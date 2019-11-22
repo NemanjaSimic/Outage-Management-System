@@ -6,6 +6,7 @@ using System.Runtime.Serialization;
 using System.Text;
 using System.Xml;
 using FTN.Common;
+using FTN.Common.GDA;
 
 namespace FTN.Services.NetworkModelService.DataModel.Core
 {

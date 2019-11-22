@@ -7,6 +7,8 @@ using System.Text;
 using System.Xml;
 using System.Reflection;
 using FTN.Common;
+using FTN.Common.GDA;
+using FTN.Common.ModelException;
 
 namespace FTN.Services.NetworkModelService.DataModel.Core
 {

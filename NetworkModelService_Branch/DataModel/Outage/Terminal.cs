@@ -6,8 +6,8 @@ using System.Runtime.Serialization;
 using System.Text;
 using System.Xml;
 using FTN.Common;
+using FTN.Common.GDA;
 using FTN.Services.NetworkModelService.DataModel.Core;
-using NMSCommon;
 
 namespace FTN.Services.NetworkModelService.DataModel.Core
 {
