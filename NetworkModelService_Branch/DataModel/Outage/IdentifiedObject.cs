@@ -6,7 +6,7 @@ using System.Runtime.Serialization;
 using System.Text;
 using System.Xml;
 using System.Reflection;
-using FTN.Common;
+using NMSCommon;
 
 namespace FTN.Services.NetworkModelService.DataModel.Core
 {
@@ -39,10 +39,13 @@ namespace FTN.Services.NetworkModelService.DataModel.Core
 		/// </summary>		
 		private string mrid = string.Empty;
 
-		/// <summary>
-		/// Description of identified object
-		/// </summary>		
-		private string aliasName = string.Empty;
+
+        /// <summary>
+        /// The description is a free human readable text describing or naming the object. It may be non unique and may not correlate to a naming hierarchy.
+        /// </summary>
+        private string description = string.Empty;
+
+		
 		
 		/// <summary>
 		/// Initializes a new instance of the IdentifiedObject class.
@@ -94,14 +97,15 @@ namespace FTN.Services.NetworkModelService.DataModel.Core
 			set { mrid = value; }
 		}
 
-		/// <summary>
-		/// Gets or sets description of the entity (identified object).
-		/// </summary>			
-		public string AliasName
-		{
-			get { return aliasName; }
-			set { aliasName = value; }
-		}		
+
+        /// <summary>
+        /// Gets or sets description of the entity (identified object).
+        /// </summary>
+        public string Description
+        {
+            get { return description; }
+            set { description = value; }
+        }
 
 		public static bool operator ==(IdentifiedObject x, IdentifiedObject y)
 		{
@@ -133,8 +137,7 @@ namespace FTN.Services.NetworkModelService.DataModel.Core
 			else
 			{
 				IdentifiedObject io = (IdentifiedObject)x;
-				return ((io.GlobalId == this.GlobalId) && (io.name == this.name) && (io.mrid == this.mrid) &&
-						(io.aliasName == this.aliasName));
+				return ((io.GlobalId == this.GlobalId) && (io.name == this.name) && (io.mrid == this.mrid));
 			}
 		}
 		
