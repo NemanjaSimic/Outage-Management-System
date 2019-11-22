@@ -3,17 +3,16 @@ using System.IO;
 using System.Text;
 using System.Windows.Forms;
 using System.Xml;
-using FTN.Common;
-using FTN.ESI.SIMES.CIM.CIMAdapter;
-using FTN.ESI.SIMES.CIM.CIMAdapter.Manager;
-using FTN.ServiceContracts;
+using Outage.Common;
+using Outage.ServiceContracts;
+using Outage.Common.GDA;
 
-namespace ModelLabsApp
+namespace Outage.ModelLabsApp
 {
 	public partial class ModelLabsAppForm : Form
 	{
-		private CIMAdapter adapter = new CIMAdapter();
-		private Delta nmsDelta = null;
+        //TODO: private CIMAdapter adapter = new CIMAdapter();
+        private Delta nmsDelta = null;
 		
         public ModelLabsAppForm()
 		{
@@ -27,12 +26,12 @@ namespace ModelLabsApp
 			buttonConvertCIM.Enabled = false;
 			buttonApplyDelta.Enabled = false;
 
-			comboBoxProfile.DataSource = Enum.GetValues(typeof(SupportedProfiles));
-			comboBoxProfile.SelectedItem = SupportedProfiles.PowerTransformer;
-			//comboBoxProfile.Enabled = false; //// other profiles are not supported
-		}
+            //TODO: comboBoxProfile.DataSource = Enum.GetValues(typeof(SupportedProfiles));
+            //TODO: comboBoxProfile.SelectedItem = SupportedProfiles.PowerTransformer;
+            //TODO: comboBoxProfile.Enabled = false; //// other profiles are not supported
+        }
 
-		private void ShowOpenCIMXMLFileDialog()
+        private void ShowOpenCIMXMLFileDialog()
 		{
 			OpenFileDialog openFileDialog = new OpenFileDialog();
 			openFileDialog.Title = "Open CIM Document File..";
@@ -68,8 +67,8 @@ namespace ModelLabsApp
 				nmsDelta = null;
 				using (FileStream fs = File.Open(textBoxCIMFile.Text, FileMode.Open))
 				{
-					nmsDelta = adapter.CreateDelta(fs, (SupportedProfiles)(comboBoxProfile.SelectedItem), out log);
-					richTextBoxReport.Text = log;
+					//TODO: nmsDelta = adapter.CreateDelta(fs, (SupportedProfiles)(comboBoxProfile.SelectedItem), out log);
+					//TODO: richTextBoxReport.Text = log;
 				}
 				if (nmsDelta != null)
 				{
@@ -98,8 +97,8 @@ namespace ModelLabsApp
             {
                 try
                 {
-                    string log = adapter.ApplyUpdates(nmsDelta);
-                    richTextBoxReport.AppendText(log);
+                    //TODO: string log = adapter.ApplyUpdates(nmsDelta);
+                    //TODO: richTextBoxReport.AppendText(log);
                     nmsDelta = null;
                     buttonApplyDelta.Enabled = (nmsDelta != null);
                 }

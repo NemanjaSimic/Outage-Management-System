@@ -7,7 +7,7 @@
     <ProjectGuid>{35679A04-DB61-4430-AD3F-65C2C2A53391}</ProjectGuid>
     <OutputType>Library</OutputType>
     <AppDesignerFolder>Properties</AppDesignerFolder>
-    <RootNamespace>CIMAdapter</RootNamespace>
+    <RootNamespace>Outage.CIMAdapter</RootNamespace>
     <AssemblyName>CIMAdapter</AssemblyName>
     <TargetFrameworkVersion>v4.7.2</TargetFrameworkVersion>
     <FileAlignment>512</FileAlignment>
@@ -41,6 +41,11 @@
     <Reference Include="System.Xml" />
   </ItemGroup>
   <ItemGroup>
+    <Compile Include="CIMAdapter.cs" />
+    <Compile Include="Importer\ImportHelper.cs" />
+    <Compile Include="Importer\OutageConverter.cs" />
+    <Compile Include="Importer\OutageImporter.cs" />
+    <Compile Include="ProfileManager.cs" />
     <Compile Include="Properties\AssemblyInfo.cs" />
   </ItemGroup>
   <Import Project="$(MSBuildToolsPath)\Microsoft.CSharp.targets" />

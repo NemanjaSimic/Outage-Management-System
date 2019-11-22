@@ -4,7 +4,7 @@ using System.Linq;
 using System.Text;
 using System.Diagnostics;
 
-namespace FTN.Common
+namespace Outage.Common
 {
 	public class CommonTrace
 	{

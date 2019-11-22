@@ -2,7 +2,7 @@ using System;
 using System.Collections.Generic;
 using System.Text;
 
-namespace FTN.Common
+namespace Outage.Common
 {
 	
 	 public enum DMSType : short

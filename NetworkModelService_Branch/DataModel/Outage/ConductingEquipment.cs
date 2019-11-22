@@ -1,5 +1,5 @@
-﻿using FTN.Common;
-using FTN.Common.GDA;
+﻿using Outage.Common;
+using Outage.Common.GDA;
 using System;
 using System.Collections.Generic;
 using System.IO;

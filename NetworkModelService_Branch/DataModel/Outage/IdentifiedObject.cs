@@ -6,8 +6,8 @@ using System.Runtime.Serialization;
 using System.Text;
 using System.Xml;
 using System.Reflection;
-using FTN.Common;
-using FTN.Common.GDA;
+using Outage.Common;
+using Outage.Common.GDA;
 
 namespace DataModel.Outage
 {

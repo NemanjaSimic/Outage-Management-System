@@ -3,7 +3,7 @@ using System.Collections.Generic;
 using System.Linq;
 using System.Text;
 
-namespace FTN.Common
+namespace Outage.Common
 {
 	public class ModelCodeHelper
 	{

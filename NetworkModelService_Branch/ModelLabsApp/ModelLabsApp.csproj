@@ -8,7 +8,7 @@
     <ProjectGuid>{3DD11384-2CC1-4EE9-9F4A-02B6FE8759C0}</ProjectGuid>
     <OutputType>WinExe</OutputType>
     <AppDesignerFolder>Properties</AppDesignerFolder>
-    <RootNamespace>ModelLabsApp</RootNamespace>
+    <RootNamespace>Outage.ModelLabsApp</RootNamespace>
     <AssemblyName>ModelLabsApp</AssemblyName>
     <TargetFrameworkVersion>v4.0</TargetFrameworkVersion>
     <TargetFrameworkProfile>Client</TargetFrameworkProfile>
@@ -98,6 +98,7 @@
     <Compile Include="Properties\Resources.Designer.cs">
       <AutoGen>True</AutoGen>
       <DependentUpon>Resources.resx</DependentUpon>
+      <DesignTime>True</DesignTime>
     </Compile>
     <None Include="App.config" />
     <None Include="Properties\Settings.settings">
@@ -111,10 +112,6 @@
     </Compile>
   </ItemGroup>
   <ItemGroup>
-    <ProjectReference Include="..\CIMAdapter\CIMAdapter.csproj">
-      <Project>{F680D34F-C148-4314-8914-B2DF3E7B17AF}</Project>
-      <Name>CIMAdapter</Name>
-    </ProjectReference>
     <ProjectReference Include="..\Common\Common.csproj">
       <Project>{892CBE15-9ED7-4540-81FA-0EAABA592138}</Project>
       <Name>Common</Name>

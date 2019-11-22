@@ -1,9 +1,9 @@
 ﻿using System.Collections.Generic;
-using FTN.Common;
+using Outage.Common;
 using System.ServiceModel;
-using FTN.Common.GDA;
+using Outage.Common.GDA;
 
-namespace FTN.ServiceContracts
+namespace Outage.ServiceContracts
 {
 	public class NetworkModelGDAProxy : ClientBase<INetworkModelGDAContract>, INetworkModelGDAContract
 	{

@@ -4,7 +4,7 @@ using System.Linq;
 using System.Text;
 using System.Runtime.Serialization;
 
-namespace FTN.Common
+namespace Outage.Common
 {
 	
 	public enum ErrorCode

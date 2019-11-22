@@ -3,10 +3,10 @@ using System.Collections.Generic;
 using System.Linq;
 using System.ServiceModel;
 using System.Text;
-using FTN.Common;
-using FTN.Common.GDA;
+using Outage.Common;
+using Outage.Common.GDA;
 
-namespace FTN.ServiceContracts
+namespace Outage.ServiceContracts
 {
 	[ServiceContract]
 	public interface INetworkModelGDAContract

@@ -8,7 +8,7 @@
 // </auto-generated>
 //------------------------------------------------------------------------------
 
-namespace FTN.ESI.SIMES.CIM.CIMProfileCreator.Properties {
+namespace Outage.ESI.SIMES.CIM.CIMProfileCreator.Properties {
     
     
     [global::System.Runtime.CompilerServices.CompilerGeneratedAttribute()]

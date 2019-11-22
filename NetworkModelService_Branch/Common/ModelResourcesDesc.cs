@@ -2,11 +2,11 @@
 using System.Collections.Generic;
 using System.Linq;
 using System.Text;
-using FTN.Common;
+using Outage.Common;
 using System.Xml;
-using FTN.Common.GDA;
+using Outage.Common.GDA;
 
-namespace FTN.Common
+namespace Outage.Common
 {	
 	public class ResourcePropertiesDesc
 	{

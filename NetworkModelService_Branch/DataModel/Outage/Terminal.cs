@@ -5,10 +5,11 @@ using System.Linq;
 using System.Runtime.Serialization;
 using System.Text;
 using System.Xml;
-using FTN.Common;
-using FTN.Common.GDA;
+using Outage.Common;
+using Outage.Common.GDA;
+using DataModel.Outage;
 
-namespace DataModel.Outage
+namespace Outage.DataModel
 {
     public class Terminal : IdentifiedObject
     {

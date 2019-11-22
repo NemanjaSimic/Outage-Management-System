@@ -1,6 +1,6 @@
 ﻿using System;
 
-namespace FTN.Common
+namespace Outage.Common
 {
     public enum AnalogMeasurementType : short
     {

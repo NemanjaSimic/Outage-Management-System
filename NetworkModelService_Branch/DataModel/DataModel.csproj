@@ -7,7 +7,7 @@
     <ProjectGuid>{274DCAF7-5FDD-46A0-97E2-91DBCA365381}</ProjectGuid>
     <OutputType>Library</OutputType>
     <AppDesignerFolder>Properties</AppDesignerFolder>
-    <RootNamespace>DataModel</RootNamespace>
+    <RootNamespace>Outage.DataModel</RootNamespace>
     <AssemblyName>DataModel</AssemblyName>
     <TargetFrameworkVersion>v4.7.2</TargetFrameworkVersion>
     <FileAlignment>512</FileAlignment>

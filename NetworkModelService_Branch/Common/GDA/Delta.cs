@@ -9,7 +9,7 @@ using System.Xml;
 using System.Xml.Serialization;
 using System.Runtime.Serialization.Formatters.Binary;
 
-namespace FTN.Common.GDA
+namespace Outage.Common.GDA
 {
 	
 	public enum DeltaOpType : byte 

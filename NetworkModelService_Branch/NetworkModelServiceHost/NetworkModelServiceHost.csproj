@@ -6,7 +6,7 @@
     <Platform Condition=" '$(Platform)' == '' ">AnyCPU</Platform>
     <ProjectGuid>{0DFE09A6-2A5D-4C50-BC03-FCC6FFE93B9A}</ProjectGuid>
     <OutputType>Exe</OutputType>
-    <RootNamespace>NetworkModelServiceHost</RootNamespace>
+    <RootNamespace>Outage.NetworkModelServiceHost</RootNamespace>
     <AssemblyName>NetworkModelServiceHost</AssemblyName>
     <TargetFrameworkVersion>v4.7.2</TargetFrameworkVersion>
     <FileAlignment>512</FileAlignment>
@@ -48,6 +48,16 @@
   </ItemGroup>
   <ItemGroup>
     <None Include="App.config" />
+  </ItemGroup>
+  <ItemGroup>
+    <ProjectReference Include="..\Common\Common.csproj">
+      <Project>{892CBE15-9ED7-4540-81FA-0EAABA592138}</Project>
+      <Name>Common</Name>
+    </ProjectReference>
+    <ProjectReference Include="..\NetworkModelService\NetworkModelService.csproj">
+      <Project>{C348D8C1-43B0-423C-A70A-374D54510830}</Project>
+      <Name>NetworkModelService</Name>
+    </ProjectReference>
   </ItemGroup>
   <Import Project="$(MSBuildToolsPath)\Microsoft.CSharp.targets" />
 </Project>

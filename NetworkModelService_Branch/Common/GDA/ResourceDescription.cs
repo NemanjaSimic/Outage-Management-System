@@ -6,7 +6,7 @@ using System.Runtime.Serialization;
 using System.Text;
 using System.Xml;
 
-namespace FTN.Common.GDA
+namespace Outage.Common.GDA
 {
 	/// <summary>
 	/// A class that describes generic model resource

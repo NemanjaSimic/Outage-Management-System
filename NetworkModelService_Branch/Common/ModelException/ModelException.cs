@@ -4,7 +4,7 @@ using System.Collections.Generic;
 using System.Text;
 using System.Runtime.Serialization;
 
-namespace FTN.Common
+namespace Outage.Common
 {
 	
 	[DataContract]

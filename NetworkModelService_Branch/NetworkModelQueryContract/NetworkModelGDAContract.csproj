@@ -8,7 +8,7 @@
     <ProjectGuid>{B726FB71-D295-41EE-9644-B2B0B1BC8911}</ProjectGuid>
     <OutputType>Library</OutputType>
     <AppDesignerFolder>Properties</AppDesignerFolder>
-    <RootNamespace>FTN.ServiceContracts</RootNamespace>
+    <RootNamespace>Outage.ServiceContracts</RootNamespace>
     <AssemblyName>FTN.ServiceContracts.ServiceContracts.NetworkModelQueryContract</AssemblyName>
     <TargetFrameworkVersion>v4.0</TargetFrameworkVersion>
     <UseHostCompilerIfAvailable>false</UseHostCompilerIfAvailable>
