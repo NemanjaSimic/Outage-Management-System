@@ -5,9 +5,8 @@ using System.Linq;
 using System.Runtime.Serialization;
 using System.Text;
 using System.Xml;
-using FTN.Services.NetworkModelService.DataModel.Core;
-using NMSCommon.GDA;
-using NMSCommon;
+using FTN.Common;
+using FTN.Common.GDA;
 
 namespace DataModel.Outage
 {

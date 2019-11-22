@@ -33,6 +33,7 @@
   <ItemGroup>
     <Reference Include="System" />
     <Reference Include="System.Core" />
+    <Reference Include="System.Runtime.Serialization" />
     <Reference Include="System.Xml.Linq" />
     <Reference Include="System.Data.DataSetExtensions" />
     <Reference Include="Microsoft.CSharp" />
@@ -41,7 +42,18 @@
     <Reference Include="System.Xml" />
   </ItemGroup>
   <ItemGroup>
+    <Compile Include="GDA\Association.cs" />
+    <Compile Include="GDA\CompareHelper.cs" />
+    <Compile Include="GDA\Delta.cs" />
+    <Compile Include="GDA\Property.cs" />
+    <Compile Include="GDA\PropertyValue.cs" />
+    <Compile Include="GDA\ResourceDescription.cs" />
+    <Compile Include="GDA\UpdateResult.cs" />
+    <Compile Include="ModelCodeHelper.cs" />
+    <Compile Include="ModelDefines.cs" />
+    <Compile Include="ModelResourcesDesc.cs" />
     <Compile Include="Properties\AssemblyInfo.cs" />
   </ItemGroup>
+  <ItemGroup />
   <Import Project="$(MSBuildToolsPath)\Microsoft.CSharp.targets" />
 </Project>

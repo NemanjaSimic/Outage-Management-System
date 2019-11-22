@@ -1,15 +1,16 @@
-﻿using NMSCommon;
-using NMSCommon.GDA;
-using System;
+﻿using System;
 using System.Collections.Generic;
 using System.IO;
 using System.Linq;
 using System.Runtime.Serialization;
 using System.Text;
 using System.Xml;
+using FTN.Common;
+using FTN.Common.GDA;
+
 
 namespace DataModel.Outage
-
+{ 
     public class Equipment : PowerSystemResource
 	{		
 		

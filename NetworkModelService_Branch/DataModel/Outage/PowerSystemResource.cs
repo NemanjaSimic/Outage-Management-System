@@ -1,11 +1,11 @@
-﻿using System;
+﻿using FTN.Common;
+using FTN.Common.GDA;
+using System;
 using System.Collections.Generic;
 using System.IO;
 using System.Linq;
 using System.Runtime.Serialization;
 using System.Text;
-using NMSCommon;
-using NMSCommon.GDA;
 
 namespace DataModel.Outage
 {

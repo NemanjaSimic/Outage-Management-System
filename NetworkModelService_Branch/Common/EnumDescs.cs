@@ -2,12 +2,11 @@
 using System.Collections.Generic;
 using System.Linq;
 using System.Text;
-using System.Threading.Tasks;
 
-namespace NMSCommon
+namespace FTN.Common
 {
-    public class EnumDescs
-    {
+	public class EnumDescs
+	{
         private Dictionary<ModelCode, Type> property2enumType = new Dictionary<ModelCode, Type>();
 
         public EnumDescs()
@@ -24,10 +23,10 @@ namespace NMSCommon
             {
                 Type type = property2enumType[propertyId];
 
-                for(int i = 0; i < Enum.GetValues(type).Length; i++)
+                for (int i = 0; i < Enum.GetValues(type).Length; i++)
                 {
                     enumList.Add(Enum.GetValues(type).GetValue(i).ToString());
-                    
+
                 }
             }
             else
