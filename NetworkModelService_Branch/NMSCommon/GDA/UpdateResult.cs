@@ -4,7 +4,7 @@ using System.Linq;
 using System.Text;
 using System.Runtime.Serialization;
 
-namespace FTN.Common
+namespace NMSCommon.GDA
 {	
 	public enum ResultType : byte
 	{

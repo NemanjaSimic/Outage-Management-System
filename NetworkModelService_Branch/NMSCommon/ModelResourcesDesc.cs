@@ -5,6 +5,7 @@ using System.Text;
 using FTN.Common;
 using System.Xml;
 using NMSCommon;
+using NMSCommon.GDA;
 
 namespace NMSCommon
 {	
@@ -877,17 +878,19 @@ namespace NMSCommon
 		private void InitializeNotSettablePropertyIds()
 		{			
 			notSettablePropertyIds.Add(ModelCode.IDOBJ_GID);
-			notSettablePropertyIds.Add(ModelCode.BASEVOLTAGE_CONDEQS);
-			notSettablePropertyIds.Add(ModelCode.LOCATION_PSRS);
-			notSettablePropertyIds.Add(ModelCode.POWERTRWINDING_TESTS);
-            notSettablePropertyIds.Add(ModelCode.POWERTR_WINDINGS);	
-		}
-	
-		# endregion Initialization of metadata
+			notSettablePropertyIds.Add(ModelCode.BASEVOLTAGE_CONDUCTINGEQUIPMENTS);
+			notSettablePropertyIds.Add(ModelCode.TERMINAL_MEASUREMENTS);
+			notSettablePropertyIds.Add(ModelCode.POWERTRANSFORMER_TRANSFORMERWINDINGS);
+            notSettablePropertyIds.Add(ModelCode.CONDUCTINGEQUIPMENT_TERMINALS);
+            notSettablePropertyIds.Add(ModelCode.TRANSFORMERWINDING_POWERTRANSFORMER);
 
-		# region Switching between enums and values
+        }
 
-		private List<ModelCode> SwitchLongsToModelCodes(List<long> longValues)
+        #endregion Initialization of metadata
+
+        #region Switching between enums and values
+
+        private List<ModelCode> SwitchLongsToModelCodes(List<long> longValues)
 		{
 			List<ModelCode> result = new List<ModelCode>();
 

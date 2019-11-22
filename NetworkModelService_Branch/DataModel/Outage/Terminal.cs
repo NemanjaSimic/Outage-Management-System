@@ -5,23 +5,20 @@ using System.Linq;
 using System.Runtime.Serialization;
 using System.Text;
 using System.Xml;
-using FTN.Common;
-using FTN.Services.NetworkModelService.DataModel.Core;
 using NMSCommon;
+using NMSCommon.GDA;
 
-namespace FTN.Services.NetworkModelService.DataModel.Core
+namespace DataModel.Outage
 {
     public class Terminal : IdentifiedObject
     {
-        private bool connected;
-
-        private PhaseCode phases;
-
-        private int sequenceNumber;
+       
 
         private long conductingEquipment;
 
-        private long connectivitiNode;
+        private long connectivityNode;
+
+        private List<long> measurements;
 
         
 
@@ -29,22 +26,6 @@ namespace FTN.Services.NetworkModelService.DataModel.Core
         {
         }
 
-
-        public bool Connected
-        {
-            get { return connected; }
-            set { connected = value; }
-        }
-        public PhaseCode Phases
-        {
-            get { return phases; }
-            set { phases = value; }
-        }
-        public int SequenceNumber
-        {
-            get { return sequenceNumber; }
-            set { sequenceNumber = value; }
-        }
 
         public long ConductingEquipment
         {
@@ -54,8 +35,14 @@ namespace FTN.Services.NetworkModelService.DataModel.Core
 
         public long ConnectivityNode
         {
-            get { return connectivitiNode; }
-            set { connectivitiNode = value; }
+            get { return connectivityNode; }
+            set { connectivityNode = value; }
+        }
+
+        public List<long> Measurements
+        {
+            get { return measurements; }
+            set { measurements = value; }
         }
 
         public override bool Equals(object obj)
@@ -63,12 +50,9 @@ namespace FTN.Services.NetworkModelService.DataModel.Core
             if (base.Equals(obj))
             {
                 Terminal x = (Terminal)obj;
-                return (x.connected == this.connected &&
-                        x.phases == this.phases &&
-                        x.sequenceNumber == this.sequenceNumber &&
-                        x.conductingEquipment == this.conductingEquipment &&
-                        x.connectivitiNode == this.connectivitiNode
-                        );
+                return (x.conductingEquipment == this.conductingEquipment &&
+                        x.connectivityNode == this.connectivityNode &&
+                        (CompareHelper.CompareLists(x.measurements, this.measurements)));
             }
             else
             {
@@ -87,11 +71,10 @@ namespace FTN.Services.NetworkModelService.DataModel.Core
         {
             switch (t)
             {
-                case ModelCode.TERMINAL_CONDUCTINGEQ:
-                case ModelCode.TERMINAL_CONNECTED:
+                case ModelCode.TERMINAL_CONDUCTINGEQUIPMENT:
+                case ModelCode.TERMINAL_MEASUREMENTS:
                 case ModelCode.TERMINAL_CONNECTIVITYNODE:
-                case ModelCode.TERMINAL_PHASES:
-                case ModelCode.TERMINAL_SEQNUMBER:
+                
                     return true;
                 default:
                     return base.HasProperty(t);
@@ -102,24 +85,16 @@ namespace FTN.Services.NetworkModelService.DataModel.Core
         {
             switch (property.Id)
             {
-                case ModelCode.TERMINAL_CONDUCTINGEQ:
+                case ModelCode.TERMINAL_CONDUCTINGEQUIPMENT:
                     property.SetValue(conductingEquipment);
                     break;
 
-                case ModelCode.TERMINAL_CONNECTED:
-                    property.SetValue(connected);
-                    break;
-
                 case ModelCode.TERMINAL_CONNECTIVITYNODE:
-                    property.SetValue(connectivitiNode);
+                    property.SetValue(connectivityNode);
                     break;
 
-                case ModelCode.TERMINAL_PHASES:
-                    property.SetValue((short)phases);
-                    break;
-
-                case ModelCode.TERMINAL_SEQNUMBER:
-                    property.SetValue(sequenceNumber);
+                case ModelCode.TERMINAL_MEASUREMENTS:
+                    property.SetValue(measurements);
                     break;
 
                 default:
@@ -132,25 +107,15 @@ namespace FTN.Services.NetworkModelService.DataModel.Core
         {
             switch (property.Id)
             {
-                case ModelCode.TERMINAL_CONDUCTINGEQ:
+                case ModelCode.CONDUCTINGEQUIPMENT:
                     conductingEquipment = property.AsReference();
                     break;
 
-                case ModelCode.TERMINAL_CONNECTED:
-                    connected = property.AsBool();
-                    break;
-
+                
                 case ModelCode.TERMINAL_CONNECTIVITYNODE:
-                    connectivitiNode = property.AsReference();
+                    connectivityNode = property.AsReference();
                     break;
 
-                case ModelCode.TERMINAL_PHASES:
-                    phases = (PhaseCode)property.AsEnum();
-                    break;
-
-                case ModelCode.TERMINAL_SEQNUMBER:
-                    sequenceNumber = property.AsInt();
-                    break;
 
                 default:
                     base.SetProperty(property);
@@ -162,21 +127,71 @@ namespace FTN.Services.NetworkModelService.DataModel.Core
 
         #region IReference implementation	
 
+        public override bool IsReferenced
+        {
+            get
+            {
+                return (measurements.Count > 0) || base.IsReferenced;
+            }
+        }
+
         public override void GetReferences(Dictionary<ModelCode, List<long>> references, TypeOfReference refType)
         {
-            if (connectivitiNode != 0 && (refType == TypeOfReference.Reference || refType == TypeOfReference.Both))
+            if (connectivityNode != 0 && (refType == TypeOfReference.Reference || refType == TypeOfReference.Both))
             {
                 references[ModelCode.TERMINAL_CONNECTIVITYNODE] = new List<long>();
-                references[ModelCode.TERMINAL_CONNECTIVITYNODE].Add(connectivitiNode);
+                references[ModelCode.TERMINAL_CONNECTIVITYNODE].Add(connectivityNode);
             }
 
             if (conductingEquipment != 0 && (refType == TypeOfReference.Reference || refType == TypeOfReference.Both))
             {
-                references[ModelCode.TERMINAL_CONDUCTINGEQ] = new List<long>();
-                references[ModelCode.TERMINAL_CONDUCTINGEQ].Add(conductingEquipment);
+                references[ModelCode.TERMINAL_CONDUCTINGEQUIPMENT] = new List<long>();
+                references[ModelCode.TERMINAL_CONDUCTINGEQUIPMENT].Add(conductingEquipment);
+            }
+
+            if (measurements != null && measurements.Count > 0 && (refType == TypeOfReference.Target || refType == TypeOfReference.Both))
+            {
+                references[ModelCode.TERMINAL_MEASUREMENTS] = measurements.GetRange(0, measurements.Count);
             }
 
             base.GetReferences(references, refType);
+        }
+
+        public override void AddReference(ModelCode referenceId, long globalId)
+        {
+            switch (referenceId)
+            {
+                case ModelCode.MEASUREMENT_TERMINAL:
+
+                    measurements.Add(globalId);
+                    break;
+
+                default:
+                    base.AddReference(referenceId, globalId);
+                    break;
+            }
+        }
+
+        public override void RemoveReference(ModelCode referenceId, long globalId)
+        {
+
+            switch (referenceId)
+            {
+                case ModelCode.MEASUREMENT_TERMINAL:
+                    if (measurements.Contains(globalId))
+                    {
+                        measurements.Remove(globalId);
+                    }
+                    else
+                    {
+                        CommonTrace.WriteTrace(CommonTrace.TraceWarning, "Entity (GID = 0x{0:x16}) doesn't contain reference 0x{1:x16}.", this.GlobalId, globalId);
+                    }
+                    break;
+
+                default:
+                    base.RemoveReference(referenceId, globalId);
+                    break;
+            }
         }
 
         #endregion IReference implementation

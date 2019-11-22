@@ -6,7 +6,7 @@ using System.Linq;
 using System.Runtime.Serialization;
 using System.Text;
 
-namespace FTN.Common
+namespace NMSCommon.GDA
 {
 	/// <summary>
 	/// An enumeration that defines property types

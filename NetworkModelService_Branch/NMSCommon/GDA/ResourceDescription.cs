@@ -6,7 +6,7 @@ using System.Runtime.Serialization;
 using System.Text;
 using System.Xml;
 
-namespace FTN.Common
+namespace NMSCommon.GDA
 {
 	/// <summary>
 	/// A class that describes generic model resource

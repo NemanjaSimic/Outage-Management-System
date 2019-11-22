@@ -7,8 +7,9 @@ using System.Text;
 using System.Xml;
 using System.Reflection;
 using NMSCommon;
+using NMSCommon.GDA;
 
-namespace FTN.Services.NetworkModelService.DataModel.Core
+namespace DataModel.Outage
 {
 	public enum TypeOfReference : short
 	{
@@ -154,7 +155,7 @@ namespace FTN.Services.NetworkModelService.DataModel.Core
 			{
 				case ModelCode.IDOBJ_GID:				
 				case ModelCode.IDOBJ_NAME:
-				case ModelCode.IDOBJ_ALIASNAME:
+				case ModelCode.IDOBJ_DESCRIPTION:
 				case ModelCode.IDOBJ_MRID:
 					return true;
 
@@ -179,8 +180,8 @@ namespace FTN.Services.NetworkModelService.DataModel.Core
 					property.SetValue(mrid);
 					break;
 
-                case ModelCode.IDOBJ_ALIASNAME:
-                    property.SetValue(aliasName);
+                case ModelCode.IDOBJ_DESCRIPTION:
+                    property.SetValue(description);
                     break;
 			
 				default:
@@ -198,8 +199,8 @@ namespace FTN.Services.NetworkModelService.DataModel.Core
 					name = property.AsString();					
 					break;
 
-				case ModelCode.IDOBJ_ALIASNAME:
-					aliasName = property.AsString();					
+				case ModelCode.IDOBJ_DESCRIPTION:
+					description = property.AsString();					
 					break;
 
 				case ModelCode.IDOBJ_MRID:					

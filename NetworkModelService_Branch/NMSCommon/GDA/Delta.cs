@@ -11,7 +11,7 @@ using System.Runtime.Serialization.Formatters.Binary;
 using NMSCommon;
 using System.Data;
 
-namespace FTN.Common
+namespace NMSCommon.GDA
 {
 	
 	public enum DeltaOpType : byte 

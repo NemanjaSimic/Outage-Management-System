@@ -8,7 +8,7 @@ using System.Text;
 using System.Xml.Serialization;
 using System.ServiceModel;
 
-namespace FTN.Common
+namespace NMSCommon.GDA
 {
     [Serializable]
     [DataContract]	

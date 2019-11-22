@@ -5,14 +5,14 @@ using System.Linq;
 using System.Runtime.Serialization;
 using System.Text;
 using System.Xml;
-using FTN.Common;
 using FTN.Services.NetworkModelService.DataModel.Core;
+using NMSCommon.GDA;
+using NMSCommon;
 
-namespace FTN.Services.NetworkModelService.DataModel.Core
+namespace DataModel.Outage
 {
     public class ConnectivityNode : IdentifiedObject
     {
-        private string description;
         private List<long> terminals = new List<long>();
 
 
@@ -20,12 +20,7 @@ namespace FTN.Services.NetworkModelService.DataModel.Core
         {
         }
 
-        public string Description
-        {
-            get { return description; }
-            set { description = value; }
-        }
-
+        
         public List<long> Terminals
         {
             get { return terminals; }
@@ -55,7 +50,6 @@ namespace FTN.Services.NetworkModelService.DataModel.Core
         {
             switch (property)
             {
-                case ModelCode.CONNECTIVITYNODE_DESCRIPTION:
                 case ModelCode.CONNECTIVITYNODE_TERMINALS:
                     return true;
 
@@ -68,9 +62,6 @@ namespace FTN.Services.NetworkModelService.DataModel.Core
         {
             switch (prop.Id)
             {
-                case ModelCode.CONNECTIVITYNODE_DESCRIPTION:
-                    prop.SetValue(description);
-                    break;
                 case ModelCode.CONNECTIVITYNODE_TERMINALS:
                     prop.SetValue(terminals);
                     break;
@@ -83,17 +74,7 @@ namespace FTN.Services.NetworkModelService.DataModel.Core
 
         public override void SetProperty(Property property)
         {
-            switch (property.Id)
-            {
-                case ModelCode.CONNECTIVITYNODE_DESCRIPTION:
-                    description = property.AsString();
-                    break;
-
-                default:
-                    base.SetProperty(property);
-                    break;
-            }
-
+            base.SetProperty(property);
         }
 
         #endregion IAccess implementation

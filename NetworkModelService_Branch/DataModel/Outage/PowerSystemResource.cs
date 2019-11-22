@@ -4,11 +4,10 @@ using System.IO;
 using System.Linq;
 using System.Runtime.Serialization;
 using System.Text;
-using FTN.Common;
+using NMSCommon;
+using NMSCommon.GDA;
 
-
-
-namespace FTN.Services.NetworkModelService.DataModel.Core
+namespace DataModel.Outage
 {
 	public class PowerSystemResource : IdentifiedObject
 	{

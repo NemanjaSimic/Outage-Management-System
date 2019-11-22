@@ -5,9 +5,10 @@ using System.Linq;
 using System.Runtime.Serialization;
 using System.Text;
 using System.Xml;
-using FTN.Common;
+using NMSCommon.GDA;
+using NMSCommon;
 
-namespace FTN.Services.NetworkModelService.DataModel.Core
+namespace DataModel.Outage
 {
 	public class ConductingEquipment : Equipment
 	{
@@ -46,7 +47,7 @@ namespace FTN.Services.NetworkModelService.DataModel.Core
 		{
 			switch (property)
 			{
-                case ModelCode.CONDEQ_TERMINALS:
+                case ModelCode.CONDUCTINGEQUIPMENT_TERMINALS:
 					return true;
 
 				default:
@@ -58,7 +59,7 @@ namespace FTN.Services.NetworkModelService.DataModel.Core
 		{
 			switch (prop.Id)
 			{
-				case ModelCode.CONDEQ_TERMINALS:
+				case ModelCode.CONDUCTINGEQUIPMENT_TERMINALS:
 					prop.SetValue(terminals);
 					break;
 
@@ -90,7 +91,7 @@ namespace FTN.Services.NetworkModelService.DataModel.Core
 		{
 			if (terminals == null && terminals.Count > 0 && (refType == TypeOfReference.Target || refType == TypeOfReference.Both))
 			{
-                references[ModelCode.CONDEQ_TERMINALS] = terminals.GetRange(0, terminals.Count);
+                references[ModelCode.CONDUCTINGEQUIPMENT_TERMINALS] = terminals.GetRange(0, terminals.Count);
 			}
 
 			base.GetReferences(references, refType);
@@ -100,7 +101,7 @@ namespace FTN.Services.NetworkModelService.DataModel.Core
         {
             switch (referenceId)
             {
-                case ModelCode.TERMINAL_CONDUCTINGEQ:
+                case ModelCode.TERMINAL_CONDUCTINGEQUIPMENT:
                     terminals.Add(globalId);
                     break;
 
@@ -114,7 +115,7 @@ namespace FTN.Services.NetworkModelService.DataModel.Core
         {
             switch (referenceId)
             {
-                case ModelCode.TERMINAL_CONDUCTINGEQ:
+                case ModelCode.TERMINAL_CONDUCTINGEQUIPMENT:
                     if (terminals.Contains(globalId))
                     {
                         terminals.Remove(globalId);

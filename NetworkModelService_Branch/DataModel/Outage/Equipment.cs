@@ -1,56 +1,30 @@
-﻿using System;
+﻿using NMSCommon;
+using NMSCommon.GDA;
+using System;
 using System.Collections.Generic;
 using System.IO;
 using System.Linq;
 using System.Runtime.Serialization;
 using System.Text;
 using System.Xml;
-using FTN.Common;
 
-namespace FTN.Services.NetworkModelService.DataModel.Core
-{
-	public class Equipment : PowerSystemResource
+namespace DataModel.Outage
+
+    public class Equipment : PowerSystemResource
 	{		
-		private bool aggregate;
-		private bool normallyInService;
+		
 						
 		public Equipment(long globalId) : base(globalId) 
 		{
 		}
 	
-		public bool Aggregate
-        {
-			get
-			{
-				return aggregate;
-			}
-
-			set
-			{
-                aggregate = value;
-			}
-		}
-
-		public bool NormallyInService
-        {
-			get 
-			{
-				return normallyInService; 
-			}
-			
-			set
-			{
-                normallyInService = value; 
-			}
-		}
+		
 
 		public override bool Equals(object obj)
 		{
-			if (base.Equals(obj))
+			if (base.Equals(obj)) //in case we add new props
 			{
-				Equipment x = (Equipment)obj;
-				return ((x.aggregate == this.aggregate) &&
-						(x.normallyInService == this.normallyInService));
+                return true;
 			}
 			else
 			{
@@ -67,12 +41,12 @@ namespace FTN.Services.NetworkModelService.DataModel.Core
 
 		public override bool HasProperty(ModelCode property)
 		{
-			switch (property)
-			{
-				case ModelCode.EQUIPMENT_AGGREGATE:
-				case ModelCode.EQUIPMENT_NORMALLYINSERVICE:
+			switch (property) //in case we add new props
+            {
+				//case ModelCode.EQUIPMENT_AGGREGATE:
+				//case ModelCode.EQUIPMENT_NORMALLYINSERVICE:
 		
-					return true;
+				//	return true;
 				default:
 					return base.HasProperty(property);
 			}
@@ -80,15 +54,15 @@ namespace FTN.Services.NetworkModelService.DataModel.Core
 
 		public override void GetProperty(Property property)
 		{
-			switch (property.Id)
-			{
-				case ModelCode.EQUIPMENT_AGGREGATE:
-					property.SetValue(aggregate);
-					break;
+			switch (property.Id) //in case we add new props
+            {
+				//case ModelCode.EQUIPMENT_AGGREGATE:
+				//	property.SetValue(aggregate);
+				//	break;
 
-				case ModelCode.EQUIPMENT_NORMALLYINSERVICE:
-					property.SetValue(normallyInService);
-					break;			
+				//case ModelCode.EQUIPMENT_NORMALLYINSERVICE:
+				//	property.SetValue(normallyInService);
+				//	break;			
 
 				default:
 					base.GetProperty(property);
@@ -98,15 +72,15 @@ namespace FTN.Services.NetworkModelService.DataModel.Core
 
 		public override void SetProperty(Property property)
 		{
-			switch (property.Id)
-			{
-				case ModelCode.EQUIPMENT_AGGREGATE:					
-					aggregate = property.AsBool();
-					break;
+			switch (property.Id) //in case we add new props
+            {
+				//case ModelCode.EQUIPMENT_AGGREGATE:					
+				//	aggregate = property.AsBool();
+				//	break;
 
-				case ModelCode.EQUIPMENT_NORMALLYINSERVICE:
-					normallyInService = property.AsBool();
-					break;
+				//case ModelCode.EQUIPMENT_NORMALLYINSERVICE:
+				//	normallyInService = property.AsBool();
+				//	break;
 			
 				default:
 					base.SetProperty(property);
