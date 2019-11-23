@@ -15,6 +15,11 @@ namespace DataModel.Outage
 	{
         private List<long> terminals = new List<long>();
 
+        private long baseVoltage;
+
+        
+
+
         public ConductingEquipment(long globalId) : base(globalId) 
 		{
 		}
@@ -25,11 +30,19 @@ namespace DataModel.Outage
             set { terminals = value; }
         }
 
+        public long BaseVoltage
+        {
+            get { return baseVoltage; }
+            set { baseVoltage = value; }
+        }
+
         public override bool Equals(object obj)
 		{
             if (base.Equals(obj))
             {
-                return CompareHelper.CompareLists(((ConductingEquipment)obj).terminals, this.terminals, true);
+                ConductingEquipment x = (ConductingEquipment)obj;
+                return (CompareHelper.CompareLists(x.terminals, this.terminals, true) &&
+                        x.baseVoltage == this.baseVoltage);
             }
             else
             {
@@ -49,6 +62,7 @@ namespace DataModel.Outage
 			switch (property)
 			{
                 case ModelCode.CONDUCTINGEQUIPMENT_TERMINALS:
+                case ModelCode.CONDUCTINGEQUIPMENT_BASEVOLTAGE:
 					return true;
 
 				default:
@@ -63,7 +77,9 @@ namespace DataModel.Outage
 				case ModelCode.CONDUCTINGEQUIPMENT_TERMINALS:
 					prop.SetValue(terminals);
 					break;
-
+                case ModelCode.CONDUCTINGEQUIPMENT_BASEVOLTAGE:
+                    prop.SetValue(baseVoltage);
+                    break;
 				default:
 					base.GetProperty(prop);
 					break;
@@ -72,7 +88,15 @@ namespace DataModel.Outage
 
 		public override void SetProperty(Property property)
 		{
-            base.SetProperty(property);
+            switch (property.Id)
+            {
+                case ModelCode.CONDUCTINGEQUIPMENT_BASEVOLTAGE:
+                    baseVoltage = property.AsReference();
+                    break;
+                default:
+                    base.SetProperty(property);
+                    break;
+            }
             
 		}
 
@@ -94,6 +118,12 @@ namespace DataModel.Outage
 			{
                 references[ModelCode.CONDUCTINGEQUIPMENT_TERMINALS] = terminals.GetRange(0, terminals.Count);
 			}
+
+            if (baseVoltage != 0 && (refType == TypeOfReference.Reference || refType == TypeOfReference.Both))
+            {
+                references[ModelCode.CONDUCTINGEQUIPMENT_BASEVOLTAGE] = new List<long>();
+                references[ModelCode.CONDUCTINGEQUIPMENT_BASEVOLTAGE].Add(baseVoltage);
+            }
 
 			base.GetReferences(references, refType);
 		}

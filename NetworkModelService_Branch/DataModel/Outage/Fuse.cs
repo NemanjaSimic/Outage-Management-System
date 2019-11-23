@@ -8,12 +8,11 @@ using System.Threading.Tasks;
 
 namespace DataModel.Outage
 {
-    public class EnergySource : ConductingEquipment
+    public class Fuse : Switch
     {
-        public EnergySource(long globalId) : base(globalId)
+        public Fuse(long globalId) : base(globalId)
         {
         }
-
 
         public override bool Equals(object obj)
         {

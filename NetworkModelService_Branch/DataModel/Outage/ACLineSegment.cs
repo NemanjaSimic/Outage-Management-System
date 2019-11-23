@@ -8,13 +8,11 @@ using System.Threading.Tasks;
 
 namespace DataModel.Outage
 {
-    public class EnergySource : ConductingEquipment
+    public class ACLineSegment : Conductor
     {
-        public EnergySource(long globalId) : base(globalId)
+        public ACLineSegment(long globalId) : base(globalId)
         {
         }
-
-
         public override bool Equals(object obj)
         {
             if (base.Equals(obj)) //in case we add new props

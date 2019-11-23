@@ -4,11 +4,11 @@
   <PropertyGroup>
     <Configuration Condition=" '$(Configuration)' == '' ">Debug</Configuration>
     <Platform Condition=" '$(Platform)' == '' ">AnyCPU</Platform>
-    <ProjectGuid>{274DCAF7-5FDD-46A0-97E2-91DBCA365381}</ProjectGuid>
+    <ProjectGuid>{E71504E5-F722-4937-842F-2309AC37FA13}</ProjectGuid>
     <OutputType>Library</OutputType>
     <AppDesignerFolder>Properties</AppDesignerFolder>
-    <RootNamespace>DataModel</RootNamespace>
-    <AssemblyName>DataModel</AssemblyName>
+    <RootNamespace>NMSCommon</RootNamespace>
+    <AssemblyName>NMSCommon</AssemblyName>
     <TargetFrameworkVersion>v4.7.2</TargetFrameworkVersion>
     <FileAlignment>512</FileAlignment>
     <Deterministic>true</Deterministic>
@@ -33,6 +33,7 @@
   <ItemGroup>
     <Reference Include="System" />
     <Reference Include="System.Core" />
+    <Reference Include="System.Runtime.Serialization" />
     <Reference Include="System.Xml.Linq" />
     <Reference Include="System.Data.DataSetExtensions" />
     <Reference Include="Microsoft.CSharp" />
@@ -41,24 +42,15 @@
     <Reference Include="System.Xml" />
   </ItemGroup>
   <ItemGroup>
-    <Compile Include="Outage\BaseVoltage.cs" />
-    <Compile Include="Outage\ConductingEquipment.cs" />
-    <Compile Include="Outage\ConnectivityNode.cs" />
-    <Compile Include="Outage\EnergyConsumer.cs" />
-    <Compile Include="Outage\EnergySource.cs" />
-    <Compile Include="Outage\Equipment.cs" />
-    <Compile Include="Outage\IdentifiedObject.cs" />
-    <Compile Include="Outage\PowerSystemResource.cs" />
-    <Compile Include="Outage\PowerTransformer.cs" />
-    <Compile Include="Outage\Terminal.cs" />
-    <Compile Include="Outage\TransformerWinding.cs" />
+    <Compile Include="GDA\Association.cs" />
+    <Compile Include="GDA\CompareHelper.cs" />
+    <Compile Include="GDA\Delta.cs" />
+    <Compile Include="GDA\Property.cs" />
+    <Compile Include="GDA\PropertyValue.cs" />
+    <Compile Include="GDA\ResourceDescription.cs" />
+    <Compile Include="GDA\UpdateResult.cs" />
+    <Compile Include="ModelDefines.cs" />
     <Compile Include="Properties\AssemblyInfo.cs" />
-  </ItemGroup>
-  <ItemGroup>
-    <ProjectReference Include="..\Common\Common.csproj">
-      <Project>{892CBE15-9ED7-4540-81FA-0EAABA592138}</Project>
-      <Name>Common</Name>
-    </ProjectReference>
   </ItemGroup>
   <Import Project="$(MSBuildToolsPath)\Microsoft.CSharp.targets" />
 </Project>
