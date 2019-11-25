@@ -35,8 +35,10 @@ namespace Outage.NetworkModelService
 
         private void InitializeHosts()
         {
-            hosts = new List<ServiceHost>();
-            hosts.Add(new ServiceHost(typeof(GenericDataAccess)));
+            hosts = new List<ServiceHost>
+            {
+                new ServiceHost(typeof(GenericDataAccess))
+            };
         }
 
         private void StartHosts()
