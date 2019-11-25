@@ -884,13 +884,14 @@ namespace Outage.Common
 		}
 
 		private void InitializeNotSettablePropertyIds()
-		{
-            //TODO:
-            //notSettablePropertyIds.Add(ModelCode.IDOBJ_GID);
-			//notSettablePropertyIds.Add(ModelCode.CONNECTNODE_TERMINALS);
-			//notSettablePropertyIds.Add(ModelCode.CONNECTNODECONTAINER_CONNECTNODES);
-			//notSettablePropertyIds.Add(ModelCode.CONDEQUIP_TERMINALS);
-		}
+        { 
+            notSettablePropertyIds.Add(ModelCode.IDOBJ_GID);
+            notSettablePropertyIds.Add(ModelCode.BASEVOLTAGE_CONDUCTINGEQUIPMENTS);
+            notSettablePropertyIds.Add(ModelCode.TERMINAL_MEASUREMENTS);
+            notSettablePropertyIds.Add(ModelCode.POWERTRANSFORMER_TRANSFORMERWINDINGS);
+            notSettablePropertyIds.Add(ModelCode.CONDUCTINGEQUIPMENT_TERMINALS);
+            notSettablePropertyIds.Add(ModelCode.TRANSFORMERWINDING_POWERTRANSFORMER);
+        }
 	
 		# endregion Initialization of metadata
 
