@@ -873,15 +873,25 @@ namespace Outage.Common
 		# region Initialization of metadata
 
 		private void InitializeTypeIdsInInsertOrder()
-		{			
-            //TODO:
-			//typeIdsInInsertOrder.Add(ModelCode.CONNECTNODECONTAINER);
-			//typeIdsInInsertOrder.Add(ModelCode.CONNECTNODE);
-			//typeIdsInInsertOrder.Add(ModelCode.ACLINESEG);
-			//typeIdsInInsertOrder.Add(ModelCode.DCLINESEG);
-			//typeIdsInInsertOrder.Add(ModelCode.SERIESCOMPENSATOR);
-			//typeIdsInInsertOrder.Add(ModelCode.TERMINAL);
-		}
+		{
+            
+            typeIdsInInsertOrder.Add(ModelCode.POWERTRANSFORMER);
+            typeIdsInInsertOrder.Add(ModelCode.TRANSFORMERWINDING);
+            typeIdsInInsertOrder.Add(ModelCode.BASEVOLTAGE);
+            typeIdsInInsertOrder.Add(ModelCode.ENERGYSOURCE);
+            typeIdsInInsertOrder.Add(ModelCode.ENERGYCONSUMER);
+            typeIdsInInsertOrder.Add(ModelCode.FUSE);
+            typeIdsInInsertOrder.Add(ModelCode.DISCONNECTOR);
+            typeIdsInInsertOrder.Add(ModelCode.BREAKER);
+            typeIdsInInsertOrder.Add(ModelCode.LOADBREAKSWITCH);
+            typeIdsInInsertOrder.Add(ModelCode.ACLINESEGMENT);
+            typeIdsInInsertOrder.Add(ModelCode.CONNECTIVITYNODE);
+            typeIdsInInsertOrder.Add(ModelCode.TERMINAL);
+            typeIdsInInsertOrder.Add(ModelCode.DISCRETE);
+            typeIdsInInsertOrder.Add(ModelCode.ANALOG);
+            
+
+        }
 
 		private void InitializeNotSettablePropertyIds()
         { 
