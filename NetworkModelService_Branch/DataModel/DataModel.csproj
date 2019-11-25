@@ -7,7 +7,7 @@
     <ProjectGuid>{274DCAF7-5FDD-46A0-97E2-91DBCA365381}</ProjectGuid>
     <OutputType>Library</OutputType>
     <AppDesignerFolder>Properties</AppDesignerFolder>
-    <RootNamespace>DataModel</RootNamespace>
+    <RootNamespace>Outage.DataModel</RootNamespace>
     <AssemblyName>DataModel</AssemblyName>
     <TargetFrameworkVersion>v4.7.2</TargetFrameworkVersion>
     <FileAlignment>512</FileAlignment>
@@ -41,15 +41,26 @@
     <Reference Include="System.Xml" />
   </ItemGroup>
   <ItemGroup>
+    <Compile Include="Outage\ACLineSegment.cs" />
+    <Compile Include="Outage\Analog.cs" />
     <Compile Include="Outage\BaseVoltage.cs" />
+    <Compile Include="Outage\Breaker.cs" />
     <Compile Include="Outage\ConductingEquipment.cs" />
+    <Compile Include="Outage\Conductor.cs" />
     <Compile Include="Outage\ConnectivityNode.cs" />
+    <Compile Include="Outage\Disconnector.cs" />
+    <Compile Include="Outage\Discrete.cs" />
     <Compile Include="Outage\EnergyConsumer.cs" />
     <Compile Include="Outage\EnergySource.cs" />
     <Compile Include="Outage\Equipment.cs" />
+    <Compile Include="Outage\Fuse.cs" />
     <Compile Include="Outage\IdentifiedObject.cs" />
+    <Compile Include="Outage\LoadBreakSwitch.cs" />
+    <Compile Include="Outage\Measurement.cs" />
     <Compile Include="Outage\PowerSystemResource.cs" />
     <Compile Include="Outage\PowerTransformer.cs" />
+    <Compile Include="Outage\ProtectedSwitch.cs" />
+    <Compile Include="Outage\Switch.cs" />
     <Compile Include="Outage\Terminal.cs" />
     <Compile Include="Outage\TransformerWinding.cs" />
     <Compile Include="Properties\AssemblyInfo.cs" />

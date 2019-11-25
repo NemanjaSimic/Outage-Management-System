@@ -6,7 +6,7 @@ using System.Threading.Tasks;
 using Outage.Common;
 using Outage.Common.GDA;
 
-namespace DataModel.Outage
+namespace Outage.DataModel
 {
     public class Measurement : IdentifiedObject
     {

@@ -1,6 +1,6 @@
-﻿using DataModel.Outage;
-using Outage.Common;
+﻿using Outage.Common;
 using Outage.Common.GDA;
+using Outage.DataModel;
 using Outage.NetworkModelService.GDA;
 using System;
 using System.Collections.Generic;

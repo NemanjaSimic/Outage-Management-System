@@ -7,7 +7,7 @@ using System.Linq;
 using System.Runtime.Serialization;
 using System.Text;
 
-namespace DataModel.Outage
+namespace Outage.DataModel
 {
 	public class PowerSystemResource : IdentifiedObject
 	{

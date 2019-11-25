@@ -8,7 +8,7 @@ using System.Xml;
 using Outage.Common;
 using Outage.Common.GDA;
 
-namespace DataModel.Outage
+namespace Outage.DataModel
 {
     public class ConnectivityNode : IdentifiedObject
     {

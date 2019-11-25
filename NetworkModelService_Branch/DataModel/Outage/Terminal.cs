@@ -7,7 +7,6 @@ using System.Text;
 using System.Xml;
 using Outage.Common;
 using Outage.Common.GDA;
-using DataModel.Outage;
 
 namespace Outage.DataModel
 {

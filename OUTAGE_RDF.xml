@@ -1,0 +1,434 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<rdf:RDF	xmlns:rdf="http://www.w3.org/1999/02/22-rdf-syntax-ns#"
+			xmlns:cim="http://iec.ch/TC57/2010/CIM-schema-cim15#"
+			xmlns:ftn="http://www.ftnydro.com/CIM15/2010/extension#">
+	
+	
+<!--[ Package_Core ]-->
+	<!--BaseVoltage-->
+	<!--
+	<cim:BaseVoltage rdf:ID=" ">
+		<cim:BaseVoltage.nominalVoltage> </cim:BaseVoltage.nominalVoltage>
+		<cim:IdentifiedObject.description> </cim:IdentifiedObject.description>
+		<cim:IdentifiedObject.mRID> </cim:IdentifiedObject.mRID>
+		<ftn:IdentifiedObject.name> </ftn:IdentifiedObject.name>
+	</cim:BaseVoltage>
+	-->
+	<cim:BaseVoltage rdf:ID="BV_1">
+		<cim:BaseVoltage.nominalVoltage>1100</cim:BaseVoltage.nominalVoltage>
+		<cim:IdentifiedObject.description>BaseVoltage1</cim:IdentifiedObject.description>
+		<cim:IdentifiedObject.mRID>BV_1</cim:IdentifiedObject.mRID>
+		<ftn:IdentifiedObject.name>BV_1</ftn:IdentifiedObject.name>
+	</cim:BaseVoltage>
+	<cim:BaseVoltage rdf:ID="BV_2">
+		<cim:BaseVoltage.nominalVoltage>220</cim:BaseVoltage.nominalVoltage>
+		<cim:IdentifiedObject.description>BaseVoltage2</cim:IdentifiedObject.description>
+		<cim:IdentifiedObject.mRID>BV_2</cim:IdentifiedObject.mRID>
+		<ftn:IdentifiedObject.name>BV_2</ftn:IdentifiedObject.name>
+	</cim:BaseVoltage>
+	<!--END BaseVoltage-->
+	
+	
+	<!--Terminal-->
+	<!--
+	<cim:Terminal rdf:ID=" ">
+		<cim:Terminal.ConductingEquipment rdf:resource="#"/>
+		<cim:Terminal.ConnectivityNode rdf:resource="#"/>
+		<cim:IdentifiedObject.description> </cim:IdentifiedObject.description>
+		<cim:IdentifiedObject.mRID> </cim:IdentifiedObject.mRID>
+		<ftn:IdentifiedObject.name> </ftn:IdentifiedObject.name>
+	</cim:Terminal>
+	-->
+	<cim:Terminal rdf:ID="TR_1">
+		<cim:Terminal.ConductingEquipment rdf:resource="#ES_1"/>
+		<cim:Terminal.ConnectivityNode rdf:resource="#CN_1"/>
+		<cim:IdentifiedObject.description>Terminal1</cim:IdentifiedObject.description>
+		<cim:IdentifiedObject.mRID>TR_1</cim:IdentifiedObject.mRID>
+		<ftn:IdentifiedObject.name>TR_1</ftn:IdentifiedObject.name>
+	</cim:Terminal>
+	<cim:Terminal rdf:ID="TR_2">
+		<cim:Terminal.ConductingEquipment rdf:resource="#ACL_1"/>
+		<cim:Terminal.ConnectivityNode rdf:resource="#CN_1"/>
+		<cim:IdentifiedObject.description>Terminal2</cim:IdentifiedObject.description>
+		<cim:IdentifiedObject.mRID>TR_2</cim:IdentifiedObject.mRID>
+		<ftn:IdentifiedObject.name>TR_2</ftn:IdentifiedObject.name>
+	</cim:Terminal>
+	<cim:Terminal rdf:ID="TR_3">
+		<cim:Terminal.ConductingEquipment rdf:resource="#ACL_1"/>
+		<cim:Terminal.ConnectivityNode rdf:resource="#CN_2"/>
+		<cim:IdentifiedObject.description>Terminal3</cim:IdentifiedObject.description>
+		<cim:IdentifiedObject.mRID>TR_3</cim:IdentifiedObject.mRID>
+		<ftn:IdentifiedObject.name>TR_3</ftn:IdentifiedObject.name>
+	</cim:Terminal>
+	<cim:Terminal rdf:ID="TR_4">
+		<cim:Terminal.ConductingEquipment rdf:resource="#DIS_1"/>
+		<cim:Terminal.ConnectivityNode rdf:resource="#CN_2"/>
+		<cim:IdentifiedObject.description>Terminal4</cim:IdentifiedObject.description>
+		<cim:IdentifiedObject.mRID>TR_4</cim:IdentifiedObject.mRID>
+		<ftn:IdentifiedObject.name>TR_4</ftn:IdentifiedObject.name>
+	</cim:Terminal>
+	<cim:Terminal rdf:ID="TR_5">
+		<cim:Terminal.ConductingEquipment rdf:resource="#DIS_1"/>
+		<cim:Terminal.ConnectivityNode rdf:resource="#CN_3"/>
+		<cim:IdentifiedObject.description>Terminal5</cim:IdentifiedObject.description>
+		<cim:IdentifiedObject.mRID>TR_5</cim:IdentifiedObject.mRID>
+		<ftn:IdentifiedObject.name>TR_5</ftn:IdentifiedObject.name>
+	</cim:Terminal>
+	<cim:Terminal rdf:ID="TR_6">
+		<cim:Terminal.ConductingEquipment rdf:resource="#ACL_2"/>
+		<cim:Terminal.ConnectivityNode rdf:resource="#CN_3"/>
+		<cim:IdentifiedObject.description>Terminal6</cim:IdentifiedObject.description>
+		<cim:IdentifiedObject.mRID>TR_6</cim:IdentifiedObject.mRID>
+		<ftn:IdentifiedObject.name>TR_6</ftn:IdentifiedObject.name>
+	</cim:Terminal>
+	<cim:Terminal rdf:ID="TR_7">
+		<cim:Terminal.ConductingEquipment rdf:resource="#ACL_2"/>
+		<cim:Terminal.ConnectivityNode rdf:resource="#CN_4"/>
+		<cim:IdentifiedObject.description>Terminal7</cim:IdentifiedObject.description>
+		<cim:IdentifiedObject.mRID>TR_7</cim:IdentifiedObject.mRID>
+		<ftn:IdentifiedObject.name>TR_7</ftn:IdentifiedObject.name>
+	</cim:Terminal>
+	<cim:Terminal rdf:ID="TR_8">
+		<cim:Terminal.ConductingEquipment rdf:resource="#LBS_1"/>
+		<cim:Terminal.ConnectivityNode rdf:resource="#CN_4"/>
+		<cim:IdentifiedObject.description>Terminal8</cim:IdentifiedObject.description>
+		<cim:IdentifiedObject.mRID>TR_8</cim:IdentifiedObject.mRID>
+		<ftn:IdentifiedObject.name>TR_8</ftn:IdentifiedObject.name>
+	</cim:Terminal>
+	<cim:Terminal rdf:ID="TR_9">
+		<cim:Terminal.ConductingEquipment rdf:resource="#LBS_1"/>
+		<cim:Terminal.ConnectivityNode rdf:resource="#CN_5"/>
+		<cim:IdentifiedObject.description>Terminal9</cim:IdentifiedObject.description>
+		<cim:IdentifiedObject.mRID>TR_9</cim:IdentifiedObject.mRID>
+		<ftn:IdentifiedObject.name>TR_9</ftn:IdentifiedObject.name>
+	</cim:Terminal>
+	<cim:Terminal rdf:ID="TR_10">
+		<cim:Terminal.ConductingEquipment rdf:resource="#ACL_3"/>
+		<cim:Terminal.ConnectivityNode rdf:resource="#CN_5"/>
+		<cim:IdentifiedObject.description>Terminal10</cim:IdentifiedObject.description>
+		<cim:IdentifiedObject.mRID>TR_10</cim:IdentifiedObject.mRID>
+		<ftn:IdentifiedObject.name>TR_10</ftn:IdentifiedObject.name>
+	</cim:Terminal>
+	<cim:Terminal rdf:ID="TR_11">
+		<cim:Terminal.ConductingEquipment rdf:resource="#ACL_3"/>
+		<cim:Terminal.ConnectivityNode rdf:resource="#CN_6"/>
+		<cim:IdentifiedObject.description>Terminal11</cim:IdentifiedObject.description>
+		<cim:IdentifiedObject.mRID>TR_11</cim:IdentifiedObject.mRID>
+		<ftn:IdentifiedObject.name>TR_11</ftn:IdentifiedObject.name>
+	</cim:Terminal>
+	<cim:Terminal rdf:ID="TR_12">
+		<cim:Terminal.ConductingEquipment rdf:resource="#DIS_2"/>
+		<cim:Terminal.ConnectivityNode rdf:resource="#CN_6"/>
+		<cim:IdentifiedObject.description>Terminal12</cim:IdentifiedObject.description>
+		<cim:IdentifiedObject.mRID>TR_12</cim:IdentifiedObject.mRID>
+		<ftn:IdentifiedObject.name>TR_12</ftn:IdentifiedObject.name>
+	</cim:Terminal>
+	<cim:Terminal rdf:ID="TR_13">
+		<cim:Terminal.ConductingEquipment rdf:resource="#DIS_2"/>
+		<cim:Terminal.ConnectivityNode rdf:resource="#CN_7"/>
+		<cim:IdentifiedObject.description>Terminal13</cim:IdentifiedObject.description>
+		<cim:IdentifiedObject.mRID>TR_13</cim:IdentifiedObject.mRID>
+		<ftn:IdentifiedObject.name>TR_13</ftn:IdentifiedObject.name>
+	</cim:Terminal>
+	<cim:Terminal rdf:ID="TR_14">
+		<cim:Terminal.ConductingEquipment rdf:resource="#ACL_4"/>
+		<cim:Terminal.ConnectivityNode rdf:resource="#CN_7"/>
+		<cim:IdentifiedObject.description>Terminal14</cim:IdentifiedObject.description>
+		<cim:IdentifiedObject.mRID>TR_14</cim:IdentifiedObject.mRID>
+		<ftn:IdentifiedObject.name>TR_14</ftn:IdentifiedObject.name>
+	</cim:Terminal>
+	<cim:Terminal rdf:ID="TR_15">
+		<cim:Terminal.ConductingEquipment rdf:resource="#ACL_4"/>
+		<cim:Terminal.ConnectivityNode rdf:resource="#CN_8"/>
+		<cim:IdentifiedObject.description>Terminal15</cim:IdentifiedObject.description>
+		<cim:IdentifiedObject.mRID>TR_15</cim:IdentifiedObject.mRID>
+		<ftn:IdentifiedObject.name>TR_15</ftn:IdentifiedObject.name>
+	</cim:Terminal>
+	<cim:Terminal rdf:ID="TR_16">
+		<cim:Terminal.ConductingEquipment rdf:resource="#PT_1"/>
+		<cim:Terminal.ConnectivityNode rdf:resource="#CN_8"/>
+		<cim:IdentifiedObject.description>Terminal16</cim:IdentifiedObject.description>
+		<cim:IdentifiedObject.mRID>TR_16</cim:IdentifiedObject.mRID>
+		<ftn:IdentifiedObject.name>TR_16</ftn:IdentifiedObject.name>
+	</cim:Terminal>
+	<!--END Terminal-->
+<!--[END Package_Core ]-->
+	
+	
+	
+<!--[ Package_Wires ]-->
+	<!--ACLineSegment-->
+	<!--
+	<cim:ACLineSegment rdf:ID=" ">
+		<cim:ConductingEquipment.BaseVoltage rdf:resource="#"/>
+		<cim:IdentifiedObject.description> </cim:IdentifiedObject.description>
+		<cim:IdentifiedObject.mRID> </cim:IdentifiedObject.mRID>
+		<ftn:IdentifiedObject.name> </ftn:IdentifiedObject.name>
+	</cim:ACLineSegment>
+	-->
+	<cim:ACLineSegment rdf:ID="ACL_1">
+		<cim:ConductingEquipment.BaseVoltage rdf:resource="#BV_1"/>
+		<cim:IdentifiedObject.description>ACLineSegment1</cim:IdentifiedObject.description>
+		<cim:IdentifiedObject.mRID>ACL_1</cim:IdentifiedObject.mRID>
+		<ftn:IdentifiedObject.name>ACL_1</ftn:IdentifiedObject.name>
+	</cim:ACLineSegment>
+	<cim:ACLineSegment rdf:ID="ACL_2">
+		<cim:ConductingEquipment.BaseVoltage rdf:resource="#BV_1"/>
+		<cim:IdentifiedObject.description>ACLineSegment2</cim:IdentifiedObject.description>
+		<cim:IdentifiedObject.mRID>ACL_2</cim:IdentifiedObject.mRID>
+		<ftn:IdentifiedObject.name>ACL_2</ftn:IdentifiedObject.name>
+	</cim:ACLineSegment>
+	<cim:ACLineSegment rdf:ID="ACL_3">
+		<cim:ConductingEquipment.BaseVoltage rdf:resource="#BV_1"/>
+		<cim:IdentifiedObject.description>ACLineSegment3</cim:IdentifiedObject.description>
+		<cim:IdentifiedObject.mRID>ACL_3</cim:IdentifiedObject.mRID>
+		<ftn:IdentifiedObject.name>ACL_3</ftn:IdentifiedObject.name>
+	</cim:ACLineSegment>
+	<cim:ACLineSegment rdf:ID="ACL_4">
+		<cim:ConductingEquipment.BaseVoltage rdf:resource="#BV_1"/>
+		<cim:IdentifiedObject.description>ACLineSegment4</cim:IdentifiedObject.description>
+		<cim:IdentifiedObject.mRID>ACL_4</cim:IdentifiedObject.mRID>
+		<ftn:IdentifiedObject.name>ACL_4</ftn:IdentifiedObject.name>
+	</cim:ACLineSegment>
+	<!--END ACLineSegment-->
+	
+	
+	<!--Breaker-->
+	<!--	
+	<cim:Breaker rdf:ID=" ">
+		<tdms:Breaker.noReclosing> </tdms:Breaker.noReclosing>
+		<cim:ConductingEquipment.BaseVoltage rdf:resource="#"/>
+		<cim:IdentifiedObject.description> </cim:IdentifiedObject.description>
+		<cim:IdentifiedObject.mRID> </cim:IdentifiedObject.mRID>
+		<ftn:IdentifiedObject.name> </ftn:IdentifiedObject.name>
+	</cim:Breaker>
+	-->
+	<!--END Breaker-->
+	
+	
+	<!--Disconnector-->
+	<!--
+	<cim:Disconnector rdf:ID=" ">
+		<cim:ConductingEquipment.BaseVoltage rdf:resource="#"/>
+		<cim:IdentifiedObject.description> </cim:IdentifiedObject.description>
+		<cim:IdentifiedObject.mRID> </cim:IdentifiedObject.mRID>
+		<ftn:IdentifiedObject.name> </ftn:IdentifiedObject.name>
+	</cim:Disconnector>
+	-->
+	<cim:Disconnector rdf:ID="DIS_1">
+		<cim:ConductingEquipment.BaseVoltage rdf:resource="#BV_1"/>
+		<cim:IdentifiedObject.description>Disconnector1</cim:IdentifiedObject.description>
+		<cim:IdentifiedObject.mRID>DIS_1</cim:IdentifiedObject.mRID>
+		<ftn:IdentifiedObject.name>DIS_1</ftn:IdentifiedObject.name>
+	</cim:Disconnector>
+	<cim:Disconnector rdf:ID="DIS_2">
+		<cim:ConductingEquipment.BaseVoltage rdf:resource="#BV_1"/>
+		<cim:IdentifiedObject.description>Disconnector2</cim:IdentifiedObject.description>
+		<cim:IdentifiedObject.mRID>DIS_2</cim:IdentifiedObject.mRID>
+		<ftn:IdentifiedObject.name>DIS_2</ftn:IdentifiedObject.name>
+	</cim:Disconnector>
+	<!--END Disconnector-->
+	
+	
+	<!--EnergyConsumer-->
+	<!--	
+	<cim:EnergyConsumer rdf:ID=" ">
+		<cim:ConductingEquipment.BaseVoltage rdf:resource="#"/>
+		<cim:IdentifiedObject.description> </cim:IdentifiedObject.description>
+		<cim:IdentifiedObject.mRID> </cim:IdentifiedObject.mRID>
+		<ftn:IdentifiedObject.name> </ftn:IdentifiedObject.name>
+	</cim:EnergyConsumer>
+	-->
+
+	<!--END EnergyConsumer-->
+	
+	
+	<!--EnergySource-->
+	<!--	
+	<cim:EnergySource rdf:ID=" ">
+		<cim:ConductingEquipment.BaseVoltage rdf:resource="#"/>
+		<cim:IdentifiedObject.description> </cim:IdentifiedObject.description>
+		<cim:IdentifiedObject.mRID> </cim:IdentifiedObject.mRID>
+		<ftn:IdentifiedObject.name> </ftn:IdentifiedObject.name>
+	</cim:EnergySource>
+	-->
+	<cim:EnergySource rdf:ID="ES_1">
+		<cim:ConductingEquipment.BaseVoltage rdf:resource="#BV_1"/>
+		<cim:IdentifiedObject.description>EnergySource1</cim:IdentifiedObject.description>
+		<cim:IdentifiedObject.mRID>ES_1</cim:IdentifiedObject.mRID>
+		<ftn:IdentifiedObject.name>ES_1</ftn:IdentifiedObject.name>
+	</cim:EnergySource>
+	<!--END EnergySource-->
+
+
+	<!--Fuse-->
+	<!--
+	<cim:Fuse rdf:ID=" ">
+		<cim:ConductingEquipment.BaseVoltage rdf:resource="#"/>
+		<cim:IdentifiedObject.description> </cim:IdentifiedObject.description>
+		<cim:IdentifiedObject.mRID> </cim:IdentifiedObject.mRID>
+		<ftn:IdentifiedObject.name> </ftn:IdentifiedObject.name>
+	</cim:Fuse>
+	-->
+	
+	<!--END Fuse-->
+	
+	
+	<!--LoadBreakSwitch-->
+	<!--	
+	<cim:LoadBreakSwitch rdf:ID=" ">
+		<cim:ConductingEquipment.BaseVoltage rdf:resource="#"/>
+		<cim:IdentifiedObject.description> </cim:IdentifiedObject.description>
+		<cim:IdentifiedObject.mRID> </cim:IdentifiedObject.mRID>
+		<ftn:IdentifiedObject.name> </ftn:IdentifiedObject.name>
+	</cim:LoadBreakSwitch>
+	-->
+	<cim:LoadBreakSwitch rdf:ID="LBS_1">
+		<cim:ConductingEquipment.BaseVoltage rdf:resource="#BV_1"/>
+		<cim:IdentifiedObject.description>LoadBreakSwitch1</cim:IdentifiedObject.description>
+		<cim:IdentifiedObject.mRID>LBS_1</cim:IdentifiedObject.mRID>
+		<ftn:IdentifiedObject.name>LBS_1</ftn:IdentifiedObject.name>
+	</cim:LoadBreakSwitch>
+	<!--END LoadBreakSwitch-->
+	
+	
+	<!--PowerTransformer-->
+	<!--
+	<cim:PowerTransformer rdf:ID=" ">
+		<cim:IdentifiedObject.description> </cim:IdentifiedObject.description>
+		<cim:IdentifiedObject.mRID> </cim:IdentifiedObject.mRID>
+		<ftn:IdentifiedObject.name> </ftn:IdentifiedObject.name>
+	</cim:PowerTransformer>
+	-->
+	<cim:PowerTransformer rdf:ID="PT_1">
+		<cim:IdentifiedObject.description>PowerTransformer1</cim:IdentifiedObject.description>
+		<cim:IdentifiedObject.mRID>PT_1</cim:IdentifiedObject.mRID>
+		<ftn:IdentifiedObject.name>PT_1</ftn:IdentifiedObject.name>
+	</cim:PowerTransformer>
+	<!--END PowerTransformer-->
+	
+	
+	<!--TransformerWinding-->
+	<!--	
+	<cim:TransformerWinding rdf:ID=" ">
+		<cim:TransformerWinding.PowerTransformer rdf:resource="#"/>
+		<cim:ConductingEquipment.BaseVoltage rdf:resource="#"/>
+		<cim:IdentifiedObject.description> </cim:IdentifiedObject.description>
+		<cim:IdentifiedObject.mRID> </cim:IdentifiedObject.mRID>
+		<ftn:IdentifiedObject.name> </ftn:IdentifiedObject.name>
+	</cim:TransformerWinding>
+	-->
+	<cim:TransformerWinding rdf:ID="TW_1">
+		<cim:TransformerWinding.PowerTransformer rdf:resource="#PT_1"/>
+		<cim:ConductingEquipment.BaseVoltage rdf:resource="#BW_1"/>
+		<cim:IdentifiedObject.description>TransformerWinding1</cim:IdentifiedObject.description>
+		<cim:IdentifiedObject.mRID>TW_1</cim:IdentifiedObject.mRID>
+		<ftn:IdentifiedObject.name>TW_1</ftn:IdentifiedObject.name>
+	</cim:TransformerWinding>
+	<cim:TransformerWinding rdf:ID="TW_2">
+		<cim:TransformerWinding.PowerTransformer rdf:resource="#PT_1"/>
+		<cim:ConductingEquipment.BaseVoltage rdf:resource="#BV_2"/>
+		<cim:IdentifiedObject.description>TransformerWinding2</cim:IdentifiedObject.description>
+		<cim:IdentifiedObject.mRID>TW_2</cim:IdentifiedObject.mRID>
+		<ftn:IdentifiedObject.name>TW_2</ftn:IdentifiedObject.name>
+	</cim:TransformerWinding>
+	<!--END TransformerWinding-->
+<!--[END Package_Wires ]-->
+	
+	
+	
+<!--[ Package_Topology ]-->
+	<!--ConnectivityNode-->
+	<!--
+	<cim:ConnectivityNode rdf:ID=" ">
+		<cim:IdentifiedObject.description> </cim:IdentifiedObject.description>
+		<cim:IdentifiedObject.mRID> </cim:IdentifiedObject.mRID>
+		<ftn:IdentifiedObject.name> </ftn:IdentifiedObject.name>
+	</cim:ConnectivityNode>
+	-->
+	<cim:ConnectivityNode rdf:ID="CN_1">
+		<cim:IdentifiedObject.description>ConnectivityNode1</cim:IdentifiedObject.description>
+		<cim:IdentifiedObject.mRID>CN_1</cim:IdentifiedObject.mRID>
+		<ftn:IdentifiedObject.name>CN_1</ftn:IdentifiedObject.name>
+	</cim:ConnectivityNode>
+	<cim:ConnectivityNode rdf:ID="CN_2">
+		<cim:IdentifiedObject.description>ConnectivityNode2</cim:IdentifiedObject.description>
+		<cim:IdentifiedObject.mRID>CN_2</cim:IdentifiedObject.mRID>
+		<ftn:IdentifiedObject.name>CN_2</ftn:IdentifiedObject.name>
+	</cim:ConnectivityNode>
+	<cim:ConnectivityNode rdf:ID="CN_3">
+		<cim:IdentifiedObject.description>ConnectivityNode3</cim:IdentifiedObject.description>
+		<cim:IdentifiedObject.mRID>CN_3</cim:IdentifiedObject.mRID>
+		<ftn:IdentifiedObject.name>CN_3</ftn:IdentifiedObject.name>
+	</cim:ConnectivityNode>
+	<cim:ConnectivityNode rdf:ID="CN_4">
+		<cim:IdentifiedObject.description>ConnectivityNode4</cim:IdentifiedObject.description>
+		<cim:IdentifiedObject.mRID>CN_4</cim:IdentifiedObject.mRID>
+		<ftn:IdentifiedObject.name>CN_4</ftn:IdentifiedObject.name>
+	</cim:ConnectivityNode>
+	<cim:ConnectivityNode rdf:ID="CN_5">
+		<cim:IdentifiedObject.description>ConnectivityNode5</cim:IdentifiedObject.description>
+		<cim:IdentifiedObject.mRID>CN_5</cim:IdentifiedObject.mRID>
+		<ftn:IdentifiedObject.name>CN_5</ftn:IdentifiedObject.name>
+	</cim:ConnectivityNode>
+	<cim:ConnectivityNode rdf:ID="CN_6">
+		<cim:IdentifiedObject.description>ConnectivityNode6</cim:IdentifiedObject.description>
+		<cim:IdentifiedObject.mRID>CN_6</cim:IdentifiedObject.mRID>
+		<ftn:IdentifiedObject.name>CN_6</ftn:IdentifiedObject.name>
+	</cim:ConnectivityNode>
+	<cim:ConnectivityNode rdf:ID="CN_7">
+		<cim:IdentifiedObject.description>ConnectivityNode7</cim:IdentifiedObject.description>
+		<cim:IdentifiedObject.mRID>CN_7</cim:IdentifiedObject.mRID>
+		<ftn:IdentifiedObject.name>CN_7</ftn:IdentifiedObject.name>
+	</cim:ConnectivityNode>
+	<cim:ConnectivityNode rdf:ID="CN_8">
+		<cim:IdentifiedObject.description>ConnectivityNode8</cim:IdentifiedObject.description>
+		<cim:IdentifiedObject.mRID>CN_8</cim:IdentifiedObject.mRID>
+		<ftn:IdentifiedObject.name>CN_8</ftn:IdentifiedObject.name>
+	</cim:ConnectivityNode>
+	<!--END ConnectivityNode-->
+<!--[END Package_Topology ]-->	
+	
+	
+	
+<!--[ Package_Meas ]-->
+	<!--Analog-->
+	<!--
+	<cim:Analog rdf:ID=" ">
+		<tdms:Analog.currentValue> </tdms:Analog.currentValue>
+		<cim:Analog.maxValue> </cim:Analog.maxValue>
+		<cim:Analog.measurementType> </cim:Analog.measurementType>
+		<cim:Analog.minValue> </cim:Analog.minValue>
+		<cim:Analog.normalValue> </cim:Analog.normalValue>
+		<cim:Measurement.address> </cim:Measurement.address>
+		<cim:Measurement.isInput> </cim:Measurement.isInput>
+		<cim:Measurement.Terminal rdf:resource="#"/>
+		<cim:IdentifiedObject.description> </cim:IdentifiedObject.description>
+		<cim:IdentifiedObject.mRID> </cim:IdentifiedObject.mRID>
+		<ftn:IdentifiedObject.name> </ftn:IdentifiedObject.name>
+	</cim:Analog>
+	-->
+	
+	<!--END Analog-->
+	
+	
+	<!--Discrete-->
+	<!--	
+	<cim:Discrete rdf:ID=" ">
+		<tdms:Discrete.currentOpen> </tdms:Discrete.currentOpen>
+		<cim:Discrete.maxValue> </cim:Discrete.maxValue>
+		<cim:Discrete.measurementType> </cim:Discrete.measurementType>
+		<cim:Discrete.minValue> </cim:Discrete.minValue>
+		<cim:Discrete.normalValue> </cim:Discrete.normalValue>
+		<cim:Measurement.address> </cim:Measurement.address>
+		<cim:Measurement.isInput> </cim:Measurement.isInput>
+		<cim:Measurement.Terminal rdf:resource="#"/>
+		<cim:IdentifiedObject.description> </cim:IdentifiedObject.description>
+		<cim:IdentifiedObject.mRID> </cim:IdentifiedObject.mRID>
+		<ftn:IdentifiedObject.name> </ftn:IdentifiedObject.name>
+	</cim:Discrete>
+	-->
+	
+	<!--END Discrete-->
+<!--[END Package_Meas ]-->	
+</rdf:RDF>

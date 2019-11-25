@@ -9,7 +9,7 @@ using System.Text;
 using System.Xml;
 
 
-namespace DataModel.Outage
+namespace Outage.DataModel
 {
 	public class ConductingEquipment : Equipment
 	{

@@ -9,7 +9,7 @@ using System.Reflection;
 using Outage.Common;
 using Outage.Common.GDA;
 
-namespace DataModel.Outage
+namespace Outage.DataModel
 {
 	public enum TypeOfReference : short
 	{

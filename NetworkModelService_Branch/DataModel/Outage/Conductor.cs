@@ -6,7 +6,7 @@ using System.Linq;
 using System.Text;
 using System.Threading.Tasks;
 
-namespace DataModel.Outage
+namespace Outage.DataModel
 {
     public class Conductor : ConductingEquipment
     {

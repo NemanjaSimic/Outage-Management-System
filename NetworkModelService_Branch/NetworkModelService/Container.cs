@@ -1,5 +1,5 @@
-﻿using DataModel.Outage;
-using Outage.Common;
+﻿using Outage.Common;
+using Outage.DataModel;
 using System;
 using System.Collections.Generic;
 using System.Linq;
@@ -121,71 +121,71 @@ namespace Outage.NetworkModelService
                         io = new BaseVoltage(globalId);
                         break;
                     }
-                //case DMSType.TERMINAL:
-                //    {
-                //        io = new Terminal(globalId);
-                //        break;
-                //    }
+                case DMSType.TERMINAL:
+                    {
+                        io = new Terminal(globalId);
+                        break;
+                    }
                 case DMSType.CONNECTIVITYNODE:
                     {
                         io = new ConnectivityNode(globalId);
                         break;
                     }
-                //case DMSType.POWERTRANSFORMER:
-                //    {
-                //        io = new PowerTransforemr(globalId);
-                //        break;
-                //    }
-                //case DMSType.ENERGYSOURCE:
-                //    {
-                //        io = new EnergySource(globalId);
-                //        break;
-                //    }
-                //case DMSType.ENERGYCONSUMER:
-                //    {
-                //        io = new EnergyConsumer(globalId);
-                //        break;
-                //    }
-                //case DMSType.TRANSFORMERWINDING:
-                //    {
-                //        io = new TransformerWinding(globalId);
-                //        break;
-                //    }
-                //case DMSType.FUSE:
-                //    {
-                //        io = new Fuse(globalId);
-                //        break;
-                //    }
-                //case DMSType.DISCONNECTOR:
-                //    {
-                //        io = new Disconnector(globalId);
-                //        break;
-                //    }
-                //case DMSType.BREAKER:
-                //    {
-                //        io = new Breaker(globalId);
-                //        break;
-                //    }
-                //case DMSType.LOADBREAKSWITCH:
-                //    {
-                //        io = new LoadBreakerSwitch(globalId);
-                //        break;
-                //    }
-                //case DMSType.ACLINESEGMENT:
-                //    {
-                //        io = new ACLineSegment(globalId);
-                //        break;
-                //    }
-                //case DMSType.DISCRETE:
-                //    {
-                //        io = new Discrete(globalId);
-                //        break;
-                //    }
-                //case DMSType.ANALOG:
-                //    {
-                //        io = new Analog(globalId);
-                //        break;
-                //    }
+                case DMSType.POWERTRANSFORMER:
+                    {
+                        io = new PowerTransformer(globalId);
+                        break;
+                    }
+                case DMSType.ENERGYSOURCE:
+                    {
+                        io = new EnergySource(globalId);
+                        break;
+                    }
+                case DMSType.ENERGYCONSUMER:
+                    {
+                        io = new EnergyConsumer(globalId);
+                        break;
+                    }
+                case DMSType.TRANSFORMERWINDING:
+                    {
+                        io = new TransformerWinding(globalId);
+                        break;
+                    }
+                case DMSType.FUSE:
+                    {
+                        io = new Fuse(globalId);
+                        break;
+                    }
+                case DMSType.DISCONNECTOR:
+                    {
+                        io = new Disconnector(globalId);
+                        break;
+                    }
+                case DMSType.BREAKER:
+                    {
+                        io = new Breaker(globalId);
+                        break;
+                    }
+                case DMSType.LOADBREAKSWITCH:
+                    {
+                        io = new LoadBreakSwitch(globalId);
+                        break;
+                    }
+                case DMSType.ACLINESEGMENT:
+                    {
+                        io = new ACLineSegment(globalId);
+                        break;
+                    }
+                case DMSType.DISCRETE:
+                    {
+                        io = new Discrete(globalId);
+                        break;
+                    }
+                case DMSType.ANALOG:
+                    {
+                        io = new Analog(globalId);
+                        break;
+                    }
                 default:
                     {
                         string message = String.Format("Failed to create entity because specified type ({0}) is not supported.", type);
