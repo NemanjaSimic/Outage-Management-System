@@ -894,7 +894,7 @@ namespace Outage.Common
         }
 
 		private void InitializeNotSettablePropertyIds()
-		{
+        { 
             notSettablePropertyIds.Add(ModelCode.IDOBJ_GID);
             notSettablePropertyIds.Add(ModelCode.BASEVOLTAGE_CONDUCTINGEQUIPMENTS);
             notSettablePropertyIds.Add(ModelCode.TERMINAL_MEASUREMENTS);

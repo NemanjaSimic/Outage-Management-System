@@ -113,35 +113,86 @@ namespace Outage.NetworkModelService
             short type = ModelCodeHelper.ExtractTypeFromGlobalId(globalId);
 
             IdentifiedObject io = null;
-            //TODO:
-            //switch ((DMSType)type)
-            //{
-            //    case DMSType.ACLINESEG:
-            //        io = new ACLineSegment(globalId);
-            //        break;
 
-            //    case DMSType.DCLINESEG:
-            //        io = new DCLineSegment(globalId);
-            //        break;
-            //    case DMSType.SERIESCOMPENSATOR:
-            //        io = new SeriesCompensator(globalId);
-            //        break;
-            //    case DMSType.TERMINAL:
-            //        io = new Terminal(globalId);
-            //        break;
-            //    case DMSType.CONNECTNODE:
-            //        io = new ConnectivityNode(globalId);
-            //        break;
-
-            //    case DMSType.CONNECTNODECONTAINER:
-            //        io = new ConnectivityNodeContainer(globalId);
-            //        break;
-
-            //    default:
-            //        string message = String.Format("Failed to create entity because specified type ({0}) is not supported.", type);
-            //        CommonTrace.WriteTrace(CommonTrace.TraceError, message);
-            //        throw new Exception(message);
-            //}
+            switch((DMSType)type)
+            {
+                case DMSType.BASEVOLTAGE:
+                    {
+                        io = new BaseVoltage(globalId);
+                        break;
+                    }
+                //case DMSType.TERMINAL:
+                //    {
+                //        io = new Terminal(globalId);
+                //        break;
+                //    }
+                case DMSType.CONNECTIVITYNODE:
+                    {
+                        io = new ConnectivityNode(globalId);
+                        break;
+                    }
+                //case DMSType.POWERTRANSFORMER:
+                //    {
+                //        io = new PowerTransforemr(globalId);
+                //        break;
+                //    }
+                //case DMSType.ENERGYSOURCE:
+                //    {
+                //        io = new EnergySource(globalId);
+                //        break;
+                //    }
+                //case DMSType.ENERGYCONSUMER:
+                //    {
+                //        io = new EnergyConsumer(globalId);
+                //        break;
+                //    }
+                //case DMSType.TRANSFORMERWINDING:
+                //    {
+                //        io = new TransformerWinding(globalId);
+                //        break;
+                //    }
+                //case DMSType.FUSE:
+                //    {
+                //        io = new Fuse(globalId);
+                //        break;
+                //    }
+                //case DMSType.DISCONNECTOR:
+                //    {
+                //        io = new Disconnector(globalId);
+                //        break;
+                //    }
+                //case DMSType.BREAKER:
+                //    {
+                //        io = new Breaker(globalId);
+                //        break;
+                //    }
+                //case DMSType.LOADBREAKSWITCH:
+                //    {
+                //        io = new LoadBreakerSwitch(globalId);
+                //        break;
+                //    }
+                //case DMSType.ACLINESEGMENT:
+                //    {
+                //        io = new ACLineSegment(globalId);
+                //        break;
+                //    }
+                //case DMSType.DISCRETE:
+                //    {
+                //        io = new Discrete(globalId);
+                //        break;
+                //    }
+                //case DMSType.ANALOG:
+                //    {
+                //        io = new Analog(globalId);
+                //        break;
+                //    }
+                default:
+                    {
+                        string message = String.Format("Failed to create entity because specified type ({0}) is not supported.", type);
+                        CommonTrace.WriteTrace(CommonTrace.TraceError, message);
+                        throw new Exception(message);
+                    }
+            }
 
             // Add entity to map
             this.AddEntity(io);
