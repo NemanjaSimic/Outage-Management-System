@@ -45,8 +45,20 @@
     <Compile Include="Importer\ImportHelper.cs" />
     <Compile Include="Importer\OutageConverter.cs" />
     <Compile Include="Importer\OutageImporter.cs" />
+    <Compile Include="Manager\LogManager.cs" />
     <Compile Include="ProfileManager.cs" />
     <Compile Include="Properties\AssemblyInfo.cs" />
+    <Compile Include="TransformAndLoadReport.cs" />
+  </ItemGroup>
+  <ItemGroup>
+    <ProjectReference Include="..\CIMParser\CIMParser.csproj">
+      <Project>{3C03A41C-BE4C-40A8-97D5-5DBAC0C34102}</Project>
+      <Name>CIMParser</Name>
+    </ProjectReference>
+    <ProjectReference Include="..\Common\Common.csproj">
+      <Project>{892CBE15-9ED7-4540-81FA-0EAABA592138}</Project>
+      <Name>Common</Name>
+    </ProjectReference>
   </ItemGroup>
   <Import Project="$(MSBuildToolsPath)\Microsoft.CSharp.targets" />
 </Project>
