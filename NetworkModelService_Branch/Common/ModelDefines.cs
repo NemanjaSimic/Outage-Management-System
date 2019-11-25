@@ -11,11 +11,11 @@ namespace Outage.Common
 
         BASEVOLTAGE                         = 0x0001,
         TERMINAL                            = 0x0002,
-        CONNECTIVITYNODE                    = 0x0003, //MOZDA
+        CONNECTIVITYNODE                    = 0x0003,
         POWERTRANSFORMER                    = 0x0004,
         ENERGYSOURCE                        = 0x0005,
         ENERGYCONSUMER                      = 0x0006,
-        TRANSFORMERWINDING                  = 0x0007, //TODO: TRANSFORMEREND???
+        TRANSFORMERWINDING                  = 0x0007,
         FUSE                                = 0x0008,
         DISCONNECTOR                        = 0x0009,
         BREAKER                             = 0x000a,
@@ -48,12 +48,12 @@ namespace Outage.Common
         TERMINAL_MEASUREMENTS               = 0x1300000000020319,
 
         CONNECTIVITYNODE                    = 0x1400000000030000,
-        CONNECTIVITYNODE_TERMINALS          = 0x1400000000030109, //DA LI JE APSTRAKTNA ILI NE (PO SLICI NIJE, NA HTMLU JESTE)
+        CONNECTIVITYNODE_TERMINALS          = 0x1400000000030109,
 
         EQUIPMENT                           = 0x1110000000000000,
 
         POWERTRANSFORMER                    = 0x1111000000040000,
-        POWERTRANSFORMER_TRANSFORMERWINDINGS= 0x1111000000040119, //TODO: TRANSFORMEREND???
+        POWERTRANSFORMER_TRANSFORMERWINDINGS= 0x1111000000040119,
 
         CONDUCTINGEQUIPMENT                 = 0x1112000000000000,
         CONDUCTINGEQUIPMENT_BASEVOLTAGE     = 0x1112000000000109,
@@ -63,8 +63,8 @@ namespace Outage.Common
 
         ENERGYCONSUMER                      = 0x1112200000060000,
 
-        TRANSFORMERWINDING                  = 0x1112300000070000,  //TODO: TRANSFORMEREND??? 
-        TRANSFORMERWINDING_POWERTRANSFORMER = 0x1112300000070119,  //TODO: TRANSFORMEREND???
+        TRANSFORMERWINDING                  = 0x1112300000070000,
+        TRANSFORMERWINDING_POWERTRANSFORMER = 0x1112300000070119,
 
         SWITCH                              = 0x111240000000000,
 

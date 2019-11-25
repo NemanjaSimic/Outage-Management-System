@@ -886,7 +886,7 @@ namespace Outage.Common
 		private void InitializeNotSettablePropertyIds()
 		{
             //TODO:
-   //         notSettablePropertyIds.Add(ModelCode.IDOBJ_GID);
+            //notSettablePropertyIds.Add(ModelCode.IDOBJ_GID);
 			//notSettablePropertyIds.Add(ModelCode.CONNECTNODE_TERMINALS);
 			//notSettablePropertyIds.Add(ModelCode.CONNECTNODECONTAINER_CONNECTNODES);
 			//notSettablePropertyIds.Add(ModelCode.CONDEQUIP_TERMINALS);

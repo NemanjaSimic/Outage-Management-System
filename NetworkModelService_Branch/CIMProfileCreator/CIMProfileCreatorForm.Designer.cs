@@ -143,7 +143,7 @@
             this.ProductNameTXT.Name = "ProductNameTXT";
             this.ProductNameTXT.Size = new System.Drawing.Size(400, 20);
             this.ProductNameTXT.TabIndex = 14;
-            this.ProductNameTXT.Text = "Labs";
+            this.ProductNameTXT.Text = "NetworkModelService";
             // 
             // FileNameTXT
             // 
@@ -153,7 +153,7 @@
             this.FileNameTXT.Name = "FileNameTXT";
             this.FileNameTXT.Size = new System.Drawing.Size(400, 20);
             this.FileNameTXT.TabIndex = 13;
-            this.FileNameTXT.Text = "PowerTransformer";
+            this.FileNameTXT.Text = "Outage";
             // 
             // NameSpaceTXT
             // 
