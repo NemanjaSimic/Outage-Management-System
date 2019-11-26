@@ -1,8 +1,8 @@
 ﻿using CIM.Model;
 using CIMParser;
-using Outage.CIMAdapter;
-using Outage.CIMAdapter.Importer;
-using Outage.CIMAdapter.Manager;
+using Outage.DataImporter.CIMAdapter;
+using Outage.DataImporter.CIMAdapter.Importer;
+using Outage.DataImporter.CIMAdapter.Manager;
 using Outage.Common.GDA;
 using Outage.ServiceContracts;
 using System;
@@ -14,7 +14,7 @@ using System.Text;
 using System.Threading;
 using System.Threading.Tasks;
 
-namespace Outage.CIMAdapter
+namespace Outage.DataImporter.CIMAdapter
 {
     public class CIMAdapterClass
     {
@@ -129,7 +129,7 @@ namespace Outage.CIMAdapter
 
                 switch (extractType)
                 {
-                    case SupportedProfiles.OutageProfile:
+                    case SupportedProfiles.Outage:
                         {
                             TransformAndLoadReport report = OutageImporter.Instance.CreateNMSDelta(concreteModel);
 

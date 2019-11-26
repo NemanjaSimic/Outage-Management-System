@@ -1,7 +1,7 @@
 ﻿using System;
 using System.Windows.Forms;
 
-namespace Outage.ModelLabsApp
+namespace Outage.DataImporter.ModelLabsApp
 {
 	static class Program
 	{

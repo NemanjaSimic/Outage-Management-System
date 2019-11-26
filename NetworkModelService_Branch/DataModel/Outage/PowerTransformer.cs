@@ -10,7 +10,7 @@ namespace Outage.DataModel
 {
     public class PowerTransformer : Equipment
     {
-        private List<long> transformerWindings;
+        private List<long> transformerWindings = new List<long>();
 
         public List<long> TransformerWindings
         {

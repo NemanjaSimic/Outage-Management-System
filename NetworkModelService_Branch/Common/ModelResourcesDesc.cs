@@ -875,9 +875,9 @@ namespace Outage.Common
 		private void InitializeTypeIdsInInsertOrder()
 		{
             
+            typeIdsInInsertOrder.Add(ModelCode.BASEVOLTAGE);
             typeIdsInInsertOrder.Add(ModelCode.POWERTRANSFORMER);
             typeIdsInInsertOrder.Add(ModelCode.TRANSFORMERWINDING);
-            typeIdsInInsertOrder.Add(ModelCode.BASEVOLTAGE);
             typeIdsInInsertOrder.Add(ModelCode.ENERGYSOURCE);
             typeIdsInInsertOrder.Add(ModelCode.ENERGYCONSUMER);
             typeIdsInInsertOrder.Add(ModelCode.FUSE);

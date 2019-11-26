@@ -4,6 +4,7 @@ using System.Collections.Generic;
 using System.Linq;
 using System.Text;
 using System.Threading.Tasks;
+using Outage.DataImporter.CIMAdapter;
 
 namespace Outage.NetworkModelServiceHost
 {
@@ -13,6 +14,8 @@ namespace Outage.NetworkModelServiceHost
         {
             try
             {
+                CIMAdapterClass cim = new CIMAdapterClass();
+                
                 string message = "Starting Network Model Service...";
                 CommonTrace.WriteTrace(CommonTrace.TraceInfo, message);
                 Console.WriteLine("\n{0}\n", message);

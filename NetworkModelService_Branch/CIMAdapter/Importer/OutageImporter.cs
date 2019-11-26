@@ -1,5 +1,5 @@
 ﻿using CIM.Model;
-using Outage.CIMAdapter.Manager;
+using Outage.DataImporter.CIMAdapter.Manager;
 using Outage.Common;
 using Outage.Common.GDA;
 using System;
@@ -8,7 +8,7 @@ using System.Linq;
 using System.Text;
 using System.Threading.Tasks;
 
-namespace Outage.CIMAdapter.Importer
+namespace Outage.DataImporter.CIMAdapter.Importer
 {
     public class OutageImporter
     {
@@ -89,7 +89,20 @@ namespace Outage.CIMAdapter.Importer
             LogManager.Log("Loading elements and creating delta...", LogLevel.Info);
 
             //// import all concrete model types (DMSType enum)
-            
+            ImportBaseVoltages();
+            ImportPowerTransformers();
+            ImportTransformerWindings();
+            ImportEnergySources();
+            ImportEnergyConsumers();
+            ImportFuses();
+            ImportDisconnectors();
+            ImportBreakers();
+            ImportLoadBreakSwitchs();
+            ImportACLineSegments();
+            ImportConnectivityNodes();
+            ImportTerminals();
+            ImportDiscretes();
+            ImportAnalogs();
 
             LogManager.Log("Loading elements and creating delta completed.", LogLevel.Info);
         }

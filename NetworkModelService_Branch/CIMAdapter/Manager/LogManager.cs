@@ -5,7 +5,7 @@ using System.Linq;
 using System.Text;
 using System.Threading.Tasks;
 
-namespace Outage.CIMAdapter.Manager
+namespace Outage.DataImporter.CIMAdapter.Manager
 {
     public enum LogLevel
     {

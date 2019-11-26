@@ -6,9 +6,11 @@ using System.Xml;
 using Outage.Common;
 using Outage.ServiceContracts;
 using Outage.Common.GDA;
-using Outage.CIMAdapter;
+using Outage.DataImporter.CIMAdapter;
+using Outage.DataImporter.CIMAdapter.Manager;
+using Outage.DataImporter.CIMAdapter.Importer;
 
-namespace Outage.ModelLabsApp
+namespace Outage.DataImporter.ModelLabsApp
 {
 	public partial class ModelLabsAppForm : Form
 	{
@@ -27,8 +29,8 @@ namespace Outage.ModelLabsApp
 			buttonConvertCIM.Enabled = false;
 			buttonApplyDelta.Enabled = false;
 
-            comboBoxProfile.DataSource = Enum.GetValues(typeof(CIMAdapter.Manager.SupportedProfiles));
-            comboBoxProfile.SelectedItem = CIMAdapter.Manager.SupportedProfiles.OutageProfile;
+            comboBoxProfile.DataSource = Enum.GetValues(typeof(SupportedProfiles));
+            comboBoxProfile.SelectedItem = SupportedProfiles.Outage;
             comboBoxProfile.Enabled = false; //// other profiles are not supported
         }
 
@@ -68,7 +70,7 @@ namespace Outage.ModelLabsApp
 				nmsDelta = null;
 				using (FileStream fs = File.Open(textBoxCIMFile.Text, FileMode.Open))
 				{
-					nmsDelta = adapter.CreateDelta(fs, (CIMAdapter.Manager.SupportedProfiles)(comboBoxProfile.SelectedItem), out log);
+					nmsDelta = adapter.CreateDelta(fs, (SupportedProfiles)(comboBoxProfile.SelectedItem), out log);
 					richTextBoxReport.Text = log;
 				}
 				if (nmsDelta != null)
@@ -139,5 +141,7 @@ namespace Outage.ModelLabsApp
 		{
 			Close();
 		}
-	}
+
+        //:x16
+    }
 }

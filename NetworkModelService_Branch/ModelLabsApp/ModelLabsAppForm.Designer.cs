@@ -1,4 +1,4 @@
-﻿namespace Outage.ModelLabsApp
+﻿namespace Outage.DataImporter.ModelLabsApp
 {
     partial class ModelLabsAppForm
     {

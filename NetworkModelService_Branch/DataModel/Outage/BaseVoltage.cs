@@ -12,7 +12,7 @@ namespace Outage.DataModel
     public class BaseVoltage : IdentifiedObject
     {
         private float nominalVoltage;
-        private List<long> conductingEquipments;
+        private List<long> conductingEquipments = new List<long>();
 
         
 
