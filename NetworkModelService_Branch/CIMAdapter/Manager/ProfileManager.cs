@@ -5,7 +5,7 @@ using System.Reflection;
 using System.Text;
 using System.Threading.Tasks;
 
-namespace Outage.CIMAdapter
+namespace Outage.CIMAdapter.Manager
 {
     public enum SupportedProfiles : byte
     {

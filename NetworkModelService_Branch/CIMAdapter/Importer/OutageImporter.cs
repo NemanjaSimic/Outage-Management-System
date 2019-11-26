@@ -1,5 +1,4 @@
 ﻿using CIM.Model;
-using Outage.CIMAdapter.Importer;
 using Outage.CIMAdapter.Manager;
 using Outage.Common;
 using Outage.Common.GDA;
