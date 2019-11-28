@@ -18,7 +18,7 @@ namespace Outage.DataModel
 
         private long connectivityNode;
 
-        private List<long> measurements;
+        private List<long> measurements = new List<long>();
 
         
 
@@ -107,7 +107,7 @@ namespace Outage.DataModel
         {
             switch (property.Id)
             {
-                case ModelCode.CONDUCTINGEQUIPMENT:
+                case ModelCode.TERMINAL_CONDUCTINGEQUIPMENT:
                     conductingEquipment = property.AsReference();
                     break;
 

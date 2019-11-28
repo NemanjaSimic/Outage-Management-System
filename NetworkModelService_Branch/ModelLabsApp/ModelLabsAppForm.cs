@@ -6,12 +6,15 @@ using System.Xml;
 using Outage.Common;
 using Outage.ServiceContracts;
 using Outage.Common.GDA;
+using Outage.DataImporter.CIMAdapter;
+using Outage.DataImporter.CIMAdapter.Manager;
+using Outage.DataImporter.CIMAdapter.Importer;
 
-namespace Outage.ModelLabsApp
+namespace Outage.DataImporter.ModelLabsApp
 {
 	public partial class ModelLabsAppForm : Form
 	{
-        //TODO: private CIMAdapter adapter = new CIMAdapter();
+        private CIMAdapterClass adapter = new CIMAdapterClass();
         private Delta nmsDelta = null;
 		
         public ModelLabsAppForm()
@@ -26,9 +29,9 @@ namespace Outage.ModelLabsApp
 			buttonConvertCIM.Enabled = false;
 			buttonApplyDelta.Enabled = false;
 
-            //TODO: comboBoxProfile.DataSource = Enum.GetValues(typeof(SupportedProfiles));
-            //TODO: comboBoxProfile.SelectedItem = SupportedProfiles.PowerTransformer;
-            //TODO: comboBoxProfile.Enabled = false; //// other profiles are not supported
+            comboBoxProfile.DataSource = Enum.GetValues(typeof(SupportedProfiles));
+            comboBoxProfile.SelectedItem = SupportedProfiles.Outage;
+            comboBoxProfile.Enabled = false; //// other profiles are not supported
         }
 
         private void ShowOpenCIMXMLFileDialog()
@@ -67,8 +70,8 @@ namespace Outage.ModelLabsApp
 				nmsDelta = null;
 				using (FileStream fs = File.Open(textBoxCIMFile.Text, FileMode.Open))
 				{
-					//TODO: nmsDelta = adapter.CreateDelta(fs, (SupportedProfiles)(comboBoxProfile.SelectedItem), out log);
-					//TODO: richTextBoxReport.Text = log;
+					nmsDelta = adapter.CreateDelta(fs, (SupportedProfiles)(comboBoxProfile.SelectedItem), out log);
+					richTextBoxReport.Text = log;
 				}
 				if (nmsDelta != null)
 				{
@@ -97,8 +100,8 @@ namespace Outage.ModelLabsApp
             {
                 try
                 {
-                    //TODO: string log = adapter.ApplyUpdates(nmsDelta);
-                    //TODO: richTextBoxReport.AppendText(log);
+                    string log = adapter.ApplyUpdates(nmsDelta);
+                    richTextBoxReport.AppendText(log);
                     nmsDelta = null;
                     buttonApplyDelta.Enabled = (nmsDelta != null);
                 }
@@ -138,5 +141,7 @@ namespace Outage.ModelLabsApp
 		{
 			Close();
 		}
-	}
+
+        //:x16
+    }
 }

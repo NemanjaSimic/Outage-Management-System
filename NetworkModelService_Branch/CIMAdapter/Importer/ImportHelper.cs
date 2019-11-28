@@ -5,7 +5,7 @@ using System.Linq;
 using System.Text;
 using System.Threading.Tasks;
 
-namespace Outage.CIMAdapter.Importer
+namespace Outage.DataImporter.CIMAdapter.Importer
 {
     public class ImportHelper
     {

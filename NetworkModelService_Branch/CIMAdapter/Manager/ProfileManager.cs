@@ -5,11 +5,11 @@ using System.Reflection;
 using System.Text;
 using System.Threading.Tasks;
 
-namespace Outage.CIMAdapter
+namespace Outage.DataImporter.CIMAdapter.Manager
 {
     public enum SupportedProfiles : byte
     {
-        OutageProfile,
+        Outage,
     };
 
     /// <summary>
@@ -18,6 +18,7 @@ namespace Outage.CIMAdapter
 	public static class ProfileManager
     {
         public const string Namespace = "Outage";
+        public const string ProductName = "NetworkModelService";
 
         /// <summary>
         /// Method returns the name of CIM profile based on the defined enumeration.
@@ -36,7 +37,7 @@ namespace Outage.CIMAdapter
         /// <returns>name of profile + "CIMProfile_Labs.DLL"</returns>
         public static string GetProfileDLLName(SupportedProfiles profile)
         {
-            return string.Format("{0}CIMProfile_Labs.dll", profile.ToString());
+            return string.Format("{0}CIMProfile_{1}.dll", profile.ToString(), ProductName);
         }
 
         public static bool LoadAssembly(SupportedProfiles profile, out Assembly assembly)
