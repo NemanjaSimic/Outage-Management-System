@@ -48,7 +48,7 @@ namespace Outage.Common
         TERMINAL_MEASUREMENTS               = 0x1300000000020319,
 
         CONNECTIVITYNODE                    = 0x1400000000030000,
-        CONNECTIVITYNODE_TERMINALS          = 0x1400000000030109,
+        CONNECTIVITYNODE_TERMINALS          = 0x1400000000030119,
 
         EQUIPMENT                           = 0x1110000000000000,
 
