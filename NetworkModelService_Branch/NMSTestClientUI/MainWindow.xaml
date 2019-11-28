@@ -30,11 +30,11 @@
                     <controls:GetExtentValues/>
                 </Grid>
             </TabItem>
-            <TabItem Header="Get Related Values">
+            <!--<TabItem Header="Get Related Values">
                 <Grid>
                     <controls:GetRelatedValues/>
                 </Grid>
-            </TabItem>
+            </TabItem>-->
         </TabControl>
     </Grid>
 </Window>
