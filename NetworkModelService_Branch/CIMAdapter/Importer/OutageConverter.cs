@@ -290,9 +290,9 @@ namespace Outage.CIMAdapter.Importer
                     rd.AddProperty(new Property(ModelCode.ANALOG_MAXVALUE, cimAnalog.MaxValue));
                 }
 
-                if (cimAnalog.SignalTypeHasValue)
+                if (cimAnalog.MeasurementTypeHasValue)
                 {
-                    rd.AddProperty(new Property(ModelCode.ANALOG_SIGNALTYPE, (short)GetAnalogMeasurementType(cimAnalog.SignalType)));
+                    rd.AddProperty(new Property(ModelCode.ANALOG_SIGNALTYPE, (short)GetAnalogMeasurementType(cimAnalog.MeasurementType)));
                 }
 
                 if (cimAnalog.MinValueHasValue)
@@ -316,7 +316,7 @@ namespace Outage.CIMAdapter.Importer
             return 0;
         }
         //TODO
-        public static Outage.Common.AnalogMeasurementType GetAnalogMeasurementType(Outage.AnalogSignalType measurementType)
+        public static Outage.Common.AnalogMeasurementType GetAnalogMeasurementType(Outage.AnalogMeasurementType measurementType)
         {
             return 0;
         }
