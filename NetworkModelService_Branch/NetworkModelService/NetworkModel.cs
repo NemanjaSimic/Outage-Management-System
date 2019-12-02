@@ -17,12 +17,23 @@ namespace Outage.NetworkModelService
         /// <summary>
 		/// Dictionaru which contains all data: Key - DMSType, Value - Container
 		/// </summary>
-		private Dictionary<DMSType, Container> networkDataModel;
+		private  Dictionary<DMSType, Container> networkDataModel;
 
         /// <summary>
         /// ModelResourceDesc class contains metadata of the model
         /// </summary>
         private ModelResourcesDesc resourcesDescs;
+
+        /// <summary>
+		/// Dictionaru which contains all data: Key - DMSType, Value - Container
+		/// </summary>
+        public Dictionary<DMSType, Container> NetworkDataModel
+        {
+            get
+            {
+                return networkDataModel ?? (networkDataModel = new Dictionary<DMSType, Container>());
+            }
+        }
 
         /// <summary>
         /// Initializes a new instance of the Model class.
