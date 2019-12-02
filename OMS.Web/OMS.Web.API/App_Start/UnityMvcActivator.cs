@@ -17,6 +17,7 @@ namespace OMS.Web.API
         /// </summary>
         public static void Start() 
         {
+            System.Console.WriteLine("UNITYYYYYYYYYYY");
             FilterProviders.Providers.Remove(FilterProviders.Providers.OfType<FilterAttributeFilterProvider>().First());
             FilterProviders.Providers.Add(new UnityFilterAttributeFilterProvider(UnityConfig.Container));
 

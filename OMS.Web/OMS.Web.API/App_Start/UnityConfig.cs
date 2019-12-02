@@ -35,7 +35,7 @@ namespace OMS.Web.API
         /// </remarks>
         public static void RegisterTypes(IUnityContainer container)
         {
-
+            // We register our types here
 
         }
     }
