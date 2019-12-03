@@ -40,7 +40,7 @@ namespace Outage.DataModel
             return base.GetHashCode();
         }
 
-        #region
+        #region IAccess implementation
         public override bool HasProperty(ModelCode property)
         {
             switch (property)

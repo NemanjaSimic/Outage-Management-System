@@ -78,7 +78,7 @@ namespace Outage.DataModel
         }
         #endregion
 
-        #region
+        #region IReference implementation
         public override bool IsReferenced
         {
             get
