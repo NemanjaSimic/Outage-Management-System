@@ -8,7 +8,7 @@ using System.Threading.Tasks;
 
 namespace Outage.NetworkModelService
 {
-    public class Container
+    public class Container //: ICloneable
     {
         /// <summary>
 		/// The dictionary of entities. Key = GlobaId, Value = Entity
@@ -278,5 +278,16 @@ namespace Outage.NetworkModelService
         {
             return entities.Keys.ToList();
         }
+
+
+        #region ICloneable
+        public Container Clone()
+        {
+            Container clone = new Container();
+            clone.Entities = new Dictionary<long, IdentifiedObject>(this.entities);
+
+            return clone;
+        }
+        #endregion
     }
 }

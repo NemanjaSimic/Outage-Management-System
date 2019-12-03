@@ -14,6 +14,9 @@ namespace Outage.DataModel
         {
         }
 
+        protected EnergySource(EnergySource es) : base(es)
+        {
+        }
 
         public override bool Equals(object obj)
         {
@@ -84,5 +87,12 @@ namespace Outage.DataModel
         }
 
         #endregion IAccess implementation
+
+        #region IClonable
+        public override IdentifiedObject Clone()
+        {
+            return new EnergySource(this);
+        }
+        #endregion
     }
 }

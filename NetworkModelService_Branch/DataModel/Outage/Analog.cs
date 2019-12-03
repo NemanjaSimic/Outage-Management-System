@@ -10,14 +10,28 @@ namespace Outage.DataModel
 {
     public class Analog : Measurement
     {
+        #region Fields
         private float currentValue;
         private float maxValue;
         private float minValue;
         private float normalValue;
         private AnalogMeasurementType signalType;
+        #endregion
 
+        public Analog(long globalId) : base(globalId)
+        {
+        }
 
+        protected Analog(Analog analog) : base(analog)
+        {
+            CurrentValue = analog.CurrentValue;
+            MaxValue = analog.MaxValue;
+            MinValue = analog.MinValue;
+            NormalValue = analog.NormalValue;
+            SignalType = analog.SignalType;
+        }
 
+        #region Properties
         public float CurrentValue
         {
             get { return currentValue; }
@@ -47,10 +61,7 @@ namespace Outage.DataModel
             get { return signalType; }
             set { signalType = value; }
         }
-
-        public Analog(long globalId) : base(globalId)
-        {
-        }
+        #endregion
 
         public override bool Equals(object obj)
         {
@@ -138,6 +149,13 @@ namespace Outage.DataModel
                     base.SetProperty(property);
                     break;
             }
+        }
+        #endregion
+
+        #region IClonable
+        public override IdentifiedObject Clone()
+        {
+            return new Analog(this);
         }
         #endregion
     }

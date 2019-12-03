@@ -12,16 +12,16 @@ using Outage.Common.GDA;
 namespace Outage.DataModel
 { 
     public class Equipment : PowerSystemResource
-	{		
-		
-						
+	{					
 		public Equipment(long globalId) : base(globalId) 
 		{
 		}
-	
-		
 
-		public override bool Equals(object obj)
+        protected Equipment(Equipment eq) : base(eq)
+        {
+        }
+
+        public override bool Equals(object obj)
 		{
 			if (base.Equals(obj)) //in case we add new props
 			{
@@ -87,8 +87,15 @@ namespace Outage.DataModel
 					base.SetProperty(property);
 					break;
 			}
-		}		
+		}
 
-		#endregion IAccess implementation
-	}
+        #endregion IAccess implementation
+
+        #region IClonable
+        public override IdentifiedObject Clone()
+        {
+            return new Equipment(this);
+        }
+        #endregion
+    }
 }

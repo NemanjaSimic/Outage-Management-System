@@ -10,12 +10,24 @@ namespace Outage.DataModel
 {
     public class Measurement : IdentifiedObject
     {
+        #region Fields
         private string address;
         private bool isInput;
         private long terminal;
+        #endregion
 
+        public Measurement(long globalId) : base(globalId)
+        {
+        }
 
+        protected Measurement(Measurement measurement) : base(measurement)
+        {
+            Address = measurement.Address;
+            IsInput = measurement.IsInput;
+            Terminal = measurement.Terminal;
+        }
 
+        #region Properties
         public string Address
         {
             get { return address; }
@@ -31,11 +43,7 @@ namespace Outage.DataModel
             get { return terminal; }
             set { terminal = value; }
         }
-
-
-        public Measurement(long globalId) : base(globalId)
-        {
-        }
+        #endregion
 
         public override bool Equals(object obj)
         {
@@ -120,6 +128,13 @@ namespace Outage.DataModel
             }
 
             base.GetReferences(references, refType);
+        }
+        #endregion
+
+        #region IClonable
+        public override IdentifiedObject Clone()
+        {
+            return new Measurement(this);
         }
         #endregion
     }

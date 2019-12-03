@@ -13,6 +13,11 @@ namespace Outage.DataModel
         public ACLineSegment(long globalId) : base(globalId)
         {
         }
+
+        protected ACLineSegment(ACLineSegment aclSeg) : base(aclSeg)
+        {
+        }
+
         public override bool Equals(object obj)
         {
             if (base.Equals(obj)) //in case we add new props
@@ -82,5 +87,12 @@ namespace Outage.DataModel
         }
 
         #endregion IAccess implementation
+
+        #region IClonable
+        public override IdentifiedObject Clone()
+        {
+            return new ACLineSegment(this);
+        }
+        #endregion
     }
 }

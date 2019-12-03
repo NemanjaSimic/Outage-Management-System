@@ -12,12 +12,18 @@ using System.Xml;
 
 namespace Outage.NetworkModelService
 {
-    public class NetworkModel
+    public class NetworkModel //: ICloneable
     {
         /// <summary>
 		/// Dictionaru which contains all data: Key - DMSType, Value - Container
 		/// </summary>
 		private  Dictionary<DMSType, Container> networkDataModel;
+
+        /// <summary>
+		/// Dictionaru which contains all incoming data: Key - DMSType, Value - Container;
+        /// Used while applying deltas.
+		/// </summary>
+        private Dictionary<DMSType, Container> incomingNetworkDataModel;
 
         /// <summary>
         /// ModelResourceDesc class contains metadata of the model
@@ -51,9 +57,9 @@ namespace Outage.NetworkModelService
         {
             DMSType type = (DMSType)ModelCodeHelper.ExtractTypeFromGlobalId(globalId);
 
-            if (ContainerExists(type))
+            if (networkDataModel.ContainsKey(type))
             {
-                Container container = GetContainer(type);
+                Container container = networkDataModel[type];
 
                 if (container.EntityExists(globalId))
                 {
@@ -64,12 +70,25 @@ namespace Outage.NetworkModelService
             return false;
         }
 
+        private bool EntityExistsInIncomingData(long globalId)
+        {
+            DMSType type = (DMSType)ModelCodeHelper.ExtractTypeFromGlobalId(globalId);
+
+            if (incomingNetworkDataModel.ContainsKey(type))
+            {
+                Container container = incomingNetworkDataModel[type];
+                return container.EntityExists(globalId);
+            }
+
+            return false;
+        }
+
         public IdentifiedObject GetEntity(long globalId)
         {
             if (EntityExists(globalId))
             {
                 DMSType type = (DMSType)ModelCodeHelper.ExtractTypeFromGlobalId(globalId);
-                IdentifiedObject io = GetContainer(type).GetEntity(globalId);
+                IdentifiedObject io = networkDataModel[type].GetEntity(globalId);
 
                 return io;
             }
@@ -80,40 +99,50 @@ namespace Outage.NetworkModelService
             }
         }
 
+        private IdentifiedObject GetEntityFromIncomingData(long globalId)
+        {
+            if (EntityExistsInIncomingData(globalId))
+            {
+                DMSType type = (DMSType)ModelCodeHelper.ExtractTypeFromGlobalId(globalId);
+                IdentifiedObject io = incomingNetworkDataModel[type].GetEntity(globalId);
+
+                return io;
+            }
+            else
+            {
+                string message = string.Format("Entity  (GID = 0x{0:x16}) does not exist.", globalId);
+                throw new Exception(message);
+            }
+        }
 
         /// <summary>
         /// Checks if container exists in model.
         /// </summary>
         /// <param name="type">Type of container.</param>
         /// <returns>True if container exists, otherwise FALSE.</returns>
-        private bool ContainerExists(DMSType type)
-        {
-            if (networkDataModel.ContainsKey(type))
-            {
-                return true;
-            }
-
-            return false;
-        }
+        //private bool ContainerExists(DMSType type)
+        //{
+        //    return networkDataModel.ContainsKey(type);
+        //}
 
         /// <summary>
         /// Gets container of specified type.
         /// </summary>
         /// <param name="type">Type of container.</param>
         /// <returns>Container for specified local id</returns>
-        private Container GetContainer(DMSType type)
-        {
-            if (ContainerExists(type))
-            {
-                return networkDataModel[type];
-            }
-            else
-            {
-                string message = string.Format("Container does not exist for type {0}.", type);
-                throw new Exception(message);
-            }
+        //private Container GetContainer(DMSType type)
+        //{
+        //    if (networkDataModel.ContainsKey(type))
+        //    {
+        //        return networkDataModel[type];
+        //    }
+        //    else
+        //    {
+        //        string message = string.Format("Container does not exist for type {0}.", type);
+        //        throw new Exception(message);
+        //    }
 
-        }
+        //}
 
         #endregion Find
 
@@ -173,9 +202,9 @@ namespace Outage.NetworkModelService
 
                 DMSType entityDmsType = ModelCodeHelper.GetTypeFromModelCode(entityType);
 
-                if (ContainerExists(entityDmsType))
+                if (NetworkDataModel.ContainsKey(entityDmsType))
                 {
-                    Container container = GetContainer(entityDmsType);
+                    Container container = NetworkDataModel[entityDmsType];
                     globalIds = container.GetEntitiesGlobalIds();
                     class2PropertyIDs.Add(entityDmsType, properties);
                 }
@@ -244,6 +273,9 @@ namespace Outage.NetworkModelService
             bool applyingStarted = false;
             UpdateResult updateResult = new UpdateResult();
 
+            //shallow copy 
+            incomingNetworkDataModel = new Dictionary<DMSType, Container>(NetworkDataModel);
+
             try
             {
                 CommonTrace.WriteTrace(CommonTrace.TraceInfo, "Applying  delta to network model.");
@@ -271,6 +303,17 @@ namespace Outage.NetworkModelService
                     DeleteEntity(rd);
                 }
 
+                //Confirming switching from current to incoming data model
+                bool confirmDelta = true; //TODO: confirmation
+
+                if(confirmDelta)
+                {
+                    networkDataModel = incomingNetworkDataModel;
+                }
+                else
+                {
+                    incomingNetworkDataModel = null;
+                }
             }
             catch (Exception ex)
             {
@@ -315,7 +358,7 @@ namespace Outage.NetworkModelService
             CommonTrace.WriteTrace(CommonTrace.TraceInfo, "Inserting entity with GID ({0:x16}).", globalId);
 
             // check if mapping for specified global id already exists			
-            if (this.EntityExists(globalId))
+            if (this.EntityExistsInIncomingData(globalId))
             {
                 string message = String.Format("Failed to insert entity because entity with specified GID ({0:x16}) already exists in network model.", globalId);
                 CommonTrace.WriteTrace(CommonTrace.TraceError, message);
@@ -327,21 +370,38 @@ namespace Outage.NetworkModelService
                 // find type
                 DMSType type = (DMSType)ModelCodeHelper.ExtractTypeFromGlobalId(globalId);
 
-                Container container = null;
+                Container incomingDataContainer = null;
 
                 // get container or create container 
-                if (ContainerExists(type))
+                if (incomingNetworkDataModel.ContainsKey(type))
                 {
-                    container = GetContainer(type);
+                    incomingDataContainer = incomingNetworkDataModel[type];
+
+                    if (networkDataModel.ContainsKey(type))
+                    {
+                        Container currentDataContainer = networkDataModel[type];
+
+                        if (currentDataContainer.GetHashCode() == incomingDataContainer.GetHashCode())
+                        {
+                            incomingDataContainer = currentDataContainer.Clone();
+                        }
+                    }
                 }
                 else
                 {
-                    container = new Container();
-                    networkDataModel.Add(type, container);
+                    if (networkDataModel.ContainsKey(type))
+                    {
+                        incomingDataContainer = networkDataModel[type].Clone();
+                    }
+                    else
+                    {
+                        incomingDataContainer = new Container();
+                        incomingNetworkDataModel.Add(type, incomingDataContainer);
+                    }
                 }
 
                 // create entity and add it to container
-                IdentifiedObject io = container.CreateEntity(globalId);
+                IdentifiedObject io = incomingDataContainer.CreateEntity(globalId);
 
                 // apply properties on created entity
                 if (rd.Properties != null)
@@ -362,15 +422,16 @@ namespace Outage.NetworkModelService
                             if (targetGlobalId != 0)
                             {
 
-                                if (!EntityExists(targetGlobalId))
+                                if (!EntityExistsInIncomingData(targetGlobalId))
                                 {
                                     string message = string.Format("Failed to get target entity with GID: 0x{0:X16}. {1}", targetGlobalId);
                                     throw new Exception(message);
                                 }
 
                                 // get referenced entity for update
-                                IdentifiedObject targetEntity = GetEntity(targetGlobalId);
-                                targetEntity.AddReference(property.Id, io.GlobalId);
+                                IdentifiedObject targetEntity = GetEntityFromIncomingData(targetGlobalId);
+                                //TOOD: make copy of entity if it is the same entity as in the current model!
+                                targetEntity.AddReference(property.Id, io.GlobalId); //TODO: thik about this, are any changes needed?
                             }
 
                             io.SetProperty(property);
@@ -410,14 +471,14 @@ namespace Outage.NetworkModelService
 
                 CommonTrace.WriteTrace(CommonTrace.TraceVerbose, "Updating entity with GID ({0:x16}).", globalId);
 
-                if (!this.EntityExists(globalId))
+                if (!this.EntityExistsInIncomingData(globalId))
                 {
                     string message = String.Format("Failed to update entity because entity with specified GID ({0:x16}) does not exist in network model.", globalId);
                     CommonTrace.WriteTrace(CommonTrace.TraceError, message);
                     throw new Exception(message);
                 }
 
-                IdentifiedObject io = GetEntity(globalId);
+                IdentifiedObject io = GetEntityFromIncomingData(globalId);
 
                 // updating properties of entity
                 foreach (Property property in rd.Properties)
@@ -428,7 +489,7 @@ namespace Outage.NetworkModelService
 
                         if (oldTargetGlobalId != 0)
                         {
-                            IdentifiedObject oldTargetEntity = GetEntity(oldTargetGlobalId);
+                            IdentifiedObject oldTargetEntity = GetEntityFromIncomingData(oldTargetGlobalId);
                             oldTargetEntity.RemoveReference(property.Id, globalId);
                         }
 
@@ -443,7 +504,7 @@ namespace Outage.NetworkModelService
                                 throw new Exception(message);
                             }
 
-                            IdentifiedObject targetEntity = GetEntity(targetGlobalId);
+                            IdentifiedObject targetEntity = GetEntityFromIncomingData(targetGlobalId);
                             targetEntity.AddReference(property.Id, globalId);
                         }
 
@@ -486,7 +547,7 @@ namespace Outage.NetworkModelService
                 CommonTrace.WriteTrace(CommonTrace.TraceVerbose, "Deleting entity with GID ({0:x16}).", globalId);
 
                 // check if entity exists
-                if (!this.EntityExists(globalId))
+                if (!this.EntityExistsInIncomingData(globalId))
                 {
                     string message = String.Format("Failed to delete entity because entity with specified GID ({0:x16}) does not exist in network model.", globalId);
                     CommonTrace.WriteTrace(CommonTrace.TraceError, message);
@@ -494,7 +555,7 @@ namespace Outage.NetworkModelService
                 }
 
                 // get entity to be deleted
-                IdentifiedObject io = GetEntity(globalId);
+                IdentifiedObject io = GetEntityFromIncomingData(globalId);
 
                 // check if entity could be deleted (if it is not referenced by any other entity)
                 if (io.IsReferenced)
@@ -538,7 +599,7 @@ namespace Outage.NetworkModelService
                             if (targetGlobalId != 0)
                             {
                                 // get target entity
-                                IdentifiedObject targetEntity = GetEntity(targetGlobalId);
+                                IdentifiedObject targetEntity = GetEntityFromIncomingData(targetGlobalId);
 
                                 // remove reference to another entity
                                 targetEntity.RemoveReference(propertyId, globalId);
@@ -549,10 +610,20 @@ namespace Outage.NetworkModelService
 
                 // remove entity form netowrk model
                 DMSType type = (DMSType)ModelCodeHelper.ExtractTypeFromGlobalId(globalId);
-                Container container = GetContainer(type);
-                container.RemoveEntity(globalId);
 
-                CommonTrace.WriteTrace(CommonTrace.TraceVerbose, "Deleting entity with GID ({0:x16}) successfully finished.", globalId);
+
+                if (incomingNetworkDataModel.ContainsKey(type))
+                {
+                    Container container = incomingNetworkDataModel[type];
+                    container.RemoveEntity(globalId);
+
+                    CommonTrace.WriteTrace(CommonTrace.TraceVerbose, "Deleting entity with GID ({0:x16}) successfully finished.", globalId);
+                }
+                else
+                {
+                    string message = string.Format("Container does not exist for type {0}.", type);
+                    throw new Exception(message);
+                }
             }
             catch (Exception ex)
             {
@@ -570,6 +641,9 @@ namespace Outage.NetworkModelService
         /// <returns>related gids</returns>
         private List<long> ApplyAssocioationOnSource(long source, Association association)
         {
+            //TODO: use case was not considered yet 
+            throw new NotImplementedException();
+
             List<long> relatedGids = new List<long>();
 
             if (association == null)
@@ -765,7 +839,7 @@ namespace Outage.NetworkModelService
 
                 if (networkDataModel.ContainsKey(type))
                 {
-                    typesCounters[(short)type] = GetContainer(type).Count;
+                    typesCounters[(short)type] = networkDataModel[type].Count;
                 }
             }
 

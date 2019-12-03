@@ -12,19 +12,26 @@ namespace Outage.DataModel
 {
     public class ConnectivityNode : IdentifiedObject
     {
+        #region Fields
         private List<long> terminals = new List<long>();
-
+        #endregion
 
         public ConnectivityNode(long globalId) : base(globalId)
         {
         }
 
-        
+        protected ConnectivityNode(ConnectivityNode cn) : base(cn)
+        {
+            Terminals.AddRange(cn.Terminals);
+        }
+
+        #region Properties
         public List<long> Terminals
         {
             get { return terminals; }
             set { terminals = value; }
         }
+        #endregion Properties
 
         public override bool Equals(object obj)
         {
@@ -134,5 +141,12 @@ namespace Outage.DataModel
         }
 
         #endregion IReference implementation
+
+        #region IClonable
+        public override IdentifiedObject Clone()
+        {
+            return new ConnectivityNode(this);
+        }
+        #endregion
     }
 }

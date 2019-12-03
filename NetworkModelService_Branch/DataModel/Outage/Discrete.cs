@@ -10,19 +10,33 @@ namespace Outage.DataModel
 {
     public class Discrete : Measurement
     {
-
+        #region Fields
         private bool currentOpen;
         private int maxValue;
-        private DiscreteMeasurementType measurementType;
         private int minValue;
         private int normalValue;
+        private DiscreteMeasurementType measurementType;
+        #endregion
 
+        public Discrete(long globalId) : base(globalId)
+        {
+        }
+
+        protected Discrete(Discrete discrete) : base(discrete)
+        {
+            CurrentOpen = discrete.CurrentOpen;
+            MaxValue = discrete.MaxValue;
+            MinValue = discrete.MinValue;
+            NormalValue = discrete.NormalValue;
+            MeasurementType = discrete.MeasurementType;
+        }
+
+        #region Properties
         public bool CurrentOpen
         {
             get { return currentOpen; }
             set { currentOpen = value; }
         }
-
 
         public int MaxValue
         {
@@ -30,32 +44,24 @@ namespace Outage.DataModel
             set { maxValue = value; }
         }
 
-
         public DiscreteMeasurementType MeasurementType
         {
             get { return measurementType; }
             set { measurementType = value; }
         }
 
-
         public int MinValue
         {
             get { return minValue; }
             set { minValue = value; }
-        }
-
-       
+        }       
 
         public int NormalValue
         {
             get { return normalValue; }
             set { normalValue = value; }
         }
-
-
-        public Discrete(long globalId) : base(globalId)
-        {
-        }
+        #endregion Properties
 
         public override bool Equals(object obj)
         {
@@ -78,7 +84,6 @@ namespace Outage.DataModel
         {
             return base.GetHashCode();
         }
-
 
         #region IAccess implementation
         public override bool HasProperty(ModelCode property)
@@ -144,6 +149,13 @@ namespace Outage.DataModel
                     base.SetProperty(property);
                     break;
             }
+        }
+        #endregion
+
+        #region IClonable
+        public override IdentifiedObject Clone()
+        {
+            return new Discrete(this);
         }
         #endregion
     }

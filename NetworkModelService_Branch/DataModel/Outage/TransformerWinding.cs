@@ -10,17 +10,26 @@ namespace Outage.DataModel
 {
     public class TransformerWinding : ConductingEquipment
     {
+        #region Fields
         private long powerTransformer;
+        #endregion
 
+        public TransformerWinding(long globalId) : base(globalId)
+        {
+        }
+
+        protected TransformerWinding(TransformerWinding tw) : base(tw)
+        {
+            PowerTransformer = tw.PowerTransformer;
+        }
+
+        #region Properties
         public long PowerTransformer
         {
             get { return powerTransformer; }
             set { powerTransformer = value; }
         }
-
-        public TransformerWinding(long globalId) : base(globalId)
-        {
-        }
+        #endregion
 
         public override bool Equals(object obj)
         {
@@ -40,7 +49,7 @@ namespace Outage.DataModel
             return base.GetHashCode();
         }
 
-        #region
+        #region IAccess implementation
         public override bool HasProperty(ModelCode property)
         {
             switch (property)
@@ -88,6 +97,13 @@ namespace Outage.DataModel
                 references[ModelCode.TRANSFORMERWINDING_POWERTRANSFORMER].Add(powerTransformer);
             }
             base.GetReferences(references, refType);
+        }
+        #endregion
+
+        #region IClonable
+        public override IdentifiedObject Clone()
+        {
+            return new TransformerWinding(this);
         }
         #endregion
     }

@@ -12,21 +12,24 @@ namespace Outage.DataModel
 {
     public class Terminal : IdentifiedObject
     {
-       
-
+        #region Fields
         private long conductingEquipment;
-
         private long connectivityNode;
-
         private List<long> measurements = new List<long>();
-
-        
+        #endregion
 
         public Terminal(long globalId) : base(globalId)
         {
         }
 
+        protected Terminal(Terminal terminal) : base(terminal)
+        {
+            ConductingEquipment = terminal.ConductingEquipment;
+            ConnectivityNode = terminal.ConnectivityNode;
+            Measurements.AddRange(terminal.Measurements);
+        }
 
+        #region Properties
         public long ConductingEquipment
         {
             get { return conductingEquipment; }
@@ -44,6 +47,7 @@ namespace Outage.DataModel
             get { return measurements; }
             set { measurements = value; }
         }
+        #endregion
 
         public override bool Equals(object obj)
         {
@@ -196,5 +200,11 @@ namespace Outage.DataModel
 
         #endregion IReference implementation
 
+        #region IClonable
+        public override IdentifiedObject Clone()
+        {
+            return new Terminal(this);
+        }
+        #endregion
     }
 }

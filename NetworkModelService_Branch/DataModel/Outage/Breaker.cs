@@ -10,18 +10,26 @@ namespace Outage.DataModel
 {
     public class Breaker : ProtectedSwitch
     {
-
+        #region Fields
         private bool noReclosing;
+        #endregion
 
+        public Breaker(long globalId) : base(globalId)
+        {
+        }
+
+        protected Breaker(Breaker br) : base(br)
+        {
+            NoReclosing = br.NoReclosing;
+        }
+
+        #region Properties
         public bool NoReclosing
         {
             get { return noReclosing; }
             set { noReclosing = value; }
         }
-
-        public Breaker(long globalId) : base(globalId)
-        {
-        }
+        #endregion
 
         public override bool Equals(object obj)
         {
@@ -78,6 +86,13 @@ namespace Outage.DataModel
                     base.SetProperty(property);
                     break;
             }
+        }
+        #endregion
+
+        #region IClonable
+        public override IdentifiedObject Clone()
+        {
+            return new Breaker(this);
         }
         #endregion
     }

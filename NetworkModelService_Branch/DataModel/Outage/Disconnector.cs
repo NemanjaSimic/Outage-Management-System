@@ -14,6 +14,10 @@ namespace Outage.DataModel
         {
         }
 
+        protected Disconnector(Disconnector dis) : base(dis)
+        {
+        }
+
         public override bool Equals(object obj)
         {
             if (base.Equals(obj)) //in case we add new props
@@ -83,5 +87,12 @@ namespace Outage.DataModel
         }
 
         #endregion IAccess implementation
+
+        #region IClonable
+        public override IdentifiedObject Clone()
+        {
+            return new Disconnector(this);
+        }
+        #endregion
     }
 }

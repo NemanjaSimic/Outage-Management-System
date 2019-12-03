@@ -18,17 +18,18 @@ namespace Outage.DataModel
 		Both = 3,
 	}
 
-	public class IdentifiedObject
+	public class IdentifiedObject //: ICloneable
 	{
 		/// <summary>
 		/// Model Resources Description
 		/// </summary>
 		private static ModelResourcesDesc resourcesDescs = new ModelResourcesDesc();
 
-		/// <summary>
-		/// Global id of the identified object (SystemId - 4 nibls, DMSType - 4 nibls, FragmentId - 8 nibls)
-		/// </summary>
-		private long globalId;
+        #region Fields
+        /// <summary>
+        /// Global id of the identified object (SystemId - 4 nibls, DMSType - 4 nibls, FragmentId - 8 nibls)
+        /// </summary>
+        private long globalId;
 		
 		/// <summary>
 		/// Name of identified object
@@ -40,27 +41,35 @@ namespace Outage.DataModel
 		/// </summary>		
 		private string mrid = string.Empty;
 
-
         /// <summary>
         /// The description is a free human readable text describing or naming the object. It may be non unique and may not correlate to a naming hierarchy.
         /// </summary>
         private string description = string.Empty;
+        #endregion
 
-		
-		
-		/// <summary>
-		/// Initializes a new instance of the IdentifiedObject class.
-		/// </summary>		
-		/// <param name="globalId">Global id of the entity.</param>
-		public IdentifiedObject(long globalId)
+
+        /// <summary>
+        /// Initializes a new instance of the IdentifiedObject class.
+        /// </summary>		
+        /// <param name="globalId">Global id of the entity.</param>
+        public IdentifiedObject(long globalId)
 		{
 			this.globalId = globalId;			
 		}		
 
-		/// <summary>
-		/// Gets or sets global id of the entity (identified object).
-		/// </summary>			
-		public long GlobalId
+        protected IdentifiedObject(IdentifiedObject io)
+        {
+            GlobalId = io.globalId;
+            Mrid = io.mrid;
+            Name = io.name;
+            Description = io.description;
+        }
+
+        #region Properties
+        /// <summary>
+        /// Gets or sets global id of the entity (identified object).
+        /// </summary>			
+        public long GlobalId
 		{
 			get
 			{
@@ -107,8 +116,9 @@ namespace Outage.DataModel
             get { return description; }
             set { description = value; }
         }
+        #endregion
 
-		public static bool operator ==(IdentifiedObject x, IdentifiedObject y)
+        public static bool operator ==(IdentifiedObject x, IdentifiedObject y)
 		{
 			if(Object.ReferenceEquals(x, null) && Object.ReferenceEquals(y, null))
 			{
@@ -317,8 +327,15 @@ namespace Outage.DataModel
 					valuesInOriginal.Add(rd.Properties[i]);
 				}
 			}
-		}	
+		}
 
-		#endregion utility methods
-	}
+        #endregion utility methods
+
+        #region IClonable
+        public virtual IdentifiedObject Clone()
+        { 
+            return new IdentifiedObject(this);
+        }
+        #endregion
+    }
 }
