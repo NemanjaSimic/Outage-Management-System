@@ -1,4 +1,6 @@
-﻿using Outage.Common;
+﻿using MongoDB.Bson;
+using MongoDB.Driver;
+using Outage.Common;
 using Outage.Common.GDA;
 using Outage.DataModel;
 using Outage.NetworkModelService.GDA;
@@ -15,7 +17,7 @@ namespace Outage.NetworkModelService
     public class NetworkModel
     {
         /// <summary>
-		/// Dictionaru which contains all data: Key - DMSType, Value - Container
+		/// Dictionary which contains all data: Key - DMSType, Value - Container
 		/// </summary>
 		private  Dictionary<DMSType, Container> networkDataModel;
 
@@ -25,7 +27,7 @@ namespace Outage.NetworkModelService
         private ModelResourcesDesc resourcesDescs;
 
         /// <summary>
-		/// Dictionaru which contains all data: Key - DMSType, Value - Container
+		/// Dictionary which contains all data: Key - DMSType, Value - Container
 		/// </summary>
         public Dictionary<DMSType, Container> NetworkDataModel
         {
@@ -34,6 +36,8 @@ namespace Outage.NetworkModelService
                 return networkDataModel ?? (networkDataModel = new Dictionary<DMSType, Container>());
             }
         }
+        
+        private IMongoDatabase db;
 
         /// <summary>
         /// Initializes a new instance of the Model class.
@@ -42,6 +46,15 @@ namespace Outage.NetworkModelService
         {
             networkDataModel = new Dictionary<DMSType, Container>();
             resourcesDescs = new ModelResourcesDesc();
+            try
+            {
+                MongoClient dbClient = new MongoClient(Config.Instance.DbConnectionString);
+                db = dbClient.GetDatabase("NMSDatabase");
+            }
+            catch (Exception e)
+            {
+                CommonTrace.WriteTrace(CommonTrace.TraceError, e.Message);
+            }
             Initialize();
         }
 
@@ -239,10 +252,10 @@ namespace Outage.NetworkModelService
 
         #endregion GDA query	
 
-        public UpdateResult ApplyDelta(Delta delta)
+        public Common.GDA.UpdateResult ApplyDelta(Delta delta)
         {
             bool applyingStarted = false;
-            UpdateResult updateResult = new UpdateResult();
+            Common.GDA.UpdateResult updateResult = new Common.GDA.UpdateResult();
 
             try
             {
@@ -677,82 +690,123 @@ namespace Outage.NetworkModelService
 
         private void SaveDelta(Delta delta)
         {
-            bool fileExisted = false;
+            //bool fileExisted = false;
 
-            if (File.Exists(Config.Instance.ConnectionString))
+            //if (File.Exists(Config.Instance.ConnectionString))
+            //{
+            //    fileExisted = true;
+            //}
+
+            //FileStream fs = new FileStream(Config.Instance.ConnectionString, FileMode.OpenOrCreate, FileAccess.ReadWrite);
+            //fs.Seek(0, SeekOrigin.Begin);
+
+            //BinaryReader br = null;
+            long deltaCount = 0;
+            var counterCollection = db.GetCollection<ModelVersion>("versions");
+            var filter = Builders<ModelVersion>.Filter.Eq("Id", "deltaVersion");
+            if(counterCollection.Find(filter).CountDocuments() > 0)
             {
-                fileExisted = true;
+                ModelVersion finded = counterCollection.Find(filter).First();
+                deltaCount = finded.Version;
             }
 
-            FileStream fs = new FileStream(Config.Instance.ConnectionString, FileMode.OpenOrCreate, FileAccess.ReadWrite);
-            fs.Seek(0, SeekOrigin.Begin);
 
-            BinaryReader br = null;
-            int deltaCount = 0;
+            //if (fileExisted)
+            //{
+            //    br = new BinaryReader(fs);
+            //    deltaCount = br.ReadInt32();
+            //}
 
-            if (fileExisted)
-            {
-                br = new BinaryReader(fs);
-                deltaCount = br.ReadInt32();
-            }
-
-            BinaryWriter bw = new BinaryWriter(fs);
-            fs.Seek(0, SeekOrigin.Begin);
+            //BinaryWriter bw = new BinaryWriter(fs);
+            //fs.Seek(0, SeekOrigin.Begin);
 
             delta.Id = ++deltaCount;
-            byte[] deltaSerialized = delta.Serialize();
-            int deltaLength = deltaSerialized.Length;
+            //byte[] deltaSerialized = delta.Serialize();
+            //int deltaLength = deltaSerialized.Length;
 
-            bw.Write(deltaCount);
-            fs.Seek(0, SeekOrigin.End);
-            bw.Write(deltaLength);
-            bw.Write(deltaSerialized);
+            //bw.Write(deltaCount);
+            //fs.Seek(0, SeekOrigin.End);
+            //bw.Write(deltaLength);
+            //bw.Write(deltaSerialized);
 
-            if (br != null)
+            //if (br != null)
+            //{
+            //    br.Close();
+            //}
+
+            //bw.Close();
+            //fs.Close();
+
+
+            try
             {
-                br.Close();
+                
+                counterCollection.ReplaceOne(new BsonDocument("_id", "deltaVersion"), new ModelVersion { Id = "deltaVersion", Version = delta.Id }, new UpdateOptions { IsUpsert = true });
+                var deltaCollection = db.GetCollection<Delta>("deltas");
+                deltaCollection.InsertOne(delta);
+                
+            }
+            catch (Exception e)
+            {
+                CommonTrace.WriteTrace(CommonTrace.TraceError, $"Error on database: {e.Message}");
             }
 
-            bw.Close();
-            fs.Close();
         }
 
         private List<Delta> ReadAllDeltas()
         {
-            List<Delta> result = new List<Delta>();
 
-            if (!File.Exists(Config.Instance.ConnectionString))
+            List<Delta> deltasFromDb = new List<Delta>();
+            //List<Delta> result = new List<Delta>();
+
+
+            var collection = db.GetCollection<Delta>("deltas");
+            
+            
+            deltasFromDb = collection.Find(new BsonDocument()).ToList();
+
+            if (deltasFromDb.Count <= 0)
             {
-                return result;
+                return deltasFromDb;
             }
 
-            FileStream fs = new FileStream(Config.Instance.ConnectionString, FileMode.OpenOrCreate, FileAccess.Read);
-            fs.Seek(0, SeekOrigin.Begin);
+            
+            
+            
 
-            if (fs.Position < fs.Length) // if it is not empty stream
-            {
-                BinaryReader br = new BinaryReader(fs);
 
-                int deltaCount = br.ReadInt32();
-                int deltaLength = 0;
-                byte[] deltaSerialized = null;
-                Delta delta = null;
+            //if (!File.Exists(Config.Instance.ConnectionString))
+            //{
+            //    return result;
+            //}
 
-                for (int i = 0; i < deltaCount; i++)
-                {
-                    deltaLength = br.ReadInt32();
-                    deltaSerialized = new byte[deltaLength];
-                    br.Read(deltaSerialized, 0, deltaLength);
-                    delta = Delta.Deserialize(deltaSerialized);
-                    result.Add(delta);
-                }
+            //FileStream fs = new FileStream(Config.Instance.ConnectionString, FileMode.OpenOrCreate, FileAccess.Read);
+            //fs.Seek(0, SeekOrigin.Begin);
 
-                br.Close();
-            }
+            //if (fs.Position < fs.Length) // if it is not empty stream
+            //{
+            //    BinaryReader br = new BinaryReader(fs);
 
-            fs.Close();
+            //    int deltaCount = br.ReadInt32();
+            //    int deltaLength = 0;
+            //    byte[] deltaSerialized = null;
+            //    Delta delta = null;
 
-            return result;
+            //    for (int i = 0; i < deltaCount; i++)
+            //    {
+            //        deltaLength = br.ReadInt32();
+            //        deltaSerialized = new byte[deltaLength];
+            //        br.Read(deltaSerialized, 0, deltaLength);
+            //        delta = Delta.Deserialize(deltaSerialized);
+            //        result.Add(delta);
+            //    }
+
+            //    br.Close();
+            //}
+
+            //fs.Close();
+
+            return deltasFromDb;
         }
 
         private Dictionary<short, int> GetCounters()
