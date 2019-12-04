@@ -257,7 +257,7 @@ namespace Outage.DataModel
 
 		#endregion IReference implementation
 
-		#region utility methods
+		#region Utility methods
 
 		public void GetReferences(Dictionary<ModelCode, List<long>> references)
 		{

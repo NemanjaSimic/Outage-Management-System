@@ -223,7 +223,7 @@ namespace Outage.NetworkModelService
             }
             else
             {
-                string message = String.Format("Failed to retrieve entity (GID = 0x{1:x16}) because entity doesn't exist.", globalId);
+                string message = String.Format("Failed to retrieve entity (GID = 0x{0:x16}) because entity doesn't exist.", globalId);
                 CommonTrace.WriteTrace(CommonTrace.TraceError, message);
                 throw new Exception(message);
             }
@@ -242,7 +242,7 @@ namespace Outage.NetworkModelService
             }
             else
             {
-                string message = String.Format("Entity (GID = 0x{1:x16}) already exists.", io.GlobalId);
+                string message = String.Format("Entity (GID = 0x{0:x16}) already exists.", io.GlobalId);
                 CommonTrace.WriteTrace(CommonTrace.TraceError, message);
                 throw new Exception(message);
             }

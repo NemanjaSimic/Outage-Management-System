@@ -567,7 +567,7 @@ namespace CIM.Model
 							, MessageLevel.WARNING);
                         string propertyType = StringManipulationManager.ExtractAllAfterSeparator(referencedType.FullName, StringManipulationManager.SeparatorDot);
 					}
-					////otherwise its DataType and its already set
+					//otherwise its DataType and its already set
 				}
 				else
 				{

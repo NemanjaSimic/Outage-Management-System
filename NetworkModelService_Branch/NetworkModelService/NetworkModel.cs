@@ -370,13 +370,15 @@ namespace Outage.NetworkModelService
                 // find type
                 DMSType type = (DMSType)ModelCodeHelper.ExtractTypeFromGlobalId(globalId);
 
+                // get container or create container 
                 Container incomingDataContainer = null;
 
-                // get container or create container 
+                //get container from incoming model
                 if (incomingNetworkDataModel.ContainsKey(type))
                 {
                     incomingDataContainer = incomingNetworkDataModel[type];
 
+                    //get container from current model
                     if (networkDataModel.ContainsKey(type))
                     {
                         Container currentDataContainer = networkDataModel[type];
@@ -421,6 +423,12 @@ namespace Outage.NetworkModelService
 
                             if (targetGlobalId != 0)
                             {
+                                IdentifiedObject currentTargetEntity = null;
+
+                                if(EntityExists(targetGlobalId))
+                                {
+                                    currentTargetEntity = GetEntity(targetGlobalId);
+                                }
 
                                 if (!EntityExistsInIncomingData(targetGlobalId))
                                 {
@@ -429,9 +437,17 @@ namespace Outage.NetworkModelService
                                 }
 
                                 // get referenced entity for update
-                                IdentifiedObject targetEntity = GetEntityFromIncomingData(targetGlobalId);
-                                //TOOD: make copy of entity if it is the same entity as in the current model!
-                                targetEntity.AddReference(property.Id, io.GlobalId); //TODO: thik about this, are any changes needed?
+                                IdentifiedObject incomingTargetEntity = GetEntityFromIncomingData(targetGlobalId);
+                                
+                                if(currentTargetEntity != null)
+                                {
+                                    if(currentTargetEntity.GetHashCode() == incomingTargetEntity.GetHashCode())
+                                    {
+                                        incomingTargetEntity = currentTargetEntity.Clone();
+                                    }
+                                }
+
+                                incomingTargetEntity.AddReference(property.Id, io.GlobalId);
                             }
 
                             io.SetProperty(property);
@@ -489,8 +505,24 @@ namespace Outage.NetworkModelService
 
                         if (oldTargetGlobalId != 0)
                         {
-                            IdentifiedObject oldTargetEntity = GetEntityFromIncomingData(oldTargetGlobalId);
-                            oldTargetEntity.RemoveReference(property.Id, globalId);
+                            IdentifiedObject incomingOldTargetEntity = null;
+                            if (EntityExistsInIncomingData(oldTargetGlobalId))
+                            {
+                                incomingOldTargetEntity = GetEntityFromIncomingData(oldTargetGlobalId);
+                            }
+
+                            IdentifiedObject currentOldTargetEntity = null;
+                            if(EntityExists(oldTargetGlobalId))
+                            {
+                                currentOldTargetEntity = GetEntity(oldTargetGlobalId);
+                            }
+
+                            if(incomingOldTargetEntity.GetHashCode() == currentOldTargetEntity.GetHashCode())
+                            {
+                                incomingOldTargetEntity = currentOldTargetEntity.Clone();
+                            }
+
+                            incomingOldTargetEntity.RemoveReference(property.Id, globalId);
                         }
 
                         // updating reference of entity
@@ -498,14 +530,26 @@ namespace Outage.NetworkModelService
 
                         if (targetGlobalId != 0)
                         {
-                            if (!EntityExists(targetGlobalId))
+                            if (!EntityExistsInIncomingData(targetGlobalId))
                             {
                                 string message = string.Format("Failed to get target entity with GID: 0x{0:X16}.", targetGlobalId);
                                 throw new Exception(message);
                             }
 
-                            IdentifiedObject targetEntity = GetEntityFromIncomingData(targetGlobalId);
-                            targetEntity.AddReference(property.Id, globalId);
+                            IdentifiedObject incomingTargetEntity = GetEntityFromIncomingData(targetGlobalId);
+
+                            IdentifiedObject currentTargetEntity = null;
+                            if (EntityExists(targetGlobalId))
+                            {
+                                currentTargetEntity = GetEntity(targetGlobalId);
+                            }
+
+                            if (incomingTargetEntity.GetHashCode() == currentTargetEntity.GetHashCode())
+                            {
+                                incomingTargetEntity = currentTargetEntity.Clone();
+                            }
+
+                            incomingTargetEntity.AddReference(property.Id, globalId);
                         }
 
                         // update value of the property in specified entity
