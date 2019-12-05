@@ -53,7 +53,7 @@ namespace Outage.DataImporter.CIMAdapter
             {
                 DoTransformAndLoad(assembly, concreteModel, extractType, deltaOpType, out nmsDelta, out transformLog);
             }
-            log = string.Concat("Load report:\r\n", loadLog, "\r\nTransform report:\r\n", transformLog);
+            log = string.Concat("Load report:\r\n", loadLog, "\r\nTransform report:\r\n", "\r\n\tOperation: ", deltaOpType, "\r\n\r\n", transformLog);
 
             return nmsDelta;
         }
