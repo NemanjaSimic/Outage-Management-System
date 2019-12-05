@@ -1,3 +1,6 @@
+using OMS.Web.API.Hubs;
+using OMS.Web.Common;
+using OMS.Web.Common.Interfaces.Exceptions;
 using System;
 using Unity;
 
@@ -36,7 +39,8 @@ namespace OMS.Web.API
         public static void RegisterTypes(IUnityContainer container)
         {
             // We register our types here
-
+            container.RegisterType<GraphHub>();
+            container.RegisterType<ICustomExceptionHandler, CustomExceptionBase>();
         }
     }
 }
