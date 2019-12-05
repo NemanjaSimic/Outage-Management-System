@@ -1,21 +1,21 @@
-﻿using Outage.ServiceContracts;
+﻿using Outage.Common;
+using Outage.Common.Contracts;
+using Outage.Common.GDA;
 using System;
 using System.Collections.Generic;
 using System.Linq;
 using System.ServiceModel;
 using System.Text;
 using System.Threading.Tasks;
-using Outage.Common;
-using Outage.Common.GDA;
 
 namespace NetworkModelServiceFunctions
 {
-	class NetworkModelGDAProxy : ChannelFactory<INetworkModelGDA>, INetworkModelGDA, IDisposable
+	class NetworkModelGDAProxy : ClientBase<INetworkModelGDAContract>, INetworkModelGDAContract , IDisposable
 	{
-		private INetworkModelGDA proxy;
-		public NetworkModelGDAProxy(NetTcpBinding binding, EndpointAddress address) : base (binding, address)
+		private INetworkModelGDAContract proxy;
+		public NetworkModelGDAProxy(string endpointName) : base (endpointName)
 		{
-			proxy = this.CreateChannel();
+			proxy = CreateChannel();
 		}
 
 		public UpdateResult ApplyUpdate(Delta delta)

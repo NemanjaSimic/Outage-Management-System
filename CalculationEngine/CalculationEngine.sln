@@ -1,10 +1,8 @@
 ﻿
 Microsoft Visual Studio Solution File, Format Version 12.00
-# Visual Studio 14
-VisualStudioVersion = 14.0.25420.1
+# Visual Studio 15
+VisualStudioVersion = 15.0.28307.136
 MinimumVisualStudioVersion = 10.0.40219.1
-Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "CalculationEngine", "CalculationEngine\CalculationEngine.csproj", "{B721E792-A471-4DEC-BAD7-273074CC1EF4}"
-EndProject
 Project("{2150E333-8FDC-42A3-9474-1A3956D46DE8}") = "Common", "Common", "{CF06F314-A704-42F2-A9D9-424DC45913C0}"
 EndProject
 Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "Common", "..\NetworkModelService_Branch\Common\Common.csproj", "{892CBE15-9ED7-4540-81FA-0EAABA592138}"
@@ -12,6 +10,8 @@ EndProject
 Project("{2150E333-8FDC-42A3-9474-1A3956D46DE8}") = "NetworkModelServiceFunctions", "NetworkModelServiceFunctions", "{028FD683-81C5-496A-BB88-22966D9429CC}"
 EndProject
 Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "NetworkModelServiceFunctions", "NetworkModelServiceFunctions\NetworkModelServiceFunctions.csproj", "{D4553E8A-C694-4EBD-BA3C-0444A1D0C1EF}"
+EndProject
+Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "CalculationEngineServiceHost", "CalculationEngineServiceHost\CalculationEngineServiceHost.csproj", "{8161DAA9-A01F-4C71-BB12-4EB918869DBC}"
 EndProject
 Global
 	GlobalSection(SolutionConfigurationPlatforms) = preSolution
@@ -23,18 +23,6 @@ Global
 		Release|x86 = Release|x86
 	EndGlobalSection
 	GlobalSection(ProjectConfigurationPlatforms) = postSolution
-		{B721E792-A471-4DEC-BAD7-273074CC1EF4}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
-		{B721E792-A471-4DEC-BAD7-273074CC1EF4}.Debug|Any CPU.Build.0 = Debug|Any CPU
-		{B721E792-A471-4DEC-BAD7-273074CC1EF4}.Debug|x64.ActiveCfg = Debug|Any CPU
-		{B721E792-A471-4DEC-BAD7-273074CC1EF4}.Debug|x64.Build.0 = Debug|Any CPU
-		{B721E792-A471-4DEC-BAD7-273074CC1EF4}.Debug|x86.ActiveCfg = Debug|Any CPU
-		{B721E792-A471-4DEC-BAD7-273074CC1EF4}.Debug|x86.Build.0 = Debug|Any CPU
-		{B721E792-A471-4DEC-BAD7-273074CC1EF4}.Release|Any CPU.ActiveCfg = Release|Any CPU
-		{B721E792-A471-4DEC-BAD7-273074CC1EF4}.Release|Any CPU.Build.0 = Release|Any CPU
-		{B721E792-A471-4DEC-BAD7-273074CC1EF4}.Release|x64.ActiveCfg = Release|Any CPU
-		{B721E792-A471-4DEC-BAD7-273074CC1EF4}.Release|x64.Build.0 = Release|Any CPU
-		{B721E792-A471-4DEC-BAD7-273074CC1EF4}.Release|x86.ActiveCfg = Release|Any CPU
-		{B721E792-A471-4DEC-BAD7-273074CC1EF4}.Release|x86.Build.0 = Release|Any CPU
 		{892CBE15-9ED7-4540-81FA-0EAABA592138}.Debug|Any CPU.ActiveCfg = Debug|x86
 		{892CBE15-9ED7-4540-81FA-0EAABA592138}.Debug|x64.ActiveCfg = Debug|x64
 		{892CBE15-9ED7-4540-81FA-0EAABA592138}.Debug|x64.Build.0 = Debug|x64
@@ -57,6 +45,18 @@ Global
 		{D4553E8A-C694-4EBD-BA3C-0444A1D0C1EF}.Release|x64.Build.0 = Release|Any CPU
 		{D4553E8A-C694-4EBD-BA3C-0444A1D0C1EF}.Release|x86.ActiveCfg = Release|Any CPU
 		{D4553E8A-C694-4EBD-BA3C-0444A1D0C1EF}.Release|x86.Build.0 = Release|Any CPU
+		{8161DAA9-A01F-4C71-BB12-4EB918869DBC}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
+		{8161DAA9-A01F-4C71-BB12-4EB918869DBC}.Debug|Any CPU.Build.0 = Debug|Any CPU
+		{8161DAA9-A01F-4C71-BB12-4EB918869DBC}.Debug|x64.ActiveCfg = Debug|Any CPU
+		{8161DAA9-A01F-4C71-BB12-4EB918869DBC}.Debug|x64.Build.0 = Debug|Any CPU
+		{8161DAA9-A01F-4C71-BB12-4EB918869DBC}.Debug|x86.ActiveCfg = Debug|Any CPU
+		{8161DAA9-A01F-4C71-BB12-4EB918869DBC}.Debug|x86.Build.0 = Debug|Any CPU
+		{8161DAA9-A01F-4C71-BB12-4EB918869DBC}.Release|Any CPU.ActiveCfg = Release|Any CPU
+		{8161DAA9-A01F-4C71-BB12-4EB918869DBC}.Release|Any CPU.Build.0 = Release|Any CPU
+		{8161DAA9-A01F-4C71-BB12-4EB918869DBC}.Release|x64.ActiveCfg = Release|Any CPU
+		{8161DAA9-A01F-4C71-BB12-4EB918869DBC}.Release|x64.Build.0 = Release|Any CPU
+		{8161DAA9-A01F-4C71-BB12-4EB918869DBC}.Release|x86.ActiveCfg = Release|Any CPU
+		{8161DAA9-A01F-4C71-BB12-4EB918869DBC}.Release|x86.Build.0 = Release|Any CPU
 	EndGlobalSection
 	GlobalSection(SolutionProperties) = preSolution
 		HideSolutionNode = FALSE
@@ -64,5 +64,8 @@ Global
 	GlobalSection(NestedProjects) = preSolution
 		{892CBE15-9ED7-4540-81FA-0EAABA592138} = {CF06F314-A704-42F2-A9D9-424DC45913C0}
 		{D4553E8A-C694-4EBD-BA3C-0444A1D0C1EF} = {028FD683-81C5-496A-BB88-22966D9429CC}
+	EndGlobalSection
+	GlobalSection(ExtensibilityGlobals) = postSolution
+		SolutionGuid = {BC871B85-FD89-4A90-87E7-F3D203CEE35D}
 	EndGlobalSection
 EndGlobal

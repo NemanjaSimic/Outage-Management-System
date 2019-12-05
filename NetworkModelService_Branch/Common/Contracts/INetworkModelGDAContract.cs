@@ -6,17 +6,17 @@ using System.Text;
 using Outage.Common;
 using Outage.Common.GDA;
 
-namespace Outage.ServiceContracts
+namespace Outage.Common.Contracts
 {
 	[ServiceContract]
-	public interface INetworkModelGDA
+	public interface INetworkModelGDAContract
 	{
 		/// <summary>
 		/// Updates model by appluing reosoreces sent in delta
 		/// </summary>		
 		/// <param name="delta">Object which contains model changes</param>		
 		/// <returns>Result of model changes</returns>
-		[OperationContract]	
+		[OperationContract]
 		UpdateResult ApplyUpdate(Delta delta);
 
 		/// <summary>
@@ -25,7 +25,7 @@ namespace Outage.ServiceContracts
 		/// <param name="resourceId">Resource id of the entity</param>
 		/// <param name="propIds">List of requested properties</param>		
 		/// <returns>Resource description of the specified entity</returns>
-		[OperationContract]				
+		[OperationContract]
 		ResourceDescription GetValues(long resourceId, List<ModelCode> propIds);
 
 		/// <summary>
@@ -34,7 +34,7 @@ namespace Outage.ServiceContracts
 		/// <param name="entityType">Type code of entity that is requested</param>
 		/// <param name="propIds">List of requested property codes</param>
 		/// <returns>Id of resource iterator for the requested entities</returns>
-		[OperationContract]		
+		[OperationContract]
 		int GetExtentValues(ModelCode entityType, List<ModelCode> propIds);
 
 		/// <summary>
@@ -46,14 +46,14 @@ namespace Outage.ServiceContracts
 		/// <returns>Id of the resource iterator for the requested entities</returns>
 		[OperationContract]
 		int GetRelatedValues(long source, List<ModelCode> propIds, Association association);
-	
+
 		/// <summary>
 		/// Gets list of next n resource descriptions from the iterator.
 		/// </summary>
 		/// <param name="n">Number of next resources that should be returned</param>
 		/// <param name="id">Id of the resource iterator</param>
 		/// <returns>List of resource descriptions</returns>
-		[OperationContract]				
+		[OperationContract]
 		List<ResourceDescription> IteratorNext(int n, int id);
 
 		/// <summary>
@@ -61,7 +61,7 @@ namespace Outage.ServiceContracts
 		/// </summary>
 		/// <param name="id">Id of the resource iterator</param>
 		/// <returns>TRUE if current position in iterator is successfully reseted</returns>
-		[OperationContract]		
+		[OperationContract]
 		bool IteratorRewind(int id);
 
 		/// <summary>
@@ -69,7 +69,7 @@ namespace Outage.ServiceContracts
 		/// </summary>
 		/// <param name="id">Id of the resource iterator</param>
 		/// <returns>Total number of resources in resource iterator</returns>
-		[OperationContract]		
+		[OperationContract]
 		int IteratorResourcesTotal(int id);
 
 		/// <summary>
@@ -77,7 +77,7 @@ namespace Outage.ServiceContracts
 		/// </summary>
 		/// <param name="id">Id of the resource iterator</param>
 		/// <returns>Number of resource iterator left to return in next calls</returns>
-		[OperationContract]		
+		[OperationContract]
 		int IteratorResourcesLeft(int id);
 
 		/// <summary>
@@ -85,7 +85,7 @@ namespace Outage.ServiceContracts
 		/// </summary>
 		/// <param name="id">Id of the resource iterator</param>
 		/// <returns>TRUE if iterator is successfully closed</returns>
-		[OperationContract]		
+		[OperationContract]
 		bool IteratorClose(int id);
 	}
 }

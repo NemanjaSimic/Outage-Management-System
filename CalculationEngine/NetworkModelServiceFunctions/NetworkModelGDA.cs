@@ -1,5 +1,4 @@
-﻿using Outage.ServiceContracts;
-using System;
+﻿using System;
 using System.Collections.Generic;
 using System.Linq;
 using System.Text;
@@ -12,13 +11,11 @@ namespace NetworkModelServiceFunctions
 {
 	class NetworkModelGDA
 	{
-		private NetTcpBinding binding;
-		private EndpointAddress address;
+		private readonly string endpointName;
 
-		public NetworkModelGDA(NetTcpBinding  binding, EndpointAddress address)
+		public NetworkModelGDA(string endpointName)
 		{
-			this.binding = binding;
-			this.address = address;
+			this.endpointName = endpointName;
 		}
 
 		public UpdateResult ApplyUpdate(Delta delta)
@@ -32,7 +29,7 @@ namespace NetworkModelServiceFunctions
 
 			List<ResourceDescription> resourceDescriptions = new List<ResourceDescription>();
 
-			using (var proxy = new NetworkModelGDAProxy(binding, address))
+			using (var proxy = new NetworkModelGDAProxy(endpointName))
 			{
 				iteratorId = proxy.GetExtentValues(entityType, propIds);
 				resourcesLeft = proxy.IteratorResourcesLeft(iteratorId);
@@ -56,7 +53,7 @@ namespace NetworkModelServiceFunctions
 
 		public int GetRelatedValues(long source, List<ModelCode> propIds, Association association)
 		{
-			using (var proxy = new NetworkModelGDAProxy(binding, address))
+			using (var proxy = new NetworkModelGDAProxy(endpointName))
 			{
 				return proxy.GetRelatedValues(source, propIds, association);
 			}
@@ -64,7 +61,7 @@ namespace NetworkModelServiceFunctions
 
 		public ResourceDescription GetValues(long resourceId, List<ModelCode> propIds)
 		{
-			using (var proxy = new NetworkModelGDAProxy(binding, address))
+			using (var proxy = new NetworkModelGDAProxy(endpointName))
 			{
 				return proxy.GetValues(resourceId, propIds);
 			}

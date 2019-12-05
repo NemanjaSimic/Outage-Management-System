@@ -9,15 +9,17 @@ using System.Threading.Tasks;
 
 namespace NetworkModelServiceFunctions
 {
-	class ModelHelper
+	public class ModelHelper
 	{
-		//privremeno
-		private static NetTcpBinding binding = new NetTcpBinding();
-		private static EndpointAddress address = new EndpointAddress(" ");
+		private static readonly string endpointName = "NetworkModelGDAEndpoint";
 
 		private ModelResourcesDesc modelResourcesDesc = new ModelResourcesDesc();
-		private NetworkModelGDA networkModelGDA = new NetworkModelGDA(binding, address);
+		private NetworkModelGDA networkModelGDA = new NetworkModelGDA(endpointName);
 
+		public ModelHelper()
+		{
+	
+		}
 
 		public Dictionary<ModelCode, List<long>> GetAllModelEntities()
 		{
@@ -33,7 +35,7 @@ namespace NetworkModelServiceFunctions
 		}
 
 
-		public List<long> GetAllGids(ModelCode concreteClass)
+		List<long> GetAllGids(ModelCode concreteClass)
 		{
 			List<long> gids = new List<long>();
 
