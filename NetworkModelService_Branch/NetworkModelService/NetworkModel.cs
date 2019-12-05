@@ -423,25 +423,22 @@ namespace Outage.NetworkModelService
 
                             if (targetGlobalId != 0)
                             {
-                                IdentifiedObject currentTargetEntity = null;
-
-                                if(EntityExists(targetGlobalId))
-                                {
-                                    currentTargetEntity = GetEntity(targetGlobalId);
-                                }
-
                                 if (!EntityExistsInIncomingData(targetGlobalId))
                                 {
-                                    string message = string.Format("Failed to get target entity with GID: 0x{0:X16}. {1}", targetGlobalId);
+                                    string message = string.Format("Failed to get target entity with GID: 0x{0:X16}.", targetGlobalId);
                                     throw new Exception(message);
                                 }
 
                                 // get referenced entity for update
                                 IdentifiedObject incomingTargetEntity = GetEntityFromIncomingData(targetGlobalId);
-                                
-                                if(currentTargetEntity != null)
+
+                                IdentifiedObject currentTargetEntity = null;
+
+                                if(EntityExists(targetGlobalId))
                                 {
-                                    if(currentTargetEntity.GetHashCode() == incomingTargetEntity.GetHashCode())
+                                    currentTargetEntity = GetEntity(targetGlobalId);
+
+                                    if (currentTargetEntity.GetHashCode() == incomingTargetEntity.GetHashCode())
                                     {
                                         incomingTargetEntity = currentTargetEntity.Clone();
                                     }
@@ -504,22 +501,25 @@ namespace Outage.NetworkModelService
                         long oldTargetGlobalId = io.GetProperty(property.Id).AsReference();
 
                         if (oldTargetGlobalId != 0)
-                        {
-                            IdentifiedObject incomingOldTargetEntity = null;
-                            if (EntityExistsInIncomingData(oldTargetGlobalId))
+                        { 
+                            if (!EntityExistsInIncomingData(oldTargetGlobalId))
                             {
-                                incomingOldTargetEntity = GetEntityFromIncomingData(oldTargetGlobalId);
+                                string message = string.Format("Failed to get old target entity with GID: 0x{0:X16}.", oldTargetGlobalId);
+                                throw new Exception(message);
                             }
 
+                            IdentifiedObject incomingOldTargetEntity = GetEntityFromIncomingData(oldTargetGlobalId);
+
                             IdentifiedObject currentOldTargetEntity = null;
+
                             if(EntityExists(oldTargetGlobalId))
                             {
                                 currentOldTargetEntity = GetEntity(oldTargetGlobalId);
-                            }
 
-                            if(incomingOldTargetEntity.GetHashCode() == currentOldTargetEntity.GetHashCode())
-                            {
-                                incomingOldTargetEntity = currentOldTargetEntity.Clone();
+                                if (incomingOldTargetEntity.GetHashCode() == currentOldTargetEntity.GetHashCode())
+                                {
+                                    incomingOldTargetEntity = currentOldTargetEntity.Clone();
+                                }
                             }
 
                             incomingOldTargetEntity.RemoveReference(property.Id, globalId);
@@ -542,11 +542,11 @@ namespace Outage.NetworkModelService
                             if (EntityExists(targetGlobalId))
                             {
                                 currentTargetEntity = GetEntity(targetGlobalId);
-                            }
 
-                            if (incomingTargetEntity.GetHashCode() == currentTargetEntity.GetHashCode())
-                            {
-                                incomingTargetEntity = currentTargetEntity.Clone();
+                                if (incomingTargetEntity.GetHashCode() == currentTargetEntity.GetHashCode())
+                                {
+                                    incomingTargetEntity = currentTargetEntity.Clone();
+                                }
                             }
 
                             incomingTargetEntity.AddReference(property.Id, globalId);
@@ -599,13 +599,25 @@ namespace Outage.NetworkModelService
                 }
 
                 // get entity to be deleted
-                IdentifiedObject io = GetEntityFromIncomingData(globalId);
+                IdentifiedObject incomingEntity = GetEntityFromIncomingData(globalId);
+
+                IdentifiedObject currentEntity = null;
+
+                if (EntityExists(globalId))
+                {
+                    currentEntity = GetEntity(globalId);
+
+                    if (currentEntity.GetHashCode() == incomingEntity.GetHashCode())
+                    {
+                        incomingEntity = currentEntity.Clone();
+                    }
+                }
 
                 // check if entity could be deleted (if it is not referenced by any other entity)
-                if (io.IsReferenced)
+                if (incomingEntity.IsReferenced)
                 {
                     Dictionary<ModelCode, List<long>> references = new Dictionary<ModelCode, List<long>>();
-                    io.GetReferences(references, TypeOfReference.Target);
+                    incomingEntity.GetReferences(references, TypeOfReference.Target);
 
                     StringBuilder sb = new StringBuilder();
 
@@ -623,7 +635,7 @@ namespace Outage.NetworkModelService
                 }
 
                 // find property ids
-                List<ModelCode> propertyIds = resourcesDescs.GetAllSettablePropertyIdsForEntityId(io.GlobalId);
+                List<ModelCode> propertyIds = resourcesDescs.GetAllSettablePropertyIdsForEntityId(incomingEntity.GlobalId);
 
                 // remove references
                 Property property = null;
@@ -633,7 +645,7 @@ namespace Outage.NetworkModelService
 
                     if (propertyType == PropertyType.Reference)
                     {
-                        property = io.GetProperty(propertyId);
+                        property = incomingEntity.GetProperty(propertyId);
 
                         if (propertyType == PropertyType.Reference)
                         {
@@ -642,11 +654,28 @@ namespace Outage.NetworkModelService
 
                             if (targetGlobalId != 0)
                             {
-                                // get target entity
-                                IdentifiedObject targetEntity = GetEntityFromIncomingData(targetGlobalId);
+                                if (!EntityExistsInIncomingData(targetGlobalId))
+                                {
+                                    string message = string.Format("Failed to get target entity with GID: 0x{0:X16}.", targetGlobalId);
+                                    throw new Exception(message);
+                                }
 
-                                // remove reference to another entity
-                                targetEntity.RemoveReference(propertyId, globalId);
+                                // get incoming target entity
+                                IdentifiedObject incomingTargetEntity = GetEntityFromIncomingData(targetGlobalId);
+
+                                // get current target entity
+                                IdentifiedObject currentTargetEntity = null;
+                                if (EntityExists(targetGlobalId))
+                                {
+                                    currentTargetEntity = GetEntity(targetGlobalId);
+
+                                    if (incomingTargetEntity.GetHashCode() == currentTargetEntity.GetHashCode())
+                                    {
+                                        incomingTargetEntity = currentTargetEntity.Clone();
+                                    }
+                                }
+
+                                incomingTargetEntity.RemoveReference(property.Id, globalId);
                             }
                         }
                     }
@@ -658,8 +687,19 @@ namespace Outage.NetworkModelService
 
                 if (incomingNetworkDataModel.ContainsKey(type))
                 {
-                    Container container = incomingNetworkDataModel[type];
-                    container.RemoveEntity(globalId);
+                    Container incomingContainer = incomingNetworkDataModel[type];
+
+                    if (networkDataModel.ContainsKey(type))
+                    {
+                        Container currentContainer = networkDataModel[type];
+
+                        if (currentContainer.GetHashCode() == incomingContainer.GetHashCode())
+                        {
+                            incomingContainer = currentContainer.Clone();
+                        }
+                    }
+
+                    incomingContainer.RemoveEntity(globalId);
 
                     CommonTrace.WriteTrace(CommonTrace.TraceVerbose, "Deleting entity with GID ({0:x16}) successfully finished.", globalId);
                 }
@@ -688,7 +728,7 @@ namespace Outage.NetworkModelService
             //TODO: use case was not considered yet 
             throw new NotImplementedException();
 
-            List<long> relatedGids = new List<long>();
+            /*List<long> relatedGids = new List<long>();
 
             if (association == null)
             {
@@ -738,6 +778,7 @@ namespace Outage.NetworkModelService
             }
 
             return relatedGids;
+            */
         }
 
         /// <summary>

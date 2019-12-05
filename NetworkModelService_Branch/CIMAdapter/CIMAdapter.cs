@@ -41,7 +41,7 @@ namespace Outage.DataImporter.CIMAdapter
             }
         }
 
-        public Delta CreateDelta(Stream extract, SupportedProfiles extractType, out string log)
+        public Delta CreateDelta(Stream extract, SupportedProfiles extractType, DeltaOpType deltaOpType, out string log)
         {
             Delta nmsDelta = null;
             ConcreteModel concreteModel = null;
@@ -51,7 +51,7 @@ namespace Outage.DataImporter.CIMAdapter
 
             if (LoadModelFromExtractFile(extract, extractType, ref concreteModel, ref assembly, out loadLog))
             {
-                DoTransformAndLoad(assembly, concreteModel, extractType, out nmsDelta, out transformLog);
+                DoTransformAndLoad(assembly, concreteModel, extractType, deltaOpType, out nmsDelta, out transformLog);
             }
             log = string.Concat("Load report:\r\n", loadLog, "\r\nTransform report:\r\n", transformLog);
 
@@ -118,7 +118,7 @@ namespace Outage.DataImporter.CIMAdapter
             return valid;
         }
 
-        private bool DoTransformAndLoad(Assembly assembly, ConcreteModel concreteModel, SupportedProfiles extractType, out Delta nmsDelta, out string log)
+        private bool DoTransformAndLoad(Assembly assembly, ConcreteModel concreteModel, SupportedProfiles extractType, DeltaOpType deltaOpType, out Delta nmsDelta, out string log)
         {
             nmsDelta = null;
             log = string.Empty;
@@ -131,7 +131,7 @@ namespace Outage.DataImporter.CIMAdapter
                 {
                     case SupportedProfiles.Outage:
                         {
-                            TransformAndLoadReport report = OutageImporter.Instance.CreateNMSDelta(concreteModel);
+                            TransformAndLoadReport report = OutageImporter.Instance.CreateNMSDelta(concreteModel, deltaOpType);
 
                             if (report.Success)
                             {

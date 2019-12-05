@@ -26,8 +26,10 @@ namespace Outage.DataImporter.ModelLabsApp
 
 		private void InitGUIElements()
 		{
-			buttonConvertCIM.Enabled = false;
-			buttonApplyDelta.Enabled = false;
+			buttonConvertCIMInsert.Enabled = false;
+            buttonConvertCIMUpdate.Enabled = false;
+            buttonConvertCIMDelete.Enabled = false;
+            buttonApplyDelta.Enabled = false;
 
             comboBoxProfile.DataSource = Enum.GetValues(typeof(SupportedProfiles));
             comboBoxProfile.SelectedItem = SupportedProfiles.Outage;
@@ -46,16 +48,20 @@ namespace Outage.DataImporter.ModelLabsApp
 			{
 				textBoxCIMFile.Text = openFileDialog.FileName;
 				toolTipControl.SetToolTip(textBoxCIMFile, openFileDialog.FileName);
-				buttonConvertCIM.Enabled = true;
-				richTextBoxReport.Clear();
+                buttonConvertCIMInsert.Enabled = true;
+                buttonConvertCIMUpdate.Enabled = true;
+                buttonConvertCIMDelete.Enabled = true;
+                richTextBoxReport.Clear();
 			}
 			else
 			{
-				buttonConvertCIM.Enabled = false;
-			}
+                buttonConvertCIMInsert.Enabled = false;
+                buttonConvertCIMUpdate.Enabled = false;
+                buttonConvertCIMDelete.Enabled = false;
+            }
 		}
 
-		private void ConvertCIMXMLToDMSNetworkModelDelta()
+		private void ConvertCIMXMLToDMSNetworkModelDelta(DeltaOpType deltaOpType)
 		{
 			////SEND CIM/XML to ADAPTER
 			try
@@ -70,7 +76,7 @@ namespace Outage.DataImporter.ModelLabsApp
 				nmsDelta = null;
 				using (FileStream fs = File.Open(textBoxCIMFile.Text, FileMode.Open))
 				{
-					nmsDelta = adapter.CreateDelta(fs, (SupportedProfiles)(comboBoxProfile.SelectedItem), out log);
+					nmsDelta = adapter.CreateDelta(fs, (SupportedProfiles)(comboBoxProfile.SelectedItem), deltaOpType, out log);
 					richTextBoxReport.Text = log;
 				}
 				if (nmsDelta != null)
@@ -127,21 +133,29 @@ namespace Outage.DataImporter.ModelLabsApp
 			ShowOpenCIMXMLFileDialog();
 		}
 
-		private void buttonConvertCIMOnClick(object sender, EventArgs e)
+		private void buttonConvertCIMInsertOnClick(object sender, EventArgs e)
 		{
-			ConvertCIMXMLToDMSNetworkModelDelta();
+			ConvertCIMXMLToDMSNetworkModelDelta(DeltaOpType.Insert);
 		}
 
-		private void buttonApplyDeltaOnClick(object sender, EventArgs e)
-		{
-			ApplyDMSNetworkModelDelta();
-		}
+        private void buttonConvertCIMUpdateOnClick(object sender, EventArgs e)
+        {
+            ConvertCIMXMLToDMSNetworkModelDelta(DeltaOpType.Update);
+        }
 
-		private void buttonExitOnClick(object sender, EventArgs e)
+        private void buttonConvertCIMDeleteOnClick(object sender, EventArgs e)
+        {
+            ConvertCIMXMLToDMSNetworkModelDelta(DeltaOpType.Delete);
+        }
+
+        private void buttonApplyDeltaOnClick(object sender, EventArgs e)
+        {
+            ApplyDMSNetworkModelDelta();
+        }
+
+        private void buttonExitOnClick(object sender, EventArgs e)
 		{
 			Close();
-		}
-
-        //:x16
+		}   
     }
 }

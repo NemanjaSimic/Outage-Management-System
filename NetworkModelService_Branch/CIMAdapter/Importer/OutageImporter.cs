@@ -18,6 +18,7 @@ namespace Outage.DataImporter.CIMAdapter.Importer
 
         private ConcreteModel concreteModel;
         private Delta delta;
+        private DeltaOpType deltaOpType;
         private ImportHelper importHelper;
         private TransformAndLoadReport report;
 
@@ -59,18 +60,19 @@ namespace Outage.DataImporter.CIMAdapter.Importer
             report = null;
         }
 
-        public TransformAndLoadReport CreateNMSDelta(ConcreteModel cimConcreteModel)
+        public TransformAndLoadReport CreateNMSDelta(ConcreteModel cimConcreteModel, DeltaOpType opType)
         {
             LogManager.Log("Importing Outage Elements...", LogLevel.Info); //TODO: ovo menjati sa nasim logom
             report = new TransformAndLoadReport();
             concreteModel = cimConcreteModel;
             delta.ClearDeltaOperations();
+            deltaOpType = opType;
 
             if ((concreteModel != null) && (concreteModel.ModelMap != null))
             {
                 try
                 {
-                    ConvertModelAndPopulateDelta();
+                    ConvertModelAndPopulateDelta(deltaOpType);
                 }
                 catch (Exception ex)
                 {
@@ -84,7 +86,7 @@ namespace Outage.DataImporter.CIMAdapter.Importer
             return report;
         }
 
-        private void ConvertModelAndPopulateDelta()
+        private void ConvertModelAndPopulateDelta(DeltaOpType deltaOpType)
         {
             LogManager.Log("Loading elements and creating delta...", LogLevel.Info);
 
@@ -119,7 +121,7 @@ namespace Outage.DataImporter.CIMAdapter.Importer
                     ResourceDescription rd = CreatePowerTransformerResourceDescription(cimPowerTransformer);
                     if (rd != null)
                     {
-                        delta.AddDeltaOperation(DeltaOpType.Insert, rd, true);
+                        delta.AddDeltaOperation(deltaOpType, rd, true);
                         report.Report.Append("Location ID = ").Append(cimPowerTransformer.ID).Append(" SUCCESSFULLY converted to GID = ").AppendLine(string.Format("0x{0:X16}", rd.Id));
                     }
                     else
@@ -156,7 +158,7 @@ namespace Outage.DataImporter.CIMAdapter.Importer
                     ResourceDescription rd = CreateTransformerWindingResourceDescription(cimTransformerWinding);
                     if (rd != null)
                     {
-                        delta.AddDeltaOperation(DeltaOpType.Insert, rd, true);
+                        delta.AddDeltaOperation(deltaOpType, rd, true);
                         report.Report.Append("Location ID = ").Append(cimTransformerWinding.ID).Append(" SUCCESSFULLY converted to GID = ").AppendLine(string.Format("0x{0:X16}", rd.Id));
                     }
                     else
@@ -194,7 +196,7 @@ namespace Outage.DataImporter.CIMAdapter.Importer
                     ResourceDescription rd = CreateBaseVoltageResourceDescription(cimBaseVoltage);
                     if (rd != null)
                     {
-                        delta.AddDeltaOperation(DeltaOpType.Insert, rd, true);
+                        delta.AddDeltaOperation(deltaOpType, rd, true);
                         report.Report.Append("Location ID = ").Append(cimBaseVoltage.ID).Append(" SUCCESSFULLY converted to GID = ").AppendLine(string.Format("0x{0:X16}", rd.Id));
                     }
                     else
@@ -233,7 +235,7 @@ namespace Outage.DataImporter.CIMAdapter.Importer
                     ResourceDescription rd = CreateEnergySourceResourceDescription(cimEnergySource);
                     if (rd != null)
                     {
-                        delta.AddDeltaOperation(DeltaOpType.Insert, rd, true);
+                        delta.AddDeltaOperation(deltaOpType, rd, true);
                         report.Report.Append("Location ID = ").Append(cimEnergySource.ID).Append(" SUCCESSFULLY converted to GID = ").AppendLine(string.Format("0x{0:X16}", rd.Id));
                     }
                     else
@@ -272,7 +274,7 @@ namespace Outage.DataImporter.CIMAdapter.Importer
                     ResourceDescription rd = CreateEnergyConsumerResourceDescription(cimEnergyConsumer);
                     if (rd != null)
                     {
-                        delta.AddDeltaOperation(DeltaOpType.Insert, rd, true);
+                        delta.AddDeltaOperation(deltaOpType, rd, true);
                         report.Report.Append("Location ID = ").Append(cimEnergyConsumer.ID).Append(" SUCCESSFULLY converted to GID = ").AppendLine(string.Format("0x{0:X16}", rd.Id));
                     }
                     else
@@ -311,7 +313,7 @@ namespace Outage.DataImporter.CIMAdapter.Importer
                     ResourceDescription rd = CreateFuseResourceDescription(cimFuse);
                     if (rd != null)
                     {
-                        delta.AddDeltaOperation(DeltaOpType.Insert, rd, true);
+                        delta.AddDeltaOperation(deltaOpType, rd, true);
                         report.Report.Append("Location ID = ").Append(cimFuse.ID).Append(" SUCCESSFULLY converted to GID = ").AppendLine(string.Format("0x{0:X16}", rd.Id));
                     }
                     else
@@ -350,7 +352,7 @@ namespace Outage.DataImporter.CIMAdapter.Importer
                     ResourceDescription rd = CreateDisconnectorResourceDescription(cimDisconnector);
                     if (rd != null)
                     {
-                        delta.AddDeltaOperation(DeltaOpType.Insert, rd, true);
+                        delta.AddDeltaOperation(deltaOpType, rd, true);
                         report.Report.Append("Location ID = ").Append(cimDisconnector.ID).Append(" SUCCESSFULLY converted to GID = ").AppendLine(string.Format("0x{0:X16}", rd.Id));
                     }
                     else
@@ -389,7 +391,7 @@ namespace Outage.DataImporter.CIMAdapter.Importer
                     ResourceDescription rd = CreateBreakerResourceDescription(cimBreaker);
                     if (rd != null)
                     {
-                        delta.AddDeltaOperation(DeltaOpType.Insert, rd, true);
+                        delta.AddDeltaOperation(deltaOpType, rd, true);
                         report.Report.Append("Location ID = ").Append(cimBreaker.ID).Append(" SUCCESSFULLY converted to GID = ").AppendLine(string.Format("0x{0:X16}", rd.Id));
                     }
                     else
@@ -428,7 +430,7 @@ namespace Outage.DataImporter.CIMAdapter.Importer
                     ResourceDescription rd = CreateLoadBreakSwitchResourceDescription(cimLoadBreakSwitch);
                     if (rd != null)
                     {
-                        delta.AddDeltaOperation(DeltaOpType.Insert, rd, true);
+                        delta.AddDeltaOperation(deltaOpType, rd, true);
                         report.Report.Append("Location ID = ").Append(cimLoadBreakSwitch.ID).Append(" SUCCESSFULLY converted to GID = ").AppendLine(string.Format("0x{0:X16}", rd.Id));
                     }
                     else
@@ -467,7 +469,7 @@ namespace Outage.DataImporter.CIMAdapter.Importer
                     ResourceDescription rd = CreateACLineSegmentResourceDescription(cimACLineSegment);
                     if (rd != null)
                     {
-                        delta.AddDeltaOperation(DeltaOpType.Insert, rd, true);
+                        delta.AddDeltaOperation(deltaOpType, rd, true);
                         report.Report.Append("Location ID = ").Append(cimACLineSegment.ID).Append(" SUCCESSFULLY converted to GID = ").AppendLine(string.Format("0x{0:X16}", rd.Id));
                     }
                     else
@@ -506,7 +508,7 @@ namespace Outage.DataImporter.CIMAdapter.Importer
                     ResourceDescription rd = CreateConnectivityNodeResourceDescription(cimConnectivityNode);
                     if (rd != null)
                     {
-                        delta.AddDeltaOperation(DeltaOpType.Insert, rd, true);
+                        delta.AddDeltaOperation(deltaOpType, rd, true);
                         report.Report.Append("Location ID = ").Append(cimConnectivityNode.ID).Append(" SUCCESSFULLY converted to GID = ").AppendLine(string.Format("0x{0:X16}", rd.Id));
                     }
                     else
@@ -545,7 +547,7 @@ namespace Outage.DataImporter.CIMAdapter.Importer
                     ResourceDescription rd = CreateTerminalResourceDescription(cimTerminal);
                     if (rd != null)
                     {
-                        delta.AddDeltaOperation(DeltaOpType.Insert, rd, true);
+                        delta.AddDeltaOperation(deltaOpType, rd, true);
                         report.Report.Append("Location ID = ").Append(cimTerminal.ID).Append(" SUCCESSFULLY converted to GID = ").AppendLine(string.Format("0x{0:X16}", rd.Id));
                     }
                     else
@@ -584,7 +586,7 @@ namespace Outage.DataImporter.CIMAdapter.Importer
                     ResourceDescription rd = CreateDiscreteResourceDescription(cimDiscrete);
                     if (rd != null)
                     {
-                        delta.AddDeltaOperation(DeltaOpType.Insert, rd, true);
+                        delta.AddDeltaOperation(deltaOpType, rd, true);
                         report.Report.Append("Location ID = ").Append(cimDiscrete.ID).Append(" SUCCESSFULLY converted to GID = ").AppendLine(string.Format("0x{0:X16}", rd.Id));
                     }
                     else
@@ -623,7 +625,7 @@ namespace Outage.DataImporter.CIMAdapter.Importer
                     ResourceDescription rd = CreateAnalogResourceDescription(cimAnalog);
                     if (rd != null)
                     {
-                        delta.AddDeltaOperation(DeltaOpType.Insert, rd, true);
+                        delta.AddDeltaOperation(deltaOpType, rd, true);
                         report.Report.Append("Location ID = ").Append(cimAnalog.ID).Append(" SUCCESSFULLY converted to GID = ").AppendLine(string.Format("0x{0:X16}", rd.Id));
                     }
                     else
