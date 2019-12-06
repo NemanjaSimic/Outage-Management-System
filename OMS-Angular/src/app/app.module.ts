@@ -6,6 +6,8 @@ import { RoutingModule } from '@modules/routing/routing.module';
 import { SharedModule } from '@shared/shared.module';
 import { ServicesModule } from '@services/services.module';
 
+import { GraphModule } from './modules/graph/graph.module';
+
 @NgModule({
   declarations: [
     AppComponent
@@ -14,7 +16,8 @@ import { ServicesModule } from '@services/services.module';
     BrowserModule,
     RoutingModule,
     SharedModule,
-    ServicesModule
+    ServicesModule,
+    GraphModule
   ],
   providers: [],
   bootstrap: [AppComponent]

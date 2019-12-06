@@ -1,5 +1,5 @@
 import { AppPage } from './app.po';
-import { browser, logging } from 'protractor';
+import { browser, logging, element, by } from 'protractor';
 
 describe('workspace-project App', () => {
   let page: AppPage;
@@ -8,9 +8,11 @@ describe('workspace-project App', () => {
     page = new AppPage();
   });
 
-  it('should display welcome message', () => {
+  it('should display AppComponent header', () => {
     page.navigateTo();
-    expect(page.getTitleText()).toEqual('OMS-Angular app is running!');
+    
+    const elem = element(by.css("#appComponent")).getText();
+    expect(elem).toEqual("AppComponent");
   });
 
   afterEach(async () => {

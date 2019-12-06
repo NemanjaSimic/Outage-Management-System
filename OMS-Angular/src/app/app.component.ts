@@ -14,12 +14,16 @@ export class AppComponent implements OnInit {
   ) { }
 
   ngOnInit() {
-    console.log('AppComponent inited.');
     this.graphService.startConnection().subscribe(
-      data => console.log(data),
-      err => console.log(err)
+      (didConnect) => {
+        if (didConnect)
+          console.log('Connected to graph service');
+        else
+          console.log('Could not connect to graph service');
+      },
+      (err) => console.log(err)
     );
-    
+
     this.graphService.updateRecieved.subscribe(data => this.onNotification(data));
   }
 
