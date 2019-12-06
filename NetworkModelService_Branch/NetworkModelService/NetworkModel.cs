@@ -491,14 +491,28 @@ namespace Outage.NetworkModelService
                     throw new Exception(message);
                 }
 
-                IdentifiedObject io = GetEntityFromIncomingData(globalId);
+                //TODO: get container, set (new) incoming entity in container.....
+
+                IdentifiedObject incomingEntity = GetEntityFromIncomingData(globalId);
+
+                IdentifiedObject currentEntity = null;
+
+                if (EntityExists(globalId))
+                {
+                    currentEntity = GetEntity(globalId);
+
+                    if (currentEntity.GetHashCode() == incomingEntity.GetHashCode())
+                    {
+                        incomingEntity = currentEntity.Clone();
+                    }
+                }
 
                 // updating properties of entity
                 foreach (Property property in rd.Properties)
                 {
                     if (property.Type == PropertyType.Reference)
                     {
-                        long oldTargetGlobalId = io.GetProperty(property.Id).AsReference();
+                        long oldTargetGlobalId = incomingEntity.GetProperty(property.Id).AsReference();
 
                         if (oldTargetGlobalId != 0)
                         { 
@@ -553,12 +567,12 @@ namespace Outage.NetworkModelService
                         }
 
                         // update value of the property in specified entity
-                        io.SetProperty(property);
+                        incomingEntity.SetProperty(property);
                     }
                     else
                     {
                         // update value of the property in specified entity
-                        io.SetProperty(property);
+                        incomingEntity.SetProperty(property);
                     }
                 }
 

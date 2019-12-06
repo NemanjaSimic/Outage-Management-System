@@ -18,6 +18,7 @@ namespace Outage.DataImporter.CIMAdapter.Importer
 
         private ConcreteModel concreteModel;
         private Delta delta;
+        private Dictionary<string, ResourceDescription> entities;
         private DeltaOpType deltaOpType;
         private ImportHelper importHelper;
         private TransformAndLoadReport report;
@@ -49,6 +50,14 @@ namespace Outage.DataImporter.CIMAdapter.Importer
                 return delta;
             }
         }
+
+        public Dictionary<string, ResourceDescription> Entities
+        {
+            get
+            {
+                return entities ?? (entities = new Dictionary<string, ResourceDescription>());
+            }
+        }
         #endregion
 
 
@@ -56,6 +65,7 @@ namespace Outage.DataImporter.CIMAdapter.Importer
         {
             concreteModel = null;
             delta = new Delta();
+            entities = new Dictionary<string, ResourceDescription>();
             importHelper = new ImportHelper();
             report = null;
         }
@@ -66,6 +76,7 @@ namespace Outage.DataImporter.CIMAdapter.Importer
             report = new TransformAndLoadReport();
             concreteModel = cimConcreteModel;
             delta.ClearDeltaOperations();
+            entities.Clear();
             deltaOpType = opType;
 
             if ((concreteModel != null) && (concreteModel.ModelMap != null))
@@ -122,6 +133,12 @@ namespace Outage.DataImporter.CIMAdapter.Importer
                     if (rd != null)
                     {
                         delta.AddDeltaOperation(deltaOpType, rd, true);
+
+                        if(!Entities.ContainsKey(cimPowerTransformer.MRID))
+                        {
+                            Entities.Add(cimPowerTransformer.MRID, rd);
+                        }
+
                         report.Report.Append("Location ID = ").Append(cimPowerTransformer.ID).Append(" SUCCESSFULLY converted to GID = ").AppendLine(string.Format("0x{0:X16}", rd.Id));
                     }
                     else
@@ -159,6 +176,12 @@ namespace Outage.DataImporter.CIMAdapter.Importer
                     if (rd != null)
                     {
                         delta.AddDeltaOperation(deltaOpType, rd, true);
+
+                        if (!Entities.ContainsKey(cimTransformerWinding.MRID))
+                        {
+                            Entities.Add(cimTransformerWinding.MRID, rd);
+                        }
+
                         report.Report.Append("Location ID = ").Append(cimTransformerWinding.ID).Append(" SUCCESSFULLY converted to GID = ").AppendLine(string.Format("0x{0:X16}", rd.Id));
                     }
                     else
@@ -197,6 +220,12 @@ namespace Outage.DataImporter.CIMAdapter.Importer
                     if (rd != null)
                     {
                         delta.AddDeltaOperation(deltaOpType, rd, true);
+
+                        if (!Entities.ContainsKey(cimBaseVoltage.MRID))
+                        {
+                            Entities.Add(cimBaseVoltage.MRID, rd);
+                        }
+
                         report.Report.Append("Location ID = ").Append(cimBaseVoltage.ID).Append(" SUCCESSFULLY converted to GID = ").AppendLine(string.Format("0x{0:X16}", rd.Id));
                     }
                     else
@@ -236,6 +265,12 @@ namespace Outage.DataImporter.CIMAdapter.Importer
                     if (rd != null)
                     {
                         delta.AddDeltaOperation(deltaOpType, rd, true);
+
+                        if (!Entities.ContainsKey(cimEnergySource.MRID))
+                        {
+                            Entities.Add(cimEnergySource.MRID, rd);
+                        }
+
                         report.Report.Append("Location ID = ").Append(cimEnergySource.ID).Append(" SUCCESSFULLY converted to GID = ").AppendLine(string.Format("0x{0:X16}", rd.Id));
                     }
                     else
@@ -275,6 +310,12 @@ namespace Outage.DataImporter.CIMAdapter.Importer
                     if (rd != null)
                     {
                         delta.AddDeltaOperation(deltaOpType, rd, true);
+
+                        if (!Entities.ContainsKey(cimEnergyConsumer.MRID))
+                        {
+                            Entities.Add(cimEnergyConsumer.MRID, rd);
+                        }
+
                         report.Report.Append("Location ID = ").Append(cimEnergyConsumer.ID).Append(" SUCCESSFULLY converted to GID = ").AppendLine(string.Format("0x{0:X16}", rd.Id));
                     }
                     else
@@ -314,6 +355,12 @@ namespace Outage.DataImporter.CIMAdapter.Importer
                     if (rd != null)
                     {
                         delta.AddDeltaOperation(deltaOpType, rd, true);
+
+                        if (!Entities.ContainsKey(cimFuse.MRID))
+                        {
+                            Entities.Add(cimFuse.MRID, rd);
+                        }
+
                         report.Report.Append("Location ID = ").Append(cimFuse.ID).Append(" SUCCESSFULLY converted to GID = ").AppendLine(string.Format("0x{0:X16}", rd.Id));
                     }
                     else
@@ -353,6 +400,12 @@ namespace Outage.DataImporter.CIMAdapter.Importer
                     if (rd != null)
                     {
                         delta.AddDeltaOperation(deltaOpType, rd, true);
+
+                        if (!Entities.ContainsKey(cimDisconnector.MRID))
+                        {
+                            Entities.Add(cimDisconnector.MRID, rd);
+                        }
+
                         report.Report.Append("Location ID = ").Append(cimDisconnector.ID).Append(" SUCCESSFULLY converted to GID = ").AppendLine(string.Format("0x{0:X16}", rd.Id));
                     }
                     else
@@ -392,6 +445,12 @@ namespace Outage.DataImporter.CIMAdapter.Importer
                     if (rd != null)
                     {
                         delta.AddDeltaOperation(deltaOpType, rd, true);
+
+                        if (!Entities.ContainsKey(cimBreaker.MRID))
+                        {
+                            Entities.Add(cimBreaker.MRID, rd);
+                        }
+
                         report.Report.Append("Location ID = ").Append(cimBreaker.ID).Append(" SUCCESSFULLY converted to GID = ").AppendLine(string.Format("0x{0:X16}", rd.Id));
                     }
                     else
@@ -431,6 +490,12 @@ namespace Outage.DataImporter.CIMAdapter.Importer
                     if (rd != null)
                     {
                         delta.AddDeltaOperation(deltaOpType, rd, true);
+
+                        if (!Entities.ContainsKey(cimLoadBreakSwitch.MRID))
+                        {
+                            Entities.Add(cimLoadBreakSwitch.MRID, rd);
+                        }
+
                         report.Report.Append("Location ID = ").Append(cimLoadBreakSwitch.ID).Append(" SUCCESSFULLY converted to GID = ").AppendLine(string.Format("0x{0:X16}", rd.Id));
                     }
                     else
@@ -470,6 +535,12 @@ namespace Outage.DataImporter.CIMAdapter.Importer
                     if (rd != null)
                     {
                         delta.AddDeltaOperation(deltaOpType, rd, true);
+
+                        if (!Entities.ContainsKey(cimACLineSegment.MRID))
+                        {
+                            Entities.Add(cimACLineSegment.MRID, rd);
+                        }
+
                         report.Report.Append("Location ID = ").Append(cimACLineSegment.ID).Append(" SUCCESSFULLY converted to GID = ").AppendLine(string.Format("0x{0:X16}", rd.Id));
                     }
                     else
@@ -509,6 +580,12 @@ namespace Outage.DataImporter.CIMAdapter.Importer
                     if (rd != null)
                     {
                         delta.AddDeltaOperation(deltaOpType, rd, true);
+
+                        if (!Entities.ContainsKey(cimConnectivityNode.MRID))
+                        {
+                            Entities.Add(cimConnectivityNode.MRID, rd);
+                        }
+
                         report.Report.Append("Location ID = ").Append(cimConnectivityNode.ID).Append(" SUCCESSFULLY converted to GID = ").AppendLine(string.Format("0x{0:X16}", rd.Id));
                     }
                     else
@@ -548,6 +625,12 @@ namespace Outage.DataImporter.CIMAdapter.Importer
                     if (rd != null)
                     {
                         delta.AddDeltaOperation(deltaOpType, rd, true);
+
+                        if (!Entities.ContainsKey(cimTerminal.MRID))
+                        {
+                            Entities.Add(cimTerminal.MRID, rd);
+                        }
+
                         report.Report.Append("Location ID = ").Append(cimTerminal.ID).Append(" SUCCESSFULLY converted to GID = ").AppendLine(string.Format("0x{0:X16}", rd.Id));
                     }
                     else
@@ -587,6 +670,12 @@ namespace Outage.DataImporter.CIMAdapter.Importer
                     if (rd != null)
                     {
                         delta.AddDeltaOperation(deltaOpType, rd, true);
+
+                        if (!Entities.ContainsKey(cimDiscrete.MRID))
+                        {
+                            Entities.Add(cimDiscrete.MRID, rd);
+                        }
+
                         report.Report.Append("Location ID = ").Append(cimDiscrete.ID).Append(" SUCCESSFULLY converted to GID = ").AppendLine(string.Format("0x{0:X16}", rd.Id));
                     }
                     else
@@ -626,6 +715,12 @@ namespace Outage.DataImporter.CIMAdapter.Importer
                     if (rd != null)
                     {
                         delta.AddDeltaOperation(deltaOpType, rd, true);
+
+                        if (!Entities.ContainsKey(cimAnalog.MRID))
+                        {
+                            Entities.Add(cimAnalog.MRID, rd);
+                        }
+
                         report.Report.Append("Location ID = ").Append(cimAnalog.ID).Append(" SUCCESSFULLY converted to GID = ").AppendLine(string.Format("0x{0:X16}", rd.Id));
                     }
                     else
