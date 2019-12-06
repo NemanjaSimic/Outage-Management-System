@@ -1,38 +1,79 @@
-import { Component, OnInit } from '@angular/core';
+import { Component, OnInit, NgZone, OnDestroy } from '@angular/core';
+import { GraphService } from '@services/notification/graph.service';
+import { Subscription } from 'rxjs';
+import { OmsGraph } from '@shared/models/oms-graph.model';
 
 @Component({
   selector: 'app-graph',
   templateUrl: './graph.component.html',
   styleUrls: ['./graph.component.css']
 })
-export class GraphComponent implements OnInit {
-  
-  graphData = {
+export class GraphComponent implements OnInit, OnDestroy {
+  private connectionSubscription: Subscription;
+  private updateSubscription: Subscription;
+
+  private graphData = {
     nodes: [
-        {data: {id: 'j', name: 'Jerry', faveColor: '#6FB1FC', faveShape: 'triangle'}},
-        {data: {id: 'e', name: 'Elaine', faveColor: '#EDA1ED', faveShape: 'ellipse'}},
-        {data: {id: 'k', name: 'Kramer', faveColor: '#86B342', faveShape: 'octagon'}},
-        {data: {id: 'g', name: 'George', faveColor: '#F5A45D', faveShape: 'rectangle'}}
+      { data: { id: "1", name: "test", faveColor: "blue"} },
+      { data: { id: "2", name: "test", faveColor: "blue"} }
     ],
     edges: [
-        {data: {source: 'j', target: 'e', faveColor: '#6FB1FC'}},
-        {data: {source: 'j', target: 'k', faveColor: '#6FB1FC'}},
-        {data: {source: 'j', target: 'g', faveColor: '#6FB1FC'}},
-
-        {data: {source: 'e', target: 'j', faveColor: '#EDA1ED'}},
-        {data: {source: 'e', target: 'k', faveColor: '#EDA1ED'}},
-
-        {data: {source: 'k', target: 'j', faveColor: '#86B342'}},
-        {data: {source: 'k', target: 'e', faveColor: '#86B342'}},
-        {data: {source: 'k', target: 'g', faveColor: '#86B342'}},
-
-        {data: {source: 'g', target: 'j', faveColor: '#F5A45D'}}
+      { data: { source: "1", target: "2" }}
     ]
-};
+  }
 
-  constructor() { }
+  constructor(
+    private graphService: GraphService,
+    private ngZone: NgZone
+  ) { }
 
   ngOnInit() {
+    this.connectionSubscription = this.graphService.startConnection().subscribe(
+      (didConnect) => {
+        if (didConnect)
+          console.log('Connected to graph service');
+        else
+          console.log('Could not connect to graph service');
+      },
+      (err) => console.log(err)
+    );
+
+    this.updateSubscription = this.graphService.updateRecieved.subscribe(
+      data => this.onNotification(data));
+  }
+
+  ngOnDestroy() {
+    if (this.connectionSubscription)
+      this.connectionSubscription.unsubscribe();
+
+    if (this.updateSubscription)
+      this.updateSubscription.unsubscribe();
+  }
+
+  public onNotification(data: OmsGraph) {
+    this.ngZone.run(() => {
+      console.log(this.graphData.nodes);
+
+      this.graphData.nodes = data.Nodes.map(node => {
+        return {
+          data: {
+            id: node.Id,
+            label: node.Name
+          }
+        }
+      });
+
+      this.graphData.edges = data.Relations.map(relation => {
+        return {
+          data: {
+            source: relation.SourceNodeId,
+            target: relation.TargetNodeId
+          }
+        }
+      });
+
+      console.log(this.graphData.nodes);
+    });
   }
 
 }

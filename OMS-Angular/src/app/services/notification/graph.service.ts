@@ -45,8 +45,6 @@ export class GraphService {
 
   public registerGraphUpdateListener(): void {
     this.proxy.on('updateGraph', (data: OmsGraph) => {
-      console.log('recieved data!!')
-      console.log(data);
       this.updateRecieved.emit(data);
     });
   }

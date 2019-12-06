@@ -1,5 +1,5 @@
 export interface Relation {
-  sourceNodeId: string;
-  targetNodeId: string;
-  isActive: Boolean;
+  SourceNodeId: string;
+  TargetNodeId: string;
+  IsActive: Boolean;
 }
