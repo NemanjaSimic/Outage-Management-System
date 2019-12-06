@@ -13,12 +13,12 @@ namespace OMS.Web.API.Hubs
 
         public void NotifyGraphUpdate(List<Node> nodes, List<Relation> relations)
         {
-            Clients.All.updateGraph(nodes, relations);
+            Clients.All.updateGraph(new OmsGraph { Nodes = nodes, Relations = relations });
         }
 
-        public void JoinGroup(string groupName)
+        public void Join()
         {
-            this.Groups.Add(this.Context.ConnectionId, groupName);
+            Groups.Add(Context.ConnectionId, "Users");
         }
 
         public override Task OnConnected()

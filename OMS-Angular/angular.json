@@ -26,7 +26,10 @@
             "styles": [
               "src/styles.css"
             ],
-            "scripts": []
+            "scripts": [
+              "node_modules/jquery/dist/jquery.js",
+              "src/assets/jquery.signalR-2.4.1.min.js"
+            ]
           },
           "configurations": {
             "production": {

@@ -8,6 +8,7 @@ namespace OMS.Web.API
         public static void Register(HttpConfiguration config)
         {
             // Web API configuration and services
+            config.EnableCors();
             config.Filters.Add(new CustomExceptionFilterAttribute());
 
             // Web API routes

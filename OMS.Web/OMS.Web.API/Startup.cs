@@ -1,4 +1,5 @@
-﻿using Microsoft.Owin;
+﻿using Microsoft.AspNet.SignalR;
+using Microsoft.Owin;
 using Microsoft.Owin.Cors;
 using Owin;
 
@@ -10,8 +11,17 @@ namespace OMS.Web.API
     {
         public void Configuration(IAppBuilder app)
         {
-            app.UseCors(CorsOptions.AllowAll);
-            app.MapSignalR();
+            app.Map("/signalr", map =>
+            {
+                map.UseCors(CorsOptions.AllowAll);
+                var hubConfiguration = new HubConfiguration
+                {
+                    EnableJSONP = true
+                };
+
+                map.RunSignalR(hubConfiguration);
+            });
+
         }
     }
 }

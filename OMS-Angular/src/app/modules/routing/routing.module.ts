@@ -1,11 +1,17 @@
 import { NgModule } from '@angular/core';
-import { RouterModule } from '@angular/router';
-import { SharedModule } from '@shared/shared.module';
+import { RouterModule, Route } from '@angular/router';
+import { NotFoundComponent } from './not-found/not-found.component';
+
+import rootRoutes from './routes.declaration';
 
 @NgModule({
-  declarations: [],
+  declarations: [
+    NotFoundComponent
+  ],
   imports: [
-    SharedModule,
+    RouterModule.forRoot(rootRoutes)
+  ],
+  exports:[
     RouterModule
   ]
 })

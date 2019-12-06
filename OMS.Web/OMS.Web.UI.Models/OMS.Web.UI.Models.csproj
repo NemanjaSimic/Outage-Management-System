@@ -42,6 +42,7 @@
   </ItemGroup>
   <ItemGroup>
     <Compile Include="Node.cs" />
+    <Compile Include="OmsGraph.cs" />
     <Compile Include="Relation.cs" />
     <Compile Include="Properties\AssemblyInfo.cs" />
   </ItemGroup>
