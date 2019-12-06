@@ -13,13 +13,8 @@ export class GraphComponent implements OnInit, OnDestroy {
   private updateSubscription: Subscription;
 
   private graphData = {
-    nodes: [
-      { data: { id: "1", name: "test", faveColor: "blue"} },
-      { data: { id: "2", name: "test", faveColor: "blue"} }
-    ],
-    edges: [
-      { data: { source: "1", target: "2" }}
-    ]
+    nodes: [],
+    edges: []
   }
 
   constructor(
