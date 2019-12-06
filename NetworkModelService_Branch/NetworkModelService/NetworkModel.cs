@@ -1,4 +1,6 @@
 ﻿using MongoDB.Bson;
+using MongoDB.Bson.Serialization;
+using MongoDB.Bson.Serialization.Serializers;
 using MongoDB.Driver;
 using Outage.Common;
 using Outage.Common.GDA;
@@ -44,6 +46,26 @@ namespace Outage.NetworkModelService
         /// </summary>
         public NetworkModel()
         {
+
+            BsonSerializer.RegisterSerializer(new EnumSerializer<DMSType>(BsonType.String));
+            BsonSerializer.RegisterSerializer(new Int64Serializer(BsonType.String));
+
+            BsonClassMap.RegisterClassMap<BaseVoltage>();
+            BsonClassMap.RegisterClassMap<Terminal>();
+            BsonClassMap.RegisterClassMap<ConnectivityNode>();
+            BsonClassMap.RegisterClassMap<PowerTransformer>();
+            BsonClassMap.RegisterClassMap<EnergySource>();
+            BsonClassMap.RegisterClassMap<EnergyConsumer>();
+            BsonClassMap.RegisterClassMap<TransformerWinding>();
+            BsonClassMap.RegisterClassMap<Fuse>();
+            BsonClassMap.RegisterClassMap<Disconnector>();
+            BsonClassMap.RegisterClassMap<Breaker>();
+            BsonClassMap.RegisterClassMap<LoadBreakSwitch>();
+            BsonClassMap.RegisterClassMap<ACLineSegment>();
+            BsonClassMap.RegisterClassMap<Discrete>();
+            BsonClassMap.RegisterClassMap<Analog>();
+
+
             networkDataModel = new Dictionary<DMSType, Container>();
             resourcesDescs = new ModelResourcesDesc();
             try
@@ -660,32 +682,56 @@ namespace Outage.NetworkModelService
 
         private void Initialize()
         {
-            List<Delta> result = ReadAllDeltas();
 
-            foreach (Delta delta in result)
+
+            long networkModelVersion = 0, deltaVersion = 0;
+            var versionsCollection = db.GetCollection<ModelVersionDocument>("versions");
+            var networkDataModelCollection = db.GetCollection<NetworkDataModelDocument>("networkModels");
+
+            GetVersions(ref networkModelVersion, ref deltaVersion, versionsCollection);
+
+            if (deltaVersion > networkModelVersion)
             {
-                try
+                List<Delta> result = ReadAllDeltas(deltaVersion, networkModelVersion);
+
+                var networkModelFilter = Builders<NetworkDataModelDocument>.Filter.Eq("_id", networkModelVersion);
+                if (networkModelVersion > 0)
                 {
-                    foreach (ResourceDescription rd in delta.InsertOperations)
-                    {
-                        InsertEntity(rd);
-                    }
-
-                    foreach (ResourceDescription rd in delta.UpdateOperations)
-                    {
-                        UpdateEntity(rd);
-                    }
-
-                    foreach (ResourceDescription rd in delta.DeleteOperations)
-                    {
-                        DeleteEntity(rd);
-                    }
+                    networkDataModel = networkDataModelCollection.Find(networkModelFilter).First().NetworkModel;
                 }
-                catch (Exception ex)
+
+                foreach (Delta delta in result)
                 {
-                    CommonTrace.WriteTrace(CommonTrace.TraceError, "Error while applying delta (id = {0}) during service initialization. {1}", delta.Id, ex.Message);
+                    try
+                    {
+                        foreach (ResourceDescription rd in delta.InsertOperations)
+                        {
+                            InsertEntity(rd);
+                        }
+
+                        foreach (ResourceDescription rd in delta.UpdateOperations)
+                        {
+                            UpdateEntity(rd);
+                        }
+
+                        foreach (ResourceDescription rd in delta.DeleteOperations)
+                        {
+                            DeleteEntity(rd);
+                        }
+                    }
+                    catch (Exception ex)
+                    {
+                        CommonTrace.WriteTrace(CommonTrace.TraceError, "Error while applying delta (id = {0}) during service initialization. {1}", delta.Id, ex.Message);
+                    }
                 }
             }
+            else if (networkModelVersion > 0)
+            {
+                var networkDataModelFilter = Builders<NetworkDataModelDocument>.Filter.Eq("_id", networkModelVersion);
+                networkDataModel = networkDataModelCollection.Find(networkDataModelFilter).First().NetworkModel;
+            }
+
+            
         }
 
         private void SaveDelta(Delta delta)
@@ -701,14 +747,18 @@ namespace Outage.NetworkModelService
             //fs.Seek(0, SeekOrigin.Begin);
 
             //BinaryReader br = null;
-            long deltaCount = 0;
-            var counterCollection = db.GetCollection<ModelVersion>("versions");
-            var filter = Builders<ModelVersion>.Filter.Eq("Id", "deltaVersion");
-            if(counterCollection.Find(filter).CountDocuments() > 0)
-            {
-                ModelVersion finded = counterCollection.Find(filter).First();
-                deltaCount = finded.Version;
-            }
+            long deltaVersion = 0, networkModelVersion = 0, newestVersion = 0;
+            var counterCollection = db.GetCollection<ModelVersionDocument>("versions");
+
+            GetVersions(ref networkModelVersion, ref deltaVersion, counterCollection);
+
+            //var filter = Builders<ModelVersionDocument>.Filter.Eq("Id", "deltaVersion");
+            //if(counterCollection.Find(filter).CountDocuments() > 0)
+            //{
+            //    ModelVersionDocument finded = counterCollection.Find(filter).First();
+            //    deltaCount = finded.Version;
+            //}
+            newestVersion = deltaVersion > networkModelVersion ? deltaVersion : networkModelVersion;
 
 
             //if (fileExisted)
@@ -720,7 +770,7 @@ namespace Outage.NetworkModelService
             //BinaryWriter bw = new BinaryWriter(fs);
             //fs.Seek(0, SeekOrigin.Begin);
 
-            delta.Id = ++deltaCount;
+            delta.Id = ++newestVersion;
             //byte[] deltaSerialized = delta.Serialize();
             //int deltaLength = deltaSerialized.Length;
 
@@ -741,7 +791,7 @@ namespace Outage.NetworkModelService
             try
             {
                 
-                counterCollection.ReplaceOne(new BsonDocument("_id", "deltaVersion"), new ModelVersion { Id = "deltaVersion", Version = delta.Id }, new UpdateOptions { IsUpsert = true });
+                counterCollection.ReplaceOne(new BsonDocument("_id", "deltaVersion"), new ModelVersionDocument { Id = "deltaVersion", Version = delta.Id }, new UpdateOptions { IsUpsert = true });
                 var deltaCollection = db.GetCollection<Delta>("deltas");
                 deltaCollection.InsertOne(delta);
                 
@@ -753,7 +803,52 @@ namespace Outage.NetworkModelService
 
         }
 
-        private List<Delta> ReadAllDeltas()
+        public void SaveNetworkModel()
+        {
+            long networkModelVersion = 0, deltaVersion = 0;
+
+            var versionsCollection = db.GetCollection<ModelVersionDocument>("versions");
+            var networkModelCollection = db.GetCollection<NetworkDataModelDocument>("networkModels");
+            var deltasCollection = db.GetCollection<Delta>("deltas");
+            GetVersions(ref networkModelVersion, ref deltaVersion, versionsCollection);
+
+            if ((networkModelVersion == 0 && deltaVersion == 0) || (networkModelVersion > deltaVersion)) //there is no model and deltas or model in use is already saved, so there is no need for datamodel storing
+            {
+                return;
+            }
+            else if (deltaVersion > networkModelVersion) //there is new deltas since startup, so store current dataModel
+            {
+
+                networkModelCollection.InsertOne(new NetworkDataModelDocument { Id = deltaVersion + 1, NetworkModel = networkDataModel });
+                versionsCollection.ReplaceOne(new BsonDocument("_id", "networkModelVersion"), new ModelVersionDocument { Id = "networkModelVersion", Version = deltaVersion + 1 }, new UpdateOptions { IsUpsert = true });
+
+            }
+            else
+            {
+                throw new Exception("SaveNetwrokModel error!");  //better message needed :((
+            }
+
+
+
+        }
+
+        private void GetVersions(ref long networkModelVersion, ref long deltaVersion, IMongoCollection<ModelVersionDocument> versionsCollection)
+        {
+            var networkModelVersionFilter = Builders<ModelVersionDocument>.Filter.Eq("_id", "networkModelVersion");
+            var deltaVersionFilter = Builders<ModelVersionDocument>.Filter.Eq("_id", "deltaVersion");
+
+            if (versionsCollection.Find(networkModelVersionFilter).CountDocuments() > 0)
+            {
+                networkModelVersion = versionsCollection.Find(networkModelVersionFilter).First().Version;
+            }
+
+            if (versionsCollection.Find(deltaVersionFilter).CountDocuments() > 0)
+            {
+                deltaVersion = versionsCollection.Find(deltaVersionFilter).First().Version;
+            }
+        }
+
+        private List<Delta> ReadAllDeltas(long deltaVersion, long networkModelVersion)
         {
 
             List<Delta> deltasFromDb = new List<Delta>();
@@ -762,13 +857,18 @@ namespace Outage.NetworkModelService
 
             var collection = db.GetCollection<Delta>("deltas");
             
-            
-            deltasFromDb = collection.Find(new BsonDocument()).ToList();
-
-            if (deltasFromDb.Count <= 0)
+            for (long deltaV = networkModelVersion + 1; deltaV <= deltaVersion; deltaV++)
             {
-                return deltasFromDb;
+                var deltaFilter = Builders<Delta>.Filter.Eq("_id", deltaV);
+                deltasFromDb.Add(collection.Find(deltaFilter).First());
             }
+            
+            //deltasFromDb = collection.Find(new BsonDocument()).ToList();
+
+            //if (deltasFromDb.Count <= 0)
+            //{
+            //    return deltasFromDb;
+            //}
 
             
             

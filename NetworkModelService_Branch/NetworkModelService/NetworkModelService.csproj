@@ -83,7 +83,8 @@
     <Compile Include="Container.cs" />
     <Compile Include="GDA\GenericDataAccess.cs" />
     <Compile Include="GDA\ResourceIterator.cs" />
-    <Compile Include="ModelVersion.cs" />
+    <Compile Include="ModelVersionDocument.cs" />
+    <Compile Include="NetworkDataModelDocument.cs" />
     <Compile Include="NetworkModel.cs" />
     <Compile Include="NetworkModelService.cs" />
     <Compile Include="Properties\AssemblyInfo.cs" />

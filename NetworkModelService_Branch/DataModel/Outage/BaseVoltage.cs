@@ -77,6 +77,9 @@ namespace Outage.DataModel
                 case ModelCode.BASEVOLTAGE_CONDUCTINGEQUIPMENTS:
                     prop.SetValue(conductingEquipments);
                     break;
+                default:
+                    base.GetProperty(prop);
+                    break;
             }
         }
 

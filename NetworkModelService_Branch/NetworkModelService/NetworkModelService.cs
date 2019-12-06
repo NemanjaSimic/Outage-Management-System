@@ -86,6 +86,7 @@ namespace Outage.NetworkModelService
 
         private void CloseHosts()
         {
+            networkModel.SaveNetworkModel();
             if (hosts == null || hosts.Count == 0)
             {
                 throw new Exception("Network Model Services can not be closed because it is not initialized.");
