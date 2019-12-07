@@ -3,4 +3,5 @@ export interface Node {
   Name: string;
   Type: string;
   Value: string;
+  IsActive: Boolean;
 }

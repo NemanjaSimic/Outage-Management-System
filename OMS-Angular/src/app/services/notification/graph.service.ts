@@ -1,7 +1,7 @@
 import { Injectable, EventEmitter } from '@angular/core';
 import { EnvironmentService } from '@services/environment/environment.service';
 import { OmsGraph } from '@shared/models/oms-graph.model';
-import { Observable } from 'rxjs';
+import { Observable, Observer } from 'rxjs';
 
 declare var $;
 
@@ -25,7 +25,7 @@ export class GraphService {
   }
 
   public startConnection(): Observable<boolean> {
-    return Observable.create((observer) => {
+    return Observable.create((observer: Observer<boolean>) => {
 
       this.connection.start(() => {
         this.proxy.invoke("join");

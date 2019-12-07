@@ -6,7 +6,7 @@ using System.Threading.Tasks;
 
 namespace OMS.Web.API.Hubs
 {
-    [HubName("graphhub")]
+    [HubName("graphhub")]   
     public class GraphHub : Hub
     {
         private static IHubContext _hubContext = GlobalHost.ConnectionManager.GetHubContext<GraphHub>();

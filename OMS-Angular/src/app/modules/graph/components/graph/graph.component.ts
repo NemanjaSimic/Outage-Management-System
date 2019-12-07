@@ -3,6 +3,12 @@ import { GraphService } from '@services/notification/graph.service';
 import { Subscription } from 'rxjs';
 import { OmsGraph } from '@shared/models/oms-graph.model';
 
+import * as cytoscape from 'cytoscape';
+import dagre from 'cytoscape-dagre';
+import { style } from './graph.style';
+cytoscape.use(dagre);
+
+
 @Component({
   selector: 'app-graph',
   templateUrl: './graph.component.html',
@@ -11,11 +17,12 @@ import { OmsGraph } from '@shared/models/oms-graph.model';
 export class GraphComponent implements OnInit, OnDestroy {
   private connectionSubscription: Subscription;
   private updateSubscription: Subscription;
+  private cy: any;
 
-  private graphData = {
+  private graphData: any = {
     nodes: [],
     edges: []
-  }
+  };
 
   constructor(
     private graphService: GraphService,
@@ -35,6 +42,8 @@ export class GraphComponent implements OnInit, OnDestroy {
 
     this.updateSubscription = this.graphService.updateRecieved.subscribe(
       data => this.onNotification(data));
+
+    this.drawGraph();
   }
 
   ngOnDestroy() {
@@ -53,7 +62,8 @@ export class GraphComponent implements OnInit, OnDestroy {
         return {
           data: {
             id: node.Id,
-            label: node.Name
+            label: node.Name,
+            state: node.IsActive ? "active" : "inactive"
           }
         }
       });
@@ -62,13 +72,25 @@ export class GraphComponent implements OnInit, OnDestroy {
         return {
           data: {
             source: relation.SourceNodeId,
-            target: relation.TargetNodeId
+            target: relation.TargetNodeId,
+            color: relation.IsActive ? "blue" : "red"
           }
         }
       });
 
       console.log(this.graphData.nodes);
+      this.drawGraph();
     });
   }
+
+  private drawGraph(): void {
+    this.cy = cytoscape({
+      container: document.getElementById('graph'),
+      layout: { name: 'dagre', rankDir: 'TB' },
+      autoungrabify: true,
+      elements: this.graphData,
+      style: style
+    })
+  };
 
 }

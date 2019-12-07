@@ -11,5 +11,6 @@
         public string Name;
         public string Type;
         public float Value;
+        public bool IsActive;
     }
 }

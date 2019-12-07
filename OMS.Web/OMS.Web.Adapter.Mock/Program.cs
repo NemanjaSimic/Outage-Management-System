@@ -14,11 +14,11 @@ namespace OMS.Web.Adapter.Mock
             // mock data
             List<Node> nodes = new List<Node>
             {
-                new Node { Id = "1", Name = "Energy Source 1", Type="ES", Value = 220.0f },
-                new Node { Id = "2", Name = "Power Transformer 1", Type="PT", Value = 110.0f },
-                new Node { Id = "3", Name = "Power Transformer 2", Type="PT", Value = 110.0f},
-                new Node { Id = "4", Name = "Breaker 1", Type="BR", Value = 110.0f },
-                new Node { Id = "5", Name = "Breaker 2", Type="BR", Value = 110.0f }
+                new Node { Id = "1", Name = "Energy Source 1", Type="ES", Value = 220.0f, IsActive = true },
+                new Node { Id = "2", Name = "Power Transformer 1", Type="PT", Value = 110.0f, IsActive = true },
+                new Node { Id = "3", Name = "Power Transformer 2", Type="PT", Value = 110.0f, IsActive = true},
+                new Node { Id = "4", Name = "Breaker 1", Type="BR", Value = 110.0f, IsActive = true },
+                new Node { Id = "5", Name = "Breaker 2", Type="BR", Value = 110.0f, IsActive = false }
             };
 
             List<Relation> relations = new List<Relation>

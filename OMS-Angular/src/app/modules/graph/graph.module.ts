@@ -1,14 +1,14 @@
 import { NgModule } from '@angular/core';
 import { CommonModule } from '@angular/common';
 import { GraphComponent } from './components/graph/graph.component';
+import { ServicesModule } from '@services/services.module';
 
-import { CytoscapeModule } from 'ngx-cytoscape';
 
 @NgModule({
   declarations: [GraphComponent],
   imports: [
     CommonModule,
-    CytoscapeModule
+    ServicesModule
   ]
 })
 export class GraphModule { }
