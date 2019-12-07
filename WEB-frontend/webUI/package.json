@@ -20,6 +20,7 @@
     "@angular/platform-browser-dynamic": "~8.0.0",
     "@angular/router": "~8.0.0",
     "cytoscape": "^3.12.1",
+    "cytoscape-dagre": "^2.2.2",
     "html5": "^1.0.5",
     "rxjs": "~6.4.0",
     "tslib": "^1.9.0",

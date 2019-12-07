@@ -27,7 +27,7 @@
               "src/styles.css"
             ],
             "scripts": [
-              "src/scripts/cytoscape.min.js"
+              "./node_modules/cytoscape/dist/cytoscape.min.js"
             ]
           },
           "configurations": {
