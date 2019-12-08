@@ -1,18 +1,17 @@
 ﻿using CECommon;
 using CECommon.TopologyConfiguration;
 using Outage.Common;
-using System;
 using System.Collections.Generic;
-using System.Linq;
-using System.Text;
-using System.Threading.Tasks;
 
 namespace TopologyElementsFuntions
 {
 	public class TopologyHelper
 	{
-		private Dictionary<ElementStatus, List<DMSType>> elementsStatus;
-		private Dictionary<TopologyType, List<DMSType>> topologyTypes;
+		private readonly Dictionary<TopologyStatus, List<DMSType>> elementsStatus;
+		private readonly Dictionary<TopologyType, List<DMSType>> topologyTypes;
+
+		private GDAModelHelper gDAModelHelper = new GDAModelHelper();
+		private ModelResourcesDesc modelResourcesDesc = new ModelResourcesDesc();
 
 		public TopologyHelper()
 		{
@@ -21,9 +20,10 @@ namespace TopologyElementsFuntions
 			topologyTypes = cp.GetAllTopologyTypes();
 		}
 
-		public ElementStatus GetElementStatus(DMSType type)
+		public TopologyStatus GetElementTopologyStatus(long gid)
 		{
-			ElementStatus retVal;
+			TopologyStatus retVal;
+			DMSType type = ModelCodeHelper.GetTypeFromModelCode(modelResourcesDesc.GetModelCodeFromId(gid));
 			foreach (var item in elementsStatus)
 			{
 				if (item.Value.Contains(type))
@@ -32,15 +32,15 @@ namespace TopologyElementsFuntions
 					return retVal;
 				}
 			}
-			return ElementStatus.Regular;
+			return TopologyStatus.Regular;
 		}
 
-		public TopologyType GetTopologyType(DMSType type)
+		public TopologyType GetElementTopologyType(long gid)
 		{
 			TopologyType retVal;
+			DMSType type = ModelCodeHelper.GetTypeFromModelCode(modelResourcesDesc.GetModelCodeFromId(gid));
 			foreach (var item in topologyTypes)
 			{
-				
 				if (item.Value.Contains(type))
 				{
 					retVal = item.Key;
@@ -48,6 +48,41 @@ namespace TopologyElementsFuntions
 				}
 			}
 			return TopologyType.None;
+		}
+
+		public List<long> GetAllReferencedElements(long gid)
+		{
+			List<long> elements = new List<long>();
+
+			foreach (var resourceDescription in gDAModelHelper.GetAllReferencedElements(gid))
+			{
+				elements.Add(resourceDescription.Id);
+			}
+
+			return elements;
+		}
+
+		public List<long> GetNextNonIgnorableElements(long gid)
+		{
+			List<long> nonIgnorableElements = new List<long>();
+
+			if (GetElementTopologyStatus(gid) != TopologyStatus.Ignorable)
+			{
+				nonIgnorableElements.Add(gid);
+			}
+			else
+			{
+				List<long> nextElements = GetAllReferencedElements(gid);
+				if (nextElements.Count != 0)
+				{
+					foreach (var element in nextElements)
+					{
+
+					}
+				}
+			}
+
+			return nonIgnorableElements;
 		}
 	}
 }

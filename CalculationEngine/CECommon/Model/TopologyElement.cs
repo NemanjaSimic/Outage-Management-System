@@ -1,4 +1,5 @@
-﻿using System;
+﻿using Outage.Common;
+using System;
 using System.Collections.Generic;
 using System.Linq;
 using System.Text;
@@ -9,11 +10,15 @@ namespace CECommon
 	public abstract class TopologyElement
 	{
 		private long id;
-		public long Id { get => id; set => id = value; }
+		private long? firstEnd;
 
+		public long Id { get => id; set => id = value; }
+		public long? FirstEnd { get => firstEnd; set => firstEnd = value; }
+		
 		public TopologyElement(long gid)
 		{
-			this.id = gid;
+			Id = gid;
+
 		}
 	}
 }

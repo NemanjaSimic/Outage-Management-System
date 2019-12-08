@@ -13,7 +13,7 @@ namespace CECommon
 		None
 	}
 
-	public enum ElementStatus
+	public enum TopologyStatus
 	{
 		Ignorable = 1,
 		Field,

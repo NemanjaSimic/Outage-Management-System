@@ -12,6 +12,7 @@ namespace CECommon
 		public List<RegularNode> Members { get => members; set => members = value; }
 		public Field(long gid) : base(gid)
 		{
+			Members = new List<RegularNode>();
 		}
 	}
 }

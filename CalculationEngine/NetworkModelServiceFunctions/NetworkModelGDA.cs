@@ -9,54 +9,32 @@ using System.ServiceModel;
 
 namespace NetworkModelServiceFunctions
 {
-	class NetworkModelGDA
+	public class NetworkModelGDA
 	{
-		private readonly string endpointName;
-
-		public NetworkModelGDA(string endpointName)
-		{
-			this.endpointName = endpointName;
-		}
-
-		public UpdateResult ApplyUpdate(Delta delta)
-		{
-			throw new NotImplementedException();
-		}
+		private static readonly string endpointName = "NetworkModelGDAEndpoint";
 
 		public List<ResourceDescription> GetExtentValues(ModelCode entityType, List<ModelCode> propIds)
 		{
-			int iteratorId = 0, numberOfResources = 3, resourcesLeft = 0;
-
-			List<ResourceDescription> resourceDescriptions = new List<ResourceDescription>();
+			int iteratorId;
 
 			using (var proxy = new NetworkModelGDAProxy(endpointName))
 			{
-				iteratorId = proxy.GetExtentValues(entityType, propIds);
-				resourcesLeft = proxy.IteratorResourcesLeft(iteratorId);
-
-				do
-				{
-					resourcesLeft = proxy.IteratorResourcesLeft(iteratorId);
-					List<ResourceDescription> rds = proxy.IteratorNext(numberOfResources, iteratorId);
-
-					foreach (var resourceDescription in rds)
-					{
-						resourceDescriptions.Add(resourceDescription);
-					}
-				} while (resourcesLeft > 0);
-
-				proxy.IteratorClose(iteratorId);
+				iteratorId = proxy.GetExtentValues(entityType, propIds);			
 			}
 
-			return resourceDescriptions;
+			return ProcessIterator(iteratorId);
 		}
 
-		public int GetRelatedValues(long source, List<ModelCode> propIds, Association association)
+		public List<ResourceDescription> GetRelatedValues(long source, List<ModelCode> propIds, Association association)
 		{
+			int iteratorId;
+
 			using (var proxy = new NetworkModelGDAProxy(endpointName))
 			{
-				return proxy.GetRelatedValues(source, propIds, association);
+				iteratorId = proxy.GetRelatedValues(source, propIds, association);
 			}
+
+			return ProcessIterator(iteratorId);
 		}
 
 		public ResourceDescription GetValues(long resourceId, List<ModelCode> propIds)
@@ -67,29 +45,26 @@ namespace NetworkModelServiceFunctions
 			}
 		}
 
-		public bool IteratorClose(int id)
+		private List<ResourceDescription> ProcessIterator(int iteratorId)
 		{
-			throw new NotImplementedException();
-		}
+			int numberOfResources = 3, resourcesLeft = 0;
 
-		public List<ResourceDescription> IteratorNext(int n, int id)
-		{
-			throw new NotImplementedException();
-		}
+			List<ResourceDescription> resourceDescriptions = new List<ResourceDescription>();
 
-		public int IteratorResourcesLeft(int id)
-		{
-			throw new NotImplementedException();
-		}
+			using (var proxy = new NetworkModelGDAProxy(endpointName))
+			{
+				do
+				{
+					List<ResourceDescription> rds = proxy.IteratorNext(numberOfResources, iteratorId);
+					resourceDescriptions.AddRange(rds);
 
-		public int IteratorResourcesTotal(int id)
-		{
-			throw new NotImplementedException();
-		}
+					resourcesLeft = proxy.IteratorResourcesLeft(iteratorId);
 
-		public bool IteratorRewind(int id)
-		{
-			throw new NotImplementedException();
+				} while (resourcesLeft > 0);
+
+				proxy.IteratorClose(iteratorId);
+			}
+			return resourceDescriptions;
 		}
 	}
 }

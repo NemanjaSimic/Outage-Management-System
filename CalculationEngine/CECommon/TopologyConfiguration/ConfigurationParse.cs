@@ -28,19 +28,19 @@ namespace CECommon.TopologyConfiguration
 				}
 				catch (Exception)
 				{
-					Console.WriteLine("Invalid structured configuration file for Element Status");
+					Console.WriteLine("Invalid structured configuration file " + path + ".");
 				}
 			}
 
 			return retValue;
 		}
 
-		public Dictionary<ElementStatus, List<DMSType>> GetAllElementStatus()
+		public Dictionary<TopologyStatus, List<DMSType>> GetAllElementStatus()
 		{
-			Dictionary<ElementStatus, List<DMSType>> elements = new Dictionary<ElementStatus, List<DMSType>>
+			Dictionary<TopologyStatus, List<DMSType>> elements = new Dictionary<TopologyStatus, List<DMSType>>
 			{
-				{ ElementStatus.Ignorable, new List<DMSType>(ParseConfigFile(ignorableFilePath)) },
-				{ ElementStatus.Field, new List<DMSType>(ParseConfigFile(fieldFilePath)) }
+				{ TopologyStatus.Ignorable, new List<DMSType>(ParseConfigFile(ignorableFilePath)) },
+				{ TopologyStatus.Field, new List<DMSType>(ParseConfigFile(fieldFilePath)) }
 			};
 
 			return elements;
