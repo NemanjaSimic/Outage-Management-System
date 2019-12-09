@@ -17,7 +17,14 @@ cytoscape.use(dagre);
 export class GraphComponent implements OnInit, OnDestroy {
   public connectionSubscription: Subscription;
   public updateSubscription: Subscription;
+  
   private cy: any;
+  private cyConfig: Object = {
+    layout: { name: 'dagre', rankDir: 'TB' },
+    autoungrabify: true,
+    style: style,
+    wheelSensitivity: 0.5
+  };
 
   private graphData: any = {
     nodes: [],
@@ -63,6 +70,14 @@ export class GraphComponent implements OnInit, OnDestroy {
     );
   }
 
+  public drawGraph(): void {
+    this.cy = cytoscape({
+      container: document.getElementById('graph'),
+      elements: this.graphData,
+      ...this.cyConfig
+    })
+  };
+
   public onNotification(data: OmsGraph): void {
     this.ngZone.run(() => {
       console.log(this.graphData.nodes);
@@ -91,15 +106,5 @@ export class GraphComponent implements OnInit, OnDestroy {
       this.drawGraph();
     });
   }
-
-  public drawGraph(): void {
-    this.cy = cytoscape({
-      container: document.getElementById('graph'),
-      layout: { name: 'dagre', rankDir: 'TB' },
-      autoungrabify: true,
-      elements: this.graphData,
-      style: style
-    })
-  };
 
 }
