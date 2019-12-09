@@ -15,8 +15,8 @@ cytoscape.use(dagre);
   styleUrls: ['./graph.component.css']
 })
 export class GraphComponent implements OnInit, OnDestroy {
-  private connectionSubscription: Subscription;
-  private updateSubscription: Subscription;
+  public connectionSubscription: Subscription;
+  public updateSubscription: Subscription;
   private cy: any;
 
   private graphData: any = {
@@ -27,23 +27,13 @@ export class GraphComponent implements OnInit, OnDestroy {
   constructor(
     private graphService: GraphService,
     private ngZone: NgZone
-  ) { }
+  ) { 
+    this.connectionSubscription = Subscription.EMPTY;
+    this.updateSubscription = Subscription.EMPTY;
+  }
 
   ngOnInit() {
-    this.connectionSubscription = this.graphService.startConnection().subscribe(
-      (didConnect) => {
-        if (didConnect)
-          console.log('Connected to graph service');
-        else
-          console.log('Could not connect to graph service');
-      },
-      (err) => console.log(err)
-    );
-
-    this.updateSubscription = this.graphService.updateRecieved.subscribe(
-      data => this.onNotification(data));
-
-    this.drawGraph();
+    this.startConnection();
   }
 
   ngOnDestroy() {
@@ -54,7 +44,26 @@ export class GraphComponent implements OnInit, OnDestroy {
       this.updateSubscription.unsubscribe();
   }
 
-  public onNotification(data: OmsGraph) {
+  public startConnection(): void {
+    this.connectionSubscription = this.graphService.startConnection().subscribe(
+      (didConnect) => {
+        if (didConnect) {
+          console.log('Connected to graph service');
+
+          this.updateSubscription = this.graphService.updateRecieved.subscribe(
+            data => this.onNotification(data));
+
+          this.drawGraph();
+        }
+        else {
+          console.log('Could not connect to graph service');
+        }
+      },
+      (err) => console.log(err)
+    );
+  }
+
+  public onNotification(data: OmsGraph): void {
     this.ngZone.run(() => {
       console.log(this.graphData.nodes);
 
@@ -83,7 +92,7 @@ export class GraphComponent implements OnInit, OnDestroy {
     });
   }
 
-  private drawGraph(): void {
+  public drawGraph(): void {
     this.cy = cytoscape({
       container: document.getElementById('graph'),
       layout: { name: 'dagre', rankDir: 'TB' },
