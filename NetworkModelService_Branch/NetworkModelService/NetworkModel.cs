@@ -354,7 +354,6 @@ namespace Outage.NetworkModelService
             }
 
             long globalId = rd.Id;
-
             CommonTrace.WriteTrace(CommonTrace.TraceInfo, "Inserting entity with GID ({0:x16}).", globalId);
 
             // check if mapping for specified global id already exists			
@@ -371,39 +370,34 @@ namespace Outage.NetworkModelService
                 DMSType type = (DMSType)ModelCodeHelper.ExtractTypeFromGlobalId(globalId);
 
                 // get container or create container 
-                Container incomingDataContainer = null;
+                Container incomingContainer = null;
 
                 //get container from incoming model
                 if (incomingNetworkDataModel.ContainsKey(type))
                 {
-                    incomingDataContainer = incomingNetworkDataModel[type];
+                    incomingContainer = incomingNetworkDataModel[type];
 
                     //get container from current model
                     if (networkDataModel.ContainsKey(type))
                     {
-                        Container currentDataContainer = networkDataModel[type];
+                        Container currentContainer = networkDataModel[type];
 
-                        if (currentDataContainer.GetHashCode() == incomingDataContainer.GetHashCode())
+                        if (currentContainer.GetHashCode() == incomingContainer.GetHashCode())
                         {
-                            incomingDataContainer = currentDataContainer.Clone();
+                            incomingContainer = currentContainer.Clone();
+                            incomingNetworkDataModel[type] = incomingContainer;
                         }
                     }
                 }
+                //create new container or make the shallow copy
                 else
                 {
-                    if (networkDataModel.ContainsKey(type))
-                    {
-                        incomingDataContainer = networkDataModel[type].Clone();
-                    }
-                    else
-                    {
-                        incomingDataContainer = new Container();
-                        incomingNetworkDataModel.Add(type, incomingDataContainer);
-                    }
+                    incomingContainer = new Container();
+                    incomingNetworkDataModel.Add(type, incomingContainer);
                 }
 
                 // create entity and add it to container
-                IdentifiedObject io = incomingDataContainer.CreateEntity(globalId);
+                IdentifiedObject io = incomingContainer.CreateEntity(globalId);
 
                 // apply properties on created entity
                 if (rd.Properties != null)
@@ -429,18 +423,30 @@ namespace Outage.NetworkModelService
                                     throw new Exception(message);
                                 }
 
-                                // get referenced entity for update
-                                IdentifiedObject incomingTargetEntity = GetEntityFromIncomingData(targetGlobalId);
+                                // find type
+                                DMSType targetType = (DMSType)ModelCodeHelper.ExtractTypeFromGlobalId(targetGlobalId);
 
-                                IdentifiedObject currentTargetEntity = null;
+                                //get container from incoming model
+                                Container incomingTargetContainer = incomingNetworkDataModel[targetType];
+                                // get referenced entity for update from incoming model
+                                IdentifiedObject incomingTargetEntity = incomingTargetContainer.Entities[targetGlobalId];
 
                                 if(EntityExists(targetGlobalId))
                                 {
-                                    currentTargetEntity = GetEntity(targetGlobalId);
+                                    Container currentTargetContainer = networkDataModel[targetType];
 
-                                    if (currentTargetEntity.GetHashCode() == incomingTargetEntity.GetHashCode())
+                                    if (currentTargetContainer.GetHashCode() == incomingTargetContainer.GetHashCode())
+                                    {
+                                        incomingTargetContainer = currentTargetContainer.Clone();
+                                        incomingNetworkDataModel[targetType] = incomingTargetContainer;
+                                    }
+
+                                    IdentifiedObject currentTargetEntity = currentTargetContainer.Entities[targetGlobalId];
+
+                                    if(incomingTargetEntity.GetHashCode() == currentTargetEntity.GetHashCode())
                                     {
                                         incomingTargetEntity = currentTargetEntity.Clone();
+                                        incomingTargetContainer.Entities[targetGlobalId] = incomingTargetEntity;
                                     }
                                 }
 
@@ -481,7 +487,6 @@ namespace Outage.NetworkModelService
             try
             {
                 long globalId = rd.Id;
-
                 CommonTrace.WriteTrace(CommonTrace.TraceVerbose, "Updating entity with GID ({0:x16}).", globalId);
 
                 if (!this.EntityExistsInIncomingData(globalId))
@@ -491,14 +496,42 @@ namespace Outage.NetworkModelService
                     throw new Exception(message);
                 }
 
-                IdentifiedObject io = GetEntityFromIncomingData(globalId);
+                // find type
+                DMSType type = (DMSType)ModelCodeHelper.ExtractTypeFromGlobalId(globalId);
+                //get container from incoming model
+                Container incomingContainer = incomingNetworkDataModel[type];
+                //get entity form incoming container
+                IdentifiedObject incomingEntity = incomingContainer.Entities[globalId];
 
+                //get container from current model
+                if (networkDataModel.ContainsKey(type))
+                {
+                    Container currentContainer = networkDataModel[type];
+
+                    if (currentContainer.GetHashCode() == incomingContainer.GetHashCode())
+                    {
+                        incomingContainer = currentContainer.Clone();
+                        incomingNetworkDataModel[type] = incomingContainer;
+                    }
+
+                    if (currentContainer.Entities.ContainsKey(globalId))
+                    {
+                        IdentifiedObject currentEntity = currentContainer.Entities[globalId];
+
+                        if(currentEntity.GetHashCode() == incomingEntity.GetHashCode())
+                        {
+                            incomingEntity = currentEntity.Clone();
+                            incomingContainer.Entities[globalId] = incomingEntity;
+                        }
+                    }
+                }
+                
                 // updating properties of entity
                 foreach (Property property in rd.Properties)
                 {
                     if (property.Type == PropertyType.Reference)
                     {
-                        long oldTargetGlobalId = io.GetProperty(property.Id).AsReference();
+                        long oldTargetGlobalId = incomingEntity.GetProperty(property.Id).AsReference();
 
                         if (oldTargetGlobalId != 0)
                         { 
@@ -508,17 +541,30 @@ namespace Outage.NetworkModelService
                                 throw new Exception(message);
                             }
 
-                            IdentifiedObject incomingOldTargetEntity = GetEntityFromIncomingData(oldTargetGlobalId);
+                            // find type
+                            DMSType oldTargetType = (DMSType)ModelCodeHelper.ExtractTypeFromGlobalId(oldTargetGlobalId);
+                            //get container from incoming model
+                            Container incomingOldTargetContainer = incomingNetworkDataModel[oldTargetType];
+                            // get referenced entity for update from incoming model
+                            IdentifiedObject incomingOldTargetEntity = incomingOldTargetContainer.Entities[oldTargetGlobalId];
 
-                            IdentifiedObject currentOldTargetEntity = null;
-
-                            if(EntityExists(oldTargetGlobalId))
+                            //get container from current model
+                            if (EntityExists(oldTargetGlobalId))
                             {
-                                currentOldTargetEntity = GetEntity(oldTargetGlobalId);
+                                Container currentOldTargetContainer = networkDataModel[oldTargetType];
+
+                                if (currentOldTargetContainer.GetHashCode() == incomingOldTargetContainer.GetHashCode())
+                                {
+                                    incomingOldTargetContainer = currentOldTargetContainer.Clone();
+                                    incomingNetworkDataModel[oldTargetType] = incomingOldTargetContainer;
+                                }
+
+                                IdentifiedObject currentOldTargetEntity = currentOldTargetContainer.Entities[oldTargetGlobalId];
 
                                 if (incomingOldTargetEntity.GetHashCode() == currentOldTargetEntity.GetHashCode())
                                 {
                                     incomingOldTargetEntity = currentOldTargetEntity.Clone();
+                                    incomingOldTargetContainer.Entities[oldTargetGlobalId] = incomingOldTargetEntity;
                                 }
                             }
 
@@ -536,16 +582,30 @@ namespace Outage.NetworkModelService
                                 throw new Exception(message);
                             }
 
-                            IdentifiedObject incomingTargetEntity = GetEntityFromIncomingData(targetGlobalId);
+                            // find type
+                            DMSType targetType = (DMSType)ModelCodeHelper.ExtractTypeFromGlobalId(targetGlobalId);
+                            //get container from incoming model
+                            Container incomingTargetContainer = incomingNetworkDataModel[targetType];
+                            // get referenced entity for update from incoming model
+                            IdentifiedObject incomingTargetEntity = incomingTargetContainer.Entities[targetGlobalId];
 
-                            IdentifiedObject currentTargetEntity = null;
+                            //get container from current model
                             if (EntityExists(targetGlobalId))
                             {
-                                currentTargetEntity = GetEntity(targetGlobalId);
+                                Container currentTargetContainer = networkDataModel[targetType];
+
+                                if (currentTargetContainer.GetHashCode() == incomingTargetContainer.GetHashCode())
+                                {
+                                    incomingTargetContainer = currentTargetContainer.Clone();
+                                    incomingNetworkDataModel[targetType] = incomingTargetContainer;
+                                }
+
+                                IdentifiedObject currentTargetEntity = currentTargetContainer.Entities[targetGlobalId];
 
                                 if (incomingTargetEntity.GetHashCode() == currentTargetEntity.GetHashCode())
                                 {
                                     incomingTargetEntity = currentTargetEntity.Clone();
+                                    incomingTargetContainer.Entities[targetGlobalId] = incomingTargetEntity;
                                 }
                             }
 
@@ -553,12 +613,12 @@ namespace Outage.NetworkModelService
                         }
 
                         // update value of the property in specified entity
-                        io.SetProperty(property);
+                        incomingEntity.SetProperty(property);
                     }
                     else
                     {
                         // update value of the property in specified entity
-                        io.SetProperty(property);
+                        incomingEntity.SetProperty(property);
                     }
                 }
 
@@ -587,7 +647,6 @@ namespace Outage.NetworkModelService
             try
             {
                 long globalId = rd.Id;
-
                 CommonTrace.WriteTrace(CommonTrace.TraceVerbose, "Deleting entity with GID ({0:x16}).", globalId);
 
                 // check if entity exists
@@ -598,18 +657,33 @@ namespace Outage.NetworkModelService
                     throw new Exception(message);
                 }
 
-                // get entity to be deleted
-                IdentifiedObject incomingEntity = GetEntityFromIncomingData(globalId);
+                // find type
+                DMSType type = (DMSType)ModelCodeHelper.ExtractTypeFromGlobalId(globalId);
+                //get container from incoming model
+                Container incomingContainer = incomingNetworkDataModel[type];
+                //entity to be deleted
+                IdentifiedObject incomingEntity = incomingContainer.Entities[globalId];
 
-                IdentifiedObject currentEntity = null;
-
-                if (EntityExists(globalId))
+                //get container from current model
+                if (networkDataModel.ContainsKey(type))
                 {
-                    currentEntity = GetEntity(globalId);
+                    Container currentContainer = networkDataModel[type];
 
-                    if (currentEntity.GetHashCode() == incomingEntity.GetHashCode())
+                    if (currentContainer.GetHashCode() == incomingContainer.GetHashCode())
                     {
-                        incomingEntity = currentEntity.Clone();
+                        incomingContainer = currentContainer.Clone();
+                        incomingNetworkDataModel[type] = incomingContainer;
+                    }
+
+                    if (currentContainer.Entities.ContainsKey(globalId))
+                    {
+                        IdentifiedObject currentEntity = currentContainer.Entities[globalId];
+
+                        if (currentEntity.GetHashCode() == incomingEntity.GetHashCode())
+                        {
+                            incomingEntity = currentEntity.Clone();
+                            incomingContainer.Entities[globalId] = incomingEntity;
+                        }
                     }
                 }
 
@@ -660,18 +734,30 @@ namespace Outage.NetworkModelService
                                     throw new Exception(message);
                                 }
 
+                                // find type
+                                DMSType targetType = (DMSType)ModelCodeHelper.ExtractTypeFromGlobalId(targetGlobalId);
+                                //get container from incoming model
+                                Container incomingTargetContainer = incomingNetworkDataModel[targetType];
                                 // get incoming target entity
-                                IdentifiedObject incomingTargetEntity = GetEntityFromIncomingData(targetGlobalId);
-
-                                // get current target entity
-                                IdentifiedObject currentTargetEntity = null;
+                                IdentifiedObject incomingTargetEntity = incomingTargetContainer.Entities[targetGlobalId];
+                                
+                                //get container from current model
                                 if (EntityExists(targetGlobalId))
                                 {
-                                    currentTargetEntity = GetEntity(targetGlobalId);
+                                    Container currentTargetContainer = networkDataModel[targetType];
+
+                                    if (currentTargetContainer.GetHashCode() == incomingTargetContainer.GetHashCode())
+                                    {
+                                        incomingTargetContainer = currentTargetContainer.Clone();
+                                        incomingNetworkDataModel[targetType] = incomingTargetContainer;
+                                    }
+
+                                    IdentifiedObject currentTargetEntity = currentTargetContainer.Entities[targetGlobalId];
 
                                     if (incomingTargetEntity.GetHashCode() == currentTargetEntity.GetHashCode())
                                     {
                                         incomingTargetEntity = currentTargetEntity.Clone();
+                                        incomingTargetContainer.Entities[targetGlobalId] = incomingTargetEntity;
                                     }
                                 }
 
@@ -682,32 +768,9 @@ namespace Outage.NetworkModelService
                 }
 
                 // remove entity form netowrk model
-                DMSType type = (DMSType)ModelCodeHelper.ExtractTypeFromGlobalId(globalId);
+                incomingContainer.RemoveEntity(globalId);
 
-
-                if (incomingNetworkDataModel.ContainsKey(type))
-                {
-                    Container incomingContainer = incomingNetworkDataModel[type];
-
-                    if (networkDataModel.ContainsKey(type))
-                    {
-                        Container currentContainer = networkDataModel[type];
-
-                        if (currentContainer.GetHashCode() == incomingContainer.GetHashCode())
-                        {
-                            incomingContainer = currentContainer.Clone();
-                        }
-                    }
-
-                    incomingContainer.RemoveEntity(globalId);
-
-                    CommonTrace.WriteTrace(CommonTrace.TraceVerbose, "Deleting entity with GID ({0:x16}) successfully finished.", globalId);
-                }
-                else
-                {
-                    string message = string.Format("Container does not exist for type {0}.", type);
-                    throw new Exception(message);
-                }
+                CommonTrace.WriteTrace(CommonTrace.TraceVerbose, "Deleting entity with GID ({0:x16}) successfully finished.", globalId);
             }
             catch (Exception ex)
             {

@@ -23,7 +23,7 @@
 	</cim:BaseVoltage>
 	-->
 	<cim:BaseVoltage rdf:ID="BV_2">
-		<cim:BaseVoltage.nominalVoltage>110</cim:BaseVoltage.nominalVoltage>
+		<cim:BaseVoltage.nominalVoltage>220</cim:BaseVoltage.nominalVoltage>
 		<cim:IdentifiedObject.description>BaseVoltage2</cim:IdentifiedObject.description>
 		<cim:IdentifiedObject.mRID>BV_2</cim:IdentifiedObject.mRID>
 		<ftn:IdentifiedObject.name>BV_2</ftn:IdentifiedObject.name>
