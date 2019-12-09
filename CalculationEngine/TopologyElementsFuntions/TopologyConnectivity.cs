@@ -100,7 +100,9 @@ namespace TopologyElementsFuntions
 				if (newElement is RegularNode && parentElement is Node)
 				{
 					Console.WriteLine("Element is RegularNode " + newElement.Id.ToString() + " and parent is Node " + parentElement.Id.ToString() + "...");
+
 					RegularNode newNode = newElement as RegularNode;
+
 					newEdge = TopologyElementFactory.CreateOrdinaryEdge(parentElement.Id, newNode.Id);
 					parentSecondEnd.Add(newEdge.Id);
 					newNode.FirstEnd = newEdge.Id;
@@ -112,14 +114,13 @@ namespace TopologyElementsFuntions
 				{
 					Console.WriteLine("Element is RegularNode " + newElement.Id.ToString() + " and parent is Edge " + parentElement.Id.ToString() +"...");
 					RegularNode newNode = newElement as RegularNode;
-					Edge edge = parentElement as Edge;
 
-					newNode.FirstEnd = edge.Id;
-					newNode.Parent = edge.FirstEnd;
-
+					newNode.FirstEnd = parentElement.Id;
+					newNode.Parent = parentElement.FirstEnd;
+					parentSecondEnd.Add(newNode.Id);
 					newNode.SecondEnd.AddRange(Create(newNode));
 				}
-				else if (newElement is Edge)
+				else if (newElement is Edge && parentElement is RegularNode)
 				{
 					Console.WriteLine("Element is Edge " + newElement.Id.ToString() + " and parent " + parentElement.Id.ToString() + "...");
 					newEdge = newElement as Edge;

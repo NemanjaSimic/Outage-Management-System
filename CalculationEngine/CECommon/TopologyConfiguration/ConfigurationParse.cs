@@ -9,10 +9,10 @@ namespace CECommon.TopologyConfiguration
 {
 	public class ConfigurationParse
 	{
-		private readonly string ignorableFilePath ="ignorables.txt";
-		private readonly string fieldFilePath ="fields.txt";
-		private readonly string nodeFilePath = "nodes.txt";
-		private readonly string edgeFilePath = "edges.txt";
+		private readonly string ignorableFilePath ="ignorable.txt";
+		private readonly string fieldFilePath ="field.txt";
+		private readonly string nodeFilePath = "node.txt";
+		private readonly string edgeFilePath = "edge.txt";
 
 		private List<DMSType> ParseConfigFile(string path)
 		{

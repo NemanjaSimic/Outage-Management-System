@@ -145,14 +145,14 @@
 		<ftn:IdentifiedObject.name>TR_15</ftn:IdentifiedObject.name>
 	</cim:Terminal>
 	<cim:Terminal rdf:ID="TR_16">
-		<cim:Terminal.ConductingEquipment rdf:resource="#PT_1"/>
+		<cim:Terminal.ConductingEquipment rdf:resource="#TW_1"/>
 		<cim:Terminal.ConnectivityNode rdf:resource="#CN_8"/>
 		<cim:IdentifiedObject.description>Terminal16</cim:IdentifiedObject.description>
 		<cim:IdentifiedObject.mRID>TR_16</cim:IdentifiedObject.mRID>
 		<ftn:IdentifiedObject.name>TR_16</ftn:IdentifiedObject.name>
 	</cim:Terminal>
 	<cim:Terminal rdf:ID="TR_17">
-		<cim:Terminal.ConductingEquipment rdf:resource="#PT_1"/>
+		<cim:Terminal.ConductingEquipment rdf:resource="#TW_2"/>
 		<cim:Terminal.ConnectivityNode rdf:resource="#CN_9"/>
 		<cim:IdentifiedObject.description>Terminal17</cim:IdentifiedObject.description>
 		<cim:IdentifiedObject.mRID>TR_17</cim:IdentifiedObject.mRID>
