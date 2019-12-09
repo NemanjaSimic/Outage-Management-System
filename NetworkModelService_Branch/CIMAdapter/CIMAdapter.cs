@@ -13,12 +13,14 @@ using System.Reflection;
 using System.Text;
 using System.Threading;
 using System.Threading.Tasks;
+using Outage.Common;
 
 namespace Outage.DataImporter.CIMAdapter
 {
     public class CIMAdapterClass
     {
         private NetworkModelGDAProxy gdaQueryProxy = null;
+        private ModelResourcesDesc resourcesDesc = new ModelResourcesDesc();
 
         public CIMAdapterClass()
         {
@@ -44,14 +46,20 @@ namespace Outage.DataImporter.CIMAdapter
         public Delta CreateDelta(Stream extract, SupportedProfiles extractType, DeltaOpType deltaOpType, out string log)
         {
             Delta nmsDelta = null;
+            Dictionary<string, ResourceDescription> entities = null;
             ConcreteModel concreteModel = null;
             Assembly assembly = null;
+
             string loadLog = string.Empty;
             string transformLog = string.Empty;
+            string correctionLog = string.Empty;
 
             if (LoadModelFromExtractFile(extract, extractType, ref concreteModel, ref assembly, out loadLog))
             {
-                DoTransformAndLoad(assembly, concreteModel, extractType, deltaOpType, out nmsDelta, out transformLog);
+                if(DoTransformAndLoad(assembly, concreteModel, extractType, deltaOpType, out nmsDelta, out entities, out transformLog))
+                {
+                    CorrectNmsDelta(entities, ref nmsDelta, out correctionLog);
+                }
             }
             log = string.Concat("Load report:\r\n", loadLog, "\r\nTransform report:\r\n", "\r\n\tOperation: ", deltaOpType, "\r\n\r\n", transformLog);
 
@@ -118,11 +126,13 @@ namespace Outage.DataImporter.CIMAdapter
             return valid;
         }
 
-        private bool DoTransformAndLoad(Assembly assembly, ConcreteModel concreteModel, SupportedProfiles extractType, DeltaOpType deltaOpType, out Delta nmsDelta, out string log)
+        private bool DoTransformAndLoad(Assembly assembly, ConcreteModel concreteModel, SupportedProfiles extractType, DeltaOpType deltaOpType, out Delta nmsDelta, out Dictionary<string, ResourceDescription> entities, out string log)
         {
             nmsDelta = null;
+            entities = new Dictionary<string, ResourceDescription>();
             log = string.Empty;
             bool success = false;
+
             try
             {
                 LogManager.Log(string.Format("Importing {0} data...", extractType), LogLevel.Info);
@@ -136,6 +146,7 @@ namespace Outage.DataImporter.CIMAdapter
                             if (report.Success)
                             {
                                 nmsDelta = OutageImporter.Instance.NMSDelta;
+                                entities = OutageImporter.Instance.Entities;
                                 success = true;
                             }
                             else
@@ -159,6 +170,68 @@ namespace Outage.DataImporter.CIMAdapter
             catch (Exception ex)
             {
                 LogManager.Log(string.Format("Import unsuccessful: {0}", ex.StackTrace), LogLevel.Error);
+                return false;
+            }
+        }
+
+        private bool CorrectNmsDelta(Dictionary<string, ResourceDescription> entities, ref Delta nmsDelta, out string log)
+        {
+            log = string.Empty;
+            bool success = false;
+
+            HashSet<ModelCode> requiredEntityTypes = new HashSet<ModelCode>();
+             
+            try
+            {
+                foreach(ResourceDescription rd in nmsDelta.UpdateOperations)
+                {
+                    ModelCode mc = resourcesDesc.GetModelCodeFromId(rd.Id);
+                    if (!requiredEntityTypes.Contains(mc))
+                    {
+                        requiredEntityTypes.Add(mc);
+                    }
+                }
+
+                foreach (ResourceDescription rd in nmsDelta.DeleteOperations)
+                {
+                    ModelCode mc = resourcesDesc.GetModelCodeFromId(rd.Id);
+                    if (!requiredEntityTypes.Contains(mc))
+                    {
+                        requiredEntityTypes.Add(mc);
+                    }
+                }
+
+                List<ModelCode> mrIdProp = new List<ModelCode>() { ModelCode.IDOBJ_MRID, ModelCode.IDOBJ_GID, ModelCode.IDOBJ_NAME, ModelCode.IDOBJ_DESCRIPTION };
+                foreach(ModelCode mc in requiredEntityTypes)
+                {
+                    int index = GdaQueryProxy.GetExtentValues(mc, mrIdProp);
+                    int resourceCount = GdaQueryProxy.IteratorResourcesLeft(index);
+                    List<ResourceDescription> gdaResult = GdaQueryProxy.IteratorNext(resourceCount, index);
+
+                    foreach(ResourceDescription rd in gdaResult)
+                    {
+                        foreach(Property prop in rd.Properties)
+                        {
+                            if(prop.Id == ModelCode.IDOBJ_MRID)
+                            {
+                                string mrId = rd.Properties[0].PropertyValue.StringValue;
+                                if(entities.ContainsKey(mrId))
+                                {
+                                    //swap negative gid for positive gid from server (NMS) 
+                                    entities[mrId].Id = rd.Id; 
+                                }
+                            }
+                        }
+                    }
+
+                    GdaQueryProxy.IteratorClose(index);
+                }
+
+                return success;
+            }
+            catch (Exception ex)
+            {
+                LogManager.Log(string.Format("Correction of delta unsuccessful: {0}", ex.StackTrace), LogLevel.Error);
                 return false;
             }
         }

@@ -39,10 +39,10 @@
             this.labelReport = new System.Windows.Forms.Label();
             this.buttonExit = new System.Windows.Forms.Button();
             this.buttonApplyDelta = new System.Windows.Forms.Button();
-            this.toolTipControl = new System.Windows.Forms.ToolTip(this.components);
             this.buttonConvertCIMInsert = new System.Windows.Forms.Button();
             this.buttonConvertCIMUpdate = new System.Windows.Forms.Button();
             this.buttonConvertCIMDelete = new System.Windows.Forms.Button();
+            this.toolTipControl = new System.Windows.Forms.ToolTip(this.components);
             this.tableLayoutPanelMain.SuspendLayout();
             this.SuspendLayout();
             // 
@@ -96,18 +96,18 @@
             this.textBoxCIMFile.Anchor = ((System.Windows.Forms.AnchorStyles)(((System.Windows.Forms.AnchorStyles.Top | System.Windows.Forms.AnchorStyles.Left) 
             | System.Windows.Forms.AnchorStyles.Right)));
             this.textBoxCIMFile.BackColor = System.Drawing.SystemColors.Window;
-            this.textBoxCIMFile.Location = new System.Drawing.Point(108, 12);
+            this.textBoxCIMFile.Location = new System.Drawing.Point(125, 12);
             this.textBoxCIMFile.Margin = new System.Windows.Forms.Padding(4, 12, 4, 4);
             this.textBoxCIMFile.Name = "textBoxCIMFile";
             this.textBoxCIMFile.ReadOnly = true;
-            this.textBoxCIMFile.Size = new System.Drawing.Size(663, 22);
+            this.textBoxCIMFile.Size = new System.Drawing.Size(620, 22);
             this.textBoxCIMFile.TabIndex = 1;
             this.textBoxCIMFile.DoubleClick += new System.EventHandler(this.textBoxCIMFileOnDoubleClick);
             // 
             // buttonBrowseLocation
             // 
             this.buttonBrowseLocation.Anchor = ((System.Windows.Forms.AnchorStyles)((System.Windows.Forms.AnchorStyles.Top | System.Windows.Forms.AnchorStyles.Right)));
-            this.buttonBrowseLocation.Location = new System.Drawing.Point(779, 12);
+            this.buttonBrowseLocation.Location = new System.Drawing.Point(753, 12);
             this.buttonBrowseLocation.Margin = new System.Windows.Forms.Padding(4, 12, 13, 12);
             this.buttonBrowseLocation.Name = "buttonBrowseLocation";
             this.buttonBrowseLocation.Size = new System.Drawing.Size(130, 28);
@@ -122,11 +122,11 @@
             | System.Windows.Forms.AnchorStyles.Left) 
             | System.Windows.Forms.AnchorStyles.Right)));
             this.richTextBoxReport.BackColor = System.Drawing.SystemColors.Window;
-            this.richTextBoxReport.Location = new System.Drawing.Point(108, 170);
+            this.richTextBoxReport.Location = new System.Drawing.Point(125, 210);
             this.richTextBoxReport.Margin = new System.Windows.Forms.Padding(4, 4, 4, 12);
             this.richTextBoxReport.Name = "richTextBoxReport";
             this.richTextBoxReport.ReadOnly = true;
-            this.richTextBoxReport.Size = new System.Drawing.Size(663, 419);
+            this.richTextBoxReport.Size = new System.Drawing.Size(620, 379);
             this.richTextBoxReport.TabIndex = 5;
             this.richTextBoxReport.Text = "";
             // 
@@ -147,16 +147,16 @@
             this.comboBoxProfile.DropDownStyle = System.Windows.Forms.ComboBoxStyle.DropDownList;
             this.comboBoxProfile.ForeColor = System.Drawing.SystemColors.WindowText;
             this.comboBoxProfile.FormattingEnabled = true;
-            this.comboBoxProfile.Location = new System.Drawing.Point(108, 64);
+            this.comboBoxProfile.Location = new System.Drawing.Point(125, 64);
             this.comboBoxProfile.Margin = new System.Windows.Forms.Padding(4, 12, 4, 6);
             this.comboBoxProfile.Name = "comboBoxProfile";
-            this.comboBoxProfile.Size = new System.Drawing.Size(663, 24);
+            this.comboBoxProfile.Size = new System.Drawing.Size(620, 24);
             this.comboBoxProfile.TabIndex = 3;
             // 
             // labelReport
             // 
             this.labelReport.AutoSize = true;
-            this.labelReport.Location = new System.Drawing.Point(7, 182);
+            this.labelReport.Location = new System.Drawing.Point(7, 183);
             this.labelReport.Margin = new System.Windows.Forms.Padding(7, 16, 4, 6);
             this.labelReport.Name = "labelReport";
             this.labelReport.Size = new System.Drawing.Size(59, 17);
@@ -166,7 +166,7 @@
             // buttonExit
             // 
             this.buttonExit.Anchor = ((System.Windows.Forms.AnchorStyles)((System.Windows.Forms.AnchorStyles.Top | System.Windows.Forms.AnchorStyles.Right)));
-            this.buttonExit.Location = new System.Drawing.Point(779, 605);
+            this.buttonExit.Location = new System.Drawing.Point(4, 605);
             this.buttonExit.Margin = new System.Windows.Forms.Padding(4, 4, 13, 12);
             this.buttonExit.Name = "buttonExit";
             this.buttonExit.Size = new System.Drawing.Size(104, 28);
@@ -179,7 +179,7 @@
             // buttonApplyDelta
             // 
             this.buttonApplyDelta.Anchor = ((System.Windows.Forms.AnchorStyles)((System.Windows.Forms.AnchorStyles.Top | System.Windows.Forms.AnchorStyles.Right)));
-            this.buttonApplyDelta.Location = new System.Drawing.Point(779, 170);
+            this.buttonApplyDelta.Location = new System.Drawing.Point(753, 210);
             this.buttonApplyDelta.Margin = new System.Windows.Forms.Padding(4, 4, 13, 4);
             this.buttonApplyDelta.Name = "buttonApplyDelta";
             this.buttonApplyDelta.Size = new System.Drawing.Size(130, 28);
@@ -192,7 +192,7 @@
             // buttonConvertCIMInsert
             // 
             this.buttonConvertCIMInsert.Anchor = ((System.Windows.Forms.AnchorStyles)((System.Windows.Forms.AnchorStyles.Top | System.Windows.Forms.AnchorStyles.Right)));
-            this.buttonConvertCIMInsert.Location = new System.Drawing.Point(779, 56);
+            this.buttonConvertCIMInsert.Location = new System.Drawing.Point(753, 99);
             this.buttonConvertCIMInsert.Margin = new System.Windows.Forms.Padding(4, 4, 13, 4);
             this.buttonConvertCIMInsert.Name = "buttonConvertCIMInsert";
             this.buttonConvertCIMInsert.Size = new System.Drawing.Size(130, 28);
@@ -205,7 +205,7 @@
             // buttonConvertCIMUpdate
             // 
             this.buttonConvertCIMUpdate.Anchor = ((System.Windows.Forms.AnchorStyles)((System.Windows.Forms.AnchorStyles.Top | System.Windows.Forms.AnchorStyles.Right)));
-            this.buttonConvertCIMUpdate.Location = new System.Drawing.Point(779, 98);
+            this.buttonConvertCIMUpdate.Location = new System.Drawing.Point(753, 135);
             this.buttonConvertCIMUpdate.Margin = new System.Windows.Forms.Padding(4, 4, 13, 4);
             this.buttonConvertCIMUpdate.Name = "buttonConvertCIMUpdate";
             this.buttonConvertCIMUpdate.Size = new System.Drawing.Size(130, 28);
@@ -218,7 +218,7 @@
             // buttonConvertCIMDelete
             // 
             this.buttonConvertCIMDelete.Anchor = ((System.Windows.Forms.AnchorStyles)((System.Windows.Forms.AnchorStyles.Top | System.Windows.Forms.AnchorStyles.Right)));
-            this.buttonConvertCIMDelete.Location = new System.Drawing.Point(779, 134);
+            this.buttonConvertCIMDelete.Location = new System.Drawing.Point(753, 171);
             this.buttonConvertCIMDelete.Margin = new System.Windows.Forms.Padding(4, 4, 13, 4);
             this.buttonConvertCIMDelete.Name = "buttonConvertCIMDelete";
             this.buttonConvertCIMDelete.Size = new System.Drawing.Size(130, 28);
