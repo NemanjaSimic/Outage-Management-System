@@ -29,14 +29,18 @@ namespace OMS.Web.Adapter.Mock
                 new Relation { SourceNodeId = "3", TargetNodeId = "5", IsActive = false, IsAclLine = false }
             };
 
-            try
+            do
             {
-                proxy.UpdateGraph(nodes, relations);
-            }
-            catch (Exception e)
-            {
-                Console.WriteLine($"Exception occured during ClientProxy.UpdateGraph(): {e.Message}");
-            }
+                try
+                {
+                    proxy.UpdateGraph(nodes, relations);
+                    Console.WriteLine($"Sent data to Web.Adapter. Press any key to send again or 'q' to quit.");
+                }
+                catch (Exception e)
+                {
+                    Console.WriteLine($"Exception occured during ClientProxy.UpdateGraph(): {e.Message}");
+                }
+            } while (Console.ReadLine().ToLower() != "q");
 
             Console.ReadLine();
         }
