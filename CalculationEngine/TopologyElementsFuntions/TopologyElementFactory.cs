@@ -13,7 +13,7 @@ namespace TopologyElementsFuntions
 		private static long edgeCounter = 0;
 		public static TopologyElement CreateTopologyElement(long gid)
 		{
-			TopologyElement retVal;;
+			TopologyElement retVal;
 			TopologyHelper topologyHelper = new TopologyHelper();
 
 			TopologyType dmsTopologyType = topologyHelper.GetElementTopologyType(gid);
