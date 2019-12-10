@@ -13,8 +13,7 @@ namespace TopologyElementsFuntions
 		private static long edgeCounter = 0;
 		public static TopologyElement CreateTopologyElement(long gid)
 		{
-			TopologyElement retVal;
-			ModelResourcesDesc modelResourcesDesc = new ModelResourcesDesc();
+			TopologyElement retVal;;
 			TopologyHelper topologyHelper = new TopologyHelper();
 
 			TopologyType dmsTopologyType = topologyHelper.GetElementTopologyType(gid);
@@ -24,14 +23,18 @@ namespace TopologyElementsFuntions
 			else if (dmsTopologyType == TopologyType.Node)
 				retVal = new RegularNode(gid, topologyHelper.GetElementTopologyStatus(gid));
 			else
-				retVal = null;
-			// ovde treba baciti exception umesto vratiti null
+			{
+				string message = $"Element with GID: {gid.ToString("X")} is neither Edge nor Node. Please check configuration files.";
+				Exception ex = new Exception(message);
+				throw ex;
+			}
+
 			return retVal;
 		}
 
 		public static Edge CreateOrdinaryEdge(long firstEndGid, long secondEndGid)
 		{
-			return new Edge(edgeCounter++) {FirstEnd = firstEndGid, SecondEnd = secondEndGid };
+			return new Edge(edgeCounter++) {FirstEnd = firstEndGid, SecondEnd = new List<long>() { secondEndGid }};
 		}
 	}
 }

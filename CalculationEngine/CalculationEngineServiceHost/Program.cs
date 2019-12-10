@@ -35,7 +35,7 @@ namespace CalculationEngineServiceHost
 			var es = models[Outage.Common.ModelCode.ENERGYSOURCE].FirstOrDefault();
 			var terminal = gda.GetRelatedValues(es, new List<Outage.Common.ModelCode>() { Outage.Common.ModelCode.IDOBJ_GID }, association );
 			TopologyConnectivity topologyConnectivity = new TopologyConnectivity();
-			RegularNode first = topologyConnectivity.Topology(es);
+			RegularNode first = topologyConnectivity.CreateTopology(es);
 			Console.ReadLine();
 		}
 	}
