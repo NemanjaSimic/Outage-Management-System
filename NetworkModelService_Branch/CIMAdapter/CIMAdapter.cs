@@ -21,6 +21,7 @@ namespace Outage.DataImporter.CIMAdapter
     {
         private NetworkModelGDAProxy gdaQueryProxy = null;
         private ModelResourcesDesc resourcesDesc = new ModelResourcesDesc();
+        private TransformAndLoadReport report;
 
         public CIMAdapterClass()
         {
@@ -53,6 +54,8 @@ namespace Outage.DataImporter.CIMAdapter
             string loadLog = string.Empty;
             string transformLog = string.Empty;
             string correctionLog = string.Empty;
+
+            report = new TransformAndLoadReport();
 
             if (LoadModelFromExtractFile(extract, extractType, ref concreteModel, ref assembly, out loadLog))
             {
@@ -218,7 +221,9 @@ namespace Outage.DataImporter.CIMAdapter
                                 if(entities.ContainsKey(mrId))
                                 {
                                     //swap negative gid for positive gid from server (NMS) 
-                                    entities[mrId].Id = rd.Id; 
+
+                                    report.Report.Append(mc).Append(" mrId = ").Append(mrId).Append(" ID = ").Append(entities[mrId].Id).Append(" corrected to GID = ").AppendLine(string.Format("0x{0:X16}", rd.Id));
+                                    entities[mrId].Id = rd.Id;
                                 }
                             }
                         }
@@ -227,11 +232,14 @@ namespace Outage.DataImporter.CIMAdapter
                     GdaQueryProxy.IteratorClose(index);
                 }
 
+                log = report.Report.ToString();
+                LogManager.Log(log, LogLevel.Info);
                 return success;
             }
             catch (Exception ex)
             {
-                LogManager.Log(string.Format("Correction of delta unsuccessful: {0}", ex.StackTrace), LogLevel.Error);
+                log = string.Format("Correction of delta unsuccessful: {0}", ex.StackTrace);
+                LogManager.Log(log, LogLevel.Error);
                 return false;
             }
         }

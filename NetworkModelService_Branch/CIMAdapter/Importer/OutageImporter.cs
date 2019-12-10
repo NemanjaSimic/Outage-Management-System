@@ -110,7 +110,7 @@ namespace Outage.DataImporter.CIMAdapter.Importer
             ImportFuses();
             ImportDisconnectors();
             ImportBreakers();
-            ImportLoadBreakSwitchs();
+            ImportLoadBreakSwitches();
             ImportACLineSegments();
             ImportConnectivityNodes();
             ImportTerminals();
@@ -139,11 +139,11 @@ namespace Outage.DataImporter.CIMAdapter.Importer
                             Entities.Add(cimPowerTransformer.MRID, rd);
                         }
 
-                        report.Report.Append("Location ID = ").Append(cimPowerTransformer.ID).Append(" SUCCESSFULLY converted to GID = ").AppendLine(string.Format("0x{0:X16}", rd.Id));
+                        report.Report.Append("PowerTransformer ID = ").Append(cimPowerTransformer.ID).Append(" SUCCESSFULLY converted to GID = ").AppendLine(string.Format("0x{0:X16}", rd.Id));
                     }
                     else
                     {
-                        report.Report.Append("Location ID = ").Append(cimPowerTransformer.ID).AppendLine(" FAILED to be converted");
+                        report.Report.Append("PowerTransformer ID = ").Append(cimPowerTransformer.ID).AppendLine(" FAILED to be converted");
                     }
                 }
             }
@@ -182,11 +182,11 @@ namespace Outage.DataImporter.CIMAdapter.Importer
                             Entities.Add(cimTransformerWinding.MRID, rd);
                         }
 
-                        report.Report.Append("Location ID = ").Append(cimTransformerWinding.ID).Append(" SUCCESSFULLY converted to GID = ").AppendLine(string.Format("0x{0:X16}", rd.Id));
+                        report.Report.Append("TransformerWinding ID = ").Append(cimTransformerWinding.ID).Append(" SUCCESSFULLY converted to GID = ").AppendLine(string.Format("0x{0:X16}", rd.Id));
                     }
                     else
                     {
-                        report.Report.Append("Location ID = ").Append(cimTransformerWinding.ID).AppendLine(" FAILED to be converted");
+                        report.Report.Append("TransformerWinding ID = ").Append(cimTransformerWinding.ID).AppendLine(" FAILED to be converted");
                     }
                 }
             }
@@ -226,11 +226,11 @@ namespace Outage.DataImporter.CIMAdapter.Importer
                             Entities.Add(cimBaseVoltage.MRID, rd);
                         }
 
-                        report.Report.Append("Location ID = ").Append(cimBaseVoltage.ID).Append(" SUCCESSFULLY converted to GID = ").AppendLine(string.Format("0x{0:X16}", rd.Id));
+                        report.Report.Append("BaseVoltage ID = ").Append(cimBaseVoltage.ID).Append(" SUCCESSFULLY converted to GID = ").AppendLine(string.Format("0x{0:X16}", rd.Id));
                     }
                     else
                     {
-                        report.Report.Append("Location ID = ").Append(cimBaseVoltage.ID).AppendLine(" FAILED to be converted");
+                        report.Report.Append("BaseVoltage ID = ").Append(cimBaseVoltage.ID).AppendLine(" FAILED to be converted");
                     }
                 }
             }
@@ -271,11 +271,11 @@ namespace Outage.DataImporter.CIMAdapter.Importer
                             Entities.Add(cimEnergySource.MRID, rd);
                         }
 
-                        report.Report.Append("Location ID = ").Append(cimEnergySource.ID).Append(" SUCCESSFULLY converted to GID = ").AppendLine(string.Format("0x{0:X16}", rd.Id));
+                        report.Report.Append("EnergySource ID = ").Append(cimEnergySource.ID).Append(" SUCCESSFULLY converted to GID = ").AppendLine(string.Format("0x{0:X16}", rd.Id));
                     }
                     else
                     {
-                        report.Report.Append("Location ID = ").Append(cimEnergySource.ID).AppendLine(" FAILED to be converted");
+                        report.Report.Append("EnergySource ID = ").Append(cimEnergySource.ID).AppendLine(" FAILED to be converted");
                     }
                 }
             }
@@ -316,11 +316,11 @@ namespace Outage.DataImporter.CIMAdapter.Importer
                             Entities.Add(cimEnergyConsumer.MRID, rd);
                         }
 
-                        report.Report.Append("Location ID = ").Append(cimEnergyConsumer.ID).Append(" SUCCESSFULLY converted to GID = ").AppendLine(string.Format("0x{0:X16}", rd.Id));
+                        report.Report.Append("EnergyConsumer ID = ").Append(cimEnergyConsumer.ID).Append(" SUCCESSFULLY converted to GID = ").AppendLine(string.Format("0x{0:X16}", rd.Id));
                     }
                     else
                     {
-                        report.Report.Append("Location ID = ").Append(cimEnergyConsumer.ID).AppendLine(" FAILED to be converted");
+                        report.Report.Append("EnergyConsumer ID = ").Append(cimEnergyConsumer.ID).AppendLine(" FAILED to be converted");
                     }
                 }
             }
@@ -361,11 +361,11 @@ namespace Outage.DataImporter.CIMAdapter.Importer
                             Entities.Add(cimFuse.MRID, rd);
                         }
 
-                        report.Report.Append("Location ID = ").Append(cimFuse.ID).Append(" SUCCESSFULLY converted to GID = ").AppendLine(string.Format("0x{0:X16}", rd.Id));
+                        report.Report.Append("Fuse ID = ").Append(cimFuse.ID).Append(" SUCCESSFULLY converted to GID = ").AppendLine(string.Format("0x{0:X16}", rd.Id));
                     }
                     else
                     {
-                        report.Report.Append("Location ID = ").Append(cimFuse.ID).AppendLine(" FAILED to be converted");
+                        report.Report.Append("Fuse ID = ").Append(cimFuse.ID).AppendLine(" FAILED to be converted");
                     }
                 }
             }
@@ -406,11 +406,11 @@ namespace Outage.DataImporter.CIMAdapter.Importer
                             Entities.Add(cimDisconnector.MRID, rd);
                         }
 
-                        report.Report.Append("Location ID = ").Append(cimDisconnector.ID).Append(" SUCCESSFULLY converted to GID = ").AppendLine(string.Format("0x{0:X16}", rd.Id));
+                        report.Report.Append("Disconnector ID = ").Append(cimDisconnector.ID).Append(" SUCCESSFULLY converted to GID = ").AppendLine(string.Format("0x{0:X16}", rd.Id));
                     }
                     else
                     {
-                        report.Report.Append("Location ID = ").Append(cimDisconnector.ID).AppendLine(" FAILED to be converted");
+                        report.Report.Append("Disconnector ID = ").Append(cimDisconnector.ID).AppendLine(" FAILED to be converted");
                     }
                 }
             }
@@ -451,11 +451,11 @@ namespace Outage.DataImporter.CIMAdapter.Importer
                             Entities.Add(cimBreaker.MRID, rd);
                         }
 
-                        report.Report.Append("Location ID = ").Append(cimBreaker.ID).Append(" SUCCESSFULLY converted to GID = ").AppendLine(string.Format("0x{0:X16}", rd.Id));
+                        report.Report.Append("Breaker ID = ").Append(cimBreaker.ID).Append(" SUCCESSFULLY converted to GID = ").AppendLine(string.Format("0x{0:X16}", rd.Id));
                     }
                     else
                     {
-                        report.Report.Append("Location ID = ").Append(cimBreaker.ID).AppendLine(" FAILED to be converted");
+                        report.Report.Append("Breaker ID = ").Append(cimBreaker.ID).AppendLine(" FAILED to be converted");
                     }
                 }
             }
@@ -477,7 +477,7 @@ namespace Outage.DataImporter.CIMAdapter.Importer
             return rd;
         }
 
-        private void ImportLoadBreakSwitchs()
+        private void ImportLoadBreakSwitches()
         {
             SortedDictionary<string, object> cimLoadBreakSwitchs = concreteModel.GetAllObjectsOfType("Outage.LoadBreakSwitch");
 
@@ -496,11 +496,11 @@ namespace Outage.DataImporter.CIMAdapter.Importer
                             Entities.Add(cimLoadBreakSwitch.MRID, rd);
                         }
 
-                        report.Report.Append("Location ID = ").Append(cimLoadBreakSwitch.ID).Append(" SUCCESSFULLY converted to GID = ").AppendLine(string.Format("0x{0:X16}", rd.Id));
+                        report.Report.Append("LoadBreakSwitch ID = ").Append(cimLoadBreakSwitch.ID).Append(" SUCCESSFULLY converted to GID = ").AppendLine(string.Format("0x{0:X16}", rd.Id));
                     }
                     else
                     {
-                        report.Report.Append("Location ID = ").Append(cimLoadBreakSwitch.ID).AppendLine(" FAILED to be converted");
+                        report.Report.Append("LoadBreakSwitch ID = ").Append(cimLoadBreakSwitch.ID).AppendLine(" FAILED to be converted");
                     }
                 }
             }
@@ -541,11 +541,11 @@ namespace Outage.DataImporter.CIMAdapter.Importer
                             Entities.Add(cimACLineSegment.MRID, rd);
                         }
 
-                        report.Report.Append("Location ID = ").Append(cimACLineSegment.ID).Append(" SUCCESSFULLY converted to GID = ").AppendLine(string.Format("0x{0:X16}", rd.Id));
+                        report.Report.Append("ACLineSegment ID = ").Append(cimACLineSegment.ID).Append(" SUCCESSFULLY converted to GID = ").AppendLine(string.Format("0x{0:X16}", rd.Id));
                     }
                     else
                     {
-                        report.Report.Append("Location ID = ").Append(cimACLineSegment.ID).AppendLine(" FAILED to be converted");
+                        report.Report.Append("ACLineSegment ID = ").Append(cimACLineSegment.ID).AppendLine(" FAILED to be converted");
                     }
                 }
             }
@@ -586,11 +586,11 @@ namespace Outage.DataImporter.CIMAdapter.Importer
                             Entities.Add(cimConnectivityNode.MRID, rd);
                         }
 
-                        report.Report.Append("Location ID = ").Append(cimConnectivityNode.ID).Append(" SUCCESSFULLY converted to GID = ").AppendLine(string.Format("0x{0:X16}", rd.Id));
+                        report.Report.Append("ConnectivityNode ID = ").Append(cimConnectivityNode.ID).Append(" SUCCESSFULLY converted to GID = ").AppendLine(string.Format("0x{0:X16}", rd.Id));
                     }
                     else
                     {
-                        report.Report.Append("Location ID = ").Append(cimConnectivityNode.ID).AppendLine(" FAILED to be converted");
+                        report.Report.Append("ConnectivityNode ID = ").Append(cimConnectivityNode.ID).AppendLine(" FAILED to be converted");
                     }
                 }
             }
@@ -631,11 +631,11 @@ namespace Outage.DataImporter.CIMAdapter.Importer
                             Entities.Add(cimTerminal.MRID, rd);
                         }
 
-                        report.Report.Append("Location ID = ").Append(cimTerminal.ID).Append(" SUCCESSFULLY converted to GID = ").AppendLine(string.Format("0x{0:X16}", rd.Id));
+                        report.Report.Append("Terminal ID = ").Append(cimTerminal.ID).Append(" SUCCESSFULLY converted to GID = ").AppendLine(string.Format("0x{0:X16}", rd.Id));
                     }
                     else
                     {
-                        report.Report.Append("Location ID = ").Append(cimTerminal.ID).AppendLine(" FAILED to be converted");
+                        report.Report.Append("Terminal ID = ").Append(cimTerminal.ID).AppendLine(" FAILED to be converted");
                     }
                 }
             }
@@ -676,11 +676,11 @@ namespace Outage.DataImporter.CIMAdapter.Importer
                             Entities.Add(cimDiscrete.MRID, rd);
                         }
 
-                        report.Report.Append("Location ID = ").Append(cimDiscrete.ID).Append(" SUCCESSFULLY converted to GID = ").AppendLine(string.Format("0x{0:X16}", rd.Id));
+                        report.Report.Append("Discret ID = ").Append(cimDiscrete.ID).Append(" SUCCESSFULLY converted to GID = ").AppendLine(string.Format("0x{0:X16}", rd.Id));
                     }
                     else
                     {
-                        report.Report.Append("Location ID = ").Append(cimDiscrete.ID).AppendLine(" FAILED to be converted");
+                        report.Report.Append("Discret ID = ").Append(cimDiscrete.ID).AppendLine(" FAILED to be converted");
                     }
                 }
             }
@@ -721,11 +721,11 @@ namespace Outage.DataImporter.CIMAdapter.Importer
                             Entities.Add(cimAnalog.MRID, rd);
                         }
 
-                        report.Report.Append("Location ID = ").Append(cimAnalog.ID).Append(" SUCCESSFULLY converted to GID = ").AppendLine(string.Format("0x{0:X16}", rd.Id));
+                        report.Report.Append("Analog ID = ").Append(cimAnalog.ID).Append(" SUCCESSFULLY converted to GID = ").AppendLine(string.Format("0x{0:X16}", rd.Id));
                     }
                     else
                     {
-                        report.Report.Append("Location ID = ").Append(cimAnalog.ID).AppendLine(" FAILED to be converted");
+                        report.Report.Append("Analog ID = ").Append(cimAnalog.ID).AppendLine(" FAILED to be converted");
                     }
                 }
             }
