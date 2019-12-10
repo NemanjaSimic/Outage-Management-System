@@ -64,7 +64,7 @@ namespace Outage.DataImporter.CIMAdapter
                     CorrectNmsDelta(entities, ref nmsDelta, out correctionLog);
                 }
             }
-            log = string.Concat("Load report:\r\n", loadLog, "\r\nTransform report:\r\n", "\r\n\tOperation: ", deltaOpType, "\r\n\r\n", transformLog);
+            log = string.Concat("Load report:\r\n", loadLog, "\r\nTransform report:\r\n", "\r\n\tOperation: ", deltaOpType, "\r\n\r\n", transformLog, "\r\n\r\nCorrection report:\r\n", correctionLog);
 
             return nmsDelta;
         }
@@ -215,22 +215,33 @@ namespace Outage.DataImporter.CIMAdapter
                     {
                         foreach(Property prop in rd.Properties)
                         {
+                            if (prop.Id != ModelCode.IDOBJ_MRID)
+                            {
+                                continue;
+                            }
+
+                            string mrId = prop.PropertyValue.StringValue;
+                            if(entities.ContainsKey(mrId))
+                            {
+                                //swap negative gid for positive gid from server (NMS) 
+
+                                report.Report.Append(mc).Append(" mrId = ").Append(mrId).Append(" ID = ").Append(string.Format("0x{0:X16}", entities[mrId].Id)).Append(" corrected to GID = ").AppendLine(string.Format("0x{0:X16}", rd.Id));
+                                entities[mrId].Id = rd.Id;
+                            }
+
                             if(prop.Id == ModelCode.IDOBJ_MRID)
                             {
-                                string mrId = rd.Properties[0].PropertyValue.StringValue;
-                                if(entities.ContainsKey(mrId))
-                                {
-                                    //swap negative gid for positive gid from server (NMS) 
-
-                                    report.Report.Append(mc).Append(" mrId = ").Append(mrId).Append(" ID = ").Append(entities[mrId].Id).Append(" corrected to GID = ").AppendLine(string.Format("0x{0:X16}", rd.Id));
-                                    entities[mrId].Id = rd.Id;
-                                }
+                                break;
                             }
                         }
                     }
 
+
                     GdaQueryProxy.IteratorClose(index);
                 }
+
+                //TODO: add unsuccessfull corrections
+                //report.Report.Append(mc).Append(" mrId = ").Append(mrId).Append(" ID = ").Append(string.Format("0x{0:X16}", entities[mrId].Id)).Append(" corrected to GID = ").AppendLine(string.Format("0x{0:X16}", rd.Id));
 
                 log = report.Report.ToString();
                 LogManager.Log(log, LogLevel.Info);
