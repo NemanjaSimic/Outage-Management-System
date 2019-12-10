@@ -180,5 +180,23 @@ namespace NMSTestClientUI.UserControls
             ExtentValues.Document.Blocks.Clear();
             ExtentValues.AppendText(sb.ToString());
         }
+
+        private void ButtonRefreshTypes_Click(object sender, RoutedEventArgs e)
+        {
+            ClassTypes.Clear();
+
+            foreach (DMSType dmsType in Enum.GetValues(typeof(DMSType)))
+            {
+                if (dmsType == DMSType.MASK_TYPE)
+                {
+                    continue;
+                }
+
+                ModelCode dmsTypesModelCode = modelResourcesDesc.GetModelCodeFromType(dmsType);
+                ClassTypes.Add(new ClassTypeViewModel() { ClassType = dmsTypesModelCode });
+            }
+
+            SelectedType = null;
+        }
     }
 }

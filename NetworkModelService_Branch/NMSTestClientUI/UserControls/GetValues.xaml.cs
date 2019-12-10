@@ -216,5 +216,27 @@ namespace NMSTestClientUI.UserControls
                 Values.AppendText(sb.ToString());
             }
         }
+
+        private void ButtonRefreshGids_Click(object sender, RoutedEventArgs e)
+        {
+            GlobalIdentifiers.Clear();
+
+            foreach (DMSType dmsType in Enum.GetValues(typeof(DMSType)))
+            {
+                if (dmsType == DMSType.MASK_TYPE)
+                {
+                    continue;
+                }
+
+                ModelCode dmsTypesModelCode = modelResourcesDesc.GetModelCodeFromType(dmsType);
+                tgda.GetExtentValues(dmsTypesModelCode, new List<ModelCode> { ModelCode.IDOBJ_GID }, null).ForEach(g => GlobalIdentifiers.Add(new GlobalIdentifierViewModel()
+                {
+                    GID = g,
+                    Type = dmsTypesModelCode.ToString(),
+                }));
+            }
+
+            SelectedGID = null;
+        }
     }
 }
