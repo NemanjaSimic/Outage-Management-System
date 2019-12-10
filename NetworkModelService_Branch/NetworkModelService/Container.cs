@@ -1,4 +1,6 @@
-﻿using Outage.Common;
+﻿using MongoDB.Bson.Serialization.Attributes;
+using MongoDB.Bson.Serialization.Options;
+using Outage.Common;
 using Outage.DataModel;
 using System;
 using System.Collections.Generic;
@@ -12,7 +14,8 @@ namespace Outage.NetworkModelService
     {
         /// <summary>
 		/// The dictionary of entities. Key = GlobaId, Value = Entity
-		/// </summary>		
+		/// </summary>	
+     
 		private Dictionary<long, IdentifiedObject> entities = new Dictionary<long, IdentifiedObject>();
 
         /// <summary>

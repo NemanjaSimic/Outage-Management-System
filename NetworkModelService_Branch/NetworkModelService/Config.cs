@@ -16,9 +16,19 @@ namespace Outage.NetworkModelService
             get { return connectionString; }
         }
 
+
+        private string dBConnectionString = string.Empty;
+
+        public string DbConnectionString
+        {
+            get { return dBConnectionString; }
+        }
+
+
         private Config()
         {
             connectionString = ConfigurationManager.ConnectionStrings["networkModelconnectionString"].ConnectionString;
+            dBConnectionString = ConfigurationManager.ConnectionStrings["mongoConnectionString"].ConnectionString;
         }
 
         #region Static members
