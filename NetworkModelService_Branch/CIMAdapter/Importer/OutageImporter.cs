@@ -51,6 +51,9 @@ namespace Outage.DataImporter.CIMAdapter.Importer
             }
         }
 
+        /// <summary>
+		/// Dictionary which contains all data: Key - MRID, Value - Container
+		/// </summary>
         public Dictionary<string, ResourceDescription> Entities
         {
             get

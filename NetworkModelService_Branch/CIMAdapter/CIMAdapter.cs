@@ -182,6 +182,14 @@ namespace Outage.DataImporter.CIMAdapter
             log = string.Empty;
             bool success = false;
 
+            Dictionary<long, long> negativeToPositiveGidMap = new Dictionary<long, long>(entities.Keys.Count);
+
+            //TODO: initialize at the same time as entities (mozda neg gid, rd)
+            foreach (string mrid in entities.Keys)
+            {
+                negativeToPositiveGidMap.Add(entities[mrid].Id, entities[mrid].Id);
+            }
+
             HashSet<ModelCode> requiredEntityTypes = new HashSet<ModelCode>();
              
             try
@@ -224,8 +232,7 @@ namespace Outage.DataImporter.CIMAdapter
                             if(entities.ContainsKey(mrId))
                             {
                                 //swap negative gid for positive gid from server (NMS) 
-
-                                report.Report.Append(mc).Append(" mrId = ").Append(mrId).Append(" ID = ").Append(string.Format("0x{0:X16}", entities[mrId].Id)).Append(" corrected to GID = ").AppendLine(string.Format("0x{0:X16}", rd.Id));
+                                negativeToPositiveGidMap[entities[mrId].Id] = rd.Id;
                                 entities[mrId].Id = rd.Id;
                             }
 
@@ -240,8 +247,20 @@ namespace Outage.DataImporter.CIMAdapter
                     GdaQueryProxy.IteratorClose(index);
                 }
 
-                //TODO: add unsuccessfull corrections
-                //report.Report.Append(mc).Append(" mrId = ").Append(mrId).Append(" ID = ").Append(string.Format("0x{0:X16}", entities[mrId].Id)).Append(" corrected to GID = ").AppendLine(string.Format("0x{0:X16}", rd.Id));
+                foreach (long negGid in negativeToPositiveGidMap.Keys)
+                {
+                    long positiveGid = negativeToPositiveGidMap[negGid];
+
+                    ModelCode mc = resourcesDesc.GetModelCodeFromId(positiveGid);
+                    //report.Report.Append(mc).Append(" mrId = ").Append(mrId).Append(" ID = ").Append(string.Format("0x{0:X16}", negGid)).Append(" after correction is GID = ").AppendLine(string.Format("0x{0:X16}", positiveGid));
+                    report.Report.Append(mc)
+                                 .Append(" ID = ")
+                                 .Append(string.Format("0x{0:X16}", negGid))
+                                 .Append(" after correction is GID = ")
+                                 .AppendLine(string.Format("0x{0:X16}", positiveGid));
+                }
+
+
 
                 log = report.Report.ToString();
                 LogManager.Log(log, LogLevel.Info);
