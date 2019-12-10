@@ -8,7 +8,7 @@ namespace OMS.Web.Adapter.HubDispatchers
     public class GraphHubDispatcher
     {
         // API hub config - TODO: change to read from config file
-        private const string _url = "https://localhost:44351/";
+        private const string _url = "http://localhost:44351/";
         private const string _hubName = "graphhub";
 
         private readonly HubConnection _connection;

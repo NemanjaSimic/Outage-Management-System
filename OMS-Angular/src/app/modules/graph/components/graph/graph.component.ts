@@ -8,6 +8,7 @@ import dagre from 'cytoscape-dagre';
 import { style } from './graph.style';
 cytoscape.use(dagre);
 
+import * as graphMock from './graph-mock.json';
 
 @Component({
   selector: 'app-graph',
@@ -23,7 +24,7 @@ export class GraphComponent implements OnInit, OnDestroy {
     layout: { name: 'dagre', rankDir: 'TB' },
     autoungrabify: true,
     style: style,
-    wheelSensitivity: 0.5
+    wheelSensitivity: 0.1
   };
 
   private graphData: any = {
@@ -40,7 +41,13 @@ export class GraphComponent implements OnInit, OnDestroy {
   }
 
   ngOnInit() {
-    this.startConnection();
+    // web api
+    // this.startConnection();
+    
+    // local testing
+    this.graphData.nodes = graphMock.nodes;
+    this.graphData.edges = graphMock.edges;
+    this.drawGraph();
   }
 
   ngOnDestroy() {
