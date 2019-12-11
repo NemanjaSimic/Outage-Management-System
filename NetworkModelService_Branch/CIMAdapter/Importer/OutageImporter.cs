@@ -118,6 +118,11 @@ namespace Outage.DataImporter.CIMAdapter.Importer
         {
             LogManager.Log("Loading elements and creating delta...", LogLevel.Info);
 
+            if(deltaOpType == DeltaOpType.Update || deltaOpType == DeltaOpType.Delete)
+            {
+                delta.PositiveIdsAllowed = true;
+            }
+
             //// import all concrete model types (DMSType enum)
             ImportBaseVoltages();
             ImportPowerTransformers();

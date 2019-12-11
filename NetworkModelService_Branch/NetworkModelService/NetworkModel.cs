@@ -303,7 +303,7 @@ namespace Outage.NetworkModelService
 
         #endregion GDA query	
 
-        public Common.GDA.UpdateResult ApplyDelta(Delta delta)
+        public Common.GDA.UpdateResult ApplyDelta(Delta delta, bool isInitialization = false)
         {
             bool applyingStarted = false;
             Common.GDA.UpdateResult updateResult = new Common.GDA.UpdateResult();
@@ -317,7 +317,12 @@ namespace Outage.NetworkModelService
 
                 Dictionary<short, int> typesCounters = GetCounters();
                 Dictionary<long, long> globalIdPairs = new Dictionary<long, long>();
-                delta.FixNegativeToPositiveIds(ref typesCounters, ref globalIdPairs);
+
+                if(!isInitialization)
+                {
+                    delta.FixNegativeToPositiveIds(ref typesCounters, ref globalIdPairs);
+                }
+
                 updateResult.GlobalIdPairs = globalIdPairs;
                 delta.SortOperations();
 
@@ -926,20 +931,22 @@ namespace Outage.NetworkModelService
                 {
                     try
                     {
-                        foreach (ResourceDescription rd in delta.InsertOperations)
-                        {
-                            InsertEntity(rd);
-                        }
+                        ApplyDelta(delta, true);
 
-                        foreach (ResourceDescription rd in delta.UpdateOperations)
-                        {
-                            UpdateEntity(rd);
-                        }
+                        //foreach (ResourceDescription rd in delta.InsertOperations)
+                        //{
+                        //    InsertEntity(rd);
+                        //}
 
-                        foreach (ResourceDescription rd in delta.DeleteOperations)
-                        {
-                            DeleteEntity(rd);
-                        }
+                        //foreach (ResourceDescription rd in delta.UpdateOperations)
+                        //{
+                        //    UpdateEntity(rd);
+                        //}
+
+                        //foreach (ResourceDescription rd in delta.DeleteOperations)
+                        //{
+                        //    DeleteEntity(rd);
+                        //}
                     }
                     catch (Exception ex)
                     {
