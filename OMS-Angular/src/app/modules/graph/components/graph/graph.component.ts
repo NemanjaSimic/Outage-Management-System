@@ -30,7 +30,9 @@ export class GraphComponent implements OnInit, OnDestroy {
     layout: { name: 'dagre', rankDir: 'TB' },
     autoungrabify: true,
     style: style,
-    wheelSensitivity: 0.1
+    wheelSensitivity: 0.1,
+    minZoom: 1,
+    maxZoom: 4
   };
 
   private graphData: any = {
@@ -94,6 +96,12 @@ export class GraphComponent implements OnInit, OnDestroy {
       this.cy.nodes().forEach(node => {
         addGraphTooltip(node);
       });
+
+      this.cy.edges().forEach(line => {
+        if(line.data('color') == 'red') {
+          console.log(line)
+        }
+      })
     });    
   };
 
