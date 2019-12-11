@@ -47,7 +47,8 @@ namespace Outage.DataImporter.CIMAdapter
         public Delta CreateDelta(Stream extract, SupportedProfiles extractType, DeltaOpType deltaOpType, out string log)
         {
             Delta nmsDelta = null;
-            Dictionary<string, ResourceDescription> entities = null;
+            Dictionary<string, ResourceDescription> mridToResource = null;
+            Dictionary<long, ResourceDescription> negativeGidToResource = null;
             ConcreteModel concreteModel = null;
             Assembly assembly = null;
 
@@ -59,9 +60,9 @@ namespace Outage.DataImporter.CIMAdapter
 
             if (LoadModelFromExtractFile(extract, extractType, ref concreteModel, ref assembly, out loadLog))
             {
-                if(DoTransformAndLoad(assembly, concreteModel, extractType, deltaOpType, out nmsDelta, out entities, out transformLog))
+                if(DoTransformAndLoad(assembly, concreteModel, extractType, deltaOpType, out nmsDelta, out mridToResource, out negativeGidToResource, out transformLog))
                 {
-                    CorrectNmsDelta(entities, ref nmsDelta, out correctionLog);
+                    CorrectNmsDelta(mridToResource, negativeGidToResource, ref nmsDelta, out correctionLog);
                 }
             }
             log = string.Concat("Load report:\r\n", loadLog, "\r\nTransform report:\r\n", "\r\n\tOperation: ", deltaOpType, "\r\n\r\n", transformLog, "\r\n\r\nCorrection report:\r\n", correctionLog);
@@ -129,10 +130,11 @@ namespace Outage.DataImporter.CIMAdapter
             return valid;
         }
 
-        private bool DoTransformAndLoad(Assembly assembly, ConcreteModel concreteModel, SupportedProfiles extractType, DeltaOpType deltaOpType, out Delta nmsDelta, out Dictionary<string, ResourceDescription> entities, out string log)
+        private bool DoTransformAndLoad(Assembly assembly, ConcreteModel concreteModel, SupportedProfiles extractType, DeltaOpType deltaOpType, out Delta nmsDelta, out Dictionary<string, ResourceDescription> mridToResource, out Dictionary<long, ResourceDescription> negativeGidToResource, out string log)
         {
             nmsDelta = null;
-            entities = new Dictionary<string, ResourceDescription>();
+            mridToResource = null;
+            negativeGidToResource = null;
             log = string.Empty;
             bool success = false;
 
@@ -149,7 +151,8 @@ namespace Outage.DataImporter.CIMAdapter
                             if (report.Success)
                             {
                                 nmsDelta = OutageImporter.Instance.NMSDelta;
-                                entities = OutageImporter.Instance.Entities;
+                                mridToResource = OutageImporter.Instance.MridToResource;
+                                negativeGidToResource = OutageImporter.Instance.NegativeGidToResource;
                                 success = true;
                             }
                             else
@@ -177,21 +180,18 @@ namespace Outage.DataImporter.CIMAdapter
             }
         }
 
-        private bool CorrectNmsDelta(Dictionary<string, ResourceDescription> entities, ref Delta nmsDelta, out string log)
+        private bool CorrectNmsDelta(Dictionary<string, ResourceDescription> mridToResource, Dictionary<long, ResourceDescription> negativeGidToResource, ref Delta nmsDelta, out string log)
         {
             log = string.Empty;
             bool success = false;
 
-            Dictionary<long, long> negativeToPositiveGidMap = new Dictionary<long, long>(entities.Keys.Count);
-
-            //TODO: initialize at the same time as entities (mozda neg gid, rd)
-            foreach (string mrid in entities.Keys)
-            {
-                negativeToPositiveGidMap.Add(entities[mrid].Id, entities[mrid].Id);
-            }
-
             HashSet<ModelCode> requiredEntityTypes = new HashSet<ModelCode>();
              
+            if(nmsDelta.UpdateOperations.Count == 0 && nmsDelta.DeleteOperations.Count == 0)
+            {
+                return false;
+            }
+
             try
             {
                 foreach(ResourceDescription rd in nmsDelta.UpdateOperations)
@@ -212,10 +212,12 @@ namespace Outage.DataImporter.CIMAdapter
                     }
                 }
 
-                List<ModelCode> mrIdProp = new List<ModelCode>() { ModelCode.IDOBJ_MRID, ModelCode.IDOBJ_GID, ModelCode.IDOBJ_NAME, ModelCode.IDOBJ_DESCRIPTION };
+                List<ModelCode> mrIdProp = new List<ModelCode>() { ModelCode.IDOBJ_MRID };
                 foreach(ModelCode mc in requiredEntityTypes)
                 {
                     int index = GdaQueryProxy.GetExtentValues(mc, mrIdProp);
+
+                    //TODO: while, n to be some predifined number...
                     int resourceCount = GdaQueryProxy.IteratorResourcesLeft(index);
                     List<ResourceDescription> gdaResult = GdaQueryProxy.IteratorNext(resourceCount, index);
 
@@ -229,11 +231,12 @@ namespace Outage.DataImporter.CIMAdapter
                             }
 
                             string mrId = prop.PropertyValue.StringValue;
-                            if(entities.ContainsKey(mrId))
+                            if(mridToResource.ContainsKey(mrId))
                             {
+                                long positiveGid = rd.Id;
+                                
                                 //swap negative gid for positive gid from server (NMS) 
-                                negativeToPositiveGidMap[entities[mrId].Id] = rd.Id;
-                                entities[mrId].Id = rd.Id;
+                                mridToResource[mrId].Id = positiveGid;
                             }
 
                             if(prop.Id == ModelCode.IDOBJ_MRID)
@@ -243,24 +246,46 @@ namespace Outage.DataImporter.CIMAdapter
                         }
                     }
 
-
                     GdaQueryProxy.IteratorClose(index);
                 }
 
-                foreach (long negGid in negativeToPositiveGidMap.Keys)
+                foreach (long negGid in negativeGidToResource.Keys)
                 {
-                    long positiveGid = negativeToPositiveGidMap[negGid];
+                    long gidAfterCorrection = negativeGidToResource[negGid].Id;
+                    ModelCode mc = resourcesDesc.GetModelCodeFromId(negGid);
 
-                    ModelCode mc = resourcesDesc.GetModelCodeFromId(positiveGid);
-                    //report.Report.Append(mc).Append(" mrId = ").Append(mrId).Append(" ID = ").Append(string.Format("0x{0:X16}", negGid)).Append(" after correction is GID = ").AppendLine(string.Format("0x{0:X16}", positiveGid));
-                    report.Report.Append(mc)
-                                 .Append(" ID = ")
-                                 .Append(string.Format("0x{0:X16}", negGid))
-                                 .Append(" after correction is GID = ")
-                                 .AppendLine(string.Format("0x{0:X16}", positiveGid));
+                    foreach (Property prop in negativeGidToResource[negGid].Properties)
+                    {
+                        //make report: negative gid mapping after correction
+                        if (prop.Id == ModelCode.IDOBJ_MRID)
+                        {
+                            string mrid = prop.PropertyValue.StringValue;
+
+                            //entities that still have the negative gid will be included in the report
+                            report.Report.Append(mc)
+                                         .Append(" mrid: ").Append(mrid)
+                                         .Append(" ID: ").Append(string.Format("0x{0:X16}", negGid))
+                                         .Append(" after correction is GID: ").AppendLine(string.Format("0x{0:X16}", gidAfterCorrection));
+                        }
+
+                        if(ModelCodeHelper.ExtractEntityIdFromGlobalId(gidAfterCorrection) <= 0)
+                        {
+                            continue; //not using break to allow first "if" to find mrid for report 
+                        }
+
+                        //if new gid is positive
+                        if(prop.Type == PropertyType.Reference)
+                        {
+                            long targetGid = prop.AsLong();
+
+                            if (ModelCodeHelper.ExtractEntityIdFromGlobalId(targetGid) < 0)
+                            {
+                                long positiveGid = negativeGidToResource[targetGid].Id;
+                                prop.SetValue(positiveGid);
+                            }
+                        }
+                    }
                 }
-
-
 
                 log = report.Report.ToString();
                 LogManager.Log(log, LogLevel.Info);

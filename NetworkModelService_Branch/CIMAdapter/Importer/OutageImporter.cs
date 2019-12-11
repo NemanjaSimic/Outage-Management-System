@@ -18,7 +18,8 @@ namespace Outage.DataImporter.CIMAdapter.Importer
 
         private ConcreteModel concreteModel;
         private Delta delta;
-        private Dictionary<string, ResourceDescription> entities;
+        private Dictionary<string, ResourceDescription> mridToResource;
+        private Dictionary<long, ResourceDescription> negativeGidToResource;
         private DeltaOpType deltaOpType;
         private ImportHelper importHelper;
         private TransformAndLoadReport report;
@@ -52,13 +53,24 @@ namespace Outage.DataImporter.CIMAdapter.Importer
         }
 
         /// <summary>
-		/// Dictionary which contains all data: Key - MRID, Value - Container
+		/// Dictionary which contains all data: Key - MRID, Value - ResourceDescription
 		/// </summary>
-        public Dictionary<string, ResourceDescription> Entities
+        public Dictionary<string, ResourceDescription> MridToResource
         {
             get
             {
-                return entities ?? (entities = new Dictionary<string, ResourceDescription>());
+                return mridToResource ?? (mridToResource = new Dictionary<string, ResourceDescription>());
+            }
+        }
+
+        /// <summary>
+		/// Dictionary which contains all data: Key - negative gid, Value - ResourceDescription
+		/// </summary>
+        public Dictionary<long, ResourceDescription> NegativeGidToResource
+        {
+            get
+            {
+                return negativeGidToResource ?? (negativeGidToResource = new Dictionary<long, ResourceDescription>());
             }
         }
         #endregion
@@ -68,7 +80,8 @@ namespace Outage.DataImporter.CIMAdapter.Importer
         {
             concreteModel = null;
             delta = new Delta();
-            entities = new Dictionary<string, ResourceDescription>();
+            mridToResource = new Dictionary<string, ResourceDescription>();
+            negativeGidToResource = new Dictionary<long, ResourceDescription>();
             importHelper = new ImportHelper();
             report = null;
         }
@@ -79,7 +92,8 @@ namespace Outage.DataImporter.CIMAdapter.Importer
             report = new TransformAndLoadReport();
             concreteModel = cimConcreteModel;
             delta.ClearDeltaOperations();
-            entities.Clear();
+            mridToResource.Clear();
+            negativeGidToResource.Clear();
             deltaOpType = opType;
 
             if ((concreteModel != null) && (concreteModel.ModelMap != null))
@@ -137,9 +151,14 @@ namespace Outage.DataImporter.CIMAdapter.Importer
                     {
                         delta.AddDeltaOperation(deltaOpType, rd, true);
 
-                        if(!Entities.ContainsKey(cimPowerTransformer.MRID))
+                        if(!MridToResource.ContainsKey(cimPowerTransformer.MRID))
                         {
-                            Entities.Add(cimPowerTransformer.MRID, rd);
+                            MridToResource.Add(cimPowerTransformer.MRID, rd);
+                        }
+
+                        if (!NegativeGidToResource.ContainsKey(rd.Id))
+                        {
+                            NegativeGidToResource.Add(rd.Id, rd);
                         }
 
                         report.Report.Append("PowerTransformer ID = ").Append(cimPowerTransformer.ID).Append(" SUCCESSFULLY converted to GID = ").AppendLine(string.Format("0x{0:X16}", rd.Id));
@@ -180,9 +199,14 @@ namespace Outage.DataImporter.CIMAdapter.Importer
                     {
                         delta.AddDeltaOperation(deltaOpType, rd, true);
 
-                        if (!Entities.ContainsKey(cimTransformerWinding.MRID))
+                        if (!MridToResource.ContainsKey(cimTransformerWinding.MRID))
                         {
-                            Entities.Add(cimTransformerWinding.MRID, rd);
+                            MridToResource.Add(cimTransformerWinding.MRID, rd);
+                        }
+
+                        if (!NegativeGidToResource.ContainsKey(rd.Id))
+                        {
+                            NegativeGidToResource.Add(rd.Id, rd);
                         }
 
                         report.Report.Append("TransformerWinding ID = ").Append(cimTransformerWinding.ID).Append(" SUCCESSFULLY converted to GID = ").AppendLine(string.Format("0x{0:X16}", rd.Id));
@@ -224,9 +248,14 @@ namespace Outage.DataImporter.CIMAdapter.Importer
                     {
                         delta.AddDeltaOperation(deltaOpType, rd, true);
 
-                        if (!Entities.ContainsKey(cimBaseVoltage.MRID))
+                        if (!MridToResource.ContainsKey(cimBaseVoltage.MRID))
                         {
-                            Entities.Add(cimBaseVoltage.MRID, rd);
+                            MridToResource.Add(cimBaseVoltage.MRID, rd);
+                        }
+
+                        if (!NegativeGidToResource.ContainsKey(rd.Id))
+                        {
+                            NegativeGidToResource.Add(rd.Id, rd);
                         }
 
                         report.Report.Append("BaseVoltage ID = ").Append(cimBaseVoltage.ID).Append(" SUCCESSFULLY converted to GID = ").AppendLine(string.Format("0x{0:X16}", rd.Id));
@@ -269,9 +298,14 @@ namespace Outage.DataImporter.CIMAdapter.Importer
                     {
                         delta.AddDeltaOperation(deltaOpType, rd, true);
 
-                        if (!Entities.ContainsKey(cimEnergySource.MRID))
+                        if (!MridToResource.ContainsKey(cimEnergySource.MRID))
                         {
-                            Entities.Add(cimEnergySource.MRID, rd);
+                            MridToResource.Add(cimEnergySource.MRID, rd);
+                        }
+
+                        if (!NegativeGidToResource.ContainsKey(rd.Id))
+                        {
+                            NegativeGidToResource.Add(rd.Id, rd);
                         }
 
                         report.Report.Append("EnergySource ID = ").Append(cimEnergySource.ID).Append(" SUCCESSFULLY converted to GID = ").AppendLine(string.Format("0x{0:X16}", rd.Id));
@@ -314,9 +348,14 @@ namespace Outage.DataImporter.CIMAdapter.Importer
                     {
                         delta.AddDeltaOperation(deltaOpType, rd, true);
 
-                        if (!Entities.ContainsKey(cimEnergyConsumer.MRID))
+                        if (!MridToResource.ContainsKey(cimEnergyConsumer.MRID))
                         {
-                            Entities.Add(cimEnergyConsumer.MRID, rd);
+                            MridToResource.Add(cimEnergyConsumer.MRID, rd);
+                        }
+
+                        if (!NegativeGidToResource.ContainsKey(rd.Id))
+                        {
+                            NegativeGidToResource.Add(rd.Id, rd);
                         }
 
                         report.Report.Append("EnergyConsumer ID = ").Append(cimEnergyConsumer.ID).Append(" SUCCESSFULLY converted to GID = ").AppendLine(string.Format("0x{0:X16}", rd.Id));
@@ -359,9 +398,14 @@ namespace Outage.DataImporter.CIMAdapter.Importer
                     {
                         delta.AddDeltaOperation(deltaOpType, rd, true);
 
-                        if (!Entities.ContainsKey(cimFuse.MRID))
+                        if (!MridToResource.ContainsKey(cimFuse.MRID))
                         {
-                            Entities.Add(cimFuse.MRID, rd);
+                            MridToResource.Add(cimFuse.MRID, rd);
+                        }
+
+                        if (!NegativeGidToResource.ContainsKey(rd.Id))
+                        {
+                            NegativeGidToResource.Add(rd.Id, rd);
                         }
 
                         report.Report.Append("Fuse ID = ").Append(cimFuse.ID).Append(" SUCCESSFULLY converted to GID = ").AppendLine(string.Format("0x{0:X16}", rd.Id));
@@ -404,9 +448,14 @@ namespace Outage.DataImporter.CIMAdapter.Importer
                     {
                         delta.AddDeltaOperation(deltaOpType, rd, true);
 
-                        if (!Entities.ContainsKey(cimDisconnector.MRID))
+                        if (!MridToResource.ContainsKey(cimDisconnector.MRID))
                         {
-                            Entities.Add(cimDisconnector.MRID, rd);
+                            MridToResource.Add(cimDisconnector.MRID, rd);
+                        }
+
+                        if (!NegativeGidToResource.ContainsKey(rd.Id))
+                        {
+                            NegativeGidToResource.Add(rd.Id, rd);
                         }
 
                         report.Report.Append("Disconnector ID = ").Append(cimDisconnector.ID).Append(" SUCCESSFULLY converted to GID = ").AppendLine(string.Format("0x{0:X16}", rd.Id));
@@ -449,9 +498,14 @@ namespace Outage.DataImporter.CIMAdapter.Importer
                     {
                         delta.AddDeltaOperation(deltaOpType, rd, true);
 
-                        if (!Entities.ContainsKey(cimBreaker.MRID))
+                        if (!MridToResource.ContainsKey(cimBreaker.MRID))
                         {
-                            Entities.Add(cimBreaker.MRID, rd);
+                            MridToResource.Add(cimBreaker.MRID, rd);
+                        }
+
+                        if (!NegativeGidToResource.ContainsKey(rd.Id))
+                        {
+                            NegativeGidToResource.Add(rd.Id, rd);
                         }
 
                         report.Report.Append("Breaker ID = ").Append(cimBreaker.ID).Append(" SUCCESSFULLY converted to GID = ").AppendLine(string.Format("0x{0:X16}", rd.Id));
@@ -494,9 +548,14 @@ namespace Outage.DataImporter.CIMAdapter.Importer
                     {
                         delta.AddDeltaOperation(deltaOpType, rd, true);
 
-                        if (!Entities.ContainsKey(cimLoadBreakSwitch.MRID))
+                        if (!MridToResource.ContainsKey(cimLoadBreakSwitch.MRID))
                         {
-                            Entities.Add(cimLoadBreakSwitch.MRID, rd);
+                            MridToResource.Add(cimLoadBreakSwitch.MRID, rd);
+                        }
+
+                        if (!NegativeGidToResource.ContainsKey(rd.Id))
+                        {
+                            NegativeGidToResource.Add(rd.Id, rd);
                         }
 
                         report.Report.Append("LoadBreakSwitch ID = ").Append(cimLoadBreakSwitch.ID).Append(" SUCCESSFULLY converted to GID = ").AppendLine(string.Format("0x{0:X16}", rd.Id));
@@ -539,9 +598,14 @@ namespace Outage.DataImporter.CIMAdapter.Importer
                     {
                         delta.AddDeltaOperation(deltaOpType, rd, true);
 
-                        if (!Entities.ContainsKey(cimACLineSegment.MRID))
+                        if (!MridToResource.ContainsKey(cimACLineSegment.MRID))
                         {
-                            Entities.Add(cimACLineSegment.MRID, rd);
+                            MridToResource.Add(cimACLineSegment.MRID, rd);
+                        }
+
+                        if (!NegativeGidToResource.ContainsKey(rd.Id))
+                        {
+                            NegativeGidToResource.Add(rd.Id, rd);
                         }
 
                         report.Report.Append("ACLineSegment ID = ").Append(cimACLineSegment.ID).Append(" SUCCESSFULLY converted to GID = ").AppendLine(string.Format("0x{0:X16}", rd.Id));
@@ -584,9 +648,14 @@ namespace Outage.DataImporter.CIMAdapter.Importer
                     {
                         delta.AddDeltaOperation(deltaOpType, rd, true);
 
-                        if (!Entities.ContainsKey(cimConnectivityNode.MRID))
+                        if (!MridToResource.ContainsKey(cimConnectivityNode.MRID))
                         {
-                            Entities.Add(cimConnectivityNode.MRID, rd);
+                            MridToResource.Add(cimConnectivityNode.MRID, rd);
+                        }
+
+                        if (!NegativeGidToResource.ContainsKey(rd.Id))
+                        {
+                            NegativeGidToResource.Add(rd.Id, rd);
                         }
 
                         report.Report.Append("ConnectivityNode ID = ").Append(cimConnectivityNode.ID).Append(" SUCCESSFULLY converted to GID = ").AppendLine(string.Format("0x{0:X16}", rd.Id));
@@ -629,9 +698,14 @@ namespace Outage.DataImporter.CIMAdapter.Importer
                     {
                         delta.AddDeltaOperation(deltaOpType, rd, true);
 
-                        if (!Entities.ContainsKey(cimTerminal.MRID))
+                        if (!MridToResource.ContainsKey(cimTerminal.MRID))
                         {
-                            Entities.Add(cimTerminal.MRID, rd);
+                            MridToResource.Add(cimTerminal.MRID, rd);
+                        }
+
+                        if (!NegativeGidToResource.ContainsKey(rd.Id))
+                        {
+                            NegativeGidToResource.Add(rd.Id, rd);
                         }
 
                         report.Report.Append("Terminal ID = ").Append(cimTerminal.ID).Append(" SUCCESSFULLY converted to GID = ").AppendLine(string.Format("0x{0:X16}", rd.Id));
@@ -674,9 +748,14 @@ namespace Outage.DataImporter.CIMAdapter.Importer
                     {
                         delta.AddDeltaOperation(deltaOpType, rd, true);
 
-                        if (!Entities.ContainsKey(cimDiscrete.MRID))
+                        if (!MridToResource.ContainsKey(cimDiscrete.MRID))
                         {
-                            Entities.Add(cimDiscrete.MRID, rd);
+                            MridToResource.Add(cimDiscrete.MRID, rd);
+                        }
+
+                        if (!NegativeGidToResource.ContainsKey(rd.Id))
+                        {
+                            NegativeGidToResource.Add(rd.Id, rd);
                         }
 
                         report.Report.Append("Discret ID = ").Append(cimDiscrete.ID).Append(" SUCCESSFULLY converted to GID = ").AppendLine(string.Format("0x{0:X16}", rd.Id));
@@ -719,9 +798,14 @@ namespace Outage.DataImporter.CIMAdapter.Importer
                     {
                         delta.AddDeltaOperation(deltaOpType, rd, true);
 
-                        if (!Entities.ContainsKey(cimAnalog.MRID))
+                        if (!MridToResource.ContainsKey(cimAnalog.MRID))
                         {
-                            Entities.Add(cimAnalog.MRID, rd);
+                            MridToResource.Add(cimAnalog.MRID, rd);
+                        }
+
+                        if (!NegativeGidToResource.ContainsKey(rd.Id))
+                        {
+                            NegativeGidToResource.Add(rd.Id, rd);
                         }
 
                         report.Report.Append("Analog ID = ").Append(cimAnalog.ID).Append(" SUCCESSFULLY converted to GID = ").AppendLine(string.Format("0x{0:X16}", rd.Id));
