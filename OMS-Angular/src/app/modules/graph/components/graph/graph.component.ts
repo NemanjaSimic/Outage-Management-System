@@ -3,12 +3,18 @@ import { GraphService } from '@services/notification/graph.service';
 import { Subscription } from 'rxjs';
 import { OmsGraph } from '@shared/models/oms-graph.model';
 
-import * as cytoscape from 'cytoscape';
-import dagre from 'cytoscape-dagre';
 import { style } from './graph.style';
-cytoscape.use(dagre);
 
+import * as cytoscape from 'cytoscape';
 import * as graphMock from './graph-mock.json';
+import { addGraphTooltip } from '@shared/utils/tooltip';
+
+// cytoscape plugins
+import dagre from 'cytoscape-dagre';
+import popper from 'cytoscape-popper';
+cytoscape.use(dagre);
+cytoscape.use(popper);
+
 
 @Component({
   selector: 'app-graph',
@@ -18,7 +24,7 @@ import * as graphMock from './graph-mock.json';
 export class GraphComponent implements OnInit, OnDestroy {
   public connectionSubscription: Subscription;
   public updateSubscription: Subscription;
-  
+
   private cy: any;
   private cyConfig: Object = {
     layout: { name: 'dagre', rankDir: 'TB' },
@@ -35,7 +41,7 @@ export class GraphComponent implements OnInit, OnDestroy {
   constructor(
     private graphService: GraphService,
     private ngZone: NgZone
-  ) { 
+  ) {
     this.connectionSubscription = Subscription.EMPTY;
     this.updateSubscription = Subscription.EMPTY;
   }
@@ -43,7 +49,7 @@ export class GraphComponent implements OnInit, OnDestroy {
   ngOnInit() {
     // web api
     // this.startConnection();
-    
+
     // local testing
     this.graphData.nodes = graphMock.nodes;
     this.graphData.edges = graphMock.edges;
@@ -79,11 +85,18 @@ export class GraphComponent implements OnInit, OnDestroy {
 
   public drawGraph(): void {
     this.cy = cytoscape({
+      ...this.cyConfig,
       container: document.getElementById('graph'),
-      elements: this.graphData,
-      ...this.cyConfig
+      elements: this.graphData
     })
+
+    this.cy.ready(() => {
+      this.cy.nodes().forEach(node => {
+        addGraphTooltip(node);
+      });
+    });    
   };
+
 
   public onNotification(data: OmsGraph): void {
     this.ngZone.run(() => {
