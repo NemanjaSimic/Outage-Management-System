@@ -99,7 +99,7 @@ export class GraphComponent implements OnInit, OnDestroy {
 
       this.cy.edges().forEach(line => {
         if(line.data('color') == 'red') {
-          console.log(line)
+          console.log(line.sourceEndpoint())
         }
       })
     });    
