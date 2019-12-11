@@ -15,6 +15,7 @@ import popper from 'cytoscape-popper';
 cytoscape.use(dagre);
 cytoscape.use(popper);
 
+import { drawWarning } from './draw.js';
 
 @Component({
   selector: 'app-graph',
@@ -55,7 +56,10 @@ export class GraphComponent implements OnInit, OnDestroy {
     // local testing
     this.graphData.nodes = graphMock.nodes;
     this.graphData.edges = graphMock.edges;
+
     this.drawGraph();
+    this.addTooltips();
+    this.drawWarnings();
   }
 
   ngOnDestroy() {
@@ -91,20 +95,29 @@ export class GraphComponent implements OnInit, OnDestroy {
       container: document.getElementById('graph'),
       elements: this.graphData
     })
+  };
 
+  public addTooltips(): void {
     this.cy.ready(() => {
       this.cy.nodes().forEach(node => {
         addGraphTooltip(node);
-      });
+      });      
+    });  
+  }
 
+  public drawWarnings(): void {
+    this.cy.ready(() => {
       this.cy.edges().forEach(line => {
         if(line.data('color') == 'red') {
-          console.log(line.sourceEndpoint())
+          const target = line.targetEndpoint();
+          console.log(line);
+          this.cy.add([
+            { group: "nodes", data: { id: `${Math.random().toPrecision(1)}`, state: 'active' }, position: { x: target.x + 20, y: target.y - 25 } }
+          ]);
         }
       })
     });    
   };
-
 
   public onNotification(data: OmsGraph): void {
     this.ngZone.run(() => {
