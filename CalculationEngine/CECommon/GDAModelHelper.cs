@@ -8,8 +8,14 @@ namespace CECommon
 	public class GDAModelHelper
 	{
 
-		private ModelResourcesDesc modelResourcesDesc = new ModelResourcesDesc();
-		private NetworkModelGDA networkModelGDA = new NetworkModelGDA();
+		private readonly ModelResourcesDesc modelResourcesDesc = new ModelResourcesDesc();
+		private readonly NetworkModelGDA networkModelGDA = new NetworkModelGDA();
+
+
+		public List<long> GetAllEnergySousces()
+		{
+			return GetAllGids(ModelCode.ENERGYSOURCE);
+		}
 
 		public Dictionary<ModelCode, List<long>> GetAllModelEntities()
 		{

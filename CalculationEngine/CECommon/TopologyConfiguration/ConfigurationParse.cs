@@ -28,7 +28,7 @@ namespace CECommon.TopologyConfiguration
 				}
 				catch (Exception)
 				{
-					Console.WriteLine("Invalid structured configuration file " + path + ".");
+					//Console.WriteLine("Invalid structured configuration file " + path + ".");
 				}
 			}
 

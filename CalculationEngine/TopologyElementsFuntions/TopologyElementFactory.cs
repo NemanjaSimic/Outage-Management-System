@@ -31,7 +31,6 @@ namespace TopologyElementsFuntions
 
 			return retVal;
 		}
-
 		public static Edge CreateOrdinaryEdge(long firstEndGid, long secondEndGid)
 		{
 			return new Edge(edgeCounter++) {FirstEnd = firstEndGid, SecondEnd = new List<long>() { secondEndGid }};

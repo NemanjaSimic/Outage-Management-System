@@ -8,11 +8,13 @@ namespace CECommon
 {
 	public class Field : Node
 	{
-		private List<RegularNode> members;
-		public List<RegularNode> Members { get => members; set => members = value; }
-		public Field(long gid) : base(gid)
+		private static long fieldNumber = 5000;
+		private List<long> members;
+		public List<long> Members { get => members; set => members = value; }
+		public Field(TopologyElement firstElement) : base(fieldNumber++)
 		{
-			Members = new List<RegularNode>();
+			Members = new List<long>() { firstElement.Id};
+			
 		}
 	}
 }

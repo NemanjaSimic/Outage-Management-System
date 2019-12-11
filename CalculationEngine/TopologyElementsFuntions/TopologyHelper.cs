@@ -10,8 +10,8 @@ namespace TopologyElementsFuntions
 		private readonly Dictionary<TopologyStatus, List<DMSType>> elementsStatus;
 		private readonly Dictionary<TopologyType, List<DMSType>> topologyTypes;
 
-		private GDAModelHelper gDAModelHelper = new GDAModelHelper();
-		private ModelResourcesDesc modelResourcesDesc = new ModelResourcesDesc();
+		private readonly GDAModelHelper gDAModelHelper = new GDAModelHelper();
+		private readonly ModelResourcesDesc modelResourcesDesc = new ModelResourcesDesc();
 
 		public TopologyHelper()
 		{
@@ -62,27 +62,26 @@ namespace TopologyElementsFuntions
 			return elements;
 		}
 
-		public List<long> GetNextNonIgnorableElements(long gid)
+		public List<long> GetAllEnergySources() => gDAModelHelper.GetAllEnergySousces();
+
+		public string GetDMSTypeOfTopologyElement(long gid)
 		{
-			List<long> nonIgnorableElements = new List<long>();
-
-			if (GetElementTopologyStatus(gid) != TopologyStatus.Ignorable)
+			try
 			{
-				nonIgnorableElements.Add(gid);
+				return ModelCodeHelper.GetTypeFromModelCode(modelResourcesDesc.GetModelCodeFromId(gid)).ToString();
+
 			}
-			else
+			catch (System.Exception)
 			{
-				List<long> nextElements = GetAllReferencedElements(gid);
-				if (nextElements.Count != 0)
+				if (gid < 1000)
 				{
-					foreach (var element in nextElements)
-					{
-
-					}
+					return "EDGE";
+				}
+				else
+				{
+					return "FIELD";
 				}
 			}
-
-			return nonIgnorableElements;
 		}
 	}
 }
