@@ -7,6 +7,7 @@ using System.Collections.Generic;
 using System.Linq;
 using System.Text;
 using System.Threading.Tasks;
+using Outage.ServiceContracts;
 
 namespace Outage.DataImporter.CIMAdapter.Importer
 {
@@ -20,7 +21,6 @@ namespace Outage.DataImporter.CIMAdapter.Importer
         private Delta delta;
         private Dictionary<string, ResourceDescription> mridToResource;
         private Dictionary<long, ResourceDescription> negativeGidToResource;
-        private DeltaOpType deltaOpType;
         private ImportHelper importHelper;
         private TransformAndLoadReport report;
 
@@ -86,7 +86,7 @@ namespace Outage.DataImporter.CIMAdapter.Importer
             report = null;
         }
 
-        public TransformAndLoadReport CreateNMSDelta(ConcreteModel cimConcreteModel, DeltaOpType opType)
+        public TransformAndLoadReport CreateNMSDelta(ConcreteModel cimConcreteModel, NetworkModelGDAProxy gdaQueryProxy, ModelResourcesDesc resourcesDesc)
         {
             LogManager.Log("Importing Outage Elements...", LogLevel.Info); //TODO: ovo menjati sa nasim logom
             report = new TransformAndLoadReport();
@@ -94,13 +94,12 @@ namespace Outage.DataImporter.CIMAdapter.Importer
             delta.ClearDeltaOperations();
             mridToResource.Clear();
             negativeGidToResource.Clear();
-            deltaOpType = opType;
 
             if ((concreteModel != null) && (concreteModel.ModelMap != null))
             {
                 try
                 {
-                    ConvertModelAndPopulateDelta(deltaOpType);
+                    ConvertModelAndPopulateDelta(gdaQueryProxy, resourcesDesc);
                 }
                 catch (Exception ex)
                 {
@@ -114,15 +113,12 @@ namespace Outage.DataImporter.CIMAdapter.Importer
             return report;
         }
 
-        private void ConvertModelAndPopulateDelta(DeltaOpType deltaOpType)
+        private void ConvertModelAndPopulateDelta(NetworkModelGDAProxy gdaQueryProxy, ModelResourcesDesc resourcesDesc)
         {
             LogManager.Log("Loading elements and creating delta...", LogLevel.Info);
 
-            if(deltaOpType == DeltaOpType.Update || deltaOpType == DeltaOpType.Delete)
-            {
-                delta.PositiveIdsAllowed = true;
-            }
-
+            GetNmsData(gdaQueryProxy, resourcesDesc, ref);
+            
             //// import all concrete model types (DMSType enum)
             ImportBaseVoltages();
             ImportPowerTransformers();
@@ -139,7 +135,176 @@ namespace Outage.DataImporter.CIMAdapter.Importer
             ImportDiscretes();
             ImportAnalogs();
 
+
             LogManager.Log("Loading elements and creating delta completed.", LogLevel.Info);
+        }
+
+        private bool GetNmsData(NetworkModelGDAProxy gdaQueryProxy, ModelResourcesDesc resourcesDesc)
+        {
+            bool success = false;
+
+            HashSet<ModelCode> requiredEntityTypes = new HashSet<ModelCode>();
+
+            foreach (DMSType dmsType in Enum.GetValues(typeof(DMSType)))
+            {
+                if (dmsType == DMSType.MASK_TYPE)
+                {
+                    continue;
+                }
+
+                ModelCode mc = resourcesDesc.GetModelCodeFromType(dmsType);
+
+                if (!requiredEntityTypes.Contains(mc))
+                {
+                    requiredEntityTypes.Add(mc);
+                }
+            }
+
+            List<ModelCode> mrIdProp = new List<ModelCode>() { ModelCode.IDOBJ_MRID };
+            foreach (ModelCode modelCodeType in requiredEntityTypes)
+            {
+                int iteratorId = 0;
+                int resourcesLeft = 0;
+                int numberOfResources = 300;
+
+
+                try
+                {
+                    iteratorId = gdaQueryProxy.GetExtentValues(modelCodeType, mrIdProp);
+                    resourcesLeft = gdaQueryProxy.IteratorResourcesLeft(iteratorId);
+
+                    //TODO: while, n to be some predifined number...
+                    while (resourcesLeft > 0)
+                    {
+                        List<ResourceDescription> gdaResult = gdaQueryProxy.IteratorNext(numberOfResources, iteratorId);
+                    }
+
+                }
+                catch (Exception)
+                {
+
+                    throw;
+                }
+
+
+                
+
+                int resourceCount = gdaQueryProxy.IteratorResourcesLeft(index);
+
+                foreach (ResourceDescription rd in gdaResult)
+
+
+                    return success;
+        }
+
+        private bool CorrectNmsDelta(NetworkModelGDAProxy gdaQueryProxy, ModelResourcesDesc resourcesDesc)
+        {
+            bool success = false;
+
+            HashSet<ModelCode> requiredEntityTypes = new HashSet<ModelCode>();
+
+            try
+            {
+                foreach (DMSType dmsType in Enum.GetValues(typeof(DMSType)))
+                {
+                    if (dmsType == DMSType.MASK_TYPE)
+                    {
+                        continue;
+                    }
+
+                    ModelCode mc = resourcesDesc.GetModelCodeFromType(dmsType);
+
+                    if (!requiredEntityTypes.Contains(mc))
+                    {
+                        requiredEntityTypes.Add(mc);
+                    }
+                }
+
+                List<ModelCode> mrIdProp = new List<ModelCode>() { ModelCode.IDOBJ_MRID };
+                foreach (ModelCode mc in requiredEntityTypes)
+                {
+                    int index = GdaQueryProxy.GetExtentValues(mc, mrIdProp);
+
+                    //TODO: while, n to be some predifined number...
+                    int resourceCount = GdaQueryProxy.IteratorResourcesLeft(index);
+                    List<ResourceDescription> gdaResult = GdaQueryProxy.IteratorNext(resourceCount, index);
+
+                    foreach (ResourceDescription rd in gdaResult)
+                    {
+                        foreach (Property prop in rd.Properties)
+                        {
+                            if (prop.Id != ModelCode.IDOBJ_MRID)
+                            {
+                                continue;
+                            }
+
+                            string mrId = prop.PropertyValue.StringValue;
+                            if (mridToResource.ContainsKey(mrId))
+                            {
+                                long positiveGid = rd.Id;
+
+                                //swap negative gid for positive gid from server (NMS) 
+                                mridToResource[mrId].Id = positiveGid;
+                            }
+
+                            if (prop.Id == ModelCode.IDOBJ_MRID)
+                            {
+                                break;
+                            }
+                        }
+                    }
+
+                    GdaQueryProxy.IteratorClose(index);
+                }
+
+                foreach (long negGid in negativeGidToResource.Keys)
+                {
+                    long gidAfterCorrection = negativeGidToResource[negGid].Id;
+                    ModelCode mc = resourcesDesc.GetModelCodeFromId(negGid);
+
+                    foreach (Property prop in negativeGidToResource[negGid].Properties)
+                    {
+                        //make report: negative gid mapping after correction
+                        if (prop.Id == ModelCode.IDOBJ_MRID)
+                        {
+                            string mrid = prop.PropertyValue.StringValue;
+
+                            //entities that still have the negative gid will be included in the report
+                            report.Report.Append(mc)
+                                         .Append(" mrid: ").Append(mrid)
+                                         .Append(" ID: ").Append(string.Format("0x{0:X16}", negGid))
+                                         .Append(" after correction is GID: ").AppendLine(string.Format("0x{0:X16}", gidAfterCorrection));
+                        }
+
+                        if (ModelCodeHelper.ExtractEntityIdFromGlobalId(gidAfterCorrection) <= 0)
+                        {
+                            continue; //not using break to allow first "if" to find mrid for report 
+                        }
+
+                        //if new gid is positive
+                        if (prop.Type == PropertyType.Reference)
+                        {
+                            long targetGid = prop.AsLong();
+
+                            if (ModelCodeHelper.ExtractEntityIdFromGlobalId(targetGid) < 0)
+                            {
+                                long positiveGid = negativeGidToResource[targetGid].Id;
+                                prop.SetValue(positiveGid);
+                            }
+                        }
+                    }
+                }
+
+                log = report.Report.ToString();
+                LogManager.Log(log, LogLevel.Info);
+                return success;
+            }
+            catch (Exception ex)
+            {
+                log = string.Format("Correction of delta unsuccessful: {0}", ex.StackTrace);
+                LogManager.Log(log, LogLevel.Error);
+                return false;
+            }
         }
 
         #region Import
