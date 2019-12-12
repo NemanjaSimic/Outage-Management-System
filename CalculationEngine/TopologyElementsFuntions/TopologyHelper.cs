@@ -73,7 +73,7 @@ namespace TopologyElementsFuntions
 			}
 			catch (System.Exception)
 			{
-				if (gid < 1000)
+				if (gid < 5000)
 				{
 					return "EDGE";
 				}

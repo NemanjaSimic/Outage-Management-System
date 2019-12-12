@@ -60,17 +60,17 @@ namespace TopologyElementsFuntions
 				if (newElement is RegularNode && parentElement is RegularNode)
 				{
 					//Console.WriteLine("Element is RegularNode " + newElement.Id.ToString("X") + " and parent is Node " + parentElement.Id.ToString("X") + "...");
-					parentSecondEnd.Add(ConnectTwoNodes(ref newElement, ref parentElement));
+					parentSecondEnd.Add(ConnectTwoNodes(newElement, parentElement));
 				}
 				else if (newElement is RegularNode && parentElement is Edge)
 				{
 					//Console.WriteLine("Element is RegularNode " + newElement.Id.ToString("X") + " and parent is Edge " + parentElement.Id.ToString("X") + "...");
-					parentSecondEnd.Add(ConnectNodeWithEdge(ref newElement, ref parentElement));
+					parentSecondEnd.Add(ConnectNodeWithEdge(newElement, parentElement));
 				}
 				else if (newElement is Edge)
 				{
 					//Console.WriteLine("Element is Edge " + newElement.Id.ToString("X") + " and parent " + parentElement.Id.ToString("X") + "...");			
-					parentSecondEnd.Add(ConnectEdgeWithTopologyElement(ref newElement, parentElement));
+					parentSecondEnd.Add(ConnectEdgeWithTopologyElement(newElement, parentElement));
 				}
 
 				newElement.SecondEnd.AddRange(CreateConnectivity(newElement));
@@ -163,7 +163,7 @@ namespace TopologyElementsFuntions
 			}
 			return field;
 		}
-		private long ConnectEdgeWithTopologyElement(ref TopologyElement edge, TopologyElement topologyElement)
+		private long ConnectEdgeWithTopologyElement(TopologyElement edge, TopologyElement topologyElement)
 		{
 			if (topologyHelper.GetElementTopologyStatus(topologyElement.Id) == TopologyStatus.Field)
 			{
@@ -180,7 +180,7 @@ namespace TopologyElementsFuntions
 			}
 			return edge.Id;
 		}
-		private long ConnectNodeWithEdge(ref TopologyElement node, ref TopologyElement Edge)
+		private long ConnectNodeWithEdge(TopologyElement node, TopologyElement Edge)
 		{
 			long parentSecondEnd;
 			if (topologyHelper.GetElementTopologyStatus(node.Id) == TopologyStatus.Field)
@@ -205,7 +205,7 @@ namespace TopologyElementsFuntions
 			}
 			return parentSecondEnd;
 		}
-		private long ConnectTwoNodes(ref TopologyElement newElement, ref TopologyElement parent)
+		private long ConnectTwoNodes(TopologyElement newElement, TopologyElement parent)
 		{
 			Node firstNode = parent as Node;
 			Node secondNode = newElement as Node;
@@ -216,14 +216,14 @@ namespace TopologyElementsFuntions
 				Field field = new Field(newElement);
 				Node fieldNode = field as Node;
 
-				newEdge = MakeEdgeBetweenNodes(ref firstNode, ref fieldNode);
+				newEdge = MakeEdgeBetweenNodes(firstNode, fieldNode);
 							
 				topologyElements.Add(field.Id, field);
 			}
 			else if (topologyHelper.GetElementTopologyStatus(newElement.Id) == TopologyStatus.Field
 				&& topologyHelper.GetElementTopologyStatus(parent.Id) == TopologyStatus.Field)
 			{
-				newEdge = MakeEdgeBetweenNodes(ref firstNode, ref secondNode);
+				newEdge = MakeEdgeBetweenNodes(firstNode, secondNode);
 				
 				Field field = GetField(parent.Id);
 				field.Members.Add(newElement.Id);
@@ -236,23 +236,23 @@ namespace TopologyElementsFuntions
 				Field field = GetField(parent.Id);
 				Node fieldNode = field as Node;
 
-				newEdge = MakeEdgeBetweenNodes(ref fieldNode, ref secondNode);
-				
+				newEdge = MakeEdgeBetweenNodes(fieldNode, secondNode);
+				field.SecondEnd.Add(newEdge.Id);
+
 				topologyElements.Remove(field.Id);
 				topologyElements.Add(field.Id, field);
 			}
 			else
 			{
-				newEdge = MakeEdgeBetweenNodes(ref firstNode, ref secondNode);
+				newEdge = MakeEdgeBetweenNodes(firstNode, secondNode);
 			}
 
 			topologyElements.Add(newEdge.Id, newEdge);
 			return newEdge.Id;
 		}
-		private Edge MakeEdgeBetweenNodes(ref Node firstElement, ref Node secondElement)
+		private Edge MakeEdgeBetweenNodes(Node firstElement, Node secondElement)
 		{
 			Edge newEdge = TopologyElementFactory.CreateOrdinaryEdge(firstElement.Id, secondElement.Id);
-			firstElement.SecondEnd.Add(newEdge.Id);
 			secondElement.FirstEnd = newEdge.Id;
 			secondElement.Parent = firstElement.Id;
 
