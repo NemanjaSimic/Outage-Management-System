@@ -5,10 +5,10 @@ import { OmsGraph } from '@shared/models/oms-graph.model';
 
 import { style } from './graph.style';
 
-import uuid from 'uuid';
 import * as cytoscape from 'cytoscape';
 import * as graphMock from './graph-mock.json';
 import { addGraphTooltip } from '@shared/utils/tooltip';
+import { drawWarning } from '@shared/utils/warning';
 
 // cytoscape plugins
 import dagre from 'cytoscape-dagre';
@@ -101,41 +101,22 @@ export class GraphComponent implements OnInit, OnDestroy {
       this.cy.nodes().forEach(node => {
         addGraphTooltip(node);
 
-        // hide the tooltip on zoom
-        this.cy.on('zoom', () => {
+        // hide the tooltip on zoom and pan
+        this.cy.on('zoom pan', () => {
           setTimeout(() => {
             node.tooltip.hide();
           }, 0);
         })
-      });      
-    });  
+      });
+    });
   }
 
   public drawWarnings(): void {
     this.cy.ready(() => {
       this.cy.edges().forEach(line => {
-        if(line.data('color') == 'red') {
-          const source = line.sourceEndpoint();
-          const target = line.targetEndpoint();
-
-          // ako je levo, onda je verovatno prvi, pa da iscrta sa leve strane
-          const isFirstChild = source.x > target.x;
-
-          this.cy.add([
-            { 
-              group: "nodes", 
-              data: { 
-                id: `${uuid()}`,  
-                type: 'warning' }, 
-                position: { 
-                  x: isFirstChild ? target.x - 15 : target.x + 15, 
-                  y: target.y - 25 
-                } 
-              }
-          ]);
-        }
+        drawWarning(line);
       })
-    });    
+    });
   };
 
   public onNotification(data: OmsGraph): void {
