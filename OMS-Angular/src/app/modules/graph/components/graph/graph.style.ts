@@ -21,9 +21,10 @@ export const style = cytoscape.stylesheet()
     .style({
         'shape': 'rectangle',
         'background-color': '#2b2a2a',
-        'background-image': 'assets/img/electric-warning.png',
+        'background-fit': 'cover',
+        'background-image': 'assets/img/warning.png',
         'height': 20,
-        'width': 20
+        'width': 20,
     })
     .selector('edge')
     .style({
