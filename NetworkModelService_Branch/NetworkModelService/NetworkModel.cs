@@ -761,48 +761,45 @@ namespace Outage.NetworkModelService
                     {
                         property = incomingEntity.GetProperty(propertyId);
 
-                        if (propertyType == PropertyType.Reference)
+                        // get target entity and remove reference to another entity
+                        long targetGlobalId = property.AsReference();
+
+                        if (targetGlobalId != 0)
                         {
-                            // get target entity and remove reference to another entity
-                            long targetGlobalId = property.AsReference();
-
-                            if (targetGlobalId != 0)
+                            if (!EntityExistsInIncomingData(targetGlobalId))
                             {
-                                if (!EntityExistsInIncomingData(targetGlobalId))
-                                {
-                                    string message = string.Format("Failed to get target entity with GID: 0x{0:X16}.", targetGlobalId);
-                                    throw new Exception(message);
-                                }
-
-                                // find type
-                                DMSType targetType = (DMSType)ModelCodeHelper.ExtractTypeFromGlobalId(targetGlobalId);
-                                //get container from incoming model
-                                Container incomingTargetContainer = incomingNetworkDataModel[targetType];
-                                // get incoming target entity
-                                IdentifiedObject incomingTargetEntity = incomingTargetContainer.Entities[targetGlobalId];
-                                
-                                //get container from current model
-                                if (EntityExists(targetGlobalId))
-                                {
-                                    Container currentTargetContainer = networkDataModel[targetType];
-
-                                    if (currentTargetContainer.GetHashCode() == incomingTargetContainer.GetHashCode())
-                                    {
-                                        incomingTargetContainer = currentTargetContainer.Clone();
-                                        incomingNetworkDataModel[targetType] = incomingTargetContainer;
-                                    }
-
-                                    IdentifiedObject currentTargetEntity = currentTargetContainer.Entities[targetGlobalId];
-
-                                    if (incomingTargetEntity.GetHashCode() == currentTargetEntity.GetHashCode())
-                                    {
-                                        incomingTargetEntity = currentTargetEntity.Clone();
-                                        incomingTargetContainer.Entities[targetGlobalId] = incomingTargetEntity;
-                                    }
-                                }
-
-                                incomingTargetEntity.RemoveReference(property.Id, globalId);
+                                string message = string.Format("Failed to get target entity with GID: 0x{0:X16}.", targetGlobalId);
+                                throw new Exception(message);
                             }
+
+                            // find type
+                            DMSType targetType = (DMSType)ModelCodeHelper.ExtractTypeFromGlobalId(targetGlobalId);
+                            //get container from incoming model
+                            Container incomingTargetContainer = incomingNetworkDataModel[targetType];
+                            // get incoming target entity
+                            IdentifiedObject incomingTargetEntity = incomingTargetContainer.Entities[targetGlobalId];
+                                
+                            //get container from current model
+                            if (EntityExists(targetGlobalId))
+                            {
+                                Container currentTargetContainer = networkDataModel[targetType];
+
+                                if (currentTargetContainer.GetHashCode() == incomingTargetContainer.GetHashCode())
+                                {
+                                    incomingTargetContainer = currentTargetContainer.Clone();
+                                    incomingNetworkDataModel[targetType] = incomingTargetContainer;
+                                }
+
+                                IdentifiedObject currentTargetEntity = currentTargetContainer.Entities[targetGlobalId];
+
+                                if (incomingTargetEntity.GetHashCode() == currentTargetEntity.GetHashCode())
+                                {
+                                    incomingTargetEntity = currentTargetEntity.Clone();
+                                    incomingTargetContainer.Entities[targetGlobalId] = incomingTargetEntity;
+                                }
+                            }
+
+                            incomingTargetEntity.RemoveReference(property.Id, globalId);
                         }
                     }
                 }

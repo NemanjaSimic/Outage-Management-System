@@ -153,10 +153,10 @@ namespace Outage.Common
 		/// </summary>
 		private List<ModelCode> typeIdsInInsertOrder = new List<ModelCode>();
 
-		/// <summary>
-		/// List of non abstract class Ids.
-		/// </summary>
-		private List<ModelCode> nonAbstractClassIds = new List<ModelCode>();
+        /// <summary>
+        /// List of non abstract class Ids.
+        /// </summary>
+        private List<ModelCode> nonAbstractClassIds = new List<ModelCode>();
 
 		/// <summary>
 		/// HashSet of not settable property Ids.
@@ -889,18 +889,15 @@ namespace Outage.Common
             typeIdsInInsertOrder.Add(ModelCode.TERMINAL);
             typeIdsInInsertOrder.Add(ModelCode.DISCRETE);
             typeIdsInInsertOrder.Add(ModelCode.ANALOG);
-            
-
         }
 
-		private void InitializeNotSettablePropertyIds()
+        private void InitializeNotSettablePropertyIds()
         { 
             notSettablePropertyIds.Add(ModelCode.IDOBJ_GID);
             notSettablePropertyIds.Add(ModelCode.BASEVOLTAGE_CONDUCTINGEQUIPMENTS);
             notSettablePropertyIds.Add(ModelCode.TERMINAL_MEASUREMENTS);
             notSettablePropertyIds.Add(ModelCode.POWERTRANSFORMER_TRANSFORMERWINDINGS);
             notSettablePropertyIds.Add(ModelCode.CONDUCTINGEQUIPMENT_TERMINALS);
-            notSettablePropertyIds.Add(ModelCode.TRANSFORMERWINDING_POWERTRANSFORMER);
         }
 	
 		# endregion Initialization of metadata

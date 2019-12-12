@@ -518,26 +518,26 @@ namespace Outage.Common.GDA
 					}
 				}
 
-				// pass through all delete operations
-				// move operations with current type to list of ordered delete operations
-				indexOp = 0;
-				for (indexOp = 0; indexOp < deleteOps.Count; indexOp++)
-				{
-					if (deleteOps[indexOp] != null && type == (DMSType)ModelCodeHelper.ExtractTypeFromGlobalId(deleteOps[indexOp].Id))
-					{
-						// add at the end of list of ordered delete operations
-						deleteOpsOrdered.Add(deleteOps[indexOp]);
-						deleteOps[indexOp] = null;
-						deleteOpsOrderedNo++;
+                // pass through all delete operations
+                // move operations with current type to list of ordered delete operations
+                indexOp = 0;
+                for (indexOp = 0; indexOp < deleteOps.Count; indexOp++)
+                {
+                    if (deleteOps[indexOp] != null && type == (DMSType)ModelCodeHelper.ExtractTypeFromGlobalId(deleteOps[indexOp].Id))
+                    {
+                        // add at the end of list of ordered delete operations
+                        deleteOpsOrdered.Add(deleteOps[indexOp]);
+                        deleteOps[indexOp] = null;
+                        deleteOpsOrderedNo++;
 
-						// remove from the old non sorted list - ATTENTION: this turns to be VERY SLOW operation in case delta is BIG
-						////deleteOps.RemoveAt(indexOp);
-					}
-				}
-			}
+                        // remove from the old non sorted list - ATTENTION: this turns to be VERY SLOW operation in case delta is BIG
+                        ////deleteOps.RemoveAt(indexOp);
+                    }
+                }
+            }
 
-			// check if there are insert operations not covered by given data model types
-			if (insertOps.Count != insertOpsOrderedNo)
+            // check if there are insert operations not covered by given data model types
+            if (insertOps.Count != insertOpsOrderedNo)
 			{
 				// find type that is not specified in given list of types
 				short typeNotDefined = 0;

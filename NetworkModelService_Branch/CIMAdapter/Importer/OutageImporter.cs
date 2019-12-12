@@ -19,8 +19,10 @@ namespace Outage.DataImporter.CIMAdapter.Importer
 
         private ConcreteModel concreteModel;
         private Delta delta;
-        private Dictionary<string, ResourceDescription> mridToResource;
-        private Dictionary<long, ResourceDescription> negativeGidToResource;
+        //private Dictionary<long, ResourceDescription> negativeGidToResource;
+        private Dictionary<string, long> mridToPositiveGidFromServer;
+        private HashSet<string> mridsFromConcreteModel;
+        private Dictionary<long, string> negativeGidToMrid;
         private ImportHelper importHelper;
         private TransformAndLoadReport report;
 
@@ -53,24 +55,35 @@ namespace Outage.DataImporter.CIMAdapter.Importer
         }
 
         /// <summary>
-		/// Dictionary which contains all data: Key - MRID, Value - ResourceDescription
-		/// </summary>
-        public Dictionary<string, ResourceDescription> MridToResource
+        /// Dictionary which contains all data: Key - negative gid, Value - MRID
+        /// </summary>
+        public Dictionary<long, string>NegativeGidToMrid
         {
             get
             {
-                return mridToResource ?? (mridToResource = new Dictionary<string, ResourceDescription>());
+                return negativeGidToMrid ?? (negativeGidToMrid = new Dictionary<long, string>());
             }
         }
 
         /// <summary>
-		/// Dictionary which contains all data: Key - negative gid, Value - ResourceDescription
-		/// </summary>
-        public Dictionary<long, ResourceDescription> NegativeGidToResource
+        /// Dictionary which contains all data: Key - MRID, Value - gid with positive counter
+        /// </summary>
+        public Dictionary<string, long> MridToPositiveGidFromServer
         {
             get
             {
-                return negativeGidToResource ?? (negativeGidToResource = new Dictionary<long, ResourceDescription>());
+                return mridToPositiveGidFromServer ?? (mridToPositiveGidFromServer = new Dictionary<string, long>());
+            }
+        }
+
+        /// <summary>
+		/// Dictionary which contains all data: Key - MRID, Value - Resource
+		/// </summary>
+        public HashSet<string> MridsFromConcreteModel
+        {
+            get
+            {
+                return mridsFromConcreteModel ?? (mridsFromConcreteModel = new HashSet<string>());
             }
         }
         #endregion
@@ -80,8 +93,10 @@ namespace Outage.DataImporter.CIMAdapter.Importer
         {
             concreteModel = null;
             delta = new Delta();
-            mridToResource = new Dictionary<string, ResourceDescription>();
-            negativeGidToResource = new Dictionary<long, ResourceDescription>();
+            //mridToResource = new Dictionary<string, ResourceDescription>();
+            mridToPositiveGidFromServer = new Dictionary<string, long>();
+            mridsFromConcreteModel = new HashSet<string>();
+            negativeGidToMrid = new Dictionary<long, string>();
             importHelper = new ImportHelper();
             report = null;
         }
@@ -92,8 +107,11 @@ namespace Outage.DataImporter.CIMAdapter.Importer
             report = new TransformAndLoadReport();
             concreteModel = cimConcreteModel;
             delta.ClearDeltaOperations();
-            mridToResource.Clear();
-            negativeGidToResource.Clear();
+            //mridToResource.Clear();
+            //negativeGidToResource.Clear();
+            MridToPositiveGidFromServer.Clear();
+            MridsFromConcreteModel.Clear();
+            NegativeGidToMrid.Clear();
 
             if ((concreteModel != null) && (concreteModel.ModelMap != null))
             {
@@ -117,7 +135,7 @@ namespace Outage.DataImporter.CIMAdapter.Importer
         {
             LogManager.Log("Loading elements and creating delta...", LogLevel.Info);
 
-            GetNmsData(gdaQueryProxy, resourcesDesc, ref);
+            PopulateNmsDataFromServer(gdaQueryProxy, resourcesDesc);
             
             //// import all concrete model types (DMSType enum)
             ImportBaseVoltages();
@@ -135,13 +153,17 @@ namespace Outage.DataImporter.CIMAdapter.Importer
             ImportDiscretes();
             ImportAnalogs();
 
+            CorrectNegativeReferences();
+            CreateAndInsertDeleteOperations();
 
             LogManager.Log("Loading elements and creating delta completed.", LogLevel.Info);
         }
 
-        private bool GetNmsData(NetworkModelGDAProxy gdaQueryProxy, ModelResourcesDesc resourcesDesc)
+        private bool PopulateNmsDataFromServer(NetworkModelGDAProxy gdaQueryProxy, ModelResourcesDesc resourcesDesc)
         {
             bool success = false;
+            string message = "Getting nms data from server started.";
+            CommonTrace.WriteTrace(CommonTrace.TraceError, message);
 
             HashSet<ModelCode> requiredEntityTypes = new HashSet<ModelCode>();
 
@@ -165,8 +187,7 @@ namespace Outage.DataImporter.CIMAdapter.Importer
             {
                 int iteratorId = 0;
                 int resourcesLeft = 0;
-                int numberOfResources = 300;
-
+                int numberOfResources = 10000; //TODO connfigurabilno
 
                 try
                 {
@@ -177,135 +198,155 @@ namespace Outage.DataImporter.CIMAdapter.Importer
                     while (resourcesLeft > 0)
                     {
                         List<ResourceDescription> gdaResult = gdaQueryProxy.IteratorNext(numberOfResources, iteratorId);
-                    }
 
-                }
-                catch (Exception)
-                {
-
-                    throw;
-                }
-
-
-                
-
-                int resourceCount = gdaQueryProxy.IteratorResourcesLeft(index);
-
-                foreach (ResourceDescription rd in gdaResult)
-
-
-                    return success;
-        }
-
-        private bool CorrectNmsDelta(NetworkModelGDAProxy gdaQueryProxy, ModelResourcesDesc resourcesDesc)
-        {
-            bool success = false;
-
-            HashSet<ModelCode> requiredEntityTypes = new HashSet<ModelCode>();
-
-            try
-            {
-                foreach (DMSType dmsType in Enum.GetValues(typeof(DMSType)))
-                {
-                    if (dmsType == DMSType.MASK_TYPE)
-                    {
-                        continue;
-                    }
-
-                    ModelCode mc = resourcesDesc.GetModelCodeFromType(dmsType);
-
-                    if (!requiredEntityTypes.Contains(mc))
-                    {
-                        requiredEntityTypes.Add(mc);
-                    }
-                }
-
-                List<ModelCode> mrIdProp = new List<ModelCode>() { ModelCode.IDOBJ_MRID };
-                foreach (ModelCode mc in requiredEntityTypes)
-                {
-                    int index = GdaQueryProxy.GetExtentValues(mc, mrIdProp);
-
-                    //TODO: while, n to be some predifined number...
-                    int resourceCount = GdaQueryProxy.IteratorResourcesLeft(index);
-                    List<ResourceDescription> gdaResult = GdaQueryProxy.IteratorNext(resourceCount, index);
-
-                    foreach (ResourceDescription rd in gdaResult)
-                    {
-                        foreach (Property prop in rd.Properties)
+                        foreach (ResourceDescription rd in gdaResult)
                         {
-                            if (prop.Id != ModelCode.IDOBJ_MRID)
+                            if (rd.Properties[0].Id != ModelCode.IDOBJ_MRID)
                             {
                                 continue;
                             }
 
-                            string mrId = prop.PropertyValue.StringValue;
-                            if (mridToResource.ContainsKey(mrId))
-                            {
-                                long positiveGid = rd.Id;
+                            string mrId = rd.Properties[0].PropertyValue.StringValue;
 
-                                //swap negative gid for positive gid from server (NMS) 
-                                mridToResource[mrId].Id = positiveGid;
+                            if(!MridToPositiveGidFromServer.ContainsKey(mrId))
+                            {
+                                MridToPositiveGidFromServer.Add(mrId, rd.Id);
                             }
-
-                            if (prop.Id == ModelCode.IDOBJ_MRID)
+                            else
                             {
-                                break;
+                                throw new NotImplementedException("Method PopulateNmsDataFromServer() -> MridToPositiveGid.ContainsKey(mrId) == true");
                             }
                         }
+
+                        resourcesLeft = gdaQueryProxy.IteratorResourcesLeft(iteratorId);
                     }
 
-                    GdaQueryProxy.IteratorClose(index);
-                }
+                    gdaQueryProxy.IteratorClose(iteratorId);
 
-                foreach (long negGid in negativeGidToResource.Keys)
+                    message = "Getting nms data from server successfully finished.";
+                    CommonTrace.WriteTrace(CommonTrace.TraceError, message);
+                    success = true;
+                }
+                catch (Exception e)
                 {
-                    long gidAfterCorrection = negativeGidToResource[negGid].Id;
-                    ModelCode mc = resourcesDesc.GetModelCodeFromId(negGid);
-
-                    foreach (Property prop in negativeGidToResource[negGid].Properties)
-                    {
-                        //make report: negative gid mapping after correction
-                        if (prop.Id == ModelCode.IDOBJ_MRID)
-                        {
-                            string mrid = prop.PropertyValue.StringValue;
-
-                            //entities that still have the negative gid will be included in the report
-                            report.Report.Append(mc)
-                                         .Append(" mrid: ").Append(mrid)
-                                         .Append(" ID: ").Append(string.Format("0x{0:X16}", negGid))
-                                         .Append(" after correction is GID: ").AppendLine(string.Format("0x{0:X16}", gidAfterCorrection));
-                        }
-
-                        if (ModelCodeHelper.ExtractEntityIdFromGlobalId(gidAfterCorrection) <= 0)
-                        {
-                            continue; //not using break to allow first "if" to find mrid for report 
-                        }
-
-                        //if new gid is positive
-                        if (prop.Type == PropertyType.Reference)
-                        {
-                            long targetGid = prop.AsLong();
-
-                            if (ModelCodeHelper.ExtractEntityIdFromGlobalId(targetGid) < 0)
-                            {
-                                long positiveGid = negativeGidToResource[targetGid].Id;
-                                prop.SetValue(positiveGid);
-                            }
-                        }
-                    }
+                    message = string.Format("Getting extent values method failed for {0}.\n\t{1}", modelCodeType, e.Message);
+                    CommonTrace.WriteTrace(CommonTrace.TraceError, message);
+                    success = false;
                 }
-
-                log = report.Report.ToString();
-                LogManager.Log(log, LogLevel.Info);
-                return success;
             }
-            catch (Exception ex)
-            {
-                log = string.Format("Correction of delta unsuccessful: {0}", ex.StackTrace);
-                LogManager.Log(log, LogLevel.Error);
-                return false;
-            }
+               
+            return success;
         }
+
+        //private bool CorrectNmsDelta(NetworkModelGDAProxy gdaQueryProxy, ModelResourcesDesc resourcesDesc)
+        //{
+        //    bool success = false;
+
+        //    HashSet<ModelCode> requiredEntityTypes = new HashSet<ModelCode>();
+
+        //    try
+        //    {
+        //        foreach (DMSType dmsType in Enum.GetValues(typeof(DMSType)))
+        //        {
+        //            if (dmsType == DMSType.MASK_TYPE)
+        //            {
+        //                continue;
+        //            }
+
+        //            ModelCode mc = resourcesDesc.GetModelCodeFromType(dmsType);
+
+        //            if (!requiredEntityTypes.Contains(mc))
+        //            {
+        //                requiredEntityTypes.Add(mc);
+        //            }
+        //        }
+
+        //        List<ModelCode> mrIdProp = new List<ModelCode>() { ModelCode.IDOBJ_MRID };
+        //        foreach (ModelCode mc in requiredEntityTypes)
+        //        {
+        //            int index = GdaQueryProxy.GetExtentValues(mc, mrIdProp);
+
+        //            //TODO: while, n to be some predifined number...
+        //            int resourceCount = GdaQueryProxy.IteratorResourcesLeft(index);
+        //            List<ResourceDescription> gdaResult = GdaQueryProxy.IteratorNext(resourceCount, index);
+
+        //            foreach (ResourceDescription rd in gdaResult)
+        //            {
+        //                foreach (Property prop in rd.Properties)
+        //                {
+        //                    if (prop.Id != ModelCode.IDOBJ_MRID)
+        //                    {
+        //                        continue;
+        //                    }
+
+        //                    string mrId = prop.PropertyValue.StringValue;
+        //                    if (mridToResource.ContainsKey(mrId))
+        //                    {
+        //                        long positiveGid = rd.Id;
+
+        //                        //swap negative gid for positive gid from server (NMS) 
+        //                        mridToResource[mrId].Id = positiveGid;
+        //                    }
+
+        //                    if (prop.Id == ModelCode.IDOBJ_MRID)
+        //                    {
+        //                        break;
+        //                    }
+        //                }
+        //            }
+
+        //            GdaQueryProxy.IteratorClose(index);
+        //        }
+
+        //        foreach (long negGid in negativeGidToResource.Keys)
+        //        {
+        //            long gidAfterCorrection = negativeGidToResource[negGid].Id;
+        //            ModelCode mc = resourcesDesc.GetModelCodeFromId(negGid);
+
+        //            foreach (Property prop in negativeGidToResource[negGid].Properties)
+        //            {
+        //                //make report: negative gid mapping after correction
+        //                if (prop.Id == ModelCode.IDOBJ_MRID)
+        //                {
+        //                    string mrid = prop.PropertyValue.StringValue;
+
+        //                    //entities that still have the negative gid will be included in the report
+        //                    report.Report.Append(mc)
+        //                                 .Append(" mrid: ").Append(mrid)
+        //                                 .Append(" ID: ").Append(string.Format("0x{0:X16}", negGid))
+        //                                 .Append(" after correction is GID: ").AppendLine(string.Format("0x{0:X16}", gidAfterCorrection));
+        //                }
+
+        //                if (ModelCodeHelper.ExtractEntityIdFromGlobalId(gidAfterCorrection) <= 0)
+        //                {
+        //                    continue; //not using break to allow first "if" to find mrid for report 
+        //                }
+
+        //                //if new gid is positive
+        //                if (prop.Type == PropertyType.Reference)
+        //                {
+        //                    long targetGid = prop.AsLong();
+
+        //                    if (ModelCodeHelper.ExtractEntityIdFromGlobalId(targetGid) < 0)
+        //                    {
+        //                        long positiveGid = negativeGidToResource[targetGid].Id;
+        //                        prop.SetValue(positiveGid);
+        //                    }
+        //                }
+        //            }
+        //        }
+
+        //        log = report.Report.ToString();
+        //        LogManager.Log(log, LogLevel.Info);
+        //        return success;
+        //    }
+        //    catch (Exception ex)
+        //    {
+        //        log = string.Format("Correction of delta unsuccessful: {0}", ex.StackTrace);
+        //        LogManager.Log(log, LogLevel.Error);
+        //        return false;
+        //    }
+        //}
 
         #region Import
         private void ImportPowerTransformers()
@@ -319,17 +360,8 @@ namespace Outage.DataImporter.CIMAdapter.Importer
                     ResourceDescription rd = CreatePowerTransformerResourceDescription(cimPowerTransformer);
                     if (rd != null)
                     {
-                        delta.AddDeltaOperation(deltaOpType, rd, true);
-
-                        if(!MridToResource.ContainsKey(cimPowerTransformer.MRID))
-                        {
-                            MridToResource.Add(cimPowerTransformer.MRID, rd);
-                        }
-
-                        if (!NegativeGidToResource.ContainsKey(rd.Id))
-                        {
-                            NegativeGidToResource.Add(rd.Id, rd);
-                        }
+                        string mrid = cimPowerTransformer.MRID;
+                        CreateAndInsertDeltaOperation(mrid, rd);
 
                         report.Report.Append("PowerTransformer ID = ").Append(cimPowerTransformer.ID).Append(" SUCCESSFULLY converted to GID = ").AppendLine(string.Format("0x{0:X16}", rd.Id));
                     }
@@ -367,17 +399,8 @@ namespace Outage.DataImporter.CIMAdapter.Importer
                     ResourceDescription rd = CreateTransformerWindingResourceDescription(cimTransformerWinding);
                     if (rd != null)
                     {
-                        delta.AddDeltaOperation(deltaOpType, rd, true);
-
-                        if (!MridToResource.ContainsKey(cimTransformerWinding.MRID))
-                        {
-                            MridToResource.Add(cimTransformerWinding.MRID, rd);
-                        }
-
-                        if (!NegativeGidToResource.ContainsKey(rd.Id))
-                        {
-                            NegativeGidToResource.Add(rd.Id, rd);
-                        }
+                        string mrid = cimTransformerWinding.MRID;
+                        CreateAndInsertDeltaOperation(mrid, rd);
 
                         report.Report.Append("TransformerWinding ID = ").Append(cimTransformerWinding.ID).Append(" SUCCESSFULLY converted to GID = ").AppendLine(string.Format("0x{0:X16}", rd.Id));
                     }
@@ -416,17 +439,8 @@ namespace Outage.DataImporter.CIMAdapter.Importer
                     ResourceDescription rd = CreateBaseVoltageResourceDescription(cimBaseVoltage);
                     if (rd != null)
                     {
-                        delta.AddDeltaOperation(deltaOpType, rd, true);
-
-                        if (!MridToResource.ContainsKey(cimBaseVoltage.MRID))
-                        {
-                            MridToResource.Add(cimBaseVoltage.MRID, rd);
-                        }
-
-                        if (!NegativeGidToResource.ContainsKey(rd.Id))
-                        {
-                            NegativeGidToResource.Add(rd.Id, rd);
-                        }
+                        string mrid = cimBaseVoltage.MRID;
+                        CreateAndInsertDeltaOperation(mrid, rd);
 
                         report.Report.Append("BaseVoltage ID = ").Append(cimBaseVoltage.ID).Append(" SUCCESSFULLY converted to GID = ").AppendLine(string.Format("0x{0:X16}", rd.Id));
                     }
@@ -466,17 +480,8 @@ namespace Outage.DataImporter.CIMAdapter.Importer
                     ResourceDescription rd = CreateEnergySourceResourceDescription(cimEnergySource);
                     if (rd != null)
                     {
-                        delta.AddDeltaOperation(deltaOpType, rd, true);
-
-                        if (!MridToResource.ContainsKey(cimEnergySource.MRID))
-                        {
-                            MridToResource.Add(cimEnergySource.MRID, rd);
-                        }
-
-                        if (!NegativeGidToResource.ContainsKey(rd.Id))
-                        {
-                            NegativeGidToResource.Add(rd.Id, rd);
-                        }
+                        string mrid = cimEnergySource.MRID;
+                        CreateAndInsertDeltaOperation(mrid, rd);
 
                         report.Report.Append("EnergySource ID = ").Append(cimEnergySource.ID).Append(" SUCCESSFULLY converted to GID = ").AppendLine(string.Format("0x{0:X16}", rd.Id));
                     }
@@ -516,17 +521,8 @@ namespace Outage.DataImporter.CIMAdapter.Importer
                     ResourceDescription rd = CreateEnergyConsumerResourceDescription(cimEnergyConsumer);
                     if (rd != null)
                     {
-                        delta.AddDeltaOperation(deltaOpType, rd, true);
-
-                        if (!MridToResource.ContainsKey(cimEnergyConsumer.MRID))
-                        {
-                            MridToResource.Add(cimEnergyConsumer.MRID, rd);
-                        }
-
-                        if (!NegativeGidToResource.ContainsKey(rd.Id))
-                        {
-                            NegativeGidToResource.Add(rd.Id, rd);
-                        }
+                        string mrid = cimEnergyConsumer.MRID;
+                        CreateAndInsertDeltaOperation(mrid, rd);
 
                         report.Report.Append("EnergyConsumer ID = ").Append(cimEnergyConsumer.ID).Append(" SUCCESSFULLY converted to GID = ").AppendLine(string.Format("0x{0:X16}", rd.Id));
                     }
@@ -566,17 +562,8 @@ namespace Outage.DataImporter.CIMAdapter.Importer
                     ResourceDescription rd = CreateFuseResourceDescription(cimFuse);
                     if (rd != null)
                     {
-                        delta.AddDeltaOperation(deltaOpType, rd, true);
-
-                        if (!MridToResource.ContainsKey(cimFuse.MRID))
-                        {
-                            MridToResource.Add(cimFuse.MRID, rd);
-                        }
-
-                        if (!NegativeGidToResource.ContainsKey(rd.Id))
-                        {
-                            NegativeGidToResource.Add(rd.Id, rd);
-                        }
+                        string mrid = cimFuse.MRID;
+                        CreateAndInsertDeltaOperation(mrid, rd);
 
                         report.Report.Append("Fuse ID = ").Append(cimFuse.ID).Append(" SUCCESSFULLY converted to GID = ").AppendLine(string.Format("0x{0:X16}", rd.Id));
                     }
@@ -616,17 +603,8 @@ namespace Outage.DataImporter.CIMAdapter.Importer
                     ResourceDescription rd = CreateDisconnectorResourceDescription(cimDisconnector);
                     if (rd != null)
                     {
-                        delta.AddDeltaOperation(deltaOpType, rd, true);
-
-                        if (!MridToResource.ContainsKey(cimDisconnector.MRID))
-                        {
-                            MridToResource.Add(cimDisconnector.MRID, rd);
-                        }
-
-                        if (!NegativeGidToResource.ContainsKey(rd.Id))
-                        {
-                            NegativeGidToResource.Add(rd.Id, rd);
-                        }
+                        string mrid = cimDisconnector.MRID;
+                        CreateAndInsertDeltaOperation(mrid, rd);
 
                         report.Report.Append("Disconnector ID = ").Append(cimDisconnector.ID).Append(" SUCCESSFULLY converted to GID = ").AppendLine(string.Format("0x{0:X16}", rd.Id));
                     }
@@ -666,17 +644,8 @@ namespace Outage.DataImporter.CIMAdapter.Importer
                     ResourceDescription rd = CreateBreakerResourceDescription(cimBreaker);
                     if (rd != null)
                     {
-                        delta.AddDeltaOperation(deltaOpType, rd, true);
-
-                        if (!MridToResource.ContainsKey(cimBreaker.MRID))
-                        {
-                            MridToResource.Add(cimBreaker.MRID, rd);
-                        }
-
-                        if (!NegativeGidToResource.ContainsKey(rd.Id))
-                        {
-                            NegativeGidToResource.Add(rd.Id, rd);
-                        }
+                        string mrid = cimBreaker.MRID;
+                        CreateAndInsertDeltaOperation(mrid, rd);
 
                         report.Report.Append("Breaker ID = ").Append(cimBreaker.ID).Append(" SUCCESSFULLY converted to GID = ").AppendLine(string.Format("0x{0:X16}", rd.Id));
                     }
@@ -716,17 +685,8 @@ namespace Outage.DataImporter.CIMAdapter.Importer
                     ResourceDescription rd = CreateLoadBreakSwitchResourceDescription(cimLoadBreakSwitch);
                     if (rd != null)
                     {
-                        delta.AddDeltaOperation(deltaOpType, rd, true);
-
-                        if (!MridToResource.ContainsKey(cimLoadBreakSwitch.MRID))
-                        {
-                            MridToResource.Add(cimLoadBreakSwitch.MRID, rd);
-                        }
-
-                        if (!NegativeGidToResource.ContainsKey(rd.Id))
-                        {
-                            NegativeGidToResource.Add(rd.Id, rd);
-                        }
+                        string mrid = cimLoadBreakSwitch.MRID;
+                        CreateAndInsertDeltaOperation(mrid, rd);
 
                         report.Report.Append("LoadBreakSwitch ID = ").Append(cimLoadBreakSwitch.ID).Append(" SUCCESSFULLY converted to GID = ").AppendLine(string.Format("0x{0:X16}", rd.Id));
                     }
@@ -766,17 +726,8 @@ namespace Outage.DataImporter.CIMAdapter.Importer
                     ResourceDescription rd = CreateACLineSegmentResourceDescription(cimACLineSegment);
                     if (rd != null)
                     {
-                        delta.AddDeltaOperation(deltaOpType, rd, true);
-
-                        if (!MridToResource.ContainsKey(cimACLineSegment.MRID))
-                        {
-                            MridToResource.Add(cimACLineSegment.MRID, rd);
-                        }
-
-                        if (!NegativeGidToResource.ContainsKey(rd.Id))
-                        {
-                            NegativeGidToResource.Add(rd.Id, rd);
-                        }
+                        string mrid = cimACLineSegment.MRID;
+                        CreateAndInsertDeltaOperation(mrid, rd);
 
                         report.Report.Append("ACLineSegment ID = ").Append(cimACLineSegment.ID).Append(" SUCCESSFULLY converted to GID = ").AppendLine(string.Format("0x{0:X16}", rd.Id));
                     }
@@ -816,17 +767,8 @@ namespace Outage.DataImporter.CIMAdapter.Importer
                     ResourceDescription rd = CreateConnectivityNodeResourceDescription(cimConnectivityNode);
                     if (rd != null)
                     {
-                        delta.AddDeltaOperation(deltaOpType, rd, true);
-
-                        if (!MridToResource.ContainsKey(cimConnectivityNode.MRID))
-                        {
-                            MridToResource.Add(cimConnectivityNode.MRID, rd);
-                        }
-
-                        if (!NegativeGidToResource.ContainsKey(rd.Id))
-                        {
-                            NegativeGidToResource.Add(rd.Id, rd);
-                        }
+                        string mrid = cimConnectivityNode.MRID;
+                        CreateAndInsertDeltaOperation(mrid, rd);
 
                         report.Report.Append("ConnectivityNode ID = ").Append(cimConnectivityNode.ID).Append(" SUCCESSFULLY converted to GID = ").AppendLine(string.Format("0x{0:X16}", rd.Id));
                     }
@@ -865,18 +807,9 @@ namespace Outage.DataImporter.CIMAdapter.Importer
                     Outage.Terminal cimTerminal = cimTerminalPair.Value as Outage.Terminal;
                     ResourceDescription rd = CreateTerminalResourceDescription(cimTerminal);
                     if (rd != null)
-                    {
-                        delta.AddDeltaOperation(deltaOpType, rd, true);
-
-                        if (!MridToResource.ContainsKey(cimTerminal.MRID))
-                        {
-                            MridToResource.Add(cimTerminal.MRID, rd);
-                        }
-
-                        if (!NegativeGidToResource.ContainsKey(rd.Id))
-                        {
-                            NegativeGidToResource.Add(rd.Id, rd);
-                        }
+                    { 
+                        string mrid = cimTerminal.MRID;
+                        CreateAndInsertDeltaOperation(mrid, rd);
 
                         report.Report.Append("Terminal ID = ").Append(cimTerminal.ID).Append(" SUCCESSFULLY converted to GID = ").AppendLine(string.Format("0x{0:X16}", rd.Id));
                     }
@@ -916,17 +849,8 @@ namespace Outage.DataImporter.CIMAdapter.Importer
                     ResourceDescription rd = CreateDiscreteResourceDescription(cimDiscrete);
                     if (rd != null)
                     {
-                        delta.AddDeltaOperation(deltaOpType, rd, true);
-
-                        if (!MridToResource.ContainsKey(cimDiscrete.MRID))
-                        {
-                            MridToResource.Add(cimDiscrete.MRID, rd);
-                        }
-
-                        if (!NegativeGidToResource.ContainsKey(rd.Id))
-                        {
-                            NegativeGidToResource.Add(rd.Id, rd);
-                        }
+                        string mrid = cimDiscrete.MRID;
+                        CreateAndInsertDeltaOperation(mrid, rd);
 
                         report.Report.Append("Discret ID = ").Append(cimDiscrete.ID).Append(" SUCCESSFULLY converted to GID = ").AppendLine(string.Format("0x{0:X16}", rd.Id));
                     }
@@ -966,17 +890,8 @@ namespace Outage.DataImporter.CIMAdapter.Importer
                     ResourceDescription rd = CreateAnalogResourceDescription(cimAnalog);
                     if (rd != null)
                     {
-                        delta.AddDeltaOperation(deltaOpType, rd, true);
-
-                        if (!MridToResource.ContainsKey(cimAnalog.MRID))
-                        {
-                            MridToResource.Add(cimAnalog.MRID, rd);
-                        }
-
-                        if (!NegativeGidToResource.ContainsKey(rd.Id))
-                        {
-                            NegativeGidToResource.Add(rd.Id, rd);
-                        }
+                        string mrid = cimAnalog.MRID;
+                        CreateAndInsertDeltaOperation(mrid, rd);
 
                         report.Report.Append("Analog ID = ").Append(cimAnalog.ID).Append(" SUCCESSFULLY converted to GID = ").AppendLine(string.Format("0x{0:X16}", rd.Id));
                     }
@@ -1003,8 +918,108 @@ namespace Outage.DataImporter.CIMAdapter.Importer
 
             return rd;
         }
-
-
         #endregion
+
+        private void CreateAndInsertDeltaOperation(string mrid, ResourceDescription rd)
+        {
+            long negGid = 0;
+            DeltaOpType deltaOp = DeltaOpType.Insert;
+            DMSType type = (DMSType)ModelCodeHelper.ExtractTypeFromGlobalId(rd.Id);
+
+            if (ModelCodeHelper.ExtractEntityIdFromGlobalId(rd.Id) < 0 && !NegativeGidToMrid.ContainsKey(rd.Id))
+            {
+                negGid = rd.Id;
+                NegativeGidToMrid.Add(rd.Id, mrid);
+            }
+
+            if (MridToPositiveGidFromServer.ContainsKey(mrid))
+            {
+                rd.Id = MridToPositiveGidFromServer[mrid];
+                deltaOp = DeltaOpType.Update;
+            }
+
+            delta.AddDeltaOperation(deltaOp, rd, true);
+
+            if (!MridsFromConcreteModel.Contains(mrid))
+            {
+                MridsFromConcreteModel.Add(mrid);
+            }
+
+            report.Report.Append("Operation: ").Append(deltaOp).Append(" ").Append(type)
+                         .Append(" mrid: ").Append(mrid)
+                         .Append(" ID: ").Append(string.Format("0x{0:X16}", negGid))
+                         .Append(" after correction is GID: ").AppendLine(string.Format("0x{0:X16}", rd.Id));
+        }
+
+        private void CorrectNegativeReferences()
+        {
+            foreach (ResourceDescription rd in delta.InsertOperations)
+            { 
+                foreach(Property prop in rd.Properties)
+                {
+                    if(prop.Type == PropertyType.Reference)
+                    {
+                        long targetGid = prop.AsLong();
+
+                        if (ModelCodeHelper.ExtractEntityIdFromGlobalId(targetGid) < 0)
+                        {
+                            if(NegativeGidToMrid.ContainsKey(targetGid))
+                            {
+                                string mrid = NegativeGidToMrid[targetGid];
+                                if (MridToPositiveGidFromServer.ContainsKey(mrid))
+                                {
+                                    long positiveGid = MridToPositiveGidFromServer[mrid];
+                                    prop.SetValue(positiveGid);
+                                }
+                            }
+                        }
+                    }
+                }
+            }
+
+            foreach (ResourceDescription rd in delta.UpdateOperations)
+            {
+                foreach (Property prop in rd.Properties)
+                {
+                    if (prop.Type == PropertyType.Reference)
+                    {
+                        long targetGid = prop.AsLong();
+
+                        if (ModelCodeHelper.ExtractEntityIdFromGlobalId(targetGid) < 0)
+                        {
+                            if (NegativeGidToMrid.ContainsKey(targetGid))
+                            {
+                                string mrid = NegativeGidToMrid[targetGid];
+                                if (MridToPositiveGidFromServer.ContainsKey(mrid))
+                                {
+                                    long positiveGid = MridToPositiveGidFromServer[mrid];
+                                    prop.SetValue(positiveGid);
+                                }
+                            }
+                        }
+                    }
+                }
+            }
+        }
+
+        private void CreateAndInsertDeleteOperations()
+        {
+            foreach(string mrid in MridToPositiveGidFromServer.Keys)
+            {
+                if(!MridsFromConcreteModel.Contains(mrid))
+                {
+                    long serverGid = MridToPositiveGidFromServer[mrid];
+                    ResourceDescription rd = new ResourceDescription(serverGid);
+                    DMSType type = (DMSType)ModelCodeHelper.ExtractTypeFromGlobalId(rd.Id);
+                    DeltaOpType deltaOp = DeltaOpType.Delete;
+
+                    delta.AddDeltaOperation(deltaOp, rd, true);
+
+                    report.Report.Append("Operation: ").Append(deltaOp).Append(" ").Append(type)
+                                 .Append(" mrid: ").Append(mrid)
+                                 .Append(" ID: ").AppendLine(string.Format("0x{0:X16}", serverGid));
+                }
+            }
+        }
     }
 }
