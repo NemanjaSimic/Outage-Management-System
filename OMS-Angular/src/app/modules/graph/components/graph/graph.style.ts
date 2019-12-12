@@ -17,6 +17,14 @@ export const style = cytoscape.stylesheet()
         'shape': 'rectangle',
         'background-color': 'red'
     })
+    .selector('node[type = "warning"]')
+    .style({
+        'shape': 'rectangle',
+        'background-color': '#2b2a2a',
+        'background-image': 'assets/img/electric-warning.png',
+        'height': 20,
+        'width': 20
+    })
     .selector('edge')
     .style({
         'line-color': 'data(color)',
