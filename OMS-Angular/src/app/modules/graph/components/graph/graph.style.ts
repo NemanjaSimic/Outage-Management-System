@@ -23,13 +23,15 @@ export const style = cytoscape.stylesheet()
         'background-color': '#2b2935',
         'background-fit': 'cover',
         'background-image': 'assets/img/warning.png',
-        'height': 20,
-        'width': 20,
+        'height': '20px',
+        'width': '20px',
     })
     .selector('edge')
     .style({
         'line-color': 'data(color)',
+        'width': '2px',
         'curve-style': 'taxi',
-        'taxi-direction': 'downward',
-        'taxi-turn-min-distance': '5px'
+        'taxi-direction': 'vertical',
+        'taxi-turn': '15px',
+        'taxi-turn-min-distance': '10px'
     })

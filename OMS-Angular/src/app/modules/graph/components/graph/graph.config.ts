@@ -6,7 +6,7 @@ const cyConfig: Object = {
   style: style,
   wheelSensitivity: 0.1,
   minZoom: 1,
-  maxZoom: 4
+  maxZoom: 3
 };
 
 export default cyConfig;

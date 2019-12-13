@@ -1,12 +1,12 @@
 import tippy from 'tippy.js';
 
 const graphTooltipBody: string =
-`<p>ID: [[id]]</p>
+  `<p>ID: [[id]]</p>
 <p>State: [[state]]</p>`;
 
 export const addGraphTooltip = (cy, node) => {
   let ref = node.popperRef();
-  
+
   node.tooltip = tippy(ref, {
     content: () => {
       // node information - mozemo preko stringa da dodamo u div
@@ -23,10 +23,10 @@ export const addGraphTooltip = (cy, node) => {
       });
 
       div.appendChild(button);
-      
+
       return div;
     },
-    animation: 'perspective',
+    animation: 'scale',
     trigger: 'manual',
     placement: 'right',
     arrow: true,
