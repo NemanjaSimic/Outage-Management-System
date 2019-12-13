@@ -317,6 +317,7 @@ namespace Outage.NetworkModelService
 
             //shallow copy 
             incomingNetworkDataModel = new Dictionary<DMSType, Container>(NetworkDataModel);
+            LoggerWrapper.Instance.LogDebug("Incoming network data model initialized with shallow copy of current network data model.");
 
             try
             {
@@ -357,10 +358,12 @@ namespace Outage.NetworkModelService
                 if(confirmDelta)
                 {
                     networkDataModel = incomingNetworkDataModel;
+                    LoggerWrapper.Instance.LogDebug("Incoming changes have been confirmed and from now represent current network data model.");
                 }
                 else
                 {
                     incomingNetworkDataModel = null;
+                    LoggerWrapper.Instance.LogDebug("Incoming changes have been rejected.");
                 }
             }
             catch (Exception ex)
@@ -405,13 +408,10 @@ namespace Outage.NetworkModelService
             }
 
             long globalId = rd.Id;
-<<<<<<< HEAD
-            CommonTrace.WriteTrace(CommonTrace.TraceInfo, "Inserting entity with GID ({0:x16}).", globalId);
-=======
+
 
             //CommonTrace.WriteTrace(CommonTrace.TraceInfo, "Inserting entity with GID ({0:x16}).", globalId);
             LoggerWrapper.Instance.LogInfo($"Inserting entity with GID ({globalId:x16})");
->>>>>>> master
 
             // check if mapping for specified global id already exists			
             if (this.EntityExistsInIncomingData(globalId))
@@ -444,6 +444,7 @@ namespace Outage.NetworkModelService
                         {
                             incomingContainer = currentContainer.Clone();
                             incomingNetworkDataModel[type] = incomingContainer;
+                            LoggerWrapper.Instance.LogDebug($"Cotainer [{type}] in incoming data model has become shallow copy of the same type container from current data model.");
                         }
                     }
                 }
@@ -452,6 +453,8 @@ namespace Outage.NetworkModelService
                 {
                     incomingContainer = new Container();
                     incomingNetworkDataModel.Add(type, incomingContainer);
+                    LoggerWrapper.Instance.LogDebug($"Container [{type}] has been created and added to incoming data model.");
+
                 }
 
                 // create entity and add it to container
@@ -497,6 +500,7 @@ namespace Outage.NetworkModelService
                                     {
                                         incomingTargetContainer = currentTargetContainer.Clone();
                                         incomingNetworkDataModel[targetType] = incomingTargetContainer;
+                                        LoggerWrapper.Instance.LogDebug($"Container [{targetType}] in incoming data model has become shallow copy of the same type container from current data model.");
                                     }
 
                                     IdentifiedObject currentTargetEntity = currentTargetContainer.Entities[targetGlobalId];
@@ -505,6 +509,7 @@ namespace Outage.NetworkModelService
                                     {
                                         incomingTargetEntity = currentTargetEntity.Clone();
                                         incomingTargetContainer.Entities[targetGlobalId] = incomingTargetEntity;
+                                        LoggerWrapper.Instance.LogDebug($"Entity [0x{targetGlobalId:x16}] in incoming data model has become shallow copy of the same entity from current data model.");
                                     }
                                 }
 
@@ -548,13 +553,10 @@ namespace Outage.NetworkModelService
             try
             {
                 long globalId = rd.Id;
-<<<<<<< HEAD
-                CommonTrace.WriteTrace(CommonTrace.TraceVerbose, "Updating entity with GID ({0:x16}).", globalId);
-=======
+
 
                 //CommonTrace.WriteTrace(CommonTrace.TraceVerbose, "Updating entity with GID ({0:x16}).", globalId);
                 LoggerWrapper.Instance.LogInfo($"Updating entity with GID ({globalId:x16}).");
->>>>>>> master
 
                 if (!this.EntityExistsInIncomingData(globalId))
                 {
@@ -580,6 +582,7 @@ namespace Outage.NetworkModelService
                     {
                         incomingContainer = currentContainer.Clone();
                         incomingNetworkDataModel[type] = incomingContainer;
+                        LoggerWrapper.Instance.LogDebug($"Container [{type}] in incoming data model has become shallow copy of the same type container from current data model.");
                     }
 
                     if (currentContainer.Entities.ContainsKey(globalId))
@@ -590,6 +593,7 @@ namespace Outage.NetworkModelService
                         {
                             incomingEntity = currentEntity.Clone();
                             incomingContainer.Entities[globalId] = incomingEntity;
+                            LoggerWrapper.Instance.LogDebug($"Entity [0x{globalId:x16}] in incoming data model has become shallow copy of the same entity from current data model.");
                         }
                     }
                 }
@@ -625,6 +629,7 @@ namespace Outage.NetworkModelService
                                 {
                                     incomingOldTargetContainer = currentOldTargetContainer.Clone();
                                     incomingNetworkDataModel[oldTargetType] = incomingOldTargetContainer;
+                                    LoggerWrapper.Instance.LogDebug($"Container [{oldTargetType}] in incoming data model has become shallow copy of the same type container from current data model.");
                                 }
 
                                 IdentifiedObject currentOldTargetEntity = currentOldTargetContainer.Entities[oldTargetGlobalId];
@@ -633,6 +638,7 @@ namespace Outage.NetworkModelService
                                 {
                                     incomingOldTargetEntity = currentOldTargetEntity.Clone();
                                     incomingOldTargetContainer.Entities[oldTargetGlobalId] = incomingOldTargetEntity;
+                                    LoggerWrapper.Instance.LogDebug($"Entity [0x{oldTargetGlobalId:x16}] in incoming data model has become shallow copy of the same entity from current data model.");
                                 }
                             }
 
@@ -666,6 +672,7 @@ namespace Outage.NetworkModelService
                                 {
                                     incomingTargetContainer = currentTargetContainer.Clone();
                                     incomingNetworkDataModel[targetType] = incomingTargetContainer;
+                                    LoggerWrapper.Instance.LogDebug($"Container [{targetType}] in incoming data model has become shallow copy of the same type container from current data model.");
                                 }
 
                                 IdentifiedObject currentTargetEntity = currentTargetContainer.Entities[targetGlobalId];
@@ -674,6 +681,7 @@ namespace Outage.NetworkModelService
                                 {
                                     incomingTargetEntity = currentTargetEntity.Clone();
                                     incomingTargetContainer.Entities[targetGlobalId] = incomingTargetEntity;
+                                    LoggerWrapper.Instance.LogDebug($"Entity [0x{targetGlobalId:x16}] in incoming data model has become shallow copy of the same entity from current data model.");
                                 }
                             }
 
@@ -718,14 +726,11 @@ namespace Outage.NetworkModelService
             try
             {
                 long globalId = rd.Id;
-<<<<<<< HEAD
-                CommonTrace.WriteTrace(CommonTrace.TraceVerbose, "Deleting entity with GID ({0:x16}).", globalId);
-=======
 
                 //CommonTrace.WriteTrace(CommonTrace.TraceVerbose, "Deleting entity with GID ({0:x16}).", globalId);
                 LoggerWrapper.Instance.LogInfo($"Deleting entity with GID ({globalId:x16})");
 
->>>>>>> master
+
 
                 // check if entity exists
                 if (!this.EntityExistsInIncomingData(globalId))
@@ -752,6 +757,7 @@ namespace Outage.NetworkModelService
                     {
                         incomingContainer = currentContainer.Clone();
                         incomingNetworkDataModel[type] = incomingContainer;
+                        LoggerWrapper.Instance.LogDebug($"Container [{type}] in incoming data model has become shallow copy of the same type container from current data model.");
                     }
 
                     if (currentContainer.Entities.ContainsKey(globalId))
@@ -762,6 +768,7 @@ namespace Outage.NetworkModelService
                         {
                             incomingEntity = currentEntity.Clone();
                             incomingContainer.Entities[globalId] = incomingEntity;
+                            LoggerWrapper.Instance.LogDebug($"Entity [0x{globalId:x16}] in incoming data model has become shallow copy of the same entity from current data model.");
                         }
                     }
                 }
@@ -829,6 +836,7 @@ namespace Outage.NetworkModelService
                                 {
                                     incomingTargetContainer = currentTargetContainer.Clone();
                                     incomingNetworkDataModel[targetType] = incomingTargetContainer;
+                                    LoggerWrapper.Instance.LogDebug($"Container [{targetType}] in incoming data model has become shallow copy of the same type container from current data model.");
                                 }
 
                                 IdentifiedObject currentTargetEntity = currentTargetContainer.Entities[targetGlobalId];
@@ -837,6 +845,7 @@ namespace Outage.NetworkModelService
                                 {
                                     incomingTargetEntity = currentTargetEntity.Clone();
                                     incomingTargetContainer.Entities[targetGlobalId] = incomingTargetEntity;
+                                    LoggerWrapper.Instance.LogDebug($"Entity [0x{targetGlobalId:x16}] in incoming data model has become shallow copy of the same entity from current data model.");
                                 }
                             }
 
@@ -951,8 +960,6 @@ namespace Outage.NetworkModelService
 
         private void Initialize()
         {
-
-
             long networkModelVersion = 0, deltaVersion = 0;
             var versionsCollection = db.GetCollection<ModelVersionDocument>("versions");
             var networkDataModelCollection = db.GetCollection<NetworkDataModelDocument>("networkModels");

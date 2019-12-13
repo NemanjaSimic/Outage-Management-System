@@ -13,5 +13,6 @@ namespace NMSTestClientUI
     /// </summary>
     public partial class App : Application
     {
+        
     }
 }

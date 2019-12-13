@@ -91,6 +91,7 @@ namespace Outage.DataModel
         #region IClonable
         public override IdentifiedObject Clone()
         {
+            //TODO log for clone
             return new ACLineSegment(this);
         }
         #endregion

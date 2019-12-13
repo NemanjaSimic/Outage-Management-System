@@ -157,15 +157,12 @@ namespace Outage.DataImporter.CIMAdapter.Importer
             ImportDiscretes();
             ImportAnalogs();
 
-<<<<<<< HEAD
+
             CorrectNegativeReferences();
             CreateAndInsertDeleteOperations();
-
-            LogManager.Log("Loading elements and creating delta completed.", LogLevel.Info);
-=======
             //LogManager.Log("Loading elements and creating delta completed.", LogLevel.Info);
             LoggerWrapper.Instance.LogInfo("Loading elements and creating delta completed.");
->>>>>>> master
+
         }
 
         private bool PopulateNmsDataFromServer(NetworkModelGDAProxy gdaQueryProxy, ModelResourcesDesc resourcesDesc)
