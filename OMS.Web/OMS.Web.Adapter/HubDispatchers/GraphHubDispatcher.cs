@@ -2,20 +2,24 @@
 using OMS.Web.UI.Models;
 using System;
 using System.Collections.Generic;
+using System.Configuration;
 
 namespace OMS.Web.Adapter.HubDispatchers
 {
     public class GraphHubDispatcher
     {
         // API hub config - TODO: change to read from config file
-        private const string _url = "http://localhost:44351/";
-        private const string _hubName = "graphhub";
+        private readonly string _url;
+        private readonly string _hubName;
 
         private readonly HubConnection _connection;
         private readonly IHubProxy _proxy;
 
         public GraphHubDispatcher()
         {
+            _url = ConfigurationManager.AppSettings.Get("hubUrl");
+            _hubName = ConfigurationManager.AppSettings.Get("hubName");
+
             _connection = new HubConnection(_url);
             _proxy = _connection.CreateHubProxy(_hubName);
         }
@@ -31,11 +35,6 @@ namespace OMS.Web.Adapter.HubDispatchers
                 else
                 {
                     Console.WriteLine($"Connected to {_hubName}. ");
-
-                    _proxy.On<string>("hello", param =>
-                    {
-                        Console.WriteLine(param);
-                    });
                 }
             }).Wait();
         }
