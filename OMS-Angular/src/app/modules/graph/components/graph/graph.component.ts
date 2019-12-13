@@ -1,20 +1,22 @@
 import { Component, OnInit, NgZone, OnDestroy } from '@angular/core';
-import { GraphService } from '@services/notification/graph.service';
 import { Subscription } from 'rxjs';
+import { GraphService } from '@services/notification/graph.service';
 import { OmsGraph } from '@shared/models/oms-graph.model';
 
-import { style } from './graph.style';
-
-import * as cytoscape from 'cytoscape';
-import * as graphMock from './graph-mock.json';
+import cyConfig from './graph.config';
 import { addGraphTooltip } from '@shared/utils/tooltip';
 import { drawWarning } from '@shared/utils/warning';
+
+import * as cytoscape from 'cytoscape';
+import * as mapper from '@shared/utils/mapper';
+import * as graphMock from './graph-mock.json';
 
 // cytoscape plugins
 import dagre from 'cytoscape-dagre';
 import popper from 'cytoscape-popper';
 cytoscape.use(dagre);
 cytoscape.use(popper);
+
 
 @Component({
   selector: 'app-graph',
@@ -26,14 +28,6 @@ export class GraphComponent implements OnInit, OnDestroy {
   public updateSubscription: Subscription;
 
   private cy: any;
-  private cyConfig: Object = {
-    layout: { name: 'dagre', rankDir: 'TB' },
-    autoungrabify: true,
-    style: style,
-    wheelSensitivity: 0.1,
-    minZoom: 1,
-    maxZoom: 4
-  };
 
   private graphData: any = {
     nodes: [],
@@ -88,7 +82,7 @@ export class GraphComponent implements OnInit, OnDestroy {
 
   public drawGraph(): void {
     this.cy = cytoscape({
-      ...this.cyConfig,
+      ...cyConfig,
       container: document.getElementById('graph'),
       elements: this.graphData
     });
@@ -115,29 +109,8 @@ export class GraphComponent implements OnInit, OnDestroy {
 
   public onNotification(data: OmsGraph): void {
     this.ngZone.run(() => {
-      console.log(this.graphData.nodes);
-
-      this.graphData.nodes = data.Nodes.map(node => {
-        return {
-          data: {
-            id: node.Id,
-            label: node.Name,
-            state: node.IsActive ? "active" : "inactive"
-          }
-        }
-      });
-
-      this.graphData.edges = data.Relations.map(relation => {
-        return {
-          data: {
-            source: relation.SourceNodeId,
-            target: relation.TargetNodeId,
-            color: relation.IsActive ? "blue" : "red"
-          }
-        }
-      });
-
-      console.log(this.graphData.nodes);
+      this.graphData.nodes = data.Nodes.map(mapper.mapNode);
+      this.graphData.edges = data.Relations.map(mapper.mapRelation);
       this.drawGraph();
     });
   }

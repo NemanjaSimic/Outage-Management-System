@@ -6,7 +6,7 @@ const graphTooltipBody: string =
 
 export const addGraphTooltip = (cy, node) => {
   let ref = node.popperRef();
-
+  
   node.tooltip = tippy(ref, {
     content: () => {
       // node information - mozemo preko stringa da dodamo u div
