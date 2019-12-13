@@ -50,15 +50,13 @@ export class GraphComponent implements OnInit, OnDestroy {
 
   ngOnInit() {
     // web api
-    // this.startConnection();
+    this.startConnection();
 
     // local testing
     this.graphData.nodes = graphMock.nodes;
     this.graphData.edges = graphMock.edges;
 
-    this.drawGraph();
-    this.addTooltips();
-    this.drawWarnings();
+    this.drawGraph();    
   }
 
   ngOnDestroy() {
@@ -93,7 +91,10 @@ export class GraphComponent implements OnInit, OnDestroy {
       ...this.cyConfig,
       container: document.getElementById('graph'),
       elements: this.graphData
-    })
+    });
+
+    this.addTooltips();
+    this.drawWarnings();
   };
 
   public addTooltips(): void {

@@ -46,7 +46,6 @@ namespace OMS.Web.Adapter.HubDispatchers
             _proxy.Invoke<string>("NotifyGraphUpdate", nodes, relations).Wait();
         }
 
-
         public void Stop() => _connection.Stop();
     }
 }
