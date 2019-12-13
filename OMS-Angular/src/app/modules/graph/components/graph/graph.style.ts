@@ -20,7 +20,7 @@ export const style = cytoscape.stylesheet()
     .selector('node[type = "warning"]')
     .style({
         'shape': 'rectangle',
-        'background-color': '#2b2a2a',
+        'background-color': '#2b2935',
         'background-fit': 'cover',
         'background-image': 'assets/img/warning.png',
         'height': 20,

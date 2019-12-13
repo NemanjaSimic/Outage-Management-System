@@ -1,6 +1,6 @@
 {
   "name": "oms-angular",
-  "version": "0.0.0",
+  "version": "1.0.0",
   "scripts": {
     "ng": "ng",
     "start": "ng serve",
@@ -23,6 +23,7 @@
     "cytoscape": "^3.12.1",
     "cytoscape-dagre": "^2.2.2",
     "cytoscape-popper": "^1.0.4",
+    "gh-pages": "^2.1.1",
     "jquery": "^3.4.1",
     "rxjs": "~6.4.0",
     "signalr": "^2.4.1",
