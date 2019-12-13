@@ -103,7 +103,8 @@ namespace Outage.DataImporter.CIMAdapter.Importer
 
         public TransformAndLoadReport CreateNMSDelta(ConcreteModel cimConcreteModel, NetworkModelGDAProxy gdaQueryProxy, ModelResourcesDesc resourcesDesc)
         {
-            LogManager.Log("Importing Outage Elements...", LogLevel.Info); //TODO: ovo menjati sa nasim logom
+            //LogManager.Log("Importing Outage Elements...", LogLevel.Info); //TODO: ovo menjati sa nasim logom
+            LoggerWrapper.Instance.LogInfo("Importing Outage Elements...");
             report = new TransformAndLoadReport();
             concreteModel = cimConcreteModel;
             delta.ClearDeltaOperations();
@@ -122,18 +123,21 @@ namespace Outage.DataImporter.CIMAdapter.Importer
                 catch (Exception ex)
                 {
                     string message = $"{DateTime.Now} - ERROR in data import - {ex.Message}";
-                    LogManager.Log(message);
+                    //LogManager.Log(message);
+                    LoggerWrapper.Instance.LogError(message, ex);
                     report.Report.AppendLine(ex.Message);
                     report.Success = false;
                 }
             }
-            LogManager.Log("Importing Outage Elements - END", LogLevel.Info);
+            //LogManager.Log("Importing Outage Elements - END", LogLevel.Info);
+            LoggerWrapper.Instance.LogInfo("Importing Outage Elements - END");
             return report;
         }
 
         private void ConvertModelAndPopulateDelta(NetworkModelGDAProxy gdaQueryProxy, ModelResourcesDesc resourcesDesc)
         {
-            LogManager.Log("Loading elements and creating delta...", LogLevel.Info);
+            //LogManager.Log("Loading elements and creating delta...", LogLevel.Info);
+            LoggerWrapper.Instance.LogInfo("Loading elements and creating delta...");
 
             PopulateNmsDataFromServer(gdaQueryProxy, resourcesDesc);
             
@@ -153,10 +157,15 @@ namespace Outage.DataImporter.CIMAdapter.Importer
             ImportDiscretes();
             ImportAnalogs();
 
+<<<<<<< HEAD
             CorrectNegativeReferences();
             CreateAndInsertDeleteOperations();
 
             LogManager.Log("Loading elements and creating delta completed.", LogLevel.Info);
+=======
+            //LogManager.Log("Loading elements and creating delta completed.", LogLevel.Info);
+            LoggerWrapper.Instance.LogInfo("Loading elements and creating delta completed.");
+>>>>>>> master
         }
 
         private bool PopulateNmsDataFromServer(NetworkModelGDAProxy gdaQueryProxy, ModelResourcesDesc resourcesDesc)

@@ -1,5 +1,7 @@
-﻿using System;
+﻿using Outage.Common;
+using System;
 using System.Windows.Forms;
+
 
 namespace Outage.DataImporter.ModelLabsApp
 {
@@ -8,6 +10,7 @@ namespace Outage.DataImporter.ModelLabsApp
 		/// <summary>
 		/// The main entry point for the application.
 		/// </summary>
+        
 		[STAThread]
 		static void Main()
 		{
@@ -20,6 +23,7 @@ namespace Outage.DataImporter.ModelLabsApp
 			catch (Exception e)
 			{
 				MessageBox.Show(string.Format("Application is going down!\n  {0}", e.Message), "Error", MessageBoxButtons.OK, MessageBoxIcon.Error);
+                LoggerWrapper.Instance.LogError($"Application is going down!\n  {e.Message}");
 			}
 			finally
 			{

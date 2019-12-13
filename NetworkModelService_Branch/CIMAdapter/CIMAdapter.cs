@@ -134,7 +134,8 @@ namespace Outage.DataImporter.CIMAdapter
 
             try
             {
-                LogManager.Log(string.Format("Importing {0} data...", extractType), LogLevel.Info);
+                //LogManager.Log(string.Format("Importing {0} data...", extractType), LogLevel.Info);
+                LoggerWrapper.Instance.LogInfo($"Importing {extractType} data...");
 
                 switch (extractType)
                 {
@@ -158,7 +159,8 @@ namespace Outage.DataImporter.CIMAdapter
                         }
                     default:
                         {
-                            LogManager.Log(string.Format("Import of {0} data is NOT SUPPORTED.", extractType), LogLevel.Warning);
+                            //LogManager.Log(string.Format("Import of {0} data is NOT SUPPORTED.", extractType), LogLevel.Warning);
+                            LoggerWrapper.Instance.LogWarn($"Import of {extractType} data is NOT SUPPORTED.");
                             break;
                         }
                 }
@@ -167,7 +169,8 @@ namespace Outage.DataImporter.CIMAdapter
             }
             catch (Exception ex)
             {
-                LogManager.Log(string.Format("Import unsuccessful: {0}", ex.StackTrace), LogLevel.Error);
+                //LogManager.Log(string.Format("Import unsuccessful: {0}", ex.StackTrace), LogLevel.Error);
+                LoggerWrapper.Instance.LogError("Import unsuccessful.", ex);
                 return false;
             }
         }

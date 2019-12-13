@@ -4,7 +4,7 @@ using System.Linq;
 using System.Text;
 using System.Threading.Tasks;
 
-namespace Outage.NetworkModelService
+namespace Outage.DBModel.NetworkModelService
 {
     public class ModelVersionDocument
     {

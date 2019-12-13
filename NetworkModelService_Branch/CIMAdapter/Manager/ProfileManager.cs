@@ -1,4 +1,5 @@
-﻿using System;
+﻿using Outage.Common;
+using System;
 using System.Collections.Generic;
 using System.Linq;
 using System.Reflection;
@@ -51,6 +52,8 @@ namespace Outage.DataImporter.CIMAdapter.Manager
             {
                 assembly = null;
                 //LogManager.Log(string.Format("Error during Assembly load. Profile: {0} ; Message: {1}", profile, e.Message), LogLevel.Error);
+                LoggerWrapper.Instance.LogError($"Error during Assembly load. Profile: {profile} ; Message: {e.Message}", e);
+                
                 return false;
             }
             return true;
@@ -66,6 +69,7 @@ namespace Outage.DataImporter.CIMAdapter.Manager
             {
                 assembly = null;
                 //LogManager.Log(string.Format("Error during Assembly load. Path: {0} ; Message: {1}", path, e.Message), LogLevel.Error);
+                LoggerWrapper.Instance.LogError($"Error during Assembly load. Path: {path} ; Message: {e.Message}");
                 return false;
             }
             return true;
