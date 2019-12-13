@@ -17,6 +17,7 @@ namespace Outage.NetworkModelServiceHost
                 CIMAdapterClass cim = new CIMAdapterClass();
                 
                 string message = "Starting Network Model Service...";
+                LoggerWrapper.Instance.LogInfo(message);
                 CommonTrace.WriteTrace(CommonTrace.TraceInfo, message);
                 Console.WriteLine("\n{0}\n", message);
 
@@ -38,6 +39,7 @@ namespace Outage.NetworkModelServiceHost
                 CommonTrace.WriteTrace(CommonTrace.TraceError, ex.Message);
                 CommonTrace.WriteTrace(CommonTrace.TraceError, "NetworkModelService failed.");
                 CommonTrace.WriteTrace(CommonTrace.TraceError, ex.StackTrace);
+                LoggerWrapper.Instance.LogError($"NetworkModelService failed.{Environment.NewLine}Message: {ex.Message} ", ex)
                 Console.ReadLine();
             }
         }

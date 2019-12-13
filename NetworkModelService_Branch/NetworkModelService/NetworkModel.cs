@@ -5,6 +5,7 @@ using MongoDB.Driver;
 using Outage.Common;
 using Outage.Common.GDA;
 using Outage.DataModel;
+using Outage.DBModel.NetworkModelService;
 using Outage.NetworkModelService.GDA;
 using System;
 using System.Collections.Generic;
@@ -75,7 +76,8 @@ namespace Outage.NetworkModelService
             }
             catch (Exception e)
             {
-                CommonTrace.WriteTrace(CommonTrace.TraceError, e.Message);
+                LoggerWrapper.Instance.LogError("Error on database Init.", e);
+                //CommonTrace.WriteTrace(CommonTrace.TraceError, e.Message);
             }
             Initialize();
         }
@@ -162,7 +164,8 @@ namespace Outage.NetworkModelService
         /// <returns>Resource description of the specified entity</returns>
         public ResourceDescription GetValues(long globalId, List<ModelCode> properties)
         {
-            CommonTrace.WriteTrace(CommonTrace.TraceVerbose, String.Format("Getting values for GID = 0x{0:x16}.", globalId));
+            LoggerWrapper.Instance.LogInfo($"Getting values for GID = 0x{globalId:x16}.");
+            //CommonTrace.WriteTrace(CommonTrace.TraceVerbose, String.Format("Getting values for GID = 0x{0:x16}.", globalId));
 
             try
             {
@@ -179,8 +182,8 @@ namespace Outage.NetworkModelService
                     io.GetProperty(property);
                     rd.AddProperty(property);
                 }
-
-                CommonTrace.WriteTrace(CommonTrace.TraceVerbose, String.Format("Getting values for GID = 0x{0:x16} succedded.", globalId));
+                LoggerWrapper.Instance.LogInfo("Getting values for GID = 0x{globalId:x16} succedded.");
+                //CommonTrace.WriteTrace(CommonTrace.TraceVerbose, String.Format("Getting values for GID = 0x{0:x16} succedded.", globalId));
 
                 return rd;
             }
@@ -217,7 +220,8 @@ namespace Outage.NetworkModelService
 
                 ResourceIterator ri = new ResourceIterator(globalIds, class2PropertyIDs);
 
-                CommonTrace.WriteTrace(CommonTrace.TraceVerbose, "Getting extent values for entity type = {0} succedded.", entityType);
+                LoggerWrapper.Instance.LogInfo($"Getting extent values for entity type = {entityType} succedded.");
+                //CommonTrace.WriteTrace(CommonTrace.TraceVerbose, "Getting extent values for entity type = {0} succedded.", entityType);
 
                 return ri;
             }
@@ -239,7 +243,8 @@ namespace Outage.NetworkModelService
         /// <returns>Resource iterator for the requested entities</returns>
         public ResourceIterator GetRelatedValues(long source, List<ModelCode> properties, Association association)
         {
-            CommonTrace.WriteTrace(CommonTrace.TraceVerbose, String.Format("Getting related values for source = 0x{0:x16}.", source));
+            LoggerWrapper.Instance.LogInfo($"Getting related values for source = 0x{source:x16}.");
+            //CommonTrace.WriteTrace(CommonTrace.TraceVerbose, String.Format("Getting related values for source = 0x{0:x16}.", source));
 
             try
             {
@@ -260,14 +265,16 @@ namespace Outage.NetworkModelService
 
                 ResourceIterator ri = new ResourceIterator(relatedGids, class2PropertyIDs);
 
-                CommonTrace.WriteTrace(CommonTrace.TraceVerbose, String.Format("Getting related values for source = 0x{0:x16} succeeded.", source));
+                LoggerWrapper.Instance.LogInfo($"Getting related values for source = 0x{source:x16} succedded.");
+                //CommonTrace.WriteTrace(CommonTrace.TraceVerbose, String.Format("Getting related values for source = 0x{0:x16} succeeded.", source));
 
                 return ri;
             }
             catch (Exception ex)
             {
                 string message = String.Format("Failed to get related values for source GID = 0x{0:x16}. {1}.", source, ex.Message);
-                CommonTrace.WriteTrace(CommonTrace.TraceError, message);
+                LoggerWrapper.Instance.LogError(message, ex);
+                //CommonTrace.WriteTrace(CommonTrace.TraceError, message);
                 throw new Exception(message);
             }
         }
@@ -281,7 +288,8 @@ namespace Outage.NetworkModelService
 
             try
             {
-                CommonTrace.WriteTrace(CommonTrace.TraceInfo, "Applying  delta to network model.");
+                LoggerWrapper.Instance.LogInfo("Applying delta to network model.");
+                //CommonTrace.WriteTrace(CommonTrace.TraceInfo, "Applying  delta to network model.");
 
                 Dictionary<short, int> typesCounters = GetCounters();
                 Dictionary<long, long> globalIdPairs = new Dictionary<long, long>();
@@ -310,7 +318,8 @@ namespace Outage.NetworkModelService
             catch (Exception ex)
             {
                 string message = string.Format("Applying delta to network model failed. {0}.", ex.Message);
-                CommonTrace.WriteTrace(CommonTrace.TraceError, message);
+                LoggerWrapper.Instance.LogError(message, ex);
+                //CommonTrace.WriteTrace(CommonTrace.TraceError, message);
 
                 updateResult.Result = ResultType.Failed;
                 updateResult.Message = message;
@@ -324,9 +333,10 @@ namespace Outage.NetworkModelService
 
                 if (updateResult.Result == ResultType.Succeeded)
                 {
-                    string mesage = "Applying delta to network model successfully finished.";
-                    CommonTrace.WriteTrace(CommonTrace.TraceInfo, mesage);
-                    updateResult.Message = mesage;
+                    string message = "Applying delta to network model successfully finished.";
+                    LoggerWrapper.Instance.LogInfo(message);
+                    //CommonTrace.WriteTrace(CommonTrace.TraceInfo, message);
+                    updateResult.Message = message;
                 }
             }
 
@@ -341,19 +351,22 @@ namespace Outage.NetworkModelService
         {
             if (rd == null)
             {
-                CommonTrace.WriteTrace(CommonTrace.TraceVerbose, "Insert entity is not done because update operation is empty.");
+                //CommonTrace.WriteTrace(CommonTrace.TraceVerbose, "Insert entity is not done because update operation is empty.");
+                LoggerWrapper.Instance.LogInfo("Insert entity is not done because update operation is empty.");
                 return;
             }
 
             long globalId = rd.Id;
 
-            CommonTrace.WriteTrace(CommonTrace.TraceInfo, "Inserting entity with GID ({0:x16}).", globalId);
+            //CommonTrace.WriteTrace(CommonTrace.TraceInfo, "Inserting entity with GID ({0:x16}).", globalId);
+            LoggerWrapper.Instance.LogInfo($"Inserting entity with GID ({globalId:x16})");
 
             // check if mapping for specified global id already exists			
             if (this.EntityExists(globalId))
             {
                 string message = String.Format("Failed to insert entity because entity with specified GID ({0:x16}) already exists in network model.", globalId);
-                CommonTrace.WriteTrace(CommonTrace.TraceError, message);
+                //CommonTrace.WriteTrace(CommonTrace.TraceError, message);
+                LoggerWrapper.Instance.LogError(message);
                 throw new Exception(message);
             }
 
@@ -417,12 +430,14 @@ namespace Outage.NetworkModelService
                     }
                 }
 
-                CommonTrace.WriteTrace(CommonTrace.TraceVerbose, "Inserting entity with GID ({0:x16}) successfully finished.", globalId);
+                //CommonTrace.WriteTrace(CommonTrace.TraceVerbose, "Inserting entity with GID ({0:x16}) successfully finished.", globalId);
+                LoggerWrapper.Instance.LogInfo($"Inserting entity with GID ({globalId:x16}) successfully finished.");
             }
             catch (Exception ex)
             {
                 string message = String.Format("Failed to insert entity (GID = 0x{0:x16}) into model. {1}", rd.Id, ex.Message);
-                CommonTrace.WriteTrace(CommonTrace.TraceError, message);
+                //CommonTrace.WriteTrace(CommonTrace.TraceError, message);
+                LoggerWrapper.Instance.LogError(message, ex);
                 throw new Exception(message);
             }
         }
@@ -435,7 +450,8 @@ namespace Outage.NetworkModelService
         {
             if (rd == null || rd.Properties == null && rd.Properties.Count == 0)
             {
-                CommonTrace.WriteTrace(CommonTrace.TraceInfo, "Update entity is not done because update operation is empty.");
+                //CommonTrace.WriteTrace(CommonTrace.TraceInfo, "Update entity is not done because update operation is empty.");
+                LoggerWrapper.Instance.LogInfo("Update entity is not done because update operation is empty.");
                 return;
             }
 
@@ -443,12 +459,14 @@ namespace Outage.NetworkModelService
             {
                 long globalId = rd.Id;
 
-                CommonTrace.WriteTrace(CommonTrace.TraceVerbose, "Updating entity with GID ({0:x16}).", globalId);
+                //CommonTrace.WriteTrace(CommonTrace.TraceVerbose, "Updating entity with GID ({0:x16}).", globalId);
+                LoggerWrapper.Instance.LogInfo($"Updating entity with GID ({globalId:x16}).");
 
                 if (!this.EntityExists(globalId))
                 {
                     string message = String.Format("Failed to update entity because entity with specified GID ({0:x16}) does not exist in network model.", globalId);
-                    CommonTrace.WriteTrace(CommonTrace.TraceError, message);
+                    //CommonTrace.WriteTrace(CommonTrace.TraceError, message);
+                    LoggerWrapper.Instance.LogError(message);
                     throw new Exception(message);
                 }
 
@@ -492,12 +510,14 @@ namespace Outage.NetworkModelService
                     }
                 }
 
-                CommonTrace.WriteTrace(CommonTrace.TraceVerbose, "Updating entity with GID ({0:x16}) successfully finished.", globalId);
+                //CommonTrace.WriteTrace(CommonTrace.TraceVerbose, "Updating entity with GID ({0:x16}) successfully finished.", globalId);
+                LoggerWrapper.Instance.LogInfo($"Updating entity with GID ({globalId:x16}) successfully finished.");
             }
             catch (Exception ex)
             {
                 string message = String.Format("Failed to update entity (GID = 0x{0:x16}) in model. {1} ", rd.Id, ex.Message);
-                CommonTrace.WriteTrace(CommonTrace.TraceError, message);
+                //CommonTrace.WriteTrace(CommonTrace.TraceError, message);
+                LoggerWrapper.Instance.LogError(message, ex);
                 throw new Exception(message);
             }
         }
@@ -510,7 +530,8 @@ namespace Outage.NetworkModelService
         {
             if (rd == null)
             {
-                CommonTrace.WriteTrace(CommonTrace.TraceInfo, "Delete entity is not done because update operation is empty.");
+                //CommonTrace.WriteTrace(CommonTrace.TraceInfo, "Delete entity is not done because update operation is empty.");
+                LoggerWrapper.Instance.LogInfo("Delete entity is not done because update operation is empty.");
                 return;
             }
 
@@ -518,13 +539,16 @@ namespace Outage.NetworkModelService
             {
                 long globalId = rd.Id;
 
-                CommonTrace.WriteTrace(CommonTrace.TraceVerbose, "Deleting entity with GID ({0:x16}).", globalId);
+                //CommonTrace.WriteTrace(CommonTrace.TraceVerbose, "Deleting entity with GID ({0:x16}).", globalId);
+                LoggerWrapper.Instance.LogInfo($"Deleting entity with GID ({globalId:x16})");
+
 
                 // check if entity exists
                 if (!this.EntityExists(globalId))
                 {
                     string message = String.Format("Failed to delete entity because entity with specified GID ({0:x16}) does not exist in network model.", globalId);
-                    CommonTrace.WriteTrace(CommonTrace.TraceError, message);
+                    //CommonTrace.WriteTrace(CommonTrace.TraceError, message);
+                    LoggerWrapper.Instance.LogError(message);
                     throw new Exception(message);
                 }
 
@@ -548,7 +572,9 @@ namespace Outage.NetworkModelService
                     }
 
                     string message = String.Format("Failed to delete entity (GID = 0x{0:x16}) because it is referenced by entities with GIDs: {1}.", globalId, sb.ToString());
-                    CommonTrace.WriteTrace(CommonTrace.TraceError, message);
+
+                    //CommonTrace.WriteTrace(CommonTrace.TraceError, message);
+                    LoggerWrapper.Instance.LogError(message);
                     throw new Exception(message);
                 }
 
@@ -587,12 +613,14 @@ namespace Outage.NetworkModelService
                 Container container = GetContainer(type);
                 container.RemoveEntity(globalId);
 
-                CommonTrace.WriteTrace(CommonTrace.TraceVerbose, "Deleting entity with GID ({0:x16}) successfully finished.", globalId);
+                //CommonTrace.WriteTrace(CommonTrace.TraceVerbose, "Deleting entity with GID ({0:x16}) successfully finished.", globalId);
+                LoggerWrapper.Instance.LogInfo($"Deleting entity with GID ({globalId:x16}) successfully finished.");
             }
             catch (Exception ex)
             {
                 string message = String.Format("Failed to delete entity (GID = 0x{0:x16}) from model. {1}", rd.Id, ex.Message);
-                CommonTrace.WriteTrace(CommonTrace.TraceError, message);
+                //CommonTrace.WriteTrace(CommonTrace.TraceError, message);
+                LoggerWrapper.Instance.LogError(message, ex);
                 throw new Exception(message);
             }
         }
@@ -670,13 +698,15 @@ namespace Outage.NetworkModelService
                 xmlWriter.Formatting = Formatting.Indented;
                 delta.ExportToXml(xmlWriter);
                 xmlWriter.Flush();
-                CommonTrace.WriteTrace(CommonTrace.TraceInfo, stringWriter.ToString());
+                //CommonTrace.WriteTrace(CommonTrace.TraceInfo, stringWriter.ToString());
+                LoggerWrapper.Instance.LogInfo(stringWriter.ToString());
                 xmlWriter.Close();
                 stringWriter.Close();
             }
             catch (Exception ex)
             {
-                CommonTrace.WriteTrace(CommonTrace.TraceError, "Failed to trace delta with ID = {0}. Reason: {1}", delta.Id, ex.Message);
+                //CommonTrace.WriteTrace(CommonTrace.TraceError, "Failed to trace delta with ID = {0}. Reason: {1}", delta.Id, ex.Message);
+                LoggerWrapper.Instance.LogError($"Failed to trace delta with id = {delta.Id}. Reason: {ex.Message}", ex);
             }
         }
 
@@ -692,6 +722,7 @@ namespace Outage.NetworkModelService
 
             if (deltaVersion > networkModelVersion)
             {
+                LoggerWrapper.Instance.LogDebug("Delta version is higher then network model version.");
                 List<Delta> result = ReadAllDeltas(deltaVersion, networkModelVersion);
 
                 var networkModelFilter = Builders<NetworkDataModelDocument>.Filter.Eq("_id", networkModelVersion);
@@ -721,7 +752,8 @@ namespace Outage.NetworkModelService
                     }
                     catch (Exception ex)
                     {
-                        CommonTrace.WriteTrace(CommonTrace.TraceError, "Error while applying delta (id = {0}) during service initialization. {1}", delta.Id, ex.Message);
+                        //CommonTrace.WriteTrace(CommonTrace.TraceError, "Error while applying delta (id = {0}) during service initialization. {1}", delta.Id, ex.Message);
+                        LoggerWrapper.Instance.LogError($"Error while applying delta (id = {delta.Id}) durning service initialization. {ex.Message}", ex);
                     }
                 }
             }
@@ -798,7 +830,8 @@ namespace Outage.NetworkModelService
             }
             catch (Exception e)
             {
-                CommonTrace.WriteTrace(CommonTrace.TraceError, $"Error on database: {e.Message}");
+                //CommonTrace.WriteTrace(CommonTrace.TraceError, $"Error on database: {e.Message}");
+                LoggerWrapper.Instance.LogError($"Error on database: {e.Message}.", e);
             }
 
         }
