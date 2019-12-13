@@ -4,7 +4,7 @@ const graphTooltipBody: string =
 `<p>ID: [[id]]</p>
 <p>State: [[state]]</p>`;
 
-export const addGraphTooltip = (node) => {
+export const addGraphTooltip = (cy, node) => {
   let ref = node.popperRef();
 
   node.tooltip = tippy(ref, {
@@ -37,6 +37,13 @@ export const addGraphTooltip = (node) => {
     // nemam pojma zasto ovako radi, ali radi ...
     setTimeout(() => {
       node.tooltip.show();
+    }, 0);
+  });
+
+  // hide the tooltip on zoom and pan
+  cy.on('zoom pan', () => {
+    setTimeout(() => {
+      node.tooltip.hide();
     }, 0);
   });
 }

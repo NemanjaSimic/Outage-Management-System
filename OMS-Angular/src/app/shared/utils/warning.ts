@@ -1,6 +1,6 @@
 import uuid from 'uuid';
 
-export const drawWarning = (line) => {
+export const drawWarning = (cy, line) => {
   if (line.data('color') == 'red') {
     const source = line.sourceEndpoint();
     const target = line.targetEndpoint();
@@ -8,7 +8,7 @@ export const drawWarning = (line) => {
     // ako je levo, onda je verovatno prvi, pa da iscrta sa leve strane
     const isFirstChild = source.x > target.x;
 
-    this.cy.add([
+    cy.add([
       {
         group: "nodes",
         data: {

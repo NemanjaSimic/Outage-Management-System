@@ -99,14 +99,7 @@ export class GraphComponent implements OnInit, OnDestroy {
   public addTooltips(): void {
     this.cy.ready(() => {
       this.cy.nodes().forEach(node => {
-        addGraphTooltip(node);
-
-        // hide the tooltip on zoom and pan
-        this.cy.on('zoom pan', () => {
-          setTimeout(() => {
-            node.tooltip.hide();
-          }, 0);
-        })
+        addGraphTooltip(this.cy, node);
       });
     });
   }
@@ -114,7 +107,7 @@ export class GraphComponent implements OnInit, OnDestroy {
   public drawWarnings(): void {
     this.cy.ready(() => {
       this.cy.edges().forEach(line => {
-        drawWarning(line);
+        drawWarning(this.cy, line);
       })
     });
   };
