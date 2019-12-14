@@ -2,6 +2,7 @@
 using Outage.Common;
 using System;
 using System.Collections.Generic;
+using System.Diagnostics;
 using System.Linq;
 using System.Text;
 using System.Threading.Tasks;
@@ -11,13 +12,18 @@ namespace TopologyElementsFuntions
 	public class TopologyElementFactory
 	{
 		private static long edgeCounter = 0;
-		public static TopologyElement CreateTopologyElement(long gid)
+		private TopologyHelper topologyHelper = new TopologyHelper();
+		public TopologyElement CreateTopologyElement(long gid)
 		{
 			TopologyElement retVal;
-			TopologyHelper topologyHelper = new TopologyHelper();
-
+			
+			Stopwatch stopwatch = new Stopwatch();
+			stopwatch.Restart();
 			TopologyType dmsTopologyType = topologyHelper.GetElementTopologyType(gid);
+			stopwatch.Stop();
+			//Console.WriteLine("Getting element DMSType for " + stopwatch.Elapsed.ToString());
 
+			stopwatch.Restart();
 			if (dmsTopologyType == TopologyType.Edge)
 				retVal = new Edge(gid);
 			else if (dmsTopologyType == TopologyType.Node)
@@ -28,12 +34,13 @@ namespace TopologyElementsFuntions
 				Exception ex = new Exception(message);
 				throw ex;
 			}
-
+			stopwatch.Stop();
+			//Console.WriteLine("Created new element for " + stopwatch.Elapsed.ToString());
 			return retVal;
 		}
-		public static Edge CreateOrdinaryEdge(long firstEndGid, long secondEndGid)
+		public Edge CreateOrdinaryEdge(TopologyElement firstEndGid, TopologyElement secondEndGid)
 		{
-			return new Edge(edgeCounter++) {FirstEnd = firstEndGid, SecondEnd = new List<long>() { secondEndGid }};
+			return new Edge(edgeCounter++) {FirstEnd = firstEndGid, SecondEnd = new List<TopologyElement>() { secondEndGid }};
 		}
 	}
 }

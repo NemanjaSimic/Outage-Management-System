@@ -8,10 +8,10 @@ namespace CECommon
 {
     public abstract class Node : TopologyElement
     {
-		private long? parent;
+		private TopologyElement parent;
 		private List<long> children;
 	
-		public long? Parent { get => parent; set => parent = value; }
+		public TopologyElement Parent { get => parent; set => parent = value; }
 		public List<long> Children { get => children; set => children = value; }
 		public Node(long gid) : base (gid)
 		{
