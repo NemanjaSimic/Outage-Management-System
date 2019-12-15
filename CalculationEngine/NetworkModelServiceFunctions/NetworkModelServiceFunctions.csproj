@@ -1,18 +1,16 @@
 ﻿<?xml version="1.0" encoding="utf-8"?>
-<Project ToolsVersion="15.0" xmlns="http://schemas.microsoft.com/developer/msbuild/2003">
+<Project ToolsVersion="14.0" DefaultTargets="Build" xmlns="http://schemas.microsoft.com/developer/msbuild/2003">
   <Import Project="$(MSBuildExtensionsPath)\$(MSBuildToolsVersion)\Microsoft.Common.props" Condition="Exists('$(MSBuildExtensionsPath)\$(MSBuildToolsVersion)\Microsoft.Common.props')" />
   <PropertyGroup>
     <Configuration Condition=" '$(Configuration)' == '' ">Debug</Configuration>
     <Platform Condition=" '$(Platform)' == '' ">AnyCPU</Platform>
-    <ProjectGuid>{274DCAF7-5FDD-46A0-97E2-91DBCA365381}</ProjectGuid>
+    <ProjectGuid>{D4553E8A-C694-4EBD-BA3C-0444A1D0C1EF}</ProjectGuid>
     <OutputType>Library</OutputType>
     <AppDesignerFolder>Properties</AppDesignerFolder>
-    <RootNamespace>Outage.DataModel</RootNamespace>
-    <AssemblyName>DataModel</AssemblyName>
+    <RootNamespace>NetworkModelServiceFunctions</RootNamespace>
+    <AssemblyName>NetworkModelServiceFunctions</AssemblyName>
     <TargetFrameworkVersion>v4.8</TargetFrameworkVersion>
     <FileAlignment>512</FileAlignment>
-    <Deterministic>true</Deterministic>
-    <TargetFrameworkProfile />
   </PropertyGroup>
   <PropertyGroup Condition=" '$(Configuration)|$(Platform)' == 'Debug|AnyCPU' ">
     <DebugSymbols>true</DebugSymbols>
@@ -22,6 +20,7 @@
     <DefineConstants>DEBUG;TRACE</DefineConstants>
     <ErrorReport>prompt</ErrorReport>
     <WarningLevel>4</WarningLevel>
+    <PlatformTarget>x86</PlatformTarget>
   </PropertyGroup>
   <PropertyGroup Condition=" '$(Configuration)|$(Platform)' == 'Release|AnyCPU' ">
     <DebugType>pdbonly</DebugType>
@@ -31,9 +30,13 @@
     <ErrorReport>prompt</ErrorReport>
     <WarningLevel>4</WarningLevel>
   </PropertyGroup>
+  <PropertyGroup>
+    <StartupObject />
+  </PropertyGroup>
   <ItemGroup>
     <Reference Include="System" />
     <Reference Include="System.Core" />
+    <Reference Include="System.ServiceModel" />
     <Reference Include="System.Xml.Linq" />
     <Reference Include="System.Data.DataSetExtensions" />
     <Reference Include="Microsoft.CSharp" />
@@ -42,35 +45,25 @@
     <Reference Include="System.Xml" />
   </ItemGroup>
   <ItemGroup>
-    <Compile Include="Outage\ACLineSegment.cs" />
-    <Compile Include="Outage\Analog.cs" />
-    <Compile Include="Outage\BaseVoltage.cs" />
-    <Compile Include="Outage\Breaker.cs" />
-    <Compile Include="Outage\ConductingEquipment.cs" />
-    <Compile Include="Outage\Conductor.cs" />
-    <Compile Include="Outage\ConnectivityNode.cs" />
-    <Compile Include="Outage\Disconnector.cs" />
-    <Compile Include="Outage\Discrete.cs" />
-    <Compile Include="Outage\EnergyConsumer.cs" />
-    <Compile Include="Outage\EnergySource.cs" />
-    <Compile Include="Outage\Equipment.cs" />
-    <Compile Include="Outage\Fuse.cs" />
-    <Compile Include="Outage\IdentifiedObject.cs" />
-    <Compile Include="Outage\LoadBreakSwitch.cs" />
-    <Compile Include="Outage\Measurement.cs" />
-    <Compile Include="Outage\PowerSystemResource.cs" />
-    <Compile Include="Outage\PowerTransformer.cs" />
-    <Compile Include="Outage\ProtectedSwitch.cs" />
-    <Compile Include="Outage\Switch.cs" />
-    <Compile Include="Outage\Terminal.cs" />
-    <Compile Include="Outage\TransformerWinding.cs" />
+    <Compile Include="NetworkModelGDA.cs" />
+    <Compile Include="NetworkModelGDAProxy.cs" />
     <Compile Include="Properties\AssemblyInfo.cs" />
   </ItemGroup>
   <ItemGroup>
-    <ProjectReference Include="..\Common\Common.csproj">
-      <Project>{892CBE15-9ED7-4540-81FA-0EAABA592138}</Project>
+    <ProjectReference Include="..\..\NetworkModelService_Branch\Common\Common.csproj">
+      <Project>{892cbe15-9ed7-4540-81fa-0eaaba592138}</Project>
       <Name>Common</Name>
     </ProjectReference>
   </ItemGroup>
+  <ItemGroup>
+    <WCFMetadata Include="Connected Services\" />
+  </ItemGroup>
   <Import Project="$(MSBuildToolsPath)\Microsoft.CSharp.targets" />
+  <!-- To modify your build process, add your task inside one of the targets below and uncomment it. 
+       Other similar extension points exist, see Microsoft.Common.targets.
+  <Target Name="BeforeBuild">
+  </Target>
+  <Target Name="AfterBuild">
+  </Target>
+  -->
 </Project>

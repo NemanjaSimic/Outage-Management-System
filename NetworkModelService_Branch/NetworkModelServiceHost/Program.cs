@@ -1,14 +1,10 @@
 ﻿using Outage.Common;
-using System;
-using System.Collections.Generic;
-using System.Linq;
-using System.Text;
-using System.Threading.Tasks;
 using Outage.DataImporter.CIMAdapter;
+using System;
 
 namespace Outage.NetworkModelServiceHost
 {
-    public class Program
+	public class Program
     {
         private static void Main(string[] args)
         {
