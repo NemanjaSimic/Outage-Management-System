@@ -159,7 +159,7 @@ namespace Outage.DataModel
                     }
                     else
                     {
-                        CommonTrace.WriteTrace(CommonTrace.TraceWarning, "Entity (GID = 0x{0:x16}) doesn't contain reference 0x{1:x16}.", this.GlobalId, globalId);
+                        CommonTrace.WriteTrace(CommonTrace.TraceWarning, "Entity (GID: 0x{0:X16}) doesn't contain reference 0x{1:X16}.", this.GlobalId, globalId);
                     }
                     break;
 

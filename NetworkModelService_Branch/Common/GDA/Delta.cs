@@ -237,7 +237,7 @@ namespace Outage.Common.GDA
 				}
 			}
 
-			string message = string.Format("There is no {0} delta operation with GID = 0x{1:x16}.", type.ToString(), id);
+			string message = string.Format("There is no {0} delta operation with GID: 0x{1:X16}.", type.ToString(), id);
 			CommonTrace.WriteTrace(CommonTrace.TraceError, message);
 			throw new Exception(message);
 		}
@@ -270,7 +270,7 @@ namespace Outage.Common.GDA
 
 		public void FixNegativeToPositiveIds(ref Dictionary<short, int> typesCounters, ref Dictionary<long, long> globaldChanges)
 		{
-			string message = String.Format("Fixing negative to positive IDs for delta with ID = {0} started.", GetCompositeId(id));
+			string message = String.Format("Fixing negative to positive IDs for delta with ID: {0} started.", GetCompositeId(id));
 			CommonTrace.WriteTrace(CommonTrace.TraceVerbose, message);
 
 			if (globaldChanges == null)
@@ -291,7 +291,7 @@ namespace Outage.Common.GDA
 
 						if (type <= 0)
 						{
-							throw new ModelException(ErrorCode.InvalidDelta, gidOld, 0, string.Format("Invalid DMS type found in insert delta operation ID = 0x{0:x16}.", rd.Id));
+							throw new ModelException(ErrorCode.InvalidDelta, gidOld, 0, string.Format("Invalid DMS type found in insert delta operation ID: 0x{0:X16}.", rd.Id));
 						}
 
 						int idNew = typesCounters[type] + 1;
@@ -305,18 +305,18 @@ namespace Outage.Common.GDA
 					}
 					else
 					{
-						message = String.Format("Failed to fix negative to positive IDs in insert delta operations for delta with ID = {0} because negative resource ID = 0x{1:x16} already exists in previous insert delta operations.", GetCompositeId(id), gidOld);
+						message = String.Format("Failed to fix negative to positive IDs in insert delta operations for delta with ID: {0} because negative resource ID: 0x{1:X16} already exists in previous insert delta operations.", GetCompositeId(id), gidOld);
 						CommonTrace.WriteTrace(CommonTrace.TraceError, message);
-						string exceptionMessage = String.Format("Invalid delta. Negative resource ID = 0x{0:x16} already exists in previous insert delta operations.", gidOld);
+						string exceptionMessage = String.Format("Invalid delta. Negative resource ID: 0x{0:X16} already exists in previous insert delta operations.", gidOld);
 						throw new Exception(exceptionMessage);
 					}
 				}
 				else if (!this.positiveIdsAllowed)
 				{
-					message = String.Format("Failed to fix negative to positive IDs in insert delta operations for delta with ID = {0} because resource ID = 0x{1:x16} must not be positive.", GetCompositeId(id), gidOld);
+					message = String.Format("Failed to fix negative to positive IDs in insert delta operations for delta with ID: {0} because resource ID: 0x{1:X16} must not be positive.", GetCompositeId(id), gidOld);
 					CommonTrace.WriteTrace(CommonTrace.TraceError, message);
 
-					string exceptionMessage = String.Format("Invalid insert delta operation. Resource ID = 0x{0:x16} must not be positive.", gidOld);
+					string exceptionMessage = String.Format("Invalid insert delta operation. Resource ID: 0x{0:X16} must not be positive.", gidOld);
 					throw new Exception(exceptionMessage);
 				}
 			}
@@ -338,10 +338,10 @@ namespace Outage.Common.GDA
 							}
 							else
 							{
-								message = String.Format("Failed to fix negative to positive IDs in insert delta operations for delta with ID = {0} because negative reference (property code: {1}, value: 0x{2:x16}) does not exist in insert delta operations. Resource ID = 0x{3:x16}. ", GetCompositeId(id), p.Id, gidOld, rd.Id);
+								message = String.Format("Failed to fix negative to positive IDs in insert delta operations for delta with ID: {0} because negative reference (property code: {1}, value: 0x{2:X16}) does not exist in insert delta operations. Resource ID: 0x{3:X16}. ", GetCompositeId(id), p.Id, gidOld, rd.Id);
 								CommonTrace.WriteTrace(CommonTrace.TraceError, message);
 
-								string exceptionMessage = String.Format("Invalid insert delta operation. Negative reference (property code: {0}, value: 0x{1:x16}) does not exist in insert delta operations. Resource ID = 0x{2:x16}. ", p.Id, gidOld, rd.Id);
+								string exceptionMessage = String.Format("Invalid insert delta operation. Negative reference (property code: {0}, value: 0x{1:X16}) does not exist in insert delta operations. Resource ID: 0x{2:X16}. ", p.Id, gidOld, rd.Id);
 								throw new Exception(exceptionMessage);
 							}
 						}
@@ -364,10 +364,10 @@ namespace Outage.Common.GDA
 								}
 								else
 								{
-									message = String.Format("Failed to fix negative to positive IDs in insert delta operations for delta with ID = {0} because negative reference (property code: {1}, value: 0x{2:x16}) does not exist in insert delta operations. Resource ID = 0x{3:x16}. ", GetCompositeId(id), p.Id, gidOldRef, rd.Id);
+									message = String.Format("Failed to fix negative to positive IDs in insert delta operations for delta with ID: {0} because negative reference (property code: {1}, value: 0x{2:X16}) does not exist in insert delta operations. Resource ID: 0x{3:X16}. ", GetCompositeId(id), p.Id, gidOldRef, rd.Id);
 									CommonTrace.WriteTrace(CommonTrace.TraceError, message);
 
-									string exceptionMessage = String.Format("Invalid insert delta operation. Negative reference (property code: {0}, value: 0x{1:x16}) does not exist in insert delta operations. Resource ID = 0x{2:x16}. ", p.Id, gidOldRef, rd.Id);
+									string exceptionMessage = String.Format("Invalid insert delta operation. Negative reference (property code: {0}, value: 0x{1:X16}) does not exist in insert delta operations. Resource ID: 0x{2:X16}. ", p.Id, gidOldRef, rd.Id);
 									throw new Exception(exceptionMessage);
 								}
 							}
@@ -394,10 +394,10 @@ namespace Outage.Common.GDA
 					}
 					else
 					{
-						message = String.Format("Failed to fix negative to positive IDs in update delta operations for delta with ID = {0} because negative resource ID = 0x{1:x16} does not exists in insert delta operations.", GetCompositeId(id), gidOld);
+						message = String.Format("Failed to fix negative to positive IDs in update delta operations for delta with ID {0} because negative resource ID: 0x{1:X16} does not exists in insert delta operations.", GetCompositeId(id), gidOld);
 						CommonTrace.WriteTrace(CommonTrace.TraceError, message);
 
-						string exceptionMessage = String.Format("Invalid update delta operation. Negative resource ID = 0x{0:x16} does not exists in insert delta operations.", gidOld);
+						string exceptionMessage = String.Format("Invalid update delta operation. Negative resource ID: 0x{0:X16} does not exists in insert delta operations.", gidOld);
 						throw new Exception(exceptionMessage);
 					}
 				}
@@ -416,10 +416,10 @@ namespace Outage.Common.GDA
 							}
 							else
 							{
-								message = String.Format("Failed to fix negative to positive IDs in update delta operations for delta with ID = {0} because negative reference (property code: {1}, value: 0x{2:x16}) does not exist in insert delta operations. Resource ID = 0x{3:x16}. ", GetCompositeId(id), p.Id, gidOldRef, rd.Id);
+								message = String.Format("Failed to fix negative to positive IDs in update delta operations for delta with ID: {0} because negative reference (property code: {1}, value: 0x{2:X16}) does not exist in insert delta operations. Resource ID: 0x{3:X16}. ", GetCompositeId(id), p.Id, gidOldRef, rd.Id);
 								CommonTrace.WriteTrace(CommonTrace.TraceError, message);
 
-								string exceptionMessage = String.Format("Invalid update delta operation. Negative reference (property code: {0}, value: 0x{1:x16}) does not exist in insert delta operations. Resource ID = 0x{2:x16}. ", p.Id, gidOldRef, rd.Id);
+								string exceptionMessage = String.Format("Invalid update delta operation. Negative reference (property code: {0}, value: 0x{1:X16}) does not exist in insert delta operations. Resource ID: 0x{2:X16}. ", p.Id, gidOldRef, rd.Id);
 								throw new Exception(exceptionMessage);
 							}
 						}
@@ -442,10 +442,10 @@ namespace Outage.Common.GDA
 								}
 								else
 								{
-									message = String.Format("Failed to fix negative to positive IDs in update delta operations for delta with ID = {0} because negative reference (property code: {1}, value: 0x{2:x16}) does not exist in insert delta operations. Resource ID = 0x{3:x16}. ", GetCompositeId(id), p.Id, gidOldRef, rd.Id);									
+									message = String.Format("Failed to fix negative to positive IDs in update delta operations for delta with ID: {0} because negative reference (property code: {1}, value: 0x{2:X16}) does not exist in insert delta operations. Resource ID: 0x{3:X16}. ", GetCompositeId(id), p.Id, gidOldRef, rd.Id);									
 									CommonTrace.WriteTrace(CommonTrace.TraceError, message);
 
-									string exceptionMessage = String.Format("Invalid update delta operation. Negative reference (property code: {0}, value: 0x{1:x16}) does not exist in insert delta operations. Resource ID = 0x{2:x16}. ", p.Id, gidOldRef, rd.Id);
+									string exceptionMessage = String.Format("Invalid update delta operation. Negative reference (property code: {0}, value: 0x{1:X16}) does not exist in insert delta operations. Resource ID: 0x{2:X16}. ", p.Id, gidOldRef, rd.Id);
 									throw new Exception(exceptionMessage);
 								}
 							}
@@ -472,22 +472,22 @@ namespace Outage.Common.GDA
 					}
 					else
 					{
-						message = String.Format("Failed to fix negative to positive IDs in delete delta operations for delta with ID = {0} because negative resource ID = 0x{1:x16} does not exists in insert delta operations.", GetCompositeId(id), gidOld);
+						message = String.Format("Failed to fix negative to positive IDs in delete delta operations for delta with ID: {0} because negative resource ID: 0x{1:X16} does not exists in insert delta operations.", GetCompositeId(id), gidOld);
 						CommonTrace.WriteTrace(CommonTrace.TraceError, message);						
 
-						string exceptionMessage = String.Format("Invalid delete delta operation. Negative resource ID = 0x{0:x16} does not exists in insert delta operations.", gidOld);
+						string exceptionMessage = String.Format("Invalid delete delta operation. Negative resource ID: 0x{0:X16} does not exists in insert delta operations.", gidOld);
 						throw new Exception(message);
 					}
 				}
 			}
 
-			message = String.Format("Fixing negative to positive IDs for delta with ID = {0} completed successfully.", GetCompositeId(id));
+			message = String.Format("Fixing negative to positive IDs for delta with ID: {0} completed successfully.", GetCompositeId(id));
 			CommonTrace.WriteTrace(CommonTrace.TraceVerbose, message);
 		}
 
 		public void SortOperations()
 		{
-			string message = String.Format("Sorting delta operations for delta with ID = {0}.", GetCompositeId(id));
+			string message = String.Format("Sorting delta operations for delta with ID: {0}.", GetCompositeId(id));
 			CommonTrace.WriteTrace(CommonTrace.TraceVerbose, message);
 			
 			List<ResourceDescription> insertOpsOrdered = new List<ResourceDescription>();
@@ -582,7 +582,7 @@ namespace Outage.Common.GDA
 			deleteOpsOrdered.Reverse();
 			deleteOps = deleteOpsOrdered;
 
-			message = String.Format("Sorting delta operations for delta with ID = {0} completed successfully.", GetCompositeId(id));
+			message = String.Format("Sorting delta operations for delta with ID: {0} completed successfully.", GetCompositeId(id));
 			CommonTrace.WriteTrace(CommonTrace.TraceVerbose, message);
 		}
      

@@ -115,9 +115,8 @@ namespace Outage.Common
 				}
 			}
 
-			string message = String.Format("Specified property ( ID = {0} ) does not exists for {1} resource.", (ModelCode)propertyId, resourceName);
-			//CommonTrace.WriteTrace(CommonTrace.TraceError, message);
-            LoggerWrapper.Instance.LogError($"Specified property ( ID = {(ModelCode)propertyId} ) does not exists for {resourceName} resource.");
+			string message = String.Format("Specified property ( ID: {0} ) does not exists for {1} resource.", (ModelCode)propertyId, resourceName);
+            LoggerWrapper.Instance.LogError($"Specified property ( ID: {(ModelCode)propertyId} ) does not exists for {resourceName} resource.");
 			throw new Exception(message);
 		}
 
@@ -823,7 +822,7 @@ namespace Outage.Common
 			}
 			else
 			{
-				string message = string.Format("Failed to get model type code for DMS type: {0}. Invalid DMS type. ID = 0x{1:x16}", type, id);
+				string message = string.Format("Failed to get model type code for DMS type: {0}. Invalid DMS type. ID: 0x{1:X16}", type, id);
 				//CommonTrace.WriteTrace(CommonTrace.TraceError, message);
                 LoggerWrapper.Instance.LogError(message);
 				throw new Exception(message);

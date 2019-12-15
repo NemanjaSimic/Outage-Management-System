@@ -228,7 +228,7 @@ namespace Outage.NetworkModelService
             else
             {
 
-                string message = String.Format("Failed to retrieve entity (GID = 0x{1:x16}) because entity doesn't exist.", globalId);
+                string message = String.Format("Failed to retrieve entity (GID: 0x{0:X16}) because entity doesn't exist.", globalId);
                 //CommonTrace.WriteTrace(CommonTrace.TraceError, message);
                 LoggerWrapper.Instance.LogError(message);
 
@@ -250,8 +250,7 @@ namespace Outage.NetworkModelService
             else
             {
 
-                string message = String.Format("Entity (GID = 0x{1:x16}) already exists.", io.GlobalId);
-                //CommonTrace.WriteTrace(CommonTrace.TraceError, message);
+                string message = String.Format("Entity (GID: 0x{0:X16}) already exists.", io.GlobalId);
                 LoggerWrapper.Instance.LogError(message);
 
                 throw new Exception(message);
@@ -272,8 +271,7 @@ namespace Outage.NetworkModelService
             }
             else
             {
-                string message = String.Format("Failed to remove entity because entity with GID = {0} doesn't exist at the specified position ( {0} ).", globalId);
-                //CommonTrace.WriteTrace(CommonTrace.TraceError, message);
+                string message = String.Format("Failed to remove entity because entity with GID: 0x{0:X16} doesn't exist at the specified position ( 0x{0:X16} ).", globalId);
                 LoggerWrapper.Instance.LogError(message);
                 throw new Exception(message);
             }
@@ -296,7 +294,7 @@ namespace Outage.NetworkModelService
         {
             Container clone = new Container();
             clone.Entities = new Dictionary<long, IdentifiedObject>(this.entities);
-            LoggerWrapper.Instance.LogDebug("Shallow copy of container has been created.");
+            //LoggerWrapper.Instance.LogDebug("Shallow copy of container has been created.");
 
             return clone;
         }

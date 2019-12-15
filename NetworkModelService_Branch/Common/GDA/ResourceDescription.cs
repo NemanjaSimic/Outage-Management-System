@@ -82,7 +82,7 @@ namespace Outage.Common.GDA
 		{
 			if (resDesc1.Id != resDesc2.Id)
 			{
-				throw new Exception(string.Format("Failed to generate difference between resource descriptions. IDs are different. First ID = {0}. Second ID = {1}", resDesc1.Id, resDesc2.Id));
+				throw new Exception(string.Format("Failed to generate difference between resource descriptions. IDs are different. First ID: 0x{0:X16}. Second ID: 0x{1:X16}", resDesc1.Id, resDesc2.Id));
 			}
 			else
 			{
@@ -126,7 +126,7 @@ namespace Outage.Common.GDA
 		{
 			if (this.Id != updateRD.Id)
 			{
-				throw new Exception(string.Format("Failed to update resource description. IDs are different. Original ID = {0} . Update ID = {1}", this.Id, updateRD.Id));
+				throw new Exception(string.Format("Failed to update resource description. IDs are different. Original ID: 0x{0:X16} . Update ID: 0x{1:X16}", this.Id, updateRD.Id));
 			}
 			else
 			{
@@ -179,7 +179,7 @@ namespace Outage.Common.GDA
 			xmlWriter.WriteStartElement("ResourceDescription");
 			xmlWriter.WriteStartElement("id");
 			xmlWriter.WriteStartAttribute("gid");
-			xmlWriter.WriteValue(String.Format("0x{0:x16}", this.Id));
+			xmlWriter.WriteValue(String.Format("0x{0:X16}", this.Id));
 			xmlWriter.WriteStartAttribute("type");
 			xmlWriter.WriteValue(((DMSType)ModelCodeHelper.ExtractTypeFromGlobalId(this.Id)).ToString());
 			xmlWriter.WriteEndElement(); // id
@@ -203,7 +203,7 @@ namespace Outage.Common.GDA
 					case PropertyType.DateTime:
 						if (this.Properties[i].Id == ModelCode.IDOBJ_GID)
 						{
-							xmlWriter.WriteValue(String.Format("0x{0:x16}", this.Properties[i].AsLong()));
+							xmlWriter.WriteValue(String.Format("0x{0:X16}", this.Properties[i].AsLong()));
 						}
 						else
 						{
@@ -224,7 +224,7 @@ namespace Outage.Common.GDA
 
 						break;
 					case PropertyType.Reference:
-						xmlWriter.WriteValue(String.Format("0x{0:x16}", this.Properties[i].AsReference()));
+						xmlWriter.WriteValue(String.Format("0x{0:X16}", this.Properties[i].AsReference()));
 						break;
 					case PropertyType.String:
 						if (this.Properties[i].PropertyValue.StringValue == null)
@@ -241,7 +241,7 @@ namespace Outage.Common.GDA
 							sb = new StringBuilder(100);
 							for (int j = 0; j < this.Properties[i].AsLongs().Count; j++)
 							{
-								sb.Append(String.Format("0x{0:x16}", this.Properties[i].AsLongs()[j])).Append(", ");
+								sb.Append(String.Format("0x{0:X16}", this.Properties[i].AsLongs()[j])).Append(", ");
 							}
 
 							xmlWriter.WriteValue(sb.ToString(0, sb.Length - 2));
@@ -258,7 +258,7 @@ namespace Outage.Common.GDA
 							sb = new StringBuilder(100);
 							for (int j = 0; j < this.Properties[i].AsLongs().Count; j++)
 							{
-								sb.Append(String.Format("0x{0:x16}", this.Properties[i].AsTimeSpans()[j])).Append(", ");
+								sb.Append(String.Format("0x{0:X16}", this.Properties[i].AsTimeSpans()[j])).Append(", ");
 							}
 
 							xmlWriter.WriteValue(sb.ToString(0, sb.Length - 2));

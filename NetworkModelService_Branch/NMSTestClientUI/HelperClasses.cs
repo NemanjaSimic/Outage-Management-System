@@ -35,18 +35,20 @@ namespace FTN.Services.NetworkModelService.TestClientUI
         private static readonly Dictionary<ModelCode, ModelCode> relations = new Dictionary<ModelCode, ModelCode>
         {
             { ModelCode.CONDUCTINGEQUIPMENT_TERMINALS,          ModelCode.TERMINAL              },
-            { ModelCode.TERMINAL_CONNECTIVITYNODE,              ModelCode.CONNECTIVITYNODE      },
-                
-            { ModelCode.TERMINAL_MEASUREMENTS,                  ModelCode.MEASUREMENT           },
-            { ModelCode.MEASUREMENT_TERMINAL,                   ModelCode.TERMINAL              },
-
-            { ModelCode.CONDUCTINGEQUIPMENT_TERMINALS,          ModelCode.TERMINAL              },
-            { ModelCode.TERMINAL_CONDUCTINGEQUIPMENT,           ModelCode.CONDUCTINGEQUIPMENT   },
-
-            { ModelCode.BASEVOLTAGE_CONDUCTINGEQUIPMENTS,       ModelCode.CONDUCTINGEQUIPMENT   },
             { ModelCode.CONDUCTINGEQUIPMENT_BASEVOLTAGE,        ModelCode.BASEVOLTAGE           },
 
+            { ModelCode.TERMINAL_CONDUCTINGEQUIPMENT,           ModelCode.CONDUCTINGEQUIPMENT   },
+            { ModelCode.TERMINAL_CONNECTIVITYNODE,              ModelCode.CONNECTIVITYNODE      },
+            { ModelCode.TERMINAL_MEASUREMENTS,                  ModelCode.MEASUREMENT           },
+                
+            { ModelCode.BASEVOLTAGE_CONDUCTINGEQUIPMENTS,       ModelCode.CONDUCTINGEQUIPMENT   },
+
+            { ModelCode.MEASUREMENT_TERMINAL,                   ModelCode.TERMINAL              },
+
+            { ModelCode.CONNECTIVITYNODE_TERMINALS,             ModelCode.TERMINAL              },
+
             { ModelCode.POWERTRANSFORMER_TRANSFORMERWINDINGS,   ModelCode.TRANSFORMERWINDING    },
+
             { ModelCode.TRANSFORMERWINDING_POWERTRANSFORMER,    ModelCode.POWERTRANSFORMER      },
         };
  

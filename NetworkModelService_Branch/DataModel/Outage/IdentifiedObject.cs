@@ -195,7 +195,7 @@ namespace Outage.DataModel
                     break;
 			
 				default:
-					string message = string.Format("Unknown property id = {0} for entity (GID = 0x{1:x16}).", property.Id.ToString(), this.GlobalId);
+					string message = string.Format("Unknown property id: {0} for entity (GID: 0x{1:X16}).", property.Id.ToString(), this.GlobalId);
 					CommonTrace.WriteTrace(CommonTrace.TraceError, message);
 					throw new Exception(message);										
 			}
@@ -218,7 +218,7 @@ namespace Outage.DataModel
 					break;				
 
 				default:					
-					string message = string.Format("Unknown property id = {0} for entity (GID = 0x{1:x16}).", property.Id.ToString(), this.GlobalId);
+					string message = string.Format("Unknown property id: {0} for entity (GID: 0x{1:X16}).", property.Id.ToString(), this.GlobalId);
 					CommonTrace.WriteTrace(CommonTrace.TraceError, message);
 					throw new Exception(message);					
 			}
@@ -243,14 +243,14 @@ namespace Outage.DataModel
 
 		public virtual void AddReference(ModelCode referenceId, long globalId)
 		{
-			string message = string.Format("Can not add reference {0} to entity (GID = 0x{1:x16}).", referenceId, this.GlobalId);
+			string message = string.Format("Can not add reference {0} to entity (GID: 0x{1:X16}).", referenceId, this.GlobalId);
 			CommonTrace.WriteTrace(CommonTrace.TraceError, message);
 			throw new Exception(message);						
 		}
 
 		public virtual void RemoveReference(ModelCode referenceId, long globalId)
 		{
-			string message = string.Format("Can not remove reference {0} from entity (GID = 0x{1:x16}).", referenceId, this.GlobalId);
+			string message = string.Format("Can not remove reference {0} from entity (GID: 0x{1:X16}).", referenceId, this.GlobalId);
 			CommonTrace.WriteTrace(CommonTrace.TraceError, message);
 			throw new ModelException(message);		
 		}

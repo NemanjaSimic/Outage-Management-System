@@ -60,7 +60,7 @@ namespace Outage.DataImporter.CIMAdapter
                 DoTransformAndLoad(assembly, concreteModel, extractType, out nmsDelta, out transformLog);
             }
 
-            log = string.Concat("Load report:\r\n", loadLog, "\r\nTransform report:\r\n", transformLog, "\r\n\r\nCorrection report:\r\n");
+            log = string.Concat("Load report:\r\n", loadLog, "\r\nTransform report:\r\n", transformLog, "\r\n\r\n");
 
             return nmsDelta;
         }
@@ -134,7 +134,6 @@ namespace Outage.DataImporter.CIMAdapter
 
             try
             {
-                //LogManager.Log(string.Format("Importing {0} data...", extractType), LogLevel.Info);
                 LoggerWrapper.Instance.LogInfo($"Importing {extractType} data...");
 
                 switch (extractType)
@@ -159,7 +158,6 @@ namespace Outage.DataImporter.CIMAdapter
                         }
                     default:
                         {
-                            //LogManager.Log(string.Format("Import of {0} data is NOT SUPPORTED.", extractType), LogLevel.Warning);
                             LoggerWrapper.Instance.LogWarn($"Import of {extractType} data is NOT SUPPORTED.");
                             break;
                         }
@@ -169,7 +167,6 @@ namespace Outage.DataImporter.CIMAdapter
             }
             catch (Exception ex)
             {
-                //LogManager.Log(string.Format("Import unsuccessful: {0}", ex.StackTrace), LogLevel.Error);
                 LoggerWrapper.Instance.LogError("Import unsuccessful.", ex);
                 return false;
             }

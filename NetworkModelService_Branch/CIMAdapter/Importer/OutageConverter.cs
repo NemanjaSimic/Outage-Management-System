@@ -57,7 +57,7 @@ namespace Outage.DataImporter.CIMAdapter.Importer
                     long gid = importHelper.GetMappedGID(cimConductingEquipment.BaseVoltage.ID);
                     if (gid < 0)
                     {
-                        report.Report.Append("WARNING: Convert").Append(cimConductingEquipment.GetType().ToString()).Append(" rdfID = \"").Append(cimConductingEquipment.ID);
+                        report.Report.Append("WARNING: Convert").Append(cimConductingEquipment.GetType().ToString()).Append(" rdfID: \"").Append(cimConductingEquipment.ID);
                         report.Report.Append("\" - Failed to set reference to BaseVoltage: rdfID\"").Append(cimConductingEquipment.BaseVoltage.ID).AppendLine(" \" is not mapped to GID!");
                     }
                     rd.AddProperty(new Property(ModelCode.CONDUCTINGEQUIPMENT_BASEVOLTAGE, gid));
@@ -100,7 +100,7 @@ namespace Outage.DataImporter.CIMAdapter.Importer
                     long gid = importHelper.GetMappedGID(cimTransformerWinding.PowerTransformer.ID);
                     if (gid < 0)
                     {
-                        report.Report.Append("WARNING: Convert").Append(cimTransformerWinding.GetType().ToString()).Append(" rdfID = \"").Append(cimTransformerWinding.ID);
+                        report.Report.Append("WARNING: Convert").Append(cimTransformerWinding.GetType().ToString()).Append(" rdfID: \"").Append(cimTransformerWinding.ID);
                         report.Report.Append("\" - Failed to set reference to PowerTransformer: rdfID\"").Append(cimTransformerWinding.PowerTransformer.ID).AppendLine(" \" is not mapped to GID!");
                     }
                     rd.AddProperty(new Property(ModelCode.TRANSFORMERWINDING_POWERTRANSFORMER, gid));
@@ -205,7 +205,7 @@ namespace Outage.DataImporter.CIMAdapter.Importer
                     long gid = importHelper.GetMappedGID(cimTerminal.ConductingEquipment.ID);
                     if (gid < 0)
                     {
-                        report.Report.Append("WARNING: Convert").Append(cimTerminal.GetType().ToString()).Append(" rdfID = \"").Append(cimTerminal.ID);
+                        report.Report.Append("WARNING: Convert").Append(cimTerminal.GetType().ToString()).Append(" rdfID: \"").Append(cimTerminal.ID);
                         report.Report.Append("\" - Failed to set reference to ConductingEquipment: rdfID\"").Append(cimTerminal.ConductingEquipment.ID).AppendLine(" \" is not mapped to GID!");
                     }
                     rd.AddProperty(new Property(ModelCode.TERMINAL_CONDUCTINGEQUIPMENT, gid));
@@ -216,7 +216,7 @@ namespace Outage.DataImporter.CIMAdapter.Importer
                     long gid = importHelper.GetMappedGID(cimTerminal.ConnectivityNode.ID);
                     if (gid < 0)
                     {
-                        report.Report.Append("WARNING: Convert").Append(cimTerminal.GetType().ToString()).Append(" rdfID = \"").Append(cimTerminal.ID);
+                        report.Report.Append("WARNING: Convert").Append(cimTerminal.GetType().ToString()).Append(" rdfID: \"").Append(cimTerminal.ID);
                         report.Report.Append("\" - Failed to set reference to ConnectivityNode: rdfID\"").Append(cimTerminal.ConnectivityNode.ID).AppendLine(" \" is not mapped to GID!");
                     }
                     rd.AddProperty(new Property(ModelCode.TERMINAL_CONNECTIVITYNODE, gid));
@@ -253,7 +253,7 @@ namespace Outage.DataImporter.CIMAdapter.Importer
                     long gid = importHelper.GetMappedGID(cimMeasurement.Terminal.ID);
                     if (gid < 0)
                     {
-                        report.Report.Append("WARNING: Convert ").Append(cimMeasurement.GetType().ToString()).Append(" rdfID = \"").Append(cimMeasurement.ID);
+                        report.Report.Append("WARNING: Convert ").Append(cimMeasurement.GetType().ToString()).Append(" rdfID: \"").Append(cimMeasurement.ID);
                         report.Report.Append("\" - Failed to set reference to Terminal: rdfID \"").Append(cimMeasurement.Terminal.ID).AppendLine(" \" is not mapped to GID!");
                     }
 

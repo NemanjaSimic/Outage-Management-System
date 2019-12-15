@@ -47,5 +47,6 @@
             <Button Click="CheckAllBtn_Click" Name="CheckAllBtn" Content="Check All" Width="100" Height="40"/>
             <Button Click="UncheckAllBtn_Click" Name="UncheckAllBtn" Content="Uncheck All" IsEnabled="False" Grid.Column="3" Grid.Row="4"  Width="100" Height="40"/>
         </StatusBar>
+        <Button Click="ButtonRefreshGids_Click" HorizontalAlignment="Center" Margin="0,0,1,0"  Content="Refresh GIDs" Grid.Column="1" Grid.Row="4" Width="200" Height="40"/>
     </Grid>
 </UserControl>
