@@ -55,18 +55,15 @@ namespace Outage.NetworkModelService
 
                 message = string.Format("The WCF service {0} is ready.", host.Description.Name);
                 Console.WriteLine(message);
-                //CommonTrace.WriteTrace(CommonTrace.TraceInfo, message);
                 LoggerWrapper.Instance.LogInfo(message);
 
                 message = "Endpoints:";
                 Console.WriteLine(message);
-                //CommonTrace.WriteTrace(CommonTrace.TraceInfo, message);
                 LoggerWrapper.Instance.LogInfo(message);
 
                 foreach (Uri uri in host.BaseAddresses)
                 {
                     Console.WriteLine(uri);
-                    //CommonTrace.WriteTrace(CommonTrace.TraceInfo, uri.ToString());
                     LoggerWrapper.Instance.LogInfo(uri.ToString());
                 }
 
@@ -75,18 +72,15 @@ namespace Outage.NetworkModelService
 
             message = string.Format("Connection string: {0}", Config.Instance.ConnectionString);
             Console.WriteLine(message);
-            //CommonTrace.WriteTrace(CommonTrace.TraceInfo, message);
             LoggerWrapper.Instance.LogInfo(message);
 
             message = string.Format("Trace level: {0}", CommonTrace.TraceLevel);
             Console.WriteLine(message);
-            //CommonTrace.WriteTrace(CommonTrace.TraceInfo, message);
             LoggerWrapper.Instance.LogInfo(message);
 
 
             message = "The Network Model Service is started.";
             Console.WriteLine("\n{0}", message);
-            //CommonTrace.WriteTrace(CommonTrace.TraceInfo, message);
             LoggerWrapper.Instance.LogInfo(message);
         }
 
@@ -104,7 +98,6 @@ namespace Outage.NetworkModelService
             }
 
             string message = "The Network Model Service is gracefully closed.";
-            //CommonTrace.WriteTrace(CommonTrace.TraceInfo, message);
             LoggerWrapper.Instance.LogInfo(message);
             Console.WriteLine("\n\n{0}", message);
         }

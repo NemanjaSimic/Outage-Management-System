@@ -509,7 +509,7 @@ namespace Outage.Common.GDA
 				case PropertyType.TimeSpan:
 					return this.AsLong().ToString();
 				case PropertyType.Reference:
-					//return this.AsLong().ToString("x16");
+					//return this.AsLong().ToString("X16");
 					return this.AsLong().ToString();
 				case PropertyType.Float:
 					return this.AsFloat().ToString(new System.Globalization.CultureInfo("en-US", false).NumberFormat);

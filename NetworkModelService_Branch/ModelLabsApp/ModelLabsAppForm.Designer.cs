@@ -36,19 +36,19 @@
             this.richTextBoxReport = new System.Windows.Forms.RichTextBox();
             this.labelProfile = new System.Windows.Forms.Label();
             this.comboBoxProfile = new System.Windows.Forms.ComboBox();
-            this.buttonConvertCIM = new System.Windows.Forms.Button();
             this.labelReport = new System.Windows.Forms.Label();
             this.buttonExit = new System.Windows.Forms.Button();
             this.buttonApplyDelta = new System.Windows.Forms.Button();
+            this.buttonConvertCIM = new System.Windows.Forms.Button();
             this.toolTipControl = new System.Windows.Forms.ToolTip(this.components);
             this.tableLayoutPanelMain.SuspendLayout();
             this.SuspendLayout();
             // 
             // tableLayoutPanelMain
             // 
-            this.tableLayoutPanelMain.Anchor = ((System.Windows.Forms.AnchorStyles)((((System.Windows.Forms.AnchorStyles.Top | System.Windows.Forms.AnchorStyles.Bottom)
-                        | System.Windows.Forms.AnchorStyles.Left)
-                        | System.Windows.Forms.AnchorStyles.Right)));
+            this.tableLayoutPanelMain.Anchor = ((System.Windows.Forms.AnchorStyles)((((System.Windows.Forms.AnchorStyles.Top | System.Windows.Forms.AnchorStyles.Bottom) 
+            | System.Windows.Forms.AnchorStyles.Left) 
+            | System.Windows.Forms.AnchorStyles.Right)));
             this.tableLayoutPanelMain.ColumnCount = 3;
             this.tableLayoutPanelMain.ColumnStyles.Add(new System.Windows.Forms.ColumnStyle());
             this.tableLayoutPanelMain.ColumnStyles.Add(new System.Windows.Forms.ColumnStyle(System.Windows.Forms.SizeType.Percent, 100F));
@@ -56,13 +56,13 @@
             this.tableLayoutPanelMain.Controls.Add(this.labelCIMXMLFile, 0, 0);
             this.tableLayoutPanelMain.Controls.Add(this.textBoxCIMFile, 1, 0);
             this.tableLayoutPanelMain.Controls.Add(this.buttonBrowseLocation, 2, 0);
-            this.tableLayoutPanelMain.Controls.Add(this.richTextBoxReport, 1, 4);
+            this.tableLayoutPanelMain.Controls.Add(this.richTextBoxReport, 1, 5);
             this.tableLayoutPanelMain.Controls.Add(this.labelProfile, 0, 1);
             this.tableLayoutPanelMain.Controls.Add(this.comboBoxProfile, 1, 1);
-            this.tableLayoutPanelMain.Controls.Add(this.buttonConvertCIM, 2, 2);
             this.tableLayoutPanelMain.Controls.Add(this.labelReport, 0, 4);
-            this.tableLayoutPanelMain.Controls.Add(this.buttonExit, 2, 5);
-            this.tableLayoutPanelMain.Controls.Add(this.buttonApplyDelta, 2, 3);
+            this.tableLayoutPanelMain.Controls.Add(this.buttonExit, 2, 6);
+            this.tableLayoutPanelMain.Controls.Add(this.buttonConvertCIM, 2, 1);
+            this.tableLayoutPanelMain.Controls.Add(this.buttonApplyDelta, 2, 2);
             this.tableLayoutPanelMain.Location = new System.Drawing.Point(0, 0);
             this.tableLayoutPanelMain.Margin = new System.Windows.Forms.Padding(0);
             this.tableLayoutPanelMain.Name = "tableLayoutPanelMain";
@@ -71,7 +71,9 @@
             this.tableLayoutPanelMain.RowStyles.Add(new System.Windows.Forms.RowStyle());
             this.tableLayoutPanelMain.RowStyles.Add(new System.Windows.Forms.RowStyle());
             this.tableLayoutPanelMain.RowStyles.Add(new System.Windows.Forms.RowStyle());
+            this.tableLayoutPanelMain.RowStyles.Add(new System.Windows.Forms.RowStyle());
             this.tableLayoutPanelMain.RowStyles.Add(new System.Windows.Forms.RowStyle(System.Windows.Forms.SizeType.Percent, 100F));
+            this.tableLayoutPanelMain.RowStyles.Add(new System.Windows.Forms.RowStyle());
             this.tableLayoutPanelMain.RowStyles.Add(new System.Windows.Forms.RowStyle());
             this.tableLayoutPanelMain.Size = new System.Drawing.Size(672, 524);
             this.tableLayoutPanelMain.TabIndex = 0;
@@ -88,40 +90,40 @@
             // 
             // textBoxCIMFile
             // 
-            this.textBoxCIMFile.Anchor = ((System.Windows.Forms.AnchorStyles)(((System.Windows.Forms.AnchorStyles.Top | System.Windows.Forms.AnchorStyles.Left)
-                        | System.Windows.Forms.AnchorStyles.Right)));
+            this.textBoxCIMFile.Anchor = ((System.Windows.Forms.AnchorStyles)(((System.Windows.Forms.AnchorStyles.Top | System.Windows.Forms.AnchorStyles.Left) 
+            | System.Windows.Forms.AnchorStyles.Right)));
             this.textBoxCIMFile.BackColor = System.Drawing.SystemColors.Window;
-            this.textBoxCIMFile.Location = new System.Drawing.Point(86, 10);
+            this.textBoxCIMFile.Location = new System.Drawing.Point(114, 10);
             this.textBoxCIMFile.Margin = new System.Windows.Forms.Padding(3, 10, 3, 3);
             this.textBoxCIMFile.Name = "textBoxCIMFile";
             this.textBoxCIMFile.ReadOnly = true;
-            this.textBoxCIMFile.Size = new System.Drawing.Size(492, 20);
+            this.textBoxCIMFile.Size = new System.Drawing.Size(444, 20);
             this.textBoxCIMFile.TabIndex = 1;
             this.textBoxCIMFile.DoubleClick += new System.EventHandler(this.textBoxCIMFileOnDoubleClick);
             // 
             // buttonBrowseLocation
             // 
             this.buttonBrowseLocation.Anchor = ((System.Windows.Forms.AnchorStyles)((System.Windows.Forms.AnchorStyles.Top | System.Windows.Forms.AnchorStyles.Right)));
-            this.buttonBrowseLocation.Location = new System.Drawing.Point(584, 10);
+            this.buttonBrowseLocation.Location = new System.Drawing.Point(564, 10);
             this.buttonBrowseLocation.Margin = new System.Windows.Forms.Padding(3, 10, 10, 10);
             this.buttonBrowseLocation.Name = "buttonBrowseLocation";
-            this.buttonBrowseLocation.Size = new System.Drawing.Size(78, 23);
-            this.buttonBrowseLocation.TabIndex = 2;
-            this.buttonBrowseLocation.Text = "Browse..";
+            this.buttonBrowseLocation.Size = new System.Drawing.Size(98, 23);
+            this.buttonBrowseLocation.TabIndex = 4;
+            this.buttonBrowseLocation.Text = "Browse";
             this.buttonBrowseLocation.UseVisualStyleBackColor = true;
             this.buttonBrowseLocation.Click += new System.EventHandler(this.buttonBrowseLocationOnClick);
             // 
             // richTextBoxReport
             // 
-            this.richTextBoxReport.Anchor = ((System.Windows.Forms.AnchorStyles)((((System.Windows.Forms.AnchorStyles.Top | System.Windows.Forms.AnchorStyles.Bottom)
-                        | System.Windows.Forms.AnchorStyles.Left)
-                        | System.Windows.Forms.AnchorStyles.Right)));
+            this.richTextBoxReport.Anchor = ((System.Windows.Forms.AnchorStyles)((((System.Windows.Forms.AnchorStyles.Top | System.Windows.Forms.AnchorStyles.Bottom) 
+            | System.Windows.Forms.AnchorStyles.Left) 
+            | System.Windows.Forms.AnchorStyles.Right)));
             this.richTextBoxReport.BackColor = System.Drawing.SystemColors.Window;
-            this.richTextBoxReport.Location = new System.Drawing.Point(86, 140);
+            this.richTextBoxReport.Location = new System.Drawing.Point(114, 113);
             this.richTextBoxReport.Margin = new System.Windows.Forms.Padding(3, 3, 3, 10);
             this.richTextBoxReport.Name = "richTextBoxReport";
             this.richTextBoxReport.ReadOnly = true;
-            this.richTextBoxReport.Size = new System.Drawing.Size(492, 338);
+            this.richTextBoxReport.Size = new System.Drawing.Size(444, 372);
             this.richTextBoxReport.TabIndex = 5;
             this.richTextBoxReport.Text = "";
             // 
@@ -137,34 +139,21 @@
             // 
             // comboBoxProfile
             // 
-            this.comboBoxProfile.Anchor = ((System.Windows.Forms.AnchorStyles)(((System.Windows.Forms.AnchorStyles.Top | System.Windows.Forms.AnchorStyles.Left)
-                        | System.Windows.Forms.AnchorStyles.Right)));
+            this.comboBoxProfile.Anchor = ((System.Windows.Forms.AnchorStyles)(((System.Windows.Forms.AnchorStyles.Top | System.Windows.Forms.AnchorStyles.Left) 
+            | System.Windows.Forms.AnchorStyles.Right)));
             this.comboBoxProfile.DropDownStyle = System.Windows.Forms.ComboBoxStyle.DropDownList;
             this.comboBoxProfile.ForeColor = System.Drawing.SystemColors.WindowText;
             this.comboBoxProfile.FormattingEnabled = true;
-            this.comboBoxProfile.Location = new System.Drawing.Point(86, 53);
+            this.comboBoxProfile.Location = new System.Drawing.Point(114, 53);
             this.comboBoxProfile.Margin = new System.Windows.Forms.Padding(3, 10, 3, 5);
             this.comboBoxProfile.Name = "comboBoxProfile";
-            this.comboBoxProfile.Size = new System.Drawing.Size(492, 21);
+            this.comboBoxProfile.Size = new System.Drawing.Size(444, 21);
             this.comboBoxProfile.TabIndex = 3;
-            // 
-            // buttonConvertCIM
-            // 
-            this.buttonConvertCIM.Anchor = ((System.Windows.Forms.AnchorStyles)((System.Windows.Forms.AnchorStyles.Top | System.Windows.Forms.AnchorStyles.Right)));
-            this.buttonConvertCIM.Location = new System.Drawing.Point(584, 82);
-            this.buttonConvertCIM.Margin = new System.Windows.Forms.Padding(3, 3, 10, 3);
-            this.buttonConvertCIM.Name = "buttonConvertCIM";
-            this.buttonConvertCIM.Size = new System.Drawing.Size(78, 23);
-            this.buttonConvertCIM.TabIndex = 4;
-            this.buttonConvertCIM.Text = "Convert";
-            this.toolTipControl.SetToolTip(this.buttonConvertCIM, "convert CIM to NMS delta..");
-            this.buttonConvertCIM.UseVisualStyleBackColor = true;
-            this.buttonConvertCIM.Click += new System.EventHandler(this.buttonConvertCIMOnClick);
             // 
             // labelReport
             // 
             this.labelReport.AutoSize = true;
-            this.labelReport.Location = new System.Drawing.Point(5, 150);
+            this.labelReport.Location = new System.Drawing.Point(5, 92);
             this.labelReport.Margin = new System.Windows.Forms.Padding(5, 13, 3, 5);
             this.labelReport.Name = "labelReport";
             this.labelReport.Size = new System.Drawing.Size(45, 13);
@@ -174,11 +163,11 @@
             // buttonExit
             // 
             this.buttonExit.Anchor = ((System.Windows.Forms.AnchorStyles)((System.Windows.Forms.AnchorStyles.Top | System.Windows.Forms.AnchorStyles.Right)));
-            this.buttonExit.Location = new System.Drawing.Point(584, 491);
-            this.buttonExit.Margin = new System.Windows.Forms.Padding(3, 3, 10, 10);
+            this.buttonExit.Location = new System.Drawing.Point(564, 10);
+            this.buttonExit.Margin = new System.Windows.Forms.Padding(3, 10, 10, 10);
             this.buttonExit.Name = "buttonExit";
-            this.buttonExit.Size = new System.Drawing.Size(78, 23);
-            this.buttonExit.TabIndex = 6;
+            this.buttonExit.Size = new System.Drawing.Size(98, 23);
+            this.buttonExit.TabIndex = 4;
             this.buttonExit.Text = "Exit";
             this.toolTipControl.SetToolTip(this.buttonExit, "exit application..");
             this.buttonExit.UseVisualStyleBackColor = true;
@@ -187,15 +176,28 @@
             // buttonApplyDelta
             // 
             this.buttonApplyDelta.Anchor = ((System.Windows.Forms.AnchorStyles)((System.Windows.Forms.AnchorStyles.Top | System.Windows.Forms.AnchorStyles.Right)));
-            this.buttonApplyDelta.Location = new System.Drawing.Point(584, 111);
-            this.buttonApplyDelta.Margin = new System.Windows.Forms.Padding(3, 3, 10, 3);
+            this.buttonApplyDelta.Location = new System.Drawing.Point(564, 10);
+            this.buttonApplyDelta.Margin = new System.Windows.Forms.Padding(3, 10, 10, 10);
             this.buttonApplyDelta.Name = "buttonApplyDelta";
-            this.buttonApplyDelta.Size = new System.Drawing.Size(78, 23);
+            this.buttonApplyDelta.Size = new System.Drawing.Size(98, 23);
             this.buttonApplyDelta.TabIndex = 4;
             this.buttonApplyDelta.Text = "Apply Delta";
             this.toolTipControl.SetToolTip(this.buttonApplyDelta, "apply delta to NMS..");
             this.buttonApplyDelta.UseVisualStyleBackColor = true;
             this.buttonApplyDelta.Click += new System.EventHandler(this.buttonApplyDeltaOnClick);
+            // 
+            // buttonConvertCIM
+            // 
+            this.buttonConvertCIM.Anchor = ((System.Windows.Forms.AnchorStyles)((System.Windows.Forms.AnchorStyles.Top | System.Windows.Forms.AnchorStyles.Right)));
+            this.buttonConvertCIM.Location = new System.Drawing.Point(564, 10);
+            this.buttonConvertCIM.Margin = new System.Windows.Forms.Padding(3, 10, 10, 10);
+            this.buttonConvertCIM.Name = "buttonConvertCIM";
+            this.buttonConvertCIM.Size = new System.Drawing.Size(98, 23);
+            this.buttonConvertCIM.TabIndex = 4;
+            this.buttonConvertCIM.Text = "Convert";
+            this.toolTipControl.SetToolTip(this.buttonConvertCIM, "convert cim/xml to delta..");
+            this.buttonConvertCIM.UseVisualStyleBackColor = true;
+            this.buttonConvertCIM.Click += new System.EventHandler(this.buttonConvertCIMOnClick);
             // 
             // ModelLabsAppForm
             // 
@@ -218,7 +220,6 @@
         private System.Windows.Forms.Label labelCIMXMLFile;
         private System.Windows.Forms.TextBox textBoxCIMFile;
         private System.Windows.Forms.Button buttonBrowseLocation;
-        private System.Windows.Forms.Button buttonConvertCIM;
         private System.Windows.Forms.ToolTip toolTipControl;
         private System.Windows.Forms.RichTextBox richTextBoxReport;
         private System.Windows.Forms.Label labelProfile;
@@ -226,6 +227,7 @@
         private System.Windows.Forms.Label labelReport;
         private System.Windows.Forms.Button buttonExit;
         private System.Windows.Forms.Button buttonApplyDelta;
+        private System.Windows.Forms.Button buttonConvertCIM;
     }
 }
 

@@ -19,12 +19,10 @@ namespace Outage.DataImporter.CIMAdapter
 {
     public class CIMAdapterClass
     {
+        private ModelResourcesDesc resourcesDesc = new ModelResourcesDesc();
+        private TransformAndLoadReport report;
+
         private NetworkModelGDAProxy gdaQueryProxy = null;
-
-        public CIMAdapterClass()
-        {
-        }
-
         private NetworkModelGDAProxy GdaQueryProxy
         {
             get
@@ -42,19 +40,27 @@ namespace Outage.DataImporter.CIMAdapter
             }
         }
 
+        public CIMAdapterClass()
+        {
+        }
+
         public Delta CreateDelta(Stream extract, SupportedProfiles extractType, out string log)
         {
             Delta nmsDelta = null;
             ConcreteModel concreteModel = null;
             Assembly assembly = null;
+
             string loadLog = string.Empty;
             string transformLog = string.Empty;
+
+            report = new TransformAndLoadReport();
 
             if (LoadModelFromExtractFile(extract, extractType, ref concreteModel, ref assembly, out loadLog))
             {
                 DoTransformAndLoad(assembly, concreteModel, extractType, out nmsDelta, out transformLog);
             }
-            log = string.Concat("Load report:\r\n", loadLog, "\r\nTransform report:\r\n", transformLog);
+
+            log = string.Concat("Load report:\r\n", loadLog, "\r\nTransform report:\r\n", transformLog, "\r\n\r\n");
 
             return nmsDelta;
         }
@@ -123,17 +129,18 @@ namespace Outage.DataImporter.CIMAdapter
         {
             nmsDelta = null;
             log = string.Empty;
+
             bool success = false;
+
             try
             {
-                //LogManager.Log(string.Format("Importing {0} data...", extractType), LogLevel.Info);
                 LoggerWrapper.Instance.LogInfo($"Importing {extractType} data...");
 
                 switch (extractType)
                 {
                     case SupportedProfiles.Outage:
                         {
-                            TransformAndLoadReport report = OutageImporter.Instance.CreateNMSDelta(concreteModel);
+                            TransformAndLoadReport report = OutageImporter.Instance.CreateNMSDelta(concreteModel, GdaQueryProxy, resourcesDesc);
 
                             if (report.Success)
                             {
@@ -151,7 +158,6 @@ namespace Outage.DataImporter.CIMAdapter
                         }
                     default:
                         {
-                            //LogManager.Log(string.Format("Import of {0} data is NOT SUPPORTED.", extractType), LogLevel.Warning);
                             LoggerWrapper.Instance.LogWarn($"Import of {extractType} data is NOT SUPPORTED.");
                             break;
                         }
@@ -161,7 +167,6 @@ namespace Outage.DataImporter.CIMAdapter
             }
             catch (Exception ex)
             {
-                //LogManager.Log(string.Format("Import unsuccessful: {0}", ex.StackTrace), LogLevel.Error);
                 LoggerWrapper.Instance.LogError("Import unsuccessful.", ex);
                 return false;
             }

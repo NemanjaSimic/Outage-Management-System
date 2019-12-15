@@ -115,9 +115,8 @@ namespace Outage.Common
 				}
 			}
 
-			string message = String.Format("Specified property ( ID = {0} ) does not exists for {1} resource.", (ModelCode)propertyId, resourceName);
-			//CommonTrace.WriteTrace(CommonTrace.TraceError, message);
-            LoggerWrapper.Instance.LogError($"Specified property ( ID = {(ModelCode)propertyId} ) does not exists for {resourceName} resource.");
+			string message = String.Format("Specified property ( ID: {0} ) does not exists for {1} resource.", (ModelCode)propertyId, resourceName);
+            LoggerWrapper.Instance.LogError($"Specified property ( ID: {(ModelCode)propertyId} ) does not exists for {resourceName} resource.");
 			throw new Exception(message);
 		}
 
@@ -154,10 +153,10 @@ namespace Outage.Common
 		/// </summary>
 		private List<ModelCode> typeIdsInInsertOrder = new List<ModelCode>();
 
-		/// <summary>
-		/// List of non abstract class Ids.
-		/// </summary>
-		private List<ModelCode> nonAbstractClassIds = new List<ModelCode>();
+        /// <summary>
+        /// List of non abstract class Ids.
+        /// </summary>
+        private List<ModelCode> nonAbstractClassIds = new List<ModelCode>();
 
 		/// <summary>
 		/// HashSet of not settable property Ids.
@@ -823,7 +822,7 @@ namespace Outage.Common
 			}
 			else
 			{
-				string message = string.Format("Failed to get model type code for DMS type: {0}. Invalid DMS type. ID = 0x{1:x16}", type, id);
+				string message = string.Format("Failed to get model type code for DMS type: {0}. Invalid DMS type. ID: 0x{1:X16}", type, id);
 				//CommonTrace.WriteTrace(CommonTrace.TraceError, message);
                 LoggerWrapper.Instance.LogError(message);
 				throw new Exception(message);
@@ -892,18 +891,15 @@ namespace Outage.Common
             typeIdsInInsertOrder.Add(ModelCode.TERMINAL);
             typeIdsInInsertOrder.Add(ModelCode.DISCRETE);
             typeIdsInInsertOrder.Add(ModelCode.ANALOG);
-            
-
         }
 
-		private void InitializeNotSettablePropertyIds()
+        private void InitializeNotSettablePropertyIds()
         { 
             notSettablePropertyIds.Add(ModelCode.IDOBJ_GID);
             notSettablePropertyIds.Add(ModelCode.BASEVOLTAGE_CONDUCTINGEQUIPMENTS);
             notSettablePropertyIds.Add(ModelCode.TERMINAL_MEASUREMENTS);
             notSettablePropertyIds.Add(ModelCode.POWERTRANSFORMER_TRANSFORMERWINDINGS);
             notSettablePropertyIds.Add(ModelCode.CONDUCTINGEQUIPMENT_TERMINALS);
-            notSettablePropertyIds.Add(ModelCode.TRANSFORMERWINDING_POWERTRANSFORMER);
         }
 	
 		# endregion Initialization of metadata

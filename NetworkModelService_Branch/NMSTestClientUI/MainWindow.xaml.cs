@@ -22,6 +22,7 @@ namespace NMSTestClientUI
     {
         public MainWindow()
         {
+            
             InitializeComponent();
         }
     }

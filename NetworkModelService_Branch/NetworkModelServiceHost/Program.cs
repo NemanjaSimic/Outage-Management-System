@@ -39,7 +39,7 @@ namespace Outage.NetworkModelServiceHost
                 CommonTrace.WriteTrace(CommonTrace.TraceError, ex.Message);
                 CommonTrace.WriteTrace(CommonTrace.TraceError, "NetworkModelService failed.");
                 CommonTrace.WriteTrace(CommonTrace.TraceError, ex.StackTrace);
-                LoggerWrapper.Instance.LogError($"NetworkModelService failed.{Environment.NewLine}Message: {ex.Message} ", ex)
+                LoggerWrapper.Instance.LogError($"NetworkModelService failed.{Environment.NewLine}Message: {ex.Message} ", ex);
                 Console.ReadLine();
             }
         }

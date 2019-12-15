@@ -10,18 +10,26 @@ namespace Outage.DataModel
 {
     public class PowerTransformer : Equipment
     {
+        #region Fields
         private List<long> transformerWindings = new List<long>();
+        #endregion
 
+        public PowerTransformer(long globalId) : base(globalId)
+        {
+        }
+
+        protected PowerTransformer(PowerTransformer pt) : base(pt)
+        {
+            TransformerWindings.AddRange(pt.TransformerWindings);
+        }
+
+        #region Properties
         public List<long> TransformerWindings
         {
             get { return transformerWindings; }
             set { transformerWindings = value; }
         }
-
-
-        public PowerTransformer(long globalId) : base(globalId)
-        {
-        }
+        #endregion
 
         public override int GetHashCode()
         {
@@ -121,7 +129,7 @@ namespace Outage.DataModel
                     }
                     else
                     {
-                        CommonTrace.WriteTrace(CommonTrace.TraceWarning, "Entity (GID = 0x{0:x16}) doesn't contain reference 0x{1:x16}.", this.GlobalId, globalId);
+                        CommonTrace.WriteTrace(CommonTrace.TraceWarning, "Entity (GID: 0x{0:X16}) doesn't contain reference 0x{1:X16}.", this.GlobalId, globalId);
                     }
 
                     break;
@@ -133,5 +141,11 @@ namespace Outage.DataModel
         }
         #endregion
 
+        #region IClonable
+        public override IdentifiedObject Clone()
+        {
+            return new PowerTransformer(this);
+        }
+        #endregion
     }
 }

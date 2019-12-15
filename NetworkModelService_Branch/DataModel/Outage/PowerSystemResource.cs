@@ -11,13 +11,13 @@ namespace Outage.DataModel
 {
 	public class PowerSystemResource : IdentifiedObject
 	{
-		
-		public PowerSystemResource(long globalId)
-			: base(globalId)
+		public PowerSystemResource(long globalId) : base(globalId)
 		{
 		}	
 
-		
+		protected PowerSystemResource(PowerSystemResource psr) : base(psr)
+        {
+        } 
 
 		public override bool Equals(object obj)
 		{
@@ -47,8 +47,13 @@ namespace Outage.DataModel
             base.SetProperty(property);
 		}
 
-		#endregion IAccess implementation
+        #endregion IAccess implementation
 
-		
-	}
+        #region IClonable
+        public override IdentifiedObject Clone()
+        {
+            return new PowerSystemResource(this);
+        }
+        #endregion
+    }
 }

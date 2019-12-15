@@ -40,7 +40,8 @@ namespace TelventDMS.Services.NetworkModelService.TestClient.TestsUI
 		public ResourceDescription GetValues(long globalId, List<ModelCode> properties)
 		{
 			string message = "Getting values method started.";
-			CommonTrace.WriteTrace(CommonTrace.TraceError, message);
+			//CommonTrace.WriteTrace(CommonTrace.TraceError, message);
+            LoggerWrapper.Instance.LogInfo(message);
 
 			ResourceDescription rd = null;
 						

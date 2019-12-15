@@ -57,7 +57,7 @@ namespace Outage.Common.GDA
 
             foreach (KeyValuePair<long, long> kvp in globalIdPairs)
             {
-                sb.AppendFormat("Client globalId: 0x{0:x16}\t - Server globalId: 0x{1:x16}\n", kvp.Key, kvp.Value);
+                sb.AppendFormat("Client globalId: 0x{0:X16}\t - Server globalId: 0x{1:X16}\n", kvp.Key, kvp.Value);
             }
 
             return sb.ToString();

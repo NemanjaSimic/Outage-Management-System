@@ -27,7 +27,7 @@ namespace Outage.DataImporter.ModelLabsApp
 		private void InitGUIElements()
 		{
 			buttonConvertCIM.Enabled = false;
-			buttonApplyDelta.Enabled = false;
+            buttonApplyDelta.Enabled = false;
 
             comboBoxProfile.DataSource = Enum.GetValues(typeof(SupportedProfiles));
             comboBoxProfile.SelectedItem = SupportedProfiles.Outage;
@@ -46,13 +46,13 @@ namespace Outage.DataImporter.ModelLabsApp
 			{
 				textBoxCIMFile.Text = openFileDialog.FileName;
 				toolTipControl.SetToolTip(textBoxCIMFile, openFileDialog.FileName);
-				buttonConvertCIM.Enabled = true;
-				richTextBoxReport.Clear();
+                buttonConvertCIM.Enabled = true;
+                richTextBoxReport.Clear();
 			}
 			else
 			{
-				buttonConvertCIM.Enabled = false;
-			}
+                buttonConvertCIM.Enabled = false;
+            }
 		}
 
 		private void ConvertCIMXMLToDMSNetworkModelDelta()
@@ -137,12 +137,12 @@ namespace Outage.DataImporter.ModelLabsApp
 			ConvertCIMXMLToDMSNetworkModelDelta();
 		}
 
-		private void buttonApplyDeltaOnClick(object sender, EventArgs e)
-		{
-			ApplyDMSNetworkModelDelta();
-		}
+        private void buttonApplyDeltaOnClick(object sender, EventArgs e)
+        {
+            ApplyDMSNetworkModelDelta();
+        }
 
-		private void buttonExitOnClick(object sender, EventArgs e)
+        private void buttonExitOnClick(object sender, EventArgs e)
 		{
 			Close();
 		}

@@ -13,17 +13,22 @@ namespace Outage.DataModel
 {
 	public class ConductingEquipment : Equipment
 	{
-        private List<long> terminals = new List<long>();
-
+        #region Fields
         private long baseVoltage;
-
-        
-
+        private List<long> terminals = new List<long>();
+        #endregion
 
         public ConductingEquipment(long globalId) : base(globalId) 
 		{
 		}
 
+        protected ConductingEquipment(ConductingEquipment ce) : base(ce)
+        {
+            BaseVoltage = ce.BaseVoltage;
+            Terminals.AddRange(ce.Terminals);
+        }
+
+        #region Properties
         public List<long> Terminals
         {
             get { return terminals; }
@@ -35,6 +40,7 @@ namespace Outage.DataModel
             get { return baseVoltage; }
             set { baseVoltage = value; }
         }
+        #endregion Properties
 
         public override bool Equals(object obj)
 		{
@@ -153,7 +159,7 @@ namespace Outage.DataModel
                     }
                     else
                     {
-                        CommonTrace.WriteTrace(CommonTrace.TraceWarning, "Entity (GID = 0x{0:x16}) doesn't contain reference 0x{1:x16}.", this.GlobalId, globalId);
+                        CommonTrace.WriteTrace(CommonTrace.TraceWarning, "Entity (GID: 0x{0:X16}) doesn't contain reference 0x{1:X16}.", this.GlobalId, globalId);
                     }
                     break;
 
@@ -164,5 +170,12 @@ namespace Outage.DataModel
         }
 
         #endregion IReference implementation
+
+        #region IClonable
+        public override IdentifiedObject Clone()
+        {
+            return new ConductingEquipment(this);
+        }
+        #endregion
     }
 }

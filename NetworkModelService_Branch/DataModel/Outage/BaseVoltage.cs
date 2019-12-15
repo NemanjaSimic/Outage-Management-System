@@ -11,12 +11,22 @@ namespace Outage.DataModel
 {
     public class BaseVoltage : IdentifiedObject
     {
+        #region Fields
         private float nominalVoltage;
         private List<long> conductingEquipments = new List<long>();
+        #endregion
 
-        
+        public BaseVoltage(long globalId) : base(globalId)
+        {
+        }
 
+        protected BaseVoltage(BaseVoltage bv) : base(bv)
+        {
+            NominalVoltage = bv.NominalVoltage;
+            ConductingEquipments.AddRange(bv.ConductingEquipments);
+        }
 
+        #region Properties
         public float NominalVoltage
         {
             get { return nominalVoltage; }
@@ -28,11 +38,7 @@ namespace Outage.DataModel
             get { return conductingEquipments; }
             set { conductingEquipments = value; }
         }
-
-
-        public BaseVoltage(long globalId) : base(globalId)
-        {
-        }
+        #endregion
 
         public override int GetHashCode()
         {
@@ -144,7 +150,7 @@ namespace Outage.DataModel
                     }
                     else
                     {
-                        CommonTrace.WriteTrace(CommonTrace.TraceWarning, "Entity (GID = 0x{0:x16}) doesn't contain reference 0x{1:x16}.", this.GlobalId, globalId);
+                        CommonTrace.WriteTrace(CommonTrace.TraceWarning, "Entity (GID: 0x{0:X16}) doesn't contain reference 0x{1:X16}.", this.GlobalId, globalId);
                     }
 
                     break;
@@ -153,6 +159,13 @@ namespace Outage.DataModel
                     base.RemoveReference(referenceId, globalId);
                     break;
             }
+        }
+        #endregion
+
+        #region IClonable
+        public override IdentifiedObject Clone()
+        {
+            return new BaseVoltage(this);
         }
         #endregion
     }

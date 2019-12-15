@@ -14,6 +14,10 @@ namespace Outage.DataModel
         {
         }
 
+        protected Switch(Switch sw) : base(sw)
+        {
+        }
+
         public override bool Equals(object obj)
         {
             if (base.Equals(obj)) //in case we add new props
@@ -83,5 +87,12 @@ namespace Outage.DataModel
         }
 
         #endregion IAccess implementation
+
+        #region IClonable
+        public override IdentifiedObject Clone()
+        {
+            return new Switch(this);
+        }
+        #endregion
     }
 }
