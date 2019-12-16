@@ -3,8 +3,8 @@ using System.Collections.Generic;
 using System.Text;
 using FTN.Services.NetworkModelService.TestClientUI;
 using Outage.Common;
-using Outage.ServiceContracts;
 using Outage.Common.GDA;
+using Outage.Common.ServiceProxies;
 
 namespace TelventDMS.Services.NetworkModelService.TestClient.TestsUI
 {

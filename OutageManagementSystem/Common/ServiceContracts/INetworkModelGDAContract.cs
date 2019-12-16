@@ -6,7 +6,7 @@ using System.Text;
 using Outage.Common;
 using Outage.Common.GDA;
 
-namespace Outage.Common.Contracts
+namespace Outage.Common.ServiceContracts
 {
 	[ServiceContract]
 	public interface INetworkModelGDAContract

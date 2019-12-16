@@ -4,7 +4,6 @@ using System.Text;
 using System.Windows.Forms;
 using System.Xml;
 using Outage.Common;
-using Outage.ServiceContracts;
 using Outage.Common.GDA;
 using Outage.DataImporter.CIMAdapter;
 using Outage.DataImporter.CIMAdapter.Manager;

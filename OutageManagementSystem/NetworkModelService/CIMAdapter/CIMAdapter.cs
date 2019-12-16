@@ -4,7 +4,7 @@ using Outage.DataImporter.CIMAdapter;
 using Outage.DataImporter.CIMAdapter.Importer;
 using Outage.DataImporter.CIMAdapter.Manager;
 using Outage.Common.GDA;
-using Outage.ServiceContracts;
+using Outage.Common.ServiceProxies;
 using System;
 using System.Collections.Generic;
 using System.IO;

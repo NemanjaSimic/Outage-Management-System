@@ -1,5 +1,4 @@
 ﻿using Outage.Common;
-using Outage.NetworkModelService.GDA;
 using System;
 using System.Collections.Generic;
 using System.Linq;
@@ -7,18 +6,14 @@ using System.ServiceModel;
 using System.Text;
 using System.Threading.Tasks;
 
-namespace Outage.NetworkModelService
+namespace Outage.TransactionManagerService
 {
-    public class NetworkModelService : IDisposable
+    public class TransactionManagerService : IDisposable
     {
-        private NetworkModel networkModel = null;
         private List<ServiceHost> hosts = null;
 
-        public NetworkModelService()
+        public TransactionManagerService()
         {
-            networkModel = new NetworkModel();
-            GenericDataAccess.NetworkModel = networkModel;
-            ResourceIterator.NetworkModel = networkModel;
             InitializeHosts();
         }
 
@@ -35,9 +30,9 @@ namespace Outage.NetworkModelService
 
         private void InitializeHosts()
         {
-            hosts = new List<ServiceHost>
+            hosts = new List<ServiceHost>()
             {
-                new ServiceHost(typeof(GenericDataAccess))
+                new ServiceHost(typeof(DistributedTransaction)),
             };
         }
 
@@ -45,7 +40,7 @@ namespace Outage.NetworkModelService
         {
             if (hosts == null || hosts.Count == 0)
             {
-                throw new Exception("Network Model Services can not be opend because they are not initialized.");
+                throw new Exception("Transaction Manager Services can not be opend because they are not initialized.");
             }
 
             string message = string.Empty;
@@ -86,10 +81,9 @@ namespace Outage.NetworkModelService
 
         private void CloseHosts()
         {
-            networkModel.SaveNetworkModel();
             if (hosts == null || hosts.Count == 0)
             {
-                throw new Exception("Network Model Services can not be closed because it is not initialized.");
+                throw new Exception("Transaction Manager Services can not be closed because they are not initialized.");
             }
 
             foreach (ServiceHost host in hosts)
@@ -97,9 +91,9 @@ namespace Outage.NetworkModelService
                 host.Close();
             }
 
-            string message = "The Network Model Service are gracefully closed.";
+            string message = "The Transaction Manager Services are gracefully closed.";
             LoggerWrapper.Instance.LogInfo(message);
             Console.WriteLine("\n\n{0}", message);
         }
     }
-}
+    }

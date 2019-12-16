@@ -2,9 +2,9 @@
 using Outage.Common;
 using System.ServiceModel;
 using Outage.Common.GDA;
-using Outage.Common.Contracts;
+using Outage.Common.ServiceContracts;
 
-namespace Outage.ServiceContracts
+namespace Outage.Common.ServiceProxies
 {
 	public class NetworkModelGDAProxy : ClientBase<INetworkModelGDAContract>, INetworkModelGDAContract
 	{
