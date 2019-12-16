@@ -51,17 +51,17 @@ namespace TopologyElementsFuntions
 			return TopologyType.None;
 		}
 
-		public List<long> GetAllReferencedElements(long gid)
-		{
-			List<long> elements = new List<long>();
+		//public List<long> GetAllReferencedElements(long gid)
+		//{
+		//	List<long> elements = new List<long>();
 
-			foreach (var resourceDescription in gDAModelHelper.GetAllReferencedElements(gid))
-			{
-				elements.Add(resourceDescription.Id);
-			}
+		//	foreach (var resourceDescription in gDAModelHelper.GetAllReferencedElements(gid))
+		//	{
+		//		elements.Add(resourceDescription.Id);
+		//	}
 
-			return elements;
-		}
+		//	return elements;
+		//}
 
 		public List<long> GetAllEnergySources() => gDAModelHelper.GetAllEnergySousces();
 

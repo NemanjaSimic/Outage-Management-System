@@ -1,4 +1,5 @@
 ﻿using CECommon;
+using NetworkModelServiceFunctions;
 using System;
 using System.Collections.Generic;
 using System.Diagnostics;
@@ -12,6 +13,7 @@ namespace TopologyElementsFuntions
 	{
 		private readonly TopologyHelper topologyHelper = new TopologyHelper();
 		private readonly TopologyElementFactory topologyElementFactory = new TopologyElementFactory();
+		private readonly GDAModelHelper gDAModelHelper = new GDAModelHelper();
 
 		private List<Field> fields = new List<Field>();
 		private HashSet<long> visited = new HashSet<long>();
@@ -25,6 +27,11 @@ namespace TopologyElementsFuntions
 			List<long> energySources = topologyHelper.GetAllEnergySources();
 			stopwatch.Stop();
 			Console.WriteLine("GetAllEnergyResources for " + stopwatch.Elapsed.ToString());
+			stopwatch.Restart();
+			gDAModelHelper.RetrieveAllElements();
+			stopwatch.Stop();
+			Console.WriteLine("RetrieveAllElements for " + stopwatch.Elapsed.ToString());
+
 			foreach (var energySourceGid in energySources)
 			{
 				stopwatch.Restart();
@@ -67,7 +74,7 @@ namespace TopologyElementsFuntions
 
 		List<long> CheckIgnorable(long gid)
 		{
-			var list = topologyHelper.GetAllReferencedElements(gid).Where(e => !visited.Contains(e)).ToList();
+			var list = gDAModelHelper.GetAllReferencedElements(gid).Where(e => !visited.Contains(e)).ToList();
 			List<long> elements = new List<long>();
 			foreach (var element in list)
 			{

@@ -1,4 +1,5 @@
 ﻿using CECommon;
+using NetworkModelServiceFunctions;
 using System;
 using System.Collections.Generic;
 using System.Diagnostics;
@@ -11,9 +12,11 @@ namespace CalculationEngineServiceHost
 		static void Main(string[] args)
 		{
 			TopologyConnectivity topologyConnectivity = new TopologyConnectivity();
+			GDAModelHelper gDAModelHelper = new GDAModelHelper();
 			Stopwatch stopwatch = new Stopwatch();
 			stopwatch.Start();
 			List<TopologyElement> energySources = topologyConnectivity.MakeAllTopologies();
+			//var entities = gDAModelHelper.RetrieveAllElements();
 			stopwatch.Stop();
 			Console.WriteLine(stopwatch.Elapsed.ToString());
 			foreach (var rs in energySources)
