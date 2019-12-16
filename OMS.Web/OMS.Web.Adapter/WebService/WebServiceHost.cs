@@ -1,6 +1,6 @@
 ﻿using OMS.Web.Adapter.Contracts;
+using OMS.Web.Common;
 using System;
-using System.Configuration;
 using System.ServiceModel;
 
 namespace OMS.Web.Adapter.WebService
@@ -17,7 +17,7 @@ namespace OMS.Web.Adapter.WebService
         public void Open()
         {
             NetTcpBinding binding = new NetTcpBinding();
-            string address = ConfigurationManager.AppSettings.Get("serviceAddress");
+            string address = AppSettings.Get<string>("serviceAddress");
 
             _host = new ServiceHost(typeof(WebService));
             _host.AddServiceEndpoint(typeof(IWebService), binding, address);
