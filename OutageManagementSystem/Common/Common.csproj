@@ -108,6 +108,7 @@
     <Compile Include="Enums.cs" />
     <Compile Include="GDA\CompareHelper.cs" />
     <Compile Include="GDA\UpdateResult.cs" />
+    <Compile Include="ILogger.cs" />
     <Compile Include="LoggerWrapper.cs" />
     <Compile Include="ModelException\ErrorCode.cs" />
     <Compile Include="ModelException\ModelException.cs" />

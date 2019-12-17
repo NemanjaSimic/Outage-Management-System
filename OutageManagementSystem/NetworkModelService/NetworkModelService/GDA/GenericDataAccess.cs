@@ -11,6 +11,8 @@ namespace Outage.NetworkModelService.GDA
 {
     public class GenericDataAccess : INetworkModelGDAContract
     {
+        private ILogger logger = LoggerWrapper.Instance;
+
         private static Dictionary<int, ResourceIterator> resourceIterators = new Dictionary<int, ResourceIterator>();
         private static int resourceItId = 0;
         protected static NetworkModel networkModel = null;
@@ -42,7 +44,8 @@ namespace Outage.NetworkModelService.GDA
             catch (Exception ex)
             {
                 string message = string.Format("Getting values for resource with ID: 0x{0:X16} failed. {1}", resourceId, ex.Message);
-                LoggerWrapper.Instance.LogError(message, ex);
+                //CommonTrace.WriteTrace(CommonTrace.TraceError, message);
+                logger.LogError(message, ex);
                 throw new Exception(message);
             }
         }
@@ -59,7 +62,8 @@ namespace Outage.NetworkModelService.GDA
             catch (Exception ex)
             {
                 string message = string.Format("Getting extent values for ModelCode = {0} failed. ", entityType, ex.Message);
-                LoggerWrapper.Instance.LogError(message, ex);
+                //CommonTrace.WriteTrace(CommonTrace.TraceError, message);
+                logger.LogError(message, ex);
                 throw new Exception(message);
             }
         }
@@ -76,7 +80,8 @@ namespace Outage.NetworkModelService.GDA
             catch (Exception ex)
             {
                 string message = string.Format("Getting related values for resource with ID: 0x{0:X16} failed. {1}", source, ex.Message);
-                LoggerWrapper.Instance.LogError(message, ex);
+                //CommonTrace.WriteTrace(CommonTrace.TraceError, message);
+                logger.LogError(message, ex);
                 throw new Exception(message);
             }
         }
@@ -92,7 +97,8 @@ namespace Outage.NetworkModelService.GDA
             catch (Exception ex)
             {
                 string message = string.Format("IteratorNext failed. Iterator ID: {0}. Resources to fetch count = {1}. {2} ", id, n, ex.Message);
-                LoggerWrapper.Instance.LogError(message, ex);
+                //CommonTrace.WriteTrace(CommonTrace.TraceError, message);
+                logger.LogError(message, ex);
                 throw new Exception(message);
             }
         }
@@ -108,7 +114,8 @@ namespace Outage.NetworkModelService.GDA
             catch (Exception ex)
             {
                 string message = string.Format("IteratorRewind failed. Iterator ID: {0}. {1}", id, ex.Message);
-                LoggerWrapper.Instance.LogError(message, ex);
+                //CommonTrace.WriteTrace(CommonTrace.TraceError, message);
+                logger.LogError(message, ex);
                 throw new Exception(message);
             }
         }
@@ -123,7 +130,8 @@ namespace Outage.NetworkModelService.GDA
             catch (Exception ex)
             {
                 string message = string.Format("IteratorResourcesTotal failed. Iterator ID: {0}. {1}", id, ex.Message);
-                LoggerWrapper.Instance.LogError(message, ex);
+                //CommonTrace.WriteTrace(CommonTrace.TraceError, message);
+                logger.LogError(message, ex);
                 throw new Exception(message);
             }
         }
@@ -139,7 +147,8 @@ namespace Outage.NetworkModelService.GDA
             catch (Exception ex)
             {
                 string message = string.Format("IteratorResourcesLeft failed. Iterator ID: {0}. {1}", id, ex.Message);
-                LoggerWrapper.Instance.LogError(message, ex);
+                //CommonTrace.WriteTrace(CommonTrace.TraceError, message);
+                logger.LogError(message, ex);
                 throw new Exception(message);
             }
         }
@@ -155,7 +164,8 @@ namespace Outage.NetworkModelService.GDA
             catch (Exception ex)
             {
                 string message = string.Format("IteratorClose failed. Iterator ID: {0}. {1}", id, ex.Message);
-                LoggerWrapper.Instance.LogError(message, ex);
+                //CommonTrace.WriteTrace(CommonTrace.TraceError, message);
+                logger.LogError(message, ex);
                 throw new Exception(message);
             }
         }

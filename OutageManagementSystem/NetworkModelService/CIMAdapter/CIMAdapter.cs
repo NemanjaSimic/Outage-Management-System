@@ -19,6 +19,8 @@ namespace Outage.DataImporter.CIMAdapter
 {
     public class CIMAdapterClass
     {
+        private ILogger logger = LoggerWrapper.Instance;
+
         private ModelResourcesDesc resourcesDesc = new ModelResourcesDesc();
         private TransformAndLoadReport report;
 
@@ -134,7 +136,7 @@ namespace Outage.DataImporter.CIMAdapter
 
             try
             {
-                LoggerWrapper.Instance.LogInfo($"Importing {extractType} data...");
+                logger.LogInfo($"Importing {extractType} data...");
 
                 switch (extractType)
                 {
@@ -158,7 +160,7 @@ namespace Outage.DataImporter.CIMAdapter
                         }
                     default:
                         {
-                            LoggerWrapper.Instance.LogWarn($"Import of {extractType} data is NOT SUPPORTED.");
+                            logger.LogWarn($"Import of {extractType} data is NOT SUPPORTED.");
                             break;
                         }
                 }
@@ -167,7 +169,7 @@ namespace Outage.DataImporter.CIMAdapter
             }
             catch (Exception ex)
             {
-                LoggerWrapper.Instance.LogError("Import unsuccessful.", ex);
+                logger.LogError("Import unsuccessful.", ex);
                 return false;
             }
         }
