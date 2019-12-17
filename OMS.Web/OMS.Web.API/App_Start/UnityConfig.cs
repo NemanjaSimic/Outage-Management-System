@@ -1,9 +1,15 @@
+using MediatR;
 using OMS.Web.API.Hubs;
 using OMS.Web.Common;
 using OMS.Web.Common.Interfaces.Exceptions;
 using OMS.Web.Common.Interfaces.Logger;
 using OMS.Web.Common.Loggers;
+using OMS.Web.Services.Commands;
+using OMS.Web.Services.Handlers;
 using System;
+using System.Collections.Generic;
+using System.Linq;
+using System.Reflection;
 using Unity;
 using Unity.Lifetime;
 
@@ -45,6 +51,102 @@ namespace OMS.Web.API
             container.RegisterType<GraphHub>();
             container.RegisterType<ICustomExceptionHandler, CustomExceptionBase>();
             container.RegisterType<ILogger, FileLogger>(new ContainerControlledLifetimeManager());
+
+            // We register our mediatr commands here (concrete, not abstracts)
+            container.RegisterMediator();
+            container.RegisterMediatorHandlers(Assembly.GetAssembly(typeof(TurnOffSwitchCommand)));
+            container.RegisterMediatorHandlers(Assembly.GetAssembly(typeof(TurnOnSwitchCommand)));
         }
+
+        #region MediatR Extensions
+        public static IUnityContainer RegisterMediator(this IUnityContainer container)
+        {
+            return container.RegisterType<IMediator, Mediator>(new HierarchicalLifetimeManager())
+                .RegisterInstance<ServiceFactory>(type =>
+                {
+                    var enumerableType = type
+                        .GetInterfaces()
+                        .Concat(new[] { type })
+                        .FirstOrDefault(t => t.IsGenericType && t.GetGenericTypeDefinition() == typeof(IEnumerable<>));
+
+                    return enumerableType != null
+                        ? container.ResolveAll(enumerableType.GetGenericArguments()[0])
+                        : container.IsRegistered(type)
+                            ? container.Resolve(type)
+                            : null;
+                });
+        }
+
+        public static IUnityContainer RegisterMediatorHandlers(this IUnityContainer container, Assembly assembly)
+        {
+            return container.RegisterTypesImplementingType(assembly, typeof(IRequestHandler<,>))
+                            .RegisterNamedTypesImplementingType(assembly, typeof(INotificationHandler<>));
+        }
+
+        internal static bool IsGenericTypeOf(this Type type, Type genericType)
+        {
+            return type.IsGenericType &&
+                   type.GetGenericTypeDefinition() == genericType;
+        }
+
+        internal static void AddGenericTypes(this List<object> list, IUnityContainer container, Type genericType)
+        {
+            var genericHandlerRegistrations =
+                container.Registrations.Where(reg => reg.RegisteredType == genericType);
+
+            foreach (var handlerRegistration in genericHandlerRegistrations)
+            {
+                if (list.All(item => item.GetType() != handlerRegistration.MappedToType))
+                {
+                    list.Add(container.Resolve(handlerRegistration.MappedToType));
+                }
+            }
+        }
+
+        /// <summary>
+        ///     Register all implementations of a given type for provided assembly.
+        /// </summary>
+        public static IUnityContainer RegisterTypesImplementingType(this IUnityContainer container, Assembly assembly, Type type)
+        {
+            foreach (var implementation in assembly.GetTypes().Where(t => t.GetInterfaces().Any(implementation => IsSubclassOfRawGeneric(type, implementation))))
+            {
+                var interfaces = implementation.GetInterfaces();
+                foreach (var @interface in interfaces)
+                    container.RegisterType(@interface, implementation);
+            }
+
+            return container;
+        }
+
+        /// <summary>
+        ///     Register all implementations of a given type for provided assembly.
+        /// </summary>
+        public static IUnityContainer RegisterNamedTypesImplementingType(this IUnityContainer container, Assembly assembly, Type type)
+        {
+            foreach (var implementation in assembly.GetTypes().Where(t => t.GetInterfaces().Any(implementation => IsSubclassOfRawGeneric(type, implementation))))
+            {
+                var interfaces = implementation.GetInterfaces();
+                foreach (var @interface in interfaces)
+                    container.RegisterType(@interface, implementation, implementation.FullName);
+            }
+
+            return container;
+        }
+
+        private static bool IsSubclassOfRawGeneric(Type generic, Type toCheck)
+        {
+            while (toCheck != null && toCheck != typeof(object))
+            {
+                var currentType = toCheck.IsGenericType ? toCheck.GetGenericTypeDefinition() : toCheck;
+                if (generic == currentType)
+                    return true;
+
+                toCheck = toCheck.BaseType;
+            }
+
+            return false;
+        }
+        #endregion
+
     }
 }

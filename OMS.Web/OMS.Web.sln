@@ -17,6 +17,8 @@ Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "OMS.Web.Adapter.Contracts",
 EndProject
 Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "OMS.Web.Adapter.Mock", "OMS.Web.Adapter.Mock\OMS.Web.Adapter.Mock.csproj", "{1028A2EB-A3EA-4FCC-B15A-05727E5254BF}"
 EndProject
+Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "OMS.Web.Services", "OMS.Web.Services\OMS.Web.Services.csproj", "{C7CBB107-FBD7-435C-BB81-C19AAA37D6A5}"
+EndProject
 Global
 	GlobalSection(SolutionConfigurationPlatforms) = preSolution
 		Debug|Any CPU = Debug|Any CPU
@@ -51,6 +53,10 @@ Global
 		{1028A2EB-A3EA-4FCC-B15A-05727E5254BF}.Debug|Any CPU.Build.0 = Debug|Any CPU
 		{1028A2EB-A3EA-4FCC-B15A-05727E5254BF}.Release|Any CPU.ActiveCfg = Release|Any CPU
 		{1028A2EB-A3EA-4FCC-B15A-05727E5254BF}.Release|Any CPU.Build.0 = Release|Any CPU
+		{C7CBB107-FBD7-435C-BB81-C19AAA37D6A5}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
+		{C7CBB107-FBD7-435C-BB81-C19AAA37D6A5}.Debug|Any CPU.Build.0 = Debug|Any CPU
+		{C7CBB107-FBD7-435C-BB81-C19AAA37D6A5}.Release|Any CPU.ActiveCfg = Release|Any CPU
+		{C7CBB107-FBD7-435C-BB81-C19AAA37D6A5}.Release|Any CPU.Build.0 = Release|Any CPU
 	EndGlobalSection
 	GlobalSection(SolutionProperties) = preSolution
 		HideSolutionNode = FALSE

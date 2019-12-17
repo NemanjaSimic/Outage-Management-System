@@ -1,24 +1,24 @@
-﻿using OMS.Web.Common.Interfaces.Logger;
-using System;
+﻿using MediatR;
+using OMS.Web.Services.Commands;
 using System.Web.Mvc;
 
 namespace WebApp.Controllers
 {
     public class HomeController : Controller
     {
-        private readonly ILogger _logger;
+        private readonly IMediator _mediator;
 
-        public HomeController(ILogger logger)
+        public HomeController(IMediator mediator)
         {
-            _logger = logger;
+            _mediator = mediator;
         }
 
         public ActionResult Index()
         {
             ViewBag.Title = "Home Page";
 
-            _logger.LogDebug("Accessing HomePage Controller");
-            _logger.LogError(new Exception("Some testing text for a exception in HomePage Controller"), "Testing with custom message");
+            _mediator.Send(new TurnOffSwitchCommand(11111));
+            _mediator.Send(new TurnOnSwitchCommand(22222));
 
             return View();
         }

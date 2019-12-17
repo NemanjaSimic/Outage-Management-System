@@ -48,6 +48,9 @@
     <WarningLevel>4</WarningLevel>
   </PropertyGroup>
   <ItemGroup>
+    <Reference Include="MediatR, Version=7.0.0.0, Culture=neutral, PublicKeyToken=bb9a41a5e8aaa7e2, processorArchitecture=MSIL">
+      <HintPath>..\packages\MediatR.7.0.0\lib\net461\MediatR.dll</HintPath>
+    </Reference>
     <Reference Include="Microsoft.AspNet.SignalR.Core, Version=2.4.1.0, Culture=neutral, PublicKeyToken=31bf3856ad364e35, processorArchitecture=MSIL">
       <HintPath>..\packages\Microsoft.AspNet.SignalR.Core.2.4.1\lib\net45\Microsoft.AspNet.SignalR.Core.dll</HintPath>
     </Reference>
@@ -392,6 +395,10 @@
     <ProjectReference Include="..\OMS.Web.Common\OMS.Web.Common.csproj">
       <Project>{63EA1AA4-DC22-4552-8454-346F1DA85082}</Project>
       <Name>OMS.Web.Common</Name>
+    </ProjectReference>
+    <ProjectReference Include="..\OMS.Web.Services\OMS.Web.Services.csproj">
+      <Project>{C7CBB107-FBD7-435C-BB81-C19AAA37D6A5}</Project>
+      <Name>OMS.Web.Services</Name>
     </ProjectReference>
     <ProjectReference Include="..\OMS.Web.UI.Models\OMS.Web.UI.Models.csproj">
       <Project>{B4ED1DFF-BFC2-44B2-B98A-D985B1BC8179}</Project>
