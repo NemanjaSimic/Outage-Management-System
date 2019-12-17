@@ -9,7 +9,8 @@ using Outage.Common.GDA;
 namespace TelventDMS.Services.NetworkModelService.TestClient.TestsUI
 {
     public class TestGda : IDisposable
-	{			
+	{
+		private ILogger logger = LoggerWrapper.Instance;
 
 		private ModelResourcesDesc modelResourcesDesc = new ModelResourcesDesc();
 
@@ -41,7 +42,7 @@ namespace TelventDMS.Services.NetworkModelService.TestClient.TestsUI
 		{
 			string message = "Getting values method started.";
 			//CommonTrace.WriteTrace(CommonTrace.TraceError, message);
-            LoggerWrapper.Instance.LogInfo(message);
+            logger.LogInfo(message);
 
 			ResourceDescription rd = null;
 						

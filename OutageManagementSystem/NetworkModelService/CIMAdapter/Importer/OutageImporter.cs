@@ -13,6 +13,7 @@ namespace Outage.DataImporter.CIMAdapter.Importer
 {
     public class OutageImporter
     {
+        private ILogger logger = LoggerWrapper.Instance;
 
         private static OutageImporter outageImporter = null;
         private static object singletoneLock = new object();
@@ -104,7 +105,7 @@ namespace Outage.DataImporter.CIMAdapter.Importer
         public TransformAndLoadReport CreateNMSDelta(ConcreteModel cimConcreteModel, NetworkModelGDAProxy gdaQueryProxy, ModelResourcesDesc resourcesDesc)
         {
             //LogManager.Log("Importing Outage Elements...", LogLevel.Info); //TODO: ovo menjati sa nasim logom
-            LoggerWrapper.Instance.LogInfo("Importing Outage Elements...");
+            logger.LogInfo("Importing Outage Elements...");
             report = new TransformAndLoadReport();
             concreteModel = cimConcreteModel;
             delta.ClearDeltaOperations();
@@ -124,20 +125,20 @@ namespace Outage.DataImporter.CIMAdapter.Importer
                 {
                     string message = $"{DateTime.Now} - ERROR in data import - {ex.Message}";
                     //LogManager.Log(message);
-                    LoggerWrapper.Instance.LogError(message, ex);
+                    logger.LogError(message, ex);
                     report.Report.AppendLine(ex.Message);
                     report.Success = false;
                 }
             }
             //LogManager.Log("Importing Outage Elements - END", LogLevel.Info);
-            LoggerWrapper.Instance.LogInfo("Importing Outage Elements - END");
+            logger.LogInfo("Importing Outage Elements - END");
             return report;
         }
 
         private void ConvertModelAndPopulateDelta(NetworkModelGDAProxy gdaQueryProxy, ModelResourcesDesc resourcesDesc)
         {
             //LogManager.Log("Loading elements and creating delta...", LogLevel.Info);
-            LoggerWrapper.Instance.LogInfo("Loading elements and creating delta...");
+            logger.LogInfo("Loading elements and creating delta...");
 
             PopulateNmsDataFromServer(gdaQueryProxy, resourcesDesc);
             
@@ -161,7 +162,7 @@ namespace Outage.DataImporter.CIMAdapter.Importer
             CorrectNegativeReferences();
             CreateAndInsertDeleteOperations();
             //LogManager.Log("Loading elements and creating delta completed.", LogLevel.Info);
-            LoggerWrapper.Instance.LogInfo("Loading elements and creating delta completed.");
+            logger.LogInfo("Loading elements and creating delta completed.");
 
         }
 

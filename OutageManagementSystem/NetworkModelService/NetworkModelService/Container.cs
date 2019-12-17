@@ -12,11 +12,13 @@ namespace Outage.NetworkModelService
 {
     public class Container //: ICloneable
     {
+        ILogger logger = LoggerWrapper.Instance;
+
         /// <summary>
-		/// The dictionary of entities. Key = GlobaId, Value = Entity
-		/// </summary>	
-     
-		private Dictionary<long, IdentifiedObject> entities = new Dictionary<long, IdentifiedObject>();
+        /// The dictionary of entities. Key = GlobaId, Value = Entity
+        /// </summary>	
+
+        private Dictionary<long, IdentifiedObject> entities = new Dictionary<long, IdentifiedObject>();
 
         /// <summary>
         /// Initializes a new instance of the Container class
@@ -193,7 +195,7 @@ namespace Outage.NetworkModelService
                     {
                         string message = String.Format("Failed to create entity because specified type ({0}) is not supported.", type);
                         //CommonTrace.WriteTrace(CommonTrace.TraceError, message);
-                        LoggerWrapper.Instance.LogError(message);
+                        logger.LogError(message);
                         throw new Exception(message);
                     }
             }
@@ -230,7 +232,7 @@ namespace Outage.NetworkModelService
 
                 string message = String.Format("Failed to retrieve entity (GID: 0x{0:X16}) because entity doesn't exist.", globalId);
                 //CommonTrace.WriteTrace(CommonTrace.TraceError, message);
-                LoggerWrapper.Instance.LogError(message);
+                logger.LogError(message);
 
                 throw new Exception(message);
             }
@@ -251,7 +253,7 @@ namespace Outage.NetworkModelService
             {
 
                 string message = String.Format("Entity (GID: 0x{0:X16}) already exists.", io.GlobalId);
-                LoggerWrapper.Instance.LogError(message);
+                logger.LogError(message);
 
                 throw new Exception(message);
             }
@@ -272,7 +274,7 @@ namespace Outage.NetworkModelService
             else
             {
                 string message = String.Format("Failed to remove entity because entity with GID: 0x{0:X16} doesn't exist at the specified position ( 0x{0:X16} ).", globalId);
-                LoggerWrapper.Instance.LogError(message);
+                logger.LogError(message);
                 throw new Exception(message);
             }
 
@@ -294,7 +296,7 @@ namespace Outage.NetworkModelService
         {
             Container clone = new Container();
             clone.Entities = new Dictionary<long, IdentifiedObject>(this.entities);
-            //LoggerWrapper.Instance.LogDebug("Shallow copy of container has been created.");
+            //logger.LogDebug("Shallow copy of container has been created.");
 
             return clone;
         }

@@ -10,6 +10,8 @@ namespace Outage.NetworkModelService.GDA
 {
     public class ResourceIterator
     {
+        private ILogger logger = LoggerWrapper.Instance;
+
         private static NetworkModel networkModel = null;
 
         private List<long> globalDs = new List<long>();
@@ -78,7 +80,7 @@ namespace Outage.NetworkModelService.GDA
             {
                 string message = string.Format("Failed to get next set of ResourceDescription iterators. {0}", ex.Message);
                 //CommonTrace.WriteTrace(CommonTrace.TraceError, message);
-                LoggerWrapper.Instance.LogError(message, ex);
+                logger.LogError(message, ex);
                 throw new Exception(message);
             }
         }
@@ -102,7 +104,7 @@ namespace Outage.NetworkModelService.GDA
             {
                 string message = string.Format("Failed to get range of ResourceDescription iterators. index:{0}, count:{1}. {2}", index, n, ex.Message);
                 //CommonTrace.WriteTrace(CommonTrace.TraceError, message);
-                LoggerWrapper.Instance.LogError(message, ex);
+                logger.LogError(message, ex);
                 throw new Exception(message);
             }
         }
@@ -130,7 +132,7 @@ namespace Outage.NetworkModelService.GDA
             catch (Exception ex)
             {
                 //CommonTrace.WriteTrace(CommonTrace.TraceError, "Collecting ResourceDescriptions failed. Exception: " + ex.Message);
-                LoggerWrapper.Instance.LogError($"Collecting ResourceDescriptions failed. Exception: {ex.Message}", ex);
+                logger.LogError($"Collecting ResourceDescriptions failed. Exception: {ex.Message}", ex);
                 throw;
             }
         }

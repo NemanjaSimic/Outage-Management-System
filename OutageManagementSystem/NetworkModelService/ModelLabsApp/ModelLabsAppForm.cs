@@ -63,7 +63,7 @@ namespace Outage.DataImporter.ModelLabsApp
                 if (textBoxCIMFile.Text == string.Empty)
                 {
                     MessageBox.Show("Must enter CIM/XML file.", "Info", MessageBoxButtons.OK, MessageBoxIcon.Information);
-                    LoggerWrapper.Instance.LogInfo("Must enter CIM/XML file.");
+                    logger.LogInfo("Must enter CIM/XML file.");
                     return;
                 }
 
@@ -72,7 +72,7 @@ namespace Outage.DataImporter.ModelLabsApp
 				using (FileStream fs = File.Open(textBoxCIMFile.Text, FileMode.Open))
 				{
 					nmsDelta = adapter.CreateDelta(fs, (SupportedProfiles)(comboBoxProfile.SelectedItem), out log);
-                    LoggerWrapper.Instance.LogInfo(log);
+                    logger.LogInfo(log);
 					richTextBoxReport.Text = log;
 				}
 				if (nmsDelta != null)
@@ -89,7 +89,7 @@ namespace Outage.DataImporter.ModelLabsApp
 			catch (Exception e)
 			{
 				MessageBox.Show(string.Format("An error occurred.\n\n{0}", e.Message), "Error", MessageBoxButtons.OK, MessageBoxIcon.Error);
-                LoggerWrapper.Instance.LogError("An error occurred.", e);
+                logger.LogError("An error occurred.", e);
             }
 
 			buttonApplyDelta.Enabled = (nmsDelta != null);
@@ -111,13 +111,13 @@ namespace Outage.DataImporter.ModelLabsApp
                 catch (Exception e)
                 {
                     MessageBox.Show(string.Format("An error occurred.\n\n{0}", e.Message), "Error", MessageBoxButtons.OK, MessageBoxIcon.Error);
-                    LoggerWrapper.Instance.LogError("An error occurred.", e);
+                    logger.LogError("An error occurred.", e);
                 }
             }
             else
             {
                 MessageBox.Show("No data is imported into delta object.", "Info", MessageBoxButtons.OK, MessageBoxIcon.Information);
-                LoggerWrapper.Instance.LogInfo("No data is imported into delta object.");
+                logger.LogInfo("No data is imported into delta object.");
             }
 		}
 

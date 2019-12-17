@@ -11,6 +11,8 @@ namespace Outage.NetworkModelService
 {
     public class NetworkModelService : IDisposable
     {
+        private ILogger logger = LoggerWrapper.Instance;
+
         private NetworkModel networkModel = null;
         private List<ServiceHost> hosts = null;
 
@@ -55,16 +57,16 @@ namespace Outage.NetworkModelService
 
                 message = string.Format("The WCF service {0} is ready.", host.Description.Name);
                 Console.WriteLine(message);
-                LoggerWrapper.Instance.LogInfo(message);
+                logger.LogInfo(message);
 
                 message = "Endpoints:";
                 Console.WriteLine(message);
-                LoggerWrapper.Instance.LogInfo(message);
+                logger.LogInfo(message);
 
                 foreach (Uri uri in host.BaseAddresses)
                 {
                     Console.WriteLine(uri);
-                    LoggerWrapper.Instance.LogInfo(uri.ToString());
+                    logger.LogInfo(uri.ToString());
                 }
 
                 Console.WriteLine("\n");
@@ -72,16 +74,16 @@ namespace Outage.NetworkModelService
 
             message = string.Format("Connection string: {0}", Config.Instance.ConnectionString);
             Console.WriteLine(message);
-            LoggerWrapper.Instance.LogInfo(message);
+            logger.LogInfo(message);
 
             message = string.Format("Trace level: {0}", CommonTrace.TraceLevel);
             Console.WriteLine(message);
-            LoggerWrapper.Instance.LogInfo(message);
+            logger.LogInfo(message);
 
 
             message = "The Network Model Service is started.";
             Console.WriteLine("\n{0}", message);
-            LoggerWrapper.Instance.LogInfo(message);
+            logger.LogInfo(message);
         }
 
         private void CloseHosts()
@@ -98,7 +100,7 @@ namespace Outage.NetworkModelService
             }
 
             string message = "The Network Model Service is gracefully closed.";
-            LoggerWrapper.Instance.LogInfo(message);
+            logger.LogInfo(message);
             Console.WriteLine("\n\n{0}", message);
         }
     }

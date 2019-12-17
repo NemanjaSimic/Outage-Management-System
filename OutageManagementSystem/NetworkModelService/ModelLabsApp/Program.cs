@@ -23,7 +23,7 @@ namespace Outage.DataImporter.ModelLabsApp
 			catch (Exception e)
 			{
 				MessageBox.Show(string.Format("Application is going down!\n  {0}", e.Message), "Error", MessageBoxButtons.OK, MessageBoxIcon.Error);
-                LoggerWrapper.Instance.LogError($"Application is going down!\n  {e.Message}");
+                logger.LogError($"Application is going down!\n  {e.Message}");
 			}
 			finally
 			{
