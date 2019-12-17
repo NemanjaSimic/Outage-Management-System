@@ -6,7 +6,7 @@ namespace OMS.Web.Services.Commands
     public abstract class SwitchCommandBase : IRequest
     {
         protected long _gid;
-        protected SwitchCommand _command;
+        protected SwitchCommandType _command;
 
         public long Gid
         {
@@ -15,7 +15,7 @@ namespace OMS.Web.Services.Commands
             protected set { _gid = value; }
         }
 
-        public SwitchCommand Command
+        public SwitchCommandType Command
         {
             get { return _command; }
             protected set { _command = value; }

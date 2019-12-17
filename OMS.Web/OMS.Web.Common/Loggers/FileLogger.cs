@@ -1,6 +1,6 @@
 ﻿using NLog;
 using System;
-using ILogger = OMS.Web.Common.Interfaces.Logger.ILogger;
+using ILogger = Outage.Common.ILogger;
 
 namespace OMS.Web.Common.Loggers
 {
@@ -13,7 +13,7 @@ namespace OMS.Web.Common.Loggers
             _logger = LogManager.GetCurrentClassLogger();
         }
 
-        public void LogDebug(string message)
+        public void LogDebug(string message, Exception e = null)
         {
             _logger.Debug(message);
         }
@@ -21,6 +21,26 @@ namespace OMS.Web.Common.Loggers
         public void LogError(Exception e, string message = null)
         {
             _logger.Error(e, message ?? e.Message);
+        }
+
+        public void LogError(string message, Exception e = null)
+        {
+            _logger.Error(e, message ?? e.Message);
+        }
+
+        public void LogFatal(string message, Exception e = null)
+        {
+            _logger.Fatal(e, message ?? e.Message);
+        }
+
+        public void LogInfo(string message, Exception e = null)
+        {
+            _logger.Info(message);
+        }
+
+        public void LogWarn(string message, Exception e = null)
+        {
+            _logger.Warn(message);
         }
     }
 }

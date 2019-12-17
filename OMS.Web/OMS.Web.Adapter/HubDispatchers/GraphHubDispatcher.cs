@@ -1,6 +1,6 @@
 ﻿using Microsoft.AspNet.SignalR.Client;
 using OMS.Web.Common;
-using OMS.Web.UI.Models;
+using OMS.Web.UI.Models.ViewModels;
 using System;
 using System.Collections.Generic;
 

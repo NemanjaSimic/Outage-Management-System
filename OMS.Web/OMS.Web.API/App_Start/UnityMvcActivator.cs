@@ -1,4 +1,5 @@
 using System.Linq;
+using System.Web.Http;
 using System.Web.Mvc;
 using Unity.AspNet.Mvc;
 
@@ -22,7 +23,7 @@ namespace OMS.Web.API
             FilterProviders.Providers.Add(new UnityFilterAttributeFilterProvider(UnityConfig.Container));
 
             DependencyResolver.SetResolver(new UnityDependencyResolver(UnityConfig.Container));
-
+            GlobalConfiguration.Configuration.DependencyResolver = new Unity.WebApi.UnityDependencyResolver(UnityConfig.Container);
         }
 
         /// <summary>

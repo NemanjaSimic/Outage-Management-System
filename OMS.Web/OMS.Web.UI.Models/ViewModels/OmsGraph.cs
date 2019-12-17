@@ -1,6 +1,6 @@
 ﻿using System.Collections.Generic;
 
-namespace OMS.Web.UI.Models
+namespace OMS.Web.UI.Models.ViewModels
 {
     public class OmsGraph
     {

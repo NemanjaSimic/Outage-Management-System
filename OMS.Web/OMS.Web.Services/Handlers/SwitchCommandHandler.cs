@@ -1,6 +1,6 @@
 ﻿using MediatR;
-using OMS.Web.Common.Interfaces.Logger;
 using OMS.Web.Services.Commands;
+using Outage.Common;
 using System.Threading;
 using System.Threading.Tasks;
 

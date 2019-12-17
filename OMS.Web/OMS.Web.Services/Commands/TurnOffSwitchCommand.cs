@@ -6,7 +6,7 @@ namespace OMS.Web.Services.Commands
     {
         public TurnOffSwitchCommand(long gid) : base(gid) 
         {
-            Command = SwitchCommand.TURN_OFF;
+            Command = SwitchCommandType.TURN_OFF;
         }
     }
 }

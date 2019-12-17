@@ -1,4 +1,4 @@
-﻿using OMS.Web.UI.Models;
+﻿using OMS.Web.UI.Models.ViewModels;
 using System.Collections.Generic;
 using System.ServiceModel;
 

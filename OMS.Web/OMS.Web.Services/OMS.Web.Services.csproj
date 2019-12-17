@@ -56,6 +56,10 @@
   </ItemGroup>
   <ItemGroup />
   <ItemGroup>
+    <ProjectReference Include="..\..\OutageManagementSystem\Common\Common.csproj">
+      <Project>{892cbe15-9ed7-4540-81fa-0eaaba592138}</Project>
+      <Name>Common</Name>
+    </ProjectReference>
     <ProjectReference Include="..\OMS.Web.Common.Interfaces\OMS.Web.Common.Interfaces.csproj">
       <Project>{2A7C8378-0F77-4C24-B124-F7B80393089C}</Project>
       <Name>OMS.Web.Common.Interfaces</Name>
