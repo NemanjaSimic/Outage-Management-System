@@ -1,5 +1,6 @@
 ﻿using Outage.Common;
 using Outage.Common.GDA;
+using Outage.Common.ServiceContracts;
 using Outage.DistributedTransactionActor;
 using System;
 using System.Collections.Generic;
@@ -9,8 +10,9 @@ using System.Threading.Tasks;
 
 namespace Outage.NetworkModelService.DistributedTransaction
 {
-    public class NMSTransactionActor : TransactionActor
+    public class NMSTransactionActor : TransactionActor, ITransactionActorContract
     {
+        private static readonly string transactionCoordinatorEndpoint = "TransactionCoordinatorEndpoint";
         protected static NetworkModel networkModel = null;
 
         public static NetworkModel NetworkModel
@@ -22,7 +24,7 @@ namespace Outage.NetworkModelService.DistributedTransaction
         }
 
         public NMSTransactionActor() 
-            : base("", ServiceHostNames.NetworkModelService)
+            : base(transactionCoordinatorEndpoint, ServiceHostNames.NetworkModelService)
         {
         }
 

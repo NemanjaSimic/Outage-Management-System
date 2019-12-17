@@ -1,16 +1,12 @@
-﻿//using ModBus.Connection;
-using Outage.Common;
-using Outage.Common.Contracts;
+﻿using Outage.Common;
 using Outage.Common.GDA;
+using Outage.Common.ServiceContracts;
 using SCADA_Common;
 using SCADA_Config_Data.Configuration;
 using System;
 using System.Collections.Generic;
 using System.Configuration;
-using System.Linq;
 using System.ServiceModel;
-using System.Text;
-using System.Threading.Tasks;
 
 namespace SCADA_Config_Data.Repository
 {
