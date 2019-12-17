@@ -1,8 +1,11 @@
 using OMS.Web.API.Hubs;
 using OMS.Web.Common;
 using OMS.Web.Common.Interfaces.Exceptions;
+using OMS.Web.Common.Interfaces.Logger;
+using OMS.Web.Common.Loggers;
 using System;
 using Unity;
+using Unity.Lifetime;
 
 namespace OMS.Web.API
 {
@@ -41,6 +44,7 @@ namespace OMS.Web.API
             // We register our types here
             container.RegisterType<GraphHub>();
             container.RegisterType<ICustomExceptionHandler, CustomExceptionBase>();
+            container.RegisterType<ILogger, FileLogger>(new ContainerControlledLifetimeManager());
         }
     }
 }
