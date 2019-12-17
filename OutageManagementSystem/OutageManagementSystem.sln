@@ -13,6 +13,7 @@ Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "CalculationEngineServiceHos
 EndProject
 Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "NetworkModelServiceFunctions", "CalculationEngineService\NetworkModelServiceFunctions\NetworkModelServiceFunctions.csproj", "{D4553E8A-C694-4EBD-BA3C-0444A1D0C1EF}"
 	ProjectSection(ProjectDependencies) = postProject
+		{B726FB71-D295-41EE-9644-B2B0B1BC8911} = {B726FB71-D295-41EE-9644-B2B0B1BC8911}
 		{E1D2D69D-E03D-4FD7-8E4F-0FC95B68F0DD} = {E1D2D69D-E03D-4FD7-8E4F-0FC95B68F0DD}
 	EndProjectSection
 EndProject

@@ -297,12 +297,13 @@ namespace Outage.NetworkModelService
                 if(!isInitialization)
                 {
                     delta.FixNegativeToPositiveIds(ref typesCounters, ref globalIdPairs);
+                    applyingStarted = true;
                 }
 
                 updateResult.GlobalIdPairs = globalIdPairs;
                 delta.SortOperations();
 
-                applyingStarted = true;
+                
 
                 foreach (ResourceDescription rd in delta.InsertOperations)
                 {
