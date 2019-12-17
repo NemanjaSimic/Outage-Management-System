@@ -1,15 +1,10 @@
 ﻿using log4net;
 using System;
-using System.Collections.Generic;
 using System.Configuration;
-using System.IO;
-using System.Linq;
-using System.Runtime.CompilerServices;
-using System.Text;
 
 namespace Outage.Common
 {
-    public class LoggerWrapper
+    public class LoggerWrapper : ILogger
     {
         private static LoggerWrapper instance;
         private static object lockObj = new object();
@@ -19,14 +14,14 @@ namespace Outage.Common
         private LoggerWrapper(string callerName)
         {
             logger = LogManager.GetLogger(callerName);
-        }   
+        }
 
         public static LoggerWrapper Instance
         {
             get
             {
 
-                if(instance == null)
+                if (instance == null)
                 {
                     lock (lockObj)
                     {
@@ -49,7 +44,7 @@ namespace Outage.Common
 
         }
 
-     
+
 
 
         public void LogInfo(string message, Exception e = null)
