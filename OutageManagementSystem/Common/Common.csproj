@@ -99,9 +99,10 @@
     <Reference Include="System.Xml" />
   </ItemGroup>
   <ItemGroup>
-    <Compile Include="ServiceContracts\IDistributedTransactionContract.cs" />
+    <Compile Include="ServiceHostNames.cs" />
+    <Compile Include="ServiceContracts\ITransactionCoordinatorContract.cs" />
     <Compile Include="ServiceContracts\INetworkModelGDAContract.cs" />
-    <Compile Include="ServiceContracts\ITwoPhaseCommitProtocolContract.cs" />
+    <Compile Include="ServiceContracts\ITransactionActorContract.cs" />
     <Compile Include="GDA\Association.cs" />
     <Compile Include="EnumDescs.cs" />
     <Compile Include="Enums.cs" />
@@ -110,9 +111,9 @@
     <Compile Include="LoggerWrapper.cs" />
     <Compile Include="ModelException\ErrorCode.cs" />
     <Compile Include="ModelException\ModelException.cs" />
-    <Compile Include="ServiceProxies\DistributedTransactionProxy.cs" />
+    <Compile Include="ServiceProxies\TransactionCoordinatorProxy.cs" />
     <Compile Include="ServiceProxies\NetworkModelGDAProxy.cs" />
-    <Compile Include="ServiceProxies\TwoPhaseCommitProtocolProxy.cs" />
+    <Compile Include="ServiceProxies\TransactionActorProxy.cs" />
     <Compile Include="Trace\CommonTrace.cs" />
     <Compile Include="ModelCodeHelper.cs" />
     <Compile Include="ModelResourcesDesc.cs" />

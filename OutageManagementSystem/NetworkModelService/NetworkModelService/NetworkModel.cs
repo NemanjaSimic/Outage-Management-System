@@ -4,6 +4,8 @@ using MongoDB.Bson.Serialization.Serializers;
 using MongoDB.Driver;
 using Outage.Common;
 using Outage.Common.GDA;
+using Outage.Common.ServiceContracts;
+using Outage.Common.ServiceProxies;
 using Outage.DataModel;
 using Outage.DBModel.NetworkModelService;
 using Outage.NetworkModelService.GDA;
@@ -17,8 +19,18 @@ using System.Xml;
 
 namespace Outage.NetworkModelService
 {
-    public class NetworkModel //: ICloneable
+    public class NetworkModel
     {
+        #region Fields
+        private readonly string transactionCoordinatorEndpoint = "TransactionCoordinatorEndpoint";
+
+        private IMongoDatabase db;
+
+        /// <summary>
+        /// ModelResourceDesc class contains metadata of the model
+        /// </summary>
+        private ModelResourcesDesc resourcesDescs;
+        
         /// <summary>
 		/// Dictionary which contains all data: Key - DMSType, Value - Container
 		/// </summary>
@@ -29,15 +41,12 @@ namespace Outage.NetworkModelService
         /// Used while applying deltas.
 		/// </summary>
         private Dictionary<DMSType, Container> incomingNetworkDataModel;
+        #endregion
 
+        #region Properties
         /// <summary>
-        /// ModelResourceDesc class contains metadata of the model
+        /// Dictionary which contains all data: Key - DMSType, Value - Container
         /// </summary>
-        private ModelResourcesDesc resourcesDescs;
-
-        /// <summary>
-		/// Dictionary which contains all data: Key - DMSType, Value - Container
-		/// </summary>
         public Dictionary<DMSType, Container> NetworkDataModel
         {
             get
@@ -45,8 +54,7 @@ namespace Outage.NetworkModelService
                 return networkDataModel ?? (networkDataModel = new Dictionary<DMSType, Container>());
             }
         }
-        
-        private IMongoDatabase db;
+        #endregion
 
         /// <summary>
         /// Initializes a new instance of the Model class.
@@ -319,19 +327,9 @@ namespace Outage.NetworkModelService
                     DeleteEntity(rd);
                 }
 
-                //Confirming switching from current to incoming data model
-                bool confirmDelta = true; //TODO: confirmation
-
-                if(confirmDelta)
+                using (TransactionCoordinatorProxy coordinatorProxy = new TransactionCoordinatorProxy(transactionCoordinatorEndpoint))
                 {
-                    networkDataModel = incomingNetworkDataModel;
-                    LoggerWrapper.Instance.LogDebug($"Incoming model [HashCode: 0x{incomingNetworkDataModel.GetHashCode():X16}] has been confirmed. Current model [HashCode: 0x{networkDataModel.GetHashCode():X16}].");
-                }
-                else
-                {
-                    int hashCode = incomingNetworkDataModel.GetHashCode();
-                    incomingNetworkDataModel = null;
-                    LoggerWrapper.Instance.LogDebug($"Incoming model [HashCode: 0x{hashCode:X16}] has been rejected. Current model [HashCode: 0x{networkDataModel.GetHashCode():X16}].");
+                    coordinatorProxy.StartDistributedUpdate(delta, ServiceHostNames.NetworkModelService);
                 }
             }
             catch (Exception ex)
@@ -360,6 +358,24 @@ namespace Outage.NetworkModelService
             return updateResult;
         }
 
+        #region ITransactionActorContract
+        public bool Commit()
+        {
+            networkDataModel = incomingNetworkDataModel;
+            LoggerWrapper.Instance.LogDebug($"Incoming model [HashCode: 0x{incomingNetworkDataModel.GetHashCode():X16}] has been confirmed. Current model [HashCode: 0x{networkDataModel.GetHashCode():X16}].");
+            return true;
+        }
+
+        public bool Rollback()
+        {
+            int hashCode = incomingNetworkDataModel.GetHashCode();
+            incomingNetworkDataModel = null;
+            LoggerWrapper.Instance.LogDebug($"Incoming model [HashCode: 0x{hashCode:X16}] has been rejected. Current model [HashCode: 0x{networkDataModel.GetHashCode():X16}].");
+            return true;
+        }
+        #endregion
+
+        #region Private Members
         /// <summary>
         /// Inserts entity into the network model.
         /// </summary>
@@ -844,29 +860,6 @@ namespace Outage.NetworkModelService
             return relatedGids;
         }
 
-        /// <summary>
-        /// Writes delta to log
-        /// </summary>
-        /// <param name="delta">delta instance which will be logged</param>
-        public static void TraceDelta(Delta delta)
-        {
-            try
-            {
-                StringWriter stringWriter = new StringWriter();
-                XmlTextWriter xmlWriter = new XmlTextWriter(stringWriter);
-                xmlWriter.Formatting = Formatting.Indented;
-                delta.ExportToXml(xmlWriter);
-                xmlWriter.Flush();
-                LoggerWrapper.Instance.LogInfo(stringWriter.ToString());
-                xmlWriter.Close();
-                stringWriter.Close();
-            }
-            catch (Exception ex)
-            {
-                LoggerWrapper.Instance.LogError($"Failed to trace delta with id: {delta.Id}. Reason: {ex.Message}", ex);
-            }
-        }
-
         private Container GetContainerShallowCopy(DMSType type, Container currentContainer)
         {
             Container incomingContainer = currentContainer.Clone();
@@ -1105,5 +1098,29 @@ namespace Outage.NetworkModelService
 
             return typesCounters;
         }
+        #endregion
+
+        ///// <summary>
+        ///// Writes delta to log
+        ///// </summary>
+        ///// <param name="delta">delta instance which will be logged</param>
+        //public static void TraceDelta(Delta delta)
+        //{
+        //    try
+        //    {
+        //        StringWriter stringWriter = new StringWriter();
+        //        XmlTextWriter xmlWriter = new XmlTextWriter(stringWriter);
+        //        xmlWriter.Formatting = Formatting.Indented;
+        //        delta.ExportToXml(xmlWriter);
+        //        xmlWriter.Flush();
+        //        LoggerWrapper.Instance.LogInfo(stringWriter.ToString());
+        //        xmlWriter.Close();
+        //        stringWriter.Close();
+        //    }
+        //    catch (Exception ex)
+        //    {
+        //        LoggerWrapper.Instance.LogError($"Failed to trace delta with id: {delta.Id}. Reason: {ex.Message}", ex);
+        //    }
+        //}
     }
 }

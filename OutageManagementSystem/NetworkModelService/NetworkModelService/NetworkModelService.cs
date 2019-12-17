@@ -1,4 +1,5 @@
 ﻿using Outage.Common;
+using Outage.NetworkModelService.DistributedTransaction;
 using Outage.NetworkModelService.GDA;
 using System;
 using System.Collections.Generic;
@@ -19,6 +20,7 @@ namespace Outage.NetworkModelService
             networkModel = new NetworkModel();
             GenericDataAccess.NetworkModel = networkModel;
             ResourceIterator.NetworkModel = networkModel;
+            NMSTransactionActor.NetworkModel = networkModel;
             InitializeHosts();
         }
 
@@ -37,7 +39,8 @@ namespace Outage.NetworkModelService
         {
             hosts = new List<ServiceHost>
             {
-                new ServiceHost(typeof(GenericDataAccess))
+                new ServiceHost(typeof(GenericDataAccess)),
+                new ServiceHost(typeof(NMSTransactionActor))
             };
         }
 

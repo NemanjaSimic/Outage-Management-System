@@ -57,8 +57,14 @@ EndProject
 Project("{2150E333-8FDC-42A3-9474-1A3956D46DE8}") = "TransactionManagerService", "TransactionManagerService", "{65CC209D-49E2-456A-AD48-31494D75658C}"
 EndProject
 Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "TransactionManagerServiceHost", "TransactionManagerService\TransactionManagerServiceHost\TransactionManagerServiceHost.csproj", "{048D591B-F46C-49CF-B455-AE21DB97F419}"
+	ProjectSection(ProjectDependencies) = postProject
+		{892CBE15-9ED7-4540-81FA-0EAABA592138} = {892CBE15-9ED7-4540-81FA-0EAABA592138}
+		{AA207779-062F-4502-AB4B-10B2D99457BA} = {AA207779-062F-4502-AB4B-10B2D99457BA}
+	EndProjectSection
 EndProject
 Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "TransactionManagerService", "TransactionManagerService\TransactionManagerService\TransactionManagerService.csproj", "{AA207779-062F-4502-AB4B-10B2D99457BA}"
+EndProject
+Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "DistributedTransactionActor", "TransactionManagerService\DistributedTransactionActor\DistributedTransactionActor.csproj", "{D2B436C8-C9AF-4FE2-B881-B8D28228637B}"
 EndProject
 Global
 	GlobalSection(SolutionConfigurationPlatforms) = preSolution
@@ -242,6 +248,18 @@ Global
 		{AA207779-062F-4502-AB4B-10B2D99457BA}.Release|x64.Build.0 = Release|Any CPU
 		{AA207779-062F-4502-AB4B-10B2D99457BA}.Release|x86.ActiveCfg = Release|Any CPU
 		{AA207779-062F-4502-AB4B-10B2D99457BA}.Release|x86.Build.0 = Release|Any CPU
+		{D2B436C8-C9AF-4FE2-B881-B8D28228637B}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
+		{D2B436C8-C9AF-4FE2-B881-B8D28228637B}.Debug|Any CPU.Build.0 = Debug|Any CPU
+		{D2B436C8-C9AF-4FE2-B881-B8D28228637B}.Debug|x64.ActiveCfg = Debug|Any CPU
+		{D2B436C8-C9AF-4FE2-B881-B8D28228637B}.Debug|x64.Build.0 = Debug|Any CPU
+		{D2B436C8-C9AF-4FE2-B881-B8D28228637B}.Debug|x86.ActiveCfg = Debug|Any CPU
+		{D2B436C8-C9AF-4FE2-B881-B8D28228637B}.Debug|x86.Build.0 = Debug|Any CPU
+		{D2B436C8-C9AF-4FE2-B881-B8D28228637B}.Release|Any CPU.ActiveCfg = Release|Any CPU
+		{D2B436C8-C9AF-4FE2-B881-B8D28228637B}.Release|Any CPU.Build.0 = Release|Any CPU
+		{D2B436C8-C9AF-4FE2-B881-B8D28228637B}.Release|x64.ActiveCfg = Release|Any CPU
+		{D2B436C8-C9AF-4FE2-B881-B8D28228637B}.Release|x64.Build.0 = Release|Any CPU
+		{D2B436C8-C9AF-4FE2-B881-B8D28228637B}.Release|x86.ActiveCfg = Release|Any CPU
+		{D2B436C8-C9AF-4FE2-B881-B8D28228637B}.Release|x86.Build.0 = Release|Any CPU
 	EndGlobalSection
 	GlobalSection(SolutionProperties) = preSolution
 		HideSolutionNode = FALSE
@@ -265,6 +283,7 @@ Global
 		{DB770671-ECE8-4978-A992-E0D4D44F8FC8} = {681EE228-E690-4D41-8E1A-306362901EF4}
 		{048D591B-F46C-49CF-B455-AE21DB97F419} = {65CC209D-49E2-456A-AD48-31494D75658C}
 		{AA207779-062F-4502-AB4B-10B2D99457BA} = {65CC209D-49E2-456A-AD48-31494D75658C}
+		{D2B436C8-C9AF-4FE2-B881-B8D28228637B} = {65CC209D-49E2-456A-AD48-31494D75658C}
 	EndGlobalSection
 	GlobalSection(ExtensibilityGlobals) = postSolution
 		SolutionGuid = {28760A05-312F-4AA5-9831-305EE698F2F1}

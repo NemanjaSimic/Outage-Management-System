@@ -1,6 +1,6 @@
 ﻿using Outage.Common;
-using Outage.Common.Contracts;
 using Outage.Common.GDA;
+using Outage.Common.ServiceContracts;
 using System;
 using System.Collections.Generic;
 using System.Linq;
