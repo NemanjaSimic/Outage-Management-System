@@ -29,7 +29,6 @@ export const addGraphTooltip = (cy, node) => {
         }
 
         button.addEventListener('click', () => {
-          console.log('switching on node with id: ', node.data('id'));
 
           // TODO: Zameniti sa logikom da posalje komandu ka SCADI i nakon sto primi uspesan odgovor da promeni status dugmeta (on/off)
           if (node.data('state') == "active") {
@@ -42,6 +41,7 @@ export const addGraphTooltip = (cy, node) => {
           }
 
         });
+
         div.appendChild(button);
       }
 
