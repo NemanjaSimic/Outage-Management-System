@@ -1,5 +1,5 @@
 import { Component, OnInit, NgZone, OnDestroy } from '@angular/core';
-import { Subscription } from 'rxjs';
+import { Subscription, Observable, fromEvent } from 'rxjs';
 import { GraphService } from '@services/notification/graph.service';
 import { OmsGraph } from '@shared/models/oms-graph.model';
 
@@ -26,7 +26,9 @@ cytoscape.use(popper);
 export class GraphComponent implements OnInit, OnDestroy {
   public connectionSubscription: Subscription;
   public updateSubscription: Subscription;
+  public zoomSubscription: Subscription;
 
+  public didLoadGraph: boolean;
   private cy: any;
 
   private graphData: any = {
@@ -41,8 +43,17 @@ export class GraphComponent implements OnInit, OnDestroy {
     this.connectionSubscription = Subscription.EMPTY;
     this.updateSubscription = Subscription.EMPTY;
   }
-
+  
   ngOnInit() {
+    
+    // testing splash screen look, will change logic after we connect to the api
+    this.didLoadGraph = false;
+
+    setTimeout(() => {
+      this.didLoadGraph = true;
+      this.drawGraph();
+    }, 2000);
+
     // web api
     this.startConnection();
 
@@ -50,7 +61,14 @@ export class GraphComponent implements OnInit, OnDestroy {
     this.graphData.nodes = graphMock.nodes;
     this.graphData.edges = graphMock.edges;
 
-    this.drawGraph();    
+    // zoom on + and -
+    this.zoomSubscription = fromEvent(document, 'keypress').subscribe(
+      (e: KeyboardEvent) => {
+        if (e.key == '+')
+          this.cy.zoom(this.cy.zoom() + 0.1);
+        else if (e.key == '-')
+          this.cy.zoom(this.cy.zoom() - 0.1);
+      });
   }
 
   ngOnDestroy() {
@@ -59,6 +77,9 @@ export class GraphComponent implements OnInit, OnDestroy {
 
     if (this.updateSubscription)
       this.updateSubscription.unsubscribe();
+
+    if (this.zoomSubscription)
+      this.zoomSubscription.unsubscribe();
   }
 
   public startConnection(): void {
@@ -106,6 +127,7 @@ export class GraphComponent implements OnInit, OnDestroy {
       })
     });
   };
+
 
   public onNotification(data: OmsGraph): void {
     this.ngZone.run(() => {

@@ -33,6 +33,7 @@
   </PropertyGroup>
   <ItemGroup>
     <Reference Include="System" />
+    <Reference Include="System.ComponentModel.DataAnnotations" />
     <Reference Include="System.Core" />
     <Reference Include="System.Xml.Linq" />
     <Reference Include="System.Data.DataSetExtensions" />
@@ -42,11 +43,17 @@
     <Reference Include="System.Xml" />
   </ItemGroup>
   <ItemGroup>
-    <Compile Include="Node.cs" />
-    <Compile Include="OmsGraph.cs" />
-    <Compile Include="Relation.cs" />
+    <Compile Include="BindingModels\SwitchCommand.cs" />
+    <Compile Include="ViewModels\Node.cs" />
+    <Compile Include="ViewModels\OmsGraph.cs" />
+    <Compile Include="ViewModels\Relation.cs" />
     <Compile Include="Properties\AssemblyInfo.cs" />
   </ItemGroup>
-  <ItemGroup />
+  <ItemGroup>
+    <ProjectReference Include="..\OMS.Web.Common\OMS.Web.Common.csproj">
+      <Project>{63EA1AA4-DC22-4552-8454-346F1DA85082}</Project>
+      <Name>OMS.Web.Common</Name>
+    </ProjectReference>
+  </ItemGroup>
   <Import Project="$(MSBuildToolsPath)\Microsoft.CSharp.targets" />
 </Project>

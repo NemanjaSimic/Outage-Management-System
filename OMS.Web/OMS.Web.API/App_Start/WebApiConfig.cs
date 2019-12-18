@@ -1,4 +1,5 @@
 ﻿using OMS.Web.API.Filters;
+using Outage.Common;
 using System.Web.Http;
 
 namespace OMS.Web.API
@@ -9,7 +10,7 @@ namespace OMS.Web.API
         {
             // Web API configuration and services
             config.EnableCors();
-            config.Filters.Add(new CustomExceptionFilterAttribute());
+            config.Filters.Add(new CustomExceptionFilterAttribute((ILogger)config.DependencyResolver.GetService(typeof(ILogger))));
 
             // Web API routes
             config.MapHttpAttributeRoutes();

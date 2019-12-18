@@ -1,7 +1,7 @@
 ﻿using System;
 using System.Collections.Generic;
 using OMS.Web.Adapter.Mock.Client;
-using OMS.Web.UI.Models;
+using OMS.Web.UI.Models.ViewModels;
 
 namespace OMS.Web.Adapter.Mock
 {

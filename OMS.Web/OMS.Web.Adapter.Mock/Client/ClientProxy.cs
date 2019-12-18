@@ -1,5 +1,5 @@
 ﻿using System;
-using OMS.Web.UI.Models;
+using OMS.Web.UI.Models.ViewModels;
 using System.ServiceModel;
 using OMS.Web.Adapter.Contracts;
 using System.Collections.Generic;

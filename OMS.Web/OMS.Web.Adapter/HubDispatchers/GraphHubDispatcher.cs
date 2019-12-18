@@ -1,8 +1,8 @@
 ﻿using Microsoft.AspNet.SignalR.Client;
-using OMS.Web.UI.Models;
+using OMS.Web.Common;
+using OMS.Web.UI.Models.ViewModels;
 using System;
 using System.Collections.Generic;
-using System.Configuration;
 
 namespace OMS.Web.Adapter.HubDispatchers
 {
@@ -17,8 +17,8 @@ namespace OMS.Web.Adapter.HubDispatchers
 
         public GraphHubDispatcher()
         {
-            _url = ConfigurationManager.AppSettings.Get("hubUrl");
-            _hubName = ConfigurationManager.AppSettings.Get("hubName");
+            _url = AppSettings.Get<string>("hubUrl");
+            _hubName = AppSettings.Get<string>("hubName");
 
             _connection = new HubConnection(_url);
             _proxy = _connection.CreateHubProxy(_hubName);
