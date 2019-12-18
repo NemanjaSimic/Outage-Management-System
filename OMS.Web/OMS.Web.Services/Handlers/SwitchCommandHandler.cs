@@ -5,7 +5,6 @@ using System.Threading;
 using System.Threading.Tasks;
 using OMS.Web.Adapter.Contracts;
 using OMS.Web.Services.Commands;
-using OMS.Web.Adapter.ScadaClient;
 
 namespace OMS.Web.Services.Handlers
 {
@@ -14,11 +13,9 @@ namespace OMS.Web.Services.Handlers
         private readonly ILogger _logger;
         private readonly IScadaClient _scadaClient;
 
-        public SwitchCommandHandler(ILogger logger, IScadaClient scadaClient)
+        public SwitchCommandHandler(ILogger logger)
         {
             _logger = logger;
-            _scadaClient = new ScadaClientProxy();
-            _scadaClient = scadaClient;
         }
 
         public Task<Unit> Handle(TurnOffSwitchCommand request, CancellationToken cancellationToken)
@@ -27,6 +24,8 @@ namespace OMS.Web.Services.Handlers
             
             try
             {
+                // treba nam implementacija scada klijenta
+                // jer sad treba da bude preko CE
                 _scadaClient.SendCommand(request.Gid, (int)request.Command);
             }
             catch(Exception e)
