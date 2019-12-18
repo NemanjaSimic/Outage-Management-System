@@ -1,4 +1,6 @@
 using MediatR;
+using OMS.Web.Adapter.Contracts;
+using OMS.Web.Adapter.ScadaClient;
 using OMS.Web.API.Hubs;
 using OMS.Web.Common;
 using OMS.Web.Common.Interfaces.Exceptions;
@@ -10,6 +12,7 @@ using System.Collections.Generic;
 using System.Linq;
 using System.Reflection;
 using Unity;
+using Unity.Injection;
 using Unity.Lifetime;
 
 namespace OMS.Web.API
@@ -50,8 +53,9 @@ namespace OMS.Web.API
             container.RegisterType<GraphHub>();
             container.RegisterType<ICustomExceptionHandler, CustomExceptionBase>();
             container.RegisterType<ILogger, FileLogger>(new ContainerControlledLifetimeManager());
+            container.RegisterType<ScadaClientProxy>(new InjectionConstructor(AppSettings.Get<string>("ScadaServiceUrl")));
 
-            // We register our mediatr commands here (concrete, not abstracts)
+            // We register our mediatr commands here (concrete, not abstract)
             container.RegisterMediator();
             container.RegisterMediatorHandlers(Assembly.GetAssembly(typeof(TurnOffSwitchCommand)));
             container.RegisterMediatorHandlers(Assembly.GetAssembly(typeof(TurnOnSwitchCommand)));
