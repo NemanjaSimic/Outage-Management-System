@@ -3,6 +3,7 @@ using System.Web.Http;
 using OMS.Web.Common.Constants;
 using OMS.Web.Services.Commands;
 using OMS.Web.UI.Models.BindingModels;
+using System;
 
 namespace OMS.Web.API.Controllers
 {
@@ -38,7 +39,14 @@ namespace OMS.Web.API.Controllers
                 return BadRequest("Invalid CommandType.");
             }
 
-            _mediator.Send(switchCommand);
+            try
+            {
+                _mediator.Send(switchCommand);
+            }
+            catch (Exception)
+            {
+                return InternalServerError();
+            }
 
             return Ok($"{switchCommand.Command.ToString()} command for {command.Guid} sent");
         }

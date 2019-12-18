@@ -5,6 +5,7 @@ using System.Threading;
 using System.Threading.Tasks;
 using OMS.Web.Adapter.Contracts;
 using OMS.Web.Services.Commands;
+using OMS.Web.Adapter.ScadaClient;
 
 namespace OMS.Web.Services.Handlers
 {
@@ -13,10 +14,10 @@ namespace OMS.Web.Services.Handlers
         private readonly ILogger _logger;
         private readonly IScadaClient _scadaClient;
 
-        public SwitchCommandHandler(ILogger logger, IScadaClient scadaClient)
+        public SwitchCommandHandler(ILogger logger)
         {
             _logger = logger;
-            _scadaClient = scadaClient;
+            _scadaClient = new ScadaClientProxy();
         }
 
         public Task<Unit> Handle(TurnOffSwitchCommand request, CancellationToken cancellationToken)
@@ -45,7 +46,9 @@ namespace OMS.Web.Services.Handlers
             }
             catch (Exception e)
             {
-                _logger.LogError("SwitchCommandHandler failed on TurnOnSwitch handler.", e);
+                _logger.LogDebug("SwitchCommandHandler failed on TurnOnSwitch handler.");
+                _logger.LogError(null, e);
+                throw;
             }
 
             return null;

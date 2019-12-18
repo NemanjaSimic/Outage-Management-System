@@ -17,7 +17,7 @@ namespace OMS.Web.Adapter.WebService
         public void Open()
         {
             NetTcpBinding binding = new NetTcpBinding();
-            string address = AppSettings.Get<string>("serviceAddress");
+            string address = AppSettings.Get<string>("webServiceAddress");
 
             _host = new ServiceHost(typeof(WebService));
             _host.AddServiceEndpoint(typeof(IWebService), binding, address);

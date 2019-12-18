@@ -1,5 +1,6 @@
 ﻿using System;
 using SCADA_Common;
+using OMS.Web.Common;
 using System.ServiceModel;
 using OMS.Web.Adapter.Contracts;
 
@@ -9,7 +10,7 @@ namespace OMS.Web.Adapter.ScadaClient
     {
         private ICommandService _proxy = null;
 
-        public ScadaClientProxy(string address) : base(binding: new NetTcpBinding(), remoteAddress: address)
+        public ScadaClientProxy() : base(binding: new NetTcpBinding(), remoteAddress: AppSettings.Get<string>("scadaServiceAddress"))
         {
             _proxy = CreateChannel();
         }
