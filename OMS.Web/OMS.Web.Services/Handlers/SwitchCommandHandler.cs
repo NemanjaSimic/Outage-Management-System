@@ -14,10 +14,11 @@ namespace OMS.Web.Services.Handlers
         private readonly ILogger _logger;
         private readonly IScadaClient _scadaClient;
 
-        public SwitchCommandHandler(ILogger logger)
+        public SwitchCommandHandler(ILogger logger, IScadaClient scadaClient)
         {
             _logger = logger;
             _scadaClient = new ScadaClientProxy();
+            _scadaClient = scadaClient;
         }
 
         public Task<Unit> Handle(TurnOffSwitchCommand request, CancellationToken cancellationToken)

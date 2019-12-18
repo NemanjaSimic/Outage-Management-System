@@ -12,6 +12,7 @@ using System.Collections.Generic;
 using System.Linq;
 using System.Reflection;
 using Unity;
+using Unity.Injection;
 using Unity.Lifetime;
 
 namespace OMS.Web.API
@@ -52,6 +53,7 @@ namespace OMS.Web.API
             container.RegisterType<GraphHub>();
             container.RegisterType<ICustomExceptionHandler, CustomExceptionBase>();
             container.RegisterType<ILogger, FileLogger>(new ContainerControlledLifetimeManager());
+            container.RegisterType<ScadaClientProxy>(new InjectionConstructor(AppSettings.Get<string>("ScadaServiceUrl")));
 
             // We register our mediatr commands here (concrete, not abstract)
             container.RegisterMediator();
