@@ -75,6 +75,7 @@
     <Compile Include="HubDispatchers\GraphHubDispatcher.cs" />
     <Compile Include="Program.cs" />
     <Compile Include="Properties\AssemblyInfo.cs" />
+    <Compile Include="ScadaClient\ScadaClientProxy.cs" />
     <Compile Include="WebService\WebService.cs" />
     <Compile Include="WebService\WebServiceHost.cs" />
   </ItemGroup>
