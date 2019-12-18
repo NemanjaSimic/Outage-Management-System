@@ -33,7 +33,6 @@ namespace Outage.NetworkModelService
         /// </summary>
         private ModelResourcesDesc resourcesDescs;
         
-
         /// <summary>
 		/// Dictionary which contains all data: Key - DMSType, Value - Container
 		/// </summary>
@@ -44,6 +43,12 @@ namespace Outage.NetworkModelService
         /// Used while applying deltas.
 		/// </summary>
         private Dictionary<DMSType, Container> incomingNetworkDataModel;
+
+        /// <summary>
+		/// Dictionaru which contains all incoming data: Key - DMSType, Value - Container;
+        /// Contains old network model during distributed transaction.
+		/// </summary>
+        private Dictionary<DMSType, Container> oldNetworkDataModel;
         #endregion
 
         #region Properties
@@ -331,10 +336,18 @@ namespace Outage.NetworkModelService
                     DeleteEntity(rd);
                 }
 
+                oldNetworkDataModel = networkDataModel;
+                logger.LogDebug($"Old model [HashCode: 0x{networkDataModel.GetHashCode():X16}] becomes Current model [HashCode: 0x{incomingNetworkDataModel.GetHashCode():X16}].");
+                
+                networkDataModel = incomingNetworkDataModel;
+                logger.LogDebug($"Current model [HashCode: 0x{networkDataModel.GetHashCode():X16}] becomes Incoming model [HashCode: 0x{incomingNetworkDataModel.GetHashCode():X16}].");
+
                 using (TransactionCoordinatorProxy coordinatorProxy = new TransactionCoordinatorProxy(transactionCoordinatorEndpoint))
                 {
-                    coordinatorProxy.StartDistributedUpdate(delta, ServiceHostNames.NetworkModelService);
+                    coordinatorProxy.StartDistributedUpdate();
                 }
+
+                //TODO: POSALJI LISTE GID PROMENA NA "CE" I "SCADA"
             }
             catch (Exception ex)
             {
@@ -365,16 +378,15 @@ namespace Outage.NetworkModelService
         #region ITransactionActorContract
         public bool Commit()
         {
-            networkDataModel = incomingNetworkDataModel;
-            logger.LogDebug($"Incoming model [HashCode: 0x{incomingNetworkDataModel.GetHashCode():X16}] has been confirmed. Current model [HashCode: 0x{networkDataModel.GetHashCode():X16}].");
+            oldNetworkDataModel = null;
+            logger.LogDebug($"Current model [HashCode: 0x{incomingNetworkDataModel.GetHashCode():X16}] commited. Old model is set to null.");
             return true;
         }
 
         public bool Rollback()
         {
-            int hashCode = incomingNetworkDataModel.GetHashCode();
-            incomingNetworkDataModel = null;
-            logger.LogDebug($"Incoming model [HashCode: 0x{hashCode:X16}] has been rejected. Current model [HashCode: 0x{networkDataModel.GetHashCode():X16}].");
+            networkDataModel = oldNetworkDataModel;
+            logger.LogDebug($"Current model [HashCode: 0x{networkDataModel.GetHashCode():X16}] rollbacked to Old model [HashCode: 0x{oldNetworkDataModel.GetHashCode():X16}].");
             return true;
         }
         #endregion

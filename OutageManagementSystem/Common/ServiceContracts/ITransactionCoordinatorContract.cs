@@ -12,7 +12,7 @@ namespace Outage.Common.ServiceContracts
     public interface ITransactionCoordinatorContract
     {
         [OperationContract]
-        void StartDistributedUpdate(Delta delta, string actorName);
+        void StartDistributedUpdate();
         [OperationContract]
         void FinishDistributedUpdate(string actorName, bool success);
     }

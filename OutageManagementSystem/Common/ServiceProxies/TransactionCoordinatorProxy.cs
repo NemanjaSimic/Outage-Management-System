@@ -15,9 +15,9 @@ namespace Outage.Common.ServiceProxies
             : base(endpointName)
         {
         }
-        public void StartDistributedUpdate(Delta delta, string actorName)
+        public void StartDistributedUpdate()
         {
-            Channel.StartDistributedUpdate(delta, actorName);
+            Channel.StartDistributedUpdate();
         }
 
         public void FinishDistributedUpdate(string actorName, bool success)
