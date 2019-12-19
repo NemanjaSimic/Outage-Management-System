@@ -99,10 +99,12 @@
     <Reference Include="System.Xml" />
   </ItemGroup>
   <ItemGroup>
-    <Compile Include="ServiceHostNames.cs" />
-    <Compile Include="ServiceContracts\ITransactionCoordinatorContract.cs" />
+    <Compile Include="EndpointNames.cs" />
+    <Compile Include="ServiceContracts\DistributedTransaction\IModelUpdateNotificationContract.cs" />
+    <Compile Include="ServiceNames.cs" />
+    <Compile Include="ServiceContracts\DistributedTransaction\ITransactionCoordinatorContract.cs" />
     <Compile Include="ServiceContracts\INetworkModelGDAContract.cs" />
-    <Compile Include="ServiceContracts\ITransactionActorContract.cs" />
+    <Compile Include="ServiceContracts\DistributedTransaction\ITransactionActorContract.cs" />
     <Compile Include="GDA\Association.cs" />
     <Compile Include="EnumDescs.cs" />
     <Compile Include="Enums.cs" />
@@ -112,9 +114,10 @@
     <Compile Include="LoggerWrapper.cs" />
     <Compile Include="ModelException\ErrorCode.cs" />
     <Compile Include="ModelException\ModelException.cs" />
-    <Compile Include="ServiceProxies\TransactionCoordinatorProxy.cs" />
+    <Compile Include="ServiceProxies\DistributedTransaction\ModelUpdateNotificationProxy.cs" />
+    <Compile Include="ServiceProxies\DistributedTransaction\TransactionCoordinatorProxy.cs" />
     <Compile Include="ServiceProxies\NetworkModelGDAProxy.cs" />
-    <Compile Include="ServiceProxies\TransactionActorProxy.cs" />
+    <Compile Include="ServiceProxies\DistributedTransaction\TransactionActorProxy.cs" />
     <Compile Include="Trace\CommonTrace.cs" />
     <Compile Include="ModelCodeHelper.cs" />
     <Compile Include="ModelResourcesDesc.cs" />

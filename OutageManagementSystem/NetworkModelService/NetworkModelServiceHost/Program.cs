@@ -12,6 +12,7 @@ namespace Outage.NetworkModelServiceHost
 
             try
             {
+                //TODO: sta ce ovo ovde?
                 CIMAdapterClass cim = new CIMAdapterClass();
                 
                 string message = "Starting Network Model Service...";

@@ -1,6 +1,4 @@
-﻿using System;
-
-namespace Outage.Common
+﻿namespace Outage.Common
 {
     public enum AnalogMeasurementType : short
     {

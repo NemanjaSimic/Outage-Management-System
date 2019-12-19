@@ -14,6 +14,8 @@ namespace Outage.DataImporter.ModelLabsApp
 		[STAThread]
 		static void Main()
 		{
+			ILogger logger = LoggerWrapper.Instance;
+
 			try
 			{
 				Application.EnableVisualStyles();

@@ -44,7 +44,7 @@ namespace SCADA_Config_Data.Repository
             ServiceAddress = ConfigurationManager.AppSettings["ServiceAddress"];
             try
             {
-                gdaQueryProxy = new ChannelFactory<INetworkModelGDAContract>("NetworkModelGDAEndpoint").CreateChannel();
+                gdaQueryProxy = new ChannelFactory<INetworkModelGDAContract>(EndpointNames.NetworkModelGDAEndpoint).CreateChannel();
             }
             catch (Exception ex)
             {

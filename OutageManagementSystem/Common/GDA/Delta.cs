@@ -1,17 +1,13 @@
 ﻿using System;
 using System.Collections.Generic;
-using System.Collections.ObjectModel;
 using System.IO;
-using System.Linq;
 using System.Runtime.Serialization;
-using System.Text;
 using System.Xml;
-using System.Xml.Serialization;
 using System.Runtime.Serialization.Formatters.Binary;
 
 namespace Outage.Common.GDA
 {
-	
+
 	public enum DeltaOpType : byte 
 	{ 
 		Insert = 0, 

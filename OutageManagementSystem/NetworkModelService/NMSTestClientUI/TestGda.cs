@@ -25,7 +25,7 @@ namespace TelventDMS.Services.NetworkModelService.TestClient.TestsUI
 					gdaQueryProxy = null;
 				}
 
-				gdaQueryProxy = new NetworkModelGDAProxy("NetworkModelGDAEndpoint");
+				gdaQueryProxy = new NetworkModelGDAProxy(EndpointNames.NetworkModelGDAEndpoint);
 				gdaQueryProxy.Open();
 
 				return gdaQueryProxy;

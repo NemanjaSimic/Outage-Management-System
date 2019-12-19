@@ -1,13 +1,10 @@
 ﻿using System;
 using System.Collections.Generic;
 using System.Linq;
-using System.Text;
-using Outage.Common;
-using System.Xml;
 using Outage.Common.GDA;
 
 namespace Outage.Common
-{	
+{
 	public class ResourcePropertiesDesc
 	{
 		private ILogger logger = LoggerWrapper.Instance;

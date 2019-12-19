@@ -32,7 +32,7 @@ namespace Outage.TransactionManagerService
         {
             hosts = new List<ServiceHost>()
             {
-                new ServiceHost(typeof(DistributedTransactionCoordinator)),
+                new ServiceHost(typeof(DistributedTransaction)),
             };
         }
 

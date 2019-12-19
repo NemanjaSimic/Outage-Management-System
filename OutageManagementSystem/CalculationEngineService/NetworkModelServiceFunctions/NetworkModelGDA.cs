@@ -11,13 +11,11 @@ namespace NetworkModelServiceFunctions
 {
 	public class NetworkModelGDA
 	{
-		private static readonly string endpointName = "NetworkModelGDAEndpoint";
-
 		public List<ResourceDescription> GetExtentValues(ModelCode entityType, List<ModelCode> propIds)
 		{
 			int iteratorId;
 
-			using (var proxy = new NetworkModelGDAProxy(endpointName))
+			using (var proxy = new NetworkModelGDAProxy(EndpointNames.NetworkModelGDAEndpoint))
 			{
 				iteratorId = proxy.GetExtentValues(entityType, propIds);			
 			}
@@ -29,7 +27,7 @@ namespace NetworkModelServiceFunctions
 		{
 			int iteratorId;
 
-			using (var proxy = new NetworkModelGDAProxy(endpointName))
+			using (var proxy = new NetworkModelGDAProxy(EndpointNames.NetworkModelGDAEndpoint))
 			{
 				iteratorId = proxy.GetRelatedValues(source, propIds, association);
 			}
@@ -39,7 +37,7 @@ namespace NetworkModelServiceFunctions
 
 		public ResourceDescription GetValues(long resourceId, List<ModelCode> propIds)
 		{
-			using (var proxy = new NetworkModelGDAProxy(endpointName))
+			using (var proxy = new NetworkModelGDAProxy(EndpointNames.NetworkModelGDAEndpoint))
 			{
 				return proxy.GetValues(resourceId, propIds);
 			}
@@ -52,7 +50,7 @@ namespace NetworkModelServiceFunctions
 
 			List<ResourceDescription> resourceDescriptions = new List<ResourceDescription>();
 
-			using (var proxy = new NetworkModelGDAProxy(endpointName))
+			using (var proxy = new NetworkModelGDAProxy(EndpointNames.NetworkModelGDAEndpoint))
 			{
 				do
 				{

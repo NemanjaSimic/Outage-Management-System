@@ -1,6 +1,7 @@
 ﻿using Outage.Common;
 using Outage.Common.GDA;
 using Outage.Common.ServiceContracts;
+using Outage.Common.ServiceContracts.DistributedTransaction;
 using Outage.Common.ServiceProxies;
 using System;
 using System.Collections.Generic;
@@ -10,20 +11,14 @@ using System.Threading.Tasks;
 
 namespace Outage.TransactionManagerService
 {
-    public class DistributedTransactionCoordinator : ITransactionCoordinatorContract
+    public class DistributedTransaction : ITransactionCoordinatorContract, ITransactionEnlistmentContract
     {
         //TODO: get from config
         private static readonly HashSet<string> distributedTransactionActors = new HashSet<string>()
         {
-            ServiceHostNames.NetworkModelService,
-            ServiceHostNames.SCADAService,
-            ServiceHostNames.CalculationEngineService,
-        };
-
-        //TODO: get from config
-        private static readonly HashSet<string> distibutedTransactionInitiators = new HashSet<string>()
-        {
-            ServiceHostNames.NetworkModelService,
+            ServiceNames.NetworkModelService,
+            ServiceNames.SCADAService,
+            ServiceNames.CalculationEngineService,
         };
 
         private static Dictionary<string, bool> transactionLedger = null;
@@ -32,83 +27,95 @@ namespace Outage.TransactionManagerService
         {
             get
             {
-                return transactionLedger ?? (transactionLedger = new Dictionary<string, bool>());
+                return transactionLedger ?? (transactionLedger = new Dictionary<string, bool>(distributedTransactionActors.Count));
             }
         }
 
-        public void StartDistributedUpdate(Delta delta, string actorName)
+        public void StartDistributedUpdate()
         {
-            if(!distibutedTransactionInitiators.Contains(actorName))
-            {
-                return;
-            }
-
             transactionLedger = new Dictionary<string, bool>(distributedTransactionActors.Count);
 
             foreach (string actor in distributedTransactionActors)
             {
-                TransactionLedger.Add(actor, false);
+                if(!TransactionLedger.ContainsKey(actor))
+                {
+                    TransactionLedger.Add(actor, false);
+                }
             }
 
-            if(!EnlistDeltaToActors(delta))
-            {
-                InvokeRollbackActors();
-            }
-
-            if(!InvokePreparationOnActors())
-            {
-                InvokeRollbackActors();
-            }
+            //TODO: start timer...
         }
         
-        public void FinishDistributedUpdate(string actorName, bool success)
+        public void FinishDistributedUpdate(bool success)
         {
-            if(TransactionLedger.ContainsKey(actorName))
+            if(success)
             {
-                TransactionLedger[actorName] = success;
+                if(InvokePreparationOnActors())
+                {
+                    InvokeCommitOnActors();
+                }
+                else
+                {
+                    InvokeRollbackOnActors();
+                }
+            }
+            else
+            {
+                transactionLedger = null;
+            }
+        }
+
+        public bool Enlist(string actorName)
+        {
+            bool success = false;
+
+            if (TransactionLedger.ContainsKey(actorName))
+            {
+                TransactionLedger[actorName] = true;
+                success = true;
             }
 
-            bool transactionFinished = true;
+            return success;
+        }
+
+        #region Private Members
+        private bool InvokePreparationOnActors()
+        {
+            bool success = false;
+
             foreach(string actor in TransactionLedger.Keys)
             {
-                if(!TransactionLedger[actor])
+                if(TransactionLedger[actor])
                 {
-                    transactionFinished = false;
+                    //TODO: call Prepare for actor -> find actor in a map <actorName, endpoint>
+                    throw new NotImplementedException();
+                }
+                else
+                {
+                    success = false;
                     break;
                 }
             }
 
-            if(transactionFinished)
-            {
-                InvokeCommitOnActors();
-            }
-        }
-
-        #region Private Members
-        private bool EnlistDeltaToActors(Delta delta)
-        {
-            foreach(string actor in TransactionLedger.Keys)
-            {
-
-            }
-
-            //todo: finish
-            return true;
-        }
-
-        private bool InvokePreparationOnActors()
-        {
-            throw new NotImplementedException();
+            return success;
         }
 
         private void InvokeCommitOnActors()
         {
-            throw new NotImplementedException();
+            foreach (string actor in TransactionLedger.Keys)
+            {
+                //TODO: call Commit for actor -> find actor in a map <actorName, endpoint>
+                throw new NotImplementedException();   
+            }
         }
 
-        private void InvokeRollbackActors()
+        private void InvokeRollbackOnActors()
         {
-            throw new NotImplementedException();
+            foreach (string actor in TransactionLedger.Keys)
+            {
+                //TODO: call Rollback for actor -> find actor in a map <actorName, endpoint>
+                throw new NotImplementedException();
+            }
         }
         #endregion
     }

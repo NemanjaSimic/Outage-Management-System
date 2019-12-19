@@ -80,8 +80,6 @@ namespace ModBus.Connection
                                     this._connectionState = ConnectionState.DISCONNECTED;
                                 }
                             }
-
-
                         }
                     }
                     else

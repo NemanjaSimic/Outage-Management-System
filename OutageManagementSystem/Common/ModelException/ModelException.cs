@@ -1,12 +1,9 @@
 using System;
-using System.Collections;
-using System.Collections.Generic;
-using System.Text;
 using System.Runtime.Serialization;
 
 namespace Outage.Common
 {
-	
+
 	[DataContract]
 	public class ModelFault
 	{

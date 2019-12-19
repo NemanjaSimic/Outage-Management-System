@@ -1,11 +1,9 @@
 using System;
-using System.Collections.Generic;
-using System.Text;
 
 namespace Outage.Common
 {
-	
-	 public enum DMSType : short
+
+    public enum DMSType : short
     {
         MASK_TYPE = unchecked((short)0xFFFF),
 

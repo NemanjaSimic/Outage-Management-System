@@ -1,12 +1,6 @@
-﻿using System;
-using System.Collections.Generic;
-using System.Linq;
-using System.Text;
-using System.Runtime.Serialization;
-
-namespace Outage.Common
+﻿namespace Outage.Common
 {
-	
+
 	public enum ErrorCode
 	{
 		Unknown						= 0x0000,

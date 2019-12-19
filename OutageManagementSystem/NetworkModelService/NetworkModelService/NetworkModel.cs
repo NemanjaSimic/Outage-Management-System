@@ -6,6 +6,7 @@ using Outage.Common;
 using Outage.Common.GDA;
 using Outage.Common.ServiceContracts;
 using Outage.Common.ServiceProxies;
+using Outage.Common.ServiceProxies.DistributedTransaction;
 using Outage.DataModel;
 using Outage.DBModel.NetworkModelService;
 using Outage.NetworkModelService.GDA;
@@ -22,8 +23,6 @@ namespace Outage.NetworkModelService
     public class NetworkModel
     {
         #region Fields
-        private readonly string transactionCoordinatorEndpoint = "TransactionCoordinatorEndpoint";
-        
         private ILogger logger = LoggerWrapper.Instance;
 
         private IMongoDatabase db;
@@ -342,7 +341,7 @@ namespace Outage.NetworkModelService
                 networkDataModel = incomingNetworkDataModel;
                 logger.LogDebug($"Current model [HashCode: 0x{networkDataModel.GetHashCode():X16}] becomes Incoming model [HashCode: 0x{incomingNetworkDataModel.GetHashCode():X16}].");
 
-                using (TransactionCoordinatorProxy coordinatorProxy = new TransactionCoordinatorProxy(transactionCoordinatorEndpoint))
+                using (TransactionCoordinatorProxy coordinatorProxy = new TransactionCoordinatorProxy(EndpointNames.TransactionCoordinatorEndpoint))
                 {
                     coordinatorProxy.StartDistributedUpdate();
                 }
@@ -376,6 +375,11 @@ namespace Outage.NetworkModelService
         }
 
         #region ITransactionActorContract
+        public bool Prepare()
+        {
+            throw new NotImplementedException();
+        }
+
         public bool Commit()
         {
             oldNetworkDataModel = null;

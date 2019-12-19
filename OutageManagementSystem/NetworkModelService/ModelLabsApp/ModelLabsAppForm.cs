@@ -13,7 +13,9 @@ namespace Outage.DataImporter.ModelLabsApp
 {
 	public partial class ModelLabsAppForm : Form
 	{
-        private CIMAdapterClass adapter = new CIMAdapterClass();
+		private ILogger logger = LoggerWrapper.Instance;
+
+		private CIMAdapterClass adapter = new CIMAdapterClass();
         private Delta nmsDelta = null;
 		
         public ModelLabsAppForm()

@@ -1,5 +1,4 @@
 ﻿using System.Collections.Generic;
-using Outage.Common;
 using System.ServiceModel;
 using Outage.Common.GDA;
 using Outage.Common.ServiceContracts;
