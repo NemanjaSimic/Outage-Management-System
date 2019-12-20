@@ -1,6 +1,4 @@
-﻿using Outage.Common.GDA;
-using Outage.Common.ServiceContracts.DistributedTransaction;
-using System.Collections.Generic;
+﻿using Outage.Common.ServiceContracts.DistributedTransaction;
 
 namespace Outage.DistributedTransactionActor
 {

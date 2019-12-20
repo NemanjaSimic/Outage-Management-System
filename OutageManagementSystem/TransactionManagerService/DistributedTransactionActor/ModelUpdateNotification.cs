@@ -31,7 +31,7 @@ namespace Outage.DistributedTransactionActor
             }
         }
 
-        public ModelUpdateNotification(string endpointName, string actorName)
+        protected ModelUpdateNotification(string endpointName, string actorName)
         {
             EndpointName = endpointName;
             ActorName = actorName;

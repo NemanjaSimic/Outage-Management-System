@@ -10,6 +10,7 @@ using System.Threading.Tasks;
 
 namespace NetworkModelServiceFunctions
 {
+	[Obsolete]
 	class NetworkModelGDAProxy : ClientBase<INetworkModelGDAContract>, INetworkModelGDAContract , IDisposable
 	{
 		private INetworkModelGDAContract proxy;

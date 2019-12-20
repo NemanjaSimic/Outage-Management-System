@@ -54,6 +54,10 @@
       <Project>{892cbe15-9ed7-4540-81fa-0eaaba592138}</Project>
       <Name>Common</Name>
     </ProjectReference>
+    <ProjectReference Include="..\CalculationEngineService\CalculationEngineService.csproj">
+      <Project>{D8BE54B0-1ED0-428E-A4A5-93B93A016D51}</Project>
+      <Name>CalculationEngineService</Name>
+    </ProjectReference>
     <ProjectReference Include="..\CECommon\CECommon.csproj">
       <Project>{E1D2D69D-E03D-4FD7-8E4F-0FC95B68F0DD}</Project>
       <Name>CECommon</Name>
