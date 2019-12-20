@@ -1,7 +1,7 @@
 ﻿
 Microsoft Visual Studio Solution File, Format Version 12.00
-# Visual Studio Version 16
-VisualStudioVersion = 16.0.29609.76
+# Visual Studio 15
+VisualStudioVersion = 15.0.28307.645
 MinimumVisualStudioVersion = 10.0.40219.1
 Project("{2150E333-8FDC-42A3-9474-1A3956D46DE8}") = "CalculationEngineService", "CalculationEngineService", "{AB9540D3-A429-4238-8BB2-5D0114ED012E}"
 EndProject
@@ -13,7 +13,6 @@ Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "CalculationEngineServiceHos
 EndProject
 Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "NetworkModelServiceFunctions", "CalculationEngineService\NetworkModelServiceFunctions\NetworkModelServiceFunctions.csproj", "{D4553E8A-C694-4EBD-BA3C-0444A1D0C1EF}"
 	ProjectSection(ProjectDependencies) = postProject
-		{B726FB71-D295-41EE-9644-B2B0B1BC8911} = {B726FB71-D295-41EE-9644-B2B0B1BC8911}
 		{E1D2D69D-E03D-4FD7-8E4F-0FC95B68F0DD} = {E1D2D69D-E03D-4FD7-8E4F-0FC95B68F0DD}
 	EndProjectSection
 EndProject
@@ -44,6 +43,9 @@ Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "CIMAdapter", "NetworkModelS
 	EndProjectSection
 EndProject
 Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "ModelLabsApp", "NetworkModelService\ModelLabsApp\ModelLabsApp.csproj", "{3DD11384-2CC1-4EE9-9F4A-02B6FE8759C0}"
+	ProjectSection(ProjectDependencies) = postProject
+		{35679A04-DB61-4430-AD3F-65C2C2A53391} = {35679A04-DB61-4430-AD3F-65C2C2A53391}
+	EndProjectSection
 EndProject
 Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "NetworkModelServiceHost", "NetworkModelService\NetworkModelServiceHost\NetworkModelServiceHost.csproj", "{0DFE09A6-2A5D-4C50-BC03-FCC6FFE93B9A}"
 EndProject
@@ -66,21 +68,36 @@ EndProject
 Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "TransactionManagerService", "TransactionManagerService\TransactionManagerService\TransactionManagerService.csproj", "{AA207779-062F-4502-AB4B-10B2D99457BA}"
 EndProject
 Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "DistributedTransactionActor", "TransactionManagerService\DistributedTransactionActor\DistributedTransactionActor.csproj", "{D2B436C8-C9AF-4FE2-B881-B8D28228637B}"
+EndProject
 Project("{2150E333-8FDC-42A3-9474-1A3956D46DE8}") = "PubSubEngine", "PubSubEngine", "{D0EA7ECA-40CA-454D-B4D3-609CD3915FBD}"
 EndProject
 Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "PubSubCommon", "PubSubEngine\PubSubCommon\PubSubCommon.csproj", "{CCB3C63A-8A1C-46C1-A055-BCA0AB7180A8}"
+	ProjectSection(ProjectDependencies) = postProject
+		{892CBE15-9ED7-4540-81FA-0EAABA592138} = {892CBE15-9ED7-4540-81FA-0EAABA592138}
+	EndProjectSection
 EndProject
 Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "PubSubEngine", "PubSubEngine\PubSubEngine\PubSubEngine.csproj", "{6971932A-3A8E-4B20-8CBB-C987408B8562}"
+	ProjectSection(ProjectDependencies) = postProject
+		{892CBE15-9ED7-4540-81FA-0EAABA592138} = {892CBE15-9ED7-4540-81FA-0EAABA592138}
+	EndProjectSection
 EndProject
 Project("{2150E333-8FDC-42A3-9474-1A3956D46DE8}") = "SCADA", "SCADA", "{F47B4360-F4CF-424E-A85E-623A1D2F297B}"
 EndProject
 Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "ModBus", "SCADA\ModBus\ModBus.csproj", "{6E88F6B5-11CB-485A-9BDF-C622FF837022}"
 EndProject
 Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "SCADA_Service", "SCADA\SCADA\SCADA_Service.csproj", "{8C1555E2-23A9-4363-B0C1-D2F4F949C841}"
+	ProjectSection(ProjectDependencies) = postProject
+		{892CBE15-9ED7-4540-81FA-0EAABA592138} = {892CBE15-9ED7-4540-81FA-0EAABA592138}
+	EndProjectSection
 EndProject
 Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "SCADA_Config_Data", "SCADA\SCADA_Config_Data\SCADA_Config_Data.csproj", "{C37F054D-37D9-46C0-881C-1EE3C8C77633}"
 EndProject
 Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "SCADA_Common", "SCADA\SCADACommon\SCADA_Common.csproj", "{7D87AA2B-ED19-47EA-B403-4EDC6B830D4A}"
+	ProjectSection(ProjectDependencies) = postProject
+		{892CBE15-9ED7-4540-81FA-0EAABA592138} = {892CBE15-9ED7-4540-81FA-0EAABA592138}
+	EndProjectSection
+EndProject
+Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "CalculationEngineService", "CalculationEngineService\CalculationEngineService\CalculationEngineService.csproj", "{D8BE54B0-1ED0-428E-A4A5-93B93A016D51}"
 EndProject
 Global
 	GlobalSection(SolutionConfigurationPlatforms) = preSolution
@@ -348,6 +365,18 @@ Global
 		{7D87AA2B-ED19-47EA-B403-4EDC6B830D4A}.Release|x64.Build.0 = Release|Any CPU
 		{7D87AA2B-ED19-47EA-B403-4EDC6B830D4A}.Release|x86.ActiveCfg = Release|Any CPU
 		{7D87AA2B-ED19-47EA-B403-4EDC6B830D4A}.Release|x86.Build.0 = Release|Any CPU
+		{D8BE54B0-1ED0-428E-A4A5-93B93A016D51}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
+		{D8BE54B0-1ED0-428E-A4A5-93B93A016D51}.Debug|Any CPU.Build.0 = Debug|Any CPU
+		{D8BE54B0-1ED0-428E-A4A5-93B93A016D51}.Debug|x64.ActiveCfg = Debug|Any CPU
+		{D8BE54B0-1ED0-428E-A4A5-93B93A016D51}.Debug|x64.Build.0 = Debug|Any CPU
+		{D8BE54B0-1ED0-428E-A4A5-93B93A016D51}.Debug|x86.ActiveCfg = Debug|Any CPU
+		{D8BE54B0-1ED0-428E-A4A5-93B93A016D51}.Debug|x86.Build.0 = Debug|Any CPU
+		{D8BE54B0-1ED0-428E-A4A5-93B93A016D51}.Release|Any CPU.ActiveCfg = Release|Any CPU
+		{D8BE54B0-1ED0-428E-A4A5-93B93A016D51}.Release|Any CPU.Build.0 = Release|Any CPU
+		{D8BE54B0-1ED0-428E-A4A5-93B93A016D51}.Release|x64.ActiveCfg = Release|Any CPU
+		{D8BE54B0-1ED0-428E-A4A5-93B93A016D51}.Release|x64.Build.0 = Release|Any CPU
+		{D8BE54B0-1ED0-428E-A4A5-93B93A016D51}.Release|x86.ActiveCfg = Release|Any CPU
+		{D8BE54B0-1ED0-428E-A4A5-93B93A016D51}.Release|x86.Build.0 = Release|Any CPU
 	EndGlobalSection
 	GlobalSection(SolutionProperties) = preSolution
 		HideSolutionNode = FALSE
@@ -378,6 +407,7 @@ Global
 		{8C1555E2-23A9-4363-B0C1-D2F4F949C841} = {F47B4360-F4CF-424E-A85E-623A1D2F297B}
 		{C37F054D-37D9-46C0-881C-1EE3C8C77633} = {F47B4360-F4CF-424E-A85E-623A1D2F297B}
 		{7D87AA2B-ED19-47EA-B403-4EDC6B830D4A} = {F47B4360-F4CF-424E-A85E-623A1D2F297B}
+		{D8BE54B0-1ED0-428E-A4A5-93B93A016D51} = {AB9540D3-A429-4238-8BB2-5D0114ED012E}
 	EndGlobalSection
 	GlobalSection(ExtensibilityGlobals) = postSolution
 		SolutionGuid = {28760A05-312F-4AA5-9831-305EE698F2F1}

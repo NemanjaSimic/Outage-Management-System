@@ -12,7 +12,7 @@ namespace CIMParser
             this.success = true;
         }
 
-        public CIMModelLoaderResult(bool success) 
+        public CIMModelLoaderResult(bool success)
         {
             this.success = success;
         }

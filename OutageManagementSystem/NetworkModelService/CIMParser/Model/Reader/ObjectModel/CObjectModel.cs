@@ -1,9 +1,9 @@
-﻿using System.Collections.Generic;
-using System.Collections;
+﻿using System.Collections;
+using System.Collections.Generic;
 
 namespace CIM.Model
 {
-    class CObjectModel
+    internal class CObjectModel
     {
         public List<CPackage> packages = new List<CPackage>();
         public Hashtable classes = new Hashtable();

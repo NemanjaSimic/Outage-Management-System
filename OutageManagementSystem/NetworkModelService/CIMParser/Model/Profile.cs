@@ -1,8 +1,7 @@
+using CIM.Manager;
 using System;
 using System.Collections.Generic;
-using System.ComponentModel;
 using System.Text;
-using CIM.Manager;
 
 namespace CIM.Model
 {
@@ -12,13 +11,12 @@ namespace CIM.Model
     /// </summary>
     public class Profile
     {
-        /// <summary> 
+        /// <summary>
         /// List of common stereotypes for profile elements which can be extended
         /// by adding newly identified stereotypes in profile processing process.
         /// <para>See also: <seealso cref="M:FindOrCreateStereotypeForName(string fullStereotypeName)"/></para>
         /// </summary>
         public static List<ProfileElementStereotype> StereotypeList;
-        
 
         private SortedDictionary<ProfileElementTypes, List<ProfileElement>> profileMap;
         private string sourcePath;
@@ -28,7 +26,6 @@ namespace CIM.Model
         private DateTime? lastModificationTime;
 
         private bool loaderErrorOcurred = false;
-
 
         static Profile()
         {
@@ -45,7 +42,6 @@ namespace CIM.Model
             StereotypeList.Add(new ProfileElementStereotype(index++, ProfileElementStereotype.StereotypeCompositeOf));
         }
 
-        
         public Profile()
         {
             profileMap = new SortedDictionary<ProfileElementTypes, List<ProfileElement>>();
@@ -58,18 +54,18 @@ namespace CIM.Model
         }
 
         /// <summary>
-        /// Gets and sets the map which projectModels the profile.        
+        /// Gets and sets the map which projectModels the profile.
         /// </summary>
-        public SortedDictionary<ProfileElementTypes, List<ProfileElement>> ProfileMap 
+        public SortedDictionary<ProfileElementTypes, List<ProfileElement>> ProfileMap
         {
             get
             {
                 return profileMap;
             }
-            set 
+            set
             {
-                profileMap = value;                
-                SortElementsInMap();                
+                profileMap = value;
+                SortElementsInMap();
             }
         }
 
@@ -78,7 +74,7 @@ namespace CIM.Model
         /// </summary>
         public string SourcePath
         {
-            set 
+            set
             {
                 sourcePath = value;
                 fileName = string.Empty;
@@ -88,7 +84,7 @@ namespace CIM.Model
                     fileName = System.IO.Path.GetFileName(sourcePath);
                     lastModificationTime = FileManager.ReadLastModificationTimeForFile(sourcePath);
                     fileSizeMB = FileManager.ReadFileSizeInMBForFile(sourcePath);
-                }                
+                }
             }
             get
             {
@@ -107,7 +103,7 @@ namespace CIM.Model
             }
         }
 
-        public string BaseNS 
+        public string BaseNS
         {
             set
             {
@@ -119,7 +115,6 @@ namespace CIM.Model
                 return baseNS;
             }
         }
-
 
         /// <summary>
         /// Gets the size of profile's source file (in MB).
@@ -253,13 +248,13 @@ namespace CIM.Model
 
         /// <summary>
         /// Method first tries to find the ProfileElementStereotype object with given fullName isInside the
-        /// (static) StereotypeList, and if it doesn't find it, it creates new stereotype objects 
+        /// (static) StereotypeList, and if it doesn't find it, it creates new stereotype objects
         /// and adds it to this list.
         /// <remarks>If the fullStereotypeName is null, method will return null.</remarks>
         /// </summary>
         /// <param fullName="fullStereotypeName">full fullName of stereotype which is being searched</param>
         /// <returns>ProfileElementStereotype object with given fullName founded (or added) in StereotypeList</returns>
-        public static ProfileElementStereotype FindOrCreateStereotypeForName(string fullStereotypeName) 
+        public static ProfileElementStereotype FindOrCreateStereotypeForName(string fullStereotypeName)
         {
             ProfileElementStereotype stereotype = null;
             if (!string.IsNullOrEmpty(fullStereotypeName))
@@ -284,8 +279,8 @@ namespace CIM.Model
             return stereotype;
         }
 
-
-        public List<ProfileElement> GetAllProfileElementsOfType(ProfileElementTypes type) {
+        public List<ProfileElement> GetAllProfileElementsOfType(ProfileElementTypes type)
+        {
             List<ProfileElement> elementsOfType = new List<ProfileElement>();
             if (profileMap != null)
             {
@@ -294,16 +289,16 @@ namespace CIM.Model
             return elementsOfType;
         }
 
-
         public ProfileElement FindProfileElementByUri(string uri)
         {
             ProfileElement element = null;
 
             if (!string.IsNullOrEmpty(uri) && (profileMap != null))
             {
-                foreach (ProfileElementTypes type in profileMap.Keys) {
+                foreach (ProfileElementTypes type in profileMap.Keys)
+                {
                     List<ProfileElement> list = profileMap[type];
-                    foreach (ProfileElement elem in list) 
+                    foreach (ProfileElement elem in list)
                     {
                         if (uri.Equals(elem.URI))
                         {
@@ -315,7 +310,7 @@ namespace CIM.Model
                     {
                         break;
                     }
-                }                
+                }
             }
             return element;
         }
@@ -467,13 +462,13 @@ namespace CIM.Model
         private void SortElementsInMap()
         {
             if ((profileMap != null) && (profileMap.Count > 0))
-            {                
+            {
                 foreach (ProfileElementTypes profileType in profileMap.Keys)
-                {                    
+                {
                     if ((profileMap[profileType] != null) && (profileMap[profileType].Count > 0))
                     {
                         profileMap[profileType].Sort(CIMComparer.ProfileElementComparer);
-                    }                    
+                    }
                 }
             }
         }

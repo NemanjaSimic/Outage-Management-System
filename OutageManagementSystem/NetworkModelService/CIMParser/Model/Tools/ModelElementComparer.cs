@@ -9,8 +9,8 @@ namespace CIM.Model
     /// </summary>
     /// <typeparam name="T">one of the: ProfileElement, ProfileElementStereotype or CIMObject class</typeparam>
     /// <para>@author: Stanislava Selena</para>
-    public class ModelElementComparer<T> : IComparer<T> 
-    {        
+    public class ModelElementComparer<T> : IComparer<T>
+    {
         /// <summary>
         /// Method implements method for comparing two objects.
         /// <para>Method is applicable only if both of given objects are instances of the same class.</para>
@@ -39,12 +39,10 @@ namespace CIM.Model
                     else if ((modelObject1 is ProfileElementStereotype) && (modelObject2 is ProfileElementStereotype))
                     {
                         i = string.Compare((modelObject1 as ProfileElementStereotype).ShortName, (modelObject2 as ProfileElementStereotype).ShortName);
-                    } 
-
+                    }
                 }
             }
             return i;
         }
-
-    } 
+    }
 }

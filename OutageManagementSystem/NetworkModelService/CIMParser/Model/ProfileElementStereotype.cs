@@ -1,5 +1,5 @@
-using System.ComponentModel;
 using CIM.Manager;
+using System.ComponentModel;
 
 namespace CIM.Model
 {
@@ -15,24 +15,30 @@ namespace CIM.Model
     {
         /// <summary> "concrete" stereotype </summary>
         public const string StereotypeConcrete = "concrete";
+
         /// <summary> "compound" stereotype </summary>
-        public const string StereotypeCompound = "compound";        
+        public const string StereotypeCompound = "compound";
+
         /// <summary> "enumeration" stereotype </summary>
         public const string StereotypeEnumeration = "enumeration";
+
         /// <summary> "attribute" stereotype </summary>
         public const string StereotypeAttribute = "attribute";
+
         /// <summary> "byreference" stereotype </summary>
         public const string StereotypeByReference = "byreference";
+
         /// <summary> "ofAggregate" stereotype </summary>
         public const string StereotypeOfAggregate = "ofAggregate";
+
         /// <summary> "aggregateOf" stereotype </summary>
         public const string StereotypeAggregateOf = "aggregateOf";
+
         /// <summary> "compositeOf" stereotype </summary>
         public const string StereotypeCompositeOf = "compositeOf";
 
         private int code;
         private string name;
-
 
         public ProfileElementStereotype(int code, string name)
         {
@@ -46,7 +52,7 @@ namespace CIM.Model
         [BrowsableAttribute(false)]
         public int Code
         {
-            get 
+            get
             {
                 return code;
             }
@@ -76,7 +82,7 @@ namespace CIM.Model
         /// <summary>
         /// Gets the simple fullName of stereotype extracted form Name property (last sustring after "#").
         /// </summary>
-        [DescriptionAttribute("Short representation of stereotype name."), 
+        [DescriptionAttribute("Short representation of stereotype name."),
          ReadOnlyAttribute(true),
          DisplayNameAttribute("Simple Name")]
         public string ShortName
@@ -84,7 +90,7 @@ namespace CIM.Model
             get
             {
                 return StringManipulationManager.ExtractShortestName(name, StringManipulationManager.SeparatorSharp);
-            }            
+            }
         }
 
         public override bool Equals(object obj)
@@ -93,7 +99,7 @@ namespace CIM.Model
             if ((obj != null) && (obj is ProfileElementStereotype) && !string.IsNullOrEmpty(this.name))
             {
                 equal = string.Equals(((ProfileElementStereotype)obj).name, this.name);
-            }                
+            }
             return equal;
         }
 

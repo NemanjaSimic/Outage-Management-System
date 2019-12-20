@@ -10,7 +10,7 @@ namespace CIM.Manager
             {
                 assembly = Assembly.LoadFrom(path);
             }
-            catch 
+            catch
             {
                 assembly = null;
                 return false;

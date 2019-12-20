@@ -2,14 +2,14 @@
 
 namespace CIM.Model
 {
-    enum ClassContainment
-    { 
+    internal enum ClassContainment
+    {
         NotContained,
         ContainedInternal,
         ContainedExternal
     };
-    
-    class CClass
+
+    internal class CClass
     {
         public string name;
         public string stereotype;

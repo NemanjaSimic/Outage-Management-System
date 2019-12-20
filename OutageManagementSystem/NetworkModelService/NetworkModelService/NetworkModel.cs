@@ -48,6 +48,21 @@ namespace Outage.NetworkModelService
         /// Contains old network model during distributed transaction.
 		/// </summary>
         private Dictionary<DMSType, Container> oldNetworkDataModel;
+
+        /// <summary>
+        /// 
+        /// </summary>
+        private TransactionCoordinatorProxy transactionCoordinatorProxy = null;
+
+        /// <summary>
+        /// 
+        /// </summary>
+        private ModelUpdateNotificationProxy scadaModelUpdateNotifierProxy = null;
+
+        /// <summary>
+        /// 
+        /// </summary>
+        private ModelUpdateNotificationProxy calculationEngineModelUpdateNotifierProxy = null;
         #endregion
 
         #region Properties
@@ -59,6 +74,57 @@ namespace Outage.NetworkModelService
             get
             {
                 return networkDataModel ?? (networkDataModel = new Dictionary<DMSType, Container>());
+            }
+        }
+
+        private TransactionCoordinatorProxy TransactionCoordinatorProxy
+        {
+            get
+            {
+                if (transactionCoordinatorProxy != null)
+                {
+                    transactionCoordinatorProxy.Abort();
+                    transactionCoordinatorProxy = null;
+                }
+
+                transactionCoordinatorProxy = new TransactionCoordinatorProxy(EndpointNames.TransactionCoordinatorEndpoint);
+                transactionCoordinatorProxy.Open();
+
+                return transactionCoordinatorProxy;
+            }
+        }
+
+        private ModelUpdateNotificationProxy SCADAModelUpdateNotifierProxy
+        {
+            get
+            {
+                if (scadaModelUpdateNotifierProxy != null)
+                {
+                    scadaModelUpdateNotifierProxy.Abort();
+                    scadaModelUpdateNotifierProxy = null;
+                }
+
+                scadaModelUpdateNotifierProxy = new ModelUpdateNotificationProxy(EndpointNames.SCADAModelUpdateNotifierEndpoint);
+                scadaModelUpdateNotifierProxy.Open();
+
+                return scadaModelUpdateNotifierProxy;
+            }
+        }
+
+        private ModelUpdateNotificationProxy CalculationEngineModelUpdateNotifierProxy
+        {
+            get
+            {
+                if (calculationEngineModelUpdateNotifierProxy != null)
+                {
+                    calculationEngineModelUpdateNotifierProxy.Abort();
+                    calculationEngineModelUpdateNotifierProxy = null;
+                }
+
+                calculationEngineModelUpdateNotifierProxy = new ModelUpdateNotificationProxy(EndpointNames.CalculationEngineModelUpdateNotifierEndpoint);
+                calculationEngineModelUpdateNotifierProxy.Open();
+
+                return calculationEngineModelUpdateNotifierProxy;
             }
         }
         #endregion
@@ -318,8 +384,6 @@ namespace Outage.NetworkModelService
                 updateResult.GlobalIdPairs = globalIdPairs;
                 delta.SortOperations();
 
-                
-
                 foreach (ResourceDescription rd in delta.InsertOperations)
                 {
                     InsertEntity(rd);
@@ -341,12 +405,49 @@ namespace Outage.NetworkModelService
                 networkDataModel = incomingNetworkDataModel;
                 logger.LogDebug($"Current model [HashCode: 0x{networkDataModel.GetHashCode():X16}] becomes Incoming model [HashCode: 0x{incomingNetworkDataModel.GetHashCode():X16}].");
 
-                using (TransactionCoordinatorProxy coordinatorProxy = new TransactionCoordinatorProxy(EndpointNames.TransactionCoordinatorEndpoint))
+                using (TransactionCoordinatorProxy)
                 {
-                    coordinatorProxy.StartDistributedUpdate();
+                    TransactionCoordinatorProxy.StartDistributedUpdate();
                 }
 
-                //TODO: POSALJI LISTE GID PROMENA NA "CE" I "SCADA"
+                Dictionary<DeltaOpType, List<long>> modelChanges = new Dictionary<DeltaOpType, List<long>>()
+                {
+                    { DeltaOpType.Insert, new List<long>(delta.InsertOperations.Count) },
+                    { DeltaOpType.Update, new List<long>(delta.UpdateOperations.Count) },
+                    { DeltaOpType.Delete, new List<long>(delta.DeleteOperations.Count) },
+                };
+
+                foreach(ResourceDescription rd in delta.InsertOperations)
+                {
+                    modelChanges[DeltaOpType.Insert].Add(rd.Id);
+                }
+
+                foreach (ResourceDescription rd in delta.UpdateOperations)
+                {
+                    modelChanges[DeltaOpType.Update].Add(rd.Id);
+                }
+
+                foreach (ResourceDescription rd in delta.DeleteOperations)
+                {
+                    modelChanges[DeltaOpType.Delete].Add(rd.Id);
+                }
+
+                bool success = false;
+
+                using (SCADAModelUpdateNotifierProxy)
+                {
+                    success = SCADAModelUpdateNotifierProxy.NotifyAboutUpdate(modelChanges);
+                }
+
+                using (CalculationEngineModelUpdateNotifierProxy)
+                {
+                    success = CalculationEngineModelUpdateNotifierProxy.NotifyAboutUpdate(modelChanges);
+                }
+
+                using (TransactionCoordinatorProxy)
+                {
+                    TransactionCoordinatorProxy.FinishDistributedUpdate(success);
+                }
             }
             catch (Exception ex)
             {
@@ -377,7 +478,7 @@ namespace Outage.NetworkModelService
         #region ITransactionActorContract
         public bool Prepare()
         {
-            throw new NotImplementedException();
+            return oldNetworkDataModel != null && networkDataModel != null && oldNetworkDataModel.GetHashCode() != networkDataModel.GetHashCode();
         }
 
         public bool Commit()

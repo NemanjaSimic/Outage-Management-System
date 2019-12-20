@@ -1,6 +1,6 @@
 ﻿namespace CIM.Model
 {
-    class CAttribute
+    internal class CAttribute
     {
         public string name;
         public string type;

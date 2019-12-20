@@ -2,7 +2,7 @@
 
 namespace CIM.Model
 {
-    class BasicConversions
+    internal class BasicConversions
     {
         public static bool StrToInt(string str, out int num)
         {

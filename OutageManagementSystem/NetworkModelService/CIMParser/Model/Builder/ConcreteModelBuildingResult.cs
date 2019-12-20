@@ -19,8 +19,11 @@ namespace CIM.Model
         public int ErrorCount
         {
             get { return errorCount; }
-            set { success = false;
-                  errorCount = value; }
+            set
+            {
+                success = false;
+                errorCount = value;
+            }
         }
 
         public int WarrningCount

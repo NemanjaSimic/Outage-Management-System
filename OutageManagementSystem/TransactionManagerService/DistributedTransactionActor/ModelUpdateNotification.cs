@@ -3,21 +3,18 @@ using Outage.Common.ServiceContracts.DistributedTransaction;
 using Outage.Common.ServiceProxies.DistributedTransaction;
 using System;
 using System.Collections.Generic;
-using System.Linq;
-using System.Text;
-using System.Threading.Tasks;
 
 namespace Outage.DistributedTransactionActor
 {
     public abstract class ModelUpdateNotification : IModelUpdateNotificationContract
-    { 
-        private TransactionCoordinatorEnlistmentProxy transactionEnlistmentProxy = null;
+    {
+        private TransactionEnlistmentProxy transactionEnlistmentProxy = null;
 
         public string EndpointName { get; private set; }
 
         public string ActorName { get; set; }
 
-        public TransactionCoordinatorEnlistmentProxy TransactionEnlistmentProxy
+        public TransactionEnlistmentProxy TransactionEnlistmentProxy
         {
             get
             {
@@ -27,7 +24,7 @@ namespace Outage.DistributedTransactionActor
                     transactionEnlistmentProxy = null;
                 }
 
-                transactionEnlistmentProxy = new TransactionCoordinatorEnlistmentProxy(EndpointName);
+                transactionEnlistmentProxy = new TransactionEnlistmentProxy(EndpointName);
                 transactionEnlistmentProxy.Open();
 
                 return transactionEnlistmentProxy;
@@ -40,24 +37,6 @@ namespace Outage.DistributedTransactionActor
             ActorName = actorName;
         }
 
-        public virtual bool NotifyAboutUpdate(Dictionary<DeltaOpType, List<long>> modelChanges)
-        {
-            bool success = false;
-
-            try
-            {
-                using (TransactionEnlistmentProxy)
-                {
-                    success = TransactionEnlistmentProxy.Enlist(ActorName);
-                }
-            }
-            catch (Exception e)
-            {
-
-                success = false;
-            }
-
-            return success;
-        }
+        public abstract bool NotifyAboutUpdate(Dictionary<DeltaOpType, List<long>> modelChanges);
     }
 }

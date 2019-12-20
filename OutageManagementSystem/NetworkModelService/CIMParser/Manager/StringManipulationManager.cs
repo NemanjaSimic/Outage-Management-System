@@ -9,35 +9,49 @@ namespace CIM.Manager
     /// <para>@author: Stanislava Selena</para>
     /// </summary>
     public class StringManipulationManager
-    {        
+    {
         /// <summary> " " </summary>
         public const string SeparatorSpace = " ";
+
         /// <summary> "#" </summary>
         public const string SeparatorSharp = "#";
+
         /// <summary> "." </summary>
         public const string SeparatorDot = ".";
+
         /// <summary> ":" </summary>
         public const string SeparatorColon = ":";
+
         /// <summary> "/" </summary>
         public const string SeparatorSlash = "/";
+
         /// <summary> "\\" </summary>
         public const string SeparatorBackslash = "\\";
+
         /// <summary> "\n" </summary>
         public const string SeparatorNewLine = "\n";
+
         /// <summary> '\n' </summary>
         public const char SeparatorNewLineAsChar = '\n';
+
         /// <summary> "&" </summary>
         public const string SymbolAmpersand = "&";
+
         /// <summary> "&amp;" </summary>
         public const string SymbolAmpersandInXML = "&amp;";
+
         /// <summary> less-than character </summary>
         public const string SymbolLessThan = "<";
+
         /// <summary> less-than character in XML "&lt;" </summary>
         public const string SymbolLessThanInXML = "&lt;";
+
         /// <summary> greater-than character </summary>
         public const string SymbolGreaterThan = ">";
+
         /// <summary> greater-than character in XML "&gt;" </summary>
-        public const string SymbolGreaterThanInXML = "&gt;";        
+        public const string SymbolGreaterThanInXML = "&gt;";
+
         /// <summary> minus "-" character </summary>
         public const string SeparatorMinus = "-";
 
@@ -114,7 +128,7 @@ namespace CIM.Manager
             {
                 formatedDateTime = string.Format("{0:yyyy-MM-dd_HH.mm.ss}", dateTime);
             }
-            
+
             return formatedDateTime;
         }
 
@@ -158,9 +172,9 @@ namespace CIM.Manager
         public static string[] SplitStringForDateInitialization_TimeOnly(string time)
         {
             string[] temp = time.Split(':');
-            for(int i =0; i<temp.Length; i++)
+            for (int i = 0; i < temp.Length; i++)
             {
-                while(temp[i][0] == '0' && temp[i].Length > 1)
+                while (temp[i][0] == '0' && temp[i].Length > 1)
                     temp[i] = temp[i].Remove(0, 1);
             }
             return temp;
@@ -169,7 +183,7 @@ namespace CIM.Manager
         /// <summary>
         /// Method recognises diferent words in given string if every word begin with an uppercase,
         /// <para>and build new string with those words separeted with given separator string.</para>
-        /// <remarks>Example: 
+        /// <remarks>Example:
         /// <para>input = "TheStringForTokenization", separator = "."</para>
         /// <para> output = "The.String.For.Tokenization"</para>
         /// </remarks>
@@ -190,7 +204,7 @@ namespace CIM.Manager
                         output.Append(" ");
                     }
                     output.Append(character);
-                }                
+                }
             }
             return output.ToString().Trim();
         }
@@ -236,25 +250,25 @@ namespace CIM.Manager
         /// <returns>extracted string</returns>
         public static string ExtractTypeOfList(string value)
         {
-            value = value.Substring(value.IndexOf('[')+1);
+            value = value.Substring(value.IndexOf('[') + 1);
             value = value.Remove(value.IndexOf(']'));
             return value;
         }
 
-		/// <summary>
-		/// Method capitalizes the first letter of the given string value
-		/// </summary>
-		/// <param name="value">string that will be processed</param>
-		/// <returns>string with capitalized first letter</returns>
-		public static string CreateHungarianNotation(string value)
-		{
-			if(string.IsNullOrEmpty(value))
-			{
-				return string.Empty;
-			}
-			char[] a = value.ToCharArray();
-			a[0] = char.ToUpper(a[0]);
-			return new string(a);
-		}
+        /// <summary>
+        /// Method capitalizes the first letter of the given string value
+        /// </summary>
+        /// <param name="value">string that will be processed</param>
+        /// <returns>string with capitalized first letter</returns>
+        public static string CreateHungarianNotation(string value)
+        {
+            if (string.IsNullOrEmpty(value))
+            {
+                return string.Empty;
+            }
+            char[] a = value.ToCharArray();
+            a[0] = char.ToUpper(a[0]);
+            return new string(a);
+        }
     }
 }

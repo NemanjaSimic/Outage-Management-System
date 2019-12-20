@@ -1,7 +1,7 @@
+using CIM.Manager;
 using System;
 using System.Collections.Generic;
 using System.ComponentModel;
-using CIM.Manager;
 
 namespace CIM.Model
 {
@@ -20,10 +20,13 @@ namespace CIM.Model
     {
         /// <summary> M:0..1 </summary>
         ZeroOrOne = 0,
+
         /// <summary> M:1 or M:1..1 </summary>
         ExactlyOne,
+
         /// <summary> M:0..n </summary>
         ZeroOrMore,
+
         /// <summary> M:1..n </summary>
         OneOrMore
     };
@@ -39,10 +42,13 @@ namespace CIM.Model
 
         /// <summary> string with value "classcategory" </summary>
         public const string TypeClassCategoryString = "classcategory";
+
         /// <summary> string with value "class" </summary>
         public const string TypeClassString = "class";
+
         /// <summary> string with value "property" </summary>
         public const string TypePropertyString = "property";
+
         /// <summary> string with value "stereotype" </summary>
         public const string TypeStereotypeString = "stereotype";
 
@@ -54,25 +60,31 @@ namespace CIM.Model
 
         /// <summary> "integer" </summary>
         protected const string SimpleDataTypeInteger = "integer";
+
         /// <summary> "int" </summary>
         protected const string SimpleDataTypeInt = "int";
+
         /// <summary> "float"  </summary>
         protected const string SimpleDataTypeFloat = "float";
+
         /// <summary> "string" </summary>
         protected const string SimpleDataTypeString = "string";
+
         /// <summary> "dateTime" </summary>
         protected const string SimpleDataTypeDateTime = "datetime";
+
         /// <summary> "boolean" </summary>
         protected const string SimpleDataTypeBoolean = "boolean";
+
         /// <summary> "bool" </summary>
         protected const string SimpleDataTypeBool = "bool";
-        
 
         protected string uri;
         protected string type;
+
         //// creted from shema
         protected ProfileElementTypes typeAsEnumValue = ProfileElementTypes.Unknown;
-        
+
         protected string label;
         protected string comment;
         protected List<ProfileElementStereotype> stereotypes;
@@ -82,39 +94,46 @@ namespace CIM.Model
 
         //// class specifics
         protected string subClassOf;
+
         protected string belongsToCategory;
-        //// creted from shema        
+
+        //// creted from shema
         protected ProfileElement subClassOfAsObject;
+
         protected List<ProfileElement> mySubclasses;
         protected ProfileElement belongsToCategoryAsObject;
         protected List<ProfileElement> myProperties;
         protected bool isEnumeration = false;
-        protected List<ProfileElement> myEnumerationMembers;  //// if class is enumeration        
+        protected List<ProfileElement> myEnumerationMembers;  //// if class is enumeration
         protected bool isExpectedAsLocal = false; //// if the instance of class is expected to be defined inside other instance
 
         //// attribute specifics
         protected string domain;    //// class to which attribute belongs
+
         protected string dataType;  //// attribute type
         protected string range;     //// moze biti tip atributa ili ??
         protected string multiplicityAsString = MultiplicityZeroOrOneString;
+
         //// creted from shema
         protected ProfileElement domainAsObject;
+
         protected bool isDataTypeSimple = false; ////da li je tip atributa prost(float, bool...) ili je neki od profilskih tipova
         protected Type dataTypeAsSimple;
         protected ProfileElement dataTypeAsComplexObject;
         protected ProfileElement rangeAsObject;
         protected ProfileElementMultiplicity multiplicity = ProfileElementMultiplicity.ZeroOrOne;
         protected bool isExpectedToContainLocalClass = false; //// if this property expected to contain inner instance of some class
-       
+
         //// asociation-attribute specifics
         protected string inverseRoleName; //// name of other side of asociation
+
         protected bool isAggregate;
-        //// creted from shema        
+
+        //// creted from shema
         protected ProfileElement inverseRoleAsObject; //// other side of asociation
 
         //// enum specifics
         protected ProfileElement enumerationObject; //// if this ProfileElement is a value in some Enumeration, this is that Enumeration
-
 
         public ProfileElement()
         {
@@ -125,11 +144,11 @@ namespace CIM.Model
             this.uri = uri;
         }
 
-
         /// <summary>
         /// Gets and sets the full URI of profile element.
         /// </summary>
-        public string URI {
+        public string URI
+        {
             get
             {
                 return uri;
@@ -147,9 +166,9 @@ namespace CIM.Model
         {
             get
             {
-                string uniqueName = StringManipulationManager.ExtractShortestName(uri, Separator);                
+                string uniqueName = StringManipulationManager.ExtractShortestName(uri, Separator);
                 return uniqueName;
-            }            
+            }
         }
 
         /// <summary>
@@ -213,7 +232,7 @@ namespace CIM.Model
         /// <summary>
         /// Gets and sets the type of given profile element in ProfileElementTypes enumeration format
         /// </summary>
-        public ProfileElementTypes TypeAsEnumValue 
+        public ProfileElementTypes TypeAsEnumValue
         {
             get
             {
@@ -221,14 +240,14 @@ namespace CIM.Model
             }
             set
             {
-                typeAsEnumValue = value;               
+                typeAsEnumValue = value;
             }
         }
 
         /// <summary>
         /// Gets and sets the label of profile element.
         /// </summary>
-        public string Label 
+        public string Label
         {
             get
             {
@@ -243,7 +262,7 @@ namespace CIM.Model
         /// <summary>
         /// gets and sets the comment atached to the profile element.
         /// </summary>
-        public string Comment 
+        public string Comment
         {
             get
             {
@@ -258,7 +277,7 @@ namespace CIM.Model
         /// <summary>
         /// Gets stereotypes of profile element (element can have more then one stereotype)
         /// </summary>
-        public List<ProfileElementStereotype> Stereotypes 
+        public List<ProfileElementStereotype> Stereotypes
         {
             get
             {
@@ -266,8 +285,8 @@ namespace CIM.Model
             }
         }
 
-
         #region Class category specifics
+
         /// <summary>
         /// Class category Specific property.
         /// <para>Gets and sets the list of all members of this class category.</para>
@@ -279,7 +298,7 @@ namespace CIM.Model
             {
                 return membersOfClassCategory;
             }
-            set 
+            set
             {
                 membersOfClassCategory = value;
             }
@@ -302,14 +321,16 @@ namespace CIM.Model
                 return count;
             }
         }
+
         #endregion Class category specifics
 
         #region Class specifics
+
         /// <summary>
         /// Class Specific property.
         /// <para>Gets and sets the URI string of super class(base class).</para>
         /// </summary>
-        public string SubClassOf 
+        public string SubClassOf
         {
             get
             {
@@ -325,7 +346,7 @@ namespace CIM.Model
         /// Class Specific property.
         /// <para>Gets and sets the URI string of parent package i.e. parent class category.</para>
         /// </summary>
-        public string BelongsToCategory 
+        public string BelongsToCategory
         {
             get
             {
@@ -337,12 +358,12 @@ namespace CIM.Model
             }
         }
 
-    //// Creted from shema
+        //// Creted from shema
         /// <summary>
         /// Class Specific property.
         /// <para>Gets and sets the super(base) class ProfileElement.</para>
         /// </summary>
-        public ProfileElement SubClassOfAsObject 
+        public ProfileElement SubClassOfAsObject
         {
             get
             {
@@ -361,22 +382,22 @@ namespace CIM.Model
         /// </summary>
         public List<ProfileElement> MySubclasses
         {
-            get 
+            get
             {
                 return mySubclasses;
-            }            
+            }
         }
 
         /// <summary>
         /// Class Specific property.
-        /// <para>Gets all of the descendant elements of this ProfileElement if 
+        /// <para>Gets all of the descendant elements of this ProfileElement if
         /// it is of type ProfileElementTypes.Class.</para>
         /// <para>Value is not a tree structure, but a list of all descendant classes, not just direct descendants.</para>
         /// </summary>
         public List<ProfileElement> MySubclassTree
         {
             get
-            {               
+            {
                 return ExtractAllDescendantSubclassesOf(this);
             }
         }
@@ -385,13 +406,13 @@ namespace CIM.Model
         /// Class Specific property.
         /// <para>Gets and sets the parent package i.e. parent class category. </para>
         /// </summary>
-        public ProfileElement BelongsToCategoryAsObject 
+        public ProfileElement BelongsToCategoryAsObject
         {
-            get 
+            get
             {
                 return belongsToCategoryAsObject;
             }
-            set 
+            set
             {
                 belongsToCategoryAsObject = value;
             }
@@ -401,7 +422,8 @@ namespace CIM.Model
         /// Class Specific property.
         /// <para>Gets the list of profile elements which are the properties of given profile class.</para>
         /// </summary>
-        public List<ProfileElement> MyProperties {
+        public List<ProfileElement> MyProperties
+        {
             get
             {
                 return myProperties;
@@ -411,14 +433,14 @@ namespace CIM.Model
         /// <summary>
         /// Class Specific property.
         /// <para>Gets the list of profile elements which are the properties of given profile class,</para>
-        /// <para>as well as all the inhereted properties.</para>  
+        /// <para>as well as all the inhereted properties.</para>
         /// </summary>
         public List<ProfileElement> MyAndInheritedProperties
         {
             get
             {
                 List<ProfileElement> allProperties = myProperties;
-                
+
                 ProfileElement superClass = SubClassOfAsObject;
                 while (superClass != null)
                 {
@@ -438,7 +460,7 @@ namespace CIM.Model
                     }
                     superClass = superClass.SubClassOfAsObject;
                 }
-                
+
                 return allProperties;
             }
         }
@@ -482,14 +504,16 @@ namespace CIM.Model
                 isExpectedAsLocal = value;
             }
         }
+
         #endregion Class specifics
 
         #region Property specifics
+
         /// <summary>
         /// Property Specific property.
         /// <para>Gets and sets the URI of profile element which is the parent class of this profile property.</para>
         /// </summary>
-        public string Domain 
+        public string Domain
         {
             get
             {
@@ -505,7 +529,7 @@ namespace CIM.Model
         /// Property Specific property.
         /// <para>Gets and sets the string representation of data type for this profile property.</para>
         /// </summary>
-        public string DataType  
+        public string DataType
         {
             get
             {
@@ -515,7 +539,7 @@ namespace CIM.Model
             {
                 dataType = value;
 
-                if (dataType != null) 
+                if (dataType != null)
                 {
                     isDataTypeSimple = true;
                     string shortDT = StringManipulationManager.ExtractShortestName(dataType, Separator);
@@ -582,7 +606,7 @@ namespace CIM.Model
             }
         }
 
-    //// creted from shema
+        //// creted from shema
         /// <summary>
         /// Property Specific property.
         /// <para>Gets and sets the ProfileElement which is cosidered for parent class of this profile property.</para>
@@ -591,7 +615,7 @@ namespace CIM.Model
         public ProfileElement DomainAsObject
         {
             get
-            {                
+            {
                 return domainAsObject;
             }
             set
@@ -614,7 +638,7 @@ namespace CIM.Model
 
         /// <summary>
         /// Property Specific property.
-        /// <para>Gets and sets the CIMType which is the data type of this profile property.</para>        
+        /// <para>Gets and sets the CIMType which is the data type of this profile property.</para>
         /// <para>This can be null if IsPropertyDataTypeSimple has <c>false</c> value.</para>
         /// </summary>
         public Type DataTypeAsSimple
@@ -666,7 +690,7 @@ namespace CIM.Model
             }
         }
 
-    //// creted from shema
+        //// creted from shema
         /// <summary>
         /// Property Specific property.
         /// <para>Gets and sets the multiplicity of this profile element.</para>
@@ -735,7 +759,7 @@ namespace CIM.Model
         /// <summary>
         /// Property Specific property.
         /// <para>If this property is expected to contain inner(local) instance(s) of "Range" class.</para>
-        /// </summary>    
+        /// </summary>
         public bool IsExpectedToContainLocalClass
         {
             get
@@ -748,7 +772,7 @@ namespace CIM.Model
             }
         }
 
-    //// asociation-attribute specifics
+        //// asociation-attribute specifics
         /// <summary>
         /// Property Specific property.
         /// <para>Gets and sets the URI string of inverse ProfileElement i.e. inverse property element.</para>
@@ -786,7 +810,7 @@ namespace CIM.Model
         /// <para>Gets and sets the inverse ProfileElement i.e. inverse property element.</para>
         /// <para>This property can be null if the InverseRole isn't defined.</para>
         /// </summary>
-        public ProfileElement InverseRoleAsObject // veza sa druge strane 
+        public ProfileElement InverseRoleAsObject // veza sa druge strane
         {
             get
             {
@@ -797,16 +821,18 @@ namespace CIM.Model
                 inverseRoleAsObject = value;
             }
         }
+
         #endregion Property specifics
 
         #region Enumeration specifics
+
         /// <summary>
         /// Enumeration member Specific property.
-        /// <para>Gets and sets the ProfileElement which is the parent class of this enumeration member element.</para>        
+        /// <para>Gets and sets the ProfileElement which is the parent class of this enumeration member element.</para>
         /// </summary>
         public ProfileElement EnumerationObject
         {
-            get 
+            get
             {
                 return enumerationObject;
             }
@@ -815,6 +841,7 @@ namespace CIM.Model
                 enumerationObject = value;
             }
         }
+
         #endregion Enumeration specifics
 
         /// <summary>
@@ -822,7 +849,7 @@ namespace CIM.Model
         /// stereotypes list if it doesn't already exists.
         /// </summary>
         /// <param fullName="fullStereotypeString">the full stereotype fullName</param>
-        public void AddStereotype(string fullStereotypeString) 
+        public void AddStereotype(string fullStereotypeString)
         {
             if (!string.IsNullOrEmpty(fullStereotypeString))
             {
@@ -859,7 +886,7 @@ namespace CIM.Model
         /// </summary>
         /// <param fullName="stereotype">search for this stereotype</param>
         /// <returns><c>true</c> if stereotype was founded, <c>false</c> otherwise</returns>
-        public bool HasStereotype(ProfileElementStereotype stereotype) 
+        public bool HasStereotype(ProfileElementStereotype stereotype)
         {
             bool hasStereotype = false;
             if (stereotypes != null)
@@ -881,7 +908,7 @@ namespace CIM.Model
             {
                 foreach (ProfileElementStereotype stereotype in stereotypes)
                 {
-                    if ((string.Compare(stereotype.Name, stereotypeName) == 0) ||(string.Compare(stereotype.ShortName, stereotypeName) == 0))
+                    if ((string.Compare(stereotype.Name, stereotypeName) == 0) || (string.Compare(stereotype.ShortName, stereotypeName) == 0))
                     {
                         hasStereotype = true;
                         break;
@@ -892,7 +919,7 @@ namespace CIM.Model
         }
 
         /// <summary>
-        /// Method checks whether or not this ProfileElement contains 
+        /// Method checks whether or not this ProfileElement contains
         /// the "concrete" stereotype inside the stereotypes list.
         /// </summary>
         public bool IsConcrete()
@@ -901,7 +928,7 @@ namespace CIM.Model
         }
 
         /// <summary>
-        /// Method checks whether or not this ProfileElement contains 
+        /// Method checks whether or not this ProfileElement contains
         /// the "compaund" stereotype inside the stereotypes list.
         /// </summary>
         public bool IsCompaund()
@@ -946,7 +973,7 @@ namespace CIM.Model
             }
             namespaceString += StringManipulationManager.SeparatorColon;
             return namespaceString;
-        }       
+        }
 
         /// <summary>
         /// Method adds given ProfileElement to the MySubclasses list.
@@ -967,8 +994,8 @@ namespace CIM.Model
         }
 
         /// <summary>
-        /// Method adds given ProfileElement to the MembersOfClassCategory list. 
-        /// 
+        /// Method adds given ProfileElement to the MembersOfClassCategory list.
+        ///
         /// </summary>
         /// <param fullName="member"></param>
         public void AddToMembersOfClassCategory(ProfileElement member)
@@ -986,10 +1013,10 @@ namespace CIM.Model
         }
 
         /// <summary>
-        /// Method adds given ProfileElement to the MyProperties list. 
+        /// Method adds given ProfileElement to the MyProperties list.
         /// </summary>
         /// <param fullName="property"></param>
-        public void AddToMyProperties(ProfileElement property) 
+        public void AddToMyProperties(ProfileElement property)
         {
             if (myProperties == null)
             {
@@ -1004,7 +1031,7 @@ namespace CIM.Model
         }
 
         /// <summary>
-        /// Method adds given ProfileElement to the MyEnumerationMembers list. 
+        /// Method adds given ProfileElement to the MyEnumerationMembers list.
         /// </summary>
         /// <param fullName="enumerationMemeber"></param>
         public void AddToMyEnumerationMembers(ProfileElement enumerationMemeber)
@@ -1042,7 +1069,7 @@ namespace CIM.Model
                         eq = this.URI.Equals(pelObj.URI);
                     }
                 }
-            }       
+            }
             return eq;
         }
 
@@ -1051,14 +1078,12 @@ namespace CIM.Model
             return base.GetHashCode();
         }
 
-        
-
         // Recursive method for getting all of the descendants of given ProfileElement.
         // Method has sense only if given element is of type ProfileElementTypes.Class.
         private List<ProfileElement> ExtractAllDescendantSubclassesOf(ProfileElement element)
         {
             List<ProfileElement> allSubclasses = new List<ProfileElement>();
-            if (element != null) 
+            if (element != null)
             {
                 if ((element.MySubclasses != null) && (MySubclasses.Count > 0))
                 {
@@ -1071,6 +1096,6 @@ namespace CIM.Model
             }
             allSubclasses.Sort(CIMComparer.ProfileElementComparer);
             return allSubclasses;
-        }        
+        }
     }
 }

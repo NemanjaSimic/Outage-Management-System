@@ -1,5 +1,4 @@
-﻿
-namespace CIM.Model
+﻿namespace CIM.Model
 {
     /// <summary>
     /// CIMComparer class contains static fields for sorting objects.
@@ -9,6 +8,6 @@ namespace CIM.Model
     {
         public static ModelElementComparer<ProfileElement> ProfileElementComparer = new ModelElementComparer<ProfileElement>();
         public static ModelElementComparer<ProfileElementStereotype> ProfileElementStereotypeComparer = new ModelElementComparer<ProfileElementStereotype>();
-        public static ModelElementComparer<CIMObject> CIMObjectComparer = new ModelElementComparer<CIMObject>();        
+        public static ModelElementComparer<CIMObject> CIMObjectComparer = new ModelElementComparer<CIMObject>();
     }
 }

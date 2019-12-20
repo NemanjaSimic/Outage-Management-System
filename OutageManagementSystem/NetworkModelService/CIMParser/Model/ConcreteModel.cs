@@ -1,8 +1,7 @@
 ﻿using System;
 using System.Collections.Generic;
-using System.Linq;
-using System.Text;
 using System.Reflection;
+using System.Text;
 
 namespace CIM.Model
 {
@@ -12,6 +11,7 @@ namespace CIM.Model
     public class ConcreteModel
     {
         #region FIELDS
+
         //             MAP<string type,MAP              <id    , object>>
         private SortedDictionary<string, SortedDictionary<string, object>> modelMap = new SortedDictionary<string, SortedDictionary<string, object>>();
 
@@ -23,23 +23,23 @@ namespace CIM.Model
             }
             set
             {
-                if(value != null)
+                if (value != null)
                 {
                     modelMap = value;
                 }
             }
         }
 
-        #endregion
+        #endregion FIELDS
 
-		public ConcreteModel()
-		{
-		}
+        public ConcreteModel()
+        {
+        }
 
-		public ConcreteModel(SortedDictionary<string, SortedDictionary<string, object>> modelMap)
-		{
-			this.ModelMap = modelMap;
-		}
+        public ConcreteModel(SortedDictionary<string, SortedDictionary<string, object>> modelMap)
+        {
+            this.ModelMap = modelMap;
+        }
 
         public string PrintModel()
         {
@@ -57,13 +57,14 @@ namespace CIM.Model
         }
 
         public string GetProperty(string mrId, string propertyName)
-        { 
+        {
             object entity = GetObjectByID(mrId);
             string porpertyValue = entity.GetType().GetProperty(propertyName).GetValue(entity, null).ToString();
             return string.Format("Type: {0}, mrId: {1}, {2}: {3}", entity.GetType(), mrId, propertyName, porpertyValue);
         }
 
         #region ADD/GET OBJECT METHODS
+
         /// <summary>
         /// Method inserts given IDClass in Model.
         /// <para>Object will be inserted in submap acording to it's Type and ID property values. </para>
@@ -103,7 +104,7 @@ namespace CIM.Model
                         }
                         else
                         {
-                            return string.Format("Object with ID: {0} already exists in model. Existing instance in model will be kept.",ID);
+                            return string.Format("Object with ID: {0} already exists in model. Existing instance in model will be kept.", ID);
                         }
                         modelMap.Remove(type.ToString());
                         modelMap.Add(type.ToString(), typeSubmap);
@@ -125,7 +126,6 @@ namespace CIM.Model
             }
         }
 
-
         /// <summary>
         /// Gets the object of type <c>type</c> and with <c>ID</c> id
         /// </summary>
@@ -135,10 +135,10 @@ namespace CIM.Model
         public object GetObjectByTypeAndID(Type type, string ID)
         {
             object foundObject = null;
-            if(modelMap.ContainsKey(type.ToString()))
+            if (modelMap.ContainsKey(type.ToString()))
             {
                 SortedDictionary<string, object> typeObjects = ModelMap[type.ToString()];
-                if(typeObjects.ContainsKey(ID))
+                if (typeObjects.ContainsKey(ID))
                 {
                     foundObject = typeObjects[ID];
                 }
@@ -146,25 +146,25 @@ namespace CIM.Model
             return foundObject;
         }
 
-		/// <summary>
-		/// Removes the object of type <c>type</c> and with <c>ID</c> id
-		/// </summary>
-		/// <param name="type">type of object</param>
-		/// <param name="ID">ID of object</param>
-		/// <returns>true if object is removed, otherwise false</returns>
-		public bool RemoveObjectByTypeAndID(Type type, string ID)
-		{
-			bool isRemoved = false;
-			if (modelMap.ContainsKey(type.ToString()))
-			{
-				SortedDictionary<string, object> typeObjects = ModelMap[type.ToString()];
-				if (typeObjects.ContainsKey(ID))
-				{
-					isRemoved = typeObjects.Remove(ID);
-				}
-			}
-			return isRemoved;
-		}
+        /// <summary>
+        /// Removes the object of type <c>type</c> and with <c>ID</c> id
+        /// </summary>
+        /// <param name="type">type of object</param>
+        /// <param name="ID">ID of object</param>
+        /// <returns>true if object is removed, otherwise false</returns>
+        public bool RemoveObjectByTypeAndID(Type type, string ID)
+        {
+            bool isRemoved = false;
+            if (modelMap.ContainsKey(type.ToString()))
+            {
+                SortedDictionary<string, object> typeObjects = ModelMap[type.ToString()];
+                if (typeObjects.ContainsKey(ID))
+                {
+                    isRemoved = typeObjects.Remove(ID);
+                }
+            }
+            return isRemoved;
+        }
 
         /// <summary>
         /// Method gets map of all objects of requested type from this ConcreteModel.
@@ -173,7 +173,7 @@ namespace CIM.Model
         /// <returns>null if the result is empty, otherwise map of all matching objects</returns>
         public SortedDictionary<string, object> GetAllObjectsOfType(string type)
         {
-            if(modelMap.ContainsKey(type))
+            if (modelMap.ContainsKey(type))
             {
                 return ModelMap[type];
             }
@@ -191,13 +191,12 @@ namespace CIM.Model
         /// <returns>requested object or null</returns>
         public object GetObjectByID(string identifier)
         {
-
             object objFound = null;
-            if((modelMap != null) && (!string.IsNullOrEmpty(identifier)))
+            if ((modelMap != null) && (!string.IsNullOrEmpty(identifier)))
             {
-                foreach(string type in modelMap.Keys)
+                foreach (string type in modelMap.Keys)
                 {
-                    if(modelMap[type].ContainsKey(identifier))
+                    if (modelMap[type].ContainsKey(identifier))
                     {
                         objFound = (modelMap[type])[identifier];
                         break;
@@ -206,7 +205,6 @@ namespace CIM.Model
             }
             return objFound;
         }
-
 
         /// <summary>
         /// Method gets map of all objects of requested type from this ConcreteModel
@@ -241,8 +239,8 @@ namespace CIM.Model
             return map;
         }
 
-        #endregion
-        
+        #endregion ADD/GET OBJECT METHODS
+
         /// <summary>
         /// Returns number of objects in model
         /// </summary>
@@ -252,14 +250,12 @@ namespace CIM.Model
             get
             {
                 int size = 0;
-                foreach(string type in modelMap.Keys)
+                foreach (string type in modelMap.Keys)
                 {
                     size += modelMap[type].Count;
                 }
                 return size;
             }
         }
-
     }
-
 }

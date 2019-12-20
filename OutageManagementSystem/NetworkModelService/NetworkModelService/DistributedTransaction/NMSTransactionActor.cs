@@ -1,17 +1,10 @@
 ﻿using Outage.Common;
-using Outage.Common.GDA;
-using Outage.Common.ServiceContracts;
-using Outage.Common.ServiceContracts.DistributedTransaction;
 using Outage.DistributedTransactionActor;
 using System;
-using System.Collections.Generic;
-using System.Linq;
-using System.Text;
-using System.Threading.Tasks;
 
 namespace Outage.NetworkModelService.DistributedTransaction
 {
-    public class NMSTransactionActor : TransactionActor, ITransactionActorContract
+    public class NMSTransactionActor : TransactionActor
     { 
         protected static NetworkModel networkModel = null;
 
@@ -34,6 +27,8 @@ namespace Outage.NetworkModelService.DistributedTransaction
             catch (Exception ex)
             {
                 LoggerWrapper.Instance.LogError(ex.Message, ex);
+                //TODO: 
+                //LoggerWrapper.Instance.LogInfo();
             }
 
             return success;
@@ -44,8 +39,10 @@ namespace Outage.NetworkModelService.DistributedTransaction
             try
             {
                 networkModel.Commit();
+                //TODO: 
+                //LoggerWrapper.Instance.LogInfo();
             }
-            catch(Exception ex)
+            catch (Exception ex)
             {
                 LoggerWrapper.Instance.LogError(ex.Message, ex);
             }
@@ -56,6 +53,8 @@ namespace Outage.NetworkModelService.DistributedTransaction
             try
             {
                 networkModel.Rollback();
+                //TODO: 
+                //LoggerWrapper.Instance.LogInfo();
             }
             catch (Exception ex)
             {

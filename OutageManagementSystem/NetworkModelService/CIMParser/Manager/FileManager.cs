@@ -8,20 +8,26 @@ namespace CIM.Manager
     /// FileManager manages all file system operations during application's execusion.
     /// <para>@author: Stanislava Selena</para>
     /// </summary>
-    static class FileManager
+    internal static class FileManager
     {
         /// <summary> ".rdf" </summary>
         public const string ExtensionRDF = ".rdf";
+
         /// <summary> ".txt" </summary>
         public const string ExtensionTXT = ".txt";
+
         /// <summary> ".svg" </summary>
         public const string ExtensionSVG = ".svg";
+
         /// <summary> ".xml" </summary>
         public const string ExtensionXML = ".xml";
+
         /// <summary> ".cimws" </summary>
         public const string ExtensionWorkspace = ".cimws";
+
         /// <summary> ".cimproj" </summary>
         public const string ExtensionCIMProject = ".cimproj";
+
         /// <summary> "" </summary>
         public const string ExtensionNone = "";
 
@@ -30,17 +36,16 @@ namespace CIM.Manager
 
         /// <summary> Directory path to the default open file location. </summary>
         public static string DefaultOpeningDirectoryPath = DefaultDirectory;
+
         /// <summary> Directory path to the default save file location. </summary>
         public static string DefaultSavingDirectoryPath = DefaultDirectory;
-        /// <summary> Directory path to the default workspace location. </summary> 
-        public static string DefaultWorkspaceDirectoryPath = DefaultDirectory + "\\workspace";
 
+        /// <summary> Directory path to the default workspace location. </summary>
+        public static string DefaultWorkspaceDirectoryPath = DefaultDirectory + "\\workspace";
 
         static FileManager()
         {
-            
         }
-
 
         /// <summary>
         /// Method reads the file size for given file path. Size is given in MB.
@@ -112,7 +117,7 @@ namespace CIM.Manager
 
         public static bool CompareTimes(DateTime? time1, DateTime? time2)
         {
-            bool isEqual = false;           
+            bool isEqual = false;
             if (!time1.HasValue && !time2.HasValue)
             {
                 isEqual = true;
@@ -185,9 +190,9 @@ namespace CIM.Manager
             string simbolEqual = "=";
             string simbolQuote = "\"";
             if (System.IO.File.Exists(xmlFilePath))
-            {                       
+            {
                 using (StreamReader sr = new StreamReader(xmlFilePath))
-                {                    
+                {
                     int i = 0;
                     while ((sr.Peek() >= 0) && (i < 20))
                     {
@@ -223,6 +228,5 @@ namespace CIM.Manager
             }
             return encoding.Trim();
         }
-        
     }
 }

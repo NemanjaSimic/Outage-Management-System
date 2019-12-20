@@ -1,14 +1,14 @@
+using CIM.Manager;
 using System;
 using System.Collections.Generic;
 using System.Text;
-using CIM.Manager;
 
 namespace CIM.Model
-{    
+{
     /// <summary>
     /// Class CIMModel represents an object view to the CIM data loaded from source file.
     /// <para>(see also <seealso cref="T:CIMDocumentHandler.cs"/>)</para>
-    /// <para>It contains map of objects packed in submaps by type of objects, 
+    /// <para>It contains map of objects packed in submaps by type of objects,
     /// and, in each submap, by value of ID property.</para>
     /// <para>Also, it contains two maps for representing connectivity model: </para>
     /// <para>they contains informations of how elements are connected to each other by connectivity nodes.</para>
@@ -22,26 +22,32 @@ namespace CIM.Model
         //        CIMType          id      object
         //HashMap<string, Hashmap<string, CIMObject>>
         private SortedDictionary<string, SortedDictionary<string, CIMObject>> modelMap;
-		//// structure that keeps all found CIM types, attributes...
-		private CIMModelContext modelContext = new CIMModelContext();
+
+        //// structure that keeps all found CIM types, attributes...
+        private CIMModelContext modelContext = new CIMModelContext();
 
         // maps for representing connectivity model:
         //      pairs(connectivityNode_ID, List<ID_of_connected_element>)
         private Dictionary<string, List<string>> nodeToElementMap;
+
         //      pairs(element_ID, List<connectivityNode_ID>)
         private Dictionary<string, List<string>> elementToNodeMap;
 
         //// RDF attributes and namespaces
         private Dictionary<string, string> rdfNamespaces;
+
         private Dictionary<string, string> rdfAttributes;
 
         //// helper structures - voltage informations :
         // map contains identifiers of all PowerTransformers grouped by their voltage level (HV, HV/MV, LV)
         private Dictionary<CIMConstants.VoltageLevel, List<string>> voltageLevelMap;
+
         // list of all TransformerWindings (IDs) with volatge in MV range
         private List<string> mvTransformerWindings;
+
         // list of all TransformerWindings (IDs) with volatge in HV range
         private List<string> hvTransformerWindings;
+
         // map key is identifier of PowerTransformer and value is map-list of it's windings and their type
         private Dictionary<string, Dictionary<CIMObject, CIMConstants.WindingType>> analyzedPowerTransformers;
 
@@ -49,7 +55,6 @@ namespace CIM.Model
         private string fileName;
         private double fileSizeMB = 0;
         private DateTime? lastModificationTime;
-
 
         public CIMModel()
         {
@@ -70,9 +75,8 @@ namespace CIM.Model
             SourcePath = filePath;
         }
 
-
         /// <summary>
-        /// Gets the CIM data in form of map of objects. 
+        /// Gets the CIM data in form of map of objects.
         /// <para>Architecture of map: </para>
         /// <para>HashMap {<c>string</c> (object type), Hashmap {<c>string</c> (object ID), <c>CIMObject</c> (whole object)}}</para>
         /// </summary>
@@ -83,17 +87,17 @@ namespace CIM.Model
                 return modelMap;
             }
         }
-		
-		/// <summary>
-		/// Gets the CIM model context instance of this model.
-		/// </summary>
-		public CIMModelContext ModelContext
-		{
-			get
-			{
-				return modelContext;
-			}
-		}
+
+        /// <summary>
+        /// Gets the CIM model context instance of this model.
+        /// </summary>
+        public CIMModelContext ModelContext
+        {
+            get
+            {
+                return modelContext;
+            }
+        }
 
         /// <summary>
         /// Gets and sets full file path to the source file of CIM document.
@@ -155,7 +159,7 @@ namespace CIM.Model
 
         /// <summary>
         /// Gets the current number of all CIMObjects in Model.
-        /// </summary> 
+        /// </summary>
         public int CountObjectsInModelMap
         {
             get
@@ -194,9 +198,9 @@ namespace CIM.Model
                 return elementToNodeMap;
             }
         }
-                
+
         /// <summary>
-        /// Gets the map with identifiers of all PowerTransformer CIMObjects 
+        /// Gets the map with identifiers of all PowerTransformer CIMObjects
         /// grouped by their voltage level (HV, HV/MV, LV).
         /// </summary>
         public Dictionary<CIMConstants.VoltageLevel, List<string>> VoltageLevelMap
@@ -210,7 +214,7 @@ namespace CIM.Model
         /// <summary>
         /// Gets the indication of whether or not this CIMModel can be displayed as diagram.
         /// <para>If ModelMap doesn't contain any CIMObjects of CIMType "TransformerWinding", than this value is false.</para>
-        /// <para>In special case, if there are no "TransformerWinding" objects, this value is true only if 
+        /// <para>In special case, if there are no "TransformerWinding" objects, this value is true only if
         /// there is at least one physical connection among model objects.</para>
         /// </summary>
         public bool IsModelDisplayable
@@ -236,7 +240,7 @@ namespace CIM.Model
                     {
                         isDisplayable = true;
                     }
-                }                
+                }
                 return isDisplayable;
             }
         }
@@ -255,7 +259,7 @@ namespace CIM.Model
 
             //SortTransformerWindingsOfModel();
             ProcessConnectivityByNodes();
-            ProcessConnectivityByPowerTransformers();   
+            ProcessConnectivityByPowerTransformers();
         }
 
         /// <summary>
@@ -269,19 +273,19 @@ namespace CIM.Model
             SortedDictionary<string, CIMObject> mapAllObjectsOfType = null;
             if ((modelMap != null) && (!string.IsNullOrEmpty(type)) && modelMap.ContainsKey(type))
             {
-               mapAllObjectsOfType = modelMap[type];
+                mapAllObjectsOfType = modelMap[type];
             }
             return mapAllObjectsOfType;
         }
 
         /// <summary>
-        /// Method counts all elements of given type inside the ModelMap.        
+        /// Method counts all elements of given type inside the ModelMap.
         /// </summary>
         /// <param fullName="type">type of IdentifedObject</param>
         /// <returns>number of all elements of given type</returns>
         public int CountAllObjectsOfType(string type)
         {
-            int count = 0;            
+            int count = 0;
             if ((modelMap != null) && (!string.IsNullOrEmpty(type)) && modelMap.ContainsKey(type))
             {
                 count = modelMap[type].Count;
@@ -334,37 +338,38 @@ namespace CIM.Model
             }
             return objFound;
         }
-      
+
         /// <summary>
         /// Method inserts given CIMObject in Model.
         /// <para>Object will be inserted in submap acording to it's CIMType and ID property values. </para>
         /// </summary>
         /// <param fullName="cimObject">object for inserting (must not be null)</param>
-		public void InsertObjectInModelMap(CIMObject cimObject)
-		{
-			if ((cimObject != null) && !string.IsNullOrEmpty(cimObject.ID) && !string.IsNullOrEmpty(cimObject.CIMType))
-			{
-				if (modelMap == null)
-				{
-					modelMap = new SortedDictionary<string, SortedDictionary<string, CIMObject>>();
-				}
+        public void InsertObjectInModelMap(CIMObject cimObject)
+        {
+            if ((cimObject != null) && !string.IsNullOrEmpty(cimObject.ID) && !string.IsNullOrEmpty(cimObject.CIMType))
+            {
+                if (modelMap == null)
+                {
+                    modelMap = new SortedDictionary<string, SortedDictionary<string, CIMObject>>();
+                }
 
-				if (!modelMap.ContainsKey(cimObject.CIMType))
-				{
-					SortedDictionary<string, CIMObject> typeSubmap = new SortedDictionary<string, CIMObject>();
-					typeSubmap.Add(cimObject.ID, cimObject);
-					modelMap.Add(cimObject.CIMType, typeSubmap);
-				}
-				else
-				{
-					if (modelMap[cimObject.CIMType] == null)
-					{
-						modelMap[cimObject.CIMType] = new SortedDictionary<string, CIMObject>();
-					}
-                    modelMap[cimObject.CIMType].Add(cimObject.ID, cimObject);                       
-				}
-			}
-		}   
+                if (!modelMap.ContainsKey(cimObject.CIMType))
+                {
+                    SortedDictionary<string, CIMObject> typeSubmap = new SortedDictionary<string, CIMObject>();
+                    typeSubmap.Add(cimObject.ID, cimObject);
+                    modelMap.Add(cimObject.CIMType, typeSubmap);
+                }
+                else
+                {
+                    if (modelMap[cimObject.CIMType] == null)
+                    {
+                        modelMap[cimObject.CIMType] = new SortedDictionary<string, CIMObject>();
+                    }
+                    modelMap[cimObject.CIMType].Add(cimObject.ID, cimObject);
+                }
+            }
+        }
+
         #endregion Simple methods for ModelMap
 
         #region Get : parents
@@ -455,12 +460,13 @@ namespace CIM.Model
             }
             return parentObjects;
         }
+
         #endregion Get : parents
 
         #region Get : children
 
         /// <summary>
-        /// Method loads and returns the map of all children (objects who refernces given 
+        /// Method loads and returns the map of all children (objects who refernces given
         /// object with their attributes) of given object.
         /// <para>All children are packed in submaps by their type.</para>
         /// </summary>
@@ -493,7 +499,7 @@ namespace CIM.Model
         }
 
         /// <summary>
-        /// Method loads and returns the map of all children (objects who refernces given 
+        /// Method loads and returns the map of all children (objects who refernces given
         /// object with their attributes) of given object.
         /// <para>All children are NOT packed in submaps by their type - they are all in one map with ID value for key.</para>
         /// </summary>
@@ -591,6 +597,7 @@ namespace CIM.Model
                 }
             }
         }
+
         #endregion Get : RDF attributes / namespaces
 
         #region Get: Voltage related informations
@@ -660,8 +667,8 @@ namespace CIM.Model
                                                             processedIds.Add(analizedTW.ID);
                                                         }
                                                     }
-                                                }                                              
-                                            }                                            
+                                                }
+                                            }
                                         }
                                     }
                                 }
@@ -671,10 +678,9 @@ namespace CIM.Model
                                     energySources.Add(tWinding.ID);
                                 }
                             }
-                        }                        
-                    }                    
+                        }
+                    }
                 }
-
             }
             return energySources;
         }
@@ -692,14 +698,14 @@ namespace CIM.Model
 
             double voltageFromBaseVoltage = ReadTransformerWindingBaseVoltageNominalVoltage(transformerWinding);
             double voltageKV = ReadTransformerWindingVoltageKV(transformerWinding);
-            double voltageU = ReadTransformerWindingVoltageU(transformerWinding);            
-       
-            if ((voltageU > -1) && (voltageFromBaseVoltage > -1) 
+            double voltageU = ReadTransformerWindingVoltageU(transformerWinding);
+
+            if ((voltageU > -1) && (voltageFromBaseVoltage > -1)
                 && (double.Equals(voltageU, voltageFromBaseVoltage) || (Math.Abs(voltageU - voltageFromBaseVoltage) < 1)))
             {
                 voltageU *= 1000;
             }
-           
+
             if (voltageKV > -1)
             {
                 voltage = voltageKV;
@@ -707,7 +713,7 @@ namespace CIM.Model
             else if (voltageU > -1)
             {
                 voltage = voltageU;
-            }    
+            }
             else if (voltageFromBaseVoltage > -1)
             {
                 voltage = voltageFromBaseVoltage;
@@ -717,7 +723,7 @@ namespace CIM.Model
         }
 
         /// <summary>
-        /// Method uses the VoltageLevelMap property and returns the previously determined VoltageLevel 
+        /// Method uses the VoltageLevelMap property and returns the previously determined VoltageLevel
         /// of given PowerTransformer CIM object.
         /// <para>This information is determined during process of analyzing transformer windings.</para>
         /// </summary>
@@ -828,7 +834,7 @@ namespace CIM.Model
                 }
                 else
                 {
-                    analyzed = new Dictionary<CIMObject, CIMConstants.WindingType>();                    
+                    analyzed = new Dictionary<CIMObject, CIMConstants.WindingType>();
 
                     List<string> windingIds = powerTransformerObject.GetChildrenOfType(CIMConstants.TypeNameTransformerWinding);
                     windingIds.Sort();
@@ -903,9 +909,10 @@ namespace CIM.Model
 
                     analyzedPowerTransformers.Add(powerTransformerObject.ID, analyzed);
                 }
-            }        
+            }
             return analyzed;
         }
+
         #endregion Get: Voltage related informations
 
         #region Get : Connectivity informations
@@ -919,7 +926,7 @@ namespace CIM.Model
         /// <returns>list of directly connected objets</returns>
         public List<string> GetAllDirectConnectionsOfObject(string cimObjectId)
         {
-            List<string> directConnections = null;            
+            List<string> directConnections = null;
             if (!string.IsNullOrEmpty(cimObjectId))
             {
                 List<string> connections = null;
@@ -950,7 +957,7 @@ namespace CIM.Model
                 }
             }
             return directConnections;
-        } 
+        }
 
         /// <summary>
         /// Method returns number of direct connections between object with
@@ -964,9 +971,9 @@ namespace CIM.Model
             int directConnections = 0;
             if (!string.IsNullOrEmpty(cimObjectId))
             {
-                List<string> connections = null;   
+                List<string> connections = null;
                 if (nodeToElementMap != null)
-                {                                 
+                {
                     nodeToElementMap.TryGetValue(cimObjectId, out connections);
                     if (connections != null)
                     {
@@ -985,6 +992,7 @@ namespace CIM.Model
             }
             return directConnections;
         }
+
         #endregion Get : Connectivity informations
 
         /// <summary>
@@ -998,7 +1006,7 @@ namespace CIM.Model
             string sourceSnippet = string.Empty;
             if (cimObject != null)
             {
-				sourceSnippet = CIM.Manager.FileManager.ReadTextSegmentFromFile(SourcePath, cimObject.SourceStartLine, (int)cimObject.SourceStartColumn, cimObject.SourceEndLine, (int)cimObject.SourceEndColumn);
+                sourceSnippet = CIM.Manager.FileManager.ReadTextSegmentFromFile(SourcePath, cimObject.SourceStartLine, (int)cimObject.SourceStartColumn, cimObject.SourceEndLine, (int)cimObject.SourceEndColumn);
             }
             return sourceSnippet;
         }
@@ -1010,29 +1018,29 @@ namespace CIM.Model
         /// </summary>
         public void CleanValidationMessagesForEntireModelElements()
         {
-			if (ModelMap != null)
-			{
-				foreach (SortedDictionary<string, CIMObject> submap in modelMap.Values)
-				{
-					foreach (CIMObject modelObject in submap.Values)
-					{
-						if (modelObject != null)
-						{
-							modelObject.ClearValidationInformations();
-							if (modelObject.MyAttributes != null)
-							{
-								foreach (int attributeCode in modelObject.MyAttributes.Keys)
-								{
-									foreach (ObjectAttribute attribute in modelObject.MyAttributes[attributeCode])
-									{
-										attribute.ClearValidationInformations();
-									}
-								}
-							}
-						}
-					}
-				}
-			}
+            if (ModelMap != null)
+            {
+                foreach (SortedDictionary<string, CIMObject> submap in modelMap.Values)
+                {
+                    foreach (CIMObject modelObject in submap.Values)
+                    {
+                        if (modelObject != null)
+                        {
+                            modelObject.ClearValidationInformations();
+                            if (modelObject.MyAttributes != null)
+                            {
+                                foreach (int attributeCode in modelObject.MyAttributes.Keys)
+                                {
+                                    foreach (ObjectAttribute attribute in modelObject.MyAttributes[attributeCode])
+                                    {
+                                        attribute.ClearValidationInformations();
+                                    }
+                                }
+                            }
+                        }
+                    }
+                }
+            }
         }
 
         /// <summary>
@@ -1040,7 +1048,7 @@ namespace CIM.Model
         /// </summary>
         /// <returns></returns>
         public override string ToString()
-        { 
+        {
             StringBuilder messageBuilder = new StringBuilder();
             int count = 0;
             messageBuilder.Append("Diferent element types count : ");
@@ -1062,8 +1070,8 @@ namespace CIM.Model
             return messageBuilder.ToString();
         }
 
-
         #region Private: Helper methods
+
         // Helper method
         private void ProcessConnectivityByNodes()
         {
@@ -1134,48 +1142,49 @@ namespace CIM.Model
         }
 
         // Helper method
-		private void AddToNodeToElementMap(string connectivityNodeId, string elementId)
-		{
-			if (nodeToElementMap == null)
-			{
-				nodeToElementMap = new Dictionary<string, List<string>>();
-			}
+        private void AddToNodeToElementMap(string connectivityNodeId, string elementId)
+        {
+            if (nodeToElementMap == null)
+            {
+                nodeToElementMap = new Dictionary<string, List<string>>();
+            }
 
-			List<string> nToE = new List<string>();
-			nodeToElementMap.TryGetValue(connectivityNodeId, out nToE);
-			if (nToE == null)
-			{
-				nToE = new List<string>();
-				nToE.Add(elementId);
-				nodeToElementMap.Add(connectivityNodeId, nToE);
-			}
-			else
-			{
-				nodeToElementMap[connectivityNodeId].Add(elementId);
-			}
-		}
+            List<string> nToE = new List<string>();
+            nodeToElementMap.TryGetValue(connectivityNodeId, out nToE);
+            if (nToE == null)
+            {
+                nToE = new List<string>();
+                nToE.Add(elementId);
+                nodeToElementMap.Add(connectivityNodeId, nToE);
+            }
+            else
+            {
+                nodeToElementMap[connectivityNodeId].Add(elementId);
+            }
+        }
 
         // Helper method
-		private void AddToElementToNodeMap(string elementId, string connectivityNodeId)
-		{
-			if (elementToNodeMap == null)
-			{
-				elementToNodeMap = new Dictionary<string, List<string>>();
-			}
+        private void AddToElementToNodeMap(string elementId, string connectivityNodeId)
+        {
+            if (elementToNodeMap == null)
+            {
+                elementToNodeMap = new Dictionary<string, List<string>>();
+            }
 
-			List<string> eToN = null;
-			elementToNodeMap.TryGetValue(elementId, out eToN);
-			if (eToN == null)
-			{
-				eToN = new List<string>();
-				eToN.Add(connectivityNodeId);
-				elementToNodeMap.Add(elementId, eToN);
-			}
-			else
-			{
-				elementToNodeMap[elementId].Add(connectivityNodeId);
-			}
-		}
+            List<string> eToN = null;
+            elementToNodeMap.TryGetValue(elementId, out eToN);
+            if (eToN == null)
+            {
+                eToN = new List<string>();
+                eToN.Add(connectivityNodeId);
+                elementToNodeMap.Add(elementId, eToN);
+            }
+            else
+            {
+                elementToNodeMap[elementId].Add(connectivityNodeId);
+            }
+        }
+
         #endregion Private: Helper methods
 
         #region Private: TransformerWinding & PowerTransformer Related
@@ -1205,30 +1214,30 @@ namespace CIM.Model
                                 switch (analized[winding])
                                 {
                                     case CIMConstants.WindingType.Primary:
-                                    {
-                                        orderedMap.Add(1, winding.ID);
-                                        break;
-                                    }
+                                        {
+                                            orderedMap.Add(1, winding.ID);
+                                            break;
+                                        }
                                     case CIMConstants.WindingType.Secondary:
-                                    {
-                                        orderedMap.Add(2, winding.ID);                                        
-                                        break;
-                                    }
+                                        {
+                                            orderedMap.Add(2, winding.ID);
+                                            break;
+                                        }
                                     case CIMConstants.WindingType.Tertiary:
-                                    {
-                                        orderedMap.Add(3, winding.ID);
-                                        break;
-                                    }
+                                        {
+                                            orderedMap.Add(3, winding.ID);
+                                            break;
+                                        }
                                     case CIMConstants.WindingType.Quaternary:
-                                    {
-                                        orderedMap.Add(4, winding.ID);
-                                        break;
-                                    }
+                                        {
+                                            orderedMap.Add(4, winding.ID);
+                                            break;
+                                        }
                                     default:
-                                    {
-                                        orderedMap.Add(4 + count, winding.ID);
-                                        break;
-                                    }
+                                        {
+                                            orderedMap.Add(4 + count, winding.ID);
+                                            break;
+                                        }
                                 }
                                 if ((count == 2) && (ptVoltageValue == -1))
                                 {
@@ -1256,7 +1265,7 @@ namespace CIM.Model
             {
                 CIMConstants.VoltageLevel level = CIMConstants.VoltageLevel.None;
                 if (voltageValue != -1)
-                {                    
+                {
                     if (voltageValue > CIMConstants.VoltageRangeUpperKV)
                     {
                         level = CIMConstants.VoltageLevel.HV;
@@ -1399,13 +1408,12 @@ namespace CIM.Model
 
                     if (typeAttribute.IsReference)
                     {
-						type = CIM.Manager.StringManipulationManager.ExtractShortestName(typeAttribute.ValueOfReference, CIM.Manager.StringManipulationManager.SeparatorSharp);
+                        type = CIM.Manager.StringManipulationManager.ExtractShortestName(typeAttribute.ValueOfReference, CIM.Manager.StringManipulationManager.SeparatorSharp);
                     }
                     else
                     {
                         type = typeAttribute.Value;
                     }
-
                 }
             }
 
@@ -1456,7 +1464,7 @@ namespace CIM.Model
                             }
                         }
                     }
-                }                
+                }
             }
 
             if (voltage > -1)
@@ -1467,6 +1475,5 @@ namespace CIM.Model
         }
 
         #endregion Private: TransformerWinding & PowerTransformer Related
-
     }
 }

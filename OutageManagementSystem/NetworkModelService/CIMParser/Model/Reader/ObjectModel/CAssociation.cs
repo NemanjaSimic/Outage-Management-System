@@ -1,7 +1,6 @@
 ﻿namespace CIM.Model
 {
-    class CAssociation
+    internal class CAssociation
     {
-
     }
 }

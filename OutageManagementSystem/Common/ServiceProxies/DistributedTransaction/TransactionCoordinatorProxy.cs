@@ -21,9 +21,9 @@ namespace Outage.Common.ServiceProxies.DistributedTransaction
         }
     }
 
-    public class TransactionCoordinatorEnlistmentProxy : ClientBase<ITransactionEnlistmentContract>, ITransactionEnlistmentContract
+    public class TransactionEnlistmentProxy : ClientBase<ITransactionEnlistmentContract>, ITransactionEnlistmentContract
     { 
-        public TransactionCoordinatorEnlistmentProxy(string endpointName)
+        public TransactionEnlistmentProxy(string endpointName)
             : base(endpointName)
         { 
         }

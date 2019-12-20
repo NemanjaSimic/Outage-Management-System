@@ -11,12 +11,8 @@ namespace Outage.DistributedTransactionActor
             return true;
         }
 
-        public virtual void Commit()
-        {
-        }
+        public abstract void Commit();
 
-        public virtual void Rollback()
-        {
-        }
+        public abstract void Rollback();
     }
 }
