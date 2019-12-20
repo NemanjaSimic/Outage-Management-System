@@ -6,6 +6,7 @@ using SCADA.Command;
 using SCADA_Config_Data.Repository;
 using SCADA_Config_Data.Configuration;
 using System.Linq;
+using ModBus.Acquisitor;
 
 namespace SCADA
 {
@@ -17,10 +18,13 @@ namespace SCADA
         static void Main(string[] args)
         {
 
+
             wcfService = new WcfService<ICommandService, CommandService>(DataModelRepository.Instance.ServiceAddress);
             Console.WriteLine(DataModelRepository.Instance.ImportModel());
             ConfigWriter configWriter = new ConfigWriter();
             configWriter.GenerateConfigFile();
+
+            Acquisition A = new Acquisition();
             /*  wcfService.Open();
               Console.WriteLine("Press any key to terminate services..");
               Console.ReadKey();
@@ -67,40 +71,40 @@ namespace SCADA
              */
         }
 
-       /* private static void InitializePointCollection(FunctionExecutor functionExecutor)
-        {
-            Points = new ObservableCollection<BasePointItem>();
-            foreach (var c in ConfigWriter.Instance.GetConfigurationItems())
-            {
-                for (int i = 0; i < c.NumberOfRegisters; i++)
-                {
-                    BasePointItem pi = CreatePoint(c, i, functionExecutor);
-                    if (pi != null)
-                        Points.Add(pi);
-                }
-            }
-        }
+        /* private static void InitializePointCollection(FunctionExecutor functionExecutor)
+         {
+             Points = new ObservableCollection<BasePointItem>();
+             foreach (var c in ConfigWriter.Instance.GetConfigurationItems())
+             {
+                 for (int i = 0; i < c.NumberOfRegisters; i++)
+                 {
+                     BasePointItem pi = CreatePoint(c, i, functionExecutor);
+                     if (pi != null)
+                         Points.Add(pi);
+                 }
+             }
+         }
 
-        private static BasePointItem CreatePoint(ConfigItem c, int i, FunctionExecutor commandExecutor)
-        {
-            switch (c.RegistryType)
-            {
-                case PointType.DIGITAL_INPUT:
-                    return new DigitalInput(c.RegistryType, (ushort)(c.StartAddress + i), c.DefaultValue, commandExecutor, c.MinValue, c.MaxValue);
+         private static BasePointItem CreatePoint(ConfigItem c, int i, FunctionExecutor commandExecutor)
+         {
+             switch (c.RegistryType)
+             {
+                 case PointType.DIGITAL_INPUT:
+                     return new DigitalInput(c.RegistryType, (ushort)(c.StartAddress + i), c.DefaultValue, commandExecutor, c.MinValue, c.MaxValue);
 
-                case PointType.DIGITAL_OUTPUT:
-                    return new DigitalOutput(c.RegistryType, (ushort)(c.StartAddress + i), c.DefaultValue, commandExecutor, c.MinValue, c.MaxValue);
+                 case PointType.DIGITAL_OUTPUT:
+                     return new DigitalOutput(c.RegistryType, (ushort)(c.StartAddress + i), c.DefaultValue, commandExecutor, c.MinValue, c.MaxValue);
 
-                case PointType.ANALOG_INPUT:
-                    return new AnalogInput(c.RegistryType, (ushort)(c.StartAddress + i), c.DefaultValue, commandExecutor, c.MinValue, c.MaxValue);
+                 case PointType.ANALOG_INPUT:
+                     return new AnalogInput(c.RegistryType, (ushort)(c.StartAddress + i), c.DefaultValue, commandExecutor, c.MinValue, c.MaxValue);
 
-                case PointType.ANALOG_OUTPUT:
-                    return new AnalogOutput(c.RegistryType, (ushort)(c.StartAddress + i), c.DefaultValue, commandExecutor, c.MinValue, c.MaxValue);
+                 case PointType.ANALOG_OUTPUT:
+                     return new AnalogOutput(c.RegistryType, (ushort)(c.StartAddress + i), c.DefaultValue, commandExecutor, c.MinValue, c.MaxValue);
 
-                default:
-                    return null;
-            }
-        }
-    */
+                 default:
+                     return null;
+             }
+         }
+     */
     }
 }

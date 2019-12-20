@@ -19,6 +19,7 @@ namespace SCADA_Config_Data.Repository
         public ushort TcpPort { get; protected set; }
         public byte UnitAddress { get; protected set; }
         public string ServiceAddress { get; protected set; }
+        public int Interval { get; protected set; }
         //public FunctionExecutor functionExecutor { get; set; }
         private INetworkModelGDAContract gdaQueryProxy = null;
         public Dictionary<long, ConfigItem> Points;
@@ -46,6 +47,7 @@ namespace SCADA_Config_Data.Repository
             TcpPort = ushort.Parse(ConfigurationManager.AppSettings["TcpPort"]);
             UnitAddress = byte.Parse(ConfigurationManager.AppSettings["UnitAddress"]);
             ServiceAddress = ConfigurationManager.AppSettings["ServiceAddress"];
+            Interval = Int32.Parse(ConfigurationManager.AppSettings["Interval"]);
             try
             {
                 gdaQueryProxy = new ChannelFactory<INetworkModelGDAContract>("NetworkModelGDAEndpoint").CreateChannel();
