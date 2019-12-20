@@ -1,4 +1,5 @@
 import tippy from 'tippy.js';
+import { SwitchCommand, SwitchCommandType } from '@shared/models/switch-command.model';
 
 const graphTooltipBody: string =
   `<p>ID: [[id]]</p>
@@ -30,12 +31,28 @@ export const addGraphTooltip = (cy, node) => {
 
         button.addEventListener('click', () => {
 
-          // TODO: Zameniti sa logikom da posalje komandu ka SCADI i nakon sto primi uspesan odgovor da promeni status dugmeta (on/off)
+          // jer je u mocku string, a u sistemu je long
+          const guid = Math.random() * 1000; 
+
           if (node.data('state') == "active") {
+            const command: SwitchCommand = {
+              guid,
+              type: SwitchCommandType.TURN_OFF
+            };
+
+            node.sendSwitchCommand(command);
+
             node.data('state', 'inactive');
             button.innerHTML = 'Switch on';
-          }
-          else {
+          } else {
+
+            const command: SwitchCommand = {
+              guid,
+              type: SwitchCommandType.TURN_ON
+            };
+
+            node.sendSwitchCommand(command);
+
             node.data('state', 'active');
             button.innerHTML = 'Switch off';
           }
