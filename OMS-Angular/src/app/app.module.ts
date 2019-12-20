@@ -19,7 +19,9 @@ import { GraphModule } from './modules/graph/graph.module';
     ServicesModule,
     GraphModule
   ],
-  providers: [],
+  providers: [
+    ServicesModule
+  ],
   bootstrap: [AppComponent]
 })
 export class AppModule { }

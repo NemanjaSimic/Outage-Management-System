@@ -24,6 +24,7 @@ namespace OMS.Web.Adapter.ScadaClient
         {
             try
             {
+                // magic :))
                 _proxy.RecvCommand(gid, default(PointType), value);
             }
             catch (Exception)

@@ -14,6 +14,8 @@ import * as graphMock from './graph-mock.json';
 // cytoscape plugins
 import dagre from 'cytoscape-dagre';
 import popper from 'cytoscape-popper';
+import { CommandService } from '@services/command/command.service';
+import { SwitchCommandType, SwitchCommand } from '@shared/models/switch-command.model';
 cytoscape.use(dagre);
 cytoscape.use(popper);
 
@@ -38,14 +40,15 @@ export class GraphComponent implements OnInit, OnDestroy {
 
   constructor(
     private graphService: GraphService,
+    private commandService: CommandService,
     private ngZone: NgZone
   ) {
     this.connectionSubscription = Subscription.EMPTY;
     this.updateSubscription = Subscription.EMPTY;
   }
-  
+
   ngOnInit() {
-    
+
     // testing splash screen look, will change logic after we connect to the api
     this.didLoadGraph = false;
 
@@ -55,7 +58,7 @@ export class GraphComponent implements OnInit, OnDestroy {
     }, 2000);
 
     // web api
-    this.startConnection();
+    //this.startConnection();
 
     // local testing
     this.graphData.nodes = graphMock.nodes;
@@ -115,6 +118,7 @@ export class GraphComponent implements OnInit, OnDestroy {
   public addTooltips(): void {
     this.cy.ready(() => {
       this.cy.nodes().forEach(node => {
+        node.sendSwitchCommand = (command) => this.onCommandHandler(command);
         addGraphTooltip(this.cy, node);
       });
     });
@@ -128,6 +132,12 @@ export class GraphComponent implements OnInit, OnDestroy {
     });
   };
 
+  public onCommandHandler = (command: SwitchCommand) => {
+    this.commandService.sendSwitchCommand(command).subscribe(
+      data => console.log(data),
+      err => console.log(err)
+    );
+  }
 
   public onNotification(data: OmsGraph): void {
     this.ngZone.run(() => {
