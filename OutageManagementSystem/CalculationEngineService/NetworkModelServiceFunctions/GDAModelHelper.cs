@@ -8,26 +8,34 @@ namespace NetworkModelServiceFunctions
 	public class GDAModelHelper
 	{
 
-		private readonly ModelResourcesDesc modelResourcesDesc = new ModelResourcesDesc();
-		private readonly NetworkModelGDA networkModelGDA = new NetworkModelGDA();
-		Dictionary<long, ResourceDescription> modelEntities;
+		private readonly ModelResourcesDesc modelResourcesDesc;
+		private readonly NetworkModelGDA networkModelGDA;
+		private Dictionary<long, ResourceDescription> modelEntities;
+
+		private static GDAModelHelper instance;
+
+		public static GDAModelHelper Instance
+		{
+			get 
+			{
+				if (instance == null)
+				{
+					instance = new GDAModelHelper();
+				}
+
+				return instance;
+			}
+		}
+
+		private GDAModelHelper()
+		{
+			modelResourcesDesc = new ModelResourcesDesc();
+			networkModelGDA = new NetworkModelGDA();
+		}
 
 		public List<long> GetAllEnergySousces()
 		{
 			return GetAllGids(ModelCode.ENERGYSOURCE);
-		}
-
-		public Dictionary<ModelCode, List<long>> GetAllModelEntities()
-		{
-			List<ModelCode> concreteClasses = modelResourcesDesc.NonAbstractClassIds;
-			Dictionary<ModelCode, List<long>> modelEntities = new Dictionary<ModelCode, List<long>>();
-
-			foreach (var concreteClass in concreteClasses)
-			{
-				modelEntities.Add(concreteClass, GetAllGids(concreteClass));
-			}
-
-			return modelEntities;
 		}
 
 		private List<long> GetAllGids(ModelCode concreteClass)
@@ -61,55 +69,10 @@ namespace NetworkModelServiceFunctions
 		public List<long> GetAllReferencedElements(long gid)
 		{
 			List<long> elements = new List<long>();
-			//Association association = new Association();
 			DMSType type = ModelCodeHelper.GetTypeFromModelCode(modelResourcesDesc.GetModelCodeFromId(gid));
 
-			List<ModelCode> propertyIds = new List<ModelCode>();
-
-			switch (type)
+			foreach (var property in GetAllReferenceProperties(type))
 			{
-				case DMSType.TERMINAL:
-					propertyIds.Add(ModelCode.TERMINAL_CONDUCTINGEQUIPMENT);
-					propertyIds.Add(ModelCode.TERMINAL_CONNECTIVITYNODE);
-					break;
-				case DMSType.CONNECTIVITYNODE:
-					propertyIds.Add(ModelCode.CONNECTIVITYNODE_TERMINALS);
-					break;
-				case DMSType.POWERTRANSFORMER:
-					propertyIds.Add(ModelCode.POWERTRANSFORMER_TRANSFORMERWINDINGS);
-					break;
-				case DMSType.ENERGYSOURCE:
-					propertyIds.Add(ModelCode.CONDUCTINGEQUIPMENT_TERMINALS);
-					break;
-				case DMSType.ENERGYCONSUMER:
-					propertyIds.Add(ModelCode.CONDUCTINGEQUIPMENT_TERMINALS);
-					break;
-				case DMSType.TRANSFORMERWINDING:
-					propertyIds.Add(ModelCode.CONDUCTINGEQUIPMENT_TERMINALS);
-					propertyIds.Add(ModelCode.TRANSFORMERWINDING_POWERTRANSFORMER);
-					break;
-				case DMSType.FUSE:
-					propertyIds.Add(ModelCode.CONDUCTINGEQUIPMENT_TERMINALS);
-					break;
-				case DMSType.DISCONNECTOR:
-					propertyIds.Add(ModelCode.CONDUCTINGEQUIPMENT_TERMINALS);
-					break;
-				case DMSType.BREAKER:
-					propertyIds.Add(ModelCode.CONDUCTINGEQUIPMENT_TERMINALS);
-					break;
-				case DMSType.LOADBREAKSWITCH:
-					propertyIds.Add(ModelCode.CONDUCTINGEQUIPMENT_TERMINALS);
-					break;
-				case DMSType.ACLINESEGMENT:
-					propertyIds.Add(ModelCode.CONDUCTINGEQUIPMENT_TERMINALS);
-					break;
-				default:
-					break;
-			}
-
-			foreach (var property in propertyIds)
-			{
-				//association.PropertyId = property;
 				if (modelEntities.ContainsKey(gid))
 				{
 					if (property == ModelCode.POWERTRANSFORMER_TRANSFORMERWINDINGS || property == ModelCode.CONDUCTINGEQUIPMENT_TERMINALS || property == ModelCode.CONNECTIVITYNODE_TERMINALS)
@@ -122,18 +85,12 @@ namespace NetworkModelServiceFunctions
 						elements.Add(modelEntities[gid].GetProperty(property).AsReference());
 					}
 				}
-				//elements.AddRange(networkModelGDA.GetRelatedValues(gid, new List<ModelCode>() { ModelCode.IDOBJ_GID }, association));
 			}
-
 			return elements;
 		}
 
-
-
-		public List<ModelCode> GetReferenceProperties(long gid)
+		private List<ModelCode> GetAllReferenceProperties(DMSType type)
 		{
-			DMSType type = ModelCodeHelper.GetTypeFromModelCode(modelResourcesDesc.GetModelCodeFromId(gid));
-
 			List<ModelCode> propertyIds = new List<ModelCode>();
 
 			switch (type)

@@ -47,7 +47,7 @@ namespace NetworkModelServiceFunctions
 
 		private List<ResourceDescription> ProcessIterator(int iteratorId)
 		{
-			int numberOfResources = 3, resourcesLeft = 0;
+			int numberOfResources = 50, resourcesLeft = 0;
 
 			List<ResourceDescription> resourceDescriptions = new List<ResourceDescription>();
 
