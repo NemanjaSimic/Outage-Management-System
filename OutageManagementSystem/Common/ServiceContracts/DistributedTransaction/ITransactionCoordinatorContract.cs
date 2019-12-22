@@ -11,11 +11,4 @@ namespace Outage.Common.ServiceContracts.DistributedTransaction
         [OperationContract]
         void FinishDistributedUpdate(bool success);
     }
-
-    [ServiceContract]
-    public interface ITransactionEnlistmentContract
-    {
-        [OperationContract]
-        bool Enlist(string actorName);
-    }
 }

@@ -8,44 +8,44 @@ using System.Threading.Tasks;
 
 namespace Outage.TransactionManagerService
 {
-    public class Config
-    {
-        private string connectionString = string.Empty;
-        private string foo = string.Empty;
+    //public class Config
+    //{
+    //    private string connectionString = string.Empty;
+    //    private string foo = string.Empty;
 
-        public string ConnectionString
-        {
-            get { return connectionString; }
-        }
+    //    public string ConnectionString
+    //    {
+    //        get { return connectionString; }
+    //    }
 
-        public string Foo
-        {
-            get { return foo; }
-        }
+    //    public string Foo
+    //    {
+    //        get { return foo; }
+    //    }
 
-        private Config()
-        {
-            //foo = ConfigurationManager.AppSettings["Foo"];
-            //connectionString = ConfigurationManager.ConnectionStrings["conn"].ConnectionString;
-        }
+    //    private Config()
+    //    {
+    //        //foo = ConfigurationManager.AppSettings["Foo"];
+    //        //connectionString = ConfigurationManager.ConnectionStrings["conn"].ConnectionString;
+    //    }
 
-        #region Static members
+    //    #region Static members
 
-        private static Config instance = null;
+    //    private static Config instance = null;
 
-        public static Config Instance
-        {
-            get
-            {
-                if (instance == null)
-                {
-                    instance = new Config();
-                }
+    //    public static Config Instance
+    //    {
+    //        get
+    //        {
+    //            if (instance == null)
+    //            {
+    //                instance = new Config();
+    //            }
 
-                return instance;
-            }
-        }
+    //            return instance;
+    //        }
+    //    }
 
-        #endregion Static members
-    }
+    //    #endregion Static members
+    //}
 }

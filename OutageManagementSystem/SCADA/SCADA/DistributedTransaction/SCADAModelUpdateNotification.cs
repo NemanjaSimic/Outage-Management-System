@@ -18,7 +18,11 @@ namespace SCADA_Service.DistributedTransaction
 
         public override bool NotifyAboutUpdate(Dictionary<DeltaOpType, List<long>> modelChanges)
         {
-            throw new NotImplementedException();
+            //TODO: SCADA notification logic
+
+            TransactionEnlistmentProxy.Enlist(ActorName);
+            logger.LogInfo("SCADA SUCCESSFULLY notified about network model update.");
+            return true;
         }
     }
 }

@@ -1,4 +1,5 @@
-﻿using Outage.Common.GDA;
+﻿using Outage.Common;
+using Outage.Common.GDA;
 using Outage.Common.ServiceContracts.DistributedTransaction;
 using Outage.Common.ServiceProxies.DistributedTransaction;
 using System;
@@ -9,12 +10,13 @@ namespace Outage.DistributedTransactionActor
     public abstract class ModelUpdateNotification : IModelUpdateNotificationContract
     {
         private TransactionEnlistmentProxy transactionEnlistmentProxy = null;
+        protected ILogger logger = LoggerWrapper.Instance; 
 
         public string EndpointName { get; private set; }
 
         public string ActorName { get; set; }
 
-        public TransactionEnlistmentProxy TransactionEnlistmentProxy
+        protected TransactionEnlistmentProxy TransactionEnlistmentProxy
         {
             get
             {

@@ -26,9 +26,17 @@ namespace Outage.NetworkModelService.DistributedTransaction
             }
             catch (Exception ex)
             {
-                LoggerWrapper.Instance.LogError(ex.Message, ex);
-                //TODO: 
-                //LoggerWrapper.Instance.LogInfo();
+                logger.LogError($"Exception catched in Prepare method on NMS Transaction actor. Exception: {ex.Message}", ex);
+                success = false;
+            }
+
+            if(success)
+            {
+                logger.LogInfo("Preparation on NMS Transaction actor SUCCESSFULLY finished.");
+            }
+            else
+            {
+                logger.LogInfo("Preparation on NMS Transaction actor UNSUCCESSFULLY finished.");
             }
 
             return success;
@@ -39,12 +47,12 @@ namespace Outage.NetworkModelService.DistributedTransaction
             try
             {
                 networkModel.Commit();
-                //TODO: 
-                //LoggerWrapper.Instance.LogInfo();
+                logger.LogInfo("Commit on NMS Transaction actor SUCCESSFULLY finished.");
             }
             catch (Exception ex)
-            {
-                LoggerWrapper.Instance.LogError(ex.Message, ex);
+            { 
+                logger.LogError($"Exception catched in Commit method on NMS Transaction actor. Exception: {ex.Message}", ex);
+                logger.LogInfo("Commit on NMS Transaction actor UNSUCCESSFULLY finished.");
             }
         }
 
@@ -53,12 +61,12 @@ namespace Outage.NetworkModelService.DistributedTransaction
             try
             {
                 networkModel.Rollback();
-                //TODO: 
-                //LoggerWrapper.Instance.LogInfo();
+                logger.LogInfo("Rollback on NMS Transaction actor SUCCESSFULLY finished.");
             }
             catch (Exception ex)
             {
-                LoggerWrapper.Instance.LogError(ex.Message, ex);
+                logger.LogError($"Exception catched in Rollback method on NMS Transaction actor. Exception: {ex.Message}", ex);
+                logger.LogInfo("Rollback on NMS Transaction actor UNSUCCESSFULLY finished.");
             }
         }
     }

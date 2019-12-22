@@ -6,6 +6,7 @@ using SCADA.Command;
 using SCADA_Config_Data.Repository;
 using SCADA_Config_Data.Configuration;
 using System.Linq;
+using Outage.Common;
 
 namespace SCADA
 {
@@ -26,9 +27,40 @@ namespace SCADA
               Console.ReadKey();
               wcfService.Close();
               Console.WriteLine("Press any key to exit the application.. "); */
-            CommandService commandService = new CommandService();
-            commandService.RecvCommand(DataModelRepository.Instance.Points.Values.First().Gid, PointType.ANALOG_OUTPUT, 100);
-            Console.ReadKey();
+            //CommandService commandService = new CommandService();
+            //commandService.RecvCommand(DataModelRepository.Instance.Points.Values.First().Gid, PointType.ANALOG_OUTPUT, 100);
+
+
+            ILogger logger = LoggerWrapper.Instance;
+
+            try
+            {
+                string message = "Starting SCADA Service...";
+                logger.LogInfo(message);
+                CommonTrace.WriteTrace(CommonTrace.TraceInfo, message);
+                Console.WriteLine("\n{0}\n", message);
+
+                using (SCADA_Service.SCADAService scadaService = new SCADA_Service.SCADAService())
+                {
+                    scadaService.Start();
+
+                    message = "Press <Enter> to stop the service.";
+                    CommonTrace.WriteTrace(CommonTrace.TraceInfo, message);
+                    Console.WriteLine(message);
+                    Console.ReadLine();
+                }
+            }
+            catch (Exception ex)
+            {
+                Console.WriteLine(ex.Message);
+                Console.WriteLine("SCADAService failed.");
+                Console.WriteLine(ex.StackTrace);
+                CommonTrace.WriteTrace(CommonTrace.TraceError, ex.Message);
+                CommonTrace.WriteTrace(CommonTrace.TraceError, "SCADAService failed.");
+                CommonTrace.WriteTrace(CommonTrace.TraceError, ex.StackTrace);
+                logger.LogError($"SCADAService failed.{Environment.NewLine}Message: {ex.Message} ", ex);
+                Console.ReadLine();
+            }
 
             // PREPRAVITI DA NE BUDE HARDCODE
 

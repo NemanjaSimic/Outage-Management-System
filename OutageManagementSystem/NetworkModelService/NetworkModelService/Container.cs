@@ -194,7 +194,6 @@ namespace Outage.NetworkModelService
                 default:
                     {
                         string message = String.Format("Failed to create entity because specified type ({0}) is not supported.", type);
-                        //CommonTrace.WriteTrace(CommonTrace.TraceError, message);
                         logger.LogError(message);
                         throw new Exception(message);
                     }
@@ -294,9 +293,10 @@ namespace Outage.NetworkModelService
         #region ICloneable
         public Container Clone()
         {
-            Container clone = new Container();
-            clone.Entities = new Dictionary<long, IdentifiedObject>(this.entities);
-            //logger.LogDebug("Shallow copy of container has been created.");
+            Container clone = new Container
+            {
+                Entities = new Dictionary<long, IdentifiedObject>(this.entities)
+            };
 
             return clone;
         }

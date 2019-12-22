@@ -17,7 +17,11 @@ namespace CalculationEngineService.DistributedTransaction
 
         public override bool NotifyAboutUpdate(Dictionary<DeltaOpType, List<long>> modelChanges)
         {
-            throw new NotImplementedException();
+            //TODO: CE notification logic
+
+            TransactionEnlistmentProxy.Enlist(ActorName);
+            logger.LogInfo("Calculation Engine SUCCESSFULLY notified about network model update.");
+            return true;
         }
     }
 }

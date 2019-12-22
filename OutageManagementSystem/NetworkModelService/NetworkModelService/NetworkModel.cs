@@ -408,6 +408,7 @@ namespace Outage.NetworkModelService
                 using (TransactionCoordinatorProxy)
                 {
                     TransactionCoordinatorProxy.StartDistributedUpdate();
+                    logger.LogDebug("StartDistributedUpdate() invoked on Transaction Coordinator.");
                 }
 
                 Dictionary<DeltaOpType, List<long>> modelChanges = new Dictionary<DeltaOpType, List<long>>()
@@ -437,16 +438,22 @@ namespace Outage.NetworkModelService
                 using (SCADAModelUpdateNotifierProxy)
                 {
                     success = SCADAModelUpdateNotifierProxy.NotifyAboutUpdate(modelChanges);
+                    logger.LogDebug("NotifyAboutUpdate() method invoked on SCADA Transaction actor.");
                 }
 
-                using (CalculationEngineModelUpdateNotifierProxy)
+                if(success)
                 {
-                    success = CalculationEngineModelUpdateNotifierProxy.NotifyAboutUpdate(modelChanges);
+                    using (CalculationEngineModelUpdateNotifierProxy)
+                    {
+                        success = CalculationEngineModelUpdateNotifierProxy.NotifyAboutUpdate(modelChanges);
+                        logger.LogDebug("NotifyAboutUpdate() method invoked on CE Transaction actor.");
+                    }
                 }
 
                 using (TransactionCoordinatorProxy)
                 {
                     TransactionCoordinatorProxy.FinishDistributedUpdate(success);
+                    logger.LogDebug($"FinishDistributedUpdate() invoked on Transaction Coordinator with parameter 'success' value: {success}.");
                 }
             }
             catch (Exception ex)

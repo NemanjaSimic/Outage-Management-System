@@ -79,7 +79,7 @@ namespace SCADA_Service
             logger.LogInfo(message);
 
 
-            message = "The Network Model Service is started.";
+            message = "The SCADA Service is started.";
             Console.WriteLine("\n{0}", message);
             logger.LogInfo(message);
         }
@@ -88,7 +88,7 @@ namespace SCADA_Service
         {
             if (hosts == null || hosts.Count == 0)
             {
-                throw new Exception("Transaction Manager Services can not be closed because they are not initialized.");
+                throw new Exception("SCADA Services can not be closed because they are not initialized.");
             }
 
             foreach (ServiceHost host in hosts)
@@ -96,7 +96,7 @@ namespace SCADA_Service
                 host.Close();
             }
 
-            string message = "The Transaction Manager Services are gracefully closed.";
+            string message = "The SCADA Services are gracefully closed.";
             logger.LogInfo(message);
             Console.WriteLine("\n\n{0}", message);
         }

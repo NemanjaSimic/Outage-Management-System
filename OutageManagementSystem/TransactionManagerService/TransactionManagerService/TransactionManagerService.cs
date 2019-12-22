@@ -67,16 +67,16 @@ namespace Outage.TransactionManagerService
                 Console.WriteLine("\n");
             }
 
-            message = string.Format("Connection string: {0}", Config.Instance.ConnectionString);
-            Console.WriteLine(message);
-            logger.LogInfo(message);
+            //message = string.Format("Connection string: {0}", Config.Instance.ConnectionString);
+            //Console.WriteLine(message);
+            //logger.LogInfo(message);
 
             message = string.Format("Trace level: {0}", CommonTrace.TraceLevel);
             Console.WriteLine(message);
             logger.LogInfo(message);
 
 
-            message = "The Network Model Service is started.";
+            message = "The Transaction Manager Service is started.";
             Console.WriteLine("\n{0}", message);
             logger.LogInfo(message);
         }

@@ -1,0 +1,142 @@
+<?xml version="1.0" encoding="utf-8"?>
+<PredefinedEnumerationTypes>
+	<EnumerationType name="UnitSymbol">
+		<Property>
+			<enum value="VA"/>
+		</Property>
+		<Property>
+			<enum value="W"/>
+		</Property>
+		<Property>
+			<enum value="VAr"/>
+		</Property>
+		<Property>
+			<enum value="VAh"/>
+		</Property>
+		<Property>
+			<enum value="Wh"/>
+		</Property>
+		<Property>
+			<enum value="VArh"/>
+		</Property>
+		<Property>
+			<enum value="V"/>
+		</Property>
+		<Property>
+			<enum value="ohm"/>
+		</Property>
+		<Property>
+			<enum value="A"/>
+		</Property>
+		<Property>
+			<enum value="F"/>
+		</Property>
+		<Property>
+			<enum value="H"/>
+		</Property>
+		<Property>
+			<enum value="DEGREEC"/>
+		</Property>
+		<Property>
+			<enum value="s"/>
+		</Property>
+		<Property>
+			<enum value="min"/>
+		</Property>
+		<Property>
+			<enum value="h"/>
+		</Property>
+		<Property>
+			<enum value="deg"/>
+		</Property>
+		<Property>
+			<enum value="rad"/>
+		</Property>
+		<Property>
+			<enum value="J"/>
+		</Property>
+		<Property>
+			<enum value="N"/>
+		</Property>
+		<Property>
+			<enum value="S"/>
+		</Property>
+		<Property>
+			<enum value="none"/>
+		</Property>
+		<Property>
+			<enum value="Hz"/>
+		</Property>
+		<Property>
+			<enum value="g"/>
+		</Property>
+		<Property>
+			<enum value="Pa"/>
+		</Property>
+		<Property>
+			<enum value="m"/>
+		</Property>
+		<Property>
+			<enum value="m2"/>
+		</Property>
+		<Property>
+			<enum value="m3"/>
+		</Property>
+		<Property>
+			<enum value="V/VAr"/>
+		</Property>
+		<Property>
+			<enum value="W/Hz"/>
+		</Property>
+		<Property>
+			<enum value="J/s"/>
+		</Property>
+		<Property>
+			<enum value="s-1"/>
+		</Property>
+		<Property>
+			<enum value="kg/J"/>
+		</Property>
+		<Property>
+			<enum value="W/s"/>
+		</Property>
+		<Property>
+			<enum value="Hz-1"/>
+		</Property>
+	</EnumerationType>
+	<EnumerationType name="UnitMultiplier">
+		<Property>
+			<enum value="p"/>
+		</Property>
+		<Property>
+			<enum value="n"/>
+		</Property>
+		<Property>
+			<enum value="micro"/>
+		</Property>
+		<Property>
+			<enum value="m"/>
+		</Property>
+		<Property>
+			<enum value="c"/>
+		</Property>
+		<Property>
+			<enum value="d"/>
+		</Property>
+		<Property>
+			<enum value="k"/>
+		</Property>
+		<Property>
+			<enum value="M"/>
+		</Property>
+		<Property>
+			<enum value="G"/>
+		</Property>
+		<Property>
+			<enum value="T"/>
+		</Property>
+		<Property>
+			<enum value="nano"/>
+		</Property>
+	</EnumerationType>
+</PredefinedEnumerationTypes>

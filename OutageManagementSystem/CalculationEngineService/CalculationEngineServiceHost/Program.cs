@@ -21,16 +21,16 @@ namespace CalculationEngineServiceHost
                 CommonTrace.WriteTrace(CommonTrace.TraceInfo, message);
                 Console.WriteLine("\n{0}\n", message);
 
-                TopologyConnectivity topologyConnectivity = new TopologyConnectivity();
-                Stopwatch stopwatch = new Stopwatch();
-                stopwatch.Start();
-                List<TopologyElement> energySources = topologyConnectivity.MakeAllTopologies();
-                stopwatch.Stop();
-                Console.WriteLine(stopwatch.Elapsed.ToString());
-                foreach (var rs in energySources)
-                {
-                    topologyConnectivity.PrintTopology(rs);
-                }
+                //TopologyConnectivity topologyConnectivity = new TopologyConnectivity();
+                //Stopwatch stopwatch = new Stopwatch();
+                //stopwatch.Start();
+                //List<TopologyElement> energySources = topologyConnectivity.MakeAllTopologies();
+                //stopwatch.Stop();
+                //Console.WriteLine(stopwatch.Elapsed.ToString());
+                //foreach (var rs in energySources)
+                //{
+                //    topologyConnectivity.PrintTopology(rs);
+                //}
 
                 using (CalculationEngineService.CalculationEngineService ces = new CalculationEngineService.CalculationEngineService())
                 {
