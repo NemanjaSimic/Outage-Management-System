@@ -54,10 +54,6 @@
       <Project>{892cbe15-9ed7-4540-81fa-0eaaba592138}</Project>
       <Name>Common</Name>
     </ProjectReference>
-    <ProjectReference Include="..\..\TopologyBuilder\TopologyBuilder.csproj">
-      <Project>{F83B7FD0-C28B-4C96-A49C-7EA0E2B579F1}</Project>
-      <Name>TopologyBuilder</Name>
-    </ProjectReference>
     <ProjectReference Include="..\CECommon\CECommon.csproj">
       <Project>{E1D2D69D-E03D-4FD7-8E4F-0FC95B68F0DD}</Project>
       <Name>CECommon</Name>
@@ -65,6 +61,10 @@
     <ProjectReference Include="..\NetworkModelServiceFunctions\NetworkModelServiceFunctions.csproj">
       <Project>{D4553E8A-C694-4EBD-BA3C-0444A1D0C1EF}</Project>
       <Name>NetworkModelServiceFunctions</Name>
+    </ProjectReference>
+    <ProjectReference Include="..\TopologyBuilder\TopologyBuilder.csproj">
+      <Project>{F83B7FD0-C28B-4C96-A49C-7EA0E2B579F1}</Project>
+      <Name>TopologyBuilder</Name>
     </ProjectReference>
     <ProjectReference Include="..\TopologyElementsFuntions\TopologyElementsFuntions.csproj">
       <Project>{7F4CFEB1-0253-4A00-83C4-FE2CA5E2A5B3}</Project>
