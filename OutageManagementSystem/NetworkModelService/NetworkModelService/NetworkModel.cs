@@ -57,12 +57,12 @@ namespace Outage.NetworkModelService
         /// <summary>
         /// 
         /// </summary>
-        private ModelUpdateNotificationProxy scadaModelUpdateNotifierProxy = null;
+        private TransactionEnlistmentProxy transactionEnlistmentProxy = null;
 
         /// <summary>
         /// 
         /// </summary>
-        private ModelUpdateNotificationProxy calculationEngineModelUpdateNotifierProxy = null;
+        private ModelUpdateNotificationProxy modelUpdateNotifierProxy = null;
         #endregion
 
         #region Properties
@@ -77,7 +77,7 @@ namespace Outage.NetworkModelService
             }
         }
 
-        private TransactionCoordinatorProxy TransactionCoordinatorProxy
+        protected TransactionCoordinatorProxy TransactionCoordinatorProxy
         {
             get
             {
@@ -94,38 +94,35 @@ namespace Outage.NetworkModelService
             }
         }
 
-        private ModelUpdateNotificationProxy SCADAModelUpdateNotifierProxy
+        protected TransactionEnlistmentProxy TransactionEnlistmentProxy
         {
             get
             {
-                if (scadaModelUpdateNotifierProxy != null)
+                if (transactionEnlistmentProxy != null)
                 {
-                    scadaModelUpdateNotifierProxy.Abort();
-                    scadaModelUpdateNotifierProxy = null;
+                    transactionEnlistmentProxy.Abort();
+                    transactionEnlistmentProxy = null;
                 }
 
-                scadaModelUpdateNotifierProxy = new ModelUpdateNotificationProxy(EndpointNames.SCADAModelUpdateNotifierEndpoint);
-                scadaModelUpdateNotifierProxy.Open();
+                transactionEnlistmentProxy = new TransactionEnlistmentProxy(EndpointNames.TransactionEnlistmentEndpoint);
+                transactionEnlistmentProxy.Open();
 
-                return scadaModelUpdateNotifierProxy;
+                return transactionEnlistmentProxy;
             }
         }
 
-        private ModelUpdateNotificationProxy CalculationEngineModelUpdateNotifierProxy
+        protected ModelUpdateNotificationProxy GetModelUpdateNotificationProxy(string endpointName)
         {
-            get
+            if (modelUpdateNotifierProxy != null)
             {
-                if (calculationEngineModelUpdateNotifierProxy != null)
-                {
-                    calculationEngineModelUpdateNotifierProxy.Abort();
-                    calculationEngineModelUpdateNotifierProxy = null;
-                }
-
-                calculationEngineModelUpdateNotifierProxy = new ModelUpdateNotificationProxy(EndpointNames.CalculationEngineModelUpdateNotifierEndpoint);
-                calculationEngineModelUpdateNotifierProxy.Open();
-
-                return calculationEngineModelUpdateNotifierProxy;
+                modelUpdateNotifierProxy.Abort();
+                modelUpdateNotifierProxy = null;
             }
+
+            modelUpdateNotifierProxy = new ModelUpdateNotificationProxy(endpointName);
+            modelUpdateNotifierProxy.Open();
+
+            return modelUpdateNotifierProxy;
         }
         #endregion
 
@@ -405,9 +402,9 @@ namespace Outage.NetworkModelService
                 networkDataModel = incomingNetworkDataModel;
                 logger.LogDebug($"Current model [HashCode: 0x{networkDataModel.GetHashCode():X16}] becomes Incoming model [HashCode: 0x{incomingNetworkDataModel.GetHashCode():X16}].");
 
-                using (TransactionCoordinatorProxy)
+                using (TransactionCoordinatorProxy transactionCoordinatorProxy = TransactionCoordinatorProxy)
                 {
-                    TransactionCoordinatorProxy.StartDistributedUpdate();
+                    transactionCoordinatorProxy.StartDistributedUpdate();
                     logger.LogDebug("StartDistributedUpdate() invoked on Transaction Coordinator.");
                 }
 
@@ -435,24 +432,33 @@ namespace Outage.NetworkModelService
 
                 bool success = false;
 
-                using (SCADAModelUpdateNotifierProxy)
+                using (ModelUpdateNotificationProxy scadaModelUpdateNotifierProxy = GetModelUpdateNotificationProxy(EndpointNames.SCADAModelUpdateNotifierEndpoint))
                 {
-                    success = SCADAModelUpdateNotifierProxy.NotifyAboutUpdate(modelChanges);
+                    success = scadaModelUpdateNotifierProxy.NotifyAboutUpdate(modelChanges);
                     logger.LogDebug("NotifyAboutUpdate() method invoked on SCADA Transaction actor.");
                 }
 
                 if(success)
                 {
-                    using (CalculationEngineModelUpdateNotifierProxy)
+                    using (ModelUpdateNotificationProxy calculationEngineModelUpdateNotifierProxy = GetModelUpdateNotificationProxy(EndpointNames.CalculationEngineModelUpdateNotifierEndpoint))
                     {
-                        success = CalculationEngineModelUpdateNotifierProxy.NotifyAboutUpdate(modelChanges);
+                        success = calculationEngineModelUpdateNotifierProxy.NotifyAboutUpdate(modelChanges);
                         logger.LogDebug("NotifyAboutUpdate() method invoked on CE Transaction actor.");
+                    }
+                
+                    if(success)
+                    {
+                        using (TransactionEnlistmentProxy transactionEnlistmentProxy = TransactionEnlistmentProxy)
+                        {
+                            success = transactionEnlistmentProxy.Enlist(ServiceNames.NetworkModelService);
+                            logger.LogDebug("Enlist() method invoked on Transaction Coordinator.");
+                        }
                     }
                 }
 
-                using (TransactionCoordinatorProxy)
+                using (TransactionCoordinatorProxy transactionCoordinatorProxy = TransactionCoordinatorProxy)
                 {
-                    TransactionCoordinatorProxy.FinishDistributedUpdate(success);
+                    transactionCoordinatorProxy.FinishDistributedUpdate(success);
                     logger.LogDebug($"FinishDistributedUpdate() invoked on Transaction Coordinator with parameter 'success' value: {success}.");
                 }
             }
