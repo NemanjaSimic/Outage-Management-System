@@ -12,7 +12,7 @@ namespace SCADA_Service.DistributedTransaction
     public class SCADAModelUpdateNotification : ModelUpdateNotification
     {
         public SCADAModelUpdateNotification()
-            : base(EndpointNames.SCADAModelUpdateNotifierEndpoint, ServiceNames.SCADAService)
+            : base(EndpointNames.TransactionEnlistmentEndpoint, ServiceNames.SCADAService)
         {
         }
 

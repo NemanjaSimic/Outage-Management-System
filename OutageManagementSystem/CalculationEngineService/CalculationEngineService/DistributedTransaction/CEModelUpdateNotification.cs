@@ -11,7 +11,7 @@ namespace CalculationEngineService.DistributedTransaction
         //public static CalculationEngineService calculationEngineService = null;
 
         public CEModelUpdateNotification()
-            : base(EndpointNames.CalculationEngineModelUpdateNotifierEndpoint, ServiceNames.CalculationEngineService)
+            : base(EndpointNames.TransactionEnlistmentEndpoint, ServiceNames.CalculationEngineService)
         {
         }
 

@@ -10,7 +10,7 @@ namespace Outage.Common
     {
         //TM
         public static readonly string TransactionCoordinatorEndpoint = "TransactionCoordinatorEndpoint";
-        public static readonly string TransactionCoordinatorEnlistmentEndpoint = "TransactionCoordinatorEnlistmentEndpoint";
+        public static readonly string TransactionEnlistmentEndpoint = "TransactionEnlistmentEndpoint";
         
         //NMS
         public static readonly string NetworkModelGDAEndpoint = "NetworkModelGDAEndpoint";

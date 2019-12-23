@@ -12,7 +12,7 @@ namespace Outage.DistributedTransactionActor
         private TransactionEnlistmentProxy transactionEnlistmentProxy = null;
         protected ILogger logger = LoggerWrapper.Instance; 
 
-        public string EndpointName { get; private set; }
+        public string TransactionEnlistmentEndpointName { get; private set; }
 
         public string ActorName { get; set; }
 
@@ -26,16 +26,16 @@ namespace Outage.DistributedTransactionActor
                     transactionEnlistmentProxy = null;
                 }
 
-                transactionEnlistmentProxy = new TransactionEnlistmentProxy(EndpointName);
+                transactionEnlistmentProxy = new TransactionEnlistmentProxy(TransactionEnlistmentEndpointName);
                 transactionEnlistmentProxy.Open();
 
                 return transactionEnlistmentProxy;
             }
         }
 
-        protected ModelUpdateNotification(string endpointName, string actorName)
+        protected ModelUpdateNotification(string transactionEnlistmentEndpointName, string actorName)
         {
-            EndpointName = endpointName;
+            TransactionEnlistmentEndpointName = transactionEnlistmentEndpointName;
             ActorName = actorName;
         }
 
