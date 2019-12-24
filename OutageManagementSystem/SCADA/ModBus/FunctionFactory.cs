@@ -1,14 +1,14 @@
-﻿using SCADA_Common;
+﻿using Outage.SCADA.SCADA_Common;
 
-using ModBus.FunctionParameters;
-using ModBus.ModbusFuntions;
+using Outage.SCADA.ModBus.FunctionParameters;
+using Outage.SCADA.ModBus.ModbusFuntions;
 using System;
 using System.Collections.Generic;
 using System.Linq;
 using System.Text;
 using System.Threading.Tasks;
 
-namespace ModBus
+namespace Outage.SCADA.ModBus
 {
     public class FunctionFactory
     {

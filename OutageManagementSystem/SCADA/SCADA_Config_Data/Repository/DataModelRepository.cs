@@ -1,14 +1,14 @@
 ﻿using Outage.Common;
 using Outage.Common.GDA;
 using Outage.Common.ServiceContracts;
-using SCADA_Common;
-using SCADA_Config_Data.Configuration;
+using Outage.SCADA.SCADA_Common;
+using Outage.SCADA.SCADA_Config_Data.Configuration;
 using System;
 using System.Collections.Generic;
 using System.Configuration;
 using System.ServiceModel;
 
-namespace SCADA_Config_Data.Repository
+namespace Outage.SCADA.SCADA_Config_Data.Repository
 {
     public class DataModelRepository
     {

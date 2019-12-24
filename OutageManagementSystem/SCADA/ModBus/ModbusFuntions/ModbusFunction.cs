@@ -1,16 +1,15 @@
-﻿using SCADA_Common;
-
-using ModBus.FunctionParameters;
+﻿using Outage.SCADA.ModBus.FunctionParameters;
 using System;
 using System.Collections.Generic;
 using System.Linq;
 using System.Reflection;
 using System.Text;
 using System.Threading.Tasks;
+using Outage.SCADA.SCADA_Common;
 
-namespace ModBus.ModbusFuntions
+namespace Outage.SCADA.ModBus.ModbusFuntions
 {
-    public abstract class ModbusFunction:IModBusFunction
+    public abstract class ModbusFunction : IModBusFunction
     {
         private ModbusCommandParameters commandParameters;
 

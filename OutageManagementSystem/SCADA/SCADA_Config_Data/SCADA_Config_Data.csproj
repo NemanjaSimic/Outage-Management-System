@@ -7,7 +7,7 @@
     <ProjectGuid>{C37F054D-37D9-46C0-881C-1EE3C8C77633}</ProjectGuid>
     <OutputType>Library</OutputType>
     <AppDesignerFolder>Properties</AppDesignerFolder>
-    <RootNamespace>SCADA_Config_Data</RootNamespace>
+    <RootNamespace>Outage.SCADA.SCADA_Config_Data</RootNamespace>
     <AssemblyName>SCADA_Config_Data</AssemblyName>
     <TargetFrameworkVersion>v4.8</TargetFrameworkVersion>
     <FileAlignment>512</FileAlignment>

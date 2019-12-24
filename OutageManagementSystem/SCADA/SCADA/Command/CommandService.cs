@@ -1,10 +1,10 @@
-﻿using ModBus;
-using ModBus.Connection;
-using ModBus.FunctionParameters;
-using ModBus.ModbusFuntions;
-using SCADA_Common;
-using SCADA_Config_Data.Configuration;
-using SCADA_Config_Data.Repository;
+﻿using Outage.SCADA.ModBus;
+using Outage.SCADA.ModBus.Connection;
+using Outage.SCADA.ModBus.FunctionParameters;
+using Outage.SCADA.ModBus.ModbusFuntions;
+using Outage.SCADA.SCADA_Common;
+using Outage.SCADA.SCADA_Config_Data.Configuration;
+using Outage.SCADA.SCADA_Config_Data.Repository;
 using System;
 using System.Collections.Generic;
 using System.Linq;
@@ -13,6 +13,7 @@ using System.Threading.Tasks;
 
 namespace SCADA.Command
 {
+    [Obsolete]
     public class CommandService : ICommandService
     {
 

@@ -7,7 +7,7 @@
     <ProjectGuid>{6E88F6B5-11CB-485A-9BDF-C622FF837022}</ProjectGuid>
     <OutputType>Library</OutputType>
     <AppDesignerFolder>Properties</AppDesignerFolder>
-    <RootNamespace>ModBus</RootNamespace>
+    <RootNamespace>Outage.SCADA.ModBus</RootNamespace>
     <AssemblyName>ModBus</AssemblyName>
     <TargetFrameworkVersion>v4.8</TargetFrameworkVersion>
     <FileAlignment>512</FileAlignment>

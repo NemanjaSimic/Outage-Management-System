@@ -1,11 +1,11 @@
-﻿using SCADA_Common;
+﻿using Outage.SCADA.SCADA_Common;
 using System;
 using System.Collections.Generic;
 using System.Linq;
 using System.Text;
 using System.Threading.Tasks;
 
-namespace SCADA_Config_Data.Configuration
+namespace Outage.SCADA.SCADA_Config_Data.Configuration
 {
     public class ConfigItem : IConfigItem
     {

@@ -1,4 +1,4 @@
-﻿using SCADA_Common;
+﻿using Outage.SCADA.SCADA_Common;
 
 using System;
 using System.Collections.Generic;
@@ -8,7 +8,7 @@ using System.Net.Sockets;
 using System.Text;
 using System.Threading.Tasks;
 
-namespace ModBus.Connection
+namespace Outage.SCADA.ModBus.Connection
 {
     public class TcpConnection : IConnection
     {

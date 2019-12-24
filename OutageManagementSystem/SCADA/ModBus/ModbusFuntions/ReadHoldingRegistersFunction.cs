@@ -1,6 +1,5 @@
-﻿using SCADA_Common;
-
-using ModBus.FunctionParameters;
+﻿using Outage.SCADA.SCADA_Common;
+using Outage.SCADA.ModBus.FunctionParameters;
 using System;
 using System.Collections.Generic;
 using System.Linq;
@@ -9,7 +8,7 @@ using System.Reflection;
 using System.Text;
 using System.Threading.Tasks;
 
-namespace ModBus.ModbusFuntions
+namespace Outage.SCADA.ModBus.ModbusFuntions
 {
     public class ReadHoldingRegistersFunction : ModbusFunction
     {

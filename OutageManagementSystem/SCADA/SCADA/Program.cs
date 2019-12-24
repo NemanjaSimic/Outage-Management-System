@@ -1,24 +1,25 @@
-using SCADA_Common;
+using Outage.SCADA.SCADA_Common;
 using System;
 using System.Collections.ObjectModel;
-using ModBus.PointModels;
+using Outage.SCADA.ModBus.PointModels;
 using SCADA.Command;
-using SCADA_Config_Data.Repository;
-using SCADA_Config_Data.Configuration;
+using Outage.SCADA.SCADA_Config_Data.Repository;
+using Outage.SCADA.SCADA_Config_Data.Configuration;
 using System.Linq;
 using Outage.Common;
 
-namespace SCADA
+namespace Outage.SCADA.SCADA
 {
+    [Obsolete]
     class Program
     {
         public static ObservableCollection<BasePointItem> Points { get; set; }
-        private static WcfService<ICommandService, CommandService> wcfService;
+        //private static WcfService<ICommandService, CommandService> wcfService;
 
         static void Main(string[] args)
         {
 
-            wcfService = new WcfService<ICommandService, CommandService>(DataModelRepository.Instance.ServiceAddress);
+            //wcfService = new WcfService<ICommandService, CommandService>(DataModelRepository.Instance.ServiceAddress);
             Console.WriteLine(DataModelRepository.Instance.ImportModel());
             ConfigWriter configWriter = new ConfigWriter();
             configWriter.GenerateConfigFile();

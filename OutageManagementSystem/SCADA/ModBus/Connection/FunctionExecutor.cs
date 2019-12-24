@@ -1,6 +1,6 @@
-﻿using SCADA_Common;
-using ModBus.FunctionParameters;
-using ModBus.ModbusFuntions;
+﻿using Outage.SCADA.SCADA_Common;
+using Outage.SCADA.ModBus.FunctionParameters;
+using Outage.SCADA.ModBus.ModbusFuntions;
 using System;
 using System.Collections.Concurrent;
 using System.Collections.Generic;
@@ -10,9 +10,9 @@ using System.Net.Sockets;
 using System.Text;
 using System.Threading;
 using System.Threading.Tasks;
-using SCADA_Config_Data.Repository;
+using Outage.SCADA.SCADA_Config_Data.Repository;
 
-namespace ModBus.Connection
+namespace Outage.SCADA.ModBus.Connection
 {
     public delegate void UpdatePointDelegate(PointType type, ushort pointAddres, ushort newValue);
 

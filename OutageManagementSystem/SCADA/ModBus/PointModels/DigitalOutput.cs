@@ -1,12 +1,12 @@
-﻿using SCADA_Common;
-using ModBus.Connection;
+﻿using Outage.SCADA.SCADA_Common;
+using Outage.SCADA.ModBus.Connection;
 using System;
 using System.Collections.Generic;
 using System.Linq;
 using System.Text;
 using System.Threading.Tasks;
 
-namespace ModBus.PointModels
+namespace Outage.SCADA.ModBus.PointModels
 {
     public class DigitalOutput : BasePointItem
     {

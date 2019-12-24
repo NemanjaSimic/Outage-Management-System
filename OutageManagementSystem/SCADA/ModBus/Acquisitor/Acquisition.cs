@@ -1,14 +1,14 @@
-﻿using SCADA_Common;
-using ModBus.Connection;
-using ModBus.FunctionParameters;
-using ModBus.ModbusFuntions;
+﻿using Outage.SCADA.SCADA_Common;
+using Outage.SCADA.ModBus.Connection;
+using Outage.SCADA.ModBus.FunctionParameters;
+using Outage.SCADA.ModBus.ModbusFuntions;
 using System;
 using System.Collections.Generic;
 using System.Linq;
 using System.Text;
 using System.Threading.Tasks;
 
-namespace ModBus.Acquisitor
+namespace Outage.SCADA.ModBus.Acquisitor
 {
     public class Acquisition
     {

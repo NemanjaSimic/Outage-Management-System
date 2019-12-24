@@ -5,8 +5,9 @@ using System.ServiceModel;
 using System.Text;
 using System.Threading.Tasks;
 
-namespace SCADA_Common
+namespace Outage.SCADA.SCADA_Common
 {
+    [Obsolete]
     [ServiceContract]
     public interface ICommandService
     {

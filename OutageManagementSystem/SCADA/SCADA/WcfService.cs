@@ -5,7 +5,7 @@ using System.ServiceModel;
 using System.Text;
 using System.Threading.Tasks;
 
-namespace SCADA
+namespace Outage.SCADA.SCADA
 {
     public class WcfService<TContract, TService> : IDisposable
         where TContract : class

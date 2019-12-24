@@ -7,7 +7,7 @@
     <ProjectGuid>{7D87AA2B-ED19-47EA-B403-4EDC6B830D4A}</ProjectGuid>
     <OutputType>Library</OutputType>
     <AppDesignerFolder>Properties</AppDesignerFolder>
-    <RootNamespace>SCADA_Common</RootNamespace>
+    <RootNamespace>Outage.SCADA.SCADA_Common</RootNamespace>
     <AssemblyName>SCADA_Common</AssemblyName>
     <TargetFrameworkVersion>v4.8</TargetFrameworkVersion>
     <FileAlignment>512</FileAlignment>

@@ -4,7 +4,7 @@ using System.Linq;
 using System.Text;
 using System.Threading.Tasks;
 
-namespace SCADA_Common
+namespace Outage.SCADA.SCADA_Common
 {
     public enum ConnectionState:short
     {
