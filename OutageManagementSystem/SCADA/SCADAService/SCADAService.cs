@@ -15,14 +15,22 @@ namespace Outage.SCADA.SCADAService
         private ILogger logger = LoggerWrapper.Instance;
 
         private List<ServiceHost> hosts = null;
+        private SCADAModel scadaModel = null;
 
         public SCADAService()
         {
+            scadaModel = new SCADAModel();
+            //CommandService.SCADAModel = scadaModel;
+            SCADAModelUpdateNotification.SCADAModel = scadaModel;
+            SCADATransactionActor.SCADAModel = scadaModel;
+
             InitializeHosts();
         }
 
         public void Start()
         {
+
+
             StartHosts();
         }
 
