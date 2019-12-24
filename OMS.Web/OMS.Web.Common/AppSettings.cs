@@ -20,7 +20,9 @@ namespace OMS.Web.Common
         public static T Get<T>(string key, T defaultValue)
         {
             string setting = ConfigurationManager.AppSettings[key];
-            return string.IsNullOrWhiteSpace(setting) ? defaultValue : (T)TypeDescriptor.GetConverter(typeof(T)).ConvertFromInvariantString(setting);
+            return string.IsNullOrWhiteSpace(setting) ?
+                defaultValue :
+                (T)TypeDescriptor.GetConverter(typeof(T)).ConvertFromInvariantString(setting);
         }
     }
 }

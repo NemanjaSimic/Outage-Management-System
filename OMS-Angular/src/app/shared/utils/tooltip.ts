@@ -2,7 +2,8 @@ import tippy from 'tippy.js';
 
 const graphTooltipBody: string =
   `<p>ID: [[id]]</p>
-<p>State: [[state]]</p>`;
+  <p>Type: [[type]]</p>
+  <p>State: [[state]]</p>`;
 
 export const addGraphTooltip = (cy, node) => {
   let ref = node.popperRef();
@@ -13,16 +14,36 @@ export const addGraphTooltip = (cy, node) => {
       const div = document.createElement('div');
       div.innerHTML = graphTooltipBody
         .replace("[[id]]", node.data('id'))
+        .replace("[[type]]", node.data('type'))
         .replace("[[state]]", node.data('state'));
 
       // button - mozemo i preko document.createElement() pa appendChild()
-      const button = document.createElement('button');
-      button.innerHTML = "Switch on";
-      button.addEventListener('click', () => {
-        console.log('switching on node with id: ', node.data('id'));
-      });
+      if (node.data('type') == "Breaker" || node.data('type') == "Disconnector") {
+        const button = document.createElement('button');
 
-      div.appendChild(button);
+        if (node.data('state') == "active") {
+          button.innerHTML = 'Switch off';
+        }
+        else {
+          button.innerHTML = 'Switch on';
+        }
+
+        button.addEventListener('click', () => {
+
+          // TODO: Zameniti sa logikom da posalje komandu ka SCADI i nakon sto primi uspesan odgovor da promeni status dugmeta (on/off)
+          if (node.data('state') == "active") {
+            node.data('state', 'inactive');
+            button.innerHTML = 'Switch on';
+          }
+          else {
+            node.data('state', 'active');
+            button.innerHTML = 'Switch off';
+          }
+
+        });
+
+        div.appendChild(button);
+      }
 
       return div;
     },

@@ -1,4 +1,4 @@
-﻿namespace OMS.Web.UI.Models
+﻿namespace OMS.Web.UI.Models.ViewModels
 {
     /// <summary>
     /// Represents a parent-child relation between two nodes.

@@ -1,4 +1,4 @@
-﻿namespace OMS.Web.UI.Models
+﻿namespace OMS.Web.UI.Models.ViewModels
 {
     /// <summary>
     /// Single item that will be present on the UI.
