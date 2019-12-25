@@ -26,15 +26,5 @@ namespace Outage.Common.ServiceProxies.PubSub
                 throw ex;
             }
         }
-
-        //No need due to ClientBase implementing IDisposable
-        //public void CloseConnection()
-        //{
-        //    if (proxy != null)
-        //    {
-        //        proxy = null;
-        //    }
-        //    this.Close();
-        //}
     }
 }

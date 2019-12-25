@@ -10,8 +10,6 @@ namespace Outage.Common.ServiceContracts.PubSub
         void Subscribe(Topic topic);
     }
 
-    //[ServiceContract] not needed as IPubSubNotification is never used as contract for ServiceHost
-    [ServiceContract]
     public interface IPubSubNotification
     {
         [OperationContract(IsOneWay = true)]
