@@ -1,5 +1,9 @@
-﻿using Outage.SCADA.ModBus.ModbusFuntions;
+﻿using Outage.Common;
+using Outage.Common.ServiceProxies.PubSub;
+using Outage.SCADA.ModBus.ModbusFuntions;
 using Outage.SCADA.SCADA_Common;
+using Outage.SCADA.SCADA_Common.PubSub;
+using Outage.SCADA.SCADA_Config_Data.Configuration;
 using Outage.SCADA.SCADA_Config_Data.Repository;
 using System;
 using System.Collections.Concurrent;
@@ -15,6 +19,7 @@ namespace Outage.SCADA.ModBus.Connection
 
     public class FunctionExecutor
     {
+        private ModelResourcesDesc resourcesDesc = new ModelResourcesDesc();
         private TcpConnection connection;
         private ushort TcpPort;
         private Thread connectionProcess;
@@ -24,6 +29,29 @@ namespace Outage.SCADA.ModBus.Connection
         private ConnectionState _connectionState = ConnectionState.DISCONNECTED;
         private AutoResetEvent _commandEvent;
         private ConcurrentQueue<IModBusFunction> _commandQueue;
+
+
+        private PublisherProxy publisherProxy = null;
+
+        public PublisherProxy PublisherProxy
+        {
+            get
+            {
+                //TODO: diskusija statefull vs stateless
+
+                if (publisherProxy != null)
+                {
+                    publisherProxy.Abort();
+                    publisherProxy = null;
+                }
+
+                publisherProxy = new PublisherProxy(EndpointNames.PublisherEndpoint);
+                publisherProxy.Open();
+
+                return publisherProxy;
+            }
+        }
+
 
         public FunctionExecutor(ushort tcpPort)
         {
@@ -96,11 +124,45 @@ namespace Outage.SCADA.ModBus.Connection
                             message = new byte[header.Length + payload.Length];
                             Buffer.BlockCopy(header, 0, message, 0, 7);
                             Buffer.BlockCopy(payload, 0, message, 7, payload.Length);
-                            Dictionary<Tuple<PointType, ushort>, ushort> pointsToupdate = this.currentCommand.ParseResponse(message);
+                            Dictionary<Tuple<PointType, ushort>, ushort> pointsToUpdate = this.currentCommand.ParseResponse(message);
 
-                            foreach (var point in pointsToupdate)
+                            foreach (Tuple<PointType, ushort> pointKey in pointsToUpdate.Keys)
                             {
-                                UpdatePoints(point.Key.Item2, point.Value);
+                                ushort address = pointKey.Item2;
+                                ushort newValue = pointsToUpdate[pointKey];
+
+                                ConfigItem point = UpdatePoints(address, newValue);
+
+                                ModelCode modelCode = resourcesDesc.GetModelCodeFromId(point.Gid);
+
+                                Topic topic;
+
+                                if (modelCode == ModelCode.ANALOG)
+                                {
+                                    topic = Topic.MEASUREMENT;
+                                }
+                                else if(modelCode == ModelCode.DISCRETE)
+                                {
+                                    topic = Topic.SWITCH_STATUS;
+                                }
+                                else
+                                {
+                                    throw new Exception("UNKNOWN type"); //TODO: log i bolji komentar
+                                }
+
+                                SCADAMessage scadaMessage = new SCADAMessage()
+                                {
+                                    Gid = point.Gid,
+                                    Value = point.CurrentValue,
+                                };
+
+                                SCADAPublication scadaPublication = new SCADAPublication()
+                                {
+                                    Topic = topic,
+                                    Message = scadaMessage,
+                                };
+
+                                PublisherProxy.Publish(scadaPublication);
                             }
                         }
                     }
@@ -124,10 +186,12 @@ namespace Outage.SCADA.ModBus.Connection
             }
         }
 
-        private void UpdatePoints(ushort address, ushort newValue)
+        private ConfigItem UpdatePoints(ushort address, ushort newValue)
         {
-            var point = DataModelRepository.Instance.Points.Values.Where(x => x.Address == address).First();
+            ConfigItem point = DataModelRepository.Instance.Points.Values.Where(x => x.Address == address).First();
             point.CurrentValue = newValue;
+
+            return point;
         }
     }
 }

@@ -23,5 +23,9 @@ namespace Outage.Common
         //SCADA
         public static readonly string SCADATransactionActorEndpoint = "SCADATransactionActorEndpoint";
         public static readonly string SCADAModelUpdateNotifierEndpoint = "SCADAModelUpdateNotifierEndpoint";
+
+        //PUBSUB
+        public static readonly string PublisherEndpoint = "PublisherEndpoint";
+        public static readonly string SubscriberEndpoint = "SubscriberEndpoint";
     }
 }

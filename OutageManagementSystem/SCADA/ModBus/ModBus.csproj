@@ -35,6 +35,7 @@
   <ItemGroup>
     <Reference Include="System" />
     <Reference Include="System.Core" />
+    <Reference Include="System.ServiceModel" />
     <Reference Include="System.Xml.Linq" />
     <Reference Include="System.Data.DataSetExtensions" />
     <Reference Include="Microsoft.CSharp" />
@@ -66,6 +67,10 @@
     <Compile Include="Properties\AssemblyInfo.cs" />
   </ItemGroup>
   <ItemGroup>
+    <ProjectReference Include="..\..\Common\Common.csproj">
+      <Project>{892CBE15-9ED7-4540-81FA-0EAABA592138}</Project>
+      <Name>Common</Name>
+    </ProjectReference>
     <ProjectReference Include="..\SCADACommon\SCADA_Common.csproj">
       <Project>{7D87AA2B-ED19-47EA-B403-4EDC6B830D4A}</Project>
       <Name>SCADA_Common</Name>
