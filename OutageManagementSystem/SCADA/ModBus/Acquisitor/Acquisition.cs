@@ -10,13 +10,22 @@ namespace Outage.SCADA.ModBus.Acquisitor
 {
     public class Acquisition
     {
+        //TODO: singleton, diskusija...
+
         private FunctionExecutor commandExecutor = new FunctionExecutor(DataModelRepository.Instance.TcpPort);
         private Thread acquisitionWorker;
+        private bool threadActiveSignal = true;
 
         public Acquisition()
         {
             this.InitializeAcquisitionThread();
-            this.StartAcquisitionThread();
+        }
+
+        //TODO: WHY NEVER USED
+        public Acquisition(FunctionExecutor fe)
+        {
+            commandExecutor = fe;
+            this.InitializeAcquisitionThread();
         }
 
         private void InitializeAcquisitionThread()
@@ -25,24 +34,25 @@ namespace Outage.SCADA.ModBus.Acquisitor
             this.acquisitionWorker.Name = "Acquisition thread";
         }
 
-        private void StartAcquisitionThread()
+        public void StartAcquisitionThread()
         {
+            threadActiveSignal = true;
             acquisitionWorker.Start();
         }
 
-        public Acquisition(FunctionExecutor fe)
+        public void StopAcquisitionThread()
         {
-            commandExecutor = fe;
+            threadActiveSignal = false;
         }
 
-        public void Acquire()
+        private void Acquire()
         {
             ushort quantity = 1;
             ushort length = 6;
 
             try
             {
-                while (true)
+                while (threadActiveSignal)
                 {
                     Thread.Sleep(DataModelRepository.Instance.Interval);
 

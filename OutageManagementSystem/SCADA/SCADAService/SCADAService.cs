@@ -1,4 +1,5 @@
 ﻿using Outage.Common;
+using Outage.SCADA.ModBus.Acquisitor;
 using Outage.SCADA.SCADAService.Command;
 using Outage.SCADA.SCADAService.DistributedTransaction;
 using System;
@@ -13,6 +14,7 @@ namespace Outage.SCADA.SCADAService
 
         private List<ServiceHost> hosts = null;
         private SCADAModel scadaModel = null;
+        private Acquisition acquisition = null;
 
         public SCADAService()
         {
@@ -26,6 +28,10 @@ namespace Outage.SCADA.SCADAService
 
         public void Start()
         {
+            //TODO: init aquisition i slicno,,....
+            StartDataAcquisition();
+
+
             StartHosts();
         }
 
@@ -43,6 +49,12 @@ namespace Outage.SCADA.SCADAService
                 new ServiceHost(typeof(SCADATransactionActor)),
                 new ServiceHost(typeof(SCADAModelUpdateNotification))
             };
+        }
+
+        private void StartDataAcquisition()
+        {
+            acquisition = new Acquisition();
+            acquisition.StartAcquisitionThread();
         }
 
         private void StartHosts()
@@ -86,6 +98,11 @@ namespace Outage.SCADA.SCADAService
 
         private void CloseHosts()
         {
+            if(acquisition != null)
+            {
+                acquisition.StopAcquisitionThread();
+            }
+
             if (hosts == null || hosts.Count == 0)
             {
                 throw new Exception("Network Model Services can not be closed because it is not initialized.");
