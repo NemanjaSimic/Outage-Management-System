@@ -33,7 +33,7 @@ namespace NetworkModelServiceFunctions
 			networkModelGDA = new NetworkModelGDA();
 		}
 
-		public List<long> GetAllEnergySousces()
+		public List<long> GetAllEnergySources()
 		{
 			return GetAllGids(ModelCode.ENERGYSOURCE);
 		}

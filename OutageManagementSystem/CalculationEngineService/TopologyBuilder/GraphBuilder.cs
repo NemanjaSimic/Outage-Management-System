@@ -11,7 +11,7 @@ using TopologyElementsFuntions;
 
 namespace TopologyBuilder
 {
-    public class GraphBuilder : IGraphBuilder
+    public class GraphBuilder : ITopologyBuilder
     {
         private readonly TopologyElementFactory topologyElementFactory = new TopologyElementFactory();
 
@@ -19,9 +19,9 @@ namespace TopologyBuilder
         private HashSet<long> visited = new HashSet<long>();
         private Stack<TopologyElement> stack = new Stack<TopologyElement>();
 
-        public Topology CreateGraphTopology(long firstElementGid)
+        public TopologyModel CreateGraphTopology(long firstElementGid)
         {
-            Topology topology = new Topology();
+            TopologyModel topology = new TopologyModel();
             TopologyElement firstNode = topologyElementFactory.CreateTopologyElement(firstElementGid);
            
             stack.Push(firstNode);

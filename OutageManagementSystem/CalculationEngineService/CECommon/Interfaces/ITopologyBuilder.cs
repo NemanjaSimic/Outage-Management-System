@@ -7,8 +7,8 @@ using System.Threading.Tasks;
 
 namespace CECommon.Interfaces
 {
-    public interface IGraphBuilder
+    public interface ITopologyBuilder
     {
-        Topology CreateGraphTopology(long firstElementGid);
+        TopologyModel CreateGraphTopology(long firstElementGid);
     }
 }

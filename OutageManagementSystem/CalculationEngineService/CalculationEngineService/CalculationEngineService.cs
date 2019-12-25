@@ -36,7 +36,8 @@ namespace CalculationEngineService
             hosts = new List<ServiceHost>
             {
                 new ServiceHost(typeof(CEModelUpdateNotification)),
-                new ServiceHost(typeof(CETransactionActor))
+                new ServiceHost(typeof(CETransactionActor)),
+                new ServiceHost(typeof(TopologyService))
             };
         }
 

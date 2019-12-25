@@ -1,36 +1,38 @@
 ﻿using System;
 using System.Collections.Generic;
 using System.Linq;
+using System.Runtime.Serialization;
 using System.Text;
 using System.Threading.Tasks;
 
 namespace CECommon.Model
 {
-    public class Topology
+	[DataContract]
+	public class TopologyModel
     {
 		private Dictionary<long,TopologyElement> nodes;
 		private Dictionary<long, HashSet<long>> relations;
 		private TopologyElement firstNode;
-
+		[DataMember]
 		public TopologyElement FirstNode
 		{
 			get { return firstNode; }
 			set { firstNode = value; }
 		}
-
+		[DataMember]
 		public Dictionary<long, TopologyElement> Nodes
 		{
 			get { return nodes; }
 			private set { nodes = value; }
 		}
-
+		[DataMember]
 		public Dictionary<long, HashSet<long>> Relations
 		{
 			get { return relations;  }
 			private set { relations = value; }
 		}
 
-		public Topology()
+		public TopologyModel()
 		{
 			Nodes = new Dictionary<long, TopologyElement>();
 			Relations = new Dictionary<long, HashSet<long>>();

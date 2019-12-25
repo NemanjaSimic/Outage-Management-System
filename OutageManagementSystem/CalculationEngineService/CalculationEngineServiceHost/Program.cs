@@ -9,6 +9,7 @@ using System.Diagnostics;
 using System.Linq;
 using TopologyBuilder;
 using TopologyElementsFuntions;
+using Topology;
 
 namespace CalculationEngineServiceHost
 {
@@ -68,7 +69,8 @@ namespace CalculationEngineServiceHost
                 string message = "Starting Calculation Engine Service...";
                 logger.LogInfo(message);
                 CommonTrace.WriteTrace(CommonTrace.TraceInfo, message);
-                Console.WriteLine("\n{0}\n", message);          
+                Console.WriteLine("\n{0}\n", message);
+				Topology.Topology.Instance.UpdateTopology();
 
                 using (CalculationEngineService.CalculationEngineService ces = new CalculationEngineService.CalculationEngineService())
                 {

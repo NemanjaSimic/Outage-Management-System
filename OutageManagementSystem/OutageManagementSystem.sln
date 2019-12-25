@@ -1,7 +1,7 @@
 ﻿
 Microsoft Visual Studio Solution File, Format Version 12.00
-# Visual Studio 15
-VisualStudioVersion = 15.0.28307.645
+# Visual Studio Version 16
+VisualStudioVersion = 16.0.29519.181
 MinimumVisualStudioVersion = 10.0.40219.1
 Project("{2150E333-8FDC-42A3-9474-1A3956D46DE8}") = "CalculationEngineService", "CalculationEngineService", "{AB9540D3-A429-4238-8BB2-5D0114ED012E}"
 EndProject
@@ -59,7 +59,6 @@ Project("{2150E333-8FDC-42A3-9474-1A3956D46DE8}") = "TestClient", "TestClient", 
 EndProject
 Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "NMSTestClientUI", "NetworkModelService\NMSTestClientUI\NMSTestClientUI.csproj", "{DB770671-ECE8-4978-A992-E0D4D44F8FC8}"
 EndProject
-<<<<<<< HEAD
 Project("{2150E333-8FDC-42A3-9474-1A3956D46DE8}") = "TransactionManagerService", "TransactionManagerService", "{65CC209D-49E2-456A-AD48-31494D75658C}"
 EndProject
 Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "TransactionManagerServiceHost", "TransactionManagerService\TransactionManagerServiceHost\TransactionManagerServiceHost.csproj", "{048D591B-F46C-49CF-B455-AE21DB97F419}"
@@ -108,9 +107,10 @@ EndProject
 Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "SCADAServiceHost", "SCADA\SCADAServiceHost\SCADAServiceHost.csproj", "{6B61EBE5-1133-4EE9-A25A-82C14039C85B}"
 EndProject
 Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "SCADAService", "SCADA\SCADAService\SCADAService.csproj", "{DF3A5248-7638-41C8-998A-53112F1ACFA2}"
-=======
+EndProject
 Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "TopologyBuilder", "CalculationEngineService\TopologyBuilder\TopologyBuilder.csproj", "{F83B7FD0-C28B-4C96-A49C-7EA0E2B579F1}"
->>>>>>> algorithm-v2-branch
+EndProject
+Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "Topology", "CalculationEngineService\Topology\Topology.csproj", "{831A52CF-75FF-4EAB-BCEC-24547C588009}"
 EndProject
 Global
 	GlobalSection(SolutionConfigurationPlatforms) = preSolution
@@ -274,7 +274,6 @@ Global
 		{DB770671-ECE8-4978-A992-E0D4D44F8FC8}.Release|x64.Build.0 = Release|Any CPU
 		{DB770671-ECE8-4978-A992-E0D4D44F8FC8}.Release|x86.ActiveCfg = Release|Any CPU
 		{DB770671-ECE8-4978-A992-E0D4D44F8FC8}.Release|x86.Build.0 = Release|Any CPU
-<<<<<<< HEAD
 		{048D591B-F46C-49CF-B455-AE21DB97F419}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
 		{048D591B-F46C-49CF-B455-AE21DB97F419}.Debug|Any CPU.Build.0 = Debug|Any CPU
 		{048D591B-F46C-49CF-B455-AE21DB97F419}.Debug|x64.ActiveCfg = Debug|Any CPU
@@ -419,7 +418,6 @@ Global
 		{DF3A5248-7638-41C8-998A-53112F1ACFA2}.Release|x64.Build.0 = Release|Any CPU
 		{DF3A5248-7638-41C8-998A-53112F1ACFA2}.Release|x86.ActiveCfg = Release|Any CPU
 		{DF3A5248-7638-41C8-998A-53112F1ACFA2}.Release|x86.Build.0 = Release|Any CPU
-=======
 		{F83B7FD0-C28B-4C96-A49C-7EA0E2B579F1}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
 		{F83B7FD0-C28B-4C96-A49C-7EA0E2B579F1}.Debug|Any CPU.Build.0 = Debug|Any CPU
 		{F83B7FD0-C28B-4C96-A49C-7EA0E2B579F1}.Debug|x64.ActiveCfg = Debug|Any CPU
@@ -432,7 +430,18 @@ Global
 		{F83B7FD0-C28B-4C96-A49C-7EA0E2B579F1}.Release|x64.Build.0 = Release|Any CPU
 		{F83B7FD0-C28B-4C96-A49C-7EA0E2B579F1}.Release|x86.ActiveCfg = Release|Any CPU
 		{F83B7FD0-C28B-4C96-A49C-7EA0E2B579F1}.Release|x86.Build.0 = Release|Any CPU
->>>>>>> algorithm-v2-branch
+		{831A52CF-75FF-4EAB-BCEC-24547C588009}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
+		{831A52CF-75FF-4EAB-BCEC-24547C588009}.Debug|Any CPU.Build.0 = Debug|Any CPU
+		{831A52CF-75FF-4EAB-BCEC-24547C588009}.Debug|x64.ActiveCfg = Debug|Any CPU
+		{831A52CF-75FF-4EAB-BCEC-24547C588009}.Debug|x64.Build.0 = Debug|Any CPU
+		{831A52CF-75FF-4EAB-BCEC-24547C588009}.Debug|x86.ActiveCfg = Debug|Any CPU
+		{831A52CF-75FF-4EAB-BCEC-24547C588009}.Debug|x86.Build.0 = Debug|Any CPU
+		{831A52CF-75FF-4EAB-BCEC-24547C588009}.Release|Any CPU.ActiveCfg = Release|Any CPU
+		{831A52CF-75FF-4EAB-BCEC-24547C588009}.Release|Any CPU.Build.0 = Release|Any CPU
+		{831A52CF-75FF-4EAB-BCEC-24547C588009}.Release|x64.ActiveCfg = Release|Any CPU
+		{831A52CF-75FF-4EAB-BCEC-24547C588009}.Release|x64.Build.0 = Release|Any CPU
+		{831A52CF-75FF-4EAB-BCEC-24547C588009}.Release|x86.ActiveCfg = Release|Any CPU
+		{831A52CF-75FF-4EAB-BCEC-24547C588009}.Release|x86.Build.0 = Release|Any CPU
 	EndGlobalSection
 	GlobalSection(SolutionProperties) = preSolution
 		HideSolutionNode = FALSE
@@ -454,7 +463,6 @@ Global
 		{274DCAF7-5FDD-46A0-97E2-91DBCA365381} = {28CF366A-EC87-4079-9FA6-1385A028E1C2}
 		{681EE228-E690-4D41-8E1A-306362901EF4} = {28CF366A-EC87-4079-9FA6-1385A028E1C2}
 		{DB770671-ECE8-4978-A992-E0D4D44F8FC8} = {681EE228-E690-4D41-8E1A-306362901EF4}
-<<<<<<< HEAD
 		{048D591B-F46C-49CF-B455-AE21DB97F419} = {65CC209D-49E2-456A-AD48-31494D75658C}
 		{AA207779-062F-4502-AB4B-10B2D99457BA} = {65CC209D-49E2-456A-AD48-31494D75658C}
 		{D2B436C8-C9AF-4FE2-B881-B8D28228637B} = {65CC209D-49E2-456A-AD48-31494D75658C}
@@ -467,9 +475,8 @@ Global
 		{D8BE54B0-1ED0-428E-A4A5-93B93A016D51} = {AB9540D3-A429-4238-8BB2-5D0114ED012E}
 		{6B61EBE5-1133-4EE9-A25A-82C14039C85B} = {F47B4360-F4CF-424E-A85E-623A1D2F297B}
 		{DF3A5248-7638-41C8-998A-53112F1ACFA2} = {F47B4360-F4CF-424E-A85E-623A1D2F297B}
-=======
 		{F83B7FD0-C28B-4C96-A49C-7EA0E2B579F1} = {AB9540D3-A429-4238-8BB2-5D0114ED012E}
->>>>>>> algorithm-v2-branch
+		{831A52CF-75FF-4EAB-BCEC-24547C588009} = {AB9540D3-A429-4238-8BB2-5D0114ED012E}
 	EndGlobalSection
 	GlobalSection(ExtensibilityGlobals) = postSolution
 		SolutionGuid = {28760A05-312F-4AA5-9831-305EE698F2F1}
