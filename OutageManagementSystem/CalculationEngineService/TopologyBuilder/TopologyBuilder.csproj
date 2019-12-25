@@ -4,17 +4,16 @@
   <PropertyGroup>
     <Configuration Condition=" '$(Configuration)' == '' ">Debug</Configuration>
     <Platform Condition=" '$(Platform)' == '' ">AnyCPU</Platform>
-    <ProjectGuid>{8161DAA9-A01F-4C71-BB12-4EB918869DBC}</ProjectGuid>
-    <OutputType>Exe</OutputType>
-    <RootNamespace>CalculationEngineServiceHost</RootNamespace>
-    <AssemblyName>CalculationEngineServiceHost</AssemblyName>
+    <ProjectGuid>{F83B7FD0-C28B-4C96-A49C-7EA0E2B579F1}</ProjectGuid>
+    <OutputType>Library</OutputType>
+    <AppDesignerFolder>Properties</AppDesignerFolder>
+    <RootNamespace>TopologyBuilder</RootNamespace>
+    <AssemblyName>TopologyBuilder</AssemblyName>
     <TargetFrameworkVersion>v4.8</TargetFrameworkVersion>
     <FileAlignment>512</FileAlignment>
-    <AutoGenerateBindingRedirects>true</AutoGenerateBindingRedirects>
     <Deterministic>true</Deterministic>
   </PropertyGroup>
   <PropertyGroup Condition=" '$(Configuration)|$(Platform)' == 'Debug|AnyCPU' ">
-    <PlatformTarget>x86</PlatformTarget>
     <DebugSymbols>true</DebugSymbols>
     <DebugType>full</DebugType>
     <Optimize>false</Optimize>
@@ -24,7 +23,6 @@
     <WarningLevel>4</WarningLevel>
   </PropertyGroup>
   <PropertyGroup Condition=" '$(Configuration)|$(Platform)' == 'Release|AnyCPU' ">
-    <PlatformTarget>AnyCPU</PlatformTarget>
     <DebugType>pdbonly</DebugType>
     <Optimize>true</Optimize>
     <OutputPath>bin\Release\</OutputPath>
@@ -43,21 +41,10 @@
     <Reference Include="System.Xml" />
   </ItemGroup>
   <ItemGroup>
-    <Compile Include="Program.cs" />
+    <Compile Include="GraphBuilder.cs" />
     <Compile Include="Properties\AssemblyInfo.cs" />
   </ItemGroup>
   <ItemGroup>
-    <None Include="App.config" />
-  </ItemGroup>
-  <ItemGroup>
-    <ProjectReference Include="..\..\Common\Common.csproj">
-      <Project>{892cbe15-9ed7-4540-81fa-0eaaba592138}</Project>
-      <Name>Common</Name>
-    </ProjectReference>
-    <ProjectReference Include="..\CalculationEngineService\CalculationEngineService.csproj">
-      <Project>{D8BE54B0-1ED0-428E-A4A5-93B93A016D51}</Project>
-      <Name>CalculationEngineService</Name>
-    </ProjectReference>
     <ProjectReference Include="..\CECommon\CECommon.csproj">
       <Project>{E1D2D69D-E03D-4FD7-8E4F-0FC95B68F0DD}</Project>
       <Name>CECommon</Name>
@@ -65,10 +52,6 @@
     <ProjectReference Include="..\NetworkModelServiceFunctions\NetworkModelServiceFunctions.csproj">
       <Project>{D4553E8A-C694-4EBD-BA3C-0444A1D0C1EF}</Project>
       <Name>NetworkModelServiceFunctions</Name>
-    </ProjectReference>
-    <ProjectReference Include="..\TopologyBuilder\TopologyBuilder.csproj">
-      <Project>{F83B7FD0-C28B-4C96-A49C-7EA0E2B579F1}</Project>
-      <Name>TopologyBuilder</Name>
     </ProjectReference>
     <ProjectReference Include="..\TopologyElementsFuntions\TopologyElementsFuntions.csproj">
       <Project>{7F4CFEB1-0253-4A00-83C4-FE2CA5E2A5B3}</Project>

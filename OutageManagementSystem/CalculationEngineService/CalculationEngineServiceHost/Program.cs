@@ -1,9 +1,13 @@
 ﻿using CalculationEngineService;
-using CECommon;
 using Outage.Common;
+﻿using CECommon;
+using CECommon.Model;
+using NetworkModelServiceFunctions;
 using System;
 using System.Collections.Generic;
 using System.Diagnostics;
+using System.Linq;
+using TopologyBuilder;
 using TopologyElementsFuntions;
 
 namespace CalculationEngineServiceHost
@@ -14,23 +18,57 @@ namespace CalculationEngineServiceHost
         {
             ILogger logger = LoggerWrapper.Instance;
 
+			//Console.WriteLine("CE started...");
+			//Stopwatch stopwatch = new Stopwatch();
+			//stopwatch.Start();
+			//GDAModelHelper.Instance.RetrieveAllElements();
+			//stopwatch.Stop();
+			//Console.WriteLine("Elements retrieved for " + stopwatch.Elapsed.ToString());
+			//GraphBuilder graphBuilder = new GraphBuilder();
+			//List<long> es = GDAModelHelper.Instance.GetAllEnergySousces();
+			//stopwatch.Restart();
+			//var topology = graphBuilder.CreateGraphTopology(es.First());
+			//stopwatch.Stop();
+			//Console.WriteLine("Topology created for " + stopwatch.Elapsed.ToString());
+			//PrintTopology(topology.FirstNode);
+			//Console.WriteLine("///////////////////////////////////////////////////////////////////////////////");
+			//PrintUI(topology);
+			//Console.ReadLine();
+		
+
+
+		//static void PrintTopology(TopologyElement firstElement)
+		//{
+		//	foreach (var connectedElement in firstElement.SecondEnd)
+		//	{
+		//		Console.WriteLine($"{TopologyHelper.Instance.GetDMSTypeOfTopologyElement(firstElement.Id)} with gid {firstElement.Id.ToString("X")} connected to {TopologyHelper.Instance.GetDMSTypeOfTopologyElement(connectedElement.Id)} with gid {connectedElement.Id.ToString("X")}");
+		//		PrintTopology(connectedElement);
+		//	}
+		//}
+		//static void PrintUI(Topology topology)
+		//{
+		//	Print(topology.FirstNode.Id, topology);
+		//}
+
+		//static void Print(long parent, Topology topology)
+		//{
+		//	var connectedElements = topology.GetRelatedElements(parent);
+		//	if (connectedElements != null)
+		//	{
+		//		foreach (var connectedElement in connectedElements)
+		//		{
+		//			Console.WriteLine($"{TopologyHelper.Instance.GetDMSTypeOfTopologyElement(parent)} with gid {parent.ToString("X")} connected to {TopologyHelper.Instance.GetDMSTypeOfTopologyElement(connectedElement)} with gid {connectedElement.ToString("X")}");
+		//			Print(connectedElement, topology);
+		//		}
+		//	}
+		//}
+
             try
             {
                 string message = "Starting Calculation Engine Service...";
                 logger.LogInfo(message);
                 CommonTrace.WriteTrace(CommonTrace.TraceInfo, message);
-                Console.WriteLine("\n{0}\n", message);
-
-                //TopologyConnectivity topologyConnectivity = new TopologyConnectivity();
-                //Stopwatch stopwatch = new Stopwatch();
-                //stopwatch.Start();
-                //List<TopologyElement> energySources = topologyConnectivity.MakeAllTopologies();
-                //stopwatch.Stop();
-                //Console.WriteLine(stopwatch.Elapsed.ToString());
-                //foreach (var rs in energySources)
-                //{
-                //    topologyConnectivity.PrintTopology(rs);
-                //}
+                Console.WriteLine("\n{0}\n", message);          
 
                 using (CalculationEngineService.CalculationEngineService ces = new CalculationEngineService.CalculationEngineService())
                 {

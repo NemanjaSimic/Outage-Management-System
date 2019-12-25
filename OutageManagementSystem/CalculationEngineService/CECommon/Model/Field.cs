@@ -6,7 +6,7 @@ using System.Threading.Tasks;
 
 namespace CECommon
 {
-	public class Field : Node
+	public class Field : Edge
 	{
 		private static long fieldNumber = 5000;
 		private List<TopologyElement> members;
