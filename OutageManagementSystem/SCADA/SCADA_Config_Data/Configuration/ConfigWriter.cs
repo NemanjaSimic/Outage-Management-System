@@ -1,17 +1,14 @@
 ﻿using Outage.SCADA.SCADA_Common;
 using Outage.SCADA.SCADA_Config_Data.Repository;
-using System;
 using System.Collections.Generic;
 using System.IO;
 using System.Linq;
 using System.Text;
-using System.Threading.Tasks;
 
 namespace Outage.SCADA.SCADA_Config_Data.Configuration
 {
     public class ConfigWriter
     {
-
         private string file_name = "RtuCfg.txt";
         private List<ConfigItem> DO_REG;
         private List<ConfigItem> DI_REG;
@@ -37,6 +34,7 @@ namespace Outage.SCADA.SCADA_Config_Data.Configuration
             }
             return true;
         }
+
         private void SetUpData()
         {
             Data = DataModelRepository.Instance.Points.Values.ToList();
@@ -44,12 +42,10 @@ namespace Outage.SCADA.SCADA_Config_Data.Configuration
             this.DI_REG = Data.Where(x => x.RegistarType == PointType.DIGITAL_INPUT).ToList();
             this.IN_REG = Data.Where(x => x.RegistarType == PointType.ANALOG_INPUT).ToList();
             this.HR_INT = Data.Where(x => x.RegistarType == PointType.ANALOG_OUTPUT).ToList();
-
-
         }
+
         private string GenerateContentForConfigFile()
         {
-
             StringBuilder content = new StringBuilder();
             content.AppendLine($"STA \t {DataModelRepository.Instance.UnitAddress}");
             content.AppendLine($"TCP \t {DataModelRepository.Instance.TcpPort}");
@@ -57,7 +53,6 @@ namespace Outage.SCADA.SCADA_Config_Data.Configuration
             foreach (var item in DO_REG)
             {
                 content.AppendLine($"DO_REG \t 1 \t {item.Address} \t 0 \t {item.MinValue} \t {item.MaxValue} \t {item.CurrentValue} \t DO \t @{item.Name}");
-
             }
             foreach (var item in DI_REG)
             {
@@ -73,10 +68,5 @@ namespace Outage.SCADA.SCADA_Config_Data.Configuration
             }
             return content.ToString();
         }
-
-
-
-
-
     }
 }

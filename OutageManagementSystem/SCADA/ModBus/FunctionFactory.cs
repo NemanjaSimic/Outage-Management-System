@@ -1,12 +1,6 @@
-﻿using Outage.SCADA.SCADA_Common;
-
-using Outage.SCADA.ModBus.FunctionParameters;
+﻿using Outage.SCADA.ModBus.FunctionParameters;
 using Outage.SCADA.ModBus.ModbusFuntions;
-using System;
-using System.Collections.Generic;
-using System.Linq;
-using System.Text;
-using System.Threading.Tasks;
+using Outage.SCADA.SCADA_Common;
 
 namespace Outage.SCADA.ModBus
 {

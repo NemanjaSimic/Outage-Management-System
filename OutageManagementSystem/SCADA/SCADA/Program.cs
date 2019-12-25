@@ -1,23 +1,20 @@
-using Outage.SCADA.SCADA_Common;
-using System;
-using System.Collections.ObjectModel;
-using Outage.SCADA.ModBus.PointModels;
-using SCADA.Command;
-using Outage.SCADA.SCADA_Config_Data.Repository;
-using Outage.SCADA.SCADA_Config_Data.Configuration;
-using System.Linq;
 using Outage.Common;
 using Outage.SCADA.ModBus.Acquisitor;
+using Outage.SCADA.ModBus.PointModels;
+using Outage.SCADA.SCADA_Config_Data.Configuration;
+using Outage.SCADA.SCADA_Config_Data.Repository;
+using System;
+using System.Collections.ObjectModel;
 
 namespace Outage.SCADA.SCADA
 {
     [Obsolete]
-    class Program
+    internal class Program
     {
         public static ObservableCollection<BasePointItem> Points { get; set; }
         //private static WcfService<ICommandService, CommandService> wcfService;
 
-        static void Main(string[] args)
+        private static void Main(string[] args)
         {
             //wcfService = new WcfService<ICommandService, CommandService>(DataModelRepository.Instance.ServiceAddress);
             Console.WriteLine(DataModelRepository.Instance.ImportModel());
@@ -32,7 +29,6 @@ namespace Outage.SCADA.SCADA
               Console.WriteLine("Press any key to exit the application.. "); */
             //CommandService commandService = new CommandService();
             //commandService.RecvCommand(DataModelRepository.Instance.Points.Values.First().Gid, PointType.ANALOG_OUTPUT, 100);
-
 
             ILogger logger = LoggerWrapper.Instance;
 
@@ -88,13 +84,11 @@ namespace Outage.SCADA.SCADA
              ModbusReadCommandParameters mdb_read = new ModbusReadCommandParameters
              (6, (byte)ModbusFunctionCode.READ_COILS, adresa1, kvantitet1);
 
-
              ModbusFunction fn = FunctionFactory.CreateModbusFunction(mdb_read);
              Console.ReadLine();
 
              functionExecutor.EnqueueCommand(fn);
              Console.ReadLine();
-
 
              Console.ReadLine();
             ConfigWriter configReader = new ConfigWriter();

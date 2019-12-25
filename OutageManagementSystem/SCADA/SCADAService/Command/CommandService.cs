@@ -1,6 +1,4 @@
-﻿
-
-using Outage.Common.ServiceContracts;
+﻿using Outage.Common.ServiceContracts;
 using Outage.SCADA.ModBus;
 using Outage.SCADA.ModBus.Connection;
 using Outage.SCADA.ModBus.FunctionParameters;
@@ -18,14 +16,12 @@ namespace Outage.SCADA.SCADAService.Command
 
         public CommandService()
         {
-
         }
 
         public void RecvCommand(long gid, object value)
         {
             if (DataModelRepository.Instance.Points.TryGetValue(gid, out ConfigItem CI))
             {
-
                 if (CI.RegistarType == PointType.ANALOG_OUTPUT || CI.RegistarType == PointType.DIGITAL_OUTPUT)
                 {
                     ModbusWriteCommandParameters mdb_write_comm_pars = null;

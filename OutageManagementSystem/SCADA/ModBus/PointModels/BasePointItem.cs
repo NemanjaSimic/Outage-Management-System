@@ -1,16 +1,10 @@
-﻿using Outage.SCADA.SCADA_Common;
-using Outage.SCADA.ModBus.Connection;
-using System;
-using System.Collections.Generic;
-using System.Linq;
-using System.Text;
-using System.Threading.Tasks;
+﻿using Outage.SCADA.ModBus.Connection;
+using Outage.SCADA.SCADA_Common;
 
 namespace Outage.SCADA.ModBus.PointModels
 {
     public class BasePointItem
     {
-
         private ushort rawValue;
         private ushort min;
         private ushort max;
@@ -23,7 +17,6 @@ namespace Outage.SCADA.ModBus.PointModels
             this.address = address;
             this.rawValue = defaultValue;
             commandExecutor.UpdatePointEvent += CommandExecutor_UpdatePointEvent;
-
         }
 
         public BasePointItem()
@@ -48,7 +41,6 @@ namespace Outage.SCADA.ModBus.PointModels
             set
             {
                 address = value;
-                
             }
         }
 
@@ -62,7 +54,6 @@ namespace Outage.SCADA.ModBus.PointModels
             set
             {
                 type = value;
-               
             }
         }
 
@@ -76,7 +67,6 @@ namespace Outage.SCADA.ModBus.PointModels
             set
             {
                 min = value;
-                
             }
         }
 
@@ -90,7 +80,6 @@ namespace Outage.SCADA.ModBus.PointModels
             set
             {
                 max = value;
-                
             }
         }
 
@@ -104,7 +93,6 @@ namespace Outage.SCADA.ModBus.PointModels
             set
             {
                 rawValue = value;
-
             }
         }
     }

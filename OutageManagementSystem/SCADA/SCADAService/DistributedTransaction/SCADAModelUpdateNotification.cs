@@ -1,11 +1,7 @@
 ﻿using Outage.Common;
 using Outage.Common.GDA;
 using Outage.DistributedTransactionActor;
-using System;
 using System.Collections.Generic;
-using System.Linq;
-using System.Text;
-using System.Threading.Tasks;
 
 namespace Outage.SCADA.SCADAService.DistributedTransaction
 {
@@ -30,7 +26,7 @@ namespace Outage.SCADA.SCADAService.DistributedTransaction
         {
             bool success = scadaModel.Notify(modelChanges);
 
-            if(success)
+            if (success)
             {
                 TransactionEnlistmentProxy.Enlist(ActorName);
                 logger.LogInfo("SCADA SUCCESSFULLY notified about network model update.");

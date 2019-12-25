@@ -1,10 +1,4 @@
-﻿using System;
-using System.Collections.Generic;
-using System.Linq;
-using System.Text;
-using System.Threading.Tasks;
-
-namespace Outage.SCADA.SCADA_Common
+﻿namespace Outage.SCADA.SCADA_Common
 {
     public interface IConfigItem
     {
@@ -24,6 +18,5 @@ namespace Outage.SCADA.SCADA_Common
         double HighLimit { get; set; }
 
         double LowLimit { get; set; }
-
     }
 }

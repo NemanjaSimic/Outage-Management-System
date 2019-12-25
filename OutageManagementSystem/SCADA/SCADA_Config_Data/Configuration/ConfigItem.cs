@@ -1,15 +1,9 @@
 ﻿using Outage.SCADA.SCADA_Common;
-using System;
-using System.Collections.Generic;
-using System.Linq;
-using System.Text;
-using System.Threading.Tasks;
 
 namespace Outage.SCADA.SCADA_Config_Data.Configuration
 {
     public class ConfigItem : IConfigItem
     {
-
         public PointType RegistarType { get; set; }
         public ushort Address { get; set; }
         public float MinValue { get; set; }
@@ -55,6 +49,5 @@ namespace Outage.SCADA.SCADA_Config_Data.Configuration
             }
             return registryType;
         }
-
     }
 }

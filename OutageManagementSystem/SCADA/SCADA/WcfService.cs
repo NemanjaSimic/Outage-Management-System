@@ -1,12 +1,9 @@
 ﻿using System;
-using System.Collections.Generic;
-using System.Linq;
 using System.ServiceModel;
-using System.Text;
-using System.Threading.Tasks;
 
 namespace Outage.SCADA.SCADA
 {
+    [Obsolete]
     public class WcfService<TContract, TService> : IDisposable
         where TContract : class
         where TService : TContract
@@ -28,8 +25,6 @@ namespace Outage.SCADA.SCADA
             {
                 Console.WriteLine("_svc host failed to open with error: {0}", ex.Message);
             }
-
-
         }
 
         public void Close()

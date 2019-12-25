@@ -3,10 +3,7 @@ using Outage.SCADA.SCADAService.Command;
 using Outage.SCADA.SCADAService.DistributedTransaction;
 using System;
 using System.Collections.Generic;
-using System.Linq;
 using System.ServiceModel;
-using System.Text;
-using System.Threading.Tasks;
 
 namespace Outage.SCADA.SCADAService
 {
@@ -29,8 +26,6 @@ namespace Outage.SCADA.SCADAService
 
         public void Start()
         {
-
-
             StartHosts();
         }
 
@@ -82,7 +77,6 @@ namespace Outage.SCADA.SCADAService
             message = string.Format("Trace level: {0}", CommonTrace.TraceLevel);
             Console.WriteLine(message);
             logger.LogInfo(message);
-
 
             message = "The SCADA" +
                 " Service is started.";

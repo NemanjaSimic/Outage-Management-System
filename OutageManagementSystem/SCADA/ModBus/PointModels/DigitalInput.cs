@@ -1,10 +1,5 @@
-﻿using Outage.SCADA.SCADA_Common;
-using Outage.SCADA.ModBus.Connection;
-using System;
-using System.Collections.Generic;
-using System.Linq;
-using System.Text;
-using System.Threading.Tasks;
+﻿using Outage.SCADA.ModBus.Connection;
+using Outage.SCADA.SCADA_Common;
 
 namespace Outage.SCADA.ModBus.PointModels
 {
@@ -34,7 +29,6 @@ namespace Outage.SCADA.ModBus.PointModels
             set
             {
                 state = value;
-               
             }
         }
 
@@ -48,7 +42,7 @@ namespace Outage.SCADA.ModBus.PointModels
         //    set
         //    {
         //        abnormalState = value;
-                
+
         //    }
         //}
 
@@ -58,7 +52,6 @@ namespace Outage.SCADA.ModBus.PointModels
             {
                 State = (DState)newValue;
                 RawValue = newValue;
-                
             }
         }
     }

@@ -2,16 +2,13 @@
 using SCADA_Service.DistributedTransaction;
 using System;
 using System.Collections.Generic;
-using System.Linq;
 using System.ServiceModel;
-using System.Text;
-using System.Threading.Tasks;
 
 namespace SCADA_Service
 {
+    [Obsolete]
     public class SCADAService : IDisposable
     {
-
         private ILogger logger = LoggerWrapper.Instance;
 
         private List<ServiceHost> hosts = null;
@@ -77,7 +74,6 @@ namespace SCADA_Service
             message = string.Format("Trace level: {0}", CommonTrace.TraceLevel);
             Console.WriteLine(message);
             logger.LogInfo(message);
-
 
             message = "The SCADA Service is started.";
             Console.WriteLine("\n{0}", message);

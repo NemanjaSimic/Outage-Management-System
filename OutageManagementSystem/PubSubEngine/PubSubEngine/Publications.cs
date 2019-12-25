@@ -1,68 +1,66 @@
-﻿using System.Collections.Concurrent;
-using System.Collections.Generic;
-using Outage.Common;
+﻿using Outage.Common;
 using Outage.Common.ServiceContracts.PubSub;
-using PubSubCommon;
+using System.Collections.Concurrent;
+using System.Collections.Generic;
 
 namespace PubSubEngine
 {
-	public class Publications
-	{
-		private ConcurrentDictionary<Topic, List<INotify>> subscribedClients;
-		private static Publications instance;
+    public class Publications
+    {
+        private ConcurrentDictionary<Topic, List<IPubSubNotification>> subscribedClients;
+        private static Publications instance;
 
-		private Publications()
-		{
-			subscribedClients = new ConcurrentDictionary<Topic, List<INotify>>();
-		}
+        private Publications()
+        {
+            subscribedClients = new ConcurrentDictionary<Topic, List<IPubSubNotification>>();
+        }
 
-		public static Publications Instance
-		{
-			get
-			{
-				if (instance == null)
-				{
-					instance = new Publications();
-				}
-				return instance;
-			}
-		}
+        public static Publications Instance
+        {
+            get
+            {
+                if (instance == null)
+                {
+                    instance = new Publications();
+                }
+                return instance;
+            }
+        }
 
-		public bool TryAddSubscriber(Topic topic, INotify subscriber)
-		{
-			bool success = subscribedClients.TryGetValue(topic, out List<INotify> list);
+        public bool TryAddSubscriber(Topic topic, IPubSubNotification subscriber)
+        {
+            bool success = subscribedClients.TryGetValue(topic, out List<IPubSubNotification> list);
 
-			if (success)
-			{
-				list.Add(subscriber);
-			}
-			else
-			{
-				list = new List<INotify>
-				{
-					subscriber
-				};
-				success = subscribedClients.TryAdd(topic, list);
-			}
-			return success;
-		}
+            if (success)
+            {
+                list.Add(subscriber);
+            }
+            else
+            {
+                list = new List<IPubSubNotification>
+                {
+                    subscriber
+                };
+                success = subscribedClients.TryAdd(topic, list);
+            }
+            return success;
+        }
 
-		public void RemoveSubscriber(INotify subscriber)
-		{
-			foreach (var item in subscribedClients)
-			{
-				if (item.Value.Contains(subscriber))
-				{
-					item.Value.Remove(subscriber);
-				}
-			}
-		}
+        public void RemoveSubscriber(IPubSubNotification subscriber)
+        {
+            foreach (var item in subscribedClients)
+            {
+                if (item.Value.Contains(subscriber))
+                {
+                    item.Value.Remove(subscriber);
+                }
+            }
+        }
 
-		public List<INotify> GetAllSubscribers(Topic topic)
-		{
-			subscribedClients.TryGetValue(topic, out List<INotify> listOfSubscribers);
-			return listOfSubscribers;
-		}
-
-	}
+        public List<IPubSubNotification> GetAllSubscribers(Topic topic)
+        {
+            subscribedClients.TryGetValue(topic, out List<IPubSubNotification> listOfSubscribers);
+            return listOfSubscribers;
+        }
+    }
 }

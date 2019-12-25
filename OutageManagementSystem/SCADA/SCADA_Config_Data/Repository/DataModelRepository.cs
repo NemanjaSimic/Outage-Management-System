@@ -16,8 +16,10 @@ namespace Outage.SCADA.SCADA_Config_Data.Repository
         public byte UnitAddress { get; protected set; }
         public string ServiceAddress { get; protected set; }
         public int Interval { get; protected set; }
+
         //public FunctionExecutor functionExecutor { get; set; }
         private INetworkModelGDAContract gdaQueryProxy = null;
+
         public Dictionary<long, ConfigItem> Points;
         public Dictionary<long, Dictionary<ModelCode, Property>> NMS_Model_Props;
         public Dictionary<long, ResourceDescription> NMS_Model;
@@ -35,6 +37,7 @@ namespace Outage.SCADA.SCADA_Config_Data.Repository
                 return _instance;
             }
         }
+
         private DataModelRepository()
         {
             Points = new Dictionary<long, ConfigItem>();
@@ -52,7 +55,6 @@ namespace Outage.SCADA.SCADA_Config_Data.Repository
             {
                 Console.WriteLine(ex.Message);
             }
-
         }
 
         public bool ImportModel()
@@ -107,6 +109,7 @@ namespace Outage.SCADA.SCADA_Config_Data.Repository
             }
             return true;
         }
+
         private bool ImportDiscrete()
         {
             int iteratorId = 0;
@@ -136,7 +139,6 @@ namespace Outage.SCADA.SCADA_Config_Data.Repository
                         {
                             NMS_Model.Add(rds[i].Id, rds[i]);
                             Points.Add(rds[i].Id, ConfigurateConfigItem(rds[i].Properties, false));
-
                         }
                     }
                     resourcesLeft = gdaQueryProxy.IteratorResourcesLeft(iteratorId);
@@ -149,6 +151,7 @@ namespace Outage.SCADA.SCADA_Config_Data.Repository
             }
             return true;
         }
+
         private ConfigItem ConfigurateConfigItem(List<Property> props, bool isAna)
         {
             ConfigItem configItem = new ConfigItem();
@@ -163,26 +166,32 @@ namespace Outage.SCADA.SCADA_Config_Data.Repository
                         prop.Add(item.Id, item);
                         configItem.Gid = gid;
                         break;
+
                     case ModelCode.IDOBJ_NAME:
                         prop.Add(item.Id, item);
                         configItem.Name = item.AsString();
                         break;
+
                     case ModelCode.DISCRETE_CURRENTOPEN:
                         prop.Add(item.Id, item);
                         configItem.CurrentValue = (item.AsBool() == true) ? 1 : 0;
                         break;
+
                     case ModelCode.DISCRETE_MAXVALUE:
                         prop.Add(item.Id, item);
                         configItem.MaxValue = item.AsInt();
                         break;
+
                     case ModelCode.DISCRETE_MINVALUE:
                         prop.Add(item.Id, item);
                         configItem.MinValue = item.AsInt();
                         break;
+
                     case ModelCode.DISCRETE_NORMALVALUE:
                         prop.Add(item.Id, item);
                         configItem.DefaultValue = item.AsInt();
                         break;
+
                     case ModelCode.MEASUREMENT_ADDRESS:
                         if (isAna)
                             configItem.Address = 3000;
@@ -190,6 +199,7 @@ namespace Outage.SCADA.SCADA_Config_Data.Repository
                             configItem.Address = 40;
                         //configItem.Address = ushort.Parse(item.AsString());
                         break;
+
                     case ModelCode.MEASUREMENT_ISINPUT:
                         prop.Add(item.Id, item);
                         if (isAna)
@@ -197,22 +207,27 @@ namespace Outage.SCADA.SCADA_Config_Data.Repository
                         else
                             configItem.RegistarType = (item.AsBool() == true) ? PointType.DIGITAL_INPUT : PointType.DIGITAL_OUTPUT;
                         break;
+
                     case ModelCode.ANALOG_CURRENTVALUE:
                         prop.Add(item.Id, item);
                         configItem.CurrentValue = item.AsFloat();
                         break;
+
                     case ModelCode.ANALOG_MAXVALUE:
                         prop.Add(item.Id, item);
                         configItem.MaxValue = item.AsFloat();
                         break;
+
                     case ModelCode.ANALOG_MINVALUE:
                         prop.Add(item.Id, item);
                         configItem.MinValue = item.AsFloat();
                         break;
+
                     case ModelCode.ANALOG_NORMALVALUE:
                         prop.Add(item.Id, item);
                         configItem.DefaultValue = item.AsFloat();
                         break;
+
                     default:
                         break;
                 }

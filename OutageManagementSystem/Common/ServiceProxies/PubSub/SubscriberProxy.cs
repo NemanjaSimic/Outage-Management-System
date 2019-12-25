@@ -10,7 +10,7 @@ namespace Outage.Common.ServiceProxies.PubSub
 {
     public class SubscriberProxy : DuplexClientBase<ISubscriber>, ISubscriber
     {
-        public SubscriberProxy(INotify callbackInstance, string endpointName) 
+        public SubscriberProxy(IPubSubNotification callbackInstance, string endpointName) 
             : base(callbackInstance, endpointName)
         {
         }

@@ -1,16 +1,13 @@
-﻿using Outage.SCADA.SCADA_Common;
-using Outage.SCADA.ModBus.FunctionParameters;
-using Outage.SCADA.ModBus.ModbusFuntions;
+﻿using Outage.SCADA.ModBus.ModbusFuntions;
+using Outage.SCADA.SCADA_Common;
+using Outage.SCADA.SCADA_Config_Data.Repository;
 using System;
 using System.Collections.Concurrent;
 using System.Collections.Generic;
 using System.Linq;
 using System.Net;
 using System.Net.Sockets;
-using System.Text;
 using System.Threading;
-using System.Threading.Tasks;
-using Outage.SCADA.SCADA_Config_Data.Repository;
 
 namespace Outage.SCADA.ModBus.Connection
 {
@@ -18,7 +15,6 @@ namespace Outage.SCADA.ModBus.Connection
 
     public class FunctionExecutor
     {
-
         private TcpConnection connection;
         private ushort TcpPort;
         private Thread connectionProcess;
@@ -28,6 +24,7 @@ namespace Outage.SCADA.ModBus.Connection
         private ConnectionState _connectionState = ConnectionState.DISCONNECTED;
         private AutoResetEvent _commandEvent;
         private ConcurrentQueue<IModBusFunction> _commandQueue;
+
         public FunctionExecutor(ushort tcpPort)
         {
             this.TcpPort = tcpPort;
@@ -44,12 +41,13 @@ namespace Outage.SCADA.ModBus.Connection
         public void EnqueueCommand(ModbusFunction modbusFunction)
 
         {
-            if(_connectionState == ConnectionState.CONNECTED)
+            if (_connectionState == ConnectionState.CONNECTED)
             {
                 this._commandQueue.Enqueue(modbusFunction);
                 this._commandEvent.Set();
             }
         }
+
         private void ConnectionProcessThread()
         {
             while (this.threadCancellationSignal)
@@ -63,7 +61,6 @@ namespace Outage.SCADA.ModBus.Connection
                         this.connection.Connect();
                         while (numberOfTries < 10)
                         {
-
                             if (this.connection.CheckState())
                             {
                                 this._connectionState = ConnectionState.CONNECTED;
@@ -101,15 +98,10 @@ namespace Outage.SCADA.ModBus.Connection
                             Buffer.BlockCopy(payload, 0, message, 7, payload.Length);
                             Dictionary<Tuple<PointType, ushort>, ushort> pointsToupdate = this.currentCommand.ParseResponse(message);
 
-                            
                             foreach (var point in pointsToupdate)
                             {
                                 UpdatePoints(point.Key.Item2, point.Value);
-                                
                             }
-                            
-
-                          
                         }
                     }
                 }
@@ -122,7 +114,8 @@ namespace Outage.SCADA.ModBus.Connection
                     currentCommand = null;
                     this._connectionState = ConnectionState.DISCONNECTED;
                     this.connection.Disconnect();
-                }catch(Exception ex)
+                }
+                catch (Exception ex)
                 {
                     Console.WriteLine(ex.Message);
                     this._connectionState = ConnectionState.DISCONNECTED;
@@ -136,9 +129,5 @@ namespace Outage.SCADA.ModBus.Connection
             var point = DataModelRepository.Instance.Points.Values.Where(x => x.Address == address).First();
             point.CurrentValue = newValue;
         }
-
-
     }
-
-
 }

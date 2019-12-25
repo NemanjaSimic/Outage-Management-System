@@ -1,8 +1,5 @@
 ﻿using System;
 using System.Collections.Generic;
-using System.Linq;
-using System.Text;
-using System.Threading.Tasks;
 
 namespace Outage.SCADA.SCADA_Common
 {
@@ -10,6 +7,6 @@ namespace Outage.SCADA.SCADA_Common
     {
         Dictionary<Tuple<PointType, ushort>, ushort> ParseResponse(byte[] receivedBytes);
 
-		byte[] PackRequest();
+        byte[] PackRequest();
     }
 }

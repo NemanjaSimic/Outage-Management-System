@@ -1,21 +1,15 @@
-﻿using Outage.SCADA.SCADA_Common;
-
-using System;
-using System.Collections.Generic;
-using System.Linq;
+﻿using System.Linq;
 using System.Net;
 using System.Net.Sockets;
-using System.Text;
-using System.Threading.Tasks;
 
 namespace Outage.SCADA.ModBus.Connection
 {
     public class TcpConnection : IConnection
     {
-
         private IPEndPoint remoteEP;
         private Socket socket;
         private ushort TcpPort;
+
         public TcpConnection(ushort tcpPort)
         {
             this.TcpPort = tcpPort;
@@ -35,14 +29,14 @@ namespace Outage.SCADA.ModBus.Connection
         public bool CheckState()
         {
             return socket.Poll(30000, SelectMode.SelectWrite);
-           //return socket.Connected;
-
+            //return socket.Connected;
         }
 
         public bool Connected()
         {
             return socket.Connected;
         }
+
         public void Connect()
         {
             socket = new Socket(AddressFamily.InterNetwork, SocketType.Stream, ProtocolType.Tcp);
@@ -92,7 +86,6 @@ namespace Outage.SCADA.ModBus.Connection
 
         public void SendBytes(byte[] bytesToSend)
         {
-            
             int sent = 0;
             while (bytesToSend.Count() > sent)
             {
@@ -101,7 +94,6 @@ namespace Outage.SCADA.ModBus.Connection
                     sent += socket.Send(bytesToSend, sent, bytesToSend.Length - sent, SocketFlags.None);
                 }
             }
-
         }
     }
 }

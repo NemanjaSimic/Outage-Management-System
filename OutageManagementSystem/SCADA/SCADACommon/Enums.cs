@@ -1,16 +1,11 @@
-﻿using System;
-using System.Collections.Generic;
-using System.Linq;
-using System.Text;
-using System.Threading.Tasks;
-
-namespace Outage.SCADA.SCADA_Common
+﻿namespace Outage.SCADA.SCADA_Common
 {
-    public enum ConnectionState:short
+    public enum ConnectionState : short
     {
         CONNECTED = 0,
         DISCONNECTED = 1
     }
+
     public enum ModbusFunctionCode : short
     {
         READ_COILS = 0x01,
