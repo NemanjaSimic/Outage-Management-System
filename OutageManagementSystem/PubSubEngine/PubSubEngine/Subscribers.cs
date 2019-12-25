@@ -1,4 +1,6 @@
-﻿using PubSubCommon;
+﻿using Outage.Common.PubSub;
+using Outage.Common.ServiceContracts.PubSub;
+using PubSubCommon;
 using System;
 using System.Collections.Concurrent;
 using System.Collections.Generic;
@@ -7,12 +9,12 @@ namespace PubSubEngine
 {
 	public class Subscribers
 	{
-		private ConcurrentDictionary<INotify, Queue<string>> subscribers;
+		private ConcurrentDictionary<INotify, Queue<IPublishableMessage>> subscribers;
 		private static Subscribers instance;
 
 		private Subscribers()
 		{
-			subscribers = new ConcurrentDictionary<INotify, Queue<string>>();
+			subscribers = new ConcurrentDictionary<INotify, Queue<IPublishableMessage>>();
 		}
 
 		public static Subscribers Instance
@@ -29,29 +31,31 @@ namespace PubSubEngine
 
 		public bool TryAddSubscriber(INotify subscriber)
 		{
-			return subscribers.TryAdd(subscriber, new Queue<string>());
+			return subscribers.TryAdd(subscriber, new Queue<IPublishableMessage>());
 		}
 
 		public void RemoveSubscriber(INotify subscriber)
 		{
-			subscribers.TryRemove(subscriber, out Queue<string> queue);
+			subscribers.TryRemove(subscriber, out Queue<IPublishableMessage> queue);
 		}
 
-		public void PublishMessage(INotify subscriber,string message)
+		public void PublishMessage(INotify subscriber, IPublishableMessage message)
 		{
-			if (subscribers.TryGetValue(subscriber, out Queue<string> queueOfMessages))
+			if (subscribers.TryGetValue(subscriber, out Queue<IPublishableMessage> queueOfMessages))
 			{
 				queueOfMessages.Enqueue(message);
 			}
 		}
 
-		public string GetNextMessage(INotify subscriber)
+		public IPublishableMessage GetNextMessage(INotify subscriber)
 		{
-			string message = String.Empty;
-			if (subscribers.TryGetValue(subscriber, out Queue<string> queue) && queue.Count > 0)
+            IPublishableMessage message = null;
+
+            if (subscribers.TryGetValue(subscriber, out Queue<IPublishableMessage> queue) && queue.Count > 0)
 			{
 				message = queue.Dequeue();
 			}
+
 			return message;
 		}
 	}

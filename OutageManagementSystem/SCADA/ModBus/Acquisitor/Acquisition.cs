@@ -8,8 +8,8 @@ using System.Linq;
 using System.Text;
 using System.Threading.Tasks;
 using System.Threading;
-using SCADA_Config_Data.Repository;
-using SCADA_Config_Data.Configuration;
+using Outage.SCADA.SCADA_Config_Data.Repository;
+using Outage.SCADA.SCADA_Config_Data.Configuration;
 
 namespace Outage.SCADA.ModBus.Acquisitor
 {

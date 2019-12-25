@@ -1,24 +1,23 @@
-﻿using System.Runtime.Serialization;
-using static PubSubCommon.Enums;
+﻿using Outage.Common;
+using Outage.Common.PubSub;
+using Outage.Common.ServiceContracts.PubSub;
+using System.Runtime.Serialization;
 
 namespace PubSubCommon
 {
 	[DataContract]
-	public class Publication
+	public class Publication : IPublication
 	{
-		//testni primer salje string, treba promeniti da message bude ono sta nam treba u projektu(npr ResourseDescription?)
-		public Publication(){}
-
-		public Publication(Topic topic, string message)
+		public Publication(Topic topic, IPublishableMessage message)
 		{
 			Topic = topic;
 			Message = message;
 		}
 
 		[DataMember]
-		public Topic Topic { get; set; }
+		public Topic Topic { get; private set; }
 
 		[DataMember]
-		public string Message { get; set; }
+		public IPublishableMessage Message { get; private set; }
 	}
 }

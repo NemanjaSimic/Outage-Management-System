@@ -100,9 +100,13 @@
   </ItemGroup>
   <ItemGroup>
     <Compile Include="EndpointNames.cs" />
+    <Compile Include="PubSub\IPublication.cs" />
+    <Compile Include="PubSub\IPublishableMessage.cs" />
     <Compile Include="ServiceContracts\DistributedTransaction\IModelUpdateNotificationContract.cs" />
     <Compile Include="ServiceContracts\DistributedTransaction\ITransactionEnlistmentContract.cs" />
     <Compile Include="ServiceContracts\ISCADACommand.cs" />
+    <Compile Include="ServiceContracts\PubSub\IPublisher.cs" />
+    <Compile Include="ServiceContracts\PubSub\ISubscriber.cs" />
     <Compile Include="ServiceNames.cs" />
     <Compile Include="ServiceContracts\DistributedTransaction\ITransactionCoordinatorContract.cs" />
     <Compile Include="ServiceContracts\INetworkModelGDAContract.cs" />
@@ -120,6 +124,8 @@
     <Compile Include="ServiceProxies\DistributedTransaction\TransactionCoordinatorProxy.cs" />
     <Compile Include="ServiceProxies\NetworkModelGDAProxy.cs" />
     <Compile Include="ServiceProxies\DistributedTransaction\TransactionActorProxy.cs" />
+    <Compile Include="ServiceProxies\PubSub\PublisherProxy.cs" />
+    <Compile Include="ServiceProxies\PubSub\SubscriberProxy.cs" />
     <Compile Include="ServiceProxies\SCADACommandProxy.cs" />
     <Compile Include="Trace\CommonTrace.cs" />
     <Compile Include="ModelCodeHelper.cs" />

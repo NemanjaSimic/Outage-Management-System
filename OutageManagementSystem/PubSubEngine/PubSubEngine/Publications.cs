@@ -1,7 +1,8 @@
 ﻿using System.Collections.Concurrent;
 using System.Collections.Generic;
+using Outage.Common;
+using Outage.Common.ServiceContracts.PubSub;
 using PubSubCommon;
-using static PubSubCommon.Enums;
 
 namespace PubSubEngine
 {

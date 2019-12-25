@@ -1,8 +1,10 @@
-﻿using PubSubCommon;
+﻿using Outage.Common;
+using Outage.Common.PubSub;
+using Outage.Common.ServiceContracts.PubSub;
+using PubSubCommon;
 using System;
 using System.ServiceModel;
 using System.Threading;
-using static PubSubCommon.Enums;
 
 namespace PubSubEngine
 {
@@ -25,8 +27,8 @@ namespace PubSubEngine
 			bool end = false;
 			while (!end)
 			{
-				string message = Subscribers.Instance.GetNextMessage(subscriber);
-				if (!String.IsNullOrEmpty(message))
+				IPublishableMessage message = Subscribers.Instance.GetNextMessage(subscriber);
+				if (message != null)
 				{
 					try
 					{
