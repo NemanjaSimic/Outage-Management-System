@@ -1,4 +1,5 @@
 ﻿using CECommon.Model;
+using CECommon.Model.UI;
 using CECommon.ServiceContracts;
 using System;
 
@@ -6,11 +7,11 @@ namespace CalculationEngineService
 {
 	public class TopologyService : ITopologyServiceContract
 	{
-        public TopologyModel GetTopology()
+        public UIModel GetTopology()
         {
 			try
 			{
-				return Topology.Topology.Instance.TopologyModel;
+				return Topology.Topology.Instance.TopologyModel.UIModel;
 			}
 			catch (Exception)
 			{
@@ -18,5 +19,12 @@ namespace CalculationEngineService
 				throw;
 			}
         }
+
+		//private UIModel PrepareTopology(TopologyElement firstElement)
+		//{
+		//	UIModel uIModel = new UIModel();
+			
+		//	return uIModel;
+		//}
     }
 }

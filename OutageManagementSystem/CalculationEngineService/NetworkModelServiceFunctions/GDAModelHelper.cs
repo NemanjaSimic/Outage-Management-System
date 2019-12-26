@@ -1,5 +1,4 @@
-﻿using NetworkModelServiceFunctions;
-using Outage.Common;
+﻿using Outage.Common;
 using Outage.Common.GDA;
 using System.Collections.Generic;
 

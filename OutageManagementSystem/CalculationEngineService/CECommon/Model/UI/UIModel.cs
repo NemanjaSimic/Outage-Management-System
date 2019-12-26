@@ -1,0 +1,62 @@
+﻿using System;
+using System.Collections.Generic;
+using System.Linq;
+using System.Runtime.Serialization;
+using System.Text;
+using System.Threading.Tasks;
+
+namespace CECommon.Model.UI
+{
+	[Serializable]
+	[DataContract]
+	public class UIModel
+	{
+		[DataMember]
+		public long FirstNode { get; set; }
+        [DataMember]
+        public Dictionary<long, UINode> Nodes { get; set; }
+        [DataMember]
+        public Dictionary<long, HashSet<long>> Relations { get; set; }
+
+        public UIModel()
+        {
+            Nodes = new Dictionary<long, UINode>();
+            Relations = new Dictionary<long, HashSet<long>>();
+        }
+
+		public void AddRelation(long source, long destination)
+		{
+			if (Relations.ContainsKey(source))
+			{
+				try
+				{
+					Relations[source].Add(destination);
+				}
+				catch (Exception)
+				{
+					throw new Exception($"Relaton {source} - {destination} already exists.");
+				}
+			}
+			else
+			{
+				Relations.Add(source, new HashSet<long>() { destination });
+			}
+		}
+		public void AddNode(UINode newNode)
+		{
+			if (!Nodes.ContainsKey(newNode.Gid))
+			{
+				Nodes.Add(newNode.Gid, newNode);
+			}
+		}
+		public HashSet<long> GetRelatedElements(long sourceGid)
+		{
+			if (Relations.ContainsKey(sourceGid))
+			{
+				return Relations[sourceGid];
+			}
+
+			return null;
+		}
+	}
+}

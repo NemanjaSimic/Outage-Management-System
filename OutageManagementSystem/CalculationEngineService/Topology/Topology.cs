@@ -18,10 +18,10 @@ namespace Topology
 
         #region Singleton
         private static Topology instance;
-        private static object syncObj;
+        private static object syncObj = new object();
         private Topology()
         {
-            topologyBuilder = new GraphBuilder();    
+            topologyBuilder = new GraphBuilder();
         }
 
         public static Topology Instance

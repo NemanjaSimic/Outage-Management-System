@@ -1,12 +1,11 @@
 ﻿using CECommon;
 using CECommon.Interfaces;
 using CECommon.Model;
+using CECommon.Model.UI;
 using NetworkModelServiceFunctions;
 using System;
 using System.Collections.Generic;
 using System.Linq;
-using System.Text;
-using System.Threading.Tasks;
 using TopologyElementsFuntions;
 
 namespace TopologyBuilder
@@ -37,12 +36,11 @@ namespace TopologyBuilder
                 var connectedElements = CheckIgnorable(currentNode.Id);
                 foreach (var element in connectedElements)
                 {
-                    var newNode = ConnectTwoNodes(element, currentNode);          
-                    //currentNode.SecondEnd.Add(newNode);
+                    var newNode = ConnectTwoNodes(element, currentNode);
                     topology.AddRelation(currentNode.Id, newNode.Id);
                     stack.Push(newNode);
                 }
-                topology.AddNode(currentNode);
+                topology.AddUINode(new UINode(currentNode.Id, TopologyHelper.Instance.GetDMSTypeOfTopologyElement(currentNode.Id)));
             }
 
             topology.FirstNode = firstNode;

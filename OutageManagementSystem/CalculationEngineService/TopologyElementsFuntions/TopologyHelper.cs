@@ -1,6 +1,5 @@
 ﻿using CECommon;
 using CECommon.TopologyConfiguration;
-using NetworkModelServiceFunctions;
 using Outage.Common;
 using System;
 using System.Collections.Generic;
@@ -63,20 +62,6 @@ namespace TopologyElementsFuntions
 			}
 			return TopologyType.None;
 		}
-
-		//public List<long> GetAllReferencedElements(long gid)
-		//{
-		//	List<long> elements = new List<long>();
-
-		//	foreach (var resourceDescription in gDAModelHelper.GetAllReferencedElements(gid))
-		//	{
-		//		elements.Add(resourceDescription.Id);
-		//	}
-
-		//	return elements;
-		//}
-
-
 		public string GetDMSTypeOfTopologyElement(long gid)
 		{
 			try

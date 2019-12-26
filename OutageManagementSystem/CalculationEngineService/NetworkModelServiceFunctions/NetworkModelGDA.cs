@@ -1,11 +1,6 @@
-﻿using System;
-using System.Collections.Generic;
-using System.Linq;
-using System.Text;
-using System.Threading.Tasks;
-using Outage.Common;
+﻿using Outage.Common;
 using Outage.Common.GDA;
-using System.ServiceModel;
+using System.Collections.Generic;
 
 namespace NetworkModelServiceFunctions
 {

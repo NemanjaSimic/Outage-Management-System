@@ -1,4 +1,4 @@
-﻿using CECommon.Model;
+﻿using CECommon.Model.UI;
 using System.ServiceModel;
 
 namespace CECommon.ServiceContracts
@@ -7,6 +7,6 @@ namespace CECommon.ServiceContracts
     public interface ITopologyServiceContract
     {
         [OperationContract]
-        TopologyModel GetTopology();
+        UIModel GetTopology();
     }
 }

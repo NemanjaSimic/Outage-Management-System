@@ -1,9 +1,4 @@
-﻿using Outage.Common;
-using System;
-using System.Collections.Generic;
-using System.Linq;
-using System.Text;
-using System.Threading.Tasks;
+﻿using System.Collections.Generic;
 
 namespace CECommon
 {
@@ -12,7 +7,6 @@ namespace CECommon
 		private long id;
 		private TopologyElement firstEnd;
 		private List<TopologyElement> secondEnd;
-
 
 		public long Id { get => id; set => id = value; }
 		public TopologyElement FirstEnd { get => firstEnd; set => firstEnd = value; }
