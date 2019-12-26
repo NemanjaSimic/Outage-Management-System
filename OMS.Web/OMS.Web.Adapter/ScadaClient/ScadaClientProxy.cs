@@ -1,14 +1,14 @@
 ﻿using System;
-using SCADA_Common;
 using OMS.Web.Common;
 using System.ServiceModel;
 using OMS.Web.Adapter.Contracts;
+using Outage.Common.ServiceContracts;
 
 namespace OMS.Web.Adapter.ScadaClient
 {
-    public class ScadaClientProxy : ChannelFactory<ICommandService>, IScadaClient
+    public class ScadaClientProxy : ChannelFactory<ISCADACommand>, IScadaClient
     {
-        private ICommandService _proxy = null;
+        private ISCADACommand _proxy = null;
 
         public ScadaClientProxy() : base(binding: new NetTcpBinding(), remoteAddress: AppSettings.Get<string>("scadaServiceAddress"))
         {
@@ -25,7 +25,7 @@ namespace OMS.Web.Adapter.ScadaClient
             try
             {
                 // magic :))
-                _proxy.RecvCommand(gid, default(PointType), value);
+                _proxy.RecvCommand(gid, value);
             }
             catch (Exception)
             {
