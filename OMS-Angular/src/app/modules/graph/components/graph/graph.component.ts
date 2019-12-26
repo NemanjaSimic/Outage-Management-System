@@ -4,6 +4,7 @@ import { GraphService } from '@services/notification/graph.service';
 import { OmsGraph } from '@shared/models/oms-graph.model';
 
 import cyConfig from './graph.config';
+import { drawBackupEdge } from '@shared/utils/backup-edge';
 import { addGraphTooltip } from '@shared/utils/tooltip';
 import { drawWarning } from '@shared/utils/warning';
 
@@ -36,7 +37,8 @@ export class GraphComponent implements OnInit, OnDestroy {
 
   private graphData: any = {
     nodes: [],
-    edges: []
+    edges: [],
+    backup_edges: []
   };
 
   constructor(
@@ -64,6 +66,8 @@ export class GraphComponent implements OnInit, OnDestroy {
     // local testing
     this.graphData.nodes = graphMock.nodes;
     this.graphData.edges = graphMock.edges;
+    this.graphData.backup_edges = graphMock.backup_edges;
+
 
     // zoom on + and -
     this.zoomSubscription = fromEvent(document, 'keypress').subscribe(
@@ -81,7 +85,6 @@ export class GraphComponent implements OnInit, OnDestroy {
             x: 50,
             y: 0
           });
-
         else if (e.key == 'ArrowRight')
           this.cy.panBy({
             x: -50,
@@ -138,9 +141,18 @@ export class GraphComponent implements OnInit, OnDestroy {
       elements: this.graphData
     });
 
+    this.drawBackupEdges();
     this.addTooltips();
     this.drawWarnings();
   };
+
+  public drawBackupEdges(): void {
+    this.cy.ready(() => {
+      this.graphData.backup_edges.forEach(line => {
+        drawBackupEdge(this.cy, line);
+      });
+    });
+  }
 
   public addTooltips(): void {
     this.cy.ready(() => {

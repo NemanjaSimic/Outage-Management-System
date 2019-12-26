@@ -65,5 +65,8 @@
       { "data": { "source": "F8", "target": "EC8", "color": "blue" } },
       { "data": { "source": "F5", "target": "EC5", "color": "red" } },
       { "data": { "source": "F6", "target": "EC6", "color": "blue" } }
+    ],
+    "backup_edges": [
+      { "data": { "source": "EC6", "target": "EC5", "color": "blue" } }
     ]
   }
