@@ -29,6 +29,7 @@ export class GraphComponent implements OnInit, OnDestroy {
   public connectionSubscription: Subscription;
   public updateSubscription: Subscription;
   public zoomSubscription: Subscription;
+  public panSubscription: Subscription;
 
   public didLoadGraph: boolean;
   private cy: any;
@@ -72,6 +73,32 @@ export class GraphComponent implements OnInit, OnDestroy {
         else if (e.key == '-')
           this.cy.zoom(this.cy.zoom() - 0.1);
       });
+
+    this.panSubscription = fromEvent(document, 'keydown').subscribe(
+      (e: KeyboardEvent) => {
+        if (e.key == 'ArrowLeft')
+          this.cy.panBy({
+            x: 50,
+            y: 0
+          });
+
+        else if (e.key == 'ArrowRight')
+          this.cy.panBy({
+            x: -50,
+            y: 0
+          });
+        else if (e.key == 'ArrowUp')
+          this.cy.panBy({
+            x: 0,
+            y: 50
+          });
+        else if (e.key == 'ArrowDown')
+          this.cy.panBy({
+            x: 0,
+            y: -50
+          });
+      }
+    )
   }
 
   ngOnDestroy() {
