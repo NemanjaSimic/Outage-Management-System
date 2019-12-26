@@ -22,11 +22,11 @@ namespace Outage.SCADA.SCADA
             configWriter.GenerateConfigFile();
 
             Acquisition A = new Acquisition();
-            /*  wcfService.Open();
-              Console.WriteLine("Press any key to terminate services..");
-              Console.ReadKey();
-              wcfService.Close();
-              Console.WriteLine("Press any key to exit the application.. "); */
+            //  wcfService.Open();
+            //  Console.WriteLine("Press any key to terminate services..");
+            //  Console.ReadKey();
+            //  wcfService.Close();
+            //  Console.WriteLine("Press any key to exit the application.. ");
             //CommandService commandService = new CommandService();
             //commandService.RecvCommand(DataModelRepository.Instance.Points.Values.First().Gid, PointType.ANALOG_OUTPUT, 100);
 

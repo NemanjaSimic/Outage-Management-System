@@ -28,6 +28,8 @@ namespace Outage.SCADA.ModBus.ModbusFuntions
             Buffer.BlockCopy(BitConverter.GetBytes(IPAddress.HostToNetworkOrder((short)mdb_read_comm_pars.StartAddress)), 0, mdb_request, 8, 2);
             Buffer.BlockCopy(BitConverter.GetBytes(IPAddress.HostToNetworkOrder((short)mdb_read_comm_pars.Quantity)), 0, mdb_request, 10, 2);
 
+            //TODO: debug log
+
             return mdb_request;
         }
 

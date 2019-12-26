@@ -29,12 +29,12 @@ namespace Outage.TransactionManagerServiceHost
             catch (Exception ex)
             {
                 Console.WriteLine(ex.Message);
-                Console.WriteLine("TransactionManagerService failed.");
+                Console.WriteLine("Transaction Manager Service failed.");
                 Console.WriteLine(ex.StackTrace);
                 CommonTrace.WriteTrace(CommonTrace.TraceError, ex.Message);
-                CommonTrace.WriteTrace(CommonTrace.TraceError, "TransactionManagerService failed.");
+                CommonTrace.WriteTrace(CommonTrace.TraceError, "Transaction Manager Service failed.");
                 CommonTrace.WriteTrace(CommonTrace.TraceError, ex.StackTrace);
-                logger.LogError($"TransactionManagerService failed.{Environment.NewLine}Message: {ex.Message} ", ex);
+                logger.LogError($"Transaction Manager Service failed.{Environment.NewLine}Message: {ex.Message} ", ex);
                 Console.ReadLine();
             }
         }

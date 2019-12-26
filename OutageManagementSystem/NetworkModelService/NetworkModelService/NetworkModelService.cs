@@ -50,7 +50,7 @@ namespace Outage.NetworkModelService
         {
             if (hosts == null || hosts.Count == 0)
             {
-                throw new Exception("Network Model Services can not be opend because they are not initialized.");
+                throw new Exception("Network Model Service hosts can not be opend because they are not initialized.");
             }
 
             string message = string.Empty;
@@ -84,7 +84,7 @@ namespace Outage.NetworkModelService
             logger.LogInfo(message);
 
 
-            message = "The Network Model Service is started.";
+            message = "Network Model Service is started.";
             Console.WriteLine("\n{0}", message);
             logger.LogInfo(message);
         }

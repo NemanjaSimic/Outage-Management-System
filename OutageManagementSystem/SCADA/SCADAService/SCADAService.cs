@@ -61,7 +61,7 @@ namespace Outage.SCADA.SCADAService
         {
             if (hosts == null || hosts.Count == 0)
             {
-                throw new Exception("SCADA Services can not be opend because they are not initialized.");
+                throw new Exception("SCADA Service hosts can not be opend because they are not initialized.");
             }
 
             string message = string.Empty;
@@ -105,7 +105,7 @@ namespace Outage.SCADA.SCADAService
 
             if (hosts == null || hosts.Count == 0)
             {
-                throw new Exception("Network Model Services can not be closed because it is not initialized.");
+                throw new Exception("SCADA Service hosts can not be closed because they are not initialized.");
             }
 
             foreach (ServiceHost host in hosts)
@@ -113,7 +113,7 @@ namespace Outage.SCADA.SCADAService
                 host.Close();
             }
 
-            string message = "The Network Model Service is gracefully closed.";
+            string message = "SCADA Service is gracefully closed.";
             logger.LogInfo(message);
             Console.WriteLine("\n\n{0}", message);
         }

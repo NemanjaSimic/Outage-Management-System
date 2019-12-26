@@ -45,12 +45,12 @@ namespace CalculationEngineServiceHost
             catch (Exception ex)
             {
                 Console.WriteLine(ex.Message);
-                Console.WriteLine("CalculationEngineService failed.");
+                Console.WriteLine("Calculation Engine Service failed.");
                 Console.WriteLine(ex.StackTrace);
                 CommonTrace.WriteTrace(CommonTrace.TraceError, ex.Message);
-                CommonTrace.WriteTrace(CommonTrace.TraceError, "CalculationEngineService failed.");
+                CommonTrace.WriteTrace(CommonTrace.TraceError, "Calculation Engine Service failed.");
                 CommonTrace.WriteTrace(CommonTrace.TraceError, ex.StackTrace);
-                logger.LogError($"CalculationEngineService failed.{Environment.NewLine}Message: {ex.Message} ", ex);
+                logger.LogError($"Calculation Engine Service failed.{Environment.NewLine}Message: {ex.Message} ", ex);
                 Console.ReadLine();
             }
         }

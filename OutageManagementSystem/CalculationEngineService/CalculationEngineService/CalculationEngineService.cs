@@ -44,7 +44,7 @@ namespace CalculationEngineService
         {
             if (hosts == null || hosts.Count == 0)
             {
-                throw new Exception("Calculation Engine Services can not be opend because they are not initialized.");
+                throw new Exception("Calculation Engine Service hosts can not be opend because they are not initialized.");
             }
 
             string message = string.Empty;
@@ -69,16 +69,12 @@ namespace CalculationEngineService
                 Console.WriteLine("\n");
             }
 
-            //message = string.Format("Connection string: {0}", Config.Instance.ConnectionString);
-            Console.WriteLine(message);
-            logger.LogInfo(message);
-
             message = string.Format("Trace level: {0}", CommonTrace.TraceLevel);
             Console.WriteLine(message);
             logger.LogInfo(message);
 
 
-            message = "The Calculation Engine is started.";
+            message = "Calculation Engine is started.";
             Console.WriteLine("\n{0}", message);
             logger.LogInfo(message);
         }
@@ -87,7 +83,7 @@ namespace CalculationEngineService
         {
             if (hosts == null || hosts.Count == 0)
             {
-                throw new Exception("Calculation Engine Services can not be closed because they are not initialized.");
+                throw new Exception("Calculation Engine Service hosts can not be closed because they are not initialized.");
             }
 
             foreach (ServiceHost host in hosts)
@@ -95,7 +91,7 @@ namespace CalculationEngineService
                 host.Close();
             }
 
-            string message = "The Calculation Engine Service is gracefully closed.";
+            string message = "Calculation Engine Service is gracefully closed.";
             logger.LogInfo(message);
             Console.WriteLine("\n\n{0}", message);
         }

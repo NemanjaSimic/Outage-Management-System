@@ -42,7 +42,7 @@ namespace Outage.TransactionManagerService
         {
             if (hosts == null || hosts.Count == 0)
             {
-                throw new Exception("Transaction Manager Services can not be opend because they are not initialized.");
+                throw new Exception("Transaction Manager Service hosts can not be opend because they are not initialized.");
             }
 
             string message = string.Empty;
@@ -67,16 +67,12 @@ namespace Outage.TransactionManagerService
                 Console.WriteLine("\n");
             }
 
-            //message = string.Format("Connection string: {0}", Config.Instance.ConnectionString);
-            //Console.WriteLine(message);
-            //logger.LogInfo(message);
-
             message = string.Format("Trace level: {0}", CommonTrace.TraceLevel);
             Console.WriteLine(message);
             logger.LogInfo(message);
 
 
-            message = "The Transaction Manager Service is started.";
+            message = "Transaction Manager Service is started.";
             Console.WriteLine("\n{0}", message);
             logger.LogInfo(message);
         }
@@ -85,7 +81,7 @@ namespace Outage.TransactionManagerService
         {
             if (hosts == null || hosts.Count == 0)
             {
-                throw new Exception("Transaction Manager Services can not be closed because they are not initialized.");
+                throw new Exception("Transaction Manager Service hosts can not be closed because they are not initialized.");
             }
 
             foreach (ServiceHost host in hosts)
@@ -93,7 +89,7 @@ namespace Outage.TransactionManagerService
                 host.Close();
             }
 
-            string message = "The Transaction Manager Services are gracefully closed.";
+            string message = "Transaction Manager Service hosts are gracefully closed.";
             logger.LogInfo(message);
             Console.WriteLine("\n\n{0}", message);
         }
