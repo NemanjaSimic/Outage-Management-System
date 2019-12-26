@@ -193,11 +193,7 @@ namespace Outage.SCADA.SCADA_Config_Data.Repository
                         break;
 
                     case ModelCode.MEASUREMENT_ADDRESS:
-                        if (isAna)
-                            configItem.Address = 3000;
-                        else
-                            configItem.Address = 40;
-                        //configItem.Address = ushort.Parse(item.AsString());
+                        configItem.Address = ushort.Parse(item.AsString());
                         break;
 
                     case ModelCode.MEASUREMENT_ISINPUT:
@@ -230,6 +226,16 @@ namespace Outage.SCADA.SCADA_Config_Data.Repository
 
                     default:
                         break;
+                }
+                if (configItem.RegistarType == PointType.ANALOG_INPUT || configItem.RegistarType == PointType.ANALOG_OUTPUT)
+                {
+                    configItem.LowLimit = configItem.EGU_Min + 200;
+                    configItem.HighLimit = configItem.EGU_Max - 200;
+                }
+                else
+                {
+                    configItem.LowLimit = 0;
+                    configItem.HighLimit = 1;
                 }
             }
             NMS_Model_Props.Add(gid, prop);
