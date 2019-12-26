@@ -26,6 +26,15 @@ export const style = cytoscape.stylesheet()
         'height': '20px',
         'width': '20px',
     })
+    .selector('node[type="EnergySource"]')
+    .style({
+        'label': 'data(id)',
+        'text-valign': 'center',
+        'text-halign': 'center',
+        'rotate':'90',
+        'shape': 'triangle',
+        'background-color': 'green'
+    })
     .selector('edge')
     .style({
         'line-color': 'data(color)',
