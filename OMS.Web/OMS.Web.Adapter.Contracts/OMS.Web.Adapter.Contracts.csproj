@@ -43,6 +43,7 @@
     <Reference Include="System.Xml" />
   </ItemGroup>
   <ItemGroup>
+    <Compile Include="IPubSubClient.cs" />
     <Compile Include="IScadaClient.cs" />
     <Compile Include="IWebService.cs" />
     <Compile Include="Properties\AssemblyInfo.cs" />
