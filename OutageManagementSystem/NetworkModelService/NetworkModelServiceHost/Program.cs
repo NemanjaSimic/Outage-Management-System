@@ -33,12 +33,12 @@ namespace Outage.NetworkModelServiceHost
             catch(Exception ex)
             {
                 Console.WriteLine(ex.Message);
-                Console.WriteLine("NetworkModelService failed.");
+                Console.WriteLine("Network Model Service failed.");
                 Console.WriteLine(ex.StackTrace);
                 CommonTrace.WriteTrace(CommonTrace.TraceError, ex.Message);
-                CommonTrace.WriteTrace(CommonTrace.TraceError, "NetworkModelService failed.");
+                CommonTrace.WriteTrace(CommonTrace.TraceError, "Network Model Service failed.");
                 CommonTrace.WriteTrace(CommonTrace.TraceError, ex.StackTrace);
-                logger.LogError($"NetworkModelService failed.{Environment.NewLine}Message: {ex.Message} ", ex);
+                logger.LogError($"Network Model Service failed.{Environment.NewLine}Message: {ex.Message} ", ex);
                 Console.ReadLine();
             }
         }
