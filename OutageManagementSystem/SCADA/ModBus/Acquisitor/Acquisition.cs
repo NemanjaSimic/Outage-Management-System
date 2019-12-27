@@ -1,4 +1,5 @@
-﻿using Outage.SCADA.ModBus.Connection;
+﻿using Outage.Common;
+using Outage.SCADA.ModBus.Connection;
 using Outage.SCADA.ModBus.FunctionParameters;
 using Outage.SCADA.ModBus.ModbusFuntions;
 using Outage.SCADA.SCADA_Common;
@@ -13,6 +14,7 @@ namespace Outage.SCADA.ModBus.Acquisitor
         //TODO: singleton, diskusija...
 
         private FunctionExecutor commandExecutor = new FunctionExecutor(DataModelRepository.Instance.TcpPort);
+        ILogger logger = LoggerWrapper.Instance;
         private Thread acquisitionWorker;
         private bool threadActiveSignal = true;
 
@@ -100,6 +102,17 @@ namespace Outage.SCADA.ModBus.Acquisitor
                             ModbusFunction fn = FunctionFactory.CreateModbusFunction(mdb_read);
                             this.commandExecutor.EnqueueCommand(fn);
                         }
+                        else
+                        {
+                            throw new Exception("PointType value is invalid");
+                        }
+
+                        //PODESAVANJE ALARMA
+                        point.Value.SetAlarms();
+                        logger.LogInfo("Alarm for item " + point.Value.Gid + " is set to " + point.Value.Alarm.ToString());
+                        
+                        
+                        
                     }
 
                     //ushort adresa1 = 00040;
