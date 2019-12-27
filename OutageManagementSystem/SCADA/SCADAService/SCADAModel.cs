@@ -59,7 +59,8 @@ namespace Outage.SCADA.SCADAService
 
                 }
                 ConfigWriter = new ConfigWriter(scadaModel.pathToTestSim, delta_Points.Values.ToList());
-
+                Console.WriteLine("Delta cfg file was generated open MdbSim.");
+                Console.ReadKey();
                 if (!TestConnection()) return false;
 
             }
