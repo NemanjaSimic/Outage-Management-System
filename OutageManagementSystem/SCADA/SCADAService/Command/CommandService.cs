@@ -46,6 +46,8 @@ namespace Outage.SCADA.SCADAService.Command
 
                     ModbusFunction fn = FunctionFactory.CreateModbusFunction(mdb_write_comm_pars);
                     fe.EnqueueCommand(fn);
+
+                    CI.SetAlarms();
                 }
             }
             else
