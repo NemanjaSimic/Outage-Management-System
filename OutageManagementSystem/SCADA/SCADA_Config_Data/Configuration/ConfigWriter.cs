@@ -9,21 +9,23 @@ namespace Outage.SCADA.SCADA_Config_Data.Configuration
 {
     public class ConfigWriter
     {
-        private string file_name = "RtuCfg.txt";
+        private string file_name = DataModelRepository.Instance.ConfigFileName;
         private List<ConfigItem> DO_REG;
         private List<ConfigItem> DI_REG;
         private List<ConfigItem> IN_REG;
         private List<ConfigItem> HR_INT;
         private List<ConfigItem> Data;
 
-        public ConfigWriter()
+        public ConfigWriter(string path, List<ConfigItem> configItems)
         {
             this.DO_REG = new List<ConfigItem>();
             this.DI_REG = new List<ConfigItem>();
             this.IN_REG = new List<ConfigItem>();
             this.HR_INT = new List<ConfigItem>();
             this.Data = new List<ConfigItem>();
+            this.Data = configItems;
             SetUpData();
+            file_name = path;
         }
 
         public bool GenerateConfigFile()

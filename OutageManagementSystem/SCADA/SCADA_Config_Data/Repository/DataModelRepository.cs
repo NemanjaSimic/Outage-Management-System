@@ -6,6 +6,7 @@ using Outage.SCADA.SCADA_Config_Data.Configuration;
 using System;
 using System.Collections.Generic;
 using System.Configuration;
+using System.IO;
 using System.ServiceModel;
 
 namespace Outage.SCADA.SCADA_Config_Data.Repository
@@ -14,14 +15,13 @@ namespace Outage.SCADA.SCADA_Config_Data.Repository
     {
         public ushort TcpPort { get; protected set; }
         public byte UnitAddress { get; protected set; }
-        public string ServiceAddress { get; protected set; }
         public ushort Interval { get; protected set; }
-
+        public string ConfigFileName { get; protected set; }
+        public ushort TcpPortTest { get; protected set; }
         //public FunctionExecutor functionExecutor { get; set; }
-        private INetworkModelGDAContract gdaQueryProxy = null;
-
+        public INetworkModelGDAContract gdaQueryProxy = null;
+        public string pathToTestSim = "";
         public Dictionary<long, ConfigItem> Points;
-        public Dictionary<long, Dictionary<ModelCode, Property>> NMS_Model_Props;
         public Dictionary<long, ResourceDescription> NMS_Model;
         private static DataModelRepository _instance;
 
@@ -42,11 +42,13 @@ namespace Outage.SCADA.SCADA_Config_Data.Repository
         {
             Points = new Dictionary<long, ConfigItem>();
             NMS_Model = new Dictionary<long, ResourceDescription>();
-            NMS_Model_Props = new Dictionary<long, Dictionary<ModelCode, Property>>();
             TcpPort = ushort.Parse(ConfigurationManager.AppSettings["TcpPort"]);
             UnitAddress = byte.Parse(ConfigurationManager.AppSettings["UnitAddress"]);
-            ServiceAddress = ConfigurationManager.AppSettings["ServiceAddress"];
             Interval = ushort.Parse(ConfigurationManager.AppSettings["Interval"]);
+            TcpPortTest = ushort.Parse(ConfigurationManager.AppSettings["TcpPortTest"]);
+            ConfigFileName = ConfigurationManager.AppSettings["ConfigFileName"];
+            pathToTestSim = Environment.CurrentDirectory;
+            pathToTestSim = pathToTestSim.Replace("\\SCADA\\bin\\Debug", $"\\MdbSimTest\\{ConfigFileName}");
             try
             {
                 gdaQueryProxy = new ChannelFactory<INetworkModelGDAContract>(EndpointNames.NetworkModelGDAEndpoint).CreateChannel();
@@ -87,6 +89,7 @@ namespace Outage.SCADA.SCADA_Config_Data.Repository
             try
             {
                 iteratorId = gdaQueryProxy.GetExtentValues(ModelCode.ANALOG, props);
+          
                 resourcesLeft = gdaQueryProxy.IteratorResourcesLeft(iteratorId);
                 while (resourcesLeft > 0)
                 {
@@ -94,7 +97,7 @@ namespace Outage.SCADA.SCADA_Config_Data.Repository
                     for (int i = 0; i < rds.Count; i++)
                     {
                         if (rds[i] != null)
-                        {
+                        {   
                             NMS_Model.Add(rds[i].Id, rds[i]);
                             Points.Add(rds[i].Id, ConfigurateConfigItem(rds[i].Properties, true));
                         }
@@ -130,13 +133,14 @@ namespace Outage.SCADA.SCADA_Config_Data.Repository
             {
                 iteratorId = gdaQueryProxy.GetExtentValues(ModelCode.DISCRETE, props);
                 resourcesLeft = gdaQueryProxy.IteratorResourcesLeft(iteratorId);
+                
                 while (resourcesLeft > 0)
                 {
                     List<ResourceDescription> rds = gdaQueryProxy.IteratorNext(numberOfResources, iteratorId);
                     for (int i = 0; i < rds.Count; i++)
                     {
                         if (rds[i] != null)
-                        {
+                        {  
                             NMS_Model.Add(rds[i].Id, rds[i]);
                             Points.Add(rds[i].Id, ConfigurateConfigItem(rds[i].Properties, false));
                         }
@@ -152,43 +156,36 @@ namespace Outage.SCADA.SCADA_Config_Data.Repository
             return true;
         }
 
-        private ConfigItem ConfigurateConfigItem(List<Property> props, bool isAna)
+        public ConfigItem ConfigurateConfigItem(List<Property> props, bool isAna)
         {
             ConfigItem configItem = new ConfigItem();
             long gid = 0;
-            Dictionary<ModelCode, Property> prop = new Dictionary<ModelCode, Property>();
             foreach (var item in props)
             {
                 switch (item.Id)
                 {
                     case ModelCode.IDOBJ_GID:
                         gid = item.AsLong();
-                        prop.Add(item.Id, item);
                         configItem.Gid = gid;
                         break;
 
                     case ModelCode.IDOBJ_NAME:
-                        prop.Add(item.Id, item);
                         configItem.Name = item.AsString();
                         break;
 
                     case ModelCode.DISCRETE_CURRENTOPEN:
-                        prop.Add(item.Id, item);
                         configItem.CurrentValue = (item.AsBool() == true) ? 1 : 0;
                         break;
 
                     case ModelCode.DISCRETE_MAXVALUE:
-                        prop.Add(item.Id, item);
                         configItem.MaxValue = item.AsInt();
                         break;
 
                     case ModelCode.DISCRETE_MINVALUE:
-                        prop.Add(item.Id, item);
                         configItem.MinValue = item.AsInt();
                         break;
 
                     case ModelCode.DISCRETE_NORMALVALUE:
-                        prop.Add(item.Id, item);
                         configItem.DefaultValue = item.AsInt();
                         break;
 
@@ -197,7 +194,6 @@ namespace Outage.SCADA.SCADA_Config_Data.Repository
                         break;
 
                     case ModelCode.MEASUREMENT_ISINPUT:
-                        prop.Add(item.Id, item);
                         if (isAna)
                             configItem.RegistarType = (item.AsBool() == true) ? PointType.ANALOG_INPUT : PointType.ANALOG_OUTPUT;
                         else
@@ -205,22 +201,18 @@ namespace Outage.SCADA.SCADA_Config_Data.Repository
                         break;
 
                     case ModelCode.ANALOG_CURRENTVALUE:
-                        prop.Add(item.Id, item);
                         configItem.CurrentValue = item.AsFloat();
                         break;
 
                     case ModelCode.ANALOG_MAXVALUE:
-                        prop.Add(item.Id, item);
                         configItem.MaxValue = item.AsFloat();
                         break;
 
                     case ModelCode.ANALOG_MINVALUE:
-                        prop.Add(item.Id, item);
                         configItem.MinValue = item.AsFloat();
                         break;
 
                     case ModelCode.ANALOG_NORMALVALUE:
-                        prop.Add(item.Id, item);
                         configItem.DefaultValue = item.AsFloat();
                         break;
 
@@ -238,7 +230,6 @@ namespace Outage.SCADA.SCADA_Config_Data.Repository
                     configItem.HighLimit = 1;
                 }
             }
-            NMS_Model_Props.Add(gid, prop);
             return configItem;
         }
     }
