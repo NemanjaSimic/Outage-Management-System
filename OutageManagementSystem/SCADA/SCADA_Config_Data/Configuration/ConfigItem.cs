@@ -55,5 +55,56 @@ namespace Outage.SCADA.SCADA_Config_Data.Configuration
             }
             return registryType;
         }
+
+        public void SetAlarms()
+        {
+            //ALARMS FOR ANALOG VALUES
+            if (RegistarType == PointType.ANALOG_INPUT || RegistarType == PointType.ANALOG_OUTPUT)
+            {
+                //VALUE IS ABOVE EGU_MAX, BUT BELOW HIGHEST POSSIBLE VALUE - ABNORMAL
+                if (CurrentValue > EGU_Max && CurrentValue < HighLimit)
+                {
+                    Alarm = AlarmType.ABNORMAL_VALUE;
+                }
+                //VALUE IS ABOVE HIGHEST POSSIBLE VALUE - HIGH ALARM
+                else if (CurrentValue > HighLimit)
+                {
+                    Alarm = AlarmType.HIGH_ALARM;
+                }
+                //VALUE IS BELOW EGU_MIN, BUT ABOVE LOWEST POSSIBLE VALUE - ABNORMAL
+                else if (CurrentValue < EGU_Min && CurrentValue > LowLimit)
+                {
+                    Alarm = AlarmType.ABNORMAL_VALUE;
+                }
+                //VALUE IS BELOW LOWEST POSSIBLE VALUE - LOW ALARM
+                else if (CurrentValue < LowLimit)
+                {
+                    Alarm = AlarmType.LOW_ALARM;
+                }
+                //VALUE IS REASONABLE - NO ALARM
+                else
+                {
+                    Alarm = AlarmType.NO_ALARM;
+                }
+            }
+            //ALARMS FOR DIGITAL VALUES
+            else if (RegistarType == PointType.DIGITAL_INPUT || RegistarType == PointType.DIGITAL_OUTPUT)
+            {
+                //VALUE IS NOT A DEFAULT VALUE - ABNORMAL
+                if (CurrentValue != DefaultValue)
+                {
+                    Alarm = AlarmType.ABNORMAL_VALUE;
+                }
+                //VALUE IS DEFAULT VALUE - NO ALARM
+                else
+                {
+                    Alarm = AlarmType.NO_ALARM;
+                }
+            }
+            else
+            {
+                throw new Exception("PointType value is invalid");
+            }
+        }
     }
 }
