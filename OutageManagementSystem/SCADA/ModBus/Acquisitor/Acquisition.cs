@@ -1,4 +1,5 @@
-﻿using Outage.SCADA.ModBus.Connection;
+﻿using Outage.Common;
+using Outage.SCADA.ModBus.Connection;
 using Outage.SCADA.ModBus.FunctionParameters;
 using Outage.SCADA.ModBus.ModbusFuntions;
 using Outage.SCADA.SCADA_Common;
@@ -15,6 +16,7 @@ namespace Outage.SCADA.ModBus.Acquisitor
         private FunctionExecutor commandExecutor = new FunctionExecutor(DataModelRepository.Instance.TcpPort);
         private Thread acquisitionWorker;
         private bool threadActiveSignal = true;
+        ILogger logger = LoggerWrapper.Instance;
 
         public Acquisition()
         {
@@ -35,20 +37,20 @@ namespace Outage.SCADA.ModBus.Acquisitor
                 Name = "Acquisition thread"
             };
 
-            //TODO: debug thread init
+            logger.LogDebug("InitializeAcquisitionThread is initialized.");
         }
 
         public void StartAcquisitionThread()
         {
             threadActiveSignal = true;
-            //TODO: log debug
+            logger.LogDebug("threadActiveSignal is set on true.");
             acquisitionWorker.Start();
         }
 
         public void StopAcquisitionThread()
         {
             threadActiveSignal = false;
-            //TODO: log debug
+            logger.LogDebug("threadActiveSignal is set on false.");
         }
 
         private void Acquire()
@@ -58,8 +60,7 @@ namespace Outage.SCADA.ModBus.Acquisitor
 
             try
             {
-                //TODO: log info thread start
-
+                logger.LogInfo("Acquisition thread is started.");
                 while (threadActiveSignal)
                 {
                     Thread.Sleep(DataModelRepository.Instance.Interval);
@@ -105,17 +106,17 @@ namespace Outage.SCADA.ModBus.Acquisitor
                         if(modbusFunction != null)
                         {
                             this.commandExecutor.EnqueueCommand(modbusFunction);
-                            //TODO: log debug
+                            logger.LogDebug($"Modbus function enquided. Point type is {point.Value.RegistarType}");
                         }
                     }
                 }
 
-                //TODO: log info thred stop
+                logger.LogInfo("Acquisition thread is stopped.");
             }
             catch (Exception e)
             {
                 Console.WriteLine(e.Message);
-                //TODO: log err
+                logger.LogError($"{e.Message}", e);
             }
         }
     }

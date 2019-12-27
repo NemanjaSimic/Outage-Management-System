@@ -19,6 +19,8 @@ namespace Outage.SCADA.ModBus.Connection
 
     public class FunctionExecutor
     {
+
+        private ILogger logger = LoggerWrapper.Instance;
         private ModelResourcesDesc resourcesDesc = new ModelResourcesDesc();
         private TcpConnection connection;
         private ushort tcpPort;
@@ -53,7 +55,8 @@ namespace Outage.SCADA.ModBus.Connection
                 }
                 catch (Exception ex)
                 {
-                    //TODO log err
+                    string message = $"Exception on PublisherProxy initialization. Message: {ex.Message}";
+                    logger.LogError(message, ex);
                     publisherProxy = null;
                 }
 
@@ -90,17 +93,18 @@ namespace Outage.SCADA.ModBus.Connection
 
         private void ConnectionProcessThread()
         {
-            //TODO: log info start trehad
+            logger.LogInfo("ConnectionProcessThread is started");
 
+
+            Console.WriteLine("Establishing connection");
+            logger.LogInfo("Establishing connection");
+            
             while (this.threadCancellationSignal)
             {
                 try
                 {
                     if (this.connectionState == ConnectionState.DISCONNECTED)
                     {
-                        Console.WriteLine("Establishing connection");
-                        //TODO: debug
-
                         this.numberOfTries = 0;
                         this.connection.Connect();
                         while (numberOfTries < 10)
@@ -110,7 +114,7 @@ namespace Outage.SCADA.ModBus.Connection
                                 this.connectionState = ConnectionState.CONNECTED;
                                 this.numberOfTries = 0;
                                 Console.WriteLine("Connected");
-                                //TODO: info
+                                logger.LogInfo("Connected");
                                 break;
                             }
                             else
@@ -118,23 +122,25 @@ namespace Outage.SCADA.ModBus.Connection
                                 numberOfTries++;
                                 if (this.numberOfTries == 10)
                                 {
-                                    //TODO: debug
-
                                     this.connection.Disconnect();
                                     this.connectionState = ConnectionState.DISCONNECTED;
+                                    logger.LogInfo($"Disconenting after {numberOfTries} tries.");
+                                    threadCancellationSignal = true;
+                                    continue;
                                 }
 
-                                //TODO: debug
+                                logger.LogInfo($"Establishing connection... Try: {numberOfTries}");
+                                Thread.Sleep(5000);
                             }
                         }
                     }
                     else
                     {
-                        //TODO: log debug connected and waiting for event
+                        logger.LogDebug("Connected and waiting for command event.");
 
                         this.commandEvent.WaitOne();
 
-                        //TODO: log debug command signal
+                        logger.LogDebug("Command event happened.");
 
                         while (commandQueue.TryDequeue(out this.currentCommand))
                         {
@@ -177,7 +183,9 @@ namespace Outage.SCADA.ModBus.Connection
                                 }
                                 else
                                 {
-                                    throw new Exception("UNKNOWN type"); //TODO: log err i bolji komentar
+                                    string errMessage = $"Config item type is neither analog nor digital. Config item type is: {modelCode}.";
+                                    logger.LogError(errMessage);
+                                    throw new Exception(errMessage); 
                                 }
 
                                 SCADAMessage scadaMessage = new SCADAMessage()
@@ -215,7 +223,7 @@ namespace Outage.SCADA.ModBus.Connection
                 }
             }
 
-            //TODO: log info stop trehad
+            logger.LogInfo("ConnectionProcessThred is stopped.");
         }
 
         private ConfigItem UpdatePoints(ushort address, ushort newValue)

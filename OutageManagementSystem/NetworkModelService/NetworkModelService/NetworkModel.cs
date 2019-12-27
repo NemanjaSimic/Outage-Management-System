@@ -48,21 +48,6 @@ namespace Outage.NetworkModelService
         /// Contains old network model during distributed transaction.
 		/// </summary>
         private Dictionary<DMSType, Container> oldNetworkDataModel;
-
-        /// <summary>
-        /// 
-        /// </summary>
-        private TransactionCoordinatorProxy transactionCoordinatorProxy = null;
-
-        /// <summary>
-        /// 
-        /// </summary>
-        private TransactionEnlistmentProxy transactionEnlistmentProxy = null;
-
-        /// <summary>
-        /// 
-        /// </summary>
-        private ModelUpdateNotificationProxy modelUpdateNotifierProxy = null;
         #endregion
 
         #region Properties
@@ -77,50 +62,95 @@ namespace Outage.NetworkModelService
             }
         }
 
+        #endregion
+
+        #region Proxies
+        /// <summary>
+        /// 
+        /// </summary>
+        private TransactionCoordinatorProxy transactionCoordinatorProxy = null;
+
         protected TransactionCoordinatorProxy TransactionCoordinatorProxy
         {
             get
             {
-                if (transactionCoordinatorProxy != null)
+                try
                 {
-                    transactionCoordinatorProxy.Abort();
-                    transactionCoordinatorProxy = null;
-                }
+                    if (transactionCoordinatorProxy != null)
+                    {
+                        transactionCoordinatorProxy.Abort();
+                        transactionCoordinatorProxy = null;
+                    }
 
-                transactionCoordinatorProxy = new TransactionCoordinatorProxy(EndpointNames.TransactionCoordinatorEndpoint);
-                transactionCoordinatorProxy.Open();
+                    transactionCoordinatorProxy = new TransactionCoordinatorProxy(EndpointNames.TransactionCoordinatorEndpoint);
+                    transactionCoordinatorProxy.Open();
+                }
+                catch (Exception ex)
+                {
+                    string message = $"Exception on TransactionCoordinatorProxy initialization. Message: {ex.Message}";
+                    logger.LogError(message, ex);
+                    transactionCoordinatorProxy = null;
+                    
+                }
 
                 return transactionCoordinatorProxy;
             }
         }
 
+        /// <summary>
+        /// 
+        /// </summary>
+        private TransactionEnlistmentProxy transactionEnlistmentProxy = null;
+
         protected TransactionEnlistmentProxy TransactionEnlistmentProxy
         {
             get
             {
-                if (transactionEnlistmentProxy != null)
+                try
                 {
-                    transactionEnlistmentProxy.Abort();
+                    if (transactionEnlistmentProxy != null)
+                    {
+                        transactionEnlistmentProxy.Abort();
+                        transactionEnlistmentProxy = null;
+                    }
+
+                    transactionEnlistmentProxy = new TransactionEnlistmentProxy(EndpointNames.TransactionEnlistmentEndpoint);
+                    transactionEnlistmentProxy.Open();
+                }
+                catch (Exception ex)
+                {
+                    string message = $"Exception on TransactionCoordinatorProxy initialization. Message: {ex.Message}";
+                    logger.LogError(message, ex);
                     transactionEnlistmentProxy = null;
                 }
-
-                transactionEnlistmentProxy = new TransactionEnlistmentProxy(EndpointNames.TransactionEnlistmentEndpoint);
-                transactionEnlistmentProxy.Open();
 
                 return transactionEnlistmentProxy;
             }
         }
 
+        /// <summary>
+        /// 
+        /// </summary>
+        private ModelUpdateNotificationProxy modelUpdateNotifierProxy = null;
+
         protected ModelUpdateNotificationProxy GetModelUpdateNotificationProxy(string endpointName)
         {
-            if (modelUpdateNotifierProxy != null)
+            try
             {
-                modelUpdateNotifierProxy.Abort();
+                if (modelUpdateNotifierProxy != null)
+                {
+                    modelUpdateNotifierProxy.Abort();
+                    modelUpdateNotifierProxy = null;
+                }
+
+                modelUpdateNotifierProxy = new ModelUpdateNotificationProxy(endpointName);
+                modelUpdateNotifierProxy.Open();
+            }
+            catch (Exception ex)
+            {
+                //TODO log err
                 modelUpdateNotifierProxy = null;
             }
-
-            modelUpdateNotifierProxy = new ModelUpdateNotificationProxy(endpointName);
-            modelUpdateNotifierProxy.Open();
 
             return modelUpdateNotifierProxy;
         }
@@ -372,7 +402,7 @@ namespace Outage.NetworkModelService
                 Dictionary<short, int> typesCounters = GetCounters();
                 Dictionary<long, long> globalIdPairs = new Dictionary<long, long>();
 
-                if(!isInitialization)
+                if (!isInitialization)
                 {
                     delta.FixNegativeToPositiveIds(ref typesCounters, ref globalIdPairs);
                     applyingStarted = true;
@@ -398,68 +428,17 @@ namespace Outage.NetworkModelService
 
                 oldNetworkDataModel = networkDataModel;
                 logger.LogDebug($"Old model [HashCode: 0x{networkDataModel.GetHashCode():X16}] becomes Current model [HashCode: 0x{incomingNetworkDataModel.GetHashCode():X16}].");
-                
+
                 networkDataModel = incomingNetworkDataModel;
                 logger.LogDebug($"Current model [HashCode: 0x{networkDataModel.GetHashCode():X16}] becomes Incoming model [HashCode: 0x{incomingNetworkDataModel.GetHashCode():X16}].");
-
-                using (TransactionCoordinatorProxy transactionCoordinatorProxy = TransactionCoordinatorProxy)
-                {
-                    transactionCoordinatorProxy.StartDistributedUpdate();
-                    logger.LogDebug("StartDistributedUpdate() invoked on Transaction Coordinator.");
-                }
-
-                Dictionary<DeltaOpType, List<long>> modelChanges = new Dictionary<DeltaOpType, List<long>>()
-                {
-                    { DeltaOpType.Insert, new List<long>(delta.InsertOperations.Count) },
-                    { DeltaOpType.Update, new List<long>(delta.UpdateOperations.Count) },
-                    { DeltaOpType.Delete, new List<long>(delta.DeleteOperations.Count) },
-                };
-
-                foreach(ResourceDescription rd in delta.InsertOperations)
-                {
-                    modelChanges[DeltaOpType.Insert].Add(rd.Id);
-                }
-
-                foreach (ResourceDescription rd in delta.UpdateOperations)
-                {
-                    modelChanges[DeltaOpType.Update].Add(rd.Id);
-                }
-
-                foreach (ResourceDescription rd in delta.DeleteOperations)
-                {
-                    modelChanges[DeltaOpType.Delete].Add(rd.Id);
-                }
-
-                bool success = false;
-
-                using (ModelUpdateNotificationProxy scadaModelUpdateNotifierProxy = GetModelUpdateNotificationProxy(EndpointNames.SCADAModelUpdateNotifierEndpoint))
-                {
-                    success = scadaModelUpdateNotifierProxy.NotifyAboutUpdate(modelChanges);
-                    logger.LogDebug("NotifyAboutUpdate() method invoked on SCADA Transaction actor.");
-                }
-
-                if(success)
-                {
-                    using (ModelUpdateNotificationProxy calculationEngineModelUpdateNotifierProxy = GetModelUpdateNotificationProxy(EndpointNames.CalculationEngineModelUpdateNotifierEndpoint))
-                    {
-                        success = calculationEngineModelUpdateNotifierProxy.NotifyAboutUpdate(modelChanges);
-                        logger.LogDebug("NotifyAboutUpdate() method invoked on CE Transaction actor.");
-                    }
                 
-                    if(success)
-                    {
-                        using (TransactionEnlistmentProxy transactionEnlistmentProxy = TransactionEnlistmentProxy)
-                        {
-                            success = transactionEnlistmentProxy.Enlist(ServiceNames.NetworkModelService);
-                            logger.LogDebug("Enlist() method invoked on Transaction Coordinator.");
-                        }
-                    }
-                }
-
-                using (TransactionCoordinatorProxy transactionCoordinatorProxy = TransactionCoordinatorProxy)
+                if(isInitialization)
                 {
-                    transactionCoordinatorProxy.FinishDistributedUpdate(success);
-                    logger.LogDebug($"FinishDistributedUpdate() invoked on Transaction Coordinator with parameter 'success' value: {success}.");
+                    Commit();
+                }
+                else
+                {
+                    StartDistributedTransaction(delta);
                 }
             }
             catch (Exception ex)
@@ -486,6 +465,69 @@ namespace Outage.NetworkModelService
             }
 
             return updateResult;
+        }
+
+        private void StartDistributedTransaction(Delta delta)
+        {
+            using (TransactionCoordinatorProxy transactionCoordinatorProxy = TransactionCoordinatorProxy)
+            {
+                transactionCoordinatorProxy.StartDistributedUpdate();
+                logger.LogDebug("StartDistributedUpdate() invoked on Transaction Coordinator.");
+            }
+
+            Dictionary<DeltaOpType, List<long>> modelChanges = new Dictionary<DeltaOpType, List<long>>()
+            {
+                { DeltaOpType.Insert, new List<long>(delta.InsertOperations.Count) },
+                { DeltaOpType.Update, new List<long>(delta.UpdateOperations.Count) },
+                { DeltaOpType.Delete, new List<long>(delta.DeleteOperations.Count) },
+            };
+
+            foreach (ResourceDescription rd in delta.InsertOperations)
+            {
+                modelChanges[DeltaOpType.Insert].Add(rd.Id);
+            }
+
+            foreach (ResourceDescription rd in delta.UpdateOperations)
+            {
+                modelChanges[DeltaOpType.Update].Add(rd.Id);
+            }
+
+            foreach (ResourceDescription rd in delta.DeleteOperations)
+            {
+                modelChanges[DeltaOpType.Delete].Add(rd.Id);
+            }
+
+            bool success = false;
+
+            using (ModelUpdateNotificationProxy scadaModelUpdateNotifierProxy = GetModelUpdateNotificationProxy(EndpointNames.SCADAModelUpdateNotifierEndpoint))
+            {
+                success = scadaModelUpdateNotifierProxy.NotifyAboutUpdate(modelChanges);
+                logger.LogDebug("NotifyAboutUpdate() method invoked on SCADA Transaction actor.");
+            }
+
+            if (success)
+            {
+                using (ModelUpdateNotificationProxy calculationEngineModelUpdateNotifierProxy = GetModelUpdateNotificationProxy(EndpointNames.CalculationEngineModelUpdateNotifierEndpoint))
+                {
+                    success = calculationEngineModelUpdateNotifierProxy.NotifyAboutUpdate(modelChanges);
+                    logger.LogDebug("NotifyAboutUpdate() method invoked on CE Transaction actor.");
+                }
+
+                if (success)
+                {
+                    using (TransactionEnlistmentProxy transactionEnlistmentProxy = TransactionEnlistmentProxy)
+                    {
+                        success = transactionEnlistmentProxy.Enlist(ServiceNames.NetworkModelService);
+                        logger.LogDebug("Enlist() method invoked on Transaction Coordinator.");
+                    }
+                }
+            }
+
+            using (TransactionCoordinatorProxy transactionCoordinatorProxy = TransactionCoordinatorProxy)
+            {
+                transactionCoordinatorProxy.FinishDistributedUpdate(success);
+                logger.LogDebug($"FinishDistributedUpdate() invoked on Transaction Coordinator with parameter 'success' value: {success}.");
+            }
         }
 
         #region ITransactionActorContract

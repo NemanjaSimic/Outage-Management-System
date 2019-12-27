@@ -9,29 +9,40 @@ namespace Outage.DistributedTransactionActor
 {
     public abstract class ModelUpdateNotification : IModelUpdateNotificationContract
     {
-        private TransactionEnlistmentProxy transactionEnlistmentProxy = null;
         protected ILogger logger = LoggerWrapper.Instance; 
 
         public string TransactionEnlistmentEndpointName { get; private set; }
 
         public string ActorName { get; set; }
 
+        #region Proxies
+        private TransactionEnlistmentProxy transactionEnlistmentProxy = null;
         protected TransactionEnlistmentProxy TransactionEnlistmentProxy
         {
             get
             {
-                if (transactionEnlistmentProxy != null)
+                try
                 {
-                    transactionEnlistmentProxy.Abort();
+                    if (transactionEnlistmentProxy != null)
+                    {
+                        transactionEnlistmentProxy.Abort();
+                        transactionEnlistmentProxy = null;
+                    }
+
+                    transactionEnlistmentProxy = new TransactionEnlistmentProxy(TransactionEnlistmentEndpointName);
+                    transactionEnlistmentProxy.Open();
+                }
+                catch (Exception ex)
+                {
+                    string message = $"Exception on TransactionEnlistmentProxy initialization. Message: {ex.Message}";
+                    logger.LogError(message, ex);
                     transactionEnlistmentProxy = null;
                 }
-
-                transactionEnlistmentProxy = new TransactionEnlistmentProxy(TransactionEnlistmentEndpointName);
-                transactionEnlistmentProxy.Open();
 
                 return transactionEnlistmentProxy;
             }
         }
+        #endregion
 
         protected ModelUpdateNotification(string transactionEnlistmentEndpointName, string actorName)
         {

@@ -14,6 +14,7 @@ namespace Outage.SCADA.SCADA_Config_Data.Repository
     public class DataModelRepository
     {
         private ModelResourcesDesc resourcesDesc = new ModelResourcesDesc();
+        private ILogger logger = LoggerWrapper.Instance;
 
         #region Proxies
         private NetworkModelGDAProxy gdaQueryProxy = null;
@@ -36,7 +37,8 @@ namespace Outage.SCADA.SCADA_Config_Data.Repository
                 }
                 catch (Exception ex)
                 {
-                    //TODO log err
+                    string message = $"Exception on NetworkModelGDAProxy initialization. Message: {ex.Message}";
+                    logger.LogError(message, ex);
                     gdaQueryProxy = null;
                 }
                         
@@ -214,7 +216,7 @@ namespace Outage.SCADA.SCADA_Config_Data.Repository
                 }
                 else
                 {
-                    Interval = 60;
+                    Interval = 10000;
                     //TODO: warnnig log
                     //throw new Exception("Interval in SCADA configuration is either not defined or not valid.");
                 }

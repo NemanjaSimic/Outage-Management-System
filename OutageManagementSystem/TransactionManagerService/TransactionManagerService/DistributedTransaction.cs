@@ -38,19 +38,30 @@ namespace Outage.TransactionManagerService
         private ILogger logger = LoggerWrapper.Instance;
         private TransactionActorProxy transactionActorProxy = null;
 
+        #region Proxies
         protected TransactionActorProxy GetTransactionActorProxy(string endpoint)
         {
-            if (transactionActorProxy != null)
+            try
             {
-                transactionActorProxy.Abort();
+                if (transactionActorProxy != null)
+                {
+                    transactionActorProxy.Abort();
+                    transactionActorProxy = null;
+                }
+
+                transactionActorProxy = new TransactionActorProxy(endpoint);
+                transactionActorProxy.Open();
+            }
+            catch (Exception ex)
+            {
+                string message = $"Exception on TransactionActorProxy initialization. Message: {ex.Message}";
+                logger.LogError(message, ex);
                 transactionActorProxy = null;
             }
 
-            transactionActorProxy = new TransactionActorProxy(endpoint);
-            transactionActorProxy.Open();
-
             return transactionActorProxy;
         }
+        #endregion
 
         #region ITransactionCoordinatorContract
         public void StartDistributedUpdate()
@@ -71,23 +82,31 @@ namespace Outage.TransactionManagerService
         
         public void FinishDistributedUpdate(bool success)
         {
-            if(success)
+            try
             {
-                if(InvokePreparationOnActors())
+
+                if(success)
                 {
-                    InvokeCommitOnActors();
+                    if(InvokePreparationOnActors())
+                    {
+                        InvokeCommitOnActors();
+                    }
+                    else
+                    {
+                        InvokeRollbackOnActors();
+                    }
+
+                    logger.LogInfo("Distributed transaction finsihed SUCCESSFULLY.");
                 }
                 else
                 {
-                    InvokeRollbackOnActors();
+                    transactionLedger = null;
+                    logger.LogInfo("Distributed transaction finsihed UNSUCCESSFULLY.");
                 }
-
-                logger.LogInfo("Distributed transaction finsihed SUCCESSFULLY.");
             }
-            else
+            catch (Exception e)
             {
-                transactionLedger = null;
-                logger.LogInfo("Distributed transaction finsihed UNSUCCESSFULLY.");
+                logger.LogError("Exception in FinishDistributedUpdate().", e);
             }
 
         }

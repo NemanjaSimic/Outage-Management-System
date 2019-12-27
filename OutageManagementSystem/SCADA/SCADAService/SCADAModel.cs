@@ -25,18 +25,17 @@ namespace Outage.SCADA.SCADAService
             delta_NMS_Model = new Dictionary<long, ResourceDescription>(scadaModel.NMS_Model);
             delta_Points = new Dictionary<long, ConfigItem>(scadaModel.Points);
 
-            
-            throw new NotImplementedException();
+            return true;
         }
 
         public void Commit()
         {
-            throw new NotImplementedException();
+            //throw new NotImplementedException();
         }
 
         public void Rollback()
         {
-            throw new NotImplementedException();
+            //throw new NotImplementedException();
         }
     }
 }

@@ -24,23 +24,35 @@ namespace Outage.DataImporter.CIMAdapter
         private ModelResourcesDesc resourcesDesc = new ModelResourcesDesc();
         private TransformAndLoadReport report;
 
+        #region Proxies
         private NetworkModelGDAProxy gdaQueryProxy = null;
         private NetworkModelGDAProxy GdaQueryProxy
         {
             get
             {
-                if (gdaQueryProxy != null)
+                try
                 {
-                    gdaQueryProxy.Abort();
+                    if (gdaQueryProxy != null)
+                    {
+                        gdaQueryProxy.Abort();
+                        gdaQueryProxy = null;
+                    }
+
+                    gdaQueryProxy = new NetworkModelGDAProxy(EndpointNames.NetworkModelGDAEndpoint);
+                    gdaQueryProxy.Open();
+
+                }
+                catch (Exception ex)
+                {
+                    string message = $"Exception on NetworkModelGDAProxy initialization. Message: {ex.Message}";
+                    logger.LogError(message, ex);
                     gdaQueryProxy = null;
                 }
 
-                gdaQueryProxy = new NetworkModelGDAProxy(EndpointNames.NetworkModelGDAEndpoint);
-                gdaQueryProxy.Open();
-
-                return gdaQueryProxy;
+                    return gdaQueryProxy;
             }
         }
+        #endregion
 
         public CIMAdapterClass()
         {
