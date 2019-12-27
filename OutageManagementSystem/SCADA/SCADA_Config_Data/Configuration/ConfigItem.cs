@@ -1,8 +1,9 @@
 ﻿using Outage.SCADA.SCADA_Common;
+using System;
 
 namespace Outage.SCADA.SCADA_Config_Data.Configuration
 {
-    public class ConfigItem : IConfigItem
+    public class ConfigItem : IConfigItem,ICloneable
     {
         public PointType RegistarType { get; set; }
         public ushort Address { get; set; }
@@ -21,6 +22,11 @@ namespace Outage.SCADA.SCADA_Config_Data.Configuration
         public long Gid { get; set; }
         public string Name { get; set; }
         public float CurrentValue { get; set; }
+        public AlarmType Alarm { get; set; }
+        public object Clone()
+        {
+            return this.MemberwiseClone();
+        }
 
         private PointType GetRegistryType(string registryTypeName)
         {
