@@ -100,6 +100,59 @@ namespace Outage.SCADA.ModBus.Acquisitor
                             ModbusFunction fn = FunctionFactory.CreateModbusFunction(mdb_read);
                             this.commandExecutor.EnqueueCommand(fn);
                         }
+                        else
+                        {
+                            throw new Exception("PointType value is invalid");
+                        }
+
+                        //ALARMS FOR ANALOG VALUES
+                        if (point.Value.RegistarType == PointType.ANALOG_INPUT || point.Value.RegistarType == PointType.ANALOG_OUTPUT)
+                        {
+                            //VALUE IS ABOVE EGU_MAX, BUT BELOW HIGHEST POSSIBLE VALUE - ABNORMAL
+                            if (point.Value.CurrentValue > point.Value.EGU_Max && point.Value.CurrentValue < point.Value.HighLimit)
+                            {
+                                point.Value.Alarm = AlarmType.ABNORMAL_VALUE;
+                            }
+                            //VALUE IS ABOVE HIGHEST POSSIBLE VALUE - HIGH ALARM
+                            else if (point.Value.CurrentValue > point.Value.HighLimit)
+                            {
+                                point.Value.Alarm = AlarmType.HIGH_ALARM;
+                            }
+                            //VALUE IS BELOW EGU_MIN, BUT ABOVE LOWEST POSSIBLE VALUE - ABNORMAL
+                            else if (point.Value.CurrentValue < point.Value.EGU_Min && point.Value.CurrentValue > point.Value.LowLimit)
+                            {
+                                point.Value.Alarm = AlarmType.ABNORMAL_VALUE;
+                            }
+                            //VALUE IS BELOW LOWEST POSSIBLE VALUE - LOW ALARM
+                            else if (point.Value.CurrentValue < point.Value.LowLimit)
+                            {
+                                point.Value.Alarm = AlarmType.LOW_ALARM;
+                            }
+                            //VALUE IS REASONABLE - NO ALARM
+                            else
+                            {
+                                point.Value.Alarm = AlarmType.NO_ALARM;
+                            }
+                        }
+                        //ALARMS FOR DIGITAL VALUES
+                        else if (point.Value.RegistarType == PointType.DIGITAL_INPUT || point.Value.RegistarType == PointType.DIGITAL_OUTPUT)
+                        {
+                            //VALUE IS NOT A DEFAULT VALUE - ABNORMAL
+                            if (point.Value.CurrentValue != point.Value.DefaultValue)
+                            {
+                                point.Value.Alarm = AlarmType.ABNORMAL_VALUE;
+                            }
+                            //VALUE IS DEFAULT VALUE - NO ALARM
+                            else
+                            {
+                                point.Value.Alarm = AlarmType.NO_ALARM;
+                            }
+                        }
+                        else
+                        {
+                            throw new Exception("PointType value is invalid");
+                        }
+                        
                     }
 
                     //ushort adresa1 = 00040;
