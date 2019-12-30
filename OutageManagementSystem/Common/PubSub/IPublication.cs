@@ -9,10 +9,8 @@ namespace Outage.Common.PubSub
 {
     public interface IPublication
     {
-        [DataMember]
         Topic Topic { get; }
 
-        [DataMember]
         IPublishableMessage Message { get; }
     }
 }

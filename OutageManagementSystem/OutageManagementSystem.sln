@@ -1,7 +1,7 @@
 ﻿
 Microsoft Visual Studio Solution File, Format Version 12.00
-# Visual Studio 15
-VisualStudioVersion = 15.0.28307.645
+# Visual Studio Version 16
+VisualStudioVersion = 16.0.29609.76
 MinimumVisualStudioVersion = 10.0.40219.1
 Project("{2150E333-8FDC-42A3-9474-1A3956D46DE8}") = "CalculationEngineService", "CalculationEngineService", "{AB9540D3-A429-4238-8BB2-5D0114ED012E}"
 EndProject
@@ -107,6 +107,8 @@ EndProject
 Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "SCADAServiceHost", "SCADA\SCADAServiceHost\SCADAServiceHost.csproj", "{6B61EBE5-1133-4EE9-A25A-82C14039C85B}"
 EndProject
 Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "SCADAService", "SCADA\SCADAService\SCADAService.csproj", "{DF3A5248-7638-41C8-998A-53112F1ACFA2}"
+EndProject
+Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "TestSub", "PubSubEngine\TestSub\TestSub.csproj", "{28D3AE66-AEFF-4E24-BAD4-5874EF13A329}"
 EndProject
 Global
 	GlobalSection(SolutionConfigurationPlatforms) = preSolution
@@ -414,6 +416,18 @@ Global
 		{DF3A5248-7638-41C8-998A-53112F1ACFA2}.Release|x64.Build.0 = Release|Any CPU
 		{DF3A5248-7638-41C8-998A-53112F1ACFA2}.Release|x86.ActiveCfg = Release|Any CPU
 		{DF3A5248-7638-41C8-998A-53112F1ACFA2}.Release|x86.Build.0 = Release|Any CPU
+		{28D3AE66-AEFF-4E24-BAD4-5874EF13A329}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
+		{28D3AE66-AEFF-4E24-BAD4-5874EF13A329}.Debug|Any CPU.Build.0 = Debug|Any CPU
+		{28D3AE66-AEFF-4E24-BAD4-5874EF13A329}.Debug|x64.ActiveCfg = Debug|Any CPU
+		{28D3AE66-AEFF-4E24-BAD4-5874EF13A329}.Debug|x64.Build.0 = Debug|Any CPU
+		{28D3AE66-AEFF-4E24-BAD4-5874EF13A329}.Debug|x86.ActiveCfg = Debug|Any CPU
+		{28D3AE66-AEFF-4E24-BAD4-5874EF13A329}.Debug|x86.Build.0 = Debug|Any CPU
+		{28D3AE66-AEFF-4E24-BAD4-5874EF13A329}.Release|Any CPU.ActiveCfg = Release|Any CPU
+		{28D3AE66-AEFF-4E24-BAD4-5874EF13A329}.Release|Any CPU.Build.0 = Release|Any CPU
+		{28D3AE66-AEFF-4E24-BAD4-5874EF13A329}.Release|x64.ActiveCfg = Release|Any CPU
+		{28D3AE66-AEFF-4E24-BAD4-5874EF13A329}.Release|x64.Build.0 = Release|Any CPU
+		{28D3AE66-AEFF-4E24-BAD4-5874EF13A329}.Release|x86.ActiveCfg = Release|Any CPU
+		{28D3AE66-AEFF-4E24-BAD4-5874EF13A329}.Release|x86.Build.0 = Release|Any CPU
 	EndGlobalSection
 	GlobalSection(SolutionProperties) = preSolution
 		HideSolutionNode = FALSE
@@ -447,6 +461,7 @@ Global
 		{D8BE54B0-1ED0-428E-A4A5-93B93A016D51} = {AB9540D3-A429-4238-8BB2-5D0114ED012E}
 		{6B61EBE5-1133-4EE9-A25A-82C14039C85B} = {F47B4360-F4CF-424E-A85E-623A1D2F297B}
 		{DF3A5248-7638-41C8-998A-53112F1ACFA2} = {F47B4360-F4CF-424E-A85E-623A1D2F297B}
+		{28D3AE66-AEFF-4E24-BAD4-5874EF13A329} = {D0EA7ECA-40CA-454D-B4D3-609CD3915FBD}
 	EndGlobalSection
 	GlobalSection(ExtensibilityGlobals) = postSolution
 		SolutionGuid = {28760A05-312F-4AA5-9831-305EE698F2F1}

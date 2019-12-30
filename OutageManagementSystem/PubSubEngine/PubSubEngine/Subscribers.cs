@@ -1,4 +1,5 @@
-﻿using Outage.Common.PubSub;
+﻿using Outage.Common;
+using Outage.Common.PubSub;
 using Outage.Common.ServiceContracts.PubSub;
 using System.Collections.Concurrent;
 using System.Collections.Generic;
@@ -7,13 +8,10 @@ namespace PubSubEngine
 {
     public class Subscribers
     {
-        private ConcurrentDictionary<IPubSubNotification, Queue<IPublishableMessage>> subscribers;
+        private static ILogger logger = LoggerWrapper.Instance;
+        private ConcurrentDictionary<ISubscriberCallback, Queue<IPublishableMessage>> subscribers;
+        
         private static Subscribers instance;
-
-        private Subscribers()
-        {
-            subscribers = new ConcurrentDictionary<IPubSubNotification, Queue<IPublishableMessage>>();
-        }
 
         public static Subscribers Instance
         {
@@ -27,31 +25,72 @@ namespace PubSubEngine
             }
         }
 
-        public bool TryAddSubscriber(IPubSubNotification subscriber)
+        private Subscribers()
         {
-            return subscribers.TryAdd(subscriber, new Queue<IPublishableMessage>());
+            subscribers = new ConcurrentDictionary<ISubscriberCallback, Queue<IPublishableMessage>>();
         }
 
-        public void RemoveSubscriber(IPubSubNotification subscriber)
+        public bool TryAddSubscriber(ISubscriberCallback subscriber)
         {
-            subscribers.TryRemove(subscriber, out Queue<IPublishableMessage> queue);
-        }
+            bool success = subscribers.TryAdd(subscriber, new Queue<IPublishableMessage>());
 
-        public void PublishMessage(IPubSubNotification subscriber, IPublishableMessage message)
-        {
-            if (subscribers.TryGetValue(subscriber, out Queue<IPublishableMessage> queueOfMessages))
+            if(success)
             {
-                queueOfMessages.Enqueue(message);
+                logger.LogDebug($"Subscriber [{subscriber.SubscriberName}] SUCCESSFYLLY added to collection of all subscribers.");
+    }
+            else
+            {
+                logger.LogError($"Try to add Subscriber [{subscriber.SubscriberName}] FAILED.");
+            }
+
+            return success;
+        }
+
+        public void RemoveSubscriber(ISubscriberCallback subscriber)
+        {
+            bool success = subscribers.TryRemove(subscriber, out Queue<IPublishableMessage> queue);
+
+            if (success)
+            {
+                logger.LogDebug($"Subscriber [{subscriber.SubscriberName}] SUCCESSFYLLY removed from collection of all subscribers.");
+            }
+            else
+            {
+                logger.LogError($"Try to remove Subscriber [{subscriber.SubscriberName}] FAILED.");
             }
         }
 
-        public IPublishableMessage GetNextMessage(IPubSubNotification subscriber)
+        public void PublishMessage(ISubscriberCallback subscriber, IPublishableMessage message)
+        {
+
+            bool success = subscribers.TryGetValue(subscriber, out Queue<IPublishableMessage> queueOfMessages);
+
+            if (success)
+            {
+                queueOfMessages.Enqueue(message);
+                //TODO: check this log in particular
+                logger.LogDebug($"Published message [{message}] SUCCESSFYLLY enqueued on Subscriber [{subscriber.SubscriberName}]");
+            }
+            else
+            {
+                logger.LogError($"Try to get queue of messages for Subscriber [{subscriber.SubscriberName}] FAILED.");
+            }
+        }
+
+        public IPublishableMessage GetNextMessage(ISubscriberCallback subscriber)
         {
             IPublishableMessage message = null;
 
-            if (subscribers.TryGetValue(subscriber, out Queue<IPublishableMessage> queue) && queue.Count > 0)
+            bool success = subscribers.TryGetValue(subscriber, out Queue<IPublishableMessage> queueOfMessages) && queueOfMessages.Count > 0;
+
+            if (success)
             {
-                message = queue.Dequeue();
+                message = queueOfMessages.Dequeue();
+                logger.LogDebug($"Published message [{message}] SUCCESSFYLLY dequeued from Subscriber's queue of messages [Subscriber name: '{subscriber.SubscriberName}']");
+            }
+            else
+            {
+                logger.LogError($"Try to get queue of messages for Subscriber [{subscriber.SubscriberName}] FAILED or queue is empty.");
             }
 
             return message;
