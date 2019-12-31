@@ -26,7 +26,7 @@ namespace Outage.SCADA.ModBus.Connection
         private bool threadCancellationSignal = true;
         private int numberOfTries = 0;
         private IModBusFunction currentCommand;
-        private ConnectionState _connectionState = ConnectionState.DISCONNECTED;
+        public ConnectionState _connectionState = ConnectionState.DISCONNECTED;
         private AutoResetEvent _commandEvent;
         private ConcurrentQueue<IModBusFunction> _commandQueue;
 
@@ -52,16 +52,30 @@ namespace Outage.SCADA.ModBus.Connection
             }
         }
 
+        private static FunctionExecutor _instance;
 
-        public FunctionExecutor(ushort tcpPort)
+        public static FunctionExecutor Instance
         {
-            this.TcpPort = tcpPort;
-            _commandQueue = new ConcurrentQueue<IModBusFunction>();
+            get { 
+                if(_instance == null)
+                {
+                    _instance = new FunctionExecutor(DataModelRepository.Instance.TcpPort);
+                }
+                
+                return _instance; }        }
+        public void StartConnection()
+        {
             connection = new TcpConnection(this.TcpPort);
-            _commandEvent = new AutoResetEvent(false);
             connectionProcess = new Thread(ConnectionProcessThread);
             connectionProcess.Name = "Communication with SIM";
             connectionProcess.Start();
+        }
+        private FunctionExecutor(ushort tcpPort)
+        {
+            this.TcpPort = tcpPort;
+            _commandQueue = new ConcurrentQueue<IModBusFunction>();
+            _commandEvent = new AutoResetEvent(false);
+
         }
 
         public event UpdatePointDelegate UpdatePointEvent;

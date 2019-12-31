@@ -12,7 +12,7 @@ namespace SCADA.Command
     [Obsolete]
     public class CommandService : ICommandService
     {
-        private static FunctionExecutor fe = new FunctionExecutor(DataModelRepository.Instance.TcpPort);
+        private static FunctionExecutor fe = FunctionExecutor.Instance;
 
         public CommandService()
         {

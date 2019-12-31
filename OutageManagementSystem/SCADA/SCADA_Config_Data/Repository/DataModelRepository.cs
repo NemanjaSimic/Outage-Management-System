@@ -17,10 +17,10 @@ namespace Outage.SCADA.SCADA_Config_Data.Repository
         public byte UnitAddress { get; protected set; }
         public ushort Interval { get; protected set; }
         public string ConfigFileName { get; protected set; }
-        public ushort TcpPortTest { get; protected set; }
         //public FunctionExecutor functionExecutor { get; set; }
         public INetworkModelGDAContract gdaQueryProxy = null;
-        public string pathToTestSim = "";
+        public string pathToDeltaCfg = "";
+        public string pathMdbSimCfg = "";
         public Dictionary<long, ConfigItem> Points;
         public Dictionary<long, ResourceDescription> NMS_Model;
         private static DataModelRepository _instance;
@@ -45,10 +45,10 @@ namespace Outage.SCADA.SCADA_Config_Data.Repository
             TcpPort = ushort.Parse(ConfigurationManager.AppSettings["TcpPort"]);
             UnitAddress = byte.Parse(ConfigurationManager.AppSettings["UnitAddress"]);
             Interval = ushort.Parse(ConfigurationManager.AppSettings["Interval"]);
-            TcpPortTest = ushort.Parse(ConfigurationManager.AppSettings["TcpPortTest"]);
             ConfigFileName = ConfigurationManager.AppSettings["ConfigFileName"];
-            pathToTestSim = Environment.CurrentDirectory;
-            pathToTestSim = pathToTestSim.Replace("\\SCADA\\bin\\Debug", $"\\MdbSimTest\\{ConfigFileName}");
+            pathToDeltaCfg = Environment.CurrentDirectory;
+            pathToDeltaCfg = pathToDeltaCfg.Replace("\\SCADA\\bin\\Debug", $"\\MdbSimTest\\{ConfigFileName}");
+            pathMdbSimCfg = Environment.CurrentDirectory.Replace("\\SCADA\\bin\\Debug", $"\\MdbSim\\{ConfigFileName}");
             try
             {
                 gdaQueryProxy = new ChannelFactory<INetworkModelGDAContract>(EndpointNames.NetworkModelGDAEndpoint).CreateChannel();
@@ -58,6 +58,7 @@ namespace Outage.SCADA.SCADA_Config_Data.Repository
                 Console.WriteLine(ex.Message);
             }
         }
+
 
         public bool ImportModel()
         {

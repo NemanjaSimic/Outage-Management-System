@@ -6,6 +6,7 @@ using Outage.SCADA.SCADA_Config_Data.Configuration;
 using Outage.SCADA.SCADA_Config_Data.Repository;
 using System;
 using System.Collections.Generic;
+using System.IO;
 using System.Linq;
 using System.Net.Sockets;
 
@@ -58,10 +59,9 @@ namespace Outage.SCADA.SCADAService
                     delta_Points[item] = ChangeOp(item);
 
                 }
-                ConfigWriter = new ConfigWriter(scadaModel.pathToTestSim, delta_Points.Values.ToList());
-                Console.WriteLine("Delta cfg file was generated open MdbSim.");
-                Console.ReadKey();
-                if (!TestConnection()) return false;
+                ConfigWriter = new ConfigWriter(scadaModel.ConfigFileName, delta_Points.Values.ToList());
+      
+
 
             }
             catch (Exception)
@@ -79,6 +79,12 @@ namespace Outage.SCADA.SCADAService
             try
             {
                 scadaModel.Points = delta_Points;
+                //Move validan u backup folder
+                File.Move(scadaModel.pathMdbSimCfg, scadaModel.pathToDeltaCfg);
+                //Move u MdbSim folder
+                File.Move(scadaModel.ConfigFileName, scadaModel.pathMdbSimCfg);
+                Console.WriteLine("There has been changes in cfg file.Reopen MdbSim .");
+                Console.ReadKey();
                 modelChanges.Clear();
             }
             catch (Exception)
@@ -90,6 +96,10 @@ namespace Outage.SCADA.SCADAService
 
         public void Rollback()
         {
+            //Move validan u backup folder
+            File.Delete(scadaModel.pathMdbSimCfg);
+            //Move u MdbSim folder
+            File.Move(scadaModel.pathToDeltaCfg, scadaModel.pathMdbSimCfg);
             delta_Points.Clear();
             modelChanges.Clear();
 
@@ -134,50 +144,7 @@ namespace Outage.SCADA.SCADAService
             }
             return newCI;
         }
-        private bool TestConnection()
-        {
-            TcpConnection tcpConnection = new TcpConnection(scadaModel.TcpPortTest);
-            while (true)
-            {
-                try
-                {
-
-                    Console.WriteLine("Establishing connection MdbSimTest");
-                    int numberOfTries = 0;
-                    tcpConnection.Connect();
-                    while (numberOfTries < 10)
-                    {
-                        if (tcpConnection.CheckState())
-                        {
-                            Console.WriteLine("Connected");
-                            return true;
-                        }
-                        else
-                        {
-                            numberOfTries++;
-                            if (numberOfTries == 10)
-                            {
-                                tcpConnection.Disconnect();
-                            }
-                        }
-                    }
-
-                }
-                catch (SocketException se)
-                {
-                    if (se.ErrorCode != 10054)
-                    {
-                        throw se;
-                    }
-                }
-                catch (Exception ex)
-                {
-                    Console.WriteLine(ex.Message);
-                    tcpConnection.Disconnect();
-                    return false;
-                }
-                return false;
-            }
-        }
+      
+        
     }
 }

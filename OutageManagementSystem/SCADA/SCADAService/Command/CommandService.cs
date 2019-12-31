@@ -13,7 +13,7 @@ namespace Outage.SCADA.SCADAService.Command
 {
     public class CommandService : ISCADACommand
     {
-        private static FunctionExecutor fe = new FunctionExecutor(DataModelRepository.Instance.TcpPort);
+        private static FunctionExecutor fe = FunctionExecutor.Instance;
 
         ILogger logger = LoggerWrapper.Instance;
 
