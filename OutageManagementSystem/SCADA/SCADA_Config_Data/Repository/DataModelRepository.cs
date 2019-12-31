@@ -47,8 +47,8 @@ namespace Outage.SCADA.SCADA_Config_Data.Repository
             Interval = ushort.Parse(ConfigurationManager.AppSettings["Interval"]);
             ConfigFileName = ConfigurationManager.AppSettings["ConfigFileName"];
             pathToDeltaCfg = Environment.CurrentDirectory;
-            pathToDeltaCfg = pathToDeltaCfg.Replace("\\SCADA\\bin\\Debug", $"\\MdbSimTest\\{ConfigFileName}");
-            pathMdbSimCfg = Environment.CurrentDirectory.Replace("\\SCADA\\bin\\Debug", $"\\MdbSim\\{ConfigFileName}");
+            pathToDeltaCfg = pathToDeltaCfg.Replace("\\SCADASServiceHost\\bin\\Debug", $"\\MdbSimTest\\{ConfigFileName}");
+            pathMdbSimCfg = Environment.CurrentDirectory.Replace("\\SCADAServiceHost\\bin\\Debug", $"\\MdbSim\\{ConfigFileName}");
             try
             {
                 gdaQueryProxy = new ChannelFactory<INetworkModelGDAContract>(EndpointNames.NetworkModelGDAEndpoint).CreateChannel();

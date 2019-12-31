@@ -1,9 +1,6 @@
-STA 1
-TCP 502
+STA 	 1
+TCP 	 502
 
-
-DO_REG  1 40   0  0      1     0  DO  @DigOut
-DI_REG  8 1000  0  0      1     0  DI  @DigIn
-IN_REG  4 2000  0  0   4095  2000  AI  @AnaIn
-HR_INT  2 3000  0  0   4095  1200  AO  @AnaOut
+DO_REG 	 1 	 40 	 0 	 0 	 1 	 0 	 DO 	 @DS_1
+HR_INT 	 1 	 4000 	 0 	 42 	 3334 	 23 	 AO 	 @AN_1
 
