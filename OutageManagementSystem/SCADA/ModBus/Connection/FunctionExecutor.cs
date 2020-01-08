@@ -19,50 +19,62 @@ namespace Outage.SCADA.ModBus.Connection
 
     public class FunctionExecutor
     {
+        private ILogger logger = LoggerWrapper.Instance; 
         private ModelResourcesDesc resourcesDesc = new ModelResourcesDesc();
         private TcpConnection connection;
         private ushort TcpPort;
         private Thread connectionProcess;
-        private bool threadCancellationSignal = true;
+        private bool threadCancellationSignal = false;
         private int numberOfTries = 0;
         private IModBusFunction currentCommand;
-        public ConnectionState _connectionState = ConnectionState.DISCONNECTED;
-        private AutoResetEvent _commandEvent;
-        private ConcurrentQueue<IModBusFunction> _commandQueue;
+        public ConnectionState connectionState = ConnectionState.DISCONNECTED;
+        private AutoResetEvent commandEvent;
+        private ConcurrentQueue<IModBusFunction> commandQueue;
 
 
         private PublisherProxy publisherProxy = null;
 
         public PublisherProxy PublisherProxy
         {
+            //TODO: diskusija statefull vs stateless
             get
             {
-                //TODO: diskusija statefull vs stateless
-
-                if (publisherProxy != null)
+                try
                 {
-                    publisherProxy.Abort();
+                    if (publisherProxy != null)
+                    {
+                        publisherProxy.Abort();
+                        publisherProxy = null;
+                    }
+
+                    publisherProxy = new PublisherProxy(EndpointNames.PublisherEndpoint);
+                    publisherProxy.Open();
+                }
+                catch (Exception ex)
+                {
+                    string message = $"Exception on PublisherProxy initialization. Message: {ex.Message}";
+                    logger.LogError(message, ex);
                     publisherProxy = null;
                 }
-
-                publisherProxy = new PublisherProxy(EndpointNames.PublisherEndpoint);
-                publisherProxy.Open();
 
                 return publisherProxy;
             }
         }
 
-        private static FunctionExecutor _instance;
+        private static FunctionExecutor instance;
 
         public static FunctionExecutor Instance
         {
-            get { 
-                if(_instance == null)
+            get
+            { 
+                if(instance == null)
                 {
-                    _instance = new FunctionExecutor(DataModelRepository.Instance.TcpPort);
+                    instance = new FunctionExecutor(DataModelRepository.Instance.TcpPort);
                 }
                 
-                return _instance; }        }
+                return instance; 
+            }        
+        }
         public void StartConnection()
         {
             connection = new TcpConnection(this.TcpPort);
@@ -73,8 +85,8 @@ namespace Outage.SCADA.ModBus.Connection
         private FunctionExecutor(ushort tcpPort)
         {
             this.TcpPort = tcpPort;
-            _commandQueue = new ConcurrentQueue<IModBusFunction>();
-            _commandEvent = new AutoResetEvent(false);
+            commandQueue = new ConcurrentQueue<IModBusFunction>();
+            commandEvent = new AutoResetEvent(false);
 
         }
 
@@ -83,31 +95,39 @@ namespace Outage.SCADA.ModBus.Connection
         public void EnqueueCommand(ModbusFunction modbusFunction)
 
         {
-            if (_connectionState == ConnectionState.CONNECTED)
+            if (connectionState == ConnectionState.CONNECTED)
             {
-                this._commandQueue.Enqueue(modbusFunction);
-                this._commandEvent.Set();
+                this.commandQueue.Enqueue(modbusFunction);
+                this.commandEvent.Set();
             }
         }
 
         private void ConnectionProcessThread()
         {
-            while (this.threadCancellationSignal)
+            logger.LogInfo("ConnectionProcessThread is started");
+
+            Console.WriteLine("Establishing connection...");
+            logger.LogInfo("Establishing connection...");
+
+            threadCancellationSignal = false;
+
+            while (!this.threadCancellationSignal)
             {
+                
                 try
                 {
-                    if (this._connectionState == ConnectionState.DISCONNECTED)
+                    if (this.connectionState == ConnectionState.DISCONNECTED)
                     {
-                        Console.WriteLine("Establishing connection");
                         this.numberOfTries = 0;
                         this.connection.Connect();
                         while (numberOfTries < 10)
                         {
                             if (this.connection.CheckState())
                             {
-                                this._connectionState = ConnectionState.CONNECTED;
+                                this.connectionState = ConnectionState.CONNECTED;
                                 this.numberOfTries = 0;
                                 Console.WriteLine("Connected");
+                                logger.LogInfo("Connected");
                                 break;
                             }
                             else
@@ -116,26 +136,41 @@ namespace Outage.SCADA.ModBus.Connection
                                 if (this.numberOfTries == 10)
                                 {
                                     this.connection.Disconnect();
-                                    this._connectionState = ConnectionState.DISCONNECTED;
+                                    this.connectionState = ConnectionState.DISCONNECTED;
+                                    logger.LogInfo($"Disconenting after {numberOfTries} tries.");
+                                    threadCancellationSignal = true;
+                                    continue;
                                 }
+
+                                logger.LogInfo($"Establishing connection... Try: {numberOfTries}");
+                                Thread.Sleep(5000);
                             }
                         }
                     }
                     else
                     {
-                        this._commandEvent.WaitOne();
-                        while (_commandQueue.TryDequeue(out this.currentCommand))
+                        logger.LogDebug("Connected and waiting for command event.");
+
+                        this.commandEvent.WaitOne();
+
+                        logger.LogDebug("Command event happened.");
+
+                        while (commandQueue.TryDequeue(out this.currentCommand))
                         {
                             this.connection.SendBytes(this.currentCommand.PackRequest());
+
                             byte[] message;
                             byte[] header = this.connection.RecvBytes(7);
                             int payLoadSize = 0;
+
                             unchecked
                             {
                                 payLoadSize = IPAddress.NetworkToHostOrder((short)BitConverter.ToInt16(header, 4));
                             }
+
                             byte[] payload = this.connection.RecvBytes(payLoadSize - 1);
                             message = new byte[header.Length + payload.Length];
+
                             Buffer.BlockCopy(header, 0, message, 0, 7);
                             Buffer.BlockCopy(payload, 0, message, 7, payload.Length);
                             Dictionary<Tuple<PointType, ushort>, ushort> pointsToUpdate = this.currentCommand.ParseResponse(message);
@@ -161,7 +196,9 @@ namespace Outage.SCADA.ModBus.Connection
                                 }
                                 else
                                 {
-                                    throw new Exception("UNKNOWN type"); //TODO: log i bolji komentar
+                                    string errMessage = $"Config item type is neither analog nor digital. Config item type is: {modelCode}.";
+                                    logger.LogError(errMessage);
+                                    throw new Exception(errMessage);
                                 }
 
                                 SCADAMessage scadaMessage = new SCADAMessage()
@@ -176,7 +213,20 @@ namespace Outage.SCADA.ModBus.Connection
                                     Message = scadaMessage,
                                 };
 
-                                PublisherProxy.Publish(scadaPublication);
+                                using(PublisherProxy publisherProxy = PublisherProxy)
+                                {
+                                    if(publisherProxy != null)
+                                    {
+                                        publisherProxy.Publish(scadaPublication);
+                                    }
+                                    else
+                                    {
+                                        string errMsg = "PublisherProxy is null.";
+                                        logger.LogWarn(errMsg);
+                                        //TODO: retry logic?
+                                        throw new NullReferenceException(errMsg);
+                                    }
+                                }
                             }
                         }
                     }
@@ -188,16 +238,18 @@ namespace Outage.SCADA.ModBus.Connection
                         throw se;
                     }
                     currentCommand = null;
-                    this._connectionState = ConnectionState.DISCONNECTED;
+                    this.connectionState = ConnectionState.DISCONNECTED;
                     this.connection.Disconnect();
                 }
                 catch (Exception ex)
                 {
                     Console.WriteLine(ex.Message);
-                    this._connectionState = ConnectionState.DISCONNECTED;
+                    this.connectionState = ConnectionState.DISCONNECTED;
                     this.connection.Disconnect();
                 }
             }
+
+            logger.LogInfo("ConnectionProcessThred is stopped.");
         }
 
         private ConfigItem UpdatePoints(ushort address, ushort newValue)

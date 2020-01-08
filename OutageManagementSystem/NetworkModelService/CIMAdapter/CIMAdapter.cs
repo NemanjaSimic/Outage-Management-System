@@ -88,7 +88,20 @@ namespace Outage.DataImporter.CIMAdapter
             if ((delta != null) && (delta.NumberOfOperations != 0))
             {
                 //// NetworkModelService->ApplyUpdates
-                updateResult = GdaQueryProxy.ApplyUpdate(delta).ToString();
+                using(NetworkModelGDAProxy gdaQueryProxy = GdaQueryProxy)
+                {
+                    if (gdaQueryProxy != null)
+                    {
+                        updateResult = gdaQueryProxy.ApplyUpdate(delta).ToString();
+                    }
+                    else
+                    {
+                        string message = "NetworkModelGDAProxy is null.";
+                        logger.LogWarn(message);
+                        //TODO: retry logic?
+                        throw new NullReferenceException(message);
+                    }
+                }
             }
 
             Thread.CurrentThread.CurrentCulture = culture;

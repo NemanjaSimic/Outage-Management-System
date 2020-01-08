@@ -7,6 +7,7 @@ using Outage.SCADA.SCADAService.Command;
 using Outage.SCADA.SCADAService.DistributedTransaction;
 using System;
 using System.Collections.Generic;
+using System.Diagnostics;
 using System.IO;
 using System.Linq;
 using System.ServiceModel;
@@ -22,6 +23,7 @@ namespace Outage.SCADA.SCADAService
         private Acquisition acquisition = null;
         private ConfigWriter configWriter = null;
         private DataModelRepository repo = DataModelRepository.Instance;
+
         public SCADAService()
         {
             scadaModel = new SCADAModel();
@@ -34,25 +36,51 @@ namespace Outage.SCADA.SCADAService
 
         public void Start()
         {
-            Console.WriteLine(repo.ImportModel());            
-            configWriter = new ConfigWriter(repo.ConfigFileName, repo.Points.Values.ToList());
-            configWriter.GenerateConfigFile();
-            if (File.Exists(repo.pathMdbSimCfg)) File.Delete(repo.pathMdbSimCfg);
-            File.Move(repo.ConfigFileName, repo.pathMdbSimCfg);
-            Console.WriteLine("Generated cfg file,open MdbSim");
-            Console.Read();
+            InitializeModbusSimConfiguration();
+            ModbusSimulatorHandler.StartModbusSimulator();
+
             FunctionExecutor.Instance.StartConnection();
             StartDataAcquisition();
-
 
             StartHosts();
         }
 
         public void Dispose()
         {
+            ModbusSimulatorHandler.StopModbusSimulaotrs();
             CloseHosts();
             GC.SuppressFinalize(this);
         }
+
+        private void InitializeModbusSimConfiguration()
+        {
+            bool success = repo.ImportModel();
+            if(success)
+            {
+                //todo: debug log
+
+                configWriter = new ConfigWriter(repo.ConfigFileName, repo.Points.Values.ToList());
+                configWriter.GenerateConfigFile();
+
+                if (File.Exists(repo.PathMdbSimCfg))
+                {
+                    File.Delete(repo.PathMdbSimCfg);
+                }
+
+                File.Move(repo.ConfigFileName, repo.PathMdbSimCfg);
+
+                Console.WriteLine("ModbusSim Configuration file generated SUCCESSFULLY.");
+            }
+            else
+            {
+                //todo: debug log
+                Console.WriteLine("ModbusSim Configuration file generated UNSUCCESSFULLY.");
+                //retry logic
+                throw new Exception("ImportModel failed.");
+            }
+        }
+
+       
 
         private void InitializeHosts()
         {

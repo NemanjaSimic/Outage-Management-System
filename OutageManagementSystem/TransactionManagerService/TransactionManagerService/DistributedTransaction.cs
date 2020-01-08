@@ -140,7 +140,17 @@ namespace Outage.TransactionManagerService
                     string endpointName = distributedTransactionActors[actor];
                     using (TransactionActorProxy transactionActorProxy = GetTransactionActorProxy(endpointName))
                     {
-                        success = transactionActorProxy.Prepare();
+                        if(transactionActorProxy != null)
+                        {
+                            success = transactionActorProxy.Prepare();
+                        }
+                        else
+                        {
+                            success = false;
+                            string message = "TransactionActorProxy is null.";
+                            logger.LogError(message);
+                            throw new NullReferenceException(message);
+                        }
                     }
 
                     if(success)
@@ -173,8 +183,17 @@ namespace Outage.TransactionManagerService
                     string endpointName = distributedTransactionActors[actor];
                     using (TransactionActorProxy transactionActorProxy = GetTransactionActorProxy(endpointName))
                     {
-                        transactionActorProxy.Commit();
-                        logger.LogInfo($"Commit invoked on Transaction actor: {actor}.");
+                        if (transactionActorProxy != null)
+                        {
+                            transactionActorProxy.Commit();
+                            logger.LogInfo($"Commit invoked on Transaction actor: {actor}.");
+                        }
+                        else
+                        {
+                            string message = "TransactionActorProxy is null.";
+                            logger.LogError(message);
+                            throw new NullReferenceException(message);
+                        }
                     }
                 }
             }
@@ -189,8 +208,17 @@ namespace Outage.TransactionManagerService
                     string endpointName = distributedTransactionActors[actor];
                     using (TransactionActorProxy transactionActorProxy = GetTransactionActorProxy(endpointName))
                     {
-                        transactionActorProxy.Rollback();
-                        logger.LogInfo($"Rollback invoked on Transaction actor: {actor}.");
+                        if (transactionActorProxy != null)
+                        {
+                            transactionActorProxy.Rollback();
+                            logger.LogInfo($"Rollback invoked on Transaction actor: {actor}.");
+                        }
+                        else
+                        {
+                            string message = "TransactionActorProxy is null.";
+                            logger.LogError(message);
+                            throw new NullReferenceException(message);
+                        }
                     }
                 }
             }

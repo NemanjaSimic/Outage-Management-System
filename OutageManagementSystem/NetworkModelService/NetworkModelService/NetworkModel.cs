@@ -27,6 +27,8 @@ namespace Outage.NetworkModelService
 
         private IMongoDatabase db;
 
+        private Delta currentDelta;
+
         /// <summary>
         /// ModelResourceDesc class contains metadata of the model
         /// </summary>
@@ -90,7 +92,6 @@ namespace Outage.NetworkModelService
                     string message = $"Exception on TransactionCoordinatorProxy initialization. Message: {ex.Message}";
                     logger.LogError(message, ex);
                     transactionCoordinatorProxy = null;
-                    
                 }
 
                 return transactionCoordinatorProxy;
@@ -183,6 +184,7 @@ namespace Outage.NetworkModelService
 
             networkDataModel = new Dictionary<DMSType, Container>();
             resourcesDescs = new ModelResourcesDesc();
+
             try
             {
                 MongoClient dbClient = new MongoClient(Config.Instance.DbConnectionString);
@@ -388,7 +390,8 @@ namespace Outage.NetworkModelService
 
         public Common.GDA.UpdateResult ApplyDelta(Delta delta, bool isInitialization = false)
         {
-            bool applyingStarted = false;
+            currentDelta = delta;
+
             Common.GDA.UpdateResult updateResult = new Common.GDA.UpdateResult();
 
             //shallow copy 
@@ -405,7 +408,7 @@ namespace Outage.NetworkModelService
                 if (!isInitialization)
                 {
                     delta.FixNegativeToPositiveIds(ref typesCounters, ref globalIdPairs);
-                    applyingStarted = true;
+           
                 }
 
                 updateResult.GlobalIdPairs = globalIdPairs;
@@ -434,7 +437,7 @@ namespace Outage.NetworkModelService
                 
                 if(isInitialization)
                 {
-                    Commit();
+                    Commit(isInitialization);
                 }
                 else
                 {
@@ -448,13 +451,14 @@ namespace Outage.NetworkModelService
 
                 updateResult.Result = ResultType.Failed;
                 updateResult.Message = message;
+                currentDelta = null;
             }
             finally
             {
-                if (applyingStarted)
-                {
-                    SaveDelta(delta);
-                }
+                //if (!isInitialization)
+                //{
+                //    SaveDelta(delta);
+                //}
 
                 if (updateResult.Result == ResultType.Succeeded)
                 {
@@ -471,6 +475,14 @@ namespace Outage.NetworkModelService
         {
             using (TransactionCoordinatorProxy transactionCoordinatorProxy = TransactionCoordinatorProxy)
             {
+                if (transactionCoordinatorProxy == null)
+                {
+                    logger.LogWarn("TransactionCoordinatorProxy is not initialized. This can be due to TransactionCoordinator not being stared.");
+                    //TODO: retry logic pre commit jedan retry?
+                    Commit(false);
+                    return;
+                }
+                
                 transactionCoordinatorProxy.StartDistributedUpdate();
                 logger.LogDebug("StartDistributedUpdate() invoked on Transaction Coordinator.");
             }
@@ -501,32 +513,72 @@ namespace Outage.NetworkModelService
 
             using (ModelUpdateNotificationProxy scadaModelUpdateNotifierProxy = GetModelUpdateNotificationProxy(EndpointNames.SCADAModelUpdateNotifierEndpoint))
             {
-                success = scadaModelUpdateNotifierProxy.NotifyAboutUpdate(modelChanges);
-                logger.LogDebug("NotifyAboutUpdate() method invoked on SCADA Transaction actor.");
+                if (scadaModelUpdateNotifierProxy != null)
+                {
+                    success = scadaModelUpdateNotifierProxy.NotifyAboutUpdate(modelChanges);
+                    logger.LogDebug("NotifyAboutUpdate() method invoked on SCADA Transaction actor.");
+                }
+                else
+                {
+                    string message = "ModelUpdateNotificationProxy for SCADA is null.";
+                    logger.LogWarn(message);
+                    //TODO: retry logic?
+                    throw new NullReferenceException(message);
+                }
             }
 
             if (success)
             {
                 using (ModelUpdateNotificationProxy calculationEngineModelUpdateNotifierProxy = GetModelUpdateNotificationProxy(EndpointNames.CalculationEngineModelUpdateNotifierEndpoint))
                 {
-                    success = calculationEngineModelUpdateNotifierProxy.NotifyAboutUpdate(modelChanges);
-                    logger.LogDebug("NotifyAboutUpdate() method invoked on CE Transaction actor.");
+                    if (calculationEngineModelUpdateNotifierProxy != null)
+                    {
+                        success = calculationEngineModelUpdateNotifierProxy.NotifyAboutUpdate(modelChanges);
+                        logger.LogDebug("NotifyAboutUpdate() method invoked on CE Transaction actor.");
+                    }
+                    else
+                    {
+                        string message = "ModelUpdateNotificationProxy for CalculationEngine is null.";
+                        logger.LogWarn(message);
+                        //TODO: retry logic?
+                        throw new NullReferenceException(message);
+                    }
                 }
 
                 if (success)
                 {
                     using (TransactionEnlistmentProxy transactionEnlistmentProxy = TransactionEnlistmentProxy)
                     {
-                        success = transactionEnlistmentProxy.Enlist(ServiceNames.NetworkModelService);
-                        logger.LogDebug("Enlist() method invoked on Transaction Coordinator.");
+                        if (transactionEnlistmentProxy != null)
+                        {
+                            success = transactionEnlistmentProxy.Enlist(ServiceNames.NetworkModelService);
+                            logger.LogDebug("Enlist() method invoked on Transaction Coordinator.");
+                        }
+                        else
+                        {
+                            string message = "TransactionEnlistmentProxy is null.";
+                            logger.LogWarn(message);
+                            //TODO: retry logic?
+                            throw new NullReferenceException(message);
+                        }
                     }
                 }
             }
 
             using (TransactionCoordinatorProxy transactionCoordinatorProxy = TransactionCoordinatorProxy)
             {
-                transactionCoordinatorProxy.FinishDistributedUpdate(success);
-                logger.LogDebug($"FinishDistributedUpdate() invoked on Transaction Coordinator with parameter 'success' value: {success}.");
+                if (transactionCoordinatorProxy != null)
+                {
+                    transactionCoordinatorProxy.FinishDistributedUpdate(success);
+                    logger.LogDebug($"FinishDistributedUpdate() invoked on Transaction Coordinator with parameter 'success' value: {success}.");
+                }
+                else
+                {
+                    string message = "TransactionCoordinatorProxy is null.";
+                    logger.LogWarn(message);
+                    //TODO: retry logic?
+                    throw new NullReferenceException(message);
+                }
             }
         }
 
@@ -536,8 +588,19 @@ namespace Outage.NetworkModelService
             return oldNetworkDataModel != null && networkDataModel != null && oldNetworkDataModel.GetHashCode() != networkDataModel.GetHashCode();
         }
 
-        public bool Commit()
+        /// <summary>
+        /// 2PhaseCommitProtocol - Commit Phase
+        /// </summary>
+        /// <param name="isInitialization">Indicates if changes are commited in initialization step, after the Network Model service has started.</param>
+        /// <returns></returns>
+        public bool Commit(bool isInitialization = false)
         {
+            if (!isInitialization && currentDelta != null)
+            {
+                SaveDelta(currentDelta);
+            }
+
+            currentDelta = null;
             oldNetworkDataModel = null;
             logger.LogDebug($"Current model [HashCode: 0x{incomingNetworkDataModel.GetHashCode():X16}] commited. Old model is set to null.");
             return true;
@@ -545,6 +608,7 @@ namespace Outage.NetworkModelService
 
         public bool Rollback()
         {
+            currentDelta = null;
             networkDataModel = oldNetworkDataModel;
             logger.LogDebug($"Current model [HashCode: 0x{networkDataModel.GetHashCode():X16}] rollbacked to Old model [HashCode: 0x{oldNetworkDataModel.GetHashCode():X16}].");
             return true;

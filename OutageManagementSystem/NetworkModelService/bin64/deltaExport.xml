@@ -936,7 +936,7 @@
           <Properties>
             <Property id="IDOBJ_MRID" value="DS_1" />
             <Property id="IDOBJ_NAME" value="DS_1" />
-            <Property id="MEASUREMENT_ADDRESS" value="CaraDusana29" />
+            <Property id="MEASUREMENT_ADDRESS" value="34" />
             <Property id="MEASUREMENT_ISINPUT" value="0" />
             <Property id="MEASUREMENT_TERMINAL" value="0x00000002FFFFFFF0" />
             <Property id="DISCRETE_CURRENTOPEN" value="0" />
@@ -950,7 +950,7 @@
           <Properties>
             <Property id="IDOBJ_MRID" value="AN_1" />
             <Property id="IDOBJ_NAME" value="AN_1" />
-            <Property id="MEASUREMENT_ADDRESS" value="sda" />
+            <Property id="MEASUREMENT_ADDRESS" value="12" />
             <Property id="MEASUREMENT_ISINPUT" value="0" />
             <Property id="MEASUREMENT_TERMINAL" value="0x00000002FFFFFFEA" />
             <Property id="ANALOG_CURRENTVALUE" value="23" />

@@ -46,7 +46,7 @@ namespace Outage.NetworkModelService.DistributedTransaction
         {
             try
             {
-                networkModel.Commit();
+                networkModel.Commit(false);
                 logger.LogInfo("Commit on NMS Transaction actor SUCCESSFULLY finished.");
             }
             catch (Exception ex)

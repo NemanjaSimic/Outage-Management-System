@@ -1,28 +1,67 @@
 ﻿using Outage.Common;
 using Outage.Common.GDA;
 using Outage.Common.ServiceContracts;
+using Outage.Common.ServiceProxies;
 using Outage.SCADA.SCADA_Common;
 using Outage.SCADA.SCADA_Config_Data.Configuration;
 using System;
 using System.Collections.Generic;
 using System.Configuration;
-using System.IO;
 using System.ServiceModel;
 
 namespace Outage.SCADA.SCADA_Config_Data.Repository
 {
     public class DataModelRepository
     {
+        private ModelResourcesDesc resourcesDesc = new ModelResourcesDesc();
+        private ILogger logger = LoggerWrapper.Instance;
+
+        #region Proxies
+        private NetworkModelGDAProxy gdaQueryProxy = null;
+
+        protected NetworkModelGDAProxy GdaQueryProxy
+        {
+            get
+            {
+                try
+                {
+                    if (gdaQueryProxy != null)
+                    {
+                        gdaQueryProxy.Abort();
+                        gdaQueryProxy = null;
+                    }
+
+                    gdaQueryProxy = new NetworkModelGDAProxy(EndpointNames.NetworkModelGDAEndpoint);
+                    gdaQueryProxy.Open();
+
+                }
+                catch (Exception ex)
+                {
+                    string message = $"Exception on NetworkModelGDAProxy initialization. Message: {ex.Message}";
+                    logger.LogError(message, ex);
+                    gdaQueryProxy = null;
+                }
+
+                return gdaQueryProxy;
+            }
+        }
+        #endregion
+
         public ushort TcpPort { get; protected set; }
         public byte UnitAddress { get; protected set; }
         public ushort Interval { get; protected set; }
-        public string ConfigFileName { get; protected set; }
-        //public FunctionExecutor functionExecutor { get; set; }
-        public INetworkModelGDAContract gdaQueryProxy = null;
-        public string pathToDeltaCfg = "";
-        public string pathMdbSimCfg = "";
-        public Dictionary<long, ConfigItem> Points;
-        public Dictionary<long, ResourceDescription> NMS_Model;
+
+        public string ConfigFileName { get; protected set; } = string.Empty;
+        public string MdbSimExeName { get; protected set; } = string.Empty;
+        public string PathToDeltaCfg { get; protected set; } = string.Empty;
+        public string PathMdbSimCfg { get; protected set; } = string.Empty;
+        public string MdbSimExePath { get; protected set; } = string.Empty;
+
+        public Dictionary<long, ConfigItem> Points { get; set; }
+        public Dictionary<long, Dictionary<ModelCode, Property>> NMS_Model_Props { get; protected set; }
+        public Dictionary<long, ResourceDescription> NMS_Model { get; protected set; }
+
+        #region Instance
         private static DataModelRepository _instance;
 
         public static DataModelRepository Instance
@@ -37,183 +76,277 @@ namespace Outage.SCADA.SCADA_Config_Data.Repository
                 return _instance;
             }
         }
+        #endregion
 
         private DataModelRepository()
         {
             Points = new Dictionary<long, ConfigItem>();
             NMS_Model = new Dictionary<long, ResourceDescription>();
-            TcpPort = ushort.Parse(ConfigurationManager.AppSettings["TcpPort"]);
-            UnitAddress = byte.Parse(ConfigurationManager.AppSettings["UnitAddress"]);
-            Interval = ushort.Parse(ConfigurationManager.AppSettings["Interval"]);
-            ConfigFileName = ConfigurationManager.AppSettings["ConfigFileName"];
-            pathToDeltaCfg = Environment.CurrentDirectory;
-            pathToDeltaCfg = pathToDeltaCfg.Replace("\\SCADASServiceHost\\bin\\Debug", $"\\MdbSimTest\\{ConfigFileName}");
-            pathMdbSimCfg = Environment.CurrentDirectory.Replace("\\SCADAServiceHost\\bin\\Debug", $"\\MdbSim\\{ConfigFileName}");
-            try
-            {
-                gdaQueryProxy = new ChannelFactory<INetworkModelGDAContract>(EndpointNames.NetworkModelGDAEndpoint).CreateChannel();
-            }
-            catch (Exception ex)
-            {
-                Console.WriteLine(ex.Message);
-            }
-        }
+            NMS_Model_Props = new Dictionary<long, Dictionary<ModelCode, Property>>();
 
+            ImportAppSettings();
+        }
 
         public bool ImportModel()
         {
-            bool anaIm;
-            bool disIm;
-            Console.WriteLine("Importing analog...");
-            anaIm = ImportAnalog();
-            Console.WriteLine("Importing discrete...");
-            disIm = ImportDiscrete();
-            return anaIm && disIm;
+            //TODO: log info
+            Console.WriteLine("Importing analog measurements started...");
+            bool analogImportSuccess = ImportAnalog();
+            //TODO: log info finish
+            Console.WriteLine($"Importing analog measurements finished. ['success' value: {analogImportSuccess}]");
+
+            //TODO: log info
+            Console.WriteLine("Importing discrete measurements started...");
+            bool discreteImportSuccess = ImportDiscrete();
+            //TODO: log info finish
+            Console.WriteLine($"Importing discrete measurements finished. ['success' value: {discreteImportSuccess}]");
+
+            return analogImportSuccess && discreteImportSuccess;
         }
 
         private bool ImportAnalog()
         {
-            int iteratorId = 0;
-            int resourcesLeft = 0;
-            int numberOfResources = 100;
-            List<ModelCode> props = new List<ModelCode>
-            {
-                ModelCode.IDOBJ_GID,
-                ModelCode.IDOBJ_NAME,
-                ModelCode.MEASUREMENT_ADDRESS,
-                ModelCode.MEASUREMENT_ISINPUT,
-                ModelCode.ANALOG_CURRENTVALUE,
-                ModelCode.ANALOG_MAXVALUE,
-                ModelCode.ANALOG_MINVALUE,
-                ModelCode.ANALOG_NORMALVALUE
-            };
+            bool success;
+            int numberOfResources = 1000;
+            List<ModelCode> props = resourcesDesc.GetAllPropertyIds(ModelCode.ANALOG);
+
             try
             {
-                iteratorId = gdaQueryProxy.GetExtentValues(ModelCode.ANALOG, props);
-          
-                resourcesLeft = gdaQueryProxy.IteratorResourcesLeft(iteratorId);
-                while (resourcesLeft > 0)
+                using (NetworkModelGDAProxy gdaProxy = GdaQueryProxy)
                 {
-                    List<ResourceDescription> rds = gdaQueryProxy.IteratorNext(numberOfResources, iteratorId);
-                    for (int i = 0; i < rds.Count; i++)
+                    if(gdaProxy != null)
                     {
-                        if (rds[i] != null)
-                        {   
-                            NMS_Model.Add(rds[i].Id, rds[i]);
-                            Points.Add(rds[i].Id, ConfigurateConfigItem(rds[i].Properties, true));
+                        int iteratorId = gdaProxy.GetExtentValues(ModelCode.ANALOG, props);
+                        int resourcesLeft = gdaProxy.IteratorResourcesLeft(iteratorId);
+
+                        while (resourcesLeft > 0)
+                        {
+                            List<ResourceDescription> rds = gdaProxy.IteratorNext(numberOfResources, iteratorId);
+                            for (int i = 0; i < rds.Count; i++)
+                            {
+                                if (rds[i] != null)
+                                {
+                                    NMS_Model.Add(rds[i].Id, rds[i]);
+                                    Points.Add(rds[i].Id, ConfigurateConfigItem(rds[i].Properties, ModelCode.ANALOG));
+                                    //TODO: log debug
+                                }
+                            }
+                            resourcesLeft = gdaProxy.IteratorResourcesLeft(iteratorId);
                         }
+
+                        success = true;
                     }
-                    resourcesLeft = gdaQueryProxy.IteratorResourcesLeft(iteratorId);
+                    else
+                    {
+                        //TODO: retry
+                        success = false;
+                    }
                 }
             }
             catch (Exception ex)
             {
+                //TODO: err log
                 Console.WriteLine("ImportAnalog failed with error: {0}", ex.Message);
-                return false;
+                success = false;
             }
-            return true;
+
+            return success;
         }
 
         private bool ImportDiscrete()
         {
-            int iteratorId = 0;
-            int resourcesLeft = 0;
+            bool success;
             int numberOfResources = 100;
-            List<ModelCode> props = new List<ModelCode>
-            {
-                ModelCode.IDOBJ_GID,
-                ModelCode.IDOBJ_NAME,
-                ModelCode.MEASUREMENT_ADDRESS,
-                ModelCode.MEASUREMENT_ISINPUT,
-                ModelCode.DISCRETE_CURRENTOPEN,
-                ModelCode.DISCRETE_MAXVALUE,
-                ModelCode.DISCRETE_MINVALUE,
-                ModelCode.DISCRETE_NORMALVALUE
-            };
+            List<ModelCode> props = resourcesDesc.GetAllPropertyIds(ModelCode.DISCRETE);
+
             try
             {
-                iteratorId = gdaQueryProxy.GetExtentValues(ModelCode.DISCRETE, props);
-                resourcesLeft = gdaQueryProxy.IteratorResourcesLeft(iteratorId);
-                
-                while (resourcesLeft > 0)
+                using (NetworkModelGDAProxy gdaProxy = GdaQueryProxy)
                 {
-                    List<ResourceDescription> rds = gdaQueryProxy.IteratorNext(numberOfResources, iteratorId);
-                    for (int i = 0; i < rds.Count; i++)
+                    if(gdaProxy != null)
                     {
-                        if (rds[i] != null)
-                        {  
-                            NMS_Model.Add(rds[i].Id, rds[i]);
-                            Points.Add(rds[i].Id, ConfigurateConfigItem(rds[i].Properties, false));
+                        int iteratorId = gdaProxy.GetExtentValues(ModelCode.DISCRETE, props);
+                        int resourcesLeft = gdaProxy.IteratorResourcesLeft(iteratorId);
+
+                        while (resourcesLeft > 0)
+                        {
+                            List<ResourceDescription> rds = gdaProxy.IteratorNext(numberOfResources, iteratorId);
+                            for (int i = 0; i < rds.Count; i++)
+                            {
+                                if (rds[i] != null)
+                                {
+                                    NMS_Model.Add(rds[i].Id, rds[i]);
+                                    Points.Add(rds[i].Id, ConfigurateConfigItem(rds[i].Properties, ModelCode.DISCRETE));
+                                    //TODO: log debug
+                                }
+                            }
+                            resourcesLeft = gdaProxy.IteratorResourcesLeft(iteratorId);
                         }
+
+                        success = true;
                     }
-                    resourcesLeft = gdaQueryProxy.IteratorResourcesLeft(iteratorId);
+                    else
+                    {
+                        //TODO: retry
+                        success = false;
+                    }
                 }
             }
             catch (Exception ex)
             {
+                //TODO: err log
                 Console.WriteLine("ImportDiscrete failed with error: {0}", ex.Message);
-                return false;
+                success = false;
             }
-            return true;
+
+            return success;
         }
 
-        public ConfigItem ConfigurateConfigItem(List<Property> props, bool isAna)
+        private void ImportAppSettings()
+        {
+            if (ConfigurationManager.AppSettings["TcpPort"] is string tcpPortSetting)
+            {
+                if (ushort.TryParse(tcpPortSetting, out ushort tcpPort))
+                {
+                    TcpPort = tcpPort;
+                }
+                else
+                {
+                    //TODO: err log
+                    throw new Exception("TcpPort in SCADA configuration is either not defined or not valid.");
+                }
+            }
+
+            if (ConfigurationManager.AppSettings["UnitAddress"] is string unitAddressSetting)
+            {
+                if (byte.TryParse(unitAddressSetting, out byte unitAddress))
+                {
+                    UnitAddress = unitAddress;
+                }
+                else
+                {
+                    //TODO: err log
+                    throw new Exception("UnitAddress in SCADA configuration is either not defined or not valid.");
+                }
+            }
+
+            if (ConfigurationManager.AppSettings["Interval"] is string intervalSetting)
+            {
+                if (ushort.TryParse(intervalSetting, out ushort interval))
+                {
+                    Interval = interval;
+                }
+                else
+                {
+                    Interval = 10000;
+                    //TODO: warnnig log
+                    //throw new Exception("Interval in SCADA configuration is either not defined or not valid.");
+                }
+            }
+
+            if (ConfigurationManager.AppSettings["ConfigFileName"] is string configFileName)
+            {
+                ConfigFileName = configFileName;
+
+                PathToDeltaCfg = Environment.CurrentDirectory.Replace("\\SCADAServiceHost\\bin\\Debug", $"\\MdbSimTest\\{ConfigFileName}");
+                PathMdbSimCfg = Environment.CurrentDirectory.Replace("\\SCADAServiceHost\\bin\\Debug", $"\\MdbSim\\{ConfigFileName}");
+            }
+
+            if (ConfigurationManager.AppSettings["MdbSimExeName"] is string mdbSimExeName)
+            {
+                MdbSimExeName = mdbSimExeName;
+
+                MdbSimExePath = Environment.CurrentDirectory.Replace("\\SCADAServiceHost\\bin\\Debug", $"\\MdbSim\\{MdbSimExeName}");
+            }
+
+        }
+
+        public ConfigItem ConfigurateConfigItem(List<Property> props, ModelCode type)
         {
             ConfigItem configItem = new ConfigItem();
             long gid = 0;
+            Dictionary<ModelCode, Property> prop = new Dictionary<ModelCode, Property>();
             foreach (var item in props)
             {
                 switch (item.Id)
                 {
                     case ModelCode.IDOBJ_GID:
                         gid = item.AsLong();
+                        prop.Add(item.Id, item);
                         configItem.Gid = gid;
                         break;
 
                     case ModelCode.IDOBJ_NAME:
+                        prop.Add(item.Id, item);
                         configItem.Name = item.AsString();
                         break;
 
                     case ModelCode.DISCRETE_CURRENTOPEN:
+                        prop.Add(item.Id, item);
                         configItem.CurrentValue = (item.AsBool() == true) ? 1 : 0;
                         break;
 
                     case ModelCode.DISCRETE_MAXVALUE:
+                        prop.Add(item.Id, item);
                         configItem.MaxValue = item.AsInt();
                         break;
 
                     case ModelCode.DISCRETE_MINVALUE:
+                        prop.Add(item.Id, item);
                         configItem.MinValue = item.AsInt();
                         break;
 
                     case ModelCode.DISCRETE_NORMALVALUE:
+                        prop.Add(item.Id, item);
                         configItem.DefaultValue = item.AsInt();
                         break;
 
                     case ModelCode.MEASUREMENT_ADDRESS:
-                        configItem.Address = ushort.Parse(item.AsString());
+                        if (ushort.TryParse(item.AsString(), out ushort address))
+                        {
+                            configItem.Address = address;
+                        }
+                        else
+                        {
+                            //TODO: log err address is either not defined or is invalid
+                            //todo: exception?
+                        }
                         break;
 
                     case ModelCode.MEASUREMENT_ISINPUT:
-                        if (isAna)
+                        prop.Add(item.Id, item);
+                        if (type == ModelCode.ANALOG)
+                        {
                             configItem.RegistarType = (item.AsBool() == true) ? PointType.ANALOG_INPUT : PointType.ANALOG_OUTPUT;
-                        else
+                        }
+                        else if(type == ModelCode.DISCRETE)
+                        {
                             configItem.RegistarType = (item.AsBool() == true) ? PointType.DIGITAL_INPUT : PointType.DIGITAL_OUTPUT;
+                        }
+                        else
+                        {
+                            //TODO: log err
+                            //todo: exception?
+                        }
                         break;
 
                     case ModelCode.ANALOG_CURRENTVALUE:
+                        prop.Add(item.Id, item);
                         configItem.CurrentValue = item.AsFloat();
                         break;
 
                     case ModelCode.ANALOG_MAXVALUE:
+                        prop.Add(item.Id, item);
                         configItem.MaxValue = item.AsFloat();
                         break;
 
                     case ModelCode.ANALOG_MINVALUE:
+                        prop.Add(item.Id, item);
                         configItem.MinValue = item.AsFloat();
                         break;
 
                     case ModelCode.ANALOG_NORMALVALUE:
+                        prop.Add(item.Id, item);
                         configItem.DefaultValue = item.AsFloat();
                         break;
 
@@ -231,6 +364,7 @@ namespace Outage.SCADA.SCADA_Config_Data.Repository
                     configItem.HighLimit = 1;
                 }
             }
+            NMS_Model_Props.Add(gid, prop);
             return configItem;
         }
     }

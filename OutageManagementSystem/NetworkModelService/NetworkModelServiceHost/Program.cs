@@ -11,10 +11,7 @@ namespace Outage.NetworkModelServiceHost
             ILogger logger = LoggerWrapper.Instance;
 
             try
-            {
-                //TODO: sta ce ovo ovde?
-                CIMAdapterClass cim = new CIMAdapterClass();
-                
+            {                
                 string message = "Starting Network Model Service...";
                 logger.LogInfo(message);
                 CommonTrace.WriteTrace(CommonTrace.TraceInfo, message);

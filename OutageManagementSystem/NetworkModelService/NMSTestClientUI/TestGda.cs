@@ -60,10 +60,22 @@ namespace TelventDMS.Services.NetworkModelService.TestClient.TestsUI
 						
 			try
 			{
-				rd = GdaQueryProxy.GetValues(globalId, properties);
-
-				message = "Getting values method successfully finished.";
-				CommonTrace.WriteTrace(CommonTrace.TraceError, message);
+				using(NetworkModelGDAProxy gdaQueryProxy = GdaQueryProxy)
+				{
+					if(gdaQueryProxy != null)
+					{
+						rd = gdaQueryProxy.GetValues(globalId, properties);
+						message = "Getting values method successfully finished.";
+						CommonTrace.WriteTrace(CommonTrace.TraceError, message);
+					}
+					else
+					{
+						string errMsg = "NetworkModelGDAProxy is null.";
+						logger.LogWarn(errMsg);
+						//TODO: retry logic?
+						throw new NullReferenceException(errMsg);
+					}
+				}	
 			}
 			catch (Exception e)
 			{
@@ -87,53 +99,67 @@ namespace TelventDMS.Services.NetworkModelService.TestClient.TestsUI
 
 			try
 			{
-				iteratorId = GdaQueryProxy.GetExtentValues(modelCodeType, properties);
-				resourcesLeft = GdaQueryProxy.IteratorResourcesLeft(iteratorId);
-
-				while (resourcesLeft > 0)
+				using(NetworkModelGDAProxy gdaQueryProxy = GdaQueryProxy)
 				{
-					List<ResourceDescription> rds = GdaQueryProxy.IteratorNext(numberOfResources, iteratorId);
+					if(gdaQueryProxy != null)
+					{
+						iteratorId = gdaQueryProxy.GetExtentValues(modelCodeType, properties);
+						resourcesLeft = gdaQueryProxy.IteratorResourcesLeft(iteratorId);
 
-					for (int i = 0; i < rds.Count; i++)
-					{ 
-						if (rds[i] != null)
+						while (resourcesLeft > 0)
 						{
-							tempSb.Append($"Entity with gid: 0x{rds[i].Id:X16}" + Environment.NewLine);
+							List<ResourceDescription> rds = gdaQueryProxy.IteratorNext(numberOfResources, iteratorId);
 
-							foreach (Property property in rds[i].Properties)
+							for (int i = 0; i < rds.Count; i++)
 							{
-								switch (property.Type)
+								if (rds[i] != null)
 								{
-									case PropertyType.Int64:
-										StringAppender.AppendLong(tempSb, property);
-										break;
-									case PropertyType.Float:
-										StringAppender.AppendFloat(tempSb, property);
-										break;
-									case PropertyType.String:
-										StringAppender.AppendString(tempSb, property);
-										break;
-									case PropertyType.Reference:
-										StringAppender.AppendReference(tempSb, property);
-										break;
-									case PropertyType.ReferenceVector:
-										StringAppender.AppendReferenceVector(tempSb, property);
-										break;
+									tempSb.Append($"Entity with gid: 0x{rds[i].Id:X16}" + Environment.NewLine);
 
-									default:
-										tempSb.Append($"{property.Id}: {property.PropertyValue.LongValue}{Environment.NewLine}");
-										break;
+									foreach (Property property in rds[i].Properties)
+									{
+										switch (property.Type)
+										{
+											case PropertyType.Int64:
+												StringAppender.AppendLong(tempSb, property);
+												break;
+											case PropertyType.Float:
+												StringAppender.AppendFloat(tempSb, property);
+												break;
+											case PropertyType.String:
+												StringAppender.AppendString(tempSb, property);
+												break;
+											case PropertyType.Reference:
+												StringAppender.AppendReference(tempSb, property);
+												break;
+											case PropertyType.ReferenceVector:
+												StringAppender.AppendReferenceVector(tempSb, property);
+												break;
+
+											default:
+												tempSb.Append($"{property.Id}: {property.PropertyValue.LongValue}{Environment.NewLine}");
+												break;
+										}
+									}
 								}
+								ids.Add(rds[i].Id);
 							}
+							resourcesLeft = gdaQueryProxy.IteratorResourcesLeft(iteratorId);
 						}
-						ids.Add(rds[i].Id);
-					}
-					resourcesLeft = GdaQueryProxy.IteratorResourcesLeft(iteratorId);
-				}
-				GdaQueryProxy.IteratorClose(iteratorId);
 
-				message = "Getting extent values method successfully finished.";
-				CommonTrace.WriteTrace(CommonTrace.TraceError, message);
+						gdaQueryProxy.IteratorClose(iteratorId);
+
+						message = "Getting extent values method successfully finished.";
+						CommonTrace.WriteTrace(CommonTrace.TraceError, message);
+					}
+					else
+					{
+						string errMsg = "NetworkModelGDAProxy is null.";
+						logger.LogWarn(errMsg);
+						//TODO: retry logic?
+						throw new NullReferenceException(errMsg);
+					}
+				}
 			}			
 			catch (Exception e)
 			{
@@ -162,53 +188,66 @@ namespace TelventDMS.Services.NetworkModelService.TestClient.TestsUI
 
 			try
 			{
-				iteratorId = GdaQueryProxy.GetRelatedValues(sourceGlobalId, properties, association);
-				resourcesLeft = GdaQueryProxy.IteratorResourcesLeft(iteratorId);
-
-				while (resourcesLeft > 0)
+				using(NetworkModelGDAProxy gdaQueryProxy = GdaQueryProxy)
 				{
-					List<ResourceDescription> rds = GdaQueryProxy.IteratorNext(numberOfResources, iteratorId);
-
-					for (int i = 0; i < rds.Count; i++)
+					if(gdaQueryProxy != null)
 					{
-						if (rds[i] != null)
+						iteratorId = gdaQueryProxy.GetRelatedValues(sourceGlobalId, properties, association);
+						resourcesLeft = gdaQueryProxy.IteratorResourcesLeft(iteratorId);
+
+						while (resourcesLeft > 0)
 						{
-							tempSb.Append($"Entity with gid: 0x{rds[i].Id:X16}" + Environment.NewLine);
+							List<ResourceDescription> rds = gdaQueryProxy.IteratorNext(numberOfResources, iteratorId);
 
-							foreach (Property property in rds[i].Properties)
+							for (int i = 0; i < rds.Count; i++)
 							{
-								switch (property.Type)
+								if (rds[i] != null)
 								{
-									case PropertyType.Int64:
-										StringAppender.AppendLong(tempSb, property);
-										break;
-									case PropertyType.Float:
-										StringAppender.AppendFloat(tempSb, property);
-										break;
-									case PropertyType.String:
-										StringAppender.AppendString(tempSb, property);
-										break;
-									case PropertyType.Reference:
-										StringAppender.AppendReference(tempSb, property);
-										break;
-									case PropertyType.ReferenceVector:
-										StringAppender.AppendReferenceVector(tempSb, property);
-										break;
+									tempSb.Append($"Entity with gid: 0x{rds[i].Id:X16}" + Environment.NewLine);
 
-									default:
-										tempSb.Append($"{property.Id}: {property.PropertyValue.LongValue}{Environment.NewLine}");
-										break;
+									foreach (Property property in rds[i].Properties)
+									{
+										switch (property.Type)
+										{
+											case PropertyType.Int64:
+												StringAppender.AppendLong(tempSb, property);
+												break;
+											case PropertyType.Float:
+												StringAppender.AppendFloat(tempSb, property);
+												break;
+											case PropertyType.String:
+												StringAppender.AppendString(tempSb, property);
+												break;
+											case PropertyType.Reference:
+												StringAppender.AppendReference(tempSb, property);
+												break;
+											case PropertyType.ReferenceVector:
+												StringAppender.AppendReferenceVector(tempSb, property);
+												break;
+
+											default:
+												tempSb.Append($"{property.Id}: {property.PropertyValue.LongValue}{Environment.NewLine}");
+												break;
+										}
+									}
 								}
+								resultIds.Add(rds[i].Id);
 							}
+							resourcesLeft = gdaQueryProxy.IteratorResourcesLeft(iteratorId);
 						}
-						resultIds.Add(rds[i].Id);
-					}
-					resourcesLeft = GdaQueryProxy.IteratorResourcesLeft(iteratorId);
-				}
-				GdaQueryProxy.IteratorClose(iteratorId);
+						gdaQueryProxy.IteratorClose(iteratorId);
 
-				message = "Getting related values method successfully finished.";
-				CommonTrace.WriteTrace(CommonTrace.TraceError, message);				
+						message = "Getting related values method successfully finished.";
+						CommonTrace.WriteTrace(CommonTrace.TraceError, message);
+					}
+					else
+					{
+						string errMsg = "NetworkModelGDAProxy is null.";
+						logger.LogWarn(errMsg);
+						//TODO: retry logic?
+						throw new NullReferenceException(errMsg);
+					}
+				}		
 			}
 			catch (Exception e)
 			{

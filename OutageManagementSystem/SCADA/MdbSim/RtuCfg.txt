@@ -1,6 +1,6 @@
 STA 	 1
 TCP 	 502
 
-DO_REG 	 1 	 40 	 0 	 0 	 1 	 0 	 DO 	 @DS_1
-HR_INT 	 1 	 4000 	 0 	 42 	 3334 	 23 	 AO 	 @AN_1
+DO_REG 	 1 	 34 	 0 	 0 	 1 	 0 	 DO 	 @DS_1
+HR_INT 	 1 	 12 	 0 	 42 	 3334 	 23 	 AO 	 @AN_1
 
