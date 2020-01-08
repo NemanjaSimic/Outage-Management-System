@@ -1,9 +1,14 @@
 ﻿using Outage.Common;
 using Outage.SCADA.ModBus.Acquisitor;
+using Outage.SCADA.ModBus.Connection;
+using Outage.SCADA.SCADA_Config_Data.Configuration;
+using Outage.SCADA.SCADA_Config_Data.Repository;
 using Outage.SCADA.SCADAService.Command;
 using Outage.SCADA.SCADAService.DistributedTransaction;
 using System;
 using System.Collections.Generic;
+using System.IO;
+using System.Linq;
 using System.ServiceModel;
 
 namespace Outage.SCADA.SCADAService
@@ -15,7 +20,8 @@ namespace Outage.SCADA.SCADAService
         private List<ServiceHost> hosts = null;
         private SCADAModel scadaModel = null;
         private Acquisition acquisition = null;
-
+        private ConfigWriter configWriter = null;
+        private DataModelRepository repo = DataModelRepository.Instance;
         public SCADAService()
         {
             scadaModel = new SCADAModel();
@@ -28,7 +34,14 @@ namespace Outage.SCADA.SCADAService
 
         public void Start()
         {
-            //TODO: init aquisition i slicno,,....
+            Console.WriteLine(repo.ImportModel());            
+            configWriter = new ConfigWriter(repo.ConfigFileName, repo.Points.Values.ToList());
+            configWriter.GenerateConfigFile();
+            if (File.Exists(repo.pathMdbSimCfg)) File.Delete(repo.pathMdbSimCfg);
+            File.Move(repo.ConfigFileName, repo.pathMdbSimCfg);
+            Console.WriteLine("Generated cfg file,open MdbSim");
+            Console.Read();
+            FunctionExecutor.Instance.StartConnection();
             StartDataAcquisition();
 
 

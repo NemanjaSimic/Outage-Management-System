@@ -12,7 +12,7 @@ namespace SCADA.Command
     [Obsolete]
     public class CommandService : ICommandService
     {
-        private static FunctionExecutor fe = new FunctionExecutor(DataModelRepository.Instance.TcpPort);
+        private static FunctionExecutor fe = FunctionExecutor.Instance;
 
         public CommandService()
         {
@@ -46,6 +46,8 @@ namespace SCADA.Command
 
                     ModbusFunction fn = FunctionFactory.CreateModbusFunction(mdb_write_comm_pars);
                     fe.EnqueueCommand(fn);
+
+                    CI.SetAlarms();
                 }
             }
             else

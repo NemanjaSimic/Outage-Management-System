@@ -4,7 +4,9 @@ using Outage.SCADA.ModBus.PointModels;
 using Outage.SCADA.SCADA_Config_Data.Configuration;
 using Outage.SCADA.SCADA_Config_Data.Repository;
 using System;
+using System.Collections.Generic;
 using System.Collections.ObjectModel;
+using System.Linq;
 
 namespace Outage.SCADA.SCADA
 {
@@ -18,7 +20,8 @@ namespace Outage.SCADA.SCADA
         {
             //wcfService = new WcfService<ICommandService, CommandService>(DataModelRepository.Instance.ServiceAddress);
             Console.WriteLine(DataModelRepository.Instance.ImportModel());
-            ConfigWriter configWriter = new ConfigWriter();
+            ConfigWriter configWriter = new ConfigWriter(DataModelRepository.Instance.ConfigFileName, DataModelRepository.Instance.Points.Values.ToList());
+
             configWriter.GenerateConfigFile();
 
             Acquisition A = new Acquisition();

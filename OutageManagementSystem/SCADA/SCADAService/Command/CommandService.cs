@@ -1,4 +1,5 @@
-﻿using Outage.Common.ServiceContracts;
+﻿using Outage.Common;
+using Outage.Common.ServiceContracts;
 using Outage.SCADA.ModBus;
 using Outage.SCADA.ModBus.Connection;
 using Outage.SCADA.ModBus.FunctionParameters;
@@ -12,7 +13,9 @@ namespace Outage.SCADA.SCADAService.Command
 {
     public class CommandService : ISCADACommand
     {
-        private static FunctionExecutor fe = new FunctionExecutor(DataModelRepository.Instance.TcpPort);
+        private static FunctionExecutor fe = FunctionExecutor.Instance;
+
+        ILogger logger = LoggerWrapper.Instance;
 
         public CommandService()
         {
@@ -34,6 +37,8 @@ namespace Outage.SCADA.SCADAService.Command
 
                         mdb_write_comm_pars = new ModbusWriteCommandParameters
                        (6, (byte)ModbusFunctionCode.WRITE_SINGLE_REGISTER, CI.Address, CommandedValue);
+
+                        logger.LogInfo("Commanded WRITE_SINGLE_REGISTER with a new value - " + CommandedValue);
                     }
                     else if (CI.RegistarType == PointType.DIGITAL_OUTPUT)
                     {
@@ -42,10 +47,18 @@ namespace Outage.SCADA.SCADAService.Command
 
                         mdb_write_comm_pars = new ModbusWriteCommandParameters
                         (6, (byte)ModbusFunctionCode.WRITE_SINGLE_COIL, CI.Address, CommandedValue);
+
+                        logger.LogInfo("Commanded WRITE_SINGLE_COIL with a new value - " + CommandedValue);
                     }
 
                     ModbusFunction fn = FunctionFactory.CreateModbusFunction(mdb_write_comm_pars);
                     fe.EnqueueCommand(fn);
+
+                    bool AlarmChanged = CI.SetAlarms();
+                    if (AlarmChanged)
+                    {
+                        logger.LogInfo("Alarm for item " + CI.Gid + " is set to " + CI.Alarm.ToString());
+                    }
                 }
             }
             else

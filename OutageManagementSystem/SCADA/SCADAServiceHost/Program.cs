@@ -29,12 +29,13 @@ namespace Outage.SCADA.SCADAServiceHost
             catch (Exception ex)
             {
                 Console.WriteLine(ex.Message);
-                Console.WriteLine("SCADA Service failed.");
+                
+                Console.WriteLine("SCADAService failed.");
                 Console.WriteLine(ex.StackTrace);
                 CommonTrace.WriteTrace(CommonTrace.TraceError, ex.Message);
-                CommonTrace.WriteTrace(CommonTrace.TraceError, "SCADA Service failed.");
+                CommonTrace.WriteTrace(CommonTrace.TraceError, "SCADAService failed.");
                 CommonTrace.WriteTrace(CommonTrace.TraceError, ex.StackTrace);
-                logger.LogError($"SCADA Service failed.{Environment.NewLine}Message: {ex.Message} ", ex);
+                logger.LogError($"SCADAService failed.{Environment.NewLine}Message: {ex.Message} ", ex);
                 Console.ReadLine();
             }
         }
