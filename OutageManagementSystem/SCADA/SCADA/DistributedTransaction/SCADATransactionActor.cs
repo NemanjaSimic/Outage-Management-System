@@ -52,7 +52,7 @@ namespace SCADA_Service.DistributedTransaction
             }
             catch (Exception ex)
             {
-                logger.LogError($"Exception catched in Commit method on SCADA Transaction actor. Exception: {ex.Message}", ex);
+                logger.LogFatal($"Exception catched in Commit method on SCADA Transaction actor. Exception: {ex.Message}", ex);
                 logger.LogInfo("Commit on SCADA Transaction actor UNSUCCESSFULLY finished.");
             }
         }

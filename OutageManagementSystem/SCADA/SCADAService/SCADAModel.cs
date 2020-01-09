@@ -10,19 +10,19 @@ using System.Collections.Generic;
 using System.IO;
 using System.Linq;
 using System.Net.Sockets;
+using System.Threading;
 
 namespace Outage.SCADA.SCADAService
 {
     public class SCADAModel
     {
         private ILogger logger = LoggerWrapper.Instance;
+        private ModelResourcesDesc modelRD;
+        private ConfigWriter configWriter;
 
-        //TODO: stanje "modela" -> npr string putanje ka dokumentu
-        private DataModelRepository scadaModel = DataModelRepository.Instance;
         private Dictionary<DeltaOpType, List<long>> modelChanges;
-        private Dictionary<long, ConfigItem> delta_Points;
-        private ModelResourcesDesc modelRD = new ModelResourcesDesc();
-        private ConfigWriter ConfigWriter;
+        private DataModelRepository dataModelRepository = DataModelRepository.Instance;
+        private Dictionary<long, ConfigItem> incomingPoints;
 
         #region Proxies
         private NetworkModelGDAProxy gdaQueryProxy = null;
@@ -31,23 +31,34 @@ namespace Outage.SCADA.SCADAService
         {
             get
             {
-                try
+                int numberOfTries = 0;
+
+                while (numberOfTries < 10)
                 {
-                    if (gdaQueryProxy != null)
+                    try
                     {
-                        gdaQueryProxy.Abort();
+                        if (gdaQueryProxy != null)
+                        {
+                            gdaQueryProxy.Abort();
+                            gdaQueryProxy = null;
+                        }
+
+                        gdaQueryProxy = new NetworkModelGDAProxy(EndpointNames.NetworkModelGDAEndpoint);
+                        gdaQueryProxy.Open();
+                        break;
+                    }
+                    catch (Exception ex)
+                    {
+                        string message = $"Exception on NetworkModelGDAProxy initialization. Message: {ex.Message}";
+                        logger.LogError(message, ex);
                         gdaQueryProxy = null;
                     }
-
-                    gdaQueryProxy = new NetworkModelGDAProxy(EndpointNames.NetworkModelGDAEndpoint);
-                    gdaQueryProxy.Open();
-
-                }
-                catch (Exception ex)
-                {
-                    string message = $"Exception on NetworkModelGDAProxy initialization. Message: {ex.Message}";
-                    logger.LogError(message, ex);
-                    gdaQueryProxy = null;
+                    finally
+                    {
+                        numberOfTries++;
+                        logger.LogDebug($"SCADAModel: GdaQueryProxy getter, try number: {numberOfTries}.");
+                        Thread.Sleep(500);
+                    }
                 }
 
                 return gdaQueryProxy;
@@ -57,8 +68,8 @@ namespace Outage.SCADA.SCADAService
 
         public SCADAModel()
         {
-            delta_Points = new Dictionary<long, ConfigItem>();
-
+            incomingPoints = new Dictionary<long, ConfigItem>();
+            modelRD = new ModelResourcesDesc();
         }
 
         public bool Notify(Dictionary<DeltaOpType, List<long>> modelChanges)
@@ -69,24 +80,14 @@ namespace Outage.SCADA.SCADAService
 
         public bool Prepare()
         {
+            bool success = false;
+
             try
             {
-                foreach(long gid in scadaModel.Points.Keys)
+                foreach(long gid in dataModelRepository.Points.Keys)
                 {
-                    ConfigItem configItem = (ConfigItem)scadaModel.Points[gid].Clone();
-                    delta_Points.Add(gid, configItem);
-                }
-
-                foreach (long gid in modelChanges[DeltaOpType.Delete])
-                {
-                    ModelCode type = modelRD.GetModelCodeFromId(gid);
-                    if (type == ModelCode.ANALOG || type == ModelCode.DISCRETE)
-                    {
-                        if (delta_Points.ContainsKey(gid))
-                        {
-                            delta_Points.Remove(gid);
-                        }
-                    }
+                    ConfigItem point = (ConfigItem)dataModelRepository.Points[gid].Clone();
+                    incomingPoints.Add(gid, point);
                 }
 
                 foreach (long gid in modelChanges[DeltaOpType.Insert])
@@ -95,7 +96,7 @@ namespace Outage.SCADA.SCADAService
                     if (type == ModelCode.ANALOG || type == ModelCode.DISCRETE)
                     {
                         ConfigItem configItem = CreateConfigItemForEntity(gid);
-                        delta_Points.Add(gid, configItem);
+                        incomingPoints.Add(gid, configItem);
                     }
                 }
 
@@ -105,71 +106,107 @@ namespace Outage.SCADA.SCADAService
                     if(type == ModelCode.ANALOG || type == ModelCode.DISCRETE)
                     {
                         ConfigItem configItem = CreateConfigItemForEntity(gid);
-                        delta_Points[gid] = configItem;
+                        incomingPoints[gid] = configItem;
                     }
                 }
 
-                ConfigWriter = new ConfigWriter(scadaModel.ConfigFileName, delta_Points.Values.ToList());
+                foreach (long gid in modelChanges[DeltaOpType.Delete])
+                {
+                    ModelCode type = modelRD.GetModelCodeFromId(gid);
+                    if (type == ModelCode.ANALOG || type == ModelCode.DISCRETE)
+                    {
+                        if (incomingPoints.ContainsKey(gid))
+                        {
+                            incomingPoints.Remove(gid);
+                        }
+                    }
+                }
+
+
+                //TODO: backup trenutne konfiguracije
+                //generisanje nove configuracije, na lokaciji trenutne konfiguracije -> ConfigWriter(trenutna lokacija, incomingPoints.Values.ToList());
+
+                throw new NotImplementedException("SCADA prepare (partialy finished)");
+
+                //configWriter = new ConfigWriter(dataModelRepository.ConfigFileName, incomingPoints.Values.ToList());
+                //configWriter.GenerateConfigFile();
+
+                success = true;
             }
-            catch (Exception)
+            catch (Exception e)
             {
-                return false;
+                logger.LogError($"Exception catched in Prepare method on SCADAModel.", e);
+                success = false;
             }
 
-            return true;
+            return success;
         }
 
         public void Commit()
         {
-            try
-            {
-                scadaModel.Points = delta_Points;
-                
-                if (File.Exists(scadaModel.PathToDeltaCfg))
-                {
-                    File.Delete(scadaModel.PathToDeltaCfg);
-                }
-                //Move validan u backup folder
-                File.Move(scadaModel.PathMdbSimCfg, scadaModel.PathToDeltaCfg);
+            //TOOD:
+            //brisanje backup konfiguracije
+            //pokretanje sim sa novom -> mozda ne iz ovog commita nego iz onog wcf-ovskog koji se gadja
 
+            throw new NotImplementedException("SCADA Commit");
 
-                
-                if (File.Exists(scadaModel.PathMdbSimCfg))
-                {
-                    File.Delete(scadaModel.PathMdbSimCfg);
-                }
-                //Move u MdbSim folder
-                File.Move(scadaModel.ConfigFileName, scadaModel.PathMdbSimCfg);
+            //dataModelRepository.Points = incomingPoints;
 
-                string message = "There has been changes in configuration file.";
-                Console.WriteLine(message);
-                logger.LogInfo(message);
+            //if (File.Exists(dataModelRepository.IncomingConfigPath))
+            //{
+            //    File.Delete(dataModelRepository.IncomingConfigPath);
+            //}
 
-                ModbusSimulatorHandler.RestartSimulator();
-                modelChanges.Clear();
-            }
-            catch (Exception e)
-            {
-                logger.LogError("Error on SCADA commit. ", e);
-                throw e;
-            }
+            //if (File.Exists(dataModelRepository.CurrentConfigPath))
+            //{
+            //    //Move validan u backup folder
+            //    File.Move(dataModelRepository.CurrentConfigPath, dataModelRepository.IncomingConfigPath);
+            //}
+
+            //if (File.Exists(dataModelRepository.CurrentConfigPath))
+            //{
+            //    File.Delete(dataModelRepository.CurrentConfigPath);
+            //}
+
+            //if (File.Exists(dataModelRepository.CurrentConfigPath))
+            //{
+            //    //Move u MdbSim folder
+            //    File.Move(dataModelRepository.ConfigFileName, dataModelRepository.CurrentConfigPath);
+            //}
+
+            //string message = "There has been changes in configuration file.";
+            //Console.WriteLine(message);
+            //logger.LogInfo(message);
+
+            //modelChanges.Clear();
+
+            //ModbusSimulatorHandler.RestartSimulator();
         }
 
         public void Rollback()
         {
-            if (File.Exists(scadaModel.PathMdbSimCfg))
-            {
-                File.Delete(scadaModel.PathMdbSimCfg);
-            }
-            //Move u MdbSim folder
-            File.Move(scadaModel.PathToDeltaCfg, scadaModel.PathMdbSimCfg);
-            ModbusSimulatorHandler.RestartSimulator();
-            delta_Points.Clear();
-            modelChanges.Clear();
+            //TODO:
+            //brisanje trenutne configuracje
+            //vracanje stare iz backupfoldera
 
+            throw new NotImplementedException("SCADA Rollback");
+
+
+            //if (File.Exists(dataModelRepository.CurrentConfigPath))
+            //{
+            //    File.Delete(dataModelRepository.CurrentConfigPath);
+            //}
+
+            ////Move u MdbSim folder
+            //File.Move(dataModelRepository.IncomingConfigPath, dataModelRepository.CurrentConfigPath);
+
+            //incomingPoints.Clear();
+            //modelChanges.Clear();
+
+            //ModbusSimulatorHandler.RestartSimulator();
         }
 
-        public ConfigItem CreateConfigItemForEntity(long gid)
+        private ConfigItem CreateConfigItemForEntity(long gid)
         {
             ModelCode type = modelRD.GetModelCodeFromId(gid);
             List<ModelCode> props;
@@ -185,28 +222,24 @@ namespace Outage.SCADA.SCADAService
                     {
                         props = modelRD.GetAllPropertyIds(type);
                         rd = gdaProxy.GetValues(gid, props);
-                        configItem = scadaModel.ConfigurateConfigItem(rd.Properties, type);
+                        configItem = dataModelRepository.ConfigurateConfigItem(rd.Properties, type);
                     }
                     else
                     {
                         string errMessage = $"ResourceDescription type is neither analog nor digital. Type: {type}.";
                         logger.LogWarn(errMessage);
                         configItem = null;
-                        //throw new Exception(errMessage);
                     }
                 }
                 else
                 {
-                    string message = "NetworkModelGDAProxy is null.";
+                    string message = "From method CreateConfigItemForEntity(): NetworkModelGDAProxy is null.";
                     logger.LogWarn(message);
-                    //TODO: retry logic?
                     throw new NullReferenceException(message);
                 }
             }
 
             return configItem;
         }
-      
-        
     }
 }

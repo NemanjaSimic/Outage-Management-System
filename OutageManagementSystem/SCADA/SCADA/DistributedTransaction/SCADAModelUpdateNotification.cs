@@ -29,7 +29,6 @@ namespace SCADA_Service.DistributedTransaction
                 {
                     string message = "TransactionEnlistmentProxy is null.";
                     logger.LogWarn(message);
-                    //TODO: retry logic?
                     throw new NullReferenceException(message);
                 }
             }

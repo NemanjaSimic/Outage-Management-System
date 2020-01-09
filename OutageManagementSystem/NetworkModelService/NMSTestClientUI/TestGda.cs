@@ -1,6 +1,7 @@
 ﻿using System;
 using System.Collections.Generic;
 using System.Text;
+using System.Threading;
 using FTN.Services.NetworkModelService.TestClientUI;
 using Outage.Common;
 using Outage.Common.GDA;
@@ -17,28 +18,40 @@ namespace TelventDMS.Services.NetworkModelService.TestClient.TestsUI
 
         #region Proxies
         private NetworkModelGDAProxy gdaQueryProxy = null;
-		private NetworkModelGDAProxy GdaQueryProxy
+		protected NetworkModelGDAProxy GdaQueryProxy
 		{
 			get
 			{
-				try
-				{
-					if (gdaQueryProxy != null)
-					{
-						gdaQueryProxy.Abort();
-						gdaQueryProxy = null;
-					}
+                int numberOfTries = 0;
 
-					gdaQueryProxy = new NetworkModelGDAProxy(EndpointNames.NetworkModelGDAEndpoint);
-					gdaQueryProxy.Open();
-				}
-				catch (Exception ex)
-				{
-					string message = $"Exception on NetworkModelGDAProxy initialization. Message: {ex.Message}";
-					logger.LogError(message, ex);
-					gdaQueryProxy = null;
-				}
-				
+                while (numberOfTries < 10)
+                {
+                    try
+				    {
+					    if (gdaQueryProxy != null)
+					    {
+						    gdaQueryProxy.Abort();
+						    gdaQueryProxy = null;
+					    }
+
+					    gdaQueryProxy = new NetworkModelGDAProxy(EndpointNames.NetworkModelGDAEndpoint);
+					    gdaQueryProxy.Open();
+                        break;
+				    }
+				    catch (Exception ex)
+				    {
+					    string message = $"Exception on NetworkModelGDAProxy initialization. Message: {ex.Message}";
+					    logger.LogError(message, ex);
+					    gdaQueryProxy = null;
+				    }
+				    finally
+                    {
+                        numberOfTries++;
+                        logger.LogDebug($"TestGda: GdaQueryProxy getter, try number: {numberOfTries}.");
+                        Thread.Sleep(500);
+                    }
+                }
+
 				return gdaQueryProxy;
 			}
 		}
@@ -72,7 +85,6 @@ namespace TelventDMS.Services.NetworkModelService.TestClient.TestsUI
 					{
 						string errMsg = "NetworkModelGDAProxy is null.";
 						logger.LogWarn(errMsg);
-						//TODO: retry logic?
 						throw new NullReferenceException(errMsg);
 					}
 				}	
@@ -156,7 +168,6 @@ namespace TelventDMS.Services.NetworkModelService.TestClient.TestsUI
 					{
 						string errMsg = "NetworkModelGDAProxy is null.";
 						logger.LogWarn(errMsg);
-						//TODO: retry logic?
 						throw new NullReferenceException(errMsg);
 					}
 				}
@@ -244,7 +255,6 @@ namespace TelventDMS.Services.NetworkModelService.TestClient.TestsUI
 					{
 						string errMsg = "NetworkModelGDAProxy is null.";
 						logger.LogWarn(errMsg);
-						//TODO: retry logic?
 						throw new NullReferenceException(errMsg);
 					}
 				}		

@@ -104,7 +104,6 @@ namespace Outage.DataImporter.CIMAdapter.Importer
 
         public TransformAndLoadReport CreateNMSDelta(ConcreteModel cimConcreteModel, NetworkModelGDAProxy gdaQueryProxy, ModelResourcesDesc resourcesDesc)
         {
-            //LogManager.Log("Importing Outage Elements...", LogLevel.Info); //TODO: ovo menjati sa nasim logom
             logger.LogInfo("Importing Outage Elements...");
             report = new TransformAndLoadReport();
             concreteModel = cimConcreteModel;
@@ -194,14 +193,13 @@ namespace Outage.DataImporter.CIMAdapter.Importer
             {
                 int iteratorId = 0;
                 int resourcesLeft = 0;
-                int numberOfResources = 10000; //TODO connfigurabilno
+                int numberOfResources = 10000; //TODO: connfigurabilno
 
                 try
                 {
                     iteratorId = gdaQueryProxy.GetExtentValues(modelCodeType, mrIdProp);
                     resourcesLeft = gdaQueryProxy.IteratorResourcesLeft(iteratorId);
 
-                    //TODO: while, n to be some predifined number...
                     while (resourcesLeft > 0)
                     {
                         List<ResourceDescription> gdaResult = gdaQueryProxy.IteratorNext(numberOfResources, iteratorId);

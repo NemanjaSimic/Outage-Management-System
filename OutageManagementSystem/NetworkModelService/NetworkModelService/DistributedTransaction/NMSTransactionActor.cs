@@ -51,7 +51,7 @@ namespace Outage.NetworkModelService.DistributedTransaction
             }
             catch (Exception ex)
             { 
-                logger.LogError($"Exception catched in Commit method on NMS Transaction actor. Exception: {ex.Message}", ex);
+                logger.LogFatal($"Exception catched in Commit method on NMS Transaction actor. Exception: {ex.Message}", ex);
                 logger.LogInfo("Commit on NMS Transaction actor UNSUCCESSFULLY finished.");
             }
         }

@@ -15,6 +15,7 @@ using System.Collections.Generic;
 using System.IO;
 using System.Linq;
 using System.Text;
+using System.Threading;
 using System.Threading.Tasks;
 using System.Xml;
 
@@ -76,22 +77,34 @@ namespace Outage.NetworkModelService
         {
             get
             {
-                try
+                int numberOfTries = 0;
+
+                while (numberOfTries < 10)
                 {
-                    if (transactionCoordinatorProxy != null)
+                    try
                     {
-                        transactionCoordinatorProxy.Abort();
+                        if (transactionCoordinatorProxy != null)
+                        {
+                            transactionCoordinatorProxy.Abort();
+                            transactionCoordinatorProxy = null;
+                        }
+
+                        transactionCoordinatorProxy = new TransactionCoordinatorProxy(EndpointNames.TransactionCoordinatorEndpoint);
+                        transactionCoordinatorProxy.Open();
+                        break;
+                    }
+                    catch (Exception ex)
+                    {
+                        string message = $"Exception on TransactionCoordinatorProxy initialization. Message: {ex.Message}";
+                        logger.LogError(message, ex);
                         transactionCoordinatorProxy = null;
                     }
-
-                    transactionCoordinatorProxy = new TransactionCoordinatorProxy(EndpointNames.TransactionCoordinatorEndpoint);
-                    transactionCoordinatorProxy.Open();
-                }
-                catch (Exception ex)
-                {
-                    string message = $"Exception on TransactionCoordinatorProxy initialization. Message: {ex.Message}";
-                    logger.LogError(message, ex);
-                    transactionCoordinatorProxy = null;
+                    finally
+                    {
+                        numberOfTries++;
+                        logger.LogDebug($"NetworkModel: TransactionCoordinatorProxy getter, try number: {numberOfTries}.");
+                        Thread.Sleep(500);
+                    }
                 }
 
                 return transactionCoordinatorProxy;
@@ -136,21 +149,34 @@ namespace Outage.NetworkModelService
 
         protected ModelUpdateNotificationProxy GetModelUpdateNotificationProxy(string endpointName)
         {
-            try
+            int numberOfTries = 0;
+
+            while(numberOfTries < 10)
             {
-                if (modelUpdateNotifierProxy != null)
+                try
                 {
-                    modelUpdateNotifierProxy.Abort();
+                    if (modelUpdateNotifierProxy != null)
+                    {
+                        modelUpdateNotifierProxy.Abort();
+                        modelUpdateNotifierProxy = null;
+                    }
+
+                    modelUpdateNotifierProxy = new ModelUpdateNotificationProxy(endpointName);
+                    modelUpdateNotifierProxy.Open();
+                    break;
+                }
+                catch (Exception ex)
+                {
+                    string message = $"Exception on ModelUpdateNotificationProxy initialization. EndpointName: {endpointName}, Message: {ex.Message}";
+                    logger.LogError(message, ex);
                     modelUpdateNotifierProxy = null;
                 }
-
-                modelUpdateNotifierProxy = new ModelUpdateNotificationProxy(endpointName);
-                modelUpdateNotifierProxy.Open();
-            }
-            catch (Exception ex)
-            {
-                //TODO log err
-                modelUpdateNotifierProxy = null;
+                finally
+                {
+                    numberOfTries++;
+                    logger.LogDebug($"NetworkModel: GetModelUpdateNotificationProxy(), EndpointName: {endpointName}, try number: {numberOfTries}.");
+                    Thread.Sleep(500);
+                }
             }
 
             return modelUpdateNotifierProxy;
@@ -478,7 +504,6 @@ namespace Outage.NetworkModelService
                 if (transactionCoordinatorProxy == null)
                 {
                     logger.LogWarn("TransactionCoordinatorProxy is not initialized. This can be due to TransactionCoordinator not being stared.");
-                    //TODO: retry logic pre commit jedan retry?
                     Commit(false);
                     return;
                 }
@@ -522,7 +547,6 @@ namespace Outage.NetworkModelService
                 {
                     string message = "ModelUpdateNotificationProxy for SCADA is null.";
                     logger.LogWarn(message);
-                    //TODO: retry logic?
                     throw new NullReferenceException(message);
                 }
             }
@@ -540,7 +564,6 @@ namespace Outage.NetworkModelService
                     {
                         string message = "ModelUpdateNotificationProxy for CalculationEngine is null.";
                         logger.LogWarn(message);
-                        //TODO: retry logic?
                         throw new NullReferenceException(message);
                     }
                 }
@@ -558,7 +581,6 @@ namespace Outage.NetworkModelService
                         {
                             string message = "TransactionEnlistmentProxy is null.";
                             logger.LogWarn(message);
-                            //TODO: retry logic?
                             throw new NullReferenceException(message);
                         }
                     }
@@ -576,7 +598,6 @@ namespace Outage.NetworkModelService
                 {
                     string message = "TransactionCoordinatorProxy is null.";
                     logger.LogWarn(message);
-                    //TODO: retry logic?
                     throw new NullReferenceException(message);
                 }
             }

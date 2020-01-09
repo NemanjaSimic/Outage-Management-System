@@ -26,30 +26,41 @@ namespace Outage.DataImporter.CIMAdapter
 
         #region Proxies
         private NetworkModelGDAProxy gdaQueryProxy = null;
-        private NetworkModelGDAProxy GdaQueryProxy
+        protected NetworkModelGDAProxy GdaQueryProxy
         {
             get
             {
-                try
+                int numberOfTries = 0;
+
+                while (numberOfTries < 10)
                 {
-                    if (gdaQueryProxy != null)
+                    try
                     {
-                        gdaQueryProxy.Abort();
+                        if (gdaQueryProxy != null)
+                        {
+                            gdaQueryProxy.Abort();
+                            gdaQueryProxy = null;
+                        }
+
+                        gdaQueryProxy = new NetworkModelGDAProxy(EndpointNames.NetworkModelGDAEndpoint);
+                        gdaQueryProxy.Open();
+                        break;
+                    }
+                    catch (Exception ex)
+                    {
+                        string message = $"Exception on NetworkModelGDAProxy initialization. Message: {ex.Message}";
+                        logger.LogError(message, ex);
                         gdaQueryProxy = null;
                     }
-
-                    gdaQueryProxy = new NetworkModelGDAProxy(EndpointNames.NetworkModelGDAEndpoint);
-                    gdaQueryProxy.Open();
-
-                }
-                catch (Exception ex)
-                {
-                    string message = $"Exception on NetworkModelGDAProxy initialization. Message: {ex.Message}";
-                    logger.LogError(message, ex);
-                    gdaQueryProxy = null;
+                    finally
+                    {
+                        numberOfTries++;
+                        logger.LogDebug($"CIMAdapterClass: GdaQueryProxy getter, try number: {numberOfTries}.");
+                        Thread.Sleep(500);
+                    }
                 }
 
-                    return gdaQueryProxy;
+                return gdaQueryProxy;
             }
         }
         #endregion
@@ -98,7 +109,6 @@ namespace Outage.DataImporter.CIMAdapter
                     {
                         string message = "NetworkModelGDAProxy is null.";
                         logger.LogWarn(message);
-                        //TODO: retry logic?
                         throw new NullReferenceException(message);
                     }
                 }

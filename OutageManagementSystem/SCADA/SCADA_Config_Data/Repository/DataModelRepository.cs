@@ -8,6 +8,7 @@ using System;
 using System.Collections.Generic;
 using System.Configuration;
 using System.ServiceModel;
+using System.Threading;
 
 namespace Outage.SCADA.SCADA_Config_Data.Repository
 {
@@ -23,23 +24,34 @@ namespace Outage.SCADA.SCADA_Config_Data.Repository
         {
             get
             {
-                try
+                int numberOfTries = 0;
+
+                while (numberOfTries < 10)
                 {
-                    if (gdaQueryProxy != null)
+                    try
                     {
-                        gdaQueryProxy.Abort();
+                        if (gdaQueryProxy != null)
+                        {
+                            gdaQueryProxy.Abort();
+                            gdaQueryProxy = null;
+                        }
+
+                        gdaQueryProxy = new NetworkModelGDAProxy(EndpointNames.NetworkModelGDAEndpoint);
+                        gdaQueryProxy.Open();
+                        break;
+                    }
+                    catch (Exception ex)
+                    {
+                        string message = $"Exception on NetworkModelGDAProxy initialization. Message: {ex.Message}";
+                        logger.LogError(message, ex);
                         gdaQueryProxy = null;
                     }
-
-                    gdaQueryProxy = new NetworkModelGDAProxy(EndpointNames.NetworkModelGDAEndpoint);
-                    gdaQueryProxy.Open();
-
-                }
-                catch (Exception ex)
-                {
-                    string message = $"Exception on NetworkModelGDAProxy initialization. Message: {ex.Message}";
-                    logger.LogError(message, ex);
-                    gdaQueryProxy = null;
+                    finally
+                    {
+                        numberOfTries++;
+                        logger.LogDebug($"DataModelRepository: GdaQueryProxy getter, try number: {numberOfTries}.");
+                        Thread.Sleep(500);
+                    }
                 }
 
                 return gdaQueryProxy;
@@ -53,8 +65,8 @@ namespace Outage.SCADA.SCADA_Config_Data.Repository
 
         public string ConfigFileName { get; protected set; } = string.Empty;
         public string MdbSimExeName { get; protected set; } = string.Empty;
-        public string PathToDeltaCfg { get; protected set; } = string.Empty;
-        public string PathMdbSimCfg { get; protected set; } = string.Empty;
+        public string IncomingConfigPath { get; protected set; } = string.Empty;
+        public string CurrentConfigPath { get; protected set; } = string.Empty;
         public string MdbSimExePath { get; protected set; } = string.Empty;
 
         public Dictionary<long, ConfigItem> Points { get; set; }
@@ -137,17 +149,19 @@ namespace Outage.SCADA.SCADA_Config_Data.Repository
                         success = true;
                     }
                     else
-                    {
-                        //TODO: retry
+                    { 
                         success = false;
+                        string errMsg = "From ImportAnalog() method: NetworkModelGDAProxy is null.";
+                        logger.LogWarn(errMsg);
                     }
                 }
             }
             catch (Exception ex)
             {
-                //TODO: err log
-                Console.WriteLine("ImportAnalog failed with error: {0}", ex.Message);
                 success = false;
+                string errorMessage = $"ImportAnalog failed with error: {ex.Message}";
+                Console.WriteLine(errorMessage);
+                logger.LogError(errorMessage, ex);
             }
 
             return success;
@@ -187,16 +201,18 @@ namespace Outage.SCADA.SCADA_Config_Data.Repository
                     }
                     else
                     {
-                        //TODO: retry
                         success = false;
+                        string errMsg = "From ImportDiscrete() method: NetworkModelGDAProxy is null.";
+                        logger.LogWarn(errMsg);
                     }
                 }
             }
             catch (Exception ex)
             {
-                //TODO: err log
-                Console.WriteLine("ImportDiscrete failed with error: {0}", ex.Message);
                 success = false;
+                string errorMessage = $"ImportDiscrete failed with error: {ex.Message}";
+                Console.WriteLine(errorMessage);
+                logger.LogError(errorMessage, ex);
             }
 
             return success;
@@ -248,15 +264,25 @@ namespace Outage.SCADA.SCADA_Config_Data.Repository
             {
                 ConfigFileName = configFileName;
 
-                PathToDeltaCfg = Environment.CurrentDirectory.Replace("\\SCADAServiceHost\\bin\\Debug", $"\\MdbSimTest\\{ConfigFileName}");
-                PathMdbSimCfg = Environment.CurrentDirectory.Replace("\\SCADAServiceHost\\bin\\Debug", $"\\MdbSim\\{ConfigFileName}");
+                if (ConfigurationManager.AppSettings["CurrentConfigPath"] is string currentConfigPath)
+                {
+                    CurrentConfigPath = Environment.CurrentDirectory.Replace(@"\SCADAServiceHost\bin\Debug", $@"{currentConfigPath}\{ConfigFileName}");
+                }
+
+                if (ConfigurationManager.AppSettings["IncomingConfigPath"] is string incomingConfigPath)
+                {
+                    IncomingConfigPath = Environment.CurrentDirectory.Replace(@"\SCADAServiceHost\bin\Debug", $@"{incomingConfigPath}\{ConfigFileName}");
+                }
             }
 
             if (ConfigurationManager.AppSettings["MdbSimExeName"] is string mdbSimExeName)
             {
                 MdbSimExeName = mdbSimExeName;
 
-                MdbSimExePath = Environment.CurrentDirectory.Replace("\\SCADAServiceHost\\bin\\Debug", $"\\MdbSim\\{MdbSimExeName}");
+                if (ConfigurationManager.AppSettings["MdbSimExePath"] is string mdbSimExePath)
+                {
+                    MdbSimExePath = Environment.CurrentDirectory.Replace(@"\SCADAServiceHost\\bin\\Debug", $@"{mdbSimExePath}\{MdbSimExeName}");
+                }   
             }
 
         }

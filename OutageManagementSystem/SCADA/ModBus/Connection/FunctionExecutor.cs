@@ -39,22 +39,34 @@ namespace Outage.SCADA.ModBus.Connection
             //TODO: diskusija statefull vs stateless
             get
             {
-                try
+                int numberOfTries = 0;
+
+                while (numberOfTries < 10)
                 {
-                    if (publisherProxy != null)
+                    try
                     {
-                        publisherProxy.Abort();
+                        if (publisherProxy != null)
+                        {
+                            publisherProxy.Abort();
+                            publisherProxy = null;
+                        }
+
+                        publisherProxy = new PublisherProxy(EndpointNames.PublisherEndpoint);
+                        publisherProxy.Open();
+                        break;
+                    }
+                    catch (Exception ex)
+                    {
+                        string message = $"Exception on PublisherProxy initialization. Message: {ex.Message}";
+                        logger.LogError(message, ex);
                         publisherProxy = null;
                     }
-
-                    publisherProxy = new PublisherProxy(EndpointNames.PublisherEndpoint);
-                    publisherProxy.Open();
-                }
-                catch (Exception ex)
-                {
-                    string message = $"Exception on PublisherProxy initialization. Message: {ex.Message}";
-                    logger.LogError(message, ex);
-                    publisherProxy = null;
+                    finally
+                    {
+                        numberOfTries++;
+                        logger.LogDebug($"FunctionExecutor: PublisherProxy getter, try number: {numberOfTries}.");
+                        Thread.Sleep(500);
+                    }
                 }
 
                 return publisherProxy;
@@ -223,7 +235,6 @@ namespace Outage.SCADA.ModBus.Connection
                                     {
                                         string errMsg = "PublisherProxy is null.";
                                         logger.LogWarn(errMsg);
-                                        //TODO: retry logic?
                                         throw new NullReferenceException(errMsg);
                                     }
                                 }

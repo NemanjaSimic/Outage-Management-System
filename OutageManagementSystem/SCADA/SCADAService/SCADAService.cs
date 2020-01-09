@@ -55,6 +55,7 @@ namespace Outage.SCADA.SCADAService
         private void InitializeModbusSimConfiguration()
         {
             bool success = repo.ImportModel();
+
             if(success)
             {
                 //todo: debug log
@@ -62,12 +63,12 @@ namespace Outage.SCADA.SCADAService
                 configWriter = new ConfigWriter(repo.ConfigFileName, repo.Points.Values.ToList());
                 configWriter.GenerateConfigFile();
 
-                if (File.Exists(repo.PathMdbSimCfg))
+                if (File.Exists(repo.CurrentConfigPath))
                 {
-                    File.Delete(repo.PathMdbSimCfg);
+                    File.Delete(repo.CurrentConfigPath);
                 }
 
-                File.Move(repo.ConfigFileName, repo.PathMdbSimCfg);
+                File.Move(repo.ConfigFileName, repo.CurrentConfigPath);
 
                 Console.WriteLine("ModbusSim Configuration file generated SUCCESSFULLY.");
             }
@@ -75,7 +76,7 @@ namespace Outage.SCADA.SCADAService
             {
                 //todo: debug log
                 Console.WriteLine("ModbusSim Configuration file generated UNSUCCESSFULLY.");
-                //retry logic
+                //toddo: retry logic
                 throw new Exception("ImportModel failed.");
             }
         }

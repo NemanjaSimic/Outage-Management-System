@@ -51,7 +51,7 @@ namespace CalculationEngineService.DistributedTransaction
             }
             catch (Exception ex)
             {
-                logger.LogError($"Exception catched in Commit method on CE Transaction actor. Exception: {ex.Message}", ex);
+                logger.LogFatal($"Exception catched in Commit method on CE Transaction actor. Exception: {ex.Message}", ex);
                 logger.LogInfo("Commit on CE Transaction actor UNSUCCESSFULLY finished.");
             }
         }

@@ -8,6 +8,7 @@ using System;
 using System.Collections.Generic;
 using System.Linq;
 using System.Text;
+using System.Threading;
 using System.Threading.Tasks;
 
 namespace Outage.TransactionManagerService
@@ -39,24 +40,36 @@ namespace Outage.TransactionManagerService
         private TransactionActorProxy transactionActorProxy = null;
 
         #region Proxies
-        protected TransactionActorProxy GetTransactionActorProxy(string endpoint)
+        protected TransactionActorProxy GetTransactionActorProxy(string endpointName)
         {
-            try
+            int numberOfTries = 0;
+
+            while (numberOfTries < 10)
             {
-                if (transactionActorProxy != null)
+                try
                 {
-                    transactionActorProxy.Abort();
+                    if (transactionActorProxy != null)
+                    {
+                        transactionActorProxy.Abort();
+                        transactionActorProxy = null;
+                    }
+
+                    transactionActorProxy = new TransactionActorProxy(endpointName);
+                    transactionActorProxy.Open();
+                    break;
+                }
+                catch (Exception ex)
+                {
+                    string message = $"Exception on TransactionActorProxy initialization. Message: {ex.Message}";
+                    logger.LogError(message, ex);
                     transactionActorProxy = null;
                 }
-
-                transactionActorProxy = new TransactionActorProxy(endpoint);
-                transactionActorProxy.Open();
-            }
-            catch (Exception ex)
-            {
-                string message = $"Exception on TransactionActorProxy initialization. Message: {ex.Message}";
-                logger.LogError(message, ex);
-                transactionActorProxy = null;
+                finally
+                {
+                    numberOfTries++;
+                    logger.LogDebug($"DistributedTransaction: GetTransactionActorProxy(), EndpointName: {endpointName}, try number: {numberOfTries}.");
+                    Thread.Sleep(500);
+                }
             }
 
             return transactionActorProxy;
@@ -138,6 +151,7 @@ namespace Outage.TransactionManagerService
                 if(TransactionLedger[actor] && distributedTransactionActors.ContainsKey(actor))
                 {
                     string endpointName = distributedTransactionActors[actor];
+
                     using (TransactionActorProxy transactionActorProxy = GetTransactionActorProxy(endpointName))
                     {
                         if(transactionActorProxy != null)
@@ -181,6 +195,7 @@ namespace Outage.TransactionManagerService
                 if(distributedTransactionActors.ContainsKey(actor))
                 {
                     string endpointName = distributedTransactionActors[actor];
+
                     using (TransactionActorProxy transactionActorProxy = GetTransactionActorProxy(endpointName))
                     {
                         if (transactionActorProxy != null)
@@ -206,6 +221,7 @@ namespace Outage.TransactionManagerService
                 if(distributedTransactionActors.ContainsKey(actor))
                 {
                     string endpointName = distributedTransactionActors[actor];
+
                     using (TransactionActorProxy transactionActorProxy = GetTransactionActorProxy(endpointName))
                     {
                         if (transactionActorProxy != null)

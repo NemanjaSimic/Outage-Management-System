@@ -40,7 +40,6 @@ namespace Outage.SCADA.SCADAService.DistributedTransaction
                     {
                         string message = "TransactionEnlistmentProxy is null.";
                         logger.LogWarn(message);
-                        //TODO: retry logic?
                         throw new NullReferenceException(message);
                     }
                 }
