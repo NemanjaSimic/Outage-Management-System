@@ -22,7 +22,14 @@ namespace Outage.SCADA.SCADAService
 
         private Dictionary<DeltaOpType, List<long>> modelChanges;
         private DataModelRepository dataModelRepository = DataModelRepository.Instance;
+
         private Dictionary<long, ConfigItem> incomingPoints;
+        protected Dictionary<long, ConfigItem> IncomingPoints
+        {
+            get { return incomingPoints ?? (incomingPoints = new Dictionary<long, ConfigItem>()); }
+        }
+
+
 
         #region Proxies
         private NetworkModelGDAProxy gdaQueryProxy = null;
@@ -87,7 +94,7 @@ namespace Outage.SCADA.SCADAService
                 foreach(long gid in dataModelRepository.Points.Keys)
                 {
                     ConfigItem point = (ConfigItem)dataModelRepository.Points[gid].Clone();
-                    incomingPoints.Add(gid, point);
+                    IncomingPoints.Add(gid, point);
                 }
 
                 foreach (long gid in modelChanges[DeltaOpType.Insert])
@@ -96,7 +103,7 @@ namespace Outage.SCADA.SCADAService
                     if (type == ModelCode.ANALOG || type == ModelCode.DISCRETE)
                     {
                         ConfigItem configItem = CreateConfigItemForEntity(gid);
-                        incomingPoints.Add(gid, configItem);
+                        IncomingPoints.Add(gid, configItem);
                     }
                 }
 
@@ -106,7 +113,7 @@ namespace Outage.SCADA.SCADAService
                     if(type == ModelCode.ANALOG || type == ModelCode.DISCRETE)
                     {
                         ConfigItem configItem = CreateConfigItemForEntity(gid);
-                        incomingPoints[gid] = configItem;
+                        IncomingPoints[gid] = configItem;
                     }
                 }
 
@@ -115,21 +122,37 @@ namespace Outage.SCADA.SCADAService
                     ModelCode type = modelRD.GetModelCodeFromId(gid);
                     if (type == ModelCode.ANALOG || type == ModelCode.DISCRETE)
                     {
-                        if (incomingPoints.ContainsKey(gid))
+                        if (IncomingPoints.ContainsKey(gid))
                         {
-                            incomingPoints.Remove(gid);
+                            IncomingPoints.Remove(gid);
                         }
                     }
                 }
 
+                configWriter = new ConfigWriter(dataModelRepository.ConfigFileName, IncomingPoints.Values.ToList());
+                configWriter.GenerateConfigFile();
 
-                //TODO: backup trenutne konfiguracije
-                //generisanje nove configuracije, na lokaciji trenutne konfiguracije -> ConfigWriter(trenutna lokacija, incomingPoints.Values.ToList());
+                if (File.Exists(dataModelRepository.BackupConfigPath))
+                {
+                    File.Delete(dataModelRepository.BackupConfigPath);
+                }
 
-                throw new NotImplementedException("SCADA prepare (partialy finished)");
+                if (File.Exists(dataModelRepository.CurrentConfigPath))
+                {
+                    //Move current config to backup folder
+                    File.Move(dataModelRepository.CurrentConfigPath, dataModelRepository.BackupConfigPath);
+                }
 
-                //configWriter = new ConfigWriter(dataModelRepository.ConfigFileName, incomingPoints.Values.ToList());
-                //configWriter.GenerateConfigFile();
+                if (File.Exists(dataModelRepository.CurrentConfigPath))
+                {
+                    File.Delete(dataModelRepository.CurrentConfigPath);
+                }
+
+                if (File.Exists(dataModelRepository.ConfigFileName))
+                {
+                    //Move u MdbSim folder
+                    File.Move(dataModelRepository.ConfigFileName, dataModelRepository.CurrentConfigPath);
+                }
 
                 success = true;
             }
@@ -144,66 +167,47 @@ namespace Outage.SCADA.SCADAService
 
         public void Commit()
         {
-            //TOOD:
-            //brisanje backup konfiguracije
-            //pokretanje sim sa novom -> mozda ne iz ovog commita nego iz onog wcf-ovskog koji se gadja
+            dataModelRepository.Points = IncomingPoints;
+            incomingPoints = null;
+            modelChanges.Clear();
 
-            throw new NotImplementedException("SCADA Commit");
+            if (File.Exists(dataModelRepository.BackupConfigPath))
+            {
+                File.Delete(dataModelRepository.BackupConfigPath);
+            }
 
-            //dataModelRepository.Points = incomingPoints;
-
-            //if (File.Exists(dataModelRepository.IncomingConfigPath))
-            //{
-            //    File.Delete(dataModelRepository.IncomingConfigPath);
-            //}
-
-            //if (File.Exists(dataModelRepository.CurrentConfigPath))
-            //{
-            //    //Move validan u backup folder
-            //    File.Move(dataModelRepository.CurrentConfigPath, dataModelRepository.IncomingConfigPath);
-            //}
-
-            //if (File.Exists(dataModelRepository.CurrentConfigPath))
-            //{
-            //    File.Delete(dataModelRepository.CurrentConfigPath);
-            //}
-
-            //if (File.Exists(dataModelRepository.CurrentConfigPath))
-            //{
-            //    //Move u MdbSim folder
-            //    File.Move(dataModelRepository.ConfigFileName, dataModelRepository.CurrentConfigPath);
-            //}
-
-            //string message = "There has been changes in configuration file.";
-            //Console.WriteLine(message);
-            //logger.LogInfo(message);
-
-            //modelChanges.Clear();
-
-            //ModbusSimulatorHandler.RestartSimulator();
+            string message = $"Incoming config file is confirmed.";
+            Console.WriteLine(message);
+            logger.LogInfo(message);
         }
 
         public void Rollback()
         {
-            //TODO:
-            //brisanje trenutne configuracje
-            //vracanje stare iz backupfoldera
+            incomingPoints = null;
+            modelChanges.Clear();
 
-            throw new NotImplementedException("SCADA Rollback");
+            if (File.Exists(dataModelRepository.CurrentConfigPath))
+            {
+                File.Delete(dataModelRepository.CurrentConfigPath);
+            }
 
-
-            //if (File.Exists(dataModelRepository.CurrentConfigPath))
-            //{
-            //    File.Delete(dataModelRepository.CurrentConfigPath);
-            //}
-
-            ////Move u MdbSim folder
-            //File.Move(dataModelRepository.IncomingConfigPath, dataModelRepository.CurrentConfigPath);
-
-            //incomingPoints.Clear();
-            //modelChanges.Clear();
-
-            //ModbusSimulatorHandler.RestartSimulator();
+            if (File.Exists(dataModelRepository.BackupConfigPath))
+            {
+                File.Move(dataModelRepository.BackupConfigPath, dataModelRepository.CurrentConfigPath);
+            }
+            else
+            {
+                if (File.Exists(dataModelRepository.ConfigFileName))
+                {
+                    File.Move(dataModelRepository.ConfigFileName, dataModelRepository.CurrentConfigPath);
+                }
+                else
+                {
+                    configWriter = new ConfigWriter(dataModelRepository.ConfigFileName, dataModelRepository.Points.Values.ToList());
+                    configWriter.GenerateConfigFile();
+                    File.Move(dataModelRepository.ConfigFileName, dataModelRepository.CurrentConfigPath);
+                }
+            }
         }
 
         private ConfigItem CreateConfigItemForEntity(long gid)
@@ -212,7 +216,6 @@ namespace Outage.SCADA.SCADAService
             List<ModelCode> props;
             ResourceDescription rd;
             ConfigItem configItem = null;
-
 
             using(NetworkModelGDAProxy gdaProxy = GdaQueryProxy)
             {

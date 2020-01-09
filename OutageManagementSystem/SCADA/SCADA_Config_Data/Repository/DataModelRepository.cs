@@ -64,14 +64,14 @@ namespace Outage.SCADA.SCADA_Config_Data.Repository
         public ushort Interval { get; protected set; }
 
         public string ConfigFileName { get; protected set; } = string.Empty;
-        public string MdbSimExeName { get; protected set; } = string.Empty;
-        public string IncomingConfigPath { get; protected set; } = string.Empty;
         public string CurrentConfigPath { get; protected set; } = string.Empty;
+        public string BackupConfigPath { get; protected set; } = string.Empty;
+        public string MdbSimExeName { get; protected set; } = string.Empty;
         public string MdbSimExePath { get; protected set; } = string.Empty;
 
         public Dictionary<long, ConfigItem> Points { get; set; }
-        public Dictionary<long, Dictionary<ModelCode, Property>> NMS_Model_Props { get; protected set; }
-        public Dictionary<long, ResourceDescription> NMS_Model { get; protected set; }
+        public Dictionary<long, ResourceDescription> NetworkModel { get; protected set; }
+        public Dictionary<long, Dictionary<ModelCode, Property>> NetworkModelProps { get; protected set; }
 
         #region Instance
         private static DataModelRepository _instance;
@@ -93,8 +93,8 @@ namespace Outage.SCADA.SCADA_Config_Data.Repository
         private DataModelRepository()
         {
             Points = new Dictionary<long, ConfigItem>();
-            NMS_Model = new Dictionary<long, ResourceDescription>();
-            NMS_Model_Props = new Dictionary<long, Dictionary<ModelCode, Property>>();
+            NetworkModel = new Dictionary<long, ResourceDescription>();
+            NetworkModelProps = new Dictionary<long, Dictionary<ModelCode, Property>>();
 
             ImportAppSettings();
         }
@@ -138,7 +138,7 @@ namespace Outage.SCADA.SCADA_Config_Data.Repository
                             {
                                 if (rds[i] != null)
                                 {
-                                    NMS_Model.Add(rds[i].Id, rds[i]);
+                                    NetworkModel.Add(rds[i].Id, rds[i]);
                                     Points.Add(rds[i].Id, ConfigurateConfigItem(rds[i].Properties, ModelCode.ANALOG));
                                     //TODO: log debug
                                 }
@@ -189,7 +189,7 @@ namespace Outage.SCADA.SCADA_Config_Data.Repository
                             {
                                 if (rds[i] != null)
                                 {
-                                    NMS_Model.Add(rds[i].Id, rds[i]);
+                                    NetworkModel.Add(rds[i].Id, rds[i]);
                                     Points.Add(rds[i].Id, ConfigurateConfigItem(rds[i].Properties, ModelCode.DISCRETE));
                                     //TODO: log debug
                                 }
@@ -269,9 +269,9 @@ namespace Outage.SCADA.SCADA_Config_Data.Repository
                     CurrentConfigPath = Environment.CurrentDirectory.Replace(@"\SCADAServiceHost\bin\Debug", $@"{currentConfigPath}\{ConfigFileName}");
                 }
 
-                if (ConfigurationManager.AppSettings["IncomingConfigPath"] is string incomingConfigPath)
+                if (ConfigurationManager.AppSettings["BackupConfigPath"] is string backupConfigPath)
                 {
-                    IncomingConfigPath = Environment.CurrentDirectory.Replace(@"\SCADAServiceHost\bin\Debug", $@"{incomingConfigPath}\{ConfigFileName}");
+                    BackupConfigPath = Environment.CurrentDirectory.Replace(@"\SCADAServiceHost\bin\Debug", $@"{backupConfigPath}\{ConfigFileName}");
                 }
             }
 
@@ -281,7 +281,7 @@ namespace Outage.SCADA.SCADA_Config_Data.Repository
 
                 if (ConfigurationManager.AppSettings["MdbSimExePath"] is string mdbSimExePath)
                 {
-                    MdbSimExePath = Environment.CurrentDirectory.Replace(@"\SCADAServiceHost\\bin\\Debug", $@"{mdbSimExePath}\{MdbSimExeName}");
+                    MdbSimExePath = Environment.CurrentDirectory.Replace(@"\SCADAServiceHost\bin\Debug", $@"{mdbSimExePath}\{MdbSimExeName}");
                 }   
             }
 
@@ -291,39 +291,39 @@ namespace Outage.SCADA.SCADA_Config_Data.Repository
         {
             ConfigItem configItem = new ConfigItem();
             long gid = 0;
-            Dictionary<ModelCode, Property> prop = new Dictionary<ModelCode, Property>();
+            Dictionary<ModelCode, Property> propDictionary = new Dictionary<ModelCode, Property>();
             foreach (var item in props)
             {
                 switch (item.Id)
                 {
                     case ModelCode.IDOBJ_GID:
                         gid = item.AsLong();
-                        prop.Add(item.Id, item);
+                        propDictionary.Add(item.Id, item);
                         configItem.Gid = gid;
                         break;
 
                     case ModelCode.IDOBJ_NAME:
-                        prop.Add(item.Id, item);
+                        propDictionary.Add(item.Id, item);
                         configItem.Name = item.AsString();
                         break;
 
                     case ModelCode.DISCRETE_CURRENTOPEN:
-                        prop.Add(item.Id, item);
+                        propDictionary.Add(item.Id, item);
                         configItem.CurrentValue = (item.AsBool() == true) ? 1 : 0;
                         break;
 
                     case ModelCode.DISCRETE_MAXVALUE:
-                        prop.Add(item.Id, item);
+                        propDictionary.Add(item.Id, item);
                         configItem.MaxValue = item.AsInt();
                         break;
 
                     case ModelCode.DISCRETE_MINVALUE:
-                        prop.Add(item.Id, item);
+                        propDictionary.Add(item.Id, item);
                         configItem.MinValue = item.AsInt();
                         break;
 
                     case ModelCode.DISCRETE_NORMALVALUE:
-                        prop.Add(item.Id, item);
+                        propDictionary.Add(item.Id, item);
                         configItem.DefaultValue = item.AsInt();
                         break;
 
@@ -340,7 +340,7 @@ namespace Outage.SCADA.SCADA_Config_Data.Repository
                         break;
 
                     case ModelCode.MEASUREMENT_ISINPUT:
-                        prop.Add(item.Id, item);
+                        propDictionary.Add(item.Id, item);
                         if (type == ModelCode.ANALOG)
                         {
                             configItem.RegistarType = (item.AsBool() == true) ? PointType.ANALOG_INPUT : PointType.ANALOG_OUTPUT;
@@ -357,40 +357,50 @@ namespace Outage.SCADA.SCADA_Config_Data.Repository
                         break;
 
                     case ModelCode.ANALOG_CURRENTVALUE:
-                        prop.Add(item.Id, item);
+                        propDictionary.Add(item.Id, item);
                         configItem.CurrentValue = item.AsFloat();
                         break;
 
                     case ModelCode.ANALOG_MAXVALUE:
-                        prop.Add(item.Id, item);
+                        propDictionary.Add(item.Id, item);
                         configItem.MaxValue = item.AsFloat();
                         break;
 
                     case ModelCode.ANALOG_MINVALUE:
-                        prop.Add(item.Id, item);
+                        propDictionary.Add(item.Id, item);
                         configItem.MinValue = item.AsFloat();
                         break;
 
                     case ModelCode.ANALOG_NORMALVALUE:
-                        prop.Add(item.Id, item);
+                        propDictionary.Add(item.Id, item);
                         configItem.DefaultValue = item.AsFloat();
                         break;
 
                     default:
                         break;
                 }
+
                 if (configItem.RegistarType == PointType.ANALOG_INPUT || configItem.RegistarType == PointType.ANALOG_OUTPUT)
                 {
                     configItem.LowLimit = configItem.EGU_Min + 200;
                     configItem.HighLimit = configItem.EGU_Max - 200;
                 }
-                else
+                else if(configItem.RegistarType == PointType.DIGITAL_INPUT || configItem.RegistarType == PointType.DIGITAL_OUTPUT)
                 {
                     configItem.LowLimit = 0;
                     configItem.HighLimit = 1;
                 }
             }
-            NMS_Model_Props.Add(gid, prop);
+
+            if(NetworkModelProps.ContainsKey(gid))
+            {
+                NetworkModelProps[gid] = propDictionary;
+            }
+            else
+            {
+                NetworkModelProps.Add(gid, propDictionary);
+            }
+
             return configItem;
         }
     }

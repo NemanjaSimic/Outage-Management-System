@@ -47,6 +47,7 @@ namespace Outage.SCADA.SCADAService.DistributedTransaction
             try
             {
                 scadaModel.Commit();
+                ModbusSimulatorHandler.RestartSimulator();
                 logger.LogInfo("Commit on SCADA Transaction actor SUCCESSFULLY finished.");
             }
             catch (Exception ex)
@@ -61,6 +62,7 @@ namespace Outage.SCADA.SCADAService.DistributedTransaction
             try
             {
                 scadaModel.Rollback();
+                ModbusSimulatorHandler.RestartSimulator();
                 logger.LogInfo("Rollback on SCADA Transaction actor SUCCESSFULLY finished.");
             }
             catch (Exception ex)

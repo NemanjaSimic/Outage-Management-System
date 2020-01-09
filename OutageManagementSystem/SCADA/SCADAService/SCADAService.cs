@@ -27,7 +27,6 @@ namespace Outage.SCADA.SCADAService
         public SCADAService()
         {
             scadaModel = new SCADAModel();
-            //CommandService.SCADAModel = scadaModel;
             SCADAModelUpdateNotification.SCADAModel = scadaModel;
             SCADATransactionActor.SCADAModel = scadaModel;
 

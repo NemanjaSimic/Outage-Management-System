@@ -16,8 +16,10 @@ namespace Outage.SCADA.SCADAService
             try
             {
                 DataModelRepository repo = DataModelRepository.Instance;
-                Process.Start(repo.MdbSimExePath);
-
+             
+                Process process = new Process();
+                process.StartInfo.FileName = repo.MdbSimExePath;
+                process.Start();
             }
             catch (Exception e)
             {
@@ -30,7 +32,7 @@ namespace Outage.SCADA.SCADAService
             try
             {
                 DataModelRepository repo = DataModelRepository.Instance;
-                Process[] modbusSimulators = Process.GetProcessesByName(repo.MdbSimExeName);
+                Process[] modbusSimulators = Process.GetProcessesByName(repo.MdbSimExeName.Replace(".exe", ""));
 
                 foreach (Process mdbSim in modbusSimulators)
                 {

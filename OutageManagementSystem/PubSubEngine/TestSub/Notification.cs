@@ -21,6 +21,11 @@ namespace TestSub
 		public void Notify(IPublishableMessage msg)
 		{
 			Console.WriteLine("Message from PubSub: " + msg);
+			
+			if(msg is ISCADAMessage scadaMsg)
+			{
+				Console.WriteLine($"Gid: {scadaMsg.Gid}, Value: {scadaMsg.Value}");
+			}
 		}
 	}
 }

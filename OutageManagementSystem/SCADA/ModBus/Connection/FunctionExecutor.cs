@@ -132,7 +132,7 @@ namespace Outage.SCADA.ModBus.Connection
                     {
                         this.numberOfTries = 0;
                         this.connection.Connect();
-                        while (numberOfTries < 10)
+                        while (numberOfTries < 40)
                         {
                             if (this.connection.CheckState())
                             {
@@ -145,7 +145,7 @@ namespace Outage.SCADA.ModBus.Connection
                             else
                             {
                                 numberOfTries++;
-                                if (this.numberOfTries == 10)
+                                if (this.numberOfTries == 40)
                                 {
                                     this.connection.Disconnect();
                                     this.connectionState = ConnectionState.DISCONNECTED;
@@ -230,6 +230,7 @@ namespace Outage.SCADA.ModBus.Connection
                                     if(publisherProxy != null)
                                     {
                                         publisherProxy.Publish(scadaPublication);
+                                        logger.LogInfo($"SCADA service published data from topic: {scadaPublication.Topic}");
                                     }
                                     else
                                     {
