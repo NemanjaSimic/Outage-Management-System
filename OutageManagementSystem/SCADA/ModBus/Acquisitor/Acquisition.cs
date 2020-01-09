@@ -3,8 +3,7 @@ using Outage.Common;
 using Outage.SCADA.ModBus.Connection;
 using Outage.SCADA.ModBus.FunctionParameters;
 using Outage.SCADA.ModBus.ModbusFuntions;
-using Outage.SCADA.SCADA_Common;
-using Outage.SCADA.SCADA_Config_Data.Repository;
+using Outage.SCADA.SCADACommon;
 using System;
 using System.Threading;
 
@@ -17,11 +16,13 @@ namespace Outage.SCADA.ModBus.Acquisitor
         private bool threadActiveSignal = true;
         private Thread acquisitionWorker;
 
-        private ModbusClient modbusClient;
         private FunctionExecutor commandExecutor; 
-        
-        public Acquisition(ModbusClient modbusClient, FunctionExecutor commandExecutor)
+        //private SCADAModel
+
+        public Acquisition(FunctionExecutor commandExecutor)
         {
+            this.commandExecutor = commandExecutor;
+
             this.InitializeAcquisitionThread();
         }
 
@@ -57,71 +58,72 @@ namespace Outage.SCADA.ModBus.Acquisitor
             {
                 logger.LogInfo("Acquisition thread is started.");
 
-                while (threadActiveSignal)
-                {
-                    Thread.Sleep(DataModelRepository.Instance.Interval);
+                //while (threadActiveSignal)
+                //{
+                //    Thread.Sleep(DataModelRepository.Instance.Interval);
 
-                    if (commandExecutor.connectionState == ConnectionState.CONNECTED)
-                    {
-                        foreach (var point in DataModelRepository.Instance.Points)
-                        {
-                            ushort address = point.Value.Address;
-                            ModbusFunction modbusFunction = null;
+                //    if (commandExecutor.connectionState == ConnectionState.CONNECTED)
+                //    {
+                //        foreach (var point in DataModelRepository.Instance.Points)
+                //        {
+                //            ushort address = point.Value.Address;
+                //            ModbusFunction modbusFunction = null;
 
-                            //DIGITAL_OUTPUT
-                            if (point.Value.RegistarType == PointType.DIGITAL_OUTPUT)
-                            {
-                                ModbusReadCommandParameters mdb_read = new ModbusReadCommandParameters(length,
-                                                                                                       (byte)ModbusFunctionCode.READ_COILS,
-                                                                                                       address, quantity);
-                                modbusFunction = FunctionFactory.CreateModbusFunction(mdb_read);
-                            }
-                            //DIGITAL_INPUT
-                            else if (point.Value.RegistarType == PointType.DIGITAL_INPUT)
-                            {
-                                ModbusReadCommandParameters mdb_read = new ModbusReadCommandParameters(length,
-                                                                                                       (byte)ModbusFunctionCode.READ_DISCRETE_INPUTS,
-                                                                                                       address, quantity);
+                //            //DIGITAL_OUTPUT
+                //            if (point.Value.RegistarType == PointType.DIGITAL_OUTPUT)
+                //            {
+                //                ModbusReadCommandParameters mdb_read = new ModbusReadCommandParameters(length,
+                //                                                                                       (byte)ModbusFunctionCode.READ_COILS,
+                //                                                                                       address, quantity);
 
-                                modbusFunction = FunctionFactory.CreateModbusFunction(mdb_read);
-                            }
-                            //ANALOG_OUTPUT
-                            else if (point.Value.RegistarType == PointType.ANALOG_OUTPUT)
-                            {
-                                ModbusReadCommandParameters mdb_read = new ModbusReadCommandParameters(length,
-                                                                                                       (byte)ModbusFunctionCode.READ_HOLDING_REGISTERS,
-                                                                                                       address, quantity);
+                //                modbusFunction = FunctionFactory.CreateModbusFunction(mdb_read);
+                //            }
+                //            //DIGITAL_INPUT
+                //            else if (point.Value.RegistarType == PointType.DIGITAL_INPUT)
+                //            {
+                //                ModbusReadCommandParameters mdb_read = new ModbusReadCommandParameters(length,
+                //                                                                                       (byte)ModbusFunctionCode.READ_DISCRETE_INPUTS,
+                //                                                                                       address, quantity);
 
-                                modbusFunction = FunctionFactory.CreateModbusFunction(mdb_read);
-                            }
-                            //ANALOG_INPUT
-                            else if (point.Value.RegistarType == PointType.ANALOG_INPUT)
-                            {
-                                ModbusReadCommandParameters mdb_read = new ModbusReadCommandParameters(length,
-                                                                                                       (byte)ModbusFunctionCode.READ_INPUT_REGISTERS,
-                                                                                                       address, quantity);
+                //                modbusFunction = FunctionFactory.CreateModbusFunction(mdb_read);
+                //            }
+                //            //ANALOG_OUTPUT
+                //            else if (point.Value.RegistarType == PointType.ANALOG_OUTPUT)
+                //            {
+                //                ModbusReadCommandParameters mdb_read = new ModbusReadCommandParameters(length,
+                //                                                                                       (byte)ModbusFunctionCode.READ_HOLDING_REGISTERS,
+                //                                                                                       address, quantity);
 
-                                modbusFunction = FunctionFactory.CreateModbusFunction(mdb_read);
-                            }
-                            else
-                            {
-                                throw new Exception("PointType value is invalid");
-                            }
+                //                modbusFunction = FunctionFactory.CreateModbusFunction(mdb_read);
+                //            }
+                //            //ANALOG_INPUT
+                //            else if (point.Value.RegistarType == PointType.ANALOG_INPUT)
+                //            {
+                //                ModbusReadCommandParameters mdb_read = new ModbusReadCommandParameters(length,
+                //                                                                                       (byte)ModbusFunctionCode.READ_INPUT_REGISTERS,
+                //                                                                                       address, quantity);
 
-                            if (modbusFunction != null)
-                            {
-                                this.commandExecutor.EnqueueCommand(modbusFunction);
-                                logger.LogDebug($"Modbus function enquided. Point type is {point.Value.RegistarType}");
-                            }
+                //                modbusFunction = FunctionFactory.CreateModbusFunction(mdb_read);
+                //            }
+                //            else
+                //            {
+                //                throw new Exception("PointType value is invalid");
+                //            }
 
-                            //PODESAVANJE ALARMA
-                            point.Value.SetAlarms();
-                            logger.LogInfo("Alarm for item " + point.Value.Gid + " is set to " + point.Value.Alarm.ToString());
-                        }
-                    }
+                //            if (modbusFunction != null)
+                //            {
+                //                this.commandExecutor.EnqueueCommand(modbusFunction);
+                //                logger.LogDebug($"Modbus function enquided. Point type is {point.Value.RegistarType}");
+                //            }
 
-                    logger.LogInfo("Acquisition thread is stopped.");
-                }
+                //            //PODESAVANJE ALARMA
+                //            point.Value.SetAlarms();
+                //            logger.LogInfo("Alarm for item " + point.Value.Gid + " is set to " + point.Value.Alarm.ToString());
+                //        }
+                //    }
+
+                //    logger.LogInfo("Acquisition thread is stopped.");
+                //}
             }
             catch (Exception e)
             {

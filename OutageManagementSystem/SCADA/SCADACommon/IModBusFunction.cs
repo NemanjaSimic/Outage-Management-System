@@ -1,10 +1,21 @@
-﻿using System;
+﻿using EasyModbus;
+using System;
 using System.Collections.Generic;
 
-namespace Outage.SCADA.SCADA_Common
+namespace Outage.SCADA.SCADACommon
 {
     public interface IModBusFunction
     {
-        void Execute();
+        void Execute(ModbusClient modbusClient);
+    }
+
+    public interface IReadDigitalModBusFunction : IModBusFunction
+    {
+        bool[] Data { get; }
+    }
+
+    public interface IReadAnalogModBusFunction : IModBusFunction
+    {
+        int[] Data { get; }
     }
 }

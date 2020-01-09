@@ -1,5 +1,5 @@
 ﻿using Outage.SCADA.ModBus.Connection;
-using Outage.SCADA.SCADA_Common;
+using Outage.SCADA.SCADACommon;
 
 namespace Outage.SCADA.ModBus.PointModels
 {

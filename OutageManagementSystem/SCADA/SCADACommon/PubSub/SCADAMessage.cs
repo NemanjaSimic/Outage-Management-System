@@ -6,7 +6,7 @@ using System.Runtime.Serialization;
 using System.Text;
 using System.Threading.Tasks;
 
-namespace Outage.SCADA.SCADA_Common.PubSub
+namespace Outage.SCADA.SCADACommon.PubSub
 {
     //TODO: scada message types
 

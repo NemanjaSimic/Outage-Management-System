@@ -1,10 +1,9 @@
 ﻿using Outage.Common;
 using Outage.Common.ServiceProxies.PubSub;
 using Outage.SCADA.ModBus.ModbusFuntions;
-using Outage.SCADA.SCADA_Common;
-using Outage.SCADA.SCADA_Common.PubSub;
-using Outage.SCADA.SCADA_Config_Data.Configuration;
-using Outage.SCADA.SCADA_Config_Data.Repository;
+using Outage.SCADA.SCADACommon;
+using Outage.SCADA.SCADACommon.PubSub;
+using Outage.SCADA.SCADAConfigData.Configuration;
 using System;
 using System.Collections.Concurrent;
 using System.Collections.Generic;
@@ -26,11 +25,13 @@ namespace Outage.SCADA.ModBus.Connection
         private Thread connectionProcess;
         private bool threadCancellationSignal = false;
         private int numberOfTries = 0;
+
         private IModBusFunction currentCommand;
         public ConnectionState connectionState = ConnectionState.DISCONNECTED;
         private AutoResetEvent commandEvent;
         private ConcurrentQueue<IModBusFunction> commandQueue;
 
+        //private Outage.SCADA.ScadaModel SCADAModel
 
         private PublisherProxy publisherProxy = null;
 
@@ -81,7 +82,7 @@ namespace Outage.SCADA.ModBus.Connection
             { 
                 if(instance == null)
                 {
-                    instance = new FunctionExecutor(DataModelRepository.Instance.TcpPort);
+                    instance = new FunctionExecutor(SCADAConfigData.Configuration.SCADAConfigData.Instance.TcpPort);
                 }
                 
                 return instance; 
@@ -167,80 +168,80 @@ namespace Outage.SCADA.ModBus.Connection
 
                         logger.LogDebug("Command event happened.");
 
-                        while (commandQueue.TryDequeue(out this.currentCommand))
-                        {
-                            this.connection.SendBytes(this.currentCommand.PackRequest());
+                        //while (commandQueue.TryDequeue(out this.currentCommand))
+                        //{
+                        //    this.connection.SendBytes(this.currentCommand.PackRequest());
 
-                            byte[] message;
-                            byte[] header = this.connection.RecvBytes(7);
-                            int payLoadSize = 0;
+                        //    byte[] message;
+                        //    byte[] header = this.connection.RecvBytes(7);
+                        //    int payLoadSize = 0;
 
-                            unchecked
-                            {
-                                payLoadSize = IPAddress.NetworkToHostOrder((short)BitConverter.ToInt16(header, 4));
-                            }
+                        //    unchecked
+                        //    {
+                        //        payLoadSize = IPAddress.NetworkToHostOrder((short)BitConverter.ToInt16(header, 4));
+                        //    }
 
-                            byte[] payload = this.connection.RecvBytes(payLoadSize - 1);
-                            message = new byte[header.Length + payload.Length];
+                        //    byte[] payload = this.connection.RecvBytes(payLoadSize - 1);
+                        //    message = new byte[header.Length + payload.Length];
 
-                            Buffer.BlockCopy(header, 0, message, 0, 7);
-                            Buffer.BlockCopy(payload, 0, message, 7, payload.Length);
-                            Dictionary<Tuple<PointType, ushort>, ushort> pointsToUpdate = this.currentCommand.ParseResponse(message);
+                        //    Buffer.BlockCopy(header, 0, message, 0, 7);
+                        //    Buffer.BlockCopy(payload, 0, message, 7, payload.Length);
+                        //    Dictionary<Tuple<PointType, ushort>, ushort> pointsToUpdate = this.currentCommand.ParseResponse(message);
 
-                            foreach (Tuple<PointType, ushort> pointKey in pointsToUpdate.Keys)
-                            {
-                                ushort address = pointKey.Item2;
-                                ushort newValue = pointsToUpdate[pointKey];
+                        //    foreach (Tuple<PointType, ushort> pointKey in pointsToUpdate.Keys)
+                        //    {
+                        //        ushort address = pointKey.Item2;
+                        //        ushort newValue = pointsToUpdate[pointKey];
 
-                                ConfigItem point = UpdatePoints(address, newValue);
+                        //        ConfigItem point = UpdatePoints(address, newValue);
 
-                                ModelCode modelCode = resourcesDesc.GetModelCodeFromId(point.Gid);
+                        //        ModelCode modelCode = resourcesDesc.GetModelCodeFromId(point.Gid);
 
-                                Topic topic;
+                        //        Topic topic;
 
-                                if (modelCode == ModelCode.ANALOG)
-                                {
-                                    topic = Topic.MEASUREMENT;
-                                }
-                                else if(modelCode == ModelCode.DISCRETE)
-                                {
-                                    topic = Topic.SWITCH_STATUS;
-                                }
-                                else
-                                {
-                                    string errMessage = $"Config item type is neither analog nor digital. Config item type is: {modelCode}.";
-                                    logger.LogError(errMessage);
-                                    throw new Exception(errMessage);
-                                }
+                        //        if (modelCode == ModelCode.ANALOG)
+                        //        {
+                        //            topic = Topic.MEASUREMENT;
+                        //        }
+                        //        else if(modelCode == ModelCode.DISCRETE)
+                        //        {
+                        //            topic = Topic.SWITCH_STATUS;
+                        //        }
+                        //        else
+                        //        {
+                        //            string errMessage = $"Config item type is neither analog nor digital. Config item type is: {modelCode}.";
+                        //            logger.LogError(errMessage);
+                        //            throw new Exception(errMessage);
+                        //        }
 
-                                SCADAMessage scadaMessage = new SCADAMessage()
-                                {
-                                    Gid = point.Gid,
-                                    Value = point.CurrentValue,
-                                };
+                        //        SCADAMessage scadaMessage = new SCADAMessage()
+                        //        {
+                        //            Gid = point.Gid,
+                        //            Value = point.CurrentValue,
+                        //        };
 
-                                SCADAPublication scadaPublication = new SCADAPublication()
-                                {
-                                    Topic = topic,
-                                    Message = scadaMessage,
-                                };
+                        //        SCADAPublication scadaPublication = new SCADAPublication()
+                        //        {
+                        //            Topic = topic,
+                        //            Message = scadaMessage,
+                        //        };
 
-                                using(PublisherProxy publisherProxy = PublisherProxy)
-                                {
-                                    if(publisherProxy != null)
-                                    {
-                                        publisherProxy.Publish(scadaPublication);
-                                        logger.LogInfo($"SCADA service published data from topic: {scadaPublication.Topic}");
-                                    }
-                                    else
-                                    {
-                                        string errMsg = "PublisherProxy is null.";
-                                        logger.LogWarn(errMsg);
-                                        throw new NullReferenceException(errMsg);
-                                    }
-                                }
-                            }
-                        }
+                        //        using(PublisherProxy publisherProxy = PublisherProxy)
+                        //        {
+                        //            if(publisherProxy != null)
+                        //            {
+                        //                publisherProxy.Publish(scadaPublication);
+                        //                logger.LogInfo($"SCADA service published data from topic: {scadaPublication.Topic}");
+                        //            }
+                        //            else
+                        //            {
+                        //                string errMsg = "PublisherProxy is null.";
+                        //                logger.LogWarn(errMsg);
+                        //                throw new NullReferenceException(errMsg);
+                        //            }
+                        //        }
+                        //    }
+                        //}
                     }
                 }
                 catch (SocketException se)
@@ -264,12 +265,13 @@ namespace Outage.SCADA.ModBus.Connection
             logger.LogInfo("ConnectionProcessThred is stopped.");
         }
 
-        private ConfigItem UpdatePoints(ushort address, ushort newValue)
+        private ModbusPoint UpdatePoints(ushort address, ushort newValue)
         {
-            ConfigItem point = DataModelRepository.Instance.Points.Values.Where(x => x.Address == address).First();
-            point.CurrentValue = newValue;
+            throw new NotImplementedException("UpdatePoints");
+            //ConfigItem point = DataModelRepository.Instance.Points.Values.Where(x => x.Address == address).First();
+            //point.CurrentValue = newValue;
 
-            return point;
+            //return point;
         }
     }
 }

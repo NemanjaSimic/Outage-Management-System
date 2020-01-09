@@ -4,9 +4,8 @@ using Outage.SCADA.ModBus;
 using Outage.SCADA.ModBus.Connection;
 using Outage.SCADA.ModBus.FunctionParameters;
 using Outage.SCADA.ModBus.ModbusFuntions;
-using Outage.SCADA.SCADA_Common;
-using Outage.SCADA.SCADA_Config_Data.Configuration;
-using Outage.SCADA.SCADA_Config_Data.Repository;
+using Outage.SCADA.SCADACommon;
+using Outage.SCADA.SCADAConfigData.Configuration;
 using System;
 
 namespace Outage.SCADA.SCADAService.Command
@@ -15,7 +14,7 @@ namespace Outage.SCADA.SCADAService.Command
     {
         private static FunctionExecutor fe = FunctionExecutor.Instance;
 
-        ILogger logger = LoggerWrapper.Instance;
+        private ILogger logger = LoggerWrapper.Instance;
 
         public CommandService()
         {
@@ -23,8 +22,9 @@ namespace Outage.SCADA.SCADAService.Command
 
         public void RecvCommand(long gid, object value)
         {
-            if (DataModelRepository.Instance.Points.TryGetValue(gid, out ConfigItem CI))
+            if (true)//DataModelRepository.Instance.Points.TryGetValue(gid, out ConfigItem CI))
             {
+                ModbusPoint CI = null;
                 if (CI.RegistarType == PointType.ANALOG_OUTPUT || CI.RegistarType == PointType.DIGITAL_OUTPUT)
                 {
                     ModbusWriteCommandParameters mdb_write_comm_pars = null;

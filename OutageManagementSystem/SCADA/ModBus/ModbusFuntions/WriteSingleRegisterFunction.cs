@@ -1,6 +1,6 @@
 ﻿using EasyModbus;
 using Outage.SCADA.ModBus.FunctionParameters;
-using Outage.SCADA.SCADA_Common;
+using Outage.SCADA.SCADACommon;
 using System;
 using System.Collections.Generic;
 using System.Net;
@@ -10,18 +10,18 @@ namespace Outage.SCADA.ModBus.ModbusFuntions
 {
     public class WriteSingleRegisterFunction : ModbusFunction
     {
-        public WriteSingleRegisterFunction(ModbusCommandParameters commandParameters, ModbusClient modbusClient) 
-            : base(commandParameters, modbusClient)
+        public WriteSingleRegisterFunction(ModbusCommandParameters commandParameters) 
+            : base(commandParameters)
         {
             //TODO: check?
             CheckArguments(MethodBase.GetCurrentMethod(), typeof(ModbusWriteCommandParameters));
         }
 
         #region IModBusFunction
-        public override void Execute()
+        public override void Execute(ModbusClient modbusClient)
         {
             ModbusWriteCommandParameters mdb_write_comm_pars = this.CommandParameters as ModbusWriteCommandParameters;
-            ModbusClient.WriteSingleRegister(mdb_write_comm_pars.OutputAddress, mdb_write_comm_pars.Value);
+            modbusClient.WriteSingleRegister(mdb_write_comm_pars.OutputAddress, mdb_write_comm_pars.Value);
             logger.LogInfo($"WriteSingleRegisterFunction executed SUCCESSFULLY. OutputAddress: {mdb_write_comm_pars.OutputAddress}, Value: {mdb_write_comm_pars.Value}");
         }
         #endregion

@@ -1,7 +1,7 @@
 ﻿using EasyModbus;
 using Outage.Common;
 using Outage.SCADA.ModBus.FunctionParameters;
-using Outage.SCADA.SCADA_Common;
+using Outage.SCADA.SCADACommon;
 using System;
 using System.Collections.Generic;
 using System.Reflection;
@@ -10,53 +10,26 @@ namespace Outage.SCADA.ModBus.ModbusFuntions
 {
     public abstract class ModbusFunction : IModBusFunction
     {
-        private ModbusCommandParameters commandParameters;
-        private ModbusClient modbusClient;
-
         protected ILogger logger = LoggerWrapper.Instance;
         
-        protected ModbusFunction(ModbusCommandParameters commandParameters, ModbusClient modbusClient)
+        public ModbusCommandParameters CommandParameters { get; protected set; }
+
+        protected ModbusFunction(ModbusCommandParameters commandParameters)
         {
             CommandParameters = commandParameters;
-            ModbusClient = modbusClient;
         }
 
-        public ModbusCommandParameters CommandParameters
-        {
-            get
-            {
-                return commandParameters;
-            }
-
-            protected set
-            {
-                commandParameters = value;
-            }
-        }
-
-        public ModbusClient ModbusClient
-        {
-            get
-            {
-                return modbusClient;
-            }
-
-            protected set
-            {
-                modbusClient = value;
-            }
-        }
 
         public override string ToString()
         {
-            return $"Transaction: {commandParameters.TransactionId}, command {commandParameters.FunctionCode}";
+            return $"Transaction: {CommandParameters.TransactionId}, command {CommandParameters.FunctionCode}";
         }
 
         protected void CheckArguments(MethodBase m, Type t)
         {
-            if (commandParameters.GetType() != t)
+            if (CommandParameters.GetType() != t)
             {
-                string message = $"{m.ReflectedType.Name}{m.Name} has invalid argument {nameof(commandParameters)} of type {commandParameters.GetType().Name}.{Environment.NewLine}Argumet type should be {t.Name}";
+                string message = $"{m.ReflectedType.Name}{m.Name} has invalid argument {nameof(CommandParameters)} of type {CommandParameters.GetType().Name}.{Environment.NewLine}Argumet type should be {t.Name}";
                 throw new ArgumentException(message);
             }
         }
@@ -64,7 +37,7 @@ namespace Outage.SCADA.ModBus.ModbusFuntions
 
         #region IModBusFunction
 
-        public abstract void Execute();
+        public abstract void Execute(ModbusClient modbusClient);
         #endregion
 
 

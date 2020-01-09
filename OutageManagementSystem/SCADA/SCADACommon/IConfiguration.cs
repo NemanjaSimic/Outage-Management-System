@@ -1,5 +1,8 @@
-﻿namespace Outage.SCADA.SCADA_Common
+﻿using System;
+
+namespace Outage.SCADA.SCADACommon
 {
+    [Obsolete]
     public interface IConfiguration
     {
         int TcpPort { get; set; }

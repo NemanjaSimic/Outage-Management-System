@@ -1,4 +1,4 @@
-﻿namespace Outage.SCADA.SCADA_Common
+﻿namespace Outage.SCADA.SCADACommon
 {
     public enum ConnectionState : short
     {

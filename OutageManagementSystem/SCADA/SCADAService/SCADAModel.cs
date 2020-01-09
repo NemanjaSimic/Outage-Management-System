@@ -2,9 +2,9 @@
 using Outage.Common.GDA;
 using Outage.Common.ServiceProxies;
 using Outage.SCADA.ModBus.Connection;
-using Outage.SCADA.SCADA_Common;
-using Outage.SCADA.SCADA_Config_Data.Configuration;
-using Outage.SCADA.SCADA_Config_Data.Repository;
+using Outage.SCADA.SCADACommon;
+using Outage.SCADA.SCADAConfigData;
+using Outage.SCADA.SCADAConfigData.Configuration;
 using System;
 using System.Collections.Generic;
 using System.IO;
@@ -17,24 +17,28 @@ namespace Outage.SCADA.SCADAService
     public class SCADAModel
     {
         private ILogger logger = LoggerWrapper.Instance;
-        private ModelResourcesDesc modelRD;
-        private ConfigWriter configWriter;
+        private ModelResourcesDesc modelResourceDesc;
+        //private ConfigWriter configWriter;
 
         private Dictionary<DeltaOpType, List<long>> modelChanges;
-        private DataModelRepository dataModelRepository = DataModelRepository.Instance;
+        private SCADAConfigData.Configuration.SCADAConfigData dataModelRepository = SCADAConfigData.Configuration.SCADAConfigData.Instance;
 
-        private Dictionary<long, ConfigItem> currentScadaModel;
-        protected Dictionary<long, ConfigItem> CurrentScadaModel
+        private Dictionary<long, ModbusPoint> currentScadaModel;
+        protected Dictionary<long, ModbusPoint> CurrentScadaModel
         {
-            get { return currentScadaModel ?? (currentScadaModel = new Dictionary<long, ConfigItem>()); }
+            get { return currentScadaModel ?? (currentScadaModel = new Dictionary<long, ModbusPoint>()); }
         }
 
-        private Dictionary<long, ConfigItem> incomingScadaModel;
-        protected Dictionary<long, ConfigItem> IncomingScadaModel
+        private Dictionary<long, ModbusPoint> incomingScadaModel;
+        protected Dictionary<long, ModbusPoint> IncomingScadaModel
         {
-            get { return incomingScadaModel ?? (incomingScadaModel = new Dictionary<long, ConfigItem>()); }
+            get { return incomingScadaModel ?? (incomingScadaModel = new Dictionary<long, ModbusPoint>()); }
         }
 
+        [Obsolete]
+        public Dictionary<long, ResourceDescription> NetworkModel { get; protected set; }
+        [Obsolete]
+        public Dictionary<long, Dictionary<ModelCode, Property>> NetworkModelProps { get; protected set; }
 
 
         #region Proxies
@@ -81,9 +85,9 @@ namespace Outage.SCADA.SCADAService
 
         public SCADAModel()
         {
-            currentScadaModel = new Dictionary<long, ConfigItem>();
-            incomingScadaModel = new Dictionary<long, ConfigItem>();
-            modelRD = new ModelResourcesDesc();
+            currentScadaModel = new Dictionary<long, ModbusPoint>();
+            incomingScadaModel = new Dictionary<long, ModbusPoint>();
+            modelResourceDesc = new ModelResourcesDesc();
         }
 
         public bool Notify(Dictionary<DeltaOpType, List<long>> modelChanges)
@@ -98,35 +102,35 @@ namespace Outage.SCADA.SCADAService
 
             try
             {
-                foreach(long gid in dataModelRepository.Points.Keys)
+                foreach(long gid in CurrentScadaModel.Keys)
                 {
-                    ConfigItem point = (ConfigItem)dataModelRepository.Points[gid].Clone();
+                    ModbusPoint point = (ModbusPoint)CurrentScadaModel[gid].Clone();
                     IncomingScadaModel.Add(gid, point);
                 }
 
                 foreach (long gid in modelChanges[DeltaOpType.Insert])
                 {
-                    ModelCode type = modelRD.GetModelCodeFromId(gid);
+                    ModelCode type = modelResourceDesc.GetModelCodeFromId(gid);
                     if (type == ModelCode.ANALOG || type == ModelCode.DISCRETE)
                     {
-                        ConfigItem configItem = CreateConfigItemForEntity(gid);
+                        ModbusPoint configItem = CreateConfigItemForEntity(gid);
                         IncomingScadaModel.Add(gid, configItem);
                     }
                 }
 
                 foreach (long gid in modelChanges[DeltaOpType.Update])
                 {
-                    ModelCode type = modelRD.GetModelCodeFromId(gid);
+                    ModelCode type = modelResourceDesc.GetModelCodeFromId(gid);
                     if(type == ModelCode.ANALOG || type == ModelCode.DISCRETE)
                     {
-                        ConfigItem configItem = CreateConfigItemForEntity(gid);
+                        ModbusPoint configItem = CreateConfigItemForEntity(gid);
                         IncomingScadaModel[gid] = configItem;
                     }
                 }
 
                 foreach (long gid in modelChanges[DeltaOpType.Delete])
                 {
-                    ModelCode type = modelRD.GetModelCodeFromId(gid);
+                    ModelCode type = modelResourceDesc.GetModelCodeFromId(gid);
                     if (type == ModelCode.ANALOG || type == ModelCode.DISCRETE)
                     {
                         if (IncomingScadaModel.ContainsKey(gid))
@@ -136,30 +140,30 @@ namespace Outage.SCADA.SCADAService
                     }
                 }
 
-                configWriter = new ConfigWriter(dataModelRepository.ConfigFileName, IncomingScadaModel.Values.ToList());
-                configWriter.GenerateConfigFile();
+                //configWriter = new ConfigWriter(dataModelRepository.ConfigFileName, IncomingScadaModel.Values.ToList());
+                //configWriter.GenerateConfigFile();
 
-                if (File.Exists(dataModelRepository.BackupConfigPath))
-                {
-                    File.Delete(dataModelRepository.BackupConfigPath);
-                }
+                //if (File.Exists(dataModelRepository.BackupConfigPath))
+                //{
+                //    File.Delete(dataModelRepository.BackupConfigPath);
+                //}
 
-                if (File.Exists(dataModelRepository.CurrentConfigPath))
-                {
-                    //Move current config to backup folder
-                    File.Move(dataModelRepository.CurrentConfigPath, dataModelRepository.BackupConfigPath);
-                }
+                //if (File.Exists(dataModelRepository.CurrentConfigPath))
+                //{
+                //    //Move current config to backup folder
+                //    File.Move(dataModelRepository.CurrentConfigPath, dataModelRepository.BackupConfigPath);
+                //}
 
-                if (File.Exists(dataModelRepository.CurrentConfigPath))
-                {
-                    File.Delete(dataModelRepository.CurrentConfigPath);
-                }
+                //if (File.Exists(dataModelRepository.CurrentConfigPath))
+                //{
+                //    File.Delete(dataModelRepository.CurrentConfigPath);
+                //}
 
-                if (File.Exists(dataModelRepository.ConfigFileName))
-                {
-                    //Move u MdbSim folder
-                    File.Move(dataModelRepository.ConfigFileName, dataModelRepository.CurrentConfigPath);
-                }
+                //if (File.Exists(dataModelRepository.ConfigFileName))
+                //{
+                //    //Move u MdbSim folder
+                //    File.Move(dataModelRepository.ConfigFileName, dataModelRepository.CurrentConfigPath);
+                //}
 
                 success = true;
             }
@@ -180,10 +184,10 @@ namespace Outage.SCADA.SCADAService
             incomingScadaModel = null;
             modelChanges.Clear();
 
-            if (File.Exists(dataModelRepository.BackupConfigPath))
-            {
-                File.Delete(dataModelRepository.BackupConfigPath);
-            }
+            //if (File.Exists(dataModelRepository.BackupConfigPath))
+            //{
+            //    File.Delete(dataModelRepository.BackupConfigPath);
+            //}
 
             string message = $"Incoming config file is confirmed.";
             Console.WriteLine(message);
@@ -195,36 +199,159 @@ namespace Outage.SCADA.SCADAService
             incomingScadaModel = null;
             modelChanges.Clear();
 
-            if (File.Exists(dataModelRepository.CurrentConfigPath))
-            {
-                File.Delete(dataModelRepository.CurrentConfigPath);
-            }
+            //if (File.Exists(dataModelRepository.CurrentConfigPath))
+            //{
+            //    File.Delete(dataModelRepository.CurrentConfigPath);
+            //}
 
-            if (File.Exists(dataModelRepository.BackupConfigPath))
-            {
-                File.Move(dataModelRepository.BackupConfigPath, dataModelRepository.CurrentConfigPath);
-            }
-            else
-            {
-                if (File.Exists(dataModelRepository.ConfigFileName))
-                {
-                    File.Move(dataModelRepository.ConfigFileName, dataModelRepository.CurrentConfigPath);
-                }
-                else
-                {
-                    configWriter = new ConfigWriter(dataModelRepository.ConfigFileName, dataModelRepository.Points.Values.ToList());
-                    configWriter.GenerateConfigFile();
-                    File.Move(dataModelRepository.ConfigFileName, dataModelRepository.CurrentConfigPath);
-                }
-            }
+            //if (File.Exists(dataModelRepository.BackupConfigPath))
+            //{
+            //    File.Move(dataModelRepository.BackupConfigPath, dataModelRepository.CurrentConfigPath);
+            //}
+            //else
+            //{
+            //    if (File.Exists(dataModelRepository.ConfigFileName))
+            //    {
+            //        File.Move(dataModelRepository.ConfigFileName, dataModelRepository.CurrentConfigPath);
+            //    }
+            //    else
+            //    {
+            //        configWriter = new ConfigWriter(dataModelRepository.ConfigFileName, dataModelRepository.Points.Values.ToList());
+            //        configWriter.GenerateConfigFile();
+            //        File.Move(dataModelRepository.ConfigFileName, dataModelRepository.CurrentConfigPath);
+            //    }
+            //}
         }
 
-        private ConfigItem CreateConfigItemForEntity(long gid)
+        #region ImportScadaModel
+        private bool ImportModel()
         {
-            ModelCode type = modelRD.GetModelCodeFromId(gid);
+            //TODO: log info
+            Console.WriteLine("Importing analog measurements started...");
+            bool analogImportSuccess = ImportAnalog();
+            //TODO: log info finish
+            Console.WriteLine($"Importing analog measurements finished. ['success' value: {analogImportSuccess}]");
+
+            //TODO: log info
+            Console.WriteLine("Importing discrete measurements started...");
+            bool discreteImportSuccess = ImportDiscrete();
+            //TODO: log info finish
+            Console.WriteLine($"Importing discrete measurements finished. ['success' value: {discreteImportSuccess}]");
+
+            return analogImportSuccess && discreteImportSuccess;
+        }
+
+        private bool ImportAnalog()
+        {
+            bool success;
+            int numberOfResources = 1000;
+            List<ModelCode> props = modelResourceDesc.GetAllPropertyIds(ModelCode.ANALOG);
+
+            try
+            {
+                using (NetworkModelGDAProxy gdaProxy = GdaQueryProxy)
+                {
+                    if (gdaProxy != null)
+                    {
+                        int iteratorId = gdaProxy.GetExtentValues(ModelCode.ANALOG, props);
+                        int resourcesLeft = gdaProxy.IteratorResourcesLeft(iteratorId);
+
+                        while (resourcesLeft > 0)
+                        {
+                            List<ResourceDescription> rds = gdaProxy.IteratorNext(numberOfResources, iteratorId);
+                            for (int i = 0; i < rds.Count; i++)
+                            {
+                                if (rds[i] != null)
+                                { 
+                                    //NetworkModel.Add(rds[i].Id, rds[i]);
+                                    ModbusPoint point = new ModbusPoint(rds[i].Properties, ModelCode.ANALOG);
+                                    CurrentScadaModel.Add(rds[i].Id, point);
+                                    //TODO: log debug
+                                }
+                            }
+                            resourcesLeft = gdaProxy.IteratorResourcesLeft(iteratorId);
+                        }
+
+                        success = true;
+                    }
+                    else
+                    {
+                        success = false;
+                        string errMsg = "From ImportAnalog() method: NetworkModelGDAProxy is null.";
+                        logger.LogWarn(errMsg);
+                    }
+                }
+            }
+            catch (Exception ex)
+            {
+                success = false;
+                string errorMessage = $"ImportAnalog failed with error: {ex.Message}";
+                Console.WriteLine(errorMessage);
+                logger.LogError(errorMessage, ex);
+            }
+
+            return success;
+        }
+
+        private bool ImportDiscrete()
+        {
+            bool success;
+            int numberOfResources = 1000;
+            List<ModelCode> props = modelResourceDesc.GetAllPropertyIds(ModelCode.DISCRETE);
+
+            try
+            {
+                using (NetworkModelGDAProxy gdaProxy = GdaQueryProxy)
+                {
+                    if (gdaProxy != null)
+                    {
+                        int iteratorId = gdaProxy.GetExtentValues(ModelCode.DISCRETE, props);
+                        int resourcesLeft = gdaProxy.IteratorResourcesLeft(iteratorId);
+
+                        while (resourcesLeft > 0)
+                        {
+                            List<ResourceDescription> rds = gdaProxy.IteratorNext(numberOfResources, iteratorId);
+                            for (int i = 0; i < rds.Count; i++)
+                            {
+                                if (rds[i] != null)
+                                {
+                                    //NetworkModel.Add(rds[i].Id, rds[i]);
+                                    ModbusPoint point = new ModbusPoint(rds[i].Properties, ModelCode.DISCRETE);
+                                    CurrentScadaModel.Add(rds[i].Id, point);
+                                    //TODO: log debug
+                                }
+                            }
+                            resourcesLeft = gdaProxy.IteratorResourcesLeft(iteratorId);
+                        }
+
+                        success = true;
+                    }
+                    else
+                    {
+                        success = false;
+                        string errMsg = "From ImportDiscrete() method: NetworkModelGDAProxy is null.";
+                        logger.LogWarn(errMsg);
+                    }
+                }
+            }
+            catch (Exception ex)
+            {
+                success = false;
+                string errorMessage = $"ImportDiscrete failed with error: {ex.Message}";
+                Console.WriteLine(errorMessage);
+                logger.LogError(errorMessage, ex);
+            }
+
+            return success;
+        }
+        #endregion
+
+        private ModbusPoint CreateConfigItemForEntity(long gid)
+        {
+            ModelCode type = modelResourceDesc.GetModelCodeFromId(gid);
             List<ModelCode> props;
             ResourceDescription rd;
-            ConfigItem configItem = null;
+            ModbusPoint configItem;
 
             using(NetworkModelGDAProxy gdaProxy = GdaQueryProxy)
             {
@@ -232,9 +359,9 @@ namespace Outage.SCADA.SCADAService
                 {
                     if (type == ModelCode.ANALOG || type == ModelCode.DISCRETE)
                     {
-                        props = modelRD.GetAllPropertyIds(type);
+                        props = modelResourceDesc.GetAllPropertyIds(type);
                         rd = gdaProxy.GetValues(gid, props);
-                        configItem = dataModelRepository.ConfigurateConfigItem(rd.Properties, type);
+                        configItem = new ModbusPoint(rd.Properties, type);
                     }
                     else
                     {

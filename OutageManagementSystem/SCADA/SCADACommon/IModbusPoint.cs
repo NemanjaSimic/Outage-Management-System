@@ -1,6 +1,6 @@
-﻿namespace Outage.SCADA.SCADA_Common
+﻿namespace Outage.SCADA.SCADACommon
 {
-    public interface IConfigItem
+    public interface IModbusPoint
     {
         string Name { get; set; }
         long Gid { get; set; }

@@ -1,9 +1,11 @@
-﻿using Outage.SCADA.SCADA_Common;
+﻿using Outage.Common;
+using Outage.Common.GDA;
 using System;
+using System.Collections.Generic;
 
-namespace Outage.SCADA.SCADA_Config_Data.Configuration
+namespace Outage.SCADA.SCADACommon
 {
-    public class ConfigItem : IConfigItem, ICloneable
+    public class ModbusPoint : IModbusPoint, ICloneable
     {
         public PointType RegistarType { get; set; }
         public ushort Address { get; set; }
@@ -23,6 +25,101 @@ namespace Outage.SCADA.SCADA_Config_Data.Configuration
         public string Name { get; set; }
         public float CurrentValue { get; set; }
         public AlarmType Alarm { get; set; }
+
+        public ModbusPoint()
+        {
+        }
+
+        public ModbusPoint(List<Property> props, ModelCode type)
+        {
+            foreach (var item in props)
+            {
+                switch (item.Id)
+                {
+                    case ModelCode.IDOBJ_GID:
+                        Gid = item.AsLong();
+                        break;
+
+                    case ModelCode.IDOBJ_NAME:
+                        Name = item.AsString();
+                        break;
+
+                    case ModelCode.DISCRETE_CURRENTOPEN:
+                        CurrentValue = (item.AsBool() == true) ? 1 : 0;
+                        break;
+
+                    case ModelCode.DISCRETE_MAXVALUE:
+                        MaxValue = item.AsInt();
+                        break;
+
+                    case ModelCode.DISCRETE_MINVALUE:
+                        MinValue = item.AsInt();
+                        break;
+
+                    case ModelCode.DISCRETE_NORMALVALUE:
+                        DefaultValue = item.AsInt();
+                        break;
+
+                    case ModelCode.MEASUREMENT_ADDRESS:
+                        if (ushort.TryParse(item.AsString(), out ushort address))
+                        {
+                            Address = address;
+                        }
+                        else
+                        {
+                            //TODO: log err address is either not defined or is invalid
+                            //todo: exception?
+                        }
+                        break;
+
+                    case ModelCode.MEASUREMENT_ISINPUT:
+                        if (type == ModelCode.ANALOG)
+                        {
+                            RegistarType = (item.AsBool() == true) ? PointType.ANALOG_INPUT : PointType.ANALOG_OUTPUT;
+                        }
+                        else if (type == ModelCode.DISCRETE)
+                        {
+                            RegistarType = (item.AsBool() == true) ? PointType.DIGITAL_INPUT : PointType.DIGITAL_OUTPUT;
+                        }
+                        else
+                        {
+                            //TODO: log err
+                            //todo: exception?
+                        }
+                        break;
+
+                    case ModelCode.ANALOG_CURRENTVALUE:
+                        CurrentValue = item.AsFloat();
+                        break;
+
+                    case ModelCode.ANALOG_MAXVALUE:
+                        MaxValue = item.AsFloat();
+                        break;
+
+                    case ModelCode.ANALOG_MINVALUE:
+                        MinValue = item.AsFloat();
+                        break;
+
+                    case ModelCode.ANALOG_NORMALVALUE:
+                        DefaultValue = item.AsFloat();
+                        break;
+
+                    default:
+                        break;
+                }
+
+                if (RegistarType == PointType.ANALOG_INPUT || RegistarType == PointType.ANALOG_OUTPUT)
+                {
+                    LowLimit = EGU_Min + 200;
+                    HighLimit = EGU_Max - 200;
+                }
+                else if (RegistarType == PointType.DIGITAL_INPUT || RegistarType == PointType.DIGITAL_OUTPUT)
+                {
+                    LowLimit = 0;
+                    HighLimit = 1;
+                }
+            }
+        }
 
         public object Clone()
         {

@@ -1,6 +1,6 @@
 ﻿using EasyModbus;
 using Outage.SCADA.ModBus.FunctionParameters;
-using Outage.SCADA.SCADA_Common;
+using Outage.SCADA.SCADACommon;
 using System;
 using System.Collections.Generic;
 using System.Net;
@@ -8,23 +8,22 @@ using System.Reflection;
 
 namespace Outage.SCADA.ModBus.ModbusFuntions
 {
-    public class ReadInputRegistersFunction : ModbusFunction
+    public class ReadInputRegistersFunction : ModbusFunction, IReadAnalogModBusFunction
     {
-        public ReadInputRegistersFunction(ModbusCommandParameters commandParameters, ModbusClient modbusClient) 
-            : base(commandParameters, modbusClient)
+        public ReadInputRegistersFunction(ModbusCommandParameters commandParameters) 
+            : base(commandParameters)
         {
             //TOOD: check?
             CheckArguments(MethodBase.GetCurrentMethod(), typeof(ModbusReadCommandParameters));
         }
 
         #region IModBusFunction
-        public override void Execute()
+        public int[] Data { get; protected set; }
+
+        public override void Execute(ModbusClient modbusClient)
         {
             ModbusReadCommandParameters mdb_read_comm_pars = this.CommandParameters as ModbusReadCommandParameters;
-            resultData = (object[])ModbusClient.ReadInputRegisters(mdb_read_comm_pars.StartAddress, mdb_read_comm_pars.Quantity);
-            
-            throw new NotImplementedException("NO RETURN VALUE");
-            
+            Data = modbusClient.ReadInputRegisters(mdb_read_comm_pars.StartAddress, mdb_read_comm_pars.Quantity);
             logger.LogDebug($"ReadInputRegistersFunction executed SUCCESSFULLY. StartAddress: {mdb_read_comm_pars.StartAddress}, Quantity: {mdb_read_comm_pars.Quantity}");
         }
         #endregion

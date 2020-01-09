@@ -1,11 +1,11 @@
 ﻿using Outage.Common;
-using Outage.SCADA.SCADA_Config_Data.Repository;
 using System;
 using System.Collections.Generic;
 using System.Diagnostics;
 using System.Linq;
 using System.Text;
 using System.Threading.Tasks;
+using Outage.SCADA.SCADAConfigData;
 
 namespace Outage.SCADA.ModBus
 {
@@ -15,7 +15,7 @@ namespace Outage.SCADA.ModBus
         {
             try
             {
-                DataModelRepository repo = DataModelRepository.Instance;
+                SCADAConfigData.Configuration.SCADAConfigData repo = SCADAConfigData.Configuration.SCADAConfigData.Instance;
              
                 Process process = new Process();
                 process.StartInfo.FileName = repo.MdbSimExePath;
@@ -31,7 +31,7 @@ namespace Outage.SCADA.ModBus
         {
             try
             {
-                DataModelRepository repo = DataModelRepository.Instance;
+                SCADAConfigData.Configuration.SCADAConfigData repo = SCADAConfigData.Configuration.SCADAConfigData.Instance;
                 Process[] modbusSimulators = Process.GetProcessesByName(repo.MdbSimExeName.Replace(".exe", ""));
 
                 foreach (Process mdbSim in modbusSimulators)

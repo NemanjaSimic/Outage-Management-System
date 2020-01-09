@@ -1,7 +1,8 @@
 ﻿using System;
 
-namespace Outage.SCADA.SCADA_Common
+namespace Outage.SCADA.SCADACommon
 {
+    [Obsolete]
     public interface IPoint
     {
         int PointId { get; }
@@ -10,7 +11,7 @@ namespace Outage.SCADA.SCADA_Common
 
         AlarmType Alarm { get; set; }
 
-        IConfigItem ConfigItem { get; }
+        IModbusPoint ConfigItem { get; }
 
         DateTime Timestamp { get; set; }
     }

@@ -3,8 +3,7 @@ using Outage.Common;
 using Outage.SCADA.ModBus;
 using Outage.SCADA.ModBus.Acquisitor;
 using Outage.SCADA.ModBus.Connection;
-using Outage.SCADA.SCADA_Config_Data.Configuration;
-using Outage.SCADA.SCADA_Config_Data.Repository;
+using Outage.SCADA.SCADAConfigData.Configuration;
 using Outage.SCADA.SCADAService.Command;
 using Outage.SCADA.SCADAService.DistributedTransaction;
 using System;
@@ -23,8 +22,8 @@ namespace Outage.SCADA.SCADAService
         private List<ServiceHost> hosts = null;
         private SCADAModel scadaModel = null;
         private Acquisition acquisition = null;
-        private ConfigWriter configWriter = null;
-        private DataModelRepository repo = DataModelRepository.Instance;
+        //private ConfigWriter configWriter = null;
+        private SCADAConfigData.Configuration.SCADAConfigData repo = SCADAConfigData.Configuration.SCADAConfigData.Instance;
 
         public SCADAService()
         {
@@ -58,34 +57,32 @@ namespace Outage.SCADA.SCADAService
 
         private void InitializeModbusSimConfiguration()
         {
-            bool success = repo.ImportModel();
+            //bool success = repo.ImportModel();
 
-            if(success)
-            {
-                //todo: debug log
+            //if(success)
+            //{
+            //    //todo: debug log
 
-                configWriter = new ConfigWriter(repo.ConfigFileName, repo.Points.Values.ToList());
-                configWriter.GenerateConfigFile();
+            //    configWriter = new ConfigWriter(repo.ConfigFileName, repo.Points.Values.ToList());
+            //    configWriter.GenerateConfigFile();
 
-                if (File.Exists(repo.CurrentConfigPath))
-                {
-                    File.Delete(repo.CurrentConfigPath);
-                }
+            //    if (File.Exists(repo.CurrentConfigPath))
+            //    {
+            //        File.Delete(repo.CurrentConfigPath);
+            //    }
 
-                File.Move(repo.ConfigFileName, repo.CurrentConfigPath);
+            //    File.Move(repo.ConfigFileName, repo.CurrentConfigPath);
 
-                Console.WriteLine("ModbusSim Configuration file generated SUCCESSFULLY.");
-            }
-            else
-            {
-                //todo: debug log
-                Console.WriteLine("ModbusSim Configuration file generated UNSUCCESSFULLY.");
-                //toddo: retry logic
-                throw new Exception("ImportModel failed.");
-            }
+            //    Console.WriteLine("ModbusSim Configuration file generated SUCCESSFULLY.");
+            //}
+            //else
+            //{
+            //    //todo: debug log
+            //    Console.WriteLine("ModbusSim Configuration file generated UNSUCCESSFULLY.");
+            //    //toddo: retry logic
+            //    throw new Exception("ImportModel failed.");
+            //}
         }
-
-       
 
         private void InitializeHosts()
         {
@@ -99,7 +96,7 @@ namespace Outage.SCADA.SCADAService
 
         private void StartDataAcquisition(ModbusClient modbusClient)
         {
-            acquisition = new Acquisition(modbusClient, FunctionExecutor.Instance);
+            acquisition = new Acquisition(FunctionExecutor.Instance);
             acquisition.StartAcquisitionThread();
         }
 

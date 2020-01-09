@@ -4,11 +4,11 @@
   <PropertyGroup>
     <Configuration Condition=" '$(Configuration)' == '' ">Debug</Configuration>
     <Platform Condition=" '$(Platform)' == '' ">AnyCPU</Platform>
-    <ProjectGuid>{C37F054D-37D9-46C0-881C-1EE3C8C77633}</ProjectGuid>
+    <ProjectGuid>{7D87AA2B-ED19-47EA-B403-4EDC6B830D4A}</ProjectGuid>
     <OutputType>Library</OutputType>
     <AppDesignerFolder>Properties</AppDesignerFolder>
-    <RootNamespace>Outage.SCADA.SCADA_Config_Data</RootNamespace>
-    <AssemblyName>SCADA_Config_Data</AssemblyName>
+    <RootNamespace>Outage.SCADA.SCADACommon</RootNamespace>
+    <AssemblyName>SCADACommon</AssemblyName>
     <TargetFrameworkVersion>v4.8</TargetFrameworkVersion>
     <FileAlignment>512</FileAlignment>
     <Deterministic>true</Deterministic>
@@ -33,9 +33,12 @@
     <WarningLevel>4</WarningLevel>
   </PropertyGroup>
   <ItemGroup>
+    <Reference Include="EasyModbus, Version=5.5.0.0, Culture=neutral, processorArchitecture=MSIL">
+      <HintPath>..\..\packages\EasyModbusTCP.5.5.0\lib\EasyModbus.dll</HintPath>
+    </Reference>
     <Reference Include="System" />
-    <Reference Include="System.Configuration" />
     <Reference Include="System.Core" />
+    <Reference Include="System.Runtime.Serialization" />
     <Reference Include="System.ServiceModel" />
     <Reference Include="System.Xml.Linq" />
     <Reference Include="System.Data.DataSetExtensions" />
@@ -45,20 +48,25 @@
     <Reference Include="System.Xml" />
   </ItemGroup>
   <ItemGroup>
-    <Compile Include="Configuration\ConfigItem.cs" />
-    <Compile Include="Configuration\ConfigWriter.cs" />
+    <Compile Include="Enums.cs" />
+    <Compile Include="IConfiguration.cs" />
+    <Compile Include="IModBusFunction.cs" />
+    <Compile Include="IPoint.cs" />
+    <Compile Include="IModbusPoint.cs" />
+    <Compile Include="IResponse.cs" />
+    <Compile Include="ModbusPoint.cs" />
     <Compile Include="Properties\AssemblyInfo.cs" />
-    <Compile Include="Repository\DataModelRepository.cs" />
+    <Compile Include="PubSub\SCADAMessage.cs" />
+    <Compile Include="PubSub\SCADAPublication.cs" />
   </ItemGroup>
   <ItemGroup>
     <ProjectReference Include="..\..\Common\Common.csproj">
-      <Project>{892cbe15-9ed7-4540-81fa-0eaaba592138}</Project>
+      <Project>{892CBE15-9ED7-4540-81FA-0EAABA592138}</Project>
       <Name>Common</Name>
     </ProjectReference>
-    <ProjectReference Include="..\SCADACommon\SCADA_Common.csproj">
-      <Project>{7D87AA2B-ED19-47EA-B403-4EDC6B830D4A}</Project>
-      <Name>SCADA_Common</Name>
-    </ProjectReference>
+  </ItemGroup>
+  <ItemGroup>
+    <None Include="packages.config" />
   </ItemGroup>
   <Import Project="$(MSBuildToolsPath)\Microsoft.CSharp.targets" />
 </Project>

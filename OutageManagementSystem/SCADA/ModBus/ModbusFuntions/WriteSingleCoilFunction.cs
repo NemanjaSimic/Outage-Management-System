@@ -1,6 +1,6 @@
 ﻿using EasyModbus;
 using Outage.SCADA.ModBus.FunctionParameters;
-using Outage.SCADA.SCADA_Common;
+using Outage.SCADA.SCADACommon;
 using System;
 using System.Collections.Generic;
 using System.Net;
@@ -10,15 +10,15 @@ namespace Outage.SCADA.ModBus.ModbusFuntions
 {
     public class WriteSingleCoilFunction : ModbusFunction
     {
-        public WriteSingleCoilFunction(ModbusCommandParameters commandParameters, ModbusClient modbusClient) 
-            : base(commandParameters, modbusClient)
+        public WriteSingleCoilFunction(ModbusCommandParameters commandParameters) 
+            : base(commandParameters)
         {
             //TODO: check?
             CheckArguments(MethodBase.GetCurrentMethod(), typeof(ModbusWriteCommandParameters));
         }
 
         #region IModBusFunction
-        public override void Execute()
+        public override void Execute(ModbusClient modbusClient)
         {
             ModbusWriteCommandParameters mdb_write_comm_pars = this.CommandParameters as ModbusWriteCommandParameters;
 
@@ -36,7 +36,7 @@ namespace Outage.SCADA.ModBus.ModbusFuntions
                 throw new ArgumentException("Non-boolean value in write single coil command parameter.");
             }
 
-            ModbusClient.WriteSingleCoil(mdb_write_comm_pars.OutputAddress, commandingValue);
+            modbusClient.WriteSingleCoil(mdb_write_comm_pars.OutputAddress, commandingValue);
             logger.LogInfo($"WriteSingleCoilFunction executed SUCCESSFULLY. OutputAddress: {mdb_write_comm_pars.OutputAddress}, Value: {commandingValue}");
         }
         #endregion
