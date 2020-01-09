@@ -1,4 +1,5 @@
-﻿using Outage.Common;
+﻿using EasyModbus;
+using Outage.Common;
 using Outage.SCADA.ModBus.Connection;
 using Outage.SCADA.ModBus.FunctionParameters;
 using Outage.SCADA.ModBus.ModbusFuntions;
@@ -11,13 +12,15 @@ namespace Outage.SCADA.ModBus.Acquisitor
 {
     public class Acquisition
     {
-        //TODO: singleton, diskusija...
-
         ILogger logger = LoggerWrapper.Instance;
-        private Thread acquisitionWorker;
+
         private bool threadActiveSignal = true;
-        private FunctionExecutor commandExecutor = FunctionExecutor.Instance;
-        public Acquisition()
+        private Thread acquisitionWorker;
+
+        private ModbusClient modbusClient;
+        private FunctionExecutor commandExecutor; 
+        
+        public Acquisition(ModbusClient modbusClient, FunctionExecutor commandExecutor)
         {
             this.InitializeAcquisitionThread();
         }

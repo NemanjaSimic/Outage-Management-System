@@ -31,6 +31,9 @@
     <WarningLevel>4</WarningLevel>
   </PropertyGroup>
   <ItemGroup>
+    <Reference Include="EasyModbus, Version=5.5.0.0, Culture=neutral, processorArchitecture=MSIL">
+      <HintPath>..\..\packages\EasyModbusTCP.5.5.0\lib\EasyModbus.dll</HintPath>
+    </Reference>
     <Reference Include="System" />
     <Reference Include="System.Core" />
     <Reference Include="System.ServiceModel" />
@@ -45,7 +48,6 @@
     <Compile Include="Command\CommandService.cs" />
     <Compile Include="DistributedTransaction\SCADAModelUpdateNotification.cs" />
     <Compile Include="DistributedTransaction\SCADATransactionActor.cs" />
-    <Compile Include="ModbusSimulatorHandler.cs" />
     <Compile Include="SCADAModel.cs" />
     <Compile Include="SCADAService.cs" />
     <Compile Include="Properties\AssemblyInfo.cs" />
@@ -71,6 +73,9 @@
       <Project>{C37F054D-37D9-46C0-881C-1EE3C8C77633}</Project>
       <Name>SCADA_Config_Data</Name>
     </ProjectReference>
+  </ItemGroup>
+  <ItemGroup>
+    <None Include="packages.config" />
   </ItemGroup>
   <Import Project="$(MSBuildToolsPath)\Microsoft.CSharp.targets" />
 </Project>

@@ -1,4 +1,6 @@
-﻿using Outage.Common;
+﻿using EasyModbus;
+using Outage.Common;
+using Outage.SCADA.ModBus;
 using Outage.SCADA.ModBus.Acquisitor;
 using Outage.SCADA.ModBus.Connection;
 using Outage.SCADA.SCADA_Config_Data.Configuration;
@@ -39,7 +41,10 @@ namespace Outage.SCADA.SCADAService
             ModbusSimulatorHandler.StartModbusSimulator();
 
             FunctionExecutor.Instance.StartConnection();
-            StartDataAcquisition();
+
+            //TODO: config address and port
+            ModbusClient modbusClient = new ModbusClient();
+            StartDataAcquisition(modbusClient);
 
             StartHosts();
         }
@@ -92,9 +97,9 @@ namespace Outage.SCADA.SCADAService
             };
         }
 
-        private void StartDataAcquisition()
+        private void StartDataAcquisition(ModbusClient modbusClient)
         {
-            acquisition = new Acquisition();
+            acquisition = new Acquisition(modbusClient, FunctionExecutor.Instance);
             acquisition.StartAcquisitionThread();
         }
 

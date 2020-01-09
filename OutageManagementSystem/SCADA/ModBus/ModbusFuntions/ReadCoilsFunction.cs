@@ -1,4 +1,5 @@
-﻿using Outage.SCADA.ModBus.FunctionParameters;
+﻿using EasyModbus;
+using Outage.SCADA.ModBus.FunctionParameters;
 using Outage.SCADA.SCADA_Common;
 using System;
 using System.Collections.Generic;
@@ -9,14 +10,32 @@ namespace Outage.SCADA.ModBus.ModbusFuntions
 {
     public class ReadCoilsFunction : ModbusFunction
     {
-        public ReadCoilsFunction(ModbusCommandParameters commandParameters) : base(commandParameters)
+        public ReadCoilsFunction(ModbusCommandParameters commandParameters, ModbusClient modbusClient) 
+            : base(commandParameters, modbusClient)
         {
+            //TODO: check?
             CheckArguments(MethodBase.GetCurrentMethod(), typeof(ModbusReadCommandParameters));
         }
 
+        #region IModBusFunction
+        public override void Execute()
+        {
+            ModbusReadCommandParameters mdb_read_comm_pars = this.CommandParameters as ModbusReadCommandParameters;
+            bool[] data = ModbusClient.ReadCoils(mdb_read_comm_pars.StartAddress, mdb_read_comm_pars.Quantity);
+
+            throw new NotImplementedException("NO RETURN VALUE");
+
+            logger.LogDebug($"ReadCoilsFunction executed SUCCESSFULLY. StartAddress: {mdb_read_comm_pars.StartAddress}, Quantity: {mdb_read_comm_pars.Quantity}");
+        }
+        #endregion
+
+
+        #region Obsolete
         /// <inheritdoc/>
+        [Obsolete]
         public override byte[] PackRequest()
         {
+
             ModbusReadCommandParameters mdb_read_comm_pars = this.CommandParameters as ModbusReadCommandParameters;
             byte[] mdb_request = new byte[12];
 
@@ -34,6 +53,7 @@ namespace Outage.SCADA.ModBus.ModbusFuntions
         }
 
         /// <inheritdoc />
+        [Obsolete]
         public override Dictionary<Tuple<PointType, ushort>, ushort> ParseResponse(byte[] response)
         {
             ModbusReadCommandParameters mdb_read_comm_pars = this.CommandParameters as ModbusReadCommandParameters;
@@ -57,5 +77,6 @@ namespace Outage.SCADA.ModBus.ModbusFuntions
 
             return returnResponse;
         }
+        #endregion
     }
 }

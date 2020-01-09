@@ -1,4 +1,5 @@
-﻿using Outage.SCADA.ModBus.FunctionParameters;
+﻿using EasyModbus;
+using Outage.SCADA.ModBus.FunctionParameters;
 using Outage.SCADA.SCADA_Common;
 using System;
 using System.Collections.Generic;
@@ -9,12 +10,29 @@ namespace Outage.SCADA.ModBus.ModbusFuntions
 {
     public class ReadInputRegistersFunction : ModbusFunction
     {
-        public ReadInputRegistersFunction(ModbusCommandParameters commandParameters) : base(commandParameters)
+        public ReadInputRegistersFunction(ModbusCommandParameters commandParameters, ModbusClient modbusClient) 
+            : base(commandParameters, modbusClient)
         {
+            //TOOD: check?
             CheckArguments(MethodBase.GetCurrentMethod(), typeof(ModbusReadCommandParameters));
         }
 
+        #region IModBusFunction
+        public override void Execute()
+        {
+            ModbusReadCommandParameters mdb_read_comm_pars = this.CommandParameters as ModbusReadCommandParameters;
+            resultData = (object[])ModbusClient.ReadInputRegisters(mdb_read_comm_pars.StartAddress, mdb_read_comm_pars.Quantity);
+            
+            throw new NotImplementedException("NO RETURN VALUE");
+            
+            logger.LogDebug($"ReadInputRegistersFunction executed SUCCESSFULLY. StartAddress: {mdb_read_comm_pars.StartAddress}, Quantity: {mdb_read_comm_pars.Quantity}");
+        }
+        #endregion
+
+
+        #region Obsolete
         /// <inheritdoc />
+        [Obsolete]
         public override byte[] PackRequest()
         {
             ModbusReadCommandParameters mdb_read_comm_pars = this.CommandParameters as ModbusReadCommandParameters;
@@ -34,6 +52,7 @@ namespace Outage.SCADA.ModBus.ModbusFuntions
         }
 
         /// <inheritdoc />
+        [Obsolete]
         public override Dictionary<Tuple<PointType, ushort>, ushort> ParseResponse(byte[] response)
         {
             ModbusReadCommandParameters mdbrp = (ModbusReadCommandParameters)CommandParameters;
@@ -56,5 +75,6 @@ namespace Outage.SCADA.ModBus.ModbusFuntions
             }
             return returnResponse;
         }
+        #endregion
     }
 }

@@ -46,7 +46,6 @@
   </ItemGroup>
   <ItemGroup>
     <Compile Include="Enums.cs" />
-    <Compile Include="ICommandService.cs" />
     <Compile Include="IConfiguration.cs" />
     <Compile Include="IModBusFunction.cs" />
     <Compile Include="IPoint.cs" />

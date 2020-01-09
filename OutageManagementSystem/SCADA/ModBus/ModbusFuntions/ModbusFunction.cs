@@ -1,4 +1,6 @@
-﻿using Outage.SCADA.ModBus.FunctionParameters;
+﻿using EasyModbus;
+using Outage.Common;
+using Outage.SCADA.ModBus.FunctionParameters;
 using Outage.SCADA.SCADA_Common;
 using System;
 using System.Collections.Generic;
@@ -9,10 +11,14 @@ namespace Outage.SCADA.ModBus.ModbusFuntions
     public abstract class ModbusFunction : IModBusFunction
     {
         private ModbusCommandParameters commandParameters;
+        private ModbusClient modbusClient;
 
-        public ModbusFunction(ModbusCommandParameters commandParameters)
+        protected ILogger logger = LoggerWrapper.Instance;
+        
+        protected ModbusFunction(ModbusCommandParameters commandParameters, ModbusClient modbusClient)
         {
-            this.commandParameters = commandParameters;
+            CommandParameters = commandParameters;
+            ModbusClient = modbusClient;
         }
 
         public ModbusCommandParameters CommandParameters
@@ -22,9 +28,22 @@ namespace Outage.SCADA.ModBus.ModbusFuntions
                 return commandParameters;
             }
 
-            set
+            protected set
             {
                 commandParameters = value;
+            }
+        }
+
+        public ModbusClient ModbusClient
+        {
+            get
+            {
+                return modbusClient;
+            }
+
+            protected set
+            {
+                modbusClient = value;
             }
         }
 
@@ -42,6 +61,14 @@ namespace Outage.SCADA.ModBus.ModbusFuntions
             }
         }
 
+
+        #region IModBusFunction
+
+        public abstract void Execute();
+        #endregion
+
+
+        #region Obsolete
         /// <summary>
         /// Method is called from communication thread:
         /// Converts command parameters to byte array
@@ -53,6 +80,7 @@ namespace Outage.SCADA.ModBus.ModbusFuntions
         ///
         /// </summary>
         /// <returns>Command parameters in form of byte array</returns>
+        [Obsolete]
         public abstract byte[] PackRequest();
 
         /// <summary>
@@ -73,6 +101,8 @@ namespace Outage.SCADA.ModBus.ModbusFuntions
         ///				- Point address
         ///		Value: Value received from MdbSim
         /// </returns>
+        [Obsolete]
         public abstract Dictionary<Tuple<PointType, ushort>, ushort> ParseResponse(byte[] response);
+        #endregion
     }
 }

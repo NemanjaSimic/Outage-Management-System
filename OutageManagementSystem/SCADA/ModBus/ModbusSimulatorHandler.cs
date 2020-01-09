@@ -7,7 +7,7 @@ using System.Linq;
 using System.Text;
 using System.Threading.Tasks;
 
-namespace Outage.SCADA.SCADAService
+namespace Outage.SCADA.ModBus
 {
     public static class ModbusSimulatorHandler
     {

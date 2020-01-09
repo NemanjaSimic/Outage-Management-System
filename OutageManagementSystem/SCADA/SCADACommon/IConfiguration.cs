@@ -3,6 +3,6 @@
     public interface IConfiguration
     {
         int TcpPort { get; set; }
-        byte unitAddress { get; set; }
+        byte UnitAddress { get; set; }
     }
 }

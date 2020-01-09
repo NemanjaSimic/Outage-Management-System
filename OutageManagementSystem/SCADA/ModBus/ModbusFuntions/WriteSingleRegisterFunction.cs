@@ -1,4 +1,5 @@
-﻿using Outage.SCADA.ModBus.FunctionParameters;
+﻿using EasyModbus;
+using Outage.SCADA.ModBus.FunctionParameters;
 using Outage.SCADA.SCADA_Common;
 using System;
 using System.Collections.Generic;
@@ -9,12 +10,26 @@ namespace Outage.SCADA.ModBus.ModbusFuntions
 {
     public class WriteSingleRegisterFunction : ModbusFunction
     {
-        public WriteSingleRegisterFunction(ModbusCommandParameters commandParameters) : base(commandParameters)
+        public WriteSingleRegisterFunction(ModbusCommandParameters commandParameters, ModbusClient modbusClient) 
+            : base(commandParameters, modbusClient)
         {
+            //TODO: check?
             CheckArguments(MethodBase.GetCurrentMethod(), typeof(ModbusWriteCommandParameters));
         }
 
-        /// <inheritdoc />
+        #region IModBusFunction
+        public override void Execute()
+        {
+            ModbusWriteCommandParameters mdb_write_comm_pars = this.CommandParameters as ModbusWriteCommandParameters;
+            ModbusClient.WriteSingleRegister(mdb_write_comm_pars.OutputAddress, mdb_write_comm_pars.Value);
+            logger.LogInfo($"WriteSingleRegisterFunction executed SUCCESSFULLY. OutputAddress: {mdb_write_comm_pars.OutputAddress}, Value: {mdb_write_comm_pars.Value}");
+        }
+        #endregion
+
+
+        #region Obsolete
+        /// <inheritdoc/>
+        [Obsolete]
         public override byte[] PackRequest()
         {
             ModbusWriteCommandParameters mdb_write_comm_pars = this.CommandParameters as ModbusWriteCommandParameters;
@@ -33,7 +48,8 @@ namespace Outage.SCADA.ModBus.ModbusFuntions
             return mdb_request;
         }
 
-        /// <inheritdoc />
+        /// <inheritdoc/>
+        [Obsolete]
         public override Dictionary<Tuple<PointType, ushort>, ushort> ParseResponse(byte[] response)
         {
             ModbusWriteCommandParameters mdb_write_comm_pars = this.CommandParameters as ModbusWriteCommandParameters;
@@ -58,5 +74,6 @@ namespace Outage.SCADA.ModBus.ModbusFuntions
 
             return returnResponse;
         }
+        #endregion
     }
 }

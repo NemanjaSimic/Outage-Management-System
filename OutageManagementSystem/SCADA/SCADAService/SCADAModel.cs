@@ -23,10 +23,16 @@ namespace Outage.SCADA.SCADAService
         private Dictionary<DeltaOpType, List<long>> modelChanges;
         private DataModelRepository dataModelRepository = DataModelRepository.Instance;
 
-        private Dictionary<long, ConfigItem> incomingPoints;
-        protected Dictionary<long, ConfigItem> IncomingPoints
+        private Dictionary<long, ConfigItem> currentScadaModel;
+        protected Dictionary<long, ConfigItem> CurrentScadaModel
         {
-            get { return incomingPoints ?? (incomingPoints = new Dictionary<long, ConfigItem>()); }
+            get { return currentScadaModel ?? (currentScadaModel = new Dictionary<long, ConfigItem>()); }
+        }
+
+        private Dictionary<long, ConfigItem> incomingScadaModel;
+        protected Dictionary<long, ConfigItem> IncomingScadaModel
+        {
+            get { return incomingScadaModel ?? (incomingScadaModel = new Dictionary<long, ConfigItem>()); }
         }
 
 
@@ -75,7 +81,8 @@ namespace Outage.SCADA.SCADAService
 
         public SCADAModel()
         {
-            incomingPoints = new Dictionary<long, ConfigItem>();
+            currentScadaModel = new Dictionary<long, ConfigItem>();
+            incomingScadaModel = new Dictionary<long, ConfigItem>();
             modelRD = new ModelResourcesDesc();
         }
 
@@ -87,14 +94,14 @@ namespace Outage.SCADA.SCADAService
 
         public bool Prepare()
         {
-            bool success = false;
+            bool success;
 
             try
             {
                 foreach(long gid in dataModelRepository.Points.Keys)
                 {
                     ConfigItem point = (ConfigItem)dataModelRepository.Points[gid].Clone();
-                    IncomingPoints.Add(gid, point);
+                    IncomingScadaModel.Add(gid, point);
                 }
 
                 foreach (long gid in modelChanges[DeltaOpType.Insert])
@@ -103,7 +110,7 @@ namespace Outage.SCADA.SCADAService
                     if (type == ModelCode.ANALOG || type == ModelCode.DISCRETE)
                     {
                         ConfigItem configItem = CreateConfigItemForEntity(gid);
-                        IncomingPoints.Add(gid, configItem);
+                        IncomingScadaModel.Add(gid, configItem);
                     }
                 }
 
@@ -113,7 +120,7 @@ namespace Outage.SCADA.SCADAService
                     if(type == ModelCode.ANALOG || type == ModelCode.DISCRETE)
                     {
                         ConfigItem configItem = CreateConfigItemForEntity(gid);
-                        IncomingPoints[gid] = configItem;
+                        IncomingScadaModel[gid] = configItem;
                     }
                 }
 
@@ -122,14 +129,14 @@ namespace Outage.SCADA.SCADAService
                     ModelCode type = modelRD.GetModelCodeFromId(gid);
                     if (type == ModelCode.ANALOG || type == ModelCode.DISCRETE)
                     {
-                        if (IncomingPoints.ContainsKey(gid))
+                        if (IncomingScadaModel.ContainsKey(gid))
                         {
-                            IncomingPoints.Remove(gid);
+                            IncomingScadaModel.Remove(gid);
                         }
                     }
                 }
 
-                configWriter = new ConfigWriter(dataModelRepository.ConfigFileName, IncomingPoints.Values.ToList());
+                configWriter = new ConfigWriter(dataModelRepository.ConfigFileName, IncomingScadaModel.Values.ToList());
                 configWriter.GenerateConfigFile();
 
                 if (File.Exists(dataModelRepository.BackupConfigPath))
@@ -167,8 +174,10 @@ namespace Outage.SCADA.SCADAService
 
         public void Commit()
         {
-            dataModelRepository.Points = IncomingPoints;
-            incomingPoints = null;
+            //dataModelRepository.Points = IncomingScadaModel;
+
+            currentScadaModel = IncomingScadaModel;
+            incomingScadaModel = null;
             modelChanges.Clear();
 
             if (File.Exists(dataModelRepository.BackupConfigPath))
@@ -183,7 +192,7 @@ namespace Outage.SCADA.SCADAService
 
         public void Rollback()
         {
-            incomingPoints = null;
+            incomingScadaModel = null;
             modelChanges.Clear();
 
             if (File.Exists(dataModelRepository.CurrentConfigPath))
