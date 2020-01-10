@@ -10,7 +10,7 @@ namespace PubSubEngine
     {
         private static ILogger logger = LoggerWrapper.Instance;
         private ConcurrentDictionary<ISubscriberCallback, Queue<IPublishableMessage>> subscribers;
-        
+
         private static Subscribers instance;
 
         public static Subscribers Instance
@@ -34,10 +34,10 @@ namespace PubSubEngine
         {
             bool success = subscribers.TryAdd(subscriber, new Queue<IPublishableMessage>());
 
-            if(success)
+            if (success)
             {
                 logger.LogDebug($"Subscriber [{subscriber.SubscriberName}] SUCCESSFYLLY added to collection of all subscribers.");
-    }
+            }
             else
             {
                 logger.LogError($"Try to add Subscriber [{subscriber.SubscriberName}] FAILED.");
@@ -62,7 +62,6 @@ namespace PubSubEngine
 
         public void PublishMessage(ISubscriberCallback subscriber, IPublishableMessage message)
         {
-
             bool success = subscribers.TryGetValue(subscriber, out Queue<IPublishableMessage> queueOfMessages);
 
             if (success)

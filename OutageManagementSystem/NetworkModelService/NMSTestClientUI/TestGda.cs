@@ -66,7 +66,6 @@ namespace TelventDMS.Services.NetworkModelService.TestClient.TestsUI
 		public ResourceDescription GetValues(long globalId, List<ModelCode> properties)
 		{
 			string message = "Getting values method started.";
-			//CommonTrace.WriteTrace(CommonTrace.TraceError, message);
             logger.LogInfo(message);
 
 			ResourceDescription rd = null;
@@ -79,7 +78,7 @@ namespace TelventDMS.Services.NetworkModelService.TestClient.TestsUI
 					{
 						rd = gdaQueryProxy.GetValues(globalId, properties);
 						message = "Getting values method successfully finished.";
-						CommonTrace.WriteTrace(CommonTrace.TraceError, message);
+						logger.LogInfo(message);
 					}
 					else
 					{
@@ -92,7 +91,7 @@ namespace TelventDMS.Services.NetworkModelService.TestClient.TestsUI
 			catch (Exception e)
 			{
 				message = string.Format("Getting values method for entered id = {0} failed.\n\t{1}", globalId, e.Message);
-				CommonTrace.WriteTrace(CommonTrace.TraceError, message);
+				logger.LogError(message);
 			}
 
 			return rd;
@@ -101,10 +100,10 @@ namespace TelventDMS.Services.NetworkModelService.TestClient.TestsUI
 		public List<long> GetExtentValues(ModelCode modelCodeType, List<ModelCode> properties, StringBuilder sb)
 		{
 			string message = "Getting extent values method started.";
-			CommonTrace.WriteTrace(CommonTrace.TraceError, message);
+			logger.LogInfo(message);
 
-			int iteratorId = 0;
-			int resourcesLeft = 0;
+			int iteratorId;
+			int resourcesLeft;
 			int numberOfResources = 300;
 			List<long> ids = new List<long>();
 			StringBuilder tempSb = new StringBuilder();
@@ -162,7 +161,7 @@ namespace TelventDMS.Services.NetworkModelService.TestClient.TestsUI
 						gdaQueryProxy.IteratorClose(iteratorId);
 
 						message = "Getting extent values method successfully finished.";
-						CommonTrace.WriteTrace(CommonTrace.TraceError, message);
+						logger.LogInfo(message);
 					}
 					else
 					{
@@ -175,7 +174,7 @@ namespace TelventDMS.Services.NetworkModelService.TestClient.TestsUI
 			catch (Exception e)
 			{
 				message = string.Format("Getting extent values method failed for {0}.\n\t{1}", modelCodeType, e.Message);
-				CommonTrace.WriteTrace(CommonTrace.TraceError, message);
+				logger.LogError(message);
 			}
 			
 			if(sb != null)
@@ -189,7 +188,7 @@ namespace TelventDMS.Services.NetworkModelService.TestClient.TestsUI
 		public List<long> GetRelatedValues(long sourceGlobalId, List<ModelCode> properties, Association association, StringBuilder sb)
 		{
 			string message = "Getting related values method started.";
-			CommonTrace.WriteTrace(CommonTrace.TraceError, message);
+			logger.LogInfo(message);
 
 			int iteratorId = 0;
 			int resourcesLeft = 0;
@@ -249,7 +248,7 @@ namespace TelventDMS.Services.NetworkModelService.TestClient.TestsUI
 						gdaQueryProxy.IteratorClose(iteratorId);
 
 						message = "Getting related values method successfully finished.";
-						CommonTrace.WriteTrace(CommonTrace.TraceError, message);
+						logger.LogInfo(message);
 					}
 					else
 					{
@@ -262,7 +261,7 @@ namespace TelventDMS.Services.NetworkModelService.TestClient.TestsUI
 			catch (Exception e)
 			{
 				message = string.Format("Getting related values method  failed for sourceGlobalId = {0} and association (propertyId = {1}, type = {2}). Reason: {3}", sourceGlobalId, association.PropertyId, association.Type, e.Message);
-				CommonTrace.WriteTrace(CommonTrace.TraceError, message);
+				logger.LogError(message);
 			}
 
 			if (sb != null)

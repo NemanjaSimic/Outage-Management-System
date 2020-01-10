@@ -11,14 +11,13 @@ namespace Outage.SCADA.ModBus.ModbusFuntions
     public abstract class ModbusFunction : IModBusFunction
     {
         protected ILogger logger = LoggerWrapper.Instance;
-        
+
         public ModbusCommandParameters CommandParameters { get; protected set; }
 
         protected ModbusFunction(ModbusCommandParameters commandParameters)
         {
             CommandParameters = commandParameters;
         }
-
 
         public override string ToString()
         {
@@ -34,13 +33,14 @@ namespace Outage.SCADA.ModBus.ModbusFuntions
             }
         }
 
-
         #region IModBusFunction
-        public abstract void Execute(ModbusClient modbusClient);
-        #endregion
 
+        public abstract void Execute(ModbusClient modbusClient);
+
+        #endregion IModBusFunction
 
         #region Obsolete
+
         /// <summary>
         /// Method is called from communication thread:
         /// Converts command parameters to byte array
@@ -75,6 +75,7 @@ namespace Outage.SCADA.ModBus.ModbusFuntions
         /// </returns>
         [Obsolete]
         public abstract Dictionary<Tuple<PointType, ushort>, ushort> ParseResponse(byte[] response);
-        #endregion
+
+        #endregion Obsolete
     }
 }

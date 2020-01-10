@@ -1,6 +1,4 @@
-﻿using System;
-
-namespace Outage.SCADA.SCADACommon
+﻿namespace Outage.SCADA.SCADACommon
 {
     public interface ISCADAConfigData
     {
@@ -8,7 +6,7 @@ namespace Outage.SCADA.SCADACommon
         string IpAddress { get; }
         byte UnitAddress { get; }
         ushort Interval { get; }
-        string MdbSimExeName { get; }
-        string MdbSimExePath { get; }
+        string ModbusSimulatorExeName { get; }
+        string ModbusSimulatorExePath { get; }
     }
 }

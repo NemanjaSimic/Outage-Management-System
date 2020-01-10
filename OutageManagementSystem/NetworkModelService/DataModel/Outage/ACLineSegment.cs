@@ -1,10 +1,5 @@
 ﻿using Outage.Common;
 using Outage.Common.GDA;
-using System;
-using System.Collections.Generic;
-using System.Linq;
-using System.Text;
-using System.Threading.Tasks;
 
 namespace Outage.DataModel
 {
@@ -60,7 +55,7 @@ namespace Outage.DataModel
 
                 //case ModelCode.EQUIPMENT_NORMALLYINSERVICE:
                 //	property.SetValue(normallyInService);
-                //	break;			
+                //	break;
 
                 default:
                     base.GetProperty(property);
@@ -72,7 +67,7 @@ namespace Outage.DataModel
         {
             switch (property.Id) //in case we add new props
             {
-                //case ModelCode.EQUIPMENT_AGGREGATE:					
+                //case ModelCode.EQUIPMENT_AGGREGATE:
                 //	aggregate = property.AsBool();
                 //	break;
 
@@ -89,11 +84,12 @@ namespace Outage.DataModel
         #endregion IAccess implementation
 
         #region IClonable
+
         public override IdentifiedObject Clone()
         {
-            //TODO log for clone
             return new ACLineSegment(this);
         }
-        #endregion
+
+        #endregion IClonable
     }
 }

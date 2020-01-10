@@ -5,65 +5,64 @@ using Outage.SCADA.ModBus.Connection;
 using Outage.SCADA.ModBus.FunctionParameters;
 using Outage.SCADA.ModBus.ModbusFuntions;
 using Outage.SCADA.SCADACommon;
-using System;
+using Outage.SCADA.SCADAData.Repository;
 
 namespace Outage.SCADA.SCADAService.Command
 {
     public class CommandService : ISCADACommand
     {
-        private static FunctionExecutor fe = FunctionExecutor.Instance;
-
         private ILogger logger = LoggerWrapper.Instance;
-
-        public CommandService()
-        {
-        }
+        private FunctionExecutor functionExecutor = FunctionExecutor.Instance;
+        private SCADAModel scadaModel = SCADAModel.Instance;
 
         public void RecvCommand(long gid, object value)
         {
-            //if (true)//DataModelRepository.Instance.Points.TryGetValue(gid, out ConfigItem CI))
-            //{
-            //    ISCADAModelPointItem pointItem = null;
-            //    if (CI.RegistarType == PointType.ANALOG_OUTPUT || CI.RegistarType == PointType.DIGITAL_OUTPUT)
-            //    {
-            //        ModbusWriteCommandParameters mdb_write_comm_pars = null;
+            if (scadaModel.CurrentScadaModel.TryGetValue(gid, out ISCADAModelPointItem pointItem))
+            {
+                ModbusWriteCommandParameters mdb_write_comm_pars;
+                ushort length = 6;
+                ushort commandedValue = (ushort)value;
 
-            //        ushort CommandedValue;
+                if (pointItem.RegistarType == PointType.ANALOG_OUTPUT)
+                {
+                    mdb_write_comm_pars = new ModbusWriteCommandParameters(length,
+                                                                           (byte)ModbusFunctionCode.WRITE_SINGLE_REGISTER,
+                                                                           pointItem.Address,
+                                                                           commandedValue);
 
-            //        if (CI.RegistarType == PointType.ANALOG_OUTPUT)
-            //        {
-            //            CommandedValue = (ushort)value;
+                    logger.LogInfo("Commanded WRITE_SINGLE_REGISTER with a new value - " + commandedValue);
+                }
+                else if (pointItem.RegistarType == PointType.DIGITAL_OUTPUT)
+                {
+                    mdb_write_comm_pars = new ModbusWriteCommandParameters(length,
+                                                                           (byte)ModbusFunctionCode.WRITE_SINGLE_COIL,
+                                                                           pointItem.Address,
+                                                                           commandedValue);
 
-            //            mdb_write_comm_pars = new ModbusWriteCommandParameters
-            //           (6, (byte)ModbusFunctionCode.WRITE_SINGLE_REGISTER, CI.Address, CommandedValue);
+                    logger.LogInfo("Commanded WRITE_SINGLE_COIL with a new value - " + commandedValue);
+                }
+                else
+                {
+                    string message = $"RegistarType of entity with gid: 0x{gid:X16} is nether ANALOG_OUTPUT nor DIGITAL_OUTPUT.";
+                    logger.LogError(message);
+                    return;
+                }
 
-            //            logger.LogInfo("Commanded WRITE_SINGLE_REGISTER with a new value - " + CommandedValue);
-            //        }
-            //        else if (CI.RegistarType == PointType.DIGITAL_OUTPUT)
-            //        {
-            //            //TREBA BOOL ZBOG DIGITAL OUTPUT-a
-            //            CommandedValue = (ushort)value;
+                ModbusFunction modbusFunction = FunctionFactory.CreateModbusFunction(mdb_write_comm_pars);
+                functionExecutor.EnqueueCommand(modbusFunction);
 
-            //            mdb_write_comm_pars = new ModbusWriteCommandParameters
-            //            (6, (byte)ModbusFunctionCode.WRITE_SINGLE_COIL, CI.Address, CommandedValue);
-
-            //            logger.LogInfo("Commanded WRITE_SINGLE_COIL with a new value - " + CommandedValue);
-            //        }
-
-            //        ModbusFunction fn = FunctionFactory.CreateModbusFunction(mdb_write_comm_pars);
-            //        fe.EnqueueCommand(fn);
-
-            //        bool AlarmChanged = CI.SetAlarms();
-            //        if (AlarmChanged)
-            //        {
-            //            logger.LogInfo("Alarm for item " + CI.Gid + " is set to " + CI.Alarm.ToString());
-            //        }
-            //    }
-            //}
-            //else
-            //{
-            //    Console.WriteLine("Ne postoji Point sa gidom " + gid);
-            //}
+                //TOOD: alarming
+                //bool AlarmChanged = CI.SetAlarms();
+                //if (AlarmChanged)
+                //{
+                //    logger.LogInfo("Alarm for item " + CI.Gid + " is set to " + CI.Alarm.ToString());
+                //}
+            }
+            else
+            {
+                string message = $"Entity with gid: 0x{gid:X16} does not exist in current SCADA model.";
+                logger.LogError(message);
+            }
         }
     }
 }

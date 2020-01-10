@@ -14,12 +14,11 @@ namespace Outage.SCADA.SCADAData.Configuration
         public byte UnitAddress { get; protected set; }
         public ushort Interval { get; protected set; }
 
-        [Obsolete]
-        public string MdbSimExeName { get; protected set; } = string.Empty;
-        [Obsolete]
-        public string MdbSimExePath { get; protected set; } = string.Empty;
+        public string ModbusSimulatorExeName { get; protected set; } = string.Empty;
+        public string ModbusSimulatorExePath { get; protected set; } = string.Empty;
 
         #region Instance
+
         private static SCADAConfigData _instance;
 
         public static SCADAConfigData Instance
@@ -34,7 +33,8 @@ namespace Outage.SCADA.SCADAData.Configuration
                 return _instance;
             }
         }
-        #endregion
+
+        #endregion Instance
 
         private SCADAConfigData()
         {
@@ -51,13 +51,15 @@ namespace Outage.SCADA.SCADAData.Configuration
                 }
                 else
                 {
-                    //TODO: err log
-                    throw new Exception("TcpPort in SCADA configuration is either not defined or not valid.");
+                    string message = "TcpPort in SCADA configuration is either not defined or not valid.";
+                    logger.LogError(message);
+                    throw new Exception(message);
                 }
             }
 
             if (ConfigurationManager.AppSettings["IpAddress"] is string ipAddress)
             {
+                //TOOD: is valid ip address? => error
                 IpAddress = ipAddress;
             }
 
@@ -69,8 +71,9 @@ namespace Outage.SCADA.SCADAData.Configuration
                 }
                 else
                 {
-                    //TODO: err log
-                    throw new Exception("UnitAddress in SCADA configuration is either not defined or not valid.");
+                    string message = "UnitAddress in SCADA configuration is either not defined or not valid.";
+                    logger.LogError(message);
+                    throw new Exception(message);
                 }
             }
 
@@ -83,36 +86,19 @@ namespace Outage.SCADA.SCADAData.Configuration
                 else
                 {
                     Interval = 10000;
-                    //TODO: warnnig log
-                    //throw new Exception("Interval in SCADA configuration is either not defined or not valid.");
+                    logger.LogWarn("Interval in SCADA configuration is either not defined or not valid.");
                 }
             }
 
-            //if (ConfigurationManager.AppSettings["ConfigFileName"] is string configFileName)
-            //{
-            //    ConfigFileName = configFileName;
-
-            //    if (ConfigurationManager.AppSettings["CurrentConfigPath"] is string currentConfigPath)
-            //    {
-            //        CurrentConfigPath = Environment.CurrentDirectory.Replace(@"\SCADAServiceHost\bin\Debug", $@"{currentConfigPath}\{ConfigFileName}");
-            //    }
-
-            //    if (ConfigurationManager.AppSettings["BackupConfigPath"] is string backupConfigPath)
-            //    {
-            //        BackupConfigPath = Environment.CurrentDirectory.Replace(@"\SCADAServiceHost\bin\Debug", $@"{backupConfigPath}\{ConfigFileName}");
-            //    }
-            //}
-
-            if (ConfigurationManager.AppSettings["MdbSimExeName"] is string mdbSimExeName)
+            if (ConfigurationManager.AppSettings["ModbusSimulatorExeName"] is string mdbSimExeName)
             {
-                MdbSimExeName = mdbSimExeName;
+                ModbusSimulatorExeName = mdbSimExeName;
 
-                if (ConfigurationManager.AppSettings["MdbSimExePath"] is string mdbSimExePath)
+                if (ConfigurationManager.AppSettings["ModbusSimulatorExePath"] is string mdbSimExePath)
                 {
-                    MdbSimExePath = Environment.CurrentDirectory.Replace(@"\SCADAServiceHost\bin\Debug", $@"{mdbSimExePath}\{MdbSimExeName}");
-                }   
+                    ModbusSimulatorExePath = Environment.CurrentDirectory.Replace(@"\SCADAServiceHost\bin\Debug", $@"{mdbSimExePath}\{ModbusSimulatorExeName}");
+                }
             }
-
         }
     }
 }

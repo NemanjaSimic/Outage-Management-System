@@ -11,13 +11,14 @@ namespace Outage.SCADA.ModBus.ModbusFuntions
 {
     public class ReadCoilsFunction : ModbusFunction, IReadDigitalModBusFunction
     {
-        public ReadCoilsFunction(ModbusCommandParameters commandParameters) 
+        public ReadCoilsFunction(ModbusCommandParameters commandParameters)
             : base(commandParameters)
         {
             CheckArguments(MethodBase.GetCurrentMethod(), typeof(ModbusReadCommandParameters));
         }
 
         #region IModBusFunction
+
         public Dictionary<long, bool> Data { get; protected set; }
 
         public override void Execute(ModbusClient modbusClient)
@@ -38,32 +39,32 @@ namespace Outage.SCADA.ModBus.ModbusFuntions
 
             SCADAModel scadaModel = SCADAModel.Instance;
 
-            for(ushort i = 0; i < quantity; i++)
+            for (ushort i = 0; i < quantity; i++)
             {
                 ushort address = (ushort)(startAddress + i);
                 bool value = data[i];
                 long gid = scadaModel.CurrentAddressToGidMap[address];
 
-                if(scadaModel.CurrentScadaModel.ContainsKey(gid))
+                if (scadaModel.CurrentScadaModel.ContainsKey(gid))
                 {
                     scadaModel.CurrentScadaModel[gid].CurrentValue = value ? 1 : 0;
                     logger.LogDebug($"ReadCoilsFunction execute => Current value: {scadaModel.CurrentScadaModel[gid].CurrentValue} from address: {address}, gid: 0x{gid:X16}.");
                 }
 
-                Data.Add(gid, value); 
+                Data.Add(gid, value);
             }
 
             logger.LogDebug($"ReadCoilsFunction executed SUCCESSFULLY. StartAddress: {startAddress}, Quantity: {quantity}");
         }
-        #endregion
 
+        #endregion IModBusFunction
 
         #region Obsolete
+
         /// <inheritdoc/>
         [Obsolete]
         public override byte[] PackRequest()
         {
-
             ModbusReadCommandParameters mdb_read_comm_pars = this.CommandParameters as ModbusReadCommandParameters;
             byte[] mdb_request = new byte[12];
 
@@ -74,8 +75,6 @@ namespace Outage.SCADA.ModBus.ModbusFuntions
             mdb_request[7] = mdb_read_comm_pars.FunctionCode;
             Buffer.BlockCopy(BitConverter.GetBytes(IPAddress.HostToNetworkOrder((short)mdb_read_comm_pars.StartAddress)), 0, mdb_request, 8, 2);
             Buffer.BlockCopy(BitConverter.GetBytes(IPAddress.HostToNetworkOrder((short)mdb_read_comm_pars.Quantity)), 0, mdb_request, 10, 2);
-
-            //TODO: debug log
 
             return mdb_request;
         }
@@ -105,6 +104,7 @@ namespace Outage.SCADA.ModBus.ModbusFuntions
 
             return returnResponse;
         }
-        #endregion
+
+        #endregion Obsolete
     }
 }

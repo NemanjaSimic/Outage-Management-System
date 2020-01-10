@@ -1,5 +1,4 @@
-﻿using EasyModbus;
-using Outage.SCADA.ModBus.FunctionParameters;
+﻿using Outage.SCADA.ModBus.FunctionParameters;
 using Outage.SCADA.ModBus.ModbusFuntions;
 using Outage.SCADA.SCADACommon;
 

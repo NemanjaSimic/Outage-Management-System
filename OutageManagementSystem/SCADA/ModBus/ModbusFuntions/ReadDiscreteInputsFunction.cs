@@ -11,13 +11,14 @@ namespace Outage.SCADA.ModBus.ModbusFuntions
 {
     public class ReadDiscreteInputsFunction : ModbusFunction, IReadDigitalModBusFunction
     {
-        public ReadDiscreteInputsFunction(ModbusCommandParameters commandParameters) 
+        public ReadDiscreteInputsFunction(ModbusCommandParameters commandParameters)
             : base(commandParameters)
         {
             CheckArguments(MethodBase.GetCurrentMethod(), typeof(ModbusReadCommandParameters));
         }
 
         #region IModBusFunction
+
         public Dictionary<long, bool> Data { get; protected set; }
 
         public override void Execute(ModbusClient modbusClient)
@@ -55,10 +56,11 @@ namespace Outage.SCADA.ModBus.ModbusFuntions
 
             logger.LogDebug($"ReadDiscreteInputsFunction executed SUCCESSFULLY. StartAddress: {startAddress}, Quantity: {quantity}");
         }
-        #endregion
 
+        #endregion IModBusFunction
 
         #region Obsolete
+
         /// <inheritdoc />
         [Obsolete]
         public override byte[] PackRequest()
@@ -73,8 +75,6 @@ namespace Outage.SCADA.ModBus.ModbusFuntions
             mdb_request[7] = mdb_read_comm_pars.FunctionCode;
             Buffer.BlockCopy(BitConverter.GetBytes(IPAddress.HostToNetworkOrder((short)mdb_read_comm_pars.StartAddress)), 0, mdb_request, 8, 2);
             Buffer.BlockCopy(BitConverter.GetBytes(IPAddress.HostToNetworkOrder((short)mdb_read_comm_pars.Quantity)), 0, mdb_request, 10, 2);
-
-            //TODO: debug log
 
             return mdb_request;
         }
@@ -104,6 +104,7 @@ namespace Outage.SCADA.ModBus.ModbusFuntions
 
             return returnResponse;
         }
-        #endregion
+
+        #endregion Obsolete
     }
 }

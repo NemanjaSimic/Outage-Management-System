@@ -2,11 +2,7 @@
 using Outage.SCADA.SCADACommon;
 using Outage.SCADA.SCADAData.Configuration;
 using System;
-using System.Collections.Generic;
 using System.Diagnostics;
-using System.Linq;
-using System.Text;
-using System.Threading.Tasks;
 
 namespace Outage.SCADA.ModBus
 {
@@ -17,9 +13,9 @@ namespace Outage.SCADA.ModBus
             try
             {
                 ISCADAConfigData config = SCADAConfigData.Instance;
-             
+
                 Process process = new Process();
-                process.StartInfo.FileName = config.MdbSimExePath;
+                process.StartInfo.FileName = config.ModbusSimulatorExePath;
                 process.Start();
             }
             catch (Exception e)
@@ -33,7 +29,7 @@ namespace Outage.SCADA.ModBus
             try
             {
                 ISCADAConfigData config = SCADAConfigData.Instance;
-                Process[] modbusSimulators = Process.GetProcessesByName(config.MdbSimExeName.Replace(".exe", ""));
+                Process[] modbusSimulators = Process.GetProcessesByName(config.ModbusSimulatorExeName.Replace(".exe", ""));
 
                 foreach (Process mdbSim in modbusSimulators)
                 {

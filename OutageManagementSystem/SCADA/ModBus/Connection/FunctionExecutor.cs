@@ -10,9 +10,6 @@ using Outage.SCADA.SCADAData.Repository;
 using System;
 using System.Collections.Concurrent;
 using System.Collections.Generic;
-using System.Linq;
-using System.Net;
-using System.Net.Sockets;
 using System.Threading;
 
 namespace Outage.SCADA.ModBus.Connection
@@ -21,16 +18,11 @@ namespace Outage.SCADA.ModBus.Connection
 
     public class FunctionExecutor
     {
-        private ILogger logger = LoggerWrapper.Instance; 
-        private ModelResourcesDesc resourcesDesc = new ModelResourcesDesc();
-        //private TcpConnection connection;
-        private ushort TcpPort;
-        private Thread connectionProcess;
+        private ILogger logger = LoggerWrapper.Instance;
+        private Thread functionExecutorThread;
         private bool threadCancellationSignal = false;
-        private int numberOfTries = 0;
 
         private IModBusFunction currentCommand;
-        //public ConnectionState connectionState = ConnectionState.DISCONNECTED;
         private AutoResetEvent commandEvent;
         private ConcurrentQueue<IModBusFunction> commandQueue;
 
@@ -39,6 +31,7 @@ namespace Outage.SCADA.ModBus.Connection
         public ModbusClient ModbusClient { get; protected set; }
 
         #region Proxies
+
         private PublisherProxy publisherProxy = null;
 
         public PublisherProxy PublisherProxy
@@ -79,31 +72,34 @@ namespace Outage.SCADA.ModBus.Connection
                 return publisherProxy;
             }
         }
-        #endregion
+
+        #endregion Proxies
 
         #region Instance
+
         private static FunctionExecutor instance;
         private static readonly object lockSync = new object();
 
         public static FunctionExecutor Instance
         {
             get
-            { 
-                if(instance == null)
+            {
+                if (instance == null)
                 {
-                    lock(lockSync)
+                    lock (lockSync)
                     {
-                        if(instance == null)
+                        if (instance == null)
                         {
                             instance = new FunctionExecutor();
                         }
                     }
                 }
-                
-                return instance; 
-            }        
+
+                return instance;
+            }
         }
-        #endregion
+
+        #endregion Instance
 
         private FunctionExecutor()
         {
@@ -116,18 +112,27 @@ namespace Outage.SCADA.ModBus.Connection
             commandEvent = new AutoResetEvent(false);
         }
 
-        public event UpdatePointDelegate UpdatePointEvent;
+        //[Obsolete("Is it usefull?")]
+        //public event UpdatePointDelegate UpdatePointEvent;
 
-        public void StartConnection()
+        #region Public Members
+
+        public void StartExecutor()
         {
             ModbusClient.Connect();
 
-            connectionProcess = new Thread(ConnectionProcessThread)
+            functionExecutorThread = new Thread(FunctionExecutorThread)
             {
-                Name = "Communication with SIM"
+                Name = "FunctionExecutorThread"
             };
 
-            connectionProcess.Start();
+            functionExecutorThread.Start();
+        }
+
+        public void StopExecutor()
+        {
+            threadCancellationSignal = true;
+            ModbusClient.Disconnect();
         }
 
         public void EnqueueCommand(ModbusFunction modbusFunction)
@@ -140,9 +145,13 @@ namespace Outage.SCADA.ModBus.Connection
             }
         }
 
-        private void ConnectionProcessThread()
+        #endregion Public Members
+
+        #region Private Members
+
+        private void FunctionExecutorThread()
         {
-            logger.LogInfo("ConnectionProcessThread is started");
+            logger.LogInfo("FunctionExecutorThread is started");
 
             Console.WriteLine("Establishing connection...");
             logger.LogInfo("Establishing connection...");
@@ -153,12 +162,12 @@ namespace Outage.SCADA.ModBus.Connection
             {
                 try
                 {
-                    if(ModbusClient == null)
+                    if (ModbusClient == null)
                     {
                         ModbusClient = new ModbusClient(ConfigData.IpAddress, ConfigData.TcpPort);
                     }
-                    
-                    if(!ModbusClient.Connected)
+
+                    if (!ModbusClient.Connected)
                     {
                         ModbusClient.Connect();
                     }
@@ -185,11 +194,11 @@ namespace Outage.SCADA.ModBus.Connection
                 }
                 catch (Exception ex)
                 {
-                    //todo: log err
+                    logger.LogError("Exception catched in FunctionExecutorThread.", ex);
                 }
             }
 
-            logger.LogInfo("ConnectionProcessThred is stopped.");
+            logger.LogInfo("FunctionExecutorThread is stopped.");
         }
 
         private void PublishAnalogData(Dictionary<long, int> data)
@@ -236,13 +245,6 @@ namespace Outage.SCADA.ModBus.Connection
             }
         }
 
-        //private ISCADAModelPointItem UpdatePoints(ushort address, ushort newValue)
-        //{
-        //    //throw new NotImplementedException("UpdatePoints");
-        //    ConfigItem point = DataModelRepository.Instance.Points.Values.Where(x => x.Address == address).First();
-        //    point.CurrentValue = newValue;
-
-        //    return point;
-        //}
+        #endregion Private Members
     }
 }

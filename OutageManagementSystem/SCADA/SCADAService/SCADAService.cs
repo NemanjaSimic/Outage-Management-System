@@ -36,15 +36,12 @@ namespace Outage.SCADA.SCADAService
             InitializeHosts();
         }
 
+        #region Public Members
         public void Start()
         {
-            InitializeModbusSimConfiguration();
             ModbusSimulatorHandler.StartModbusSimulator();
-
-            FunctionExecutor.Instance.StartConnection();
-
+            FunctionExecutor.Instance.StartExecutor();
             StartDataAcquisition();
-
             StartHosts();
         }
 
@@ -54,36 +51,10 @@ namespace Outage.SCADA.SCADAService
             CloseHosts();
             GC.SuppressFinalize(this);
         }
+        #endregion
 
-        private void InitializeModbusSimConfiguration()
-        {
-            //bool success = repo.ImportModel();
 
-            //if(success)
-            //{
-            //    //todo: debug log
-
-            //    configWriter = new ConfigWriter(repo.ConfigFileName, repo.Points.Values.ToList());
-            //    configWriter.GenerateConfigFile();
-
-            //    if (File.Exists(repo.CurrentConfigPath))
-            //    {
-            //        File.Delete(repo.CurrentConfigPath);
-            //    }
-
-            //    File.Move(repo.ConfigFileName, repo.CurrentConfigPath);
-
-            //    Console.WriteLine("ModbusSim Configuration file generated SUCCESSFULLY.");
-            //}
-            //else
-            //{
-            //    //todo: debug log
-            //    Console.WriteLine("ModbusSim Configuration file generated UNSUCCESSFULLY.");
-            //    //toddo: retry logic
-            //    throw new Exception("ImportModel failed.");
-            //}
-        }
-
+        #region Private Members
         private void InitializeHosts()
         {
             hosts = new List<ServiceHost>()
@@ -129,9 +100,9 @@ namespace Outage.SCADA.SCADAService
                 Console.WriteLine("\n");
             }
 
-            message = string.Format("Trace level: {0}", CommonTrace.TraceLevel);
+            message = "Trace level: LEVEL NOT SPECIFIED!";
             Console.WriteLine(message);
-            logger.LogInfo(message);
+            logger.LogWarn(message);
 
             message = "The SCADA" +
                 " Service is started.";
@@ -145,6 +116,8 @@ namespace Outage.SCADA.SCADAService
             {
                 acquisition.StopAcquisitionThread();
             }
+
+            FunctionExecutor.Instance.StopExecutor();
 
             if (hosts == null || hosts.Count == 0)
             {
@@ -160,5 +133,6 @@ namespace Outage.SCADA.SCADAService
             logger.LogInfo(message);
             Console.WriteLine("\n\n{0}", message);
         }
+        #endregion
     }
 }

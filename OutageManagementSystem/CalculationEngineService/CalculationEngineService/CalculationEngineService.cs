@@ -69,9 +69,9 @@ namespace CalculationEngineService
                 Console.WriteLine("\n");
             }
 
-            message = string.Format("Trace level: {0}", CommonTrace.TraceLevel);
+            message = string.Format("Trace level: LEVEL NOT SPECIFIED!");
             Console.WriteLine(message);
-            logger.LogInfo(message);
+            logger.LogWarn(message);
 
 
             message = "Calculation Engine is started.";

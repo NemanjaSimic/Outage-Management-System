@@ -1,5 +1,4 @@
 ﻿using EasyModbus;
-using System;
 using System.Collections.Generic;
 
 namespace Outage.SCADA.SCADACommon

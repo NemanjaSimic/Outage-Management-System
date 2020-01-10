@@ -2,13 +2,8 @@
 using Outage.Common.GDA;
 using Outage.Common.ServiceProxies;
 using Outage.SCADA.SCADACommon;
-using Outage.SCADA.SCADAData;
-using Outage.SCADA.SCADAData.Configuration;
 using System;
 using System.Collections.Generic;
-using System.IO;
-using System.Linq;
-using System.Net.Sockets;
 using System.Threading;
 
 namespace Outage.SCADA.SCADAData.Repository
@@ -17,16 +12,19 @@ namespace Outage.SCADA.SCADAData.Repository
     {
         private ILogger logger = LoggerWrapper.Instance;
         private ModelResourcesDesc modelResourceDesc;
-        //private ConfigWriter configWriter;
 
         private Dictionary<DeltaOpType, List<long>> modelChanges;
-        private ISCADAConfigData configData = SCADAConfigData.Instance;
-
         private Dictionary<long, ISCADAModelPointItem> incomingScadaModel;
         private Dictionary<ushort, long> incomingAddressToGidMap;
         private Dictionary<long, ISCADAModelPointItem> currentScadaModel;
         private Dictionary<ushort, long> currentAddressToGidMap;
 
+        #region Properties
+
+        protected Dictionary<DeltaOpType, List<long>> ModelChanges
+        {
+            get { return modelChanges ?? (modelChanges = new Dictionary<DeltaOpType, List<long>>()); }
+        }
 
         protected Dictionary<long, ISCADAModelPointItem> IncomingScadaModel
         {
@@ -48,13 +46,10 @@ namespace Outage.SCADA.SCADAData.Repository
             get { return currentAddressToGidMap ?? (currentAddressToGidMap = new Dictionary<ushort, long>(CurrentScadaModel.Count)); }
         }
 
-
-        [Obsolete]
-        public Dictionary<long, ResourceDescription> NetworkModel { get; protected set; }
-        [Obsolete]
-        public Dictionary<long, Dictionary<ModelCode, Property>> NetworkModelProps { get; protected set; }
+        #endregion Properties
 
         #region Instance
+
         private static SCADAModel instance;
         private static readonly object lockSync = new object();
 
@@ -62,11 +57,11 @@ namespace Outage.SCADA.SCADAData.Repository
         {
             get
             {
-                if(instance == null)
+                if (instance == null)
                 {
-                    lock(lockSync)
+                    lock (lockSync)
                     {
-                        if(instance == null)
+                        if (instance == null)
                         {
                             instance = new SCADAModel();
                         }
@@ -76,9 +71,11 @@ namespace Outage.SCADA.SCADAData.Repository
                 return instance;
             }
         }
-        #endregion
+
+        #endregion Instance
 
         #region Proxies
+
         private NetworkModelGDAProxy gdaQueryProxy = null;
 
         protected NetworkModelGDAProxy GdaQueryProxy
@@ -118,14 +115,19 @@ namespace Outage.SCADA.SCADAData.Repository
                 return gdaQueryProxy;
             }
         }
-        #endregion
+
+        #endregion Proxies
 
         private SCADAModel()
         {
             currentScadaModel = new Dictionary<long, ISCADAModelPointItem>();
             incomingScadaModel = new Dictionary<long, ISCADAModelPointItem>();
             modelResourceDesc = new ModelResourcesDesc();
+
+            ImportModel();
         }
+
+        #region IModelUpdateNotificationContract
 
         public bool Notify(Dictionary<DeltaOpType, List<long>> modelChanges)
         {
@@ -133,14 +135,17 @@ namespace Outage.SCADA.SCADAData.Repository
             return true;
         }
 
+        #endregion IModelUpdateNotificationContract
+
         #region ITransactionActorContract
+
         public bool Prepare()
         {
             bool success;
 
             try
             {
-                foreach(long gid in CurrentScadaModel.Keys)
+                foreach (long gid in CurrentScadaModel.Keys)
                 {
                     ISCADAModelPointItem pointItem = CurrentScadaModel[gid].Clone();
                     IncomingScadaModel.Add(gid, pointItem);
@@ -154,7 +159,7 @@ namespace Outage.SCADA.SCADAData.Repository
                     {
                         ISCADAModelPointItem pointItem = CreateConfigItemForEntity(gid);
 
-                        if(IncomingScadaModel.ContainsKey(gid) || IncomingAddressToGidMap.ContainsKey(pointItem.Address))
+                        if (IncomingScadaModel.ContainsKey(gid) || IncomingAddressToGidMap.ContainsKey(pointItem.Address))
                         {
                             string message = $"Model update data in fault state. Inserting gid: {gid} or measurement address: {pointItem.Address}, that already exists in SCADA model.";
                             logger.LogError(message);
@@ -169,7 +174,7 @@ namespace Outage.SCADA.SCADAData.Repository
                 foreach (long gid in modelChanges[DeltaOpType.Update])
                 {
                     ModelCode type = modelResourceDesc.GetModelCodeFromId(gid);
-                    if(type == ModelCode.ANALOG || type == ModelCode.DISCRETE)
+                    if (type == ModelCode.ANALOG || type == ModelCode.DISCRETE)
                     {
                         ISCADAModelPointItem pointItem = CreateConfigItemForEntity(gid);
 
@@ -239,23 +244,30 @@ namespace Outage.SCADA.SCADAData.Repository
             Console.WriteLine(message);
             logger.LogInfo(message);
         }
-        #endregion
 
+        #endregion ITransactionActorContract
 
         #region ImportScadaModel
+
         private bool ImportModel()
         {
-            //TODO: log info
-            Console.WriteLine("Importing analog measurements started...");
+            string message = "Importing analog measurements started...";
+            logger.LogInfo(message);
+            Console.WriteLine(message);
             bool analogImportSuccess = ImportAnalog();
-            //TODO: log info finish
-            Console.WriteLine($"Importing analog measurements finished. ['success' value: {analogImportSuccess}]");
 
-            //TODO: log info
-            Console.WriteLine("Importing discrete measurements started...");
+            message = $"Importing analog measurements finished. ['success' value: {analogImportSuccess}]";
+            logger.LogInfo(message);
+            Console.WriteLine(message);
+
+            message = "Importing discrete measurements started...";
+            logger.LogInfo(message);
+            Console.WriteLine(message);
             bool discreteImportSuccess = ImportDiscrete();
-            //TODO: log info finish
-            Console.WriteLine($"Importing discrete measurements finished. ['success' value: {discreteImportSuccess}]");
+
+            message = $"Importing discrete measurements finished. ['success' value: {discreteImportSuccess}]";
+            logger.LogInfo(message);
+            Console.WriteLine(message);
 
             return analogImportSuccess && discreteImportSuccess;
         }
@@ -281,12 +293,12 @@ namespace Outage.SCADA.SCADAData.Repository
                             for (int i = 0; i < rds.Count; i++)
                             {
                                 if (rds[i] != null)
-                                { 
-                                    //NetworkModel.Add(rds[i].Id, rds[i]);
+                                {
+                                    long gid = rds[i].Id;
                                     ISCADAModelPointItem pointItem = new SCADAModelPointItem(rds[i].Properties, ModelCode.ANALOG);
                                     CurrentScadaModel.Add(rds[i].Id, pointItem);
                                     CurrentAddressToGidMap.Add(pointItem.Address, rds[i].Id);
-                                    //TODO: log debug
+                                    logger.LogDebug($"ANALOG measurement added to SCADA model [Gid: {gid}, Address: {pointItem.Address}]");
                                 }
                             }
                             resourcesLeft = gdaProxy.IteratorResourcesLeft(iteratorId);
@@ -335,11 +347,11 @@ namespace Outage.SCADA.SCADAData.Repository
                             {
                                 if (rds[i] != null)
                                 {
-                                    //NetworkModel.Add(rds[i].Id, rds[i]);
+                                    long gid = rds[i].Id;
                                     ISCADAModelPointItem pointItem = new SCADAModelPointItem(rds[i].Properties, ModelCode.DISCRETE);
-                                    CurrentScadaModel.Add(rds[i].Id, pointItem);
-                                    CurrentAddressToGidMap.Add(pointItem.Address, rds[i].Id);
-                                    //TODO: log debug
+                                    CurrentScadaModel.Add(gid, pointItem);
+                                    CurrentAddressToGidMap.Add(pointItem.Address, gid);
+                                    logger.LogDebug($"DISCRETE measurement added to SCADA model [Gid: {gid}, Address: {pointItem.Address}]");
                                 }
                             }
                             resourcesLeft = gdaProxy.IteratorResourcesLeft(iteratorId);
@@ -365,7 +377,8 @@ namespace Outage.SCADA.SCADAData.Repository
 
             return success;
         }
-        #endregion
+
+        #endregion ImportScadaModel
 
         private ISCADAModelPointItem CreateConfigItemForEntity(long gid)
         {
@@ -374,9 +387,9 @@ namespace Outage.SCADA.SCADAData.Repository
             ResourceDescription rd;
             ISCADAModelPointItem pointItem;
 
-            using(NetworkModelGDAProxy gdaProxy = GdaQueryProxy)
+            using (NetworkModelGDAProxy gdaProxy = GdaQueryProxy)
             {
-                if(gdaProxy != null)
+                if (gdaProxy != null)
                 {
                     if (type == ModelCode.ANALOG || type == ModelCode.DISCRETE)
                     {

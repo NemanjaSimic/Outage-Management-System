@@ -228,11 +228,8 @@ namespace Outage.NetworkModelService
             }
             else
             {
-
                 string message = String.Format("Failed to retrieve entity (GID: 0x{0:X16}) because entity doesn't exist.", globalId);
-                //CommonTrace.WriteTrace(CommonTrace.TraceError, message);
                 logger.LogError(message);
-
                 throw new Exception(message);
             }
         }

@@ -1,15 +1,9 @@
 ﻿using Outage.Common;
-using Outage.Common.GDA;
-using Outage.Common.ServiceContracts;
 using Outage.Common.ServiceContracts.DistributedTransaction;
-using Outage.Common.ServiceProxies;
 using Outage.Common.ServiceProxies.DistributedTransaction;
 using System;
 using System.Collections.Generic;
-using System.Linq;
-using System.Text;
 using System.Threading;
-using System.Threading.Tasks;
 
 namespace Outage.TransactionManagerService
 {
@@ -17,6 +11,7 @@ namespace Outage.TransactionManagerService
 
     {
         #region Static Members
+
         //TODO: get from config
         private static readonly Dictionary<string, string> distributedTransactionActors = new Dictionary<string, string>()
         {
@@ -30,16 +25,18 @@ namespace Outage.TransactionManagerService
         protected static Dictionary<string, bool> TransactionLedger
         {
             get
-            { 
+            {
                 return transactionLedger ?? (transactionLedger = new Dictionary<string, bool>(distributedTransactionActors.Count));
             }
         }
-        #endregion
+
+        #endregion Static Members
 
         private ILogger logger = LoggerWrapper.Instance;
         private TransactionActorProxy transactionActorProxy = null;
 
         #region Proxies
+
         protected TransactionActorProxy GetTransactionActorProxy(string endpointName)
         {
             int numberOfTries = 0;
@@ -74,16 +71,18 @@ namespace Outage.TransactionManagerService
 
             return transactionActorProxy;
         }
-        #endregion
+
+        #endregion Proxies
 
         #region ITransactionCoordinatorContract
+
         public void StartDistributedUpdate()
-        { 
+        {
             transactionLedger = new Dictionary<string, bool>(distributedTransactionActors.Count);
 
             foreach (string actor in distributedTransactionActors.Keys)
             {
-                if(!TransactionLedger.ContainsKey(actor))
+                if (!TransactionLedger.ContainsKey(actor))
                 {
                     TransactionLedger.Add(actor, false);
                 }
@@ -92,15 +91,14 @@ namespace Outage.TransactionManagerService
             logger.LogInfo("Distributed transaction started. Waiting for transaction actors to enlist...");
             //TODO: start timer...
         }
-        
+
         public void FinishDistributedUpdate(bool success)
         {
             try
             {
-
-                if(success)
+                if (success)
                 {
-                    if(InvokePreparationOnActors())
+                    if (InvokePreparationOnActors())
                     {
                         InvokeCommitOnActors();
                     }
@@ -121,11 +119,12 @@ namespace Outage.TransactionManagerService
             {
                 logger.LogError("Exception in FinishDistributedUpdate().", e);
             }
-
         }
-        #endregion
+
+        #endregion ITransactionCoordinatorContract
 
         #region ITransactionEnlistmentContract
+
         public bool Enlist(string actorName)
         {
             bool success = false;
@@ -139,22 +138,24 @@ namespace Outage.TransactionManagerService
 
             return success;
         }
-        #endregion
+
+        #endregion ITransactionEnlistmentContract
 
         #region Private Members
+
         private bool InvokePreparationOnActors()
         {
             bool success = false;
 
-            foreach(string actor in TransactionLedger.Keys)
+            foreach (string actor in TransactionLedger.Keys)
             {
-                if(TransactionLedger[actor] && distributedTransactionActors.ContainsKey(actor))
+                if (TransactionLedger[actor] && distributedTransactionActors.ContainsKey(actor))
                 {
                     string endpointName = distributedTransactionActors[actor];
 
                     using (TransactionActorProxy transactionActorProxy = GetTransactionActorProxy(endpointName))
                     {
-                        if(transactionActorProxy != null)
+                        if (transactionActorProxy != null)
                         {
                             success = transactionActorProxy.Prepare();
                         }
@@ -167,7 +168,7 @@ namespace Outage.TransactionManagerService
                         }
                     }
 
-                    if(success)
+                    if (success)
                     {
                         logger.LogInfo($"Preparation on Transaction actor: {actor} finsihed SUCCESSFULLY.");
                     }
@@ -192,7 +193,7 @@ namespace Outage.TransactionManagerService
         {
             foreach (string actor in TransactionLedger.Keys)
             {
-                if(distributedTransactionActors.ContainsKey(actor))
+                if (distributedTransactionActors.ContainsKey(actor))
                 {
                     string endpointName = distributedTransactionActors[actor];
 
@@ -218,7 +219,7 @@ namespace Outage.TransactionManagerService
         {
             foreach (string actor in TransactionLedger.Keys)
             {
-                if(distributedTransactionActors.ContainsKey(actor))
+                if (distributedTransactionActors.ContainsKey(actor))
                 {
                     string endpointName = distributedTransactionActors[actor];
 
@@ -239,7 +240,8 @@ namespace Outage.TransactionManagerService
                 }
             }
         }
-        #endregion
+
+        #endregion Private Members
     }
 
     //public class DistributedTransactionEnlistment : ITransactionEnlistmentContract

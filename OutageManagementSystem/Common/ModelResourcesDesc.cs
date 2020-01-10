@@ -796,7 +796,6 @@ namespace Outage.Common
 			else
 			{
 				string message = string.Format("Failed to get model type code for DMS type: {0}. Invalid DMS type", type);
-				//CommonTrace.WriteTrace(CommonTrace.TraceError, message);
                 logger.LogError(message);
 				throw new Exception(message);
 			}
@@ -824,7 +823,6 @@ namespace Outage.Common
 			else
 			{
 				string message = string.Format("Failed to get model type code for DMS type: {0}. Invalid DMS type. ID: 0x{1:X16}", type, id);
-				//CommonTrace.WriteTrace(CommonTrace.TraceError, message);
                 logger.LogError(message);
 				throw new Exception(message);
 			}

@@ -1,16 +1,12 @@
 ﻿using Outage.Common;
 using Outage.Common.GDA;
-using System;
-using System.Collections.Generic;
-using System.Linq;
-using System.Text;
-using System.Threading.Tasks;
 
 namespace Outage.DataImporter.CIMAdapter.Importer
 {
     public static class OutageConverter
     {
         #region Populate ResourceDescription
+
         public static void PopulateIdentifiedObjectProperties(Outage.IdentifiedObject cimIdentifiedObject, ResourceDescription rd)
         {
             if ((cimIdentifiedObject != null) && (rd != null))
@@ -105,8 +101,6 @@ namespace Outage.DataImporter.CIMAdapter.Importer
                     }
                     rd.AddProperty(new Property(ModelCode.TRANSFORMERWINDING_POWERTRANSFORMER, gid));
                 }
-
-                
             }
         }
 
@@ -115,7 +109,6 @@ namespace Outage.DataImporter.CIMAdapter.Importer
             if ((cimSwitch != null) && (rd != null))
             {
                 OutageConverter.PopulateConductingEquipmentProperties(cimSwitch, rd, importHelper, report);
-                
             }
         }
 
@@ -198,7 +191,6 @@ namespace Outage.DataImporter.CIMAdapter.Importer
             if ((cimTerminal != null) && (rd != null))
             {
                 OutageConverter.PopulateIdentifiedObjectProperties(cimTerminal, rd);
-                
 
                 if (cimTerminal.ConductingEquipmentHasValue)
                 {
@@ -327,7 +319,8 @@ namespace Outage.DataImporter.CIMAdapter.Importer
                 }
             }
         }
-        #endregion
+
+        #endregion Populate ResourceDescription
 
         #region Enums convert
 
@@ -336,11 +329,13 @@ namespace Outage.DataImporter.CIMAdapter.Importer
         {
             return 0;
         }
+
         //TODO
         public static Outage.Common.AnalogMeasurementType GetAnalogMeasurementType(Outage.AnalogMeasurementType measurementType)
         {
             return 0;
         }
-        #endregion
+
+        #endregion Enums convert
     }
 }

@@ -1,5 +1,4 @@
-﻿using EasyModbus;
-using Outage.Common;
+﻿using Outage.Common;
 using Outage.SCADA.ModBus.Connection;
 using Outage.SCADA.ModBus.FunctionParameters;
 using Outage.SCADA.ModBus.ModbusFuntions;
@@ -122,7 +121,7 @@ namespace Outage.SCADA.ModBus.Acquisitor
                                 logger.LogDebug($"Modbus function enquided. Point type is {pointItem.RegistarType}");
                             }
 
-                            //PODESAVANJE ALARMA
+                            //TOOD: PODESAVANJE ALARMA
                             //pointItem.SetAlarms();
                             //logger.LogInfo("Alarm for item " + pointItem.Gid + " is set to " + pointItem.Alarm.ToString());
                         }

@@ -67,9 +67,9 @@ namespace Outage.TransactionManagerService
                 Console.WriteLine("\n");
             }
 
-            message = string.Format("Trace level: {0}", CommonTrace.TraceLevel);
+            message = "Trace level: LEVEL NOT SPECIFIED!";
             Console.WriteLine(message);
-            logger.LogInfo(message);
+            logger.LogWarn(message);
 
 
             message = "Transaction Manager Service is started.";

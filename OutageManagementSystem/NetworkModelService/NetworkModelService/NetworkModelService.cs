@@ -79,9 +79,9 @@ namespace Outage.NetworkModelService
             Console.WriteLine(message);
             logger.LogInfo(message);
 
-            message = string.Format("Trace level: {0}", CommonTrace.TraceLevel);
+            message = "Trace level: LEVEL NOT SPECIFIED.";
             Console.WriteLine(message);
-            logger.LogInfo(message);
+            logger.LogWarn(message);
 
 
             message = "Network Model Service is started.";

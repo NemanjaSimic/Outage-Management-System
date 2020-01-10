@@ -1,5 +1,4 @@
 ﻿using Outage.DistributedTransactionActor;
-using Outage.SCADA.ModBus;
 using Outage.SCADA.SCADAData.Repository;
 using System;
 
@@ -49,12 +48,11 @@ namespace Outage.SCADA.SCADAService.DistributedTransaction
             try
             {
                 scadaModel.Commit();
-                ModbusSimulatorHandler.RestartSimulator();
                 logger.LogInfo("Commit on SCADA Transaction actor SUCCESSFULLY finished.");
             }
             catch (Exception ex)
             {
-                logger.LogFatal($"Exception catched in Commit method on SCADA Transaction actor. Exception: {ex.Message}", ex);
+                logger.LogError($"Exception catched in Commit method on SCADA Transaction actor. Exception: {ex.Message}", ex);
                 logger.LogInfo("Commit on SCADA Transaction actor UNSUCCESSFULLY finished.");
             }
         }
@@ -64,12 +62,11 @@ namespace Outage.SCADA.SCADAService.DistributedTransaction
             try
             {
                 scadaModel.Rollback();
-                ModbusSimulatorHandler.RestartSimulator();
                 logger.LogInfo("Rollback on SCADA Transaction actor SUCCESSFULLY finished.");
             }
             catch (Exception ex)
             {
-                logger.LogFatal($"Exception catched in Rollback method on SCADA Transaction actor. Exception: {ex.Message}", ex);
+                logger.LogError($"Exception catched in Rollback method on SCADA Transaction actor. Exception: {ex.Message}", ex);
                 logger.LogInfo("Rollback on SCADA Transaction actor UNSUCCESSFULLY finished.");
             }
         }

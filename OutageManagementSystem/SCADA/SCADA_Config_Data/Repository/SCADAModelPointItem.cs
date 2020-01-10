@@ -8,6 +8,8 @@ namespace Outage.SCADA.SCADAData.Repository
 {
     public class SCADAModelPointItem : ISCADAModelPointItem //, ICloneable
     {
+        private ILogger logger = LoggerWrapper.Instance;
+
         public long Gid { get; set; }
         public PointType RegistarType { get; set; }
         public string Name { get; set; }
@@ -66,8 +68,9 @@ namespace Outage.SCADA.SCADAData.Repository
                         }
                         else
                         {
-                            //TODO: log err address is either not defined or is invalid
-                            //todo: exception?
+                            string message = "SCADAModelPointItem constructor => Address is either not defined or is invalid.";
+                            logger.LogError(message);
+                            throw new ArgumentException(message);
                         }
                         break;
 
@@ -82,8 +85,9 @@ namespace Outage.SCADA.SCADAData.Repository
                         }
                         else
                         {
-                            //TODO: log err
-                            //todo: exception?
+                            string message = "SCADAModelPointItem constructor => ModelCode type is neither ANALOG nor DISCRETE.";
+                            logger.LogError(message);
+                            throw new ArgumentException(message);
                         }
                         break;
 
@@ -120,42 +124,8 @@ namespace Outage.SCADA.SCADAData.Repository
             }
         }
 
-        public ISCADAModelPointItem Clone()
-        {
-            return this.MemberwiseClone() as ISCADAModelPointItem;
-        }
-
-        private PointType GetRegistryType(string registryTypeName)
-        {
-            PointType registryType;
-            switch (registryTypeName)
-            {
-                case "DO_REG":
-                    registryType = PointType.DIGITAL_OUTPUT;
-                    break;
-
-                case "DI_REG":
-                    registryType = PointType.DIGITAL_INPUT;
-                    break;
-
-                case "IN_REG":
-                    registryType = PointType.ANALOG_INPUT;
-                    break;
-
-                case "HR_INT":
-                    registryType = PointType.ANALOG_OUTPUT;
-                    break;
-
-                default:
-                    registryType = PointType.HR_LONG;
-                    break;
-            }
-            return registryType;
-        }
-
         public bool SetAlarms()
         {
-
             bool AlarmChanged = false;
             AlarmType CurrentAlarm = Alarm;
 
@@ -164,7 +134,7 @@ namespace Outage.SCADA.SCADAData.Repository
             {
                 //VALUE IS ABOVE EGU_MAX, BUT BELOW HIGHEST POSSIBLE VALUE - ABNORMAL
                 if (CurrentValue > EGU_Max && CurrentValue < HighLimit)
-                {                  
+                {
                     Alarm = AlarmType.ABNORMAL_VALUE;
                     if (CurrentAlarm != Alarm)
                     {
@@ -248,6 +218,43 @@ namespace Outage.SCADA.SCADAData.Repository
             {
                 throw new Exception("PointType value is invalid");
             }
+        }
+
+        #region IClonable
+
+        public ISCADAModelPointItem Clone()
+        {
+            return this.MemberwiseClone() as ISCADAModelPointItem;
+        }
+
+        #endregion IClonable
+
+        private PointType GetRegistryType(string registryTypeName)
+        {
+            PointType registryType;
+            switch (registryTypeName)
+            {
+                case "DO_REG":
+                    registryType = PointType.DIGITAL_OUTPUT;
+                    break;
+
+                case "DI_REG":
+                    registryType = PointType.DIGITAL_INPUT;
+                    break;
+
+                case "IN_REG":
+                    registryType = PointType.ANALOG_INPUT;
+                    break;
+
+                case "HR_INT":
+                    registryType = PointType.ANALOG_OUTPUT;
+                    break;
+
+                default:
+                    registryType = PointType.HR_LONG;
+                    break;
+            }
+            return registryType;
         }
     }
 }

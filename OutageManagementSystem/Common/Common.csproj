@@ -127,7 +127,6 @@
     <Compile Include="ServiceProxies\PubSub\PublisherProxy.cs" />
     <Compile Include="ServiceProxies\PubSub\SubscriberProxy.cs" />
     <Compile Include="ServiceProxies\SCADACommandProxy.cs" />
-    <Compile Include="Trace\CommonTrace.cs" />
     <Compile Include="ModelCodeHelper.cs" />
     <Compile Include="ModelResourcesDesc.cs" />
     <Compile Include="Properties\Settings.Designer.cs">
