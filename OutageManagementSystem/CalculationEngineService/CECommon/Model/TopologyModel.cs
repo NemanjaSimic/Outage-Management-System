@@ -1,5 +1,4 @@
 ﻿using CECommon.Model.UI;
-using System.Runtime.Serialization;
 
 namespace CECommon.Model
 {
@@ -8,7 +7,6 @@ namespace CECommon.Model
     {
 		private TopologyElement firstNode;
 
-		[DataMember]
 		public TopologyElement FirstNode
 		{
 			get { return firstNode; }

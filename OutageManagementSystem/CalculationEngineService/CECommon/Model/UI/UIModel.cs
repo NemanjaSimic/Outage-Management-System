@@ -1,9 +1,7 @@
-﻿using System;
+﻿using Outage.Common;
+using System;
 using System.Collections.Generic;
-using System.Linq;
 using System.Runtime.Serialization;
-using System.Text;
-using System.Threading.Tasks;
 
 namespace CECommon.Model.UI
 {
@@ -11,6 +9,8 @@ namespace CECommon.Model.UI
 	[DataContract]
 	public class UIModel
 	{
+		private ILogger logger = LoggerWrapper.Instance;
+
 		[DataMember]
 		public long FirstNode { get; set; }
         [DataMember]
@@ -34,7 +34,8 @@ namespace CECommon.Model.UI
 				}
 				catch (Exception)
 				{
-					throw new Exception($"Relaton {source} - {destination} already exists.");
+					string message = $"Failed to make relation. Relaton {source} - {destination} already exists.";
+					logger.LogDebug(message);
 				}
 			}
 			else

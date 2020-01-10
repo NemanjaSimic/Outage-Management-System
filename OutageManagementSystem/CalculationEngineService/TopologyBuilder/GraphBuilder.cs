@@ -3,6 +3,7 @@ using CECommon.Interfaces;
 using CECommon.Model;
 using CECommon.Model.UI;
 using NetworkModelServiceFunctions;
+using Outage.Common;
 using System;
 using System.Collections.Generic;
 using System.Linq;
@@ -12,14 +13,19 @@ namespace TopologyBuilder
 {
     public class GraphBuilder : ITopologyBuilder
     {
+        #region Fields
+        private ILogger logger = LoggerWrapper.Instance;
         private readonly TopologyElementFactory topologyElementFactory = new TopologyElementFactory();
-
         private List<Field> fields = new List<Field>();
         private HashSet<long> visited = new HashSet<long>();
         private Stack<TopologyElement> stack = new Stack<TopologyElement>();
+        #endregion
 
         public TopologyModel CreateGraphTopology(long firstElementGid)
         {
+            string message = $"Creating graph topology from first element with GID {firstElementGid}.";
+            logger.LogInfo(message);
+
             TopologyModel topology = new TopologyModel();
             TopologyElement firstNode = topologyElementFactory.CreateTopologyElement(firstElementGid);
            
@@ -42,10 +48,14 @@ namespace TopologyBuilder
                 }
                 topology.AddUINode(new UINode(currentNode.Id, TopologyHelper.Instance.GetDMSTypeOfTopologyElement(currentNode.Id)));
             }
-
             topology.FirstNode = firstNode;
+
+            message = $"Topology graph created.";
+            logger.LogInfo(message);
             return topology;
         }
+
+        #region HelperFunctions
         private List<long> CheckIgnorable(long gid)
         {
             var list = GDAModelHelper.Instance.GetAllReferencedElements(gid).Where(e => !visited.Contains(e)).ToList();
@@ -123,5 +133,6 @@ namespace TopologyBuilder
             }
             return field;
         }
+        #endregion
     }
 }
