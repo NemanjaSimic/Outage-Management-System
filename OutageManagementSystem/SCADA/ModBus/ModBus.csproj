@@ -49,8 +49,6 @@
   <ItemGroup>
     <Compile Include="Acquisitor\Acquisition.cs" />
     <Compile Include="Connection\FunctionExecutor.cs" />
-    <Compile Include="Connection\IConnection.cs" />
-    <Compile Include="Connection\TcpConnection.cs" />
     <Compile Include="FunctionFactory.cs" />
     <Compile Include="FunctionParameters\ModbusCommandParameters.cs" />
     <Compile Include="FunctionParameters\ModbusReadCommandParameters.cs" />
@@ -76,16 +74,12 @@
       <Name>Common</Name>
     </ProjectReference>
     <ProjectReference Include="..\SCADACommon\SCADACommon.csproj">
-      <Project>{7d87aa2b-ed19-47ea-b403-4edc6b830d4a}</Project>
+      <Project>{7D87AA2B-ED19-47EA-B403-4EDC6B830D4A}</Project>
       <Name>SCADACommon</Name>
     </ProjectReference>
-    <ProjectReference Include="..\SCADACommon\SCADA_Common.csproj">
-      <Project>{7D87AA2B-ED19-47EA-B403-4EDC6B830D4A}</Project>
-      <Name>SCADA_Common</Name>
-    </ProjectReference>
-    <ProjectReference Include="..\SCADA_Config_Data\SCADAConfigData.csproj">
-      <Project>{c37f054d-37d9-46c0-881c-1ee3c8c77633}</Project>
-      <Name>SCADAConfigData</Name>
+    <ProjectReference Include="..\SCADA_Config_Data\SCADAData.csproj">
+      <Project>{C37F054D-37D9-46C0-881C-1EE3C8C77633}</Project>
+      <Name>SCADAData</Name>
     </ProjectReference>
   </ItemGroup>
   <ItemGroup>

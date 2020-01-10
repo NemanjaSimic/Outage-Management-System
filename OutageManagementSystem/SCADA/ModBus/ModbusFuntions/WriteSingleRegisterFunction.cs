@@ -13,7 +13,6 @@ namespace Outage.SCADA.ModBus.ModbusFuntions
         public WriteSingleRegisterFunction(ModbusCommandParameters commandParameters) 
             : base(commandParameters)
         {
-            //TODO: check?
             CheckArguments(MethodBase.GetCurrentMethod(), typeof(ModbusWriteCommandParameters));
         }
 

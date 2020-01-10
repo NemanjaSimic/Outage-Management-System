@@ -1,18 +1,22 @@
 ﻿using Outage.Common;
+using Outage.SCADA.SCADACommon;
 using System;
 using System.Configuration;
 
-namespace Outage.SCADA.SCADAConfigData.Configuration
+namespace Outage.SCADA.SCADAData.Configuration
 {
-    public class SCADAConfigData
+    public class SCADAConfigData : ISCADAConfigData
     {
         private ILogger logger = LoggerWrapper.Instance;
 
         public ushort TcpPort { get; protected set; }
+        public string IpAddress { get; protected set; }
         public byte UnitAddress { get; protected set; }
         public ushort Interval { get; protected set; }
 
+        [Obsolete]
         public string MdbSimExeName { get; protected set; } = string.Empty;
+        [Obsolete]
         public string MdbSimExePath { get; protected set; } = string.Empty;
 
         #region Instance
@@ -50,6 +54,11 @@ namespace Outage.SCADA.SCADAConfigData.Configuration
                     //TODO: err log
                     throw new Exception("TcpPort in SCADA configuration is either not defined or not valid.");
                 }
+            }
+
+            if (ConfigurationManager.AppSettings["IpAddress"] is string ipAddress)
+            {
+                IpAddress = ipAddress;
             }
 
             if (ConfigurationManager.AppSettings["UnitAddress"] is string unitAddressSetting)

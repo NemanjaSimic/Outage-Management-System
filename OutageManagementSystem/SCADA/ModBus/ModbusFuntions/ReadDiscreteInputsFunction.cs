@@ -1,6 +1,7 @@
 ﻿using EasyModbus;
 using Outage.SCADA.ModBus.FunctionParameters;
 using Outage.SCADA.SCADACommon;
+using Outage.SCADA.SCADAData.Repository;
 using System;
 using System.Collections.Generic;
 using System.Net;
@@ -13,18 +14,46 @@ namespace Outage.SCADA.ModBus.ModbusFuntions
         public ReadDiscreteInputsFunction(ModbusCommandParameters commandParameters) 
             : base(commandParameters)
         {
-            //TODO: check?
             CheckArguments(MethodBase.GetCurrentMethod(), typeof(ModbusReadCommandParameters));
         }
 
         #region IModBusFunction
-        public bool[] Data { get; protected set; }
+        public Dictionary<long, bool> Data { get; protected set; }
 
         public override void Execute(ModbusClient modbusClient)
         {
             ModbusReadCommandParameters mdb_read_comm_pars = this.CommandParameters as ModbusReadCommandParameters;
-            Data = modbusClient.ReadDiscreteInputs(mdb_read_comm_pars.StartAddress, mdb_read_comm_pars.Quantity);
-            logger.LogDebug($"ReadDiscreteInputsFunction executed SUCCESSFULLY. StartAddress: {mdb_read_comm_pars.StartAddress}, Quantity: {mdb_read_comm_pars.Quantity}");
+            ushort startAddress = mdb_read_comm_pars.StartAddress;
+            ushort quantity = mdb_read_comm_pars.Quantity;
+
+            if (startAddress + quantity >= ushort.MaxValue || startAddress + quantity == ushort.MinValue || startAddress == ushort.MinValue)
+            {
+                string message = $"Address is out of bound. Start address: {startAddress}, Quantity: {quantity}";
+                logger.LogError(message);
+                throw new Exception(message);
+            }
+
+            bool[] data = modbusClient.ReadDiscreteInputs(startAddress, quantity);
+            Data = new Dictionary<long, bool>(data.Length);
+
+            SCADAModel scadaModel = SCADAModel.Instance;
+
+            for (ushort i = 0; i < quantity; i++)
+            {
+                ushort address = (ushort)(startAddress + i);
+                bool value = data[i];
+                long gid = scadaModel.CurrentAddressToGidMap[address];
+
+                if (scadaModel.CurrentScadaModel.ContainsKey(gid))
+                {
+                    scadaModel.CurrentScadaModel[gid].CurrentValue = value ? 1 : 0;
+                    logger.LogDebug($"ReadDiscreteInputsFunction execute => Current value: {scadaModel.CurrentScadaModel[gid].CurrentValue} from address: {address}, gid: 0x{gid:X16}.");
+                }
+
+                Data.Add(gid, data[i]);
+            }
+
+            logger.LogDebug($"ReadDiscreteInputsFunction executed SUCCESSFULLY. StartAddress: {startAddress}, Quantity: {quantity}");
         }
         #endregion
 

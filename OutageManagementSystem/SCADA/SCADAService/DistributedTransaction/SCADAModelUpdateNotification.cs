@@ -2,6 +2,7 @@
 using Outage.Common.GDA;
 using Outage.Common.ServiceProxies.DistributedTransaction;
 using Outage.DistributedTransactionActor;
+using Outage.SCADA.SCADAData.Repository;
 using System;
 using System.Collections.Generic;
 

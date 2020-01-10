@@ -11,12 +11,32 @@ namespace Outage.Common.PubSub
     {
     }
 
-    public interface ISCADAMessage : IPublishableMessage
+    public interface ISingleAnalogValueSCADAMessage : IPublishableMessage
     {
         [DataMember]
         long Gid { get; }
         [DataMember]
-        object Value { get; }
+        int Value { get; }
+    }
+
+    public interface IMultipleAnalogValueSCADAMessage : IPublishableMessage
+    {
+        [DataMember]
+        Dictionary<long, int> Values { get; }
+    }
+
+    public interface ISingleDiscreteValueSCADAMessage : IPublishableMessage
+    {
+        [DataMember]
+        long Gid { get; }
+        [DataMember]
+        bool Value { get; }
+    }
+
+    public interface IMultipleDiscreteValueSCADAMessage : IPublishableMessage
+    {
+        [DataMember]
+        Dictionary<long, bool> Values { get; }
     }
 
     public interface ICalculationEngineMessage : IPublishableMessage

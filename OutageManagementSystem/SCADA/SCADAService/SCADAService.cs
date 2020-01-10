@@ -3,7 +3,9 @@ using Outage.Common;
 using Outage.SCADA.ModBus;
 using Outage.SCADA.ModBus.Acquisitor;
 using Outage.SCADA.ModBus.Connection;
-using Outage.SCADA.SCADAConfigData.Configuration;
+using Outage.SCADA.SCADACommon;
+using Outage.SCADA.SCADAData.Configuration;
+using Outage.SCADA.SCADAData.Repository;
 using Outage.SCADA.SCADAService.Command;
 using Outage.SCADA.SCADAService.DistributedTransaction;
 using System;
@@ -23,11 +25,11 @@ namespace Outage.SCADA.SCADAService
         private SCADAModel scadaModel = null;
         private Acquisition acquisition = null;
         //private ConfigWriter configWriter = null;
-        private SCADAConfigData.Configuration.SCADAConfigData repo = SCADAConfigData.Configuration.SCADAConfigData.Instance;
+        private ISCADAConfigData configData = SCADAConfigData.Instance;
 
         public SCADAService()
         {
-            scadaModel = new SCADAModel();
+            scadaModel = SCADAModel.Instance;
             SCADAModelUpdateNotification.SCADAModel = scadaModel;
             SCADATransactionActor.SCADAModel = scadaModel;
 
@@ -41,9 +43,7 @@ namespace Outage.SCADA.SCADAService
 
             FunctionExecutor.Instance.StartConnection();
 
-            //TODO: config address and port
-            ModbusClient modbusClient = new ModbusClient();
-            StartDataAcquisition(modbusClient);
+            StartDataAcquisition();
 
             StartHosts();
         }
@@ -94,9 +94,9 @@ namespace Outage.SCADA.SCADAService
             };
         }
 
-        private void StartDataAcquisition(ModbusClient modbusClient)
+        private void StartDataAcquisition()
         {
-            acquisition = new Acquisition(FunctionExecutor.Instance);
+            acquisition = new Acquisition();
             acquisition.StartAcquisitionThread();
         }
 

@@ -1,5 +1,6 @@
 ﻿using Outage.DistributedTransactionActor;
 using Outage.SCADA.ModBus;
+using Outage.SCADA.SCADAData.Repository;
 using System;
 
 namespace Outage.SCADA.SCADAService.DistributedTransaction

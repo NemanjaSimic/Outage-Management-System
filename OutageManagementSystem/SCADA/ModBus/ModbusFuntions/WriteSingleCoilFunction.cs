@@ -13,7 +13,6 @@ namespace Outage.SCADA.ModBus.ModbusFuntions
         public WriteSingleCoilFunction(ModbusCommandParameters commandParameters) 
             : base(commandParameters)
         {
-            //TODO: check?
             CheckArguments(MethodBase.GetCurrentMethod(), typeof(ModbusWriteCommandParameters));
         }
 

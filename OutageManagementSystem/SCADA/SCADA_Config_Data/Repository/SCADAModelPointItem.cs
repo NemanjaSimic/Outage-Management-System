@@ -1,13 +1,17 @@
 ﻿using Outage.Common;
 using Outage.Common.GDA;
+using Outage.SCADA.SCADACommon;
 using System;
 using System.Collections.Generic;
 
-namespace Outage.SCADA.SCADACommon
+namespace Outage.SCADA.SCADAData.Repository
 {
-    public class ModbusPoint : IModbusPoint, ICloneable
+    public class SCADAModelPointItem : ISCADAModelPointItem //, ICloneable
     {
+        public long Gid { get; set; }
         public PointType RegistarType { get; set; }
+        public string Name { get; set; }
+        public float CurrentValue { get; set; }
         public ushort Address { get; set; }
         public float MinValue { get; set; }
         public float MaxValue { get; set; }
@@ -16,21 +20,16 @@ namespace Outage.SCADA.SCADACommon
         public double Deviation { get; set; }
         public double EGU_Min { get; set; }
         public double EGU_Max { get; set; }
-
         public ushort AbnormalValue { get; set; }
-
         public double HighLimit { get; set; }
         public double LowLimit { get; set; }
-        public long Gid { get; set; }
-        public string Name { get; set; }
-        public float CurrentValue { get; set; }
         public AlarmType Alarm { get; set; }
 
-        public ModbusPoint()
+        public SCADAModelPointItem()
         {
         }
 
-        public ModbusPoint(List<Property> props, ModelCode type)
+        public SCADAModelPointItem(List<Property> props, ModelCode type)
         {
             foreach (var item in props)
             {
@@ -121,9 +120,9 @@ namespace Outage.SCADA.SCADACommon
             }
         }
 
-        public object Clone()
+        public ISCADAModelPointItem Clone()
         {
-            return this.MemberwiseClone();
+            return this.MemberwiseClone() as ISCADAModelPointItem;
         }
 
         private PointType GetRegistryType(string registryTypeName)

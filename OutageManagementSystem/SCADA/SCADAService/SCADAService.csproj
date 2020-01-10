@@ -48,7 +48,6 @@
     <Compile Include="Command\CommandService.cs" />
     <Compile Include="DistributedTransaction\SCADAModelUpdateNotification.cs" />
     <Compile Include="DistributedTransaction\SCADATransactionActor.cs" />
-    <Compile Include="SCADAModel.cs" />
     <Compile Include="SCADAService.cs" />
     <Compile Include="Properties\AssemblyInfo.cs" />
   </ItemGroup>
@@ -69,9 +68,9 @@
       <Project>{7d87aa2b-ed19-47ea-b403-4edc6b830d4a}</Project>
       <Name>SCADACommon</Name>
     </ProjectReference>
-    <ProjectReference Include="..\SCADA_Config_Data\SCADAConfigData.csproj">
+    <ProjectReference Include="..\SCADA_Config_Data\SCADAData.csproj">
       <Project>{c37f054d-37d9-46c0-881c-1ee3c8c77633}</Project>
-      <Name>SCADAConfigData</Name>
+      <Name>SCADAData</Name>
     </ProjectReference>
   </ItemGroup>
   <Import Project="$(MSBuildToolsPath)\Microsoft.CSharp.targets" />

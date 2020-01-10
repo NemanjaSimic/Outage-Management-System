@@ -1,10 +1,9 @@
 ﻿using Outage.Common;
 using Outage.Common.GDA;
 using Outage.Common.ServiceProxies;
-using Outage.SCADA.ModBus.Connection;
 using Outage.SCADA.SCADACommon;
-using Outage.SCADA.SCADAConfigData;
-using Outage.SCADA.SCADAConfigData.Configuration;
+using Outage.SCADA.SCADAData;
+using Outage.SCADA.SCADAData.Configuration;
 using System;
 using System.Collections.Generic;
 using System.IO;
@@ -12,7 +11,7 @@ using System.Linq;
 using System.Net.Sockets;
 using System.Threading;
 
-namespace Outage.SCADA.SCADAService
+namespace Outage.SCADA.SCADAData.Repository
 {
     public class SCADAModel
     {
@@ -21,25 +20,63 @@ namespace Outage.SCADA.SCADAService
         //private ConfigWriter configWriter;
 
         private Dictionary<DeltaOpType, List<long>> modelChanges;
-        private SCADAConfigData.Configuration.SCADAConfigData dataModelRepository = SCADAConfigData.Configuration.SCADAConfigData.Instance;
+        private ISCADAConfigData configData = SCADAConfigData.Instance;
 
-        private Dictionary<long, ModbusPoint> currentScadaModel;
-        protected Dictionary<long, ModbusPoint> CurrentScadaModel
+        private Dictionary<long, ISCADAModelPointItem> incomingScadaModel;
+        private Dictionary<ushort, long> incomingAddressToGidMap;
+        private Dictionary<long, ISCADAModelPointItem> currentScadaModel;
+        private Dictionary<ushort, long> currentAddressToGidMap;
+
+
+        protected Dictionary<long, ISCADAModelPointItem> IncomingScadaModel
         {
-            get { return currentScadaModel ?? (currentScadaModel = new Dictionary<long, ModbusPoint>()); }
+            get { return incomingScadaModel ?? (incomingScadaModel = new Dictionary<long, ISCADAModelPointItem>()); }
         }
 
-        private Dictionary<long, ModbusPoint> incomingScadaModel;
-        protected Dictionary<long, ModbusPoint> IncomingScadaModel
+        protected Dictionary<ushort, long> IncomingAddressToGidMap
         {
-            get { return incomingScadaModel ?? (incomingScadaModel = new Dictionary<long, ModbusPoint>()); }
+            get { return incomingAddressToGidMap ?? (incomingAddressToGidMap = new Dictionary<ushort, long>(CurrentScadaModel.Count)); }
         }
+
+        public Dictionary<long, ISCADAModelPointItem> CurrentScadaModel
+        {
+            get { return currentScadaModel ?? (currentScadaModel = new Dictionary<long, ISCADAModelPointItem>()); }
+        }
+
+        public Dictionary<ushort, long> CurrentAddressToGidMap
+        {
+            get { return currentAddressToGidMap ?? (currentAddressToGidMap = new Dictionary<ushort, long>(CurrentScadaModel.Count)); }
+        }
+
 
         [Obsolete]
         public Dictionary<long, ResourceDescription> NetworkModel { get; protected set; }
         [Obsolete]
         public Dictionary<long, Dictionary<ModelCode, Property>> NetworkModelProps { get; protected set; }
 
+        #region Instance
+        private static SCADAModel instance;
+        private static readonly object lockSync = new object();
+
+        public static SCADAModel Instance
+        {
+            get
+            {
+                if(instance == null)
+                {
+                    lock(lockSync)
+                    {
+                        if(instance == null)
+                        {
+                            instance = new SCADAModel();
+                        }
+                    }
+                }
+
+                return instance;
+            }
+        }
+        #endregion
 
         #region Proxies
         private NetworkModelGDAProxy gdaQueryProxy = null;
@@ -83,10 +120,10 @@ namespace Outage.SCADA.SCADAService
         }
         #endregion
 
-        public SCADAModel()
+        private SCADAModel()
         {
-            currentScadaModel = new Dictionary<long, ModbusPoint>();
-            incomingScadaModel = new Dictionary<long, ModbusPoint>();
+            currentScadaModel = new Dictionary<long, ISCADAModelPointItem>();
+            incomingScadaModel = new Dictionary<long, ISCADAModelPointItem>();
             modelResourceDesc = new ModelResourcesDesc();
         }
 
@@ -96,6 +133,7 @@ namespace Outage.SCADA.SCADAService
             return true;
         }
 
+        #region ITransactionActorContract
         public bool Prepare()
         {
             bool success;
@@ -104,8 +142,9 @@ namespace Outage.SCADA.SCADAService
             {
                 foreach(long gid in CurrentScadaModel.Keys)
                 {
-                    ModbusPoint point = (ModbusPoint)CurrentScadaModel[gid].Clone();
-                    IncomingScadaModel.Add(gid, point);
+                    ISCADAModelPointItem pointItem = CurrentScadaModel[gid].Clone();
+                    IncomingScadaModel.Add(gid, pointItem);
+                    IncomingAddressToGidMap.Add(pointItem.Address, gid);
                 }
 
                 foreach (long gid in modelChanges[DeltaOpType.Insert])
@@ -113,8 +152,17 @@ namespace Outage.SCADA.SCADAService
                     ModelCode type = modelResourceDesc.GetModelCodeFromId(gid);
                     if (type == ModelCode.ANALOG || type == ModelCode.DISCRETE)
                     {
-                        ModbusPoint configItem = CreateConfigItemForEntity(gid);
-                        IncomingScadaModel.Add(gid, configItem);
+                        ISCADAModelPointItem pointItem = CreateConfigItemForEntity(gid);
+
+                        if(IncomingScadaModel.ContainsKey(gid) || IncomingAddressToGidMap.ContainsKey(pointItem.Address))
+                        {
+                            string message = $"Model update data in fault state. Inserting gid: {gid} or measurement address: {pointItem.Address}, that already exists in SCADA model.";
+                            logger.LogError(message);
+                            throw new ArgumentException(message);
+                        }
+
+                        IncomingScadaModel.Add(gid, pointItem);
+                        IncomingAddressToGidMap.Add(pointItem.Address, gid);
                     }
                 }
 
@@ -123,8 +171,17 @@ namespace Outage.SCADA.SCADAService
                     ModelCode type = modelResourceDesc.GetModelCodeFromId(gid);
                     if(type == ModelCode.ANALOG || type == ModelCode.DISCRETE)
                     {
-                        ModbusPoint configItem = CreateConfigItemForEntity(gid);
-                        IncomingScadaModel[gid] = configItem;
+                        ISCADAModelPointItem pointItem = CreateConfigItemForEntity(gid);
+
+                        if (!IncomingScadaModel.ContainsKey(gid) || !IncomingAddressToGidMap.ContainsKey(pointItem.Address))
+                        {
+                            string message = $"Model update data in fault state. Updating entity with gid: {gid} or measurement address: {pointItem.Address}, that does not exists in SCADA model.";
+                            logger.LogError(message);
+                            throw new ArgumentException(message);
+                        }
+
+                        IncomingScadaModel[gid] = pointItem;
+                        IncomingAddressToGidMap[pointItem.Address] = gid;
                     }
                 }
 
@@ -133,37 +190,18 @@ namespace Outage.SCADA.SCADAService
                     ModelCode type = modelResourceDesc.GetModelCodeFromId(gid);
                     if (type == ModelCode.ANALOG || type == ModelCode.DISCRETE)
                     {
-                        if (IncomingScadaModel.ContainsKey(gid))
+                        if (!IncomingScadaModel.ContainsKey(gid))
                         {
-                            IncomingScadaModel.Remove(gid);
+                            string message = $"Model update data in fault state. Deleting entity with gid: {gid}, that does not exists in SCADA model.";
+                            logger.LogError(message);
+                            throw new ArgumentException(message);
                         }
+
+                        ushort address = IncomingScadaModel[gid].Address;
+                        IncomingAddressToGidMap.Remove(address);
+                        IncomingScadaModel.Remove(gid);
                     }
                 }
-
-                //configWriter = new ConfigWriter(dataModelRepository.ConfigFileName, IncomingScadaModel.Values.ToList());
-                //configWriter.GenerateConfigFile();
-
-                //if (File.Exists(dataModelRepository.BackupConfigPath))
-                //{
-                //    File.Delete(dataModelRepository.BackupConfigPath);
-                //}
-
-                //if (File.Exists(dataModelRepository.CurrentConfigPath))
-                //{
-                //    //Move current config to backup folder
-                //    File.Move(dataModelRepository.CurrentConfigPath, dataModelRepository.BackupConfigPath);
-                //}
-
-                //if (File.Exists(dataModelRepository.CurrentConfigPath))
-                //{
-                //    File.Delete(dataModelRepository.CurrentConfigPath);
-                //}
-
-                //if (File.Exists(dataModelRepository.ConfigFileName))
-                //{
-                //    //Move u MdbSim folder
-                //    File.Move(dataModelRepository.ConfigFileName, dataModelRepository.CurrentConfigPath);
-                //}
 
                 success = true;
             }
@@ -178,18 +216,15 @@ namespace Outage.SCADA.SCADAService
 
         public void Commit()
         {
-            //dataModelRepository.Points = IncomingScadaModel;
-
             currentScadaModel = IncomingScadaModel;
             incomingScadaModel = null;
+
+            currentAddressToGidMap = IncomingAddressToGidMap;
+            incomingAddressToGidMap = null;
+
             modelChanges.Clear();
 
-            //if (File.Exists(dataModelRepository.BackupConfigPath))
-            //{
-            //    File.Delete(dataModelRepository.BackupConfigPath);
-            //}
-
-            string message = $"Incoming config file is confirmed.";
+            string message = $"Incoming SCADA model is confirmed.";
             Console.WriteLine(message);
             logger.LogInfo(message);
         }
@@ -197,31 +232,15 @@ namespace Outage.SCADA.SCADAService
         public void Rollback()
         {
             incomingScadaModel = null;
+            incomingAddressToGidMap = null;
             modelChanges.Clear();
 
-            //if (File.Exists(dataModelRepository.CurrentConfigPath))
-            //{
-            //    File.Delete(dataModelRepository.CurrentConfigPath);
-            //}
-
-            //if (File.Exists(dataModelRepository.BackupConfigPath))
-            //{
-            //    File.Move(dataModelRepository.BackupConfigPath, dataModelRepository.CurrentConfigPath);
-            //}
-            //else
-            //{
-            //    if (File.Exists(dataModelRepository.ConfigFileName))
-            //    {
-            //        File.Move(dataModelRepository.ConfigFileName, dataModelRepository.CurrentConfigPath);
-            //    }
-            //    else
-            //    {
-            //        configWriter = new ConfigWriter(dataModelRepository.ConfigFileName, dataModelRepository.Points.Values.ToList());
-            //        configWriter.GenerateConfigFile();
-            //        File.Move(dataModelRepository.ConfigFileName, dataModelRepository.CurrentConfigPath);
-            //    }
-            //}
+            string message = $"Incoming SCADA model is rejected.";
+            Console.WriteLine(message);
+            logger.LogInfo(message);
         }
+        #endregion
+
 
         #region ImportScadaModel
         private bool ImportModel()
@@ -264,8 +283,9 @@ namespace Outage.SCADA.SCADAService
                                 if (rds[i] != null)
                                 { 
                                     //NetworkModel.Add(rds[i].Id, rds[i]);
-                                    ModbusPoint point = new ModbusPoint(rds[i].Properties, ModelCode.ANALOG);
-                                    CurrentScadaModel.Add(rds[i].Id, point);
+                                    ISCADAModelPointItem pointItem = new SCADAModelPointItem(rds[i].Properties, ModelCode.ANALOG);
+                                    CurrentScadaModel.Add(rds[i].Id, pointItem);
+                                    CurrentAddressToGidMap.Add(pointItem.Address, rds[i].Id);
                                     //TODO: log debug
                                 }
                             }
@@ -316,8 +336,9 @@ namespace Outage.SCADA.SCADAService
                                 if (rds[i] != null)
                                 {
                                     //NetworkModel.Add(rds[i].Id, rds[i]);
-                                    ModbusPoint point = new ModbusPoint(rds[i].Properties, ModelCode.DISCRETE);
-                                    CurrentScadaModel.Add(rds[i].Id, point);
+                                    ISCADAModelPointItem pointItem = new SCADAModelPointItem(rds[i].Properties, ModelCode.DISCRETE);
+                                    CurrentScadaModel.Add(rds[i].Id, pointItem);
+                                    CurrentAddressToGidMap.Add(pointItem.Address, rds[i].Id);
                                     //TODO: log debug
                                 }
                             }
@@ -346,12 +367,12 @@ namespace Outage.SCADA.SCADAService
         }
         #endregion
 
-        private ModbusPoint CreateConfigItemForEntity(long gid)
+        private ISCADAModelPointItem CreateConfigItemForEntity(long gid)
         {
             ModelCode type = modelResourceDesc.GetModelCodeFromId(gid);
             List<ModelCode> props;
             ResourceDescription rd;
-            ModbusPoint configItem;
+            ISCADAModelPointItem pointItem;
 
             using(NetworkModelGDAProxy gdaProxy = GdaQueryProxy)
             {
@@ -361,13 +382,13 @@ namespace Outage.SCADA.SCADAService
                     {
                         props = modelResourceDesc.GetAllPropertyIds(type);
                         rd = gdaProxy.GetValues(gid, props);
-                        configItem = new ModbusPoint(rd.Properties, type);
+                        pointItem = new SCADAModelPointItem(rd.Properties, type);
                     }
                     else
                     {
                         string errMessage = $"ResourceDescription type is neither analog nor digital. Type: {type}.";
                         logger.LogWarn(errMessage);
-                        configItem = null;
+                        pointItem = null;
                     }
                 }
                 else
@@ -378,7 +399,7 @@ namespace Outage.SCADA.SCADAService
                 }
             }
 
-            return configItem;
+            return pointItem;
         }
     }
 }

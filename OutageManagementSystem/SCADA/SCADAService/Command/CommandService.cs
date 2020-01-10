@@ -5,7 +5,6 @@ using Outage.SCADA.ModBus.Connection;
 using Outage.SCADA.ModBus.FunctionParameters;
 using Outage.SCADA.ModBus.ModbusFuntions;
 using Outage.SCADA.SCADACommon;
-using Outage.SCADA.SCADAConfigData.Configuration;
 using System;
 
 namespace Outage.SCADA.SCADAService.Command
@@ -22,49 +21,49 @@ namespace Outage.SCADA.SCADAService.Command
 
         public void RecvCommand(long gid, object value)
         {
-            if (true)//DataModelRepository.Instance.Points.TryGetValue(gid, out ConfigItem CI))
-            {
-                ModbusPoint CI = null;
-                if (CI.RegistarType == PointType.ANALOG_OUTPUT || CI.RegistarType == PointType.DIGITAL_OUTPUT)
-                {
-                    ModbusWriteCommandParameters mdb_write_comm_pars = null;
+            //if (true)//DataModelRepository.Instance.Points.TryGetValue(gid, out ConfigItem CI))
+            //{
+            //    ISCADAModelPointItem pointItem = null;
+            //    if (CI.RegistarType == PointType.ANALOG_OUTPUT || CI.RegistarType == PointType.DIGITAL_OUTPUT)
+            //    {
+            //        ModbusWriteCommandParameters mdb_write_comm_pars = null;
 
-                    ushort CommandedValue;
+            //        ushort CommandedValue;
 
-                    if (CI.RegistarType == PointType.ANALOG_OUTPUT)
-                    {
-                        CommandedValue = (ushort)value;
+            //        if (CI.RegistarType == PointType.ANALOG_OUTPUT)
+            //        {
+            //            CommandedValue = (ushort)value;
 
-                        mdb_write_comm_pars = new ModbusWriteCommandParameters
-                       (6, (byte)ModbusFunctionCode.WRITE_SINGLE_REGISTER, CI.Address, CommandedValue);
+            //            mdb_write_comm_pars = new ModbusWriteCommandParameters
+            //           (6, (byte)ModbusFunctionCode.WRITE_SINGLE_REGISTER, CI.Address, CommandedValue);
 
-                        logger.LogInfo("Commanded WRITE_SINGLE_REGISTER with a new value - " + CommandedValue);
-                    }
-                    else if (CI.RegistarType == PointType.DIGITAL_OUTPUT)
-                    {
-                        //TREBA BOOL ZBOG DIGITAL OUTPUT-a
-                        CommandedValue = (ushort)value;
+            //            logger.LogInfo("Commanded WRITE_SINGLE_REGISTER with a new value - " + CommandedValue);
+            //        }
+            //        else if (CI.RegistarType == PointType.DIGITAL_OUTPUT)
+            //        {
+            //            //TREBA BOOL ZBOG DIGITAL OUTPUT-a
+            //            CommandedValue = (ushort)value;
 
-                        mdb_write_comm_pars = new ModbusWriteCommandParameters
-                        (6, (byte)ModbusFunctionCode.WRITE_SINGLE_COIL, CI.Address, CommandedValue);
+            //            mdb_write_comm_pars = new ModbusWriteCommandParameters
+            //            (6, (byte)ModbusFunctionCode.WRITE_SINGLE_COIL, CI.Address, CommandedValue);
 
-                        logger.LogInfo("Commanded WRITE_SINGLE_COIL with a new value - " + CommandedValue);
-                    }
+            //            logger.LogInfo("Commanded WRITE_SINGLE_COIL with a new value - " + CommandedValue);
+            //        }
 
-                    ModbusFunction fn = FunctionFactory.CreateModbusFunction(mdb_write_comm_pars);
-                    fe.EnqueueCommand(fn);
+            //        ModbusFunction fn = FunctionFactory.CreateModbusFunction(mdb_write_comm_pars);
+            //        fe.EnqueueCommand(fn);
 
-                    bool AlarmChanged = CI.SetAlarms();
-                    if (AlarmChanged)
-                    {
-                        logger.LogInfo("Alarm for item " + CI.Gid + " is set to " + CI.Alarm.ToString());
-                    }
-                }
-            }
-            else
-            {
-                Console.WriteLine("Ne postoji Point sa gidom " + gid);
-            }
+            //        bool AlarmChanged = CI.SetAlarms();
+            //        if (AlarmChanged)
+            //        {
+            //            logger.LogInfo("Alarm for item " + CI.Gid + " is set to " + CI.Alarm.ToString());
+            //        }
+            //    }
+            //}
+            //else
+            //{
+            //    Console.WriteLine("Ne postoji Point sa gidom " + gid);
+            //}
         }
     }
 }

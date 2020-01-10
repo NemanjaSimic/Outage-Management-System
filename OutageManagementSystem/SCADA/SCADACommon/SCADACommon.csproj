@@ -49,12 +49,9 @@
   </ItemGroup>
   <ItemGroup>
     <Compile Include="Enums.cs" />
-    <Compile Include="IConfiguration.cs" />
+    <Compile Include="ISCADAConfigData.cs" />
     <Compile Include="IModBusFunction.cs" />
-    <Compile Include="IPoint.cs" />
-    <Compile Include="IModbusPoint.cs" />
-    <Compile Include="IResponse.cs" />
-    <Compile Include="ModbusPoint.cs" />
+    <Compile Include="ISCADAModelPointItem.cs" />
     <Compile Include="Properties\AssemblyInfo.cs" />
     <Compile Include="PubSub\SCADAMessage.cs" />
     <Compile Include="PubSub\SCADAPublication.cs" />

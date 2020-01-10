@@ -1,11 +1,11 @@
 ﻿namespace Outage.SCADA.SCADACommon
 {
-    public interface IModbusPoint
+    public interface ISCADAModelPointItem
     {
-        string Name { get; set; }
         long Gid { get; set; }
-        PointType RegistarType { get; set; }
         ushort Address { get; set; }
+        string Name { get; set; }
+        PointType RegistarType { get; set; }
         float MinValue { get; set; }
         float MaxValue { get; set; }
         float DefaultValue { get; set; }
@@ -16,7 +16,8 @@
         double EGU_Max { get; set; }
         ushort AbnormalValue { get; set; }
         double HighLimit { get; set; }
-
         double LowLimit { get; set; }
+
+        ISCADAModelPointItem Clone();
     }
 }

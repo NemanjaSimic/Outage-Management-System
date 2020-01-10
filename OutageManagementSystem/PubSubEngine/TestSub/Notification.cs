@@ -22,9 +22,10 @@ namespace TestSub
 		{
 			Console.WriteLine("Message from PubSub: " + msg);
 			
-			if(msg is ISCADAMessage scadaMsg)
+			if(msg is IMultipleAnalogValueSCADAMessage scadaMsg)
 			{
-				Console.WriteLine($"Gid: {scadaMsg.Gid}, Value: {scadaMsg.Value}");
+				throw new Exception();
+				//Console.WriteLine($"Gid: {scadaMsg.Gid}, Value: {scadaMsg.Value}");
 			}
 		}
 	}

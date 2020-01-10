@@ -11,11 +11,11 @@ namespace Outage.SCADA.SCADACommon
 
     public interface IReadDigitalModBusFunction : IModBusFunction
     {
-        bool[] Data { get; }
+        Dictionary<long, bool> Data { get; }
     }
 
     public interface IReadAnalogModBusFunction : IModBusFunction
     {
-        int[] Data { get; }
+        Dictionary<long, int> Data { get; }
     }
 }

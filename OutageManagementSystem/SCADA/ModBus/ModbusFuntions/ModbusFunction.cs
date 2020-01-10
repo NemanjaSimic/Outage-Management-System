@@ -36,7 +36,6 @@ namespace Outage.SCADA.ModBus.ModbusFuntions
 
 
         #region IModBusFunction
-
         public abstract void Execute(ModbusClient modbusClient);
         #endregion
 
