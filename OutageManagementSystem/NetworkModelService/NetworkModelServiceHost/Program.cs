@@ -8,12 +8,12 @@ namespace Outage.NetworkModelServiceHost
     {
         private static void Main(string[] args)
         {
-            ILogger logger = LoggerWrapper.Instance;
+            ILogger Logger = LoggerWrapper.Instance;
 
             try
             {                
                 string message = "Starting Network Model Service...";
-                logger.LogInfo(message);
+                Logger.LogInfo(message);
                 Console.WriteLine("\n{0}\n", message);
 
                 using (NetworkModelService.NetworkModelService nms = new NetworkModelService.NetworkModelService())
@@ -30,7 +30,7 @@ namespace Outage.NetworkModelServiceHost
                 Console.WriteLine(ex.Message);
                 Console.WriteLine("Network Model Service failed.");
                 Console.WriteLine(ex.StackTrace);
-                logger.LogError($"Network Model Service failed.{Environment.NewLine}Message: {ex.Message} ", ex);
+                Logger.LogError($"Network Model Service failed.{Environment.NewLine}Message: {ex.Message} ", ex);
                 Console.ReadLine();
             }
         }

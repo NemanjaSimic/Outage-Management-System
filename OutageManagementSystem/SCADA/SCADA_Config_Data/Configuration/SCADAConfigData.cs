@@ -7,7 +7,13 @@ namespace Outage.SCADA.SCADAData.Configuration
 {
     public class SCADAConfigData : ISCADAConfigData
     {
-        private ILogger logger = LoggerWrapper.Instance;
+        private ILogger logger;
+
+        protected ILogger Logger
+        {
+            get { return logger ?? (logger = LoggerWrapper.Instance); }
+        }
+
 
         public ushort TcpPort { get; protected set; }
         public string IpAddress { get; protected set; }
@@ -52,7 +58,7 @@ namespace Outage.SCADA.SCADAData.Configuration
                 else
                 {
                     string message = "TcpPort in SCADA configuration is either not defined or not valid.";
-                    logger.LogError(message);
+                    Logger.LogError(message);
                     throw new Exception(message);
                 }
             }
@@ -72,7 +78,7 @@ namespace Outage.SCADA.SCADAData.Configuration
                 else
                 {
                     string message = "UnitAddress in SCADA configuration is either not defined or not valid.";
-                    logger.LogError(message);
+                    Logger.LogError(message);
                     throw new Exception(message);
                 }
             }
@@ -86,7 +92,7 @@ namespace Outage.SCADA.SCADAData.Configuration
                 else
                 {
                     Interval = 10000;
-                    logger.LogWarn("Interval in SCADA configuration is either not defined or not valid.");
+                    Logger.LogWarn("Interval in SCADA configuration is either not defined or not valid.");
                 }
             }
 

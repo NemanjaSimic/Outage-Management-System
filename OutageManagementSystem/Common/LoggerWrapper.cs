@@ -9,11 +9,11 @@ namespace Outage.Common
         private static LoggerWrapper instance;
         private static object lockObj = new object();
 
-        private ILog logger;
+        private ILog Logger;
 
         private LoggerWrapper(string callerName)
         {
-            logger = LogManager.GetLogger(callerName);
+            Logger = LogManager.GetLogger(callerName);
         }
 
         public static LoggerWrapper Instance
@@ -28,9 +28,9 @@ namespace Outage.Common
                         if (instance == null)
                         {
                             string callerName = "Unknown";
-                            if (ConfigurationManager.ConnectionStrings["loggerName"] != null)
+                            if (ConfigurationManager.ConnectionStrings["LoggerName"] != null)
                             {
-                                callerName = ConfigurationManager.ConnectionStrings["loggerName"].ConnectionString;
+                                callerName = ConfigurationManager.ConnectionStrings["LoggerName"].ConnectionString;
                             }
 
                             instance = new LoggerWrapper(callerName);
@@ -49,27 +49,27 @@ namespace Outage.Common
 
         public void LogInfo(string message, Exception e = null)
         {
-            logger.Info(message, e);
+            Logger.Info(message, e);
         }
 
         public void LogDebug(string message, Exception e = null)
         {
-            logger.Debug(message, e);
+            Logger.Debug(message, e);
         }
 
         public void LogWarn(string message, Exception e = null)
         {
-            logger.Warn(message, e);
+            Logger.Warn(message, e);
         }
 
         public void LogError(string message, Exception e = null)
         {
-            logger.Error(message, e);
+            Logger.Error(message, e);
         }
 
         public void LogFatal(string message, Exception e = null)
         {
-            logger.Fatal(message, e);
+            Logger.Fatal(message, e);
         }
     }
 }

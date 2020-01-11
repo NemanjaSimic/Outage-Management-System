@@ -7,12 +7,12 @@ namespace Outage.TransactionManagerServiceHost
     {
         private static void Main(string[] args)
         {
-            ILogger logger = LoggerWrapper.Instance;
+            ILogger Logger = LoggerWrapper.Instance;
 
             try
             {
                 string message = "Starting Transaction Manager Service...";
-                logger.LogInfo(message);
+                Logger.LogInfo(message);
                 Console.WriteLine("\n{0}\n", message);
 
                 using (TransactionManagerService.TransactionManagerService tms = new TransactionManagerService.TransactionManagerService())
@@ -29,7 +29,7 @@ namespace Outage.TransactionManagerServiceHost
                 Console.WriteLine(ex.Message);
                 Console.WriteLine("Transaction Manager Service failed.");
                 Console.WriteLine(ex.StackTrace);
-                logger.LogError($"Transaction Manager Service failed.{Environment.NewLine}Message: {ex.Message} ", ex);
+                Logger.LogError($"Transaction Manager Service failed.{Environment.NewLine}Message: {ex.Message} ", ex);
                 Console.ReadLine();
             }
         }

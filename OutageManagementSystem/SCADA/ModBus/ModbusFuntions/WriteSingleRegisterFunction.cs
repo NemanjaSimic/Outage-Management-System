@@ -22,7 +22,7 @@ namespace Outage.SCADA.ModBus.ModbusFuntions
         {
             ModbusWriteCommandParameters mdb_write_comm_pars = this.CommandParameters as ModbusWriteCommandParameters;
             modbusClient.WriteSingleRegister(mdb_write_comm_pars.OutputAddress, mdb_write_comm_pars.Value);
-            logger.LogInfo($"WriteSingleRegisterFunction executed SUCCESSFULLY. OutputAddress: {mdb_write_comm_pars.OutputAddress}, Value: {mdb_write_comm_pars.Value}");
+            Logger.LogInfo($"WriteSingleRegisterFunction executed SUCCESSFULLY. OutputAddress: {mdb_write_comm_pars.OutputAddress}, Value: {mdb_write_comm_pars.Value}");
         }
 
         #endregion IModBusFunction

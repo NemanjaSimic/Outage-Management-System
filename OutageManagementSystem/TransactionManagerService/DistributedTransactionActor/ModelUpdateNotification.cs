@@ -9,7 +9,7 @@ namespace Outage.DistributedTransactionActor
 {
     public abstract class ModelUpdateNotification : IModelUpdateNotificationContract
     {
-        protected ILogger logger = LoggerWrapper.Instance; 
+        protected ILogger Logger = LoggerWrapper.Instance; 
 
         public string TransactionEnlistmentEndpointName { get; private set; }
 
@@ -35,7 +35,7 @@ namespace Outage.DistributedTransactionActor
                 catch (Exception ex)
                 {
                     string message = $"Exception on TransactionEnlistmentProxy initialization. Message: {ex.Message}";
-                    logger.LogError(message, ex);
+                    Logger.LogError(message, ex);
                     transactionEnlistmentProxy = null;
                 }
 

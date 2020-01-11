@@ -60,10 +60,6 @@
       <Project>{892CBE15-9ED7-4540-81FA-0EAABA592138}</Project>
       <Name>Common</Name>
     </ProjectReference>
-    <ProjectReference Include="..\PubSubCommon\PubSubCommon.csproj">
-      <Project>{ccb3c63a-8a1c-46c1-a055-bca0ab7180a8}</Project>
-      <Name>PubSubCommon</Name>
-    </ProjectReference>
   </ItemGroup>
   <Import Project="$(MSBuildToolsPath)\Microsoft.CSharp.targets" />
   <!-- To modify your build process, add your task inside one of the targets below and uncomment it. 

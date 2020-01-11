@@ -37,7 +37,7 @@ namespace Outage.SCADA.ModBus.ModbusFuntions
             }
 
             modbusClient.WriteSingleCoil(mdb_write_comm_pars.OutputAddress, commandingValue);
-            logger.LogInfo($"WriteSingleCoilFunction executed SUCCESSFULLY. OutputAddress: {mdb_write_comm_pars.OutputAddress}, Value: {commandingValue}");
+            Logger.LogInfo($"WriteSingleCoilFunction executed SUCCESSFULLY. OutputAddress: {mdb_write_comm_pars.OutputAddress}, Value: {commandingValue}");
         }
 
         #endregion IModBusFunction

@@ -30,7 +30,7 @@ namespace Outage.SCADA.ModBus.ModbusFuntions
             if (startAddress + quantity >= ushort.MaxValue || startAddress + quantity == ushort.MinValue || startAddress == ushort.MinValue)
             {
                 string message = $"Address is out of bound. Start address: {startAddress}, Quantity: {quantity}";
-                logger.LogError(message);
+                Logger.LogError(message);
                 throw new Exception(message);
             }
 
@@ -48,13 +48,13 @@ namespace Outage.SCADA.ModBus.ModbusFuntions
                 if (scadaModel.CurrentScadaModel.ContainsKey(gid))
                 {
                     scadaModel.CurrentScadaModel[gid].CurrentValue = value;
-                    logger.LogDebug($"ReadHoldingRegistersFunction execute => Current value: {value} from address: {address}, gid: 0x{gid:X16}.");
+                    Logger.LogDebug($"ReadHoldingRegistersFunction execute => Current value: {value} from address: {address}, gid: 0x{gid:X16}.");
                 }
 
                 Data.Add(gid, data[i]);
             }
 
-            logger.LogDebug($"ReadHoldingRegistersFunction executed SUCCESSFULLY. StartAddress: {startAddress}, Quantity: {quantity}");
+            Logger.LogDebug($"ReadHoldingRegistersFunction executed SUCCESSFULLY. StartAddress: {startAddress}, Quantity: {quantity}");
         }
 
         #endregion IModBusFunction

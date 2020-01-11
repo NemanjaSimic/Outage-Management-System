@@ -32,7 +32,13 @@ namespace Outage.TransactionManagerService
 
         #endregion Static Members
 
-        private ILogger logger = LoggerWrapper.Instance;
+        private ILogger logger;
+
+        protected ILogger Logger
+        {
+            get { return logger ?? (logger = LoggerWrapper.Instance); }
+        }
+
         private TransactionActorProxy transactionActorProxy = null;
 
         #region Proxies
@@ -58,13 +64,13 @@ namespace Outage.TransactionManagerService
                 catch (Exception ex)
                 {
                     string message = $"Exception on TransactionActorProxy initialization. Message: {ex.Message}";
-                    logger.LogError(message, ex);
+                    Logger.LogError(message, ex);
                     transactionActorProxy = null;
                 }
                 finally
                 {
                     numberOfTries++;
-                    logger.LogDebug($"DistributedTransaction: GetTransactionActorProxy(), EndpointName: {endpointName}, try number: {numberOfTries}.");
+                    Logger.LogDebug($"DistributedTransaction: GetTransactionActorProxy(), EndpointName: {endpointName}, try number: {numberOfTries}.");
                     Thread.Sleep(500);
                 }
             }
@@ -88,7 +94,7 @@ namespace Outage.TransactionManagerService
                 }
             }
 
-            logger.LogInfo("Distributed transaction started. Waiting for transaction actors to enlist...");
+            Logger.LogInfo("Distributed transaction started. Waiting for transaction actors to enlist...");
             //TODO: start timer...
         }
 
@@ -107,17 +113,17 @@ namespace Outage.TransactionManagerService
                         InvokeRollbackOnActors();
                     }
 
-                    logger.LogInfo("Distributed transaction finsihed SUCCESSFULLY.");
+                    Logger.LogInfo("Distributed transaction finsihed SUCCESSFULLY.");
                 }
                 else
                 {
                     transactionLedger = null;
-                    logger.LogInfo("Distributed transaction finsihed UNSUCCESSFULLY.");
+                    Logger.LogInfo("Distributed transaction finsihed UNSUCCESSFULLY.");
                 }
             }
             catch (Exception e)
             {
-                logger.LogError("Exception in FinishDistributedUpdate().", e);
+                Logger.LogError("Exception in FinishDistributedUpdate().", e);
             }
         }
 
@@ -133,7 +139,7 @@ namespace Outage.TransactionManagerService
             {
                 TransactionLedger[actorName] = true;
                 success = true;
-                logger.LogInfo($"Transaction actor: {actorName} enlisted for transaction.");
+                Logger.LogInfo($"Transaction actor: {actorName} enlisted for transaction.");
             }
 
             return success;
@@ -163,25 +169,25 @@ namespace Outage.TransactionManagerService
                         {
                             success = false;
                             string message = "TransactionActorProxy is null.";
-                            logger.LogError(message);
+                            Logger.LogError(message);
                             throw new NullReferenceException(message);
                         }
                     }
 
                     if (success)
                     {
-                        logger.LogInfo($"Preparation on Transaction actor: {actor} finsihed SUCCESSFULLY.");
+                        Logger.LogInfo($"Preparation on Transaction actor: {actor} finsihed SUCCESSFULLY.");
                     }
                     else
                     {
-                        logger.LogInfo($"Preparation on Transaction actor: {actor} finsihed UNSUCCESSFULLY.");
+                        Logger.LogInfo($"Preparation on Transaction actor: {actor} finsihed UNSUCCESSFULLY.");
                         break;
                     }
                 }
                 else
                 {
                     success = false;
-                    logger.LogError($"Preparation failed either because Transaction actor: {actor} was not enlisted or do not belong to distributed transaction.");
+                    Logger.LogError($"Preparation failed either because Transaction actor: {actor} was not enlisted or do not belong to distributed transaction.");
                     break;
                 }
             }
@@ -202,12 +208,12 @@ namespace Outage.TransactionManagerService
                         if (transactionActorProxy != null)
                         {
                             transactionActorProxy.Commit();
-                            logger.LogInfo($"Commit invoked on Transaction actor: {actor}.");
+                            Logger.LogInfo($"Commit invoked on Transaction actor: {actor}.");
                         }
                         else
                         {
                             string message = "TransactionActorProxy is null.";
-                            logger.LogError(message);
+                            Logger.LogError(message);
                             throw new NullReferenceException(message);
                         }
                     }
@@ -228,12 +234,12 @@ namespace Outage.TransactionManagerService
                         if (transactionActorProxy != null)
                         {
                             transactionActorProxy.Rollback();
-                            logger.LogInfo($"Rollback invoked on Transaction actor: {actor}.");
+                            Logger.LogInfo($"Rollback invoked on Transaction actor: {actor}.");
                         }
                         else
                         {
                             string message = "TransactionActorProxy is null.";
-                            logger.LogError(message);
+                            Logger.LogError(message);
                             throw new NullReferenceException(message);
                         }
                     }
@@ -246,7 +252,7 @@ namespace Outage.TransactionManagerService
 
     //public class DistributedTransactionEnlistment : ITransactionEnlistmentContract
     //{
-    //    private ILogger logger = LoggerWrapper.Instance;
+    //    private ILogger logger;
 
     //    #region ITransactionEnlistmentContract
     //    public bool Enlist(string actorName)
@@ -257,7 +263,7 @@ namespace Outage.TransactionManagerService
     //        {
     //            TransactionLedger[actorName] = true;
     //            success = true;
-    //            logger.LogInfo($"Transaction actor: {actorName} enlisted for transaction.");
+    //            Logger.LogInfo($"Transaction actor: {actorName} enlisted for transaction.");
     //        }
 
     //        return success;

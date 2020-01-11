@@ -10,7 +10,13 @@ namespace Outage.SCADA.SCADAData.Repository
 {
     public class SCADAModel
     {
-        private ILogger logger = LoggerWrapper.Instance;
+        private ILogger logger;
+
+        protected ILogger Logger
+        {
+            get { return logger ?? (logger = LoggerWrapper.Instance); }
+        }
+
         private ModelResourcesDesc modelResourceDesc;
 
         private Dictionary<DeltaOpType, List<long>> modelChanges;
@@ -101,13 +107,13 @@ namespace Outage.SCADA.SCADAData.Repository
                     catch (Exception ex)
                     {
                         string message = $"Exception on NetworkModelGDAProxy initialization. Message: {ex.Message}";
-                        logger.LogError(message, ex);
+                        Logger.LogError(message, ex);
                         gdaQueryProxy = null;
                     }
                     finally
                     {
                         numberOfTries++;
-                        logger.LogDebug($"SCADAModel: GdaQueryProxy getter, try number: {numberOfTries}.");
+                        Logger.LogDebug($"SCADAModel: GdaQueryProxy getter, try number: {numberOfTries}.");
                         Thread.Sleep(500);
                     }
                 }
@@ -162,7 +168,7 @@ namespace Outage.SCADA.SCADAData.Repository
                         if (IncomingScadaModel.ContainsKey(gid) || IncomingAddressToGidMap.ContainsKey(pointItem.Address))
                         {
                             string message = $"Model update data in fault state. Inserting gid: {gid} or measurement address: {pointItem.Address}, that already exists in SCADA model.";
-                            logger.LogError(message);
+                            Logger.LogError(message);
                             throw new ArgumentException(message);
                         }
 
@@ -181,7 +187,7 @@ namespace Outage.SCADA.SCADAData.Repository
                         if (!IncomingScadaModel.ContainsKey(gid) || !IncomingAddressToGidMap.ContainsKey(pointItem.Address))
                         {
                             string message = $"Model update data in fault state. Updating entity with gid: {gid} or measurement address: {pointItem.Address}, that does not exists in SCADA model.";
-                            logger.LogError(message);
+                            Logger.LogError(message);
                             throw new ArgumentException(message);
                         }
 
@@ -198,7 +204,7 @@ namespace Outage.SCADA.SCADAData.Repository
                         if (!IncomingScadaModel.ContainsKey(gid))
                         {
                             string message = $"Model update data in fault state. Deleting entity with gid: {gid}, that does not exists in SCADA model.";
-                            logger.LogError(message);
+                            Logger.LogError(message);
                             throw new ArgumentException(message);
                         }
 
@@ -212,7 +218,7 @@ namespace Outage.SCADA.SCADAData.Repository
             }
             catch (Exception e)
             {
-                logger.LogError($"Exception catched in Prepare method on SCADAModel.", e);
+                Logger.LogError($"Exception caught in Prepare method on SCADAModel.", e);
                 success = false;
             }
 
@@ -231,7 +237,7 @@ namespace Outage.SCADA.SCADAData.Repository
 
             string message = $"Incoming SCADA model is confirmed.";
             Console.WriteLine(message);
-            logger.LogInfo(message);
+            Logger.LogInfo(message);
         }
 
         public void Rollback()
@@ -242,7 +248,7 @@ namespace Outage.SCADA.SCADAData.Repository
 
             string message = $"Incoming SCADA model is rejected.";
             Console.WriteLine(message);
-            logger.LogInfo(message);
+            Logger.LogInfo(message);
         }
 
         #endregion ITransactionActorContract
@@ -252,21 +258,21 @@ namespace Outage.SCADA.SCADAData.Repository
         private bool ImportModel()
         {
             string message = "Importing analog measurements started...";
-            logger.LogInfo(message);
+            Logger.LogInfo(message);
             Console.WriteLine(message);
             bool analogImportSuccess = ImportAnalog();
 
             message = $"Importing analog measurements finished. ['success' value: {analogImportSuccess}]";
-            logger.LogInfo(message);
+            Logger.LogInfo(message);
             Console.WriteLine(message);
 
             message = "Importing discrete measurements started...";
-            logger.LogInfo(message);
+            Logger.LogInfo(message);
             Console.WriteLine(message);
             bool discreteImportSuccess = ImportDiscrete();
 
             message = $"Importing discrete measurements finished. ['success' value: {discreteImportSuccess}]";
-            logger.LogInfo(message);
+            Logger.LogInfo(message);
             Console.WriteLine(message);
 
             return analogImportSuccess && discreteImportSuccess;
@@ -298,7 +304,7 @@ namespace Outage.SCADA.SCADAData.Repository
                                     ISCADAModelPointItem pointItem = new SCADAModelPointItem(rds[i].Properties, ModelCode.ANALOG);
                                     CurrentScadaModel.Add(rds[i].Id, pointItem);
                                     CurrentAddressToGidMap.Add(pointItem.Address, rds[i].Id);
-                                    logger.LogDebug($"ANALOG measurement added to SCADA model [Gid: {gid}, Address: {pointItem.Address}]");
+                                    Logger.LogDebug($"ANALOG measurement added to SCADA model [Gid: {gid}, Address: {pointItem.Address}]");
                                 }
                             }
                             resourcesLeft = gdaProxy.IteratorResourcesLeft(iteratorId);
@@ -310,7 +316,7 @@ namespace Outage.SCADA.SCADAData.Repository
                     {
                         success = false;
                         string errMsg = "From ImportAnalog() method: NetworkModelGDAProxy is null.";
-                        logger.LogWarn(errMsg);
+                        Logger.LogWarn(errMsg);
                     }
                 }
             }
@@ -319,7 +325,7 @@ namespace Outage.SCADA.SCADAData.Repository
                 success = false;
                 string errorMessage = $"ImportAnalog failed with error: {ex.Message}";
                 Console.WriteLine(errorMessage);
-                logger.LogError(errorMessage, ex);
+                Logger.LogError(errorMessage, ex);
             }
 
             return success;
@@ -351,7 +357,7 @@ namespace Outage.SCADA.SCADAData.Repository
                                     ISCADAModelPointItem pointItem = new SCADAModelPointItem(rds[i].Properties, ModelCode.DISCRETE);
                                     CurrentScadaModel.Add(gid, pointItem);
                                     CurrentAddressToGidMap.Add(pointItem.Address, gid);
-                                    logger.LogDebug($"DISCRETE measurement added to SCADA model [Gid: {gid}, Address: {pointItem.Address}]");
+                                    Logger.LogDebug($"DISCRETE measurement added to SCADA model [Gid: {gid}, Address: {pointItem.Address}]");
                                 }
                             }
                             resourcesLeft = gdaProxy.IteratorResourcesLeft(iteratorId);
@@ -363,7 +369,7 @@ namespace Outage.SCADA.SCADAData.Repository
                     {
                         success = false;
                         string errMsg = "From ImportDiscrete() method: NetworkModelGDAProxy is null.";
-                        logger.LogWarn(errMsg);
+                        Logger.LogWarn(errMsg);
                     }
                 }
             }
@@ -372,7 +378,7 @@ namespace Outage.SCADA.SCADAData.Repository
                 success = false;
                 string errorMessage = $"ImportDiscrete failed with error: {ex.Message}";
                 Console.WriteLine(errorMessage);
-                logger.LogError(errorMessage, ex);
+                Logger.LogError(errorMessage, ex);
             }
 
             return success;
@@ -400,14 +406,14 @@ namespace Outage.SCADA.SCADAData.Repository
                     else
                     {
                         string errMessage = $"ResourceDescription type is neither analog nor digital. Type: {type}.";
-                        logger.LogWarn(errMessage);
+                        Logger.LogWarn(errMessage);
                         pointItem = null;
                     }
                 }
                 else
                 {
                     string message = "From method CreateConfigItemForEntity(): NetworkModelGDAProxy is null.";
-                    logger.LogWarn(message);
+                    Logger.LogWarn(message);
                     throw new NullReferenceException(message);
                 }
             }

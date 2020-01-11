@@ -9,10 +9,10 @@ namespace PubSubEngine
     [ServiceBehavior(InstanceContextMode = InstanceContextMode.Single, ConcurrencyMode = ConcurrencyMode.Multiple)]
     internal class Publisher : IPublisher
     {
-        private static ILogger logger = LoggerWrapper.Instance;
-
         public void Publish(IPublication publication)
         {
+            ILogger logger = LoggerWrapper.Instance;
+
             List<ISubscriberCallback> listOfSubscribers = Publications.Instance.GetAllSubscribers(publication.Topic);
 
             if (listOfSubscribers != null)

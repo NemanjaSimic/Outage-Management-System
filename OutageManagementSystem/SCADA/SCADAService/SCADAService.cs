@@ -1,5 +1,4 @@
-﻿using EasyModbus;
-using Outage.Common;
+﻿using Outage.Common;
 using Outage.SCADA.ModBus;
 using Outage.SCADA.ModBus.Acquisitor;
 using Outage.SCADA.ModBus.Connection;
@@ -9,17 +8,21 @@ using Outage.SCADA.SCADAData.Repository;
 using Outage.SCADA.SCADAService.Command;
 using Outage.SCADA.SCADAService.DistributedTransaction;
 using System;
+using System.Text;
 using System.Collections.Generic;
-using System.Diagnostics;
-using System.IO;
-using System.Linq;
 using System.ServiceModel;
 
 namespace Outage.SCADA.SCADAService
 {
     public class SCADAService : IDisposable
     {
-        private ILogger logger = LoggerWrapper.Instance;
+        private ILogger logger;
+
+        protected ILogger Logger
+        {
+            get { return logger ?? (logger = LoggerWrapper.Instance); }
+        }
+
 
         private List<ServiceHost> hosts = null;
         private SCADAModel scadaModel = null;
@@ -78,36 +81,41 @@ namespace Outage.SCADA.SCADAService
                 throw new Exception("SCADA Service hosts can not be opend because they are not initialized.");
             }
 
-            string message = string.Empty;
+            string message;
+            StringBuilder sb = new StringBuilder();
+
             foreach (ServiceHost host in hosts)
             {
                 host.Open();
 
                 message = string.Format("The WCF service {0} is ready.", host.Description.Name);
                 Console.WriteLine(message);
-                logger.LogInfo(message);
+                sb.AppendLine(message);
 
                 message = "Endpoints:";
                 Console.WriteLine(message);
-                logger.LogInfo(message);
+                sb.AppendLine(message);
 
                 foreach (Uri uri in host.BaseAddresses)
                 {
                     Console.WriteLine(uri);
-                    logger.LogInfo(uri.ToString());
+                    sb.AppendLine(uri.ToString());
                 }
 
                 Console.WriteLine("\n");
+                sb.AppendLine();
             }
+
+            Logger.LogInfo(sb.ToString());
 
             message = "Trace level: LEVEL NOT SPECIFIED!";
             Console.WriteLine(message);
-            logger.LogWarn(message);
+            Logger.LogWarn(message);
 
             message = "The SCADA" +
                 " Service is started.";
             Console.WriteLine("\n{0}", message);
-            logger.LogInfo(message);
+            Logger.LogInfo(message);
         }
 
         private void CloseHosts()
@@ -130,7 +138,7 @@ namespace Outage.SCADA.SCADAService
             }
 
             string message = "SCADA Service is gracefully closed.";
-            logger.LogInfo(message);
+            Logger.LogInfo(message);
             Console.WriteLine("\n\n{0}", message);
         }
         #endregion

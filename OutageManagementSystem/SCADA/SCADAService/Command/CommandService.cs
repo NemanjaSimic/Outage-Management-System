@@ -11,7 +11,13 @@ namespace Outage.SCADA.SCADAService.Command
 {
     public class CommandService : ISCADACommand
     {
-        private ILogger logger = LoggerWrapper.Instance;
+        private ILogger logger;
+
+        protected ILogger Logger
+        {
+            get { return logger ?? (logger = LoggerWrapper.Instance); }
+        }
+
         private FunctionExecutor functionExecutor = FunctionExecutor.Instance;
         private SCADAModel scadaModel = SCADAModel.Instance;
 
@@ -30,7 +36,7 @@ namespace Outage.SCADA.SCADAService.Command
                                                                            pointItem.Address,
                                                                            commandedValue);
 
-                    logger.LogInfo("Commanded WRITE_SINGLE_REGISTER with a new value - " + commandedValue);
+                    Logger.LogInfo("Commanded WRITE_SINGLE_REGISTER with a new value - " + commandedValue);
                 }
                 else if (pointItem.RegistarType == PointType.DIGITAL_OUTPUT)
                 {
@@ -39,12 +45,12 @@ namespace Outage.SCADA.SCADAService.Command
                                                                            pointItem.Address,
                                                                            commandedValue);
 
-                    logger.LogInfo("Commanded WRITE_SINGLE_COIL with a new value - " + commandedValue);
+                    Logger.LogInfo("Commanded WRITE_SINGLE_COIL with a new value - " + commandedValue);
                 }
                 else
                 {
                     string message = $"RegistarType of entity with gid: 0x{gid:X16} is nether ANALOG_OUTPUT nor DIGITAL_OUTPUT.";
-                    logger.LogError(message);
+                    Logger.LogError(message);
                     return;
                 }
 
@@ -55,13 +61,13 @@ namespace Outage.SCADA.SCADAService.Command
                 //bool AlarmChanged = CI.SetAlarms();
                 //if (AlarmChanged)
                 //{
-                //    logger.LogInfo("Alarm for item " + CI.Gid + " is set to " + CI.Alarm.ToString());
+                //    Logger.LogInfo("Alarm for item " + CI.Gid + " is set to " + CI.Alarm.ToString());
                 //}
             }
             else
             {
                 string message = $"Entity with gid: 0x{gid:X16} does not exist in current SCADA model.";
-                logger.LogError(message);
+                Logger.LogError(message);
             }
         }
     }

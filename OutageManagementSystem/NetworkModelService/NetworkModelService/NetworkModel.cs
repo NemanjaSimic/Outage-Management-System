@@ -24,7 +24,12 @@ namespace Outage.NetworkModelService
     public class NetworkModel
     {
         #region Fields
-        private ILogger logger = LoggerWrapper.Instance;
+        private ILogger logger;
+
+        protected ILogger Logger
+        {
+            get { return logger ?? (logger = LoggerWrapper.Instance); }
+        }
 
         private IMongoDatabase db;
 
@@ -96,13 +101,13 @@ namespace Outage.NetworkModelService
                     catch (Exception ex)
                     {
                         string message = $"Exception on TransactionCoordinatorProxy initialization. Message: {ex.Message}";
-                        logger.LogError(message, ex);
+                        Logger.LogError(message, ex);
                         transactionCoordinatorProxy = null;
                     }
                     finally
                     {
                         numberOfTries++;
-                        logger.LogDebug($"NetworkModel: TransactionCoordinatorProxy getter, try number: {numberOfTries}.");
+                        Logger.LogDebug($"NetworkModel: TransactionCoordinatorProxy getter, try number: {numberOfTries}.");
                         Thread.Sleep(500);
                     }
                 }
@@ -134,7 +139,7 @@ namespace Outage.NetworkModelService
                 catch (Exception ex)
                 {
                     string message = $"Exception on TransactionCoordinatorProxy initialization. Message: {ex.Message}";
-                    logger.LogError(message, ex);
+                    Logger.LogError(message, ex);
                     transactionEnlistmentProxy = null;
                 }
 
@@ -168,13 +173,13 @@ namespace Outage.NetworkModelService
                 catch (Exception ex)
                 {
                     string message = $"Exception on ModelUpdateNotificationProxy initialization. EndpointName: {endpointName}, Message: {ex.Message}";
-                    logger.LogError(message, ex);
+                    Logger.LogError(message, ex);
                     modelUpdateNotifierProxy = null;
                 }
                 finally
                 {
                     numberOfTries++;
-                    logger.LogDebug($"NetworkModel: GetModelUpdateNotificationProxy(), EndpointName: {endpointName}, try number: {numberOfTries}.");
+                    Logger.LogDebug($"NetworkModel: GetModelUpdateNotificationProxy(), EndpointName: {endpointName}, try number: {numberOfTries}.");
                     Thread.Sleep(500);
                 }
             }
@@ -218,7 +223,7 @@ namespace Outage.NetworkModelService
             }
             catch (Exception e)
             {
-                logger.LogError("Error on database Init.", e);
+                Logger.LogError("Error on database Init.", e);
             }
 
             Initialize();
@@ -268,7 +273,7 @@ namespace Outage.NetworkModelService
             else
             {
                 string message = string.Format("Entity  (GID: 0x{0:X16}) does not exist.", globalId);
-                logger.LogError(message);
+                Logger.LogError(message);
                 throw new Exception(message);
             }
         }
@@ -285,7 +290,7 @@ namespace Outage.NetworkModelService
             else
             {
                 string message = string.Format("Entity  (GID: 0x{0:X16}) does not exist.", globalId);
-                logger.LogError(message);
+                Logger.LogError(message);
                 throw new Exception(message);
             }
         }
@@ -302,7 +307,7 @@ namespace Outage.NetworkModelService
         /// <returns>Resource description of the specified entity</returns>
         public ResourceDescription GetValues(long globalId, List<ModelCode> properties)
         {
-            logger.LogInfo($"Getting values for GID: 0x{globalId:X16}.");
+            Logger.LogInfo($"Getting values for GID: 0x{globalId:X16}.");
 
             try
             {
@@ -319,14 +324,14 @@ namespace Outage.NetworkModelService
                     io.GetProperty(property);
                     rd.AddProperty(property);
                 }
-                logger.LogInfo($"Getting values for GID: 0x{globalId:X16} succedded.");
+                Logger.LogInfo($"Getting values for GID: 0x{globalId:X16} succedded.");
 
                 return rd;
             }
             catch (Exception ex)
             {
                 string message = string.Format("Failed to get values for entity with GID: 0x{0:X16}. {1}", globalId, ex.Message);
-                logger.LogError(message, ex);
+                Logger.LogError(message, ex);
                 throw new Exception(message);
             }
         }
@@ -339,7 +344,7 @@ namespace Outage.NetworkModelService
         /// <returns>Resource iterator for the requested entities</returns>
         public ResourceIterator GetExtentValues(ModelCode entityType, List<ModelCode> properties)
         {
-            logger.LogInfo($"Getting extent values for entity type: {entityType}.");
+            Logger.LogInfo($"Getting extent values for entity type: {entityType}.");
 
             try
             {
@@ -357,14 +362,14 @@ namespace Outage.NetworkModelService
 
                 ResourceIterator ri = new ResourceIterator(globalIds, class2PropertyIDs);
 
-                logger.LogInfo($"Getting extent values for entity type: {entityType} succedded.");
+                Logger.LogInfo($"Getting extent values for entity type: {entityType} succedded.");
 
                 return ri;
             }
             catch (Exception ex)
             {
                 string message = string.Format("Failed to get extent values for entity type: {0}. {1}", entityType, ex.Message);
-                logger.LogError(message, ex);
+                Logger.LogError(message, ex);
                 throw new Exception(message);
             }
         }
@@ -380,7 +385,7 @@ namespace Outage.NetworkModelService
         /// <returns>Resource iterator for the requested entities</returns>
         public ResourceIterator GetRelatedValues(long source, List<ModelCode> properties, Association association)
         {
-            logger.LogInfo($"Getting related values for source: 0x{source:X16}.");
+            Logger.LogInfo($"Getting related values for source: 0x{source:X16}.");
 
             try
             {
@@ -400,14 +405,14 @@ namespace Outage.NetworkModelService
 
                 ResourceIterator ri = new ResourceIterator(relatedGids, class2PropertyIDs);
 
-                logger.LogInfo($"Getting related values for source: 0x{source:X16} succedded.");
+                Logger.LogInfo($"Getting related values for source: 0x{source:X16} succedded.");
 
                 return ri;
             }
             catch (Exception ex)
             {
                 string message = String.Format("Failed to get related values for source GID: 0x{0:X16}. {1}.", source, ex.Message);
-                logger.LogError(message, ex);
+                Logger.LogError(message, ex);
                 throw new Exception(message);
             }
         }
@@ -422,11 +427,11 @@ namespace Outage.NetworkModelService
 
             //shallow copy 
             incomingNetworkDataModel = new Dictionary<DMSType, Container>(NetworkDataModel);
-            logger.LogDebug($"Incoming model [HashCode: 0x{incomingNetworkDataModel.GetHashCode():X16}] is shallow copy of Current model [HashCode: 0x{networkDataModel.GetHashCode():X16}].");
+            Logger.LogDebug($"Incoming model [HashCode: 0x{incomingNetworkDataModel.GetHashCode():X16}] is shallow copy of Current model [HashCode: 0x{networkDataModel.GetHashCode():X16}].");
 
             try
             {
-                logger.LogInfo("Applying delta to network model.");
+                Logger.LogInfo("Applying delta to network model.");
 
                 Dictionary<short, int> typesCounters = GetCounters();
                 Dictionary<long, long> globalIdPairs = new Dictionary<long, long>();
@@ -456,10 +461,10 @@ namespace Outage.NetworkModelService
                 }
 
                 oldNetworkDataModel = networkDataModel;
-                logger.LogDebug($"Old model [HashCode: 0x{networkDataModel.GetHashCode():X16}] becomes Current model [HashCode: 0x{incomingNetworkDataModel.GetHashCode():X16}].");
+                Logger.LogDebug($"Old model [HashCode: 0x{networkDataModel.GetHashCode():X16}] becomes Current model [HashCode: 0x{incomingNetworkDataModel.GetHashCode():X16}].");
 
                 networkDataModel = incomingNetworkDataModel;
-                logger.LogDebug($"Current model [HashCode: 0x{networkDataModel.GetHashCode():X16}] becomes Incoming model [HashCode: 0x{incomingNetworkDataModel.GetHashCode():X16}].");
+                Logger.LogDebug($"Current model [HashCode: 0x{networkDataModel.GetHashCode():X16}] becomes Incoming model [HashCode: 0x{incomingNetworkDataModel.GetHashCode():X16}].");
                 
                 if(isInitialization)
                 {
@@ -473,7 +478,7 @@ namespace Outage.NetworkModelService
             catch (Exception ex)
             {
                 string message = string.Format("Applying delta to network model failed. {0}.", ex.Message);
-                logger.LogError(message, ex);
+                Logger.LogError(message, ex);
 
                 updateResult.Result = ResultType.Failed;
                 updateResult.Message = message;
@@ -489,7 +494,7 @@ namespace Outage.NetworkModelService
                 if (updateResult.Result == ResultType.Succeeded)
                 {
                     string message = "Applying delta to network model successfully finished.";
-                    logger.LogInfo(message);
+                    Logger.LogInfo(message);
                     updateResult.Message = message;
                 }
             }
@@ -503,13 +508,13 @@ namespace Outage.NetworkModelService
             {
                 if (transactionCoordinatorProxy == null)
                 {
-                    logger.LogWarn("TransactionCoordinatorProxy is not initialized. This can be due to TransactionCoordinator not being stared.");
+                    Logger.LogWarn("TransactionCoordinatorProxy is not initialized. This can be due to TransactionCoordinator not being stared.");
                     Commit(false);
                     return;
                 }
                 
                 transactionCoordinatorProxy.StartDistributedUpdate();
-                logger.LogDebug("StartDistributedUpdate() invoked on Transaction Coordinator.");
+                Logger.LogDebug("StartDistributedUpdate() invoked on Transaction Coordinator.");
             }
 
             Dictionary<DeltaOpType, List<long>> modelChanges = new Dictionary<DeltaOpType, List<long>>()
@@ -541,12 +546,12 @@ namespace Outage.NetworkModelService
                 if (scadaModelUpdateNotifierProxy != null)
                 {
                     success = scadaModelUpdateNotifierProxy.NotifyAboutUpdate(modelChanges);
-                    logger.LogDebug("NotifyAboutUpdate() method invoked on SCADA Transaction actor.");
+                    Logger.LogDebug("NotifyAboutUpdate() method invoked on SCADA Transaction actor.");
                 }
                 else
                 {
                     string message = "ModelUpdateNotificationProxy for SCADA is null.";
-                    logger.LogWarn(message);
+                    Logger.LogWarn(message);
                     throw new NullReferenceException(message);
                 }
             }
@@ -558,12 +563,12 @@ namespace Outage.NetworkModelService
                     if (calculationEngineModelUpdateNotifierProxy != null)
                     {
                         success = calculationEngineModelUpdateNotifierProxy.NotifyAboutUpdate(modelChanges);
-                        logger.LogDebug("NotifyAboutUpdate() method invoked on CE Transaction actor.");
+                        Logger.LogDebug("NotifyAboutUpdate() method invoked on CE Transaction actor.");
                     }
                     else
                     {
                         string message = "ModelUpdateNotificationProxy for CalculationEngine is null.";
-                        logger.LogWarn(message);
+                        Logger.LogWarn(message);
                         throw new NullReferenceException(message);
                     }
                 }
@@ -575,12 +580,12 @@ namespace Outage.NetworkModelService
                         if (transactionEnlistmentProxy != null)
                         {
                             success = transactionEnlistmentProxy.Enlist(ServiceNames.NetworkModelService);
-                            logger.LogDebug("Enlist() method invoked on Transaction Coordinator.");
+                            Logger.LogDebug("Enlist() method invoked on Transaction Coordinator.");
                         }
                         else
                         {
                             string message = "TransactionEnlistmentProxy is null.";
-                            logger.LogWarn(message);
+                            Logger.LogWarn(message);
                             throw new NullReferenceException(message);
                         }
                     }
@@ -592,12 +597,12 @@ namespace Outage.NetworkModelService
                 if (transactionCoordinatorProxy != null)
                 {
                     transactionCoordinatorProxy.FinishDistributedUpdate(success);
-                    logger.LogDebug($"FinishDistributedUpdate() invoked on Transaction Coordinator with parameter 'success' value: {success}.");
+                    Logger.LogDebug($"FinishDistributedUpdate() invoked on Transaction Coordinator with parameter 'success' value: {success}.");
                 }
                 else
                 {
                     string message = "TransactionCoordinatorProxy is null.";
-                    logger.LogWarn(message);
+                    Logger.LogWarn(message);
                     throw new NullReferenceException(message);
                 }
             }
@@ -623,7 +628,7 @@ namespace Outage.NetworkModelService
 
             currentDelta = null;
             oldNetworkDataModel = null;
-            logger.LogDebug($"Current model [HashCode: 0x{incomingNetworkDataModel.GetHashCode():X16}] commited. Old model is set to null.");
+            Logger.LogDebug($"Current model [HashCode: 0x{incomingNetworkDataModel.GetHashCode():X16}] commited. Old model is set to null.");
             return true;
         }
 
@@ -631,7 +636,7 @@ namespace Outage.NetworkModelService
         {
             currentDelta = null;
             networkDataModel = oldNetworkDataModel;
-            logger.LogDebug($"Current model [HashCode: 0x{networkDataModel.GetHashCode():X16}] rollbacked to Old model [HashCode: 0x{oldNetworkDataModel.GetHashCode():X16}].");
+            Logger.LogDebug($"Current model [HashCode: 0x{networkDataModel.GetHashCode():X16}] rollbacked to Old model [HashCode: 0x{oldNetworkDataModel.GetHashCode():X16}].");
             return true;
         }
         #endregion
@@ -645,18 +650,18 @@ namespace Outage.NetworkModelService
         {
             if (rd == null)
             {
-                logger.LogInfo("Insert entity is not done because update operation is empty.");
+                Logger.LogInfo("Insert entity is not done because update operation is empty.");
                 return;
             }
 
             long globalId = rd.Id;
-            logger.LogInfo($"Inserting entity with GID: 0x{globalId:X16}");
+            Logger.LogInfo($"Inserting entity with GID: 0x{globalId:X16}");
 
             // check if mapping for specified global id already exists			
             if (this.EntityExistsInIncomingData(globalId))
             {
                 string message = String.Format("Failed to insert entity because entity with specified GID: 0x{0:X16} already exists in network model.", globalId);
-                logger.LogError(message);
+                Logger.LogError(message);
                 throw new Exception(message);
             }
 
@@ -689,7 +694,7 @@ namespace Outage.NetworkModelService
                 {
                     incomingContainer = new Container();
                     incomingNetworkDataModel.Add(type, incomingContainer);
-                    logger.LogDebug($"Container [{type}, HashCode: 0x{incomingContainer.GetHashCode():X16}] created and added to Incoming model.");
+                    Logger.LogDebug($"Container [{type}, HashCode: 0x{incomingContainer.GetHashCode():X16}] created and added to Incoming model.");
 
                 }
 
@@ -757,12 +762,12 @@ namespace Outage.NetworkModelService
                     }
                 }
 
-                logger.LogInfo($"Inserting entity with GID: 0x{globalId:X16} successfully finished.");
+                Logger.LogInfo($"Inserting entity with GID: 0x{globalId:X16} successfully finished.");
             }
             catch (Exception ex)
             {
                 string message = String.Format("Failed to insert entity (GID: 0x{0:X16}) into model. {1}", rd.Id, ex.Message);
-                logger.LogError(message, ex);
+                Logger.LogError(message, ex);
                 throw new Exception(message);
             }
         }
@@ -775,19 +780,19 @@ namespace Outage.NetworkModelService
         {
             if (rd == null || rd.Properties == null && rd.Properties.Count == 0)
             {
-                logger.LogInfo("Update entity is not done because update operation is empty.");
+                Logger.LogInfo("Update entity is not done because update operation is empty.");
                 return;
             }
 
             try
             {
                 long globalId = rd.Id;
-                logger.LogInfo($"Updating entity with GID: 0x{globalId:X16}.");
+                Logger.LogInfo($"Updating entity with GID: 0x{globalId:X16}.");
 
                 if (!this.EntityExistsInIncomingData(globalId))
                 {
                     string message = String.Format("Failed to update entity because entity with specified GID: 0x{0:X16} does not exist in network model.", globalId);
-                    logger.LogError(message);
+                    Logger.LogError(message);
                     throw new Exception(message);
                 }
 
@@ -911,12 +916,12 @@ namespace Outage.NetworkModelService
                     }
                 }
 
-                logger.LogInfo($"Updating entity with GID: 0x{globalId:X16} successfully finished.");
+                Logger.LogInfo($"Updating entity with GID: 0x{globalId:X16} successfully finished.");
             }
             catch (Exception ex)
             {
                 string message = String.Format("Failed to update entity (GID: 0x{0:X16}) in model. {1} ", rd.Id, ex.Message);
-                logger.LogError(message, ex);
+                Logger.LogError(message, ex);
                 throw new Exception(message);
             }
         }
@@ -929,20 +934,20 @@ namespace Outage.NetworkModelService
         {
             if (rd == null)
             {
-                logger.LogInfo("Delete entity is not done because update operation is empty.");
+                Logger.LogInfo("Delete entity is not done because update operation is empty.");
                 return;
             }
 
             try
             {
                 long globalId = rd.Id;
-                logger.LogInfo($"Deleting entity with GID: 0x{globalId:X16}");
+                Logger.LogInfo($"Deleting entity with GID: 0x{globalId:X16}");
 
                 // check if entity exists
                 if (!this.EntityExistsInIncomingData(globalId))
                 {
                     string message = String.Format("Failed to delete entity because entity with specified GID: 0x{0:X16} does not exist in network model.", globalId);
-                    logger.LogError(message);
+                    Logger.LogError(message);
                     throw new Exception(message);
                 }
 
@@ -991,7 +996,7 @@ namespace Outage.NetworkModelService
                     }
 
                     string message = String.Format("Failed to delete entity (GID: 0x{0:X16}) because it is referenced by entities with GIDs: {1}.", globalId, sb.ToString());
-                    logger.LogError(message);
+                    Logger.LogError(message);
                     throw new Exception(message);
                 }
 
@@ -1051,12 +1056,12 @@ namespace Outage.NetworkModelService
 
                 // remove entity form netowrk model
                 incomingContainer.RemoveEntity(globalId);
-                logger.LogInfo($"Deleting entity with GID: 0x{globalId:X16} successfully finished.");
+                Logger.LogInfo($"Deleting entity with GID: 0x{globalId:X16} successfully finished.");
             }
             catch (Exception ex)
             {
                 string message = String.Format("Failed to delete entity (GID: 0x{0:X16}) from model. {1}", rd.Id, ex.Message);
-                logger.LogError(message, ex);
+                Logger.LogError(message, ex);
                 throw new Exception(message);
             }
         }
@@ -1125,7 +1130,7 @@ namespace Outage.NetworkModelService
         {
             Container incomingContainer = currentContainer.Clone();
             incomingNetworkDataModel[type] = incomingContainer;
-            logger.LogDebug($"Incoming model Container [{type}, HashCode: 0x{incomingContainer.GetHashCode():X16}] is shallow copy of Current model Container [HashCode: 0x{currentContainer.GetHashCode():X16}].");
+            Logger.LogDebug($"Incoming model Container [{type}, HashCode: 0x{incomingContainer.GetHashCode():X16}] is shallow copy of Current model Container [HashCode: 0x{currentContainer.GetHashCode():X16}].");
             return incomingContainer;
         }
 
@@ -1133,7 +1138,7 @@ namespace Outage.NetworkModelService
         {
             IdentifiedObject incomingEntity = currentEntity.Clone();
             incomingContainer.Entities[globalId] = incomingEntity;
-            logger.LogDebug($"Incoming model Entity [0x{globalId:X16}, HashCode: 0x{incomingEntity.GetHashCode():X16}] is shallow copy of Current model Entity [HashCode: 0x{currentEntity.GetHashCode():X16}].");
+            Logger.LogDebug($"Incoming model Entity [0x{globalId:X16}, HashCode: 0x{incomingEntity.GetHashCode():X16}] is shallow copy of Current model Entity [HashCode: 0x{currentEntity.GetHashCode():X16}].");
             return incomingEntity;
         }
 
@@ -1147,7 +1152,7 @@ namespace Outage.NetworkModelService
 
             if (deltaVersion > networkModelVersion)
             {
-                logger.LogDebug("Delta version is higher then network model version.");
+                Logger.LogDebug("Delta version is higher then network model version.");
                 List<Delta> result = ReadAllDeltas(deltaVersion, networkModelVersion);
 
                 var networkModelFilter = Builders<NetworkDataModelDocument>.Filter.Eq("_id", networkModelVersion);
@@ -1164,7 +1169,7 @@ namespace Outage.NetworkModelService
                     }
                     catch (Exception ex)
                     {
-                        logger.LogError($"Error while applying delta (id: {delta.Id}) durning service initialization. {ex.Message}", ex);
+                        Logger.LogError($"Error while applying delta (id: {delta.Id}) durning service initialization. {ex.Message}", ex);
                     }
                 }
             }
@@ -1239,7 +1244,7 @@ namespace Outage.NetworkModelService
             }
             catch (Exception e)
             {
-                logger.LogError($"Error on database: {e.Message}.", e);
+                Logger.LogError($"Error on database: {e.Message}.", e);
             }
 
         }

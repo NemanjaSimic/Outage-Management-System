@@ -8,7 +8,12 @@ namespace Outage.SCADA.SCADAData.Repository
 {
     public class SCADAModelPointItem : ISCADAModelPointItem //, ICloneable
     {
-        private ILogger logger = LoggerWrapper.Instance;
+        private ILogger logger;
+
+        protected ILogger Logger
+        {
+            get { return logger ?? (logger = LoggerWrapper.Instance); }
+        }
 
         public long Gid { get; set; }
         public PointType RegistarType { get; set; }
@@ -69,7 +74,7 @@ namespace Outage.SCADA.SCADAData.Repository
                         else
                         {
                             string message = "SCADAModelPointItem constructor => Address is either not defined or is invalid.";
-                            logger.LogError(message);
+                            Logger.LogError(message);
                             throw new ArgumentException(message);
                         }
                         break;
@@ -86,7 +91,7 @@ namespace Outage.SCADA.SCADAData.Repository
                         else
                         {
                             string message = "SCADAModelPointItem constructor => ModelCode type is neither ANALOG nor DISCRETE.";
-                            logger.LogError(message);
+                            Logger.LogError(message);
                             throw new ArgumentException(message);
                         }
                         break;

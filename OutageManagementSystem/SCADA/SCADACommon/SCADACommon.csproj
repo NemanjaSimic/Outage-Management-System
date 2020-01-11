@@ -53,8 +53,6 @@
     <Compile Include="IModBusFunction.cs" />
     <Compile Include="ISCADAModelPointItem.cs" />
     <Compile Include="Properties\AssemblyInfo.cs" />
-    <Compile Include="PubSub\SCADAMessage.cs" />
-    <Compile Include="PubSub\SCADAPublication.cs" />
   </ItemGroup>
   <ItemGroup>
     <ProjectReference Include="..\..\Common\Common.csproj">

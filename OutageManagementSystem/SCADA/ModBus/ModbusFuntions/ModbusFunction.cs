@@ -10,7 +10,7 @@ namespace Outage.SCADA.ModBus.ModbusFuntions
 {
     public abstract class ModbusFunction : IModBusFunction
     {
-        protected ILogger logger = LoggerWrapper.Instance;
+        protected ILogger Logger = LoggerWrapper.Instance;
 
         public ModbusCommandParameters CommandParameters { get; protected set; }
 

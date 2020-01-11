@@ -40,16 +40,16 @@ namespace Outage.SCADA.SCADAService.DistributedTransaction
                     else
                     {
                         string message = "TransactionEnlistmentProxy is null.";
-                        logger.LogWarn(message);
+                        Logger.LogWarn(message);
                         throw new NullReferenceException(message);
                     }
                 }
 
-                logger.LogInfo("SCADA SUCCESSFULLY notified about network model update.");
+                Logger.LogInfo("SCADA SUCCESSFULLY notified about network model update.");
             }
             else
             {
-                logger.LogInfo("SCADA UNSUCCESSFULLY notified about network model update.");
+                Logger.LogInfo("SCADA UNSUCCESSFULLY notified about network model update.");
             }
 
             return success;

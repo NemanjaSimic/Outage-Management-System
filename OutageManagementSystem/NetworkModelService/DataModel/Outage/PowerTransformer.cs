@@ -130,7 +130,7 @@ namespace Outage.DataModel
                     else
                     {
                         string message = $"Entity (GID: 0x{this.GlobalId:X16}) doesn't contain reference 0x{globalId:X16}.";
-                        logger.LogWarn(message);
+                        Logger.LogWarn(message);
                     }
 
                     break;

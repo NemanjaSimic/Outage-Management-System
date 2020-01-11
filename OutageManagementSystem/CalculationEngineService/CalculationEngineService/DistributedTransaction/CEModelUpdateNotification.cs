@@ -30,14 +30,14 @@ namespace CalculationEngineService.DistributedTransaction
                 else
                 {
                     string message = "TransactionEnlistmentProxy is null.";
-                    logger.LogWarn(message);
+                    Logger.LogWarn(message);
                     //TODO: retry logic?
                     throw new NullReferenceException(message);
                 }
             }
 
                 
-            logger.LogInfo("Calculation Engine SUCCESSFULLY notified about network model update.");
+            Logger.LogInfo("Calculation Engine SUCCESSFULLY notified about network model update.");
             return true;
         }
     }

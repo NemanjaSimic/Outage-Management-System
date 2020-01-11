@@ -12,20 +12,25 @@ namespace Outage.SCADA.ModBus.Acquisitor
 {
     public class Acquisition
     {
-        private ILogger logger = LoggerWrapper.Instance;
-        private ISCADAConfigData scadaConfig;
+        private ILogger logger;
+
+        protected ILogger Logger
+        {
+            get { return logger ?? (logger = LoggerWrapper.Instance); }
+        }
 
         private bool threadActiveSignal = true;
-        private Thread acquisitionWorker;
+        private Thread acquisitionThread;
 
-        private FunctionExecutor commandExecutor;
+        private ISCADAConfigData scadaConfig;
+        private FunctionExecutor functionExecutor;
 
         public SCADAModel SCADAModel { get; protected set; }
 
         public Acquisition()
         {
             this.scadaConfig = SCADAConfigData.Instance;
-            this.commandExecutor = FunctionExecutor.Instance;
+            this.functionExecutor = FunctionExecutor.Instance;
             SCADAModel = SCADAModel.Instance;
 
             this.InitializeAcquisitionThread();
@@ -33,41 +38,41 @@ namespace Outage.SCADA.ModBus.Acquisitor
 
         private void InitializeAcquisitionThread()
         {
-            this.acquisitionWorker = new Thread(Acquire)
+            this.acquisitionThread = new Thread(AcquisitionThread)
             {
-                Name = "Acquisition thread"
+                Name = "AcquisitionThread"
             };
 
-            logger.LogDebug("InitializeAcquisitionThread is initialized.");
+            Logger.LogDebug("InitializeAcquisitionThread is initialized.");
         }
 
         public void StartAcquisitionThread()
         {
             threadActiveSignal = true;
-            logger.LogDebug("threadActiveSignal is set on true.");
-            acquisitionWorker.Start();
+            Logger.LogDebug("threadActiveSignal is set on true.");
+            acquisitionThread.Start();
         }
 
         public void StopAcquisitionThread()
         {
             threadActiveSignal = false;
-            logger.LogDebug("threadActiveSignal is set on false.");
+            Logger.LogDebug("threadActiveSignal is set on false.");
         }
 
-        private void Acquire()
+        private void AcquisitionThread()
         {
             ushort quantity = 1;
             ushort length = 6;
 
             try
             {
-                logger.LogInfo("Acquisition thread is started.");
+                Logger.LogInfo("AcquisitionThread is started.");
 
                 while (threadActiveSignal)
                 {
                     Thread.Sleep(scadaConfig.Interval);
 
-                    if (commandExecutor.ModbusClient.Connected)
+                    if (functionExecutor.ModbusClient.Connected)
                     {
                         foreach (ISCADAModelPointItem pointItem in SCADAModel.CurrentScadaModel.Values)
                         {
@@ -117,23 +122,23 @@ namespace Outage.SCADA.ModBus.Acquisitor
 
                             if (modbusFunction != null)
                             {
-                                this.commandExecutor.EnqueueCommand(modbusFunction);
-                                logger.LogDebug($"Modbus function enquided. Point type is {pointItem.RegistarType}");
+                                this.functionExecutor.EnqueueCommand(modbusFunction);
+                                Logger.LogDebug($"Modbus function enquided. Point type is {pointItem.RegistarType}");
                             }
 
                             //TOOD: PODESAVANJE ALARMA
                             //pointItem.SetAlarms();
-                            //logger.LogInfo("Alarm for item " + pointItem.Gid + " is set to " + pointItem.Alarm.ToString());
+                            //Logger.LogInfo("Alarm for item " + pointItem.Gid + " is set to " + pointItem.Alarm.ToString());
                         }
                     }
-
-                    logger.LogInfo("Acquisition thread is stopped.");
                 }
+
+                Logger.LogInfo("AcquisitionThread is stopped.");
             }
             catch (Exception e)
             {
-                Console.WriteLine(e.Message);
-                logger.LogError($"{e.Message}", e);
+                string message = "Exception caught in AcquisitionThread.";
+                Logger.LogError(message, e);
             }
         }
     }

@@ -7,7 +7,7 @@ namespace PubSubEngine
 {
     public class Publications
     {
-        private static ILogger logger = LoggerWrapper.Instance;
+        private static ILogger Logger = LoggerWrapper.Instance;
         private ConcurrentDictionary<Topic, List<ISubscriberCallback>> subscribedClients;
         private static Publications instance;
 
@@ -35,7 +35,7 @@ namespace PubSubEngine
             if (success)
             {
                 list.Add(subscriber);
-                logger.LogDebug($"Subscriber [{subscriber.SubscriberName}] added to subscribed clients map. [Key Topic: {topic}]");
+                Logger.LogDebug($"Subscriber [{subscriber.SubscriberName}] added to subscribed clients map. [Key Topic: {topic}]");
             }
             else
             {
@@ -48,11 +48,11 @@ namespace PubSubEngine
 
                 if(success)
                 {
-                    logger.LogDebug($"Subscriber [{subscriber.SubscriberName}] added to subscribed clients map. [Key Topic: {topic}]");
+                    Logger.LogDebug($"Subscriber [{subscriber.SubscriberName}] added to subscribed clients map. [Key Topic: {topic}]");
                 }
                 else
                 {
-                    logger.LogWarn($"Try to add Subscriber [{subscriber.SubscriberName}] to subscribed clients map FAILED. [Key Topic: {topic}]");
+                    Logger.LogWarn($"Try to add Subscriber [{subscriber.SubscriberName}] to subscribed clients map FAILED. [Key Topic: {topic}]");
                 }
             }
 
@@ -66,7 +66,7 @@ namespace PubSubEngine
                 if (item.Value.Contains(subscriber))
                 {
                     item.Value.Remove(subscriber);
-                    logger.LogInfo($"Subscriber [{subscriber.SubscriberName}] removed from subscribed clients map. [Key Topic: {item.Key}]");
+                    Logger.LogInfo($"Subscriber [{subscriber.SubscriberName}] removed from subscribed clients map. [Key Topic: {item.Key}]");
                 }
             }
         }
@@ -77,11 +77,11 @@ namespace PubSubEngine
             
             if(success)
             {
-                logger.LogDebug($"Try to get List of subscribers is SUCCESSFUL. Topic ['{topic}']");
+                Logger.LogDebug($"Try to get List of subscribers is SUCCESSFUL. Topic ['{topic}']");
             }
             else
             {
-                logger.LogError($"Try to get List of subscribers FAILED. Topic ['{topic}']");
+                Logger.LogError($"Try to get List of subscribers FAILED. Topic ['{topic}']");
             }
             
             return listOfSubscribers;

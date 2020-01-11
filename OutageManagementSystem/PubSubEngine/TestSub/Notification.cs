@@ -3,6 +3,7 @@ using System.Runtime.Serialization;
 using System.ServiceModel;
 using Outage.Common.PubSub;
 using Outage.Common.ServiceContracts.PubSub;
+using Outage.Common.PubSub.SCADADataContract;
 
 namespace TestSub
 {
@@ -22,11 +23,22 @@ namespace TestSub
 		{
 			Console.WriteLine("Message from PubSub: " + msg);
 			
-			if(msg is IMultipleAnalogValueSCADAMessage scadaMsg)
+			if(msg is MultipleAnalogValueSCADAMessage multipleAnalogValue)
 			{
-				throw new Exception();
-				//Console.WriteLine($"Gid: {scadaMsg.Gid}, Value: {scadaMsg.Value}");
+                foreach(long gid in multipleAnalogValue.Data.Keys)
+                {
+                    int currentValue = multipleAnalogValue.Data[gid];
+                    Console.WriteLine($"Analog => Gid: {gid}, Value: {currentValue}");
+                }
 			}
+            else if(msg is MultipleDiscreteValueSCADAMessage multipleDiscreteValue)
+            {
+                foreach (long gid in multipleDiscreteValue.Data.Keys)
+                {
+                    bool currentValue = multipleDiscreteValue.Data[gid];
+                    Console.WriteLine($"Discrete => Gid: {gid}, Value: {currentValue}");
+                }
+            }
 		}
 	}
 }

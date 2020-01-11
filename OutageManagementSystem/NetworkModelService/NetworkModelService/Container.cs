@@ -12,7 +12,7 @@ namespace Outage.NetworkModelService
 {
     public class Container //: ICloneable
     {
-        ILogger logger = LoggerWrapper.Instance;
+        ILogger Logger = LoggerWrapper.Instance;
 
         /// <summary>
         /// The dictionary of entities. Key = GlobaId, Value = Entity
@@ -194,7 +194,7 @@ namespace Outage.NetworkModelService
                 default:
                     {
                         string message = String.Format("Failed to create entity because specified type ({0}) is not supported.", type);
-                        logger.LogError(message);
+                        Logger.LogError(message);
                         throw new Exception(message);
                     }
             }
@@ -229,7 +229,7 @@ namespace Outage.NetworkModelService
             else
             {
                 string message = String.Format("Failed to retrieve entity (GID: 0x{0:X16}) because entity doesn't exist.", globalId);
-                logger.LogError(message);
+                Logger.LogError(message);
                 throw new Exception(message);
             }
         }
@@ -249,7 +249,7 @@ namespace Outage.NetworkModelService
             {
 
                 string message = String.Format("Entity (GID: 0x{0:X16}) already exists.", io.GlobalId);
-                logger.LogError(message);
+                Logger.LogError(message);
 
                 throw new Exception(message);
             }
@@ -270,7 +270,7 @@ namespace Outage.NetworkModelService
             else
             {
                 string message = String.Format("Failed to remove entity because entity with GID: 0x{0:X16} doesn't exist at the specified position ( 0x{0:X16} ).", globalId);
-                logger.LogError(message);
+                Logger.LogError(message);
                 throw new Exception(message);
             }
 

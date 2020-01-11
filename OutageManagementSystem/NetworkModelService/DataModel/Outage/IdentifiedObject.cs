@@ -20,7 +20,7 @@ namespace Outage.DataModel
 
 	public class IdentifiedObject //: ICloneable
 	{
-		protected ILogger logger = LoggerWrapper.Instance;
+		protected ILogger Logger = LoggerWrapper.Instance;
 
 		/// <summary>
 		/// Model Resources Description
@@ -198,7 +198,7 @@ namespace Outage.DataModel
 			
 				default:
 					string message = string.Format("Unknown property id: {0} for entity (GID: 0x{1:X16}).", property.Id.ToString(), this.GlobalId);
-					logger.LogError(message);
+					Logger.LogError(message);
 					throw new Exception(message);										
 			}
 		}
@@ -221,7 +221,7 @@ namespace Outage.DataModel
 
 				default:					
 					string message = string.Format("Unknown property id: {0} for entity (GID: 0x{1:X16}).", property.Id.ToString(), this.GlobalId);
-					logger.LogError(message);
+					Logger.LogError(message);
 					throw new Exception(message);					
 			}
 		}
@@ -246,14 +246,14 @@ namespace Outage.DataModel
 		public virtual void AddReference(ModelCode referenceId, long globalId)
 		{
 			string message = string.Format("Can not add reference {0} to entity (GID: 0x{1:X16}).", referenceId, this.GlobalId);
-			logger.LogError(message);
+			Logger.LogError(message);
 			throw new Exception(message);						
 		}
 
 		public virtual void RemoveReference(ModelCode referenceId, long globalId)
 		{
 			string message = string.Format("Can not remove reference {0} from entity (GID: 0x{1:X16}).", referenceId, this.GlobalId);
-			logger.LogError(message);
+			Logger.LogError(message);
 			throw new ModelException(message);		
 		}
 

@@ -9,7 +9,12 @@ namespace Outage.DataImporter.CIMAdapter.Importer
 {
     public class OutageImporter
     {
-        private ILogger logger = LoggerWrapper.Instance;
+        private ILogger logger;
+
+        protected ILogger Logger
+        {
+            get { return logger ?? (logger = LoggerWrapper.Instance); }
+        }
 
         private static OutageImporter outageImporter = null;
         private static object singletoneLock = new object();
@@ -103,7 +108,7 @@ namespace Outage.DataImporter.CIMAdapter.Importer
 
         public TransformAndLoadReport CreateNMSDelta(ConcreteModel cimConcreteModel, NetworkModelGDAProxy gdaQueryProxy, ModelResourcesDesc resourcesDesc)
         {
-            logger.LogInfo("Importing Outage Elements...");
+            Logger.LogInfo("Importing Outage Elements...");
             report = new TransformAndLoadReport();
             concreteModel = cimConcreteModel;
             delta.ClearDeltaOperations();
@@ -123,20 +128,20 @@ namespace Outage.DataImporter.CIMAdapter.Importer
                 {
                     string message = $"{DateTime.Now} - ERROR in data import - {ex.Message}";
                     //LogManager.Log(message);
-                    logger.LogError(message, ex);
+                    Logger.LogError(message, ex);
                     report.Report.AppendLine(ex.Message);
                     report.Success = false;
                 }
             }
             //LogManager.Log("Importing Outage Elements - END", LogLevel.Info);
-            logger.LogInfo("Importing Outage Elements - END");
+            Logger.LogInfo("Importing Outage Elements - END");
             return report;
         }
 
         private void ConvertModelAndPopulateDelta(NetworkModelGDAProxy gdaQueryProxy, ModelResourcesDesc resourcesDesc)
         {
             //LogManager.Log("Loading elements and creating delta...", LogLevel.Info);
-            logger.LogInfo("Loading elements and creating delta...");
+            Logger.LogInfo("Loading elements and creating delta...");
 
             PopulateNmsDataFromServer(gdaQueryProxy, resourcesDesc);
 
@@ -159,14 +164,14 @@ namespace Outage.DataImporter.CIMAdapter.Importer
             CorrectNegativeReferences();
             CreateAndInsertDeleteOperations();
             //LogManager.Log("Loading elements and creating delta completed.", LogLevel.Info);
-            logger.LogInfo("Loading elements and creating delta completed.");
+            Logger.LogInfo("Loading elements and creating delta completed.");
         }
 
         private bool PopulateNmsDataFromServer(NetworkModelGDAProxy gdaQueryProxy, ModelResourcesDesc resourcesDesc)
         {
             bool success = false;
             string message = "Getting nms data from server started.";
-            logger.LogInfo(message);
+            Logger.LogInfo(message);
 
             HashSet<ModelCode> requiredEntityTypes = new HashSet<ModelCode>();
 
@@ -226,13 +231,13 @@ namespace Outage.DataImporter.CIMAdapter.Importer
                     gdaQueryProxy.IteratorClose(iteratorId);
 
                     message = "Getting nms data from server successfully finished.";
-                    logger.LogInfo(message);
+                    Logger.LogInfo(message);
                     success = true;
                 }
                 catch (Exception e)
                 {
                     message = string.Format("Getting extent values method failed for {0}.\n\t{1}", modelCodeType, e.Message);
-                    logger.LogError(message);
+                    Logger.LogError(message);
                     success = false;
                 }
             }

@@ -11,9 +11,14 @@ namespace TelventDMS.Services.NetworkModelService.TestClient.TestsUI
 {
     public class TestGda : IDisposable
 	{
-		private ILogger logger = LoggerWrapper.Instance;
+		private ILogger logger;
 
-		private ModelResourcesDesc modelResourcesDesc = new ModelResourcesDesc();
+        protected ILogger Logger
+        {
+            get { return logger ?? (logger = LoggerWrapper.Instance); }
+        }
+
+        private ModelResourcesDesc modelResourcesDesc = new ModelResourcesDesc();
 
 
         #region Proxies
@@ -41,13 +46,13 @@ namespace TelventDMS.Services.NetworkModelService.TestClient.TestsUI
 				    catch (Exception ex)
 				    {
 					    string message = $"Exception on NetworkModelGDAProxy initialization. Message: {ex.Message}";
-					    logger.LogError(message, ex);
+					    Logger.LogError(message, ex);
 					    gdaQueryProxy = null;
 				    }
 				    finally
                     {
                         numberOfTries++;
-                        logger.LogDebug($"TestGda: GdaQueryProxy getter, try number: {numberOfTries}.");
+                        Logger.LogDebug($"TestGda: GdaQueryProxy getter, try number: {numberOfTries}.");
                         Thread.Sleep(500);
                     }
                 }
@@ -66,7 +71,7 @@ namespace TelventDMS.Services.NetworkModelService.TestClient.TestsUI
 		public ResourceDescription GetValues(long globalId, List<ModelCode> properties)
 		{
 			string message = "Getting values method started.";
-            logger.LogInfo(message);
+            Logger.LogInfo(message);
 
 			ResourceDescription rd = null;
 						
@@ -78,12 +83,12 @@ namespace TelventDMS.Services.NetworkModelService.TestClient.TestsUI
 					{
 						rd = gdaQueryProxy.GetValues(globalId, properties);
 						message = "Getting values method successfully finished.";
-						logger.LogInfo(message);
+						Logger.LogInfo(message);
 					}
 					else
 					{
 						string errMsg = "NetworkModelGDAProxy is null.";
-						logger.LogWarn(errMsg);
+						Logger.LogWarn(errMsg);
 						throw new NullReferenceException(errMsg);
 					}
 				}	
@@ -91,7 +96,7 @@ namespace TelventDMS.Services.NetworkModelService.TestClient.TestsUI
 			catch (Exception e)
 			{
 				message = string.Format("Getting values method for entered id = {0} failed.\n\t{1}", globalId, e.Message);
-				logger.LogError(message);
+				Logger.LogError(message);
 			}
 
 			return rd;
@@ -100,7 +105,7 @@ namespace TelventDMS.Services.NetworkModelService.TestClient.TestsUI
 		public List<long> GetExtentValues(ModelCode modelCodeType, List<ModelCode> properties, StringBuilder sb)
 		{
 			string message = "Getting extent values method started.";
-			logger.LogInfo(message);
+			Logger.LogInfo(message);
 
 			int iteratorId;
 			int resourcesLeft;
@@ -161,12 +166,12 @@ namespace TelventDMS.Services.NetworkModelService.TestClient.TestsUI
 						gdaQueryProxy.IteratorClose(iteratorId);
 
 						message = "Getting extent values method successfully finished.";
-						logger.LogInfo(message);
+						Logger.LogInfo(message);
 					}
 					else
 					{
 						string errMsg = "NetworkModelGDAProxy is null.";
-						logger.LogWarn(errMsg);
+						Logger.LogWarn(errMsg);
 						throw new NullReferenceException(errMsg);
 					}
 				}
@@ -174,7 +179,7 @@ namespace TelventDMS.Services.NetworkModelService.TestClient.TestsUI
 			catch (Exception e)
 			{
 				message = string.Format("Getting extent values method failed for {0}.\n\t{1}", modelCodeType, e.Message);
-				logger.LogError(message);
+				Logger.LogError(message);
 			}
 			
 			if(sb != null)
@@ -188,7 +193,7 @@ namespace TelventDMS.Services.NetworkModelService.TestClient.TestsUI
 		public List<long> GetRelatedValues(long sourceGlobalId, List<ModelCode> properties, Association association, StringBuilder sb)
 		{
 			string message = "Getting related values method started.";
-			logger.LogInfo(message);
+			Logger.LogInfo(message);
 
 			int iteratorId = 0;
 			int resourcesLeft = 0;
@@ -248,12 +253,12 @@ namespace TelventDMS.Services.NetworkModelService.TestClient.TestsUI
 						gdaQueryProxy.IteratorClose(iteratorId);
 
 						message = "Getting related values method successfully finished.";
-						logger.LogInfo(message);
+						Logger.LogInfo(message);
 					}
 					else
 					{
 						string errMsg = "NetworkModelGDAProxy is null.";
-						logger.LogWarn(errMsg);
+						Logger.LogWarn(errMsg);
 						throw new NullReferenceException(errMsg);
 					}
 				}		
@@ -261,7 +266,7 @@ namespace TelventDMS.Services.NetworkModelService.TestClient.TestsUI
 			catch (Exception e)
 			{
 				message = string.Format("Getting related values method  failed for sourceGlobalId = {0} and association (propertyId = {1}, type = {2}). Reason: {3}", sourceGlobalId, association.PropertyId, association.Type, e.Message);
-				logger.LogError(message);
+				Logger.LogError(message);
 			}
 
 			if (sb != null)

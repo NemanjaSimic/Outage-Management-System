@@ -26,17 +26,17 @@ namespace CalculationEngineService.DistributedTransaction
             }
             catch (Exception ex)
             {
-                logger.LogError($"Exception catched in Prepare method on CE Transaction actor. Exception: {ex.Message}", ex);
+                Logger.LogError($"Exception caught in Prepare method on CE Transaction actor. Exception: {ex.Message}", ex);
                 success = false;
             }
 
             if (success)
             {
-                logger.LogInfo("Preparation on CE Transaction actor SUCCESSFULLY finished.");
+                Logger.LogInfo("Preparation on CE Transaction actor SUCCESSFULLY finished.");
             }
             else
             {
-                logger.LogInfo("Preparation on CE Transaction actor UNSUCCESSFULLY finished.");
+                Logger.LogInfo("Preparation on CE Transaction actor UNSUCCESSFULLY finished.");
             }
 
             return success;
@@ -47,12 +47,12 @@ namespace CalculationEngineService.DistributedTransaction
             try
             {
                 //topologyModel.Commit();
-                logger.LogInfo("Commit on CE Transaction actor SUCCESSFULLY finished.");
+                Logger.LogInfo("Commit on CE Transaction actor SUCCESSFULLY finished.");
             }
             catch (Exception ex)
             {
-                logger.LogError($"Exception catched in Commit method on CE Transaction actor. Exception: {ex.Message}", ex);
-                logger.LogInfo("Commit on CE Transaction actor UNSUCCESSFULLY finished.");
+                Logger.LogError($"Exception caught in Commit method on CE Transaction actor. Exception: {ex.Message}", ex);
+                Logger.LogInfo("Commit on CE Transaction actor UNSUCCESSFULLY finished.");
             }
         }
 
@@ -61,12 +61,12 @@ namespace CalculationEngineService.DistributedTransaction
             try
             {
                 //topologyModel.Commit();
-                logger.LogInfo("Rollback on CE Transaction actor SUCCESSFULLY finished.");
+                Logger.LogInfo("Rollback on CE Transaction actor SUCCESSFULLY finished.");
             }
             catch (Exception ex)
             {
-                logger.LogError($"Exception catched in Rollback method on CE Transaction actor. Exception: {ex.Message}", ex);
-                logger.LogInfo("Rollback on CE Transaction actor UNSUCCESSFULLY finished.");
+                Logger.LogError($"Exception caught in Rollback method on CE Transaction actor. Exception: {ex.Message}", ex);
+                Logger.LogInfo("Rollback on CE Transaction actor UNSUCCESSFULLY finished.");
             }
         }
     }

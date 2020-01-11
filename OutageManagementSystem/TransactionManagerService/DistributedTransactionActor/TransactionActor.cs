@@ -5,11 +5,11 @@ namespace Outage.DistributedTransactionActor
 {
     public abstract class TransactionActor : ITransactionActorContract
     {
-        protected ILogger logger = LoggerWrapper.Instance;
+        protected ILogger Logger = LoggerWrapper.Instance;
 
         public virtual bool Prepare()
         {
-            logger.LogInfo("Prepare finished SUCCESSFULLY");
+            Logger.LogInfo("Prepare finished SUCCESSFULLY");
             return true;
         }
 

@@ -19,7 +19,12 @@ namespace Outage.DataImporter.CIMAdapter
 {
     public class CIMAdapterClass
     {
-        private ILogger logger = LoggerWrapper.Instance;
+        private ILogger logger;
+
+        protected ILogger Logger
+        {
+            get { return logger ?? (logger = LoggerWrapper.Instance); }
+        }
 
         private ModelResourcesDesc resourcesDesc = new ModelResourcesDesc();
         private TransformAndLoadReport report;
@@ -49,13 +54,13 @@ namespace Outage.DataImporter.CIMAdapter
                     catch (Exception ex)
                     {
                         string message = $"Exception on NetworkModelGDAProxy initialization. Message: {ex.Message}";
-                        logger.LogError(message, ex);
+                        Logger.LogError(message, ex);
                         gdaQueryProxy = null;
                     }
                     finally
                     {
                         numberOfTries++;
-                        logger.LogDebug($"CIMAdapterClass: GdaQueryProxy getter, try number: {numberOfTries}.");
+                        Logger.LogDebug($"CIMAdapterClass: GdaQueryProxy getter, try number: {numberOfTries}.");
                         Thread.Sleep(500);
                     }
                 }
@@ -108,7 +113,7 @@ namespace Outage.DataImporter.CIMAdapter
                     else
                     {
                         string message = "NetworkModelGDAProxy is null.";
-                        logger.LogWarn(message);
+                        Logger.LogWarn(message);
                         throw new NullReferenceException(message);
                     }
                 }
@@ -171,7 +176,7 @@ namespace Outage.DataImporter.CIMAdapter
 
             try
             {
-                logger.LogInfo($"Importing {extractType} data...");
+                Logger.LogInfo($"Importing {extractType} data...");
 
                 switch (extractType)
                 {
@@ -195,7 +200,7 @@ namespace Outage.DataImporter.CIMAdapter
                         }
                     default:
                         {
-                            logger.LogWarn($"Import of {extractType} data is NOT SUPPORTED.");
+                            Logger.LogWarn($"Import of {extractType} data is NOT SUPPORTED.");
                             break;
                         }
                 }
@@ -204,7 +209,7 @@ namespace Outage.DataImporter.CIMAdapter
             }
             catch (Exception ex)
             {
-                logger.LogError("Import unsuccessful.", ex);
+                Logger.LogError("Import unsuccessful.", ex);
                 return false;
             }
         }

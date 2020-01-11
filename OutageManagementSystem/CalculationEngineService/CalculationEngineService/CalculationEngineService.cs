@@ -11,7 +11,12 @@ namespace CalculationEngineService
 {
     public class CalculationEngineService : IDisposable
     {
-        private ILogger logger = LoggerWrapper.Instance;
+        private ILogger logger;
+
+        protected ILogger Logger
+        {
+            get { return logger ?? (logger = LoggerWrapper.Instance); }
+        }
 
         private List<ServiceHost> hosts = null;
 
@@ -47,36 +52,41 @@ namespace CalculationEngineService
                 throw new Exception("Calculation Engine Service hosts can not be opend because they are not initialized.");
             }
 
-            string message = string.Empty;
+            string message;
+            StringBuilder sb = new StringBuilder();
+
             foreach (ServiceHost host in hosts)
             {
                 host.Open();
 
                 message = string.Format("The WCF service {0} is ready.", host.Description.Name);
                 Console.WriteLine(message);
-                logger.LogInfo(message);
+                sb.AppendLine(message);
 
                 message = "Endpoints:";
                 Console.WriteLine(message);
-                logger.LogInfo(message);
+                sb.AppendLine(message);
 
                 foreach (Uri uri in host.BaseAddresses)
                 {
                     Console.WriteLine(uri);
-                    logger.LogInfo(uri.ToString());
+                    sb.AppendLine(uri.ToString());
                 }
 
                 Console.WriteLine("\n");
+                sb.AppendLine();
             }
+
+            Logger.LogInfo(sb.ToString());
 
             message = string.Format("Trace level: LEVEL NOT SPECIFIED!");
             Console.WriteLine(message);
-            logger.LogWarn(message);
+            Logger.LogWarn(message);
 
 
             message = "Calculation Engine is started.";
             Console.WriteLine("\n{0}", message);
-            logger.LogInfo(message);
+            Logger.LogInfo(message);
         }
 
         private void CloseHosts()
@@ -92,7 +102,7 @@ namespace CalculationEngineService
             }
 
             string message = "Calculation Engine Service is gracefully closed.";
-            logger.LogInfo(message);
+            Logger.LogInfo(message);
             Console.WriteLine("\n\n{0}", message);
         }
     }

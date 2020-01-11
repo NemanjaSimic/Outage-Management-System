@@ -100,8 +100,11 @@
   </ItemGroup>
   <ItemGroup>
     <Compile Include="EndpointNames.cs" />
+    <Compile Include="PubSub\CalculationEngineDataContract\CalculationEngineMessage.cs" />
     <Compile Include="PubSub\IPublication.cs" />
-    <Compile Include="PubSub\IPublishableMessage.cs" />
+    <Compile Include="PubSub\Publication.cs" />
+    <Compile Include="PubSub\SCADADataContract\SCADAMessage.cs" />
+    <Compile Include="PubSub\SCADADataContract\SCADAPublication.cs" />
     <Compile Include="ServiceContracts\DistributedTransaction\IModelUpdateNotificationContract.cs" />
     <Compile Include="ServiceContracts\DistributedTransaction\ITransactionEnlistmentContract.cs" />
     <Compile Include="ServiceContracts\ISCADACommand.cs" />

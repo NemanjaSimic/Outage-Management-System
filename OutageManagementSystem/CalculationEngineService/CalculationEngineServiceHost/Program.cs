@@ -12,12 +12,12 @@ namespace CalculationEngineServiceHost
 	{
         static void Main(string[] args)
         {
-            ILogger logger = LoggerWrapper.Instance;
+            ILogger Logger = LoggerWrapper.Instance;
 
             try
             {
                 string message = "Starting Calculation Engine Service...";
-                logger.LogInfo(message);
+                Logger.LogInfo(message);
                 Console.WriteLine("\n{0}\n", message);
 
                 //TopologyConnectivity topologyConnectivity = new TopologyConnectivity();
@@ -45,7 +45,7 @@ namespace CalculationEngineServiceHost
                 Console.WriteLine(ex.Message);
                 Console.WriteLine("Calculation Engine Service failed.");
                 Console.WriteLine(ex.StackTrace);
-                logger.LogError($"Calculation Engine Service failed.{Environment.NewLine}Message: {ex.Message} ", ex);
+                Logger.LogError($"Calculation Engine Service failed.{Environment.NewLine}Message: {ex.Message} ", ex);
                 Console.ReadLine();
             }
         }
