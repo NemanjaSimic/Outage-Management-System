@@ -1,4 +1,4 @@
-﻿using CECommon.Model.UI;
+﻿using Outage.Common.UI;
 using System;
 
 namespace TopologyServiceClientMock

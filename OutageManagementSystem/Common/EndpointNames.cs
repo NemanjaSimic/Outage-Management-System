@@ -13,6 +13,7 @@
         //CE
         public static readonly string CalculationEngineTransactionActorEndpoint = "CalculationEngineTransactionActorEndpoint";
         public static readonly string CalculationEngineModelUpdateNotifierEndpoint = "CalculationEngineModelUpdateNotifierEndpoint";
+        public static readonly string TopologyServiceEndpoint = "TopologyServiceEndpoint";
 
         //SCADA
         public static readonly string SCADATransactionActorEndpoint = "SCADATransactionActorEndpoint";

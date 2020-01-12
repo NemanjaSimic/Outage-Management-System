@@ -1,7 +1,7 @@
 ﻿using System;
 using System.Runtime.Serialization;
 
-namespace CECommon.Model.UI
+namespace Outage.Common.UI
 {
     [Serializable]
     [DataContract]

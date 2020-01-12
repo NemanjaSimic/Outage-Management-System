@@ -1,7 +1,6 @@
 ﻿using CECommon;
 using CECommon.Interfaces;
 using CECommon.Model;
-using CECommon.Model.UI;
 using NetworkModelServiceFunctions;
 using Outage.Common;
 using System;

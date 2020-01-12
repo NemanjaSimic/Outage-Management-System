@@ -1,6 +1,6 @@
-﻿using CECommon.Model.UI;
-using CECommon.ServiceContracts;
-using Outage.Common;
+﻿using Outage.Common;
+using Outage.Common.ServiceContracts;
+using Outage.Common.UI;
 using System;
 
 namespace Topology

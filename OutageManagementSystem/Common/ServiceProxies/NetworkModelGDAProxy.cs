@@ -6,7 +6,7 @@ using Outage.Common.ServiceContracts;
 
 namespace Outage.Common.ServiceProxies
 {
-	public class NetworkModelGDAProxy : ClientBase<INetworkModelGDAContract>, INetworkModelGDAContract, IDisposable
+	public class NetworkModelGDAProxy : ClientBase<INetworkModelGDAContract>, INetworkModelGDAContract
 	{
 		public NetworkModelGDAProxy(string endpointName)
 			: base(endpointName)

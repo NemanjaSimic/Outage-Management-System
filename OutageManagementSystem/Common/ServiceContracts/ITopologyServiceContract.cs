@@ -1,7 +1,7 @@
-﻿using CECommon.Model.UI;
+﻿using Outage.Common.UI;
 using System.ServiceModel;
 
-namespace CECommon.ServiceContracts
+namespace Outage.Common.ServiceContracts
 {
     [ServiceContract]
     public interface ITopologyServiceContract
