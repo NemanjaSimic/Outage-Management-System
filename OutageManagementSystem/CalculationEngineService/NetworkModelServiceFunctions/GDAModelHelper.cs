@@ -1,5 +1,4 @@
-﻿using NetworkModelServiceFunctions;
-using Outage.Common;
+﻿using Outage.Common;
 using Outage.Common.GDA;
 using System.Collections.Generic;
 
@@ -7,37 +6,40 @@ namespace NetworkModelServiceFunctions
 {
 	public class GDAModelHelper
 	{
-
-		private readonly ModelResourcesDesc modelResourcesDesc;
+        #region Fields
+        private readonly ModelResourcesDesc modelResourcesDesc;
 		private readonly NetworkModelGDA networkModelGDA;
 		private Dictionary<long, ResourceDescription> modelEntities;
+        #endregion
 
+        #region Singleton
+        private static object syncObj = new object();
 		private static GDAModelHelper instance;
 
-		public static GDAModelHelper Instance
+        public static GDAModelHelper Instance
 		{
 			get 
 			{
-				if (instance == null)
+				lock (syncObj)
 				{
-					instance = new GDAModelHelper();
+					if (instance == null)
+					{
+						instance = new GDAModelHelper();
+					}
 				}
-
 				return instance;
 			}
 		}
-
-		private GDAModelHelper()
+        #endregion
+        private GDAModelHelper()
 		{
 			modelResourcesDesc = new ModelResourcesDesc();
 			networkModelGDA = new NetworkModelGDA();
 		}
-
-		public List<long> GetAllEnergySousces()
+		public List<long> GetAllEnergySources()
 		{
 			return GetAllGids(ModelCode.ENERGYSOURCE);
 		}
-
 		private List<long> GetAllGids(ModelCode concreteClass)
 		{
 			List<long> gids = new List<long>();
@@ -49,7 +51,6 @@ namespace NetworkModelServiceFunctions
 			}
 			return gids;
 		}
-
 		public Dictionary<long, ResourceDescription> RetrieveAllElements()
 		{
 			List<ModelCode> concreteClasses = modelResourcesDesc.NonAbstractClassIds;
@@ -65,7 +66,6 @@ namespace NetworkModelServiceFunctions
 			}
 			return modelEntities;
 		}
-
 		public List<long> GetAllReferencedElements(long gid)
 		{
 			List<long> elements = new List<long>();
@@ -88,7 +88,6 @@ namespace NetworkModelServiceFunctions
 			}
 			return elements;
 		}
-
 		private List<ModelCode> GetAllReferenceProperties(DMSType type)
 		{
 			List<ModelCode> propertyIds = new List<ModelCode>();

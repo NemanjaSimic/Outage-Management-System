@@ -1,4 +1,5 @@
-﻿using System.Collections.Generic;
+﻿using System;
+using System.Collections.Generic;
 using System.ServiceModel;
 using Outage.Common.GDA;
 using Outage.Common.ServiceContracts;
@@ -57,5 +58,6 @@ namespace Outage.Common.ServiceProxies
 		{
 			return Channel.IteratorRewind(id);
 		}
+
 	}
 }

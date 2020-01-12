@@ -2,10 +2,8 @@
 using Outage.Common;
 using System;
 using System.Collections.Generic;
-using System.Linq;
 using System.ServiceModel;
-using System.Text;
-using System.Threading.Tasks;
+using Topology;
 
 namespace CalculationEngineService
 {
@@ -36,7 +34,8 @@ namespace CalculationEngineService
             hosts = new List<ServiceHost>
             {
                 new ServiceHost(typeof(CEModelUpdateNotification)),
-                new ServiceHost(typeof(CETransactionActor))
+                new ServiceHost(typeof(CETransactionActor)),
+                new ServiceHost(typeof(TopologyService))
             };
         }
 

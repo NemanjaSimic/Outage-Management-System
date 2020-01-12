@@ -1,31 +1,31 @@
-﻿using System;
-using System.Collections.Generic;
+﻿using Outage.Common;
+using System;
 using System.IO;
-using System.Linq;
-using System.Text;
-using System.Threading.Tasks;
 
 namespace CECommon.TopologyConfiguration
 {
 	public class Config
 	{
+		ILogger logger = LoggerWrapper.Instance;
+        #region Singleton
+        private static object syncObj = new object();
 		private static Config instance;
-
 		public static Config Instance
 		{
 			get
 			{
-				if (instance == null)
+				lock (syncObj)
 				{
-					instance = new Config();
+					if (instance == null)
+					{
+						instance = new Config();
+					}
 				}
 				return instance;
 			}
 		}
-		private Config()
-		{
-
-		}
+        #endregion
+        private Config(){}
 		public string ReadConfiguration(string path)
 		{
 			string retValue = "";
@@ -37,9 +37,11 @@ namespace CECommon.TopologyConfiguration
 					retValue = sr.ReadToEnd();
 				}
 			}
-			catch (Exception e)
+			catch (Exception ex)
 			{
-				Console.WriteLine(e.Message);
+				string message = $"Failed to read configuration file on path {path}. Exception message: " + ex.Message;
+				logger.LogError(message);
+				throw ex;
 			}
 
 			return retValue;

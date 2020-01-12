@@ -1,12 +1,6 @@
-﻿using System;
-using System.Collections.Generic;
-using System.Linq;
-using System.Text;
-using System.Threading.Tasks;
-
-namespace CECommon
+﻿namespace CECommon
 {
-    public class Node : TopologyElement
+	public class Node : TopologyElement
     {
 		private TopologyElement parent;
 		public TopologyElement Parent { get => parent; set => parent = value; }

@@ -1,6 +1,5 @@
 ﻿using CECommon;
 using CECommon.TopologyConfiguration;
-using NetworkModelServiceFunctions;
 using Outage.Common;
 using System;
 using System.Collections.Generic;
@@ -12,28 +11,32 @@ namespace TopologyElementsFuntions
 		private readonly Dictionary<TopologyStatus, List<DMSType>> elementsStatus;
 		private readonly Dictionary<TopologyType, List<DMSType>> topologyTypes;
 		private readonly ModelResourcesDesc modelResourcesDesc = new ModelResourcesDesc();
-		private static TopologyHelper instance;
 
+        #region Singleton
+        private static object syncObj = new object();
+		private static TopologyHelper instance;
 		public static TopologyHelper Instance
 		{
 			get 
 			{
-				if (instance == null)
+				lock (syncObj)
 				{
-					instance = new TopologyHelper();
+					if (instance == null)
+					{
+						instance = new TopologyHelper();
+					}
 				}
 				return instance; 
 			}
 			
 		}
-
-		private TopologyHelper()
+        #endregion
+        private TopologyHelper()
 		{
 			ConfigurationParse cp = new ConfigurationParse();
 			elementsStatus = cp.GetAllElementStatus();
 			topologyTypes = cp.GetAllTopologyTypes();
 		}
-
 		public TopologyStatus GetElementTopologyStatus(long gid)
 		{
 			TopologyStatus retVal;
@@ -48,7 +51,6 @@ namespace TopologyElementsFuntions
 			}
 			return TopologyStatus.Regular;
 		}
-
 		public TopologyType GetElementTopologyType(long gid)
 		{
 			TopologyType retVal;
@@ -63,20 +65,6 @@ namespace TopologyElementsFuntions
 			}
 			return TopologyType.None;
 		}
-
-		//public List<long> GetAllReferencedElements(long gid)
-		//{
-		//	List<long> elements = new List<long>();
-
-		//	foreach (var resourceDescription in gDAModelHelper.GetAllReferencedElements(gid))
-		//	{
-		//		elements.Add(resourceDescription.Id);
-		//	}
-
-		//	return elements;
-		//}
-
-
 		public string GetDMSTypeOfTopologyElement(long gid)
 		{
 			try

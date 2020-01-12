@@ -2,26 +2,30 @@
 using CECommon.Interfaces;
 using CECommon.Model;
 using NetworkModelServiceFunctions;
+using Outage.Common;
 using System;
 using System.Collections.Generic;
 using System.Linq;
-using System.Text;
-using System.Threading.Tasks;
 using TopologyElementsFuntions;
 
 namespace TopologyBuilder
 {
-    public class GraphBuilder : IGraphBuilder
+    public class GraphBuilder : ITopologyBuilder
     {
+        #region Fields
+        private ILogger logger = LoggerWrapper.Instance;
         private readonly TopologyElementFactory topologyElementFactory = new TopologyElementFactory();
-
         private List<Field> fields = new List<Field>();
         private HashSet<long> visited = new HashSet<long>();
         private Stack<TopologyElement> stack = new Stack<TopologyElement>();
+        #endregion
 
-        public Topology CreateGraphTopology(long firstElementGid)
+        public TopologyModel CreateGraphTopology(long firstElementGid)
         {
-            Topology topology = new Topology();
+            string message = $"Creating graph topology from first element with GID {firstElementGid}.";
+            logger.LogInfo(message);
+
+            TopologyModel topology = new TopologyModel();
             TopologyElement firstNode = topologyElementFactory.CreateTopologyElement(firstElementGid);
            
             stack.Push(firstNode);
@@ -37,17 +41,21 @@ namespace TopologyBuilder
                 var connectedElements = CheckIgnorable(currentNode.Id);
                 foreach (var element in connectedElements)
                 {
-                    var newNode = ConnectTwoNodes(element, currentNode);          
-                    //currentNode.SecondEnd.Add(newNode);
+                    var newNode = ConnectTwoNodes(element, currentNode);
                     topology.AddRelation(currentNode.Id, newNode.Id);
                     stack.Push(newNode);
                 }
-                topology.AddNode(currentNode);
+                currentNode.DmsType = TopologyHelper.Instance.GetDMSTypeOfTopologyElement(currentNode.Id);
+                topology.AddElement(currentNode);
             }
-
             topology.FirstNode = firstNode;
+
+            message = $"Topology graph created.";
+            logger.LogInfo(message);
             return topology;
         }
+
+        #region HelperFunctions
         private List<long> CheckIgnorable(long gid)
         {
             var list = GDAModelHelper.Instance.GetAllReferencedElements(gid).Where(e => !visited.Contains(e)).ToList();
@@ -89,7 +97,9 @@ namespace TopologyBuilder
                 }
                 catch (Exception)
                 {
-                    throw new Exception($"Element with GID {parent.Id.ToString("X")} has no field.");
+                    string message = $"Element with GID {parent.Id.ToString("X")} has no field.";
+                    logger.LogDebug(message);
+                    throw new Exception(message);
                 }
                
             }
@@ -98,7 +108,9 @@ namespace TopologyBuilder
                 var field = GetField(parent.Id);
                 if (field == null)
                 {
-                    throw new Exception($"Element with GID {parent.Id.ToString("X")} has no field.");
+                    string message = $"Element with GID {parent.Id.ToString("X")} has no field.";
+                    logger.LogDebug(message);
+                    throw new Exception(message);
                 }
                 else
                 {
@@ -125,5 +137,6 @@ namespace TopologyBuilder
             }
             return field;
         }
+        #endregion
     }
 }

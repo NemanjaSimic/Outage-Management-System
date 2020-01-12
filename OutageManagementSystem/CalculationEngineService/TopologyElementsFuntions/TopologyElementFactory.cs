@@ -2,16 +2,13 @@
 using Outage.Common;
 using System;
 using System.Collections.Generic;
-using System.Diagnostics;
-using System.Linq;
-using System.Text;
-using System.Threading.Tasks;
 
 namespace TopologyElementsFuntions
 {
 	public class TopologyElementFactory
 	{
 		private static long edgeCounter = 0;
+		private ILogger logger = LoggerWrapper.Instance;
 		public TopologyElement CreateTopologyElement(long gid)
 		{
 			TopologyElement retVal;
@@ -24,6 +21,7 @@ namespace TopologyElementsFuntions
 			else
 			{
 				string message = $"Element with GID: {gid.ToString("X")} is neither Edge nor Node. Please check configuration files.";
+				logger.LogError(message);
 				throw new Exception(message);
 			}
 			return retVal;
