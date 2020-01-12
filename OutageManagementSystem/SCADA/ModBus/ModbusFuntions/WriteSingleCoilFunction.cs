@@ -36,7 +36,7 @@ namespace Outage.SCADA.ModBus.ModbusFuntions
                 throw new ArgumentException("Non-boolean value in write single coil command parameter.");
             }
 
-            modbusClient.WriteSingleCoil(mdb_write_comm_pars.OutputAddress, commandingValue);
+            modbusClient.WriteSingleCoil(mdb_write_comm_pars.OutputAddress - 1, commandingValue);
             Logger.LogInfo($"WriteSingleCoilFunction executed SUCCESSFULLY. OutputAddress: {mdb_write_comm_pars.OutputAddress}, Value: {commandingValue}");
         }
 

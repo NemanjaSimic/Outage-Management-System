@@ -34,7 +34,7 @@ namespace Outage.SCADA.ModBus.ModbusFuntions
                 throw new Exception(message);
             }
 
-            int[] data = modbusClient.ReadInputRegisters(startAddress, quantity);
+            int[] data = modbusClient.ReadInputRegisters(startAddress - 1, quantity);
             Data = new Dictionary<long, int>(data.Length);
 
             SCADAModel scadaModel = SCADAModel.Instance;

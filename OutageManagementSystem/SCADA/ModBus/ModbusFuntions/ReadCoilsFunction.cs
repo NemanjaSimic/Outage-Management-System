@@ -34,7 +34,7 @@ namespace Outage.SCADA.ModBus.ModbusFuntions
                 throw new Exception(message);
             }
 
-            bool[] data = modbusClient.ReadCoils(startAddress, quantity);
+            bool[] data = modbusClient.ReadCoils(startAddress - 1, quantity);
             Data = new Dictionary<long, bool>(data.Length);
 
             SCADAModel scadaModel = SCADAModel.Instance;
