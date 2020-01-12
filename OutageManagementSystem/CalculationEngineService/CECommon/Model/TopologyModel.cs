@@ -1,4 +1,5 @@
 ﻿using CECommon.Model.UI;
+using System.Collections.Generic;
 
 namespace CECommon.Model
 {
@@ -6,6 +7,7 @@ namespace CECommon.Model
 	public class TopologyModel
     {
 		private TopologyElement firstNode;
+		private Dictionary<long, TopologyElement> topologyElements;
 
 		public TopologyElement FirstNode
 		{
@@ -17,17 +19,24 @@ namespace CECommon.Model
 			}
 		}
 		public UIModel UIModel { get; set; }
+		public Dictionary<long, TopologyElement> TopologyElements { get => topologyElements; set => topologyElements = value; }
+
 		public TopologyModel()
 		{
+			TopologyElements = new Dictionary<long, TopologyElement>();
 			UIModel = new UIModel();
 		}
 		public void AddRelation(long source, long destination)
 		{
 			UIModel.AddRelation(source, destination);
 		}
-		public void AddUINode(UINode newUiNode)
+		public void AddElement(TopologyElement newElement)
 		{
-			UIModel.AddNode(newUiNode);
+			if (!TopologyElements.ContainsKey(newElement.Id))
+			{
+				TopologyElements.Add(newElement.Id, newElement);
+			}
+			UIModel.AddNode(new UINode(newElement.Id, newElement.DmsType));
 		}
 		
 	}

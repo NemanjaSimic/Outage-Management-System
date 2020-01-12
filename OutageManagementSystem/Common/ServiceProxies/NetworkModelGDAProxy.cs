@@ -1,11 +1,12 @@
-﻿using System.Collections.Generic;
+﻿using System;
+using System.Collections.Generic;
 using System.ServiceModel;
 using Outage.Common.GDA;
 using Outage.Common.ServiceContracts;
 
 namespace Outage.Common.ServiceProxies
 {
-	public class NetworkModelGDAProxy : ClientBase<INetworkModelGDAContract>, INetworkModelGDAContract
+	public class NetworkModelGDAProxy : ClientBase<INetworkModelGDAContract>, INetworkModelGDAContract, IDisposable
 	{
 		public NetworkModelGDAProxy(string endpointName)
 			: base(endpointName)
@@ -57,5 +58,6 @@ namespace Outage.Common.ServiceProxies
 		{
 			return Channel.IteratorRewind(id);
 		}
+
 	}
 }

@@ -25,13 +25,15 @@ namespace CalculationEngineServiceHost
                 logger.LogInfo(message);
                 CommonTrace.WriteTrace(CommonTrace.TraceInfo, message);
                 Console.WriteLine("\n{0}\n", message);
-			
-				Topology.Topology.Instance.UpdateTopology();
 
-				//PrintTopology(Topology.Topology.Instance.TopologyModel.FirstNode);
-				//Console.WriteLine("///////////////////////////////////////////////////////////////////////////////");
+                logger.LogInfo("Initializing topology...");
+                Topology.Topology.Instance.InitializeTopology();
+                logger.LogInfo("Topology has been successfully initialized.");
 
-				using (CalculationEngineService.CalculationEngineService ces = new CalculationEngineService.CalculationEngineService())
+                //PrintTopology(Topology.Topology.Instance.TopologyModel.FirstNode);
+                //Console.WriteLine("///////////////////////////////////////////////////////////////////////////////");
+
+                using (CalculationEngineService.CalculationEngineService ces = new CalculationEngineService.CalculationEngineService())
                 {
                     ces.Start();
 

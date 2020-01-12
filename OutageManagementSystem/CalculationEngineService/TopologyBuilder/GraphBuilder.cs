@@ -46,7 +46,8 @@ namespace TopologyBuilder
                     topology.AddRelation(currentNode.Id, newNode.Id);
                     stack.Push(newNode);
                 }
-                topology.AddUINode(new UINode(currentNode.Id, TopologyHelper.Instance.GetDMSTypeOfTopologyElement(currentNode.Id)));
+                currentNode.DmsType = TopologyHelper.Instance.GetDMSTypeOfTopologyElement(currentNode.Id);
+                topology.AddElement(currentNode);
             }
             topology.FirstNode = firstNode;
 
@@ -97,7 +98,9 @@ namespace TopologyBuilder
                 }
                 catch (Exception)
                 {
-                    throw new Exception($"Element with GID {parent.Id.ToString("X")} has no field.");
+                    string message = $"Element with GID {parent.Id.ToString("X")} has no field.";
+                    logger.LogDebug(message);
+                    throw new Exception(message);
                 }
                
             }
@@ -106,7 +109,9 @@ namespace TopologyBuilder
                 var field = GetField(parent.Id);
                 if (field == null)
                 {
-                    throw new Exception($"Element with GID {parent.Id.ToString("X")} has no field.");
+                    string message = $"Element with GID {parent.Id.ToString("X")} has no field.";
+                    logger.LogDebug(message);
+                    throw new Exception(message);
                 }
                 else
                 {

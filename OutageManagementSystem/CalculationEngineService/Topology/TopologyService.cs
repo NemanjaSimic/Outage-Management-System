@@ -1,19 +1,18 @@
-﻿using CECommon.Model;
-using CECommon.Model.UI;
+﻿using CECommon.Model.UI;
 using CECommon.ServiceContracts;
 using Outage.Common;
 using System;
 
-namespace CalculationEngineService
+namespace Topology
 {
 	public class TopologyService : ITopologyServiceContract
 	{
 		private ILogger logger = LoggerWrapper.Instance;
 		public UIModel GetTopology()
-        {
+		{
 			try
 			{
-				return Topology.Topology.Instance.TopologyModel.UIModel;
+				return Topology.Instance.TopologyModel.UIModel;
 			}
 			catch (Exception ex)
 			{
@@ -21,13 +20,6 @@ namespace CalculationEngineService
 				logger.LogError(message);
 				throw ex;
 			}
-        }
-
-		//private UIModel PrepareTopology(TopologyElement firstElement)
-		//{
-		//	UIModel uIModel = new UIModel();
-			
-		//	return uIModel;
-		//}
-    }
+		}
+	}
 }
