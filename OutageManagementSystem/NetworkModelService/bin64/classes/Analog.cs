@@ -29,12 +29,6 @@ namespace Outage {
         
         private const string _maxValuePrefix = "cim";
         
-        private AnalogMeasurementType? cim_measurementType;
-        
-        private const bool isMeasurementTypeMandatory = true;
-        
-        private const string _measurementTypePrefix = "cim";
-        
         /// Normal value range minimum for any of the MeasurementValue.values. Used for scaling, e.g. in bar graphs or of telemetered raw values
         private System.Single? cim_minValue;
         
@@ -48,6 +42,13 @@ namespace Outage {
         private const bool isNormalValueMandatory = true;
         
         private const string _normalValuePrefix = "cim";
+        
+        /// Meaning of this signal, e.g. "Set point" or "Measured value"
+        private AnalogSignalType? cim_signalType;
+        
+        private const bool isSignalTypeMandatory = true;
+        
+        private const string _signalTypePrefix = "tdms";
         
         public virtual float CurrentValue {
             get {
@@ -103,33 +104,6 @@ namespace Outage {
             }
         }
         
-        public virtual AnalogMeasurementType MeasurementType {
-            get {
-                return this.cim_measurementType.GetValueOrDefault();
-            }
-            set {
-                this.cim_measurementType = value;
-            }
-        }
-        
-        public virtual bool MeasurementTypeHasValue {
-            get {
-                return this.cim_measurementType != null;
-            }
-        }
-        
-        public static bool IsMeasurementTypeMandatory {
-            get {
-                return isMeasurementTypeMandatory;
-            }
-        }
-        
-        public static string MeasurementTypePrefix {
-            get {
-                return _measurementTypePrefix;
-            }
-        }
-        
         public virtual float MinValue {
             get {
                 return this.cim_minValue.GetValueOrDefault();
@@ -181,6 +155,33 @@ namespace Outage {
         public static string NormalValuePrefix {
             get {
                 return _normalValuePrefix;
+            }
+        }
+        
+        public virtual AnalogSignalType SignalType {
+            get {
+                return this.cim_signalType.GetValueOrDefault();
+            }
+            set {
+                this.cim_signalType = value;
+            }
+        }
+        
+        public virtual bool SignalTypeHasValue {
+            get {
+                return this.cim_signalType != null;
+            }
+        }
+        
+        public static bool IsSignalTypeMandatory {
+            get {
+                return isSignalTypeMandatory;
+            }
+        }
+        
+        public static string SignalTypePrefix {
+            get {
+                return _signalTypePrefix;
             }
         }
     }

@@ -19,7 +19,7 @@ namespace Outage {
         /// Use association to ConductingEquipment only when there is no VoltageLevel container used.
         private BaseVoltage cim_BaseVoltage;
         
-        private const bool isBaseVoltageMandatory = false;
+        private const bool isBaseVoltageMandatory = true;
         
         private const string _BaseVoltagePrefix = "cim";
         

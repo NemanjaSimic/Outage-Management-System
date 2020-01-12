@@ -43,7 +43,7 @@ namespace Outage.SCADA.ModBus.ModbusFuntions
             {
                 ushort address = (ushort)(startAddress + i);
                 bool value = data[i];
-                long gid = scadaModel.CurrentAddressToGidMap[address];
+                long gid = scadaModel.CurrentAddressToGidMap[PointType.DIGITAL_OUTPUT][address];
 
                 if (scadaModel.CurrentScadaModel.ContainsKey(gid))
                 {
