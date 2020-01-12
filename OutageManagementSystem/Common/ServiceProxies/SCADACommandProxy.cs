@@ -1,4 +1,4 @@
-﻿using Outage.Common.ServiceContracts;
+﻿using Outage.Common.ServiceContracts.SCADA;
 using System;
 using System.Collections.Generic;
 using System.Linq;
@@ -10,9 +10,32 @@ namespace Outage.Common.ServiceProxies
 {
     public class SCADACommandProxy : ClientBase<ISCADACommand>, ISCADACommand
     {
-        public void RecvCommand(long gid, object value)
+        public void SendAnalogCommand(long gid, float commandingValue)
         {
-            Channel.RecvCommand(gid, value);
+            try
+            {
+                Channel.SendAnalogCommand(gid, commandingValue);
+            }
+            catch (Exception e)
+            {
+                string message = "Exception in SendAnalogCommand() proxy method.";
+                LoggerWrapper.Instance.LogError(message, e);
+                throw e;
+            }
+        }
+
+        public void SendDiscreteCommand(long gid, ushort commandingValue)
+        {
+            try
+            {
+                Channel.SendDiscreteCommand(gid, commandingValue);
+            }
+            catch (Exception e)
+            {
+                string message = "Exception in SendDiscreteCommand() proxy method.";
+                LoggerWrapper.Instance.LogError(message, e);
+                throw e;
+            }
         }
     }
 }

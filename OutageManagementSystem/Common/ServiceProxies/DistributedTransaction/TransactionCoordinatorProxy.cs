@@ -1,4 +1,5 @@
 ﻿using Outage.Common.ServiceContracts.DistributedTransaction;
+using System;
 using System.ServiceModel;
 
 namespace Outage.Common.ServiceProxies.DistributedTransaction
@@ -12,12 +13,31 @@ namespace Outage.Common.ServiceProxies.DistributedTransaction
 
         public void StartDistributedUpdate()
         {
-            Channel.StartDistributedUpdate();
+            try
+            {
+                Channel.StartDistributedUpdate();
+            }
+            catch (Exception e)
+            {
+
+                string message = "Exception in StartDistributedUpdate() proxy method.";
+                LoggerWrapper.Instance.LogError(message, e);
+                throw e;
+            }           
         }
 
         public void FinishDistributedUpdate(bool success)
         {
-            Channel.FinishDistributedUpdate(success);
+            try
+            {
+                Channel.FinishDistributedUpdate(success);
+            }
+            catch (Exception e)
+            {
+                string message = "Exception in FinishDistributedUpdate() proxy method.";
+                LoggerWrapper.Instance.LogError(message, e);
+                throw e;
+            }   
         }
     }
 
@@ -30,7 +50,20 @@ namespace Outage.Common.ServiceProxies.DistributedTransaction
 
         public bool Enlist(string actorName)
         {
-            return Channel.Enlist(actorName);
+            bool success;
+
+            try
+            {
+                success = Channel.Enlist(actorName);
+            }
+            catch (Exception e)
+            {
+                string message = "Exception in Enlist() proxy method.";
+                LoggerWrapper.Instance.LogError(message, e);
+                throw e;
+            }
+
+            return success;
         }
     }
 }

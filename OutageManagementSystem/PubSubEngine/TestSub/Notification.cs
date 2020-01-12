@@ -11,15 +11,19 @@ namespace TestSub
 	[DataContract]
 	public class Notification : ISubscriberCallback
 	{
-		[DataMember]
-		public string SubscriberName { get; private set; }
+        private string subscriberName;
 
 		public Notification(string subscriberName = "")
 		{
-			SubscriberName = subscriberName;
+			this.subscriberName = subscriberName;
 		}
 
-		public void Notify(IPublishableMessage msg)
+        public string GetSubscriberName()
+        {
+            return subscriberName;
+        }
+
+        public void Notify(IPublishableMessage msg)
 		{
 			Console.WriteLine("Message from PubSub: " + msg);
 			
@@ -28,7 +32,7 @@ namespace TestSub
                 foreach(long gid in multipleAnalogValue.Data.Keys)
                 {
                     int currentValue = multipleAnalogValue.Data[gid];
-                    Console.WriteLine($"Analog => Gid: {gid}, Value: {currentValue}");
+                    Console.WriteLine($"Analog => Gid: 0x{gid:X16}, Value: {currentValue}");
                 }
 			}
             else if(msg is MultipleDiscreteValueSCADAMessage multipleDiscreteValue)
@@ -36,7 +40,7 @@ namespace TestSub
                 foreach (long gid in multipleDiscreteValue.Data.Keys)
                 {
                     bool currentValue = multipleDiscreteValue.Data[gid];
-                    Console.WriteLine($"Discrete => Gid: {gid}, Value: {currentValue}");
+                    Console.WriteLine($"Discrete => Gid: 0x{gid:X16}, Value: {currentValue}");
                 }
             }
 		}

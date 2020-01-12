@@ -31,11 +31,12 @@ namespace PubSubEngine
         public bool TryAddSubscriber(Topic topic, ISubscriberCallback subscriber)
         {
             bool success = subscribedClients.TryGetValue(topic, out List<ISubscriberCallback> list);
+            string subscriberName = subscriber.GetSubscriberName();
 
             if (success)
             {
                 list.Add(subscriber);
-                Logger.LogDebug($"Subscriber [{subscriber.SubscriberName}] added to subscribed clients map. [Key Topic: {topic}]");
+                Logger.LogDebug($"Subscriber [{subscriberName}] added to subscribed clients map. [Key Topic: {topic}]");
             }
             else
             {
@@ -48,11 +49,11 @@ namespace PubSubEngine
 
                 if(success)
                 {
-                    Logger.LogDebug($"Subscriber [{subscriber.SubscriberName}] added to subscribed clients map. [Key Topic: {topic}]");
+                    Logger.LogDebug($"Subscriber [{subscriberName}] added to subscribed clients map. [Key Topic: {topic}]");
                 }
                 else
                 {
-                    Logger.LogWarn($"Try to add Subscriber [{subscriber.SubscriberName}] to subscribed clients map FAILED. [Key Topic: {topic}]");
+                    Logger.LogWarn($"Try to add Subscriber [{subscriberName}] to subscribed clients map FAILED. [Key Topic: {topic}]");
                 }
             }
 
@@ -61,12 +62,14 @@ namespace PubSubEngine
 
         public void RemoveSubscriber(ISubscriberCallback subscriber)
         {
+            string subscriberName = subscriber.GetSubscriberName();
+
             foreach (var item in subscribedClients)
             {
                 if (item.Value.Contains(subscriber))
                 {
                     item.Value.Remove(subscriber);
-                    Logger.LogInfo($"Subscriber [{subscriber.SubscriberName}] removed from subscribed clients map. [Key Topic: {item.Key}]");
+                    Logger.LogInfo($"Subscriber [{subscriberName}] removed from subscribed clients map. [Key Topic: {item.Key}]");
                 }
             }
         }
@@ -81,7 +84,7 @@ namespace PubSubEngine
             }
             else
             {
-                Logger.LogError($"Try to get List of subscribers FAILED. Topic ['{topic}']");
+                Logger.LogDebug($"Try to get List of subscribers FAILED. Topic ['{topic}']");
             }
             
             return listOfSubscribers;

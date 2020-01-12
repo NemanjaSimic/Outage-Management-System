@@ -5,10 +5,7 @@ using Outage.Common.PubSub.CalculationEngineDataContract;
 
 namespace Outage.Common.PubSub
 {
-    [Serializable]
     [DataContract]
-    [KnownType(typeof(SCADAPublication))]
-    //[KnownType(typeof(IPublication))]
     public abstract class Publication : IPublication
     {
         protected Publication(Topic topic, IPublishableMessage message)

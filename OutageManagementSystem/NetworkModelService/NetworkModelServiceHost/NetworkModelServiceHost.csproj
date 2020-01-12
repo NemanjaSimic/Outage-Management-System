@@ -60,7 +60,7 @@
       <Name>Common</Name>
     </ProjectReference>
     <ProjectReference Include="..\NetworkModelService\NetworkModelService.csproj">
-      <Project>{C348D8C1-43B0-423C-A70A-374D54510830}</Project>
+      <Project>{c348d8c1-43b0-423c-a70a-374d54510830}</Project>
       <Name>NetworkModelService</Name>
     </ProjectReference>
   </ItemGroup>

@@ -2,7 +2,7 @@
 using System.ServiceModel;
 using Outage.Common.GDA;
 
-namespace Outage.Common.ServiceContracts
+namespace Outage.Common.ServiceContracts.GDA
 {
 	[ServiceContract]
 	public interface INetworkModelGDAContract

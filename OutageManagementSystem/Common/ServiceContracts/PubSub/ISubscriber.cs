@@ -1,4 +1,5 @@
 ﻿using Outage.Common.PubSub;
+using Outage.Common.PubSub.SCADADataContract;
 using System.Runtime.Serialization;
 using System.ServiceModel;
 
@@ -13,9 +14,15 @@ namespace Outage.Common.ServiceContracts.PubSub
 
     public interface ISubscriberCallback
     {
-        string SubscriberName { get; }
+        [OperationContract]
+        string GetSubscriberName();
 
         [OperationContract(IsOneWay = true)]
+        [ServiceKnownType(typeof(SCADAMessage))]
+        [ServiceKnownType(typeof(SingleAnalogValueSCADAMessage))]
+        [ServiceKnownType(typeof(MultipleAnalogValueSCADAMessage))]
+        [ServiceKnownType(typeof(SingleDiscreteValueSCADAMessage))]
+        [ServiceKnownType(typeof(MultipleDiscreteValueSCADAMessage))]
         void Notify(IPublishableMessage message);
     }
 }

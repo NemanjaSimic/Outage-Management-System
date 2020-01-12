@@ -5,12 +5,15 @@ using System.ServiceModel;
 using System.Text;
 using System.Threading.Tasks;
 
-namespace Outage.Common.ServiceContracts
+namespace Outage.Common.ServiceContracts.SCADA
 {
     [ServiceContract]
     public interface ISCADACommand
     {
         [OperationContract]
-        void RecvCommand(long gid, object value);
+        void SendAnalogCommand(long gid, float commandingValue);
+
+        [OperationContract]
+        void SendDiscreteCommand(long gid, ushort commandingValue);
     }
 }

@@ -15,16 +15,17 @@ namespace PubSubEngine
         public void Subscribe(Topic topic)
         {
             ISubscriberCallback subscriber = OperationContext.Current.GetCallbackChannel<ISubscriberCallback>();
+            string subscriberName = subscriber.GetSubscriberName();
 
-            if(Subscribers.Instance.TryAddSubscriber(subscriber) && Publications.Instance.TryAddSubscriber(topic, subscriber))
+            if (Subscribers.Instance.TryAddSubscriber(subscriber) && Publications.Instance.TryAddSubscriber(topic, subscriber))
             {
-                Logger.LogInfo($"Subscriber [{subscriber.SubscriberName}, Topic: {topic}] SUCCESSFYLLY.");
+                Logger.LogInfo($"Subscriber [{subscriberName}, Topic: {topic}] SUCCESSFYLLY.");
                 Thread thread = new Thread(() => TrackPublications(subscriber));
                 thread.Start();
             }
             else
             {
-                string message = $"Try to add Subscriber [{subscriber.SubscriberName}, Topic: {topic}] FAILED.";
+                string message = $"Try to add Subscriber [{subscriberName}, Topic: {topic}] FAILED.";
                 Logger.LogError(message);
                 throw new Exception(message);
             }
@@ -33,8 +34,9 @@ namespace PubSubEngine
         private void TrackPublications(ISubscriberCallback subscriber)
         {
             bool end = false;
+            string subscriberName = subscriber.GetSubscriberName();
 
-            Logger.LogInfo($"Thread for tracking publications STARTED. Subscriber [{subscriber.SubscriberName}]");
+            Logger.LogInfo($"Thread for tracking publications STARTED. Subscriber [{subscriberName}]");
 
             while (!end)
             {
@@ -45,11 +47,11 @@ namespace PubSubEngine
                     try
                     {
                         subscriber.Notify(message);
-                        Logger.LogDebug($"Subscriber [{subscriber.SubscriberName}] notified SUCCESSFULLY.");
+                        Logger.LogDebug($"Subscriber [{subscriberName}] notified SUCCESSFULLY.");
                     }
                     catch (Exception ex)
                     {
-                        Logger.LogError($"Exception on notifying Subscriber [{subscriber.SubscriberName}].", ex);
+                        Logger.LogError($"Exception on notifying Subscriber [{subscriberName}].", ex);
 
                         Subscribers.Instance.RemoveSubscriber(subscriber);
                         Publications.Instance.RemoveSubscriber(subscriber);
@@ -60,7 +62,7 @@ namespace PubSubEngine
                 Thread.Sleep(200);
             }
 
-            Logger.LogInfo($"Thread for tracking publications STOPPED. Subscriber [{subscriber.SubscriberName}]");
+            Logger.LogInfo($"Thread for tracking publications STOPPED. Subscriber [{subscriberName}]");
         }
     }
 }

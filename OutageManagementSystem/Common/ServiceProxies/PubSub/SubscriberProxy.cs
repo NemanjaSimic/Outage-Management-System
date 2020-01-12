@@ -21,20 +21,12 @@ namespace Outage.Common.ServiceProxies.PubSub
             {
                 Channel.Subscribe(topic);
             }
-            catch (Exception ex)
+            catch (Exception e)
             {
-                throw ex;
+                string message = "Exception in Subscribe() proxy method.";
+                LoggerWrapper.Instance.LogError(message, e);
+                throw e;
             }
         }
-
-        //No need due to ClientBase implementing IDisposable
-        //public void CloseConnection()
-        //{
-        //    if (proxy != null)
-        //    {
-        //        proxy = null;
-        //    }
-        //    this.Close();
-        //}
     }
 }

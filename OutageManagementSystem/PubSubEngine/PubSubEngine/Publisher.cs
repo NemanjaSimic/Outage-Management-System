@@ -19,8 +19,9 @@ namespace PubSubEngine
             {
                 foreach (ISubscriberCallback subscriber in listOfSubscribers)
                 {
+                    string subscriberName = subscriber.GetSubscriberName();
                     Subscribers.Instance.PublishMessage(subscriber, publication.Message);
-                    logger.LogInfo($"Publication [Topic: {publication.Topic}] SUCCESSFULLY published to Subscriber [{subscriber.SubscriberName}]");
+                    logger.LogInfo($"Publication [Topic: {publication.Topic}] SUCCESSFULLY published to Subscriber [{subscriberName}]");
                 }
             }
         }

@@ -11,6 +11,7 @@ using System.Collections.Concurrent;
 using System.Collections.Generic;
 using System.Threading;
 using Outage.Common.PubSub.SCADADataContract;
+using EasyModbus.Exceptions;
 
 namespace Outage.SCADA.ModBus.Connection
 {
@@ -125,29 +126,60 @@ namespace Outage.SCADA.ModBus.Connection
 
         public void StartExecutor()
         {
-            ModbusClient.Connect();
-
-            functionExecutorThread = new Thread(FunctionExecutorThread)
+            try
             {
-                Name = "FunctionExecutorThread"
-            };
+                if(ModbusClient != null && !ModbusClient.Connected)
+                {
+                    ConnectToModbusClient();
+                }
 
-            functionExecutorThread.Start();
+                functionExecutorThread = new Thread(FunctionExecutorThread)
+                {
+                    Name = "FunctionExecutorThread"
+                };
+
+                functionExecutorThread.Start();
+            }
+            catch (Exception e)
+            {
+                string message = "Exception caught in StartExecutor() method.";
+                Logger.LogError(message, e);
+            }
         }
 
         public void StopExecutor()
         {
-            threadCancellationSignal = true;
-            ModbusClient.Disconnect();
+            try
+            {
+                threadCancellationSignal = true;
+
+                if (ModbusClient != null && ModbusClient.Connected)
+                {
+                    ModbusClient.Disconnect();
+                }
+            }
+            catch (Exception e)
+            {
+                string message = "Exception caught in StopExecutor() method.";
+                Logger.LogError(message, e);
+            }
+            
         }
 
         public void EnqueueCommand(ModbusFunction modbusFunction)
-
         {
-            if (ModbusClient.Connected)
+            try
             {
-                this.commandQueue.Enqueue(modbusFunction);
-                this.commandEvent.Set();
+                if (ModbusClient != null && ModbusClient.Connected)
+                {
+                    this.commandQueue.Enqueue(modbusFunction);
+                    this.commandEvent.Set();
+                }
+            }
+            catch (Exception e)
+            {
+                string message = "Exception caught in EnqueueCommand() method.";
+                Logger.LogError(message, e);
             }
         }
 
@@ -155,12 +187,50 @@ namespace Outage.SCADA.ModBus.Connection
 
         #region Private Members
 
+        private void ConnectToModbusClient()
+        {
+            
+            int numberOfTries = 0;
+
+            string message = $"Connecting to modbus client...";
+            Console.WriteLine(message);
+            Logger.LogInfo(message);
+
+            while (!ModbusClient.Connected)
+            {
+                try
+                {
+                    ModbusClient.Connect();
+                }
+                catch(ConnectionException ce)
+                {
+                    Logger.LogWarn("ConnectionException on ModbusClient.Connect().", ce);
+                }
+
+                if (!ModbusClient.Connected)
+                {
+                    numberOfTries++;
+                    Logger.LogDebug($"Connecting try number: {numberOfTries}.");
+                    Thread.Sleep(500);
+                }
+                else if (!ModbusClient.Connected && numberOfTries == 40)
+                {
+                    string timeoutMessage = "Failed to connect to Modbus client by exceeding the maximum number of connection retries.";
+                    Logger.LogError(timeoutMessage);
+                    throw new Exception(timeoutMessage);
+                }
+                else
+                {
+                    message = $"Successfully connected to modbus client.";
+                    Console.WriteLine(message);
+                    Logger.LogInfo(message);
+                }
+            }
+        }
+
         private void FunctionExecutorThread()
         {
             Logger.LogInfo("FunctionExecutorThread is started");
-
-            Console.WriteLine("Establishing connection...");
-            Logger.LogInfo("Establishing connection...");
 
             threadCancellationSignal = false;
 
@@ -175,7 +245,7 @@ namespace Outage.SCADA.ModBus.Connection
 
                     if (!ModbusClient.Connected)
                     {
-                        ModbusClient.Connect();
+                        ConnectToModbusClient();
                     }
 
                     Logger.LogDebug("Connected and waiting for command event.");

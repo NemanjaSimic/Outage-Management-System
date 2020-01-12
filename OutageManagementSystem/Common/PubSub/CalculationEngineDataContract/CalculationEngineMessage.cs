@@ -9,7 +9,6 @@ namespace Outage.Common.PubSub.CalculationEngineDataContract
 {
     [Serializable]
     [DataContract]
-    [KnownType(typeof(IPublishableMessage))]
     public abstract class CalculationEngineMessage : IPublishableMessage
     {
     }
