@@ -1,11 +1,5 @@
-﻿namespace Outage.SCADA.SCADA_Common
+﻿namespace Outage.SCADA.SCADACommon
 {
-    public enum ConnectionState : short
-    {
-        CONNECTED = 0,
-        DISCONNECTED = 1
-    }
-
     public enum ModbusFunctionCode : short
     {
         READ_COILS = 0x01,

@@ -10,7 +10,7 @@ namespace Outage.Common.ServiceProxies.PubSub
 {
     public class SubscriberProxy : DuplexClientBase<ISubscriber>, ISubscriber
     {
-        public SubscriberProxy(IPubSubNotification callbackInstance, string endpointName) 
+        public SubscriberProxy(ISubscriberCallback callbackInstance, string endpointName) 
             : base(callbackInstance, endpointName)
         {
         }
@@ -21,9 +21,11 @@ namespace Outage.Common.ServiceProxies.PubSub
             {
                 Channel.Subscribe(topic);
             }
-            catch (Exception ex)
+            catch (Exception e)
             {
-                throw ex;
+                string message = "Exception in Subscribe() proxy method.";
+                LoggerWrapper.Instance.LogError(message, e);
+                throw e;
             }
         }
     }

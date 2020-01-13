@@ -1,8 +1,14 @@
 ﻿using Outage.Common;
+using Outage.SCADA.ModBus;
 using Outage.SCADA.ModBus.Acquisitor;
+using Outage.SCADA.ModBus.Connection;
+using Outage.SCADA.SCADACommon;
+using Outage.SCADA.SCADAData.Configuration;
+using Outage.SCADA.SCADAData.Repository;
 using Outage.SCADA.SCADAService.Command;
 using Outage.SCADA.SCADAService.DistributedTransaction;
 using System;
+using System.Text;
 using System.Collections.Generic;
 using System.ServiceModel;
 
@@ -10,37 +16,48 @@ namespace Outage.SCADA.SCADAService
 {
     public class SCADAService : IDisposable
     {
-        private ILogger logger = LoggerWrapper.Instance;
+        private ILogger logger;
+
+        protected ILogger Logger
+        {
+            get { return logger ?? (logger = LoggerWrapper.Instance); }
+        }
+
 
         private List<ServiceHost> hosts = null;
         private SCADAModel scadaModel = null;
         private Acquisition acquisition = null;
+        //private ConfigWriter configWriter = null;
+        private ISCADAConfigData configData = SCADAConfigData.Instance;
 
         public SCADAService()
         {
-            scadaModel = new SCADAModel();
-            //CommandService.SCADAModel = scadaModel;
+            scadaModel = SCADAModel.Instance;
             SCADAModelUpdateNotification.SCADAModel = scadaModel;
             SCADATransactionActor.SCADAModel = scadaModel;
 
             InitializeHosts();
         }
 
+        #region Public Members
         public void Start()
         {
-            //TODO: init aquisition i slicno,,....
+            ModbusSimulatorHandler.StartModbusSimulator();
+            FunctionExecutor.Instance.StartExecutor();
             StartDataAcquisition();
-
-
             StartHosts();
         }
 
         public void Dispose()
         {
+            ModbusSimulatorHandler.StopModbusSimulaotrs();
             CloseHosts();
             GC.SuppressFinalize(this);
         }
+        #endregion
 
+
+        #region Private Members
         private void InitializeHosts()
         {
             hosts = new List<ServiceHost>()
@@ -61,39 +78,44 @@ namespace Outage.SCADA.SCADAService
         {
             if (hosts == null || hosts.Count == 0)
             {
-                throw new Exception("SCADA Services can not be opend because they are not initialized.");
+                throw new Exception("SCADA Service hosts can not be opend because they are not initialized.");
             }
 
-            string message = string.Empty;
+            string message;
+            StringBuilder sb = new StringBuilder();
+
             foreach (ServiceHost host in hosts)
             {
                 host.Open();
 
                 message = string.Format("The WCF service {0} is ready.", host.Description.Name);
                 Console.WriteLine(message);
-                logger.LogInfo(message);
+                sb.AppendLine(message);
 
                 message = "Endpoints:";
                 Console.WriteLine(message);
-                logger.LogInfo(message);
+                sb.AppendLine(message);
 
                 foreach (Uri uri in host.BaseAddresses)
                 {
                     Console.WriteLine(uri);
-                    logger.LogInfo(uri.ToString());
+                    sb.AppendLine(uri.ToString());
                 }
 
                 Console.WriteLine("\n");
+                sb.AppendLine();
             }
 
-            message = string.Format("Trace level: {0}", CommonTrace.TraceLevel);
+            Logger.LogInfo(sb.ToString());
+
+            message = "Trace level: LEVEL NOT SPECIFIED!";
             Console.WriteLine(message);
-            logger.LogInfo(message);
+            Logger.LogWarn(message);
 
             message = "The SCADA" +
                 " Service is started.";
             Console.WriteLine("\n{0}", message);
-            logger.LogInfo(message);
+            Logger.LogInfo(message);
         }
 
         private void CloseHosts()
@@ -103,9 +125,11 @@ namespace Outage.SCADA.SCADAService
                 acquisition.StopAcquisitionThread();
             }
 
+            FunctionExecutor.Instance.StopExecutor();
+
             if (hosts == null || hosts.Count == 0)
             {
-                throw new Exception("Network Model Services can not be closed because it is not initialized.");
+                throw new Exception("SCADA Service hosts can not be closed because they are not initialized.");
             }
 
             foreach (ServiceHost host in hosts)
@@ -113,9 +137,10 @@ namespace Outage.SCADA.SCADAService
                 host.Close();
             }
 
-            string message = "The Network Model Service is gracefully closed.";
-            logger.LogInfo(message);
+            string message = "SCADA Service is gracefully closed.";
+            Logger.LogInfo(message);
             Console.WriteLine("\n\n{0}", message);
         }
+        #endregion
     }
 }

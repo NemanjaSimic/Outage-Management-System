@@ -17,18 +17,17 @@ namespace CalculationEngineServiceHost
 	{
         static void Main(string[] args)
         {
-            ILogger logger = LoggerWrapper.Instance;
+            ILogger Logger = LoggerWrapper.Instance;
 
             try
             {
                 string message = "Starting Calculation Engine Service...";
-                logger.LogInfo(message);
-                CommonTrace.WriteTrace(CommonTrace.TraceInfo, message);
+                Logger.LogInfo(message);
                 Console.WriteLine("\n{0}\n", message);
 
-                logger.LogInfo("Initializing topology...");
+                Logger.LogInfo("Initializing topology...");
                 Topology.Topology.Instance.InitializeTopology();
-                logger.LogInfo("Topology has been successfully initialized.");
+                Logger.LogInfo("Topology has been successfully initialized.");
 
                 //PrintTopology(Topology.Topology.Instance.TopologyModel.FirstNode);
                 //Console.WriteLine("///////////////////////////////////////////////////////////////////////////////");
@@ -38,7 +37,6 @@ namespace CalculationEngineServiceHost
                     ces.Start();
 
                     message = "Press <Enter> to stop the service.";
-                    CommonTrace.WriteTrace(CommonTrace.TraceInfo, message);
                     Console.WriteLine(message);
                     Console.ReadLine();
                 }
@@ -46,12 +44,9 @@ namespace CalculationEngineServiceHost
             catch (Exception ex)
             {
                 Console.WriteLine(ex.Message);
-                Console.WriteLine("CalculationEngineService failed.");
+                Console.WriteLine("Calculation Engine Service failed.");
                 Console.WriteLine(ex.StackTrace);
-                CommonTrace.WriteTrace(CommonTrace.TraceError, ex.Message);
-                CommonTrace.WriteTrace(CommonTrace.TraceError, "CalculationEngineService failed.");
-                CommonTrace.WriteTrace(CommonTrace.TraceError, ex.StackTrace);
-                logger.LogError($"CalculationEngineService failed.{Environment.NewLine}Message: {ex.Message} ", ex);
+                Logger.LogError($"Calculation Engine Service failed.{Environment.NewLine}Message: {ex.Message} ", ex);
                 Console.ReadLine();
             }
         }

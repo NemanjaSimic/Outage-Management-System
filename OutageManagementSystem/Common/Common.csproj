@@ -103,17 +103,20 @@
   </ItemGroup>
   <ItemGroup>
     <Compile Include="EndpointNames.cs" />
+    <Compile Include="PubSub\CalculationEngineDataContract\CalculationEngineMessage.cs" />
     <Compile Include="PubSub\IPublication.cs" />
-    <Compile Include="PubSub\IPublishableMessage.cs" />
+    <Compile Include="PubSub\Publication.cs" />
+    <Compile Include="PubSub\SCADADataContract\SCADAMessage.cs" />
+    <Compile Include="PubSub\SCADADataContract\SCADAPublication.cs" />
     <Compile Include="ServiceContracts\DistributedTransaction\IModelUpdateNotificationContract.cs" />
     <Compile Include="ServiceContracts\DistributedTransaction\ITransactionEnlistmentContract.cs" />
-    <Compile Include="ServiceContracts\ISCADACommand.cs" />
+    <Compile Include="ServiceContracts\SCADA\ISCADACommand.cs" />
     <Compile Include="ServiceContracts\ITopologyServiceContract.cs" />
     <Compile Include="ServiceContracts\PubSub\IPublisher.cs" />
     <Compile Include="ServiceContracts\PubSub\ISubscriber.cs" />
     <Compile Include="ServiceNames.cs" />
     <Compile Include="ServiceContracts\DistributedTransaction\ITransactionCoordinatorContract.cs" />
-    <Compile Include="ServiceContracts\INetworkModelGDAContract.cs" />
+    <Compile Include="ServiceContracts\GDA\INetworkModelGDAContract.cs" />
     <Compile Include="ServiceContracts\DistributedTransaction\ITransactionActorContract.cs" />
     <Compile Include="GDA\Association.cs" />
     <Compile Include="EnumDescs.cs" />
@@ -132,7 +135,6 @@
     <Compile Include="ServiceProxies\PubSub\SubscriberProxy.cs" />
     <Compile Include="ServiceProxies\SCADACommandProxy.cs" />
     <Compile Include="ServiceProxies\TopologyServiceProxy.cs" />
-    <Compile Include="Trace\CommonTrace.cs" />
     <Compile Include="ModelCodeHelper.cs" />
     <Compile Include="ModelResourcesDesc.cs" />
     <Compile Include="Properties\Settings.Designer.cs">

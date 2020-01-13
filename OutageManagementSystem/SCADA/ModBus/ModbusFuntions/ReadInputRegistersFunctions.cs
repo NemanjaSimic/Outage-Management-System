@@ -1,5 +1,7 @@
-﻿using Outage.SCADA.ModBus.FunctionParameters;
-using Outage.SCADA.SCADA_Common;
+﻿using EasyModbus;
+using Outage.SCADA.ModBus.FunctionParameters;
+using Outage.SCADA.SCADACommon;
+using Outage.SCADA.SCADAData.Repository;
 using System;
 using System.Collections.Generic;
 using System.Net;
@@ -7,14 +9,60 @@ using System.Reflection;
 
 namespace Outage.SCADA.ModBus.ModbusFuntions
 {
-    public class ReadInputRegistersFunction : ModbusFunction
+    public class ReadInputRegistersFunction : ModbusFunction, IReadAnalogModBusFunction
     {
-        public ReadInputRegistersFunction(ModbusCommandParameters commandParameters) : base(commandParameters)
+        public ReadInputRegistersFunction(ModbusCommandParameters commandParameters)
+            : base(commandParameters)
         {
             CheckArguments(MethodBase.GetCurrentMethod(), typeof(ModbusReadCommandParameters));
         }
 
+        #region IModBusFunction
+
+        public Dictionary<long, int> Data { get; protected set; }
+
+        public override void Execute(ModbusClient modbusClient)
+        {
+            ModbusReadCommandParameters mdb_read_comm_pars = this.CommandParameters as ModbusReadCommandParameters;
+            ushort startAddress = mdb_read_comm_pars.StartAddress;
+            ushort quantity = mdb_read_comm_pars.Quantity;
+
+            if (startAddress + quantity >= ushort.MaxValue || startAddress + quantity == ushort.MinValue || startAddress == ushort.MinValue)
+            {
+                string message = $"Address is out of bound. Start address: {startAddress}, Quantity: {quantity}";
+                Logger.LogError(message);
+                throw new Exception(message);
+            }
+
+            int[] data = modbusClient.ReadInputRegisters(startAddress - 1, quantity);
+            Data = new Dictionary<long, int>(data.Length);
+
+            SCADAModel scadaModel = SCADAModel.Instance;
+
+            for (ushort i = 0; i < quantity; i++)
+            {
+                ushort address = (ushort)(startAddress + i);
+                int value = data[i];
+                long gid = scadaModel.CurrentAddressToGidMap[PointType.ANALOG_INPUT][address];
+
+                if (scadaModel.CurrentScadaModel.ContainsKey(gid))
+                {
+                    scadaModel.CurrentScadaModel[gid].CurrentValue = value;
+                    Logger.LogDebug($"ReadInputRegistersFunction execute => Current value: {value} from address: {address}, gid: 0x{gid:X16}.");
+                }
+
+                Data.Add(gid, data[i]);
+            }
+
+            Logger.LogDebug($"ReadInputRegistersFunction executed SUCCESSFULLY. StartAddress: {startAddress}, Quantity: {quantity}");
+        }
+
+        #endregion IModBusFunction
+
+        #region Obsolete
+
         /// <inheritdoc />
+        [Obsolete]
         public override byte[] PackRequest()
         {
             ModbusReadCommandParameters mdb_read_comm_pars = this.CommandParameters as ModbusReadCommandParameters;
@@ -32,6 +80,7 @@ namespace Outage.SCADA.ModBus.ModbusFuntions
         }
 
         /// <inheritdoc />
+        [Obsolete]
         public override Dictionary<Tuple<PointType, ushort>, ushort> ParseResponse(byte[] response)
         {
             ModbusReadCommandParameters mdbrp = (ModbusReadCommandParameters)CommandParameters;
@@ -54,5 +103,7 @@ namespace Outage.SCADA.ModBus.ModbusFuntions
             }
             return returnResponse;
         }
+
+        #endregion Obsolete
     }
 }

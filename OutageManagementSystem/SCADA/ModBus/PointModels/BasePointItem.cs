@@ -1,99 +1,99 @@
-﻿using Outage.SCADA.ModBus.Connection;
-using Outage.SCADA.SCADA_Common;
+﻿//using Outage.SCADA.ModBus.Connection;
+//using Outage.SCADA.SCADACommon;
 
-namespace Outage.SCADA.ModBus.PointModels
-{
-    public class BasePointItem
-    {
-        private ushort rawValue;
-        private ushort min;
-        private ushort max;
-        private PointType type;
-        private ushort address;
+//namespace Outage.SCADA.ModBus.PointModels
+//{
+//    public class BasePointItem
+//    {
+//        private ushort rawValue;
+//        private ushort min;
+//        private ushort max;
+//        private PointType type;
+//        private ushort address;
 
-        public BasePointItem(PointType type, ushort address, FunctionExecutor commandExecutor, ushort defaultValue)
-        {
-            this.type = type;
-            this.address = address;
-            this.rawValue = defaultValue;
-            commandExecutor.UpdatePointEvent += CommandExecutor_UpdatePointEvent;
-        }
+//        public BasePointItem(PointType type, ushort address, FunctionExecutor commandExecutor, ushort defaultValue)
+//        {
+//            this.type = type;
+//            this.address = address;
+//            this.rawValue = defaultValue;
+//            commandExecutor.UpdatePointEvent += CommandExecutor_UpdatePointEvent;
+//        }
 
-        public BasePointItem()
-        {
-        }
+//        public BasePointItem()
+//        {
+//        }
 
-        protected virtual void CommandExecutor_UpdatePointEvent(PointType type, ushort pointAddres, ushort newValue)
-        {
-            // Intentionally left blank
-        }
+//        protected virtual void CommandExecutor_UpdatePointEvent(PointType type, ushort pointAddres, ushort newValue)
+//        {
+//            // Intentionally left blank
+//        }
 
-        /// <summary>
-		/// Address of point on MdbSim Simulator
-		/// </summary>
-		public ushort Address
-        {
-            get
-            {
-                return address;
-            }
+//        /// <summary>
+//		/// Address of point on MdbSim Simulator
+//		/// </summary>
+//		public ushort Address
+//        {
+//            get
+//            {
+//                return address;
+//            }
 
-            set
-            {
-                address = value;
-            }
-        }
+//            set
+//            {
+//                address = value;
+//            }
+//        }
 
-        public PointType Type
-        {
-            get
-            {
-                return type;
-            }
+//        public PointType Type
+//        {
+//            get
+//            {
+//                return type;
+//            }
 
-            set
-            {
-                type = value;
-            }
-        }
+//            set
+//            {
+//                type = value;
+//            }
+//        }
 
-        public ushort Min
-        {
-            get
-            {
-                return min;
-            }
+//        public ushort Min
+//        {
+//            get
+//            {
+//                return min;
+//            }
 
-            set
-            {
-                min = value;
-            }
-        }
+//            set
+//            {
+//                min = value;
+//            }
+//        }
 
-        public ushort Max
-        {
-            get
-            {
-                return max;
-            }
+//        public ushort Max
+//        {
+//            get
+//            {
+//                return max;
+//            }
 
-            set
-            {
-                max = value;
-            }
-        }
+//            set
+//            {
+//                max = value;
+//            }
+//        }
 
-        public ushort RawValue
-        {
-            get
-            {
-                return rawValue;
-            }
+//        public ushort RawValue
+//        {
+//            get
+//            {
+//                return rawValue;
+//            }
 
-            set
-            {
-                rawValue = value;
-            }
-        }
-    }
-}
+//            set
+//            {
+//                rawValue = value;
+//            }
+//        }
+//    }
+//}

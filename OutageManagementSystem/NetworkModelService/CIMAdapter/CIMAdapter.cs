@@ -19,28 +19,56 @@ namespace Outage.DataImporter.CIMAdapter
 {
     public class CIMAdapterClass
     {
-        private ILogger logger = LoggerWrapper.Instance;
+        private ILogger logger;
+
+        protected ILogger Logger
+        {
+            get { return logger ?? (logger = LoggerWrapper.Instance); }
+        }
 
         private ModelResourcesDesc resourcesDesc = new ModelResourcesDesc();
         private TransformAndLoadReport report;
 
+        #region Proxies
         private NetworkModelGDAProxy gdaQueryProxy = null;
-        private NetworkModelGDAProxy GdaQueryProxy
+        protected NetworkModelGDAProxy GdaQueryProxy
         {
             get
             {
-                if (gdaQueryProxy != null)
-                {
-                    gdaQueryProxy.Abort();
-                    gdaQueryProxy = null;
-                }
+                int numberOfTries = 0;
 
-                gdaQueryProxy = new NetworkModelGDAProxy(EndpointNames.NetworkModelGDAEndpoint);
-                gdaQueryProxy.Open();
+                while (numberOfTries < 10)
+                {
+                    try
+                    {
+                        if (gdaQueryProxy != null)
+                        {
+                            gdaQueryProxy.Abort();
+                            gdaQueryProxy = null;
+                        }
+
+                        gdaQueryProxy = new NetworkModelGDAProxy(EndpointNames.NetworkModelGDAEndpoint);
+                        gdaQueryProxy.Open();
+                        break;
+                    }
+                    catch (Exception ex)
+                    {
+                        string message = $"Exception on NetworkModelGDAProxy initialization. Message: {ex.Message}";
+                        Logger.LogError(message, ex);
+                        gdaQueryProxy = null;
+                    }
+                    finally
+                    {
+                        numberOfTries++;
+                        Logger.LogDebug($"CIMAdapterClass: GdaQueryProxy getter, try number: {numberOfTries}.");
+                        Thread.Sleep(500);
+                    }
+                }
 
                 return gdaQueryProxy;
             }
         }
+        #endregion
 
         public CIMAdapterClass()
         {
@@ -76,7 +104,19 @@ namespace Outage.DataImporter.CIMAdapter
             if ((delta != null) && (delta.NumberOfOperations != 0))
             {
                 //// NetworkModelService->ApplyUpdates
-                updateResult = GdaQueryProxy.ApplyUpdate(delta).ToString();
+                using(NetworkModelGDAProxy gdaQueryProxy = GdaQueryProxy)
+                {
+                    if (gdaQueryProxy != null)
+                    {
+                        updateResult = gdaQueryProxy.ApplyUpdate(delta).ToString();
+                    }
+                    else
+                    {
+                        string message = "NetworkModelGDAProxy is null.";
+                        Logger.LogWarn(message);
+                        throw new NullReferenceException(message);
+                    }
+                }
             }
 
             Thread.CurrentThread.CurrentCulture = culture;
@@ -136,7 +176,7 @@ namespace Outage.DataImporter.CIMAdapter
 
             try
             {
-                logger.LogInfo($"Importing {extractType} data...");
+                Logger.LogInfo($"Importing {extractType} data...");
 
                 switch (extractType)
                 {
@@ -160,7 +200,7 @@ namespace Outage.DataImporter.CIMAdapter
                         }
                     default:
                         {
-                            logger.LogWarn($"Import of {extractType} data is NOT SUPPORTED.");
+                            Logger.LogWarn($"Import of {extractType} data is NOT SUPPORTED.");
                             break;
                         }
                 }
@@ -169,7 +209,7 @@ namespace Outage.DataImporter.CIMAdapter
             }
             catch (Exception ex)
             {
-                logger.LogError("Import unsuccessful.", ex);
+                Logger.LogError("Import unsuccessful.", ex);
                 return false;
             }
         }

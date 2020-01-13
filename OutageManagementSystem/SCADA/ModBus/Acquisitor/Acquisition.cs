@@ -1,8 +1,10 @@
-﻿using Outage.SCADA.ModBus.Connection;
+﻿using Outage.Common;
+using Outage.SCADA.ModBus.Connection;
 using Outage.SCADA.ModBus.FunctionParameters;
 using Outage.SCADA.ModBus.ModbusFuntions;
-using Outage.SCADA.SCADA_Common;
-using Outage.SCADA.SCADA_Config_Data.Repository;
+using Outage.SCADA.SCADACommon;
+using Outage.SCADA.SCADAData.Configuration;
+using Outage.SCADA.SCADAData.Repository;
 using System;
 using System.Threading;
 
@@ -10,110 +12,137 @@ namespace Outage.SCADA.ModBus.Acquisitor
 {
     public class Acquisition
     {
-        //TODO: singleton, diskusija...
+        private ILogger logger;
 
-        private FunctionExecutor commandExecutor = new FunctionExecutor(DataModelRepository.Instance.TcpPort);
-        private Thread acquisitionWorker;
+        protected ILogger Logger
+        {
+            get { return logger ?? (logger = LoggerWrapper.Instance); }
+        }
+
         private bool threadActiveSignal = true;
+        private Thread acquisitionThread;
+
+        private ISCADAConfigData scadaConfig;
+        private FunctionExecutor functionExecutor;
+
+        public SCADAModel SCADAModel { get; protected set; }
 
         public Acquisition()
         {
-            this.InitializeAcquisitionThread();
-        }
+            this.scadaConfig = SCADAConfigData.Instance;
+            this.functionExecutor = FunctionExecutor.Instance;
+            SCADAModel = SCADAModel.Instance;
 
-        //TODO: WHY NEVER USED
-        public Acquisition(FunctionExecutor fe)
-        {
-            commandExecutor = fe;
             this.InitializeAcquisitionThread();
         }
 
         private void InitializeAcquisitionThread()
         {
-            this.acquisitionWorker = new Thread(Acquire);
-            this.acquisitionWorker.Name = "Acquisition thread";
+            this.acquisitionThread = new Thread(AcquisitionThread)
+            {
+                Name = "AcquisitionThread"
+            };
+
+            Logger.LogDebug("InitializeAcquisitionThread is initialized.");
         }
 
         public void StartAcquisitionThread()
         {
             threadActiveSignal = true;
-            acquisitionWorker.Start();
+            Logger.LogDebug("threadActiveSignal is set on true.");
+            acquisitionThread.Start();
         }
 
         public void StopAcquisitionThread()
         {
             threadActiveSignal = false;
+            Logger.LogDebug("threadActiveSignal is set on false.");
         }
 
-        private void Acquire()
+        private void AcquisitionThread()
         {
             ushort quantity = 1;
             ushort length = 6;
 
             try
             {
+                Logger.LogInfo("AcquisitionThread is started.");
+
                 while (threadActiveSignal)
                 {
-                    Thread.Sleep(DataModelRepository.Instance.Interval);
+                    Thread.Sleep(scadaConfig.Interval);
 
-                    foreach (var point in DataModelRepository.Instance.Points)
+                    if (functionExecutor.ModbusClient.Connected)
                     {
-                        ushort address = point.Value.Address;
-
-                        //DIGITALNI IZLAZI
-                        if (point.Value.RegistarType == PointType.DIGITAL_OUTPUT)
+                        foreach (ISCADAModelPointItem pointItem in SCADAModel.CurrentScadaModel.Values)
                         {
-                            ModbusReadCommandParameters mdb_read = new ModbusReadCommandParameters(length,
-                                                                                                   (byte)ModbusFunctionCode.READ_COILS,
-                                                                                                   address, quantity);
+                            ushort address = pointItem.Address;
+                            ModbusFunction modbusFunction;
 
-                            ModbusFunction fn = FunctionFactory.CreateModbusFunction(mdb_read);
-                            this.commandExecutor.EnqueueCommand(fn);
-                        }
-                        //DIGITALNI ULAZI
-                        else if (point.Value.RegistarType == PointType.DIGITAL_INPUT)
-                        {
-                            ModbusReadCommandParameters mdb_read = new ModbusReadCommandParameters(length,
-                                                                                                   (byte)ModbusFunctionCode.READ_DISCRETE_INPUTS,
-                                                                                                   address, quantity);
+                            //DIGITAL_OUTPUT
+                            if (pointItem.RegistarType == PointType.DIGITAL_OUTPUT)
+                            {
+                                ModbusReadCommandParameters mdb_read = new ModbusReadCommandParameters(length,
+                                                                                                       (byte)ModbusFunctionCode.READ_COILS,
+                                                                                                       address, quantity);
 
-                            ModbusFunction fn = FunctionFactory.CreateModbusFunction(mdb_read);
-                            this.commandExecutor.EnqueueCommand(fn);
-                        }
-                        //ANALOGNI IZLAZI
-                        else if (point.Value.RegistarType == PointType.ANALOG_OUTPUT)
-                        {
-                            ModbusReadCommandParameters mdb_read = new ModbusReadCommandParameters(length,
-                                                                                                   (byte)ModbusFunctionCode.READ_HOLDING_REGISTERS,
-                                                                                                   address, quantity);
+                                modbusFunction = FunctionFactory.CreateModbusFunction(mdb_read);
+                            }
+                            //DIGITAL_INPUT
+                            else if (pointItem.RegistarType == PointType.DIGITAL_INPUT)
+                            {
+                                ModbusReadCommandParameters mdb_read = new ModbusReadCommandParameters(length,
+                                                                                                       (byte)ModbusFunctionCode.READ_DISCRETE_INPUTS,
+                                                                                                       address, quantity);
 
-                            ModbusFunction fn = FunctionFactory.CreateModbusFunction(mdb_read);
-                            this.commandExecutor.EnqueueCommand(fn);
-                        }
-                        //ANALOGNI ULAZI
-                        else if (point.Value.RegistarType == PointType.ANALOG_INPUT)
-                        {
-                            ModbusReadCommandParameters mdb_read = new ModbusReadCommandParameters(length,
-                                                                                                   (byte)ModbusFunctionCode.READ_INPUT_REGISTERS,
-                                                                                                   address, quantity);
+                                modbusFunction = FunctionFactory.CreateModbusFunction(mdb_read);
+                            }
+                            //ANALOG_OUTPUT
+                            else if (pointItem.RegistarType == PointType.ANALOG_OUTPUT)
+                            {
+                                ModbusReadCommandParameters mdb_read = new ModbusReadCommandParameters(length,
+                                                                                                       (byte)ModbusFunctionCode.READ_HOLDING_REGISTERS,
+                                                                                                       address, quantity);
 
-                            ModbusFunction fn = FunctionFactory.CreateModbusFunction(mdb_read);
-                            this.commandExecutor.EnqueueCommand(fn);
+                                modbusFunction = FunctionFactory.CreateModbusFunction(mdb_read);
+                            }
+                            //ANALOG_INPUT
+                            else if (pointItem.RegistarType == PointType.ANALOG_INPUT)
+                            {
+                                ModbusReadCommandParameters mdb_read = new ModbusReadCommandParameters(length,
+                                                                                                       (byte)ModbusFunctionCode.READ_INPUT_REGISTERS,
+                                                                                                       address, quantity);
+
+                                modbusFunction = FunctionFactory.CreateModbusFunction(mdb_read);
+                            }
+                            else
+                            {
+                                modbusFunction = null;
+                                string message = $"PointType value is invalid";
+                                Logger.LogError(message);
+                            }
+
+                            if (modbusFunction != null)
+                            {
+                                if(this.functionExecutor.EnqueueCommand(modbusFunction))
+                                {
+                                    Logger.LogDebug($"Modbus function enquided. Point type is {pointItem.RegistarType}");
+                                }
+                            }
+
+                            //TOOD: PODESAVANJE ALARMA
+                            //pointItem.SetAlarms();
+                            //Logger.LogInfo("Alarm for item " + pointItem.Gid + " is set to " + pointItem.Alarm.ToString());
                         }
                     }
-
-                    //ushort adresa1 = 00040;
-                    //ushort kvantitet1 = 1;
-                    //ModbusReadCommandParameters mdb_read = new ModbusReadCommandParameters
-                    //(6, (byte)ModbusFunctionCode.READ_COILS, adresa1, kvantitet1);
-
-                    //ModbusFunction fn = FunctionFactory.CreateModbusFunction(mdb_read);
-                    //this.commandExecutor.EnqueueCommand(fn);
                 }
+
+                Logger.LogInfo("AcquisitionThread is stopped.");
             }
             catch (Exception e)
             {
-                Console.WriteLine(e.Message);
+                string message = "Exception caught in AcquisitionThread.";
+                Logger.LogError(message, e);
             }
         }
     }

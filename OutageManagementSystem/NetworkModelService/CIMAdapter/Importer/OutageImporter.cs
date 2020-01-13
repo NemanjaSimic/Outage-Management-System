@@ -1,42 +1,46 @@
 ﻿using CIM.Model;
-using Outage.DataImporter.CIMAdapter.Manager;
 using Outage.Common;
 using Outage.Common.GDA;
+using Outage.Common.ServiceProxies;
 using System;
 using System.Collections.Generic;
-using System.Linq;
-using System.Text;
-using System.Threading.Tasks;
-using Outage.Common.ServiceProxies;
 
 namespace Outage.DataImporter.CIMAdapter.Importer
 {
     public class OutageImporter
     {
-        private ILogger logger = LoggerWrapper.Instance;
+        private ILogger logger;
+
+        protected ILogger Logger
+        {
+            get { return logger ?? (logger = LoggerWrapper.Instance); }
+        }
 
         private static OutageImporter outageImporter = null;
         private static object singletoneLock = new object();
 
         private ConcreteModel concreteModel;
         private Delta delta;
+
         //private Dictionary<long, ResourceDescription> negativeGidToResource;
         private Dictionary<string, long> mridToPositiveGidFromServer;
+
         private HashSet<string> mridsFromConcreteModel;
         private Dictionary<long, string> negativeGidToMrid;
         private ImportHelper importHelper;
         private TransformAndLoadReport report;
 
         #region Properties
+
         public static OutageImporter Instance
         {
             get
             {
-                if(outageImporter == null)
+                if (outageImporter == null)
                 {
                     lock (singletoneLock)
                     {
-                        if(outageImporter == null)
+                        if (outageImporter == null)
                         {
                             outageImporter = new OutageImporter();
                             outageImporter.Reset();
@@ -58,7 +62,7 @@ namespace Outage.DataImporter.CIMAdapter.Importer
         /// <summary>
         /// Dictionary which contains all data: Key - negative gid, Value - MRID
         /// </summary>
-        public Dictionary<long, string>NegativeGidToMrid
+        public Dictionary<long, string> NegativeGidToMrid
         {
             get
             {
@@ -87,8 +91,8 @@ namespace Outage.DataImporter.CIMAdapter.Importer
                 return mridsFromConcreteModel ?? (mridsFromConcreteModel = new HashSet<string>());
             }
         }
-        #endregion
 
+        #endregion Properties
 
         public void Reset()
         {
@@ -104,8 +108,7 @@ namespace Outage.DataImporter.CIMAdapter.Importer
 
         public TransformAndLoadReport CreateNMSDelta(ConcreteModel cimConcreteModel, NetworkModelGDAProxy gdaQueryProxy, ModelResourcesDesc resourcesDesc)
         {
-            //LogManager.Log("Importing Outage Elements...", LogLevel.Info); //TODO: ovo menjati sa nasim logom
-            logger.LogInfo("Importing Outage Elements...");
+            Logger.LogInfo("Importing Outage Elements...");
             report = new TransformAndLoadReport();
             concreteModel = cimConcreteModel;
             delta.ClearDeltaOperations();
@@ -125,23 +128,23 @@ namespace Outage.DataImporter.CIMAdapter.Importer
                 {
                     string message = $"{DateTime.Now} - ERROR in data import - {ex.Message}";
                     //LogManager.Log(message);
-                    logger.LogError(message, ex);
+                    Logger.LogError(message, ex);
                     report.Report.AppendLine(ex.Message);
                     report.Success = false;
                 }
             }
             //LogManager.Log("Importing Outage Elements - END", LogLevel.Info);
-            logger.LogInfo("Importing Outage Elements - END");
+            Logger.LogInfo("Importing Outage Elements - END");
             return report;
         }
 
         private void ConvertModelAndPopulateDelta(NetworkModelGDAProxy gdaQueryProxy, ModelResourcesDesc resourcesDesc)
         {
             //LogManager.Log("Loading elements and creating delta...", LogLevel.Info);
-            logger.LogInfo("Loading elements and creating delta...");
+            Logger.LogInfo("Loading elements and creating delta...");
 
             PopulateNmsDataFromServer(gdaQueryProxy, resourcesDesc);
-            
+
             //// import all concrete model types (DMSType enum)
             ImportBaseVoltages();
             ImportPowerTransformers();
@@ -158,19 +161,17 @@ namespace Outage.DataImporter.CIMAdapter.Importer
             ImportDiscretes();
             ImportAnalogs();
 
-
             CorrectNegativeReferences();
             CreateAndInsertDeleteOperations();
             //LogManager.Log("Loading elements and creating delta completed.", LogLevel.Info);
-            logger.LogInfo("Loading elements and creating delta completed.");
-
+            Logger.LogInfo("Loading elements and creating delta completed.");
         }
 
         private bool PopulateNmsDataFromServer(NetworkModelGDAProxy gdaQueryProxy, ModelResourcesDesc resourcesDesc)
         {
             bool success = false;
             string message = "Getting nms data from server started.";
-            CommonTrace.WriteTrace(CommonTrace.TraceError, message);
+            Logger.LogInfo(message);
 
             HashSet<ModelCode> requiredEntityTypes = new HashSet<ModelCode>();
 
@@ -194,14 +195,13 @@ namespace Outage.DataImporter.CIMAdapter.Importer
             {
                 int iteratorId = 0;
                 int resourcesLeft = 0;
-                int numberOfResources = 10000; //TODO connfigurabilno
+                int numberOfResources = 10000; //TODO: connfigurabilno
 
                 try
                 {
                     iteratorId = gdaQueryProxy.GetExtentValues(modelCodeType, mrIdProp);
                     resourcesLeft = gdaQueryProxy.IteratorResourcesLeft(iteratorId);
 
-                    //TODO: while, n to be some predifined number...
                     while (resourcesLeft > 0)
                     {
                         List<ResourceDescription> gdaResult = gdaQueryProxy.IteratorNext(numberOfResources, iteratorId);
@@ -215,7 +215,7 @@ namespace Outage.DataImporter.CIMAdapter.Importer
 
                             string mrId = rd.Properties[0].PropertyValue.StringValue;
 
-                            if(!MridToPositiveGidFromServer.ContainsKey(mrId))
+                            if (!MridToPositiveGidFromServer.ContainsKey(mrId))
                             {
                                 MridToPositiveGidFromServer.Add(mrId, rd.Id);
                             }
@@ -231,27 +231,28 @@ namespace Outage.DataImporter.CIMAdapter.Importer
                     gdaQueryProxy.IteratorClose(iteratorId);
 
                     message = "Getting nms data from server successfully finished.";
-                    CommonTrace.WriteTrace(CommonTrace.TraceError, message);
+                    Logger.LogInfo(message);
                     success = true;
                 }
                 catch (Exception e)
                 {
                     message = string.Format("Getting extent values method failed for {0}.\n\t{1}", modelCodeType, e.Message);
-                    CommonTrace.WriteTrace(CommonTrace.TraceError, message);
+                    Logger.LogError(message);
                     success = false;
                 }
             }
-               
+
             return success;
         }
 
         #region Import
+
         private void ImportPowerTransformers()
         {
             SortedDictionary<string, object> cimPowerTransformers = concreteModel.GetAllObjectsOfType("Outage.PowerTransformer");
             if (cimPowerTransformers != null)
             {
-                foreach(KeyValuePair<string, object> cimPowerTransformerPair in cimPowerTransformers)
+                foreach (KeyValuePair<string, object> cimPowerTransformerPair in cimPowerTransformers)
                 {
                     Outage.PowerTransformer cimPowerTransformer = cimPowerTransformerPair.Value as Outage.PowerTransformer;
                     ResourceDescription rd = CreatePowerTransformerResourceDescription(cimPowerTransformer);
@@ -320,7 +321,6 @@ namespace Outage.DataImporter.CIMAdapter.Importer
 
                 OutageConverter.PopulateTransformerWindingProperties(cimTransformerWinding, rd, importHelper, report);
             }
-           
 
             return rd;
         }
@@ -330,7 +330,7 @@ namespace Outage.DataImporter.CIMAdapter.Importer
             SortedDictionary<string, object> cimBaseVoltages = concreteModel.GetAllObjectsOfType("Outage.BaseVoltage");
             if (cimBaseVoltages != null)
             {
-                foreach(KeyValuePair<string, object> cimBaseVoltagePair in cimBaseVoltages)
+                foreach (KeyValuePair<string, object> cimBaseVoltagePair in cimBaseVoltages)
                 {
                     Outage.BaseVoltage cimBaseVoltage = cimBaseVoltagePair.Value as Outage.BaseVoltage;
                     ResourceDescription rd = CreateBaseVoltageResourceDescription(cimBaseVoltage);
@@ -371,7 +371,7 @@ namespace Outage.DataImporter.CIMAdapter.Importer
 
             if (cimEnergySources != null)
             {
-                foreach(KeyValuePair<string, object> cimEnergySourcePair in cimEnergySources)
+                foreach (KeyValuePair<string, object> cimEnergySourcePair in cimEnergySources)
                 {
                     Outage.EnergySource cimEnergySource = cimEnergySourcePair.Value as Outage.EnergySource;
                     ResourceDescription rd = CreateEnergySourceResourceDescription(cimEnergySource);
@@ -815,7 +815,8 @@ namespace Outage.DataImporter.CIMAdapter.Importer
 
             return rd;
         }
-        #endregion
+
+        #endregion Import
 
         private void CreateAndInsertDeltaOperation(string mrid, ResourceDescription rd)
         {
@@ -851,16 +852,16 @@ namespace Outage.DataImporter.CIMAdapter.Importer
         private void CorrectNegativeReferences()
         {
             foreach (ResourceDescription rd in delta.InsertOperations)
-            { 
-                foreach(Property prop in rd.Properties)
+            {
+                foreach (Property prop in rd.Properties)
                 {
-                    if(prop.Type == PropertyType.Reference)
+                    if (prop.Type == PropertyType.Reference)
                     {
                         long targetGid = prop.AsLong();
 
                         if (ModelCodeHelper.ExtractEntityIdFromGlobalId(targetGid) < 0)
                         {
-                            if(NegativeGidToMrid.ContainsKey(targetGid))
+                            if (NegativeGidToMrid.ContainsKey(targetGid))
                             {
                                 string mrid = NegativeGidToMrid[targetGid];
                                 if (MridToPositiveGidFromServer.ContainsKey(mrid))
@@ -901,9 +902,9 @@ namespace Outage.DataImporter.CIMAdapter.Importer
 
         private void CreateAndInsertDeleteOperations()
         {
-            foreach(string mrid in MridToPositiveGidFromServer.Keys)
+            foreach (string mrid in MridToPositiveGidFromServer.Keys)
             {
-                if(!MridsFromConcreteModel.Contains(mrid))
+                if (!MridsFromConcreteModel.Contains(mrid))
                 {
                     long serverGid = MridToPositiveGidFromServer[mrid];
                     ResourceDescription rd = new ResourceDescription(serverGid);

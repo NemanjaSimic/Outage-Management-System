@@ -3,9 +3,9 @@
     public class ModbusWriteCommandParameters : ModbusCommandParameters
     {
         private ushort outputAddress;
-        private ushort value;
+        private int value;
 
-        public ModbusWriteCommandParameters(ushort length, byte functionCode, ushort outputAddress, ushort value)
+        public ModbusWriteCommandParameters(ushort length, byte functionCode, ushort outputAddress, int value)
             : base(length, functionCode)
         {
             OutputAddress = outputAddress;
@@ -25,7 +25,7 @@
             }
         }
 
-        public ushort Value
+        public int Value
         {
             get
             {

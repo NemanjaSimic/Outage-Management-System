@@ -1,8 +1,6 @@
-﻿using PubSubCommon;
-using PubSubCommon.Proxy;
+﻿using Outage.Common;
+using Outage.Common.ServiceProxies.PubSub;
 using System;
-using System.ServiceModel;
-using static PubSubCommon.Enums;
 
 namespace TestSub
 {
@@ -10,15 +8,22 @@ namespace TestSub
 	{
 		static void Main(string[] args)
 		{
-			//DuplexChannelFactory<ISubscriber> factory = new DuplexChannelFactory<ISubscriber>(new InstanceContext(new Notify()), "PubSubService");
-			//ISubscriber proxy = factory.CreateChannel();
-			Console.WriteLine("Created..");
-			//proxy.Subscribe(Topic.Status);
-			var proxy = new SubscriberProxy(new Notify(), "PubSubService");
-			
-			proxy.Subscribe(Topic.Measurement);
-			
-			Console.WriteLine("Subscribed..");
+			try
+			{
+				Console.WriteLine("Created..");
+				Notification notification = new Notification("TEST_SUBSCRIBER");
+				SubscriberProxy proxy = new SubscriberProxy(notification, EndpointNames.SubscriberEndpoint);
+				proxy.Subscribe(Topic.MEASUREMENT);
+                proxy.Subscribe(Topic.SWITCH_STATUS);
+
+				Console.WriteLine("Subscribed..");
+			}
+			catch (Exception e)
+			{
+
+				Console.WriteLine(e.Message);
+				Console.WriteLine(e.StackTrace);
+			}
 
 			Console.ReadLine();
 		}
