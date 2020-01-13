@@ -10,11 +10,13 @@ namespace Outage.Common.ServiceProxies
 {
     public class SCADACommandProxy : ClientBase<ISCADACommand>, ISCADACommand
     {
-        public void SendAnalogCommand(long gid, float commandingValue)
+        public bool SendAnalogCommand(long gid, float commandingValue)
         {
+            bool success;
+
             try
             {
-                Channel.SendAnalogCommand(gid, commandingValue);
+                success = Channel.SendAnalogCommand(gid, commandingValue);
             }
             catch (Exception e)
             {
@@ -22,27 +24,17 @@ namespace Outage.Common.ServiceProxies
                 LoggerWrapper.Instance.LogError(message, e);
                 throw e;
             }
+
+            return success;
         }
 
-        public void SendAnalogCommand(ushort address, float commandingValue)
+        public bool SendDiscreteCommand(long gid, ushort commandingValue)
         {
-            try
-            {
-                Channel.SendAnalogCommand(address, commandingValue);
-            }
-            catch (Exception e)
-            {
-                string message = "Exception in SendAnalogCommand() proxy method.";
-                LoggerWrapper.Instance.LogError(message, e);
-                throw e;
-            }
-        }
+            bool success;
 
-        public void SendDiscreteCommand(long gid, ushort commandingValue)
-        {
             try
             {
-                Channel.SendDiscreteCommand(gid, commandingValue);
+                success = Channel.SendDiscreteCommand(gid, commandingValue);
             }
             catch (Exception e)
             {
@@ -50,20 +42,8 @@ namespace Outage.Common.ServiceProxies
                 LoggerWrapper.Instance.LogError(message, e);
                 throw e;
             }
-        }
 
-        public void SendDiscreteCommand(ushort address, ushort commandingValue)
-        {
-            try
-            {
-                Channel.SendDiscreteCommand(address, commandingValue);
-            }
-            catch (Exception e)
-            {
-                string message = "Exception in SendDiscreteCommand() proxy method.";
-                LoggerWrapper.Instance.LogError(message, e);
-                throw e;
-            }
+            return success;
         }
     }
 }

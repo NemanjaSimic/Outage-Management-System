@@ -77,7 +77,7 @@ namespace Outage.SCADA.ModBus.Acquisitor
                         foreach (ISCADAModelPointItem pointItem in SCADAModel.CurrentScadaModel.Values)
                         {
                             ushort address = pointItem.Address;
-                            ModbusFunction modbusFunction = null;
+                            ModbusFunction modbusFunction;
 
                             //DIGITAL_OUTPUT
                             if (pointItem.RegistarType == PointType.DIGITAL_OUTPUT)
@@ -117,13 +117,17 @@ namespace Outage.SCADA.ModBus.Acquisitor
                             }
                             else
                             {
-                                throw new Exception("PointType value is invalid");
+                                modbusFunction = null;
+                                string message = $"PointType value is invalid";
+                                Logger.LogError(message);
                             }
 
                             if (modbusFunction != null)
                             {
-                                this.functionExecutor.EnqueueCommand(modbusFunction);
-                                Logger.LogDebug($"Modbus function enquided. Point type is {pointItem.RegistarType}");
+                                if(this.functionExecutor.EnqueueCommand(modbusFunction))
+                                {
+                                    Logger.LogDebug($"Modbus function enquided. Point type is {pointItem.RegistarType}");
+                                }
                             }
 
                             //TOOD: PODESAVANJE ALARMA

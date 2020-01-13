@@ -11,15 +11,9 @@ namespace Outage.Common.ServiceContracts.SCADA
     public interface ISCADACommand
     {
         [OperationContract]
-        void SendAnalogCommand(long gid, float commandingValue);
-
-        //[OperationContract]
-        //void SendAnalogCommand(ushort address, float commandingValue);
+        bool SendAnalogCommand(long gid, float commandingValue);
 
         [OperationContract]
-        void SendDiscreteCommand(long gid, ushort commandingValue);
-
-        //[OperationContract]
-        //void SendDiscreteCommand(ushort address, ushort commandingValue);
+        bool SendDiscreteCommand(long gid, ushort commandingValue);
     }
 }

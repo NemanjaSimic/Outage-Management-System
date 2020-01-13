@@ -166,21 +166,33 @@ namespace Outage.SCADA.ModBus.Connection
             
         }
 
-        public void EnqueueCommand(ModbusFunction modbusFunction)
+        public bool EnqueueCommand(ModbusFunction modbusFunction)
         {
+            bool success;
+
             try
             {
                 if (ModbusClient != null && ModbusClient.Connected)
                 {
                     this.commandQueue.Enqueue(modbusFunction);
                     this.commandEvent.Set();
+                    success = true;
+                }
+                else
+                {
+                    success = false;
+                    string message = "Modbus client is either not connected or null.";
+                    Logger.LogError(message);
                 }
             }
             catch (Exception e)
             {
+                success = false;
                 string message = "Exception caught in EnqueueCommand() method.";
                 Logger.LogError(message, e);
             }
+
+            return success;
         }
 
         #endregion Public Members

@@ -82,7 +82,7 @@ namespace PubSubEngine
             {
                 Logger.LogDebug($"Try to get List of subscribers is SUCCESSFUL. Topic ['{topic}']");
             }
-            else if(subscribedClients[topic].Count == 0)
+            else if(subscribedClients.ContainsKey(topic) && subscribedClients[topic].Count == 0)
             {
                 Logger.LogDebug($"List of subscribers for topic: '{topic}' is empty.");
             }
