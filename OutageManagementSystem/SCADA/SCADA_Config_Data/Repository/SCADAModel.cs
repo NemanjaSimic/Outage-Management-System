@@ -195,14 +195,16 @@ namespace Outage.SCADA.SCADAData.Repository
                     {
                         ISCADAModelPointItem pointItem = CreateConfigItemForEntity(gid);
 
-                        if (!IncomingScadaModel.ContainsKey(gid) || !IncomingAddressToGidMap[pointItem.RegistarType].ContainsKey(pointItem.Address))
+                        if (!IncomingScadaModel.ContainsKey(gid))
                         {
                             string message = $"Model update data in fault state. Updating entity with gid: {gid} or measurement address: {pointItem.Address}, that does not exists in SCADA model.";
                             Logger.LogError(message);
                             throw new ArgumentException(message);
                         }
 
+                        ISCADAModelPointItem oldPointItem = IncomingScadaModel[gid];
                         IncomingScadaModel[gid] = pointItem;
+                        IncomingAddressToGidMap[pointItem.RegistarType].Remove(oldPointItem.Address);
                         IncomingAddressToGidMap[pointItem.RegistarType][pointItem.Address] = gid;
                     }
                 }

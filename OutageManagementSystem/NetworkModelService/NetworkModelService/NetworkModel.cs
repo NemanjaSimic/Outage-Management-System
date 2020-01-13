@@ -1172,6 +1172,7 @@ namespace Outage.NetworkModelService
                         Logger.LogError($"Error while applying delta (id: {delta.Id}) durning service initialization. {ex.Message}", ex);
                     }
                 }
+                SaveNetworkModel();
             }
             else if (networkModelVersion > 0)
             {
