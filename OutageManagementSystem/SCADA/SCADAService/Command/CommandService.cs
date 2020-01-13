@@ -28,7 +28,7 @@ namespace Outage.SCADA.SCADAService.Command
             {
                 if (pointItem.RegistarType == PointType.ANALOG_OUTPUT)
                 {
-                    ushort modbusValue = (ushort)commandingValue; //TODO: EGU convertion...
+                    int modbusValue = (int)commandingValue; //TODO: EGU convertion...
                     SendCommand(pointItem, modbusValue);
                 }
                 else
@@ -43,6 +43,30 @@ namespace Outage.SCADA.SCADAService.Command
                 string message = $"Entity with gid: 0x{gid:X16} does not exist in current SCADA model.";
                 Logger.LogError(message);
             }
+        }
+
+        public void SendAnalogCommand(ushort address, float commandingValue)
+        {
+            throw new NotImplementedException("SendAnalogCommand");
+            //if (scadaModel.CurrentScadaModel.TryGetValue(gid, out ISCADAModelPointItem pointItem))
+            //{
+            //    if (pointItem.RegistarType == PointType.ANALOG_OUTPUT)
+            //    {
+            //        int modbusValue = (int)commandingValue; //TODO: EGU convertion...
+            //        SendCommand(pointItem, modbusValue);
+            //    }
+            //    else
+            //    {
+            //        string message = $"RegistarType of entity with gid: 0x{gid:X16} is not ANALOG_OUTPUT.";
+            //        Logger.LogError(message);
+            //        return;
+            //    }
+            //}
+            //else
+            //{
+            //    string message = $"Entity with gid: 0x{gid:X16} does not exist in current SCADA model.";
+            //    Logger.LogError(message);
+            //}
         }
 
         public void SendDiscreteCommand(long gid, ushort commandingValue)
@@ -67,17 +91,40 @@ namespace Outage.SCADA.SCADAService.Command
             }
         }
 
+        public void SendDiscreteCommand(ushort address, ushort commandingValue)
+        {
+            throw new NotImplementedException("SendDiscreteCommand");
+            //if (scadaModel.CurrentScadaModel.TryGetValue(gid, out ISCADAModelPointItem pointItem))
+            //{
+            //    if (pointItem.RegistarType == PointType.DIGITAL_OUTPUT)
+            //    {
+            //        SendCommand(pointItem, commandingValue);
+            //    }
+            //    else
+            //    {
+            //        string message = $"RegistarType of entity with gid: 0x{gid:X16} is not DIGITAL_OUTPUT.";
+            //        Logger.LogError(message);
+            //        return;
+            //    }
+            //}
+            //else
+            //{
+            //    string message = $"Entity with gid: 0x{gid:X16} does not exist in current SCADA model.";
+            //    Logger.LogError(message);
+            //}
+        }
+
         private void SendCommand(ISCADAModelPointItem pointItem, object commandingValue)
         {
             ushort length = 6;
             ModbusWriteCommandParameters mdb_write_comm_pars;
 
-            if (pointItem.RegistarType == PointType.ANALOG_OUTPUT && commandingValue is float analogCommandingValue)
+            if (pointItem.RegistarType == PointType.ANALOG_OUTPUT && commandingValue is int analogCommandingValue)
             {
                 mdb_write_comm_pars = new ModbusWriteCommandParameters(length,
                                                                        (byte)ModbusFunctionCode.WRITE_SINGLE_REGISTER,
                                                                        pointItem.Address,
-                                                                       (ushort)analogCommandingValue);
+                                                                       analogCommandingValue);
 
                 Logger.LogInfo("Commanded WRITE_SINGLE_REGISTER with a new value - " + analogCommandingValue);
             }
