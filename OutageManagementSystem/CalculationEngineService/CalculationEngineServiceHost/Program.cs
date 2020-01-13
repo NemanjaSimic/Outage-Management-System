@@ -25,9 +25,9 @@ namespace CalculationEngineServiceHost
                 Logger.LogInfo(message);
                 Console.WriteLine("\n{0}\n", message);
 
-                logger.LogInfo("Initializing topology...");
+                Logger.LogInfo("Initializing topology...");
                 Topology.Topology.Instance.InitializeTopology();
-                logger.LogInfo("Topology has been successfully initialized.");
+                Logger.LogInfo("Topology has been successfully initialized.");
 
                 //PrintTopology(Topology.Topology.Instance.TopologyModel.FirstNode);
                 //Console.WriteLine("///////////////////////////////////////////////////////////////////////////////");

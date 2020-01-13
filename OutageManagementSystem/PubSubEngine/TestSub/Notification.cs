@@ -26,16 +26,16 @@ namespace TestSub
         public void Notify(IPublishableMessage msg)
 		{
 			Console.WriteLine("Message from PubSub: " + msg);
-			
-			if(msg is MultipleAnalogValueSCADAMessage multipleAnalogValue)
-			{
-                foreach(long gid in multipleAnalogValue.Data.Keys)
+
+            if (msg is MultipleAnalogValueSCADAMessage multipleAnalogValue)
+            {
+                foreach (long gid in multipleAnalogValue.Data.Keys)
                 {
                     int currentValue = multipleAnalogValue.Data[gid];
                     Console.WriteLine($"Analog => Gid: 0x{gid:X16}, Value: {currentValue}");
                 }
-			}
-            else if(msg is MultipleDiscreteValueSCADAMessage multipleDiscreteValue)
+            }
+            else if (msg is MultipleDiscreteValueSCADAMessage multipleDiscreteValue)
             {
                 foreach (long gid in multipleDiscreteValue.Data.Keys)
                 {
@@ -43,6 +43,6 @@ namespace TestSub
                     Console.WriteLine($"Discrete => Gid: 0x{gid:X16}, Value: {currentValue}");
                 }
             }
-		}
+        }
 	}
 }

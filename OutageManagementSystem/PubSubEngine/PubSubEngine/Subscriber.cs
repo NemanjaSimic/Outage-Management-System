@@ -17,18 +17,26 @@ namespace PubSubEngine
             ISubscriberCallback subscriber = OperationContext.Current.GetCallbackChannel<ISubscriberCallback>();
             string subscriberName = subscriber.GetSubscriberName();
 
-            if (Subscribers.Instance.TryAddSubscriber(subscriber) && Publications.Instance.TryAddSubscriber(topic, subscriber))
+            if (Subscribers.Instance.TryAddSubscriber(subscriber))
             {
-                Logger.LogInfo($"Subscriber [{subscriberName}, Topic: {topic}] SUCCESSFYLLY.");
+                Logger.LogInfo($"Subscriber [{subscriberName}, in subscriber list SUCCESSFYLLY.");
                 Thread thread = new Thread(() => TrackPublications(subscriber));
                 thread.Start();
             }
             else
             {
+                string message = $"Try to add Subscriber [{subscriberName}, in subscriber list FAILED.";
+                Logger.LogDebug(message);
+                //throw new Exception(message);
+            }
+
+            if (!Publications.Instance.TryAddSubscriber(topic, subscriber))
+            {
                 string message = $"Try to add Subscriber [{subscriberName}, Topic: {topic}] FAILED.";
                 Logger.LogError(message);
                 //throw new Exception(message);
             }
+
         }
 
         private void TrackPublications(ISubscriberCallback subscriber)

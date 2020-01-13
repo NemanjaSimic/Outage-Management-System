@@ -13,13 +13,13 @@ namespace Outage.Common.ServiceContracts.SCADA
         [OperationContract]
         void SendAnalogCommand(long gid, float commandingValue);
 
-        [OperationContract]
-        void SendAnalogCommand(ushort address, float commandingValue);
+        //[OperationContract]
+        //void SendAnalogCommand(ushort address, float commandingValue);
 
         [OperationContract]
         void SendDiscreteCommand(long gid, ushort commandingValue);
 
-        [OperationContract]
-        void SendDiscreteCommand(ushort address, ushort commandingValue);
+        //[OperationContract]
+        //void SendDiscreteCommand(ushort address, ushort commandingValue);
     }
 }

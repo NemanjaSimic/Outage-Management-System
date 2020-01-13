@@ -3,6 +3,7 @@ using Outage.Common;
 using System;
 using System.Collections.Generic;
 using System.ServiceModel;
+using System.Text;
 using Topology;
 
 namespace CalculationEngineService
