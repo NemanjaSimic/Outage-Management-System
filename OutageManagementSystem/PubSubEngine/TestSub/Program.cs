@@ -11,10 +11,13 @@ namespace TestSub
 			try
 			{
 				Console.WriteLine("Created..");
-				Notification notification = new Notification("TEST_SUBSCRIBER");
-				SubscriberProxy proxy = new SubscriberProxy(notification, EndpointNames.SubscriberEndpoint);
+				Notification notification1 = new Notification("MEASUREMENT_SUBSCRIBER");
+				SubscriberProxy proxy1 = new SubscriberProxy(notification1, EndpointNames.SubscriberEndpoint);
+				proxy1.Subscribe(Topic.MEASUREMENT);
 
-				proxy.Subscribe(Topic.MEASUREMENT);
+                Notification notification2 = new Notification("SWITCH_STATUS_SUBSCRIBER");
+                SubscriberProxy proxy2 = new SubscriberProxy(notification2, EndpointNames.SubscriberEndpoint);
+                proxy2.Subscribe(Topic.SWITCH_STATUS);
 
 				Console.WriteLine("Subscribed..");
 			}

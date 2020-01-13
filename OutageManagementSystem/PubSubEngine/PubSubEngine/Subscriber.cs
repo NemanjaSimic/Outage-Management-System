@@ -27,7 +27,7 @@ namespace PubSubEngine
             {
                 string message = $"Try to add Subscriber [{subscriberName}, Topic: {topic}] FAILED.";
                 Logger.LogError(message);
-                throw new Exception(message);
+                //throw new Exception(message);
             }
         }
 
