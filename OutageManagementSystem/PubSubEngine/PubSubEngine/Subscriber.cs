@@ -19,22 +19,15 @@ namespace PubSubEngine
 
             if (Subscribers.Instance.TryAddSubscriber(subscriber))
             {
-                Logger.LogInfo($"Subscriber [{subscriberName}, in subscriber list SUCCESSFYLLY.");
+                Logger.LogInfo($"Subscriber [{subscriberName}] added to list of all subscribers SUCCESSFULLY.");
                 Thread thread = new Thread(() => TrackPublications(subscriber));
                 thread.Start();
             }
-            else
-            {
-                string message = $"Try to add Subscriber [{subscriberName}, in subscriber list FAILED.";
-                Logger.LogDebug(message);
-                //throw new Exception(message);
-            }
 
-            if (!Publications.Instance.TryAddSubscriber(topic, subscriber))
+            if (Publications.Instance.TryAddSubscriber(topic, subscriber))
             {
-                string message = $"Try to add Subscriber [{subscriberName}, Topic: {topic}] FAILED.";
-                Logger.LogError(message);
-                //throw new Exception(message);
+                string message = $"Subscriber [{subscriberName}], added to map Topic -> subscriber SUCCESSFULLY. Topic: '{topic}'.";
+                Logger.LogInfo(message);
             }
 
         }

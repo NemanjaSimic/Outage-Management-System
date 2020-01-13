@@ -39,9 +39,9 @@ namespace PubSubEngine
             {
                 Logger.LogDebug($"Subscriber [{subscriberName}] SUCCESSFYLLY added to collection of all subscribers.");
             }
-            else
+            else if(subscribers.ContainsKey(subscriber))
             {
-                Logger.LogWarn($"Try to add Subscriber [{subscriberName}] FAILED.");
+                Logger.LogWarn($"Subscriber [{subscriberName}, HashCode: {subscriber.GetHashCode()}] already exists in collection of all subscibers.");
             }
 
             return success;
@@ -56,9 +56,9 @@ namespace PubSubEngine
             {
                 Logger.LogDebug($"Subscriber [{subscriberName}] SUCCESSFYLLY removed from collection of all subscribers.");
             }
-            else
+            else if(subscribers.ContainsKey(subscriber))
             {
-                Logger.LogWarn($"Try to remove Subscriber [{subscriberName}] FAILED.");
+                Logger.LogWarn($"Try to remove Subscriber [{subscriberName}] FAILED for unknown reason.");
             }
         }
 
@@ -73,9 +73,9 @@ namespace PubSubEngine
                 //TODO: check this log in particular
                 Logger.LogDebug($"Published message [{message}] SUCCESSFYLLY enqueued on Subscriber [{subscriberName}]");
             }
-            else
+            else if(!subscribers.ContainsKey(subscriber))
             {
-                Logger.LogWarn($"Try to get queue of messages for Subscriber [{subscriberName}] FAILED.");
+                Logger.LogWarn($"Subscriber [{subscriberName}, HasCode: {subscriber.GetHashCode()}] does not exist in collection of all subscribers.");
             }
         }
 
@@ -89,11 +89,11 @@ namespace PubSubEngine
             if (success)
             {
                 message = queueOfMessages.Dequeue();
-                Logger.LogDebug($"Published message [{message}] SUCCESSFYLLY dequeued from Subscriber's queue of messages [Subscriber name: '{subscriberName}']");
+                Logger.LogDebug($"Published message [{message}] SUCCESSFYLLY dequeued from Subscriber's queue of messages [Subscriber name: '{subscriberName}'].");
             }
-            else
+            else if(queueOfMessages.Count == 0)
             {
-                Logger.LogWarn($"Try to get queue of messages for Subscriber [{subscriberName}] FAILED or queue is empty.");
+                Logger.LogDebug($"Queue of messages for subscriber [{subscriberName}] is empty.");
             }
 
             return message;

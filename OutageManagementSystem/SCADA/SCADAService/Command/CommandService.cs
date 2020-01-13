@@ -45,30 +45,6 @@ namespace Outage.SCADA.SCADAService.Command
             }
         }
 
-        public void SendAnalogCommand(ushort address, float commandingValue)
-        {
-            throw new NotImplementedException("SendAnalogCommand");
-            //if (scadaModel.CurrentScadaModel.TryGetValue(gid, out ISCADAModelPointItem pointItem))
-            //{
-            //    if (pointItem.RegistarType == PointType.ANALOG_OUTPUT)
-            //    {
-            //        int modbusValue = (int)commandingValue; //TODO: EGU convertion...
-            //        SendCommand(pointItem, modbusValue);
-            //    }
-            //    else
-            //    {
-            //        string message = $"RegistarType of entity with gid: 0x{gid:X16} is not ANALOG_OUTPUT.";
-            //        Logger.LogError(message);
-            //        return;
-            //    }
-            //}
-            //else
-            //{
-            //    string message = $"Entity with gid: 0x{gid:X16} does not exist in current SCADA model.";
-            //    Logger.LogError(message);
-            //}
-        }
-
         public void SendDiscreteCommand(long gid, ushort commandingValue)
         {
             if (scadaModel.CurrentScadaModel.TryGetValue(gid, out ISCADAModelPointItem pointItem))
@@ -89,29 +65,6 @@ namespace Outage.SCADA.SCADAService.Command
                 string message = $"Entity with gid: 0x{gid:X16} does not exist in current SCADA model.";
                 Logger.LogError(message);
             }
-        }
-
-        public void SendDiscreteCommand(ushort address, ushort commandingValue)
-        {
-            throw new NotImplementedException("SendDiscreteCommand");
-            //if (scadaModel.CurrentScadaModel.TryGetValue(gid, out ISCADAModelPointItem pointItem))
-            //{
-            //    if (pointItem.RegistarType == PointType.DIGITAL_OUTPUT)
-            //    {
-            //        SendCommand(pointItem, commandingValue);
-            //    }
-            //    else
-            //    {
-            //        string message = $"RegistarType of entity with gid: 0x{gid:X16} is not DIGITAL_OUTPUT.";
-            //        Logger.LogError(message);
-            //        return;
-            //    }
-            //}
-            //else
-            //{
-            //    string message = $"Entity with gid: 0x{gid:X16} does not exist in current SCADA model.";
-            //    Logger.LogError(message);
-            //}
         }
 
         private void SendCommand(ISCADAModelPointItem pointItem, object commandingValue)

@@ -38,7 +38,7 @@ namespace PubSubEngine
                 list.Add(subscriber);
                 Logger.LogDebug($"Subscriber [{subscriberName}] added to subscribed clients map. [Key Topic: {topic}]");
             }
-            else
+            else if(!subscribedClients.ContainsKey(topic))
             {
                 list = new List<ISubscriberCallback>
                 {
@@ -51,10 +51,6 @@ namespace PubSubEngine
                 {
                     Logger.LogDebug($"Subscriber [{subscriberName}] added to subscribed clients map. [Key Topic: {topic}]");
                 }
-                else
-                {
-                    Logger.LogWarn($"Try to add Subscriber [{subscriberName}] to subscribed clients map FAILED. [Key Topic: {topic}]");
-                }
             }
 
             return success;
@@ -64,12 +60,16 @@ namespace PubSubEngine
         {
             string subscriberName = subscriber.GetSubscriberName();
 
-            foreach (var item in subscribedClients)
+            foreach (Topic topic in subscribedClients.Keys)
             {
-                if (item.Value.Contains(subscriber))
+                List<ISubscriberCallback> listOfSubscribers = subscribedClients[topic];
+
+                if (listOfSubscribers.Contains(subscriber))
                 {
-                    item.Value.Remove(subscriber);
-                    Logger.LogInfo($"Subscriber [{subscriberName}] removed from subscribed clients map. [Key Topic: {item.Key}]");
+                    if(listOfSubscribers.Remove(subscriber))
+                    {
+                        Logger.LogDebug($"Subscriber [{subscriberName}] removed from subscribed clients map. [Key Topic: {topic}]");
+                    }
                 }
             }
         }
@@ -82,9 +82,9 @@ namespace PubSubEngine
             {
                 Logger.LogDebug($"Try to get List of subscribers is SUCCESSFUL. Topic ['{topic}']");
             }
-            else
+            else if(subscribedClients[topic].Count == 0)
             {
-                Logger.LogDebug($"Try to get List of subscribers FAILED. Topic ['{topic}']");
+                Logger.LogDebug($"List of subscribers for topic: '{topic}' is empty.");
             }
             
             return listOfSubscribers;
