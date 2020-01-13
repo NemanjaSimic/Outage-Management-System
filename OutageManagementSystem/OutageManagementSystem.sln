@@ -98,6 +98,11 @@ EndProject
 Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "PubSubEngineHost", "PubSubEngine\PubSubEngineHost\PubSubEngineHost.csproj", "{92A8D0F1-28DF-40BB-B8BF-B80DB2662E7C}"
 EndProject
 Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "PubSubEngine", "PubSubEngine\PubSubEngine\PubSubEngine.csproj", "{62921ECE-B533-4644-8DBF-1CFBFCA5EFC5}"
+Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "TopologyBuilder", "CalculationEngineService\TopologyBuilder\TopologyBuilder.csproj", "{F83B7FD0-C28B-4C96-A49C-7EA0E2B579F1}"
+EndProject
+Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "Topology", "CalculationEngineService\Topology\Topology.csproj", "{831A52CF-75FF-4EAB-BCEC-24547C588009}"
+EndProject
+Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "TopologyServiceClientMock", "TopologyServiceClientMock\TopologyServiceClientMock.csproj", "{2A715511-30EF-4E48-8A4B-AFF923187C24}"
 EndProject
 Global
 	GlobalSection(SolutionConfigurationPlatforms) = preSolution

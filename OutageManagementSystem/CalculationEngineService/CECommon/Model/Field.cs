@@ -1,12 +1,8 @@
-﻿using System;
-using System.Collections.Generic;
-using System.Linq;
-using System.Text;
-using System.Threading.Tasks;
+﻿using System.Collections.Generic;
 
 namespace CECommon
 {
-	public class Field : Node
+	public class Field : Edge
 	{
 		private static long fieldNumber = 5000;
 		private List<TopologyElement> members;

@@ -1,5 +1,4 @@
-﻿using NetworkModelServiceFunctions;
-using Outage.Common;
+﻿using Outage.Common;
 using Outage.Common.GDA;
 using System.Collections.Generic;
 
@@ -7,29 +6,40 @@ namespace NetworkModelServiceFunctions
 {
 	public class GDAModelHelper
 	{
+        #region Fields
+        private readonly ModelResourcesDesc modelResourcesDesc;
+		private readonly NetworkModelGDA networkModelGDA;
+		private Dictionary<long, ResourceDescription> modelEntities;
+        #endregion
 
-		private readonly ModelResourcesDesc modelResourcesDesc = new ModelResourcesDesc();
-		private readonly NetworkModelGDA networkModelGDA = new NetworkModelGDA();
+        #region Singleton
+        private static object syncObj = new object();
+		private static GDAModelHelper instance;
 
-
-		public List<long> GetAllEnergySousces()
+        public static GDAModelHelper Instance
+		{
+			get 
+			{
+				lock (syncObj)
+				{
+					if (instance == null)
+					{
+						instance = new GDAModelHelper();
+					}
+				}
+				return instance;
+			}
+		}
+        #endregion
+        private GDAModelHelper()
+		{
+			modelResourcesDesc = new ModelResourcesDesc();
+			networkModelGDA = new NetworkModelGDA();
+		}
+		public List<long> GetAllEnergySources()
 		{
 			return GetAllGids(ModelCode.ENERGYSOURCE);
 		}
-
-		public Dictionary<ModelCode, List<long>> GetAllModelEntities()
-		{
-			List<ModelCode> concreteClasses = modelResourcesDesc.NonAbstractClassIds;
-			Dictionary<ModelCode, List<long>> modelEntities = new Dictionary<ModelCode, List<long>>();
-
-			foreach (var concreteClass in concreteClasses)
-			{
-				modelEntities.Add(concreteClass, GetAllGids(concreteClass));
-			}
-
-			return modelEntities;
-		}
-
 		private List<long> GetAllGids(ModelCode concreteClass)
 		{
 			List<long> gids = new List<long>();
@@ -41,13 +51,45 @@ namespace NetworkModelServiceFunctions
 			}
 			return gids;
 		}
-
-		public List<ResourceDescription> GetAllReferencedElements(long gid)
+		public Dictionary<long, ResourceDescription> RetrieveAllElements()
 		{
-			List<ResourceDescription> elements = new List<ResourceDescription>();
-			Association association = new Association();
+			List<ModelCode> concreteClasses = modelResourcesDesc.NonAbstractClassIds;
+			modelEntities = new Dictionary<long, ResourceDescription>();
+			foreach (var item in concreteClasses)
+			{
+				List<ModelCode> properties = modelResourcesDesc.GetAllPropertyIds(ModelCodeHelper.GetTypeFromModelCode(item));
+				var elements = networkModelGDA.GetExtentValues(item, properties);
+				foreach (var element in elements)
+				{
+					modelEntities.Add(element.Id, element);
+				}
+			}
+			return modelEntities;
+		}
+		public List<long> GetAllReferencedElements(long gid)
+		{
+			List<long> elements = new List<long>();
 			DMSType type = ModelCodeHelper.GetTypeFromModelCode(modelResourcesDesc.GetModelCodeFromId(gid));
 
+			foreach (var property in GetAllReferenceProperties(type))
+			{
+				if (modelEntities.ContainsKey(gid))
+				{
+					if (property == ModelCode.POWERTRANSFORMER_TRANSFORMERWINDINGS || property == ModelCode.CONDUCTINGEQUIPMENT_TERMINALS || property == ModelCode.CONNECTIVITYNODE_TERMINALS)
+					{
+						elements.AddRange(modelEntities[gid].GetProperty(property).AsReferences());
+
+					}
+					else
+					{
+						elements.Add(modelEntities[gid].GetProperty(property).AsReference());
+					}
+				}
+			}
+			return elements;
+		}
+		private List<ModelCode> GetAllReferenceProperties(DMSType type)
+		{
 			List<ModelCode> propertyIds = new List<ModelCode>();
 
 			switch (type)
@@ -91,13 +133,7 @@ namespace NetworkModelServiceFunctions
 					break;
 			}
 
-			foreach (var property in propertyIds)
-			{
-				association.PropertyId = property;
-				elements.AddRange(networkModelGDA.GetRelatedValues(gid, new List<ModelCode>() { ModelCode.IDOBJ_GID }, association));
-			}
-
-			return elements;
+			return propertyIds;
 		}
 	}
 }

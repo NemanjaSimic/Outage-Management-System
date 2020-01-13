@@ -56,6 +56,14 @@
       <Project>{D2B436C8-C9AF-4FE2-B881-B8D28228637B}</Project>
       <Name>DistributedTransactionActor</Name>
     </ProjectReference>
+    <ProjectReference Include="..\CECommon\CECommon.csproj">
+      <Project>{E1D2D69D-E03D-4FD7-8E4F-0FC95B68F0DD}</Project>
+      <Name>CECommon</Name>
+    </ProjectReference>
+    <ProjectReference Include="..\Topology\Topology.csproj">
+      <Project>{831A52CF-75FF-4EAB-BCEC-24547C588009}</Project>
+      <Name>Topology</Name>
+    </ProjectReference>
   </ItemGroup>
   <Import Project="$(MSBuildToolsPath)\Microsoft.CSharp.targets" />
 </Project>
