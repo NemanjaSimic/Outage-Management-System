@@ -26,7 +26,7 @@ export const style = cytoscape.stylesheet()
         'height': '20px',
         'width': '20px',
     })
-    .selector('node[type="EnergySource"]')
+    .selector('node[type="ENERGYSOURCE"]')
     .style({
         'label': 'data(id)',
         'text-valign': 'center',
@@ -34,6 +34,15 @@ export const style = cytoscape.stylesheet()
         'rotate':'90',
         'shape': 'triangle',
         'background-color': 'green'
+    })
+    .selector('node[type="ACLINESEGMENT"]')
+    .style({
+        'label': 'data(id)',
+        'text-valign': 'center',
+        'text-halign': 'center',
+        'shape': 'rectangle',
+        'width': '2px',
+        'background-color': 'red'
     })
     .selector('edge')
     .style({

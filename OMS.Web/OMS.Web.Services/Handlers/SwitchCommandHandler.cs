@@ -34,7 +34,7 @@ namespace OMS.Web.Services.Handlers
                 _logger.LogError("SwitchCommandHandler failed on TurnOffSwitch handler.", e);
             }
             
-            return null;
+            return null; // vracanje null vrednosti je anti-pattern ali ovde nemam drugog izbora
         }
 
         public Task<Unit> Handle(TurnOnSwitchCommand request, CancellationToken cancellationToken)

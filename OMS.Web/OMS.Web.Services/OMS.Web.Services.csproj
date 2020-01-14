@@ -48,12 +48,13 @@
     <Reference Include="System.Xml" />
   </ItemGroup>
   <ItemGroup>
+    <Compile Include="Queries\GetTopologyQuery.cs" />
     <Compile Include="Commands\SwitchCommandBase.cs" />
     <Compile Include="Commands\TurnOffSwitchCommand.cs" />
     <Compile Include="Commands\TurnOnSwitchCommand.cs" />
     <Compile Include="Handlers\SwitchCommandHandler.cs" />
+    <Compile Include="Handlers\TopologyQueryHandler.cs" />
     <Compile Include="Properties\AssemblyInfo.cs" />
-    <Compile Include="Queries\ExampleQuery.cs" />
   </ItemGroup>
   <ItemGroup>
     <None Include="packages.config" />
@@ -72,13 +73,13 @@
       <Project>{18D15695-17F8-4E5C-9F92-51AD600437B9}</Project>
       <Name>OMS.Web.Adapter</Name>
     </ProjectReference>
-    <ProjectReference Include="..\OMS.Web.Common.Interfaces\OMS.Web.Common.Interfaces.csproj">
-      <Project>{2A7C8378-0F77-4C24-B124-F7B80393089C}</Project>
-      <Name>OMS.Web.Common.Interfaces</Name>
-    </ProjectReference>
     <ProjectReference Include="..\OMS.Web.Common\OMS.Web.Common.csproj">
       <Project>{63EA1AA4-DC22-4552-8454-346F1DA85082}</Project>
       <Name>OMS.Web.Common</Name>
+    </ProjectReference>
+    <ProjectReference Include="..\OMS.Web.UI.Models\OMS.Web.UI.Models.csproj">
+      <Project>{B4ED1DFF-BFC2-44B2-B98A-D985B1BC8179}</Project>
+      <Name>OMS.Web.UI.Models</Name>
     </ProjectReference>
   </ItemGroup>
   <Import Project="$(MSBuildToolsPath)\Microsoft.CSharp.targets" />

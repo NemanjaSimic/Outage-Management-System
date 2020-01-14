@@ -2,6 +2,7 @@ import { Injectable, EventEmitter } from '@angular/core';
 import { EnvironmentService } from '@services/environment/environment.service';
 import { OmsGraph } from '@shared/models/oms-graph.model';
 import { Observable, Observer } from 'rxjs';
+import { HttpClient } from '@angular/common/http';
 
 // TODO: add jquery in a different way, this may result in prod. build errors
 declare var $;
@@ -16,7 +17,7 @@ export class GraphService {
   private connection: any;
   private proxyName: string = 'graphhub';
 
-  constructor(private envService: EnvironmentService) {
+  constructor(private envService: EnvironmentService, private http: HttpClient) {
     this.updateRecieved = new EventEmitter<OmsGraph>();
 
     this.connection = $.hubConnection(`${this.envService.serverUrl}`);
@@ -48,6 +49,10 @@ export class GraphService {
     this.proxy.on('updateGraph', (data: OmsGraph) => {
       this.updateRecieved.emit(data);
     });
+  }
+
+  public getTopology(): Observable<OmsGraph> {
+    return this.http.get(`${this.envService.apiUrl}/topology`) as Observable<OmsGraph>;
   }
 
 }

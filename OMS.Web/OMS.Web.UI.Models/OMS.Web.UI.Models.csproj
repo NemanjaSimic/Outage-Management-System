@@ -53,12 +53,6 @@
     <Compile Include="Properties\AssemblyInfo.cs" />
   </ItemGroup>
   <ItemGroup>
-    <ProjectReference Include="..\OMS.Web.Common\OMS.Web.Common.csproj">
-      <Project>{63EA1AA4-DC22-4552-8454-346F1DA85082}</Project>
-      <Name>OMS.Web.Common</Name>
-    </ProjectReference>
-  </ItemGroup>
-  <ItemGroup>
     <None Include="app.config" />
     <None Include="packages.config" />
   </ItemGroup>

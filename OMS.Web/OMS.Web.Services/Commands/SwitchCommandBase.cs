@@ -1,5 +1,5 @@
 ﻿using MediatR;
-using OMS.Web.Common.Constants;
+using OMS.Web.UI.Models.BindingModels;
 
 namespace OMS.Web.Services.Commands
 {

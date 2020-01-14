@@ -1,7 +1,6 @@
 ﻿using System;
 using MediatR;
 using System.Web.Http;
-using OMS.Web.Common.Constants;
 using OMS.Web.Services.Commands;
 using OMS.Web.UI.Models.BindingModels;
 

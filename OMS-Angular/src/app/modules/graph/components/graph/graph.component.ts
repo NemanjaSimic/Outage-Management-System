@@ -28,6 +28,7 @@ cytoscape.use(popper);
 })
 export class GraphComponent implements OnInit, OnDestroy {
   public connectionSubscription: Subscription;
+  public topologySubscription: Subscription;
   public updateSubscription: Subscription;
   public zoomSubscription: Subscription;
   public panSubscription: Subscription;
@@ -57,7 +58,9 @@ export class GraphComponent implements OnInit, OnDestroy {
 
     setTimeout(() => {
       this.didLoadGraph = true;
-      this.drawGraph();
+
+      // initial topology
+      this.getTopology();      
     }, 2000);
 
     // web api
@@ -108,11 +111,24 @@ export class GraphComponent implements OnInit, OnDestroy {
     if (this.connectionSubscription)
       this.connectionSubscription.unsubscribe();
 
+    if (this.topologySubscription)
+      this.topologySubscription.unsubscribe();
+    
     if (this.updateSubscription)
       this.updateSubscription.unsubscribe();
 
     if (this.zoomSubscription)
       this.zoomSubscription.unsubscribe();
+  }
+
+  public getTopology(): void {
+    this.topologySubscription = this.graphService.getTopology().subscribe(
+      graph => {
+        console.log(graph);
+        this.onNotification(graph);
+      },
+      error => console.log(error)
+    );
   }
 
   public startConnection(): void {
