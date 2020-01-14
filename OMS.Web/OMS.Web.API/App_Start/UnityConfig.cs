@@ -1,6 +1,4 @@
 using MediatR;
-using OMS.Web.Adapter.Contracts;
-using OMS.Web.Adapter.ScadaClient;
 using OMS.Web.API.Hubs;
 using OMS.Web.Common;
 using OMS.Web.Common.Interfaces.Exceptions;

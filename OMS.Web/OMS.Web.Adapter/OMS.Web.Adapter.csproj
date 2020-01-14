@@ -78,7 +78,6 @@
     <Compile Include="HubDispatchers\GraphHubDispatcher.cs" />
     <Compile Include="Program.cs" />
     <Compile Include="Properties\AssemblyInfo.cs" />
-    <Compile Include="ScadaClient\ScadaClientProxy.cs" />
     <Compile Include="WebService\WebService.cs" />
     <Compile Include="WebService\WebServiceHost.cs" />
   </ItemGroup>
@@ -87,10 +86,6 @@
     <None Include="packages.config" />
   </ItemGroup>
   <ItemGroup>
-    <ProjectReference Include="..\..\OutageManagementSystem\SCADA\SCADACommon\SCADA_Common.csproj">
-      <Project>{7D87AA2B-ED19-47EA-B403-4EDC6B830D4A}</Project>
-      <Name>SCADA_Common</Name>
-    </ProjectReference>
     <ProjectReference Include="..\OMS.Web.Adapter.Contracts\OMS.Web.Adapter.Contracts.csproj">
       <Project>{0CAD32C4-5C09-467F-B5DC-57C646BAC2A2}</Project>
       <Name>OMS.Web.Adapter.Contracts</Name>
