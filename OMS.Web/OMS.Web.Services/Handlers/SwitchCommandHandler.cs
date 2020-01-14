@@ -16,6 +16,7 @@ namespace OMS.Web.Services.Handlers
         public SwitchCommandHandler(ILogger logger)
         {
             _logger = logger;
+            _scadaClient = null; // ovde izmeniti ili constructor injection
         }
 
         public Task<Unit> Handle(TurnOffSwitchCommand request, CancellationToken cancellationToken)

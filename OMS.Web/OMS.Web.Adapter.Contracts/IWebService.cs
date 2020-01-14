@@ -1,6 +1,6 @@
-﻿using OMS.Web.UI.Models.ViewModels;
+﻿using System.ServiceModel;
 using System.Collections.Generic;
-using System.ServiceModel;
+using OMS.Web.UI.Models.ViewModels;
 
 namespace OMS.Web.Adapter.Contracts
 {
