@@ -28,11 +28,11 @@ namespace Outage.SCADA.ModBus.Connection
 
         private Thread functionExecutorThread;
         private bool threadCancellationSignal = false;
-
         private IModBusFunction currentCommand;
         private AutoResetEvent commandEvent;
         private ConcurrentQueue<IModBusFunction> commandQueue;
 
+        public bool isDelta = false;
         public ISCADAConfigData ConfigData { get; protected set; }
         public SCADAModel SCADAModel { get; protected set; }
         public ModbusClient ModbusClient { get; protected set; }
@@ -112,7 +112,8 @@ namespace Outage.SCADA.ModBus.Connection
         {
             ConfigData = SCADAConfigData.Instance;
             SCADAModel = SCADAModel.Instance;
-
+            SCADAModel.EnableDelta = EnableDelta;
+            SCADAModel.DisableDelta = DisableDelta;
             ModbusClient = new ModbusClient(ConfigData.IpAddress, ConfigData.TcpPort);
 
             commandQueue = new ConcurrentQueue<IModBusFunction>();
@@ -243,9 +244,10 @@ namespace Outage.SCADA.ModBus.Connection
                         ModbusClient = new ModbusClient(ConfigData.IpAddress, ConfigData.TcpPort);
                     }
 
-                    if (!ModbusClient.Connected)
+                    if (!ModbusClient.Connected && !isDelta)
                     {
                         ConnectToModbusClient();
+                        if (SCADAModel.modelImported) InitSimulatorValues();
                     }
 
                     Logger.LogDebug("Connected and waiting for command event.");
@@ -310,6 +312,34 @@ namespace Outage.SCADA.ModBus.Connection
             }
         }
 
+        private void InitSimulatorValues()
+        {
+            foreach (var item in SCADAModel.Instance.CurrentScadaModel.Values)
+            {
+                switch (item.RegistarType)
+                {
+                    case PointType.DIGITAL_OUTPUT:
+                        ModbusClient.WriteSingleCoil(item.Address - 1, (item.CurrentValue == 1) ? true : false);
+                        break;
+ 
+                    case PointType.ANALOG_OUTPUT:
+                        ModbusClient.WriteSingleRegister(item.Address - 1, (int)item.CurrentValue);
+                        break;
+                    default:
+                        break;
+                }
+            }
+        }
+        private void EnableDelta()
+        {
+            isDelta = true;
+            ModbusClient.Disconnect();
+        }
+        private void DisableDelta()
+        {
+            isDelta = false;
+        }
+       
         #endregion Private Members
     }
 }
