@@ -16,55 +16,63 @@ namespace Outage.Common.PubSub.SCADADataContract
     [DataContract]
     public class SingleAnalogValueSCADAMessage : SCADAMessage
     {
-        public SingleAnalogValueSCADAMessage(long gid, int value)
+        public SingleAnalogValueSCADAMessage(long gid, float value, AlarmType alarm)
         {
             Gid = gid;
             Value = value;
+            Alarm = alarm;
         }
 
         public long Gid { get; private set; }
 
-        public int Value { get; private set; }
+        public float Value { get; private set; }
+
+        [DataMember]
+        public AlarmType Alarm { get; private set; }
     }
 
     [Serializable]
     [DataContract]
     public class MultipleAnalogValueSCADAMessage : SCADAMessage
     {
-        public MultipleAnalogValueSCADAMessage(Dictionary<long, int> data)
+        public MultipleAnalogValueSCADAMessage(Dictionary<long, AnalogModbusData> data)
         {
             Data = data;
         }
 
         [DataMember]
-        public Dictionary<long, int> Data { get; private set; }
+        public Dictionary<long, AnalogModbusData> Data { get; private set; }
     }
 
     [Serializable]
     [DataContract]
     public class SingleDiscreteValueSCADAMessage : SCADAMessage
     {
-        public SingleDiscreteValueSCADAMessage(long gid, bool value)
+        public SingleDiscreteValueSCADAMessage(long gid, ushort value, AlarmType alarm)
         {
             Gid = gid;
             Value = value;
+            Alarm = alarm;
         }
 
         public long Gid { get; private set; }
 
-        public bool Value { get; private set; }
+        public ushort Value { get; private set; }
+
+        [DataMember]
+        public AlarmType Alarm { get; private set; }
     }
 
     [Serializable]
     [DataContract]
     public class MultipleDiscreteValueSCADAMessage : SCADAMessage
     {
-        public MultipleDiscreteValueSCADAMessage(Dictionary<long, bool> data)
+        public MultipleDiscreteValueSCADAMessage(Dictionary<long, DiscreteModbusData> data)
         {
             Data = data;
         }
 
         [DataMember]
-        public Dictionary<long, bool> Data { get; private set; }
+        public Dictionary<long, DiscreteModbusData> Data { get; private set; }
     }
 }

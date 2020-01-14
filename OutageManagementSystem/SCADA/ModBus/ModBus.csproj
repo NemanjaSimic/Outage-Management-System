@@ -61,11 +61,6 @@
     <Compile Include="ModbusFuntions\WriteSingleCoilFunction.cs" />
     <Compile Include="ModbusFuntions\WriteSingleRegisterFunction.cs" />
     <Compile Include="ModbusSimulatorHandler.cs" />
-    <Compile Include="PointModels\AnalogInput.cs" />
-    <Compile Include="PointModels\AnalogOutput.cs" />
-    <Compile Include="PointModels\BasePointItem.cs" />
-    <Compile Include="PointModels\DigitalInput.cs" />
-    <Compile Include="PointModels\DigitalOutput.cs" />
     <Compile Include="Properties\AssemblyInfo.cs" />
   </ItemGroup>
   <ItemGroup>

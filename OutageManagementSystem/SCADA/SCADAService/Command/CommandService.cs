@@ -28,7 +28,7 @@ namespace Outage.SCADA.SCADAService.Command
 
             if (scadaModel.CurrentScadaModel.TryGetValue(gid, out ISCADAModelPointItem pointItem))
             {
-                if (pointItem.RegistarType == PointType.ANALOG_OUTPUT)
+                if (pointItem.RegisterType == PointType.ANALOG_OUTPUT)
                 {
                     int modbusValue = (int)commandingValue; //TODO: EGU convertion...
                     success = SendCommand(pointItem, modbusValue);
@@ -56,7 +56,7 @@ namespace Outage.SCADA.SCADAService.Command
 
             if (scadaModel.CurrentScadaModel.TryGetValue(gid, out ISCADAModelPointItem pointItem))
             {
-                if (pointItem.RegistarType == PointType.DIGITAL_OUTPUT)
+                if (pointItem.RegisterType == PointType.DIGITAL_OUTPUT)
                 {
                     success = SendCommand(pointItem, commandingValue);
                 }
@@ -85,7 +85,7 @@ namespace Outage.SCADA.SCADAService.Command
 
             try
             {
-                if (pointItem.RegistarType == PointType.ANALOG_OUTPUT && commandingValue is int analogCommandingValue)
+                if (pointItem.RegisterType == PointType.ANALOG_OUTPUT && commandingValue is int analogCommandingValue)
                 {
                     modbusWriteCommandParams = new ModbusWriteCommandParameters(length,
                                                                            (byte)ModbusFunctionCode.WRITE_SINGLE_REGISTER,
@@ -94,7 +94,7 @@ namespace Outage.SCADA.SCADAService.Command
 
                     Logger.LogInfo("Commanded WRITE_SINGLE_REGISTER with a new value - " + analogCommandingValue);
                 }
-                else if (pointItem.RegistarType == PointType.DIGITAL_OUTPUT && commandingValue is ushort discreteCommandingValue)
+                else if (pointItem.RegisterType == PointType.DIGITAL_OUTPUT && commandingValue is ushort discreteCommandingValue)
                 {
                     modbusWriteCommandParams = new ModbusWriteCommandParameters(length,
                                                                            (byte)ModbusFunctionCode.WRITE_SINGLE_COIL,
@@ -111,19 +111,11 @@ namespace Outage.SCADA.SCADAService.Command
                     Logger.LogError(message);
                 }
 
-                if(modbusWriteCommandParams != null)
+                if (modbusWriteCommandParams != null)
                 {
                     ModbusFunction modbusFunction = FunctionFactory.CreateModbusFunction(modbusWriteCommandParams);
                     success = functionExecutor.EnqueueCommand(modbusFunction);
                 }
-
-                //TOOD: alarming
-                //bool AlarmChanged = CI.SetAlarms();
-                //if (AlarmChanged)
-                //{
-                //    Logger.LogInfo("Alarm for item " + CI.Gid + " is set to " + CI.Alarm.ToString());
-                //}
-
             }
             catch (Exception e)
             {

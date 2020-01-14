@@ -1,4 +1,5 @@
 ﻿using EasyModbus;
+using Outage.Common.PubSub.SCADADataContract;
 using Outage.SCADA.ModBus.FunctionParameters;
 using Outage.SCADA.SCADACommon;
 using Outage.SCADA.SCADAData.Repository;
@@ -9,7 +10,7 @@ using System.Reflection;
 
 namespace Outage.SCADA.ModBus.ModbusFuntions
 {
-    public class ReadDiscreteInputsFunction : ModbusFunction, IReadDigitalModBusFunction
+    public class ReadDiscreteInputsFunction : ModbusFunction, IReadDiscreteModbusFunction
     {
         public ReadDiscreteInputsFunction(ModbusCommandParameters commandParameters)
             : base(commandParameters)
@@ -18,8 +19,7 @@ namespace Outage.SCADA.ModBus.ModbusFuntions
         }
 
         #region IModBusFunction
-
-        public Dictionary<long, bool> Data { get; protected set; }
+        public Dictionary<long, DiscreteModbusData> Data { get; protected set; }
 
         public override void Execute(ModbusClient modbusClient)
         {
@@ -35,23 +35,39 @@ namespace Outage.SCADA.ModBus.ModbusFuntions
             }
 
             bool[] data = modbusClient.ReadDiscreteInputs(startAddress - 1, quantity);
-            Data = new Dictionary<long, bool>(data.Length);
+            Data = new Dictionary<long, DiscreteModbusData>(data.Length);
 
             SCADAModel scadaModel = SCADAModel.Instance;
 
             for (ushort i = 0; i < quantity; i++)
             {
                 ushort address = (ushort)(startAddress + i);
-                bool value = data[i];
+                ushort value = (ushort)(data[i] ? 1 : 0);
                 long gid = scadaModel.CurrentAddressToGidMap[PointType.DIGITAL_INPUT][address];
 
                 if (scadaModel.CurrentScadaModel.ContainsKey(gid))
                 {
-                    scadaModel.CurrentScadaModel[gid].CurrentValue = value ? 1 : 0;
-                    Logger.LogDebug($"ReadDiscreteInputsFunction execute => Current value: {scadaModel.CurrentScadaModel[gid].CurrentValue} from address: {address}, gid: 0x{gid:X16}.");
-                }
+                    DiscreteSCADAModelPointItem pointItem = scadaModel.CurrentScadaModel[gid] as DiscreteSCADAModelPointItem;
 
-                Data.Add(gid, data[i]);
+                    if (pointItem == null)
+                    {
+                        string message = $"PointItem [Gid: 0x{gid:X16}] is not type DiscreteSCADAModelPointItem.";
+                        Logger.LogError(message);
+                        throw new Exception(message);
+                    }
+
+                    pointItem.CurrentValue = value;
+
+                    bool alarmChanged = pointItem.SetAlarms();
+                    if (alarmChanged)
+                    {
+                        Logger.LogInfo($"Alarm for Point [Gid: 0x{pointItem.Gid:X16}, Address: {pointItem.Address}] set to {pointItem.Alarm}.");
+                    }
+
+                    DiscreteModbusData digitalData = new DiscreteModbusData(value, pointItem.Alarm);
+                    Data.Add(gid, digitalData);
+                    Logger.LogDebug($"ReadDiscreteInputsFunction execute => Current value: {value} from address: {address}, gid: 0x{gid:X16}.");
+                }
             }
 
             Logger.LogDebug($"ReadDiscreteInputsFunction executed SUCCESSFULLY. StartAddress: {startAddress}, Quantity: {quantity}");

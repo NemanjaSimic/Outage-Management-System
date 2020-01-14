@@ -15,6 +15,8 @@ namespace Outage.Common.ServiceContracts.PubSub
         [ServiceKnownType(typeof(MultipleAnalogValueSCADAMessage))]
         [ServiceKnownType(typeof(SingleDiscreteValueSCADAMessage))]
         [ServiceKnownType(typeof(MultipleDiscreteValueSCADAMessage))]
+        //[ServiceKnownType(typeof(AnalogModbusData))]
+        //[ServiceKnownType(typeof(DigitalModbusData))]
         void Publish(IPublication publication);
     }
 }

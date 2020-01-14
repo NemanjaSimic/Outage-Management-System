@@ -29,9 +29,9 @@ namespace Outage.SCADA.ModBus.Connection
         private Thread functionExecutorThread;
         private bool threadCancellationSignal = false;
 
-        private IModBusFunction currentCommand;
+        private IModbusFunction currentCommand;
         private AutoResetEvent commandEvent;
-        private ConcurrentQueue<IModBusFunction> commandQueue;
+        private ConcurrentQueue<IModbusFunction> commandQueue;
 
         public ISCADAConfigData ConfigData { get; protected set; }
         public SCADAModel SCADAModel { get; protected set; }
@@ -115,12 +115,9 @@ namespace Outage.SCADA.ModBus.Connection
 
             ModbusClient = new ModbusClient(ConfigData.IpAddress, ConfigData.TcpPort);
 
-            commandQueue = new ConcurrentQueue<IModBusFunction>();
+            commandQueue = new ConcurrentQueue<IModbusFunction>();
             commandEvent = new AutoResetEvent(false);
         }
-
-        //[Obsolete("Is it usefull?")]
-        //public event UpdatePointDelegate UpdatePointEvent;
 
         #region Public Members
 
@@ -201,7 +198,6 @@ namespace Outage.SCADA.ModBus.Connection
 
         private void ConnectToModbusClient()
         {
-            
             int numberOfTries = 0;
 
             string message = $"Connecting to modbus client...";
@@ -268,15 +264,24 @@ namespace Outage.SCADA.ModBus.Connection
 
                     while (commandQueue.TryDequeue(out this.currentCommand))
                     {
-                        currentCommand.Execute(ModbusClient);
+                        try
+                        {
+                            currentCommand.Execute(ModbusClient);
+                        }
+                        catch (Exception e)
+                        {
+                            //todo: retry
+                            string message = "Exception on currentCommand.Execute().";
+                            Logger.LogWarn(message, e);
+                        }
 
-                        if (currentCommand is IReadAnalogModBusFunction readAnalogCommand)
+                        if (currentCommand is IReadAnalogModusFunction readAnalogCommand)
                         {
                             PublishAnalogData(readAnalogCommand.Data);
                         }
-                        else if (currentCommand is IReadDigitalModBusFunction readDigitalCommand)
+                        else if (currentCommand is IReadDiscreteModbusFunction readDiscreteCommand)
                         {
-                            PublishDigitalData(readDigitalCommand.Data);
+                            PublishDigitalData(readDiscreteCommand.Data);
                         }
                     }
                 }
@@ -290,13 +295,13 @@ namespace Outage.SCADA.ModBus.Connection
             Logger.LogInfo("FunctionExecutorThread is stopped.");
         }
 
-        private void PublishAnalogData(Dictionary<long, int> data)
+        private void PublishAnalogData(Dictionary<long, AnalogModbusData> data)
         {
             SCADAMessage scadaMessage = new MultipleAnalogValueSCADAMessage(data);
             PublishScadaData(Topic.MEASUREMENT, scadaMessage);
         }
 
-        private void PublishDigitalData(Dictionary<long, bool> data)
+        private void PublishDigitalData(Dictionary<long, DiscreteModbusData> data)
         {
             SCADAMessage scadaMessage = new MultipleDiscreteValueSCADAMessage(data);
             PublishScadaData(Topic.SWITCH_STATUS, scadaMessage);

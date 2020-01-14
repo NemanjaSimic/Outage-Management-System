@@ -80,7 +80,7 @@ namespace Outage.SCADA.ModBus.Acquisitor
                             ModbusFunction modbusFunction;
 
                             //DIGITAL_OUTPUT
-                            if (pointItem.RegistarType == PointType.DIGITAL_OUTPUT)
+                            if (pointItem.RegisterType == PointType.DIGITAL_OUTPUT)
                             {
                                 ModbusReadCommandParameters mdb_read = new ModbusReadCommandParameters(length,
                                                                                                        (byte)ModbusFunctionCode.READ_COILS,
@@ -89,7 +89,7 @@ namespace Outage.SCADA.ModBus.Acquisitor
                                 modbusFunction = FunctionFactory.CreateModbusFunction(mdb_read);
                             }
                             //DIGITAL_INPUT
-                            else if (pointItem.RegistarType == PointType.DIGITAL_INPUT)
+                            else if (pointItem.RegisterType == PointType.DIGITAL_INPUT)
                             {
                                 ModbusReadCommandParameters mdb_read = new ModbusReadCommandParameters(length,
                                                                                                        (byte)ModbusFunctionCode.READ_DISCRETE_INPUTS,
@@ -98,7 +98,7 @@ namespace Outage.SCADA.ModBus.Acquisitor
                                 modbusFunction = FunctionFactory.CreateModbusFunction(mdb_read);
                             }
                             //ANALOG_OUTPUT
-                            else if (pointItem.RegistarType == PointType.ANALOG_OUTPUT)
+                            else if (pointItem.RegisterType == PointType.ANALOG_OUTPUT)
                             {
                                 ModbusReadCommandParameters mdb_read = new ModbusReadCommandParameters(length,
                                                                                                        (byte)ModbusFunctionCode.READ_HOLDING_REGISTERS,
@@ -107,7 +107,7 @@ namespace Outage.SCADA.ModBus.Acquisitor
                                 modbusFunction = FunctionFactory.CreateModbusFunction(mdb_read);
                             }
                             //ANALOG_INPUT
-                            else if (pointItem.RegistarType == PointType.ANALOG_INPUT)
+                            else if (pointItem.RegisterType == PointType.ANALOG_INPUT)
                             {
                                 ModbusReadCommandParameters mdb_read = new ModbusReadCommandParameters(length,
                                                                                                        (byte)ModbusFunctionCode.READ_INPUT_REGISTERS,
@@ -124,15 +124,11 @@ namespace Outage.SCADA.ModBus.Acquisitor
 
                             if (modbusFunction != null)
                             {
-                                if(this.functionExecutor.EnqueueCommand(modbusFunction))
+                                if (this.functionExecutor.EnqueueCommand(modbusFunction))
                                 {
-                                    Logger.LogDebug($"Modbus function enquided. Point type is {pointItem.RegistarType}");
+                                    Logger.LogDebug($"Modbus function enquided. Point type is {pointItem.RegisterType}");
                                 }
                             }
-
-                            //TOOD: PODESAVANJE ALARMA
-                            //pointItem.SetAlarms();
-                            //Logger.LogInfo("Alarm for item " + pointItem.Gid + " is set to " + pointItem.Alarm.ToString());
                         }
                     }
                 }
