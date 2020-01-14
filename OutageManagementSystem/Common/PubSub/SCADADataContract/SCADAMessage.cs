@@ -23,8 +23,10 @@ namespace Outage.Common.PubSub.SCADADataContract
             Alarm = alarm;
         }
 
+        [DataMember]
         public long Gid { get; private set; }
 
+        [DataMember]
         public float Value { get; private set; }
 
         [DataMember]

@@ -7,7 +7,6 @@ using System.Threading.Tasks;
 
 namespace Outage.Common.PubSub.SCADADataContract
 {
-    //[Serializable]
     [DataContract]
     public class AnalogModbusData : IModbusData
     {

@@ -99,7 +99,8 @@ namespace Outage.Common
         ANALOG_MINVALUE                         = 0x15200000000e0305,
         ANALOG_NORMALVALUE                      = 0x15200000000e0405,
         ANALOG_SIGNALTYPE                       = 0x15200000000e050a,
-
+        //ANALOG_SCALEFACTOR                      = 0x15200000000e0605,
+        //ANALOG_DEVIATION                        = 0x15200000000e0705,
     }
 
     [Flags]

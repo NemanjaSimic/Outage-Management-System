@@ -14,31 +14,29 @@ namespace Outage.SCADA.SCADAData.Repository
         public AnalogSCADAModelPointItem() 
             : base()
         {
-            ScaleFactor = 1; //TODO: pre svih ostalih
-            Deviation = 0;  //TODO: pre svih ostalih
+            ScaleFactor = 1;    //TODO: za sad cisto da bi bilo popunjeno (zahteva promene na NMS)
+            Deviation = 0;      //TODO: za sad cisto da bi bilo popunjeno (zahteva promene na NMS)
         }
 
         public AnalogSCADAModelPointItem(List<Property> props, ModelCode type)
             : base(props, type)
         {
-            ScaleFactor = 1; //TODO: pre svih ostalih
-            Deviation = 0;  //TODO: pre svih ostalih
+            ScaleFactor = 1;    //TODO: za sad cisto da bi bilo popunjeno (zahteva promene na NMS)
+            Deviation = 0;      //TODO: za sad cisto da bi bilo popunjeno (zahteva promene na NMS)
 
             foreach (var item in props)
             {
                 switch (item.Id)
                 {
                     case ModelCode.ANALOG_CURRENTVALUE:
-                        CurrentRawValue = EguToRawValueConversion(item.AsFloat());
+                        CurrentEguValue = item.AsFloat();
                         break;
 
                     case ModelCode.ANALOG_MAXVALUE:
-                        MaxValue = EguToRawValueConversion(item.AsFloat());
                         EGU_Max = item.AsFloat();
                         break;
 
                     case ModelCode.ANALOG_MINVALUE:
-                        MinValue = EguToRawValueConversion(item.AsFloat());
                         EGU_Min = item.AsFloat();
                         break;
 
@@ -46,7 +44,6 @@ namespace Outage.SCADA.SCADAData.Repository
                         NormalValue = item.AsFloat();
                         break;
 
-                    //TODO:
                     //case ModelCode.ANALOG_SCALEFACTOR:
                     //    ScaleFactor = item.AsFloat();
                     //    break;
@@ -61,26 +58,42 @@ namespace Outage.SCADA.SCADAData.Repository
 
             }
             
-            LowLimit = EGU_Min + 5; //todo: config
-            HighLimit = EGU_Max - 5; //todo: config                
+            LowLimit = EGU_Min + 5;     //todo: config
+            HighLimit = EGU_Max - 5;    //todo: config                
         }
 
-        public int MinValue { get; set; }
-        public int MaxValue { get; set; }
-        public int CurrentRawValue { get; set; }
+        
         public double NormalValue { get; set; }
-        public double CurrentEguValue
-        {
-            get
-            {
-                return RawToEguValueConversion(CurrentRawValue);
-            }
-        }
+        public double CurrentEguValue { get; set; }
+        public double EGU_Min { get; set; }
+        public double EGU_Max { get; set; }
         public float ScaleFactor { get; set; }
         public float Deviation { get; set; }
 
-        public double EGU_Min { get; set; }
-        public double EGU_Max { get; set; }
+        public int CurrentRawValue
+        {
+            get
+            {
+                return EguToRawValueConversion(CurrentEguValue);
+            }
+        }
+
+        public int MinRawValue
+        {
+            get
+            {
+                return EguToRawValueConversion(CurrentEguValue);
+            }
+        }
+
+        public int MaxRawValue
+        {
+            get
+            {
+                return EguToRawValueConversion(CurrentEguValue);
+            }
+        }
+
         public double HighLimit { get; set; }
         public double LowLimit { get; set; }
 
@@ -93,7 +106,7 @@ namespace Outage.SCADA.SCADAData.Repository
             if (RegisterType == PointType.ANALOG_INPUT || RegisterType == PointType.ANALOG_OUTPUT)
             {
                 //VALUE IS INVALID
-                if (CurrentRawValue < MinValue || CurrentRawValue > MaxValue)
+                if (CurrentRawValue < MinRawValue || CurrentRawValue > MaxRawValue)
                 {
                     Alarm = AlarmType.ABNORMAL_VALUE;
                     if (currentAlarm != Alarm)
@@ -147,13 +160,13 @@ namespace Outage.SCADA.SCADAData.Repository
 
         public double RawToEguValueConversion(int rawValue)
         {
-            //TODO: implement
+            //TODO: implement with Deviation and ScaleFactor
             return rawValue;
         }
 
         public int EguToRawValueConversion(double eguValue)
         {
-            //TODO: implement
+            //TODO: implement with Deviation and ScaleFactor
             return (int)eguValue;
         }
 

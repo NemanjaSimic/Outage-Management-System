@@ -16,16 +16,18 @@ namespace Outage.SCADA.SCADACommon
 
     public interface IAnalogSCADAModelPointItem : ISCADAModelPointItem
     {
-        int MinValue { get; set; }
-        int MaxValue { get; set; }
-        int CurrentRawValue { get; set; }
-        double CurrentEguValue { get; }
+        
+        double CurrentEguValue { get; set; }
         double NormalValue { get; set; }
+        double EGU_Min { get; set; }
+        double EGU_Max { get; set; }
         float ScaleFactor { get; set; }
         float Deviation { get; set; }
 
-        double EGU_Min { get; set; }
-        double EGU_Max { get; set; }
+        int CurrentRawValue { get; }
+        int MinRawValue { get; }
+        int MaxRawValue { get; }
+
         double HighLimit { get; set; }
         double LowLimit { get; set; }
 
