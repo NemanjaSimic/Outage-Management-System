@@ -1,4 +1,5 @@
 ﻿using EasyModbus;
+using Outage.Common.PubSub.SCADADataContract;
 using Outage.SCADA.ModBus.FunctionParameters;
 using Outage.SCADA.SCADACommon;
 using Outage.SCADA.SCADAData.Repository;
@@ -9,7 +10,7 @@ using System.Reflection;
 
 namespace Outage.SCADA.ModBus.ModbusFuntions
 {
-    public class ReadHoldingRegistersFunction : ModbusFunction, IReadAnalogModBusFunction
+    public class ReadHoldingRegistersFunction : ModbusFunction, IReadAnalogModusFunction
     {
         public ReadHoldingRegistersFunction(ModbusCommandParameters commandParameters)
             : base(commandParameters)
@@ -19,7 +20,7 @@ namespace Outage.SCADA.ModBus.ModbusFuntions
 
         #region IModBusFunction
 
-        public Dictionary<long, int> Data { get; protected set; }
+        public Dictionary<long, AnalogModbusData> Data { get; protected set; }
 
         public override void Execute(ModbusClient modbusClient)
         {
@@ -35,7 +36,7 @@ namespace Outage.SCADA.ModBus.ModbusFuntions
             }
 
             int[] data = modbusClient.ReadHoldingRegisters(startAddress - 1, quantity);
-            Data = new Dictionary<long, int>(data.Length);
+            Data = new Dictionary<long, AnalogModbusData>(data.Length);
 
             SCADAModel scadaModel = SCADAModel.Instance;
 
@@ -47,11 +48,27 @@ namespace Outage.SCADA.ModBus.ModbusFuntions
 
                 if (scadaModel.CurrentScadaModel.ContainsKey(gid))
                 {
-                    scadaModel.CurrentScadaModel[gid].CurrentValue = value;
-                    Logger.LogDebug($"ReadHoldingRegistersFunction execute => Current value: {value} from address: {address}, gid: 0x{gid:X16}.");
-                }
+                    AnalogSCADAModelPointItem pointItem = scadaModel.CurrentScadaModel[gid] as AnalogSCADAModelPointItem;
 
-                Data.Add(gid, data[i]);
+                    if (pointItem == null)
+                    {
+                        string message = $"PointItem [Gid: 0x{gid:X16}] is not type AnalogSCADAModelPointItem.";
+                        Logger.LogError(message);
+                        throw new Exception(message);
+                    }
+
+                    pointItem.CurrentRawValue = value;
+
+                    bool alarmChanged = pointItem.SetAlarms();
+                    if (alarmChanged)
+                    {
+                        Logger.LogInfo($"Alarm for Point [Gid: 0x{pointItem.Gid:X16}, Address: {pointItem.Address}] set to {pointItem.Alarm}.");
+                    }
+
+                    AnalogModbusData digitalData = new AnalogModbusData(pointItem.CurrentEguValue, pointItem.Alarm);
+                    Data.Add(gid, digitalData);
+                    Logger.LogDebug($"ReadHoldingRegistersFunction execute => Current value: {pointItem.CurrentEguValue} from address: {address}, gid: 0x{gid:X16}.");
+                }
             }
 
             Logger.LogDebug($"ReadHoldingRegistersFunction executed SUCCESSFULLY. StartAddress: {startAddress}, Quantity: {quantity}");

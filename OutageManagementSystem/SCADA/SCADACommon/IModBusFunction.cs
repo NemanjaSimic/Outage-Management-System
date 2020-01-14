@@ -1,20 +1,22 @@
 ﻿using EasyModbus;
+using Outage.Common.PubSub.SCADADataContract;
 using System.Collections.Generic;
 
 namespace Outage.SCADA.SCADACommon
 {
-    public interface IModBusFunction
+    public interface IModbusFunction
     {
         void Execute(ModbusClient modbusClient);
     }
 
-    public interface IReadDigitalModBusFunction : IModBusFunction
+    public interface IReadAnalogModusFunction : IModbusFunction
     {
-        Dictionary<long, bool> Data { get; }
+        Dictionary<long, AnalogModbusData> Data { get; }
     }
 
-    public interface IReadAnalogModBusFunction : IModBusFunction
+    public interface IReadDiscreteModbusFunction : IModbusFunction
     {
-        Dictionary<long, int> Data { get; }
+        Dictionary<long, DiscreteModbusData> Data { get; }
     }
+    
 }

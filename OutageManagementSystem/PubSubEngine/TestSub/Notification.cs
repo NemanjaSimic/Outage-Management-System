@@ -4,6 +4,7 @@ using System.ServiceModel;
 using Outage.Common.PubSub;
 using Outage.Common.ServiceContracts.PubSub;
 using Outage.Common.PubSub.SCADADataContract;
+using Outage.Common;
 
 namespace TestSub
 {
@@ -31,16 +32,18 @@ namespace TestSub
             {
                 foreach (long gid in multipleAnalogValue.Data.Keys)
                 {
-                    int currentValue = multipleAnalogValue.Data[gid];
-                    Console.WriteLine($"Analog => Gid: 0x{gid:X16}, Value: {currentValue}");
+                    double currentValue = multipleAnalogValue.Data[gid].Value;
+                    AlarmType alarm = multipleAnalogValue.Data[gid].Alarm;
+                    Console.WriteLine($"Analog => Gid: 0x{gid:X16}, Value: {currentValue}, Alarm: {alarm}");
                 }
             }
             else if (msg is MultipleDiscreteValueSCADAMessage multipleDiscreteValue)
             {
                 foreach (long gid in multipleDiscreteValue.Data.Keys)
                 {
-                    bool currentValue = multipleDiscreteValue.Data[gid];
-                    Console.WriteLine($"Discrete => Gid: 0x{gid:X16}, Value: {currentValue}");
+                    ushort currentValue = multipleDiscreteValue.Data[gid].Value;
+                    AlarmType alarm = multipleDiscreteValue.Data[gid].Alarm;
+                    Console.WriteLine($"Discrete => Gid: 0x{gid:X16}, Value: {currentValue}, Alarm: {alarm}");
                 }
             }
         }

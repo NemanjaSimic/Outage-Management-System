@@ -166,7 +166,7 @@ namespace Outage.SCADA.SCADAData.Repository
                     ModelCode type = modelResourceDesc.GetModelCodeFromId(gid);
                     ISCADAModelPointItem pointItem = CurrentScadaModel[gid].Clone();
                     IncomingScadaModel.Add(gid, pointItem);
-                    IncomingAddressToGidMap[pointItem.RegistarType].Add(pointItem.Address, gid);
+                    IncomingAddressToGidMap[pointItem.RegisterType].Add(pointItem.Address, gid);
                 }
 
                 foreach (long gid in modelChanges[DeltaOpType.Insert])
@@ -177,7 +177,7 @@ namespace Outage.SCADA.SCADAData.Repository
                         ISCADAModelPointItem pointItem = CreateConfigItemForEntity(gid);
                         
 
-                        if (IncomingScadaModel.ContainsKey(gid) || IncomingAddressToGidMap[pointItem.RegistarType].ContainsKey(pointItem.Address))
+                        if (IncomingScadaModel.ContainsKey(gid) || IncomingAddressToGidMap[pointItem.RegisterType].ContainsKey(pointItem.Address))
                         {
                             string message = $"Model update data in fault state. Inserting gid: {gid} or measurement address: {pointItem.Address}, that already exists in SCADA model.";
                             Logger.LogError(message);
@@ -185,7 +185,7 @@ namespace Outage.SCADA.SCADAData.Repository
                         }
 
                         IncomingScadaModel.Add(gid, pointItem);
-                        IncomingAddressToGidMap[pointItem.RegistarType].Add(pointItem.Address, gid);
+                        IncomingAddressToGidMap[pointItem.RegisterType].Add(pointItem.Address, gid);
                     }
                 }
 
@@ -205,8 +205,8 @@ namespace Outage.SCADA.SCADAData.Repository
 
                         ISCADAModelPointItem oldPointItem = IncomingScadaModel[gid];
                         IncomingScadaModel[gid] = pointItem;
-                        IncomingAddressToGidMap[pointItem.RegistarType].Remove(oldPointItem.Address);
-                        IncomingAddressToGidMap[pointItem.RegistarType][pointItem.Address] = gid;
+                        IncomingAddressToGidMap[pointItem.RegisterType].Remove(oldPointItem.Address);
+                        IncomingAddressToGidMap[pointItem.RegisterType][pointItem.Address] = gid;
                     }
                 }
 
@@ -223,7 +223,7 @@ namespace Outage.SCADA.SCADAData.Repository
                         }
 
                         ushort address = IncomingScadaModel[gid].Address;
-                        IncomingAddressToGidMap[IncomingScadaModel[gid].RegistarType].Remove(address);
+                        IncomingAddressToGidMap[IncomingScadaModel[gid].RegisterType].Remove(address);
                         IncomingScadaModel.Remove(gid);
                     }
                 }
@@ -319,9 +319,9 @@ namespace Outage.SCADA.SCADAData.Repository
                                 {
                                     long gid = rds[i].Id;
                                     ModelCode type = modelResourceDesc.GetModelCodeFromId(gid);
-                                    ISCADAModelPointItem pointItem = new SCADAModelPointItem(rds[i].Properties, ModelCode.ANALOG);
+                                    ISCADAModelPointItem pointItem = new AnalogSCADAModelPointItem(rds[i].Properties, ModelCode.ANALOG);
                                     CurrentScadaModel.Add(rds[i].Id, pointItem);
-                                    CurrentAddressToGidMap[pointItem.RegistarType].Add(pointItem.Address, rds[i].Id);
+                                    CurrentAddressToGidMap[pointItem.RegisterType].Add(pointItem.Address, rds[i].Id);
                                     Logger.LogDebug($"ANALOG measurement added to SCADA model [Gid: {gid}, Address: {pointItem.Address}]");
                                 }
                             }
@@ -373,9 +373,9 @@ namespace Outage.SCADA.SCADAData.Repository
                                 {
                                     long gid = rds[i].Id;
                                     ModelCode type = modelResourceDesc.GetModelCodeFromId(gid);
-                                    ISCADAModelPointItem pointItem = new SCADAModelPointItem(rds[i].Properties, ModelCode.DISCRETE);
+                                    ISCADAModelPointItem pointItem = new DiscreteSCADAModelPointItem(rds[i].Properties, ModelCode.DISCRETE);
                                     CurrentScadaModel.Add(gid, pointItem);
-                                    CurrentAddressToGidMap[pointItem.RegistarType].Add(pointItem.Address, gid);
+                                    CurrentAddressToGidMap[pointItem.RegisterType].Add(pointItem.Address, gid);
                                     Logger.LogDebug($"DISCRETE measurement added to SCADA model [Gid: {gid}, Address: {pointItem.Address}]");
                                 }
                             }
@@ -416,11 +416,17 @@ namespace Outage.SCADA.SCADAData.Repository
             {
                 if (gdaProxy != null)
                 {
-                    if (type == ModelCode.ANALOG || type == ModelCode.DISCRETE)
+                    if (type == ModelCode.ANALOG)
                     {
                         props = modelResourceDesc.GetAllPropertyIds(type);
                         rd = gdaProxy.GetValues(gid, props);
-                        pointItem = new SCADAModelPointItem(rd.Properties, type);
+                        pointItem = new AnalogSCADAModelPointItem(rd.Properties, type);
+                    }
+                    else if (type == ModelCode.DISCRETE)
+                    {
+                        props = modelResourceDesc.GetAllPropertyIds(type);
+                        rd = gdaProxy.GetValues(gid, props);
+                        pointItem = new DiscreteSCADAModelPointItem(rd.Properties, type);
                     }
                     else
                     {

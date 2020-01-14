@@ -1,5 +1,6 @@
 ﻿using EasyModbus;
 using Outage.Common;
+using Outage.Common.PubSub.SCADADataContract;
 using Outage.SCADA.ModBus.FunctionParameters;
 using Outage.SCADA.SCADACommon;
 using System;
@@ -8,7 +9,7 @@ using System.Reflection;
 
 namespace Outage.SCADA.ModBus.ModbusFuntions
 {
-    public abstract class ModbusFunction : IModBusFunction
+    public abstract class ModbusFunction : IModbusFunction
     {
         protected ILogger Logger = LoggerWrapper.Instance;
 
