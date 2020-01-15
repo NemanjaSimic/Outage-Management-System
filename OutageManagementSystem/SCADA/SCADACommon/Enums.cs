@@ -10,6 +10,11 @@
         WRITE_SINGLE_REGISTER = 0x06,
     }
 
+    public enum AnalogType : short
+    {
+        Power = 0x01,
+        Voltage = 0x02
+    }
     public enum PointType : short
     {
         DIGITAL_OUTPUT = 0x01,

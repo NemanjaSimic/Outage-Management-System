@@ -27,9 +27,7 @@ namespace Outage.SCADA.SCADACommon
         int CurrentRawValue { get; }
         int MinRawValue { get; }
         int MaxRawValue { get; }
-
-        double HighLimit { get; set; }
-        double LowLimit { get; set; }
+        AnalogType AnalogType { get; }
 
         double RawToEguValueConversion(int rawValue);
         int EguToRawValueConversion(double eguValue);

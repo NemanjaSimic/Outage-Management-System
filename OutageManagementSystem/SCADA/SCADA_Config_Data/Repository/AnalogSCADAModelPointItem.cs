@@ -1,6 +1,7 @@
 ﻿using Outage.Common;
 using Outage.Common.GDA;
 using Outage.SCADA.SCADACommon;
+using Outage.SCADA.SCADAData.Configuration;
 using System;
 using System.Collections.Generic;
 using System.Linq;
@@ -57,18 +58,16 @@ namespace Outage.SCADA.SCADAData.Repository
                 }
 
             }
-            
-            LowLimit = EGU_Min + 5;     //todo: config
-            HighLimit = EGU_Max - 5;    //todo: config                
+                         
         }
 
-        
         public double NormalValue { get; set; }
         public double CurrentEguValue { get; set; }
         public double EGU_Min { get; set; }
         public double EGU_Max { get; set; }
         public float ScaleFactor { get; set; }
         public float Deviation { get; set; }
+        public AnalogType AnalogType { get; set; }
 
         public int CurrentRawValue
         {
@@ -94,14 +93,23 @@ namespace Outage.SCADA.SCADAData.Repository
             }
         }
 
-        public double HighLimit { get; set; }
-        public double LowLimit { get; set; }
 
         public override bool SetAlarms()
         {
             bool alarmChanged = false;
             AlarmType currentAlarm = Alarm;
-
+            ushort LowLimit = 0;
+            ushort HighLimit = 0;
+            if (AnalogType == AnalogType.Power)
+            {
+                LowLimit = AlarmConfigData.Instance.LowPowerLimit;
+                HighLimit = AlarmConfigData.Instance.HighPowerLimit;
+            }
+            else if(AnalogType == AnalogType.Voltage)
+            {
+                LowLimit = AlarmConfigData.Instance.LowVoltageLimit;
+                HighLimit = AlarmConfigData.Instance.HighVolageLimit;
+            }
             //ALARMS FOR ANALOG VALUES
             if (RegisterType == PointType.ANALOG_INPUT || RegisterType == PointType.ANALOG_OUTPUT)
             {
