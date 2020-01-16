@@ -1,28 +1,26 @@
 ﻿using CECommon.Interfaces;
 using CECommon.Model;
 using NetworkModelServiceFunctions;
-using Outage.Common;
 using Outage.Common.GDA;
 using System.Collections.Generic;
 using System.Linq;
 using TopologyBuilder;
+using Logger = Outage.Common.LoggerWrapper;
 
 namespace Topology
 {
     public class Topology
     {
         #region Fields
-        ILogger logger = LoggerWrapper.Instance;
         private ITopologyBuilder topologyBuilder;
         private List<long> roots;
-        private Dictionary<long, ResourceDescription> modelEntities;
+
         public TopologyModel TopologyModel { get; private set; }
         #endregion
 
         private Topology()
         {
             topologyBuilder = new GraphBuilder();
-            modelEntities = new Dictionary<long, ResourceDescription>();
         }
 
         #region Singleton
@@ -47,28 +45,38 @@ namespace Topology
 
         public void InitializeTopology()
         {
-            logger.LogDebug("Initializing topology started.");
+            Logger.Instance.LogDebug("Initializing topology started.");
+            CreateTopology();
+            Logger.Instance.LogDebug("Initializing topology finished.");
+        }
 
-            logger.LogDebug("Retrieve all elements started.");
-            modelEntities = GDAModelHelper.Instance.RetrieveAllElements();
-            logger.LogDebug("Retrieve all elements finished.");
+        public void UpdateTopology()
+        {
+            Logger.Instance.LogDebug("Updating topology started.");
+            CreateTopology();
+            Logger.Instance.LogDebug("Updating topology finished.");
+        }
 
-            logger.LogDebug("Get all energy sources started.");
-            roots = GDAModelHelper.Instance.GetAllEnergySources();
-            logger.LogDebug("Get all energy sources finished.");
+        public void CreateTopology()
+        {
+            Logger.Instance.LogDebug("Get all energy sources started.");
+            roots = NMSElements.Instance.GetAllEnergySources();
+            Logger.Instance.LogDebug("Get all energy sources finished.");
 
-            logger.LogDebug("Creating topology started.");
+
+            Logger.Instance.LogDebug("Creating topology started.");
             if(roots.Count > 0)
             {
                 TopologyModel = topologyBuilder.CreateGraphTopology(roots.First());
             }
             else
             {
-                logger.LogDebug("No roots found.");
+                Logger.Instance.LogDebug("No roots found.");
             }
-            logger.LogDebug("Creating topology finished.");
+            Logger.Instance.LogDebug("Creating topology finished.");
 
-            logger.LogDebug("Initializing topology finished.");
+            Logger.Instance.LogDebug("Initializing topology finished.");
+
         }
     }
 }

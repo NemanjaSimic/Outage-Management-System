@@ -1,22 +1,25 @@
 ﻿using Outage.Common;
 using Outage.Common.GDA;
 using System.Collections.Generic;
+using Logger = Outage.Common.LoggerWrapper;
 
 namespace NetworkModelServiceFunctions
 {
-	public class GDAModelHelper
+	public class NMSElements
 	{
         #region Fields
         private readonly ModelResourcesDesc modelResourcesDesc;
 		private readonly NetworkModelGDA networkModelGDA;
 		private Dictionary<long, ResourceDescription> modelEntities;
-        #endregion
+		private Dictionary<long, ResourceDescription> transactionModelEntities;
 
-        #region Singleton
-        private static object syncObj = new object();
-		private static GDAModelHelper instance;
+		#endregion
 
-        public static GDAModelHelper Instance
+		#region Singleton
+		private static object syncObj = new object();
+		private static NMSElements instance;
+
+        public static NMSElements Instance
 		{
 			get 
 			{
@@ -24,17 +27,20 @@ namespace NetworkModelServiceFunctions
 				{
 					if (instance == null)
 					{
-						instance = new GDAModelHelper();
+						instance = new NMSElements();
 					}
 				}
 				return instance;
 			}
 		}
         #endregion
-        private GDAModelHelper()
+        private NMSElements()
 		{
 			modelResourcesDesc = new ModelResourcesDesc();
 			networkModelGDA = new NetworkModelGDA();
+			Logger.Instance.LogDebug("Retrieve all elements started.");
+			RetrieveAllElements();
+			Logger.Instance.LogDebug("Retrieve all elements finished.");
 		}
 		public List<long> GetAllEnergySources()
 		{
@@ -51,7 +57,7 @@ namespace NetworkModelServiceFunctions
 			}
 			return gids;
 		}
-		public Dictionary<long, ResourceDescription> RetrieveAllElements()
+		private void RetrieveAllElements()
 		{
 			List<ModelCode> concreteClasses = modelResourcesDesc.NonAbstractClassIds;
 			modelEntities = new Dictionary<long, ResourceDescription>();
@@ -64,7 +70,6 @@ namespace NetworkModelServiceFunctions
 					modelEntities.Add(element.Id, element);
 				}
 			}
-			return modelEntities;
 		}
 		public List<long> GetAllReferencedElements(long gid)
 		{
@@ -134,6 +139,28 @@ namespace NetworkModelServiceFunctions
 			}
 
 			return propertyIds;
+		}
+
+		public void PrepareTransaction(Dictionary<DeltaOpType, List<long>> delta)
+		{
+			transactionModelEntities = new Dictionary<long, ResourceDescription>(modelEntities);
+			foreach (var pair in delta)
+			{
+				if (pair.Key == DeltaOpType.Delete)
+				{
+					foreach (var gid in pair.Value)
+					{
+						transactionModelEntities.Remove(gid);
+					}
+				}
+				else if (pair.Key == DeltaOpType.Insert)
+				{
+					foreach (var gid in pair.Value)
+					{
+						transactionModelEntities.Add(gid);
+					}
+				}
+			}
 		}
 	}
 }

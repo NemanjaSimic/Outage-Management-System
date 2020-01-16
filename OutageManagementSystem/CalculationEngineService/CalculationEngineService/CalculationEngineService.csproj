@@ -46,6 +46,7 @@
     <Compile Include="DistributedTransaction\CEModelUpdateNotification.cs" />
     <Compile Include="DistributedTransaction\CETransactionActor.cs" />
     <Compile Include="Properties\AssemblyInfo.cs" />
+    <Compile Include="TransactionManager.cs" />
   </ItemGroup>
   <ItemGroup>
     <ProjectReference Include="..\..\Common\Common.csproj">

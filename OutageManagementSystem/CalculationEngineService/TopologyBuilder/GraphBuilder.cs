@@ -58,7 +58,7 @@ namespace TopologyBuilder
         #region HelperFunctions
         private List<long> CheckIgnorable(long gid)
         {
-            var list = GDAModelHelper.Instance.GetAllReferencedElements(gid).Where(e => !visited.Contains(e)).ToList();
+            var list = NMSElements.Instance.GetAllReferencedElements(gid).Where(e => !visited.Contains(e)).ToList();
             List<long> elements = new List<long>();
             foreach (var element in list)
             {
