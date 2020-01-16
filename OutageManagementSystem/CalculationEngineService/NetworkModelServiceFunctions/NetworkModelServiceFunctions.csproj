@@ -45,7 +45,7 @@
     <Reference Include="System.Xml" />
   </ItemGroup>
   <ItemGroup>
-    <Compile Include="GDAModelHelper.cs" />
+    <Compile Include="NMSElements.cs" />
     <Compile Include="NetworkModelGDA.cs" />
     <Compile Include="NetworkModelGDAProxy.cs" />
     <Compile Include="Properties\AssemblyInfo.cs" />
