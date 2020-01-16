@@ -19,7 +19,7 @@ namespace CalculationEngineService.DistributedTransaction
 
         public override bool NotifyAboutUpdate(Dictionary<DeltaOpType, List<long>> modelChanges)
         {
-            //TODO: CE notification logic
+            TransactionManager.Intance.UpdateNotify(modelChanges);
 
             using (TransactionEnlistmentProxy transactionEnlistmentProxy = TransactionEnlistmentProxy)
             {

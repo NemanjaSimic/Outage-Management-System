@@ -19,4 +19,10 @@ namespace CECommon
 		Field,
 		Regular
 	}
+
+	public enum TransactionFlag
+	{
+		InTransaction = 1,
+		NoTransaction
+	}
 }

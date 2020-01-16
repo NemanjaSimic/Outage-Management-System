@@ -15,15 +15,19 @@ namespace TopologyBuilder
         #region Fields
         private ILogger logger = LoggerWrapper.Instance;
         private readonly TopologyElementFactory topologyElementFactory = new TopologyElementFactory();
-        private List<Field> fields = new List<Field>();
-        private HashSet<long> visited = new HashSet<long>();
-        private Stack<TopologyElement> stack = new Stack<TopologyElement>();
+        private List<Field> fields;
+        private HashSet<long> visited;
+        private Stack<TopologyElement> stack;
         #endregion
 
-        public TopologyModel CreateGraphTopology(long firstElementGid)
+        public TopologyModel CreateGraphTopology(long firstElementGid, TransactionFlag flag)
         {
             string message = $"Creating graph topology from first element with GID {firstElementGid}.";
             logger.LogInfo(message);
+
+            visited = new HashSet<long>();
+            stack = new Stack<TopologyElement>();
+            fields = new List<Field>();
 
             TopologyModel topology = new TopologyModel();
             TopologyElement firstNode = topologyElementFactory.CreateTopologyElement(firstElementGid);
@@ -38,7 +42,7 @@ namespace TopologyBuilder
                     visited.Add(currentNode.Id);
                 }
 
-                var connectedElements = CheckIgnorable(currentNode.Id);
+                var connectedElements = CheckIgnorable(currentNode.Id, flag);
                 foreach (var element in connectedElements)
                 {
                     var newNode = ConnectTwoNodes(element, currentNode);
@@ -56,16 +60,16 @@ namespace TopologyBuilder
         }
 
         #region HelperFunctions
-        private List<long> CheckIgnorable(long gid)
+        private List<long> CheckIgnorable(long gid, TransactionFlag flag)
         {
-            var list = GDAModelHelper.Instance.GetAllReferencedElements(gid).Where(e => !visited.Contains(e)).ToList();
+            var list = NMSManager.Instance.GetAllReferencedElements(gid, flag).Where(e => !visited.Contains(e)).ToList();
             List<long> elements = new List<long>();
             foreach (var element in list)
             {
                 if (TopologyHelper.Instance.GetElementTopologyStatus(element) == TopologyStatus.Ignorable)
                 {
                     visited.Add(element);
-                    elements.AddRange(CheckIgnorable(element));
+                    elements.AddRange(CheckIgnorable(element, flag));
                 }
                 else
                 {

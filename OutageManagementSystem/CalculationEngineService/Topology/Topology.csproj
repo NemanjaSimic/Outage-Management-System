@@ -41,7 +41,7 @@
     <Reference Include="System.Xml" />
   </ItemGroup>
   <ItemGroup>
-    <Compile Include="Topology.cs" />
+    <Compile Include="TopologyManager.cs" />
     <Compile Include="Properties\AssemblyInfo.cs" />
     <Compile Include="TopologyService.cs" />
   </ItemGroup>
