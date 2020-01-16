@@ -19,9 +19,15 @@ namespace Outage {
         /// Use association to ConductingEquipment only when there is no VoltageLevel container used.
         private BaseVoltage cim_BaseVoltage;
         
-        private const bool isBaseVoltageMandatory = true;
+        private const bool isBaseVoltageMandatory = false;
         
         private const string _BaseVoltagePrefix = "cim";
+        
+        private System.Boolean? cim_isRemote;
+        
+        private const bool isIsRemoteMandatory = true;
+        
+        private const string _isRemotePrefix = "cim";
         
         public virtual BaseVoltage BaseVoltage {
             get {
@@ -47,6 +53,33 @@ namespace Outage {
         public static string BaseVoltagePrefix {
             get {
                 return _BaseVoltagePrefix;
+            }
+        }
+        
+        public virtual bool IsRemote {
+            get {
+                return this.cim_isRemote.GetValueOrDefault();
+            }
+            set {
+                this.cim_isRemote = value;
+            }
+        }
+        
+        public virtual bool IsRemoteHasValue {
+            get {
+                return this.cim_isRemote != null;
+            }
+        }
+        
+        public static bool IsIsRemoteMandatory {
+            get {
+                return isIsRemoteMandatory;
+            }
+        }
+        
+        public static string IsRemotePrefix {
+            get {
+                return _isRemotePrefix;
             }
         }
     }

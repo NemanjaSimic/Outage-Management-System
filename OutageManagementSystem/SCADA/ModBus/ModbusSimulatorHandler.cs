@@ -14,6 +14,8 @@ namespace Outage.SCADA.ModBus
             {
                 ISCADAConfigData config = SCADAConfigData.Instance;
 
+                StopModbusSimulaotrs();
+
                 Process process = new Process();
                 process.StartInfo.FileName = config.ModbusSimulatorExePath;
                 process.Start();

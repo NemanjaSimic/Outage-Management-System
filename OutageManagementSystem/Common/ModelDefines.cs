@@ -56,6 +56,7 @@ namespace Outage.Common
         CONDUCTINGEQUIPMENT                     = 0x1112000000000000,
         CONDUCTINGEQUIPMENT_BASEVOLTAGE         = 0x1112000000000109,
         CONDUCTINGEQUIPMENT_TERMINALS           = 0x1112000000000219,
+        CONDUCTINGEQUIPMENT_ISREMOTE            = 0x1112000000000301,
 
         ENERGYSOURCE                            = 0x1112100000050000,
 
@@ -99,6 +100,8 @@ namespace Outage.Common
         ANALOG_MINVALUE                         = 0x15200000000e0305,
         ANALOG_NORMALVALUE                      = 0x15200000000e0405,
         ANALOG_SIGNALTYPE                       = 0x15200000000e050a,
+        ANALOG_DEVIATION                        = 0x15200000000e0605,
+        ANALOG_SCALINGFACTOR                    = 0x15200000000e0705,
 
     }
 

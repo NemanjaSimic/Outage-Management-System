@@ -14,6 +14,7 @@ namespace Outage.DataModel
 	public class ConductingEquipment : Equipment
 	{
         #region Fields
+        private bool isRemote;
         private long baseVoltage;
         private List<long> terminals = new List<long>();
         #endregion
@@ -29,6 +30,12 @@ namespace Outage.DataModel
         }
 
         #region Properties
+        public bool IsRemote
+        {
+            get { return isRemote; }
+            set { isRemote = value; }
+        }
+
         public List<long> Terminals
         {
             get { return terminals; }
@@ -48,7 +55,8 @@ namespace Outage.DataModel
             {
                 ConductingEquipment x = (ConductingEquipment)obj;
                 return (CompareHelper.CompareLists(x.terminals, this.terminals, true) &&
-                        x.baseVoltage == this.baseVoltage);
+                                                   x.baseVoltage == this.baseVoltage &&
+                                                   x.isRemote == this.isRemote);
             }
             else
             {
@@ -67,6 +75,7 @@ namespace Outage.DataModel
 		{
 			switch (property)
 			{
+                case ModelCode.CONDUCTINGEQUIPMENT_ISREMOTE:
                 case ModelCode.CONDUCTINGEQUIPMENT_TERMINALS:
                 case ModelCode.CONDUCTINGEQUIPMENT_BASEVOLTAGE:
 					return true;
@@ -80,6 +89,9 @@ namespace Outage.DataModel
 		{
 			switch (prop.Id)
 			{
+                case ModelCode.CONDUCTINGEQUIPMENT_ISREMOTE:
+                    prop.SetValue(isRemote);
+                    break;
 				case ModelCode.CONDUCTINGEQUIPMENT_TERMINALS:
 					prop.SetValue(terminals);
 					break;
@@ -98,6 +110,9 @@ namespace Outage.DataModel
             {
                 case ModelCode.CONDUCTINGEQUIPMENT_BASEVOLTAGE:
                     baseVoltage = property.AsReference();
+                    break;
+                case ModelCode.CONDUCTINGEQUIPMENT_ISREMOTE:
+                    isRemote = property.AsBool();
                     break;
                 default:
                     base.SetProperty(property);

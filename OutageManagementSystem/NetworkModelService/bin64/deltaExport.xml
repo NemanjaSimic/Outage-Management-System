@@ -63,6 +63,7 @@
             <Property id="IDOBJ_MRID" value="EC_1" />
             <Property id="IDOBJ_NAME" value="EC_1" />
             <Property id="CONDUCTINGEQUIPMENT_BASEVOLTAGE" value="0x0000000100000002" />
+            <Property id="CONDUCTINGEQUIPMENT_ISREMOTE" value="1" />
           </Properties>
         </ResourceDescription>
         <ResourceDescription>
@@ -129,6 +130,7 @@
             <Property id="IDOBJ_MRID" value="BR_1" />
             <Property id="IDOBJ_NAME" value="BR_1" />
             <Property id="CONDUCTINGEQUIPMENT_BASEVOLTAGE" value="0x0000000100000002" />
+            <Property id="CONDUCTINGEQUIPMENT_ISREMOTE" value="1" />
             <Property id="BREAKER_NORECLOSING" value="1" />
           </Properties>
         </ResourceDescription>
@@ -936,11 +938,12 @@
           <Properties>
             <Property id="IDOBJ_MRID" value="DS_1" />
             <Property id="IDOBJ_NAME" value="DS_1" />
-            <Property id="MEASUREMENT_ADDRESS" value="1" />
+            <Property id="MEASUREMENT_ADDRESS" value="2" />
             <Property id="MEASUREMENT_ISINPUT" value="0" />
             <Property id="MEASUREMENT_TERMINAL" value="0x0000000200000010" />
             <Property id="DISCRETE_CURRENTOPEN" value="0" />
             <Property id="DISCRETE_MAXVALUE" value="1" />
+            <Property id="DISCRETE_MEASUREMENTTYPE" value="SWITCH_STATUS" />
             <Property id="DISCRETE_MINVALUE" value="0" />
             <Property id="DISCRETE_NORMALVALUE" value="0" />
           </Properties>
@@ -953,10 +956,13 @@
             <Property id="MEASUREMENT_ADDRESS" value="2" />
             <Property id="MEASUREMENT_ISINPUT" value="0" />
             <Property id="MEASUREMENT_TERMINAL" value="0x0000000200000016" />
-            <Property id="ANALOG_CURRENTVALUE" value="23" />
-            <Property id="ANALOG_MAXVALUE" value="3334" />
-            <Property id="ANALOG_MINVALUE" value="42" />
+            <Property id="ANALOG_CURRENTVALUE" value="12" />
+            <Property id="ANALOG_MAXVALUE" value="20" />
+            <Property id="ANALOG_SIGNALTYPE" value="CURRENT" />
+            <Property id="ANALOG_MINVALUE" value="10" />
             <Property id="ANALOG_NORMALVALUE" value="12" />
+            <Property id="ANALOG_DEVIATION" value="0" />
+            <Property id="ANALOG_SCALINGFACTOR" value="1" />
           </Properties>
         </ResourceDescription>
       </ResourceDescriptions>

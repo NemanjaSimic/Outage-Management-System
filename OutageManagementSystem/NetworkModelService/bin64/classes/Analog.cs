@@ -22,12 +22,24 @@ namespace Outage {
         
         private const string _currentValuePrefix = "tdms";
         
+        private System.Single? cim_deviation;
+        
+        private const bool isDeviationMandatory = true;
+        
+        private const string _deviationPrefix = "tdms";
+        
         /// Normal value range maximum for any of the MeasurementValue.values. Used for scaling, e.g. in bar graphs or of telemetered raw values.
         private System.Single? cim_maxValue;
         
         private const bool isMaxValueMandatory = true;
         
         private const string _maxValuePrefix = "cim";
+        
+        private AnalogMeasurementType? cim_measurementType;
+        
+        private const bool isMeasurementTypeMandatory = true;
+        
+        private const string _measurementTypePrefix = "cim";
         
         /// Normal value range minimum for any of the MeasurementValue.values. Used for scaling, e.g. in bar graphs or of telemetered raw values
         private System.Single? cim_minValue;
@@ -43,12 +55,11 @@ namespace Outage {
         
         private const string _normalValuePrefix = "cim";
         
-        /// Meaning of this signal, e.g. "Set point" or "Measured value"
-        private AnalogSignalType? cim_signalType;
+        private System.Single? cim_scalingFactor;
         
-        private const bool isSignalTypeMandatory = true;
+        private const bool isScalingFactorMandatory = true;
         
-        private const string _signalTypePrefix = "tdms";
+        private const string _scalingFactorPrefix = "tdms";
         
         public virtual float CurrentValue {
             get {
@@ -77,6 +88,33 @@ namespace Outage {
             }
         }
         
+        public virtual float Deviation {
+            get {
+                return this.cim_deviation.GetValueOrDefault();
+            }
+            set {
+                this.cim_deviation = value;
+            }
+        }
+        
+        public virtual bool DeviationHasValue {
+            get {
+                return this.cim_deviation != null;
+            }
+        }
+        
+        public static bool IsDeviationMandatory {
+            get {
+                return isDeviationMandatory;
+            }
+        }
+        
+        public static string DeviationPrefix {
+            get {
+                return _deviationPrefix;
+            }
+        }
+        
         public virtual float MaxValue {
             get {
                 return this.cim_maxValue.GetValueOrDefault();
@@ -101,6 +139,33 @@ namespace Outage {
         public static string MaxValuePrefix {
             get {
                 return _maxValuePrefix;
+            }
+        }
+        
+        public virtual AnalogMeasurementType MeasurementType {
+            get {
+                return this.cim_measurementType.GetValueOrDefault();
+            }
+            set {
+                this.cim_measurementType = value;
+            }
+        }
+        
+        public virtual bool MeasurementTypeHasValue {
+            get {
+                return this.cim_measurementType != null;
+            }
+        }
+        
+        public static bool IsMeasurementTypeMandatory {
+            get {
+                return isMeasurementTypeMandatory;
+            }
+        }
+        
+        public static string MeasurementTypePrefix {
+            get {
+                return _measurementTypePrefix;
             }
         }
         
@@ -158,30 +223,30 @@ namespace Outage {
             }
         }
         
-        public virtual AnalogSignalType SignalType {
+        public virtual float ScalingFactor {
             get {
-                return this.cim_signalType.GetValueOrDefault();
+                return this.cim_scalingFactor.GetValueOrDefault();
             }
             set {
-                this.cim_signalType = value;
+                this.cim_scalingFactor = value;
             }
         }
         
-        public virtual bool SignalTypeHasValue {
+        public virtual bool ScalingFactorHasValue {
             get {
-                return this.cim_signalType != null;
+                return this.cim_scalingFactor != null;
             }
         }
         
-        public static bool IsSignalTypeMandatory {
+        public static bool IsScalingFactorMandatory {
             get {
-                return isSignalTypeMandatory;
+                return isScalingFactorMandatory;
             }
         }
         
-        public static string SignalTypePrefix {
+        public static string ScalingFactorPrefix {
             get {
-                return _signalTypePrefix;
+                return _scalingFactorPrefix;
             }
         }
     }

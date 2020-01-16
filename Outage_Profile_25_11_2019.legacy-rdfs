@@ -196,6 +196,24 @@ When the sensor location is needed both Measurement-PSR and Measurement-Terminal
     <cims:multiplicity rdf:resource="http://iec.ch/TC57/1999/rdf-schema-extensions-19990926#M:1"/>
     <rdf:type rdf:resource="http://www.w3.org/1999/02/22-rdf-syntax-ns#Property"/>
   </rdf:Description>
+  <rdf:Description rdf:about="#Analog.deviation">
+    <cims:stereotype rdf:resource="http://langdale.com.au/2005/UML#tdms"/>
+    <cims:stereotype rdf:resource="http://langdale.com.au/2005/UML#attribute"/>
+    <rdfs:label>deviation</rdfs:label>
+    <cims:dataType rdf:resource="http://www.w3.org/2001/XMLSchema#float"/>
+    <rdfs:domain rdf:resource="#Analog"/>
+    <cims:multiplicity rdf:resource="http://iec.ch/TC57/1999/rdf-schema-extensions-19990926#M:1"/>
+    <rdf:type rdf:resource="http://www.w3.org/1999/02/22-rdf-syntax-ns#Property"/>
+  </rdf:Description>
+  <rdf:Description rdf:about="#Analog.scalingFactor">
+    <cims:stereotype rdf:resource="http://langdale.com.au/2005/UML#tdms"/>
+    <cims:stereotype rdf:resource="http://langdale.com.au/2005/UML#attribute"/>
+    <rdfs:label>scalingFactor</rdfs:label>
+    <cims:dataType rdf:resource="http://www.w3.org/2001/XMLSchema#float"/>
+    <rdfs:domain rdf:resource="#Analog"/>
+    <cims:multiplicity rdf:resource="http://iec.ch/TC57/1999/rdf-schema-extensions-19990926#M:1"/>
+    <rdf:type rdf:resource="http://www.w3.org/1999/02/22-rdf-syntax-ns#Property"/>
+  </rdf:Description>
   <rdf:Description rdf:about="#ConductingEquipment">
     <rdfs:subClassOf rdf:resource="#Equipment"/>
     <cims:belongsToCategory rdf:resource="#Package_Core"/>
@@ -203,6 +221,14 @@ When the sensor location is needed both Measurement-PSR and Measurement-Terminal
     <rdfs:comment>The parts of the power system that are designed to carry current or that are conductively connected therewith. ConductingEquipment is contained within an EquipmentContainer that may be a Substation, or a VoltageLevel or a Bay within a Substation.</rdfs:comment>
     <rdfs:label>ConductingEquipment</rdfs:label>
     <rdf:type rdf:resource="http://www.w3.org/2000/01/rdf-schema#Class"/>
+  </rdf:Description>
+  <rdf:Description rdf:about="#ConductingEquipment.isRemote">
+    <cims:stereotype rdf:resource="http://langdale.com.au/2005/UML#attribute"/>
+    <rdfs:label>isRemote</rdfs:label>
+    <cims:dataType rdf:resource="http://www.w3.org/2001/XMLSchema#boolean"/>
+    <rdfs:domain rdf:resource="#ConductingEquipment"/>
+    <cims:multiplicity rdf:resource="http://iec.ch/TC57/1999/rdf-schema-extensions-19990926#M:1"/>
+    <rdf:type rdf:resource="http://www.w3.org/1999/02/22-rdf-syntax-ns#Property"/>
   </rdf:Description>
   <rdf:Description rdf:about="#Analog.minValue">
     <cims:stereotype rdf:resource="http://langdale.com.au/2005/UML#attribute"/>
@@ -261,6 +287,10 @@ When the sensor location is needed both Measurement-PSR and Measurement-Terminal
     <cims:stereotype rdf:resource="http://langdale.com.au/2005/UML#enumeration"/>
     <rdfs:label>DiscreteMeasurementType</rdfs:label>
     <rdf:type rdf:resource="http://www.w3.org/2000/01/rdf-schema#Class"/>
+  </rdf:Description>
+  <rdf:Description rdf:about="#DiscreteMeasurementType.SwitchStatus">
+    <rdfs:label>SwitchStatus</rdfs:label>
+    <rdf:type rdf:resource="#DiscreteMeasurementType"/>
   </rdf:Description>
   <rdf:Description rdf:about="#Discrete.currentOpen">
     <cims:stereotype rdf:resource="http://langdale.com.au/2005/UML#tdms"/>
@@ -334,6 +364,18 @@ When the sensor location is needed both Measurement-PSR and Measurement-Terminal
     <cims:stereotype rdf:resource="http://langdale.com.au/2005/UML#enumeration"/>
     <rdfs:label>AnalogMeasurementType</rdfs:label>
     <rdf:type rdf:resource="http://www.w3.org/2000/01/rdf-schema#Class"/>
+  </rdf:Description>
+  <rdf:Description rdf:about="#AnalogMeasurementType.Voltage">
+	<rdfs:label>Voltage</rdfs:label>
+	<rdf:type rdf:resource="#AnalogMeasurementType"/>
+  </rdf:Description>
+  <rdf:Description rdf:about="#AnalogMeasurementType.Current">
+	<rdfs:label>Current</rdfs:label>
+	<rdf:type rdf:resource="#AnalogMeasurementType"/>
+  </rdf:Description>
+  <rdf:Description rdf:about="#AnalogMeasurementType.Power">
+	<rdfs:label>Power</rdfs:label>
+	<rdf:type rdf:resource="#AnalogMeasurementType"/>
   </rdf:Description>
   <rdf:Description rdf:about="#Discrete">
     <rdfs:subClassOf rdf:resource="#Measurement"/>

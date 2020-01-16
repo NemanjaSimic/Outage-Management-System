@@ -13,5 +13,11 @@ namespace Outage {
     
     
     public enum AnalogMeasurementType {
+        
+        Current,
+        
+        Power,
+        
+        Voltage,
     }
 }

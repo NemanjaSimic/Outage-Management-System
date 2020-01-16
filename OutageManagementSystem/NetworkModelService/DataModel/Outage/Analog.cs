@@ -15,6 +15,8 @@ namespace Outage.DataModel
         private float maxValue;
         private float minValue;
         private float normalValue;
+        private float scalingFactor;
+        private float deviation;
         private AnalogMeasurementType signalType;
         #endregion
 
@@ -29,6 +31,8 @@ namespace Outage.DataModel
             MinValue = analog.MinValue;
             NormalValue = analog.NormalValue;
             SignalType = analog.SignalType;
+            ScalingFactor = analog.ScalingFactor;
+            Deviation = analog.Deviation;
         }
 
         #region Properties
@@ -61,6 +65,18 @@ namespace Outage.DataModel
             get { return signalType; }
             set { signalType = value; }
         }
+
+        public float ScalingFactor
+        {
+            get { return scalingFactor; }
+            set { scalingFactor = value; }
+        }
+
+        public float Deviation
+        {
+            get { return deviation; }
+            set { deviation = value; }
+        }
         #endregion
 
         public override bool Equals(object obj)
@@ -72,7 +88,9 @@ namespace Outage.DataModel
                         x.maxValue == this.maxValue &&
                         x.minValue == this.minValue &&
                         x.normalValue == this.normalValue &&
-                        x.signalType == this.signalType);
+                        x.signalType == this.signalType) &&
+                        x.scalingFactor == this.scalingFactor &&
+                        x.deviation == this.deviation;
             }
             else
             {
@@ -95,6 +113,8 @@ namespace Outage.DataModel
                 case ModelCode.ANALOG_MINVALUE:
                 case ModelCode.ANALOG_NORMALVALUE:
                 case ModelCode.ANALOG_SIGNALTYPE:
+                case ModelCode.ANALOG_SCALINGFACTOR:
+                case ModelCode.ANALOG_DEVIATION:
                     return true;
                 default:
                     return base.HasProperty(property);
@@ -120,6 +140,12 @@ namespace Outage.DataModel
                 case ModelCode.ANALOG_SIGNALTYPE:
                     property.SetValue((short)signalType);
                     break;
+                case ModelCode.ANALOG_SCALINGFACTOR:
+                    property.SetValue(scalingFactor);
+                    break;
+                case ModelCode.ANALOG_DEVIATION:
+                    property.SetValue(deviation);
+                    break;
                 default:
                     base.GetProperty(property);
                     break;
@@ -144,6 +170,12 @@ namespace Outage.DataModel
                     break;
                 case ModelCode.ANALOG_SIGNALTYPE:
                     signalType = (AnalogMeasurementType)property.AsEnum();
+                    break;
+                case ModelCode.ANALOG_SCALINGFACTOR:
+                    scalingFactor = property.AsFloat();
+                    break;
+                case ModelCode.ANALOG_DEVIATION:
+                    deviation = property.AsFloat();
                     break;
                 default:
                     base.SetProperty(property);

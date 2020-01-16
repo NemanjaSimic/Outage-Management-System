@@ -13,5 +13,7 @@ namespace Outage {
     
     
     public enum DiscreteMeasurementType {
+        
+        SwitchStatus,
     }
 }

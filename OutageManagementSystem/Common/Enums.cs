@@ -5,12 +5,14 @@ namespace Outage.Common
     //NMS
     public enum AnalogMeasurementType : short
     {
-
+        VOLTAGE = 1,
+        CURRENT = 2,
+        POWER   = 3,
     }
 
     public enum DiscreteMeasurementType : short
     {
-
+        SWITCH_STATUS   = 1,
     }
 
 

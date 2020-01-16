@@ -58,7 +58,14 @@ namespace Topology
             logger.LogDebug("Get all energy sources finished.");
 
             logger.LogDebug("Creating topology started.");
-            TopologyModel = topologyBuilder.CreateGraphTopology(roots.First());
+            if(roots.Count > 0)
+            {
+                TopologyModel = topologyBuilder.CreateGraphTopology(roots.First());
+            }
+            else
+            {
+                logger.LogDebug("No roots found.");
+            }
             logger.LogDebug("Creating topology finished.");
 
             logger.LogDebug("Initializing topology finished.");
