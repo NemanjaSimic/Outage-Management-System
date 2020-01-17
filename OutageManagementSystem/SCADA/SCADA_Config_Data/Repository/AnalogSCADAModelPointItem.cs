@@ -46,14 +46,13 @@ namespace Outage.SCADA.SCADAData.Repository
                         NormalValue = item.AsFloat();
                         break;
 
-                    //TODO:
-                    //case ModelCode.ANALOG_SCALEFACTOR:
-                    //    ScaleFactor = item.AsFloat();
-                    //    break;
+                    case ModelCode.ANALOG_SCALINGFACTOR:
+                        ScaleFactor = item.AsFloat();
+                        break;
 
-                    //case ModelCode.ANALOG_DEVIATION:
-                    //    Deviation = item.AsFloat();
-                    //    break;
+                    case ModelCode.ANALOG_DEVIATION:
+                        Deviation = item.AsFloat();
+                        break;
 
                     default:
                         break;
