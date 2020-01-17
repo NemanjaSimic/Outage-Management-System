@@ -43,7 +43,7 @@ namespace Outage.SCADA.ModBus.ModbusFuntions
             for (ushort i = 0; i < quantity; i++)
             {
                 ushort address = (ushort)(startAddress + i);
-                int value = data[i];
+                int rawValue = data[i];
                 long gid = scadaModel.CurrentAddressToGidMap[PointType.ANALOG_OUTPUT][address];
 
                 if (scadaModel.CurrentScadaModel.ContainsKey(gid))
@@ -57,7 +57,7 @@ namespace Outage.SCADA.ModBus.ModbusFuntions
                         throw new Exception(message);
                     }
 
-                    pointItem.CurrentRawValue = value;
+                    pointItem.CurrentEguValue = pointItem.RawToEguValueConversion(rawValue);
 
                     bool alarmChanged = pointItem.SetAlarms();
                     if (alarmChanged)

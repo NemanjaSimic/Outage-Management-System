@@ -24,7 +24,9 @@ namespace Outage.SCADA.SCADAData.Repository
         private Dictionary<PointType, Dictionary<ushort, long>> incomingAddressToGidMap;
         private Dictionary<long, ISCADAModelPointItem> currentScadaModel;
         private Dictionary<PointType, Dictionary<ushort, long>> currentAddressToGidMap;
-
+        public bool modelImported = false;
+        public Action EnableDelta;
+        public Action DisableDelta;
         #region Properties
 
         protected Dictionary<DeltaOpType, List<long>> ModelChanges
@@ -139,7 +141,7 @@ namespace Outage.SCADA.SCADAData.Repository
             incomingScadaModel = new Dictionary<long, ISCADAModelPointItem>();
             modelResourceDesc = new ModelResourcesDesc();
 
-            ImportModel();
+            modelImported = ImportModel();
         }
 
         #region IModelUpdateNotificationContract
@@ -157,7 +159,6 @@ namespace Outage.SCADA.SCADAData.Repository
         public bool Prepare()
         {
             bool success;
-
             try
             {
                 foreach (long gid in CurrentScadaModel.Keys)
@@ -240,6 +241,7 @@ namespace Outage.SCADA.SCADAData.Repository
 
         public void Commit()
         {
+            EnableDelta();
             currentScadaModel = IncomingScadaModel;
             incomingScadaModel = null;
 
@@ -251,10 +253,12 @@ namespace Outage.SCADA.SCADAData.Repository
             string message = $"Incoming SCADA model is confirmed.";
             Console.WriteLine(message);
             Logger.LogInfo(message);
+            DisableDelta();
         }
 
         public void Rollback()
         {
+            
             incomingScadaModel = null;
             incomingAddressToGidMap = null;
             modelChanges.Clear();

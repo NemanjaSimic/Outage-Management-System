@@ -30,9 +30,11 @@ namespace Outage.SCADA.ModBus.Connection
         private bool threadCancellationSignal = false;
 
         private IModbusFunction currentCommand;
+
         private AutoResetEvent commandEvent;
         private ConcurrentQueue<IModbusFunction> commandQueue;
 
+        public bool isDelta = false;
         public ISCADAConfigData ConfigData { get; protected set; }
         public SCADAModel SCADAModel { get; protected set; }
         public ModbusClient ModbusClient { get; protected set; }
@@ -112,7 +114,8 @@ namespace Outage.SCADA.ModBus.Connection
         {
             ConfigData = SCADAConfigData.Instance;
             SCADAModel = SCADAModel.Instance;
-
+            SCADAModel.EnableDelta = EnableDelta;
+            SCADAModel.DisableDelta = DisableDelta;
             ModbusClient = new ModbusClient(ConfigData.IpAddress, ConfigData.TcpPort);
 
             commandQueue = new ConcurrentQueue<IModbusFunction>();
@@ -251,9 +254,10 @@ namespace Outage.SCADA.ModBus.Connection
                         ModbusClient = new ModbusClient(ConfigData.IpAddress, ConfigData.TcpPort);
                     }
 
-                    if (!ModbusClient.Connected)
+                    if (!ModbusClient.Connected && !isDelta)
                     {
                         ConnectToModbusClient();
+                        if (SCADAModel.modelImported) InitSimulatorValues();
                     }
 
                     Logger.LogDebug("Connected and waiting for command event.");
@@ -327,6 +331,32 @@ namespace Outage.SCADA.ModBus.Connection
             }
         }
 
+        private void InitSimulatorValues()
+        {
+            foreach (ISCADAModelPointItem pointItem in SCADAModel.Instance.CurrentScadaModel.Values)
+            {
+                if(pointItem is AnalogSCADAModelPointItem analogPointItem)
+                {
+                    ModbusClient.WriteSingleRegister(analogPointItem.Address - 1, analogPointItem.CurrentRawValue);
+                }
+                else if(pointItem is DiscreteSCADAModelPointItem discretePointItem)
+                {
+                    ModbusClient.WriteSingleCoil(discretePointItem.Address - 1, (discretePointItem.CurrentValue == 1) ? true : false);
+                }
+            }
+        }
+
+        private void EnableDelta()
+        {
+            isDelta = true;
+            ModbusClient.Disconnect();
+        }
+        
+        private void DisableDelta()
+        {
+            isDelta = false;
+        }
+       
         #endregion Private Members
     }
 }

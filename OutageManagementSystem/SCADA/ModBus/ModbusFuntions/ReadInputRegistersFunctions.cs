@@ -57,7 +57,7 @@ namespace Outage.SCADA.ModBus.ModbusFuntions
                         throw new Exception(message);
                     }
 
-                    pointItem.CurrentRawValue = rawValue;
+                    pointItem.CurrentEguValue = pointItem.RawToEguValueConversion(rawValue);
 
                     bool alarmChanged = pointItem.SetAlarms();
                     if (alarmChanged)
