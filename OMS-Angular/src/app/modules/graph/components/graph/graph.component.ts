@@ -4,6 +4,7 @@ import { GraphService } from '@services/notification/graph.service';
 import { OmsGraph } from '@shared/models/oms-graph.model';
 
 import cyConfig from './graph.config';
+import { drawBackupEdge } from '@shared/utils/backup-edge';
 import { addGraphTooltip } from '@shared/utils/tooltip';
 import { drawWarning } from '@shared/utils/warning';
 
@@ -14,6 +15,8 @@ import * as graphMock from './graph-mock.json';
 // cytoscape plugins
 import dagre from 'cytoscape-dagre';
 import popper from 'cytoscape-popper';
+import { CommandService } from '@services/command/command.service';
+import { SwitchCommandType, SwitchCommand } from '@shared/models/switch-command.model';
 cytoscape.use(dagre);
 cytoscape.use(popper);
 
@@ -25,41 +28,49 @@ cytoscape.use(popper);
 })
 export class GraphComponent implements OnInit, OnDestroy {
   public connectionSubscription: Subscription;
+  public topologySubscription: Subscription;
   public updateSubscription: Subscription;
   public zoomSubscription: Subscription;
+  public panSubscription: Subscription;
 
   public didLoadGraph: boolean;
   private cy: any;
 
   private graphData: any = {
     nodes: [],
-    edges: []
+    edges: [],
+    backup_edges: []
   };
 
   constructor(
     private graphService: GraphService,
+    private commandService: CommandService,
     private ngZone: NgZone
   ) {
     this.connectionSubscription = Subscription.EMPTY;
     this.updateSubscription = Subscription.EMPTY;
   }
-  
+
   ngOnInit() {
-    
+
     // testing splash screen look, will change logic after we connect to the api
     this.didLoadGraph = false;
 
     setTimeout(() => {
       this.didLoadGraph = true;
-      this.drawGraph();
+
+      // initial topology
+      this.getTopology();      
     }, 2000);
 
     // web api
-    this.startConnection();
+    //this.startConnection();
 
     // local testing
     this.graphData.nodes = graphMock.nodes;
     this.graphData.edges = graphMock.edges;
+    this.graphData.backup_edges = graphMock.backup_edges;
+
 
     // zoom on + and -
     this.zoomSubscription = fromEvent(document, 'keypress').subscribe(
@@ -69,17 +80,55 @@ export class GraphComponent implements OnInit, OnDestroy {
         else if (e.key == '-')
           this.cy.zoom(this.cy.zoom() - 0.1);
       });
+
+    this.panSubscription = fromEvent(document, 'keydown').subscribe(
+      (e: KeyboardEvent) => {
+        if (e.key == 'ArrowLeft')
+          this.cy.panBy({
+            x: 50,
+            y: 0
+          });
+        else if (e.key == 'ArrowRight')
+          this.cy.panBy({
+            x: -50,
+            y: 0
+          });
+        else if (e.key == 'ArrowUp')
+          this.cy.panBy({
+            x: 0,
+            y: 50
+          });
+        else if (e.key == 'ArrowDown')
+          this.cy.panBy({
+            x: 0,
+            y: -50
+          });
+      }
+    )
   }
 
   ngOnDestroy() {
     if (this.connectionSubscription)
       this.connectionSubscription.unsubscribe();
 
+    if (this.topologySubscription)
+      this.topologySubscription.unsubscribe();
+    
     if (this.updateSubscription)
       this.updateSubscription.unsubscribe();
 
     if (this.zoomSubscription)
       this.zoomSubscription.unsubscribe();
+  }
+
+  public getTopology(): void {
+    this.topologySubscription = this.graphService.getTopology().subscribe(
+      graph => {
+        console.log(graph);
+        this.onNotification(graph);
+      },
+      error => console.log(error)
+    );
   }
 
   public startConnection(): void {
@@ -108,13 +157,23 @@ export class GraphComponent implements OnInit, OnDestroy {
       elements: this.graphData
     });
 
+    this.drawBackupEdges();
     this.addTooltips();
     this.drawWarnings();
   };
 
+  public drawBackupEdges(): void {
+    this.cy.ready(() => {
+      this.graphData.backup_edges.forEach(line => {
+        drawBackupEdge(this.cy, line);
+      });
+    });
+  }
+
   public addTooltips(): void {
     this.cy.ready(() => {
       this.cy.nodes().forEach(node => {
+        node.sendSwitchCommand = (command) => this.onCommandHandler(command);
         addGraphTooltip(this.cy, node);
       });
     });
@@ -128,6 +187,12 @@ export class GraphComponent implements OnInit, OnDestroy {
     });
   };
 
+  public onCommandHandler = (command: SwitchCommand) => {
+    this.commandService.sendSwitchCommand(command).subscribe(
+      data => console.log(data),
+      err => console.log(err)
+    );
+  }
 
   public onNotification(data: OmsGraph): void {
     this.ngZone.run(() => {

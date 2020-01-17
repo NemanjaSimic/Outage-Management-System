@@ -8,6 +8,15 @@ import { ServicesModule } from '@services/services.module';
 
 import { GraphModule } from './modules/graph/graph.module';
 
+import { MatSidenavModule } from '@angular/material/sidenav';
+import { MatCheckboxModule } from '@angular/material/checkbox';
+import { BrowserAnimationsModule } from '@angular/platform-browser/animations';
+import { MatListModule } from '@angular/material/list';
+import { MatToolbarModule } from '@angular/material/toolbar';
+import { MatButtonModule } from '@angular/material/button';
+import { MatIconModule } from '@angular/material/icon';
+
+
 @NgModule({
   declarations: [
     AppComponent
@@ -17,9 +26,18 @@ import { GraphModule } from './modules/graph/graph.module';
     RoutingModule,
     SharedModule,
     ServicesModule,
-    GraphModule
+    GraphModule,
+    MatSidenavModule,
+    MatCheckboxModule,
+    MatListModule,
+    BrowserAnimationsModule,
+    MatToolbarModule,
+    MatButtonModule,
+    MatIconModule
   ],
-  providers: [],
+  providers: [
+    ServicesModule
+  ],
   bootstrap: [AppComponent]
 })
 export class AppModule { }

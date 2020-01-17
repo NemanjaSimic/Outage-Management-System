@@ -1,14 +1,14 @@
-﻿using Microsoft.AspNet.SignalR.Client;
+﻿using System;
 using OMS.Web.Common;
-using OMS.Web.UI.Models.ViewModels;
-using System;
 using System.Collections.Generic;
+using OMS.Web.UI.Models.ViewModels;
+using Microsoft.AspNet.SignalR.Client;
 
 namespace OMS.Web.Adapter.HubDispatchers
 {
     public class GraphHubDispatcher
     {
-        // API hub config - TODO: change to read from config file
+        // TODO: IDisposable
         private readonly string _url;
         private readonly string _hubName;
 

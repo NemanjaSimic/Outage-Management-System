@@ -103,7 +103,7 @@ Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "TopologyBuilder", "Calculat
 EndProject
 Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "Topology", "CalculationEngineService\Topology\Topology.csproj", "{831A52CF-75FF-4EAB-BCEC-24547C588009}"
 EndProject
-Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "TopologyServiceClientMock", "TopologyServiceClientMock\TopologyServiceClientMock.csproj", "{2A715511-30EF-4E48-8A4B-AFF923187C24}"
+Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "TopologyServiceClientMock", "CalculationEngineService\TopologyServiceClientMock\TopologyServiceClientMock.csproj", "{2A715511-30EF-4E48-8A4B-AFF923187C24}"
 EndProject
 Global
 	GlobalSection(SolutionConfigurationPlatforms) = preSolution

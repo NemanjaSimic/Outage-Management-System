@@ -46,10 +46,17 @@
     <Reference Include="System.Xml" />
   </ItemGroup>
   <ItemGroup>
+    <Compile Include="IPubSubClient.cs" />
+    <Compile Include="IScadaClient.cs" />
+    <Compile Include="ITopologyClient.cs" />
     <Compile Include="IWebService.cs" />
     <Compile Include="Properties\AssemblyInfo.cs" />
   </ItemGroup>
   <ItemGroup>
+    <ProjectReference Include="..\..\OutageManagementSystem\Common\Common.csproj">
+      <Project>{892CBE15-9ED7-4540-81FA-0EAABA592138}</Project>
+      <Name>Common</Name>
+    </ProjectReference>
     <ProjectReference Include="..\OMS.Web.UI.Models\OMS.Web.UI.Models.csproj">
       <Project>{B4ED1DFF-BFC2-44B2-B98A-D985B1BC8179}</Project>
       <Name>OMS.Web.UI.Models</Name>

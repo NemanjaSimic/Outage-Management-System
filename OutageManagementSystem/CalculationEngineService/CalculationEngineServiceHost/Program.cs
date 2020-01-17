@@ -25,12 +25,13 @@ namespace CalculationEngineServiceHost
                 Logger.LogInfo(message);
                 Console.WriteLine("\n{0}\n", message);
 
-                Logger.LogInfo("Initializing topology...");
-                Topology.Topology.Instance.InitializeTopology();
-                Logger.LogInfo("Topology has been successfully initialized.");
+                Logger.LogDebug("Initializing NMSManager...");
+                NMSManager.Instance.Initialize();
+                Logger.LogDebug("NMSManager has been successfully initialized.");
 
-                //PrintTopology(Topology.Topology.Instance.TopologyModel.FirstNode);
-                //Console.WriteLine("///////////////////////////////////////////////////////////////////////////////");
+                Logger.LogInfo("Initializing topology...");
+                TopologyManager.Instance.InitializeTopology();
+                Logger.LogInfo("Topology has been successfully initialized.");
 
                 using (CalculationEngineService.CalculationEngineService ces = new CalculationEngineService.CalculationEngineService())
                 {
@@ -51,14 +52,5 @@ namespace CalculationEngineServiceHost
             }
         }
 
-
-		static void PrintTopology(TopologyElement firstElement)
-		{
-			foreach (var connectedElement in firstElement.SecondEnd)
-			{
-				Console.WriteLine($"{TopologyHelper.Instance.GetDMSTypeOfTopologyElement(firstElement.Id)} with gid {firstElement.Id.ToString("X")} connected to {TopologyHelper.Instance.GetDMSTypeOfTopologyElement(connectedElement.Id)} with gid {connectedElement.Id.ToString("X")}");
-				PrintTopology(connectedElement);
-			}
-		}
 	}
 }

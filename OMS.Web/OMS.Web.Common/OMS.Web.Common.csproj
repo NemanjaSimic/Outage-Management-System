@@ -103,23 +103,22 @@
   </ItemGroup>
   <ItemGroup>
     <Compile Include="AppSettings.cs" />
-    <Compile Include="Constants\SwitchCommands.cs" />
-    <Compile Include="Exceptions\CustomExceptionBase.cs" />
+    <Compile Include="Exceptions\ICustomExceptionHandler.cs" />
+    <Compile Include="Exceptions\TopologyException.cs" />
     <Compile Include="Loggers\FileLogger.cs" />
+    <Compile Include="Mappers\GraphMapper.cs" />
+    <Compile Include="Mappers\IGraphMapper.cs" />
     <Compile Include="Properties\AssemblyInfo.cs" />
   </ItemGroup>
-  <ItemGroup>
-    <Folder Include="Extensions\" />
-    <Folder Include="Mapper\" />
-  </ItemGroup>
+  <ItemGroup />
   <ItemGroup>
     <ProjectReference Include="..\..\OutageManagementSystem\Common\Common.csproj">
       <Project>{892cbe15-9ed7-4540-81fa-0eaaba592138}</Project>
       <Name>Common</Name>
     </ProjectReference>
-    <ProjectReference Include="..\OMS.Web.Common.Interfaces\OMS.Web.Common.Interfaces.csproj">
-      <Project>{2A7C8378-0F77-4C24-B124-F7B80393089C}</Project>
-      <Name>OMS.Web.Common.Interfaces</Name>
+    <ProjectReference Include="..\OMS.Web.UI.Models\OMS.Web.UI.Models.csproj">
+      <Project>{B4ED1DFF-BFC2-44B2-B98A-D985B1BC8179}</Project>
+      <Name>OMS.Web.UI.Models</Name>
     </ProjectReference>
   </ItemGroup>
   <ItemGroup>

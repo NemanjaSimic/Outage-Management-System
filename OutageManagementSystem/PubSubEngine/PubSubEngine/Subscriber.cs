@@ -20,7 +20,7 @@ namespace PubSubEngine
             if (Subscribers.Instance.TryAddSubscriber(subscriber))
             {
                 Logger.LogInfo($"Subscriber [{subscriberName}] added to list of all subscribers SUCCESSFULLY.");
-                Thread thread = new Thread(() => TrackPublications(subscriber));
+                Thread thread = new Thread(() => TrackPublications(subscriber, subscriberName));
                 thread.Start();
             }
 
@@ -32,10 +32,9 @@ namespace PubSubEngine
 
         }
 
-        private void TrackPublications(ISubscriberCallback subscriber)
+        private void TrackPublications(ISubscriberCallback subscriber, string subscriberName)
         {
             bool end = false;
-            string subscriberName = subscriber.GetSubscriberName();
 
             Logger.LogInfo($"Thread for tracking publications STARTED. Subscriber [{subscriberName}]");
 

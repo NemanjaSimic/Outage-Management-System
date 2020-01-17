@@ -19,7 +19,7 @@ namespace CalculationEngineService.DistributedTransaction
 
         public override bool NotifyAboutUpdate(Dictionary<DeltaOpType, List<long>> modelChanges)
         {
-            TransactionManager.Instance.UpdateNotify(modelChanges);
+            TransactionManager.Intance.UpdateNotify(modelChanges);
 
             using (TransactionEnlistmentProxy transactionEnlistmentProxy = TransactionEnlistmentProxy)
             {
@@ -36,7 +36,7 @@ namespace CalculationEngineService.DistributedTransaction
                 }
             }
 
-                
+
             Logger.LogInfo("Calculation Engine SUCCESSFULLY notified about network model update.");
             return true;
         }
