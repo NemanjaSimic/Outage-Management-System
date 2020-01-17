@@ -1,4 +1,5 @@
 ﻿using Outage.Common.PubSub;
+using Outage.Common.PubSub.CalculationEngineDataContract;
 using Outage.Common.PubSub.SCADADataContract;
 using System.Runtime.Serialization;
 using System.ServiceModel;
@@ -23,6 +24,9 @@ namespace Outage.Common.ServiceContracts.PubSub
         [ServiceKnownType(typeof(MultipleAnalogValueSCADAMessage))]
         [ServiceKnownType(typeof(SingleDiscreteValueSCADAMessage))]
         [ServiceKnownType(typeof(MultipleDiscreteValueSCADAMessage))]
+        [ServiceKnownType(typeof(CalculationEngineMessage))]
+        [ServiceKnownType(typeof(CalcualtionEnginePublication))]
+        [ServiceKnownType(typeof(TopologyForUIMessage))]
         void Notify(IPublishableMessage message);
     }
 }

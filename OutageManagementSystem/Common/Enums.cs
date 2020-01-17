@@ -22,7 +22,10 @@ namespace Outage.Common
         MEASUREMENT = 0,
 
         [EnumMember]
-        SWITCH_STATUS
+        SWITCH_STATUS,
+
+        [EnumMember]
+        TOPOLOGY
     }
 
     //SCADA

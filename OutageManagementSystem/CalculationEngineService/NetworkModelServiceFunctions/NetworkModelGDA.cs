@@ -13,7 +13,7 @@ namespace NetworkModelServiceFunctions
 			int iteratorId;
 			try
 			{
-				using (var proxy = new NetworkModelGDAProxy(EndpointNames.NetworkModelGDAEndpoint))
+				using (var proxy = new Outage.Common.ServiceProxies.NetworkModelGDAProxy(EndpointNames.NetworkModelGDAEndpoint))
 				{
 					iteratorId = proxy.GetExtentValues(entityType, propIds);
 				}
@@ -32,7 +32,7 @@ namespace NetworkModelServiceFunctions
 			int iteratorId;
 			try
 			{
-				using (var proxy = new NetworkModelGDAProxy(EndpointNames.NetworkModelGDAEndpoint))
+				using (var proxy = new Outage.Common.ServiceProxies.NetworkModelGDAProxy(EndpointNames.NetworkModelGDAEndpoint))
 				{
 					iteratorId = proxy.GetRelatedValues(source, propIds, association);
 				}
@@ -50,7 +50,7 @@ namespace NetworkModelServiceFunctions
 		{
 			try
 			{
-				using (var proxy = new NetworkModelGDAProxy(EndpointNames.NetworkModelGDAEndpoint))
+				using (var proxy = new Outage.Common.ServiceProxies.NetworkModelGDAProxy(EndpointNames.NetworkModelGDAEndpoint))
 				{
 					return proxy.GetValues(resourceId, propIds);
 				}
@@ -70,7 +70,7 @@ namespace NetworkModelServiceFunctions
 
 			try
 			{
-				using (var proxy = new NetworkModelGDAProxy(EndpointNames.NetworkModelGDAEndpoint))
+				using (var proxy = new Outage.Common.ServiceProxies.NetworkModelGDAProxy(EndpointNames.NetworkModelGDAEndpoint))
 				{
 					do
 					{

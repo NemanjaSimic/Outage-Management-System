@@ -3,18 +3,17 @@ using Outage.Common;
 using Outage.Common.GDA;
 using System;
 using System.Collections.Generic;
-using Logger = Outage.Common.LoggerWrapper;
 
 namespace NetworkModelServiceFunctions
 {
 	public class NMSManager
 	{
-        #region Fields
+		#region Fields
+		ILogger logger = LoggerWrapper.Instance;
         private readonly ModelResourcesDesc modelResourcesDesc;
 		private readonly NetworkModelGDA networkModelGDA;
 		private Dictionary<long, ResourceDescription> modelEntities;
 		private Dictionary<long, ResourceDescription> transactionModelEntities;
-
 		#endregion
 
 		#region Singleton
@@ -47,12 +46,12 @@ namespace NetworkModelServiceFunctions
 			Dictionary<long, ResourceDescription> entities;
 			if (flag == TransactionFlag.InTransaction)
 			{
-				Logger.Instance.LogDebug("Getting all energy sources in transaction.");
+				logger.LogDebug("Getting all energy sources in transaction.");
 				entities = transactionModelEntities;
 			}
 			else
 			{
-				Logger.Instance.LogDebug("Getting all energy sources in no transaction.");
+				logger.LogDebug("Getting all energy sources in no transaction.");
 				entities = modelEntities;
 			}
 
@@ -86,12 +85,12 @@ namespace NetworkModelServiceFunctions
 			Dictionary<long, ResourceDescription> entities;
 			if (flag == TransactionFlag.InTransaction)
 			{
-				Logger.Instance.LogDebug($"Getting all referenced elements for GID {gid} in transaction.");
+				logger.LogDebug($"Getting all referenced elements for GID {gid} in transaction.");
 				entities = transactionModelEntities;
 			}
 			else
 			{
-				Logger.Instance.LogDebug($"Getting all referenced elements for GID {gid} in no transaction.");
+				logger.LogDebug($"Getting all referenced elements for GID {gid} in no transaction.");
 				entities = modelEntities;
 			}
 			DMSType type = ModelCodeHelper.GetTypeFromModelCode(modelResourcesDesc.GetModelCodeFromId(gid));
@@ -162,7 +161,7 @@ namespace NetworkModelServiceFunctions
 		}
 		public bool PrepareForTransaction(Dictionary<DeltaOpType, List<long>> delta)
 		{
-			Logger.Instance.LogInfo("NMSManager prepare for transaction started.");
+			logger.LogInfo("NMSManager prepare for transaction started.");
 
 			bool success = true;
 			transactionModelEntities = new Dictionary<long, ResourceDescription>(modelEntities);
@@ -174,7 +173,7 @@ namespace NetworkModelServiceFunctions
 					{
 						if (pair.Key == DeltaOpType.Delete)
 						{
-							Logger.Instance.LogDebug($"Element with GID {elementGid} is being deleted.");
+							logger.LogDebug($"Element with GID {elementGid} is being deleted.");
 							transactionModelEntities.Remove(elementGid);
 						}
 						else if (pair.Key == DeltaOpType.Insert)
@@ -183,12 +182,12 @@ namespace NetworkModelServiceFunctions
 							ResourceDescription newEl = networkModelGDA.GetValues(elementGid, properties);
 							if (!transactionModelEntities.TryGetValue(elementGid, out ResourceDescription element))
 							{
-								Logger.Instance.LogDebug($"Element with GID {elementGid} is being inserted.");
+								logger.LogDebug($"Element with GID {elementGid} is being inserted.");
 								transactionModelEntities.Add(newEl.Id, newEl);
 							}
 							else
 							{
-								Logger.Instance.LogDebug($"Element with GID {elementGid} is already inserted.");
+								logger.LogDebug($"Element with GID {elementGid} is already inserted.");
 							}
 							//descented values ???
 						}
@@ -198,12 +197,12 @@ namespace NetworkModelServiceFunctions
 							ResourceDescription updatedEl = networkModelGDA.GetValues(elementGid, properties);
 							if (transactionModelEntities.TryGetValue(elementGid, out ResourceDescription element))
 							{
-								Logger.Instance.LogDebug($"Element with GID {elementGid} is being updated.");
+								logger.LogDebug($"Element with GID {elementGid} is being updated.");
 								element = updatedEl;
 							}
 							else
 							{
-								Logger.Instance.LogDebug($"Element with GID {elementGid} does not exist.");
+								logger.LogDebug($"Element with GID {elementGid} does not exist.");
 							}
 						}
 					}
@@ -212,19 +211,22 @@ namespace NetworkModelServiceFunctions
 			}
 			catch (Exception ex)
 			{
-				Logger.Instance.LogInfo($"NMSManager failed to prepare for transaction. Exception message: {ex.Message}");
+				logger.LogInfo($"NMSManager failed to prepare for transaction. Exception message: {ex.Message}");
 				success = false;
 			}
-			Logger.Instance.LogInfo("NMSManager is prepared for transaction.");
+			logger.LogInfo("NMSManager is prepared for transaction.");
 			return success;
 		}
 		public void CommitTransaction()
 		{
 			modelEntities = new Dictionary<long, ResourceDescription>(transactionModelEntities);
+			logger.LogDebug("NMSManager commited transaction successfully.");
 		}
 		public void RollbackTransaction()
 		{
 			transactionModelEntities = null;
+			logger.LogDebug("NMSManager rolled back transaction.");
+
 		}
 	}
 }

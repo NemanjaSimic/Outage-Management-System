@@ -4,11 +4,12 @@ using CECommon.Model;
 using NetworkModelServiceFunctions;
 using Outage.Common;
 using Outage.Common.GDA;
+using Outage.Common.PubSub.CalculationEngineDataContract;
+using Outage.Common.ServiceProxies.PubSub;
 using System;
 using System.Collections.Generic;
 using System.Linq;
 using TopologyBuilder;
-using Logger = Outage.Common.LoggerWrapper;
 
 namespace Topology
 {
@@ -74,12 +75,12 @@ namespace Topology
             bool success = true;
             try
             {
-                Logger.Instance.LogInfo($"Topology manager prepare for transaction started.");
+                logger.LogInfo($"Topology manager prepare for transaction started.");
                 TransactionTopologyModel = CreateTopology(TransactionFlag.InTransaction);
             }
             catch (Exception ex)
             {
-                Logger.Instance.LogInfo($"Topology manager failed to prepare for transaction. Exception message: {ex.Message}");
+                logger.LogInfo($"Topology manager failed to prepare for transaction. Exception message: {ex.Message}");
                 success = false;
             }
             return success;
@@ -88,11 +89,21 @@ namespace Topology
         public void CommitTransaction()
         {
             TopologyModel = TransactionTopologyModel;
+            logger.LogDebug("TopologyManager commited transaction successfully.");
+            using (var publisherProxy = new PublisherProxy(EndpointNames.PublisherEndpoint))
+            {
+                //publisherProxy.Open();
+                TopologyForUIMessage message = new TopologyForUIMessage(TopologyModel.UIModel);
+                CalcualtionEnginePublication publication = new CalcualtionEnginePublication(Topic.TOPOLOGY, message);
+                publisherProxy.Publish(publication);
+                logger.LogDebug("TopologyManager published new topology successfully.");
+            }
         }
 
         public void RollbackTransaction()
         {
             TransactionTopologyModel = null;
+            logger.LogDebug("TopologyManager rolled back topology.");
         }
 
     }
