@@ -1,9 +1,8 @@
-﻿using MediatR;
-using OMS.Web.Common.Constants;
+﻿using System;
+using MediatR;
+using System.Web.Http;
 using OMS.Web.Services.Commands;
 using OMS.Web.UI.Models.BindingModels;
-using System.Threading.Tasks;
-using System.Web.Http;
 
 namespace OMS.Web.API.Controllers
 {
@@ -15,7 +14,7 @@ namespace OMS.Web.API.Controllers
         {
             _mediator = mediator;
         }
-      
+
         [HttpPost]
         public IHttpActionResult Post(SwitchCommand command)
         {
@@ -26,16 +25,27 @@ namespace OMS.Web.API.Controllers
 
             SwitchCommandBase switchCommand;
 
-            if(command.Command == SwitchCommandType.TURN_ON)
+            if (command.Command == SwitchCommandType.TURN_ON)
             {
                 switchCommand = new TurnOnSwitchCommand(command.Guid);
             }
-            else
+            else if (command.Command == SwitchCommandType.TURN_OFF)
             {
                 switchCommand = new TurnOffSwitchCommand(command.Guid);
             }
-              
-            _mediator.Send(switchCommand);
+            else
+            {
+                return BadRequest("Invalid CommandType.");
+            }
+
+            try
+            {
+                _mediator.Send(switchCommand);
+            }
+            catch (Exception)
+            {
+                return InternalServerError();
+            }
 
             return Ok($"{switchCommand.Command.ToString()} command for {command.Guid} sent");
         }

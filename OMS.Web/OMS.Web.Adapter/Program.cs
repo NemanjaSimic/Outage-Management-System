@@ -1,5 +1,6 @@
-﻿using OMS.Web.Adapter.WebService;
-using System;
+﻿using System;
+using OMS.Web.Adapter.WebService;
+using OMS.Web.Common;
 
 namespace OMS.Web.Adapter
 {
@@ -7,7 +8,7 @@ namespace OMS.Web.Adapter
     {
         static void Main(string[] args)
         {
-            WebServiceHost host = new WebServiceHost();
+            WebServiceHost host = new WebServiceHost(AppSettings.Get<string>("webServiceUrl"));
 
             try
             {
@@ -18,6 +19,8 @@ namespace OMS.Web.Adapter
                 Console.WriteLine($"Exception occured during WebServiceHost Open(): {e.Message}");
                 throw;
             }
+
+
 
             Console.WriteLine("Press enter to close the app.");
             Console.ReadLine();

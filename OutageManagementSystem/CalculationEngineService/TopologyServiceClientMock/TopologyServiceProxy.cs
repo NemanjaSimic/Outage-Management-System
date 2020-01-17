@@ -13,6 +13,7 @@ namespace TopologyServiceClientMock
         {
             proxy = this.CreateChannel();
         }
+
         public UIModel GetTopology()
         {
             return proxy.GetTopology();

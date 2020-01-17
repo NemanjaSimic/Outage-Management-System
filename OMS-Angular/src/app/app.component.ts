@@ -7,6 +7,9 @@ import { Component, OnInit, NgZone } from '@angular/core';
 })
 export class AppComponent implements OnInit {
 
+  events: string[] = [];
+  opened: boolean;
+
   constructor() { }
 
   ngOnInit() { }

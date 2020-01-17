@@ -1,32 +1,56 @@
-﻿using MediatR;
-using OMS.Web.Services.Commands;
+﻿using System;
+using MediatR;
 using Outage.Common;
 using System.Threading;
 using System.Threading.Tasks;
+using OMS.Web.Adapter.Contracts;
+using OMS.Web.Services.Commands;
 
 namespace OMS.Web.Services.Handlers
 {
     public class SwitchCommandHandler : IRequestHandler<TurnOffSwitchCommand>, IRequestHandler<TurnOnSwitchCommand>
     {
         private readonly ILogger _logger;
+        private readonly IScadaClient _scadaClient;
 
         public SwitchCommandHandler(ILogger logger)
         {
             _logger = logger;
+            _scadaClient = null; // ovde izmeniti ili constructor injection
         }
 
         public Task<Unit> Handle(TurnOffSwitchCommand request, CancellationToken cancellationToken)
         {
             _logger.LogDebug($"Sending {request.Command.ToString()} command to {request.Gid}");
-            // TODO: Implement logic for sending command
-
-            return null;
+            
+            try
+            {
+                // treba nam implementacija scada klijenta
+                // jer sad treba da bude preko CE
+                _scadaClient.SendCommand(request.Gid, (int)request.Command);
+            }
+            catch(Exception e)
+            {
+                _logger.LogError("SwitchCommandHandler failed on TurnOffSwitch handler.", e);
+            }
+            
+            return null; // vracanje null vrednosti je anti-pattern ali ovde nemam drugog izbora
         }
 
         public Task<Unit> Handle(TurnOnSwitchCommand request, CancellationToken cancellationToken)
         {
             _logger.LogDebug($"Sending {request.Command.ToString()} command to {request.Gid}");
-            // TODO: Implement logic for sending command
+
+            try
+            {
+                _scadaClient.SendCommand(request.Gid, (int)request.Command);
+            }
+            catch (Exception e)
+            {
+                _logger.LogDebug("SwitchCommandHandler failed on TurnOnSwitch handler.");
+                _logger.LogError(null, e);
+                throw;
+            }
 
             return null;
         }

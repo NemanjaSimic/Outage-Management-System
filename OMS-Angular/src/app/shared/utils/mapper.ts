@@ -5,8 +5,8 @@ export const mapNode = (node: Node) => {
   return {
     data: {
       id: node.Id,
-      label: node.Name,
-      state: node.IsActive ? "active" : "inactive"
+      state: node.IsActive ? "active" : "inactive",
+      type: node.Type
     }
   }
 }
