@@ -53,15 +53,15 @@
     <None Include="App.config" />
   </ItemGroup>
   <ItemGroup>
-    <ProjectReference Include="..\CalculationEngineService\CECommon\CECommon.csproj">
+    <ProjectReference Include="..\CECommon\CECommon.csproj">
       <Project>{E1D2D69D-E03D-4FD7-8E4F-0FC95B68F0DD}</Project>
       <Name>CECommon</Name>
     </ProjectReference>
-    <ProjectReference Include="..\CalculationEngineService\TopologyElementsFuntions\TopologyElementsFuntions.csproj">
+    <ProjectReference Include="..\TopologyElementsFuntions\TopologyElementsFuntions.csproj">
       <Project>{7F4CFEB1-0253-4A00-83C4-FE2CA5E2A5B3}</Project>
       <Name>TopologyElementsFuntions</Name>
     </ProjectReference>
-    <ProjectReference Include="..\Common\Common.csproj">
+    <ProjectReference Include="..\..\Common\Common.csproj">
       <Project>{892CBE15-9ED7-4540-81FA-0EAABA592138}</Project>
       <Name>Common</Name>
     </ProjectReference>
