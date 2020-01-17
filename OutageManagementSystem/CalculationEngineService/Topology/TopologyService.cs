@@ -12,7 +12,7 @@ namespace Topology
 		{
 			try
 			{
-				return Topology.Instance.TopologyModel.UIModel;
+				return TopologyManager.Instance.TopologyModel.UIModel;
 			}
 			catch (Exception ex)
 			{

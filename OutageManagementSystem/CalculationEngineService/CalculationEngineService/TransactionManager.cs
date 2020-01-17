@@ -1,9 +1,12 @@
-﻿using Outage.Common.GDA;
+﻿using NetworkModelServiceFunctions;
+using Outage.Common.GDA;
 using System;
 using System.Collections.Generic;
 using System.Linq;
 using System.Text;
 using System.Threading.Tasks;
+using Topology;
+using Logger = Outage.Common.LoggerWrapper;
 
 namespace CalculationEngineService
 {
@@ -17,7 +20,7 @@ namespace CalculationEngineService
         private static TransactionManager instance;
         private static object syncObj = new object();
 
-        public static TransactionManager Instance
+        public static TransactionManager Intance
         {
             get
             {
@@ -33,9 +36,38 @@ namespace CalculationEngineService
         }
         #endregion
 
-        public void UpdateNotify(Dictionary<DeltaOpType, List<long>> newDelta)
+        public bool UpdateNotify(Dictionary<DeltaOpType, List<long>> newDelta)
         {
-            delta = newDelta;
+            delta = new Dictionary<DeltaOpType, List<long>>(newDelta);
+            return true;
+        }
+
+        public bool Prepare()
+        {
+            bool success;
+
+            if(NMSManager.Instance.PrepareForTransaction(delta) && TopologyManager.Instance.PrepareForTransaction())
+            {
+                success = true;
+            }
+            else
+            {
+                success = false;
+            }
+
+            return success;
+        }
+
+        public void CommitTransaction()
+        {
+            NMSManager.Instance.CommitTransaction();
+            TopologyManager.Instance.CommitTransaction();
+        }
+
+        public void RollbackTransaction()
+        {
+            NMSManager.Instance.RollbackTransaction();
+            TopologyManager.Instance.RollbackTransaction();
         }
     }
 }

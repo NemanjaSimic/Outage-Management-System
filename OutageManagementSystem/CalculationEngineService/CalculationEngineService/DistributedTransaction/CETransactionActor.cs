@@ -21,8 +21,7 @@ namespace CalculationEngineService.DistributedTransaction
 
             try
             {
-                success = true;
-                //success = topologyModel.Prepare();
+                success = TransactionManager.Intance.Prepare();
             }
             catch (Exception ex)
             {
@@ -46,7 +45,7 @@ namespace CalculationEngineService.DistributedTransaction
         {
             try
             {
-                //topologyModel.Commit();
+                TransactionManager.Intance.CommitTransaction();
                 Logger.LogInfo("Commit on CE Transaction actor SUCCESSFULLY finished.");
             }
             catch (Exception ex)
@@ -60,7 +59,7 @@ namespace CalculationEngineService.DistributedTransaction
         {
             try
             {
-                //topologyModel.Commit();
+                TransactionManager.Intance.RollbackTransaction();
                 Logger.LogInfo("Rollback on CE Transaction actor SUCCESSFULLY finished.");
             }
             catch (Exception ex)

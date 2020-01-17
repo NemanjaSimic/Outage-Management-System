@@ -103,6 +103,7 @@
   </ItemGroup>
   <ItemGroup>
     <Compile Include="EndpointNames.cs" />
+    <Compile Include="PubSub\CalculationEngineDataContract\CalcualtionEnginePublication.cs" />
     <Compile Include="PubSub\CalculationEngineDataContract\CalculationEngineMessage.cs" />
     <Compile Include="PubSub\IPublication.cs" />
     <Compile Include="PubSub\Publication.cs" />
