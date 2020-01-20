@@ -161,7 +161,8 @@ namespace Outage.SCADA.SCADAData.Repository
             return alarmChanged;
         }
 
-
+        #region Conversions
+        
         public float RawToEguValueConversion(int rawValue)
         {
             //TODO: implement with Deviation and ScaleFactor
@@ -188,6 +189,8 @@ namespace Outage.SCADA.SCADAData.Repository
 
             return rawValue;
         }
+
+        #endregion
 
         #region IClonable
 

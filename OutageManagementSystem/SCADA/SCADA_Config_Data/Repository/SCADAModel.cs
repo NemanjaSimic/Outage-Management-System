@@ -1,7 +1,9 @@
-﻿using Outage.Common;
+﻿using EasyModbus;
+using Outage.Common;
 using Outage.Common.GDA;
 using Outage.Common.ServiceProxies;
 using Outage.SCADA.SCADACommon;
+using Outage.SCADA.SCADAData.Configuration;
 using System;
 using System.Collections.Generic;
 using System.Threading;
@@ -19,14 +21,14 @@ namespace Outage.SCADA.SCADAData.Repository
 
         private ModelResourcesDesc modelResourceDesc;
 
+        private bool isSCADAModelImported = false;
         private Dictionary<DeltaOpType, List<long>> modelChanges;
         private Dictionary<long, ISCADAModelPointItem> incomingScadaModel;
         private Dictionary<PointType, Dictionary<ushort, long>> incomingAddressToGidMap;
         private Dictionary<long, ISCADAModelPointItem> currentScadaModel;
         private Dictionary<PointType, Dictionary<ushort, long>> currentAddressToGidMap;
-        public bool modelImported = false;
-        public Action EnableDelta;
-        public Action DisableDelta;
+
+
         #region Properties
 
         protected Dictionary<DeltaOpType, List<long>> ModelChanges
@@ -41,11 +43,23 @@ namespace Outage.SCADA.SCADAData.Repository
 
         protected Dictionary<PointType, Dictionary<ushort, long>> IncomingAddressToGidMap
         {
-            get { return incomingAddressToGidMap ?? (incomingAddressToGidMap = new Dictionary<PointType, Dictionary<ushort, long>>() {  { PointType.ANALOG_INPUT, new Dictionary<ushort, long>() },
-                                                                                                                                        { PointType.ANALOG_OUTPUT, new Dictionary<ushort, long>()},
-                                                                                                                                        { PointType.DIGITAL_INPUT, new Dictionary<ushort, long>()},
-                                                                                                                                        { PointType.DIGITAL_OUTPUT, new Dictionary<ushort, long>()},
-                                                                                                                                        { PointType.HR_LONG, new Dictionary<ushort, long>()} }); }
+            get
+            {
+                return incomingAddressToGidMap ?? (incomingAddressToGidMap = new Dictionary<PointType, Dictionary<ushort, long>>() 
+                {  
+                    { PointType.ANALOG_INPUT, new Dictionary<ushort, long>()    },
+                    { PointType.ANALOG_OUTPUT, new Dictionary<ushort, long>()   },
+                    { PointType.DIGITAL_INPUT, new Dictionary<ushort, long>()   },
+                    { PointType.DIGITAL_OUTPUT, new Dictionary<ushort, long>()  },
+                    { PointType.HR_LONG, new Dictionary<ushort, long>()         },
+                }); 
+            }
+        }
+
+
+        public bool IsSCADAModelImported
+        {
+            get { return isSCADAModelImported;  }
         }
 
         public Dictionary<long, ISCADAModelPointItem> CurrentScadaModel
@@ -55,14 +69,21 @@ namespace Outage.SCADA.SCADAData.Repository
 
         public Dictionary<PointType, Dictionary<ushort, long>> CurrentAddressToGidMap
         {
-            get { return currentAddressToGidMap ?? (currentAddressToGidMap = new Dictionary<PointType, Dictionary<ushort, long>>() {  { PointType.ANALOG_INPUT, new Dictionary<ushort, long>() },
-                                                                                                                                        { PointType.ANALOG_OUTPUT, new Dictionary<ushort, long>()},
-                                                                                                                                        { PointType.DIGITAL_INPUT, new Dictionary<ushort, long>()},
-                                                                                                                                        { PointType.DIGITAL_OUTPUT, new Dictionary<ushort, long>()},
-                                                                                                                                        { PointType.HR_LONG, new Dictionary<ushort, long>()} });
+            get 
+            { 
+                return currentAddressToGidMap ?? (currentAddressToGidMap = new Dictionary<PointType, Dictionary<ushort, long>>() 
+                {
+                    { PointType.ANALOG_INPUT, new Dictionary<ushort, long>()    },
+                    { PointType.ANALOG_OUTPUT, new Dictionary<ushort, long>()   },
+                    { PointType.DIGITAL_INPUT, new Dictionary<ushort, long>()   },
+                    { PointType.DIGITAL_OUTPUT, new Dictionary<ushort, long>()  },
+                    { PointType.HR_LONG, new Dictionary<ushort, long>()         },
+                });
             }
         }
 
+        public Action SignalIncomingModelConfirmation;
+        
         #endregion Properties
 
         #region Instance
@@ -141,7 +162,7 @@ namespace Outage.SCADA.SCADAData.Repository
             incomingScadaModel = new Dictionary<long, ISCADAModelPointItem>();
             modelResourceDesc = new ModelResourcesDesc();
 
-            modelImported = ImportModel();
+            isSCADAModelImported = ImportModel();
         }
 
         #region IModelUpdateNotificationContract
@@ -161,12 +182,19 @@ namespace Outage.SCADA.SCADAData.Repository
             bool success;
             try
             {
+                incomingScadaModel = new Dictionary<long, ISCADAModelPointItem>(CurrentScadaModel.Count);
+                
                 foreach (long gid in CurrentScadaModel.Keys)
                 {
                     ModelCode type = modelResourceDesc.GetModelCodeFromId(gid);
                     ISCADAModelPointItem pointItem = CurrentScadaModel[gid].Clone();
+
                     IncomingScadaModel.Add(gid, pointItem);
-                    IncomingAddressToGidMap[pointItem.RegisterType].Add(pointItem.Address, gid);
+                    
+                    if(!IncomingAddressToGidMap[pointItem.RegisterType].ContainsKey(pointItem.Address))
+                    {
+                        IncomingAddressToGidMap[pointItem.RegisterType].Add(pointItem.Address, gid);
+                    }
                 }
 
                 foreach (long gid in modelChanges[DeltaOpType.Insert])
@@ -176,7 +204,6 @@ namespace Outage.SCADA.SCADAData.Repository
                     {
                         ISCADAModelPointItem pointItem = CreateConfigItemForEntity(gid);
                         
-
                         if (IncomingScadaModel.ContainsKey(gid) || IncomingAddressToGidMap[pointItem.RegisterType].ContainsKey(pointItem.Address))
                         {
                             string message = $"Model update data in fault state. Inserting gid: {gid} or measurement address: {pointItem.Address}, that already exists in SCADA model.";
@@ -241,7 +268,6 @@ namespace Outage.SCADA.SCADAData.Repository
 
         public void Commit()
         {
-            EnableDelta();
             currentScadaModel = IncomingScadaModel;
             incomingScadaModel = null;
 
@@ -253,7 +279,8 @@ namespace Outage.SCADA.SCADAData.Repository
             string message = $"Incoming SCADA model is confirmed.";
             Console.WriteLine(message);
             Logger.LogInfo(message);
-            DisableDelta();
+            
+            SignalIncomingModelConfirmation();
         }
 
         public void Rollback()
@@ -445,5 +472,6 @@ namespace Outage.SCADA.SCADAData.Repository
 
             return pointItem;
         }
+        
     }
 }

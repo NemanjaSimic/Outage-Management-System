@@ -44,31 +44,41 @@ namespace Outage.SCADA.ModBus.ModbusFuntions
             {
                 ushort address = (ushort)(startAddress + i);
                 int rawValue = data[i];
+
+                //for commands enqueued during model update
+                if (!scadaModel.CurrentAddressToGidMap[PointType.ANALOG_OUTPUT].ContainsKey(address))
+                {
+                    Logger.LogWarn($"ReadHoldingRegistersFunction execute => trying to read value on address {address}, Point type: {PointType.ANALOG_OUTPUT}, which is not in the current SCADA Model.");
+                    continue;
+                }
+
                 long gid = scadaModel.CurrentAddressToGidMap[PointType.ANALOG_OUTPUT][address];
 
-                if (scadaModel.CurrentScadaModel.ContainsKey(gid))
+                //for commands enqueued during model update
+                if (!scadaModel.CurrentScadaModel.ContainsKey(gid))
                 {
-                    AnalogSCADAModelPointItem pointItem = scadaModel.CurrentScadaModel[gid] as AnalogSCADAModelPointItem;
-
-                    if (pointItem == null)
-                    {
-                        string message = $"PointItem [Gid: 0x{gid:X16}] is not type AnalogSCADAModelPointItem.";
-                        Logger.LogError(message);
-                        throw new Exception(message);
-                    }
-
-                    pointItem.CurrentEguValue = pointItem.RawToEguValueConversion(rawValue);
-
-                    bool alarmChanged = pointItem.SetAlarms();
-                    if (alarmChanged)
-                    {
-                        Logger.LogInfo($"Alarm for Point [Gid: 0x{pointItem.Gid:X16}, Address: {pointItem.Address}] set to {pointItem.Alarm}.");
-                    }
-
-                    AnalogModbusData digitalData = new AnalogModbusData(pointItem.CurrentEguValue, pointItem.Alarm);
-                    Data.Add(gid, digitalData);
-                    Logger.LogDebug($"ReadHoldingRegistersFunction execute => Current value: {pointItem.CurrentEguValue} from address: {address}, gid: 0x{gid:X16}.");
+                    Logger.LogWarn($"ReadHoldingRegistersFunction execute => trying to read value for measurement with gid: 0x{gid:X16}, which is not in the current SCADA Model.");
+                    continue;
                 }
+
+                if (!(scadaModel.CurrentScadaModel[gid] is AnalogSCADAModelPointItem pointItem))
+                {
+                    string message = $"PointItem [Gid: 0x{gid:X16}] is not type AnalogSCADAModelPointItem.";
+                    Logger.LogError(message);
+                    throw new Exception(message);
+                }
+
+                pointItem.CurrentEguValue = pointItem.RawToEguValueConversion(rawValue);
+
+                bool alarmChanged = pointItem.SetAlarms();
+                if (alarmChanged)
+                {
+                    Logger.LogInfo($"Alarm for Point [Gid: 0x{pointItem.Gid:X16}, Address: {pointItem.Address}] set to {pointItem.Alarm}.");
+                }
+
+                AnalogModbusData digitalData = new AnalogModbusData(pointItem.CurrentEguValue, pointItem.Alarm);
+                Data.Add(gid, digitalData);
+                Logger.LogDebug($"ReadHoldingRegistersFunction execute => Current value: {pointItem.CurrentEguValue} from address: {address}, gid: 0x{gid:X16}.");
             }
 
             Logger.LogDebug($"ReadHoldingRegistersFunction executed SUCCESSFULLY. StartAddress: {startAddress}, Quantity: {quantity}");

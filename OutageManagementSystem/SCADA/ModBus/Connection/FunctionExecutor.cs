@@ -29,12 +29,11 @@ namespace Outage.SCADA.ModBus.Connection
         private Thread functionExecutorThread;
         private bool threadCancellationSignal = false;
 
-        private IModbusFunction currentCommand;
-
         private AutoResetEvent commandEvent;
         private ConcurrentQueue<IModbusFunction> commandQueue;
+        private ConcurrentQueue<IModbusFunction> highPriorityCommandQueue;
 
-        public bool isDelta = false;
+        //public bool isDelta = false;
         public ISCADAConfigData ConfigData { get; protected set; }
         public SCADAModel SCADAModel { get; protected set; }
         public ModbusClient ModbusClient { get; protected set; }
@@ -114,12 +113,12 @@ namespace Outage.SCADA.ModBus.Connection
         {
             ConfigData = SCADAConfigData.Instance;
             SCADAModel = SCADAModel.Instance;
-            SCADAModel.EnableDelta = EnableDelta;
-            SCADAModel.DisableDelta = DisableDelta;
+            //SCADAModel.EnableDelta = EnableDelta;
+            //SCADAModel.DisableDelta = DisableDelta;
             ModbusClient = new ModbusClient(ConfigData.IpAddress, ConfigData.TcpPort);
 
             commandQueue = new ConcurrentQueue<IModbusFunction>();
-            commandEvent = new AutoResetEvent(false);
+            commandEvent = new AutoResetEvent(true);
         }
 
         #region Public Members
@@ -172,23 +171,43 @@ namespace Outage.SCADA.ModBus.Connection
 
             try
             {
-                if (ModbusClient != null && ModbusClient.Connected)
-                {
-                    this.commandQueue.Enqueue(modbusFunction);
-                    this.commandEvent.Set();
-                    success = true;
-                }
-                else
-                {
-                    success = false;
-                    string message = "Modbus client is either not connected or null.";
-                    Logger.LogError(message);
-                }
-            }
+                //if (ModbusClient != null && ModbusClient.Connected)
+                //{
+                this.commandQueue.Enqueue(modbusFunction);
+                this.commandEvent.Set();
+                success = true;
+                //}
+                //else
+                //{
+                //    success = false;
+                //    string message = "Modbus client is either not connected or null.";
+                //    Logger.LogError(message);
+                //}
+        }
             catch (Exception e)
             {
                 success = false;
                 string message = "Exception caught in EnqueueCommand() method.";
+                Logger.LogError(message, e);
+            }
+
+            return success;
+        }
+
+        public bool EnqueueHighPriorityCommand(ModbusFunction modbusFunction)
+        {
+            bool success;
+
+            try
+            {
+                this.highPriorityCommandQueue.Enqueue(modbusFunction);
+                this.commandEvent.Set();
+                success = true;
+            }
+            catch (Exception e)
+            {
+                success = false;
+                string message = "Exception caught in EnqueueHighPriorityCommand() method.";
                 Logger.LogError(message, e);
             }
 
@@ -254,11 +273,12 @@ namespace Outage.SCADA.ModBus.Connection
                         ModbusClient = new ModbusClient(ConfigData.IpAddress, ConfigData.TcpPort);
                     }
 
-                    if (!ModbusClient.Connected && !isDelta)
+                    if (!ModbusClient.Connected)
                     {
                         ConnectToModbusClient();
-                        if (SCADAModel.modelImported) InitSimulatorValues();
                     }
+                    
+                    //if (SCADAModel.modelImported) InitSimulatorValues();
 
                     Logger.LogDebug("Connected and waiting for command event.");
 
@@ -266,27 +286,16 @@ namespace Outage.SCADA.ModBus.Connection
 
                     Logger.LogDebug("Command event happened.");
 
-                    while (commandQueue.TryDequeue(out this.currentCommand))
+                    //HIGH PROPRITY COMMANDS - model update commands
+                    while (highPriorityCommandQueue.TryDequeue(out IModbusFunction currentCommand))
                     {
-                        try
-                        {
-                            currentCommand.Execute(ModbusClient);
-                        }
-                        catch (Exception e)
-                        {
-                            //todo: retry
-                            string message = "Exception on currentCommand.Execute().";
-                            Logger.LogWarn(message, e);
-                        }
+                        ExecuteCommand(currentCommand);
+                    }
 
-                        if (currentCommand is IReadAnalogModusFunction readAnalogCommand)
-                        {
-                            PublishAnalogData(readAnalogCommand.Data);
-                        }
-                        else if (currentCommand is IReadDiscreteModbusFunction readDiscreteCommand)
-                        {
-                            PublishDigitalData(readDiscreteCommand.Data);
-                        }
+                    //REGULAR COMMANDS - acquisition and user commands
+                    while (commandQueue.TryDequeue(out IModbusFunction currentCommand))
+                    {
+                        ExecuteCommand(currentCommand);
                     }
                 }
                 catch (Exception ex)
@@ -296,7 +305,35 @@ namespace Outage.SCADA.ModBus.Connection
                 }
             }
 
+            if(ModbusClient.Connected)
+            {
+                ModbusClient.Disconnect();
+            }
+
             Logger.LogInfo("FunctionExecutorThread is stopped.");
+        }
+
+        private void ExecuteCommand(IModbusFunction command)
+        {
+            try
+            {
+                command.Execute(ModbusClient);
+            }
+            catch (Exception e)
+            {
+                //todo: retry
+                string message = "Exception on currentCommand.Execute().";
+                Logger.LogWarn(message, e);
+            }
+
+            if (command is IReadAnalogModusFunction readAnalogCommand)
+            {
+                PublishAnalogData(readAnalogCommand.Data);
+            }
+            else if (command is IReadDiscreteModbusFunction readDiscreteCommand)
+            {
+                PublishDigitalData(readDiscreteCommand.Data);
+            }
         }
 
         private void PublishAnalogData(Dictionary<long, AnalogModbusData> data)
@@ -331,32 +368,79 @@ namespace Outage.SCADA.ModBus.Connection
             }
         }
 
+        //private void InitSimulatorValues()
+        //{
+        //    foreach (ISCADAModelPointItem pointItem in SCADAModel.Instance.CurrentScadaModel.Values)
+        //    {
+        //        if(pointItem is AnalogSCADAModelPointItem analogPointItem)
+        //        {
+        //            ModbusClient.WriteSingleRegister(analogPointItem.Address - 1, analogPointItem.CurrentRawValue);
+        //        }
+        //        else if(pointItem is DiscreteSCADAModelPointItem discretePointItem)
+        //        {
+        //            ModbusClient.WriteSingleCoil(discretePointItem.Address - 1, (discretePointItem.CurrentValue == 1) ? true : false);
+        //        }
+        //    }
+        //}
+
+        //private void EnableDelta()
+        //{
+        //    isDelta = true;
+        //    ModbusClient.Disconnect();
+        //}
+
+        //private void DisableDelta()
+        //{
+        //    isDelta = false;
+        //}
+
         private void InitSimulatorValues()
         {
-            foreach (ISCADAModelPointItem pointItem in SCADAModel.Instance.CurrentScadaModel.Values)
+            try
             {
-                if(pointItem is AnalogSCADAModelPointItem analogPointItem)
+                string ipAddress = SCADAConfigData.Instance.IpAddress;
+                ushort tcpPort = SCADAConfigData.Instance.TcpPort;
+                ModbusClient modbusClient = new ModbusClient(ipAddress, tcpPort);
+                modbusClient.Connect();
+
+                if (modbusClient.Connected)
                 {
-                    ModbusClient.WriteSingleRegister(analogPointItem.Address - 1, analogPointItem.CurrentRawValue);
+                    foreach (ISCADAModelPointItem pointItem in SCADAModel.Instance.CurrentScadaModel.Values)
+                    {
+                        if (pointItem is AnalogSCADAModelPointItem analogPointItem)
+                        {
+                            modbusClient.WriteSingleRegister(analogPointItem.Address - 1, analogPointItem.CurrentRawValue);
+                        }
+                        else if (pointItem is DiscreteSCADAModelPointItem discretePointItem)
+                        {
+                            bool commandingValue;
+                            if (discretePointItem.CurrentValue == 0)
+                            {
+                                commandingValue = false;
+                            }
+                            else if (discretePointItem.CurrentValue == 1)
+                            {
+                                commandingValue = true;
+                            }
+                            else
+                            {
+                                Logger.LogError("Non-boolean value in write single coil command parameter.");
+                                continue;
+                            }
+
+                            modbusClient.WriteSingleCoil(discretePointItem.Address - 1, commandingValue);
+                        }
+                    }
+
+                    modbusClient.Disconnect();
                 }
-                else if(pointItem is DiscreteSCADAModelPointItem discretePointItem)
-                {
-                    ModbusClient.WriteSingleCoil(discretePointItem.Address - 1, (discretePointItem.CurrentValue == 1) ? true : false);
-                }
+            }
+            catch (Exception e)
+            {
+                Logger.LogError("Exception caught in InitSimulatorValues().", e);
             }
         }
 
-        private void EnableDelta()
-        {
-            isDelta = true;
-            ModbusClient.Disconnect();
-        }
-        
-        private void DisableDelta()
-        {
-            isDelta = false;
-        }
-       
         #endregion Private Members
     }
 }

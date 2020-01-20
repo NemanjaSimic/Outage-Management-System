@@ -8,17 +8,22 @@ namespace Outage.SCADA.ModBus
 {
     public static class ModbusSimulatorHandler
     {
+        /// <summary>
+        /// Starts new ModbusServer if one is not already opened.
+        /// </summary>
         public static void StartModbusSimulator()
         {
             try
             {
                 ISCADAConfigData config = SCADAConfigData.Instance;
+                Process[] modbusSimulators = Process.GetProcessesByName(config.ModbusSimulatorExeName.Replace(".exe", ""));
 
-                StopModbusSimulaotrs();
-
-                Process process = new Process();
-                process.StartInfo.FileName = config.ModbusSimulatorExePath;
-                process.Start();
+                if(modbusSimulators.Length == 0)
+                {
+                    Process process = new Process();
+                    process.StartInfo.FileName = config.ModbusSimulatorExePath;
+                    process.Start();
+                }
             }
             catch (Exception e)
             {
@@ -26,6 +31,9 @@ namespace Outage.SCADA.ModBus
             }
         }
 
+        /// <summary>
+        /// Stops all instances of ModbusServer.
+        /// </summary>
         public static void StopModbusSimulaotrs()
         {
             try
@@ -44,6 +52,9 @@ namespace Outage.SCADA.ModBus
             }
         }
 
+        /// <summary>
+        /// First stops all instances of ModbusServer and then starts a new one.
+        /// </summary>
         public static void RestartSimulator()
         {
             StopModbusSimulaotrs();

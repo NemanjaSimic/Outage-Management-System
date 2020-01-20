@@ -28,15 +28,15 @@ namespace Outage.SCADA.SCADAService.Command
 
             if (scadaModel.CurrentScadaModel.TryGetValue(gid, out ISCADAModelPointItem pointItem))
             {
-                if (pointItem.RegisterType == PointType.ANALOG_OUTPUT)
+                if (pointItem is IAnalogSCADAModelPointItem analogPointItem && pointItem.RegisterType == PointType.ANALOG_OUTPUT)
                 {
-                    int modbusValue = (int)commandingValue; //TODO: EGU convertion...
+                    int modbusValue = analogPointItem.EguToRawValueConversion(commandingValue);
                     success = SendCommand(pointItem, modbusValue);
                 }
                 else
                 {
                     success = false;
-                    string message = $"RegistarType of entity with gid: 0x{gid:X16} is not ANALOG_OUTPUT.";
+                    string message = $"Either RegistarType of entity with gid: 0x{gid:X16} is not ANALOG_OUTPUT or entity does not implement IAnalogSCADAModelPointItem interface.";
                     Logger.LogError(message);
                 }
             }
@@ -56,14 +56,14 @@ namespace Outage.SCADA.SCADAService.Command
 
             if (scadaModel.CurrentScadaModel.TryGetValue(gid, out ISCADAModelPointItem pointItem))
             {
-                if (pointItem.RegisterType == PointType.DIGITAL_OUTPUT)
+                if (pointItem is IDiscreteSCADAModelPointItem && pointItem.RegisterType == PointType.DIGITAL_OUTPUT)
                 {
                     success = SendCommand(pointItem, commandingValue);
                 }
                 else
                 {
                     success = false;
-                    string message = $"RegistarType of entity with gid: 0x{gid:X16} is not DIGITAL_OUTPUT.";
+                    string message = $"RegistarType of entity with gid: 0x{gid:X16} is not DIGITAL_OUTPUT or entity does not implement IDiscreteSCADAModelPointItem interface.";
                     Logger.LogError(message);
                 }
             }

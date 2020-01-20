@@ -43,31 +43,41 @@ namespace Outage.SCADA.ModBus.ModbusFuntions
             {
                 ushort address = (ushort)(startAddress + i);
                 ushort value = (ushort)(data[i] ? 1 : 0);
+
+                //for commands enqueued during model update
+                if (!scadaModel.CurrentAddressToGidMap[PointType.DIGITAL_INPUT].ContainsKey(address))
+                {
+                    Logger.LogWarn($"ReadDiscreteInputsFunction execute => trying to read value on address {address}, Point type: {PointType.DIGITAL_INPUT}, which is not in the current SCADA Model.");
+                    continue;
+                }
+
                 long gid = scadaModel.CurrentAddressToGidMap[PointType.DIGITAL_INPUT][address];
 
-                if (scadaModel.CurrentScadaModel.ContainsKey(gid))
+                //for commands enqueued during model update
+                if (!scadaModel.CurrentScadaModel.ContainsKey(gid))
                 {
-                    DiscreteSCADAModelPointItem pointItem = scadaModel.CurrentScadaModel[gid] as DiscreteSCADAModelPointItem;
-
-                    if (pointItem == null)
-                    {
-                        string message = $"PointItem [Gid: 0x{gid:X16}] is not type DiscreteSCADAModelPointItem.";
-                        Logger.LogError(message);
-                        throw new Exception(message);
-                    }
-
-                    pointItem.CurrentValue = value;
-
-                    bool alarmChanged = pointItem.SetAlarms();
-                    if (alarmChanged)
-                    {
-                        Logger.LogInfo($"Alarm for Point [Gid: 0x{pointItem.Gid:X16}, Address: {pointItem.Address}] set to {pointItem.Alarm}.");
-                    }
-
-                    DiscreteModbusData digitalData = new DiscreteModbusData(value, pointItem.Alarm);
-                    Data.Add(gid, digitalData);
-                    Logger.LogDebug($"ReadDiscreteInputsFunction execute => Current value: {value} from address: {address}, gid: 0x{gid:X16}.");
+                    Logger.LogWarn($"ReadDiscreteInputsFunction execute => trying to read value for measurement with gid: 0x{gid:X16}, which is not in the current SCADA Model.");
+                    continue;
                 }
+
+                if (!(scadaModel.CurrentScadaModel[gid] is DiscreteSCADAModelPointItem pointItem))
+                {
+                    string message = $"PointItem [Gid: 0x{gid:X16}] is not type DiscreteSCADAModelPointItem.";
+                    Logger.LogError(message);
+                    throw new Exception(message);
+                }
+
+                pointItem.CurrentValue = value;
+
+                bool alarmChanged = pointItem.SetAlarms();
+                if (alarmChanged)
+                {
+                    Logger.LogInfo($"Alarm for Point [Gid: 0x{pointItem.Gid:X16}, Point type: {PointType.DIGITAL_INPUT}, Address: {pointItem.Address}] set to {pointItem.Alarm}.");
+                }
+
+                DiscreteModbusData digitalData = new DiscreteModbusData(value, pointItem.Alarm);
+                Data.Add(gid, digitalData);
+                Logger.LogDebug($"ReadDiscreteInputsFunction execute => Current value: {value} from address: {address}, point type: {PointType.DIGITAL_INPUT}, gid: 0x{gid:X16}.");
             }
 
             Logger.LogDebug($"ReadDiscreteInputsFunction executed SUCCESSFULLY. StartAddress: {startAddress}, Quantity: {quantity}");
