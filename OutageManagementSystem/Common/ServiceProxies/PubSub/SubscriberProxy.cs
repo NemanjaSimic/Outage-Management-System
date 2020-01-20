@@ -25,7 +25,7 @@ namespace Outage.Common.ServiceProxies.PubSub
             {
                 string message = "Exception in Subscribe() proxy method.";
                 LoggerWrapper.Instance.LogError(message, e);
-                throw e;
+                throw;
             }
         }
     }

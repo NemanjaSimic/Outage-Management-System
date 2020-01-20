@@ -16,7 +16,7 @@ namespace OMS.Web.Adapter
 
             SubscriberProxy _subscriberClient = new SubscriberProxy(
                 new TopologyNotification("WEB_SUBSCRIBER", new GraphMapper()),
-                AppSettings.Get<string>("pubSubServiceAddress")
+                EndpointNames.SubscriberEndpoint
                 );
 
             try

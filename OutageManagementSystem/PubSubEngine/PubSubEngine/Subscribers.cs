@@ -1,6 +1,7 @@
 ﻿using Outage.Common;
 using Outage.Common.PubSub;
 using Outage.Common.ServiceContracts.PubSub;
+using System;
 using System.Collections.Concurrent;
 using System.Collections.Generic;
 
@@ -65,7 +66,15 @@ namespace PubSubEngine
         public void PublishMessage(ISubscriberCallback subscriber, IPublishableMessage message)
         {
             bool success = subscribers.TryGetValue(subscriber, out Queue<IPublishableMessage> queueOfMessages);
-            string subscriberName = subscriber.GetSubscriberName();
+            string subscriberName = "";
+            try
+            {
+                subscriberName = subscriber.GetSubscriberName();
+            }
+            catch (Exception ex)
+            {
+                Logger.LogDebug($"Couldn't get subscriber name. Execption message: {ex.Message}");
+            }
 
             if (success)
             {
@@ -84,7 +93,15 @@ namespace PubSubEngine
             IPublishableMessage message = null;
 
             bool success = subscribers.TryGetValue(subscriber, out Queue<IPublishableMessage> queueOfMessages) && queueOfMessages.Count > 0;
-            string subscriberName = subscriber.GetSubscriberName();
+            string subscriberName = "";
+            try
+            {
+                subscriberName = subscriber.GetSubscriberName();
+            }
+            catch (Exception ex)
+            {
+                Logger.LogDebug($"Couldn't get subscriber name. Execption message: {ex.Message}");
+            }
 
             if (success)
             {
