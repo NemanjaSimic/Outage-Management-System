@@ -15,11 +15,15 @@ import { MatListModule } from '@angular/material/list';
 import { MatToolbarModule } from '@angular/material/toolbar';
 import { MatButtonModule } from '@angular/material/button';
 import { MatIconModule } from '@angular/material/icon';
+import { ActiveBrowserComponent } from './modules/active-browser/active-browser.component';
+import { HistoricalBrowserComponent } from './modules/historical-browser/historical-browser.component';
 
 
 @NgModule({
   declarations: [
-    AppComponent
+    AppComponent,
+    ActiveBrowserComponent,
+    HistoricalBrowserComponent
   ],
   imports: [
     BrowserModule,
