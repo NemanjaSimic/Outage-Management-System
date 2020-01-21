@@ -64,7 +64,7 @@ export class GraphComponent implements OnInit, OnDestroy {
     }, 2000);
 
     // web api
-    //this.startConnection();
+    this.startConnection();
 
     // local testing
     this.graphData.nodes = graphMock.nodes;
@@ -157,7 +157,7 @@ export class GraphComponent implements OnInit, OnDestroy {
       elements: this.graphData
     });
 
-    this.drawBackupEdges();
+    //this.drawBackupEdges();
     this.addTooltips();
     this.drawWarnings();
   };
@@ -196,6 +196,7 @@ export class GraphComponent implements OnInit, OnDestroy {
 
   public onNotification(data: OmsGraph): void {
     this.ngZone.run(() => {
+      console.log(data);
       this.graphData.nodes = data.Nodes.map(mapper.mapNode);
       this.graphData.edges = data.Relations.map(mapper.mapRelation);
       this.drawGraph();

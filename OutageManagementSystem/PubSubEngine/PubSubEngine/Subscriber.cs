@@ -14,8 +14,16 @@ namespace PubSubEngine
 
         public void Subscribe(Topic topic)
         {
+            string subscriberName = "";
             ISubscriberCallback subscriber = OperationContext.Current.GetCallbackChannel<ISubscriberCallback>();
-            string subscriberName = subscriber.GetSubscriberName();
+            try
+            {
+                subscriberName = subscriber.GetSubscriberName();
+            }
+            catch (Exception ex)
+            {
+                Logger.LogDebug($"Couldn't get subscriber name. Execption message: {ex.Message}");
+            }
 
             if (Subscribers.Instance.TryAddSubscriber(subscriber))
             {
@@ -23,11 +31,19 @@ namespace PubSubEngine
                 Thread thread = new Thread(() => TrackPublications(subscriber, subscriberName));
                 thread.Start();
             }
+            else
+            {
+                Logger.LogDebug($"Failed to add subscriber [{subscriberName}] to list of subsribers.");
+            }
 
             if (Publications.Instance.TryAddSubscriber(topic, subscriber))
             {
                 string message = $"Subscriber [{subscriberName}], added to map Topic -> subscriber SUCCESSFULLY. Topic: '{topic}'.";
                 Logger.LogInfo(message);
+            }
+            else
+            {
+                Logger.LogDebug($"Failed to add subscriber [{subscriberName}] to map Topic -> subsriber. Topic: {topic}");
             }
 
         }
