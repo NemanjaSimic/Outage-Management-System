@@ -27,11 +27,13 @@ namespace Outage.SCADA.SCADAService
         private List<ServiceHost> hosts = null;
         private SCADAModel scadaModel = null;
         private Acquisition acquisition = null;
+        private FunctionExecutor functionExecutor = null;
         //private ConfigWriter configWriter = null;
         private ISCADAConfigData configData = SCADAConfigData.Instance;
 
         public SCADAService()
         {
+            functionExecutor = FunctionExecutor.Instance;
             scadaModel = SCADAModel.Instance;
             SCADAModelUpdateNotification.SCADAModel = scadaModel;
             SCADATransactionActor.SCADAModel = scadaModel;
@@ -43,7 +45,7 @@ namespace Outage.SCADA.SCADAService
         public void Start()
         {
             ModbusSimulatorHandler.StartModbusSimulator();
-            FunctionExecutor.Instance.StartExecutor();
+            functionExecutor.StartExecutor();
             StartDataAcquisition();
             StartHosts();
         }

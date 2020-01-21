@@ -27,6 +27,7 @@ namespace Outage.SCADA.SCADAData.Repository
         private Dictionary<PointType, Dictionary<ushort, long>> incomingAddressToGidMap;
         private Dictionary<long, ISCADAModelPointItem> currentScadaModel;
         private Dictionary<PointType, Dictionary<ushort, long>> currentAddressToGidMap;
+        
 
 
         #region Properties
@@ -47,11 +48,11 @@ namespace Outage.SCADA.SCADAData.Repository
             {
                 return incomingAddressToGidMap ?? (incomingAddressToGidMap = new Dictionary<PointType, Dictionary<ushort, long>>() 
                 {  
-                    { PointType.ANALOG_INPUT, new Dictionary<ushort, long>()    },
-                    { PointType.ANALOG_OUTPUT, new Dictionary<ushort, long>()   },
-                    { PointType.DIGITAL_INPUT, new Dictionary<ushort, long>()   },
+                    { PointType.ANALOG_INPUT,   new Dictionary<ushort, long>()  },
+                    { PointType.ANALOG_OUTPUT,  new Dictionary<ushort, long>()  },
+                    { PointType.DIGITAL_INPUT,  new Dictionary<ushort, long>()  },
                     { PointType.DIGITAL_OUTPUT, new Dictionary<ushort, long>()  },
-                    { PointType.HR_LONG, new Dictionary<ushort, long>()         },
+                    { PointType.HR_LONG,        new Dictionary<ushort, long>()  },
                 }); 
             }
         }
@@ -73,16 +74,16 @@ namespace Outage.SCADA.SCADAData.Repository
             { 
                 return currentAddressToGidMap ?? (currentAddressToGidMap = new Dictionary<PointType, Dictionary<ushort, long>>() 
                 {
-                    { PointType.ANALOG_INPUT, new Dictionary<ushort, long>()    },
-                    { PointType.ANALOG_OUTPUT, new Dictionary<ushort, long>()   },
-                    { PointType.DIGITAL_INPUT, new Dictionary<ushort, long>()   },
+                    { PointType.ANALOG_INPUT,   new Dictionary<ushort, long>()  },
+                    { PointType.ANALOG_OUTPUT,  new Dictionary<ushort, long>()  },
+                    { PointType.DIGITAL_INPUT,  new Dictionary<ushort, long>()  },
                     { PointType.DIGITAL_OUTPUT, new Dictionary<ushort, long>()  },
-                    { PointType.HR_LONG, new Dictionary<ushort, long>()         },
+                    { PointType.HR_LONG,        new Dictionary<ushort, long>()  },
                 });
             }
         }
 
-        public Action SignalIncomingModelConfirmation;
+        public event ModelUpdateDelegate SignalIncomingModelConfirmation;
         
         #endregion Properties
 
@@ -162,7 +163,9 @@ namespace Outage.SCADA.SCADAData.Repository
             incomingScadaModel = new Dictionary<long, ISCADAModelPointItem>();
             modelResourceDesc = new ModelResourcesDesc();
 
-            isSCADAModelImported = ImportModel();
+
+            //ImportModel();
+            //
         }
 
         #region IModelUpdateNotificationContract
@@ -280,7 +283,7 @@ namespace Outage.SCADA.SCADAData.Repository
             Console.WriteLine(message);
             Logger.LogInfo(message);
             
-            SignalIncomingModelConfirmation();
+            SignalIncomingModelConfirmation.Invoke(new List<long>(CurrentScadaModel.Keys));
         }
 
         public void Rollback()
@@ -299,8 +302,10 @@ namespace Outage.SCADA.SCADAData.Repository
 
         #region ImportScadaModel
 
-        private bool ImportModel()
+        public bool ImportModel()
         {
+
+
             string message = "Importing analog measurements started...";
             Logger.LogInfo(message);
             Console.WriteLine(message);
@@ -318,6 +323,7 @@ namespace Outage.SCADA.SCADAData.Repository
             message = $"Importing discrete measurements finished. ['success' value: {discreteImportSuccess}]";
             Logger.LogInfo(message);
             Console.WriteLine(message);
+            SignalIncomingModelConfirmation.Invoke(new List<long>(CurrentScadaModel.Keys));
 
             return analogImportSuccess && discreteImportSuccess;
         }
@@ -327,7 +333,6 @@ namespace Outage.SCADA.SCADAData.Repository
             bool success;
             int numberOfResources = 1000;
             List<ModelCode> props = modelResourceDesc.GetAllPropertyIds(ModelCode.ANALOG);
-
             try
             {
                 using (NetworkModelGDAProxy gdaProxy = GdaQueryProxy)
@@ -349,6 +354,7 @@ namespace Outage.SCADA.SCADAData.Repository
                                     ISCADAModelPointItem pointItem = new AnalogSCADAModelPointItem(rds[i].Properties, ModelCode.ANALOG);
                                     CurrentScadaModel.Add(rds[i].Id, pointItem);
                                     CurrentAddressToGidMap[pointItem.RegisterType].Add(pointItem.Address, rds[i].Id);
+                                    
                                     Logger.LogDebug($"ANALOG measurement added to SCADA model [Gid: {gid}, Address: {pointItem.Address}]");
                                 }
                             }
@@ -381,7 +387,6 @@ namespace Outage.SCADA.SCADAData.Repository
             bool success;
             int numberOfResources = 1000;
             List<ModelCode> props = modelResourceDesc.GetAllPropertyIds(ModelCode.DISCRETE);
-
             try
             {
                 using (NetworkModelGDAProxy gdaProxy = GdaQueryProxy)

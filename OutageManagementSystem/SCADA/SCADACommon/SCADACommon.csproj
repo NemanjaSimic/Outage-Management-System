@@ -52,6 +52,7 @@
     <Compile Include="ISCADAConfigData.cs" />
     <Compile Include="IModBusFunction.cs" />
     <Compile Include="ISCADAModelPointItem.cs" />
+    <Compile Include="ModelUpdateDelegate.cs" />
     <Compile Include="Properties\AssemblyInfo.cs" />
   </ItemGroup>
   <ItemGroup>

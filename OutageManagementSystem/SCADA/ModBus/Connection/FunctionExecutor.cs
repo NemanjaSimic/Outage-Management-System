@@ -12,10 +12,10 @@ using System.Collections.Generic;
 using System.Threading;
 using Outage.Common.PubSub.SCADADataContract;
 using EasyModbus.Exceptions;
+using Outage.SCADA.ModBus.FunctionParameters;
 
 namespace Outage.SCADA.ModBus.Connection
 {
-    public delegate void UpdatePointDelegate(PointType type, ushort pointAddres, ushort newValue);
 
     public class FunctionExecutor
     {
@@ -31,7 +31,7 @@ namespace Outage.SCADA.ModBus.Connection
 
         private AutoResetEvent commandEvent;
         private ConcurrentQueue<IModbusFunction> commandQueue;
-        private ConcurrentQueue<IModbusFunction> highPriorityCommandQueue;
+        private ConcurrentQueue<IModbusFunction> modelUpdateQueue;
 
         //public bool isDelta = false;
         public ISCADAConfigData ConfigData { get; protected set; }
@@ -112,13 +112,17 @@ namespace Outage.SCADA.ModBus.Connection
         private FunctionExecutor()
         {
             ConfigData = SCADAConfigData.Instance;
-            SCADAModel = SCADAModel.Instance;
             //SCADAModel.EnableDelta = EnableDelta;
             //SCADAModel.DisableDelta = DisableDelta;
             ModbusClient = new ModbusClient(ConfigData.IpAddress, ConfigData.TcpPort);
 
-            commandQueue = new ConcurrentQueue<IModbusFunction>();
-            commandEvent = new AutoResetEvent(true);
+            this.commandQueue = new ConcurrentQueue<IModbusFunction>();
+            this.modelUpdateQueue = new ConcurrentQueue<IModbusFunction>();
+            this.commandEvent = new AutoResetEvent(true);
+
+            SCADAModel = SCADAModel.Instance;
+            SCADAModel.SignalIncomingModelConfirmation += EnqueueModelUpdateCommands;
+            SCADAModel.ImportModel();
         }
 
         #region Public Members
@@ -165,7 +169,7 @@ namespace Outage.SCADA.ModBus.Connection
             
         }
 
-        public bool EnqueueCommand(ModbusFunction modbusFunction)
+        public bool EnqueueCommand(IModbusFunction modbusFunction)
         {
             bool success;
 
@@ -183,7 +187,7 @@ namespace Outage.SCADA.ModBus.Connection
                 //    string message = "Modbus client is either not connected or null.";
                 //    Logger.LogError(message);
                 //}
-        }
+            }
             catch (Exception e)
             {
                 success = false;
@@ -194,13 +198,41 @@ namespace Outage.SCADA.ModBus.Connection
             return success;
         }
 
-        public bool EnqueueHighPriorityCommand(ModbusFunction modbusFunction)
+        public bool EnqueueModelUpdateCommands(List<long> modelUpdateFunctions)
         {
             bool success;
-
+            ushort length = 6;
             try
             {
-                this.highPriorityCommandQueue.Enqueue(modbusFunction);
+                foreach(long measurementGID in modelUpdateFunctions)
+                {
+                    ISCADAModelPointItem scadaPointItem = SCADAModel.CurrentScadaModel[measurementGID];
+                    IModbusFunction modbusFunction;
+
+                    if (scadaPointItem is IAnalogSCADAModelPointItem analogSCADAModelPointItem)
+                    {
+                        modbusFunction = FunctionFactory.CreateModbusFunction(new ModbusWriteCommandParameters(length,
+                                                                                (byte)ModbusFunctionCode.WRITE_SINGLE_REGISTER,
+                                                                                analogSCADAModelPointItem.Address,
+                                                                                analogSCADAModelPointItem.CurrentRawValue));
+                    }
+                    else if (scadaPointItem is IDiscreteSCADAModelPointItem discreteSCADAModelPointItem)
+                    {
+                        modbusFunction = FunctionFactory.CreateModbusFunction(new ModbusWriteCommandParameters(length,
+                                                                                (byte)ModbusFunctionCode.WRITE_SINGLE_COIL,
+                                                                                discreteSCADAModelPointItem.Address,
+                                                                                discreteSCADAModelPointItem.CurrentValue));
+                    }
+                    else
+                    {
+                        Logger.LogWarn("Unknown type of ISCADAModelPointItem.");
+                        continue;
+                    }
+
+                    this.modelUpdateQueue.Enqueue(modbusFunction);
+                }
+                
+                
                 this.commandEvent.Set();
                 success = true;
             }
@@ -273,11 +305,6 @@ namespace Outage.SCADA.ModBus.Connection
                         ModbusClient = new ModbusClient(ConfigData.IpAddress, ConfigData.TcpPort);
                     }
 
-                    if (!ModbusClient.Connected)
-                    {
-                        ConnectToModbusClient();
-                    }
-                    
                     //if (SCADAModel.modelImported) InitSimulatorValues();
 
                     Logger.LogDebug("Connected and waiting for command event.");
@@ -286,8 +313,13 @@ namespace Outage.SCADA.ModBus.Connection
 
                     Logger.LogDebug("Command event happened.");
 
+                    if (!ModbusClient.Connected)
+                    {
+                        ConnectToModbusClient();
+                    }
+
                     //HIGH PROPRITY COMMANDS - model update commands
-                    while (highPriorityCommandQueue.TryDequeue(out IModbusFunction currentCommand))
+                    while (modelUpdateQueue.TryDequeue(out IModbusFunction currentCommand))
                     {
                         ExecuteCommand(currentCommand);
                     }
