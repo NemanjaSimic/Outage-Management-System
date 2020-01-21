@@ -7,13 +7,12 @@ namespace Outage.SCADA.SCADAServiceHost
     {
         private static void Main(string[] args)
         {
-            ILogger logger = LoggerWrapper.Instance;
+            ILogger Logger = LoggerWrapper.Instance;
 
             try
             {
                 string message = "Starting SCADA Service...";
-                logger.LogInfo(message);
-                CommonTrace.WriteTrace(CommonTrace.TraceInfo, message);
+                Logger.LogInfo(message);
                 Console.WriteLine("\n{0}\n", message);
 
                 using (SCADAService.SCADAService scadaService = new SCADAService.SCADAService())
@@ -21,7 +20,6 @@ namespace Outage.SCADA.SCADAServiceHost
                     scadaService.Start();
 
                     message = "Press <Enter> to stop the service.";
-                    CommonTrace.WriteTrace(CommonTrace.TraceInfo, message);
                     Console.WriteLine(message);
                     Console.ReadLine();
                 }
@@ -29,12 +27,9 @@ namespace Outage.SCADA.SCADAServiceHost
             catch (Exception ex)
             {
                 Console.WriteLine(ex.Message);
-                Console.WriteLine("SCADAService failed.");
+                Console.WriteLine("SCADA Service failed.");
                 Console.WriteLine(ex.StackTrace);
-                CommonTrace.WriteTrace(CommonTrace.TraceError, ex.Message);
-                CommonTrace.WriteTrace(CommonTrace.TraceError, "SCADAService failed.");
-                CommonTrace.WriteTrace(CommonTrace.TraceError, ex.StackTrace);
-                logger.LogError($"SCADAService failed.{Environment.NewLine}Message: {ex.Message} ", ex);
+                Logger.LogError($"SCADA Service failed.{Environment.NewLine}Message: {ex.Message} ", ex);
                 Console.ReadLine();
             }
         }

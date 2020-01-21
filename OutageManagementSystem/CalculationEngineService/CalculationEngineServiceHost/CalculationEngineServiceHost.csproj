@@ -74,6 +74,10 @@
       <Project>{7F4CFEB1-0253-4A00-83C4-FE2CA5E2A5B3}</Project>
       <Name>TopologyElementsFuntions</Name>
     </ProjectReference>
+    <ProjectReference Include="..\Topology\Topology.csproj">
+      <Project>{831A52CF-75FF-4EAB-BCEC-24547C588009}</Project>
+      <Name>Topology</Name>
+    </ProjectReference>
   </ItemGroup>
   <Import Project="$(MSBuildToolsPath)\Microsoft.CSharp.targets" />
 </Project>

@@ -1,11 +1,5 @@
-﻿namespace Outage.SCADA.SCADA_Common
+﻿namespace Outage.SCADA.SCADACommon
 {
-    public enum ConnectionState : short
-    {
-        CONNECTED = 0,
-        DISCONNECTED = 1
-    }
-
     public enum ModbusFunctionCode : short
     {
         READ_COILS = 0x01,
@@ -29,14 +23,5 @@
     {
         CLOSED = 0,
         OPENED = 1,
-    }
-
-    public enum AlarmType : short
-    {
-        NO_ALARM = 0x01,
-        REASONABILITY_FAILURE = 0x02,
-        LOW_ALARM = 0x03,
-        HIGH_ALARM = 0x04,
-        ABNORMAL_VALUE = 0x05,
     }
 }

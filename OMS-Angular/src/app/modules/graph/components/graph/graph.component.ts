@@ -28,6 +28,7 @@ cytoscape.use(popper);
 })
 export class GraphComponent implements OnInit, OnDestroy {
   public connectionSubscription: Subscription;
+  public topologySubscription: Subscription;
   public updateSubscription: Subscription;
   public zoomSubscription: Subscription;
   public panSubscription: Subscription;
@@ -57,11 +58,13 @@ export class GraphComponent implements OnInit, OnDestroy {
 
     setTimeout(() => {
       this.didLoadGraph = true;
-      this.drawGraph();
+
+      // initial topology
+      this.getTopology();      
     }, 2000);
 
     // web api
-    //this.startConnection();
+    this.startConnection();
 
     // local testing
     this.graphData.nodes = graphMock.nodes;
@@ -108,11 +111,24 @@ export class GraphComponent implements OnInit, OnDestroy {
     if (this.connectionSubscription)
       this.connectionSubscription.unsubscribe();
 
+    if (this.topologySubscription)
+      this.topologySubscription.unsubscribe();
+    
     if (this.updateSubscription)
       this.updateSubscription.unsubscribe();
 
     if (this.zoomSubscription)
       this.zoomSubscription.unsubscribe();
+  }
+
+  public getTopology(): void {
+    this.topologySubscription = this.graphService.getTopology().subscribe(
+      graph => {
+        console.log(graph);
+        this.onNotification(graph);
+      },
+      error => console.log(error)
+    );
   }
 
   public startConnection(): void {
@@ -141,7 +157,7 @@ export class GraphComponent implements OnInit, OnDestroy {
       elements: this.graphData
     });
 
-    this.drawBackupEdges();
+    //this.drawBackupEdges();
     this.addTooltips();
     this.drawWarnings();
   };
@@ -180,6 +196,7 @@ export class GraphComponent implements OnInit, OnDestroy {
 
   public onNotification(data: OmsGraph): void {
     this.ngZone.run(() => {
+      console.log(data);
       this.graphData.nodes = data.Nodes.map(mapper.mapNode);
       this.graphData.edges = data.Relations.map(mapper.mapRelation);
       this.drawGraph();

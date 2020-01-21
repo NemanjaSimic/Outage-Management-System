@@ -1,4 +1,4 @@
-﻿using OMS.Web.Common.Interfaces.Exceptions;
+﻿using OMS.Web.Common.Exceptions;
 using Outage.Common;
 using System;
 using System.Net;
@@ -22,6 +22,8 @@ namespace OMS.Web.API.Filters
         {
             var exceptionType = context.Exception.GetType();
 
+            // fix this
+            // doesnt quite work as in .net core
             if (exceptionType is ICustomExceptionHandler customExceptionHandler)
             {
                 customExceptionHandler.Handle(context);

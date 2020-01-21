@@ -1,10 +1,4 @@
-﻿using System;
-using System.Collections.Generic;
-using System.Linq;
-using System.Text;
-using System.Threading.Tasks;
-
-namespace Outage.Common
+﻿namespace Outage.Common
 {
     public static class EndpointNames
     {
@@ -19,6 +13,7 @@ namespace Outage.Common
         //CE
         public static readonly string CalculationEngineTransactionActorEndpoint = "CalculationEngineTransactionActorEndpoint";
         public static readonly string CalculationEngineModelUpdateNotifierEndpoint = "CalculationEngineModelUpdateNotifierEndpoint";
+        public static readonly string TopologyServiceEndpoint = "TopologyServiceEndpoint";
 
         //SCADA
         public static readonly string SCADATransactionActorEndpoint = "SCADATransactionActorEndpoint";

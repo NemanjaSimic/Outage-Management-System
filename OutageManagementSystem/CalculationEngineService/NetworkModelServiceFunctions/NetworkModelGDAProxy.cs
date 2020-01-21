@@ -1,12 +1,9 @@
 ﻿using Outage.Common;
 using Outage.Common.GDA;
-using Outage.Common.ServiceContracts;
+using Outage.Common.ServiceContracts.GDA;
 using System;
 using System.Collections.Generic;
-using System.Linq;
 using System.ServiceModel;
-using System.Text;
-using System.Threading.Tasks;
 
 namespace NetworkModelServiceFunctions
 {

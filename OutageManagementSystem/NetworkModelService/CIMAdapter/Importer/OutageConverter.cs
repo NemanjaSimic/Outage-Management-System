@@ -1,16 +1,12 @@
 ﻿using Outage.Common;
 using Outage.Common.GDA;
-using System;
-using System.Collections.Generic;
-using System.Linq;
-using System.Text;
-using System.Threading.Tasks;
 
 namespace Outage.DataImporter.CIMAdapter.Importer
 {
     public static class OutageConverter
     {
         #region Populate ResourceDescription
+
         public static void PopulateIdentifiedObjectProperties(Outage.IdentifiedObject cimIdentifiedObject, ResourceDescription rd)
         {
             if ((cimIdentifiedObject != null) && (rd != null))
@@ -48,6 +44,7 @@ namespace Outage.DataImporter.CIMAdapter.Importer
 
         public static void PopulateConductingEquipmentProperties(Outage.ConductingEquipment cimConductingEquipment, ResourceDescription rd, ImportHelper importHelper, TransformAndLoadReport report)
         {
+
             if ((cimConductingEquipment != null) && (rd != null))
             {
                 OutageConverter.PopulateEquipmentProperties(cimConductingEquipment, rd);
@@ -61,6 +58,11 @@ namespace Outage.DataImporter.CIMAdapter.Importer
                         report.Report.Append("\" - Failed to set reference to BaseVoltage: rdfID\"").Append(cimConductingEquipment.BaseVoltage.ID).AppendLine(" \" is not mapped to GID!");
                     }
                     rd.AddProperty(new Property(ModelCode.CONDUCTINGEQUIPMENT_BASEVOLTAGE, gid));
+                }
+
+                if (cimConductingEquipment.IsRemoteHasValue)
+                {
+                    rd.AddProperty(new Property(ModelCode.CONDUCTINGEQUIPMENT_ISREMOTE, cimConductingEquipment.IsRemote));
                 }
             }
         }
@@ -105,8 +107,6 @@ namespace Outage.DataImporter.CIMAdapter.Importer
                     }
                     rd.AddProperty(new Property(ModelCode.TRANSFORMERWINDING_POWERTRANSFORMER, gid));
                 }
-
-                
             }
         }
 
@@ -115,7 +115,6 @@ namespace Outage.DataImporter.CIMAdapter.Importer
             if ((cimSwitch != null) && (rd != null))
             {
                 OutageConverter.PopulateConductingEquipmentProperties(cimSwitch, rd, importHelper, report);
-                
             }
         }
 
@@ -198,7 +197,6 @@ namespace Outage.DataImporter.CIMAdapter.Importer
             if ((cimTerminal != null) && (rd != null))
             {
                 OutageConverter.PopulateIdentifiedObjectProperties(cimTerminal, rd);
-                
 
                 if (cimTerminal.ConductingEquipmentHasValue)
                 {
@@ -325,22 +323,50 @@ namespace Outage.DataImporter.CIMAdapter.Importer
                 {
                     rd.AddProperty(new Property(ModelCode.ANALOG_NORMALVALUE, cimAnalog.NormalValue));
                 }
+
+                if (cimAnalog.DeviationHasValue)
+                {
+                    rd.AddProperty(new Property(ModelCode.ANALOG_DEVIATION, cimAnalog.Deviation));
+                }
+                
+                if (cimAnalog.ScalingFactorHasValue)
+                {
+                    rd.AddProperty(new Property(ModelCode.ANALOG_SCALINGFACTOR, cimAnalog.ScalingFactor));
+                }
+                
             }
         }
-        #endregion
+
+        #endregion Populate ResourceDescription
 
         #region Enums convert
 
-        //TODO
         public static Outage.Common.DiscreteMeasurementType GetDiscreteMeasuremetType(Outage.DiscreteMeasurementType measurementType)
         {
-            return 0;
+            switch (measurementType)
+            {
+                case Outage.DiscreteMeasurementType.SwitchStatus:
+                    return  Outage.Common.DiscreteMeasurementType.SWITCH_STATUS;
+                default:
+                    throw new System.Exception($"Unknown enum type: {measurementType}.");
+            }
         }
-        //TODO
+
         public static Outage.Common.AnalogMeasurementType GetAnalogMeasurementType(Outage.AnalogMeasurementType measurementType)
         {
-            return 0;
+            switch(measurementType)
+            {
+                case Outage.AnalogMeasurementType.Current:
+                    return Outage.Common.AnalogMeasurementType.CURRENT;
+                case Outage.AnalogMeasurementType.Voltage:
+                    return Outage.Common.AnalogMeasurementType.VOLTAGE;
+                case Outage.AnalogMeasurementType.Power:
+                    return Outage.Common.AnalogMeasurementType.POWER;
+                default:
+                    throw new System.Exception($"Unknown enum type: {measurementType}.");
+            }
         }
-        #endregion
+
+        #endregion Enums convert
     }
 }

@@ -1,69 +1,94 @@
-﻿using System;
-using System.Collections.Generic;
-using System.Linq;
-using System.Text;
-using System.Threading.Tasks;
-using Outage.Common;
+﻿using Outage.Common;
 using Outage.Common.GDA;
-using System.ServiceModel;
+using System;
+using System.Collections.Generic;
 
 namespace NetworkModelServiceFunctions
 {
 	public class NetworkModelGDA
 	{
+		private ILogger logger = LoggerWrapper.Instance;
 		public List<ResourceDescription> GetExtentValues(ModelCode entityType, List<ModelCode> propIds)
 		{
 			int iteratorId;
-
-			using (var proxy = new NetworkModelGDAProxy(EndpointNames.NetworkModelGDAEndpoint))
+			try
 			{
-				iteratorId = proxy.GetExtentValues(entityType, propIds);			
+				using (var proxy = new Outage.Common.ServiceProxies.NetworkModelGDAProxy(EndpointNames.NetworkModelGDAEndpoint))
+				{
+					iteratorId = proxy.GetExtentValues(entityType, propIds);
+				}
+			}
+			catch (Exception ex)
+			{
+				string message = $"Failed to get extent values for entity type {entityType.ToString()}. Exception message: " + ex.Message;
+				logger.LogError(message);
+				throw ex;
 			}
 
 			return ProcessIterator(iteratorId);
 		}
-
 		public List<ResourceDescription> GetRelatedValues(long source, List<ModelCode> propIds, Association association)
 		{
 			int iteratorId;
-
-			using (var proxy = new NetworkModelGDAProxy(EndpointNames.NetworkModelGDAEndpoint))
+			try
 			{
-				iteratorId = proxy.GetRelatedValues(source, propIds, association);
+				using (var proxy = new Outage.Common.ServiceProxies.NetworkModelGDAProxy(EndpointNames.NetworkModelGDAEndpoint))
+				{
+					iteratorId = proxy.GetRelatedValues(source, propIds, association);
+				}
+			}
+			catch (Exception ex)
+			{
+				string message = $"Failed to get related values for element with GID {source.ToString()}. Exception message: " + ex.Message;
+				logger.LogError(message);
+				throw ex;
 			}
 
 			return ProcessIterator(iteratorId);
 		}
-
 		public ResourceDescription GetValues(long resourceId, List<ModelCode> propIds)
 		{
-			using (var proxy = new NetworkModelGDAProxy(EndpointNames.NetworkModelGDAEndpoint))
+			try
 			{
-				return proxy.GetValues(resourceId, propIds);
+				using (var proxy = new Outage.Common.ServiceProxies.NetworkModelGDAProxy(EndpointNames.NetworkModelGDAEndpoint))
+				{
+					return proxy.GetValues(resourceId, propIds);
+				}
+			}
+			catch (Exception ex)
+			{
+				string message = $"Failed to get values for elemnt with GID {resourceId.ToString()}. Exception message: " + ex.Message;
+				logger.LogError(message);
+				throw ex;
 			}
 		}
-
 		private List<ResourceDescription> ProcessIterator(int iteratorId)
 		{
-
             //TODO: mozda vec ovde napakovati dictionary<long, rd> ?
 			int numberOfResources = 50, resourcesLeft = 0;
-
-
 			List<ResourceDescription> resourceDescriptions = new List<ResourceDescription>();
 
-			using (var proxy = new NetworkModelGDAProxy(EndpointNames.NetworkModelGDAEndpoint))
+			try
 			{
-				do
+				using (var proxy = new Outage.Common.ServiceProxies.NetworkModelGDAProxy(EndpointNames.NetworkModelGDAEndpoint))
 				{
-					List<ResourceDescription> rds = proxy.IteratorNext(numberOfResources, iteratorId);
-					resourceDescriptions.AddRange(rds);
+					do
+					{
+						List<ResourceDescription> rds = proxy.IteratorNext(numberOfResources, iteratorId);
+						resourceDescriptions.AddRange(rds);
 
-					resourcesLeft = proxy.IteratorResourcesLeft(iteratorId);
+						resourcesLeft = proxy.IteratorResourcesLeft(iteratorId);
 
-				} while (resourcesLeft > 0);
+					} while (resourcesLeft > 0);
 
-				proxy.IteratorClose(iteratorId);
+					proxy.IteratorClose(iteratorId);
+				}
+			}
+			catch (Exception ex)
+			{
+				string message = $"Failed to retrieve all Resourse descriptions with iterator {iteratorId}. Exception message: " + ex.Message;
+				logger.LogError(message);
+				throw ex;
 			}
 			return resourceDescriptions;
 		}

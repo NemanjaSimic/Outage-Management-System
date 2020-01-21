@@ -1,4 +1,5 @@
 ﻿using Outage.DistributedTransactionActor;
+using Outage.SCADA.SCADAData.Repository;
 using System;
 
 namespace Outage.SCADA.SCADAService.DistributedTransaction
@@ -26,17 +27,17 @@ namespace Outage.SCADA.SCADAService.DistributedTransaction
             }
             catch (Exception ex)
             {
-                logger.LogError($"Exception catched in Prepare method on SCADA Transaction actor. Exception: {ex.Message}", ex);
+                Logger.LogError($"Exception caught in Prepare method on SCADA Transaction actor. Exception: {ex.Message}", ex);
                 success = false;
             }
 
             if (success)
             {
-                logger.LogInfo("Preparation on SCADA Transaction actor SUCCESSFULLY finished.");
+                Logger.LogInfo("Preparation on SCADA Transaction actor SUCCESSFULLY finished.");
             }
             else
             {
-                logger.LogInfo("Preparation on SCADA Transaction actor UNSUCCESSFULLY finished.");
+                Logger.LogInfo("Preparation on SCADA Transaction actor UNSUCCESSFULLY finished.");
             }
 
             return success;
@@ -47,12 +48,12 @@ namespace Outage.SCADA.SCADAService.DistributedTransaction
             try
             {
                 scadaModel.Commit();
-                logger.LogInfo("Commit on SCADA Transaction actor SUCCESSFULLY finished.");
+                Logger.LogInfo("Commit on SCADA Transaction actor SUCCESSFULLY finished.");
             }
             catch (Exception ex)
             {
-                logger.LogError($"Exception catched in Commit method on SCADA Transaction actor. Exception: {ex.Message}", ex);
-                logger.LogInfo("Commit on SCADA Transaction actor UNSUCCESSFULLY finished.");
+                Logger.LogError($"Exception caught in Commit method on SCADA Transaction actor. Exception: {ex.Message}", ex);
+                Logger.LogInfo("Commit on SCADA Transaction actor UNSUCCESSFULLY finished.");
             }
         }
 
@@ -61,12 +62,12 @@ namespace Outage.SCADA.SCADAService.DistributedTransaction
             try
             {
                 scadaModel.Rollback();
-                logger.LogInfo("Rollback on SCADA Transaction actor SUCCESSFULLY finished.");
+                Logger.LogInfo("Rollback on SCADA Transaction actor SUCCESSFULLY finished.");
             }
             catch (Exception ex)
             {
-                logger.LogError($"Exception catched in Rollback method on SCADA Transaction actor. Exception: {ex.Message}", ex);
-                logger.LogInfo("Rollback on SCADA Transaction actor UNSUCCESSFULLY finished.");
+                Logger.LogError($"Exception caught in Rollback method on SCADA Transaction actor. Exception: {ex.Message}", ex);
+                Logger.LogInfo("Rollback on SCADA Transaction actor UNSUCCESSFULLY finished.");
             }
         }
     }

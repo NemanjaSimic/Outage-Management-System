@@ -89,6 +89,9 @@
     <Reference Include="System.ServiceModel">
       <RequiredTargetFramework>3.0</RequiredTargetFramework>
     </Reference>
+    <Reference Include="System.Web.Cors, Version=5.2.7.0, Culture=neutral, PublicKeyToken=31bf3856ad364e35, processorArchitecture=MSIL">
+      <HintPath>..\..\OMS.Web\packages\Microsoft.AspNet.Cors.5.2.7\lib\net45\System.Web.Cors.dll</HintPath>
+    </Reference>
     <Reference Include="System.Xml.Linq">
       <RequiredTargetFramework>3.5</RequiredTargetFramework>
     </Reference>
@@ -100,16 +103,23 @@
   </ItemGroup>
   <ItemGroup>
     <Compile Include="EndpointNames.cs" />
+    <Compile Include="PubSub\CalculationEngineDataContract\CalcualtionEnginePublication.cs" />
+    <Compile Include="PubSub\CalculationEngineDataContract\CalculationEngineMessage.cs" />
     <Compile Include="PubSub\IPublication.cs" />
-    <Compile Include="PubSub\IPublishableMessage.cs" />
+    <Compile Include="PubSub\Publication.cs" />
+    <Compile Include="PubSub\SCADADataContract\IModbusData.cs" />
+    <Compile Include="PubSub\SCADADataContract\ModbusData.cs" />
+    <Compile Include="PubSub\SCADADataContract\SCADAMessage.cs" />
+    <Compile Include="PubSub\SCADADataContract\SCADAPublication.cs" />
     <Compile Include="ServiceContracts\DistributedTransaction\IModelUpdateNotificationContract.cs" />
     <Compile Include="ServiceContracts\DistributedTransaction\ITransactionEnlistmentContract.cs" />
-    <Compile Include="ServiceContracts\ISCADACommand.cs" />
+    <Compile Include="ServiceContracts\SCADA\ISCADACommand.cs" />
+    <Compile Include="ServiceContracts\ITopologyServiceContract.cs" />
     <Compile Include="ServiceContracts\PubSub\IPublisher.cs" />
     <Compile Include="ServiceContracts\PubSub\ISubscriber.cs" />
     <Compile Include="ServiceNames.cs" />
     <Compile Include="ServiceContracts\DistributedTransaction\ITransactionCoordinatorContract.cs" />
-    <Compile Include="ServiceContracts\INetworkModelGDAContract.cs" />
+    <Compile Include="ServiceContracts\GDA\INetworkModelGDAContract.cs" />
     <Compile Include="ServiceContracts\DistributedTransaction\ITransactionActorContract.cs" />
     <Compile Include="GDA\Association.cs" />
     <Compile Include="EnumDescs.cs" />
@@ -127,7 +137,7 @@
     <Compile Include="ServiceProxies\PubSub\PublisherProxy.cs" />
     <Compile Include="ServiceProxies\PubSub\SubscriberProxy.cs" />
     <Compile Include="ServiceProxies\SCADACommandProxy.cs" />
-    <Compile Include="Trace\CommonTrace.cs" />
+    <Compile Include="ServiceProxies\TopologyServiceProxy.cs" />
     <Compile Include="ModelCodeHelper.cs" />
     <Compile Include="ModelResourcesDesc.cs" />
     <Compile Include="Properties\Settings.Designer.cs">
@@ -141,6 +151,8 @@
     <Compile Include="GDA\Property.cs" />
     <Compile Include="GDA\ResourceDescription.cs" />
     <Compile Include="GDA\PropertyValue.cs" />
+    <Compile Include="UI\UIModel.cs" />
+    <Compile Include="UI\UINode.cs" />
     <Compile Include="Versioning\DeltaDB.cs" />
   </ItemGroup>
   <ItemGroup>

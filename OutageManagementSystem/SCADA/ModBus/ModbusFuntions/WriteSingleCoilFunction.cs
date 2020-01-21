@@ -1,5 +1,6 @@
-﻿using Outage.SCADA.ModBus.FunctionParameters;
-using Outage.SCADA.SCADA_Common;
+﻿using EasyModbus;
+using Outage.SCADA.ModBus.FunctionParameters;
+using Outage.SCADA.SCADACommon;
 using System;
 using System.Collections.Generic;
 using System.Net;
@@ -9,12 +10,51 @@ namespace Outage.SCADA.ModBus.ModbusFuntions
 {
     public class WriteSingleCoilFunction : ModbusFunction
     {
-        public WriteSingleCoilFunction(ModbusCommandParameters commandParameters) : base(commandParameters)
+        public WriteSingleCoilFunction(ModbusCommandParameters commandParameters)
+            : base(commandParameters)
         {
             CheckArguments(MethodBase.GetCurrentMethod(), typeof(ModbusWriteCommandParameters));
         }
 
-        /// <inheritdoc />
+        #region IModBusFunction
+
+        public override void Execute(ModbusClient modbusClient)
+        {
+            ModbusWriteCommandParameters mdb_write_comm_pars = this.CommandParameters as ModbusWriteCommandParameters;
+            ushort outputAddress = mdb_write_comm_pars.OutputAddress;
+            int value = mdb_write_comm_pars.Value;
+
+            if (outputAddress >= ushort.MaxValue || outputAddress == ushort.MinValue)
+            {
+                string message = $"Address is out of bound. Output address: {outputAddress}.";
+                Logger.LogError(message);
+                throw new Exception(message);
+            }
+
+            bool commandingValue;
+            if (value == 0)
+            {
+                commandingValue = false;
+            }
+            else if (value == 1)
+            {
+                commandingValue = true;
+            }
+            else
+            {
+                throw new ArgumentException("Non-boolean value in write single coil command parameter.");
+            }
+
+            modbusClient.WriteSingleCoil(outputAddress - 1, commandingValue);
+            Logger.LogInfo($"WriteSingleCoilFunction executed SUCCESSFULLY. OutputAddress: {outputAddress}, Value: {commandingValue}");
+        }
+
+        #endregion IModBusFunction
+
+        #region Obsolete
+
+        /// <inheritdoc/>
+        [Obsolete]
         public override byte[] PackRequest()
         {
             ModbusWriteCommandParameters mdb_write_comm_pars = this.CommandParameters as ModbusWriteCommandParameters;
@@ -31,7 +71,8 @@ namespace Outage.SCADA.ModBus.ModbusFuntions
             return mdb_request;
         }
 
-        /// <inheritdoc />
+        /// <inheritdoc/>
+        [Obsolete]
         public override Dictionary<Tuple<PointType, ushort>, ushort> ParseResponse(byte[] response)
         {
             ModbusWriteCommandParameters mdb_write_comm_pars = this.CommandParameters as ModbusWriteCommandParameters;
@@ -56,5 +97,7 @@ namespace Outage.SCADA.ModBus.ModbusFuntions
 
             return returnResponse;
         }
+
+        #endregion Obsolete
     }
 }

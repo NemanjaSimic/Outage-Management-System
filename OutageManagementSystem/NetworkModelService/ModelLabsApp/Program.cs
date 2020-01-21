@@ -14,7 +14,7 @@ namespace Outage.DataImporter.ModelLabsApp
 		[STAThread]
 		static void Main()
 		{
-			ILogger logger = LoggerWrapper.Instance;
+			ILogger Logger = LoggerWrapper.Instance;
 
 			try
 			{
@@ -25,7 +25,7 @@ namespace Outage.DataImporter.ModelLabsApp
 			catch (Exception e)
 			{
 				MessageBox.Show(string.Format("Application is going down!\n  {0}", e.Message), "Error", MessageBoxButtons.OK, MessageBoxIcon.Error);
-                logger.LogError($"Application is going down!\n  {e.Message}");
+                Logger.LogError($"Application is going down!\n  {e.Message}");
 			}
 			finally
 			{

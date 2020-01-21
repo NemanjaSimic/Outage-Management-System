@@ -22,9 +22,11 @@ namespace Outage.Common.ServiceProxies.PubSub
             {
                 Channel.Publish(publication);
             }
-            catch (Exception ex)
+            catch (Exception e)
             {
-                throw ex;
+                string message = "Exception in Publish() proxy method.";
+                LoggerWrapper.Instance.LogError(message, e);
+                throw;
             }
         }
     }

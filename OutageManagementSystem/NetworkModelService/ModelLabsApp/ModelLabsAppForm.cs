@@ -13,9 +13,14 @@ namespace Outage.DataImporter.ModelLabsApp
 {
 	public partial class ModelLabsAppForm : Form
 	{
-		private ILogger logger = LoggerWrapper.Instance;
+		private ILogger logger;
 
-		private CIMAdapterClass adapter = new CIMAdapterClass();
+        protected ILogger Logger
+        {
+            get { return logger ?? (logger = LoggerWrapper.Instance); }
+        }
+
+        private CIMAdapterClass adapter = new CIMAdapterClass();
         private Delta nmsDelta = null;
 		
         public ModelLabsAppForm()
@@ -64,7 +69,7 @@ namespace Outage.DataImporter.ModelLabsApp
                 if (textBoxCIMFile.Text == string.Empty)
                 {
                     MessageBox.Show("Must enter CIM/XML file.", "Info", MessageBoxButtons.OK, MessageBoxIcon.Information);
-                    logger.LogInfo("Must enter CIM/XML file.");
+                    Logger.LogInfo("Must enter CIM/XML file.");
                     return;
                 }
 
@@ -73,7 +78,7 @@ namespace Outage.DataImporter.ModelLabsApp
 				using (FileStream fs = File.Open(textBoxCIMFile.Text, FileMode.Open))
 				{
 					nmsDelta = adapter.CreateDelta(fs, (SupportedProfiles)(comboBoxProfile.SelectedItem), out log);
-                    logger.LogInfo(log);
+                    Logger.LogInfo(log);
 					richTextBoxReport.Text = log;
 				}
 				if (nmsDelta != null)
@@ -90,7 +95,7 @@ namespace Outage.DataImporter.ModelLabsApp
 			catch (Exception e)
 			{
 				MessageBox.Show(string.Format("An error occurred.\n\n{0}", e.Message), "Error", MessageBoxButtons.OK, MessageBoxIcon.Error);
-                logger.LogError("An error occurred.", e);
+                Logger.LogError("An error occurred.", e);
             }
 
 			buttonApplyDelta.Enabled = (nmsDelta != null);
@@ -112,13 +117,13 @@ namespace Outage.DataImporter.ModelLabsApp
                 catch (Exception e)
                 {
                     MessageBox.Show(string.Format("An error occurred.\n\n{0}", e.Message), "Error", MessageBoxButtons.OK, MessageBoxIcon.Error);
-                    logger.LogError("An error occurred.", e);
+                    Logger.LogError("An error occurred.", e);
                 }
             }
             else
             {
                 MessageBox.Show("No data is imported into delta object.", "Info", MessageBoxButtons.OK, MessageBoxIcon.Information);
-                logger.LogInfo("No data is imported into delta object.");
+                Logger.LogInfo("No data is imported into delta object.");
             }
 		}
 

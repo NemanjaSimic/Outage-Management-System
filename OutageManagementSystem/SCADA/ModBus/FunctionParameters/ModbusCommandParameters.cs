@@ -10,9 +10,6 @@
 
         public ModbusCommandParameters(ushort length, byte functionCode)
         {
-            //TransactionId = Configuration.ConfigReader.Instance.GetTransactionId();
-            //UnitId = Configuration.ConfigReader.Instance.UnitAddress;
-
             ProtocolId = 0;
             Length = length;
             FunctionCode = functionCode;

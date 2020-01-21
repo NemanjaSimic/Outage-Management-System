@@ -18,7 +18,7 @@ namespace Outage.DataImporter.CIMAdapter.Manager
 	/// </summary>
 	public static class ProfileManager
     {
-        private static ILogger logger = LoggerWrapper.Instance;
+        private static ILogger Logger = LoggerWrapper.Instance;
 
         public const string Namespace = "Outage";
         public const string ProductName = "NetworkModelService";
@@ -54,7 +54,7 @@ namespace Outage.DataImporter.CIMAdapter.Manager
             {
                 assembly = null;
                 //LogManager.Log(string.Format("Error during Assembly load. Profile: {0} ; Message: {1}", profile, e.Message), LogLevel.Error);
-                logger.LogError($"Error during Assembly load. Profile: {profile} ; Message: {e.Message}", e);
+                Logger.LogError($"Error during Assembly load. Profile: {profile} ; Message: {e.Message}", e);
                 
                 return false;
             }
@@ -71,7 +71,7 @@ namespace Outage.DataImporter.CIMAdapter.Manager
             {
                 assembly = null;
                 //LogManager.Log(string.Format("Error during Assembly load. Path: {0} ; Message: {1}", path, e.Message), LogLevel.Error);
-                logger.LogError($"Error during Assembly load. Path: {path} ; Message: {e.Message}");
+                Logger.LogError($"Error during Assembly load. Path: {path} ; Message: {e.Message}");
                 return false;
             }
             return true;

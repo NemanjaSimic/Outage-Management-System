@@ -9,14 +9,6 @@ namespace Outage.NetworkModelService
 {
     public class Config
     {
-        private string connectionString = string.Empty;
-
-        public string ConnectionString
-        {
-            get { return connectionString; }
-        }
-
-
         private string dBConnectionString = string.Empty;
 
         public string DbConnectionString
@@ -27,7 +19,6 @@ namespace Outage.NetworkModelService
 
         private Config()
         {
-            connectionString = ConfigurationManager.ConnectionStrings["networkModelconnectionString"].ConnectionString;
             dBConnectionString = ConfigurationManager.ConnectionStrings["mongoConnectionString"].ConnectionString;
         }
 

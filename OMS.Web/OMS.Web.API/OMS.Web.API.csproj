@@ -23,6 +23,10 @@
     <IISExpressAnonymousAuthentication>enabled</IISExpressAnonymousAuthentication>
     <IISExpressWindowsAuthentication>disabled</IISExpressWindowsAuthentication>
     <IISExpressUseClassicPipelineMode>false</IISExpressUseClassicPipelineMode>
+    <IISExpressSSLPort>44351</IISExpressSSLPort>
+    <IISExpressAnonymousAuthentication>enabled</IISExpressAnonymousAuthentication>
+    <IISExpressWindowsAuthentication>disabled</IISExpressWindowsAuthentication>
+    <IISExpressUseClassicPipelineMode>false</IISExpressUseClassicPipelineMode>
     <UseGlobalApplicationHostFile />
     <NuGetPackageImportStamp>
     </NuGetPackageImportStamp>
@@ -87,6 +91,7 @@
       <HintPath>..\packages\System.Runtime.CompilerServices.Unsafe.4.6.0\lib\netstandard2.0\System.Runtime.CompilerServices.Unsafe.dll</HintPath>
     </Reference>
     <Reference Include="System.Security" />
+    <Reference Include="System.ServiceModel" />
     <Reference Include="System.Threading.Tasks.Extensions, Version=4.2.0.0, Culture=neutral, PublicKeyToken=cc7b13ffcd2ddd51, processorArchitecture=MSIL">
       <HintPath>..\packages\System.Threading.Tasks.Extensions.4.5.2\lib\netstandard2.0\System.Threading.Tasks.Extensions.dll</HintPath>
     </Reference>
@@ -213,6 +218,7 @@
     <Compile Include="Areas\HelpPage\XmlDocumentationProvider.cs" />
     <Compile Include="Controllers\HomeController.cs" />
     <Compile Include="Controllers\ScadaController.cs" />
+    <Compile Include="Controllers\TopologyController.cs" />
     <Compile Include="Filters\CustomExceptionFilter.cs" />
     <Compile Include="Global.asax.cs">
       <DependentUpon>Global.asax</DependentUpon>
@@ -397,23 +403,19 @@
       <Name>Common</Name>
     </ProjectReference>
     <ProjectReference Include="..\OMS.Web.Adapter.Contracts\OMS.Web.Adapter.Contracts.csproj">
-      <Project>{0CAD32C4-5C09-467F-B5DC-57C646BAC2A2}</Project>
+      <Project>{0cad32c4-5c09-467f-b5dc-57c646bac2a2}</Project>
       <Name>OMS.Web.Adapter.Contracts</Name>
     </ProjectReference>
     <ProjectReference Include="..\OMS.Web.Adapter\OMS.Web.Adapter.csproj">
-      <Project>{18D15695-17F8-4E5C-9F92-51AD600437B9}</Project>
+      <Project>{18d15695-17f8-4e5c-9f92-51ad600437b9}</Project>
       <Name>OMS.Web.Adapter</Name>
     </ProjectReference>
-    <ProjectReference Include="..\OMS.Web.Common.Interfaces\OMS.Web.Common.Interfaces.csproj">
-      <Project>{2A7C8378-0F77-4C24-B124-F7B80393089C}</Project>
-      <Name>OMS.Web.Common.Interfaces</Name>
-    </ProjectReference>
     <ProjectReference Include="..\OMS.Web.Common\OMS.Web.Common.csproj">
-      <Project>{63EA1AA4-DC22-4552-8454-346F1DA85082}</Project>
+      <Project>{63ea1aa4-dc22-4552-8454-346f1da85082}</Project>
       <Name>OMS.Web.Common</Name>
     </ProjectReference>
     <ProjectReference Include="..\OMS.Web.Services\OMS.Web.Services.csproj">
-      <Project>{C7CBB107-FBD7-435C-BB81-C19AAA37D6A5}</Project>
+      <Project>{c7cbb107-fbd7-435c-bb81-c19aaa37d6a5}</Project>
       <Name>OMS.Web.Services</Name>
     </ProjectReference>
     <ProjectReference Include="..\OMS.Web.UI.Models\OMS.Web.UI.Models.csproj">

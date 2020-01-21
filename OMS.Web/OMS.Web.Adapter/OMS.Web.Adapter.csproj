@@ -61,9 +61,13 @@
     <Reference Include="System" />
     <Reference Include="System.Core" />
     <Reference Include="System.Net.Http.WebRequest" />
+    <Reference Include="System.Runtime.Serialization" />
     <Reference Include="System.Security" />
     <Reference Include="System.ServiceModel" />
     <Reference Include="System.Web" />
+    <Reference Include="System.Web.Cors, Version=5.2.7.0, Culture=neutral, PublicKeyToken=31bf3856ad364e35, processorArchitecture=MSIL">
+      <HintPath>..\packages\Microsoft.AspNet.Cors.5.2.7\lib\net45\System.Web.Cors.dll</HintPath>
+    </Reference>
     <Reference Include="System.Xml.Linq" />
     <Reference Include="System.Data.DataSetExtensions" />
     <Reference Include="Microsoft.CSharp" />
@@ -75,9 +79,8 @@
     <Compile Include="HubDispatchers\GraphHubDispatcher.cs" />
     <Compile Include="Program.cs" />
     <Compile Include="Properties\AssemblyInfo.cs" />
-    <Compile Include="PubSubClient\PubSubClientProxy.cs" />
-    <Compile Include="PubSubClient\PubSubNotification.cs" />
-    <Compile Include="ScadaClient\ScadaClientProxy.cs" />
+    <Compile Include="Topology\TopologyClientProxy.cs" />
+    <Compile Include="Topology\TopologyNotification.cs" />
     <Compile Include="WebService\WebService.cs" />
     <Compile Include="WebService\WebServiceHost.cs" />
   </ItemGroup>
@@ -91,11 +94,11 @@
       <Name>Common</Name>
     </ProjectReference>
     <ProjectReference Include="..\OMS.Web.Adapter.Contracts\OMS.Web.Adapter.Contracts.csproj">
-      <Project>{0CAD32C4-5C09-467F-B5DC-57C646BAC2A2}</Project>
+      <Project>{0cad32c4-5c09-467f-b5dc-57c646bac2a2}</Project>
       <Name>OMS.Web.Adapter.Contracts</Name>
     </ProjectReference>
     <ProjectReference Include="..\OMS.Web.Common\OMS.Web.Common.csproj">
-      <Project>{63EA1AA4-DC22-4552-8454-346F1DA85082}</Project>
+      <Project>{63ea1aa4-dc22-4552-8454-346f1da85082}</Project>
       <Name>OMS.Web.Common</Name>
     </ProjectReference>
     <ProjectReference Include="..\OMS.Web.UI.Models\OMS.Web.UI.Models.csproj">

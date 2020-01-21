@@ -7,12 +7,13 @@ namespace PubSubEngine
 {
     public class Publications
     {
-        private ConcurrentDictionary<Topic, List<IPubSubNotification>> subscribedClients;
+        private static ILogger Logger = LoggerWrapper.Instance;
+        private ConcurrentDictionary<Topic, List<ISubscriberCallback>> subscribedClients;
         private static Publications instance;
 
         private Publications()
         {
-            subscribedClients = new ConcurrentDictionary<Topic, List<IPubSubNotification>>();
+            subscribedClients = new ConcurrentDictionary<Topic, List<ISubscriberCallback>>();
         }
 
         public static Publications Instance
@@ -27,39 +28,65 @@ namespace PubSubEngine
             }
         }
 
-        public bool TryAddSubscriber(Topic topic, IPubSubNotification subscriber)
+        public bool TryAddSubscriber(Topic topic, ISubscriberCallback subscriber)
         {
-            bool success = subscribedClients.TryGetValue(topic, out List<IPubSubNotification> list);
+            bool success = subscribedClients.TryGetValue(topic, out List<ISubscriberCallback> list);
+            string subscriberName = subscriber.GetSubscriberName();
 
             if (success)
             {
                 list.Add(subscriber);
+                Logger.LogDebug($"Subscriber [{subscriberName}] added to subscribed clients map. [Key Topic: {topic}]");
             }
-            else
+            else if(!subscribedClients.ContainsKey(topic))
             {
-                list = new List<IPubSubNotification>
+                list = new List<ISubscriberCallback>
                 {
                     subscriber
                 };
+
                 success = subscribedClients.TryAdd(topic, list);
+
+                if(success)
+                {
+                    Logger.LogDebug($"Subscriber [{subscriberName}] added to subscribed clients map. [Key Topic: {topic}]");
+                }
             }
+
             return success;
         }
 
-        public void RemoveSubscriber(IPubSubNotification subscriber)
+        public void RemoveSubscriber(ISubscriberCallback subscriber)
         {
-            foreach (var item in subscribedClients)
+            string subscriberName = subscriber.GetSubscriberName();
+
+            foreach (Topic topic in subscribedClients.Keys)
             {
-                if (item.Value.Contains(subscriber))
+                List<ISubscriberCallback> listOfSubscribers = subscribedClients[topic];
+
+                if (listOfSubscribers.Contains(subscriber))
                 {
-                    item.Value.Remove(subscriber);
+                    if(listOfSubscribers.Remove(subscriber))
+                    {
+                        Logger.LogDebug($"Subscriber [{subscriberName}] removed from subscribed clients map. [Key Topic: {topic}]");
+                    }
                 }
             }
         }
 
-        public List<IPubSubNotification> GetAllSubscribers(Topic topic)
+        public List<ISubscriberCallback> GetAllSubscribers(Topic topic)
         {
-            subscribedClients.TryGetValue(topic, out List<IPubSubNotification> listOfSubscribers);
+            bool success = subscribedClients.TryGetValue(topic, out List<ISubscriberCallback> listOfSubscribers);
+            
+            if(success)
+            {
+                Logger.LogDebug($"Try to get List of subscribers is SUCCESSFUL. Topic ['{topic}']");
+            }
+            else if(subscribedClients.ContainsKey(topic) && subscribedClients[topic].Count == 0)
+            {
+                Logger.LogDebug($"List of subscribers for topic: '{topic}' is empty.");
+            }
+            
             return listOfSubscribers;
         }
     }

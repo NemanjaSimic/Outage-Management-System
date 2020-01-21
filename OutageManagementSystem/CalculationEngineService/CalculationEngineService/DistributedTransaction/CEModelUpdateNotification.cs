@@ -1,5 +1,7 @@
 ﻿using Outage.Common;
 using Outage.Common.GDA;
+using Outage.Common.ServiceContracts.DistributedTransaction;
+using Outage.Common.ServiceProxies.DistributedTransaction;
 using Outage.DistributedTransactionActor;
 using System;
 using System.Collections.Generic;
@@ -17,10 +19,25 @@ namespace CalculationEngineService.DistributedTransaction
 
         public override bool NotifyAboutUpdate(Dictionary<DeltaOpType, List<long>> modelChanges)
         {
-            //TODO: CE notification logic
+            TransactionManager.Intance.UpdateNotify(modelChanges);
 
-            TransactionEnlistmentProxy.Enlist(ActorName);
-            logger.LogInfo("Calculation Engine SUCCESSFULLY notified about network model update.");
+            using (TransactionEnlistmentProxy transactionEnlistmentProxy = TransactionEnlistmentProxy)
+            {
+                if(transactionEnlistmentProxy != null)
+                {
+                    transactionEnlistmentProxy.Enlist(ActorName);
+                }
+                else
+                {
+                    string message = "TransactionEnlistmentProxy is null.";
+                    Logger.LogWarn(message);
+                    //TODO: retry logic?
+                    throw new NullReferenceException(message);
+                }
+            }
+
+
+            Logger.LogInfo("Calculation Engine SUCCESSFULLY notified about network model update.");
             return true;
         }
     }

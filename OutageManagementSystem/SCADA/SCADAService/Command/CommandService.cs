@@ -1,57 +1,130 @@
-﻿using Outage.Common.ServiceContracts;
+﻿using System;
+using Outage.Common;
+using Outage.Common.ServiceContracts.SCADA;
 using Outage.SCADA.ModBus;
 using Outage.SCADA.ModBus.Connection;
 using Outage.SCADA.ModBus.FunctionParameters;
 using Outage.SCADA.ModBus.ModbusFuntions;
-using Outage.SCADA.SCADA_Common;
-using Outage.SCADA.SCADA_Config_Data.Configuration;
-using Outage.SCADA.SCADA_Config_Data.Repository;
-using System;
+using Outage.SCADA.SCADACommon;
+using Outage.SCADA.SCADAData.Repository;
 
 namespace Outage.SCADA.SCADAService.Command
 {
     public class CommandService : ISCADACommand
     {
-        private static FunctionExecutor fe = new FunctionExecutor(DataModelRepository.Instance.TcpPort);
+        private ILogger logger;
 
-        public CommandService()
+        private FunctionExecutor functionExecutor = FunctionExecutor.Instance;
+        private SCADAModel scadaModel = SCADAModel.Instance;
+
+        protected ILogger Logger
         {
+            get { return logger ?? (logger = LoggerWrapper.Instance); }
         }
 
-        public void RecvCommand(long gid, object value)
+        public bool SendAnalogCommand(long gid, float commandingValue)
         {
-            if (DataModelRepository.Instance.Points.TryGetValue(gid, out ConfigItem CI))
+            bool success;
+
+            if (scadaModel.CurrentScadaModel.TryGetValue(gid, out ISCADAModelPointItem pointItem))
             {
-                if (CI.RegistarType == PointType.ANALOG_OUTPUT || CI.RegistarType == PointType.DIGITAL_OUTPUT)
+                if (pointItem.RegisterType == PointType.ANALOG_OUTPUT)
                 {
-                    ModbusWriteCommandParameters mdb_write_comm_pars = null;
-
-                    ushort CommandedValue;
-
-                    if (CI.RegistarType == PointType.ANALOG_OUTPUT)
-                    {
-                        CommandedValue = (ushort)value;
-
-                        mdb_write_comm_pars = new ModbusWriteCommandParameters
-                       (6, (byte)ModbusFunctionCode.WRITE_SINGLE_REGISTER, CI.Address, CommandedValue);
-                    }
-                    else if (CI.RegistarType == PointType.DIGITAL_OUTPUT)
-                    {
-                        //TREBA BOOL ZBOG DIGITAL OUTPUT-a
-                        CommandedValue = (ushort)value;
-
-                        mdb_write_comm_pars = new ModbusWriteCommandParameters
-                        (6, (byte)ModbusFunctionCode.WRITE_SINGLE_COIL, CI.Address, CommandedValue);
-                    }
-
-                    ModbusFunction fn = FunctionFactory.CreateModbusFunction(mdb_write_comm_pars);
-                    fe.EnqueueCommand(fn);
+                    int modbusValue = (int)commandingValue; //TODO: EGU convertion...
+                    success = SendCommand(pointItem, modbusValue);
+                }
+                else
+                {
+                    success = false;
+                    string message = $"RegistarType of entity with gid: 0x{gid:X16} is not ANALOG_OUTPUT.";
+                    Logger.LogError(message);
                 }
             }
             else
             {
-                Console.WriteLine("Ne postoji Point sa gidom " + gid);
+                success = false;
+                string message = $"Entity with gid: 0x{gid:X16} does not exist in current SCADA model.";
+                Logger.LogError(message);
             }
+
+            return success;
+        }
+
+        public bool SendDiscreteCommand(long gid, ushort commandingValue)
+        {
+            bool success;
+
+            if (scadaModel.CurrentScadaModel.TryGetValue(gid, out ISCADAModelPointItem pointItem))
+            {
+                if (pointItem.RegisterType == PointType.DIGITAL_OUTPUT)
+                {
+                    success = SendCommand(pointItem, commandingValue);
+                }
+                else
+                {
+                    success = false;
+                    string message = $"RegistarType of entity with gid: 0x{gid:X16} is not DIGITAL_OUTPUT.";
+                    Logger.LogError(message);
+                }
+            }
+            else
+            {
+                success = false;
+                string message = $"Entity with gid: 0x{gid:X16} does not exist in current SCADA model.";
+                Logger.LogError(message);
+            }
+
+            return success;
+        }
+
+        private bool SendCommand(ISCADAModelPointItem pointItem, object commandingValue)
+        {
+            bool success = false;
+            ushort length = 6;
+            ModbusWriteCommandParameters modbusWriteCommandParams;
+
+            try
+            {
+                if (pointItem.RegisterType == PointType.ANALOG_OUTPUT && commandingValue is int analogCommandingValue)
+                {
+                    modbusWriteCommandParams = new ModbusWriteCommandParameters(length,
+                                                                           (byte)ModbusFunctionCode.WRITE_SINGLE_REGISTER,
+                                                                           pointItem.Address,
+                                                                           analogCommandingValue);
+
+                    Logger.LogInfo("Commanded WRITE_SINGLE_REGISTER with a new value - " + analogCommandingValue);
+                }
+                else if (pointItem.RegisterType == PointType.DIGITAL_OUTPUT && commandingValue is ushort discreteCommandingValue)
+                {
+                    modbusWriteCommandParams = new ModbusWriteCommandParameters(length,
+                                                                           (byte)ModbusFunctionCode.WRITE_SINGLE_COIL,
+                                                                           pointItem.Address,
+                                                                           discreteCommandingValue);
+
+                    Logger.LogInfo("Commanded WRITE_SINGLE_COIL with a new value - " + discreteCommandingValue);
+                }
+                else
+                {
+                    success = false;
+                    modbusWriteCommandParams = null;
+                    string message = $"Commanding arguments are not valid.";
+                    Logger.LogError(message);
+                }
+
+                if (modbusWriteCommandParams != null)
+                {
+                    ModbusFunction modbusFunction = FunctionFactory.CreateModbusFunction(modbusWriteCommandParams);
+                    success = functionExecutor.EnqueueCommand(modbusFunction);
+                }
+            }
+            catch (Exception e)
+            {
+                success = false;
+                string message = $"Exception in SendCommand() method.";
+                Logger.LogError(message, e);
+            }
+
+            return success;
         }
     }
 }

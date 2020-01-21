@@ -5,7 +5,6 @@ using System.Threading;
 using System.Threading.Tasks;
 using OMS.Web.Adapter.Contracts;
 using OMS.Web.Services.Commands;
-using OMS.Web.Adapter.ScadaClient;
 
 namespace OMS.Web.Services.Handlers
 {
@@ -17,7 +16,7 @@ namespace OMS.Web.Services.Handlers
         public SwitchCommandHandler(ILogger logger)
         {
             _logger = logger;
-            _scadaClient = new ScadaClientProxy();
+            _scadaClient = null; // ovde izmeniti ili constructor injection
         }
 
         public Task<Unit> Handle(TurnOffSwitchCommand request, CancellationToken cancellationToken)
@@ -26,6 +25,8 @@ namespace OMS.Web.Services.Handlers
             
             try
             {
+                // treba nam implementacija scada klijenta
+                // jer sad treba da bude preko CE
                 _scadaClient.SendCommand(request.Gid, (int)request.Command);
             }
             catch(Exception e)
@@ -33,7 +34,7 @@ namespace OMS.Web.Services.Handlers
                 _logger.LogError("SwitchCommandHandler failed on TurnOffSwitch handler.", e);
             }
             
-            return null;
+            return null; // vracanje null vrednosti je anti-pattern ali ovde nemam drugog izbora
         }
 
         public Task<Unit> Handle(TurnOnSwitchCommand request, CancellationToken cancellationToken)

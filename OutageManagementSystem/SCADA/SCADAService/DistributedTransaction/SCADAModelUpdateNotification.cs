@@ -1,6 +1,9 @@
 ﻿using Outage.Common;
 using Outage.Common.GDA;
+using Outage.Common.ServiceProxies.DistributedTransaction;
 using Outage.DistributedTransactionActor;
+using Outage.SCADA.SCADAData.Repository;
+using System;
 using System.Collections.Generic;
 
 namespace Outage.SCADA.SCADAService.DistributedTransaction
@@ -28,12 +31,25 @@ namespace Outage.SCADA.SCADAService.DistributedTransaction
 
             if (success)
             {
-                TransactionEnlistmentProxy.Enlist(ActorName);
-                logger.LogInfo("SCADA SUCCESSFULLY notified about network model update.");
+                using (TransactionEnlistmentProxy transactionEnlistmentProxy = TransactionEnlistmentProxy)
+                {
+                    if (transactionEnlistmentProxy != null)
+                    {
+                        transactionEnlistmentProxy.Enlist(ActorName);
+                    }
+                    else
+                    {
+                        string message = "TransactionEnlistmentProxy is null.";
+                        Logger.LogWarn(message);
+                        throw new NullReferenceException(message);
+                    }
+                }
+
+                Logger.LogInfo("SCADA SUCCESSFULLY notified about network model update.");
             }
             else
             {
-                logger.LogInfo("SCADA UNSUCCESSFULLY notified about network model update.");
+                Logger.LogInfo("SCADA UNSUCCESSFULLY notified about network model update.");
             }
 
             return success;

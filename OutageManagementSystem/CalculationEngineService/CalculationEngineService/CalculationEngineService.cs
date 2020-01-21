@@ -2,16 +2,20 @@
 using Outage.Common;
 using System;
 using System.Collections.Generic;
-using System.Linq;
 using System.ServiceModel;
 using System.Text;
-using System.Threading.Tasks;
+using Topology;
 
 namespace CalculationEngineService
 {
     public class CalculationEngineService : IDisposable
     {
-        private ILogger logger = LoggerWrapper.Instance;
+        private ILogger logger;
+
+        protected ILogger Logger
+        {
+            get { return logger ?? (logger = LoggerWrapper.Instance); }
+        }
 
         private List<ServiceHost> hosts = null;
 
@@ -36,7 +40,8 @@ namespace CalculationEngineService
             hosts = new List<ServiceHost>
             {
                 new ServiceHost(typeof(CEModelUpdateNotification)),
-                new ServiceHost(typeof(CETransactionActor))
+                new ServiceHost(typeof(CETransactionActor)),
+                new ServiceHost(typeof(TopologyService))
             };
         }
 
@@ -44,50 +49,51 @@ namespace CalculationEngineService
         {
             if (hosts == null || hosts.Count == 0)
             {
-                throw new Exception("Calculation Engine Services can not be opend because they are not initialized.");
+                throw new Exception("Calculation Engine Service hosts can not be opend because they are not initialized.");
             }
 
-            string message = string.Empty;
+            string message;
+            StringBuilder sb = new StringBuilder();
+
             foreach (ServiceHost host in hosts)
             {
                 host.Open();
 
                 message = string.Format("The WCF service {0} is ready.", host.Description.Name);
                 Console.WriteLine(message);
-                logger.LogInfo(message);
+                sb.AppendLine(message);
 
                 message = "Endpoints:";
                 Console.WriteLine(message);
-                logger.LogInfo(message);
+                sb.AppendLine(message);
 
                 foreach (Uri uri in host.BaseAddresses)
                 {
                     Console.WriteLine(uri);
-                    logger.LogInfo(uri.ToString());
+                    sb.AppendLine(uri.ToString());
                 }
 
                 Console.WriteLine("\n");
+                sb.AppendLine();
             }
 
-            //message = string.Format("Connection string: {0}", Config.Instance.ConnectionString);
+            Logger.LogInfo(sb.ToString());
+
+            message = string.Format("Trace level: LEVEL NOT SPECIFIED!");
             Console.WriteLine(message);
-            logger.LogInfo(message);
-
-            message = string.Format("Trace level: {0}", CommonTrace.TraceLevel);
-            Console.WriteLine(message);
-            logger.LogInfo(message);
+            Logger.LogWarn(message);
 
 
-            message = "The Calculation Engine is started.";
+            message = "Calculation Engine is started.";
             Console.WriteLine("\n{0}", message);
-            logger.LogInfo(message);
+            Logger.LogInfo(message);
         }
 
         private void CloseHosts()
         {
             if (hosts == null || hosts.Count == 0)
             {
-                throw new Exception("Calculation Engine Services can not be closed because they are not initialized.");
+                throw new Exception("Calculation Engine Service hosts can not be closed because they are not initialized.");
             }
 
             foreach (ServiceHost host in hosts)
@@ -95,8 +101,8 @@ namespace CalculationEngineService
                 host.Close();
             }
 
-            string message = "The Calculation Engine Service is gracefully closed.";
-            logger.LogInfo(message);
+            string message = "Calculation Engine Service is gracefully closed.";
+            Logger.LogInfo(message);
             Console.WriteLine("\n\n{0}", message);
         }
     }

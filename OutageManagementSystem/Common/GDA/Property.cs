@@ -45,10 +45,17 @@ namespace Outage.Common.GDA
 	[DataContract]	
 	public class Property : IComparable
 	{
-		/// <summary>
-		/// Code for property of model type 
-		/// </summary>
-		private ModelCode id;
+		private ILogger logger;
+
+        protected ILogger Logger
+        {
+            get { return logger ?? (logger = LoggerWrapper.Instance); }
+        }
+
+        /// <summary>
+        /// Code for property of model type 
+        /// </summary>
+        private ModelCode id;
 
 		/// <summary>
 		/// Current value of the property
@@ -531,7 +538,7 @@ namespace Outage.Common.GDA
 			else
 			{
 				string errorMessage = String.Format("Failed to set value for property ({0}) because specified value ({1}) is not compatible with property type ({2}).", this.id, boolValue, type);
-				CommonTrace.WriteTrace(CommonTrace.TraceError, errorMessage);
+				Logger.LogError(errorMessage);
 				throw new Exception(errorMessage);
 			}
 		}
@@ -547,7 +554,7 @@ namespace Outage.Common.GDA
 			else
 			{
 				string errorMessage = String.Format("Failed to set value for property ({0}) because specified value ({1}) is not compatible with property type ({2}).", this.id, byteValue, type);
-				CommonTrace.WriteTrace(CommonTrace.TraceError, errorMessage);
+				Logger.LogError(errorMessage);
 				throw new Exception(errorMessage);
 			}
 		}
@@ -563,7 +570,7 @@ namespace Outage.Common.GDA
 			else
 			{
 				string errorMessage = String.Format("Failed to set value for property ({0}) because specified value ({1}) is not compatible with property type ({2}).", this.id, int16Value, type);
-				CommonTrace.WriteTrace(CommonTrace.TraceError, errorMessage);
+				Logger.LogError(errorMessage);
 				throw new Exception(errorMessage);
 			}
 		}
@@ -580,7 +587,7 @@ namespace Outage.Common.GDA
 			else
 			{
 				string errorMessage = String.Format("Failed to set value for property ({0}) because specified value ({1}) is not compatible with property type ({2}).", this.id, int32Value, type);
-				CommonTrace.WriteTrace(CommonTrace.TraceError, errorMessage);
+				Logger.LogError(errorMessage);
 				throw new Exception(errorMessage);
 			}
 		}
@@ -598,7 +605,7 @@ namespace Outage.Common.GDA
 			else
 			{
 				string errorMessage = String.Format("Failed to set value for property ({0}) because specified value ({1}) is not compatible with property type ({2}).", this.id, int64Value, type);
-				CommonTrace.WriteTrace(CommonTrace.TraceError, errorMessage);
+				Logger.LogError(errorMessage);
 				throw new Exception(errorMessage);
 			}
 		}
@@ -613,7 +620,7 @@ namespace Outage.Common.GDA
 			else
 			{
 				string errorMessage = String.Format("Failed to set value for property ({0}) because specified value ({1}) is not compatible with property type ({2}).", this.id, floatValue, type);
-				CommonTrace.WriteTrace(CommonTrace.TraceError, errorMessage);
+				Logger.LogError(errorMessage);
 				throw new Exception(errorMessage);
 			}
 		}
@@ -628,7 +635,7 @@ namespace Outage.Common.GDA
 			else
 			{
 				string errorMessage = String.Format("Failed to set value for property ({0}) because specified value ({1}) is not compatible with property type ({2}).", this.id, stringValue, type);
-				CommonTrace.WriteTrace(CommonTrace.TraceError, errorMessage);
+				Logger.LogError(errorMessage);
 				throw new Exception(errorMessage);
 			}
 		}
@@ -643,7 +650,7 @@ namespace Outage.Common.GDA
 			else
 			{
 				string errorMessage = String.Format("Failed to set value for property ({0}) because specified value ({1}) is not compatible with property type ({2}).", this.id, dateTime.ToString(), type);
-				CommonTrace.WriteTrace(CommonTrace.TraceError, errorMessage);
+				Logger.LogError(errorMessage);
 				throw new Exception(errorMessage);
 			}
 		}
@@ -658,7 +665,7 @@ namespace Outage.Common.GDA
 			else
 			{
 				string errorMessage = String.Format("Failed to set value for property ({0}) because specified value ({1}) is not compatible with property type ({2}).", this.id, timeSpan.ToString(), type);
-				CommonTrace.WriteTrace(CommonTrace.TraceError, errorMessage);
+				Logger.LogError(errorMessage);
 				throw new Exception(errorMessage);
 			}
 		}
@@ -686,7 +693,7 @@ namespace Outage.Common.GDA
 			else
 			{
 				string errorMessage = String.Format("Failed to set value for property ({0}) because specified vector value is not compatible with property type ({1}).", this.id, type);
-				CommonTrace.WriteTrace(CommonTrace.TraceError, errorMessage);
+				Logger.LogError(errorMessage);
 				throw new Exception(errorMessage);
 			}
 		}
@@ -701,7 +708,7 @@ namespace Outage.Common.GDA
 			else
 			{
 				string errorMessage = String.Format("Failed to set value for property ({0}) because specified vector value is not compatible with property type ({1}).", this.id, type);
-				CommonTrace.WriteTrace(CommonTrace.TraceError, errorMessage);
+				Logger.LogError(errorMessage);
 				throw new Exception(errorMessage);
 			}
 		}
@@ -722,7 +729,7 @@ namespace Outage.Common.GDA
 			else
 			{
 				string errorMessage = String.Format("Failed to set value for property ({0}) because specified vector value is not compatible with property type ({1}).", this.id, type);
-				CommonTrace.WriteTrace(CommonTrace.TraceError, errorMessage);
+				Logger.LogError(errorMessage);
 				throw new Exception(errorMessage);
 			}
 		}
@@ -743,7 +750,7 @@ namespace Outage.Common.GDA
 			else
 			{
 				string errorMessage = String.Format("Failed to set value for property ({0}) because specified vector value is not compatible with property type ({1}).", this.id, type);
-				CommonTrace.WriteTrace(CommonTrace.TraceError, errorMessage);
+				Logger.LogError(errorMessage);
 				throw new Exception(errorMessage);
 			}
 		}
@@ -758,7 +765,7 @@ namespace Outage.Common.GDA
 			else
 			{
 				string errorMessage = String.Format("Failed to set value for property ({0}) because specified vector value is not compatible with property type ({1}).", this.id, type);
-				CommonTrace.WriteTrace(CommonTrace.TraceError, errorMessage);
+				Logger.LogError(errorMessage);
 				throw new Exception(errorMessage);
 			}
 		}
@@ -773,7 +780,7 @@ namespace Outage.Common.GDA
 			else
 			{
 				string errorMessage = String.Format("Failed to set value for property ({0}) because specified vector value is not compatible with property type ({1}).", this.id, type);
-				CommonTrace.WriteTrace(CommonTrace.TraceError, errorMessage);
+				Logger.LogError(errorMessage);
 				throw new Exception(errorMessage);
 			}
 		}		
@@ -788,7 +795,7 @@ namespace Outage.Common.GDA
 			else
 			{
 				string errorMessage = String.Format("Failed to return value from property for specified type ({0}) because it is incompatible with actual property type ({1})", PropertyType.Bool, type);
-				CommonTrace.WriteTrace(CommonTrace.TraceError, errorMessage);
+				Logger.LogError(errorMessage);
 				throw new Exception(errorMessage);
 			}
 		}
@@ -803,7 +810,7 @@ namespace Outage.Common.GDA
 			else
 			{
 				string errorMessage = String.Format("Failed to return value from property for specified type ({0}) because it is incompatible with actual property type ({1})", PropertyType.Byte, type);
-				CommonTrace.WriteTrace(CommonTrace.TraceError, errorMessage);
+				Logger.LogError(errorMessage);
 				throw new Exception(errorMessage);
 			}
 		}
@@ -818,7 +825,7 @@ namespace Outage.Common.GDA
 			else
 			{
 				string errorMessage = String.Format("Failed to return value from property for specified type ({0}) because it is incompatible with actual property type ({1})", PropertyType.Enum, type);
-				CommonTrace.WriteTrace(CommonTrace.TraceError, errorMessage);
+				Logger.LogError(errorMessage);
 				throw new Exception(errorMessage);
 			}
 		}
@@ -833,7 +840,7 @@ namespace Outage.Common.GDA
 			else
 			{
 				string errorMessage = String.Format("Failed to return value from property for specified type ({0}) because it is incompatible with actual property type ({1})", PropertyType.Int32, type);
-				CommonTrace.WriteTrace(CommonTrace.TraceError, errorMessage);
+				Logger.LogError(errorMessage);
 				throw new Exception(errorMessage);
 			}
 		}
@@ -849,7 +856,7 @@ namespace Outage.Common.GDA
 			else
 			{
 				string errorMessage = String.Format("Failed to return value from property for specified type ({0}) because it is incompatible with actual property type ({1})", PropertyType.Int64, type);
-				CommonTrace.WriteTrace(CommonTrace.TraceError, errorMessage);
+				Logger.LogError(errorMessage);
 				throw new Exception(errorMessage);
 			}
 		}
@@ -864,7 +871,7 @@ namespace Outage.Common.GDA
 			else
 			{
 				string errorMessage = String.Format("Failed to return value from property for specified type ({0}) because it is incompatible with actual property type ({1})", PropertyType.Float, type);
-				CommonTrace.WriteTrace(CommonTrace.TraceError, errorMessage);
+				Logger.LogError(errorMessage);
 				throw new Exception(errorMessage);
 			}
 		}		
@@ -886,7 +893,7 @@ namespace Outage.Common.GDA
 			else
 			{
 				string errorMessage = String.Format("Failed to return value from property for specified type ({0}) because it is incompatible with actual property type ({1})", PropertyType.String, type);
-				CommonTrace.WriteTrace(CommonTrace.TraceError, errorMessage);
+				Logger.LogError(errorMessage);
 				throw new Exception(errorMessage);
 			}
 		}
@@ -901,7 +908,7 @@ namespace Outage.Common.GDA
 			else
 			{
 				string errorMessage = String.Format("Failed to return value from property for specified type ({0}) because it is incompatible with actual property type ({1})", PropertyType.Reference, type);
-				CommonTrace.WriteTrace(CommonTrace.TraceError, errorMessage);
+				Logger.LogError(errorMessage);
 				throw new Exception(errorMessage);
 			}
 		}
@@ -916,7 +923,7 @@ namespace Outage.Common.GDA
 			else
 			{
 				string errorMessage = String.Format("Failed to return value from property for specified type ({0}) because it is incompatible with actual property type ({1})", PropertyType.DateTime, type);
-				CommonTrace.WriteTrace(CommonTrace.TraceError, errorMessage);
+				Logger.LogError(errorMessage);
 				throw new Exception(errorMessage);
 			}
 		}
@@ -931,7 +938,7 @@ namespace Outage.Common.GDA
 			else
 			{
 				string errorMessage = String.Format("Failed to return value from property for specified type ({0}) because it is incompatible with actual property type ({1})", PropertyType.TimeSpan, type);
-				CommonTrace.WriteTrace(CommonTrace.TraceError, errorMessage);
+				Logger.LogError(errorMessage);
 				throw new Exception(errorMessage);
 			}
 		}	
@@ -946,7 +953,7 @@ namespace Outage.Common.GDA
 			else
 			{
 				string errorMessage = String.Format("Failed to return value from property for specified type ({0}) because it is incompatible with actual property type ({1})", PropertyType.Int64Vector, type);
-				CommonTrace.WriteTrace(CommonTrace.TraceError, errorMessage);
+				Logger.LogError(errorMessage);
 				throw new Exception(errorMessage);
 			}
 		}		
@@ -961,7 +968,7 @@ namespace Outage.Common.GDA
 			else
 			{
 				string errorMessage = String.Format("Failed to return value from property for specified type ({0}) because it is incompatible with actual property type ({1})", PropertyType.TimeSpanVector, type);
-				CommonTrace.WriteTrace(CommonTrace.TraceError, errorMessage);
+				Logger.LogError(errorMessage);
 				throw new Exception(errorMessage);
 			}
 		}
@@ -976,7 +983,7 @@ namespace Outage.Common.GDA
 			else
 			{
 				string errorMessage = String.Format("Failed to return value from property for specified type ({0}) because it is incompatible with actual property type ({1})", PropertyType.DateTimeVector, type);
-				CommonTrace.WriteTrace(CommonTrace.TraceError, errorMessage);
+				Logger.LogError(errorMessage);
 				throw new Exception(errorMessage);
 			}
 		}
@@ -991,7 +998,7 @@ namespace Outage.Common.GDA
 			else
 			{
 				string errorMessage = String.Format("Failed to return value from property for specified type ({0}) because it is incompatible with actual property type ({1})", PropertyType.ReferenceVector, type);
-				CommonTrace.WriteTrace(CommonTrace.TraceError, errorMessage);
+				Logger.LogError(errorMessage);
 				throw new Exception(errorMessage);
 			}
 		}
@@ -1031,7 +1038,7 @@ namespace Outage.Common.GDA
 			else
 			{
 				string errorMessage = String.Format("Failed to return value from property for specified type ({0}) because it is incompatible with actual property type ({1})", PropertyType.StringVector, type);
-				CommonTrace.WriteTrace(CommonTrace.TraceError, errorMessage);
+				Logger.LogError(errorMessage);
 				throw new Exception(errorMessage);
 			}
 		}
@@ -1046,7 +1053,7 @@ namespace Outage.Common.GDA
 			else
 			{
 				string errorMessage = String.Format("Failed to return value from property for specified type ({0}) because it is incompatible with actual property type ({1})", PropertyType.FloatVector, type);
-				CommonTrace.WriteTrace(CommonTrace.TraceError, errorMessage);
+				Logger.LogError(errorMessage);
 				throw new Exception(errorMessage);
 			}
 		}		
@@ -1067,7 +1074,7 @@ namespace Outage.Common.GDA
 			else
 			{
 				string errorMessage = String.Format("Failed to return value from property for specified type ({0}) because it is incompatible with actual property type ({1})", PropertyType.Int64Vector, type);
-				CommonTrace.WriteTrace(CommonTrace.TraceError, errorMessage);
+				Logger.LogError(errorMessage);
 				throw new Exception(errorMessage);
 			}
 		}
@@ -1088,7 +1095,7 @@ namespace Outage.Common.GDA
 			else
 			{
 				string errorMessage = String.Format("Failed to return value from property for specified type ({0}) because it is incompatible with actual property type ({1})", PropertyType.Int32Vector, type);
-				CommonTrace.WriteTrace(CommonTrace.TraceError, errorMessage);
+				Logger.LogError(errorMessage);
 				throw new Exception(errorMessage);
 			}
 		}
@@ -1109,7 +1116,7 @@ namespace Outage.Common.GDA
 			else
 			{
 				string errorMessage = String.Format("Failed to return value from property for specified type ({0}) because it is incompatible with actual property type ({1})", PropertyType.BoolVector, type);
-				CommonTrace.WriteTrace(CommonTrace.TraceError, errorMessage);
+				Logger.LogError(errorMessage);
 				throw new Exception(errorMessage);
 			}
 		}
@@ -1130,7 +1137,7 @@ namespace Outage.Common.GDA
 			else
 			{
 				string errorMessage = String.Format("Failed to return value from property for specified type ({0}) because it is incompatible with actual property type ({1})", PropertyType.Int32Vector, type);
-				CommonTrace.WriteTrace(CommonTrace.TraceError, errorMessage);
+				Logger.LogError(errorMessage);
 				throw new Exception(errorMessage);
 			}
 		}

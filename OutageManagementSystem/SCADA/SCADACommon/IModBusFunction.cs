@@ -1,12 +1,22 @@
-﻿using System;
+﻿using EasyModbus;
+using Outage.Common.PubSub.SCADADataContract;
 using System.Collections.Generic;
 
-namespace Outage.SCADA.SCADA_Common
+namespace Outage.SCADA.SCADACommon
 {
-    public interface IModBusFunction
+    public interface IModbusFunction
     {
-        Dictionary<Tuple<PointType, ushort>, ushort> ParseResponse(byte[] receivedBytes);
-
-        byte[] PackRequest();
+        void Execute(ModbusClient modbusClient);
     }
+
+    public interface IReadAnalogModusFunction : IModbusFunction
+    {
+        Dictionary<long, AnalogModbusData> Data { get; }
+    }
+
+    public interface IReadDiscreteModbusFunction : IModbusFunction
+    {
+        Dictionary<long, DiscreteModbusData> Data { get; }
+    }
+    
 }

@@ -1,17 +1,17 @@
-﻿using Outage.Common;
+﻿using EasyModbus;
+using Outage.Common;
+using Outage.Common.PubSub;
 using Outage.Common.ServiceProxies.PubSub;
 using Outage.SCADA.ModBus.ModbusFuntions;
-using Outage.SCADA.SCADA_Common;
-using Outage.SCADA.SCADA_Common.PubSub;
-using Outage.SCADA.SCADA_Config_Data.Configuration;
-using Outage.SCADA.SCADA_Config_Data.Repository;
+using Outage.SCADA.SCADACommon;
+using Outage.SCADA.SCADAData.Configuration;
+using Outage.SCADA.SCADAData.Repository;
 using System;
 using System.Collections.Concurrent;
 using System.Collections.Generic;
-using System.Linq;
-using System.Net;
-using System.Net.Sockets;
 using System.Threading;
+using Outage.Common.PubSub.SCADADataContract;
+using EasyModbus.Exceptions;
 
 namespace Outage.SCADA.ModBus.Connection
 {
@@ -19,179 +19,314 @@ namespace Outage.SCADA.ModBus.Connection
 
     public class FunctionExecutor
     {
-        private ModelResourcesDesc resourcesDesc = new ModelResourcesDesc();
-        private TcpConnection connection;
-        private ushort TcpPort;
-        private Thread connectionProcess;
-        private bool threadCancellationSignal = true;
-        private int numberOfTries = 0;
-        private IModBusFunction currentCommand;
-        private ConnectionState _connectionState = ConnectionState.DISCONNECTED;
-        private AutoResetEvent _commandEvent;
-        private ConcurrentQueue<IModBusFunction> _commandQueue;
+        private ILogger logger;
 
+        protected ILogger Logger
+        {
+            get { return logger ?? (logger = LoggerWrapper.Instance); }
+        }
+
+        private Thread functionExecutorThread;
+        private bool threadCancellationSignal = false;
+
+        private IModbusFunction currentCommand;
+        private AutoResetEvent commandEvent;
+        private ConcurrentQueue<IModbusFunction> commandQueue;
+
+        public ISCADAConfigData ConfigData { get; protected set; }
+        public SCADAModel SCADAModel { get; protected set; }
+        public ModbusClient ModbusClient { get; protected set; }
+
+        #region Proxies
 
         private PublisherProxy publisherProxy = null;
 
         public PublisherProxy PublisherProxy
         {
+            //TODO: diskusija statefull vs stateless
             get
             {
-                //TODO: diskusija statefull vs stateless
+                int numberOfTries = 0;
 
-                if (publisherProxy != null)
+                while (numberOfTries < 10)
                 {
-                    publisherProxy.Abort();
-                    publisherProxy = null;
-                }
+                    try
+                    {
+                        if (publisherProxy != null)
+                        {
+                            publisherProxy.Abort();
+                            publisherProxy = null;
+                        }
 
-                publisherProxy = new PublisherProxy(EndpointNames.PublisherEndpoint);
-                publisherProxy.Open();
+                        publisherProxy = new PublisherProxy(EndpointNames.PublisherEndpoint);
+                        publisherProxy.Open();
+                        break;
+                    }
+                    catch (Exception ex)
+                    {
+                        string message = $"Exception on PublisherProxy initialization. Message: {ex.Message}";
+                        Logger.LogError(message, ex);
+                        publisherProxy = null;
+                    }
+                    finally
+                    {
+                        numberOfTries++;
+                        Logger.LogDebug($"FunctionExecutor: PublisherProxy getter, try number: {numberOfTries}.");
+                        Thread.Sleep(500);
+                    }
+                }
 
                 return publisherProxy;
             }
         }
 
+        #endregion Proxies
 
-        public FunctionExecutor(ushort tcpPort)
+        #region Instance
+
+        private static FunctionExecutor instance;
+        private static readonly object lockSync = new object();
+
+        public static FunctionExecutor Instance
         {
-            this.TcpPort = tcpPort;
-            _commandQueue = new ConcurrentQueue<IModBusFunction>();
-            connection = new TcpConnection(this.TcpPort);
-            _commandEvent = new AutoResetEvent(false);
-            connectionProcess = new Thread(ConnectionProcessThread);
-            connectionProcess.Name = "Communication with SIM";
-            connectionProcess.Start();
-        }
-
-        public event UpdatePointDelegate UpdatePointEvent;
-
-        public void EnqueueCommand(ModbusFunction modbusFunction)
-
-        {
-            if (_connectionState == ConnectionState.CONNECTED)
+            get
             {
-                this._commandQueue.Enqueue(modbusFunction);
-                this._commandEvent.Set();
+                if (instance == null)
+                {
+                    lock (lockSync)
+                    {
+                        if (instance == null)
+                        {
+                            instance = new FunctionExecutor();
+                        }
+                    }
+                }
+
+                return instance;
             }
         }
 
-        private void ConnectionProcessThread()
+        #endregion Instance
+
+        private FunctionExecutor()
         {
-            while (this.threadCancellationSignal)
+            ConfigData = SCADAConfigData.Instance;
+            SCADAModel = SCADAModel.Instance;
+
+            ModbusClient = new ModbusClient(ConfigData.IpAddress, ConfigData.TcpPort);
+
+            commandQueue = new ConcurrentQueue<IModbusFunction>();
+            commandEvent = new AutoResetEvent(false);
+        }
+
+        #region Public Members
+
+        public void StartExecutor()
+        {
+            try
+            {
+                if(ModbusClient != null && !ModbusClient.Connected)
+                {
+                    ConnectToModbusClient();
+                }
+
+                functionExecutorThread = new Thread(FunctionExecutorThread)
+                {
+                    Name = "FunctionExecutorThread"
+                };
+
+                functionExecutorThread.Start();
+            }
+            catch (Exception e)
+            {
+                string message = "Exception caught in StartExecutor() method.";
+                Logger.LogError(message, e);
+            }
+        }
+
+        public void StopExecutor()
+        {
+            try
+            {
+                threadCancellationSignal = true;
+
+                if (ModbusClient != null && ModbusClient.Connected)
+                {
+                    ModbusClient.Disconnect();
+                }
+            }
+            catch (Exception e)
+            {
+                string message = "Exception caught in StopExecutor() method.";
+                Logger.LogError(message, e);
+            }
+            
+        }
+
+        public bool EnqueueCommand(ModbusFunction modbusFunction)
+        {
+            bool success;
+
+            try
+            {
+                if (ModbusClient != null && ModbusClient.Connected)
+                {
+                    this.commandQueue.Enqueue(modbusFunction);
+                    this.commandEvent.Set();
+                    success = true;
+                }
+                else
+                {
+                    success = false;
+                    string message = "Modbus client is either not connected or null.";
+                    Logger.LogError(message);
+                }
+            }
+            catch (Exception e)
+            {
+                success = false;
+                string message = "Exception caught in EnqueueCommand() method.";
+                Logger.LogError(message, e);
+            }
+
+            return success;
+        }
+
+        #endregion Public Members
+
+        #region Private Members
+
+        private void ConnectToModbusClient()
+        {
+            int numberOfTries = 0;
+
+            string message = $"Connecting to modbus client...";
+            Console.WriteLine(message);
+            Logger.LogInfo(message);
+
+            while (!ModbusClient.Connected)
             {
                 try
                 {
-                    if (this._connectionState == ConnectionState.DISCONNECTED)
-                    {
-                        Console.WriteLine("Establishing connection");
-                        this.numberOfTries = 0;
-                        this.connection.Connect();
-                        while (numberOfTries < 10)
-                        {
-                            if (this.connection.CheckState())
-                            {
-                                this._connectionState = ConnectionState.CONNECTED;
-                                this.numberOfTries = 0;
-                                Console.WriteLine("Connected");
-                                break;
-                            }
-                            else
-                            {
-                                numberOfTries++;
-                                if (this.numberOfTries == 10)
-                                {
-                                    this.connection.Disconnect();
-                                    this._connectionState = ConnectionState.DISCONNECTED;
-                                }
-                            }
-                        }
-                    }
-                    else
-                    {
-                        this._commandEvent.WaitOne();
-                        while (_commandQueue.TryDequeue(out this.currentCommand))
-                        {
-                            this.connection.SendBytes(this.currentCommand.PackRequest());
-                            byte[] message;
-                            byte[] header = this.connection.RecvBytes(7);
-                            int payLoadSize = 0;
-                            unchecked
-                            {
-                                payLoadSize = IPAddress.NetworkToHostOrder((short)BitConverter.ToInt16(header, 4));
-                            }
-                            byte[] payload = this.connection.RecvBytes(payLoadSize - 1);
-                            message = new byte[header.Length + payload.Length];
-                            Buffer.BlockCopy(header, 0, message, 0, 7);
-                            Buffer.BlockCopy(payload, 0, message, 7, payload.Length);
-                            Dictionary<Tuple<PointType, ushort>, ushort> pointsToUpdate = this.currentCommand.ParseResponse(message);
-
-                            foreach (Tuple<PointType, ushort> pointKey in pointsToUpdate.Keys)
-                            {
-                                ushort address = pointKey.Item2;
-                                ushort newValue = pointsToUpdate[pointKey];
-
-                                ConfigItem point = UpdatePoints(address, newValue);
-
-                                ModelCode modelCode = resourcesDesc.GetModelCodeFromId(point.Gid);
-
-                                Topic topic;
-
-                                if (modelCode == ModelCode.ANALOG)
-                                {
-                                    topic = Topic.MEASUREMENT;
-                                }
-                                else if(modelCode == ModelCode.DISCRETE)
-                                {
-                                    topic = Topic.SWITCH_STATUS;
-                                }
-                                else
-                                {
-                                    throw new Exception("UNKNOWN type"); //TODO: log i bolji komentar
-                                }
-
-                                SCADAMessage scadaMessage = new SCADAMessage()
-                                {
-                                    Gid = point.Gid,
-                                    Value = point.CurrentValue,
-                                };
-
-                                SCADAPublication scadaPublication = new SCADAPublication()
-                                {
-                                    Topic = topic,
-                                    Message = scadaMessage,
-                                };
-
-                                PublisherProxy.Publish(scadaPublication);
-                            }
-                        }
-                    }
+                    ModbusClient.Connect();
                 }
-                catch (SocketException se)
+                catch(ConnectionException ce)
                 {
-                    if (se.ErrorCode != 10054)
-                    {
-                        throw se;
-                    }
-                    currentCommand = null;
-                    this._connectionState = ConnectionState.DISCONNECTED;
-                    this.connection.Disconnect();
+                    Logger.LogWarn("ConnectionException on ModbusClient.Connect().", ce);
                 }
-                catch (Exception ex)
+
+                if (!ModbusClient.Connected)
                 {
-                    Console.WriteLine(ex.Message);
-                    this._connectionState = ConnectionState.DISCONNECTED;
-                    this.connection.Disconnect();
+                    numberOfTries++;
+                    Logger.LogDebug($"Connecting try number: {numberOfTries}.");
+                    Thread.Sleep(500);
+                }
+                else if (!ModbusClient.Connected && numberOfTries == 40)
+                {
+                    string timeoutMessage = "Failed to connect to Modbus client by exceeding the maximum number of connection retries.";
+                    Logger.LogError(timeoutMessage);
+                    throw new Exception(timeoutMessage);
+                }
+                else
+                {
+                    message = $"Successfully connected to modbus client.";
+                    Console.WriteLine(message);
+                    Logger.LogInfo(message);
                 }
             }
         }
 
-        private ConfigItem UpdatePoints(ushort address, ushort newValue)
+        private void FunctionExecutorThread()
         {
-            ConfigItem point = DataModelRepository.Instance.Points.Values.Where(x => x.Address == address).First();
-            point.CurrentValue = newValue;
+            Logger.LogInfo("FunctionExecutorThread is started");
 
-            return point;
+            threadCancellationSignal = false;
+
+            while (!this.threadCancellationSignal)
+            {
+                try
+                {
+                    if (ModbusClient == null)
+                    {
+                        ModbusClient = new ModbusClient(ConfigData.IpAddress, ConfigData.TcpPort);
+                    }
+
+                    if (!ModbusClient.Connected)
+                    {
+                        ConnectToModbusClient();
+                    }
+
+                    Logger.LogDebug("Connected and waiting for command event.");
+
+                    this.commandEvent.WaitOne();
+
+                    Logger.LogDebug("Command event happened.");
+
+                    while (commandQueue.TryDequeue(out this.currentCommand))
+                    {
+                        try
+                        {
+                            currentCommand.Execute(ModbusClient);
+                        }
+                        catch (Exception e)
+                        {
+                            //todo: retry
+                            string message = "Exception on currentCommand.Execute().";
+                            Logger.LogWarn(message, e);
+                        }
+
+                        if (currentCommand is IReadAnalogModusFunction readAnalogCommand)
+                        {
+                            PublishAnalogData(readAnalogCommand.Data);
+                        }
+                        else if (currentCommand is IReadDiscreteModbusFunction readDiscreteCommand)
+                        {
+                            PublishDigitalData(readDiscreteCommand.Data);
+                        }
+                    }
+                }
+                catch (Exception ex)
+                {
+                    string message = "Exception caught in FunctionExecutorThread.";
+                    Logger.LogError(message, ex);
+                }
+            }
+
+            Logger.LogInfo("FunctionExecutorThread is stopped.");
         }
+
+        private void PublishAnalogData(Dictionary<long, AnalogModbusData> data)
+        {
+            SCADAMessage scadaMessage = new MultipleAnalogValueSCADAMessage(data);
+            PublishScadaData(Topic.MEASUREMENT, scadaMessage);
+        }
+
+        private void PublishDigitalData(Dictionary<long, DiscreteModbusData> data)
+        {
+            SCADAMessage scadaMessage = new MultipleDiscreteValueSCADAMessage(data);
+            PublishScadaData(Topic.SWITCH_STATUS, scadaMessage);
+        }
+
+        private void PublishScadaData(Topic topic, SCADAMessage scadaMessage)
+        {
+            SCADAPublication scadaPublication = new SCADAPublication(topic, scadaMessage);
+
+            using (PublisherProxy publisherProxy = PublisherProxy)
+            {
+                if (publisherProxy != null)
+                {
+                    publisherProxy.Publish(scadaPublication);
+                    Logger.LogInfo($"SCADA service published data from topic: {scadaPublication.Topic}");
+                }
+                else
+                {
+                    string errMsg = "PublisherProxy is null.";
+                    Logger.LogWarn(errMsg);
+                    throw new NullReferenceException(errMsg);
+                }
+            }
+        }
+
+        #endregion Private Members
     }
 }

@@ -1,46 +1,46 @@
-﻿using Outage.SCADA.ModBus.FunctionParameters;
-using Outage.SCADA.SCADA_Common;
+﻿using EasyModbus;
+using Outage.Common;
+using Outage.Common.PubSub.SCADADataContract;
+using Outage.SCADA.ModBus.FunctionParameters;
+using Outage.SCADA.SCADACommon;
 using System;
 using System.Collections.Generic;
 using System.Reflection;
 
 namespace Outage.SCADA.ModBus.ModbusFuntions
 {
-    public abstract class ModbusFunction : IModBusFunction
+    public abstract class ModbusFunction : IModbusFunction
     {
-        private ModbusCommandParameters commandParameters;
+        protected ILogger Logger = LoggerWrapper.Instance;
 
-        public ModbusFunction(ModbusCommandParameters commandParameters)
+        public ModbusCommandParameters CommandParameters { get; protected set; }
+
+        protected ModbusFunction(ModbusCommandParameters commandParameters)
         {
-            this.commandParameters = commandParameters;
-        }
-
-        public ModbusCommandParameters CommandParameters
-        {
-            get
-            {
-                return commandParameters;
-            }
-
-            set
-            {
-                commandParameters = value;
-            }
+            CommandParameters = commandParameters;
         }
 
         public override string ToString()
         {
-            return $"Transaction: {commandParameters.TransactionId}, command {commandParameters.FunctionCode}";
+            return $"Transaction: {CommandParameters.TransactionId}, command {CommandParameters.FunctionCode}";
         }
 
         protected void CheckArguments(MethodBase m, Type t)
         {
-            if (commandParameters.GetType() != t)
+            if (CommandParameters.GetType() != t)
             {
-                string message = $"{m.ReflectedType.Name}{m.Name} has invalid argument {nameof(commandParameters)} of type {commandParameters.GetType().Name}.{Environment.NewLine}Argumet type should be {t.Name}";
+                string message = $"{m.ReflectedType.Name}{m.Name} has invalid argument {nameof(CommandParameters)} of type {CommandParameters.GetType().Name}.{Environment.NewLine}Argumet type should be {t.Name}";
                 throw new ArgumentException(message);
             }
         }
+
+        #region IModBusFunction
+
+        public abstract void Execute(ModbusClient modbusClient);
+
+        #endregion IModBusFunction
+
+        #region Obsolete
 
         /// <summary>
         /// Method is called from communication thread:
@@ -53,6 +53,7 @@ namespace Outage.SCADA.ModBus.ModbusFuntions
         ///
         /// </summary>
         /// <returns>Command parameters in form of byte array</returns>
+        [Obsolete]
         public abstract byte[] PackRequest();
 
         /// <summary>
@@ -73,6 +74,9 @@ namespace Outage.SCADA.ModBus.ModbusFuntions
         ///				- Point address
         ///		Value: Value received from MdbSim
         /// </returns>
+        [Obsolete]
         public abstract Dictionary<Tuple<PointType, ushort>, ushort> ParseResponse(byte[] response);
+
+        #endregion Obsolete
     }
 }

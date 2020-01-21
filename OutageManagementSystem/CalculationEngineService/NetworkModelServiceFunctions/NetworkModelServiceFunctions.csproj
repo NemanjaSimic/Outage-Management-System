@@ -45,7 +45,7 @@
     <Reference Include="System.Xml" />
   </ItemGroup>
   <ItemGroup>
-    <Compile Include="GDAModelHelper.cs" />
+    <Compile Include="NMSManager.cs" />
     <Compile Include="NetworkModelGDA.cs" />
     <Compile Include="NetworkModelGDAProxy.cs" />
     <Compile Include="Properties\AssemblyInfo.cs" />
@@ -58,9 +58,13 @@
       <Project>{892CBE15-9ED7-4540-81FA-0EAABA592138}</Project>
       <Name>Common</Name>
     </ProjectReference>
+    <ProjectReference Include="..\CECommon\CECommon.csproj">
+      <Project>{E1D2D69D-E03D-4FD7-8E4F-0FC95B68F0DD}</Project>
+      <Name>CECommon</Name>
+    </ProjectReference>
   </ItemGroup>
   <Import Project="$(MSBuildToolsPath)\Microsoft.CSharp.targets" />
-  <!-- To modify your build process, add your task inside one of the targets below and uncomment it. 
+  <!-- To modify your build process, add your task inside one of the targets below and uncomment it.
        Other similar extension points exist, see Microsoft.Common.targets.
   <Target Name="BeforeBuild">
   </Target>
