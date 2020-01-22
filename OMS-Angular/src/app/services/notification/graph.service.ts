@@ -12,6 +12,7 @@ declare var $;
 })
 export class GraphService {
   public updateRecieved: EventEmitter<OmsGraph>;
+  public outageRecieved: EventEmitter<Number>;
 
   private proxy: any;
   private connection: any;
@@ -19,11 +20,13 @@ export class GraphService {
 
   constructor(private envService: EnvironmentService, private http: HttpClient) {
     this.updateRecieved = new EventEmitter<OmsGraph>();
+    this.outageRecieved = new EventEmitter<Number>();
 
     this.connection = $.hubConnection(`${this.envService.serverUrl}`);
     this.proxy = this.connection.createHubProxy(this.proxyName);
 
     this.registerGraphUpdateListener();
+    this.registerOutageListener();
   }
 
   public startConnection(): Observable<boolean> {
@@ -48,6 +51,12 @@ export class GraphService {
   public registerGraphUpdateListener(): void {
     this.proxy.on('updateGraph', (data: OmsGraph) => {
       this.updateRecieved.emit(data);
+    });
+  }
+
+  public registerOutageListener(): void {
+    this.proxy.on('reportOutageCall', (gid: Number) => {
+      this.outageRecieved.emit(gid);
     });
   }
 

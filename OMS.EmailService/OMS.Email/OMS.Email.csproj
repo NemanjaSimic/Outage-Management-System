@@ -34,9 +34,16 @@
     <Reference Include="ImapX, Version=2.0.0.18, Culture=neutral, PublicKeyToken=5992873d65130d1f, processorArchitecture=MSIL">
       <HintPath>..\packages\ImapX.2.0.0.18\lib\net46\ImapX.dll</HintPath>
     </Reference>
+    <Reference Include="Microsoft.AspNet.SignalR.Client, Version=2.4.1.0, Culture=neutral, PublicKeyToken=31bf3856ad364e35, processorArchitecture=MSIL">
+      <HintPath>..\packages\Microsoft.AspNet.SignalR.Client.2.4.1\lib\net45\Microsoft.AspNet.SignalR.Client.dll</HintPath>
+    </Reference>
+    <Reference Include="Newtonsoft.Json, Version=6.0.0.0, Culture=neutral, PublicKeyToken=30ad4fe6b2a6aeed, processorArchitecture=MSIL">
+      <HintPath>..\packages\Newtonsoft.Json.6.0.4\lib\net45\Newtonsoft.Json.dll</HintPath>
+    </Reference>
     <Reference Include="System" />
     <Reference Include="System.Configuration" />
     <Reference Include="System.Core" />
+    <Reference Include="System.Net.Http.WebRequest" />
     <Reference Include="System.Xml.Linq" />
     <Reference Include="System.Data.DataSetExtensions" />
     <Reference Include="Microsoft.CSharp" />
@@ -45,13 +52,18 @@
     <Reference Include="System.Xml" />
   </ItemGroup>
   <ItemGroup>
+    <Compile Include="Dispatchers\GraphHubDispatcher.cs" />
+    <Compile Include="EmailParsers\OutageEmailParser.cs" />
     <Compile Include="Imap\ImapEmailMapper.cs" />
     <Compile Include="Imap\ImapIdleEmailClient.cs" />
     <Compile Include="Imap\ImapEmailClient.cs" />
+    <Compile Include="Interfaces\IDispatcher.cs" />
     <Compile Include="Interfaces\IEmailClient.cs" />
+    <Compile Include="Interfaces\IEmailParser.cs" />
     <Compile Include="Interfaces\IIdleEmailClient.cs" />
     <Compile Include="Interfaces\IImapEmailMapper.cs" />
     <Compile Include="Models\OutageMailMessage.cs" />
+    <Compile Include="Models\OutageTracingModel.cs" />
     <Compile Include="Properties\AssemblyInfo.cs" />
   </ItemGroup>
   <ItemGroup>
