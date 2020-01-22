@@ -21,7 +21,7 @@ namespace Outage.SCADA.SCADACommon
         float NormalValue { get; set; }
         float EGU_Min { get; set; }
         float EGU_Max { get; set; }
-        float ScaleFactor { get; set; }
+        float ScalingFactor { get; set; }
         float Deviation { get; set; }
 
         int CurrentRawValue { get; }
@@ -40,6 +40,7 @@ namespace Outage.SCADA.SCADACommon
         ushort NormalValue { get; set; }
         ushort CurrentValue { get; set; }
         ushort AbnormalValue { get; set; }
+        DiscreteMeasurementType DiscreteType { get; set; }
         
     }
 }

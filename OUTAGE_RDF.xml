@@ -833,7 +833,7 @@
 		<cim:Analog.deviation>0</cim:Analog.deviation>
 		<cim:Analog.currentValue>12</cim:Analog.currentValue>
 		<cim:Analog.maxValue>20</cim:Analog.maxValue>
-		<cim:Analog.measurementType>Current</cim:Analog.measurementType>
+		<cim:Analog.measurementType>Power</cim:Analog.measurementType>
 		<cim:Analog.minValue>10</cim:Analog.minValue>
 		<cim:Analog.normalValue>15</cim:Analog.normalValue>
 		<cim:Measurement.address>3</cim:Measurement.address>

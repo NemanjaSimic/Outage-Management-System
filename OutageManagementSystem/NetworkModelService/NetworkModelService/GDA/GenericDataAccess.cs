@@ -20,6 +20,7 @@ namespace Outage.NetworkModelService.GDA
 
         private static Dictionary<int, ResourceIterator> resourceIterators = new Dictionary<int, ResourceIterator>();
         private static int resourceItId = 0;
+
         protected static NetworkModel networkModel = null;
 
         public static NetworkModel NetworkModel

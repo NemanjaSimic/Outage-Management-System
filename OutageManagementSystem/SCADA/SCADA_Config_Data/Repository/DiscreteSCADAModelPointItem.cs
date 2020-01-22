@@ -11,6 +11,7 @@ namespace Outage.SCADA.SCADAData.Repository
 {
     public class DiscreteSCADAModelPointItem : SCADAModelPointItem, IDiscreteSCADAModelPointItem
     {
+        private EnumDescs enumDescs = new EnumDescs(); //TODO: Izmesti ovo !!
         public DiscreteSCADAModelPointItem()
             : base()
         {
@@ -38,6 +39,9 @@ namespace Outage.SCADA.SCADAData.Repository
                     case ModelCode.DISCRETE_NORMALVALUE:
                         NormalValue = (ushort)item.AsInt();
                         break;
+                    case ModelCode.DISCRETE_MEASUREMENTTYPE:
+                        DiscreteType = (DiscreteMeasurementType)(enumDescs.GetEnumValueFromString(ModelCode.ANALOG_SIGNALTYPE, item.AsEnum().ToString()));
+                        break;
 
                     default:
                         break;
@@ -49,8 +53,8 @@ namespace Outage.SCADA.SCADAData.Repository
         public ushort MaxValue { get; set; }
         public ushort NormalValue { get; set; }
         public ushort CurrentValue { get; set; }
-
         public ushort AbnormalValue { get; set; }
+        public DiscreteMeasurementType DiscreteType { get; set; }
 
         public override bool SetAlarms()
         {
@@ -63,7 +67,7 @@ namespace Outage.SCADA.SCADAData.Repository
                 //VALUE IS INVALID
                 if (CurrentValue < MinValue || CurrentValue > MaxValue)
                 {
-                    Alarm = AlarmType.ABNORMAL_VALUE;
+                    Alarm = AlarmType.REASONABILITY_FAILURE;
                     if (currentAlarm != Alarm)
                     {
                         alarmChanged = true;
@@ -72,7 +76,7 @@ namespace Outage.SCADA.SCADAData.Repository
                     //TODO: maybe throw new Exception("Invalid value.");
                 }
                 //VALUE IS NOT A NORMAL VALUE -> ABNORMAL ALARM
-                else if (CurrentValue != NormalValue)
+                else if (CurrentValue != NormalValue && DiscreteType == DiscreteMeasurementType.SWITCH_STATUS)
                 {
                     Alarm = AlarmType.ABNORMAL_VALUE;
                     if (currentAlarm != Alarm)

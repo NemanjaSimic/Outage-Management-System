@@ -12,10 +12,13 @@ namespace Outage.SCADA.ModBus.ModbusFuntions
 {
     public class ReadCoilsFunction : ModbusFunction, IReadDiscreteModbusFunction
     {
-        public ReadCoilsFunction(ModbusCommandParameters commandParameters)
+        public SCADAModel SCADAModel { get; private set; }
+
+        public ReadCoilsFunction(ModbusCommandParameters commandParameters, SCADAModel scadaModel)
             : base(commandParameters)
         {
             CheckArguments(MethodBase.GetCurrentMethod(), typeof(ModbusReadCommandParameters));
+            SCADAModel = scadaModel;
         }
 
         #region IModBusFunction
@@ -37,30 +40,28 @@ namespace Outage.SCADA.ModBus.ModbusFuntions
             bool[] data = modbusClient.ReadCoils(startAddress - 1, quantity);
             Data = new Dictionary<long, DiscreteModbusData>(data.Length);
 
-            SCADAModel scadaModel = SCADAModel.Instance;
-
             for (ushort i = 0; i < quantity; i++)
             {
                 ushort address = (ushort)(startAddress + i);
                 ushort value = (ushort)(data[i] ? 1 : 0);
 
                 //for commands enqueued during model update
-                if (!scadaModel.CurrentAddressToGidMap[PointType.DIGITAL_OUTPUT].ContainsKey(address))
+                if (!SCADAModel.CurrentAddressToGidMap[PointType.DIGITAL_OUTPUT].ContainsKey(address))
                 {
                     Logger.LogWarn($"ReadCoilsFunction execute => trying to read value on address {address}, Point type: {PointType.DIGITAL_OUTPUT}, which is not in the current SCADA Model.");
                     continue;
                 }
 
-                long gid = scadaModel.CurrentAddressToGidMap[PointType.DIGITAL_OUTPUT][address];
+                long gid = SCADAModel.CurrentAddressToGidMap[PointType.DIGITAL_OUTPUT][address];
 
                 //for commands enqueued during model update
-                if (!scadaModel.CurrentScadaModel.ContainsKey(gid))
+                if (!SCADAModel.CurrentScadaModel.ContainsKey(gid))
                 {
                     Logger.LogWarn($"ReadCoilsFunction execute => trying to read value for measurement with gid: 0x{gid:X16}, which is not in the current SCADA Model.");
                     continue;
                 }
 
-                if (!(scadaModel.CurrentScadaModel[gid] is DiscreteSCADAModelPointItem pointItem))
+                if (!(SCADAModel.CurrentScadaModel[gid] is DiscreteSCADAModelPointItem pointItem))
                 {
                     string message = $"PointItem [Gid: 0x{gid:X16}] is not type DiscreteSCADAModelPointItem.";
                     Logger.LogError(message);

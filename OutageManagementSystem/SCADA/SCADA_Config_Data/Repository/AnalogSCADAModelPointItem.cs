@@ -9,6 +9,7 @@ namespace Outage.SCADA.SCADAData.Repository
 {
     public class AnalogSCADAModelPointItem : SCADAModelPointItem, IAnalogSCADAModelPointItem
     {
+        private EnumDescs enumDescs = new EnumDescs(); //TODO: Izmesti ovo !!
         public AnalogSCADAModelPointItem() 
             : base()
         {
@@ -17,6 +18,9 @@ namespace Outage.SCADA.SCADAData.Repository
         public AnalogSCADAModelPointItem(List<Property> props, ModelCode type)
             : base(props, type)
         {
+            
+            
+
             foreach (var item in props)
             {
                 switch (item.Id)
@@ -38,11 +42,15 @@ namespace Outage.SCADA.SCADAData.Repository
                         break;
 
                     case ModelCode.ANALOG_SCALINGFACTOR:
-                        ScaleFactor = item.AsFloat();
+                        ScalingFactor = item.AsFloat();
                         break;
 
                     case ModelCode.ANALOG_DEVIATION:
                         Deviation = item.AsFloat();
+                        break;
+
+                    case ModelCode.ANALOG_SIGNALTYPE:
+                        AnalogType = (AnalogMeasurementType)(enumDescs.GetEnumValueFromString(ModelCode.ANALOG_SIGNALTYPE, item.AsEnum().ToString()));
                         break;
 
                     default:
@@ -55,7 +63,7 @@ namespace Outage.SCADA.SCADAData.Repository
         public float CurrentEguValue { get; set; }
         public float EGU_Min { get; set; }
         public float EGU_Max { get; set; }
-        public float ScaleFactor { get; set; }
+        public float ScalingFactor { get; set; }
         public float Deviation { get; set; }
         public AnalogMeasurementType AnalogType { get; set; }
 
@@ -165,31 +173,24 @@ namespace Outage.SCADA.SCADAData.Repository
         
         public float RawToEguValueConversion(int rawValue)
         {
-            //TODO: implement with Deviation and ScaleFactor
-            //start raw to egu value
-            float eguValue = 0;
-
-            //end raw to egu value
+            float eguValue = ((ScalingFactor * rawValue) + Deviation);
 
             if(eguValue > float.MaxValue || eguValue < float.MinValue)
             {
-                throw new Exception($"eguValue: {eguValue} is out of float data type boundaries [{float.MinValue}, {float.MaxValue}]");
+                throw new Exception($"Egu value: {eguValue} is out of float data type boundaries [{float.MinValue}, {float.MaxValue}]");
             }
 
-            eguValue = ((ScaleFactor * rawValue) + Deviation);
-
-            return (float)eguValue;
+            return eguValue;
         }
 
         public int EguToRawValueConversion(float eguValue)
         {
-            //TODO: implement with Deviation and ScaleFactor
-            //start raw to egu value
-            int rawValue = 0;
+            if(ScalingFactor == 0)
+            {
+                throw new DivideByZeroException($"Scaling factor is zero.");
+            }
 
-            rawValue = (int)((eguValue - Deviation) / ScaleFactor);
-
-            //end raw to egu value
+            int rawValue = (int)((eguValue - Deviation) / ScalingFactor);
 
             return rawValue;
         }

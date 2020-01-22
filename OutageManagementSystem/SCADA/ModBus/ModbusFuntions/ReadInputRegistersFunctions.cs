@@ -12,10 +12,13 @@ namespace Outage.SCADA.ModBus.ModbusFuntions
 {
     public class ReadInputRegistersFunction : ModbusFunction, IReadAnalogModusFunction
     {
-        public ReadInputRegistersFunction(ModbusCommandParameters commandParameters)
+        public SCADAModel SCADAModel { get; private set; }
+
+        public ReadInputRegistersFunction(ModbusCommandParameters commandParameters, SCADAModel scadaModel)
             : base(commandParameters)
         {
             CheckArguments(MethodBase.GetCurrentMethod(), typeof(ModbusReadCommandParameters));
+            SCADAModel = scadaModel; 
         }
 
         #region IModBusFunction
@@ -38,30 +41,28 @@ namespace Outage.SCADA.ModBus.ModbusFuntions
             int[] data = modbusClient.ReadInputRegisters(startAddress - 1, quantity);
             Data = new Dictionary<long, AnalogModbusData>(data.Length);
 
-            SCADAModel scadaModel = SCADAModel.Instance;
-
             for (ushort i = 0; i < quantity; i++)
             {
                 ushort address = (ushort)(startAddress + i);
                 int rawValue = data[i];
 
                 //for commands enqueued during model update
-                if (!scadaModel.CurrentAddressToGidMap[PointType.ANALOG_INPUT].ContainsKey(address))
+                if (!SCADAModel.CurrentAddressToGidMap[PointType.ANALOG_INPUT].ContainsKey(address))
                 {
                     Logger.LogWarn($"ReadInputRegistersFunction execute => trying to read value on address {address}, Point type: {PointType.ANALOG_INPUT}, which is not in the current SCADA Model.");
                     continue;
                 }
 
-                long gid = scadaModel.CurrentAddressToGidMap[PointType.ANALOG_INPUT][address];
+                long gid = SCADAModel.CurrentAddressToGidMap[PointType.ANALOG_INPUT][address];
 
                 //for commands enqueued during model update
-                if (!scadaModel.CurrentScadaModel.ContainsKey(gid))
+                if (!SCADAModel.CurrentScadaModel.ContainsKey(gid))
                 {
                     Logger.LogWarn($"ReadInputRegistersFunction execute => trying to read value for measurement with gid: 0x{gid:X16}, which is not in the current SCADA Model.");
                     continue;
                 }
 
-                if (!(scadaModel.CurrentScadaModel[gid] is AnalogSCADAModelPointItem pointItem))
+                if (!(SCADAModel.CurrentScadaModel[gid] is AnalogSCADAModelPointItem pointItem))
                 {
                     string message = $"PointItem [Gid: 0x{gid:X16}] is not type AnalogSCADAModelPointItem.";
                     Logger.LogError(message);

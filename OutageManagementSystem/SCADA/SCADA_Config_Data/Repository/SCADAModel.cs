@@ -21,7 +21,7 @@ namespace Outage.SCADA.SCADAData.Repository
 
         private ModelResourcesDesc modelResourceDesc;
 
-        private bool isSCADAModelImported = false;
+        private bool isSCADAModelImported;
         private Dictionary<DeltaOpType, List<long>> modelChanges;
         private Dictionary<long, ISCADAModelPointItem> incomingScadaModel;
         private Dictionary<PointType, Dictionary<ushort, long>> incomingAddressToGidMap;
@@ -87,32 +87,6 @@ namespace Outage.SCADA.SCADAData.Repository
         
         #endregion Properties
 
-        #region Instance
-
-        private static SCADAModel instance;
-        private static readonly object lockSync = new object();
-
-        public static SCADAModel Instance
-        {
-            get
-            {
-                if (instance == null)
-                {
-                    lock (lockSync)
-                    {
-                        if (instance == null)
-                        {
-                            instance = new SCADAModel();
-                        }
-                    }
-                }
-
-                return instance;
-            }
-        }
-
-        #endregion Instance
-
         #region Proxies
 
         private NetworkModelGDAProxy gdaQueryProxy = null;
@@ -157,15 +131,11 @@ namespace Outage.SCADA.SCADAData.Repository
 
         #endregion Proxies
 
-        private SCADAModel()
+        public SCADAModel()
         {
             currentScadaModel = new Dictionary<long, ISCADAModelPointItem>();
             incomingScadaModel = new Dictionary<long, ISCADAModelPointItem>();
             modelResourceDesc = new ModelResourcesDesc();
-
-
-            //ImportModel();
-            //
         }
 
         #region IModelUpdateNotificationContract
@@ -304,8 +274,6 @@ namespace Outage.SCADA.SCADAData.Repository
 
         public bool ImportModel()
         {
-
-
             string message = "Importing analog measurements started...";
             Logger.LogInfo(message);
             Console.WriteLine(message);
@@ -323,9 +291,15 @@ namespace Outage.SCADA.SCADAData.Repository
             message = $"Importing discrete measurements finished. ['success' value: {discreteImportSuccess}]";
             Logger.LogInfo(message);
             Console.WriteLine(message);
-            SignalIncomingModelConfirmation.Invoke(new List<long>(CurrentScadaModel.Keys));
 
-            return analogImportSuccess && discreteImportSuccess;
+            isSCADAModelImported = analogImportSuccess && discreteImportSuccess;
+            
+            if (isSCADAModelImported && SignalIncomingModelConfirmation != null)
+            {
+                SignalIncomingModelConfirmation.Invoke(new List<long>(CurrentScadaModel.Keys));
+            }
+
+            return isSCADAModelImported;
         }
 
         private bool ImportAnalog()

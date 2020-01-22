@@ -33,10 +33,9 @@ namespace Outage.SCADA.ModBus.Connection
         private ConcurrentQueue<IModbusFunction> commandQueue;
         private ConcurrentQueue<IModbusFunction> modelUpdateQueue;
 
-        //public bool isDelta = false;
-        public ISCADAConfigData ConfigData { get; protected set; }
-        public SCADAModel SCADAModel { get; protected set; }
-        public ModbusClient ModbusClient { get; protected set; }
+        public  ISCADAConfigData ConfigData { get; private set; }
+        public SCADAModel SCADAModel { get; private set; }
+        public ModbusClient ModbusClient { get; private set; }
 
         #region Proxies
 
@@ -83,51 +82,23 @@ namespace Outage.SCADA.ModBus.Connection
 
         #endregion Proxies
 
-        #region Instance
-
-        private static FunctionExecutor instance;
-        private static readonly object lockSync = new object();
-
-        public static FunctionExecutor Instance
+        public FunctionExecutor(SCADAModel scadaModel)
         {
-            get
-            {
-                if (instance == null)
-                {
-                    lock (lockSync)
-                    {
-                        if (instance == null)
-                        {
-                            instance = new FunctionExecutor();
-                        }
-                    }
-                }
-
-                return instance;
-            }
-        }
-
-        #endregion Instance
-
-        private FunctionExecutor()
-        {
-            ConfigData = SCADAConfigData.Instance;
-            //SCADAModel.EnableDelta = EnableDelta;
-            //SCADAModel.DisableDelta = DisableDelta;
-            ModbusClient = new ModbusClient(ConfigData.IpAddress, ConfigData.TcpPort);
-
             this.commandQueue = new ConcurrentQueue<IModbusFunction>();
             this.modelUpdateQueue = new ConcurrentQueue<IModbusFunction>();
             this.commandEvent = new AutoResetEvent(true);
 
-            SCADAModel = SCADAModel.Instance;
+            SCADAModel = scadaModel;
             SCADAModel.SignalIncomingModelConfirmation += EnqueueModelUpdateCommands;
-            SCADAModel.ImportModel();
+
+            ConfigData = SCADAConfigData.Instance;
+            ModbusClient = new ModbusClient(ConfigData.IpAddress, ConfigData.TcpPort);
+
         }
 
         #region Public Members
 
-        public void StartExecutor()
+        public void StartExecutorThread()
         {
             try
             {
@@ -150,7 +121,7 @@ namespace Outage.SCADA.ModBus.Connection
             }
         }
 
-        public void StopExecutor()
+        public void StopExecutorThread()
         {
             try
             {
@@ -175,18 +146,9 @@ namespace Outage.SCADA.ModBus.Connection
 
             try
             {
-                //if (ModbusClient != null && ModbusClient.Connected)
-                //{
                 this.commandQueue.Enqueue(modbusFunction);
                 this.commandEvent.Set();
                 success = true;
-                //}
-                //else
-                //{
-                //    success = false;
-                //    string message = "Modbus client is either not connected or null.";
-                //    Logger.LogError(message);
-                //}
             }
             catch (Exception e)
             {
@@ -198,13 +160,13 @@ namespace Outage.SCADA.ModBus.Connection
             return success;
         }
 
-        public bool EnqueueModelUpdateCommands(List<long> modelUpdateFunctions)
+        public bool EnqueueModelUpdateCommands(List<long> measurementGids)
         {
             bool success;
             ushort length = 6;
             try
             {
-                foreach(long measurementGID in modelUpdateFunctions)
+                foreach(long measurementGID in measurementGids)
                 {
                     ISCADAModelPointItem scadaPointItem = SCADAModel.CurrentScadaModel[measurementGID];
                     IModbusFunction modbusFunction;
@@ -212,16 +174,16 @@ namespace Outage.SCADA.ModBus.Connection
                     if (scadaPointItem is IAnalogSCADAModelPointItem analogSCADAModelPointItem)
                     {
                         modbusFunction = FunctionFactory.CreateModbusFunction(new ModbusWriteCommandParameters(length,
-                                                                                (byte)ModbusFunctionCode.WRITE_SINGLE_REGISTER,
-                                                                                analogSCADAModelPointItem.Address,
-                                                                                analogSCADAModelPointItem.CurrentRawValue));
+                                                                                                               (byte)ModbusFunctionCode.WRITE_SINGLE_REGISTER,
+                                                                                                               analogSCADAModelPointItem.Address,
+                                                                                                               analogSCADAModelPointItem.CurrentRawValue));
                     }
                     else if (scadaPointItem is IDiscreteSCADAModelPointItem discreteSCADAModelPointItem)
                     {
                         modbusFunction = FunctionFactory.CreateModbusFunction(new ModbusWriteCommandParameters(length,
-                                                                                (byte)ModbusFunctionCode.WRITE_SINGLE_COIL,
-                                                                                discreteSCADAModelPointItem.Address,
-                                                                                discreteSCADAModelPointItem.CurrentValue));
+                                                                                                               (byte)ModbusFunctionCode.WRITE_SINGLE_COIL,
+                                                                                                               discreteSCADAModelPointItem.Address,
+                                                                                                               discreteSCADAModelPointItem.CurrentValue));
                     }
                     else
                     {
@@ -239,7 +201,7 @@ namespace Outage.SCADA.ModBus.Connection
             catch (Exception e)
             {
                 success = false;
-                string message = "Exception caught in EnqueueHighPriorityCommand() method.";
+                string message = "Exception caught in EnqueueModelUpdateCommands() method.";
                 Logger.LogError(message, e);
             }
 
@@ -247,6 +209,7 @@ namespace Outage.SCADA.ModBus.Connection
         }
 
         #endregion Public Members
+
 
         #region Private Members
 
@@ -305,8 +268,6 @@ namespace Outage.SCADA.ModBus.Connection
                         ModbusClient = new ModbusClient(ConfigData.IpAddress, ConfigData.TcpPort);
                     }
 
-                    //if (SCADAModel.modelImported) InitSimulatorValues();
-
                     Logger.LogDebug("Connected and waiting for command event.");
 
                     this.commandEvent.WaitOne();
@@ -318,7 +279,7 @@ namespace Outage.SCADA.ModBus.Connection
                         ConnectToModbusClient();
                     }
 
-                    //HIGH PROPRITY COMMANDS - model update commands
+                    //HIGH PRIORITY COMMANDS - model update commands
                     while (modelUpdateQueue.TryDequeue(out IModbusFunction currentCommand))
                     {
                         ExecuteCommand(currentCommand);
@@ -397,79 +358,6 @@ namespace Outage.SCADA.ModBus.Connection
                     Logger.LogWarn(errMsg);
                     throw new NullReferenceException(errMsg);
                 }
-            }
-        }
-
-        //private void InitSimulatorValues()
-        //{
-        //    foreach (ISCADAModelPointItem pointItem in SCADAModel.Instance.CurrentScadaModel.Values)
-        //    {
-        //        if(pointItem is AnalogSCADAModelPointItem analogPointItem)
-        //        {
-        //            ModbusClient.WriteSingleRegister(analogPointItem.Address - 1, analogPointItem.CurrentRawValue);
-        //        }
-        //        else if(pointItem is DiscreteSCADAModelPointItem discretePointItem)
-        //        {
-        //            ModbusClient.WriteSingleCoil(discretePointItem.Address - 1, (discretePointItem.CurrentValue == 1) ? true : false);
-        //        }
-        //    }
-        //}
-
-        //private void EnableDelta()
-        //{
-        //    isDelta = true;
-        //    ModbusClient.Disconnect();
-        //}
-
-        //private void DisableDelta()
-        //{
-        //    isDelta = false;
-        //}
-
-        private void InitSimulatorValues()
-        {
-            try
-            {
-                string ipAddress = SCADAConfigData.Instance.IpAddress;
-                ushort tcpPort = SCADAConfigData.Instance.TcpPort;
-                ModbusClient modbusClient = new ModbusClient(ipAddress, tcpPort);
-                modbusClient.Connect();
-
-                if (modbusClient.Connected)
-                {
-                    foreach (ISCADAModelPointItem pointItem in SCADAModel.Instance.CurrentScadaModel.Values)
-                    {
-                        if (pointItem is AnalogSCADAModelPointItem analogPointItem)
-                        {
-                            modbusClient.WriteSingleRegister(analogPointItem.Address - 1, analogPointItem.CurrentRawValue);
-                        }
-                        else if (pointItem is DiscreteSCADAModelPointItem discretePointItem)
-                        {
-                            bool commandingValue;
-                            if (discretePointItem.CurrentValue == 0)
-                            {
-                                commandingValue = false;
-                            }
-                            else if (discretePointItem.CurrentValue == 1)
-                            {
-                                commandingValue = true;
-                            }
-                            else
-                            {
-                                Logger.LogError("Non-boolean value in write single coil command parameter.");
-                                continue;
-                            }
-
-                            modbusClient.WriteSingleCoil(discretePointItem.Address - 1, commandingValue);
-                        }
-                    }
-
-                    modbusClient.Disconnect();
-                }
-            }
-            catch (Exception e)
-            {
-                Logger.LogError("Exception caught in InitSimulatorValues().", e);
             }
         }
 
