@@ -9,16 +9,17 @@ namespace OMS.Email.Dispatchers
     {
         private readonly string _url;
         private readonly string _hubName;
-        private bool _isConnected;
 
         private readonly HubConnection _connection;
         private readonly IHubProxy _proxy;
+
+        public bool IsConnected { get; private set; }
 
         public GraphHubDispatcher()
         {
             _url = ConfigurationManager.AppSettings["hubUrl"];
             _hubName = ConfigurationManager.AppSettings["hubName"];
-            _isConnected = false;
+            IsConnected = false;
 
             _connection = new HubConnection(_url);
             _proxy = _connection.CreateHubProxy(_hubName);
@@ -35,13 +36,14 @@ namespace OMS.Email.Dispatchers
                 else
                 {
                     Console.WriteLine($"Connected to {_hubName}. ");
+                    IsConnected = true;
                 }
             }).Wait();
         }
 
         public void Dispatch(long gid)
         {
-            if(!_isConnected)
+            if (!IsConnected)
                 Connect();
 
             Console.WriteLine($"Sending graph outage call update to Graph Hub");
@@ -50,10 +52,10 @@ namespace OMS.Email.Dispatchers
 
         public void Stop()
         {
-            if(_isConnected) 
+            if (IsConnected)
                 _connection.Stop();
 
-            _isConnected = false;
+            IsConnected = false;
         }
 
         ~GraphHubDispatcher()
