@@ -26,6 +26,15 @@ export const style = cytoscape.stylesheet()
         'height': '20px',
         'width': '20px',
     })
+    .selector('node[type = "outage-call"]')
+    .style({
+        'shape': 'rectangle',
+        'background-color': '#2b2935',
+        'background-fit': 'cover',
+        'background-image': 'assets/img/outage-call.png',
+        'height': '20px',
+        'width': '20px',
+    })
     .selector('node[type="ENERGYSOURCE"]')
     .style({
         'label': 'data(type)',

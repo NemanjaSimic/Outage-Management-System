@@ -30,7 +30,7 @@
       { "data": { "id": "EC5", "state": "inactive", "type": "EnergyConsumer" } },
       { "data": { "id": "EC6", "state": "active", "type": "EnergyConsumer" } },
       { "data": { "id": "EC7", "state": "active", "type": "EnergyConsumer" } },
-      { "data": { "id": "EC8", "state": "active", "type": "EnergyConsumer" } }      
+      { "data": { "id": "1234567", "state": "active", "type": "EnergyConsumer" } }      
     ],
     "edges": [
       { "data": { "source": "ES", "target": "D1", "color": "blue" } },
@@ -62,7 +62,7 @@
       { "data": { "source": "B7", "target": "F7", "color": "blue" } },
       { "data": { "source": "B7", "target": "F8", "color": "blue" } },
       { "data": { "source": "F7", "target": "EC7", "color": "blue" } },
-      { "data": { "source": "F8", "target": "EC8", "color": "blue" } },
+      { "data": { "source": "F8", "target": "1234567", "color": "blue" } },
       { "data": { "source": "F5", "target": "EC5", "color": "red" } },
       { "data": { "source": "F6", "target": "EC6", "color": "blue" } }
     ],
