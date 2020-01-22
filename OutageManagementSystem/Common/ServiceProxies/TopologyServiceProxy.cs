@@ -7,24 +7,15 @@ namespace TopologyServiceClientMock
 {
     public class TopologyServiceProxy : ClientBase<ITopologyServiceContract>, ITopologyServiceContract, IDisposable
     {
-        private ITopologyServiceContract proxy;
-
-        public TopologyServiceProxy(string endPointName) : base (endPointName) 
+        public TopologyServiceProxy(string endpointName)
+            : base(endpointName)
         {
-            proxy = this.CreateChannel();
+
         }
         public UIModel GetTopology()
         {
-            return proxy.GetTopology();
+            return Channel.GetTopology();
         }
 
-        public void Dispose()
-        {
-            if (proxy != null)
-            {
-                proxy = null;
-            }
-            this.Close();
-        }
     }
 }
