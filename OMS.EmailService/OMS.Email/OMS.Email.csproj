@@ -54,6 +54,8 @@
   <ItemGroup>
     <Compile Include="Dispatchers\GraphHubDispatcher.cs" />
     <Compile Include="EmailParsers\OutageEmailParser.cs" />
+    <Compile Include="Factories\ImapClientFactory.cs" />
+    <Compile Include="Factories\ImapIdleClientFactory.cs" />
     <Compile Include="Imap\ImapEmailMapper.cs" />
     <Compile Include="Imap\ImapIdleEmailClient.cs" />
     <Compile Include="Imap\ImapEmailClient.cs" />
