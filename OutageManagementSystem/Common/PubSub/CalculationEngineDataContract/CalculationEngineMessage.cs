@@ -14,7 +14,7 @@ namespace Outage.Common.PubSub.CalculationEngineDataContract
 
     }
 
-    [Serializable]
+    //[Serializable]
     [DataContract]
     public class TopologyForUIMessage : CalculationEngineMessage
     {

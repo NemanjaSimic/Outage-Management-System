@@ -12,7 +12,7 @@ namespace Outage.Common.PubSub.SCADADataContract
     {
     }
 
-    [Serializable]
+    //[Serializable]
     [DataContract]
     public class SingleAnalogValueSCADAMessage : SCADAMessage
     {
@@ -33,7 +33,7 @@ namespace Outage.Common.PubSub.SCADADataContract
         public AlarmType Alarm { get; private set; }
     }
 
-    [Serializable]
+    //[Serializable]
     [DataContract]
     public class MultipleAnalogValueSCADAMessage : SCADAMessage
     {
@@ -46,7 +46,7 @@ namespace Outage.Common.PubSub.SCADADataContract
         public Dictionary<long, AnalogModbusData> Data { get; private set; }
     }
 
-    [Serializable]
+    //[Serializable]
     [DataContract]
     public class SingleDiscreteValueSCADAMessage : SCADAMessage
     {
@@ -65,7 +65,7 @@ namespace Outage.Common.PubSub.SCADADataContract
         public AlarmType Alarm { get; private set; }
     }
 
-    [Serializable]
+    //[Serializable]
     [DataContract]
     public class MultipleDiscreteValueSCADAMessage : SCADAMessage
     {

@@ -113,6 +113,9 @@
     <Compile Include="PubSub\SCADADataContract\SCADAPublication.cs" />
     <Compile Include="ServiceContracts\DistributedTransaction\IModelUpdateNotificationContract.cs" />
     <Compile Include="ServiceContracts\DistributedTransaction\ITransactionEnlistmentContract.cs" />
+    <Compile Include="ServiceContracts\OMS\ICallingContract.cs" />
+    <Compile Include="ServiceContracts\OMS\IOutageContract.cs" />
+    <Compile Include="ServiceContracts\OMS\OutageData.cs" />
     <Compile Include="ServiceContracts\SCADA\ISCADACommand.cs" />
     <Compile Include="ServiceContracts\ITopologyServiceContract.cs" />
     <Compile Include="ServiceContracts\PubSub\IPublisher.cs" />
@@ -134,6 +137,8 @@
     <Compile Include="ServiceProxies\DistributedTransaction\TransactionCoordinatorProxy.cs" />
     <Compile Include="ServiceProxies\NetworkModelGDAProxy.cs" />
     <Compile Include="ServiceProxies\DistributedTransaction\TransactionActorProxy.cs" />
+    <Compile Include="ServiceProxies\Outage\CallingServiceProxy.cs" />
+    <Compile Include="ServiceProxies\Outage\OutageServiceProxy.cs" />
     <Compile Include="ServiceProxies\PubSub\PublisherProxy.cs" />
     <Compile Include="ServiceProxies\PubSub\SubscriberProxy.cs" />
     <Compile Include="ServiceProxies\SCADACommandProxy.cs" />

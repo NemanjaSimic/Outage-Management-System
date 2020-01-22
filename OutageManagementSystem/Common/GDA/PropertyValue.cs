@@ -5,7 +5,7 @@ using System.Runtime.Serialization;
 
 namespace Outage.Common.GDA
 {
-    [Serializable]
+    //[Serializable]
     [DataContract]	
 	public class PropertyValue
 	{
