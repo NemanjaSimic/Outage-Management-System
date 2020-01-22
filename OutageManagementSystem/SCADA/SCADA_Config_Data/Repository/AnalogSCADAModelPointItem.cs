@@ -167,7 +167,7 @@ namespace Outage.SCADA.SCADAData.Repository
         {
             //TODO: implement with Deviation and ScaleFactor
             //start raw to egu value
-            double eguValue = rawValue;
+            float eguValue = 0;
 
             //end raw to egu value
 
@@ -176,6 +176,8 @@ namespace Outage.SCADA.SCADAData.Repository
                 throw new Exception($"eguValue: {eguValue} is out of float data type boundaries [{float.MinValue}, {float.MaxValue}]");
             }
 
+            eguValue = ((ScaleFactor * rawValue) + Deviation);
+
             return (float)eguValue;
         }
 
@@ -183,7 +185,9 @@ namespace Outage.SCADA.SCADAData.Repository
         {
             //TODO: implement with Deviation and ScaleFactor
             //start raw to egu value
-            int rawValue = (int)eguValue;
+            int rawValue = 0;
+
+            rawValue = (int)((eguValue - Deviation) / ScaleFactor);
 
             //end raw to egu value
 
