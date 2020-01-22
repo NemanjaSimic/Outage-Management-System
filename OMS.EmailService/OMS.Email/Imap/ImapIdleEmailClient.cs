@@ -31,12 +31,13 @@ namespace OMS.Email.Imap
         {
             foreach (var message in args.Messages)
             {
+                message.Seen = true;
                 OutageMailMessage outageMessage = _mapper.MapMail(message);
                 Console.WriteLine(outageMessage);
 
                 OutageTracingModel tracingModel = _parser.Parse(outageMessage);
 
-                if (tracingModel.IsValidReport)
+                if (tracingModel.IsValidReport && _dispatcher.IsConnected)
                 {
                     // notify clients about outage
                     _dispatcher.Dispatch(tracingModel.Gid);

@@ -52,6 +52,7 @@ namespace OMS.Email.Imap
             {
                 OutageMailMessage outageMessage = _mapper.MapMail(message);
                 outageMailMessages.Add(outageMessage);
+                message.Seen = true;
             }
 
             return outageMailMessages;
