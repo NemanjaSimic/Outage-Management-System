@@ -3,6 +3,8 @@
 
 using System;
 using System.Collections.Generic;
+using OMS.Email.Dispatchers;
+using OMS.Email.EmailParsers;
 using OMS.Email.Imap;
 using OMS.Email.Interfaces;
 using OMS.Email.Models;
@@ -15,6 +17,8 @@ namespace OMS.EmailService
         {
             // todo: add factory for email clients
             IImapEmailMapper mapper = new ImapEmailMapper();
+            IDispatcher dispatcher = new GraphHubDispatcher();
+            IEmailParser emailParser = new OutageEmailParser();
 
             #if (IDLE_SCAN)
             #region Idle scan
@@ -22,7 +26,7 @@ namespace OMS.EmailService
             Console.WriteLine("Idle scanning starting...");
 
             // Use-case #1: Idle all-time listening to new messages
-            IIdleEmailClient idleEmailClient = new ImapIdleEmailClient(mapper);
+            IIdleEmailClient idleEmailClient = new ImapIdleEmailClient(mapper, emailParser, dispatcher);
 
             if (!idleEmailClient.Connect())
             {
