@@ -5,7 +5,7 @@ import { OmsGraph } from '@shared/models/oms-graph.model';
 
 import cyConfig from './graph.config';
 import { drawBackupEdge } from '@shared/utils/backup-edge';
-import { addGraphTooltip } from '@shared/utils/tooltip';
+import { addGraphTooltip, addOutageTooltip } from '@shared/utils/tooltip';
 import { drawWarning } from '@shared/utils/warning';
 
 import * as cytoscape from 'cytoscape';
@@ -39,7 +39,8 @@ export class GraphComponent implements OnInit, OnDestroy {
   private graphData: any = {
     nodes: [],
     edges: [],
-    backup_edges: []
+    backup_edges: [],
+    outages: []
   };
 
   constructor(
@@ -70,6 +71,7 @@ export class GraphComponent implements OnInit, OnDestroy {
     this.graphData.nodes = graphMock.nodes;
     this.graphData.edges = graphMock.edges;
     this.graphData.backup_edges = graphMock.backup_edges;
+    this.graphData.outages = graphMock.outages;
 
 
     // zoom on + and -
@@ -158,8 +160,8 @@ export class GraphComponent implements OnInit, OnDestroy {
     });
 
     //this.drawBackupEdges();
-    this.addTooltips();
     this.drawWarnings();
+    this.addTooltips();
   };
 
   public drawBackupEdges(): void {
@@ -174,7 +176,22 @@ export class GraphComponent implements OnInit, OnDestroy {
     this.cy.ready(() => {
       this.cy.nodes().forEach(node => {
         node.sendSwitchCommand = (command) => this.onCommandHandler(command);
-        addGraphTooltip(this.cy, node);
+        if(node.data("type") == 'warning')
+        {
+          //Za sad ovako jer su hardkodovani i Outage simboli, ovako je testirano samo
+          var outage;
+          this.graphData.outages.forEach(o => {
+             var outageId = o["data"]["elementId"];
+              if(node.data("targetId") == outageId)
+              {
+                outage = o;
+              }
+           });
+           addOutageTooltip(this.cy, node, outage);
+        }else
+        {
+          addGraphTooltip(this.cy, node);
+        }
       });
     });
   }
@@ -182,7 +199,7 @@ export class GraphComponent implements OnInit, OnDestroy {
   public drawWarnings(): void {
     this.cy.ready(() => {
       this.cy.edges().forEach(line => {
-        drawWarning(this.cy, line);
+            drawWarning(this.cy, line);
       })
     });
   };

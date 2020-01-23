@@ -6,6 +6,12 @@ const graphTooltipBody: string =
   <p>Type: [[type]]</p>
   <p>State: [[state]]</p>`;
 
+const outageTooltipBody: string =
+  `<p>ID: [[id]]</p>
+  <p>ElementID: [[elementId]]</p>
+  <p>ReportTime: [[reportTime]]</p>
+  <p>ArchiveTime: [[archiveTime]]</p>`;
+
 export const addGraphTooltip = (cy, node) => {
   let ref = node.popperRef();
 
@@ -79,6 +85,40 @@ export const addGraphTooltip = (cy, node) => {
   });
 
   // hide the tooltip on zoom and pan
+  cy.on('zoom pan', () => {
+    setTimeout(() => {
+      node.tooltip.hide();
+    }, 0);
+  });
+}
+
+export const addOutageTooltip = (cy, node, outage) => {
+  let ref = node.popperRef();
+
+  node.tooltip = tippy(ref, {
+    content: () => {
+      const div = document.createElement('div');
+      div.innerHTML = outageTooltipBody
+        .replace("[[id]]", outage["data"]['id'])
+        .replace("[[elementId]]", outage["data"]['elementId'])
+        .replace("[[reportTime]]", outage["data"]['reportTime'])
+        .replace("[[archiveTime]]", outage["data"]['archiveTime']);
+    
+        return div;
+      },
+      animation: 'scale',
+      trigger: 'manual',
+      placement: 'right',
+      arrow: true,
+      interactive: true
+  });
+
+  node.on('tap', () => {
+    setTimeout(() => {
+      node.tooltip.show();
+    }, 0);
+  });
+
   cy.on('zoom pan', () => {
     setTimeout(() => {
       node.tooltip.hide();

@@ -68,5 +68,11 @@
     ],
     "backup_edges": [
       { "data": { "source": "EC6", "target": "EC5", "color": "blue" } }
+    ],
+    "outages": [
+      {"data" : {"id" : "OUTAGE1", "elementId": "F3", "reportTime": "21.01.2020. 21:07:35", "archiveTime": "21.01.2020. 21:48:55"}},
+      {"data" : {"id" : "OUTAGE2", "elementId": "EC3", "reportTime": "21.01.2020. 21:07:35", "archiveTime": "21.01.2020. 21:48:55"}},
+      {"data" : {"id" : "OUTAGE3", "elementId": "F5", "reportTime": "21.01.2020. 21:07:35", "archiveTime": "21.01.2020. 21:48:55"}},
+      {"data" : {"id" : "OUTAGE3", "elementId": "EC5", "reportTime": "21.01.2020. 21:07:35", "archiveTime": "21.01.2020. 21:48:55"}}
     ]
   }
