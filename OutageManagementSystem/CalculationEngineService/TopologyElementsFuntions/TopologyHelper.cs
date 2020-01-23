@@ -65,23 +65,16 @@ namespace TopologyElementsFuntions
 			}
 			return TopologyType.None;
 		}
-		public string GetDMSTypeOfTopologyElement(long gid)
+		public DMSType GetDMSTypeOfTopologyElement(long gid)
 		{
 			try
 			{
-				return ModelCodeHelper.GetTypeFromModelCode(modelResourcesDesc.GetModelCodeFromId(gid)).ToString();
+				return ModelCodeHelper.GetTypeFromModelCode(modelResourcesDesc.GetModelCodeFromId(gid));
 
 			}
 			catch (Exception)
 			{
-				if (gid < 5000)
-				{
-					return "EDGE";
-				}
-				else
-				{
-					return "FIELD";
-				}
+				throw;
 			}
 		}
 	}

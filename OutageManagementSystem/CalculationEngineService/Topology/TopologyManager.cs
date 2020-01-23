@@ -52,20 +52,20 @@ namespace Topology
         public void InitializeTopology()
         {
             logger.LogDebug("Initializing topology started.");
-            TopologyModel = CreateTopology(TransactionFlag.NoTransaction);
+            TopologyModel = CreateTopology();
             logger.LogDebug("Initializing topology finished.");
         }
-        private TopologyModel CreateTopology(TransactionFlag flag)
+        private TopologyModel CreateTopology()
         {
             logger.LogDebug("Get all energy sources started.");
-            roots = NMSManager.Instance.GetAllEnergySources(flag);
+            roots = NMSManager.Instance.GetAllEnergySources();
             logger.LogDebug("Get all energy sources finished.");
 
             TopologyModel topologyModel = new TopologyModel();
 
             if (roots.Count > 0)
             {
-                topologyModel = topologyBuilder.CreateGraphTopology(roots.First(), flag);
+                topologyModel = topologyBuilder.CreateGraphTopology(roots.First());
             }
             return topologyModel;
         }
@@ -76,7 +76,7 @@ namespace Topology
             try
             {
                 logger.LogInfo($"Topology manager prepare for transaction started.");
-                TransactionTopologyModel = CreateTopology(TransactionFlag.InTransaction);
+                TransactionTopologyModel = CreateTopology();
             }
             catch (Exception ex)
             {
@@ -92,7 +92,6 @@ namespace Topology
             logger.LogDebug("TopologyManager commited transaction successfully.");
             using (var publisherProxy = new PublisherProxy(EndpointNames.PublisherEndpoint))
             {
-                //publisherProxy.Open();
                 TopologyForUIMessage message = new TopologyForUIMessage(TopologyModel.UIModel);
                 CalcualtionEnginePublication publication = new CalcualtionEnginePublication(Topic.TOPOLOGY, message);
                 publisherProxy.Publish(publication);

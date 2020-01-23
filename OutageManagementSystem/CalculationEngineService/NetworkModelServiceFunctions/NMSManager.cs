@@ -1,4 +1,5 @@
 ﻿using CECommon;
+using CECommon.Model;
 using Outage.Common;
 using Outage.Common.GDA;
 using System;
@@ -10,6 +11,7 @@ namespace NetworkModelServiceFunctions
 	{
 		#region Fields
 		ILogger logger = LoggerWrapper.Instance;
+		private TransactionFlag transactionFlag;
         private readonly ModelResourcesDesc modelResourcesDesc;
 		private readonly NetworkModelGDA networkModelGDA;
 		private Dictionary<long, ResourceDescription> modelEntities;
@@ -38,22 +40,28 @@ namespace NetworkModelServiceFunctions
         private NMSManager()
 		{
 			modelResourcesDesc = new ModelResourcesDesc();
-			networkModelGDA = new NetworkModelGDA();		
+			networkModelGDA = new NetworkModelGDA();
+			transactionFlag = TransactionFlag.NoTransaction;
 		}
-		public List<long> GetAllEnergySources(TransactionFlag flag)
+
+		private Dictionary<long, ResourceDescription> GetEntities()
 		{
-			List<long> gids = new List<long>();
 			Dictionary<long, ResourceDescription> entities;
-			if (flag == TransactionFlag.InTransaction)
+			if (transactionFlag == TransactionFlag.InTransaction)
 			{
-				logger.LogDebug("Getting all energy sources in transaction.");
 				entities = transactionModelEntities;
 			}
 			else
 			{
-				logger.LogDebug("Getting all energy sources in no transaction.");
 				entities = modelEntities;
 			}
+			return entities;
+		}
+		public List<long> GetAllEnergySources()
+		{
+			logger.LogDebug("Getting all energy sources.");
+			List<long> gids = new List<long>();
+			Dictionary<long, ResourceDescription> entities = GetEntities();
 
 			foreach (var pair in entities)
 			{
@@ -64,7 +72,6 @@ namespace NetworkModelServiceFunctions
 			}
 			return gids;
 		}
-
 		public void Initialize()
 		{
 			List<ModelCode> concreteClasses = modelResourcesDesc.NonAbstractClassIds;
@@ -79,20 +86,12 @@ namespace NetworkModelServiceFunctions
 				}
 			}
 		}
-		public List<long> GetAllReferencedElements(long gid, TransactionFlag flag)
+		public List<long> GetAllReferencedElements(long gid)
 		{
+			logger.LogDebug($"Getting all referenced elements for GID {gid} in transaction.");
 			List<long> elements = new List<long>();
-			Dictionary<long, ResourceDescription> entities;
-			if (flag == TransactionFlag.InTransaction)
-			{
-				logger.LogDebug($"Getting all referenced elements for GID {gid} in transaction.");
-				entities = transactionModelEntities;
-			}
-			else
-			{
-				logger.LogDebug($"Getting all referenced elements for GID {gid} in no transaction.");
-				entities = modelEntities;
-			}
+			Dictionary<long, ResourceDescription> entities = GetEntities();
+
 			DMSType type = ModelCodeHelper.GetTypeFromModelCode(modelResourcesDesc.GetModelCodeFromId(gid));
 
 			foreach (var property in GetAllReferenceProperties(type))
@@ -159,6 +158,55 @@ namespace NetworkModelServiceFunctions
 
 			return propertyIds;
 		}
+		public AnalogMeasurement GetPopulatedAnalogMeasurement(long gid)
+		{
+			AnalogMeasurement measurement = new AnalogMeasurement();
+			Dictionary<long, ResourceDescription> elements = GetEntities();
+			if (elements.ContainsKey(gid))
+			{
+				try
+				{
+					ResourceDescription rs = elements[gid];
+					measurement.Gid = gid;
+					measurement.CurrentValue = rs.GetProperty(ModelCode.ANALOG_CURRENTVALUE).AsFloat();
+					measurement.MaxValue = rs.GetProperty(ModelCode.ANALOG_MAXVALUE).AsFloat();
+					measurement.MinValue = rs.GetProperty(ModelCode.ANALOG_MINVALUE).AsFloat();
+					measurement.NormalValue = rs.GetProperty(ModelCode.ANALOG_NORMALVALUE).AsFloat();
+					measurement.Deviation = rs.GetProperty(ModelCode.ANALOG_DEVIATION).AsFloat();
+					measurement.ScalingFactor = rs.GetProperty(ModelCode.ANALOG_SCALINGFACTOR).AsFloat();
+					measurement.SignalType = (AnalogMeasurementType)rs.GetProperty(ModelCode.ANALOG_SIGNALTYPE).AsEnum();
+				}
+				catch (Exception)
+				{
+					logger.LogDebug($"Failed to populate analog measurement with GID: {gid}.");
+				}
+			}
+			return measurement;
+		}
+
+		public DiscreteMeasurement GetPopulatedDiscreteMeasurement(long gid)
+		{
+			DiscreteMeasurement measurement = new DiscreteMeasurement();
+			Dictionary<long, ResourceDescription> elements = GetEntities();
+			if (elements.ContainsKey(gid))
+			{
+				try
+				{
+					ResourceDescription rs = elements[gid];
+					measurement.Gid = gid;
+					measurement.CurrentOpen = rs.GetProperty(ModelCode.DISCRETE_CURRENTOPEN).AsBool();
+					measurement.MaxValue = rs.GetProperty(ModelCode.DISCRETE_MAXVALUE).AsInt();
+					measurement.MinValue = rs.GetProperty(ModelCode.DISCRETE_MINVALUE).AsInt();
+					measurement.NormalValue = rs.GetProperty(ModelCode.DISCRETE_NORMALVALUE).AsInt();
+					measurement.MeasurementType = (DiscreteMeasurementType)rs.GetProperty(ModelCode.DISCRETE_MEASUREMENTTYPE).AsEnum();
+				}
+				catch (Exception)
+				{
+					logger.LogDebug($"Failed to populate discrete measurement with GID: {gid}.");
+				}
+			}
+			return measurement;
+		}
 		public bool PrepareForTransaction(Dictionary<DeltaOpType, List<long>> delta)
 		{
 			logger.LogInfo("NMSManager prepare for transaction started.");
@@ -206,13 +254,14 @@ namespace NetworkModelServiceFunctions
 							}
 						}
 					}
-
+					transactionFlag = TransactionFlag.InTransaction;
 				}
 			}
 			catch (Exception ex)
 			{
 				logger.LogInfo($"NMSManager failed to prepare for transaction. Exception message: {ex.Message}");
 				success = false;
+				transactionFlag = TransactionFlag.NoTransaction;
 			}
 			logger.LogInfo("NMSManager is prepared for transaction.");
 			return success;
@@ -220,11 +269,13 @@ namespace NetworkModelServiceFunctions
 		public void CommitTransaction()
 		{
 			modelEntities = new Dictionary<long, ResourceDescription>(transactionModelEntities);
+			transactionFlag = TransactionFlag.NoTransaction;
 			logger.LogDebug("NMSManager commited transaction successfully.");
 		}
 		public void RollbackTransaction()
 		{
 			transactionModelEntities = null;
+			transactionFlag = TransactionFlag.NoTransaction;
 			logger.LogDebug("NMSManager rolled back transaction.");
 
 		}

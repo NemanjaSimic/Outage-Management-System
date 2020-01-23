@@ -20,10 +20,9 @@ namespace TopologyBuilder
         private Stack<TopologyElement> stack;
         #endregion
 
-        public TopologyModel CreateGraphTopology(long firstElementGid, TransactionFlag flag)
+        public TopologyModel CreateGraphTopology(long firstElementGid)
         {
-            string message = $"Creating graph topology from first element with GID {firstElementGid}.";
-            logger.LogInfo(message);
+            logger.LogInfo($"Creating graph topology from first element with GID {firstElementGid}.");
 
             visited = new HashSet<long>();
             stack = new Stack<TopologyElement>();
@@ -42,34 +41,40 @@ namespace TopologyBuilder
                     visited.Add(currentNode.Id);
                 }
 
-                var connectedElements = CheckIgnorable(currentNode.Id, flag);
+                var connectedElements = CheckIgnorable(currentNode.Id);
                 foreach (var element in connectedElements)
                 {
-                    var newNode = ConnectTwoNodes(element, currentNode);
-                    topology.AddRelation(currentNode.Id, newNode.Id);
-                    stack.Push(newNode);
+                    if (TopologyHelper.Instance.GetElementTopologyType(element) == TopologyType.Measurement)
+                    {
+                        currentNode.Measurement = topologyElementFactory.CreateMeasurement(element);
+                    }
+                    else
+                    {
+                        var newNode = ConnectTwoNodes(element, currentNode);
+                        topology.AddRelation(currentNode.Id, newNode.Id);
+                        stack.Push(newNode);
+                    }
                 }
-                currentNode.DmsType = TopologyHelper.Instance.GetDMSTypeOfTopologyElement(currentNode.Id);
+                currentNode.DmsType = TopologyHelper.Instance.GetDMSTypeOfTopologyElement(currentNode.Id).ToString();
                 topology.AddElement(currentNode);
             }
             topology.FirstNode = firstNode;
 
-            message = $"Topology graph created.";
-            logger.LogInfo(message);
+            logger.LogInfo("Topology graph created.");
             return topology;
         }
 
         #region HelperFunctions
-        private List<long> CheckIgnorable(long gid, TransactionFlag flag)
+        private List<long> CheckIgnorable(long gid)
         {
-            var list = NMSManager.Instance.GetAllReferencedElements(gid, flag).Where(e => !visited.Contains(e)).ToList();
+            var list = NMSManager.Instance.GetAllReferencedElements(gid).Where(e => !visited.Contains(e)).ToList();
             List<long> elements = new List<long>();
             foreach (var element in list)
             {
                 if (TopologyHelper.Instance.GetElementTopologyStatus(element) == TopologyStatus.Ignorable)
                 {
                     visited.Add(element);
-                    elements.AddRange(CheckIgnorable(element, flag));
+                    elements.AddRange(CheckIgnorable(element));
                 }
                 else
                 {

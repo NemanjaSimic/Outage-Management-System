@@ -1,4 +1,5 @@
-﻿using System.Collections.Generic;
+﻿using CECommon.Model;
+using System.Collections.Generic;
 
 namespace CECommon
 {
@@ -9,6 +10,8 @@ namespace CECommon
 		private TopologyElement firstEnd;
 		private List<TopologyElement> secondEnd;
 		private string dmsType;
+		private Measurement measurement;
+
 		#endregion
 
 		#region Properties
@@ -17,8 +20,10 @@ namespace CECommon
 		public List<TopologyElement> SecondEnd { get => secondEnd; set => secondEnd = value; }
 		public string DmsType { get => dmsType; set => dmsType = value; }
 
-        #endregion
-        public TopologyElement(long gid)
+		public Measurement Measurement { get => measurement; set => measurement = value; }
+
+		#endregion
+		public TopologyElement(long gid)
 		{
 			Id = gid;
 			SecondEnd = new List<TopologyElement>();
