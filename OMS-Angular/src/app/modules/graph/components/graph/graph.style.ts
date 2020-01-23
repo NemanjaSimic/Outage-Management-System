@@ -35,6 +35,15 @@ export const style = cytoscape.stylesheet()
         'shape': 'triangle',
         'background-color': 'green'
     })
+    .selector('node[type="FUSE"]')
+    .style({
+        'shape': 'rectangle',
+        'background-color': '#2b2935',
+        'background-fit': 'cover',
+        'background-image': 'assets/img/fuse.png',
+        'height': '20px',
+        'width': '20px',
+    })
     .selector('node[type="ACLINESEGMENT"]')
     .style({
         'label': 'data(type)',
