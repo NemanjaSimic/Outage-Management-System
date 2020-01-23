@@ -1,4 +1,5 @@
-﻿using Outage.Common;
+﻿using CECommon.Interfaces;
+using Outage.Common;
 using Outage.Common.ServiceContracts;
 using Outage.Common.UI;
 using System;
@@ -8,11 +9,12 @@ namespace Topology
 	public class TopologyService : ITopologyServiceContract
 	{
 		private ILogger logger = LoggerWrapper.Instance;
+		private IWebTopologyBuilder webTopologyBuilder = new WebTopologyBuilder();
 		public UIModel GetTopology()
 		{
 			try
 			{
-				return TopologyManager.Instance.TopologyModel.UIModel;
+				return webTopologyBuilder.CreateTopologyForWeb(TopologyManager.Instance.TopologyModel);
 			}
 			catch (Exception ex)
 			{

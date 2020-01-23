@@ -17,18 +17,18 @@ namespace TopologyBuilder
         private readonly TopologyElementFactory topologyElementFactory = new TopologyElementFactory();
         private List<Field> fields;
         private HashSet<long> visited;
-        private Stack<TopologyElement> stack;
+        private Stack<ITopologyElement> stack;
         #endregion
 
-        public TopologyModel CreateGraphTopology(long firstElementGid)
+        public ITopology CreateGraphTopology(long firstElementGid)
         {
             logger.LogInfo($"Creating graph topology from first element with GID {firstElementGid}.");
 
             visited = new HashSet<long>();
-            stack = new Stack<TopologyElement>();
+            stack = new Stack<ITopologyElement>();
             fields = new List<Field>();
 
-            TopologyModel topology = new TopologyModel();
+            ITopology topology = new TopologyModel();
             TopologyElement firstNode = topologyElementFactory.CreateTopologyElement(firstElementGid);
 
             stack.Push(firstNode);
@@ -50,15 +50,19 @@ namespace TopologyBuilder
                     }
                     else
                     {
-                        var newNode = ConnectTwoNodes(element, currentNode);
-                        topology.AddRelation(currentNode.Id, newNode.Id);
+                        var newNode = ConnectTwoNodes(element, currentNode);       
                         stack.Push(newNode);
                     }
                 }
-                currentNode.DmsType = TopologyHelper.Instance.GetDMSTypeOfTopologyElement(currentNode.Id).ToString();
+                currentNode.DmsType = TopologyHelper.Instance.GetDMSTypeOfTopologyElement(currentNode.Id);
                 topology.AddElement(currentNode);
             }
-            topology.FirstNode = firstNode;
+            topology.FirstNode = firstNode.Id;
+
+            foreach (var field in fields)
+            {
+                topology.AddElement(field);
+            }
 
             logger.LogInfo("Topology graph created.");
             return topology;
@@ -83,26 +87,28 @@ namespace TopologyBuilder
             }
             return elements;
         }
-        private TopologyElement ConnectTwoNodes(long newElementGid, TopologyElement parent)
+        private ITopologyElement ConnectTwoNodes(long newElementGid, ITopologyElement parent)
         {
             bool newElementIsField = TopologyHelper.Instance.GetElementTopologyStatus(newElementGid) == TopologyStatus.Field;
             bool parentElementIsField = TopologyHelper.Instance.GetElementTopologyStatus(parent.Id) == TopologyStatus.Field;
 
-            TopologyElement newNode = topologyElementFactory.CreateTopologyElement(newElementGid);
+            ITopologyElement newNode = topologyElementFactory.CreateTopologyElement(newElementGid);
 
             if (newElementIsField && !parentElementIsField)
             {
-                var field = new Field(newNode);
+                var field = new Field(newNode.Id);
+                field.FirstEnd = parent.Id;
+                newNode.FirstEnd = parent.Id;
                 fields.Add(field);
-                parent.SecondEnd.Add(field);
+                parent.SecondEnd.Add(field.Id);
             }
             else if (newElementIsField && parentElementIsField)
             {
                 try
                 {
-                    GetField(parent.Id).Members.Add(newNode);
-                    newNode.FirstEnd = parent;
-                    parent.SecondEnd.Add(newNode);
+                    GetField(parent.Id).Members.Add(newNode.Id);
+                    newNode.FirstEnd = parent.Id;
+                    parent.SecondEnd.Add(newNode.Id);
                 }
                 catch (Exception)
                 {
@@ -123,14 +129,15 @@ namespace TopologyBuilder
                 }
                 else
                 {
-                    field.SecondEnd.Add(newNode);
-                    newNode.FirstEnd = field;
+                    field.SecondEnd.Add(newNode.Id);
+                    parent.SecondEnd.Add(newNode.Id);
+                    newNode.FirstEnd = field.Id;
                 }
             }
             else
             {
-                newNode.FirstEnd = parent;
-                parent.SecondEnd.Add(newNode);
+                newNode.FirstEnd = parent.Id;
+                parent.SecondEnd.Add(newNode.Id);
             }
             return newNode;
         }
@@ -139,7 +146,7 @@ namespace TopologyBuilder
             Field field = null;
             for (int i = 0; i < fields.Count; i++)
             {
-                if (fields[i].Members.Where(e => e.Id == memberGid).ToList().Count > 0)
+                if (fields[i].Members.Where(e => e == memberGid).ToList().Count > 0)
                 {
                     return fields[i];
                 }

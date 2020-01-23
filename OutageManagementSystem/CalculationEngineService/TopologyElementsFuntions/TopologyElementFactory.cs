@@ -30,21 +30,28 @@ namespace TopologyElementsFuntions
 
 		public Measurement CreateMeasurement(long gid)
 		{
+			string errMessage = $"Element with GID: {gid.ToString("X")} is neither analog nor discrete measurement. Please check configuration files.";
 			Measurement measurement;
-			DMSType dmsTopologyType = TopologyHelper.Instance.GetDMSTypeOfTopologyElement(gid);
-			if (dmsTopologyType == DMSType.ANALOG)
+			if (Enum.TryParse<DMSType>(TopologyHelper.Instance.GetDMSTypeOfTopologyElement(gid), out DMSType dmsTopologyType))
 			{
-				measurement = NMSManager.Instance.GetPopulatedAnalogMeasurement(gid);
-			}
-			else if (dmsTopologyType == DMSType.DISCRETE)
-			{
-				measurement = NMSManager.Instance.GetPopulatedDiscreteMeasurement(gid);
+				if (dmsTopologyType == DMSType.ANALOG)
+				{
+					measurement = NMSManager.Instance.GetPopulatedAnalogMeasurement(gid);
+				}
+				else if (dmsTopologyType == DMSType.DISCRETE)
+				{
+					measurement = NMSManager.Instance.GetPopulatedDiscreteMeasurement(gid);
+				}
+				else
+				{			
+					logger.LogError(errMessage);
+					throw new Exception(errMessage);
+				}
 			}
 			else
 			{
-				string message = $"Element with GID: {gid.ToString("X")} is neither analog nor discrete measurement. Please check configuration files.";
-				logger.LogError(message);
-				throw new Exception(message);
+				logger.LogError(errMessage);
+				throw new Exception(errMessage);
 			}
 			return measurement;
 		}

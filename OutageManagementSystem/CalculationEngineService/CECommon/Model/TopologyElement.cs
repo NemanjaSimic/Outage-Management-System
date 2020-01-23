@@ -1,32 +1,32 @@
-﻿using CECommon.Model;
+﻿using CECommon.Interfaces;
+using CECommon.Model;
 using System.Collections.Generic;
 
 namespace CECommon
 {
-	public abstract class TopologyElement
+	public abstract class TopologyElement : ITopologyElement
 	{
         #region Fields
         private long id;
-		private TopologyElement firstEnd;
-		private List<TopologyElement> secondEnd;
+		private long firstEnd;
+		private List<long> secondEnd;
 		private string dmsType;
-		private Measurement measurement;
+		private IMeasurement measurement;
 
 		#endregion
 
 		#region Properties
 		public long Id { get => id; set => id = value; }
-		public TopologyElement FirstEnd { get => firstEnd; set => firstEnd = value; }
-		public List<TopologyElement> SecondEnd { get => secondEnd; set => secondEnd = value; }
+		public long FirstEnd { get => firstEnd; set => firstEnd = value; }
+		public List<long> SecondEnd { get => secondEnd; set => secondEnd = value; }
 		public string DmsType { get => dmsType; set => dmsType = value; }
-
-		public Measurement Measurement { get => measurement; set => measurement = value; }
+		public IMeasurement Measurement { get => measurement; set => measurement = value; }
 
 		#endregion
 		public TopologyElement(long gid)
 		{
 			Id = gid;
-			SecondEnd = new List<TopologyElement>();
+			SecondEnd = new List<long>();
 		}
 	}
 }

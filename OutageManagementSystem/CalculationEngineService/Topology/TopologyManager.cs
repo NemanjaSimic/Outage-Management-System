@@ -20,8 +20,8 @@ namespace Topology
         private ITopologyBuilder topologyBuilder;
         private List<long> roots;
 
-        public TopologyModel TopologyModel { get; private set; }
-        public TopologyModel TransactionTopologyModel { get; private set; }
+        public ITopology TopologyModel { get; private set; }
+        public ITopology TransactionTopologyModel { get; private set; }
         #endregion
 
         private TopologyManager()
@@ -55,13 +55,13 @@ namespace Topology
             TopologyModel = CreateTopology();
             logger.LogDebug("Initializing topology finished.");
         }
-        private TopologyModel CreateTopology()
+        private ITopology CreateTopology()
         {
             logger.LogDebug("Get all energy sources started.");
             roots = NMSManager.Instance.GetAllEnergySources();
             logger.LogDebug("Get all energy sources finished.");
 
-            TopologyModel topologyModel = new TopologyModel();
+            ITopology topologyModel = new TopologyModel();
 
             if (roots.Count > 0)
             {
@@ -92,9 +92,9 @@ namespace Topology
             logger.LogDebug("TopologyManager commited transaction successfully.");
             using (var publisherProxy = new PublisherProxy(EndpointNames.PublisherEndpoint))
             {
-                TopologyForUIMessage message = new TopologyForUIMessage(TopologyModel.UIModel);
-                CalcualtionEnginePublication publication = new CalcualtionEnginePublication(Topic.TOPOLOGY, message);
-                publisherProxy.Publish(publication);
+                //TopologyForUIMessage message = new TopologyForUIMessage(TopologyModel.UIModel);
+                //CalcualtionEnginePublication publication = new CalcualtionEnginePublication(Topic.TOPOLOGY, message);
+                //publisherProxy.Publish(publication);
                 logger.LogDebug("TopologyManager published new topology successfully.");
             }
         }

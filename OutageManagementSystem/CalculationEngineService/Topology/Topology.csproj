@@ -45,6 +45,7 @@
     <Compile Include="TopologyManager.cs" />
     <Compile Include="Properties\AssemblyInfo.cs" />
     <Compile Include="TopologyService.cs" />
+    <Compile Include="WebTopologyBuilder.cs" />
   </ItemGroup>
   <ItemGroup>
     <ProjectReference Include="..\..\Common\Common.csproj">
@@ -62,6 +63,10 @@
     <ProjectReference Include="..\TopologyBuilder\TopologyBuilder.csproj">
       <Project>{F83B7FD0-C28B-4C96-A49C-7EA0E2B579F1}</Project>
       <Name>TopologyBuilder</Name>
+    </ProjectReference>
+    <ProjectReference Include="..\TopologyElementsFuntions\TopologyElementsFuntions.csproj">
+      <Project>{7F4CFEB1-0253-4A00-83C4-FE2CA5E2A5B3}</Project>
+      <Name>TopologyElementsFuntions</Name>
     </ProjectReference>
   </ItemGroup>
   <Import Project="$(MSBuildToolsPath)\Microsoft.CSharp.targets" />

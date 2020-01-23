@@ -1,43 +1,61 @@
-﻿using Outage.Common.UI;
+﻿using CECommon.Interfaces;
+using Outage.Common.UI;
 using System.Collections.Generic;
+using Logger = Outage.Common.LoggerWrapper;
 
 namespace CECommon.Model
 {
 
-	public class TopologyModel
+	public class TopologyModel : ITopology
     {
-		private TopologyElement firstNode;
-		private Dictionary<long, TopologyElement> topologyElements;
+		private long firstNode;
+		private Dictionary<long, ITopologyElement> topologyElements;
 
-		public TopologyElement FirstNode
+		public long FirstNode
 		{
 			get { return firstNode; }
 			set 
 			{ 
 				firstNode = value;
-				UIModel.FirstNode = firstNode.Id;
+				//UIModel.FirstNode = firstNode.Id;
 			}
 		}
 		public UIModel UIModel { get; set; }
-		public Dictionary<long, TopologyElement> TopologyElements { get => topologyElements; set => topologyElements = value; }
-
+		public Dictionary<long, ITopologyElement> TopologyElements { get => topologyElements; set => topologyElements = value; }
 		public TopologyModel()
 		{
-			TopologyElements = new Dictionary<long, TopologyElement>();
+			TopologyElements = new Dictionary<long, ITopologyElement>();
 			UIModel = new UIModel();
 		}
 		public void AddRelation(long source, long destination)
 		{
 			UIModel.AddRelation(source, destination);
 		}
-		public void AddElement(TopologyElement newElement)
+		public void AddElement(ITopologyElement newElement)
 		{
 			if (!TopologyElements.ContainsKey(newElement.Id))
 			{
 				TopologyElements.Add(newElement.Id, newElement);
 			}
-			UIModel.AddNode(new UINode(newElement.Id, newElement.DmsType));
+			else
+			{
+				Logger.Instance.LogWarn($"Topology element with GID {newElement.Id} is already added.");
+			}
 		}
-		
+		public bool GetElementByGid(long gid, out ITopologyElement topologyElement)
+		{
+			bool success = false;
+			if (topologyElements.ContainsKey(gid))
+			{
+				topologyElement = topologyElements[gid];
+				success = true;
+			}
+			else
+			{
+				topologyElement = null;
+			}
+			return success;
+		}
+
 	}
 }

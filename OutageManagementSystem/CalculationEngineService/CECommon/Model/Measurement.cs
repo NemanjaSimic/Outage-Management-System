@@ -1,4 +1,5 @@
-﻿using Outage.Common;
+﻿using CECommon.Interfaces;
+using Outage.Common;
 using System;
 using System.Collections.Generic;
 using System.Linq;
@@ -7,7 +8,7 @@ using System.Threading.Tasks;
 
 namespace CECommon.Model
 {
-    public abstract class Measurement
+    public abstract class Measurement : IMeasurement
     {
         public long Gid { get; set; }
     }

@@ -4,6 +4,6 @@ namespace CECommon.Interfaces
 {
     public interface ITopologyBuilder
     {
-        TopologyModel CreateGraphTopology(long firstElementGid);
+        ITopology CreateGraphTopology(long firstElementGid);
     }
 }
