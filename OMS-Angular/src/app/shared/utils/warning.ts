@@ -13,7 +13,8 @@ export const drawWarning = (cy, line) => {
         group: "nodes",
         data: {
           id: `${uuid()}`,
-          type: 'warning'
+          type: 'warning',
+          targetId: line.data('target')
         },
         position: {
           x: isFirstChild ? target.x - 15 : target.x + 15,
