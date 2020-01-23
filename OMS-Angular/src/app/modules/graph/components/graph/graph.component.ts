@@ -35,6 +35,7 @@ export class GraphComponent implements OnInit, OnDestroy {
   public zoomSubscription: Subscription;
   public panSubscription: Subscription;
 
+  public gidSearchQuery: string;
   public didLoadGraph: boolean;
   private cy: any;
 
@@ -58,6 +59,13 @@ export class GraphComponent implements OnInit, OnDestroy {
     // testing splash screen look, will change logic after we connect to the api
     this.didLoadGraph = true;
 
+    setTimeout(() => {
+      this.didLoadGraph = true;
+
+      // initial topology
+      this.getTopology();
+    }, 2000);
+
     // web api
     //this.getTopology();
     this.startConnection();
@@ -67,7 +75,7 @@ export class GraphComponent implements OnInit, OnDestroy {
     this.graphData.edges = graphMock.edges;
     this.graphData.backup_edges = graphMock.backup_edges;
 
-    this.drawGraph();
+    this.drawGraph(); // initial test
 
     // zoom on + and -
     this.zoomSubscription = fromEvent(document, 'keypress').subscribe(
@@ -110,7 +118,7 @@ export class GraphComponent implements OnInit, OnDestroy {
 
     if (this.topologySubscription)
       this.topologySubscription.unsubscribe();
-    
+
     if (this.updateSubscription)
       this.updateSubscription.unsubscribe();
 
@@ -205,6 +213,23 @@ export class GraphComponent implements OnInit, OnDestroy {
       this.graphData.edges = data.Relations.map(mapper.mapRelation);
       this.drawGraph();
     });
+  }
+
+  public onSearch() : void {
+    this.cy.ready(() => {
+      this.cy.nodes().forEach(node => {
+        if(node.data('id') == this.gidSearchQuery){
+          console.log('zooming');          
+          this.cy.zoom({
+            level: 6,
+            position: {
+              x: node.position().x,
+              y: node.position().y
+            }
+          })
+        }
+      })
+    })
   }
 
 }

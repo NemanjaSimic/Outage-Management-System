@@ -8,14 +8,6 @@ import { ServicesModule } from '@services/services.module';
 
 import { GraphModule } from './modules/graph/graph.module';
 
-import { MatSidenavModule } from '@angular/material/sidenav';
-import { MatCheckboxModule } from '@angular/material/checkbox';
-import { BrowserAnimationsModule } from '@angular/platform-browser/animations';
-import { MatListModule } from '@angular/material/list';
-import { MatToolbarModule } from '@angular/material/toolbar';
-import { MatButtonModule } from '@angular/material/button';
-import { MatIconModule } from '@angular/material/icon';
-
 
 @NgModule({
   declarations: [
@@ -26,14 +18,7 @@ import { MatIconModule } from '@angular/material/icon';
     RoutingModule,
     SharedModule,
     ServicesModule,
-    GraphModule,
-    MatSidenavModule,
-    MatCheckboxModule,
-    MatListModule,
-    BrowserAnimationsModule,
-    MatToolbarModule,
-    MatButtonModule,
-    MatIconModule
+    GraphModule
   ],
   providers: [
     ServicesModule
