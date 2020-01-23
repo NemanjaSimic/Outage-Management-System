@@ -15,6 +15,7 @@ namespace OutageManagementService.Calling
         {
             get { return logger ?? (logger = LoggerWrapper.Instance); }
         }
+
         public void ReportMalfunction(long consumerGid)
         {
             //TODO: Logic

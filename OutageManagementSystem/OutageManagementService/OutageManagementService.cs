@@ -116,8 +116,7 @@ namespace OutageManagementService
             Console.WriteLine(message);
             Logger.LogWarn(message);
 
-            message = "The Outage Management" +
-                " Service is started.";
+            message = "The Outage Management Service is started.";
             Console.WriteLine("\n{0}", message);
             Logger.LogInfo(message);
         }

@@ -10,6 +10,11 @@ namespace Outage.Common.ServiceProxies.Outage
 {
     public class CallingServiceProxy : ClientBase<ICallingContract>, ICallingContract
     {
+        public CallingServiceProxy(string endpointName)
+            : base(endpointName)
+        {
+        }
+
         public void ReportMalfunction(long consumerGid)
         {
             try

@@ -15,6 +15,7 @@ namespace OutageManagementService.Outage
         {
             get { return logger ?? (logger = LoggerWrapper.Instance); }
         }
+
         public List<OutageData> GetActiveOutages()
         {
             //TODO: Logic

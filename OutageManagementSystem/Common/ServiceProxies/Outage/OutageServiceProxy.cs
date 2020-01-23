@@ -10,6 +10,11 @@ namespace Outage.Common.ServiceProxies.Outage
 {
     public class OutageServiceProxy : ClientBase<IOutageContract>, IOutageContract
     {
+        public OutageServiceProxy(string endpointName)
+            : base(endpointName)
+        {
+        }
+
         public List<OutageData> GetActiveOutages()
         {
             List<OutageData> outageModels = null;

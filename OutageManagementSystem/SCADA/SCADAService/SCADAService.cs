@@ -127,8 +127,7 @@ namespace Outage.SCADA.SCADAService
             Console.WriteLine(message);
             Logger.LogWarn(message);
 
-            message = "The SCADA" +
-                " Service is started.";
+            message = "The SCADA Service is started.";
             Console.WriteLine("\n{0}", message);
             Logger.LogInfo(message);
         }
