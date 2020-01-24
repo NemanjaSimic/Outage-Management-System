@@ -6,15 +6,22 @@ namespace Outage.SCADA.SCADAService.DistributedTransaction
 {
     public class SCADATransactionActor : TransactionActor
     {
+        #region Static Members
+
         protected static SCADAModel scadaModel = null;
 
         public static SCADAModel SCADAModel
         {
             set
             {
-                scadaModel = value;
+                if (scadaModel == null)
+                {
+                    scadaModel = value;
+                }
             }
         }
+
+        #endregion
 
         public override bool Prepare()
         {
@@ -23,7 +30,7 @@ namespace Outage.SCADA.SCADAService.DistributedTransaction
             try
             {
                 success = true;
-                success = scadaModel.Prepare();
+                success = SCADATransactionActor.scadaModel.Prepare();
             }
             catch (Exception ex)
             {
@@ -47,7 +54,7 @@ namespace Outage.SCADA.SCADAService.DistributedTransaction
         {
             try
             {
-                scadaModel.Commit();
+                SCADATransactionActor.scadaModel.Commit();
                 Logger.LogInfo("Commit on SCADA Transaction actor SUCCESSFULLY finished.");
             }
             catch (Exception ex)
@@ -61,7 +68,7 @@ namespace Outage.SCADA.SCADAService.DistributedTransaction
         {
             try
             {
-                scadaModel.Rollback();
+                SCADATransactionActor.scadaModel.Rollback();
                 Logger.LogInfo("Rollback on SCADA Transaction actor SUCCESSFULLY finished.");
             }
             catch (Exception ex)

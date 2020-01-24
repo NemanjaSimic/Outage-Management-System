@@ -102,7 +102,6 @@ namespace Outage.Common
         ANALOG_SIGNALTYPE                       = 0x15200000000e050a,
         ANALOG_DEVIATION                        = 0x15200000000e0605,
         ANALOG_SCALINGFACTOR                    = 0x15200000000e0705,
-
     }
 
     [Flags]

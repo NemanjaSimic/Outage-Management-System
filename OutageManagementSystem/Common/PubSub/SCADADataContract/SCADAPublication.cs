@@ -4,7 +4,7 @@ using Outage.Common.PubSub;
 
 namespace Outage.Common.PubSub.SCADADataContract
 {
-    [Serializable]
+    //[Serializable]
     [DataContract]
     public class SCADAPublication : Publication
     {

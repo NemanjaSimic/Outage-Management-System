@@ -23,18 +23,22 @@ namespace Outage.SCADA.SCADAService
             get { return logger ?? (logger = LoggerWrapper.Instance); }
         }
 
-
         private List<ServiceHost> hosts = null;
         private SCADAModel scadaModel = null;
         private Acquisition acquisition = null;
-        //private ConfigWriter configWriter = null;
-        private ISCADAConfigData configData = SCADAConfigData.Instance;
+        private FunctionExecutor functionExecutor = null;
 
         public SCADAService()
         {
-            scadaModel = SCADAModel.Instance;
+            scadaModel = new SCADAModel();
+            functionExecutor = new FunctionExecutor(scadaModel);
+
+            FunctionFactory.SCADAModel = scadaModel;
+            CommandService.SCADAModel = scadaModel;
             SCADAModelUpdateNotification.SCADAModel = scadaModel;
             SCADATransactionActor.SCADAModel = scadaModel;
+
+            scadaModel.ImportModel();
 
             InitializeHosts();
         }
@@ -43,7 +47,7 @@ namespace Outage.SCADA.SCADAService
         public void Start()
         {
             ModbusSimulatorHandler.StartModbusSimulator();
-            FunctionExecutor.Instance.StartExecutor();
+            functionExecutor.StartExecutorThread();
             StartDataAcquisition();
             StartHosts();
         }
@@ -52,6 +56,17 @@ namespace Outage.SCADA.SCADAService
         {
             ModbusSimulatorHandler.StopModbusSimulaotrs();
             CloseHosts();
+            
+            if (acquisition != null)
+            {
+                acquisition.StopAcquisitionThread();
+            }
+
+            if(functionExecutor != null)
+            {
+                functionExecutor.StopExecutorThread();
+            }
+
             GC.SuppressFinalize(this);
         }
         #endregion
@@ -70,7 +85,7 @@ namespace Outage.SCADA.SCADAService
 
         private void StartDataAcquisition()
         {
-            acquisition = new Acquisition();
+            acquisition = new Acquisition(functionExecutor, scadaModel);
             acquisition.StartAcquisitionThread();
         }
 
@@ -112,21 +127,13 @@ namespace Outage.SCADA.SCADAService
             Console.WriteLine(message);
             Logger.LogWarn(message);
 
-            message = "The SCADA" +
-                " Service is started.";
+            message = "The SCADA Service is started.";
             Console.WriteLine("\n{0}", message);
             Logger.LogInfo(message);
         }
 
         private void CloseHosts()
         {
-            if(acquisition != null)
-            {
-                acquisition.StopAcquisitionThread();
-            }
-
-            FunctionExecutor.Instance.StopExecutor();
-
             if (hosts == null || hosts.Count == 0)
             {
                 throw new Exception("SCADA Service hosts can not be closed because they are not initialized.");
