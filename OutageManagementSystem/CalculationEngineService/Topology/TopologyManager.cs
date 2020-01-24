@@ -21,14 +21,16 @@ namespace Topology
         private IWebTopologyBuilder webTopologyBuilder;
         private List<long> roots;
 
-        public ITopology TopologyModel { get; private set; }
-        public ITopology TransactionTopologyModel { get; private set; }
+        public List<ITopology> TopologyModel { get; private set; }
+        public List<ITopology> TransactionTopologyModel { get; private set; }
         #endregion
 
         private TopologyManager()
         {
             topologyBuilder = new GraphBuilder();
             webTopologyBuilder = new WebTopologyBuilder();
+            TopologyModel = new List<ITopology>();
+            TransactionTopologyModel = new List<ITopology>();
         }
 
         #region Singleton
@@ -57,18 +59,19 @@ namespace Topology
             TopologyModel = CreateTopology();
             logger.LogDebug("Initializing topology finished.");
         }
-        private ITopology CreateTopology()
+        private List<ITopology> CreateTopology()
         {
             logger.LogDebug("Get all energy sources started.");
             roots = NMSManager.Instance.GetAllEnergySources();
             logger.LogDebug("Get all energy sources finished.");
 
-            ITopology topologyModel = new TopologyModel();
+            List<ITopology> topologyModel = new List<ITopology>();
 
-            if (roots.Count > 0)
+            foreach (var rootElement in roots)
             {
-                topologyModel = topologyBuilder.CreateGraphTopology(roots.First());
+                topologyModel.Add(topologyBuilder.CreateGraphTopology(rootElement));
             }
+
             return topologyModel;
         }
 
@@ -90,11 +93,11 @@ namespace Topology
 
         public void CommitTransaction()
         {
-            TopologyModel = TransactionTopologyModel;
+            TopologyModel = new List<ITopology>(TransactionTopologyModel);
             logger.LogDebug("TopologyManager commited transaction successfully.");
             using (var publisherProxy = new PublisherProxy(EndpointNames.PublisherEndpoint))
             {
-                TopologyForUIMessage message = new TopologyForUIMessage(webTopologyBuilder.CreateTopologyForWeb(TopologyModel));
+                TopologyForUIMessage message = new TopologyForUIMessage(webTopologyBuilder.CreateTopologyForWeb(TopologyModel.First())); //privremeno resenje, dok se ne razradi logika
                 CalcualtionEnginePublication publication = new CalcualtionEnginePublication(Topic.TOPOLOGY, message);
                 publisherProxy.Publish(publication);
                 logger.LogDebug("TopologyManager published new topology successfully.");
@@ -103,7 +106,7 @@ namespace Topology
 
         public void RollbackTransaction()
         {
-            TransactionTopologyModel = null;
+            TransactionTopologyModel = new List<ITopology>();
             logger.LogDebug("TopologyManager rolled back topology.");
         }
 
