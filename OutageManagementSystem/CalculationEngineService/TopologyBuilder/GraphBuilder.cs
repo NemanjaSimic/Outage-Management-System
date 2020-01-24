@@ -29,7 +29,7 @@ namespace TopologyBuilder
             fields = new List<Field>();
 
             ITopology topology = new TopologyModel();
-            TopologyElement firstNode = topologyElementFactory.CreateTopologyElement(firstElementGid);
+            ITopologyElement firstNode = topologyElementFactory.CreateTopologyElement(firstElementGid);
 
             stack.Push(firstNode);
 

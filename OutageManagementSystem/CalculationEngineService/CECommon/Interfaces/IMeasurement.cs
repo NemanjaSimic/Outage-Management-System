@@ -8,6 +8,8 @@ namespace CECommon.Interfaces
 {
     public interface IMeasurement
     {
-        long Gid { get; set; }
+        long Id { get; set; }
+        string Address { get; set; }
+        bool isInput { get; set; }
     }
 }

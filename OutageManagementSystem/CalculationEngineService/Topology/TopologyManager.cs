@@ -18,6 +18,7 @@ namespace Topology
         #region Fields
         ILogger logger = LoggerWrapper.Instance;
         private ITopologyBuilder topologyBuilder;
+        private IWebTopologyBuilder webTopologyBuilder;
         private List<long> roots;
 
         public ITopology TopologyModel { get; private set; }
@@ -27,6 +28,7 @@ namespace Topology
         private TopologyManager()
         {
             topologyBuilder = new GraphBuilder();
+            webTopologyBuilder = new WebTopologyBuilder();
         }
 
         #region Singleton
@@ -92,9 +94,9 @@ namespace Topology
             logger.LogDebug("TopologyManager commited transaction successfully.");
             using (var publisherProxy = new PublisherProxy(EndpointNames.PublisherEndpoint))
             {
-                //TopologyForUIMessage message = new TopologyForUIMessage(TopologyModel.UIModel);
-                //CalcualtionEnginePublication publication = new CalcualtionEnginePublication(Topic.TOPOLOGY, message);
-                //publisherProxy.Publish(publication);
+                TopologyForUIMessage message = new TopologyForUIMessage(webTopologyBuilder.CreateTopologyForWeb(TopologyModel));
+                CalcualtionEnginePublication publication = new CalcualtionEnginePublication(Topic.TOPOLOGY, message);
+                publisherProxy.Publish(publication);
                 logger.LogDebug("TopologyManager published new topology successfully.");
             }
         }

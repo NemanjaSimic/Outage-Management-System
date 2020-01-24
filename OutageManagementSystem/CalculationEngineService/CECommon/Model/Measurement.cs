@@ -10,7 +10,9 @@ namespace CECommon.Model
 {
     public abstract class Measurement : IMeasurement
     {
-        public long Gid { get; set; }
+        public long Id { get; set; }
+        public string Address { get; set; }
+        public bool isInput { get; set; }
     }
 
     public class DiscreteMeasurement : Measurement

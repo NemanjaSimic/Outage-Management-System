@@ -49,4 +49,14 @@ namespace Outage.Common
         [EnumMember]
         ABNORMAL_VALUE = 0x05,
     }
+
+    [DataContract]
+    public enum ElementType
+    {
+        [DataMember]
+        Remote = 1,
+
+        [DataMember]
+        Local
+    }
 }

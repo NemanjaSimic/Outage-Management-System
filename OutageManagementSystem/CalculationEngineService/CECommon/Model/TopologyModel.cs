@@ -16,20 +16,13 @@ namespace CECommon.Model
 			get { return firstNode; }
 			set 
 			{ 
-				firstNode = value;
-				//UIModel.FirstNode = firstNode.Id;
+				firstNode = value;			
 			}
 		}
-		public UIModel UIModel { get; set; }
 		public Dictionary<long, ITopologyElement> TopologyElements { get => topologyElements; set => topologyElements = value; }
 		public TopologyModel()
 		{
 			TopologyElements = new Dictionary<long, ITopologyElement>();
-			UIModel = new UIModel();
-		}
-		public void AddRelation(long source, long destination)
-		{
-			UIModel.AddRelation(source, destination);
 		}
 		public void AddElement(ITopologyElement newElement)
 		{

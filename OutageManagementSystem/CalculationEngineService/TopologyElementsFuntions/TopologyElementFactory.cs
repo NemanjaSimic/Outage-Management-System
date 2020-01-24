@@ -1,4 +1,5 @@
 ﻿using CECommon;
+using CECommon.Interfaces;
 using CECommon.Model;
 using NetworkModelServiceFunctions;
 using Outage.Common;
@@ -10,13 +11,13 @@ namespace TopologyElementsFuntions
 	public class TopologyElementFactory
 	{
 		private ILogger logger = LoggerWrapper.Instance;
-		public TopologyElement CreateTopologyElement(long gid)
+		public ITopologyElement CreateTopologyElement(long gid)
 		{
-			TopologyElement retVal;
+			ITopologyElement retVal;
 			TopologyType dmsTopologyType = TopologyHelper.Instance.GetElementTopologyType(gid);
-	
+			
 			if (dmsTopologyType == TopologyType.Edge)
-				retVal = new Edge(gid);
+				retVal = new Edge(gid);			
 			else if (dmsTopologyType == TopologyType.Node)
 				retVal = new Node(gid);
 			else
@@ -25,9 +26,9 @@ namespace TopologyElementsFuntions
 				logger.LogError(message);
 				throw new Exception(message);
 			}
+			NMSManager.Instance.PopulateElement(ref retVal);
 			return retVal;
 		}
-
 		public Measurement CreateMeasurement(long gid)
 		{
 			string errMessage = $"Element with GID: {gid.ToString("X")} is neither analog nor discrete measurement. Please check configuration files.";

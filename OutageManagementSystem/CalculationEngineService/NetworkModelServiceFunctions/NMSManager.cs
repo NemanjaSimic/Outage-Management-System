@@ -1,4 +1,5 @@
 ﻿using CECommon;
+using CECommon.Interfaces;
 using CECommon.Model;
 using Outage.Common;
 using Outage.Common.GDA;
@@ -101,7 +102,6 @@ namespace NetworkModelServiceFunctions
 					if (property == ModelCode.POWERTRANSFORMER_TRANSFORMERWINDINGS || property == ModelCode.CONDUCTINGEQUIPMENT_TERMINALS || property == ModelCode.CONNECTIVITYNODE_TERMINALS)
 					{
 						elements.AddRange(entities[gid].GetProperty(property).AsReferences());
-
 					}
 					else
 					{
@@ -152,11 +152,41 @@ namespace NetworkModelServiceFunctions
 				case DMSType.ACLINESEGMENT:
 					propertyIds.Add(ModelCode.CONDUCTINGEQUIPMENT_TERMINALS);
 					break;
+				case DMSType.ANALOG:
+					propertyIds.Add(ModelCode.MEASUREMENT_TERMINAL);
+					break;
+				case DMSType.DISCRETE:
+					propertyIds.Add(ModelCode.MEASUREMENT_TERMINAL);
+					break;
 				default:
 					break;
 			}
 
 			return propertyIds;
+		}
+
+		public void PopulateElement(ref ITopologyElement element)
+		{
+			Dictionary<long, ResourceDescription> entities = GetEntities();
+			if (entities.ContainsKey(element.Id))
+			{
+				ResourceDescription rs = entities[element.Id];
+				element.Mrid = rs.GetProperty(ModelCode.IDOBJ_MRID).AsString();
+				element.Name = rs.GetProperty(ModelCode.IDOBJ_NAME).AsString();
+				element.Description = rs.GetProperty(ModelCode.IDOBJ_DESCRIPTION).AsString();
+				if (rs.ContainsProperty(ModelCode.CONDUCTINGEQUIPMENT_ISREMOTE))
+				{
+					element.IsRemote = rs.GetProperty(ModelCode.CONDUCTINGEQUIPMENT_ISREMOTE).AsBool();
+				}
+				else
+				{
+					element.IsRemote = false;
+				}
+			}
+			else
+			{
+				logger.LogError($"Failed to populate element with GID {element.Id}.");
+			}
 		}
 		public AnalogMeasurement GetPopulatedAnalogMeasurement(long gid)
 		{
@@ -167,7 +197,9 @@ namespace NetworkModelServiceFunctions
 				try
 				{
 					ResourceDescription rs = elements[gid];
-					measurement.Gid = gid;
+					measurement.Id = gid;
+					measurement.Address = rs.GetProperty(ModelCode.MEASUREMENT_ADDRESS).AsString();
+					measurement.isInput = rs.GetProperty(ModelCode.MEASUREMENT_ISINPUT).AsBool();
 					measurement.CurrentValue = rs.GetProperty(ModelCode.ANALOG_CURRENTVALUE).AsFloat();
 					measurement.MaxValue = rs.GetProperty(ModelCode.ANALOG_MAXVALUE).AsFloat();
 					measurement.MinValue = rs.GetProperty(ModelCode.ANALOG_MINVALUE).AsFloat();
@@ -183,7 +215,6 @@ namespace NetworkModelServiceFunctions
 			}
 			return measurement;
 		}
-
 		public DiscreteMeasurement GetPopulatedDiscreteMeasurement(long gid)
 		{
 			DiscreteMeasurement measurement = new DiscreteMeasurement();
@@ -193,7 +224,9 @@ namespace NetworkModelServiceFunctions
 				try
 				{
 					ResourceDescription rs = elements[gid];
-					measurement.Gid = gid;
+					measurement.Id = gid;
+					measurement.Address = rs.GetProperty(ModelCode.MEASUREMENT_ADDRESS).AsString();
+					measurement.isInput = rs.GetProperty(ModelCode.MEASUREMENT_ISINPUT).AsBool();
 					measurement.CurrentOpen = rs.GetProperty(ModelCode.DISCRETE_CURRENTOPEN).AsBool();
 					measurement.MaxValue = rs.GetProperty(ModelCode.DISCRETE_MAXVALUE).AsInt();
 					measurement.MinValue = rs.GetProperty(ModelCode.DISCRETE_MINVALUE).AsInt();
