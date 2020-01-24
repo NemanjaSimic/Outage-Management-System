@@ -1,5 +1,6 @@
 ﻿using Outage.Common.PubSub;
 using Outage.Common.PubSub.CalculationEngineDataContract;
+using Outage.Common.PubSub.EmailDataContract;
 using Outage.Common.PubSub.SCADADataContract;
 using System.Runtime.Serialization;
 using System.ServiceModel;
@@ -27,6 +28,8 @@ namespace Outage.Common.ServiceContracts.PubSub
         [ServiceKnownType(typeof(CalculationEngineMessage))]
         [ServiceKnownType(typeof(CalcualtionEnginePublication))]
         [ServiceKnownType(typeof(TopologyForUIMessage))]
+        [ServiceKnownType(typeof(EmailServiceMessage))]
+        [ServiceKnownType(typeof(EmailToOutageMessage))]
         void Notify(IPublishableMessage message);
     }
 }
