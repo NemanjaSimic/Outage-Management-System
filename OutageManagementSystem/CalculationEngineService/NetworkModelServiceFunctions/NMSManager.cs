@@ -170,17 +170,24 @@ namespace NetworkModelServiceFunctions
 			Dictionary<long, ResourceDescription> entities = GetEntities();
 			if (entities.ContainsKey(element.Id))
 			{
-				ResourceDescription rs = entities[element.Id];
-				element.Mrid = rs.GetProperty(ModelCode.IDOBJ_MRID).AsString();
-				element.Name = rs.GetProperty(ModelCode.IDOBJ_NAME).AsString();
-				element.Description = rs.GetProperty(ModelCode.IDOBJ_DESCRIPTION).AsString();
-				if (rs.ContainsProperty(ModelCode.CONDUCTINGEQUIPMENT_ISREMOTE))
+				try
 				{
-					element.IsRemote = rs.GetProperty(ModelCode.CONDUCTINGEQUIPMENT_ISREMOTE).AsBool();
+					ResourceDescription rs = entities[element.Id];
+					element.Mrid = rs.GetProperty(ModelCode.IDOBJ_MRID).AsString();
+					element.Name = rs.GetProperty(ModelCode.IDOBJ_NAME).AsString();
+					element.Description = rs.GetProperty(ModelCode.IDOBJ_DESCRIPTION).AsString();
+					if (rs.ContainsProperty(ModelCode.CONDUCTINGEQUIPMENT_ISREMOTE))
+					{
+						element.IsRemote = rs.GetProperty(ModelCode.CONDUCTINGEQUIPMENT_ISREMOTE).AsBool();
+					}
+					else
+					{
+						element.IsRemote = false;
+					}
 				}
-				else
+				catch (Exception)
 				{
-					element.IsRemote = false;
+					logger.LogError($"Failed to populate element with GID {element.Id}. Could not get all properties.");
 				}
 			}
 			else

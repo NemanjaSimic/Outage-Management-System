@@ -30,7 +30,7 @@ namespace TopologyBuilder
 
             ITopology topology = new TopologyModel();
             ITopologyElement firstNode = topologyElementFactory.CreateTopologyElement(firstElementGid);
-
+            firstNode.IsActive = true;
             stack.Push(firstNode);
 
             while (stack.Count > 0)
@@ -46,7 +46,7 @@ namespace TopologyBuilder
                 {
                     if (TopologyHelper.Instance.GetElementTopologyType(element) == TopologyType.Measurement)
                     {
-                        currentNode.Measurement = topologyElementFactory.CreateMeasurement(element);
+                        currentNode.Measurement = topologyElementFactory.CreateMeasurement(element);                   
                     }
                     else
                     {
@@ -139,6 +139,23 @@ namespace TopologyBuilder
                 newNode.FirstEnd = parent.Id;
                 parent.SecondEnd.Add(newNode.Id);
             }
+
+            if (newNode.Measurement != null && newNode.Measurement is DiscreteMeasurement)
+            {
+                if (newNode.Measurement.GetCurrentVaule() == 1)
+                {
+                    newNode.IsActive = false;
+                }
+                else
+                {
+                    newNode.IsActive = true;
+                }
+            }
+            else
+            {
+                newNode.IsActive = parent.IsActive;
+            }
+
             return newNode;
         }
         private Field GetField(long memberGid)

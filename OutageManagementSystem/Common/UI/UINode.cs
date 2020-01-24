@@ -14,13 +14,18 @@ namespace Outage.Common.UI
         [DataMember]
         public float Measurement { get; set; }
         [DataMember]
+        public string MeasurementType { get; set; }
+        [DataMember]
         public string DMSType { get; set; }
         [DataMember]
         public ElementType ElementType { get; set; }
-        public UINode(long gid, string type)
+        public UINode(long gid, string type, string measurementType, float measurement, bool isActive)
         {
             Gid = gid;
             DMSType = type;
+            MeasurementType = measurementType;
+            Measurement = measurement;
+            IsActive = isActive;
         }
     }
 }

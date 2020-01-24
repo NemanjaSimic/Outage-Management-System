@@ -44,7 +44,7 @@ namespace Topology
                         uIModel.AddRelation(element.Id, nextElement);
                         stack.Push(nextElement);
                     }
-                    uIModel.AddNode(new UINode(element.Id, element.DmsType));
+                    uIModel.AddNode(new UINode(element.Id, element.DmsType, element.Measurement.GetMeasurementType(), element.Measurement.GetCurrentVaule(), element.IsActive));
                 }
                 else
                 {

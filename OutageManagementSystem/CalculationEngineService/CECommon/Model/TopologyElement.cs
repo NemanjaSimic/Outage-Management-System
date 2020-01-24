@@ -16,6 +16,7 @@ namespace CECommon
 		private string mrid;
 		private string name;
 		private bool isRemote;
+		private bool isActive;
 		#endregion
 
 		#region Properties
@@ -28,7 +29,7 @@ namespace CECommon
 		public string DmsType { get => dmsType; set => dmsType = value; }
 		public IMeasurement Measurement { get => measurement; set => measurement = value; }
 		public bool IsRemote { get => IsRemote; set => isRemote = value; }
-
+		public bool IsActive { get => isActive; set => isActive = value; }
 		#endregion
 		public TopologyElement(long gid)
 		{
