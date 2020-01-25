@@ -116,5 +116,12 @@ namespace Topology
             logger.LogDebug("TopologyManager rolled back topology.");
         }
 
+        public void UpdateTopology()
+        {
+            logger.LogDebug("Updating topology started.");
+            TopologyModel = CreateTopology();
+            logger.LogDebug("Updating topology finished.");
+        }
+
     }
 }

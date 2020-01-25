@@ -1,10 +1,12 @@
 ﻿using System;
 using MediatR;
-using Outage.Common;
 using System.Threading;
 using System.Threading.Tasks;
 using OMS.Web.Adapter.Contracts;
 using OMS.Web.Services.Commands;
+using Outage.Common;
+using OMS.Web.Adapter.Topology;
+using OMS.Web.Common;
 
 namespace OMS.Web.Services.Handlers
 {
@@ -16,7 +18,8 @@ namespace OMS.Web.Services.Handlers
         public SwitchCommandHandler(ILogger logger)
         {
             _logger = logger;
-            _scadaClient = null; // ovde izmeniti ili constructor injection
+            string scadaCommandServiceAddress = AppSettings.Get<string>("scadaCommandServiceAddress");
+            _scadaClient = new TopologySCADACommandProxy(scadaCommandServiceAddress);
         }
 
         public Task<Unit> Handle(TurnOffSwitchCommand request, CancellationToken cancellationToken)

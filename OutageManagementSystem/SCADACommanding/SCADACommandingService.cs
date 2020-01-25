@@ -19,7 +19,7 @@ namespace SCADACommanding
             {
                 try
                 {
-                    using (var proxy = new SCADACommandProxy())
+                    using (var proxy = new SCADACommandProxy(EndpointNames.SCADACommandService))
                     {
                         proxy.SendAnalogCommand(measurementId, commandingValue);
                         success = true;
@@ -44,7 +44,7 @@ namespace SCADACommanding
             {
                 try
                 {
-                    using (var proxy = new SCADACommandProxy())
+                    using (var proxy = new SCADACommandProxy(EndpointNames.SCADACommandService))
                     {
                         proxy.SendDiscreteCommand(measurementId, commandingValue);
                         success = true;
