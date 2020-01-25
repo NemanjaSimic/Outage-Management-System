@@ -1,4 +1,5 @@
-﻿using Outage.Common.ServiceContracts;
+﻿using Outage.Common;
+using Outage.Common.ServiceContracts;
 using Outage.Common.UI;
 using System;
 using System.ServiceModel;
@@ -7,24 +8,22 @@ namespace TopologyServiceClientMock
 {
     public class TopologyServiceProxy : ClientBase<ITopologyServiceContract>, ITopologyServiceContract, IDisposable
     {
-        private ITopologyServiceContract proxy;
-
         public TopologyServiceProxy(string endPointName) : base (endPointName) 
         {
-            proxy = this.CreateChannel();
+
         }
         public UIModel GetTopology()
         {
-            return proxy.GetTopology();
+            try
+            {
+                return Channel.GetTopology();
+            }
+            catch (Exception ex)
+            {
+                LoggerWrapper.Instance.LogError($"Failed to get topology. Exception message: {ex.Message}");
+                throw;
+            }
         }
 
-        public void Dispose()
-        {
-            if (proxy != null)
-            {
-                proxy = null;
-            }
-            this.Close();
-        }
     }
 }

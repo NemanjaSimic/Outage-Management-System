@@ -41,12 +41,24 @@ namespace TopologyBuilder
                     visited.Add(currentNode.Id);
                 }
 
-                var connectedElements = CheckIgnorable(currentNode.Id);
+                var connectedElements = GetReferencedElementsWithoutIgnorables(currentNode.Id);
                 foreach (var element in connectedElements)
                 {
                     if (TopologyHelper.Instance.GetElementTopologyType(element) == TopologyType.Measurement)
                     {
-                        currentNode.Measurement = topologyElementFactory.CreateMeasurement(element);                   
+                        string elementType = TopologyHelper.Instance.GetDMSTypeOfTopologyElement(element);
+                        if (elementType.Equals("BASEVOLTAGE"))
+                        {
+                            currentNode.NominalVoltage = NMSManager.Instance.GetBaseVoltageForElement(element);
+                        }
+                        else if (elementType.Equals("ANALOG") || elementType.Equals("DISCRETE"))
+                        {
+                            currentNode.Measurement = topologyElementFactory.CreateMeasurement(element);
+                        }
+                        else
+                        {
+                            logger.LogError($"Failed to procces element of type Measurement. Element is neither Analog,Discrete nor BaseVoltage.");
+                        }
                     }
                     else
                     {
@@ -69,7 +81,8 @@ namespace TopologyBuilder
         }
 
         #region HelperFunctions
-        private List<long> CheckIgnorable(long gid)
+
+        private List<long> GetReferencedElementsWithoutIgnorables(long gid)
         {
             var list = NMSManager.Instance.GetAllReferencedElements(gid).Where(e => !visited.Contains(e)).ToList();
             List<long> elements = new List<long>();
@@ -78,7 +91,7 @@ namespace TopologyBuilder
                 if (TopologyHelper.Instance.GetElementTopologyStatus(element) == TopologyStatus.Ignorable)
                 {
                     visited.Add(element);
-                    elements.AddRange(CheckIgnorable(element));
+                    elements.AddRange(GetReferencedElementsWithoutIgnorables(element));
                 }
                 else
                 {

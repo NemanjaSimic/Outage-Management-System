@@ -17,5 +17,10 @@ namespace CECommon.Interfaces
         string DmsType { get; set; }
         IMeasurement Measurement { get; set; }
         bool IsRemote { get; set; }
+        bool IsActive { get; set; }
+        float NominalVoltage { get; set; }
+
+        string GetMeasurementType();
+        float GetMeasurementValue();
     }
 }

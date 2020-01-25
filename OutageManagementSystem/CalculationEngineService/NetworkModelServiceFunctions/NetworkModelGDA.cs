@@ -1,5 +1,6 @@
 ﻿using Outage.Common;
 using Outage.Common.GDA;
+using Outage.Common.ServiceProxies;
 using System;
 using System.Collections.Generic;
 
@@ -10,29 +11,34 @@ namespace NetworkModelServiceFunctions
 		private ILogger logger = LoggerWrapper.Instance;
 		public List<ResourceDescription> GetExtentValues(ModelCode entityType, List<ModelCode> propIds)
 		{
-			int iteratorId;
-			try
+			int iteratorId = 0;
+			int numberOfTries = 0;
+			while (numberOfTries < 5)
 			{
-				using (var proxy = new Outage.Common.ServiceProxies.NetworkModelGDAProxy(EndpointNames.NetworkModelGDAEndpoint))
+				try
 				{
-					iteratorId = proxy.GetExtentValues(entityType, propIds);
+					numberOfTries++;
+					using (var proxy = new NetworkModelGDAProxy(EndpointNames.NetworkModelGDAEndpoint))
+					{
+						iteratorId = proxy.GetExtentValues(entityType, propIds);
+					}
+					break;
 				}
-			}
-			catch (Exception ex)
-			{
-				string message = $"Failed to get extent values for entity type {entityType.ToString()}. Exception message: " + ex.Message;
-				logger.LogError(message);
-				throw ex;
+				catch (Exception ex)
+				{				
+					logger.LogError($"Failed to get extent values for entity type {entityType.ToString()}. Exception message: " + ex.Message);
+					logger.LogWarn($"Retrying to connect to NMSProxy. Number of tries: {numberOfTries}.");
+				}
 			}
 
 			return ProcessIterator(iteratorId);
 		}
 		public List<ResourceDescription> GetRelatedValues(long source, List<ModelCode> propIds, Association association)
 		{
-			int iteratorId;
+			int iteratorId = 0;
 			try
 			{
-				using (var proxy = new Outage.Common.ServiceProxies.NetworkModelGDAProxy(EndpointNames.NetworkModelGDAEndpoint))
+				using (var proxy = new NetworkModelGDAProxy(EndpointNames.NetworkModelGDAEndpoint))
 				{
 					iteratorId = proxy.GetRelatedValues(source, propIds, association);
 				}
@@ -41,26 +47,26 @@ namespace NetworkModelServiceFunctions
 			{
 				string message = $"Failed to get related values for element with GID {source.ToString()}. Exception message: " + ex.Message;
 				logger.LogError(message);
-				throw ex;
 			}
 
 			return ProcessIterator(iteratorId);
 		}
 		public ResourceDescription GetValues(long resourceId, List<ModelCode> propIds)
 		{
+			ResourceDescription rs = new ResourceDescription();
 			try
 			{
-				using (var proxy = new Outage.Common.ServiceProxies.NetworkModelGDAProxy(EndpointNames.NetworkModelGDAEndpoint))
+				using (var proxy = new NetworkModelGDAProxy(EndpointNames.NetworkModelGDAEndpoint))
 				{
-					return proxy.GetValues(resourceId, propIds);
+					rs = proxy.GetValues(resourceId, propIds);
 				}
 			}
 			catch (Exception ex)
 			{
 				string message = $"Failed to get values for elemnt with GID {resourceId.ToString()}. Exception message: " + ex.Message;
 				logger.LogError(message);
-				throw ex;
 			}
+			return rs;
 		}
 		private List<ResourceDescription> ProcessIterator(int iteratorId)
 		{
@@ -70,7 +76,7 @@ namespace NetworkModelServiceFunctions
 
 			try
 			{
-				using (var proxy = new Outage.Common.ServiceProxies.NetworkModelGDAProxy(EndpointNames.NetworkModelGDAEndpoint))
+				using (var proxy = new NetworkModelGDAProxy(EndpointNames.NetworkModelGDAEndpoint))
 				{
 					do
 					{
@@ -88,7 +94,6 @@ namespace NetworkModelServiceFunctions
 			{
 				string message = $"Failed to retrieve all Resourse descriptions with iterator {iteratorId}. Exception message: " + ex.Message;
 				logger.LogError(message);
-				throw ex;
 			}
 			return resourceDescriptions;
 		}

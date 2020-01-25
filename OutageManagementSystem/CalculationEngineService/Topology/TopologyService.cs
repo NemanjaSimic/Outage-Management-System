@@ -3,6 +3,7 @@ using Outage.Common;
 using Outage.Common.ServiceContracts;
 using Outage.Common.UI;
 using System;
+using System.Linq;
 
 namespace Topology
 {
@@ -14,7 +15,7 @@ namespace Topology
 		{
 			try
 			{
-				return webTopologyBuilder.CreateTopologyForWeb(TopologyManager.Instance.TopologyModel);
+				return webTopologyBuilder.CreateTopologyForWeb(TopologyManager.Instance.TopologyModel.First());
 			}
 			catch (Exception ex)
 			{

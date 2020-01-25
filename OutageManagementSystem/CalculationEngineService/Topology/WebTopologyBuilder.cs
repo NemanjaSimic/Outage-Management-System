@@ -16,6 +16,7 @@ namespace Topology
         ILogger logger = LoggerWrapper.Instance;
         public UIModel CreateTopologyForWeb(ITopology topology)
         {
+            logger.LogDebug("Web topology builder started.");
             UIModel uIModel = new UIModel();
             Stack<long> stack = new Stack<long>();
             uIModel.FirstNode = topology.FirstNode;
@@ -44,13 +45,14 @@ namespace Topology
                         uIModel.AddRelation(element.Id, nextElement);
                         stack.Push(nextElement);
                     }
-                    uIModel.AddNode(new UINode(element.Id, element.DmsType, element.Measurement.GetMeasurementType(), element.Measurement.GetCurrentVaule(), element.IsActive));
+                    uIModel.AddNode(new UINode(element.Id, element.DmsType,element.NominalVoltage, element.GetMeasurementType(), element.GetMeasurementValue(), element.IsActive, element.IsRemote));
                 }
                 else
                 {
-                    logger.LogWarn($"FError while getting topology element in WebTopologyBuilder.");
+                    logger.LogWarn($"Error while getting topology element in WebTopologyBuilder.");
                 }
             }
+            logger.LogDebug("Web topology builder finished.");
             return uIModel;
         }
     }

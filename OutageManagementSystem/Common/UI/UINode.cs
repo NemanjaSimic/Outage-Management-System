@@ -16,16 +16,20 @@ namespace Outage.Common.UI
         [DataMember]
         public string MeasurementType { get; set; }
         [DataMember]
+        public float NominalVoltage { get; set; }
+        [DataMember]
         public string DMSType { get; set; }
         [DataMember]
-        public ElementType ElementType { get; set; }
-        public UINode(long gid, string type, string measurementType, float measurement, bool isActive)
+        public bool IsRemote { get; set; }
+        public UINode(long gid, string type,float nominalVoltage, string measurementType, float measurement, bool isActive, bool isRemote)
         {
             Gid = gid;
             DMSType = type;
+            NominalVoltage = nominalVoltage;
             MeasurementType = measurementType;
             Measurement = measurement;
             IsActive = isActive;
+            IsRemote = isRemote;
         }
     }
 }

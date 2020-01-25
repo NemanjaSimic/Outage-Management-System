@@ -99,7 +99,10 @@ namespace NetworkModelServiceFunctions
 			{
 				if (entities.ContainsKey(gid))
 				{
-					if (property == ModelCode.POWERTRANSFORMER_TRANSFORMERWINDINGS || property == ModelCode.CONDUCTINGEQUIPMENT_TERMINALS || property == ModelCode.CONNECTIVITYNODE_TERMINALS)
+					if (property == ModelCode.POWERTRANSFORMER_TRANSFORMERWINDINGS ||
+						property == ModelCode.CONDUCTINGEQUIPMENT_TERMINALS ||
+						property == ModelCode.CONNECTIVITYNODE_TERMINALS ||
+						property == ModelCode.BASEVOLTAGE_CONDUCTINGEQUIPMENTS)
 					{
 						elements.AddRange(entities[gid].GetProperty(property).AsReferences());
 					}
@@ -158,13 +161,15 @@ namespace NetworkModelServiceFunctions
 				case DMSType.DISCRETE:
 					propertyIds.Add(ModelCode.MEASUREMENT_TERMINAL);
 					break;
+				case DMSType.BASEVOLTAGE:
+					propertyIds.Add(ModelCode.BASEVOLTAGE_CONDUCTINGEQUIPMENTS);
+					break;
 				default:
 					break;
 			}
 
 			return propertyIds;
 		}
-
 		public void PopulateElement(ref ITopologyElement element)
 		{
 			Dictionary<long, ResourceDescription> entities = GetEntities();
@@ -246,6 +251,28 @@ namespace NetworkModelServiceFunctions
 				}
 			}
 			return measurement;
+		}
+		public float GetBaseVoltageForElement(long gid)
+		{
+			float voltage = 0;
+			Dictionary<long, ResourceDescription> entities = GetEntities();
+			if (entities.ContainsKey(gid))
+			{
+				ResourceDescription rs = entities[gid];
+				if (rs.ContainsProperty(ModelCode.BASEVOLTAGE_NOMINALVOLTAGE))
+				{
+					voltage = rs.GetProperty(ModelCode.BASEVOLTAGE_NOMINALVOLTAGE).AsFloat();
+				}
+				else
+				{
+					logger.LogError($"Failed to get BaseVoltage. Element with GID {gid} does not have BASEVOLTAGE_NOMINALVOLTAGE property.");
+				}
+			}
+			else
+			{
+				logger.LogError($"Failed to get BaseVoltage. Element with GID {gid} does not exist.");
+			}
+			return voltage;
 		}
 		public bool PrepareForTransaction(Dictionary<DeltaOpType, List<long>> delta)
 		{

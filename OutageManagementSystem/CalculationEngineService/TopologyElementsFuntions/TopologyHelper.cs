@@ -8,6 +8,7 @@ namespace TopologyElementsFuntions
 {
 	public class TopologyHelper
 	{
+		private ILogger logger = LoggerWrapper.Instance;
 		private readonly Dictionary<TopologyStatus, List<DMSType>> elementsStatus;
 		private readonly Dictionary<TopologyType, List<DMSType>> topologyTypes;
 		private readonly ModelResourcesDesc modelResourcesDesc = new ModelResourcesDesc();
@@ -39,6 +40,7 @@ namespace TopologyElementsFuntions
 		}
 		public TopologyStatus GetElementTopologyStatus(long gid)
 		{
+			logger.LogDebug($"Getting element topology status for GID {gid}.");
 			TopologyStatus retVal;
 			DMSType type = ModelCodeHelper.GetTypeFromModelCode(modelResourcesDesc.GetModelCodeFromId(gid));
 			foreach (var item in elementsStatus)
@@ -53,6 +55,7 @@ namespace TopologyElementsFuntions
 		}
 		public TopologyType GetElementTopologyType(long gid)
 		{
+			logger.LogDebug($"Getting element topology type for GID {gid}.");
 			TopologyType retVal;
 			DMSType type = ModelCodeHelper.GetTypeFromModelCode(modelResourcesDesc.GetModelCodeFromId(gid));
 			foreach (var item in topologyTypes)
@@ -67,6 +70,7 @@ namespace TopologyElementsFuntions
 		}
 		public string GetDMSTypeOfTopologyElement(long gid)
 		{
+			logger.LogDebug($"Getting element DMStype for GID {gid}.");
 			try
 			{
 				return ModelCodeHelper.GetTypeFromModelCode(modelResourcesDesc.GetModelCodeFromId(gid)).ToString();

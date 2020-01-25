@@ -47,7 +47,6 @@
   <ItemGroup>
     <Compile Include="NMSManager.cs" />
     <Compile Include="NetworkModelGDA.cs" />
-    <Compile Include="NetworkModelGDAProxy.cs" />
     <Compile Include="Properties\AssemblyInfo.cs" />
   </ItemGroup>
   <ItemGroup>
