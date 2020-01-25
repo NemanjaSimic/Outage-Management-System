@@ -45,7 +45,20 @@ namespace Topology
                         uIModel.AddRelation(element.Id, nextElement);
                         stack.Push(nextElement);
                     }
-                    uIModel.AddNode(new UINode(element.Id, element.DmsType,element.NominalVoltage, element.GetMeasurementType(), element.GetMeasurementValue(), element.IsActive, element.IsRemote));
+                    UINode newUINode = new UINode()
+                    {
+                        Id = element.Id,
+                        Name = element.Name,
+                        Mrid = element.Mrid,
+                        Description = element.Description,
+                        DMSType = element.DmsType,
+                        NominalVoltage = element.NominalVoltage,
+                        MeasurementType = element.GetMeasurementType(),
+                        MeasurementValue = element.GetMeasurementValue(),
+                        IsActive = element.IsActive,
+                        IsRemote = element.IsRemote
+                    };
+                    uIModel.AddNode(newUINode);
                 }
                 else
                 {

@@ -7,6 +7,9 @@
     public class Node
     {
         public string Id;
+        public string Name;
+        public string Mrid;
+        public string Description;
         public string DMSType;
         public string MeasurementValue;
         public string MeasurementType;

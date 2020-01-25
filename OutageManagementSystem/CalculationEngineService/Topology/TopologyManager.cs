@@ -97,6 +97,7 @@ namespace Topology
             logger.LogDebug("TopologyManager commited transaction successfully.");
             using (var publisherProxy = new PublisherProxy(EndpointNames.PublisherEndpoint))
             {
+                //Dok se ne sredi logika za vise topologija na WEB-u
                 ITopology topology = new TopologyModel();
                 if (TopologyModel.Count > 0)
                 {

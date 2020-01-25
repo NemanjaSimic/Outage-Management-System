@@ -5,6 +5,9 @@ export const mapNode = (node: Node) => {
   return {
     data: {
       id: node.Id,
+      name: node.Name,
+      description: node.Description,
+      mrid: node.Mrid,
       state: node.IsActive ? "active" : "inactive",
       dmsType: node.DMSType,
       measurementType: node.MeasurementType,

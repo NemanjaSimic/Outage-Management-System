@@ -16,6 +16,9 @@ namespace OMS.Web.Common.Mappers
                 Node graphNode = new Node
                 {
                     Id = keyValue.Value.Id.ToString(),
+                    Name = keyValue.Value.Name,
+                    Description = keyValue.Value.Description,
+                    Mrid = keyValue.Value.Mrid,
                     IsActive = keyValue.Value.IsActive,
                     DMSType = keyValue.Value.DMSType,
                     MeasurementValue = keyValue.Value.MeasurementValue.ToString(),

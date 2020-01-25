@@ -4,6 +4,9 @@ import { SwitchCommand, SwitchCommandType } from '@shared/models/switch-command.
 const graphTooltipBody: string =
   `<p>ID: [[id]]</p>
   <p>Type: [[type]]</p>
+  <p>Name: [[name]]</p>
+  <p>Mrid: [[mrid]]</p>
+  <p>Description: [[description]]</p>
   <p>Device type: [[deviceType]]</p>
   <p>State: [[state]]</p>
   <p>Nominal voltage: [[nominalVoltage]]</p>
@@ -20,6 +23,9 @@ export const addGraphTooltip = (cy, node) => {
       div.innerHTML = graphTooltipBody
         .replace("[[id]]", node.data('id'))
         .replace("[[type]]", node.data('dmsType'))
+        .replace("[[name]]", node.data('name'))
+        .replace("[[mrid]]", node.data('mrid'))
+        .replace("[[description]]", node.data('description'))
         .replace("[[deviceType]]", node.data('deviceType'))
         .replace("[[state]]", node.data('state'))
         .replace("[[nominalVoltage]]", node.data('nominalVoltage'))
