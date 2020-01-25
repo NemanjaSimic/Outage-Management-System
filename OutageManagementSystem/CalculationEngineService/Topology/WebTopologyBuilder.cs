@@ -53,8 +53,7 @@ namespace Topology
                         Description = element.Description,
                         DMSType = element.DmsType,
                         NominalVoltage = element.NominalVoltage,
-                        MeasurementType = element.GetMeasurementType(),
-                        MeasurementValue = element.GetMeasurementValue(),
+                        Measurements = element.GetMeasurements(),
                         IsActive = element.IsActive,
                         IsRemote = element.IsRemote
                     };

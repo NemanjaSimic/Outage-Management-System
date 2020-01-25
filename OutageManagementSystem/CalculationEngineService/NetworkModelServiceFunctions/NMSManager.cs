@@ -77,15 +77,23 @@ namespace NetworkModelServiceFunctions
 		{
 			List<ModelCode> concreteClasses = modelResourcesDesc.NonAbstractClassIds;
 			modelEntities = new Dictionary<long, ResourceDescription>();
-			foreach (var item in concreteClasses)
+			try
 			{
-				List<ModelCode> properties = modelResourcesDesc.GetAllPropertyIds(item);
-				var elements = networkModelGDA.GetExtentValues(item, properties);
-				foreach (var element in elements)
+				foreach (var item in concreteClasses)
 				{
-					modelEntities.Add(element.Id, element);
+					List<ModelCode> properties = modelResourcesDesc.GetAllPropertyIds(item);
+					var elements = networkModelGDA.GetExtentValues(item, properties);
+					foreach (var element in elements)
+					{
+						modelEntities.Add(element.Id, element);
+					}
 				}
 			}
+			catch (Exception ex)
+			{
+				logger.LogError($"Failed to initialize NMSManager. Exception message: {ex.Message}");
+			}
+		
 		}
 		public List<long> GetAllReferencedElements(long gid)
 		{
@@ -102,7 +110,8 @@ namespace NetworkModelServiceFunctions
 					if (property == ModelCode.POWERTRANSFORMER_TRANSFORMERWINDINGS ||
 						property == ModelCode.CONDUCTINGEQUIPMENT_TERMINALS ||
 						property == ModelCode.CONNECTIVITYNODE_TERMINALS ||
-						property == ModelCode.BASEVOLTAGE_CONDUCTINGEQUIPMENTS)
+						property == ModelCode.BASEVOLTAGE_CONDUCTINGEQUIPMENTS ||
+						property == ModelCode.TERMINAL_MEASUREMENTS)
 					{
 						elements.AddRange(entities[gid].GetProperty(property).AsReferences());
 					}
@@ -123,6 +132,7 @@ namespace NetworkModelServiceFunctions
 				case DMSType.TERMINAL:
 					propertyIds.Add(ModelCode.TERMINAL_CONDUCTINGEQUIPMENT);
 					propertyIds.Add(ModelCode.TERMINAL_CONNECTIVITYNODE);
+					propertyIds.Add(ModelCode.TERMINAL_MEASUREMENTS);
 					break;
 				case DMSType.CONNECTIVITYNODE:
 					propertyIds.Add(ModelCode.CONNECTIVITYNODE_TERMINALS);

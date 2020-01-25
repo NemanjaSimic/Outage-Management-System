@@ -9,9 +9,7 @@ const graphTooltipBody: string =
   <p>Description: [[description]]</p>
   <p>Device type: [[deviceType]]</p>
   <p>State: [[state]]</p>
-  <p>Nominal voltage: [[nominalVoltage]]</p>
-  <p>Measurement type: [[measurementType]]</p>
-  <p>Measurement value: [[measurementValue]]</p>`;
+  <p>Nominal voltage: [[nominalVoltage]]</p>`;
 
 export const addGraphTooltip = (cy, node) => {
   let ref = node.popperRef();
@@ -28,9 +26,7 @@ export const addGraphTooltip = (cy, node) => {
         .replace("[[description]]", node.data('description'))
         .replace("[[deviceType]]", node.data('deviceType'))
         .replace("[[state]]", node.data('state'))
-        .replace("[[nominalVoltage]]", node.data('nominalVoltage'))
-        .replace("[[measurementType]]", node.data('measurementType'))
-        .replace("[[measurementValue]]", node.data('measurementValue'));
+        .replace("[[nominalVoltage]]", node.data('nominalVoltage'));
 
       // button - mozemo i preko document.createElement() pa appendChild()
       if (node.data('type') == "Breaker" || node.data('type') == "Disconnector") {

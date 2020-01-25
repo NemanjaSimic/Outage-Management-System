@@ -1,4 +1,5 @@
 ﻿using System;
+using System.Collections.Generic;
 using System.Runtime.Serialization;
 
 namespace Outage.Common.UI
@@ -18,9 +19,7 @@ namespace Outage.Common.UI
         [DataMember]
         public bool IsActive { get; set; }
         [DataMember]
-        public float MeasurementValue { get; set; }
-        [DataMember]
-        public string MeasurementType { get; set; }
+        public List<Tuple<float, string>> Measurements {get; set;}
         [DataMember]
         public float NominalVoltage { get; set; }
         [DataMember]

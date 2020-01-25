@@ -105,6 +105,8 @@ Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "Topology", "CalculationEngi
 EndProject
 Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "TopologyServiceClientMock", "CalculationEngineService\TopologyServiceClientMock\TopologyServiceClientMock.csproj", "{2A715511-30EF-4E48-8A4B-AFF923187C24}"
 EndProject
+Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "SCADACommanding", "SCADACommanding\SCADACommanding.csproj", "{2E72183F-B2D1-4F43-8396-377AA1950078}"
+EndProject
 Global
 	GlobalSection(SolutionConfigurationPlatforms) = preSolution
 		Debug|Any CPU = Debug|Any CPU
@@ -447,6 +449,18 @@ Global
 		{2A715511-30EF-4E48-8A4B-AFF923187C24}.Release|x64.Build.0 = Release|Any CPU
 		{2A715511-30EF-4E48-8A4B-AFF923187C24}.Release|x86.ActiveCfg = Release|Any CPU
 		{2A715511-30EF-4E48-8A4B-AFF923187C24}.Release|x86.Build.0 = Release|Any CPU
+		{2E72183F-B2D1-4F43-8396-377AA1950078}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
+		{2E72183F-B2D1-4F43-8396-377AA1950078}.Debug|Any CPU.Build.0 = Debug|Any CPU
+		{2E72183F-B2D1-4F43-8396-377AA1950078}.Debug|x64.ActiveCfg = Debug|Any CPU
+		{2E72183F-B2D1-4F43-8396-377AA1950078}.Debug|x64.Build.0 = Debug|Any CPU
+		{2E72183F-B2D1-4F43-8396-377AA1950078}.Debug|x86.ActiveCfg = Debug|Any CPU
+		{2E72183F-B2D1-4F43-8396-377AA1950078}.Debug|x86.Build.0 = Debug|Any CPU
+		{2E72183F-B2D1-4F43-8396-377AA1950078}.Release|Any CPU.ActiveCfg = Release|Any CPU
+		{2E72183F-B2D1-4F43-8396-377AA1950078}.Release|Any CPU.Build.0 = Release|Any CPU
+		{2E72183F-B2D1-4F43-8396-377AA1950078}.Release|x64.ActiveCfg = Release|Any CPU
+		{2E72183F-B2D1-4F43-8396-377AA1950078}.Release|x64.Build.0 = Release|Any CPU
+		{2E72183F-B2D1-4F43-8396-377AA1950078}.Release|x86.ActiveCfg = Release|Any CPU
+		{2E72183F-B2D1-4F43-8396-377AA1950078}.Release|x86.Build.0 = Release|Any CPU
 	EndGlobalSection
 	GlobalSection(SolutionProperties) = preSolution
 		HideSolutionNode = FALSE
@@ -483,6 +497,7 @@ Global
 		{F83B7FD0-C28B-4C96-A49C-7EA0E2B579F1} = {AB9540D3-A429-4238-8BB2-5D0114ED012E}
 		{831A52CF-75FF-4EAB-BCEC-24547C588009} = {AB9540D3-A429-4238-8BB2-5D0114ED012E}
 		{2A715511-30EF-4E48-8A4B-AFF923187C24} = {AB9540D3-A429-4238-8BB2-5D0114ED012E}
+		{2E72183F-B2D1-4F43-8396-377AA1950078} = {AB9540D3-A429-4238-8BB2-5D0114ED012E}
 	EndGlobalSection
 	GlobalSection(ExtensibilityGlobals) = postSolution
 		SolutionGuid = {28760A05-312F-4AA5-9831-305EE698F2F1}

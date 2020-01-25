@@ -49,6 +49,10 @@
       <Project>{892CBE15-9ED7-4540-81FA-0EAABA592138}</Project>
       <Name>Common</Name>
     </ProjectReference>
+    <ProjectReference Include="..\..\SCADACommanding\SCADACommanding.csproj">
+      <Project>{2E72183F-B2D1-4F43-8396-377AA1950078}</Project>
+      <Name>SCADACommanding</Name>
+    </ProjectReference>
     <ProjectReference Include="..\CECommon\CECommon.csproj">
       <Project>{E1D2D69D-E03D-4FD7-8E4F-0FC95B68F0DD}</Project>
       <Name>CECommon</Name>

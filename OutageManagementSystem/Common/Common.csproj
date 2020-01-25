@@ -111,10 +111,11 @@
     <Compile Include="PubSub\SCADADataContract\ModbusData.cs" />
     <Compile Include="PubSub\SCADADataContract\SCADAMessage.cs" />
     <Compile Include="PubSub\SCADADataContract\SCADAPublication.cs" />
+    <Compile Include="ServiceContracts\CalculationEngine\ICECommand.cs" />
     <Compile Include="ServiceContracts\DistributedTransaction\IModelUpdateNotificationContract.cs" />
     <Compile Include="ServiceContracts\DistributedTransaction\ITransactionEnlistmentContract.cs" />
     <Compile Include="ServiceContracts\SCADA\ISCADACommand.cs" />
-    <Compile Include="ServiceContracts\ITopologyServiceContract.cs" />
+    <Compile Include="ServiceContracts\CalculationEngine\ITopologyServiceContract.cs" />
     <Compile Include="ServiceContracts\PubSub\IPublisher.cs" />
     <Compile Include="ServiceContracts\PubSub\ISubscriber.cs" />
     <Compile Include="ServiceNames.cs" />

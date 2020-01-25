@@ -1,5 +1,6 @@
 ﻿using CECommon.Interfaces;
 using CECommon.Model;
+using System;
 using System.Collections.Generic;
 
 namespace CECommon
@@ -11,7 +12,7 @@ namespace CECommon
 		private long firstEnd;
 		private List<long> secondEnd;
 		private string dmsType;
-		private IMeasurement measurement;
+		private List<IMeasurement> measurements;
 		private string descritption;
 		private string mrid;
 		private string name;
@@ -29,7 +30,7 @@ namespace CECommon
 		public long FirstEnd { get => firstEnd; set => firstEnd = value; }
 		public List<long> SecondEnd { get => secondEnd; set => secondEnd = value; }
 		public string DmsType { get => dmsType; set => dmsType = value; }
-		public IMeasurement Measurement { get => measurement; set => measurement = value; }
+		public List<IMeasurement> Measurements { get => measurements; set => measurements = value; }
 		public bool IsRemote { get => isRemote; set => isRemote = value; }
 		public bool IsActive { get => isActive; set => isActive = value; }
 		#endregion
@@ -37,24 +38,17 @@ namespace CECommon
 		{
 			Id = gid;
 			SecondEnd = new List<long>();
+			Measurements = new List<IMeasurement>();
 		}
-		public float GetMeasurementValue()
+
+		public List<Tuple<float,string>> GetMeasurements()
 		{
-			float value = -1;
-			if (Measurement != null)
+			List<Tuple<float, string>> measurements = new List<Tuple<float, string>>();
+			foreach (var measurement in Measurements)
 			{
-				value = Measurement.GetCurrentVaule();
+				measurements.Add(new Tuple<float, string>(measurement.GetCurrentVaule(), measurement.GetMeasurementType()));
 			}
-			return value;
-		}
-		public string GetMeasurementType()
-		{
-			string type = string.Empty;
-			if (Measurement != null)
-			{
-				type = Measurement.GetMeasurementType();
-			}
-			return type;
+			return measurements;
 		}
 	}
 }

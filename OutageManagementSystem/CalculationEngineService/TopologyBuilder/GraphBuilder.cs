@@ -3,6 +3,7 @@ using CECommon.Interfaces;
 using CECommon.Model;
 using NetworkModelServiceFunctions;
 using Outage.Common;
+using SCADACommanding;
 using System;
 using System.Collections.Generic;
 using System.Linq;
@@ -53,7 +54,8 @@ namespace TopologyBuilder
                         }
                         else if (elementType.Equals("ANALOG") || elementType.Equals("DISCRETE"))
                         {
-                            currentNode.Measurement = topologyElementFactory.CreateMeasurement(element);
+                            currentNode.Measurements.Add(topologyElementFactory.CreateMeasurement(element));
+                            //SCADACommandingCache.Instance.AddMeasurementToElement(currentNode.Id, currentNode.Measurement.Id);
                         }
                         else
                         {
@@ -153,22 +155,21 @@ namespace TopologyBuilder
                 parent.SecondEnd.Add(newNode.Id);
             }
 
-            if (newNode.Measurement != null && newNode.Measurement is DiscreteMeasurement)
+            newNode.IsActive = parent.IsActive;
+            foreach (var measurement in newNode.Measurements)
             {
-                if (newNode.Measurement.GetCurrentVaule() == 1)
+                if (measurement is DiscreteMeasurement && parent.IsActive)
                 {
-                    newNode.IsActive = false;
-                }
-                else
-                {
-                    newNode.IsActive = true;
+                    if (measurement.GetCurrentVaule() == 1)
+                    {
+                        newNode.IsActive = false;
+                    }
+                    else
+                    {
+                        newNode.IsActive = true;
+                    }
                 }
             }
-            else
-            {
-                newNode.IsActive = parent.IsActive;
-            }
-
             return newNode;
         }
         private Field GetField(long memberGid)

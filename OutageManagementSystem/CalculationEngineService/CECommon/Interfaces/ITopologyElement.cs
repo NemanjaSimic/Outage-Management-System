@@ -15,12 +15,10 @@ namespace CECommon.Interfaces
         long FirstEnd { get; set; }
         List<long> SecondEnd { get; set; }
         string DmsType { get; set; }
-        IMeasurement Measurement { get; set; }
         bool IsRemote { get; set; }
         bool IsActive { get; set; }
         float NominalVoltage { get; set; }
-
-        string GetMeasurementType();
-        float GetMeasurementValue();
+        List<IMeasurement> Measurements { get; set; }
+        List<Tuple<float, string>> GetMeasurements();
     }
 }

@@ -21,8 +21,7 @@ namespace OMS.Web.Common.Mappers
                     Mrid = keyValue.Value.Mrid,
                     IsActive = keyValue.Value.IsActive,
                     DMSType = keyValue.Value.DMSType,
-                    MeasurementValue = keyValue.Value.MeasurementValue.ToString(),
-                    MeasurementType = keyValue.Value.MeasurementType,
+                    Measurements = keyValue.Value.Measurements,
                     IsRemote = keyValue.Value.IsRemote,
                     NominalVoltage = keyValue.Value.NominalVoltage.ToString()
                 };

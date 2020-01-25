@@ -10,8 +10,7 @@ export const mapNode = (node: Node) => {
       mrid: node.Mrid,
       state: node.IsActive ? "active" : "inactive",
       dmsType: node.DMSType,
-      measurementType: node.MeasurementType,
-      measurementValue: node.MeasurementValue,
+      measurements: node.Measurements,
       nominalVoltage: node.NominalVoltage,
       deviceType: node.IsRemote ? "remote" : "local"
     }

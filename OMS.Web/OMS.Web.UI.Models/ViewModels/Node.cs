@@ -1,4 +1,7 @@
-﻿namespace OMS.Web.UI.Models.ViewModels
+﻿using System;
+using System.Collections.Generic;
+
+namespace OMS.Web.UI.Models.ViewModels
 {
     /// <summary>
     /// Single item that will be present on the UI.
@@ -11,8 +14,7 @@
         public string Mrid;
         public string Description;
         public string DMSType;
-        public string MeasurementValue;
-        public string MeasurementType;
+        public List<Tuple<float,string>> Measurements;
         public bool IsActive;
         public string NominalVoltage;
         public bool IsRemote;

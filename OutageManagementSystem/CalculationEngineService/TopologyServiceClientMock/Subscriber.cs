@@ -42,7 +42,11 @@ namespace TopologyServiceClientMock
 				foreach (var connectedElement in connectedElements)
 				{
 					Console.WriteLine($"{parent.DMSType} with gid {parent.Id.ToString("X")} connected to {topology.Nodes[connectedElement].DMSType} with gid {topology.Nodes[connectedElement].Id.ToString("X")}");
-					Console.WriteLine($"NominalVoltage: {parent.NominalVoltage}; MeasurementType: {parent.MeasurementType}; MeasurementValue:{parent.MeasurementValue}; IsActive: {parent.IsActive}");
+					Console.WriteLine($"NominalVoltage: {parent.NominalVoltage}; IsActive: {parent.IsActive}");
+					foreach (var measurement in parent.Measurements)
+					{
+						Console.WriteLine($"MeasurementTypes: {measurement.Item2}; MeasurementValue: { measurement.Item1};");
+					}
 					Print(topology.Nodes[connectedElement], topology);
 				}
 			}

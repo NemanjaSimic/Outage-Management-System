@@ -1,5 +1,6 @@
 ﻿using CalculationEngineService.DistributedTransaction;
 using Outage.Common;
+using SCADACommanding;
 using System;
 using System.Collections.Generic;
 using System.ServiceModel;
@@ -41,7 +42,8 @@ namespace CalculationEngineService
             {
                 new ServiceHost(typeof(CEModelUpdateNotification)),
                 new ServiceHost(typeof(CETransactionActor)),
-                new ServiceHost(typeof(TopologyService))
+                new ServiceHost(typeof(TopologyService)),
+                new ServiceHost(typeof(SCADACommandingService))
             };
         }
 
