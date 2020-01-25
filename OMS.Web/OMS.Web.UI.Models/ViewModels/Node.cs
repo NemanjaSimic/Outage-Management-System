@@ -7,8 +7,11 @@
     public class Node
     {
         public string Id;
-        public string Type;
-        public float Value;
+        public string DMSType;
+        public string MeasurementValue;
+        public string MeasurementType;
         public bool IsActive;
+        public string NominalVoltage;
+        public bool IsRemote;
     }
 }

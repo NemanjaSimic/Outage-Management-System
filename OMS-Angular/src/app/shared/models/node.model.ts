@@ -1,6 +1,9 @@
 export interface Node {
   Id: string;
-  Type: string;
-  Value: string;
+  DMSType: string;
+  MeasurementValue: string;
+  MeasurementType: string;
+  NominalVoltage: string;
+  IsRemote: Boolean;
   IsActive: Boolean;
 }

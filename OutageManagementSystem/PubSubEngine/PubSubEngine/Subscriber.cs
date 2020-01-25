@@ -65,10 +65,9 @@ namespace PubSubEngine
                         subscriber.Notify(message);
                         Logger.LogDebug($"Subscriber [{subscriberName}] notified SUCCESSFULLY.");
                     }
-                    catch (Exception ex)
+                    catch (Exception)
                     {
-                        Logger.LogError($"Exception on notifying Subscriber [{subscriberName}].", ex);
-
+                        Logger.LogWarn($"Subscriber [{subscriberName}] is no longer in subscriber list.");
                         Subscribers.Instance.RemoveSubscriber(subscriber);
                         Publications.Instance.RemoveSubscriber(subscriber);
                         end = true;

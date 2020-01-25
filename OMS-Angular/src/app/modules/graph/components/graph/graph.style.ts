@@ -3,7 +3,7 @@ import * as cytoscape from 'cytoscape';
 export const style = cytoscape.stylesheet()
     .selector('node[state = "active"]')
     .style({
-        'label': 'data(type)',
+        'label': 'data(dmsType)',
         'text-valign': 'center',
         'text-halign': 'center',
         'shape': 'rectangle',
@@ -11,7 +11,7 @@ export const style = cytoscape.stylesheet()
     })
     .selector('node[state = "inactive"]')
     .style({
-        'label': 'data(type)',
+        'label': 'data(dmsType)',
         'text-valign': 'center',
         'text-halign': 'center',
         'shape': 'rectangle',
@@ -26,18 +26,18 @@ export const style = cytoscape.stylesheet()
         'height': '20px',
         'width': '20px',
     })
-    .selector('node[type="ENERGYSOURCE"]')
+    .selector('node[dmsType="ENERGYSOURCE"]')
     .style({
-        'label': 'data(type)',
+        'label': 'data(dmsType)',
         'text-valign': 'center',
         'text-halign': 'center',
         'rotate':'90',
         'shape': 'triangle',
         'background-color': 'green'
     })
-    .selector('node[type="ACLINESEGMENT"]')
+    .selector('node[dmsType="ACLINESEGMENT"]')
     .style({
-        'label': 'data(type)',
+        'label': 'data(dmsType)',
         'text-valign': 'center',
         'text-halign': 'center',
         'shape': 'rectangle',

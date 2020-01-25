@@ -15,7 +15,12 @@ namespace Topology
 		{
 			try
 			{
-				return webTopologyBuilder.CreateTopologyForWeb(TopologyManager.Instance.TopologyModel.First());
+				UIModel uIModel = new UIModel();
+				if (TopologyManager.Instance.TopologyModel.Count > 0)
+				{
+					uIModel = webTopologyBuilder.CreateTopologyForWeb(TopologyManager.Instance.TopologyModel.First());
+				}
+				return uIModel; 
 			}
 			catch (Exception ex)
 			{

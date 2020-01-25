@@ -1,6 +1,7 @@
 ﻿using Outage.Common;
 using Outage.Common.PubSub;
 using Outage.Common.ServiceContracts.PubSub;
+using System;
 using System.Collections.Generic;
 using System.ServiceModel;
 
@@ -19,9 +20,19 @@ namespace PubSubEngine
             {
                 foreach (ISubscriberCallback subscriber in listOfSubscribers)
                 {
-                    string subscriberName = subscriber.GetSubscriberName();
-                    Subscribers.Instance.PublishMessage(subscriber, publication.Message);
-                    logger.LogInfo($"Publication [Topic: {publication.Topic}] SUCCESSFULLY published to Subscriber [{subscriberName}]");
+                    try
+                    {
+                        string subscriberName = subscriber.GetSubscriberName();
+                        Subscribers.Instance.PublishMessage(subscriber, publication.Message);
+                        logger.LogInfo($"Publication [Topic: {publication.Topic}] SUCCESSFULLY published to Subscriber [{subscriberName}]");
+                    }
+                    catch (Exception)
+                    {
+                        Subscribers.Instance.RemoveSubscriber(subscriber);
+                        Publications.Instance.RemoveSubscriber(subscriber);
+                        logger.LogWarn($"Failed to publish. Subscriber is no longer in subscriber list.");
+                    }
+                   
                 }
             }
         }

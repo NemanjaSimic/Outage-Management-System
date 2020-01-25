@@ -36,13 +36,13 @@ namespace TopologyServiceClientMock
 
 		void Print(UINode parent, UIModel topology)
 		{
-			var connectedElements = topology.GetRelatedElements(parent.Gid);
+			var connectedElements = topology.GetRelatedElements(parent.Id);
 			if (connectedElements != null)
 			{
 				foreach (var connectedElement in connectedElements)
 				{
-					Console.WriteLine($"{parent.DMSType} with gid {parent.Gid.ToString("X")} connected to {topology.Nodes[connectedElement].DMSType} with gid {topology.Nodes[connectedElement].Gid.ToString("X")}");
-					Console.WriteLine($"NominalVoltage: {parent.NominalVoltage}; MeasurementType: {parent.MeasurementType}; MeasurementValue:{parent.Measurement}; IsActive: {parent.IsActive}");
+					Console.WriteLine($"{parent.DMSType} with gid {parent.Id.ToString("X")} connected to {topology.Nodes[connectedElement].DMSType} with gid {topology.Nodes[connectedElement].Id.ToString("X")}");
+					Console.WriteLine($"NominalVoltage: {parent.NominalVoltage}; MeasurementType: {parent.MeasurementType}; MeasurementValue:{parent.MeasurementValue}; IsActive: {parent.IsActive}");
 					Print(topology.Nodes[connectedElement], topology);
 				}
 			}

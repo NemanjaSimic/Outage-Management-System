@@ -6,7 +6,11 @@ export const mapNode = (node: Node) => {
     data: {
       id: node.Id,
       state: node.IsActive ? "active" : "inactive",
-      type: node.Type
+      dmsType: node.DMSType,
+      measurementType: node.MeasurementType,
+      measurementValue: node.MeasurementValue,
+      nominalVoltage: node.NominalVoltage,
+      deviceType: node.IsRemote ? "remote" : "local"
     }
   }
 }

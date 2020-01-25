@@ -4,7 +4,11 @@ import { SwitchCommand, SwitchCommandType } from '@shared/models/switch-command.
 const graphTooltipBody: string =
   `<p>ID: [[id]]</p>
   <p>Type: [[type]]</p>
-  <p>State: [[state]]</p>`;
+  <p>Device type: [[deviceType]]</p>
+  <p>State: [[state]]</p>
+  <p>Nominal voltage: [[nominalVoltage]]</p>
+  <p>Measurement type: [[measurementType]]</p>
+  <p>Measurement value: [[measurementValue]]</p>`;
 
 export const addGraphTooltip = (cy, node) => {
   let ref = node.popperRef();
@@ -15,8 +19,12 @@ export const addGraphTooltip = (cy, node) => {
       const div = document.createElement('div');
       div.innerHTML = graphTooltipBody
         .replace("[[id]]", node.data('id'))
-        .replace("[[type]]", node.data('type'))
-        .replace("[[state]]", node.data('state'));
+        .replace("[[type]]", node.data('dmsType'))
+        .replace("[[deviceType]]", node.data('deviceType'))
+        .replace("[[state]]", node.data('state'))
+        .replace("[[nominalVoltage]]", node.data('nominalVoltage'))
+        .replace("[[measurementType]]", node.data('measurementType'))
+        .replace("[[measurementValue]]", node.data('measurementValue'));
 
       // button - mozemo i preko document.createElement() pa appendChild()
       if (node.data('type') == "Breaker" || node.data('type') == "Disconnector") {

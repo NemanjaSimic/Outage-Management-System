@@ -97,7 +97,12 @@ namespace Topology
             logger.LogDebug("TopologyManager commited transaction successfully.");
             using (var publisherProxy = new PublisherProxy(EndpointNames.PublisherEndpoint))
             {
-                TopologyForUIMessage message = new TopologyForUIMessage(webTopologyBuilder.CreateTopologyForWeb(TopologyModel.First())); //privremeno resenje, dok se ne razradi logika
+                ITopology topology = new TopologyModel();
+                if (TopologyModel.Count > 0)
+                {
+                    topology = TopologyModel.First();
+                }
+                TopologyForUIMessage message = new TopologyForUIMessage(webTopologyBuilder.CreateTopologyForWeb(topology)); //privremeno resenje, dok se ne razradi logika
                 CalcualtionEnginePublication publication = new CalcualtionEnginePublication(Topic.TOPOLOGY, message);
                 publisherProxy.Publish(publication);
                 logger.LogDebug("TopologyManager published new topology successfully.");

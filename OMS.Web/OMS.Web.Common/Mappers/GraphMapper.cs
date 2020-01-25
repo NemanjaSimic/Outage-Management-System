@@ -15,10 +15,13 @@ namespace OMS.Web.Common.Mappers
             {
                 Node graphNode = new Node
                 {
-                    Id = keyValue.Value.Gid.ToString(),
+                    Id = keyValue.Value.Id.ToString(),
                     IsActive = keyValue.Value.IsActive,
-                    Type = keyValue.Value.Type,
-                    Value = keyValue.Value.Measurement
+                    DMSType = keyValue.Value.DMSType,
+                    MeasurementValue = keyValue.Value.MeasurementValue.ToString(),
+                    MeasurementType = keyValue.Value.MeasurementType,
+                    IsRemote = keyValue.Value.IsRemote,
+                    NominalVoltage = keyValue.Value.NominalVoltage.ToString()
                 };
 
                 graph.Nodes.Add(graphNode);

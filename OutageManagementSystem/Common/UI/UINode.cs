@@ -8,11 +8,11 @@ namespace Outage.Common.UI
     public class UINode
     {
         [DataMember]
-        public long Gid { get; set; }
+        public long Id { get; set; }
         [DataMember]
         public bool IsActive { get; set; }
         [DataMember]
-        public float Measurement { get; set; }
+        public float MeasurementValue { get; set; }
         [DataMember]
         public string MeasurementType { get; set; }
         [DataMember]
@@ -21,13 +21,13 @@ namespace Outage.Common.UI
         public string DMSType { get; set; }
         [DataMember]
         public bool IsRemote { get; set; }
-        public UINode(long gid, string type,float nominalVoltage, string measurementType, float measurement, bool isActive, bool isRemote)
+        public UINode(long id, string type,float nominalVoltage, string measurementType, float measurementValue, bool isActive, bool isRemote)
         {
-            Gid = gid;
+            Id = id;
             DMSType = type;
             NominalVoltage = nominalVoltage;
             MeasurementType = measurementType;
-            Measurement = measurement;
+            MeasurementValue = measurementValue;
             IsActive = isActive;
             IsRemote = isRemote;
         }
