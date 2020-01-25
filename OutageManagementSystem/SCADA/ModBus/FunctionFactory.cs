@@ -1,36 +1,76 @@
-﻿using Outage.SCADA.ModBus.FunctionParameters;
+﻿using Outage.Common;
+using Outage.SCADA.ModBus.FunctionParameters;
 using Outage.SCADA.ModBus.ModbusFuntions;
 using Outage.SCADA.SCADACommon;
+using Outage.SCADA.SCADAData.Repository;
+using System;
 
 namespace Outage.SCADA.ModBus
 {
     public class FunctionFactory
     {
+        #region Static Members
+
+        protected static SCADAModel scadaModel = null;
+
+        public static SCADAModel SCADAModel
+        {
+            set
+            {
+                if (scadaModel == null)
+                {
+                    scadaModel = value;
+                }
+            }
+        }
+
+        #endregion
+
+
         public static ModbusFunction CreateModbusFunction(ModbusCommandParameters commandParameters)
         {
+            ModbusFunction modbusFunction;
+
+            if(FunctionFactory.scadaModel == null)
+            {
+                string message = $"CreateModbusFunction => SCADA model is null.";
+                LoggerWrapper.Instance.LogError(message);
+                //TODO: InternalSCADAServiceException
+                throw new Exception(message);
+            }
+
             switch ((ModbusFunctionCode)commandParameters.FunctionCode)
             {
                 case ModbusFunctionCode.READ_COILS:
-                    return new ReadCoilsFunction(commandParameters);
+                    modbusFunction = new ReadCoilsFunction(commandParameters, FunctionFactory.scadaModel);
+                    break;
 
                 case ModbusFunctionCode.READ_DISCRETE_INPUTS:
-                    return new ReadDiscreteInputsFunction(commandParameters);
+                    modbusFunction = new ReadDiscreteInputsFunction(commandParameters, FunctionFactory.scadaModel);
+                    break;
 
                 case ModbusFunctionCode.READ_INPUT_REGISTERS:
-                    return new ReadInputRegistersFunction(commandParameters);
+                    modbusFunction = new ReadInputRegistersFunction(commandParameters, FunctionFactory.scadaModel);
+                    break;
 
                 case ModbusFunctionCode.READ_HOLDING_REGISTERS:
-                    return new ReadHoldingRegistersFunction(commandParameters);
+                    modbusFunction = new ReadHoldingRegistersFunction(commandParameters, FunctionFactory.scadaModel);
+                    break;
 
                 case ModbusFunctionCode.WRITE_SINGLE_COIL:
-                    return new WriteSingleCoilFunction(commandParameters);
+                    modbusFunction = new WriteSingleCoilFunction(commandParameters);
+                    break;
 
                 case ModbusFunctionCode.WRITE_SINGLE_REGISTER:
-                    return new WriteSingleRegisterFunction(commandParameters);
+                    modbusFunction = new WriteSingleRegisterFunction(commandParameters);
+                    break;
 
                 default:
-                    return null;
+                    modbusFunction = null;
+                    break;
             }
+
+            return modbusFunction;
         }
     }
 }

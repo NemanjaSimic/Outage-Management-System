@@ -41,7 +41,7 @@ namespace Outage.Common.GDA
 	/// <summary>
 	/// A class that describes property of generic model resource
 	/// </summary>
-	[Serializable]
+	//[Serializable]
 	[DataContract]	
 	public class Property : IComparable
 	{

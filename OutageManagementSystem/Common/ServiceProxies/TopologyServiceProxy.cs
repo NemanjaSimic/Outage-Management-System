@@ -8,7 +8,8 @@ namespace TopologyServiceClientMock
 {
     public class TopologyServiceProxy : ClientBase<ITopologyServiceContract>, ITopologyServiceContract, IDisposable
     {
-        public TopologyServiceProxy(string endPointName) : base (endPointName) 
+        public TopologyServiceProxy(string endpointName)
+            : base(endpointName)
         {
 
         }

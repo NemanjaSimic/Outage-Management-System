@@ -1,44 +1,39 @@
 ﻿using Outage.Common;
 using Outage.Common.GDA;
 using Outage.SCADA.SCADACommon;
+using Outage.SCADA.SCADAData.Configuration;
 using System;
 using System.Collections.Generic;
-using System.Linq;
-using System.Text;
-using System.Threading.Tasks;
 
 namespace Outage.SCADA.SCADAData.Repository
 {
     public class AnalogSCADAModelPointItem : SCADAModelPointItem, IAnalogSCADAModelPointItem
     {
+        private EnumDescs enumDescs = new EnumDescs(); //TODO: Izmesti ovo !!
         public AnalogSCADAModelPointItem() 
             : base()
         {
-            ScaleFactor = 1; //TODO: pre svih ostalih
-            Deviation = 0;  //TODO: pre svih ostalih
         }
 
         public AnalogSCADAModelPointItem(List<Property> props, ModelCode type)
             : base(props, type)
         {
-            ScaleFactor = 1; //TODO: pre svih ostalih
-            Deviation = 0;  //TODO: pre svih ostalih
+            
+            
 
             foreach (var item in props)
             {
                 switch (item.Id)
                 {
                     case ModelCode.ANALOG_CURRENTVALUE:
-                        CurrentRawValue = EguToRawValueConversion(item.AsFloat());
+                        CurrentEguValue = item.AsFloat();
                         break;
 
                     case ModelCode.ANALOG_MAXVALUE:
-                        MaxValue = EguToRawValueConversion(item.AsFloat());
                         EGU_Max = item.AsFloat();
                         break;
 
                     case ModelCode.ANALOG_MINVALUE:
-                        MinValue = EguToRawValueConversion(item.AsFloat());
                         EGU_Min = item.AsFloat();
                         break;
 
@@ -46,54 +41,84 @@ namespace Outage.SCADA.SCADAData.Repository
                         NormalValue = item.AsFloat();
                         break;
 
-                    //TODO:
-                    //case ModelCode.ANALOG_SCALEFACTOR:
-                    //    ScaleFactor = item.AsFloat();
-                    //    break;
+                    case ModelCode.ANALOG_SCALINGFACTOR:
+                        ScalingFactor = item.AsFloat();
+                        break;
 
-                    //case ModelCode.ANALOG_DEVIATION:
-                    //    Deviation = item.AsFloat();
-                    //    break;
+                    case ModelCode.ANALOG_DEVIATION:
+                        Deviation = item.AsFloat();
+                        break;
+
+                    case ModelCode.ANALOG_SIGNALTYPE:
+                        AnalogType = (AnalogMeasurementType)(enumDescs.GetEnumValueFromString(ModelCode.ANALOG_SIGNALTYPE, item.AsEnum().ToString()));
+                        break;
 
                     default:
                         break;
                 }
-
-            }
-            
-            LowLimit = EGU_Min + 5; //todo: config
-            HighLimit = EGU_Max - 5; //todo: config                
+            }                       
         }
 
-        public int MinValue { get; set; }
-        public int MaxValue { get; set; }
-        public int CurrentRawValue { get; set; }
-        public double NormalValue { get; set; }
-        public double CurrentEguValue
+        public float NormalValue { get; set; }
+        public float CurrentEguValue { get; set; }
+        public float EGU_Min { get; set; }
+        public float EGU_Max { get; set; }
+        public float ScalingFactor { get; set; }
+        public float Deviation { get; set; }
+        public AnalogMeasurementType AnalogType { get; set; }
+
+        public int CurrentRawValue
         {
             get
             {
-                return RawToEguValueConversion(CurrentRawValue);
+                return EguToRawValueConversion(CurrentEguValue);
             }
         }
-        public float ScaleFactor { get; set; }
-        public float Deviation { get; set; }
 
-        public double EGU_Min { get; set; }
-        public double EGU_Max { get; set; }
-        public double HighLimit { get; set; }
-        public double LowLimit { get; set; }
+        public int MinRawValue
+        {
+            get
+            {
+                return EguToRawValueConversion(CurrentEguValue);
+            }
+        }
+
+        public int MaxRawValue
+        {
+            get
+            {
+                return EguToRawValueConversion(CurrentEguValue);
+            }
+        }
+
 
         public override bool SetAlarms()
         {
             bool alarmChanged = false;
+            ushort LowLimit;
+            ushort HighLimit;
             AlarmType currentAlarm = Alarm;
+
+            if (AnalogType == AnalogMeasurementType.POWER)
+            {
+                LowLimit = AlarmConfigData.Instance.LowPowerLimit;
+                HighLimit = AlarmConfigData.Instance.HighPowerLimit;
+            }
+            else if(AnalogType == AnalogMeasurementType.VOLTAGE)
+            {
+                LowLimit = AlarmConfigData.Instance.LowVoltageLimit;
+                HighLimit = AlarmConfigData.Instance.HighVolageLimit;
+            }
+            else
+            {
+                throw new Exception($"Analog measurement is of type: {AnalogType} which is not supported for alarming.");
+            }
 
             //ALARMS FOR ANALOG VALUES
             if (RegisterType == PointType.ANALOG_INPUT || RegisterType == PointType.ANALOG_OUTPUT)
             {
                 //VALUE IS INVALID
-                if (CurrentRawValue < MinValue || CurrentRawValue > MaxValue)
+                if (CurrentRawValue < MinRawValue || CurrentRawValue > MaxRawValue)
                 {
                     Alarm = AlarmType.ABNORMAL_VALUE;
                     if (currentAlarm != Alarm)
@@ -144,18 +169,33 @@ namespace Outage.SCADA.SCADAData.Repository
             return alarmChanged;
         }
 
-
-        public double RawToEguValueConversion(int rawValue)
+        #region Conversions
+        
+        public float RawToEguValueConversion(int rawValue)
         {
-            //TODO: implement
+            float eguValue = ((ScalingFactor * rawValue) + Deviation);
+
+            if(eguValue > float.MaxValue || eguValue < float.MinValue)
+            {
+                throw new Exception($"Egu value: {eguValue} is out of float data type boundaries [{float.MinValue}, {float.MaxValue}]");
+            }
+
+            return eguValue;
+        }
+
+        public int EguToRawValueConversion(float eguValue)
+        {
+            if(ScalingFactor == 0)
+            {
+                throw new DivideByZeroException($"Scaling factor is zero.");
+            }
+
+            int rawValue = (int)((eguValue - Deviation) / ScalingFactor);
+
             return rawValue;
         }
 
-        public int EguToRawValueConversion(double eguValue)
-        {
-            //TODO: implement
-            return (int)eguValue;
-        }
+        #endregion
 
         #region IClonable
 

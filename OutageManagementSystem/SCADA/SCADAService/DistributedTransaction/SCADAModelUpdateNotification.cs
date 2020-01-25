@@ -10,15 +10,22 @@ namespace Outage.SCADA.SCADAService.DistributedTransaction
 {
     public class SCADAModelUpdateNotification : ModelUpdateNotification
     {
+        #region Static Members
+
         protected static SCADAModel scadaModel = null;
 
         public static SCADAModel SCADAModel
         {
             set
             {
-                scadaModel = value;
+                if (scadaModel == null)
+                {
+                    scadaModel = value;
+                }
             }
         }
+
+        #endregion
 
         public SCADAModelUpdateNotification()
             : base(EndpointNames.TransactionEnlistmentEndpoint, ServiceNames.SCADAService)
@@ -27,7 +34,7 @@ namespace Outage.SCADA.SCADAService.DistributedTransaction
 
         public override bool NotifyAboutUpdate(Dictionary<DeltaOpType, List<long>> modelChanges)
         {
-            bool success = scadaModel.Notify(modelChanges);
+            bool success = SCADAModelUpdateNotification.scadaModel.Notify(modelChanges);
 
             if (success)
             {

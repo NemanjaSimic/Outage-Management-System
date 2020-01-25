@@ -11,9 +11,15 @@ namespace Outage.Common.ServiceContracts.SCADA
     public interface ISCADACommand
     {
         [OperationContract]
+        [FaultContract(typeof(ArgumentException))]
+        //TODO: InternalSCADAServiceException
+        //[FaultContract(typeof(InternalSCADAServiceException))]
         bool SendAnalogCommand(long gid, float commandingValue);
 
         [OperationContract]
+        [FaultContract(typeof(ArgumentException))]
+        //TODO: InternalSCADAServiceException
+        //[FaultContract(typeof(InternalSCADAServiceException))]
         bool SendDiscreteCommand(long gid, ushort commandingValue);
     }
 }

@@ -9,7 +9,7 @@ namespace Outage.Common.GDA
 	/// <summary>
 	/// A class that describes generic model resource
 	/// </summary>
-	[Serializable]
+	//[Serializable]
 	[DataContract]	
 	public class ResourceDescription
 	{
