@@ -1,5 +1,5 @@
-﻿#define IDLE_SCAN
-//#define MANUAL_SCAN
+﻿//#define IDLE_SCAN
+#define MANUAL_SCAN
 
 namespace OMS.EmailService
 {

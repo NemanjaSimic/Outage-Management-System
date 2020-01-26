@@ -20,6 +20,7 @@ namespace Outage.Common.ServiceContracts.PubSub
         [ServiceKnownType(typeof(CalculationEngineMessage))]
         [ServiceKnownType(typeof(CalcualtionEnginePublication))]
         [ServiceKnownType(typeof(TopologyForUIMessage))]    
+        [ServiceKnownType(typeof(OutageEmailPublication))]
         [ServiceKnownType(typeof(EmailServiceMessage))]
         [ServiceKnownType(typeof(EmailToOutageMessage))]
         //[ServiceKnownType(typeof(AnalogModbusData))]

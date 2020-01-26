@@ -66,6 +66,10 @@
     <None Include="App.config" />
   </ItemGroup>
   <ItemGroup>
+    <ProjectReference Include="..\..\OutageManagementSystem\Common\Common.csproj">
+      <Project>{892cbe15-9ed7-4540-81fa-0eaaba592138}</Project>
+      <Name>Common</Name>
+    </ProjectReference>
     <ProjectReference Include="..\OMS.Email\OMS.Email.csproj">
       <Project>{c1dce718-9a70-44c5-944b-6c7b2a486165}</Project>
       <Name>OMS.Email</Name>

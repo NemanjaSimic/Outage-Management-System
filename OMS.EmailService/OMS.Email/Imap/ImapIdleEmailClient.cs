@@ -3,18 +3,20 @@
     using ImapX;
     using OMS.Email.Interfaces;
     using OMS.Email.Models;
+    using Outage.Common;
+    using Outage.Common.PubSub.EmailDataContract;
+    using Outage.Common.ServiceContracts.PubSub;
     using System;
 
     public class ImapIdleEmailClient : ImapEmailClient, IIdleEmailClient
     {
-        private readonly IDispatcher _dispatcher;
-        private readonly IEmailParser _parser;
-
-        public ImapIdleEmailClient(IImapEmailMapper mapper, IEmailParser parser, IDispatcher dispatcher) : base(mapper)
-        {
-            _dispatcher = dispatcher;
-            _parser = parser;
-        }
+        public ImapIdleEmailClient(
+             IImapEmailMapper mapper,
+             IEmailParser parser,
+             IPublisher publisher,
+             IDispatcher dispatcher)
+             : base(mapper, parser, publisher, dispatcher)
+        { }
 
         public bool StartIdling()
         {
@@ -39,11 +41,12 @@
 
                 if (tracingModel.IsValidReport && _dispatcher.IsConnected)
                 {
-                    // notify clients about outage
                     _dispatcher.Dispatch(tracingModel.Gid);
                 }
 
-                // Todo: Send message to tracing service here 
+                _publisher.Publish(
+                    publication: new OutageEmailPublication(Topic.OUTAGE_EMAIL, new EmailToOutageMessage(tracingModel.Gid))
+                    );
             }
         }
     }
