@@ -88,12 +88,13 @@ namespace PubSubEngine
             }
         }
 
-        public IPublishableMessage GetNextMessage(ISubscriberCallback subscriber)
+        public IPublishableMessage GetNextMessage(ISubscriberCallback subscriber, bool lastMessageWasNull = false)
         {
             IPublishableMessage message = null;
 
             bool success = subscribers.TryGetValue(subscriber, out Queue<IPublishableMessage> queueOfMessages) && queueOfMessages.Count > 0;
             string subscriberName = "";
+
             try
             {
                 subscriberName = subscriber.GetSubscriberName();
@@ -108,7 +109,7 @@ namespace PubSubEngine
                 message = queueOfMessages.Dequeue();
                 Logger.LogDebug($"Published message [{message}] SUCCESSFYLLY dequeued from Subscriber's queue of messages [Subscriber name: '{subscriberName}'].");
             }
-            else if(queueOfMessages.Count == 0)
+            else if(queueOfMessages.Count == 0 && !lastMessageWasNull)
             {
                 Logger.LogDebug($"Queue of messages for subscriber [{subscriberName}] is empty.");
             }

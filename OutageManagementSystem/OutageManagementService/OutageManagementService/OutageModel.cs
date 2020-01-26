@@ -61,6 +61,7 @@ namespace OutageManagementService
             }
         }
         #endregion
+
         public OutageModel()
         {
             ImportTopologyModel();
@@ -70,8 +71,17 @@ namespace OutageManagementService
         {
             using (TopologyServiceProxy topologyServiceProxy = TopologyProxy)
             {
-                topology = TopologyProxy.GetTopology();
-                PrintUI(topology);
+                if (topologyServiceProxy != null)
+                {
+                    topology = TopologyProxy.GetTopology();
+                    PrintUI(topology);
+                }
+                else
+                {
+                    string message = "From method ImportTopologyModel(): TopologyServiceProxy is null.";
+                    logger.LogError(message);
+                    throw new NullReferenceException(message);
+                }
             }
         }
 
