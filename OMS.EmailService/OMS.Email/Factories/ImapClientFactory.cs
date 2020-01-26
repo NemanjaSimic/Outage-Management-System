@@ -1,7 +1,7 @@
-﻿using OMS.Email.Imap;
-
-namespace OMS.Email.Factories
+﻿namespace OMS.Email.Factories
 {
+    using OMS.Email.Imap;
+
     public class ImapClientFactory
     {
         public ImapEmailClient CreateClient() => 

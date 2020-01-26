@@ -1,9 +1,9 @@
-﻿using ImapX;
-using OMS.Email.Interfaces;
-using OMS.Email.Models;
-
-namespace OMS.Email.Imap
+﻿namespace OMS.Email.Imap
 {
+    using ImapX;
+    using OMS.Email.Interfaces;
+    using OMS.Email.Models;
+
     public class ImapEmailMapper : IImapEmailMapper
     {
         public OutageMailMessage MapMail(Message message)

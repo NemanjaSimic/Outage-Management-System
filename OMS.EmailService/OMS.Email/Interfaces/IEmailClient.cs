@@ -1,8 +1,8 @@
-﻿using OMS.Email.Models;
-using System.Collections.Generic;
-
-namespace OMS.Email.Interfaces
+﻿namespace OMS.Email.Interfaces
 {
+    using OMS.Email.Models;
+    using System.Collections.Generic;
+
     public interface IEmailClient
     {
         bool Connect();

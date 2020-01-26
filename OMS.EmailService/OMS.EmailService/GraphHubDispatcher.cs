@@ -1,10 +1,10 @@
-﻿namespace OMS.Email.Dispatchers
+﻿using Microsoft.AspNet.SignalR.Client;
+using OMS.Email.Interfaces;
+using System;
+using System.Configuration;
+
+namespace OMS.Email.Dispatchers
 {
-    using Microsoft.AspNet.SignalR.Client;
-    using OMS.Email.Interfaces;
-    using System;
-    using System.Configuration;
-    
     public class GraphHubDispatcher : IDispatcher
     {
         private readonly string _url;

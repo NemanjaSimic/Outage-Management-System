@@ -1,17 +1,17 @@
 ﻿#define IDLE_SCAN
 //#define MANUAL_SCAN
 
-using System;
-using System.Collections.Generic;
-using OMS.Email.Dispatchers;
-using OMS.Email.EmailParsers;
-using OMS.Email.Factories;
-using OMS.Email.Imap;
-using OMS.Email.Interfaces;
-using OMS.Email.Models;
-
 namespace OMS.EmailService
 {
+    using System;
+    using System.Collections.Generic;
+    using OMS.Email.Dispatchers;
+    using OMS.Email.EmailParsers;
+    using OMS.Email.Factories;
+    using OMS.Email.Imap;
+    using OMS.Email.Interfaces;
+    using OMS.Email.Models;
+
     class Program
     {
         static void Main(string[] args)

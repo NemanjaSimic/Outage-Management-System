@@ -1,10 +1,10 @@
-﻿using ImapX;
-using OMS.Email.Interfaces;
-using OMS.Email.Models;
-using System;
-
-namespace OMS.Email.Imap
+﻿namespace OMS.Email.Imap
 {
+    using ImapX;
+    using OMS.Email.Interfaces;
+    using OMS.Email.Models;
+    using System;
+
     public class ImapIdleEmailClient : ImapEmailClient, IIdleEmailClient
     {
         private readonly IDispatcher _dispatcher;

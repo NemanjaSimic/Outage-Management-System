@@ -1,13 +1,13 @@
-﻿using ImapX;
-using System;
-using ImapX.Enums;
-using OMS.Email.Models;
-using System.Configuration;
-using OMS.Email.Interfaces;
-using System.Collections.Generic;
-
-namespace OMS.Email.Imap
+﻿namespace OMS.Email.Imap
 {
+    using ImapX;
+    using System;
+    using ImapX.Enums;
+    using OMS.Email.Models;
+    using System.Configuration;
+    using OMS.Email.Interfaces;
+    using System.Collections.Generic;
+
     public class ImapEmailClient : IEmailClient
     {
         protected readonly ImapClient _client;

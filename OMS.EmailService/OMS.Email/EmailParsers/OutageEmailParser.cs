@@ -1,9 +1,9 @@
-﻿using OMS.Email.Interfaces;
-using OMS.Email.Models;
-using System;
-
-namespace OMS.Email.EmailParsers
+﻿namespace OMS.Email.EmailParsers
 {
+    using OMS.Email.Interfaces;
+    using OMS.Email.Models;
+    using System;
+
     public class OutageEmailParser : IEmailParser
     {
         public OutageTracingModel Parse(OutageMailMessage message)
