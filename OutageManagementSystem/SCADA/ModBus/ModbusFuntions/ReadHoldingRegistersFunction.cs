@@ -12,10 +12,13 @@ namespace Outage.SCADA.ModBus.ModbusFuntions
 {
     public class ReadHoldingRegistersFunction : ModbusFunction, IReadAnalogModusFunction
     {
-        public ReadHoldingRegistersFunction(ModbusCommandParameters commandParameters)
+        public SCADAModel SCADAModel { get; private set; }
+
+        public ReadHoldingRegistersFunction(ModbusCommandParameters commandParameters, SCADAModel scadaModel)
             : base(commandParameters)
         {
             CheckArguments(MethodBase.GetCurrentMethod(), typeof(ModbusReadCommandParameters));
+            SCADAModel = scadaModel;
         }
 
         #region IModBusFunction
@@ -38,37 +41,45 @@ namespace Outage.SCADA.ModBus.ModbusFuntions
             int[] data = modbusClient.ReadHoldingRegisters(startAddress - 1, quantity);
             Data = new Dictionary<long, AnalogModbusData>(data.Length);
 
-            SCADAModel scadaModel = SCADAModel.Instance;
-
             for (ushort i = 0; i < quantity; i++)
             {
                 ushort address = (ushort)(startAddress + i);
-                int value = data[i];
-                long gid = scadaModel.CurrentAddressToGidMap[PointType.ANALOG_OUTPUT][address];
+                int rawValue = data[i];
 
-                if (scadaModel.CurrentScadaModel.ContainsKey(gid))
+                //for commands enqueued during model update
+                if (!SCADAModel.CurrentAddressToGidMap[PointType.ANALOG_OUTPUT].ContainsKey(address))
                 {
-                    AnalogSCADAModelPointItem pointItem = scadaModel.CurrentScadaModel[gid] as AnalogSCADAModelPointItem;
-
-                    if (pointItem == null)
-                    {
-                        string message = $"PointItem [Gid: 0x{gid:X16}] is not type AnalogSCADAModelPointItem.";
-                        Logger.LogError(message);
-                        throw new Exception(message);
-                    }
-
-                    pointItem.CurrentRawValue = value;
-
-                    bool alarmChanged = pointItem.SetAlarms();
-                    if (alarmChanged)
-                    {
-                        Logger.LogInfo($"Alarm for Point [Gid: 0x{pointItem.Gid:X16}, Address: {pointItem.Address}] set to {pointItem.Alarm}.");
-                    }
-
-                    AnalogModbusData digitalData = new AnalogModbusData(pointItem.CurrentEguValue, pointItem.Alarm);
-                    Data.Add(gid, digitalData);
-                    Logger.LogDebug($"ReadHoldingRegistersFunction execute => Current value: {pointItem.CurrentEguValue} from address: {address}, gid: 0x{gid:X16}.");
+                    Logger.LogWarn($"ReadHoldingRegistersFunction execute => trying to read value on address {address}, Point type: {PointType.ANALOG_OUTPUT}, which is not in the current SCADA Model.");
+                    continue;
                 }
+
+                long gid = SCADAModel.CurrentAddressToGidMap[PointType.ANALOG_OUTPUT][address];
+
+                //for commands enqueued during model update
+                if (!SCADAModel.CurrentScadaModel.ContainsKey(gid))
+                {
+                    Logger.LogWarn($"ReadHoldingRegistersFunction execute => trying to read value for measurement with gid: 0x{gid:X16}, which is not in the current SCADA Model.");
+                    continue;
+                }
+
+                if (!(SCADAModel.CurrentScadaModel[gid] is AnalogSCADAModelPointItem pointItem))
+                {
+                    string message = $"PointItem [Gid: 0x{gid:X16}] is not type AnalogSCADAModelPointItem.";
+                    Logger.LogError(message);
+                    throw new Exception(message);
+                }
+
+                pointItem.CurrentEguValue = pointItem.RawToEguValueConversion(rawValue);
+
+                bool alarmChanged = pointItem.SetAlarms();
+                if (alarmChanged)
+                {
+                    Logger.LogInfo($"Alarm for Point [Gid: 0x{pointItem.Gid:X16}, Address: {pointItem.Address}] set to {pointItem.Alarm}.");
+                }
+
+                AnalogModbusData digitalData = new AnalogModbusData(pointItem.CurrentEguValue, pointItem.Alarm);
+                Data.Add(gid, digitalData);
+                Logger.LogDebug($"ReadHoldingRegistersFunction execute => Current value: {pointItem.CurrentEguValue} from address: {address}, gid: 0x{gid:X16}.");
             }
 
             Logger.LogDebug($"ReadHoldingRegistersFunction executed SUCCESSFULLY. StartAddress: {startAddress}, Quantity: {quantity}");

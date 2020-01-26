@@ -6,6 +6,7 @@ using Outage.SCADA.SCADACommon;
 using Outage.SCADA.SCADAData.Configuration;
 using Outage.SCADA.SCADAData.Repository;
 using System;
+using System.Collections.Generic;
 using System.Threading;
 
 namespace Outage.SCADA.ModBus.Acquisitor
@@ -19,21 +20,20 @@ namespace Outage.SCADA.ModBus.Acquisitor
             get { return logger ?? (logger = LoggerWrapper.Instance); }
         }
 
+        private readonly ISCADAConfigData scadaConfig;
+        private readonly FunctionExecutor functionExecutor;
+        private readonly SCADAModel scadaModel;
+        
         private bool threadActiveSignal = true;
         private Thread acquisitionThread;
 
-        private ISCADAConfigData scadaConfig;
-        private FunctionExecutor functionExecutor;
-
-        public SCADAModel SCADAModel { get; protected set; }
-
-        public Acquisition()
+        public Acquisition(FunctionExecutor functionExecutor, SCADAModel scadaModel)
         {
+            this.functionExecutor = functionExecutor;
+            this.scadaModel = scadaModel;
             this.scadaConfig = SCADAConfigData.Instance;
-            this.functionExecutor = FunctionExecutor.Instance;
-            SCADAModel = SCADAModel.Instance;
 
-            this.InitializeAcquisitionThread();
+            InitializeAcquisitionThread();
         }
 
         private void InitializeAcquisitionThread()
@@ -70,67 +70,74 @@ namespace Outage.SCADA.ModBus.Acquisitor
 
                 while (threadActiveSignal)
                 {
-                    Thread.Sleep(scadaConfig.Interval);
-
-                    if (functionExecutor.ModbusClient.Connected)
+                    if (this.functionExecutor == null)
                     {
-                        foreach (ISCADAModelPointItem pointItem in SCADAModel.CurrentScadaModel.Values)
+                        string message = $"Function Executor is null.";
+                        Logger.LogError(message);
+                        
+                        Thread.Sleep(scadaConfig.Interval);
+                        continue;
+                    }
+
+                    //MODEL UPDATE -> will swap incoming and current SCADAModel in commit step, so we have to save the reference locally
+                    Dictionary<long, ISCADAModelPointItem> currentScadaModel = scadaModel.CurrentScadaModel;
+
+                    foreach (ISCADAModelPointItem pointItem in currentScadaModel.Values)
+                    {
+                        ushort address = pointItem.Address;
+                        ModbusFunction modbusFunction;
+
+                        //DIGITAL_OUTPUT
+                        if (pointItem.RegisterType == PointType.DIGITAL_OUTPUT)
                         {
-                            ushort address = pointItem.Address;
-                            ModbusFunction modbusFunction;
+                            ModbusReadCommandParameters mdb_read = new ModbusReadCommandParameters(length,
+                                                                                                   (byte)ModbusFunctionCode.READ_COILS,
+                                                                                                   address, 
+                                                                                                   quantity);
+                            modbusFunction = FunctionFactory.CreateModbusFunction(mdb_read);
+                        }
+                        //DIGITAL_INPUT
+                        else if (pointItem.RegisterType == PointType.DIGITAL_INPUT)
+                        {
+                            ModbusReadCommandParameters mdb_read = new ModbusReadCommandParameters(length,
+                                                                                                   (byte)ModbusFunctionCode.READ_DISCRETE_INPUTS,
+                                                                                                   address,
+                                                                                                   quantity);
+                            modbusFunction = FunctionFactory.CreateModbusFunction(mdb_read);
+                        }
+                        //ANALOG_OUTPUT
+                        else if (pointItem.RegisterType == PointType.ANALOG_OUTPUT)
+                        {
+                            ModbusReadCommandParameters mdb_read = new ModbusReadCommandParameters(length,
+                                                                                                   (byte)ModbusFunctionCode.READ_HOLDING_REGISTERS,
+                                                                                                   address,
+                                                                                                   quantity);
+                            modbusFunction = FunctionFactory.CreateModbusFunction(mdb_read);
+                        }
+                        //ANALOG_INPUT
+                        else if (pointItem.RegisterType == PointType.ANALOG_INPUT)
+                        {
+                            ModbusReadCommandParameters mdb_read = new ModbusReadCommandParameters(length,
+                                                                                                   (byte)ModbusFunctionCode.READ_INPUT_REGISTERS,
+                                                                                                   address,
+                                                                                                   quantity);
+                            modbusFunction = FunctionFactory.CreateModbusFunction(mdb_read);
+                        }
+                        else
+                        {
+                            modbusFunction = null;
+                            string message = $"PointType value is invalid";
+                            Logger.LogError(message);
+                            continue;
+                        }
 
-                            //DIGITAL_OUTPUT
-                            if (pointItem.RegisterType == PointType.DIGITAL_OUTPUT)
-                            {
-                                ModbusReadCommandParameters mdb_read = new ModbusReadCommandParameters(length,
-                                                                                                       (byte)ModbusFunctionCode.READ_COILS,
-                                                                                                       address, quantity);
-
-                                modbusFunction = FunctionFactory.CreateModbusFunction(mdb_read);
-                            }
-                            //DIGITAL_INPUT
-                            else if (pointItem.RegisterType == PointType.DIGITAL_INPUT)
-                            {
-                                ModbusReadCommandParameters mdb_read = new ModbusReadCommandParameters(length,
-                                                                                                       (byte)ModbusFunctionCode.READ_DISCRETE_INPUTS,
-                                                                                                       address, quantity);
-
-                                modbusFunction = FunctionFactory.CreateModbusFunction(mdb_read);
-                            }
-                            //ANALOG_OUTPUT
-                            else if (pointItem.RegisterType == PointType.ANALOG_OUTPUT)
-                            {
-                                ModbusReadCommandParameters mdb_read = new ModbusReadCommandParameters(length,
-                                                                                                       (byte)ModbusFunctionCode.READ_HOLDING_REGISTERS,
-                                                                                                       address, quantity);
-
-                                modbusFunction = FunctionFactory.CreateModbusFunction(mdb_read);
-                            }
-                            //ANALOG_INPUT
-                            else if (pointItem.RegisterType == PointType.ANALOG_INPUT)
-                            {
-                                ModbusReadCommandParameters mdb_read = new ModbusReadCommandParameters(length,
-                                                                                                       (byte)ModbusFunctionCode.READ_INPUT_REGISTERS,
-                                                                                                       address, quantity);
-
-                                modbusFunction = FunctionFactory.CreateModbusFunction(mdb_read);
-                            }
-                            else
-                            {
-                                modbusFunction = null;
-                                string message = $"PointType value is invalid";
-                                Logger.LogError(message);
-                            }
-
-                            if (modbusFunction != null)
-                            {
-                                if (this.functionExecutor.EnqueueCommand(modbusFunction))
-                                {
-                                    Logger.LogDebug($"Modbus function enquided. Point type is {pointItem.RegisterType}");
-                                }
-                            }
+                        if (this.functionExecutor.EnqueueCommand(modbusFunction))
+                        {
+                            Logger.LogDebug($"Modbus function enquided. Point type is {pointItem.RegisterType}");
                         }
                     }
+
+                    Thread.Sleep(scadaConfig.Interval);
                 }
 
                 Logger.LogInfo("AcquisitionThread is stopped.");

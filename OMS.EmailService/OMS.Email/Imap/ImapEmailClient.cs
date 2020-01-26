@@ -26,6 +26,7 @@ namespace OMS.Email.Imap
             _port = Int32.Parse(ConfigurationManager.AppSettings["emailPort"]);
 
             _mapper = mapper;
+
             _client = new ImapClient(_server, _port, true);
         }
 
@@ -51,6 +52,7 @@ namespace OMS.Email.Imap
             {
                 OutageMailMessage outageMessage = _mapper.MapMail(message);
                 outageMailMessages.Add(outageMessage);
+                message.Seen = true;
             }
 
             return outageMailMessages;

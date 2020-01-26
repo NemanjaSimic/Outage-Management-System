@@ -3,6 +3,9 @@
 
 using System;
 using System.Collections.Generic;
+using OMS.Email.Dispatchers;
+using OMS.Email.EmailParsers;
+using OMS.Email.Factories;
 using OMS.Email.Imap;
 using OMS.Email.Interfaces;
 using OMS.Email.Models;
@@ -13,16 +16,11 @@ namespace OMS.EmailService
     {
         static void Main(string[] args)
         {
-            // todo: add factory for email clients
-            IImapEmailMapper mapper = new ImapEmailMapper();
-
-            #if (IDLE_SCAN)
-            #region Idle scan
-
+            #if (IDLE_SCAN)          
             Console.WriteLine("Idle scanning starting...");
 
             // Use-case #1: Idle all-time listening to new messages
-            IIdleEmailClient idleEmailClient = new ImapIdleEmailClient(mapper);
+            IIdleEmailClient idleEmailClient = new ImapIdleClientFactory().CreateClient();
 
             if (!idleEmailClient.Connect())
             {
@@ -38,31 +36,27 @@ namespace OMS.EmailService
             }
 
             Console.WriteLine("Idle scanning started.");
-
-
-            #endregion
             #endif
 
+
             #if (MANUAL_SCAN)
-            #region Manual scan
+            Console.WriteLine("Manual scan starting ...");
 
-                        Console.WriteLine("Manual scan starting ...");
-                        // Use-case #2: Manual scan for unread emails that can be setup as a cron job
-                        IEmailClient emailClient = new ImapEmailClient(mapper);
+            IEmailClient emailClient = new ImapClientFactory().CreateClient();
 
-                        if (!emailClient.Connect())
-                        {
-                            Console.WriteLine("Could not connect email client.");
-                            Console.ReadLine();
-                            return;
-                        }
-                        IEnumerable<OutageMailMessage> unreadMessages = emailClient.GetUnreadMessages();
+            if (!emailClient.Connect())
+            {
+                Console.WriteLine("Could not connect email client.");
+                Console.ReadLine();
+                return;
+            }
 
-                        foreach (var message in unreadMessages)
-                            Console.WriteLine(message);
+            IEnumerable<OutageMailMessage> unreadMessages = emailClient.GetUnreadMessages();
+
+            foreach (var message in unreadMessages)
+                Console.WriteLine(message);
                         
-                        Console.WriteLine("Manual scan finished.");
-            #endregion
+            Console.WriteLine("Manual scan finished.");
             #endif
 
             Console.ReadLine();

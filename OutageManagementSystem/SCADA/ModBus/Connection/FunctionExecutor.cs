@@ -12,10 +12,10 @@ using System.Collections.Generic;
 using System.Threading;
 using Outage.Common.PubSub.SCADADataContract;
 using EasyModbus.Exceptions;
+using Outage.SCADA.ModBus.FunctionParameters;
 
 namespace Outage.SCADA.ModBus.Connection
 {
-    public delegate void UpdatePointDelegate(PointType type, ushort pointAddres, ushort newValue);
 
     public class FunctionExecutor
     {
@@ -29,13 +29,13 @@ namespace Outage.SCADA.ModBus.Connection
         private Thread functionExecutorThread;
         private bool threadCancellationSignal = false;
 
-        private IModbusFunction currentCommand;
         private AutoResetEvent commandEvent;
         private ConcurrentQueue<IModbusFunction> commandQueue;
+        private ConcurrentQueue<IModbusFunction> modelUpdateQueue;
 
-        public ISCADAConfigData ConfigData { get; protected set; }
-        public SCADAModel SCADAModel { get; protected set; }
-        public ModbusClient ModbusClient { get; protected set; }
+        public  ISCADAConfigData ConfigData { get; private set; }
+        public SCADAModel SCADAModel { get; private set; }
+        public ModbusClient ModbusClient { get; private set; }
 
         #region Proxies
 
@@ -82,46 +82,23 @@ namespace Outage.SCADA.ModBus.Connection
 
         #endregion Proxies
 
-        #region Instance
-
-        private static FunctionExecutor instance;
-        private static readonly object lockSync = new object();
-
-        public static FunctionExecutor Instance
+        public FunctionExecutor(SCADAModel scadaModel)
         {
-            get
-            {
-                if (instance == null)
-                {
-                    lock (lockSync)
-                    {
-                        if (instance == null)
-                        {
-                            instance = new FunctionExecutor();
-                        }
-                    }
-                }
+            this.commandQueue = new ConcurrentQueue<IModbusFunction>();
+            this.modelUpdateQueue = new ConcurrentQueue<IModbusFunction>();
+            this.commandEvent = new AutoResetEvent(true);
 
-                return instance;
-            }
-        }
+            SCADAModel = scadaModel;
+            SCADAModel.SignalIncomingModelConfirmation += EnqueueModelUpdateCommands;
 
-        #endregion Instance
-
-        private FunctionExecutor()
-        {
             ConfigData = SCADAConfigData.Instance;
-            SCADAModel = SCADAModel.Instance;
-
             ModbusClient = new ModbusClient(ConfigData.IpAddress, ConfigData.TcpPort);
 
-            commandQueue = new ConcurrentQueue<IModbusFunction>();
-            commandEvent = new AutoResetEvent(false);
         }
 
         #region Public Members
 
-        public void StartExecutor()
+        public void StartExecutorThread()
         {
             try
             {
@@ -144,7 +121,7 @@ namespace Outage.SCADA.ModBus.Connection
             }
         }
 
-        public void StopExecutor()
+        public void StopExecutorThread()
         {
             try
             {
@@ -163,24 +140,15 @@ namespace Outage.SCADA.ModBus.Connection
             
         }
 
-        public bool EnqueueCommand(ModbusFunction modbusFunction)
+        public bool EnqueueCommand(IModbusFunction modbusFunction)
         {
             bool success;
 
             try
             {
-                if (ModbusClient != null && ModbusClient.Connected)
-                {
-                    this.commandQueue.Enqueue(modbusFunction);
-                    this.commandEvent.Set();
-                    success = true;
-                }
-                else
-                {
-                    success = false;
-                    string message = "Modbus client is either not connected or null.";
-                    Logger.LogError(message);
-                }
+                this.commandQueue.Enqueue(modbusFunction);
+                this.commandEvent.Set();
+                success = true;
             }
             catch (Exception e)
             {
@@ -192,7 +160,56 @@ namespace Outage.SCADA.ModBus.Connection
             return success;
         }
 
+        public bool EnqueueModelUpdateCommands(List<long> measurementGids)
+        {
+            bool success;
+            ushort length = 6;
+            try
+            {
+                foreach(long measurementGID in measurementGids)
+                {
+                    ISCADAModelPointItem scadaPointItem = SCADAModel.CurrentScadaModel[measurementGID];
+                    IModbusFunction modbusFunction;
+
+                    if (scadaPointItem is IAnalogSCADAModelPointItem analogSCADAModelPointItem)
+                    {
+                        modbusFunction = FunctionFactory.CreateModbusFunction(new ModbusWriteCommandParameters(length,
+                                                                                                               (byte)ModbusFunctionCode.WRITE_SINGLE_REGISTER,
+                                                                                                               analogSCADAModelPointItem.Address,
+                                                                                                               analogSCADAModelPointItem.CurrentRawValue));
+                    }
+                    else if (scadaPointItem is IDiscreteSCADAModelPointItem discreteSCADAModelPointItem)
+                    {
+                        modbusFunction = FunctionFactory.CreateModbusFunction(new ModbusWriteCommandParameters(length,
+                                                                                                               (byte)ModbusFunctionCode.WRITE_SINGLE_COIL,
+                                                                                                               discreteSCADAModelPointItem.Address,
+                                                                                                               discreteSCADAModelPointItem.CurrentValue));
+                    }
+                    else
+                    {
+                        Logger.LogWarn("Unknown type of ISCADAModelPointItem.");
+                        continue;
+                    }
+
+                    this.modelUpdateQueue.Enqueue(modbusFunction);
+                }
+                
+                
+                this.commandEvent.Set();
+                success = true;
+            }
+            catch (Exception e)
+            {
+                success = false;
+                string message = "Exception caught in EnqueueModelUpdateCommands() method.";
+                Logger.LogError(message, e);
+            }
+
+            return success;
+        }
+
         #endregion Public Members
+
 
         #region Private Members
 
@@ -251,38 +268,27 @@ namespace Outage.SCADA.ModBus.Connection
                         ModbusClient = new ModbusClient(ConfigData.IpAddress, ConfigData.TcpPort);
                     }
 
-                    if (!ModbusClient.Connected)
-                    {
-                        ConnectToModbusClient();
-                    }
-
                     Logger.LogDebug("Connected and waiting for command event.");
 
                     this.commandEvent.WaitOne();
 
                     Logger.LogDebug("Command event happened.");
 
-                    while (commandQueue.TryDequeue(out this.currentCommand))
+                    if (!ModbusClient.Connected)
                     {
-                        try
-                        {
-                            currentCommand.Execute(ModbusClient);
-                        }
-                        catch (Exception e)
-                        {
-                            //todo: retry
-                            string message = "Exception on currentCommand.Execute().";
-                            Logger.LogWarn(message, e);
-                        }
+                        ConnectToModbusClient();
+                    }
 
-                        if (currentCommand is IReadAnalogModusFunction readAnalogCommand)
-                        {
-                            PublishAnalogData(readAnalogCommand.Data);
-                        }
-                        else if (currentCommand is IReadDiscreteModbusFunction readDiscreteCommand)
-                        {
-                            PublishDigitalData(readDiscreteCommand.Data);
-                        }
+                    //HIGH PRIORITY COMMANDS - model update commands
+                    while (modelUpdateQueue.TryDequeue(out IModbusFunction currentCommand))
+                    {
+                        ExecuteCommand(currentCommand);
+                    }
+
+                    //REGULAR COMMANDS - acquisition and user commands
+                    while (commandQueue.TryDequeue(out IModbusFunction currentCommand))
+                    {
+                        ExecuteCommand(currentCommand);
                     }
                 }
                 catch (Exception ex)
@@ -292,7 +298,35 @@ namespace Outage.SCADA.ModBus.Connection
                 }
             }
 
+            if(ModbusClient.Connected)
+            {
+                ModbusClient.Disconnect();
+            }
+
             Logger.LogInfo("FunctionExecutorThread is stopped.");
+        }
+
+        private void ExecuteCommand(IModbusFunction command)
+        {
+            try
+            {
+                command.Execute(ModbusClient);
+            }
+            catch (Exception e)
+            {
+                //todo: retry
+                string message = "Exception on currentCommand.Execute().";
+                Logger.LogWarn(message, e);
+            }
+
+            if (command is IReadAnalogModusFunction readAnalogCommand)
+            {
+                PublishAnalogData(readAnalogCommand.Data);
+            }
+            else if (command is IReadDiscreteModbusFunction readDiscreteCommand)
+            {
+                PublishDigitalData(readDiscreteCommand.Data);
+            }
         }
 
         private void PublishAnalogData(Dictionary<long, AnalogModbusData> data)

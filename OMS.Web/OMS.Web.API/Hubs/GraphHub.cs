@@ -16,6 +16,11 @@ namespace OMS.Web.API.Hubs
             Clients.All.updateGraph(new OmsGraph { Nodes = nodes, Relations = relations });
         }
 
+        public void NotifyGraphOutageCall(long gid)
+        {
+            Clients.All.reportOutageCall(gid);
+        }
+
         public void Join()
         {
             Groups.Add(Context.ConnectionId, "Users");

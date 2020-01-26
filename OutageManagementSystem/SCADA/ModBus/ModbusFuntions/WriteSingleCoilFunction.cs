@@ -20,6 +20,7 @@ namespace Outage.SCADA.ModBus.ModbusFuntions
 
         public override void Execute(ModbusClient modbusClient)
         {
+
             ModbusWriteCommandParameters mdb_write_comm_pars = this.CommandParameters as ModbusWriteCommandParameters;
             ushort outputAddress = mdb_write_comm_pars.OutputAddress;
             int value = mdb_write_comm_pars.Value;
@@ -45,6 +46,8 @@ namespace Outage.SCADA.ModBus.ModbusFuntions
                 throw new ArgumentException("Non-boolean value in write single coil command parameter.");
             }
 
+
+            //TODO: Check does current scada model has the requested address, maybe let anyway
             modbusClient.WriteSingleCoil(outputAddress - 1, commandingValue);
             Logger.LogInfo($"WriteSingleCoilFunction executed SUCCESSFULLY. OutputAddress: {outputAddress}, Value: {commandingValue}");
         }

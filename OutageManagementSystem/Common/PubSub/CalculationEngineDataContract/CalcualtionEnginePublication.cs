@@ -9,7 +9,7 @@ using System.Threading.Tasks;
 namespace Outage.Common.PubSub.CalculationEngineDataContract
 {
    
-    [Serializable]
+    //[Serializable]
     [DataContract]
     public class CalcualtionEnginePublication : Publication
     {

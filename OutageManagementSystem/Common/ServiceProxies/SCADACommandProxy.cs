@@ -9,6 +9,11 @@ namespace Outage.Common.ServiceProxies
 {
     public class SCADACommandProxy : ClientBase<ISCADACommand>, ISCADACommand
     {
+        public SCADACommandProxy(string endpointName)
+            : base(endpointName)
+        {
+        }
+
         public bool SendAnalogCommand(long gid, float commandingValue)
         {
             bool success;
