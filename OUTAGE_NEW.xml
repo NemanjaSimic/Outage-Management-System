@@ -3392,7 +3392,7 @@
 		<cim:Discrete.normalValue>0</cim:Discrete.normalValue>
 		<cim:Measurement.address>3</cim:Measurement.address>
 		<cim:Measurement.isInput>false</cim:Measurement.isInput>
-		<cim:Measurement.Terminal rdf:resource="#TM_25"/>
+		<cim:Measurement.Terminal rdf:resource="#TM_26"/>
 		<cim:IdentifiedObject.description> </cim:IdentifiedObject.description>
 		<cim:IdentifiedObject.mRID>DS_1</cim:IdentifiedObject.mRID>
 		<ftn:IdentifiedObject.name>DS_1</ftn:IdentifiedObject.name>
