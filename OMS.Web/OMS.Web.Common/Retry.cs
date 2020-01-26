@@ -11,7 +11,7 @@
             TimeSpan retryInterval,
             int maxAttemptCount = 3)
         {
-            Console.WriteLine($"Attempting method: {action.Method.Name}");
+            Console.WriteLine($"Attempting method: {action.Method.Name}, {maxAttemptCount} times every {retryInterval.TotalSeconds} seconds.");
 
             Do<object>(() =>
             {
