@@ -11,6 +11,7 @@ export interface Node {
 }
 
 export interface IMeasurement {
-  Value: Number, 
-  Type: string
+  Id: string;
+  Type: string;
+  Value: Number; 
 }

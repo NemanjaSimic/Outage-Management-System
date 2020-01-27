@@ -2,7 +2,7 @@
 
 namespace CECommon
 {
-	public class Field : Edge
+	public class Field : TopologyElement
 	{
 		private static long fieldNumber = 5000;
 		private List<long> members;

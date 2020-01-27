@@ -29,8 +29,8 @@ export const addGraphTooltip = (cy, node) => {
         .replace("[[nominalVoltage]]", node.data('nominalVoltage'));
 
       // button - mozemo i preko document.createElement() pa appendChild()
-      if ((node.data('dmsType') == "LOADBREAKSWITCH" || node.data('dmsType') == "DISCONNECTOR") &&
-            node.data('IsRemote') == true) {
+      if (node.data('dmsType') == "LOADBREAKSWITCH" || node.data('dmsType') == "DISCONNECTOR" 
+            || node.data('dmsType') == "BREAKER" || node.data('dmsType') == "FUSE") {
         const button = document.createElement('button');
 
         if (node.data('state') == "active") {
@@ -43,8 +43,8 @@ export const addGraphTooltip = (cy, node) => {
         button.addEventListener('click', () => {
 
           // jer je u mocku string, a u sistemu je long
-          const guid = Math.random() * 1000; 
-
+          const meas = node.data('measurements');
+          const guid = meas[0].Id;
           if (node.data('state') == "active") {
             const command: SwitchCommand = {
               guid,

@@ -58,7 +58,7 @@ namespace PubSubEngine
 
         public void RemoveSubscriber(ISubscriberCallback subscriber)
         {
-            string subscriberName = subscriber.GetSubscriberName();
+            //string subscriberName = subscriber.GetSubscriberName();
 
             foreach (Topic topic in subscribedClients.Keys)
             {
@@ -68,7 +68,7 @@ namespace PubSubEngine
                 {
                     if(listOfSubscribers.Remove(subscriber))
                     {
-                        Logger.LogDebug($"Subscriber [{subscriberName}] removed from subscribed clients map. [Key Topic: {topic}]");
+                        Logger.LogDebug($"Subscriber [] removed from subscribed clients map. [Key Topic: {topic}]");
                     }
                 }
             }

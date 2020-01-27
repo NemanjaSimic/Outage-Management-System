@@ -6,7 +6,7 @@ using System.Threading.Tasks;
 
 namespace CECommon.Interfaces
 {
-    public interface IMeasurement
+    public interface IMeasurement : IGraphElement
     {
         long Id { get; set; }
         string Address { get; set; }

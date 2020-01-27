@@ -71,7 +71,7 @@ namespace NetworkModelServiceFunctions
 		private List<ResourceDescription> ProcessIterator(int iteratorId)
 		{
             //TODO: mozda vec ovde napakovati dictionary<long, rd> ?
-			int numberOfResources = 50, resourcesLeft = 0;
+			int numberOfResources = 10000, resourcesLeft = 0;
 			List<ResourceDescription> resourceDescriptions = new List<ResourceDescription>();
 
 			try

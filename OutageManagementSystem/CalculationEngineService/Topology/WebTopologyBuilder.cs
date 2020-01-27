@@ -1,13 +1,12 @@
 ﻿using CECommon;
 using CECommon.Interfaces;
+using NetworkModelServiceFunctions;
 using Outage.Common;
 using Outage.Common.UI;
 using System;
 using System.Collections.Generic;
 using System.Linq;
-using System.Text;
-using System.Threading.Tasks;
-using TopologyElementsFuntions;
+using TopologyBuilder;
 
 namespace Topology
 {
@@ -29,7 +28,7 @@ namespace Topology
                     foreach (long child in element.SecondEnd)
                     {
                         long nextElement = child;
-                        if (TopologyHelper.Instance.GetDMSTypeOfTopologyElement(child).Equals("FIELD"))
+                        if (NMSManager.Instance.GetDMSTypeOfTopologyElementString(child).Equals("FIELD"))
                         {
                             try
                             {
@@ -45,6 +44,17 @@ namespace Topology
                         uIModel.AddRelation(element.Id, nextElement);
                         stack.Push(nextElement);
                     }
+                    List<UIMeasurement> measurements = new List<UIMeasurement>();
+                    foreach (var meas in element.Measurements)
+                    {
+                        measurements.Add(new UIMeasurement()
+                        {
+                            Gid = meas.Id,
+                            Type = meas.GetMeasurementType(),
+                            Value = meas.GetCurrentVaule()
+                        });
+                    }
+
                     UINode newUINode = new UINode()
                     {
                         Id = element.Id,
@@ -53,7 +63,7 @@ namespace Topology
                         Description = element.Description,
                         DMSType = element.DmsType,
                         NominalVoltage = element.NominalVoltage,
-                        Measurements = element.GetMeasurements(),
+                        Measurements = measurements,
                         IsActive = element.IsActive,
                         IsRemote = element.IsRemote
                     };

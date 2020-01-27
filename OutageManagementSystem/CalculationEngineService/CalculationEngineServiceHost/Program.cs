@@ -1,19 +1,12 @@
-﻿using CalculationEngineService;
-using Outage.Common;
-﻿using CECommon;
-using CECommon.Model;
+﻿using Outage.Common;
 using NetworkModelServiceFunctions;
 using System;
-using System.Collections.Generic;
 using System.Diagnostics;
-using System.Linq;
-using TopologyBuilder;
-using TopologyElementsFuntions;
 using Topology;
 
 namespace CalculationEngineServiceHost
 {
-	class Program
+    class Program
 	{
         static void Main(string[] args)
         {
@@ -25,13 +18,20 @@ namespace CalculationEngineServiceHost
                 Logger.LogInfo(message);
                 Console.WriteLine("\n{0}\n", message);
 
+                Stopwatch stopwatch = new Stopwatch();
                 Logger.LogDebug("Initializing NMSManager...");
+                stopwatch.Start();
                 NMSManager.Instance.Initialize();
+                stopwatch.Stop();
+                Console.WriteLine($"NMS Initialized for {stopwatch.Elapsed.ToString()}");
                 Logger.LogDebug("NMSManager has been successfully initialized.");
 
                 Logger.LogInfo("Initializing topology...");
+                stopwatch.Restart();
                 TopologyManager.Instance.InitializeTopology();
+                Console.WriteLine($"Topology Initialized for {stopwatch.Elapsed}");
                 Logger.LogInfo("Topology has been successfully initialized.");
+
 
                 using (CalculationEngineService.CalculationEngineService ces = new CalculationEngineService.CalculationEngineService())
                 {

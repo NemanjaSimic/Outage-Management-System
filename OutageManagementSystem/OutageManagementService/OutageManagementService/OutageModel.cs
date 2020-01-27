@@ -71,29 +71,29 @@ namespace OutageManagementService
             using (TopologyServiceProxy topologyServiceProxy = TopologyProxy)
             {
                 topology = TopologyProxy.GetTopology();
-                PrintUI(topology);
+                //PrintUI(topology);
             }
         }
 
-        private void PrintUI(UIModel topology)
-        {
-            if (topology.Nodes.Count > 0)
-            {
-                Print(topology.Nodes[topology.FirstNode], topology);
-            }
-        }
+        //private void PrintUI(UIModel topology)
+        //{
+        //    if (topology.Nodes.Count > 0)
+        //    {
+        //        Print(topology.Nodes[topology.FirstNode], topology);
+        //    }
+        //}
 
-        private void Print(UINode parent, UIModel topology)
-        {
-            var connectedElements = topology.GetRelatedElements(parent.Gid);
-            if (connectedElements != null)
-            {
-                foreach (var connectedElement in connectedElements)
-                {
-                    Console.WriteLine($"{parent.Type} with gid {parent.Gid.ToString("X")} connected to {topology.Nodes[connectedElement].Type} with gid {topology.Nodes[connectedElement].Gid.ToString("X")}");
-                    Print(topology.Nodes[connectedElement], topology);
-                }
-            }
-        }
+        //private void Print(UINode parent, UIModel topology)
+        //{
+        //    var connectedElements = topology.GetRelatedElements(parent.Gid);
+        //    if (connectedElements != null)
+        //    {
+        //        foreach (var connectedElement in connectedElements)
+        //        {
+        //            Console.WriteLine($"{parent.Type} with gid {parent.Gid.ToString("X")} connected to {topology.Nodes[connectedElement].Type} with gid {topology.Nodes[connectedElement].Gid.ToString("X")}");
+        //            Print(topology.Nodes[connectedElement], topology);
+        //        }
+        //    }
+        //}
     }
 }

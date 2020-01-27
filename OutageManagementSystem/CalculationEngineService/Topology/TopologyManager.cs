@@ -95,19 +95,7 @@ namespace Topology
         {
             TopologyModel = new List<ITopology>(TransactionTopologyModel);
             logger.LogDebug("TopologyManager commited transaction successfully.");
-            using (var publisherProxy = new PublisherProxy(EndpointNames.PublisherEndpoint))
-            {
-                //Dok se ne sredi logika za vise root-ova na WEB-u
-                ITopology topology = new TopologyModel();
-                if (TopologyModel.Count > 0)
-                {
-                    topology = TopologyModel.First();
-                }
-                TopologyForUIMessage message = new TopologyForUIMessage(webTopologyBuilder.CreateTopologyForWeb(topology)); //privremeno resenje, dok se ne razradi logika
-                CalcualtionEnginePublication publication = new CalcualtionEnginePublication(Topic.TOPOLOGY, message);
-                publisherProxy.Publish(publication);
-                logger.LogDebug("TopologyManager published new topology successfully.");
-            }
+            Publish();
         }
 
         public void RollbackTransaction()
@@ -121,7 +109,32 @@ namespace Topology
             logger.LogDebug("Updating topology started.");
             TopologyModel = CreateTopology();
             logger.LogDebug("Updating topology finished.");
+            Publish();
         }
 
+        public void Publish()
+        {
+            //Dok se ne sredi logika za vise root-ova na WEB-u
+            ITopology topology = new TopologyModel();
+            if (TopologyModel.Count > 0)
+            {
+                topology = TopologyModel.First();
+            }
+            TopologyForUIMessage message = new TopologyForUIMessage(webTopologyBuilder.CreateTopologyForWeb(topology)); //privremeno resenje, dok se ne razradi logika
+            CalcualtionEnginePublication publication = new CalcualtionEnginePublication(Topic.TOPOLOGY, message);
+            try
+            {
+                using (var publisherProxy = new PublisherProxy(EndpointNames.PublisherEndpoint))
+                {
+                    publisherProxy.Publish(publication);
+                    logger.LogDebug("TopologyManager published new topology successfully.");
+                }
+            }
+            catch (Exception ex)
+            {
+                logger.LogError($"TopologyManager failed to publish new topology. Exception: {ex.Message}");
+            }
+            
+        }
     }
 }

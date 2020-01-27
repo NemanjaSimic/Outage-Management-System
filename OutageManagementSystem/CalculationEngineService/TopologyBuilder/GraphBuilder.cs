@@ -7,7 +7,6 @@ using SCADACommanding;
 using System;
 using System.Collections.Generic;
 using System.Linq;
-using TopologyElementsFuntions;
 
 namespace TopologyBuilder
 {
@@ -15,7 +14,6 @@ namespace TopologyBuilder
     {
         #region Fields
         private ILogger logger = LoggerWrapper.Instance;
-        private readonly TopologyElementFactory topologyElementFactory = new TopologyElementFactory();
         private List<Field> fields;
         private HashSet<long> visited;
         private Stack<ITopologyElement> stack;
@@ -30,7 +28,8 @@ namespace TopologyBuilder
             fields = new List<Field>();
 
             ITopology topology = new TopologyModel();
-            ITopologyElement firstNode = topologyElementFactory.CreateTopologyElement(firstElementGid);
+            ITopologyElement firstNode = NMSManager.Instance.GetPopulatedElement(firstElementGid);
+                
             firstNode.IsActive = true;
             stack.Push(firstNode);
 
@@ -47,16 +46,25 @@ namespace TopologyBuilder
                 {
                     if (TopologyHelper.Instance.GetElementTopologyType(element) == TopologyType.Measurement)
                     {
-                        string elementType = TopologyHelper.Instance.GetDMSTypeOfTopologyElement(element);
+                        string elementType = NMSManager.Instance.GetDMSTypeOfTopologyElementString(element);
                         if (elementType.Equals("BASEVOLTAGE"))
                         {
-                            currentNode.NominalVoltage = NMSManager.Instance.GetBaseVoltageForElement(element);
+                            float voltage = NMSManager.Instance.GetBaseVoltageForElement(element);
+                            currentNode.NominalVoltage = voltage;
                         }
-                        else if (elementType.Equals("ANALOG") || elementType.Equals("DISCRETE"))
+                        else if (elementType.Equals("ANALOG"))
                         {
-                            currentNode.Measurements.Add(topologyElementFactory.CreateMeasurement(element));
-                            //SCADACommandingCache.Instance.AddMeasurementToElement(currentNode.Id, currentNode.Measurement.Id);
+                            Measurement newMeasurement = NMSManager.Instance.GetPopulatedAnalogMeasurement(element);
+                            currentNode.Measurements.Add(newMeasurement);
+                            SCADACommandingCache.Instance.AddAnalogMeasurement(newMeasurement.Id, currentNode.Id, newMeasurement.GetCurrentVaule());
                         }
+                        else if (elementType.Equals("DISCRETE"))
+                        {
+                            Measurement newMeasurement = NMSManager.Instance.GetPopulatedAnalogMeasurement(element);
+                            currentNode.Measurements.Add(newMeasurement);
+                            SCADACommandingCache.Instance.AddDiscreteMeasurement(newMeasurement.Id, currentNode.Id, (ushort)newMeasurement.GetCurrentVaule());
+                        
+                        }                      
                         else
                         {
                             logger.LogError($"Failed to procces element of type Measurement. Element is neither Analog,Discrete nor BaseVoltage.");
@@ -64,11 +72,30 @@ namespace TopologyBuilder
                     }
                     else
                     {
-                        var newNode = ConnectTwoNodes(element, currentNode);       
+                        var newNode = ConnectTwoNodes(element, currentNode);
+                        //ITopologyElement newNode = NMSManager.Instance.GetTopologyElement(element);
+                        //currentNode.SecondEnd.Add(newNode.Id);
+                        //newNode.FirstEnd = currentNode.Id;
+
+                        //newNode.IsActive = currentNode.IsActive;
+                        //foreach (var measurement in newNode.Measurements)
+                        //{
+                        //    if (measurement is DiscreteMeasurement && currentNode.IsActive)
+                        //    {
+                        //        if (measurement.GetCurrentVaule() == 1)
+                        //        {
+                        //            newNode.IsActive = false;
+                        //        }
+                        //        else
+                        //        {
+                        //            newNode.IsActive = true;
+                        //        }
+                        //    }
+                        //}
                         stack.Push(newNode);
                     }
                 }
-                currentNode.DmsType = TopologyHelper.Instance.GetDMSTypeOfTopologyElement(currentNode.Id);
+                currentNode.DmsType = NMSManager.Instance.GetDMSTypeOfTopologyElementString(currentNode.Id);
                 topology.AddElement(currentNode);
             }
             topology.FirstNode = firstNode.Id;
@@ -107,7 +134,8 @@ namespace TopologyBuilder
             bool newElementIsField = TopologyHelper.Instance.GetElementTopologyStatus(newElementGid) == TopologyStatus.Field;
             bool parentElementIsField = TopologyHelper.Instance.GetElementTopologyStatus(parent.Id) == TopologyStatus.Field;
 
-            ITopologyElement newNode = topologyElementFactory.CreateTopologyElement(newElementGid);
+            ITopologyElement newNode = NMSManager.Instance.GetPopulatedElement(newElementGid);
+               
 
             if (newElementIsField && !parentElementIsField)
             {

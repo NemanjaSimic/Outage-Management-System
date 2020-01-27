@@ -21,11 +21,20 @@ namespace OMS.Web.Common.Mappers
                     Mrid = keyValue.Value.Mrid,
                     IsActive = keyValue.Value.IsActive,
                     DMSType = keyValue.Value.DMSType,
-                    Measurements = keyValue.Value.Measurements,
                     IsRemote = keyValue.Value.IsRemote,
-                    NominalVoltage = keyValue.Value.NominalVoltage.ToString()
+                    NominalVoltage = keyValue.Value.NominalVoltage.ToString(),
+                    Measurements = new List<Meauserement>()
                 };
 
+                foreach (var measurement in keyValue.Value.Measurements)
+                {
+                    graphNode.Measurements.Add(new Meauserement()
+                    {
+                        Id = measurement.Gid.ToString(),
+                        Type = measurement.Type,
+                        Value = measurement.Value
+                    });
+                }
                 graph.Nodes.Add(graphNode);
             }
 

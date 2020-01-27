@@ -14,7 +14,7 @@ namespace OMS.Web.UI.Models.ViewModels
         public string Mrid;
         public string Description;
         public string DMSType;
-        public List<Tuple<float,string>> Measurements;
+        public List<Meauserement> Measurements;
         public bool IsActive;
         public string NominalVoltage;
         public bool IsRemote;

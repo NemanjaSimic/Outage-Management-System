@@ -1,5 +1,7 @@
 ﻿using CalculationEngineService.DistributedTransaction;
 using Outage.Common;
+using Outage.Common.ServiceContracts.PubSub;
+using Outage.Common.ServiceProxies.PubSub;
 using SCADACommanding;
 using System;
 using System.Collections.Generic;
@@ -12,6 +14,7 @@ namespace CalculationEngineService
     public class CalculationEngineService : IDisposable
     {
         private ILogger logger;
+        private ISubscriber proxy;
 
         protected ILogger Logger
         {
@@ -28,6 +31,7 @@ namespace CalculationEngineService
         public void Start()
         {
             StartHosts();
+            SubscribeToSCADA();
         }
 
         public void Dispose()
@@ -106,6 +110,14 @@ namespace CalculationEngineService
             string message = "Calculation Engine Service is gracefully closed.";
             Logger.LogInfo(message);
             Console.WriteLine("\n\n{0}", message);
+        }
+
+        private void SubscribeToSCADA()
+        {
+            Logger.LogDebug("Subcribing on SCADA measurements.");
+            proxy = new SubscriberProxy(new SCADASubscriber(), EndpointNames.SubscriberEndpoint);
+            proxy.Subscribe(Topic.MEASUREMENT);
+            proxy.Subscribe(Topic.SWITCH_STATUS);
         }
     }
 }

@@ -6,7 +6,7 @@ using System.Threading.Tasks;
 
 namespace CECommon.Interfaces
 {
-    public interface ITopologyElement
+    public interface ITopologyElement : IGraphElement
     {
         long Id { get; set; }
         string Description { get; set; }
@@ -19,6 +19,5 @@ namespace CECommon.Interfaces
         bool IsActive { get; set; }
         float NominalVoltage { get; set; }
         List<IMeasurement> Measurements { get; set; }
-        List<Tuple<float, string>> GetMeasurements();
     }
 }

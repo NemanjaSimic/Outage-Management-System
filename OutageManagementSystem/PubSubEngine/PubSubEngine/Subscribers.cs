@@ -34,7 +34,16 @@ namespace PubSubEngine
         public bool TryAddSubscriber(ISubscriberCallback subscriber)
         {
             bool success = subscribers.TryAdd(subscriber, new Queue<IPublishableMessage>());
-            string subscriberName = subscriber.GetSubscriberName();
+            string subscriberName = "";
+            try
+            {
+                subscriberName = subscriber.GetSubscriberName();
+            }
+            catch (Exception ex)
+            {
+                Logger.LogDebug($"Couldn't get subscriber name. Execption message: {ex.Message}");
+            }
+
 
             if (success)
             {
@@ -51,7 +60,15 @@ namespace PubSubEngine
         public void RemoveSubscriber(ISubscriberCallback subscriber)
         {
             bool success = subscribers.TryRemove(subscriber, out Queue<IPublishableMessage> queue);
-            string subscriberName = subscriber.GetSubscriberName();
+            string subscriberName = "";
+            try
+            {
+                subscriberName = subscriber.GetSubscriberName();
+            }
+            catch (Exception ex)
+            {
+                Logger.LogDebug($"Couldn't get subscriber name. Execption message: {ex.Message}");
+            }
 
             if (success)
             {

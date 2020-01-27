@@ -15,49 +15,24 @@ namespace SCADACommanding
         public bool SendAnalogCommand(long gid, float commandingValue)
         {
             bool success = false;
-            if (SCADACommandingCache.Instance.TryGetMeasurementOfElement(gid, out long measurementId))
-            {
-                try
-                {
-                    using (var proxy = new SCADACommandProxy(EndpointNames.SCADACommandService))
-                    {
-                        proxy.SendAnalogCommand(measurementId, commandingValue);
-                        success = true;
-                    }
-                }
-                catch (Exception ex)
-                {
-                    logger.LogError($"Sending analog command for measurement with GID {measurementId} failed. Exception: {ex.Message}");
-                }
-            }
-            else
-            {
-                logger.LogError($"Failed to get measurement for element with GID {gid}.");
-            }
+            //Imamo li analog komandu ????
             return success;
         }
 
         public bool SendDiscreteCommand(long gid, ushort commandingValue)
         {
             bool success = false;
-            if (SCADACommandingCache.Instance.TryGetMeasurementOfElement(gid, out long measurementId))
+            try
             {
-                try
+                using (var proxy = new SCADACommandProxy(EndpointNames.SCADACommandService))
                 {
-                    using (var proxy = new SCADACommandProxy(EndpointNames.SCADACommandService))
-                    {
-                        proxy.SendDiscreteCommand(measurementId, commandingValue);
-                        success = true;
-                    }
-                }
-                catch (Exception ex)
-                {
-                    logger.LogError($"Sending discrete command for measurement with GID {measurementId} failed. Exception: {ex.Message}");
+                    proxy.SendDiscreteCommand(gid, commandingValue);
+                    success = true;
                 }
             }
-            else
+            catch (Exception ex)
             {
-                logger.LogError($"Failed to get measurement for element with GID {gid}.");
+                logger.LogError($"Sending discrete command for measurement with GID {gid} failed. Exception: {ex.Message}");
             }
             return success;
         }

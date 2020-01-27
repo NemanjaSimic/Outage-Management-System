@@ -19,7 +19,7 @@ namespace Outage.Common.UI
         [DataMember]
         public bool IsActive { get; set; }
         [DataMember]
-        public List<Tuple<float, string>> Measurements {get; set;}
+        public List<UIMeasurement> Measurements {get; set;}
         [DataMember]
         public float NominalVoltage { get; set; }
         [DataMember]

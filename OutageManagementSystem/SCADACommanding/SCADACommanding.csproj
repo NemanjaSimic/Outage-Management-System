@@ -45,6 +45,7 @@
     <Compile Include="Properties\AssemblyInfo.cs" />
     <Compile Include="SCADACommandingCache.cs" />
     <Compile Include="SCADACommandingService.cs" />
+    <Compile Include="SCADASubscriber.cs" />
   </ItemGroup>
   <ItemGroup>
     <ProjectReference Include="..\Common\Common.csproj">

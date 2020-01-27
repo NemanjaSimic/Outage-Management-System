@@ -47,6 +47,7 @@
   </ItemGroup>
   <ItemGroup>
     <Compile Include="BindingModels\SwitchCommand.cs" />
+    <Compile Include="ViewModels\Meauserement.cs" />
     <Compile Include="ViewModels\Node.cs" />
     <Compile Include="ViewModels\OmsGraph.cs" />
     <Compile Include="ViewModels\Relation.cs" />

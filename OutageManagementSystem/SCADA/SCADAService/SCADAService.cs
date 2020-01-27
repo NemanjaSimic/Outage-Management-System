@@ -37,7 +37,7 @@ namespace Outage.SCADA.SCADAService
             CommandService.SCADAModel = scadaModel;
             SCADAModelUpdateNotification.SCADAModel = scadaModel;
             SCADATransactionActor.SCADAModel = scadaModel;
-
+            CommandService.FunctionExecutor = functionExecutor;
             scadaModel.ImportModel();
 
             InitializeHosts();

@@ -5,7 +5,7 @@ using System.Collections.Generic;
 
 namespace CECommon
 {
-	public abstract class TopologyElement : ITopologyElement
+	public class TopologyElement : ITopologyElement
 	{
         #region Fields
         private long id;
@@ -39,16 +39,6 @@ namespace CECommon
 			Id = gid;
 			SecondEnd = new List<long>();
 			Measurements = new List<IMeasurement>();
-		}
-
-		public List<Tuple<float,string>> GetMeasurements()
-		{
-			List<Tuple<float, string>> measurements = new List<Tuple<float, string>>();
-			foreach (var measurement in Measurements)
-			{
-				measurements.Add(new Tuple<float, string>(measurement.GetCurrentVaule(), measurement.GetMeasurementType()));
-			}
-			return measurements;
 		}
 	}
 }

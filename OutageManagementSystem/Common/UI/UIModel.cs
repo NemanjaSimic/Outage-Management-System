@@ -5,7 +5,6 @@ using System.Runtime.Serialization;
 
 namespace Outage.Common.UI
 {
-	//[Serializable]
 	[DataContract]
 	public class UIModel
 	{

@@ -157,6 +157,7 @@
     <Compile Include="GDA\Property.cs" />
     <Compile Include="GDA\ResourceDescription.cs" />
     <Compile Include="GDA\PropertyValue.cs" />
+    <Compile Include="UI\UIMeasurement.cs" />
     <Compile Include="UI\UIModel.cs" />
     <Compile Include="UI\UINode.cs" />
     <Compile Include="Versioning\DeltaDB.cs" />
