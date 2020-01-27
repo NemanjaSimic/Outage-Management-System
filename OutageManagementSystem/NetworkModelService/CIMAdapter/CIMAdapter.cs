@@ -14,6 +14,7 @@ using System.Text;
 using System.Threading;
 using System.Threading.Tasks;
 using Outage.Common;
+using System.ServiceModel;
 
 namespace Outage.DataImporter.CIMAdapter
 {
@@ -31,42 +32,51 @@ namespace Outage.DataImporter.CIMAdapter
 
         #region Proxies
         private NetworkModelGDAProxy gdaQueryProxy = null;
-        protected NetworkModelGDAProxy GdaQueryProxy
+
+        private NetworkModelGDAProxy GetGdaQueryProxy()
         {
-            get
+            int numberOfTries = 0;
+            int sleepInterval = 500;
+
+            while (numberOfTries <= int.MaxValue)
             {
-                int numberOfTries = 0;
-
-                while (numberOfTries < 10)
+                try
                 {
-                    try
+                    if (gdaQueryProxy != null)
                     {
-                        if (gdaQueryProxy != null)
-                        {
-                            gdaQueryProxy.Abort();
-                            gdaQueryProxy = null;
-                        }
-
-                        gdaQueryProxy = new NetworkModelGDAProxy(EndpointNames.NetworkModelGDAEndpoint);
-                        gdaQueryProxy.Open();
-                        break;
-                    }
-                    catch (Exception ex)
-                    {
-                        string message = $"Exception on NetworkModelGDAProxy initialization. Message: {ex.Message}";
-                        Logger.LogError(message, ex);
+                        gdaQueryProxy.Abort();
                         gdaQueryProxy = null;
                     }
-                    finally
+
+                    gdaQueryProxy = new NetworkModelGDAProxy(EndpointNames.NetworkModelGDAEndpoint);
+                    gdaQueryProxy.Open();
+
+                    if (gdaQueryProxy.State == CommunicationState.Opened)
                     {
-                        numberOfTries++;
-                        Logger.LogDebug($"CIMAdapterClass: GdaQueryProxy getter, try number: {numberOfTries}.");
-                        Thread.Sleep(500);
+                        break;
                     }
                 }
+                catch (Exception ex)
+                {
+                    string message = $"Exception on NetworkModelGDAProxy initialization. Message: {ex.Message}";
+                    logger.LogWarn(message, ex);
+                    gdaQueryProxy = null;
+                }
+                finally
+                {
+                    numberOfTries++;
+                    logger.LogDebug($"CIMAdapterClass: GdaQueryProxy getter, try number: {numberOfTries}.");
 
-                return gdaQueryProxy;
+                    if (numberOfTries >= 100)
+                    {
+                        sleepInterval = 1000;
+                    }
+
+                    Thread.Sleep(sleepInterval);
+                }
             }
+
+            return gdaQueryProxy;
         }
         #endregion
 
@@ -104,7 +114,7 @@ namespace Outage.DataImporter.CIMAdapter
             if ((delta != null) && (delta.NumberOfOperations != 0))
             {
                 //// NetworkModelService->ApplyUpdates
-                using(NetworkModelGDAProxy gdaQueryProxy = GdaQueryProxy)
+                using(NetworkModelGDAProxy gdaQueryProxy = GetGdaQueryProxy())
                 {
                     if (gdaQueryProxy != null)
                     {
@@ -182,7 +192,7 @@ namespace Outage.DataImporter.CIMAdapter
                 {
                     case SupportedProfiles.Outage:
                         {
-                            TransformAndLoadReport report = OutageImporter.Instance.CreateNMSDelta(concreteModel, GdaQueryProxy, resourcesDesc);
+                            TransformAndLoadReport report = OutageImporter.Instance.CreateNMSDelta(concreteModel, GetGdaQueryProxy(), resourcesDesc);
 
                             if (report.Success)
                             {

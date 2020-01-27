@@ -38,7 +38,7 @@ namespace Outage.SCADA.SCADAService.DistributedTransaction
 
             if (success)
             {
-                using (TransactionEnlistmentProxy transactionEnlistmentProxy = TransactionEnlistmentProxy)
+                using (TransactionEnlistmentProxy transactionEnlistmentProxy = GetTransactionEnlistmentProxy())
                 {
                     if (transactionEnlistmentProxy != null)
                     {

@@ -13,6 +13,7 @@ using System.Threading;
 using Outage.Common.PubSub.SCADADataContract;
 using EasyModbus.Exceptions;
 using Outage.SCADA.ModBus.FunctionParameters;
+using System.ServiceModel;
 
 namespace Outage.SCADA.ModBus.Connection
 {
@@ -41,43 +42,52 @@ namespace Outage.SCADA.ModBus.Connection
 
         private PublisherProxy publisherProxy = null;
 
-        public PublisherProxy PublisherProxy
+        private PublisherProxy GetPublisherProxy()
         {
             //TODO: diskusija statefull vs stateless
-            get
+
+            int numberOfTries = 0;
+            int sleepInterval = 500;
+
+            while (numberOfTries < 10)
             {
-                int numberOfTries = 0;
-
-                while (numberOfTries < 10)
+                try
                 {
-                    try
+                    if (publisherProxy != null)
                     {
-                        if (publisherProxy != null)
-                        {
-                            publisherProxy.Abort();
-                            publisherProxy = null;
-                        }
-
-                        publisherProxy = new PublisherProxy(EndpointNames.PublisherEndpoint);
-                        publisherProxy.Open();
-                        break;
-                    }
-                    catch (Exception ex)
-                    {
-                        string message = $"Exception on PublisherProxy initialization. Message: {ex.Message}";
-                        Logger.LogError(message, ex);
+                        publisherProxy.Abort();
                         publisherProxy = null;
                     }
-                    finally
+
+                    publisherProxy = new PublisherProxy(EndpointNames.PublisherEndpoint);
+                    publisherProxy.Open();
+
+                    if (publisherProxy.State == CommunicationState.Opened)
                     {
-                        numberOfTries++;
-                        Logger.LogDebug($"FunctionExecutor: PublisherProxy getter, try number: {numberOfTries}.");
-                        Thread.Sleep(500);
+                        break;
                     }
                 }
+                catch (Exception ex)
+                {
+                    string message = $"Exception on PublisherProxy initialization. Message: {ex.Message}";
+                    Logger.LogError(message, ex);
+                    publisherProxy = null;
+                }
+                finally
+                {
+                    numberOfTries++;
+                    Logger.LogDebug($"FunctionExecutor: PublisherProxy getter, try number: {numberOfTries}.");
 
-                return publisherProxy;
+                    if (numberOfTries >= 100)
+                    {
+                        sleepInterval = 1000;
+                    }
+
+                    Thread.Sleep(sleepInterval);
+                }
             }
+
+            return publisherProxy;
         }
 
         #endregion Proxies
@@ -345,7 +355,7 @@ namespace Outage.SCADA.ModBus.Connection
         {
             SCADAPublication scadaPublication = new SCADAPublication(topic, scadaMessage);
 
-            using (PublisherProxy publisherProxy = PublisherProxy)
+            using (PublisherProxy publisherProxy = GetPublisherProxy())
             {
                 if (publisherProxy != null)
                 {
