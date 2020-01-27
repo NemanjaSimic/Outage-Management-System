@@ -7,6 +7,8 @@ import { SharedModule } from '@shared/shared.module';
 import { ServicesModule } from '@services/services.module';
 
 import { GraphModule } from './modules/graph/graph.module';
+import { ActiveBrowserComponent } from './modules/active-browser/active-browser.component';
+import { HistoricalBrowserComponent } from './modules/historical-browser/historical-browser.component';
 
 import { MatSidenavModule } from '@angular/material/sidenav';
 import { MatCheckboxModule } from '@angular/material/checkbox';
@@ -15,9 +17,7 @@ import { MatListModule } from '@angular/material/list';
 import { MatToolbarModule } from '@angular/material/toolbar';
 import { MatButtonModule } from '@angular/material/button';
 import { MatIconModule } from '@angular/material/icon';
-import { ActiveBrowserComponent } from './modules/active-browser/active-browser.component';
-import { HistoricalBrowserComponent } from './modules/historical-browser/historical-browser.component';
-
+import { MatTableModule } from '@angular/material/table';
 
 @NgModule({
   declarations: [
@@ -37,7 +37,8 @@ import { HistoricalBrowserComponent } from './modules/historical-browser/histori
     BrowserAnimationsModule,
     MatToolbarModule,
     MatButtonModule,
-    MatIconModule
+    MatIconModule,
+    MatTableModule
   ],
   providers: [
     ServicesModule
