@@ -93,7 +93,7 @@ namespace NetworkModelServiceFunctions
 			int iteratorId = 0;
 			try
 			{
-				using (var proxy = new NetworkModelGDAProxy(EndpointNames.NetworkModelGDAEndpoint))
+				using (var gdaProxy = new NetworkModelGDAProxy(EndpointNames.NetworkModelGDAEndpoint))
 				{
 					if (gdaProxy != null)
 					{
@@ -142,7 +142,7 @@ namespace NetworkModelServiceFunctions
 
 			try
 			{
-				using (var proxy = new NetworkModelGDAProxy(EndpointNames.NetworkModelGDAEndpoint))
+				using (var gdaProxy = new NetworkModelGDAProxy(EndpointNames.NetworkModelGDAEndpoint))
 				{
 					if (gdaProxy != null)
 					{

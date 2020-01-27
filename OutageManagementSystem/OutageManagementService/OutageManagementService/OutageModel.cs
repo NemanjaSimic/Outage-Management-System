@@ -84,7 +84,7 @@ namespace OutageManagementService
                 if (topologyServiceProxy != null)
                 {
                     topology = topologyServiceProxy.GetTopology();
-                    PrintUI(topology);
+                    //PrintUI(topology);
                 }
                 else
                 {
