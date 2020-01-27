@@ -56,7 +56,7 @@
       <Name>Common</Name>
     </ProjectReference>
     <ProjectReference Include="..\OutageManagementService\OutageManagementService.csproj">
-      <Project>{6F2AB5E9-8313-4954-9D1C-EDBB772FD276}</Project>
+      <Project>{6f2ab5e9-8313-4954-9d1c-edbb772fd276}</Project>
       <Name>OutageManagementService</Name>
     </ProjectReference>
   </ItemGroup>

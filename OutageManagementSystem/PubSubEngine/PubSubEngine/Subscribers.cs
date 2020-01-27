@@ -105,12 +105,13 @@ namespace PubSubEngine
             }
         }
 
-        public IPublishableMessage GetNextMessage(ISubscriberCallback subscriber)
+        public IPublishableMessage GetNextMessage(ISubscriberCallback subscriber, bool lastMessageWasNull = false)
         {
             IPublishableMessage message = null;
 
             bool success = subscribers.TryGetValue(subscriber, out Queue<IPublishableMessage> queueOfMessages) && queueOfMessages.Count > 0;
             string subscriberName = "";
+
             try
             {
                 subscriberName = subscriber.GetSubscriberName();

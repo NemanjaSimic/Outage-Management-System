@@ -54,11 +54,15 @@ namespace PubSubEngine
 
             Logger.LogInfo($"Thread for tracking publications STARTED. Subscriber [{subscriberName}]");
 
+            bool isMessageNull = false;
+
             while (!end)
             {
-                IPublishableMessage message = Subscribers.Instance.GetNextMessage(subscriber);
+                IPublishableMessage message = Subscribers.Instance.GetNextMessage(subscriber, isMessageNull);
 
-                if (message != null)
+                isMessageNull = message == null;
+
+                if (!isMessageNull)
                 {
                     try
                     {

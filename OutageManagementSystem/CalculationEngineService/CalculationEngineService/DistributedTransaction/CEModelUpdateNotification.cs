@@ -19,7 +19,7 @@ namespace CalculationEngineService.DistributedTransaction
         {
             TransactionManager.Intance.UpdateNotify(modelChanges);
 
-            using (TransactionEnlistmentProxy transactionEnlistmentProxy = TransactionEnlistmentProxy)
+            using (TransactionEnlistmentProxy transactionEnlistmentProxy = GetTransactionEnlistmentProxy())
             {
                 if(transactionEnlistmentProxy != null)
                 {

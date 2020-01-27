@@ -2,8 +2,8 @@
 <rdf:RDF	xmlns:rdf="http://www.w3.org/1999/02/22-rdf-syntax-ns#"
 			xmlns:cim="http://iec.ch/TC57/2010/CIM-schema-cim15#"
 			xmlns:ftn="http://www.ftnydro.com/CIM15/2010/extension#">
-	
-	
+
+
 <!--[ Package_Core ]-->
 	<!--BaseVoltage-->
 	<!--
@@ -27,8 +27,8 @@
 		<ftn:IdentifiedObject.name>BV_2</ftn:IdentifiedObject.name>
 	</cim:BaseVoltage>
 	<!--END BaseVoltage-->
-	
-	
+
+
 	<!--Terminal-->
 	<!--
 	<cim:Terminal rdf:ID="TM_">
@@ -1678,9 +1678,9 @@
 	</cim:Terminal>
 	<!--END Terminal-->
 <!--[END Package_Core ]-->
-	
-	
-	
+
+
+
 <!--[ Package_Wires ]-->
 	<!--ACLineSegment-->
 	<!--
@@ -2078,10 +2078,10 @@
 		<ftn:IdentifiedObject.name>ACL_55</ftn:IdentifiedObject.name>
 	</cim:ACLineSegment>
 	<!--END ACLineSegment-->
-	
-	
+
+
 	<!--Breaker-->
-	<!--	
+	<!--
 	<cim:Breaker rdf:ID="BR_">
 		<tdms:Breaker.noReclosing>true</tdms:Breaker.noReclosing>
 		<cim:ConductingEquipment.isRemote>true</cim:ConductingEquipment.isRemote>
@@ -2099,7 +2099,7 @@
 		<cim:IdentifiedObject.mRID>BR_1</cim:IdentifiedObject.mRID>
 		<ftn:IdentifiedObject.name>BR_1</ftn:IdentifiedObject.name>
 	</cim:Breaker>
-	
+
 	<cim:Breaker rdf:ID="BR_2">
 		<cim:Breaker.noReclosing>true</cim:Breaker.noReclosing>
 		<cim:ConductingEquipment.isRemote>true</cim:ConductingEquipment.isRemote>
@@ -2108,7 +2108,7 @@
 		<cim:IdentifiedObject.mRID>BR_2</cim:IdentifiedObject.mRID>
 		<ftn:IdentifiedObject.name>BR_2</ftn:IdentifiedObject.name>
 	</cim:Breaker>
-	
+
 	<cim:Breaker rdf:ID="BR_3">
 		<cim:Breaker.noReclosing>true</cim:Breaker.noReclosing>
 		<cim:ConductingEquipment.isRemote>true</cim:ConductingEquipment.isRemote>
@@ -2117,7 +2117,7 @@
 		<cim:IdentifiedObject.mRID>BR_3</cim:IdentifiedObject.mRID>
 		<ftn:IdentifiedObject.name>BR_3</ftn:IdentifiedObject.name>
 	</cim:Breaker>
-	
+
 	<cim:Breaker rdf:ID="BR_4">
 		<cim:Breaker.noReclosing>true</cim:Breaker.noReclosing>
 		<cim:ConductingEquipment.isRemote>true</cim:ConductingEquipment.isRemote>
@@ -2126,7 +2126,7 @@
 		<cim:IdentifiedObject.mRID>BR_4</cim:IdentifiedObject.mRID>
 		<ftn:IdentifiedObject.name>BR_4</ftn:IdentifiedObject.name>
 	</cim:Breaker>
-	
+
 	<cim:Breaker rdf:ID="BR_5">
 		<cim:Breaker.noReclosing>true</cim:Breaker.noReclosing>
 		<cim:ConductingEquipment.isRemote>true</cim:ConductingEquipment.isRemote>
@@ -2135,7 +2135,7 @@
 		<cim:IdentifiedObject.mRID>BR_5</cim:IdentifiedObject.mRID>
 		<ftn:IdentifiedObject.name>BR_5</ftn:IdentifiedObject.name>
 	</cim:Breaker>
-	
+
 	<cim:Breaker rdf:ID="BR_6">
 		<cim:Breaker.noReclosing>true</cim:Breaker.noReclosing>
 		<cim:ConductingEquipment.isRemote>true</cim:ConductingEquipment.isRemote>
@@ -2144,7 +2144,7 @@
 		<cim:IdentifiedObject.mRID>BR_6</cim:IdentifiedObject.mRID>
 		<ftn:IdentifiedObject.name>BR_6</ftn:IdentifiedObject.name>
 	</cim:Breaker>
-	
+
 	<cim:Breaker rdf:ID="BR_7">
 		<cim:Breaker.noReclosing>true</cim:Breaker.noReclosing>
 		<cim:ConductingEquipment.isRemote>true</cim:ConductingEquipment.isRemote>
@@ -2153,7 +2153,7 @@
 		<cim:IdentifiedObject.mRID>BR_7</cim:IdentifiedObject.mRID>
 		<ftn:IdentifiedObject.name>BR_7</ftn:IdentifiedObject.name>
 	</cim:Breaker>
-	
+
 	<cim:Breaker rdf:ID="BR_8">
 		<cim:Breaker.noReclosing>true</cim:Breaker.noReclosing>
 		<cim:ConductingEquipment.isRemote>true</cim:ConductingEquipment.isRemote>
@@ -2162,7 +2162,7 @@
 		<cim:IdentifiedObject.mRID>BR_8</cim:IdentifiedObject.mRID>
 		<ftn:IdentifiedObject.name>BR_8</ftn:IdentifiedObject.name>
 	</cim:Breaker>
-	
+
 	<cim:Breaker rdf:ID="BR_9">
 		<cim:Breaker.noReclosing>true</cim:Breaker.noReclosing>
 		<cim:ConductingEquipment.isRemote>true</cim:ConductingEquipment.isRemote>
@@ -2171,7 +2171,7 @@
 		<cim:IdentifiedObject.mRID>BR_9</cim:IdentifiedObject.mRID>
 		<ftn:IdentifiedObject.name>BR_9</ftn:IdentifiedObject.name>
 	</cim:Breaker>
-	
+
 	<cim:Breaker rdf:ID="BR_10">
 		<cim:Breaker.noReclosing>true</cim:Breaker.noReclosing>
 		<cim:ConductingEquipment.isRemote>true</cim:ConductingEquipment.isRemote>
@@ -2180,7 +2180,7 @@
 		<cim:IdentifiedObject.mRID>BR_10</cim:IdentifiedObject.mRID>
 		<ftn:IdentifiedObject.name>BR_10</ftn:IdentifiedObject.name>
 	</cim:Breaker>
-	
+
 	<cim:Breaker rdf:ID="BR_11">
 		<cim:Breaker.noReclosing>true</cim:Breaker.noReclosing>
 		<cim:ConductingEquipment.isRemote>true</cim:ConductingEquipment.isRemote>
@@ -2189,7 +2189,7 @@
 		<cim:IdentifiedObject.mRID>BR_11</cim:IdentifiedObject.mRID>
 		<ftn:IdentifiedObject.name>BR_11</ftn:IdentifiedObject.name>
 	</cim:Breaker>
-	
+
 	<cim:Breaker rdf:ID="BR_12">
 		<cim:Breaker.noReclosing>true</cim:Breaker.noReclosing>
 		<cim:ConductingEquipment.isRemote>true</cim:ConductingEquipment.isRemote>
@@ -2198,7 +2198,7 @@
 		<cim:IdentifiedObject.mRID>BR_12</cim:IdentifiedObject.mRID>
 		<ftn:IdentifiedObject.name>BR_12</ftn:IdentifiedObject.name>
 	</cim:Breaker>
-	
+
 	<cim:Breaker rdf:ID="BR_13">
 		<cim:Breaker.noReclosing>true</cim:Breaker.noReclosing>
 		<cim:ConductingEquipment.isRemote>true</cim:ConductingEquipment.isRemote>
@@ -2207,7 +2207,7 @@
 		<cim:IdentifiedObject.mRID>BR_13</cim:IdentifiedObject.mRID>
 		<ftn:IdentifiedObject.name>BR_13</ftn:IdentifiedObject.name>
 	</cim:Breaker>
-	
+
 	<cim:Breaker rdf:ID="BR_14">
 		<cim:Breaker.noReclosing>true</cim:Breaker.noReclosing>
 		<cim:ConductingEquipment.isRemote>true</cim:ConductingEquipment.isRemote>
@@ -2217,8 +2217,8 @@
 		<ftn:IdentifiedObject.name>BR_14</ftn:IdentifiedObject.name>
 	</cim:Breaker>
 	<!--END Breaker-->
-	
-	
+
+
 	<!--Disconnector-->
 	<!--
 	<cim:Disconnector rdf:ID=" ">
@@ -2286,10 +2286,10 @@
 		<ftn:IdentifiedObject.name>DC_8</ftn:IdentifiedObject.name>
 	</cim:Disconnector>
 	<!--END Disconnector-->
-	
-	
+
+
 	<!--EnergyConsumer-->
-	<!--	
+	<!--
 	<cim:EnergyConsumer rdf:ID="EC_">
 		<cim:ConductingEquipment.BaseVoltage rdf:resource="#BV_"/>
 		<cim:ConductingEquipment.isRemote>false</cim:ConductingEquipment.isRemote>
@@ -2305,21 +2305,21 @@
 		<cim:IdentifiedObject.mRID>EC_1</cim:IdentifiedObject.mRID>
 		<ftn:IdentifiedObject.name>EC_1</ftn:IdentifiedObject.name>
 	</cim:EnergyConsumer>
-	
+
 	<cim:EnergyConsumer rdf:ID="EC_2">
 		<cim:ConductingEquipment.BaseVoltage rdf:resource="#BV_2"/>
 		<cim:IdentifiedObject.description> </cim:IdentifiedObject.description>
 		<cim:IdentifiedObject.mRID>EC_2</cim:IdentifiedObject.mRID>
 		<ftn:IdentifiedObject.name>EC_2</ftn:IdentifiedObject.name>
 	</cim:EnergyConsumer>
-	
+
 	<cim:EnergyConsumer rdf:ID="EC_3">
 		<cim:ConductingEquipment.BaseVoltage rdf:resource="#BV_2"/>
 		<cim:IdentifiedObject.description> </cim:IdentifiedObject.description>
 		<cim:IdentifiedObject.mRID>EC_3</cim:IdentifiedObject.mRID>
 		<ftn:IdentifiedObject.name>EC_3</ftn:IdentifiedObject.name>
 	</cim:EnergyConsumer>
-	
+
 	<cim:EnergyConsumer rdf:ID="EC_4">
 		<cim:ConductingEquipment.BaseVoltage rdf:resource="#BV_2"/>
 		<cim:ConductingEquipment.isRemote>true</cim:ConductingEquipment.isRemote>
@@ -2327,7 +2327,7 @@
 		<cim:IdentifiedObject.mRID>EC_4</cim:IdentifiedObject.mRID>
 		<ftn:IdentifiedObject.name>EC_4</ftn:IdentifiedObject.name>
 	</cim:EnergyConsumer>
-	
+
 	<cim:EnergyConsumer rdf:ID="EC_5">
 		<cim:ConductingEquipment.BaseVoltage rdf:resource="#BV_2"/>
 		<cim:ConductingEquipment.isRemote>true</cim:ConductingEquipment.isRemote>
@@ -2335,7 +2335,7 @@
 		<cim:IdentifiedObject.mRID>EC_5</cim:IdentifiedObject.mRID>
 		<ftn:IdentifiedObject.name>EC_5</ftn:IdentifiedObject.name>
 	</cim:EnergyConsumer>
-	
+
 	<cim:EnergyConsumer rdf:ID="EC_6">
 		<cim:ConductingEquipment.BaseVoltage rdf:resource="#BV_2"/>
 		<cim:ConductingEquipment.isRemote>true</cim:ConductingEquipment.isRemote>
@@ -2343,7 +2343,7 @@
 		<cim:IdentifiedObject.mRID>EC_6</cim:IdentifiedObject.mRID>
 		<ftn:IdentifiedObject.name>EC_6</ftn:IdentifiedObject.name>
 	</cim:EnergyConsumer>
-	
+
 	<cim:EnergyConsumer rdf:ID="EC_7">
 		<cim:ConductingEquipment.BaseVoltage rdf:resource="#BV_2"/>
 		<cim:ConductingEquipment.isRemote>true</cim:ConductingEquipment.isRemote>
@@ -2351,7 +2351,7 @@
 		<cim:IdentifiedObject.mRID>EC_7</cim:IdentifiedObject.mRID>
 		<ftn:IdentifiedObject.name>EC_7</ftn:IdentifiedObject.name>
 	</cim:EnergyConsumer>
-	
+
 	<cim:EnergyConsumer rdf:ID="EC_8">
 		<cim:ConductingEquipment.BaseVoltage rdf:resource="#BV_2"/>
 		<cim:ConductingEquipment.isRemote>true</cim:ConductingEquipment.isRemote>
@@ -2359,7 +2359,7 @@
 		<cim:IdentifiedObject.mRID>EC_8</cim:IdentifiedObject.mRID>
 		<ftn:IdentifiedObject.name>EC_8</ftn:IdentifiedObject.name>
 	</cim:EnergyConsumer>
-	
+
 	<cim:EnergyConsumer rdf:ID="EC_9">
 		<cim:ConductingEquipment.BaseVoltage rdf:resource="#BV_2"/>
 		<cim:ConductingEquipment.isRemote>true</cim:ConductingEquipment.isRemote>
@@ -2367,7 +2367,7 @@
 		<cim:IdentifiedObject.mRID>EC_9</cim:IdentifiedObject.mRID>
 		<ftn:IdentifiedObject.name>EC_9</ftn:IdentifiedObject.name>
 	</cim:EnergyConsumer>
-	
+
 	<cim:EnergyConsumer rdf:ID="EC_10">
 		<cim:ConductingEquipment.BaseVoltage rdf:resource="#BV_2"/>
 		<cim:ConductingEquipment.isRemote>true</cim:ConductingEquipment.isRemote>
@@ -2375,7 +2375,7 @@
 		<cim:IdentifiedObject.mRID>EC_10</cim:IdentifiedObject.mRID>
 		<ftn:IdentifiedObject.name>EC_10</ftn:IdentifiedObject.name>
 	</cim:EnergyConsumer>
-	
+
 	<cim:EnergyConsumer rdf:ID="EC_11">
 		<cim:ConductingEquipment.BaseVoltage rdf:resource="#BV_2"/>
 		<cim:ConductingEquipment.isRemote>true</cim:ConductingEquipment.isRemote>
@@ -2383,7 +2383,7 @@
 		<cim:IdentifiedObject.mRID>EC_11</cim:IdentifiedObject.mRID>
 		<ftn:IdentifiedObject.name>EC_11</ftn:IdentifiedObject.name>
 	</cim:EnergyConsumer>
-	
+
 	<cim:EnergyConsumer rdf:ID="EC_12">
 		<cim:ConductingEquipment.BaseVoltage rdf:resource="#BV_2"/>
 		<cim:ConductingEquipment.isRemote>true</cim:ConductingEquipment.isRemote>
@@ -2391,7 +2391,7 @@
 		<cim:IdentifiedObject.mRID>EC_12</cim:IdentifiedObject.mRID>
 		<ftn:IdentifiedObject.name>EC_12</ftn:IdentifiedObject.name>
 	</cim:EnergyConsumer>
-	
+
 	<cim:EnergyConsumer rdf:ID="EC_13">
 		<cim:ConductingEquipment.BaseVoltage rdf:resource="#BV_2"/>
 		<cim:ConductingEquipment.isRemote>true</cim:ConductingEquipment.isRemote>
@@ -2399,7 +2399,7 @@
 		<cim:IdentifiedObject.mRID>EC_13</cim:IdentifiedObject.mRID>
 		<ftn:IdentifiedObject.name>EC_13</ftn:IdentifiedObject.name>
 	</cim:EnergyConsumer>
-	
+
 	<cim:EnergyConsumer rdf:ID="EC_14">
 		<cim:ConductingEquipment.BaseVoltage rdf:resource="#BV_2"/>
 		<cim:ConductingEquipment.isRemote>true</cim:ConductingEquipment.isRemote>
@@ -2407,7 +2407,7 @@
 		<cim:IdentifiedObject.mRID>EC_14</cim:IdentifiedObject.mRID>
 		<ftn:IdentifiedObject.name>EC_14</ftn:IdentifiedObject.name>
 	</cim:EnergyConsumer>
-	
+
 	<cim:EnergyConsumer rdf:ID="EC_15">
 		<cim:ConductingEquipment.BaseVoltage rdf:resource="#BV_2"/>
 		<cim:ConductingEquipment.isRemote>true</cim:ConductingEquipment.isRemote>
@@ -2415,7 +2415,7 @@
 		<cim:IdentifiedObject.mRID>EC_15</cim:IdentifiedObject.mRID>
 		<ftn:IdentifiedObject.name>EC_15</ftn:IdentifiedObject.name>
 	</cim:EnergyConsumer>
-	
+
 	<cim:EnergyConsumer rdf:ID="EC_16">
 		<cim:ConductingEquipment.BaseVoltage rdf:resource="#BV_2"/>
 		<cim:ConductingEquipment.isRemote>true</cim:ConductingEquipment.isRemote>
@@ -2423,7 +2423,7 @@
 		<cim:IdentifiedObject.mRID>EC_16</cim:IdentifiedObject.mRID>
 		<ftn:IdentifiedObject.name>EC_16</ftn:IdentifiedObject.name>
 	</cim:EnergyConsumer>
-	
+
 	<cim:EnergyConsumer rdf:ID="EC_17">
 		<cim:ConductingEquipment.BaseVoltage rdf:resource="#BV_2"/>
 		<cim:ConductingEquipment.isRemote>true</cim:ConductingEquipment.isRemote>
@@ -2431,7 +2431,7 @@
 		<cim:IdentifiedObject.mRID>EC_17</cim:IdentifiedObject.mRID>
 		<ftn:IdentifiedObject.name>EC_17</ftn:IdentifiedObject.name>
 	</cim:EnergyConsumer>
-	
+
 	<cim:EnergyConsumer rdf:ID="EC_18">
 		<cim:ConductingEquipment.BaseVoltage rdf:resource="#BV_2"/>
 		<cim:ConductingEquipment.isRemote>true</cim:ConductingEquipment.isRemote>
@@ -2439,7 +2439,7 @@
 		<cim:IdentifiedObject.mRID>EC_18</cim:IdentifiedObject.mRID>
 		<ftn:IdentifiedObject.name>EC_18</ftn:IdentifiedObject.name>
 	</cim:EnergyConsumer>
-	
+
 	<cim:EnergyConsumer rdf:ID="EC_19">
 		<cim:ConductingEquipment.BaseVoltage rdf:resource="#BV_2"/>
 		<cim:ConductingEquipment.isRemote>true</cim:ConductingEquipment.isRemote>
@@ -2447,7 +2447,7 @@
 		<cim:IdentifiedObject.mRID>EC_19</cim:IdentifiedObject.mRID>
 		<ftn:IdentifiedObject.name>EC_19</ftn:IdentifiedObject.name>
 	</cim:EnergyConsumer>
-	
+
 	<cim:EnergyConsumer rdf:ID="EC_20">
 		<cim:ConductingEquipment.BaseVoltage rdf:resource="#BV_2"/>
 		<cim:ConductingEquipment.isRemote>true</cim:ConductingEquipment.isRemote>
@@ -2455,7 +2455,7 @@
 		<cim:IdentifiedObject.mRID>EC_20</cim:IdentifiedObject.mRID>
 		<ftn:IdentifiedObject.name>EC_20</ftn:IdentifiedObject.name>
 	</cim:EnergyConsumer>
-	
+
 	<cim:EnergyConsumer rdf:ID="EC_21">
 		<cim:ConductingEquipment.BaseVoltage rdf:resource="#BV_2"/>
 		<cim:ConductingEquipment.isRemote>true</cim:ConductingEquipment.isRemote>
@@ -2463,7 +2463,7 @@
 		<cim:IdentifiedObject.mRID>EC_21</cim:IdentifiedObject.mRID>
 		<ftn:IdentifiedObject.name>EC_21</ftn:IdentifiedObject.name>
 	</cim:EnergyConsumer>
-	
+
 	<cim:EnergyConsumer rdf:ID="EC_22">
 		<cim:ConductingEquipment.BaseVoltage rdf:resource="#BV_2"/>
 		<cim:ConductingEquipment.isRemote>true</cim:ConductingEquipment.isRemote>
@@ -2472,10 +2472,10 @@
 		<ftn:IdentifiedObject.name>EC_22</ftn:IdentifiedObject.name>
 	</cim:EnergyConsumer>
 	<!--END EnergyConsumer-->
-	
-	
+
+
 	<!--EnergySource-->
-	<!--	
+	<!--
 	<cim:EnergySource rdf:ID="ES_">
 		<cim:ConductingEquipment.BaseVoltage rdf:resource="#BV_"/>
 		<cim:ConductingEquipment.isRemote>true</cim:ConductingEquipment.isRemote>
@@ -2510,7 +2510,7 @@
 		<cim:IdentifiedObject.mRID>FS_1</cim:IdentifiedObject.mRID>
 		<ftn:IdentifiedObject.name>FS_1</ftn:IdentifiedObject.name>
 	</cim:Fuse>
-	
+
 	<cim:Fuse rdf:ID="FS_2">
 		<cim:ConductingEquipment.BaseVoltage rdf:resource="#BV_2"/>
 		<cim:ConductingEquipment.isRemote>true</cim:ConductingEquipment.isRemote>
@@ -2518,7 +2518,7 @@
 		<cim:IdentifiedObject.mRID>FS_2</cim:IdentifiedObject.mRID>
 		<ftn:IdentifiedObject.name>FS_2</ftn:IdentifiedObject.name>
 	</cim:Fuse>
-	
+
 	<cim:Fuse rdf:ID="FS_3">
 		<cim:ConductingEquipment.BaseVoltage rdf:resource="#BV_2"/>
 		<cim:ConductingEquipment.isRemote>true</cim:ConductingEquipment.isRemote>
@@ -2526,7 +2526,7 @@
 		<cim:IdentifiedObject.mRID>FS_3</cim:IdentifiedObject.mRID>
 		<ftn:IdentifiedObject.name>FS_3</ftn:IdentifiedObject.name>
 	</cim:Fuse>
-	
+
 	<cim:Fuse rdf:ID="FS_4">
 		<cim:ConductingEquipment.BaseVoltage rdf:resource="#BV_2"/>
 		<cim:ConductingEquipment.isRemote>true</cim:ConductingEquipment.isRemote>
@@ -2534,7 +2534,7 @@
 		<cim:IdentifiedObject.mRID>FS_4</cim:IdentifiedObject.mRID>
 		<ftn:IdentifiedObject.name>FS_4</ftn:IdentifiedObject.name>
 	</cim:Fuse>
-	
+
 	<cim:Fuse rdf:ID="FS_5">
 		<cim:ConductingEquipment.BaseVoltage rdf:resource="#BV_2"/>
 		<cim:ConductingEquipment.isRemote>true</cim:ConductingEquipment.isRemote>
@@ -2542,7 +2542,7 @@
 		<cim:IdentifiedObject.mRID>FS_5</cim:IdentifiedObject.mRID>
 		<ftn:IdentifiedObject.name>FS_5</ftn:IdentifiedObject.name>
 	</cim:Fuse>
-	
+
 	<cim:Fuse rdf:ID="FS_6">
 		<cim:ConductingEquipment.BaseVoltage rdf:resource="#BV_2"/>
 		<cim:ConductingEquipment.isRemote>true</cim:ConductingEquipment.isRemote>
@@ -2550,7 +2550,7 @@
 		<cim:IdentifiedObject.mRID>FS_6</cim:IdentifiedObject.mRID>
 		<ftn:IdentifiedObject.name>FS_6</ftn:IdentifiedObject.name>
 	</cim:Fuse>
-	
+
 	<cim:Fuse rdf:ID="FS_7">
 		<cim:ConductingEquipment.BaseVoltage rdf:resource="#BV_2"/>
 		<cim:ConductingEquipment.isRemote>true</cim:ConductingEquipment.isRemote>
@@ -2558,7 +2558,7 @@
 		<cim:IdentifiedObject.mRID>FS_7</cim:IdentifiedObject.mRID>
 		<ftn:IdentifiedObject.name>FS_7</ftn:IdentifiedObject.name>
 	</cim:Fuse>
-	
+
 	<cim:Fuse rdf:ID="FS_8">
 		<cim:ConductingEquipment.BaseVoltage rdf:resource="#BV_2"/>
 		<cim:ConductingEquipment.isRemote>true</cim:ConductingEquipment.isRemote>
@@ -2566,7 +2566,7 @@
 		<cim:IdentifiedObject.mRID>FS_8</cim:IdentifiedObject.mRID>
 		<ftn:IdentifiedObject.name>FS_8</ftn:IdentifiedObject.name>
 	</cim:Fuse>
-	
+
 	<cim:Fuse rdf:ID="FS_9">
 		<cim:ConductingEquipment.BaseVoltage rdf:resource="#BV_2"/>
 		<cim:ConductingEquipment.isRemote>true</cim:ConductingEquipment.isRemote>
@@ -2574,7 +2574,7 @@
 		<cim:IdentifiedObject.mRID>FS_9</cim:IdentifiedObject.mRID>
 		<ftn:IdentifiedObject.name>FS_9</ftn:IdentifiedObject.name>
 	</cim:Fuse>
-	
+
 	<cim:Fuse rdf:ID="FS_10">
 		<cim:ConductingEquipment.BaseVoltage rdf:resource="#BV_2"/>
 		<cim:ConductingEquipment.isRemote>true</cim:ConductingEquipment.isRemote>
@@ -2582,7 +2582,7 @@
 		<cim:IdentifiedObject.mRID>FS_10</cim:IdentifiedObject.mRID>
 		<ftn:IdentifiedObject.name>FS_10</ftn:IdentifiedObject.name>
 	</cim:Fuse>
-	
+
 	<cim:Fuse rdf:ID="FS_11">
 		<cim:ConductingEquipment.BaseVoltage rdf:resource="#BV_2"/>
 		<cim:ConductingEquipment.isRemote>true</cim:ConductingEquipment.isRemote>
@@ -2590,7 +2590,7 @@
 		<cim:IdentifiedObject.mRID>FS_11</cim:IdentifiedObject.mRID>
 		<ftn:IdentifiedObject.name>FS_11</ftn:IdentifiedObject.name>
 	</cim:Fuse>
-	
+
 	<cim:Fuse rdf:ID="FS_12">
 		<cim:ConductingEquipment.BaseVoltage rdf:resource="#BV_2"/>
 		<cim:ConductingEquipment.isRemote>true</cim:ConductingEquipment.isRemote>
@@ -2598,7 +2598,7 @@
 		<cim:IdentifiedObject.mRID>FS_12</cim:IdentifiedObject.mRID>
 		<ftn:IdentifiedObject.name>FS_12</ftn:IdentifiedObject.name>
 	</cim:Fuse>
-	
+
 	<cim:Fuse rdf:ID="FS_13">
 		<cim:ConductingEquipment.BaseVoltage rdf:resource="#BV_2"/>
 		<cim:ConductingEquipment.isRemote>true</cim:ConductingEquipment.isRemote>
@@ -2606,7 +2606,7 @@
 		<cim:IdentifiedObject.mRID>FS_13</cim:IdentifiedObject.mRID>
 		<ftn:IdentifiedObject.name>FS_13</ftn:IdentifiedObject.name>
 	</cim:Fuse>
-	
+
 	<cim:Fuse rdf:ID="FS_14">
 		<cim:ConductingEquipment.BaseVoltage rdf:resource="#BV_2"/>
 		<cim:ConductingEquipment.isRemote>true</cim:ConductingEquipment.isRemote>
@@ -2614,7 +2614,7 @@
 		<cim:IdentifiedObject.mRID>FS_14</cim:IdentifiedObject.mRID>
 		<ftn:IdentifiedObject.name>FS_14</ftn:IdentifiedObject.name>
 	</cim:Fuse>
-	
+
 	<cim:Fuse rdf:ID="FS_15">
 		<cim:ConductingEquipment.BaseVoltage rdf:resource="#BV_2"/>
 		<cim:ConductingEquipment.isRemote>true</cim:ConductingEquipment.isRemote>
@@ -2622,7 +2622,7 @@
 		<cim:IdentifiedObject.mRID>FS_15</cim:IdentifiedObject.mRID>
 		<ftn:IdentifiedObject.name>FS_15</ftn:IdentifiedObject.name>
 	</cim:Fuse>
-	
+
 	<cim:Fuse rdf:ID="FS_16">
 		<cim:ConductingEquipment.BaseVoltage rdf:resource="#BV_2"/>
 		<cim:ConductingEquipment.isRemote>true</cim:ConductingEquipment.isRemote>
@@ -2630,7 +2630,7 @@
 		<cim:IdentifiedObject.mRID>FS_16</cim:IdentifiedObject.mRID>
 		<ftn:IdentifiedObject.name>FS_16</ftn:IdentifiedObject.name>
 	</cim:Fuse>
-	
+
 	<cim:Fuse rdf:ID="FS_17">
 		<cim:ConductingEquipment.BaseVoltage rdf:resource="#BV_2"/>
 		<cim:ConductingEquipment.isRemote>true</cim:ConductingEquipment.isRemote>
@@ -2638,7 +2638,7 @@
 		<cim:IdentifiedObject.mRID>FS_17</cim:IdentifiedObject.mRID>
 		<ftn:IdentifiedObject.name>FS_17</ftn:IdentifiedObject.name>
 	</cim:Fuse>
-	
+
 	<cim:Fuse rdf:ID="FS_18">
 		<cim:ConductingEquipment.BaseVoltage rdf:resource="#BV_2"/>
 		<cim:ConductingEquipment.isRemote>true</cim:ConductingEquipment.isRemote>
@@ -2646,7 +2646,7 @@
 		<cim:IdentifiedObject.mRID>FS_18</cim:IdentifiedObject.mRID>
 		<ftn:IdentifiedObject.name>FS_18</ftn:IdentifiedObject.name>
 	</cim:Fuse>
-	
+
 	<cim:Fuse rdf:ID="FS_19">
 		<cim:ConductingEquipment.BaseVoltage rdf:resource="#BV_2"/>
 		<cim:ConductingEquipment.isRemote>true</cim:ConductingEquipment.isRemote>
@@ -2654,7 +2654,7 @@
 		<cim:IdentifiedObject.mRID>FS_19</cim:IdentifiedObject.mRID>
 		<ftn:IdentifiedObject.name>FS_19</ftn:IdentifiedObject.name>
 	</cim:Fuse>
-	
+
 	<cim:Fuse rdf:ID="FS_20">
 		<cim:ConductingEquipment.BaseVoltage rdf:resource="#BV_2"/>
 		<cim:ConductingEquipment.isRemote>true</cim:ConductingEquipment.isRemote>
@@ -2662,7 +2662,7 @@
 		<cim:IdentifiedObject.mRID>FS_20</cim:IdentifiedObject.mRID>
 		<ftn:IdentifiedObject.name>FS_20</ftn:IdentifiedObject.name>
 	</cim:Fuse>
-	
+
 	<cim:Fuse rdf:ID="FS_21">
 		<cim:ConductingEquipment.BaseVoltage rdf:resource="#BV_2"/>
 		<cim:ConductingEquipment.isRemote>true</cim:ConductingEquipment.isRemote>
@@ -2670,7 +2670,7 @@
 		<cim:IdentifiedObject.mRID>FS_21</cim:IdentifiedObject.mRID>
 		<ftn:IdentifiedObject.name>FS_21</ftn:IdentifiedObject.name>
 	</cim:Fuse>
-	
+
 	<cim:Fuse rdf:ID="FS_22">
 		<cim:ConductingEquipment.BaseVoltage rdf:resource="#BV_2"/>
 		<cim:ConductingEquipment.isRemote>true</cim:ConductingEquipment.isRemote>
@@ -2679,10 +2679,10 @@
 		<ftn:IdentifiedObject.name>FS_22</ftn:IdentifiedObject.name>
 	</cim:Fuse>
 	<!--END Fuse-->
-	
-	
+
+
 	<!--LoadBreakSwitch-->
-	<!--	
+	<!--
 	<cim:LoadBreakSwitch rdf:ID="LB_">
 		<cim:ConductingEquipment.BaseVoltage rdf:resource="#BV_"/>
 		<cim:ConductingEquipment.isRemote>true</cim:ConductingEquipment.isRemote>
@@ -2698,7 +2698,7 @@
 		<cim:IdentifiedObject.mRID>LBS_1</cim:IdentifiedObject.mRID>
 		<ftn:IdentifiedObject.name>LBS_1</ftn:IdentifiedObject.name>
 	</cim:LoadBreakSwitch>
-	
+
 	<cim:LoadBreakSwitch rdf:ID="LB_2">
 		<cim:ConductingEquipment.BaseVoltage rdf:resource="#BV_2"/>
 		<cim:ConductingEquipment.isRemote>true</cim:ConductingEquipment.isRemote>
@@ -2706,7 +2706,7 @@
 		<cim:IdentifiedObject.mRID>LBS_2</cim:IdentifiedObject.mRID>
 		<ftn:IdentifiedObject.name>LBS_2</ftn:IdentifiedObject.name>
 	</cim:LoadBreakSwitch>
-	
+
 	<cim:LoadBreakSwitch rdf:ID="LB_3">
 		<cim:ConductingEquipment.BaseVoltage rdf:resource="#BV_1"/>
 		<cim:ConductingEquipment.isRemote>true</cim:ConductingEquipment.isRemote>
@@ -2714,7 +2714,7 @@
 		<cim:IdentifiedObject.mRID>LBS_3</cim:IdentifiedObject.mRID>
 		<ftn:IdentifiedObject.name>LBS_3</ftn:IdentifiedObject.name>
 	</cim:LoadBreakSwitch>
-	
+
 	<cim:LoadBreakSwitch rdf:ID="LB_4">
 		<cim:ConductingEquipment.BaseVoltage rdf:resource="#BV_2"/>
 		<cim:ConductingEquipment.isRemote>true</cim:ConductingEquipment.isRemote>
@@ -2723,8 +2723,8 @@
 		<ftn:IdentifiedObject.name>LBS_4</ftn:IdentifiedObject.name>
 	</cim:LoadBreakSwitch>
 	<!--END LoadBreakSwitch-->
-	
-	
+
+
 	<!--PowerTransformer-->
 	<!--
 	<cim:PowerTransformer rdf:ID="PT_">
@@ -2738,17 +2738,17 @@
 		<cim:IdentifiedObject.mRID>PT_1</cim:IdentifiedObject.mRID>
 		<ftn:IdentifiedObject.name>PT_1</ftn:IdentifiedObject.name>
 	</cim:PowerTransformer>
-	
+
 	<cim:PowerTransformer rdf:ID="PT_2">
 		<cim:IdentifiedObject.description>PowerTransformer1</cim:IdentifiedObject.description>
 		<cim:IdentifiedObject.mRID>PT_2</cim:IdentifiedObject.mRID>
 		<ftn:IdentifiedObject.name>PT_2</ftn:IdentifiedObject.name>
 	</cim:PowerTransformer>
 	<!--END PowerTransformer-->
-	
-	
+
+
 	<!--TransformerWinding-->
-	<!--	
+	<!--
 	<cim:TransformerWinding rdf:ID="TW_">
 		<cim:TransformerWinding.PowerTransformer rdf:resource="#TR_"/>
 		<cim:ConductingEquipment.isRemote>ture</cim:ConductingEquipment.isRemote>
@@ -2792,9 +2792,9 @@
 	</cim:TransformerWinding>
 	<!--END TransformerWinding-->
 <!--[END Package_Wires ]-->
-	
-	
-	
+
+
+
 <!--[ Package_Topology ]-->
 	<!--ConnectivityNode-->
 	<!--
@@ -3335,10 +3335,10 @@
 		<ftn:IdentifiedObject.name>CN_106</ftn:IdentifiedObject.name>
 	</cim:ConnectivityNode>
 	<!--END ConnectivityNode-->
-<!--[END Package_Topology ]-->	
-	
-	
-	
+<!--[END Package_Topology ]-->
+
+
+
 <!--[ Package_Meas ]-->
 	<!--Analog-->
 	<!--
@@ -3372,10 +3372,10 @@
 		<ftn:IdentifiedObject.name>AN_1</ftn:IdentifiedObject.name>
 	</cim:Analog>
 	<!--END Analog-->
-	
-	
+
+
 	<!--Discrete-->
-	<!--	
+	<!--
 	<cim:Discrete rdf:ID=" ">
 		<tdms:Discrete.currentOpen> </tdms:Discrete.currentOpen>
 		<cim:Discrete.maxValue> </cim:Discrete.maxValue>
@@ -3404,5 +3404,5 @@
 		<ftn:IdentifiedObject.name>DS_1</ftn:IdentifiedObject.name>
 	</cim:Discrete>
 	<!--END Discrete-->
-<!--[END Package_Meas ]-->	
+<!--[END Package_Meas ]-->
 </rdf:RDF>

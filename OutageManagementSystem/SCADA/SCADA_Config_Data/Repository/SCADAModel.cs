@@ -6,6 +6,7 @@ using Outage.SCADA.SCADACommon;
 using Outage.SCADA.SCADAData.Configuration;
 using System;
 using System.Collections.Generic;
+using System.ServiceModel;
 using System.Threading;
 
 namespace Outage.SCADA.SCADAData.Repository
@@ -91,42 +92,50 @@ namespace Outage.SCADA.SCADAData.Repository
 
         private NetworkModelGDAProxy gdaQueryProxy = null;
 
-        protected NetworkModelGDAProxy GdaQueryProxy
+        private NetworkModelGDAProxy GetGdaQueryProxy()
         {
-            get
+            int numberOfTries = 0;
+            int sleepInterval = 500;
+
+            while (numberOfTries <= int.MaxValue)
             {
-                int numberOfTries = 0;
-
-                while (numberOfTries < 10)
+                try
                 {
-                    try
+                    if (gdaQueryProxy != null)
                     {
-                        if (gdaQueryProxy != null)
-                        {
-                            gdaQueryProxy.Abort();
-                            gdaQueryProxy = null;
-                        }
-
-                        gdaQueryProxy = new NetworkModelGDAProxy(EndpointNames.NetworkModelGDAEndpoint);
-                        gdaQueryProxy.Open();
-                        break;
-                    }
-                    catch (Exception ex)
-                    {
-                        string message = $"Exception on NetworkModelGDAProxy initialization. Message: {ex.Message}";
-                        Logger.LogError(message, ex);
+                        gdaQueryProxy.Abort();
                         gdaQueryProxy = null;
                     }
-                    finally
+
+                    gdaQueryProxy = new NetworkModelGDAProxy(EndpointNames.NetworkModelGDAEndpoint);
+                    gdaQueryProxy.Open();
+
+                    if (gdaQueryProxy.State == CommunicationState.Opened)
                     {
-                        numberOfTries++;
-                        Logger.LogDebug($"SCADAModel: GdaQueryProxy getter, try number: {numberOfTries}.");
-                        Thread.Sleep(500);
+                        break;
                     }
                 }
+                catch (Exception ex)
+                {
+                    string message = $"Exception on NetworkModelGDAProxy initialization. Message: {ex.Message}";
+                    Logger.LogError(message, ex);
+                    gdaQueryProxy = null;
+                }
+                finally
+                {
+                    numberOfTries++;
+                    Logger.LogDebug($"SCADAModel: NetworkModelGDAProxy getter, try number: {numberOfTries}.");
 
-                return gdaQueryProxy;
+                    if (numberOfTries >= 100)
+                    {
+                        sleepInterval = 1000;
+                    }
+
+                    Thread.Sleep(sleepInterval);
+                }
             }
+
+            return gdaQueryProxy;
         }
 
         #endregion Proxies
@@ -309,7 +318,7 @@ namespace Outage.SCADA.SCADAData.Repository
             List<ModelCode> props = modelResourceDesc.GetAllPropertyIds(ModelCode.ANALOG);
             try
             {
-                using (NetworkModelGDAProxy gdaProxy = GdaQueryProxy)
+                using (NetworkModelGDAProxy gdaProxy = GetGdaQueryProxy())
                 {
                     if (gdaProxy != null)
                     {
@@ -363,7 +372,7 @@ namespace Outage.SCADA.SCADAData.Repository
             List<ModelCode> props = modelResourceDesc.GetAllPropertyIds(ModelCode.DISCRETE);
             try
             {
-                using (NetworkModelGDAProxy gdaProxy = GdaQueryProxy)
+                using (NetworkModelGDAProxy gdaProxy = GetGdaQueryProxy())
                 {
                     if (gdaProxy != null)
                     {
@@ -418,7 +427,7 @@ namespace Outage.SCADA.SCADAData.Repository
             ResourceDescription rd;
             ISCADAModelPointItem pointItem;
 
-            using (NetworkModelGDAProxy gdaProxy = GdaQueryProxy)
+            using (NetworkModelGDAProxy gdaProxy = GetGdaQueryProxy())
             {
                 if (gdaProxy != null)
                 {

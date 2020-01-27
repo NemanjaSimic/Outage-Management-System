@@ -1,5 +1,6 @@
 ﻿using System;
 using System.Collections.Generic;
+using System.ServiceModel;
 using System.Text;
 using System.Threading;
 using FTN.Services.NetworkModelService.TestClientUI;
@@ -23,43 +24,53 @@ namespace TelventDMS.Services.NetworkModelService.TestClient.TestsUI
 
         #region Proxies
         private NetworkModelGDAProxy gdaQueryProxy = null;
-		protected NetworkModelGDAProxy GdaQueryProxy
+
+		private NetworkModelGDAProxy GetGdaQueryProxy()
 		{
-			get
-			{
-                int numberOfTries = 0;
+            int numberOfTries = 0;
+			int sleepInterval = 500;
 
-                while (numberOfTries < 10)
+			while (numberOfTries <= int.MaxValue)
+            {
+                try
+				{
+					if (gdaQueryProxy != null)
+					{
+						gdaQueryProxy.Abort();
+						gdaQueryProxy = null;
+					}
+
+					gdaQueryProxy = new NetworkModelGDAProxy(EndpointNames.NetworkModelGDAEndpoint);
+					gdaQueryProxy.Open();
+
+					if (gdaQueryProxy.State == CommunicationState.Opened)
+					{
+						break;
+					}
+				}
+				catch (Exception ex)
+				{
+					string message = $"Exception on NetworkModelGDAProxy initialization. Message: {ex.Message}";
+					Logger.LogError(message, ex);
+					gdaQueryProxy = null;
+				}
+				finally
                 {
-                    try
-				    {
-					    if (gdaQueryProxy != null)
-					    {
-						    gdaQueryProxy.Abort();
-						    gdaQueryProxy = null;
-					    }
+                    numberOfTries++;
+                    Logger.LogDebug($"TestGda: NetworkModelGDAProxy getter, try number: {numberOfTries}.");
 
-					    gdaQueryProxy = new NetworkModelGDAProxy(EndpointNames.NetworkModelGDAEndpoint);
-					    gdaQueryProxy.Open();
-                        break;
-				    }
-				    catch (Exception ex)
-				    {
-					    string message = $"Exception on NetworkModelGDAProxy initialization. Message: {ex.Message}";
-					    Logger.LogError(message, ex);
-					    gdaQueryProxy = null;
-				    }
-				    finally
-                    {
-                        numberOfTries++;
-                        Logger.LogDebug($"TestGda: GdaQueryProxy getter, try number: {numberOfTries}.");
-                        Thread.Sleep(500);
-                    }
+					if (numberOfTries >= 100)
+					{
+						sleepInterval = 1000;
+					}
+
+					Thread.Sleep(sleepInterval);
                 }
+            }
 
-				return gdaQueryProxy;
-			}
+			return gdaQueryProxy;
 		}
+
         #endregion
 
         public TestGda()
@@ -77,7 +88,7 @@ namespace TelventDMS.Services.NetworkModelService.TestClient.TestsUI
 						
 			try
 			{
-				using(NetworkModelGDAProxy gdaQueryProxy = GdaQueryProxy)
+				using(NetworkModelGDAProxy gdaQueryProxy = GetGdaQueryProxy())
 				{
 					if(gdaQueryProxy != null)
 					{
@@ -115,7 +126,7 @@ namespace TelventDMS.Services.NetworkModelService.TestClient.TestsUI
 
 			try
 			{
-				using(NetworkModelGDAProxy gdaQueryProxy = GdaQueryProxy)
+				using(NetworkModelGDAProxy gdaQueryProxy = GetGdaQueryProxy())
 				{
 					if(gdaQueryProxy != null)
 					{
@@ -203,7 +214,7 @@ namespace TelventDMS.Services.NetworkModelService.TestClient.TestsUI
 
 			try
 			{
-				using(NetworkModelGDAProxy gdaQueryProxy = GdaQueryProxy)
+				using(NetworkModelGDAProxy gdaQueryProxy = GetGdaQueryProxy())
 				{
 					if(gdaQueryProxy != null)
 					{
