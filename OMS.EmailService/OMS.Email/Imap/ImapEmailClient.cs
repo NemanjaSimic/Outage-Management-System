@@ -1,3 +1,4 @@
+<<<<<<< HEAD
 ﻿using ImapX;
 using System;
 using ImapX.Enums;
@@ -12,13 +13,44 @@ namespace OMS.Email.Imap
     {
         protected readonly ImapClient _client;
         protected readonly IImapEmailMapper _mapper;
+=======
+﻿namespace OMS.Email.Imap
+{
+    using ImapX;
+    using System;
+    using ImapX.Enums;
+    using Outage.Common;
+    using OMS.Email.Models;
+    using System.Configuration;
+    using OMS.Email.Interfaces;
+    using System.Collections.Generic;
+    using Outage.Common.ServiceContracts.PubSub;
+    using Outage.Common.PubSub.EmailDataContract;
+
+    public class ImapEmailClient : IEmailClient
+    {
+        protected readonly ImapClient _client;
+
+        protected readonly IImapEmailMapper _mapper;
+        protected readonly IEmailParser _parser;
+        protected readonly IPublisher _publisher;
+        protected readonly IDispatcher _dispatcher;
+>>>>>>> 2800298cec0dac58b6c9a650c22ac579428c4bc6
 
         protected readonly string _address;
         protected readonly string _password;
         protected readonly string _server;
         protected readonly int _port;
 
+<<<<<<< HEAD
         public ImapEmailClient(IImapEmailMapper mapper)
+=======
+        public ImapEmailClient(
+            IImapEmailMapper mapper,
+            IEmailParser parser,
+            IPublisher publisher,
+            IDispatcher dispatcher)
+>>>>>>> 2800298cec0dac58b6c9a650c22ac579428c4bc6
         {
             _address = ConfigurationManager.AppSettings["emailAddress"];
             _password = ConfigurationManager.AppSettings["emailPassword"];
@@ -26,6 +58,12 @@ namespace OMS.Email.Imap
             _port = Int32.Parse(ConfigurationManager.AppSettings["emailPort"]);
 
             _mapper = mapper;
+<<<<<<< HEAD
+=======
+            _parser = parser;
+            _publisher = publisher;
+            _dispatcher = dispatcher;
+>>>>>>> 2800298cec0dac58b6c9a650c22ac579428c4bc6
 
             _client = new ImapClient(_server, _port, true);
         }
@@ -53,6 +91,19 @@ namespace OMS.Email.Imap
                 OutageMailMessage outageMessage = _mapper.MapMail(message);
                 outageMailMessages.Add(outageMessage);
                 message.Seen = true;
+<<<<<<< HEAD
+=======
+
+                OutageTracingModel tracingModel = _parser.Parse(outageMessage);
+
+                if (tracingModel.IsValidReport && _dispatcher.IsConnected)
+                {
+                    _dispatcher.Dispatch(tracingModel.Gid);
+                }
+                _publisher.Publish(
+                    publication: new OutageEmailPublication(Topic.OUTAGE_EMAIL, new EmailToOutageMessage(tracingModel.Gid))
+                    );
+>>>>>>> 2800298cec0dac58b6c9a650c22ac579428c4bc6
             }
 
             return outageMailMessages;

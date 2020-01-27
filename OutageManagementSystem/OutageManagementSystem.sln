@@ -107,9 +107,9 @@ Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "TopologyServiceClientMock",
 EndProject
 Project("{2150E333-8FDC-42A3-9474-1A3956D46DE8}") = "OutageManagementService", "OutageManagementService", "{9DB302A8-78A0-459E-99DD-FE5E80E93E24}"
 EndProject
-Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "OutageManagementService", "OutageManagementService\OutageManagementService.csproj", "{6F2AB5E9-8313-4954-9D1C-EDBB772FD276}"
+Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "OutageManagementService", "OutageManagementService\OutageManagementService\OutageManagementService.csproj", "{6F2AB5E9-8313-4954-9D1C-EDBB772FD276}"
 EndProject
-Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "OutageManagementServiceHost", "OutageManagementServiceHost\OutageManagementServiceHost.csproj", "{F3C001F8-941D-4D47-B0BD-0B5268EBB68F}"
+Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "OutageManagementServiceHost", "OutageManagementService\OutageManagementServiceHost\OutageManagementServiceHost.csproj", "{F3C001F8-941D-4D47-B0BD-0B5268EBB68F}"
 EndProject
 Global
 	GlobalSection(SolutionConfigurationPlatforms) = preSolution

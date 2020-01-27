@@ -1,3 +1,4 @@
+<<<<<<< HEAD
 ﻿using Microsoft.AspNet.SignalR.Client;
 using OMS.Email.Interfaces;
 using System;
@@ -5,6 +6,15 @@ using System.Configuration;
 
 namespace OMS.Email.Dispatchers
 {
+=======
+﻿namespace OMS.Email.Dispatchers
+{
+    using Microsoft.AspNet.SignalR.Client;
+    using OMS.Email.Interfaces;
+    using System;
+    using System.Configuration;
+    
+>>>>>>> 2800298cec0dac58b6c9a650c22ac579428c4bc6
     public class GraphHubDispatcher : IDispatcher
     {
         private readonly string _url;

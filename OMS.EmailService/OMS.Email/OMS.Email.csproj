@@ -37,13 +37,22 @@
     <Reference Include="Microsoft.AspNet.SignalR.Client, Version=2.4.1.0, Culture=neutral, PublicKeyToken=31bf3856ad364e35, processorArchitecture=MSIL">
       <HintPath>..\packages\Microsoft.AspNet.SignalR.Client.2.4.1\lib\net45\Microsoft.AspNet.SignalR.Client.dll</HintPath>
     </Reference>
+<<<<<<< HEAD
     <Reference Include="Newtonsoft.Json, Version=6.0.0.0, Culture=neutral, PublicKeyToken=30ad4fe6b2a6aeed, processorArchitecture=MSIL">
       <HintPath>..\packages\Newtonsoft.Json.6.0.4\lib\net45\Newtonsoft.Json.dll</HintPath>
+=======
+    <Reference Include="Newtonsoft.Json, Version=12.0.0.0, Culture=neutral, PublicKeyToken=30ad4fe6b2a6aeed, processorArchitecture=MSIL">
+      <HintPath>..\packages\Newtonsoft.Json.12.0.3\lib\net45\Newtonsoft.Json.dll</HintPath>
+>>>>>>> 2800298cec0dac58b6c9a650c22ac579428c4bc6
     </Reference>
     <Reference Include="System" />
     <Reference Include="System.Configuration" />
     <Reference Include="System.Core" />
     <Reference Include="System.Net.Http.WebRequest" />
+<<<<<<< HEAD
+=======
+    <Reference Include="System.ServiceModel" />
+>>>>>>> 2800298cec0dac58b6c9a650c22ac579428c4bc6
     <Reference Include="System.Xml.Linq" />
     <Reference Include="System.Data.DataSetExtensions" />
     <Reference Include="Microsoft.CSharp" />
@@ -69,7 +78,19 @@
     <Compile Include="Properties\AssemblyInfo.cs" />
   </ItemGroup>
   <ItemGroup>
+<<<<<<< HEAD
     <None Include="packages.config" />
   </ItemGroup>
+=======
+    <None Include="app.config" />
+    <None Include="packages.config" />
+  </ItemGroup>
+  <ItemGroup>
+    <ProjectReference Include="..\..\OutageManagementSystem\Common\Common.csproj">
+      <Project>{892cbe15-9ed7-4540-81fa-0eaaba592138}</Project>
+      <Name>Common</Name>
+    </ProjectReference>
+  </ItemGroup>
+>>>>>>> 2800298cec0dac58b6c9a650c22ac579428c4bc6
   <Import Project="$(MSBuildToolsPath)\Microsoft.CSharp.targets" />
 </Project>
