@@ -14,7 +14,8 @@ namespace PubSubEngine
         {
             ILogger logger = LoggerWrapper.Instance;
 
-            List<ISubscriberCallback> listOfSubscribers = Publications.Instance.GetAllSubscribers(publication.Topic);
+            // Konstruktor kopije kako ne bi pucao exception u foreachu ako se originalna lista subscribera izmeni u sred petlje
+            List<ISubscriberCallback> listOfSubscribers = new List<ISubscriberCallback>(Publications.Instance.GetAllSubscribers(publication.Topic));
 
             if (listOfSubscribers != null)
             {
@@ -31,8 +32,7 @@ namespace PubSubEngine
                         Subscribers.Instance.RemoveSubscriber(subscriber);
                         Publications.Instance.RemoveSubscriber(subscriber);
                         logger.LogWarn($"Failed to publish. Subscriber is no longer in subscriber list.");
-                    }
-                   
+                    }             
                 }
             }
         }
