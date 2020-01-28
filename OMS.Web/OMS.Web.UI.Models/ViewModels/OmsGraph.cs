@@ -1,7 +1,8 @@
-﻿using System.Collections.Generic;
-
+﻿
 namespace OMS.Web.UI.Models.ViewModels
 {
+    using System.Collections.Generic;
+    
     public class OmsGraph
     {
         public List<Node> Nodes;

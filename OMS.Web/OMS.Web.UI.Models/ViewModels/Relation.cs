@@ -6,7 +6,6 @@
     /// </summary>
     public class Relation
     {
-        // These can be changed later on ...
         public string SourceNodeId;
         public string TargetNodeId;
         public bool IsActive;

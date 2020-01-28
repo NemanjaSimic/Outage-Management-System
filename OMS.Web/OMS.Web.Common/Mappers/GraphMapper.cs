@@ -23,12 +23,12 @@ namespace OMS.Web.Common.Mappers
                     DMSType = keyValue.Value.DMSType,
                     IsRemote = keyValue.Value.IsRemote,
                     NominalVoltage = keyValue.Value.NominalVoltage.ToString(),
-                    Measurements = new List<Meauserement>()
+                    Measurements = new List<Measurement>()
                 };
 
                 foreach (var measurement in keyValue.Value.Measurements)
                 {
-                    graphNode.Measurements.Add(new Meauserement()
+                    graphNode.Measurements.Add(new Measurement()
                     {
                         Id = measurement.Gid.ToString(),
                         Type = measurement.Type,
