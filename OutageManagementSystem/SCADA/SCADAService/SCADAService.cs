@@ -27,10 +27,15 @@ namespace Outage.SCADA.SCADAService
         private SCADAModel scadaModel = null;
         private Acquisition acquisition = null;
         private FunctionExecutor functionExecutor = null;
+        private EnumDescs enumDescs = null;
+        private ModelResourcesDesc modelResourcesDesc = null;
 
         public SCADAService()
         {
-            scadaModel = new SCADAModel();
+            modelResourcesDesc = new ModelResourcesDesc();
+            enumDescs = new EnumDescs();
+
+            scadaModel = new SCADAModel(modelResourcesDesc, enumDescs);
             functionExecutor = new FunctionExecutor(scadaModel);
 
             FunctionFactory.SCADAModel = scadaModel;

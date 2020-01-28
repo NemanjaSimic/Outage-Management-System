@@ -128,63 +128,61 @@ namespace TelventDMS.Services.NetworkModelService.TestClient.TestsUI
 			{
 				using(NetworkModelGDAProxy gdaQueryProxy = GetGdaQueryProxy())
 				{
-					if(gdaQueryProxy != null)
-					{
-						iteratorId = gdaQueryProxy.GetExtentValues(modelCodeType, properties);
-						resourcesLeft = gdaQueryProxy.IteratorResourcesLeft(iteratorId);
-
-						while (resourcesLeft > 0)
-						{
-							List<ResourceDescription> rds = gdaQueryProxy.IteratorNext(numberOfResources, iteratorId);
-
-							for (int i = 0; i < rds.Count; i++)
-							{
-								if (rds[i] != null)
-								{
-									tempSb.Append($"Entity with gid: 0x{rds[i].Id:X16}" + Environment.NewLine);
-
-									foreach (Property property in rds[i].Properties)
-									{
-										switch (property.Type)
-										{
-											case PropertyType.Int64:
-												StringAppender.AppendLong(tempSb, property);
-												break;
-											case PropertyType.Float:
-												StringAppender.AppendFloat(tempSb, property);
-												break;
-											case PropertyType.String:
-												StringAppender.AppendString(tempSb, property);
-												break;
-											case PropertyType.Reference:
-												StringAppender.AppendReference(tempSb, property);
-												break;
-											case PropertyType.ReferenceVector:
-												StringAppender.AppendReferenceVector(tempSb, property);
-												break;
-
-											default:
-												tempSb.Append($"{property.Id}: {property.PropertyValue.LongValue}{Environment.NewLine}");
-												break;
-										}
-									}
-								}
-								ids.Add(rds[i].Id);
-							}
-							resourcesLeft = gdaQueryProxy.IteratorResourcesLeft(iteratorId);
-						}
-
-						gdaQueryProxy.IteratorClose(iteratorId);
-
-						message = "Getting extent values method successfully finished.";
-						Logger.LogInfo(message);
-					}
-					else
+					if(gdaQueryProxy == null)
 					{
 						string errMsg = "NetworkModelGDAProxy is null.";
 						Logger.LogWarn(errMsg);
 						throw new NullReferenceException(errMsg);
 					}
+
+					iteratorId = gdaQueryProxy.GetExtentValues(modelCodeType, properties);
+					resourcesLeft = gdaQueryProxy.IteratorResourcesLeft(iteratorId);
+
+					while (resourcesLeft > 0)
+					{
+						List<ResourceDescription> rds = gdaQueryProxy.IteratorNext(numberOfResources, iteratorId);
+
+						for (int i = 0; i < rds.Count; i++)
+						{
+							if (rds[i] != null)
+							{
+								tempSb.Append($"Entity with gid: 0x{rds[i].Id:X16}" + Environment.NewLine);
+
+								foreach (Property property in rds[i].Properties)
+								{
+									switch (property.Type)
+									{
+										case PropertyType.Int64:
+											StringAppender.AppendLong(tempSb, property);
+											break;
+										case PropertyType.Float:
+											StringAppender.AppendFloat(tempSb, property);
+											break;
+										case PropertyType.String:
+											StringAppender.AppendString(tempSb, property);
+											break;
+										case PropertyType.Reference:
+											StringAppender.AppendReference(tempSb, property);
+											break;
+										case PropertyType.ReferenceVector:
+											StringAppender.AppendReferenceVector(tempSb, property);
+											break;
+
+										default:
+											tempSb.Append($"{property.Id}: {property.PropertyValue.LongValue}{Environment.NewLine}");
+											break;
+									}
+								}
+							}
+							ids.Add(rds[i].Id);
+						}
+						resourcesLeft = gdaQueryProxy.IteratorResourcesLeft(iteratorId);
+					}
+
+					gdaQueryProxy.IteratorClose(iteratorId);
+
+					message = "Getting extent values method successfully finished.";
+					Logger.LogInfo(message);
 				}
 			}			
 			catch (Exception e)
