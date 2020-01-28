@@ -164,6 +164,7 @@ namespace Outage.SCADA.SCADAData.Repository
             bool success;
             try
             {
+                //INIT INCOMING SCADA MODEL with current model values
                 incomingScadaModel = new Dictionary<long, ISCADAModelPointItem>(CurrentScadaModel.Count);
                 
                 foreach (long gid in CurrentScadaModel.Keys)
@@ -175,6 +176,49 @@ namespace Outage.SCADA.SCADAData.Repository
                     
                     if(!IncomingAddressToGidMap[pointItem.RegisterType].ContainsKey(pointItem.Address))
                     {
+                        IncomingAddressToGidMap[pointItem.RegisterType].Add(pointItem.Address, gid);
+                    }
+                }
+
+                //ORDER IS IMPORTANT due to IncomingAddressToGidMap validity: DELETE => UPDATE => INSERT
+
+                foreach (long gid in modelChanges[DeltaOpType.Delete])
+                {
+                    ModelCode type = modelResourceDesc.GetModelCodeFromId(gid);
+                    if (type == ModelCode.ANALOG || type == ModelCode.DISCRETE)
+                    {
+                        if (!IncomingScadaModel.ContainsKey(gid))
+                        {
+                            string message = $"Model update data in fault state. Deleting entity with gid: {gid}, that does not exists in SCADA model.";
+                            Logger.LogError(message);
+                            throw new ArgumentException(message);
+                        }
+
+                        ISCADAModelPointItem oldPointItem = IncomingScadaModel[gid];
+                        IncomingScadaModel.Remove(gid);
+
+                        IncomingAddressToGidMap[oldPointItem.RegisterType].Remove(oldPointItem.Address);
+                    }
+                }
+
+                foreach (long gid in modelChanges[DeltaOpType.Update])
+                {
+                    ModelCode type = modelResourceDesc.GetModelCodeFromId(gid);
+                    if (type == ModelCode.ANALOG || type == ModelCode.DISCRETE)
+                    {
+                        ISCADAModelPointItem pointItem = CreateConfigItemForEntity(gid);
+
+                        if (!IncomingScadaModel.ContainsKey(gid))
+                        {
+                            string message = $"Model update data in fault state. Updating entity with gid: 0x{gid:X16}, that does not exists in SCADA model.";
+                            Logger.LogError(message);
+                            throw new ArgumentException(message);
+                        }
+
+                        ISCADAModelPointItem oldPointItem = IncomingScadaModel[gid];
+                        IncomingScadaModel[gid] = pointItem;
+
+                        IncomingAddressToGidMap[oldPointItem.RegisterType].Remove(oldPointItem.Address);
                         IncomingAddressToGidMap[pointItem.RegisterType].Add(pointItem.Address, gid);
                     }
                 }
@@ -195,45 +239,6 @@ namespace Outage.SCADA.SCADAData.Repository
 
                         IncomingScadaModel.Add(gid, pointItem);
                         IncomingAddressToGidMap[pointItem.RegisterType].Add(pointItem.Address, gid);
-                    }
-                }
-
-                foreach (long gid in modelChanges[DeltaOpType.Update])
-                {
-                    ModelCode type = modelResourceDesc.GetModelCodeFromId(gid);
-                    if (type == ModelCode.ANALOG || type == ModelCode.DISCRETE)
-                    {
-                        ISCADAModelPointItem pointItem = CreateConfigItemForEntity(gid);
-
-                        if (!IncomingScadaModel.ContainsKey(gid))
-                        {
-                            string message = $"Model update data in fault state. Updating entity with gid: {gid} or measurement address: {pointItem.Address}, that does not exists in SCADA model.";
-                            Logger.LogError(message);
-                            throw new ArgumentException(message);
-                        }
-
-                        ISCADAModelPointItem oldPointItem = IncomingScadaModel[gid];
-                        IncomingScadaModel[gid] = pointItem;
-                        IncomingAddressToGidMap[pointItem.RegisterType].Remove(oldPointItem.Address);
-                        IncomingAddressToGidMap[pointItem.RegisterType][pointItem.Address] = gid;
-                    }
-                }
-
-                foreach (long gid in modelChanges[DeltaOpType.Delete])
-                {
-                    ModelCode type = modelResourceDesc.GetModelCodeFromId(gid);
-                    if (type == ModelCode.ANALOG || type == ModelCode.DISCRETE)
-                    {
-                        if (!IncomingScadaModel.ContainsKey(gid))
-                        {
-                            string message = $"Model update data in fault state. Deleting entity with gid: {gid}, that does not exists in SCADA model.";
-                            Logger.LogError(message);
-                            throw new ArgumentException(message);
-                        }
-
-                        ushort address = IncomingScadaModel[gid].Address;
-                        IncomingAddressToGidMap[IncomingScadaModel[gid].RegisterType].Remove(address);
-                        IncomingScadaModel.Remove(gid);
                     }
                 }
 
