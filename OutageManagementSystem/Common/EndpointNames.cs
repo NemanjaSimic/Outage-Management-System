@@ -10,6 +10,7 @@
         public static readonly string SCADACommandService = "SCADACommandService";
         public static readonly string SCADATransactionActorEndpoint = "SCADATransactionActorEndpoint";
         public static readonly string SCADAModelUpdateNotifierEndpoint = "SCADAModelUpdateNotifierEndpoint";
+        public static readonly string SCADAAnalogRecieverEndpoint = "SCADAnalogRecieverEndpoint";
 
         //NMS - 2
         public static readonly string NetworkModelGDAEndpoint = "NetworkModelGDAEndpoint";

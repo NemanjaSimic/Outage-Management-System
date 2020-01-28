@@ -1,4 +1,5 @@
-﻿using OMS.Web.Adapter.Topology;
+﻿using OMS.Web.Adapter.SCADA;
+using OMS.Web.Adapter.Topology;
 using OMS.Web.Common;
 using OMS.Web.Common.Mappers;
 using Outage.Common;
@@ -18,6 +19,9 @@ namespace OMS.Web.Adapter
                 new TopologyNotification("WEB_SUBSCRIBER", new GraphMapper()),
                 EndpointNames.SubscriberEndpoint
                 );
+
+            SubscriberProxy _subscriberSCADA = new SubscriberProxy(
+                new SCADANotification("WEB_SUBSCRIBER"), EndpointNames.SCADAAnalogRecieverEndpoint);
 
             try
             {
