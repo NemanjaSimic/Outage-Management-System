@@ -3,6 +3,7 @@ using Outage.Common.ServiceContracts.DistributedTransaction;
 using Outage.Common.ServiceProxies.DistributedTransaction;
 using System;
 using System.Collections.Generic;
+using System.ServiceModel;
 using System.Threading;
 
 namespace Outage.TransactionManagerService
@@ -39,13 +40,15 @@ namespace Outage.TransactionManagerService
             get { return logger ?? (logger = LoggerWrapper.Instance); }
         }
 
-        private TransactionActorProxy transactionActorProxy = null;
 
         #region Proxies
 
-        protected TransactionActorProxy GetTransactionActorProxy(string endpointName)
+        private TransactionActorProxy transactionActorProxy = null;
+
+        private TransactionActorProxy GetTransactionActorProxy(string endpointName)
         {
             int numberOfTries = 0;
+            int sleepInterval = 500;  
 
             while (numberOfTries < 10)
             {
@@ -59,7 +62,11 @@ namespace Outage.TransactionManagerService
 
                     transactionActorProxy = new TransactionActorProxy(endpointName);
                     transactionActorProxy.Open();
-                    break;
+
+                    if (transactionActorProxy.State == CommunicationState.Opened)
+                    {
+                        break;
+                    }
                 }
                 catch (Exception ex)
                 {
@@ -71,7 +78,13 @@ namespace Outage.TransactionManagerService
                 {
                     numberOfTries++;
                     Logger.LogDebug($"DistributedTransaction: GetTransactionActorProxy(), EndpointName: {endpointName}, try number: {numberOfTries}.");
-                    Thread.Sleep(500);
+
+                    if (numberOfTries >= 100)
+                    {
+                        sleepInterval = 1000;
+                    }
+
+                    Thread.Sleep(sleepInterval);
                 }
             }
 

@@ -5,6 +5,7 @@ using System;
 using System.Collections.Concurrent;
 using System.Collections.Generic;
 using System.Linq;
+using System.ServiceModel;
 using System.Text;
 using System.Threading;
 using System.Threading.Tasks;
@@ -28,43 +29,53 @@ namespace OutageManagementService
         #region Proxies
         private TopologyServiceProxy topologyProxy = null;
 
-        protected TopologyServiceProxy TopologyProxy
+        private TopologyServiceProxy GetTopologyProxy()
         {
-            get
-            {
-                int numberOfTries = 0;
-                while (numberOfTries < 10)
-                {
-                    try
-                    {
-                        if(topologyProxy != null)
-                        {
-                            topologyProxy.Abort();
-                            topologyProxy = null;
-                        }
+            int numberOfTries = 0;
+            int sleepInterval = 500;
 
-                        topologyProxy = new TopologyServiceProxy(EndpointNames.TopologyServiceEndpoint);
-                        topologyProxy.Open();
-                        break;
-                    }
-                    catch(Exception ex)
+            while (numberOfTries <= int.MaxValue)
+            {
+                try
+                {
+                    if (topologyProxy != null)
                     {
-                        string message = $"Exception on TopologyServiceProxy initialization. Message: {ex.Message}";
-                        Logger.LogError(message, ex);
+                        topologyProxy.Abort();
                         topologyProxy = null;
                     }
-                    finally
+
+                    topologyProxy = new TopologyServiceProxy(EndpointNames.TopologyServiceEndpoint);
+                    topologyProxy.Open();
+
+                    if (topologyProxy.State == CommunicationState.Opened)
                     {
-                        numberOfTries++;
-                        Logger.LogDebug($"OutageModel: TopologyServiceProxy getter, try number: {numberOfTries}.");
-                        Thread.Sleep(500);
+                        break;
                     }
                 }
+                catch (Exception ex)
+                {
+                    string message = $"Exception on TopologyServiceProxy initialization. Message: {ex.Message}";
+                    Logger.LogError(message, ex);
+                    topologyProxy = null;
+                }
+                finally
+                {
+                    numberOfTries++;
+                    Logger.LogDebug($"OutageModel: TopologyServiceProxy getter, try number: {numberOfTries}.");
 
-                return topologyProxy;
+                    if (numberOfTries >= 100)
+                    {
+                        sleepInterval = 1000;
+                    }
+
+                    Thread.Sleep(sleepInterval);
+                }
             }
+
+            return topologyProxy;
         }
         #endregion
+
         public OutageModel()
         {
             EmailMsg = new ConcurrentQueue<long>();
@@ -74,10 +85,19 @@ namespace OutageManagementService
 
         private void ImportTopologyModel()
         {
-            using (TopologyServiceProxy topologyServiceProxy = TopologyProxy)
+            using (TopologyServiceProxy topologyServiceProxy = GetTopologyProxy())
             {
-                topology = TopologyProxy.GetTopology();
-                PrintUI(topology);
+                if (topologyServiceProxy != null)
+                {
+                    topology = topologyServiceProxy.GetTopology();
+                    PrintUI(topology);
+                }
+                else
+                {
+                    string message = "From method ImportTopologyModel(): TopologyServiceProxy is null.";
+                    logger.LogError(message);
+                    throw new NullReferenceException(message);
+                }
             }
         }
 
