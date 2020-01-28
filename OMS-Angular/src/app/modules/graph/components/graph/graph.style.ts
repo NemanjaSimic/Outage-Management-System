@@ -31,7 +31,7 @@ export const style = cytoscape.stylesheet()
         'label': 'data(dmsType)',
         'text-valign': 'center',
         'text-halign': 'center',
-        'rotate':'90',
+        'rotate': '90',
         'shape': 'triangle',
         'background-color': 'green'
     })
@@ -43,6 +43,15 @@ export const style = cytoscape.stylesheet()
         'shape': 'rectangle',
         'width': '2px',
         'background-color': 'red'
+    })
+    .selector('node[deviceType = "remote"]')
+    .style({
+        'label': 'data(dmsType)',
+        'text-valign': 'center',
+        'text-halign': 'center',
+        'shape': 'rectangle',
+        'background-color': 'green',
+        'opacity': 0.7
     })
     .selector('edge')
     .style({
