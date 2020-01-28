@@ -1,15 +1,15 @@
-﻿using OMS.Web.UI.Models.ViewModels;
-using Outage.Common.UI;
-using System.Collections.Generic;
-
-namespace OMS.Web.Common.Mappers
+﻿namespace OMS.Web.Common.Mappers
 {
+    using OMS.Web.UI.Models.ViewModels;
+    using Outage.Common.UI;
+    using System.Collections.Generic;
+    
     public class GraphMapper : IGraphMapper
     {
         public OmsGraph MapTopology(UIModel topologyModel)
         {
             OmsGraph graph = new OmsGraph();
-
+            
             // map nodes
             foreach (KeyValuePair<long, UINode> keyValue in topologyModel.Nodes)
             {
@@ -35,6 +35,7 @@ namespace OMS.Web.Common.Mappers
                         Value = measurement.Value
                     });
                 }
+
                 graph.Nodes.Add(graphNode);
             }
 

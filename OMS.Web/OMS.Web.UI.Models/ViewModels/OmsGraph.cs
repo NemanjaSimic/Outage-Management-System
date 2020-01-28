@@ -1,5 +1,4 @@
-﻿
-namespace OMS.Web.UI.Models.ViewModels
+﻿namespace OMS.Web.UI.Models.ViewModels
 {
     using System.Collections.Generic;
     
