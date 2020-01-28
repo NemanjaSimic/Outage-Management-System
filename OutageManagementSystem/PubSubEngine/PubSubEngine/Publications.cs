@@ -28,10 +28,9 @@ namespace PubSubEngine
             }
         }
 
-        public bool TryAddSubscriber(Topic topic, ISubscriberCallback subscriber)
+        public bool TryAddSubscriber(Topic topic, ISubscriberCallback subscriber, string subscriberName)
         {
             bool success = subscribedClients.TryGetValue(topic, out List<ISubscriberCallback> list);
-            string subscriberName = subscriber.GetSubscriberName();
 
             if (success)
             {
@@ -40,12 +39,7 @@ namespace PubSubEngine
             }
             else if(!subscribedClients.ContainsKey(topic))
             {
-                list = new List<ISubscriberCallback>
-                {
-                    subscriber
-                };
-
-                success = subscribedClients.TryAdd(topic, list);
+                success = subscribedClients.TryAdd(topic, new List<ISubscriberCallback>(){subscriber});
 
                 if(success)
                 {
@@ -58,8 +52,7 @@ namespace PubSubEngine
 
         public void RemoveSubscriber(ISubscriberCallback subscriber)
         {
-            //string subscriberName = subscriber.GetSubscriberName();
-
+            string subscriberName = Subscribers.Instance.GetSubscriberName(subscriber);
             foreach (Topic topic in subscribedClients.Keys)
             {
                 List<ISubscriberCallback> listOfSubscribers = subscribedClients[topic];
@@ -82,11 +75,12 @@ namespace PubSubEngine
             {
                 Logger.LogDebug($"Try to get List of subscribers is SUCCESSFUL. Topic ['{topic}']");
             }
-            else if(subscribedClients.ContainsKey(topic) && subscribedClients[topic].Count == 0)
+            else
             {
                 Logger.LogDebug($"List of subscribers for topic: '{topic}' is empty.");
+                listOfSubscribers = new List<ISubscriberCallback>();
             }
-            
+           
             return listOfSubscribers;
         }
     }
