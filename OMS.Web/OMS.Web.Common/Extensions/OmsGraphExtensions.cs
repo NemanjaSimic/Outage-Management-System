@@ -18,40 +18,77 @@
                 = graph
                 .Nodes
                 .Where(x => x.DMSType.Equals(PowerTransformerDmsTypeName))
-                .Select(n => n as TransformerNode)
-                .ToList();
+                ?.Select(n => n as TransformerNode)
+                ?.ToList();
 
             IEnumerable<Node> windingNodes
                 = graph
                 .Nodes
                 .Where(x => x.DMSType.Equals(TransformerWindingDmsTypeName))
-                .ToList();
+                ?.ToList();
 
             IEnumerable<Relation> firstWindingRelations
                 = graph
                 .Relations
                 .Where(x => windingNodes.Any(w => w.Id.Equals(x.SourceNodeId)))
                 .Where(x => transformerNodes.Any(t => t.Id.Equals(x.TargetNodeId)))
-                .ToList();
+                ?.ToList();
 
             IEnumerable<Relation> secondWindingRelations
                 = graph
                 .Relations
                 .Where(x => windingNodes.Any(w => w.Id.Equals(x.TargetNodeId)))
                 .Where(x => transformerNodes.Any(t => t.Id.Equals(x.SourceNodeId)))
-                .ToList();
+                ?.ToList();
 
             IEnumerable<Relation> firstWindingSourceRelations
                 = graph
                 .Relations
                 .Where(x => firstWindingRelations.Any(f => f.SourceNodeId.Equals(x.TargetNodeId)))
+                ?.Select(x =>
+                    new Relation
+                    {
+                        SourceNodeId = x.SourceNodeId,
+                        TargetNodeId = firstWindingRelations
+                                        ?.First(f => f.SourceNodeId.Equals(x.TargetNodeId))
+                                        ?.TargetNodeId
+                    }
+                )
+                ?.ToList();
+
+            IEnumerable<Relation> secondWindingTargetRelations
+                = graph
+                .Relations
+                .Where(x => secondWindingRelations.Any(f => f.TargetNodeId.Equals(x.SourceNodeId)))
+                ?.Select(x =>
+                    new Relation
+                    {
+                        TargetNodeId = x.TargetNodeId,
+                        SourceNodeId = secondWindingRelations
+                                        ?.First(f => f.TargetNodeId.Equals(x.SourceNodeId))
+                                        ?.SourceNodeId
+                    }
+                )
+                ?.ToList();
+
+            IEnumerable<Relation> windingRelationsForDelete
+                = graph
+                .Relations
+                .Where(x => windingNodes
+                            .Any(w =>
+                                 x.SourceNodeId.Equals(w.Id)
+                                 || x.TargetNodeId.Equals(w.Id))
+                )
                 .ToList();
-            
-            // sad nekako spojiti ovo
 
             graph.RemoveNodes(windingNodes);
+
             graph.RemoveRelations(firstWindingRelations);
             graph.RemoveRelations(secondWindingRelations);
+            graph.RemoveRelations(windingRelationsForDelete);
+
+            graph.AddRelations(firstWindingSourceRelations);
+            graph.AddRelations(secondWindingTargetRelations);
 
             return graph;
         }
