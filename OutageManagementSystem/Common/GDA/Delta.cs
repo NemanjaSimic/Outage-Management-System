@@ -625,7 +625,7 @@ namespace Outage.Common.GDA
 			return delta;
 		}
 
-		public void ExportToXml(XmlTextWriter xmlWriter)
+		public void ExportToXml(XmlTextWriter xmlWriter, EnumDescs enumDescs)
 		{
 			xmlWriter.WriteStartElement("delta");
 			xmlWriter.WriteStartAttribute("id");
@@ -642,7 +642,7 @@ namespace Outage.Common.GDA
 				xmlWriter.WriteValue(this.InsertOperations.Count);
 				for (int i = 0; i < this.InsertOperations.Count; i++)
 				{
-					this.InsertOperations[i].ExportToXml(xmlWriter);
+					this.InsertOperations[i].ExportToXml(xmlWriter, enumDescs);
 				}
 
 				xmlWriter.WriteEndElement(); // operation
@@ -659,7 +659,7 @@ namespace Outage.Common.GDA
 				xmlWriter.WriteValue(this.UpdateOperations.Count);
 				for (int i = 0; i < this.UpdateOperations.Count; i++)
 				{
-					this.UpdateOperations[i].ExportToXml(xmlWriter);
+					this.UpdateOperations[i].ExportToXml(xmlWriter, enumDescs);
 				}
 
 				xmlWriter.WriteEndElement(); // operation
@@ -676,7 +676,7 @@ namespace Outage.Common.GDA
 				xmlWriter.WriteValue(this.DeleteOperations.Count);
 				for (int i = 0; i < this.DeleteOperations.Count; i++)
 				{
-					this.DeleteOperations[i].ExportToXml(xmlWriter);
+					this.DeleteOperations[i].ExportToXml(xmlWriter, enumDescs);
 				}
 
 				xmlWriter.WriteEndElement(); // operation

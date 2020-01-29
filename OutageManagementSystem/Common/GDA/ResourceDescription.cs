@@ -170,7 +170,7 @@ namespace Outage.Common.GDA
 			properties[index] = property;
 		}
 
-		public void ExportToXml(XmlTextWriter xmlWriter)
+		public void ExportToXml(XmlTextWriter xmlWriter, EnumDescs enumDescs)
 		{
 			StringBuilder sb;
 
@@ -212,7 +212,6 @@ namespace Outage.Common.GDA
 					case PropertyType.Enum:
 						try
 						{
-							EnumDescs enumDescs = new EnumDescs();
 							xmlWriter.WriteValue(enumDescs.GetStringFromEnum(this.Properties[i].Id, this.Properties[i].AsEnum()));
 						}
 						catch (Exception)
@@ -358,7 +357,6 @@ namespace Outage.Common.GDA
 						if (this.Properties[i].AsEnums().Count > 0)
 						{
 							sb = new StringBuilder(100);
-							EnumDescs enumDescs = new EnumDescs();
 
 							for (int j = 0; j < this.Properties[i].AsEnums().Count; j++)
 							{
