@@ -2,6 +2,6 @@
 {
     public interface IScadaClient
     {
-        void SendCommand(long guid, object value);
+        void SendCommand(long guid, int value);
     }
 }

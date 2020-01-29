@@ -1,7 +1,7 @@
-﻿using System.ComponentModel.DataAnnotations;
-
-namespace OMS.Web.UI.Models.BindingModels
+﻿namespace OMS.Web.UI.Models.BindingModels
 {
+    using System.ComponentModel.DataAnnotations;
+
     public enum SwitchCommandType
     {
         TURN_OFF = 0,

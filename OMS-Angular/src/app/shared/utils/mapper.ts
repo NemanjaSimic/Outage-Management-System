@@ -5,8 +5,14 @@ export const mapNode = (node: Node) => {
   return {
     data: {
       id: node.Id,
+      name: node.Name,
+      description: node.Description,
+      mrid: node.Mrid,
       state: node.IsActive ? "active" : "inactive",
-      type: node.Type
+      dmsType: node.DMSType,
+      measurements: node.Measurements,
+      nominalVoltage: node.NominalVoltage,
+      deviceType: node.IsRemote ? "remote" : "local"
     }
   }
 }

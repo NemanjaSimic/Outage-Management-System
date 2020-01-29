@@ -1,4 +1,5 @@
 ﻿using System;
+using System.Collections.Generic;
 using System.Runtime.Serialization;
 
 namespace Outage.Common.UI
@@ -8,17 +9,23 @@ namespace Outage.Common.UI
     public class UINode
     {
         [DataMember]
-        public long Gid { get; set; }
+        public long Id { get; set; }
+        [DataMember]
+        public string Description { get; set; }
+        [DataMember]
+        public string Mrid { get; set; }
+        [DataMember]
+        public string Name { get; set; }
         [DataMember]
         public bool IsActive { get; set; }
         [DataMember]
-        public float Measurement { get; set; }
+        public List<UIMeasurement> Measurements {get; set;}
         [DataMember]
-        public string Type { get; set; }
-        public UINode(long gid, string type)
-        {
-            Gid = gid;
-            Type = type;
-        }
+        public float NominalVoltage { get; set; }
+        [DataMember]
+        public string DMSType { get; set; }
+        [DataMember]
+        public bool IsRemote { get; set; }
+        public UINode(){}
     }
 }

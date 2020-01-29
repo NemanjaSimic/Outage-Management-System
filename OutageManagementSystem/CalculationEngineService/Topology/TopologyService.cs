@@ -1,18 +1,26 @@
-﻿using Outage.Common;
+﻿using CECommon.Interfaces;
+using Outage.Common;
 using Outage.Common.ServiceContracts;
 using Outage.Common.UI;
 using System;
+using System.Linq;
 
 namespace Topology
 {
 	public class TopologyService : ITopologyServiceContract
 	{
 		private ILogger logger = LoggerWrapper.Instance;
+		private IWebTopologyBuilder webTopologyBuilder = new WebTopologyBuilder();
 		public UIModel GetTopology()
 		{
 			try
 			{
-				return TopologyManager.Instance.TopologyModel.UIModel;
+				UIModel uIModel = new UIModel();
+				if (TopologyManager.Instance.TopologyModel.Count > 0)
+				{
+					uIModel = webTopologyBuilder.CreateTopologyForWeb(TopologyManager.Instance.TopologyModel.First());
+				}
+				return uIModel; 
 			}
 			catch (Exception ex)
 			{

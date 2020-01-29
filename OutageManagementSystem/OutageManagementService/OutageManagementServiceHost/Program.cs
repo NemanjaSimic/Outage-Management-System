@@ -1,4 +1,5 @@
 ﻿using Outage.Common;
+using OutageManagementService;
 using System;
 
 namespace OutageManagementServiceHost

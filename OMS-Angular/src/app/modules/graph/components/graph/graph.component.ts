@@ -55,6 +55,7 @@ export class GraphComponent implements OnInit, OnDestroy {
   }
 
   ngOnInit() {
+    // testing splash screen look, will change logic after we connect to the api
     this.didLoadGraph = true;
 
     // web api
@@ -65,6 +66,8 @@ export class GraphComponent implements OnInit, OnDestroy {
     this.graphData.nodes = graphMock.nodes;
     this.graphData.edges = graphMock.edges;
     this.graphData.backup_edges = graphMock.backup_edges;
+
+    this.drawGraph();
 
     // zoom on + and -
     this.zoomSubscription = fromEvent(document, 'keypress').subscribe(

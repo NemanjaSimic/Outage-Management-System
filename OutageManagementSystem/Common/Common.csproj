@@ -113,13 +113,14 @@
     <Compile Include="PubSub\SCADADataContract\ModbusData.cs" />
     <Compile Include="PubSub\SCADADataContract\SCADAMessage.cs" />
     <Compile Include="PubSub\SCADADataContract\SCADAPublication.cs" />
+    <Compile Include="ServiceContracts\CalculationEngine\ICECommand.cs" />
     <Compile Include="ServiceContracts\DistributedTransaction\IModelUpdateNotificationContract.cs" />
     <Compile Include="ServiceContracts\DistributedTransaction\ITransactionEnlistmentContract.cs" />
     <Compile Include="ServiceContracts\OMS\ICallingContract.cs" />
     <Compile Include="ServiceContracts\OMS\IOutageContract.cs" />
     <Compile Include="ServiceContracts\OMS\OutageData.cs" />
     <Compile Include="ServiceContracts\SCADA\ISCADACommand.cs" />
-    <Compile Include="ServiceContracts\ITopologyServiceContract.cs" />
+    <Compile Include="ServiceContracts\CalculationEngine\ITopologyServiceContract.cs" />
     <Compile Include="ServiceContracts\PubSub\IPublisher.cs" />
     <Compile Include="ServiceContracts\PubSub\ISubscriber.cs" />
     <Compile Include="ServiceNames.cs" />
@@ -158,6 +159,7 @@
     <Compile Include="GDA\Property.cs" />
     <Compile Include="GDA\ResourceDescription.cs" />
     <Compile Include="GDA\PropertyValue.cs" />
+    <Compile Include="UI\UIMeasurement.cs" />
     <Compile Include="UI\UIModel.cs" />
     <Compile Include="UI\UINode.cs" />
     <Compile Include="Versioning\DeltaDB.cs" />

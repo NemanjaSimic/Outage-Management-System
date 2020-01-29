@@ -20,6 +20,7 @@ namespace Outage.SCADA.SCADAData.Repository
             get { return logger ?? (logger = LoggerWrapper.Instance); }
         }
 
+        private EnumDescs enumDescs;
         private ModelResourcesDesc modelResourceDesc;
 
         private bool isSCADAModelImported;
@@ -140,11 +141,13 @@ namespace Outage.SCADA.SCADAData.Repository
 
         #endregion Proxies
 
-        public SCADAModel()
+        public SCADAModel(ModelResourcesDesc modelResourceDesc, EnumDescs enumDescs)
         {
+            this.modelResourceDesc = modelResourceDesc;
+            this.enumDescs = enumDescs;
+
             currentScadaModel = new Dictionary<long, ISCADAModelPointItem>();
             incomingScadaModel = new Dictionary<long, ISCADAModelPointItem>();
-            modelResourceDesc = new ModelResourcesDesc();
         }
 
         #region IModelUpdateNotificationContract
@@ -162,8 +165,10 @@ namespace Outage.SCADA.SCADAData.Repository
         public bool Prepare()
         {
             bool success;
+
             try
             {
+                //INIT INCOMING SCADA MODEL with current model values
                 incomingScadaModel = new Dictionary<long, ISCADAModelPointItem>(CurrentScadaModel.Count);
                 
                 foreach (long gid in CurrentScadaModel.Keys)
@@ -179,45 +184,9 @@ namespace Outage.SCADA.SCADAData.Repository
                     }
                 }
 
-                foreach (long gid in modelChanges[DeltaOpType.Insert])
-                {
-                    ModelCode type = modelResourceDesc.GetModelCodeFromId(gid);
-                    if (type == ModelCode.ANALOG || type == ModelCode.DISCRETE)
-                    {
-                        ISCADAModelPointItem pointItem = CreateConfigItemForEntity(gid);
-                        
-                        if (IncomingScadaModel.ContainsKey(gid) || IncomingAddressToGidMap[pointItem.RegisterType].ContainsKey(pointItem.Address))
-                        {
-                            string message = $"Model update data in fault state. Inserting gid: {gid} or measurement address: {pointItem.Address}, that already exists in SCADA model.";
-                            Logger.LogError(message);
-                            throw new ArgumentException(message);
-                        }
+                CreatePointItemsFromNetworkModelMeasurements(out Dictionary<long, ISCADAModelPointItem> incomingPointItems);
 
-                        IncomingScadaModel.Add(gid, pointItem);
-                        IncomingAddressToGidMap[pointItem.RegisterType].Add(pointItem.Address, gid);
-                    }
-                }
-
-                foreach (long gid in modelChanges[DeltaOpType.Update])
-                {
-                    ModelCode type = modelResourceDesc.GetModelCodeFromId(gid);
-                    if (type == ModelCode.ANALOG || type == ModelCode.DISCRETE)
-                    {
-                        ISCADAModelPointItem pointItem = CreateConfigItemForEntity(gid);
-
-                        if (!IncomingScadaModel.ContainsKey(gid))
-                        {
-                            string message = $"Model update data in fault state. Updating entity with gid: {gid} or measurement address: {pointItem.Address}, that does not exists in SCADA model.";
-                            Logger.LogError(message);
-                            throw new ArgumentException(message);
-                        }
-
-                        ISCADAModelPointItem oldPointItem = IncomingScadaModel[gid];
-                        IncomingScadaModel[gid] = pointItem;
-                        IncomingAddressToGidMap[pointItem.RegisterType].Remove(oldPointItem.Address);
-                        IncomingAddressToGidMap[pointItem.RegisterType][pointItem.Address] = gid;
-                    }
-                }
+                //ORDER IS IMPORTANT due to IncomingAddressToGidMap validity: DELETE => UPDATE => INSERT
 
                 foreach (long gid in modelChanges[DeltaOpType.Delete])
                 {
@@ -226,14 +195,88 @@ namespace Outage.SCADA.SCADAData.Repository
                     {
                         if (!IncomingScadaModel.ContainsKey(gid))
                         {
+                            success = false;
                             string message = $"Model update data in fault state. Deleting entity with gid: {gid}, that does not exists in SCADA model.";
                             Logger.LogError(message);
                             throw new ArgumentException(message);
                         }
 
-                        ushort address = IncomingScadaModel[gid].Address;
-                        IncomingAddressToGidMap[IncomingScadaModel[gid].RegisterType].Remove(address);
+                        ISCADAModelPointItem oldPointItem = IncomingScadaModel[gid];
                         IncomingScadaModel.Remove(gid);
+
+                        IncomingAddressToGidMap[oldPointItem.RegisterType].Remove(oldPointItem.Address);
+                    }
+                }
+
+                foreach (long gid in modelChanges[DeltaOpType.Update])
+                {
+                    ModelCode type = modelResourceDesc.GetModelCodeFromId(gid);
+                    if (type == ModelCode.ANALOG || type == ModelCode.DISCRETE)
+                    {
+
+                        if (!IncomingScadaModel.ContainsKey(gid))
+                        {
+                            success = false;
+                            string message = $"Model update data in fault state. Updating entity with gid: 0x{gid:X16}, that does not exists in SCADA model.";
+                            Logger.LogError(message);
+                            throw new ArgumentException(message);
+                        }
+
+                        ISCADAModelPointItem incomingPointItem = incomingPointItems[gid];
+                        ISCADAModelPointItem oldPointItem = IncomingScadaModel[gid];
+
+                        if (!IncomingAddressToGidMap[oldPointItem.RegisterType].ContainsKey(oldPointItem.Address))
+                        {
+                            success = false;
+                            string message = $"Model update data in fault state. Updating point with address: {oldPointItem.Address}, that does not exists in SCADA model.";
+                            Logger.LogError(message);
+                            throw new ArgumentException(message);
+                        }
+
+                        if (oldPointItem.Address != incomingPointItem.Address && IncomingAddressToGidMap[incomingPointItem.RegisterType].ContainsKey(incomingPointItem.Address))
+                        {
+                            success = false;
+                            string message = $"Model update data in fault state. Trying to add point with address: {incomingPointItem.Address}, that already exists in SCADA model.";
+                            Logger.LogError(message);
+                            throw new ArgumentException(message);
+                        }
+
+                        IncomingScadaModel[gid] = incomingPointItem;
+
+                        if(oldPointItem.Address != incomingPointItem.Address)
+                        {
+                            IncomingAddressToGidMap[oldPointItem.RegisterType].Remove(oldPointItem.Address);
+                            IncomingAddressToGidMap[incomingPointItem.RegisterType].Add(incomingPointItem.Address, gid);
+                        }
+
+                    }
+                }
+
+                foreach (long gid in modelChanges[DeltaOpType.Insert])
+                {
+                    ModelCode type = modelResourceDesc.GetModelCodeFromId(gid);
+                    if (type == ModelCode.ANALOG || type == ModelCode.DISCRETE)
+                    {
+                        if (IncomingScadaModel.ContainsKey(gid))
+                        {
+                            success = false;
+                            string message = $"Model update data in fault state. Inserting gid: {gid}, that already exists in SCADA model.";
+                            Logger.LogError(message);
+                            throw new ArgumentException(message);
+                        }
+
+                        ISCADAModelPointItem incomingPointItem = incomingPointItems[gid];
+
+                        if (IncomingAddressToGidMap[incomingPointItem.RegisterType].ContainsKey(incomingPointItem.Address))
+                        {
+                            success = false;
+                            string message = $"Model update data in fault state. Trying to add point with address: {incomingPointItem.Address}, that already exists in SCADA model.";
+                            Logger.LogError(message);
+                            throw new ArgumentException(message);
+                        }
+
+                        IncomingScadaModel.Add(gid, incomingPointItem);
+                        IncomingAddressToGidMap[incomingPointItem.RegisterType].Add(incomingPointItem.Address, gid);
                     }
                 }
 
@@ -267,7 +310,6 @@ namespace Outage.SCADA.SCADAData.Repository
 
         public void Rollback()
         {
-            
             incomingScadaModel = null;
             incomingAddressToGidMap = null;
             modelChanges.Clear();
@@ -334,7 +376,7 @@ namespace Outage.SCADA.SCADAData.Repository
                                 {
                                     long gid = rds[i].Id;
                                     ModelCode type = modelResourceDesc.GetModelCodeFromId(gid);
-                                    ISCADAModelPointItem pointItem = new AnalogSCADAModelPointItem(rds[i].Properties, ModelCode.ANALOG);
+                                    ISCADAModelPointItem pointItem = new AnalogSCADAModelPointItem(rds[i].Properties, ModelCode.ANALOG, enumDescs);
                                     CurrentScadaModel.Add(rds[i].Id, pointItem);
                                     CurrentAddressToGidMap[pointItem.RegisterType].Add(pointItem.Address, rds[i].Id);
                                     
@@ -388,7 +430,7 @@ namespace Outage.SCADA.SCADAData.Repository
                                 {
                                     long gid = rds[i].Id;
                                     ModelCode type = modelResourceDesc.GetModelCodeFromId(gid);
-                                    ISCADAModelPointItem pointItem = new DiscreteSCADAModelPointItem(rds[i].Properties, ModelCode.DISCRETE);
+                                    ISCADAModelPointItem pointItem = new DiscreteSCADAModelPointItem(rds[i].Properties, ModelCode.DISCRETE, enumDescs);
                                     CurrentScadaModel.Add(gid, pointItem);
                                     CurrentAddressToGidMap[pointItem.RegisterType].Add(pointItem.Address, gid);
                                     Logger.LogDebug($"DISCRETE measurement added to SCADA model [Gid: {gid}, Address: {pointItem.Address}]");
@@ -420,42 +462,108 @@ namespace Outage.SCADA.SCADAData.Repository
 
         #endregion ImportScadaModel
 
-        private ISCADAModelPointItem CreateConfigItemForEntity(long gid)
+        private void CreatePointItemsFromNetworkModelMeasurements(out Dictionary<long, ISCADAModelPointItem> pointItems)
         {
-            ModelCode type = modelResourceDesc.GetModelCodeFromId(gid);
-            List<ModelCode> props;
-            ResourceDescription rd;
-            ISCADAModelPointItem pointItem;
+            pointItems = new Dictionary<long, ISCADAModelPointItem>();
 
             using (NetworkModelGDAProxy gdaProxy = GetGdaQueryProxy())
             {
-                if (gdaProxy != null)
+                if(gdaProxy == null)
                 {
-                    if (type == ModelCode.ANALOG)
-                    {
-                        props = modelResourceDesc.GetAllPropertyIds(type);
-                        rd = gdaProxy.GetValues(gid, props);
-                        pointItem = new AnalogSCADAModelPointItem(rd.Properties, type);
-                    }
-                    else if (type == ModelCode.DISCRETE)
-                    {
-                        props = modelResourceDesc.GetAllPropertyIds(type);
-                        rd = gdaProxy.GetValues(gid, props);
-                        pointItem = new DiscreteSCADAModelPointItem(rd.Properties, type);
-                    }
-                    else
-                    {
-                        string errMessage = $"ResourceDescription type is neither analog nor digital. Type: {type}.";
-                        Logger.LogWarn(errMessage);
-                        pointItem = null;
-                    }
-                }
-                else
-                {
-                    string message = "From method CreateConfigItemForEntity(): NetworkModelGDAProxy is null.";
+                    string message = "From method CreatePointItemsFromNetworkModelMeasurements(): NetworkModelGDAProxy is null.";
                     Logger.LogWarn(message);
                     throw new NullReferenceException(message);
                 }
+
+                ModelCode type;
+                List<ModelCode> props;
+
+                int iteratorId;
+                int resourcesLeft;
+                int numberOfResources = 10000;
+
+
+                //CREATE ANALOG POINTS
+                type = ModelCode.ANALOG;
+                props = modelResourceDesc.GetAllPropertyIds(type);
+
+                iteratorId = gdaProxy.GetExtentValues(type, props);
+                resourcesLeft = gdaProxy.IteratorResourcesLeft(iteratorId);
+
+                while (resourcesLeft > 0)
+                {
+                    List<ResourceDescription> resources = gdaProxy.IteratorNext(numberOfResources, iteratorId);
+
+                    foreach (ResourceDescription rd in resources)
+                    {
+                        if (pointItems.ContainsKey(rd.Id))
+                        {
+                            string message = $"Trying to create point item for resource that already exists in model. Gid: 0x{rd.Id:X16}";
+                            Logger.LogError(message);
+                            throw new ArgumentException(message);
+                        }
+
+                        ISCADAModelPointItem point = CreatePointItemForResource(rd);
+                        pointItems.Add(rd.Id, point);
+                    }
+
+                    resourcesLeft = gdaQueryProxy.IteratorResourcesLeft(iteratorId);
+                }
+
+                gdaQueryProxy.IteratorClose(iteratorId);
+
+
+                //CREATE DISCRETE POINTS
+                type = ModelCode.DISCRETE;
+                props = modelResourceDesc.GetAllPropertyIds(type);
+
+                iteratorId = gdaProxy.GetExtentValues(type, props);
+                resourcesLeft = gdaProxy.IteratorResourcesLeft(iteratorId);
+
+                while (resourcesLeft > 0)
+                {
+                    List<ResourceDescription> resources = gdaProxy.IteratorNext(numberOfResources, iteratorId);
+
+                    foreach (ResourceDescription rd in resources)
+                    {
+                        if (pointItems.ContainsKey(rd.Id))
+                        {
+                            string message = $"Trying to create point item for resource that already exists in model. Gid: 0x{rd.Id:X16}";
+                            Logger.LogError(message);
+                            throw new ArgumentException(message);
+                        }
+
+                        ISCADAModelPointItem point = CreatePointItemForResource(rd);
+                        pointItems.Add(rd.Id, point);
+                    }
+
+                    resourcesLeft = gdaQueryProxy.IteratorResourcesLeft(iteratorId);
+                }
+
+                gdaQueryProxy.IteratorClose(iteratorId);
+            }
+        }
+
+        private ISCADAModelPointItem CreatePointItemForResource(ResourceDescription resource)
+        {
+            long gid = resource.Id;
+            ModelCode type = modelResourceDesc.GetModelCodeFromId(gid);
+            
+            ISCADAModelPointItem pointItem;
+
+            if (type == ModelCode.ANALOG)
+            {
+                pointItem = new AnalogSCADAModelPointItem(resource.Properties, type, enumDescs);
+            }
+            else if (type == ModelCode.DISCRETE)
+            {
+                pointItem = new DiscreteSCADAModelPointItem(resource.Properties, type, enumDescs);
+            }
+            else
+            {
+                string errMessage = $"ResourceDescription type is neither analog nor digital. Type: {type}.";
+                Logger.LogWarn(errMessage);
+                pointItem = null;
             }
 
             return pointItem;

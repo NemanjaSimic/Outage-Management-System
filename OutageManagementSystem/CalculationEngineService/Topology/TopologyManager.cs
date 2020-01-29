@@ -18,15 +18,19 @@ namespace Topology
         #region Fields
         ILogger logger = LoggerWrapper.Instance;
         private ITopologyBuilder topologyBuilder;
+        private IWebTopologyBuilder webTopologyBuilder;
         private List<long> roots;
 
-        public TopologyModel TopologyModel { get; private set; }
-        public TopologyModel TransactionTopologyModel { get; private set; }
+        public List<ITopology> TopologyModel { get; private set; }
+        public List<ITopology> TransactionTopologyModel { get; private set; }
         #endregion
 
         private TopologyManager()
         {
             topologyBuilder = new GraphBuilder();
+            webTopologyBuilder = new WebTopologyBuilder();
+            TopologyModel = new List<ITopology>();
+            TransactionTopologyModel = new List<ITopology>();
         }
 
         #region Singleton
@@ -52,21 +56,22 @@ namespace Topology
         public void InitializeTopology()
         {
             logger.LogDebug("Initializing topology started.");
-            TopologyModel = CreateTopology(TransactionFlag.NoTransaction);
+            TopologyModel = CreateTopology();
             logger.LogDebug("Initializing topology finished.");
         }
-        private TopologyModel CreateTopology(TransactionFlag flag)
+        private List<ITopology> CreateTopology()
         {
             logger.LogDebug("Get all energy sources started.");
-            roots = NMSManager.Instance.GetAllEnergySources(flag);
+            roots = NMSManager.Instance.GetAllEnergySources();
             logger.LogDebug("Get all energy sources finished.");
 
-            TopologyModel topologyModel = new TopologyModel();
+            List<ITopology> topologyModel = new List<ITopology>();
 
-            if (roots.Count > 0)
+            foreach (var rootElement in roots)
             {
-                topologyModel = topologyBuilder.CreateGraphTopology(roots.First(), flag);
+                topologyModel.Add(topologyBuilder.CreateGraphTopology(rootElement));
             }
+
             return topologyModel;
         }
 
@@ -76,7 +81,7 @@ namespace Topology
             try
             {
                 logger.LogInfo($"Topology manager prepare for transaction started.");
-                TransactionTopologyModel = CreateTopology(TransactionFlag.InTransaction);
+                TransactionTopologyModel = CreateTopology();
             }
             catch (Exception ex)
             {
@@ -88,23 +93,48 @@ namespace Topology
 
         public void CommitTransaction()
         {
-            TopologyModel = TransactionTopologyModel;
+            TopologyModel = new List<ITopology>(TransactionTopologyModel);
             logger.LogDebug("TopologyManager commited transaction successfully.");
-            using (var publisherProxy = new PublisherProxy(EndpointNames.PublisherEndpoint))
-            {
-                //publisherProxy.Open();
-                TopologyForUIMessage message = new TopologyForUIMessage(TopologyModel.UIModel);
-                CalcualtionEnginePublication publication = new CalcualtionEnginePublication(Topic.TOPOLOGY, message);
-                publisherProxy.Publish(publication);
-                logger.LogDebug("TopologyManager published new topology successfully.");
-            }
+            Publish();
         }
 
         public void RollbackTransaction()
         {
-            TransactionTopologyModel = null;
+            TransactionTopologyModel = new List<ITopology>();
             logger.LogDebug("TopologyManager rolled back topology.");
         }
 
+        public void UpdateTopology()
+        {
+            logger.LogDebug("Updating topology started.");
+            TopologyModel = CreateTopology();
+            logger.LogDebug("Updating topology finished.");
+            Publish();
+        }
+
+        public void Publish()
+        {
+            //Dok se ne sredi logika za vise root-ova na WEB-u
+            ITopology topology = new TopologyModel();
+            if (TopologyModel.Count > 0)
+            {
+                topology = TopologyModel.First();
+            }
+            TopologyForUIMessage message = new TopologyForUIMessage(webTopologyBuilder.CreateTopologyForWeb(topology)); //privremeno resenje, dok se ne razradi logika
+            CalcualtionEnginePublication publication = new CalcualtionEnginePublication(Topic.TOPOLOGY, message);
+            try
+            {
+                using (var publisherProxy = new PublisherProxy(EndpointNames.PublisherEndpoint))
+                {
+                    publisherProxy.Publish(publication);
+                    logger.LogDebug("TopologyManager published new topology successfully.");
+                }
+            }
+            catch (Exception ex)
+            {
+                logger.LogError($"TopologyManager failed to publish new topology. Exception: {ex.Message}");
+            }
+            
+        }
     }
 }

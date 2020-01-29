@@ -73,7 +73,9 @@ namespace OutageManagementService.Calling
             List<long> outage = new List<long>();
             foreach (var call in this.outageModel.CalledOutages)
             {
-                outage.Add(this.outageModel.topologyModel.TopologyElements[call].FirstEnd.Id);
+                // nece build da prodje jer ti je ovde FirstEnd tipa long, a nije struktura
+                // pa ne postoji .Id polje kod njega
+                //outage.Add(this.outageModel.topologyModel.TopologyElements[call].FirstEnd.Id);
             }
 
             foreach (var item in outage)

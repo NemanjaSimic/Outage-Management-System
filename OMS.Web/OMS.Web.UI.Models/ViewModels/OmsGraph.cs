@@ -1,8 +1,9 @@
-﻿using System.Collections.Generic;
-
-namespace OMS.Web.UI.Models.ViewModels
+﻿namespace OMS.Web.UI.Models.ViewModels
 {
-    public class OmsGraph
+    using System;
+    using System.Collections.Generic;
+    
+    public class OmsGraph : IEquatable<OmsGraph>
     {
         public List<Node> Nodes;
         public List<Relation> Relations;
@@ -12,5 +13,9 @@ namespace OMS.Web.UI.Models.ViewModels
             Nodes = new List<Node>();
             Relations = new List<Relation>();
         }
+
+        public bool Equals(OmsGraph other)
+            => Nodes.Equals(other.Nodes)
+            && Relations.Equals(other.Relations);
     }
 }
