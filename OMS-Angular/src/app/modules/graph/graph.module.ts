@@ -4,13 +4,14 @@ import { ServicesModule } from '@services/services.module';
 import { SharedModule } from '@shared/shared.module';
 import { RouterModule } from '@angular/router';
 
-
 @NgModule({
-  declarations: [GraphComponent],
+  declarations: [
+    GraphComponent
+  ],
   imports: [
     SharedModule,
     ServicesModule,
-    RouterModule.forChild([{ path: '', component: GraphComponent}]) // no child routes yet
+    RouterModule.forChild([])
   ]
 })
 export class GraphModule { }

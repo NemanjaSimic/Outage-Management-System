@@ -43,9 +43,9 @@
       { "data": { "source": "D3", "target": "T1", "color": "blue" } },
       { "data": { "source": "D4", "target": "T2", "color": "blue" } },
       
-      { "data": { "source": "T1", "target": "1234568", "color": "blue" } },
+      { "data": { "source": "T1", "target": "B3", "color": "blue" } },
       { "data": { "source": "T1", "target": "B4", "color": "blue" } },
-      { "data": { "source": "1234568", "target": "F1", "color": "blue" } },
+      { "data": { "source": "B3", "target": "F1", "color": "blue" } },
       { "data": { "source": "B4", "target": "F2", "color": "blue" } },
       { "data": { "source": "B4", "target": "F3", "color": "red" } },
       { "data": { "source": "F1", "target": "EC1", "color": "blue" } },
@@ -62,7 +62,7 @@
       { "data": { "source": "B7", "target": "F7", "color": "blue" } },
       { "data": { "source": "B7", "target": "F8", "color": "blue" } },
       { "data": { "source": "F7", "target": "EC7", "color": "blue" } },
-      { "data": { "source": "F8", "target": "1234567", "color": "blue" } },
+      { "data": { "source": "F8", "target": "EC8", "color": "blue" } },
       { "data": { "source": "F5", "target": "EC5", "color": "red" } },
       { "data": { "source": "F6", "target": "EC6", "color": "blue" } }
     ],

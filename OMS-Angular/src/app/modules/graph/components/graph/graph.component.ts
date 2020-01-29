@@ -18,6 +18,7 @@ import dagre from 'cytoscape-dagre';
 import popper from 'cytoscape-popper';
 import { CommandService } from '@services/command/command.service';
 import { SwitchCommandType, SwitchCommand } from '@shared/models/switch-command.model';
+import { zoom } from '@shared/utils/zoom';
 cytoscape.use(dagre);
 cytoscape.use(popper);
 
@@ -58,13 +59,6 @@ export class GraphComponent implements OnInit, OnDestroy {
   ngOnInit() {
     // testing splash screen look, will change logic after we connect to the api
     this.didLoadGraph = true;
-
-    setTimeout(() => {
-      this.didLoadGraph = true;
-
-      // initial topology
-      this.getTopology();
-    }, 2000);
 
     // web api
     //this.getTopology();
@@ -217,18 +211,7 @@ export class GraphComponent implements OnInit, OnDestroy {
 
   public onSearch() : void {
     this.cy.ready(() => {
-      this.cy.nodes().forEach(node => {
-        if(node.data('id') == this.gidSearchQuery){
-          console.log('zooming');          
-          this.cy.zoom({
-            level: 6,
-            position: {
-              x: node.position().x,
-              y: node.position().y
-            }
-          })
-        }
-      })
+      zoom(this.cy, this.gidSearchQuery);
     })
   }
 
