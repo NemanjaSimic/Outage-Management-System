@@ -1,11 +1,14 @@
 ﻿namespace OMS.Web.Common.Mappers
 {
     using OMS.Web.UI.Models.ViewModels;
+    using OMS.Web.Common.Extensions;
     using Outage.Common.UI;
     using System.Collections.Generic;
     
     public class GraphMapper : IGraphMapper
     {
+        private const string PowerTransformerDmsTypeName = "POWERTRANSFORMER";
+
         public OmsGraph MapTopology(UIModel topologyModel)
         {
             OmsGraph graph = new OmsGraph();
@@ -36,7 +39,11 @@
                     });
                 }
 
-                graph.Nodes.Add(graphNode);
+                graph.Nodes.Add(
+                    graphNode.DMSType == PowerTransformerDmsTypeName 
+                    ? (TransformerNode)graphNode
+                    : graphNode
+                );
             }
 
             // map relations
@@ -54,7 +61,7 @@
                 }
             }
 
-            return graph;
+            return graph.SquashTransformerWindings();
         }
     }
 }
