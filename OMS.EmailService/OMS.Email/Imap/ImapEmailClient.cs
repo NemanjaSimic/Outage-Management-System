@@ -70,7 +70,7 @@
 
                 OutageTracingModel tracingModel = _parser.Parse(outageMessage);
 
-                if (tracingModel.IsValidReport && _dispatcher.IsConnected)
+                if (tracingModel.IsValidReport)
                 {
                     _dispatcher.Dispatch(tracingModel.Gid);
                 }

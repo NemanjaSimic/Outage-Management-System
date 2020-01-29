@@ -46,8 +46,15 @@
             if (!IsConnected)
                 Connect();
 
-            Console.WriteLine($"Sending graph outage call update to Graph Hub");
-            _proxy.Invoke<string>("NotifyGraphOutageCall", gid).Wait();
+            try
+            {
+                Console.WriteLine($"Sending graph outage call update to Graph Hub");
+                _proxy.Invoke<string>("NotifyGraphOutageCall", gid).Wait();
+            }
+            catch (Exception)
+            {
+                Console.WriteLine($"Sending graph outage call update failed.");
+            }
         }
 
         public void Stop()

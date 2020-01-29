@@ -6,7 +6,8 @@ export const drawCallWarning = (cy, gid: Number) => {
   cy.nodes().forEach(node => {
     if (node.data('id') == gid) {
       const nodePosition = node.position();
-
+      console.log('adding outage icon');
+      
       cy.add([
         {
           group: "nodes",

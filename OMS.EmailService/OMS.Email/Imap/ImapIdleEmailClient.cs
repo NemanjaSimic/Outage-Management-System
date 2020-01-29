@@ -20,7 +20,7 @@
 
         public bool StartIdling()
         {
-            Folder folder = _client.Folders["INBOX"];
+            Folder folder = _client.Folders.Inbox;
             return folder.StartIdling();
         }
 
@@ -39,7 +39,7 @@
 
                 OutageTracingModel tracingModel = _parser.Parse(outageMessage);
 
-                if (tracingModel.IsValidReport && _dispatcher.IsConnected)
+                if (tracingModel.IsValidReport)
                 {
                     _dispatcher.Dispatch(tracingModel.Gid);
                 }
