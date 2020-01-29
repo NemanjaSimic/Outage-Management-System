@@ -44,9 +44,16 @@
                     _dispatcher.Dispatch(tracingModel.Gid);
                 }
 
-                _publisher.Publish(
-                    publication: new OutageEmailPublication(Topic.OUTAGE_EMAIL, new EmailToOutageMessage(tracingModel.Gid))
-                    );
+                try
+                {
+                    _publisher.Publish(
+                        publication: new OutageEmailPublication(Topic.OUTAGE_EMAIL, new EmailToOutageMessage(tracingModel.Gid))
+                        );
+                }
+                catch (Exception)
+                {
+                    Console.WriteLine("Sending to PubSub Engine failed.");
+                }
             }
         }
     }

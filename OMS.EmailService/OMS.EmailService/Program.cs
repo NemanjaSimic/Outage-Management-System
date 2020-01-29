@@ -1,45 +1,35 @@
-#define IDLE_SCAN
-//#define MANUAL_SCAN
-
 namespace OMS.EmailService
 {
-    using System;
-    using System.Collections.Generic;
-    using OMS.Email.Dispatchers;
-    using OMS.Email.EmailParsers;
     using OMS.Email.Factories;
-    using OMS.Email.Imap;
     using OMS.Email.Interfaces;
     using OMS.Email.Models;
+    using System;
+    using System.Collections.Generic;
+    using System.Configuration;
 
     class Program
     {
+        private static string IDLE_SCAN = "IDLE_SCAN";
+        private static string MANUAL_SCAN = "MANUAL_SCAN";
+
+        private static Dictionary<string, Action> ScanActions = new Dictionary<string, Action>
+        {
+            { IDLE_SCAN, StartIdleScan },
+            { MANUAL_SCAN, StartManualScan },
+            { string.Empty , () => Console.WriteLine("No scanType defined in App.config.") }
+        };
+
         static void Main(string[] args)
         {
-            #if (IDLE_SCAN)          
-            Console.WriteLine("Idle scanning starting...");
+            string scanType = ConfigurationManager.AppSettings.Get("scanType")?.ToUpper() ?? string.Empty;
 
-            // Use-case #1: Idle all-time listening to new messages
-            IIdleEmailClient idleEmailClient = new ImapIdleClientFactory().CreateClient();
+            ScanActions[scanType].Invoke();
 
-            if (!idleEmailClient.Connect())
-            {
-                Console.WriteLine("Could not connect email client.");
-                Console.ReadLine();
-                return;
-            }
+            Console.ReadLine();
+        }
 
-            idleEmailClient.RegisterIdleHandler();
-            if (!idleEmailClient.StartIdling())
-            {
-                Console.WriteLine("Could not start idling.");
-            }
-
-            Console.WriteLine("Idle scanning started.");
-            #endif
-
-
-            #if (MANUAL_SCAN)
+        private static void StartManualScan()
+        {
             Console.WriteLine("Manual scan starting ...");
 
             IEmailClient emailClient = new ImapClientFactory().CreateClient();
@@ -55,11 +45,31 @@ namespace OMS.EmailService
 
             foreach (var message in unreadMessages)
                 Console.WriteLine(message);
-                        
-            Console.WriteLine("Manual scan finished.");
-            #endif
 
-            Console.ReadLine();
+            Console.WriteLine("Manual scan finished.");
         }
+
+        private static void StartIdleScan()
+        {
+            // Use-case #1: Idle all-time listening to new messages
+            IIdleEmailClient idleEmailClient = new ImapIdleClientFactory().CreateClient();
+
+            Console.WriteLine("Idle scanning starting...");
+            if (!idleEmailClient.Connect())
+            {
+                Console.WriteLine("Could not connect email client.");
+                Console.ReadLine();
+                return;
+            }
+
+            idleEmailClient.RegisterIdleHandler();
+            if (!idleEmailClient.StartIdling())
+            {
+                Console.WriteLine("Could not start idling.");
+            }
+
+            Console.WriteLine("Idle scanning started.");
+        }
+
     }
 }
