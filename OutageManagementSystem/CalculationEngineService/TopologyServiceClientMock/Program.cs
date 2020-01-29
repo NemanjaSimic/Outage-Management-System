@@ -9,13 +9,21 @@ namespace TopologyServiceClientMock
         static void Main(string[] args)
         {
 			Subscriber sub = new Subscriber();
-            using (var proxy = new TopologyServiceProxy("TopologyServiceEndpoint"))
-            {
-				var ui = proxy.GetTopology();
-				sub.PrintUI(ui);
-            }
+			try
+			{
+				using (var proxy = new TopologyServiceProxy("TopologyServiceEndpoint"))
+				{
+					var ui = proxy.GetTopology();
+					sub.PrintUI(ui);
+				}
+			}
+			catch (Exception ex)
+			{
+				Console.WriteLine(ex.Message);
+			}
 			SubscriberProxy subProxy = new SubscriberProxy(sub, EndpointNames.SubscriberEndpoint);
 			subProxy.Subscribe(Topic.TOPOLOGY);
+			subProxy.Subscribe(Topic.MEASUREMENT);
 			Console.ReadLine();
         }
 

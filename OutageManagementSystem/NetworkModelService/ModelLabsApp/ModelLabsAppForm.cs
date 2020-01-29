@@ -22,11 +22,12 @@ namespace Outage.DataImporter.ModelLabsApp
 
         private CIMAdapterClass adapter = new CIMAdapterClass();
         private Delta nmsDelta = null;
-		
+		private EnumDescs enumDescs = null;
+
         public ModelLabsAppForm()
 		{
+			enumDescs = new EnumDescs();
 			InitializeComponent();
-
 			InitGUIElements();
 		}
 
@@ -61,7 +62,7 @@ namespace Outage.DataImporter.ModelLabsApp
             }
 		}
 
-		private void ConvertCIMXMLToDMSNetworkModelDelta()
+		private void ConvertCIMXMLToDMSNetworkModelDelta(EnumDescs enumDescs)
 		{
 			////SEND CIM/XML to ADAPTER
 			try
@@ -81,13 +82,14 @@ namespace Outage.DataImporter.ModelLabsApp
                     Logger.LogInfo(log);
 					richTextBoxReport.Text = log;
 				}
+
 				if (nmsDelta != null)
 				{
 					//// export delta to file
 					using (XmlTextWriter xmlWriter = new XmlTextWriter(".\\deltaExport.xml", Encoding.UTF8))
 					{
 						xmlWriter.Formatting = Formatting.Indented;
-						nmsDelta.ExportToXml(xmlWriter);
+						nmsDelta.ExportToXml(xmlWriter, enumDescs);
 						xmlWriter.Flush();
 					}
 				}
@@ -140,7 +142,7 @@ namespace Outage.DataImporter.ModelLabsApp
 
 		private void buttonConvertCIMOnClick(object sender, EventArgs e)
 		{
-			ConvertCIMXMLToDMSNetworkModelDelta();
+			ConvertCIMXMLToDMSNetworkModelDelta(enumDescs);
 		}
 
         private void buttonApplyDeltaOnClick(object sender, EventArgs e)

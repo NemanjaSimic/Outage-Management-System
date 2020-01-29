@@ -1,11 +1,11 @@
-﻿using System;
-using OMS.Web.Common;
-using System.Collections.Generic;
-using OMS.Web.UI.Models.ViewModels;
-using Microsoft.AspNet.SignalR.Client;
-
-namespace OMS.Web.Adapter.HubDispatchers
+﻿namespace OMS.Web.Adapter.HubDispatchers
 {
+    using System;
+    using OMS.Web.Common;
+    using System.Collections.Generic;
+    using OMS.Web.UI.Models.ViewModels;
+    using Microsoft.AspNet.SignalR.Client;
+
     public class GraphHubDispatcher
     {
         // TODO: IDisposable

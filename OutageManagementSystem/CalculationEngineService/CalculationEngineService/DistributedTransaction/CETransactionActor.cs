@@ -5,16 +5,6 @@ namespace CalculationEngineService.DistributedTransaction
 {
     public class CETransactionActor : TransactionActor
     {
-        //protected static TopologyModel topologyModel = null;
-
-        //public static TopologyModel TopologyModel
-        //{
-        //    set
-        //    {
-        //        topologyModel = value;
-        //    }
-        //}
-
         public override bool Prepare()
         {
             bool success = false;

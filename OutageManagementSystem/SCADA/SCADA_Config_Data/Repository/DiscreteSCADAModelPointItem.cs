@@ -11,13 +11,12 @@ namespace Outage.SCADA.SCADAData.Repository
 {
     public class DiscreteSCADAModelPointItem : SCADAModelPointItem, IDiscreteSCADAModelPointItem
     {
-        private EnumDescs enumDescs = new EnumDescs(); //TODO: Izmesti ovo !!
         public DiscreteSCADAModelPointItem()
             : base()
         {
         }
 
-        public DiscreteSCADAModelPointItem(List<Property> props, ModelCode type)
+        public DiscreteSCADAModelPointItem(List<Property> props, ModelCode type, EnumDescs enumDescs)
             : base(props, type)
         {
             foreach (var item in props)

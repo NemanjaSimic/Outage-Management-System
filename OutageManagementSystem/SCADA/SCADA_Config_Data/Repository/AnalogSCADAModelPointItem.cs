@@ -9,18 +9,14 @@ namespace Outage.SCADA.SCADAData.Repository
 {
     public class AnalogSCADAModelPointItem : SCADAModelPointItem, IAnalogSCADAModelPointItem
     {
-        private EnumDescs enumDescs = new EnumDescs(); //TODO: Izmesti ovo !!
         public AnalogSCADAModelPointItem() 
             : base()
         {
         }
 
-        public AnalogSCADAModelPointItem(List<Property> props, ModelCode type)
+        public AnalogSCADAModelPointItem(List<Property> props, ModelCode type, EnumDescs enumDescs)
             : base(props, type)
         {
-            
-            
-
             foreach (var item in props)
             {
                 switch (item.Id)

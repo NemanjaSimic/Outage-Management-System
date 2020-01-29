@@ -14,6 +14,7 @@ namespace CECommon.TopologyConfiguration
 		private readonly string fieldFilePath ="field.txt";
 		private readonly string nodeFilePath = "node.txt";
 		private readonly string edgeFilePath = "edge.txt";
+		private readonly string measurementFilePath = "measurement.txt";
 		#endregion
 
 		private ILogger logger = LoggerWrapper.Instance;
@@ -54,7 +55,8 @@ namespace CECommon.TopologyConfiguration
 			Dictionary<TopologyType, List<DMSType>> elements = new Dictionary<TopologyType, List<DMSType>>
 			{
 				{TopologyType.Node, new List<DMSType>(ParseConfigFile(nodeFilePath))},
-				{TopologyType.Edge, new List<DMSType>(ParseConfigFile(edgeFilePath))}
+				{TopologyType.Edge, new List<DMSType>(ParseConfigFile(edgeFilePath))},
+				{TopologyType.Measurement, new List<DMSType>(ParseConfigFile(measurementFilePath))}
 			};
 
 			return elements;

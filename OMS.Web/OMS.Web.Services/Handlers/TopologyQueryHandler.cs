@@ -1,18 +1,18 @@
-﻿using MediatR;
-using OMS.Web.Adapter.Contracts;
-using OMS.Web.Adapter.Topology;
-using OMS.Web.Common;
-using OMS.Web.Common.Exceptions;
-using OMS.Web.Common.Mappers;
-using OMS.Web.Services.Queries;
-using OMS.Web.UI.Models.ViewModels;
-using Outage.Common.UI;
-using System;
-using System.Threading;
-using System.Threading.Tasks;
-
-namespace OMS.Web.Services.Handlers
+﻿namespace OMS.Web.Services.Handlers
 {
+    using MediatR;
+    using OMS.Web.Adapter.Contracts;
+    using OMS.Web.Adapter.Topology;
+    using OMS.Web.Common;
+    using OMS.Web.Common.Exceptions;
+    using OMS.Web.Common.Mappers;
+    using OMS.Web.Services.Queries;
+    using OMS.Web.UI.Models.ViewModels;
+    using Outage.Common.UI;
+    using System;
+    using System.Threading;
+    using System.Threading.Tasks;
+
     public class TopologyQueryHandler : IRequestHandler<GetTopologyQuery, OmsGraph>
     {
         private readonly ITopologyClient _topologyClient;

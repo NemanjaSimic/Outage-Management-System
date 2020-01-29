@@ -102,7 +102,7 @@ namespace Outage.SCADA.ModBus.Connection
             SCADAModel.SignalIncomingModelConfirmation += EnqueueModelUpdateCommands;
 
             ConfigData = SCADAConfigData.Instance;
-            ModbusClient = new ModbusClient(ConfigData.IpAddress, ConfigData.TcpPort);
+            ModbusClient = new ModbusClient(ConfigData.IpAddress.ToString(), ConfigData.TcpPort);
 
         }
 
@@ -275,7 +275,7 @@ namespace Outage.SCADA.ModBus.Connection
                 {
                     if (ModbusClient == null)
                     {
-                        ModbusClient = new ModbusClient(ConfigData.IpAddress, ConfigData.TcpPort);
+                        ModbusClient = new ModbusClient(ConfigData.IpAddress.ToString(), ConfigData.TcpPort);
                     }
 
                     Logger.LogDebug("Connected and waiting for command event.");

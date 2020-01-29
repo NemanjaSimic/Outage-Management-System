@@ -5,7 +5,6 @@ using System.Runtime.Serialization;
 
 namespace Outage.Common.UI
 {
-	//[Serializable]
 	[DataContract]
 	public class UIModel
 	{
@@ -45,9 +44,9 @@ namespace Outage.Common.UI
 		}
 		public void AddNode(UINode newNode)
 		{
-			if (!Nodes.ContainsKey(newNode.Gid))
+			if (!Nodes.ContainsKey(newNode.Id))
 			{
-				Nodes.Add(newNode.Gid, newNode);
+				Nodes.Add(newNode.Id, newNode);
 			}
 		}
 		public HashSet<long> GetRelatedElements(long sourceGid)

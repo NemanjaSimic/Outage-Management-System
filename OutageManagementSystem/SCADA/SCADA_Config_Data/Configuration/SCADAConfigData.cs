@@ -2,6 +2,7 @@
 using Outage.SCADA.SCADACommon;
 using System;
 using System.Configuration;
+using System.Net;
 
 namespace Outage.SCADA.SCADAData.Configuration
 {
@@ -16,7 +17,7 @@ namespace Outage.SCADA.SCADAData.Configuration
 
 
         public ushort TcpPort { get; protected set; }
-        public string IpAddress { get; protected set; }
+        public IPAddress IpAddress { get; protected set; }
         public byte UnitAddress { get; protected set; }
         public ushort Interval { get; protected set; }
 
@@ -63,10 +64,18 @@ namespace Outage.SCADA.SCADAData.Configuration
                 }
             }
 
-            if (ConfigurationManager.AppSettings["IpAddress"] is string ipAddress)
+            if (ConfigurationManager.AppSettings["IpAddress"] is string ipAddressString)
             {
-                //TOOD: is valid ip address? => error
-                IpAddress = ipAddress;
+                if(IPAddress.TryParse(ipAddressString, out IPAddress ipAddress))
+                {
+                    IpAddress = ipAddress;
+                }
+                else
+                {
+                    string message = "IpAddress in SCADA configuration is either not defined or not valid.";
+                    Logger.LogError(message);
+                    throw new Exception(message);
+                }
             }
 
             if (ConfigurationManager.AppSettings["UnitAddress"] is string unitAddressSetting)

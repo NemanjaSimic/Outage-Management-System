@@ -66,40 +66,34 @@ namespace NetworkModelServiceFunctions
 
 		public List<ResourceDescription> GetExtentValues(ModelCode entityType, List<ModelCode> propIds)
 		{
-			int iteratorId;
-
-			try
+			int iteratorId = 0;
+			int numberOfTries = 0;
+			while (numberOfTries < 5)
 			{
-				using (NetworkModelGDAProxy gdaProxy = GetGdaQueryProxy())
+				try
 				{
-					if (gdaProxy != null)
+					numberOfTries++;
+					using (var proxy = new NetworkModelGDAProxy(EndpointNames.NetworkModelGDAEndpoint))
 					{
-						iteratorId = gdaProxy.GetExtentValues(entityType, propIds);
+						iteratorId = proxy.GetExtentValues(entityType, propIds);
 					}
-					else
-					{
-						string message = "From method GetExtentValues(): NetworkModelGDAProxy is null.";
-						logger.LogError(message);
-						throw new NullReferenceException(message);
-					}
+					break;
 				}
-			}
-			catch (Exception ex)
-			{
-				string message = $"Failed to get extent values for entity type {entityType.ToString()}. Exception message: " + ex.Message;
-				logger.LogError(message);
-				throw ex;
+				catch (Exception ex)
+				{
+					logger.LogError($"Failed to get extent values for entity type {entityType.ToString()}. Exception message: " + ex.Message);
+					logger.LogWarn($"Retrying to connect to NMSProxy. Number of tries: {numberOfTries}.");
+				}
 			}
 
 			return ProcessIterator(iteratorId);
 		}
 		public List<ResourceDescription> GetRelatedValues(long source, List<ModelCode> propIds, Association association)
 		{
-			int iteratorId;
-
+			int iteratorId = 0;
 			try
 			{
-				using (NetworkModelGDAProxy gdaProxy = GetGdaQueryProxy())
+				using (var gdaProxy = new NetworkModelGDAProxy(EndpointNames.NetworkModelGDAEndpoint))
 				{
 					if (gdaProxy != null)
 					{
@@ -117,7 +111,6 @@ namespace NetworkModelServiceFunctions
 			{
 				string message = $"Failed to get related values for element with GID {source.ToString()}. Exception message: " + ex.Message;
 				logger.LogError(message);
-				throw ex;
 			}
 
 			return ProcessIterator(iteratorId);
@@ -125,42 +118,31 @@ namespace NetworkModelServiceFunctions
 
 		public ResourceDescription GetValues(long resourceId, List<ModelCode> propIds)
 		{
-			ResourceDescription resource;
-
+			ResourceDescription rs = new ResourceDescription();
 			try
 			{
-				using (NetworkModelGDAProxy gdaProxy = GetGdaQueryProxy())
+				using (var proxy = new NetworkModelGDAProxy(EndpointNames.NetworkModelGDAEndpoint))
 				{
-					if (gdaProxy != null)
-					{
-						resource = gdaProxy.GetValues(resourceId, propIds);
-					}
-					else
-					{
-						string message = "From method GetValues(): NetworkModelGDAProxy is null.";
-						logger.LogError(message);
-						throw new NullReferenceException(message);
-					}
+					rs = proxy.GetValues(resourceId, propIds);
 				}
 			}
 			catch (Exception ex)
 			{
 				string message = $"Failed to get values for elemnt with GID {resourceId.ToString()}. Exception message: " + ex.Message;
 				logger.LogError(message);
-				throw ex;
 			}
 
-			return resource;
+			return rs;
 		}
 		private List<ResourceDescription> ProcessIterator(int iteratorId)
 		{
             //TODO: mozda vec ovde napakovati dictionary<long, rd> ?
-			int numberOfResources = 50, resourcesLeft = 0;
+			int numberOfResources = 10000, resourcesLeft = 0;
 			List<ResourceDescription> resourceDescriptions = new List<ResourceDescription>();
 
 			try
 			{
-				using (NetworkModelGDAProxy gdaProxy = GetGdaQueryProxy())
+				using (var gdaProxy = new NetworkModelGDAProxy(EndpointNames.NetworkModelGDAEndpoint))
 				{
 					if (gdaProxy != null)
 					{
@@ -187,7 +169,6 @@ namespace NetworkModelServiceFunctions
 			{
 				string message = $"Failed to retrieve all Resourse descriptions with iterator {iteratorId}. Exception message: " + ex.Message;
 				logger.LogError(message);
-				throw ex;
 			}
 			return resourceDescriptions;
 		}

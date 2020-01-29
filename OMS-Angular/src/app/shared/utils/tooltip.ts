@@ -4,7 +4,12 @@ import { SwitchCommand, SwitchCommandType } from '@shared/models/switch-command.
 const graphTooltipBody: string =
   `<p>ID: [[id]]</p>
   <p>Type: [[type]]</p>
-  <p>State: [[state]]</p>`;
+  <p>Name: [[name]]</p>
+  <p>Mrid: [[mrid]]</p>
+  <p>Description: [[description]]</p>
+  <p>Device type: [[deviceType]]</p>
+  <p>State: [[state]]</p>
+  <p>Nominal voltage: [[nominalVoltage]]</p>`;
 
 export const addGraphTooltip = (cy, node) => {
   let ref = node.popperRef();
@@ -15,11 +20,17 @@ export const addGraphTooltip = (cy, node) => {
       const div = document.createElement('div');
       div.innerHTML = graphTooltipBody
         .replace("[[id]]", node.data('id'))
-        .replace("[[type]]", node.data('type'))
-        .replace("[[state]]", node.data('state'));
+        .replace("[[type]]", node.data('dmsType'))
+        .replace("[[name]]", node.data('name'))
+        .replace("[[mrid]]", node.data('mrid'))
+        .replace("[[description]]", node.data('description'))
+        .replace("[[deviceType]]", node.data('deviceType'))
+        .replace("[[state]]", node.data('state'))
+        .replace("[[nominalVoltage]]", node.data('nominalVoltage'));
 
       // button - mozemo i preko document.createElement() pa appendChild()
-      if (node.data('type') == "Breaker" || node.data('type') == "Disconnector") {
+      if (node.data('dmsType') == "LOADBREAKSWITCH" || node.data('dmsType') == "DISCONNECTOR" 
+            || node.data('dmsType') == "BREAKER" || node.data('dmsType') == "FUSE") {
         const button = document.createElement('button');
 
         if (node.data('state') == "active") {
@@ -32,8 +43,8 @@ export const addGraphTooltip = (cy, node) => {
         button.addEventListener('click', () => {
 
           // jer je u mocku string, a u sistemu je long
-          const guid = Math.random() * 1000; 
-
+          const meas = node.data('measurements');
+          const guid = meas[0].Id;
           if (node.data('state') == "active") {
             const command: SwitchCommand = {
               guid,
