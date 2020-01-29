@@ -78,7 +78,6 @@
 
             Assert.NotNull(graph);
             Assert.NotNull(resultGraph);
-
             Assert.Equal(initialNodes, resultGraph.Nodes);
             Assert.Equal(initialRelations, resultGraph.Relations);
         }

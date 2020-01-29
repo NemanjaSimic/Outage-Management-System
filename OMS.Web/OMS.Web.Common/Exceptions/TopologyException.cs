@@ -1,11 +1,11 @@
-﻿using System;
-using System.Net;
-using System.Net.Http;
-using System.Text;
-using System.Web.Http.Filters;
-
-namespace OMS.Web.Common.Exceptions
+﻿namespace OMS.Web.Common.Exceptions
 {
+    using System;
+    using System.Net;
+    using System.Net.Http;
+    using System.Text;
+    using System.Web.Http.Filters;
+
     public class TopologyException : Exception, ICustomExceptionHandler
     {
         public HttpStatusCode StatusCode { get; set; } = HttpStatusCode.InternalServerError;

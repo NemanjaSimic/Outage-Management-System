@@ -107,6 +107,7 @@
     <Compile Include="Exceptions\ICustomExceptionHandler.cs" />
     <Compile Include="Exceptions\TopologyException.cs" />
     <Compile Include="Extensions\OmsGraphExtensions.cs" />
+    <Compile Include="Extensions\TransformerNodeExtensions.cs" />
     <Compile Include="Loggers\FileLogger.cs" />
     <Compile Include="Mappers\GraphMapper.cs" />
     <Compile Include="Mappers\IGraphMapper.cs" />

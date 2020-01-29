@@ -1,10 +1,10 @@
-﻿using System;
-using System.ServiceModel;
-using OMS.Web.Adapter.Contracts;
-using OMS.Web.Common;
-
-namespace OMS.Web.Adapter.WebService
+﻿namespace OMS.Web.Adapter.WebService
 {
+    using System;
+    using System.ServiceModel;
+    using OMS.Web.Adapter.Contracts;
+    using OMS.Web.Common;
+
     public class WebServiceHost
     {
         private ServiceHost _host;

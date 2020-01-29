@@ -1,8 +1,8 @@
-﻿using MediatR;
-using OMS.Web.UI.Models.BindingModels;
-
-namespace OMS.Web.Services.Commands
+﻿namespace OMS.Web.Services.Commands
 {
+    using MediatR;
+    using OMS.Web.UI.Models.BindingModels;
+
     public abstract class SwitchCommandBase : IRequest
     {
         protected long _gid;

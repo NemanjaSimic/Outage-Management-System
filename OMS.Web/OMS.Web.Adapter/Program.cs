@@ -1,12 +1,11 @@
-﻿using OMS.Web.Adapter.Topology;
-using OMS.Web.Common;
-using OMS.Web.Common.Mappers;
-using Outage.Common;
-using Outage.Common.ServiceProxies.PubSub;
-using System;
-
-namespace OMS.Web.Adapter
+﻿namespace OMS.Web.Adapter
 {
+    using OMS.Web.Adapter.Topology;
+    using OMS.Web.Common.Mappers;
+    using Outage.Common;
+    using Outage.Common.ServiceProxies.PubSub;
+    using System;
+
     class Program
     {
         static void Main(string[] args)

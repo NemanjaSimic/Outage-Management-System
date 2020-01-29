@@ -81,6 +81,8 @@
                 )
                 .ToList();
 
+            graph.ResolveWindings(firstWindingRelations, secondWindingRelations);
+    
             graph.RemoveNodes(windingNodes);
 
             graph.RemoveRelations(firstWindingRelations);
@@ -116,5 +118,47 @@
 
             return graph;
         }
+
+        public static OmsGraph ResolveWindings(
+            this OmsGraph graph,
+            IEnumerable<Relation> firstWindingRelations,
+            IEnumerable<Relation> secondWindingRelations)
+        {
+            foreach (var firstWindingRelation in firstWindingRelations)
+            {
+                Node firstWinding
+                    = graph
+                    .Nodes
+                    .First(x => x.Id.Equals(firstWindingRelation.SourceNodeId));
+
+                TransformerNode transformer
+                    = graph
+                    .Nodes
+                    .First(x => x.Id.Equals(firstWindingRelation.TargetNodeId))
+                    as TransformerNode;
+
+                transformer.AddFirstWinding(firstWinding);
+            }
+
+            foreach (var secondWindingRelation in secondWindingRelations)
+            {
+                Node secondWinding
+                    = graph
+                    .Nodes
+                    .First(x => x.Id.Equals(secondWindingRelation.TargetNodeId));
+
+                TransformerNode transformer
+                    = graph
+                    .Nodes
+                    .First(x => x.Id.Equals(secondWindingRelation.SourceNodeId))
+                    as TransformerNode;
+
+                transformer.AddSecondWinding(secondWinding);
+            }
+
+            return graph;
+        }
+
+
     }
 }
