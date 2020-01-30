@@ -69,17 +69,22 @@ namespace Outage.SCADA.ModBus.ModbusFuntions
                     throw new Exception(message);
                 }
 
-                pointItem.CurrentEguValue = pointItem.RawToEguValueConversion(rawValue);
-
-                bool alarmChanged = pointItem.SetAlarms();
-                if (alarmChanged)
+                float eguValue = pointItem.RawToEguValueConversion(rawValue);
+                
+                if(pointItem.CurrentEguValue != eguValue)
                 {
-                    Logger.LogInfo($"Alarm for Point [Gid: 0x{pointItem.Gid:X16}, Address: {pointItem.Address}] set to {pointItem.Alarm}.");
-                }
+                    pointItem.CurrentEguValue = eguValue;
 
-                AnalogModbusData digitalData = new AnalogModbusData(pointItem.CurrentEguValue, pointItem.Alarm);
-                Data.Add(gid, digitalData);
-                Logger.LogDebug($"ReadHoldingRegistersFunction execute => Current value: {pointItem.CurrentEguValue} from address: {address}, gid: 0x{gid:X16}.");
+                    bool alarmChanged = pointItem.SetAlarms();
+                    if (alarmChanged)
+                    {
+                        Logger.LogInfo($"Alarm for Point [Gid: 0x{pointItem.Gid:X16}, Address: {pointItem.Address}] set to {pointItem.Alarm}.");
+                    }
+
+                    AnalogModbusData digitalData = new AnalogModbusData(pointItem.CurrentEguValue, pointItem.Alarm);
+                    Data.Add(gid, digitalData);
+                    Logger.LogDebug($"ReadHoldingRegistersFunction execute => Current value: {pointItem.CurrentEguValue} from address: {address}, gid: 0x{gid:X16}.");
+                }
             }
 
             Logger.LogDebug($"ReadHoldingRegistersFunction executed SUCCESSFULLY. StartAddress: {startAddress}, Quantity: {quantity}");

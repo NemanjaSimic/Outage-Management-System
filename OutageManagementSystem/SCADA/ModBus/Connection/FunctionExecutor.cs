@@ -324,31 +324,32 @@ namespace Outage.SCADA.ModBus.Connection
             }
             catch (Exception e)
             {
-                //todo: retry
                 string message = "Exception on currentCommand.Execute().";
                 Logger.LogWarn(message, e);
             }
 
             if (command is IReadAnalogModusFunction readAnalogCommand)
             {
-                PublishAnalogData(readAnalogCommand.Data);
+                Dictionary<long, AnalogModbusData> data = readAnalogCommand.Data;
+
+                //if data is empty that means that there are no new values in the current acquisition cycle
+                if (data != null && data.Count > 0)
+                {
+                    SCADAMessage scadaMessage = new MultipleAnalogValueSCADAMessage(data);
+                    PublishScadaData(Topic.MEASUREMENT, scadaMessage);
+                }
             }
             else if (command is IReadDiscreteModbusFunction readDiscreteCommand)
             {
-                PublishDigitalData(readDiscreteCommand.Data);
+                Dictionary<long, DiscreteModbusData> data = readDiscreteCommand.Data;
+
+                //if data is empty that means that there are no new values in the current acquisition cycle
+                if (data != null && data.Count > 0)
+                {
+                    SCADAMessage scadaMessage = new MultipleDiscreteValueSCADAMessage(data);
+                    PublishScadaData(Topic.SWITCH_STATUS, scadaMessage);
+                }
             }
-        }
-
-        private void PublishAnalogData(Dictionary<long, AnalogModbusData> data)
-        {
-            SCADAMessage scadaMessage = new MultipleAnalogValueSCADAMessage(data);
-            PublishScadaData(Topic.MEASUREMENT, scadaMessage);
-        }
-
-        private void PublishDigitalData(Dictionary<long, DiscreteModbusData> data)
-        {
-            SCADAMessage scadaMessage = new MultipleDiscreteValueSCADAMessage(data);
-            PublishScadaData(Topic.SWITCH_STATUS, scadaMessage);
         }
 
         private void PublishScadaData(Topic topic, SCADAMessage scadaMessage)
