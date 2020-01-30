@@ -6,6 +6,7 @@ using Outage.SCADA.SCADACommon;
 using Outage.SCADA.SCADAData.Configuration;
 using System;
 using System.Collections.Generic;
+using System.Linq;
 using System.ServiceModel;
 using System.Threading;
 
@@ -169,6 +170,7 @@ namespace Outage.SCADA.SCADAData.Repository
             try
             {
                 //INIT INCOMING SCADA MODEL with current model values
+                //can not go with just 'incomingScadaModel = new Dictionary<long, ISCADAModelPointItem>(CurrentScadaModel)' because IncomingAddressToGidMap must also be initialized
                 incomingScadaModel = new Dictionary<long, ISCADAModelPointItem>(CurrentScadaModel.Count);
                 
                 foreach (long gid in CurrentScadaModel.Keys)
@@ -475,76 +477,73 @@ namespace Outage.SCADA.SCADAData.Repository
                     throw new NullReferenceException(message);
                 }
 
-                ModelCode type;
-                List<ModelCode> props;
+                //ModelCode type;
 
                 int iteratorId;
                 int resourcesLeft;
                 int numberOfResources = 10000;
 
+                List<ModelCode> props;
 
-                //CREATE ANALOG POINTS
-                type = ModelCode.ANALOG;
-                props = modelResourceDesc.GetAllPropertyIds(type);
-
-                iteratorId = gdaProxy.GetExtentValues(type, props);
-                resourcesLeft = gdaProxy.IteratorResourcesLeft(iteratorId);
-
-                while (resourcesLeft > 0)
+                //TOOD: change service contract IModelUpdateNotificationContract to receive types of all changed elements from NMS 
+                HashSet<ModelCode> changedTypes = new HashSet<ModelCode>();
+                foreach (List<long> gids in ModelChanges.Values)
                 {
-                    List<ResourceDescription> resources = gdaProxy.IteratorNext(numberOfResources, iteratorId);
-
-                    foreach (ResourceDescription rd in resources)
+                    foreach(long gid in gids)
                     {
-                        if (pointItems.ContainsKey(rd.Id))
+                        ModelCode type = modelResourceDesc.GetModelCodeFromId(gid);
+                    
+                        if(!changedTypes.Contains(type))
                         {
-                            string message = $"Trying to create point item for resource that already exists in model. Gid: 0x{rd.Id:X16}";
-                            Logger.LogError(message);
-                            throw new ArgumentException(message);
+                            changedTypes.Add(type);
                         }
-
-                        ISCADAModelPointItem point = CreatePointItemForResource(rd);
-                        pointItems.Add(rd.Id, point);
                     }
-
-                    resourcesLeft = gdaQueryProxy.IteratorResourcesLeft(iteratorId);
                 }
 
-                gdaQueryProxy.IteratorClose(iteratorId);
-
-
-                //CREATE DISCRETE POINTS
-                type = ModelCode.DISCRETE;
-                props = modelResourceDesc.GetAllPropertyIds(type);
-
-                iteratorId = gdaProxy.GetExtentValues(type, props);
-                resourcesLeft = gdaProxy.IteratorResourcesLeft(iteratorId);
-
-                while (resourcesLeft > 0)
+                foreach(ModelCode type in changedTypes)
                 {
-                    List<ResourceDescription> resources = gdaProxy.IteratorNext(numberOfResources, iteratorId);
-
-                    foreach (ResourceDescription rd in resources)
+                    if(type != ModelCode.ANALOG && type != ModelCode.DISCRETE)
                     {
-                        if (pointItems.ContainsKey(rd.Id))
-                        {
-                            string message = $"Trying to create point item for resource that already exists in model. Gid: 0x{rd.Id:X16}";
-                            Logger.LogError(message);
-                            throw new ArgumentException(message);
-                        }
-
-                        ISCADAModelPointItem point = CreatePointItemForResource(rd);
-                        pointItems.Add(rd.Id, point);
+                        continue;
                     }
 
-                    resourcesLeft = gdaQueryProxy.IteratorResourcesLeft(iteratorId);
-                }
+                    props = modelResourceDesc.GetAllPropertyIds(type);
 
-                gdaQueryProxy.IteratorClose(iteratorId);
+                    iteratorId = gdaProxy.GetExtentValues(type, props);
+                    resourcesLeft = gdaProxy.IteratorResourcesLeft(iteratorId);
+
+                    while (resourcesLeft > 0)
+                    {
+                        List<ResourceDescription> resources = gdaProxy.IteratorNext(numberOfResources, iteratorId);
+
+                        foreach (ResourceDescription rd in resources)
+                        {
+                            if (pointItems.ContainsKey(rd.Id))
+                            {
+                                string message = $"Trying to create point item for resource that already exists in model. Gid: 0x{rd.Id:X16}";
+                                Logger.LogError(message);
+                                throw new ArgumentException(message);
+                            }
+
+                            ISCADAModelPointItem point;
+
+                            //change service contract IModelUpdateNotificationContract => change List<long> to Hashset<long> 
+                            if (ModelChanges[DeltaOpType.Update].Contains(rd.Id) || ModelChanges[DeltaOpType.Insert].Contains(rd.Id))
+                            {
+                                point = CreatePointItemFromResource(rd);
+                                pointItems.Add(rd.Id, point);
+                            }
+                        }
+
+                        resourcesLeft = gdaQueryProxy.IteratorResourcesLeft(iteratorId);
+                    }
+
+                    gdaQueryProxy.IteratorClose(iteratorId);
+                }
             }
         }
 
-        private ISCADAModelPointItem CreatePointItemForResource(ResourceDescription resource)
+        private ISCADAModelPointItem CreatePointItemFromResource(ResourceDescription resource)
         {
             long gid = resource.Id;
             ModelCode type = modelResourceDesc.GetModelCodeFromId(gid);
