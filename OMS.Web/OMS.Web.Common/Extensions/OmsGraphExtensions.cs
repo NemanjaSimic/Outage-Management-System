@@ -11,9 +11,6 @@
 
         public static OmsGraph SquashTransformerWindings(this OmsGraph graph)
         {
-            // think think think!!
-            // easter egg za ovaj commit: https://i.kym-cdn.com/entries/icons/original/000/030/338/New.jpg
-
             IEnumerable<TransformerNode> transformerNodes
                 = graph
                 .Nodes

@@ -14,12 +14,12 @@
             new Node { Id = "1", DMSType="ENERGYSOURCE" },
             new Node { Id = "2", DMSType="LOADBREAKSWITCH" },
             new Node { Id = "3", DMSType="TRANSFORMERWINDING" },
-            new TransformerNode { Id = "4", DMSType="POWERTRANSFORMER" },
+            new Node { Id = "4", DMSType="POWERTRANSFORMER" },
             new Node { Id = "5", DMSType="TRANSFORMERWINDING" },
             new Node { Id = "6", DMSType="LOADBREAKSWITCH" },
             new Node { Id = "7", DMSType="LOADBREAKSWITCH" },
             new Node { Id = "8", DMSType="TRANSFORMERWINDING" },
-            new TransformerNode { Id = "9", DMSType="POWERTRANSFORMER" },
+            new Node { Id = "9", DMSType="POWERTRANSFORMER" },
             new Node { Id = "10", DMSType="TRANSFORMERWINDING" },
             new Node { Id = "11", DMSType="LOADBREAKSWITCH" }
         };
@@ -64,6 +64,9 @@
 
         public OmsGraphTests()
         {
+            initialNodes[3] = initialNodes[3].ToTransformerNode();
+            initialNodes[8] = initialNodes[8].ToTransformerNode();
+
             ((TransformerNode)resultNodes[2]).FirstWinding = initialNodes[2];
             ((TransformerNode)resultNodes[2]).SecondWinding = initialNodes[4];
 
