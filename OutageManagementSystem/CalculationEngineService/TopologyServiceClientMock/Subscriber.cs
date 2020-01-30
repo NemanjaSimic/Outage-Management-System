@@ -1,15 +1,10 @@
-﻿using Outage.Common;
-using Outage.Common.PubSub;
+﻿using Outage.Common.PubSub;
 using Outage.Common.PubSub.CalculationEngineDataContract;
 using Outage.Common.PubSub.SCADADataContract;
 using Outage.Common.ServiceContracts.PubSub;
 using Outage.Common.UI;
 using System;
-using System.Collections.Generic;
-using System.Linq;
 using System.ServiceModel;
-using System.Text;
-using System.Threading.Tasks;
 
 namespace TopologyServiceClientMock
 {

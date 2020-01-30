@@ -1,11 +1,13 @@
 ﻿using CECommon;
 using CECommon.Interfaces;
 using CECommon.Model;
+using CECommon.Providers;
 using NetworkModelServiceFunctions;
 using Outage.Common;
 using SCADACommanding;
 using System;
 using System.Collections.Generic;
+using System.Diagnostics;
 using System.Linq;
 
 namespace TopologyBuilder
@@ -16,89 +18,67 @@ namespace TopologyBuilder
         private ILogger logger = LoggerWrapper.Instance;
         private List<Field> fields;
         private HashSet<long> visited;
-        private Stack<ITopologyElement> stack;
+        private Stack<long> stack;
+        private Stopwatch stopwatch = new Stopwatch();
+        private Dictionary<long, ITopologyElement> elements;
+        private Dictionary<long, IMeasurement> measurements;
+        private Dictionary<long, List<long>> connections;
         #endregion
 
         public ITopology CreateGraphTopology(long firstElementGid)
-        {
+        { 
+            elements = Provider.Instance.ModelProvider.GetElementModels();
+            measurements = Provider.Instance.ModelProvider.GetMeasurementModels();
+            connections = Provider.Instance.ModelProvider.GetConnections();
+            
             logger.LogInfo($"Creating graph topology from first element with GID {firstElementGid}.");
 
             visited = new HashSet<long>();
-            stack = new Stack<ITopologyElement>();
+            stack = new Stack<long>();
             fields = new List<Field>();
 
             ITopology topology = new TopologyModel();
-            ITopologyElement firstNode = NMSManager.Instance.GetPopulatedElement(firstElementGid);
-                
-            firstNode.IsActive = true;
-            stack.Push(firstNode);
+            topology.FirstNode = firstElementGid;
+ 
+            stack.Push(firstElementGid);
 
             while (stack.Count > 0)
             {
-                var currentNode = stack.Pop();
-                if (!visited.Contains(currentNode.Id))
+                var currentElementId = stack.Pop();
+                if (!visited.Contains(currentElementId))
                 {
-                    visited.Add(currentNode.Id);
+                    visited.Add(currentElementId);
                 }
+                ITopologyElement currentElement = elements[currentElementId];
 
-                var connectedElements = GetReferencedElementsWithoutIgnorables(currentNode.Id);
-                foreach (var element in connectedElements)
+                foreach (var element in GetReferencedElementsWithoutIgnorables(currentElementId))
                 {
-                    if (TopologyHelper.Instance.GetElementTopologyType(element) == TopologyType.Measurement)
+                    if (elements.ContainsKey(element))
                     {
-                        string elementType = NMSManager.Instance.GetDMSTypeOfTopologyElementString(element);
-                        if (elementType.Equals("BASEVOLTAGE"))
-                        {
-                            float voltage = NMSManager.Instance.GetBaseVoltageForElement(element);
-                            currentNode.NominalVoltage = voltage;
-                        }
-                        else if (elementType.Equals("ANALOG"))
-                        {
-                            Measurement newMeasurement = NMSManager.Instance.GetPopulatedAnalogMeasurement(element);
-                            currentNode.Measurements.Add(newMeasurement);
-                            SCADACommandingCache.Instance.AddAnalogMeasurement(newMeasurement.Id, currentNode.Id, newMeasurement.GetCurrentVaule());
-                        }
-                        else if (elementType.Equals("DISCRETE"))
-                        {
-                            Measurement newMeasurement = NMSManager.Instance.GetPopulatedAnalogMeasurement(element);
-                            currentNode.Measurements.Add(newMeasurement);
-                            SCADACommandingCache.Instance.AddDiscreteMeasurement(newMeasurement.Id, currentNode.Id, (ushort)newMeasurement.GetCurrentVaule());
-                        
-                        }                      
-                        else
-                        {
-                            logger.LogError($"Failed to procces element of type Measurement. Element is neither Analog,Discrete nor BaseVoltage.");
-                        }
+                        ConnectTwoNodes(element, currentElement);
+                        stack.Push(element);
                     }
-                    else
+                    else if (measurements.ContainsKey(element))
                     {
-                        var newNode = ConnectTwoNodes(element, currentNode);
-                        //ITopologyElement newNode = NMSManager.Instance.GetTopologyElement(element);
-                        //currentNode.SecondEnd.Add(newNode.Id);
-                        //newNode.FirstEnd = currentNode.Id;
-
-                        //newNode.IsActive = currentNode.IsActive;
-                        //foreach (var measurement in newNode.Measurements)
+                        IMeasurement newMeasurement = measurements[element];
+                        newMeasurement.ElementId = currentElement.Id;
+                        currentElement.Measurements.Add(newMeasurement);
+                        //if (Enum.TryParse<AnalogMeasurementType>(newMeasurement.GetMeasurementType(), out AnalogMeasurementType type))
                         //{
-                        //    if (measurement is DiscreteMeasurement && currentNode.IsActive)
-                        //    {
-                        //        if (measurement.GetCurrentVaule() == 1)
-                        //        {
-                        //            newNode.IsActive = false;
-                        //        }
-                        //        else
-                        //        {
-                        //            newNode.IsActive = true;
-                        //        }
-                        //    }
-                        //}
-                        stack.Push(newNode);
+                            //SCADACommandingCache.Instance.AddAnalogMeasurement(newMeasurement.Id, currentElementId, newMeasurement.GetCurrentVaule());
+                       // }
+                        //else
+                        //{
+                            //SCADACommandingCache.Instance.AddDiscreteMeasurement(newMeasurement.Id, currentElementId, (ushort)newMeasurement.GetCurrentVaule());
+                       // }
+
                     }
-                }
-                currentNode.DmsType = NMSManager.Instance.GetDMSTypeOfTopologyElementString(currentNode.Id);
-                topology.AddElement(currentNode);
+                    
+
+                }  
+               
+                topology.AddElement(currentElement);
             }
-            topology.FirstNode = firstNode.Id;
 
             foreach (var field in fields)
             {
@@ -110,32 +90,30 @@ namespace TopologyBuilder
         }
 
         #region HelperFunctions
-
         private List<long> GetReferencedElementsWithoutIgnorables(long gid)
         {
-            var list = NMSManager.Instance.GetAllReferencedElements(gid).Where(e => !visited.Contains(e)).ToList();
-            List<long> elements = new List<long>();
+            var list = connections[gid].Where(e => !visited.Contains(e)).ToList();
+            List<long> refElements = new List<long>();
             foreach (var element in list)
             {
                 if (TopologyHelper.Instance.GetElementTopologyStatus(element) == TopologyStatus.Ignorable)
                 {
                     visited.Add(element);
-                    elements.AddRange(GetReferencedElementsWithoutIgnorables(element));
+                    refElements.AddRange(GetReferencedElementsWithoutIgnorables(element));
                 }
                 else
                 {
-                    elements.Add(element);
+                    refElements.Add(element);
                 }
             }
-            return elements;
+            return refElements;
         }
-        private ITopologyElement ConnectTwoNodes(long newElementGid, ITopologyElement parent)
+        private void ConnectTwoNodes(long newElementGid, ITopologyElement parent)
         {
             bool newElementIsField = TopologyHelper.Instance.GetElementTopologyStatus(newElementGid) == TopologyStatus.Field;
             bool parentElementIsField = TopologyHelper.Instance.GetElementTopologyStatus(parent.Id) == TopologyStatus.Field;
-
-            ITopologyElement newNode = NMSManager.Instance.GetPopulatedElement(newElementGid);
-               
+            
+            ITopologyElement newNode = elements[newElementGid];
 
             if (newElementIsField && !parentElementIsField)
             {
@@ -198,7 +176,7 @@ namespace TopologyBuilder
                     }
                 }
             }
-            return newNode;
+
         }
         private Field GetField(long memberGid)
         {

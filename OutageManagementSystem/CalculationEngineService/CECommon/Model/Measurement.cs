@@ -11,6 +11,7 @@ namespace CECommon.Model
     public abstract class Measurement : IMeasurement
     {
         public long Id { get; set; }
+        public long ElementId { get; set; }
         public string Address { get; set; }
         public bool isInput { get; set; }
         public abstract string GetMeasurementType();

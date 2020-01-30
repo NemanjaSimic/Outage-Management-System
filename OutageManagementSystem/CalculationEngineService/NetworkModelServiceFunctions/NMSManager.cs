@@ -1,119 +1,127 @@
 ﻿using CECommon;
 using CECommon.Interfaces;
 using CECommon.Model;
+using CECommon.Providers;
 using Outage.Common;
 using Outage.Common.GDA;
 using System;
 using System.Collections.Generic;
 using System.Linq;
+using System.Threading.Tasks;
 
 namespace NetworkModelServiceFunctions
 {
-	public class NMSManager
+	public class NMSManager : IModelManager
 	{
+		#region ReferenceProperties
+		private readonly Dictionary<DMSType, List<ModelCode>> ReferenceProperties = new Dictionary<DMSType, List<ModelCode>>()
+			{
+				{ DMSType.TERMINAL, new List<ModelCode>(){ ModelCode.TERMINAL_CONDUCTINGEQUIPMENT,ModelCode.TERMINAL_CONNECTIVITYNODE, ModelCode.TERMINAL_MEASUREMENTS } },
+				{ DMSType.CONNECTIVITYNODE, new List<ModelCode>(){ ModelCode.CONNECTIVITYNODE_TERMINALS } },
+				{ DMSType.POWERTRANSFORMER, new List<ModelCode>(){ ModelCode.POWERTRANSFORMER_TRANSFORMERWINDINGS } },
+				{ DMSType.ENERGYSOURCE, new List<ModelCode>(){ ModelCode.CONDUCTINGEQUIPMENT_TERMINALS, ModelCode.CONDUCTINGEQUIPMENT_BASEVOLTAGE } },
+				{ DMSType.ENERGYCONSUMER, new List<ModelCode>(){ ModelCode.CONDUCTINGEQUIPMENT_TERMINALS, ModelCode.CONDUCTINGEQUIPMENT_BASEVOLTAGE } },
+				{ DMSType.TRANSFORMERWINDING, new List<ModelCode>(){ ModelCode.CONDUCTINGEQUIPMENT_TERMINALS, ModelCode.CONDUCTINGEQUIPMENT_BASEVOLTAGE, ModelCode.TRANSFORMERWINDING_POWERTRANSFORMER } },
+				{ DMSType.FUSE, new List<ModelCode>(){ ModelCode.CONDUCTINGEQUIPMENT_TERMINALS, ModelCode.CONDUCTINGEQUIPMENT_BASEVOLTAGE } },
+				{ DMSType.DISCONNECTOR, new List<ModelCode>(){ ModelCode.CONDUCTINGEQUIPMENT_TERMINALS, ModelCode.CONDUCTINGEQUIPMENT_BASEVOLTAGE } },
+				{ DMSType.BREAKER, new List<ModelCode>(){ ModelCode.CONDUCTINGEQUIPMENT_TERMINALS, ModelCode.CONDUCTINGEQUIPMENT_BASEVOLTAGE } },
+				{ DMSType.LOADBREAKSWITCH, new List<ModelCode>(){ ModelCode.CONDUCTINGEQUIPMENT_TERMINALS, ModelCode.CONDUCTINGEQUIPMENT_BASEVOLTAGE } },
+				{ DMSType.ACLINESEGMENT, new List<ModelCode>(){ ModelCode.CONDUCTINGEQUIPMENT_TERMINALS, ModelCode.CONDUCTINGEQUIPMENT_BASEVOLTAGE } },
+				{ DMSType.ANALOG, new List<ModelCode>(){ ModelCode.MEASUREMENT_TERMINAL } },
+				{ DMSType.DISCRETE, new List<ModelCode>(){ ModelCode.MEASUREMENT_TERMINAL } },
+				{ DMSType.BASEVOLTAGE, new List<ModelCode>(){ ModelCode.BASEVOLTAGE_CONDUCTINGEQUIPMENTS } }
+			};
+		#endregion
+
 		#region Fields
 		ILogger logger = LoggerWrapper.Instance;
 		private TransactionFlag transactionFlag;
-        private readonly ModelResourcesDesc modelResourcesDesc;
+		private readonly ModelResourcesDesc modelResourcesDesc;
 		private readonly NetworkModelGDA networkModelGDA;
-		private Dictionary<long, ResourceDescription> modelEntities;
-		private Dictionary<long, ResourceDescription> transactionModelEntities;
+		private Dictionary<long, IMeasurement> measurements;
+		private Dictionary<long, ITopologyElement> elements;
+		private List<long> energySources;
+		private Dictionary<long, List<long>> allElementConnections;
+		private Dictionary<long, long> measurementConnection;
 		#endregion
 
-		#region Singleton
-		private static object syncObj = new object();
-		private static NMSManager instance;
-
-        public static NMSManager Instance
-		{
-			get 
-			{
-				lock (syncObj)
-				{
-					if (instance == null)
-					{
-						instance = new NMSManager();
-					}
-				}
-				return instance;
-			}
-		}
-        #endregion
-        private NMSManager()
+		public NMSManager()
 		{
 			modelResourcesDesc = new ModelResourcesDesc();
 			networkModelGDA = new NetworkModelGDA();
 			transactionFlag = TransactionFlag.NoTransaction;
-		}
-
-		private Dictionary<long, ResourceDescription> GetEntities()
-		{
-			Dictionary<long, ResourceDescription> entities;
-			if (transactionFlag == TransactionFlag.InTransaction)
-			{
-				entities = transactionModelEntities;
-			}
-			else
-			{
-				entities = modelEntities;
-			}
-			return entities;
+			Initialize();
 		}
 
 		public List<long> GetAllEnergySources()
 		{
 			logger.LogDebug("Getting all energy sources.");
-			List<long> gids = new List<long>();
-			Dictionary<long, ResourceDescription> entities = GetEntities();
+			return energySources;
+			//List<long> gids = new List<long>();
+			//Dictionary<long, ResourceDescription> entities = GetEntities();
 
-			foreach (var pair in entities)
-			{
-				if (modelResourcesDesc.GetModelCodeFromId(pair.Key) == ModelCode.ENERGYSOURCE)
-				{
-					gids.Add(pair.Value.GetProperty(ModelCode.IDOBJ_GID).AsLong());
-				}
-			}
-			return gids;
+			//foreach (var pair in entities)
+			//{
+			//	if (modelResourcesDesc.GetModelCodeFromId(pair.Key) == ModelCode.ENERGYSOURCE)
+			//	{
+			//		gids.Add(pair.Value.GetProperty(ModelCode.IDOBJ_GID).AsLong());
+			//	}
+			//}
+			//return gids;
 		}
 		public void Initialize()
 		{
-			modelEntities = GetAllModelEntities();
+			GetAllModelEntities(); 
+			//PutMeasurementsInElements();
 		}
-
-		//private Dictionary<long, IGraphElement> TransformToTopologyElements(Dictionary<long,ResourceDescription> modelEntities)
-		//{
-		//	Dictionary<long, IGraphElement> elements = new Dictionary<long, IGraphElement>();
-
-		//	DMSType dmsType;
-		//	foreach (var modelEntity in modelEntities.Keys)
-		//	{
-		//		dmsType = GetDMSTypeOfTopologyElement(modelEntity);
-		//		if (dmsType == DMSType.DISCRETE)
-		//		{
-		//			Measurement newDiscrete = GetPopulatedDiscreteMeasurement(modelEntity);
-		//			elements.Add(newDiscrete.Id, newDiscrete);
-		//		}
-		//		else if (dmsType == DMSType.ANALOG)
-		//		{
-		//			Measurement newAnalog = GetPopulatedAnalogMeasurement(modelEntity);
-		//			elements.Add(newAnalog.Id, newAnalog);
-		//		}
-		//		else if (dmsType == DMSType.BASEVOLTAGE)
-		//		{
-		//			elements.Add(modelEntity, GetBaseVoltageForElement(modelEntity));
-		//		}
-		//		else if (dmsType != DMSType.TERMINAL && dmsType != DMSType.CONNECTIVITYNODE && dmsType != DMSType.MASK_TYPE)
-		//		{
-		//			ITopologyElement newElement = GetPopulatedElement(modelEntity);
-		//			elements.Add(newElement.Id, newElement);
-		//		}
-		//	}
-		//	return elements;
-		//}
-		public Dictionary<long, ResourceDescription> GetAllModelEntities()
+		private void PutMeasurementsInElements()
 		{
+			foreach (var pair in measurements)
+			{
+				if (measurementConnection.ContainsKey(pair.Key))
+				{
+					var connectedEl = measurementConnection[pair.Key];
+					
+					elements[measurementConnection[pair.Key]].Measurements.Add(pair.Value);
+				}
+			}
+		}
+		private void TransformToTopologyElements(ResourceDescription modelEntity)
+		{
+			DMSType dmsType;
+			dmsType = GetDMSTypeOfTopologyElement(modelEntity.Id);
+			if (dmsType == DMSType.DISCRETE)
+			{
+				Measurement newDiscrete = GetPopulatedDiscreteMeasurement(modelEntity);
+				Provider.Instance.CacheProvider.AddDiscreteMeasurement(newDiscrete as DiscreteMeasurement);
+				measurements.Add(newDiscrete.Id, newDiscrete);
+			}
+			else if (dmsType == DMSType.ANALOG)
+			{
+				Measurement newAnalog = GetPopulatedAnalogMeasurement(modelEntity);
+				Provider.Instance.CacheProvider.AddAnalogMeasurement(newAnalog as AnalogMeasurement);
+				measurements.Add(newAnalog.Id, newAnalog);
+			}
+			else if (dmsType != DMSType.BASEVOLTAGE && dmsType != DMSType.MASK_TYPE)
+			{
+				ITopologyElement newElement = GetPopulatedElement(modelEntity);
+				elements.Add(newElement.Id, newElement);
+				if (dmsType == DMSType.ENERGYSOURCE)
+				{
+					energySources.Add(newElement.Id);
+				}
+			}
+			allElementConnections.Add(modelEntity.Id, (GetAllReferencedElements(modelEntity)));
+		}
+		private void GetAllModelEntities()
+		{
+			elements = new Dictionary<long, ITopologyElement>();
+			measurements = new Dictionary<long, IMeasurement>();
+			energySources = new List<long>();
+			allElementConnections = new Dictionary<long, List<long>>();
+			measurementConnection = new Dictionary<long, long>();
 			List<ModelCode> concreteClasses = modelResourcesDesc.NonAbstractClassIds;
-			Dictionary<long, ResourceDescription>  modelEntities = new Dictionary<long, ResourceDescription>();
+
 			try
 			{
 				foreach (var item in concreteClasses)
@@ -122,7 +130,7 @@ namespace NetworkModelServiceFunctions
 					var elements = networkModelGDA.GetExtentValues(item, properties);
 					foreach (var element in elements)
 					{
-						modelEntities.Add(element.Id, element);
+						TransformToTopologyElements(element);
 					}
 				}
 			}
@@ -130,42 +138,53 @@ namespace NetworkModelServiceFunctions
 			{
 				logger.LogError($"Failed to initialize NMSManager. Exception message: {ex.Message}");
 			}
-			return modelEntities;
 		}
-		public List<long> GetAllReferencedElements(long gid)
+		public void GetAllModels(out Dictionary<long, ITopologyElement> elements, out Dictionary<long, IMeasurement> measurements, out Dictionary<long, List<long>> connections)
 		{
-			logger.LogDebug($"Getting all referenced elements for GID {gid}.");
-			List<long> elements = new List<long>();
-			Dictionary<long, ResourceDescription> entities = GetEntities();
+			elements = this.elements;
+			measurements = this.measurements;
+			connections = allElementConnections;
+		}
 
-			DMSType type = GetDMSTypeOfTopologyElement(gid);
+		public void PrepareTransaction()
+		{
+			GetAllModelEntities();
+		}
+
+		private List<long> GetAllReferencedElements(ResourceDescription element)
+		{
+			logger.LogDebug($"Getting all referenced elements for GID {element.Id}.");
+			List<long> elements = new List<long>();
+			
+
+			DMSType type = GetDMSTypeOfTopologyElement(element.Id);
 
 			foreach (var property in GetAllReferenceProperties(type))
 			{
-				if (entities.ContainsKey(gid))
+
+				if (property == ModelCode.POWERTRANSFORMER_TRANSFORMERWINDINGS ||
+					property == ModelCode.CONDUCTINGEQUIPMENT_TERMINALS ||
+					property == ModelCode.CONNECTIVITYNODE_TERMINALS ||
+					property == ModelCode.BASEVOLTAGE_CONDUCTINGEQUIPMENTS ||
+					property == ModelCode.TERMINAL_MEASUREMENTS)
 				{
-					if (property == ModelCode.POWERTRANSFORMER_TRANSFORMERWINDINGS ||
-						property == ModelCode.CONDUCTINGEQUIPMENT_TERMINALS ||
-						property == ModelCode.CONNECTIVITYNODE_TERMINALS ||
-						property == ModelCode.BASEVOLTAGE_CONDUCTINGEQUIPMENTS ||
-						property == ModelCode.TERMINAL_MEASUREMENTS)
+					elements.AddRange(element.GetProperty(property).AsReferences());
+				}
+				else
+				{
+					var elementGid = element.GetProperty(property).AsReference();
+					if (elementGid != 0)
 					{
-						elements.AddRange(entities[gid].GetProperty(property).AsReferences());
-					}
-					else
-					{
-						var elementGid = entities[gid].GetProperty(property).AsReference();
-						if (elementGid != 0)
-						{
-							elements.Add(elementGid);
-						}
+						elements.Add(elementGid);
 					}
 				}
+
 			}
 			return elements;
 		}
 		private List<ModelCode> GetAllReferenceProperties(DMSType type)
 		{
+			//return ReferenceProperties[type];
 			List<ModelCode> propertyIds = new List<ModelCode>();
 
 			switch (type)
@@ -229,200 +248,116 @@ namespace NetworkModelServiceFunctions
 
 			return propertyIds;
 		}
-		public ITopologyElement GetPopulatedElement(long gid)
+		public ITopologyElement GetPopulatedElement(ResourceDescription rs)
 		{
-			ITopologyElement topologyElement = new TopologyElement(gid);
-			Dictionary<long, ResourceDescription> entities = GetEntities();
-			if (entities.ContainsKey(topologyElement.Id))
+			ITopologyElement topologyElement = new TopologyElement(rs.Id);
+			try
 			{
-				try
+				DMSType type = GetDMSTypeOfTopologyElement(rs.Id);
+				topologyElement.Mrid = rs.GetProperty(ModelCode.IDOBJ_MRID).AsString();
+				topologyElement.Name = rs.GetProperty(ModelCode.IDOBJ_NAME).AsString();
+				topologyElement.Description = rs.GetProperty(ModelCode.IDOBJ_DESCRIPTION).AsString();
+				topologyElement.DmsType = type.ToString();
+				if (rs.ContainsProperty(ModelCode.CONDUCTINGEQUIPMENT_ISREMOTE))
 				{
-					ResourceDescription rs = entities[topologyElement.Id];
-					topologyElement.Mrid = rs.GetProperty(ModelCode.IDOBJ_MRID).AsString();
-					topologyElement.Name = rs.GetProperty(ModelCode.IDOBJ_NAME).AsString();
-					topologyElement.Description = rs.GetProperty(ModelCode.IDOBJ_DESCRIPTION).AsString();
-
-					if (rs.ContainsProperty(ModelCode.CONDUCTINGEQUIPMENT_ISREMOTE))
-					{
-						topologyElement.IsRemote = rs.GetProperty(ModelCode.CONDUCTINGEQUIPMENT_ISREMOTE).AsBool();
-					}
-					else
-					{
-						topologyElement.IsRemote = false;
-					}
-				}
-				catch (Exception)
-				{
-					logger.LogError($"Failed to populate element with GID {topologyElement.Id}. Could not get all properties.");
-				}
-			}
-			else
-			{
-				logger.LogError($"Failed to populate element with GID {topologyElement.Id}.");
-			}
-			return topologyElement;
-		}
-		public AnalogMeasurement GetPopulatedAnalogMeasurement(long gid)
-		{
-			AnalogMeasurement measurement = new AnalogMeasurement();
-			Dictionary<long, ResourceDescription> elements = GetEntities();
-			if (elements.ContainsKey(gid))
-			{
-				try
-				{
-					ResourceDescription rs = elements[gid];
-					measurement.Id = gid;
-					measurement.Address = rs.GetProperty(ModelCode.MEASUREMENT_ADDRESS).AsString();
-					measurement.isInput = rs.GetProperty(ModelCode.MEASUREMENT_ISINPUT).AsBool();
-					measurement.CurrentValue = rs.GetProperty(ModelCode.ANALOG_CURRENTVALUE).AsFloat();
-					measurement.MaxValue = rs.GetProperty(ModelCode.ANALOG_MAXVALUE).AsFloat();
-					measurement.MinValue = rs.GetProperty(ModelCode.ANALOG_MINVALUE).AsFloat();
-					measurement.NormalValue = rs.GetProperty(ModelCode.ANALOG_NORMALVALUE).AsFloat();
-					measurement.Deviation = rs.GetProperty(ModelCode.ANALOG_DEVIATION).AsFloat();
-					measurement.ScalingFactor = rs.GetProperty(ModelCode.ANALOG_SCALINGFACTOR).AsFloat();
-					measurement.SignalType = (AnalogMeasurementType)rs.GetProperty(ModelCode.ANALOG_SIGNALTYPE).AsEnum();
-				}
-				catch (Exception)
-				{
-					logger.LogDebug($"Failed to populate analog measurement with GID: {gid}.");
-				}
-			}
-			return measurement;
-		}
-		public DiscreteMeasurement GetPopulatedDiscreteMeasurement(long gid)
-		{
-			DiscreteMeasurement measurement = new DiscreteMeasurement();
-			Dictionary<long, ResourceDescription> elements = GetEntities();
-			if (elements.ContainsKey(gid))
-			{
-				try
-				{
-					ResourceDescription rs = elements[gid];
-					measurement.Id = gid;
-					measurement.Address = rs.GetProperty(ModelCode.MEASUREMENT_ADDRESS).AsString();
-					measurement.isInput = rs.GetProperty(ModelCode.MEASUREMENT_ISINPUT).AsBool();
-					measurement.CurrentOpen = rs.GetProperty(ModelCode.DISCRETE_CURRENTOPEN).AsBool();
-					measurement.MaxValue = rs.GetProperty(ModelCode.DISCRETE_MAXVALUE).AsInt();
-					measurement.MinValue = rs.GetProperty(ModelCode.DISCRETE_MINVALUE).AsInt();
-					measurement.NormalValue = rs.GetProperty(ModelCode.DISCRETE_NORMALVALUE).AsInt();
-					measurement.MeasurementType = (DiscreteMeasurementType)rs.GetProperty(ModelCode.DISCRETE_MEASUREMENTTYPE).AsEnum();
-				}
-				catch (Exception)
-				{
-					logger.LogDebug($"Failed to populate discrete measurement with GID: {gid}.");
-				}
-			}
-			return measurement;
-		}
-		public float GetBaseVoltageForElement(long gid)
-		{
-			float voltage = 0;
-			Dictionary<long, ResourceDescription> entities = GetEntities();
-			if (entities.ContainsKey(gid))
-			{
-				ResourceDescription rs = entities[gid];
-				if (rs.ContainsProperty(ModelCode.BASEVOLTAGE_NOMINALVOLTAGE))
-				{
-					voltage = rs.GetProperty(ModelCode.BASEVOLTAGE_NOMINALVOLTAGE).AsFloat();
+					topologyElement.IsRemote = rs.GetProperty(ModelCode.CONDUCTINGEQUIPMENT_ISREMOTE).AsBool();
 				}
 				else
 				{
-					logger.LogError($"Failed to get BaseVoltage. Element with GID {gid} does not have BASEVOLTAGE_NOMINALVOLTAGE property.");
+					topologyElement.IsRemote = false;
 				}
-			}
-			else
-			{
-				logger.LogError($"Failed to get BaseVoltage. Element with GID {gid} does not exist.");
-			}
-			return voltage;
-		}
-		public bool PrepareForTransaction(Dictionary<DeltaOpType, List<long>> delta)
-		{
-			logger.LogInfo("NMSManager prepare for transaction started.");
-			//Dictionary<long, ResourceDescription> newElements = GetAllEements();
-			bool success = true;
-			//transactionModelEntities = new Dictionary<long, ResourceDescription>(newElements);
-			try
-			{
-				//Dictionary<long, ResourceDescription> newElements = GetAllModelEntities();
-				transactionModelEntities = GetAllModelEntities();
-				transactionFlag = TransactionFlag.InTransaction;
-				//foreach (var pair in delta)
-				//{
-				//	foreach (var elementGid in pair.Value)
-				//	{
-				//		if (pair.Key == DeltaOpType.Delete)
-				//		{
-				//			logger.LogDebug($"Element with GID {elementGid} is being deleted.");
-				//			transactionModelEntities.Remove(elementGid);
-				//		}
-				//		else if (pair.Key == DeltaOpType.Insert)
-				//		{
-				//			List<ModelCode> properties = modelResourcesDesc.GetAllPropertyIdsForEntityId(elementGid);
-				//			ResourceDescription newEl = networkModelGDA.GetValues(elementGid, properties);
-				//			if (!transactionModelEntities.TryGetValue(elementGid, out ResourceDescription element))
-				//			{
-				//				logger.LogDebug($"Element with GID {elementGid} is being inserted.");
-				//				transactionModelEntities.Add(newEl.Id, newEl);
-				//			}
-				//			else
-				//			{
-				//				logger.LogDebug($"Element with GID {elementGid} is already inserted.");
-				//			}
-				//			//descented values ???
-				//		}
-				//		else if (pair.Key == DeltaOpType.Update)
-				//		{
-				//			List<ModelCode> properties = modelResourcesDesc.GetAllPropertyIdsForEntityId(elementGid);
-				//			ResourceDescription updatedEl = networkModelGDA.GetValues(elementGid, properties);
-				//			if (transactionModelEntities.TryGetValue(elementGid, out ResourceDescription element))
-				//			{
-				//				logger.LogDebug($"Element with GID {elementGid} is being updated.");
-				//				element = updatedEl;
-				//			}
-				//			else
-				//			{
-				//				logger.LogDebug($"Element with GID {elementGid} does not exist.");
-				//			}
-				//		}
-				//	}
-				//	transactionFlag = TransactionFlag.InTransaction;
-				//}
-			}
-			catch (Exception ex)
-			{
-				logger.LogInfo($"NMSManager failed to prepare for transaction. Exception message: {ex.Message}");
-				success = false;
-				transactionFlag = TransactionFlag.NoTransaction;
-			}
-			logger.LogInfo("NMSManager is prepared for transaction.");
-			return success;
-		}
-		public void CommitTransaction()
-		{
-			modelEntities = new Dictionary<long, ResourceDescription>(transactionModelEntities);
-			transactionFlag = TransactionFlag.NoTransaction;
-			logger.LogDebug("NMSManager commited transaction successfully.");
-		}
-		public void RollbackTransaction()
-		{
-			transactionModelEntities = null;
-			transactionFlag = TransactionFlag.NoTransaction;
-			logger.LogDebug("NMSManager rolled back transaction.");
 
-		}
-		public DMSType GetDMSTypeOfTopologyElement(long gid) => ModelCodeHelper.GetTypeFromModelCode(modelResourcesDesc.GetModelCodeFromId(gid));
-		public string GetDMSTypeOfTopologyElementString(long gid)
-		{
-			logger.LogDebug($"Getting element DMStype for GID {gid}.");
-			try
-			{
-				return GetDMSTypeOfTopologyElement(gid).ToString();
+				if (rs.ContainsProperty(ModelCode.BASEVOLTAGE_NOMINALVOLTAGE))
+				{
+					topologyElement.NominalVoltage = rs.GetProperty(ModelCode.BASEVOLTAGE_NOMINALVOLTAGE).AsFloat();
+				}
+				else
+				{
+					topologyElement.NominalVoltage = 0;
+					logger.LogWarn($"Failed to get BaseVoltage. Element with GID {rs.Id} does not have BASEVOLTAGE_NOMINALVOLTAGE property.");
+				}			
 			}
 			catch (Exception)
 			{
-				return "FIELD";
+				logger.LogError($"Failed to populate element with GID {topologyElement.Id}. Could not get all properties.");
 			}
+				
+			return topologyElement;
+		}
+		public AnalogMeasurement GetPopulatedAnalogMeasurement(ResourceDescription rs)
+		{
+			AnalogMeasurement measurement = new AnalogMeasurement();
+			try
+			{
+				measurement.Id = rs.Id;
+				measurement.Address = rs.GetProperty(ModelCode.MEASUREMENT_ADDRESS).AsString();
+				measurement.isInput = rs.GetProperty(ModelCode.MEASUREMENT_ISINPUT).AsBool();
+				measurement.CurrentValue = rs.GetProperty(ModelCode.ANALOG_CURRENTVALUE).AsFloat();
+				measurement.MaxValue = rs.GetProperty(ModelCode.ANALOG_MAXVALUE).AsFloat();
+				measurement.MinValue = rs.GetProperty(ModelCode.ANALOG_MINVALUE).AsFloat();
+				measurement.NormalValue = rs.GetProperty(ModelCode.ANALOG_NORMALVALUE).AsFloat();
+				measurement.Deviation = rs.GetProperty(ModelCode.ANALOG_DEVIATION).AsFloat();
+				measurement.ScalingFactor = rs.GetProperty(ModelCode.ANALOG_SCALINGFACTOR).AsFloat();
+				measurement.SignalType = (AnalogMeasurementType)rs.GetProperty(ModelCode.ANALOG_SIGNALTYPE).AsEnum();
+			}
+			catch (Exception)
+			{
+				logger.LogDebug($"Failed to populate analog measurement with GID: {rs.Id}.");
+			}
+			return measurement;
+		}
+		public DiscreteMeasurement GetPopulatedDiscreteMeasurement(ResourceDescription rs)
+		{
+			DiscreteMeasurement measurement = new DiscreteMeasurement();
+			try
+			{
+				measurement.Id = rs.Id;
+				measurement.Address = rs.GetProperty(ModelCode.MEASUREMENT_ADDRESS).AsString();
+				measurement.isInput = rs.GetProperty(ModelCode.MEASUREMENT_ISINPUT).AsBool();
+				measurement.CurrentOpen = rs.GetProperty(ModelCode.DISCRETE_CURRENTOPEN).AsBool();
+				measurement.MaxValue = rs.GetProperty(ModelCode.DISCRETE_MAXVALUE).AsInt();
+				measurement.MinValue = rs.GetProperty(ModelCode.DISCRETE_MINVALUE).AsInt();
+				measurement.NormalValue = rs.GetProperty(ModelCode.DISCRETE_NORMALVALUE).AsInt();
+				measurement.MeasurementType = (DiscreteMeasurementType)rs.GetProperty(ModelCode.DISCRETE_MEASUREMENTTYPE).AsEnum();
+
+				var connection = GetAllReferencedElements(rs);
+				if (connection.Count < 0)
+				{
+					logger.LogWarn($"Discrete measurement with GID: {rs.Id} is not connected to any element.");
+
+				}
+				else if (connection.Count > 1)
+				{
+					logger.LogWarn($"Discrete measurement with GID: {rs.Id} is connected to more then one element.");
+					measurementConnection.Add(rs.Id, connection.First());
+				}
+				else
+				{
+					measurementConnection.Add(rs.Id, connection.First());
+				}
+			}
+			catch (Exception)
+			{
+				logger.LogError($"Failed to populate discrete measurement with GID: {rs.Id}.");
+			}
+			return measurement;
+		}
+		public DMSType GetDMSTypeOfTopologyElement(long gid)
+		{	
+			return (DMSType)ModelCodeHelper.ExtractTypeFromGlobalId(gid);
+		}
+		public string GetDMSTypeOfTopologyElementString(long gid)
+		{
+			logger.LogDebug($"Getting element DMStype for GID {gid}.");		
+			DMSType type = GetDMSTypeOfTopologyElement(gid);
+			if (type != 0)
+			{
+				return type.ToString();
+			}
+			else
+			{
+				return "FIELD";
+			}			
 		}
 	}
 }

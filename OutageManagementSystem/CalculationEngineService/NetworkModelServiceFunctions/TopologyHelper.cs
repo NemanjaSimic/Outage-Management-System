@@ -4,7 +4,7 @@ using NetworkModelServiceFunctions;
 using Outage.Common;
 using System.Collections.Generic;
 
-namespace TopologyBuilder
+namespace NetworkModelServiceFunctions
 {
 	public class TopologyHelper
 	{
@@ -41,7 +41,7 @@ namespace TopologyBuilder
 		{
 			logger.LogDebug($"Getting element topology status for GID {gid}.");
 			TopologyStatus retVal;
-			DMSType type = NMSManager.Instance.GetDMSTypeOfTopologyElement(gid);
+			DMSType type = (DMSType)ModelCodeHelper.ExtractTypeFromGlobalId(gid);
 			foreach (var item in elementsStatus)
 			{
 				if (item.Value.Contains(type))
@@ -56,7 +56,7 @@ namespace TopologyBuilder
 		{
 			logger.LogDebug($"Getting element topology type for GID {gid}.");
 			TopologyType retVal;
-			DMSType type = NMSManager.Instance.GetDMSTypeOfTopologyElement(gid);
+			DMSType type = (DMSType)ModelCodeHelper.ExtractTypeFromGlobalId(gid);
 			foreach (var item in topologyTypes)
 			{
 				if (item.Value.Contains(type))

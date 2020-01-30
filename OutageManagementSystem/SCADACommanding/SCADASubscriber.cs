@@ -1,4 +1,5 @@
-﻿using Outage.Common;
+﻿using CECommon.Providers;
+using Outage.Common;
 using Outage.Common.PubSub;
 using Outage.Common.PubSub.SCADADataContract;
 using Outage.Common.ServiceContracts.PubSub;
@@ -20,27 +21,7 @@ namespace SCADACommanding
 		public void Notify(IPublishableMessage message)
 		{
 			Logger.LogError($"Message recived from PubSub with type {message.GetType().ToString()}.");
-
-			if (message is SingleAnalogValueSCADAMessage singleAnalog)
-			{
-				SCADACommandingCache.Instance.UpdateAnalogMeasurement(singleAnalog.Gid, singleAnalog.Value);
-			}
-			else if (message is MultipleAnalogValueSCADAMessage multipleAnalog)
-			{
-				SCADACommandingCache.Instance.UpdateAnalogMeasurement(multipleAnalog.Data);
-			}
-			else if (message is SingleDiscreteValueSCADAMessage singleDiscrete)
-			{
-				SCADACommandingCache.Instance.UpdateDiscreteMeasurement(singleDiscrete.Gid, singleDiscrete.Value);
-			}
-			else if (message is MultipleDiscreteValueSCADAMessage multipleDiscrete)
-			{
-				SCADACommandingCache.Instance.UpdateDiscreteMeasurement(multipleDiscrete.Data);
-			}
-			else
-			{
-				Logger.LogError($"Message has unsupported type [{message.GetType().ToString()}].");
-			}
+			Provider.Instance.SCADAResultHandler.HandleResult(message);
 		}
 	}
 }
