@@ -31,11 +31,11 @@
             {
                 if (task.IsFaulted)
                 {
-                    Console.WriteLine($"There was an error opening the connection: {task.Exception.GetBaseException()}");
+                    Console.WriteLine($"[GraphHubDispatcher::Connect] Could not connect to Graph SignalR Hub.");
                 }
                 else
                 {
-                    Console.WriteLine($"Connected to {_hubName}. ");
+                    Console.WriteLine($"[GraphHubDispatcher::Connect] Connected to {_hubName}. ");
                     IsConnected = true;
                 }
             }).Wait();
@@ -48,12 +48,12 @@
 
             try
             {
-                Console.WriteLine($"Sending graph outage call update to Graph Hub");
-                _proxy.Invoke<string>("NotifyGraphOutageCall", gid).Wait();
+                Console.WriteLine($"[GraphHubDispatcher::Dispatch] Sending graph outage call update to Graph Hub");
+                _proxy.Invoke<string>("NotifyGraphOutageCall", gid)?.Wait();
             }
             catch (Exception)
             {
-                Console.WriteLine($"Sending graph outage call update failed.");
+                Console.WriteLine($"[GraphHubDispatcher::Dispatch] Sending graph outage call update failed.");
             }
         }
 
