@@ -1,5 +1,6 @@
 ﻿using Outage.Common.PubSub;
 using Outage.Common.PubSub.CalculationEngineDataContract;
+using Outage.Common.PubSub.SCADADataContract;
 using Outage.Common.ServiceContracts.PubSub;
 using System;
 using System.Collections.Generic;
@@ -16,19 +17,25 @@ namespace OMS.Web.Adapter.SCADA
     public class SCADANotification : ISubscriberCallback
     {
         private readonly string _subscriberName;
+        private readonly Dictionary<long, double> _analogValues;
 
         public SCADANotification(string subscriberName)
         {
             _subscriberName = subscriberName;
+
         }
 
         public string GetSubscriberName() => _subscriberName;
 
         public void Notify(IPublishableMessage message)
         {
-            if (message is MultipleAnalogScadaMessage topologyMessage)
+            if (message is MultipleAnalogValueSCADAMessage scadaMessage)
             {
-
+                foreach (var item in scadaMessage.Data)
+                {
+                    _analogValues.Add(item.Key, item.Value.Value);
+                }
             }
         }
+    }
 }
