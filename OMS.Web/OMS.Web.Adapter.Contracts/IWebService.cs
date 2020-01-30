@@ -1,9 +1,9 @@
-﻿using System.ServiceModel;
-using System.Collections.Generic;
-using OMS.Web.UI.Models.ViewModels;
-
-namespace OMS.Web.Adapter.Contracts
+﻿namespace OMS.Web.Adapter.Contracts
 {
+    using System.ServiceModel;
+    using System.Collections.Generic;
+    using OMS.Web.UI.Models.ViewModels;
+
     [ServiceContract]
     public interface IWebService
     {

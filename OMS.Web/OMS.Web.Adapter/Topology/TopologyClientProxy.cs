@@ -1,10 +1,10 @@
-﻿using OMS.Web.Adapter.Contracts;
-using Outage.Common.ServiceContracts;
-using Outage.Common.UI;
-using System.ServiceModel;
-
-namespace OMS.Web.Adapter.Topology
+﻿namespace OMS.Web.Adapter.Topology
 {
+    using OMS.Web.Adapter.Contracts;
+    using Outage.Common.ServiceContracts;
+    using Outage.Common.UI;
+    using System.ServiceModel;
+
     public class TopologyClientProxy : ChannelFactory<ITopologyServiceContract>, ITopologyClient
     {
         private ITopologyServiceContract proxy;

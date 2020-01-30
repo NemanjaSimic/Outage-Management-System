@@ -1,6 +1,8 @@
-﻿using Outage.Common;
+﻿using CECommon.Model;
+using Outage.Common;
 using Outage.Common.UI;
 using System;
+using System.Collections.Concurrent;
 using System.Collections.Generic;
 using System.Linq;
 using System.ServiceModel;
@@ -14,9 +16,11 @@ namespace OutageManagementService
     public class OutageModel
     {
 
-        public static UIModel topology = new UIModel();
+        public UIModel topology = new UIModel();
+        public TopologyModel topologyModel = new TopologyModel();
         private ILogger logger;
-
+        public ConcurrentQueue<long> EmailMsg;
+        public List<long> CalledOutages;
         protected ILogger Logger
         {
             get { return logger ?? (logger = LoggerWrapper.Instance); }
@@ -74,6 +78,8 @@ namespace OutageManagementService
 
         public OutageModel()
         {
+            EmailMsg = new ConcurrentQueue<long>();
+            CalledOutages = new List<long>();
             ImportTopologyModel();
         }
 

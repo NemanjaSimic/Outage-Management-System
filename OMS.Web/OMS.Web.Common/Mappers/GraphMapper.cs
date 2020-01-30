@@ -1,15 +1,18 @@
-﻿using OMS.Web.UI.Models.ViewModels;
-using Outage.Common.UI;
-using System.Collections.Generic;
-
-namespace OMS.Web.Common.Mappers
+﻿namespace OMS.Web.Common.Mappers
 {
+    using OMS.Web.UI.Models.ViewModels;
+    using OMS.Web.Common.Extensions;
+    using Outage.Common.UI;
+    using System.Collections.Generic;
+    
     public class GraphMapper : IGraphMapper
     {
+        private const string PowerTransformerDmsTypeName = "POWERTRANSFORMER";
+
         public OmsGraph MapTopology(UIModel topologyModel)
         {
             OmsGraph graph = new OmsGraph();
-
+            
             // map nodes
             foreach (KeyValuePair<long, UINode> keyValue in topologyModel.Nodes)
             {
@@ -23,19 +26,24 @@ namespace OMS.Web.Common.Mappers
                     DMSType = keyValue.Value.DMSType,
                     IsRemote = keyValue.Value.IsRemote,
                     NominalVoltage = keyValue.Value.NominalVoltage.ToString(),
-                    Measurements = new List<Meauserement>()
+                    Measurements = new List<Measurement>()
                 };
 
                 foreach (var measurement in keyValue.Value.Measurements)
                 {
-                    graphNode.Measurements.Add(new Meauserement()
+                    graphNode.Measurements.Add(new Measurement()
                     {
                         Id = measurement.Gid.ToString(),
                         Type = measurement.Type,
                         Value = measurement.Value
                     });
                 }
-                graph.Nodes.Add(graphNode);
+
+                graph.Nodes.Add(
+                    graphNode.DMSType == PowerTransformerDmsTypeName 
+                    ? graphNode.ToTransformerNode()
+                    : graphNode
+                );
             }
 
             // map relations
@@ -53,7 +61,7 @@ namespace OMS.Web.Common.Mappers
                 }
             }
 
-            return graph;
+            return graph.SquashTransformerWindings();
         }
     }
 }

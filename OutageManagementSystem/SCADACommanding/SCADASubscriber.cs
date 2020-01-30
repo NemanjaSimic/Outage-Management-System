@@ -22,6 +22,7 @@ namespace SCADACommanding
 		{
 			Logger.LogError($"Message recived from PubSub with type {message.GetType().ToString()}.");
 			Provider.Instance.SCADAResultHandler.HandleResult(message);
+
 		}
 	}
 }

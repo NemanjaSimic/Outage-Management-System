@@ -1,8 +1,8 @@
-﻿using System.ComponentModel;
-using System.Configuration;
-
-namespace OMS.Web.Common
+﻿namespace OMS.Web.Common
 {
+    using System.ComponentModel;
+    using System.Configuration;
+
     public static class AppSettings
     {
         public static T Get<T>(string key)

@@ -1,0 +1,64 @@
+﻿
+Microsoft Visual Studio Solution File, Format Version 12.00
+# Visual Studio Version 16
+VisualStudioVersion = 16.0.29403.142
+MinimumVisualStudioVersion = 10.0.40219.1
+Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "OMS.EmailService", "OMS.EmailService\OMS.EmailService.csproj", "{7C21EB5B-FA88-4167-9E2C-814D3594905E}"
+EndProject
+Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "OMS.Email", "OMS.Email\OMS.Email.csproj", "{C1DCE718-9A70-44C5-944B-6C7B2A486165}"
+EndProject
+Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "Common", "..\OutageManagementSystem\Common\Common.csproj", "{892CBE15-9ED7-4540-81FA-0EAABA592138}"
+EndProject
+Global
+	GlobalSection(SolutionConfigurationPlatforms) = preSolution
+		Debug|Any CPU = Debug|Any CPU
+		Debug|x64 = Debug|x64
+		Debug|x86 = Debug|x86
+		Release|Any CPU = Release|Any CPU
+		Release|x64 = Release|x64
+		Release|x86 = Release|x86
+	EndGlobalSection
+	GlobalSection(ProjectConfigurationPlatforms) = postSolution
+		{7C21EB5B-FA88-4167-9E2C-814D3594905E}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
+		{7C21EB5B-FA88-4167-9E2C-814D3594905E}.Debug|Any CPU.Build.0 = Debug|Any CPU
+		{7C21EB5B-FA88-4167-9E2C-814D3594905E}.Debug|x64.ActiveCfg = Debug|Any CPU
+		{7C21EB5B-FA88-4167-9E2C-814D3594905E}.Debug|x64.Build.0 = Debug|Any CPU
+		{7C21EB5B-FA88-4167-9E2C-814D3594905E}.Debug|x86.ActiveCfg = Debug|Any CPU
+		{7C21EB5B-FA88-4167-9E2C-814D3594905E}.Debug|x86.Build.0 = Debug|Any CPU
+		{7C21EB5B-FA88-4167-9E2C-814D3594905E}.Release|Any CPU.ActiveCfg = Release|Any CPU
+		{7C21EB5B-FA88-4167-9E2C-814D3594905E}.Release|Any CPU.Build.0 = Release|Any CPU
+		{7C21EB5B-FA88-4167-9E2C-814D3594905E}.Release|x64.ActiveCfg = Release|Any CPU
+		{7C21EB5B-FA88-4167-9E2C-814D3594905E}.Release|x64.Build.0 = Release|Any CPU
+		{7C21EB5B-FA88-4167-9E2C-814D3594905E}.Release|x86.ActiveCfg = Release|Any CPU
+		{7C21EB5B-FA88-4167-9E2C-814D3594905E}.Release|x86.Build.0 = Release|Any CPU
+		{C1DCE718-9A70-44C5-944B-6C7B2A486165}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
+		{C1DCE718-9A70-44C5-944B-6C7B2A486165}.Debug|Any CPU.Build.0 = Debug|Any CPU
+		{C1DCE718-9A70-44C5-944B-6C7B2A486165}.Debug|x64.ActiveCfg = Debug|Any CPU
+		{C1DCE718-9A70-44C5-944B-6C7B2A486165}.Debug|x64.Build.0 = Debug|Any CPU
+		{C1DCE718-9A70-44C5-944B-6C7B2A486165}.Debug|x86.ActiveCfg = Debug|Any CPU
+		{C1DCE718-9A70-44C5-944B-6C7B2A486165}.Debug|x86.Build.0 = Debug|Any CPU
+		{C1DCE718-9A70-44C5-944B-6C7B2A486165}.Release|Any CPU.ActiveCfg = Release|Any CPU
+		{C1DCE718-9A70-44C5-944B-6C7B2A486165}.Release|Any CPU.Build.0 = Release|Any CPU
+		{C1DCE718-9A70-44C5-944B-6C7B2A486165}.Release|x64.ActiveCfg = Release|Any CPU
+		{C1DCE718-9A70-44C5-944B-6C7B2A486165}.Release|x64.Build.0 = Release|Any CPU
+		{C1DCE718-9A70-44C5-944B-6C7B2A486165}.Release|x86.ActiveCfg = Release|Any CPU
+		{C1DCE718-9A70-44C5-944B-6C7B2A486165}.Release|x86.Build.0 = Release|Any CPU
+		{892CBE15-9ED7-4540-81FA-0EAABA592138}.Debug|Any CPU.ActiveCfg = Debug|x64
+		{892CBE15-9ED7-4540-81FA-0EAABA592138}.Debug|Any CPU.Build.0 = Debug|x64
+		{892CBE15-9ED7-4540-81FA-0EAABA592138}.Debug|x64.ActiveCfg = Debug|x64
+		{892CBE15-9ED7-4540-81FA-0EAABA592138}.Debug|x64.Build.0 = Debug|x64
+		{892CBE15-9ED7-4540-81FA-0EAABA592138}.Debug|x86.ActiveCfg = Debug|x86
+		{892CBE15-9ED7-4540-81FA-0EAABA592138}.Debug|x86.Build.0 = Debug|x86
+		{892CBE15-9ED7-4540-81FA-0EAABA592138}.Release|Any CPU.ActiveCfg = Release|x86
+		{892CBE15-9ED7-4540-81FA-0EAABA592138}.Release|x64.ActiveCfg = Release|x64
+		{892CBE15-9ED7-4540-81FA-0EAABA592138}.Release|x64.Build.0 = Release|x64
+		{892CBE15-9ED7-4540-81FA-0EAABA592138}.Release|x86.ActiveCfg = Release|x86
+		{892CBE15-9ED7-4540-81FA-0EAABA592138}.Release|x86.Build.0 = Release|x86
+	EndGlobalSection
+	GlobalSection(SolutionProperties) = preSolution
+		HideSolutionNode = FALSE
+	EndGlobalSection
+	GlobalSection(ExtensibilityGlobals) = postSolution
+		SolutionGuid = {5B77986C-4C4D-48DC-8A2D-582029611051}
+	EndGlobalSection
+EndGlobal

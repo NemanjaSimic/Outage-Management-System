@@ -27,7 +27,10 @@ namespace Outage.Common
         SWITCH_STATUS,
 
         [EnumMember]
-        TOPOLOGY
+        TOPOLOGY,
+
+        [EnumMember]
+        OUTAGE_EMAIL
     }
 
     //SCADA

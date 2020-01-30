@@ -17,7 +17,7 @@ namespace OutageManagementService
         private ILogger logger;
         private List<ServiceHost> hosts = null;
         private OutageModel outageModel;
-
+        private CallingService callingService;
         #endregion
 
 
@@ -29,6 +29,9 @@ namespace OutageManagementService
         public OutageManagementService()
         {
             //TODO: Initialize what is needed
+            callingService = new CallingService("OutageService");
+            callingService.outageModel = outageModel;
+
             outageModel = new OutageModel();
             InitializeHosts();
 

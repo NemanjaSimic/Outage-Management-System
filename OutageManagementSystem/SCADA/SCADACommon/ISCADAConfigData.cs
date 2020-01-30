@@ -1,9 +1,11 @@
-﻿namespace Outage.SCADA.SCADACommon
+﻿using System.Net;
+
+namespace Outage.SCADA.SCADACommon
 {
     public interface ISCADAConfigData
     {
         ushort TcpPort { get; }
-        string IpAddress { get; }
+        IPAddress IpAddress { get; }
         byte UnitAddress { get; }
         ushort Interval { get; }
         string ModbusSimulatorExeName { get; }
