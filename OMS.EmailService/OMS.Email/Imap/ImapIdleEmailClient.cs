@@ -21,12 +21,25 @@
         public bool StartIdling()
         {
             Folder folder = _client.Folders.Inbox;
+            folder.StopIdling();
             return folder.StartIdling();
         }
 
         public void RegisterIdleHandler()
         {
-            _client.OnNewMessagesArrived += OnMessageArrived;
+            _client.Folders.Inbox.OnNewMessagesArrived += OnMessageArrived;
+        }
+
+        public void UnregisterIdleHandler()
+        {
+            _client.Folders.Inbox.OnNewMessagesArrived -= OnMessageArrived;
+        }
+
+        public void ReregisterIdleHandler()
+        {
+            UnregisterIdleHandler();
+            RegisterIdleHandler();
+            StartIdling();
         }
 
         private void OnMessageArrived(object sender, IdleEventArgs args)
@@ -52,9 +65,11 @@
                 }
                 catch (Exception)
                 {
-                    Console.WriteLine("Sending to PubSub Engine failed.");
+                    Console.WriteLine("[ImapIdleEmailClient::OnMessageArrived] Sending to PubSub Engine failed.");
                 }
             }
+
+            ReregisterIdleHandler();
         }
     }
 }

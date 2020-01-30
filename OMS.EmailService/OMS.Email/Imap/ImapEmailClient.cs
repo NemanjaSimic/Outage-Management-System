@@ -83,7 +83,7 @@
                 }
                 catch (Exception)
                 {
-                    Console.WriteLine("Sending to PubSub Engine failed.");
+                    Console.WriteLine("[ImapEmailClient::GetUnreadMessages] Sending to PubSub Engine failed.");
                 }
             }
 

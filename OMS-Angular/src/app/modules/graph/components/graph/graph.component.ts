@@ -61,15 +61,15 @@ export class GraphComponent implements OnInit, OnDestroy {
     this.didLoadGraph = true;
 
     // web api
-    //this.getTopology();
+    this.getTopology();
     this.startConnection();
 
     // local testing
-    this.graphData.nodes = graphMock.nodes;
-    this.graphData.edges = graphMock.edges;
-    this.graphData.backup_edges = graphMock.backup_edges;
+    //this.graphData.nodes = graphMock.nodes;
+    //this.graphData.edges = graphMock.edges;
+    //this.graphData.backup_edges = graphMock.backup_edges;
 
-    this.drawGraph(); // initial test
+    //this.drawGraph(); // initial test
 
     // zoom on + and -
     this.zoomSubscription = fromEvent(document, 'keypress').subscribe(
