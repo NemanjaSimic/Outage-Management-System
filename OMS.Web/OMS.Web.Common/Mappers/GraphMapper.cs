@@ -41,7 +41,7 @@
 
                 graph.Nodes.Add(
                     graphNode.DMSType == PowerTransformerDmsTypeName 
-                    ? (TransformerNode)graphNode
+                    ? graphNode.ToTransformerNode()
                     : graphNode
                 );
             }

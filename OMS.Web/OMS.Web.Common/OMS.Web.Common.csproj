@@ -106,6 +106,7 @@
     <Compile Include="AppSettings.cs" />
     <Compile Include="Exceptions\ICustomExceptionHandler.cs" />
     <Compile Include="Exceptions\TopologyException.cs" />
+    <Compile Include="Extensions\NodeExtensions.cs" />
     <Compile Include="Extensions\OmsGraphExtensions.cs" />
     <Compile Include="Extensions\TransformerNodeExtensions.cs" />
     <Compile Include="Loggers\FileLogger.cs" />
