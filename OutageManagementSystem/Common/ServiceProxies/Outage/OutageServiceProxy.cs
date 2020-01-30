@@ -15,14 +15,14 @@ namespace Outage.Common.ServiceProxies.Outage
         {
         }
 
-        public List<OutageData> GetActiveOutages()
+        public List<ActiveOutage> GetActiveOutages()
         {
-            List<OutageData> outageModels = null;
+            List<ActiveOutage> outageModels = null;
             try
             {
                 outageModels = Channel.GetActiveOutages();
             }
-            catch(Exception e)
+            catch (Exception e)
             {
                 string message = "Exception in GetActiveOutages() proxy method.";
                 LoggerWrapper.Instance.LogError(message, e);
@@ -32,9 +32,9 @@ namespace Outage.Common.ServiceProxies.Outage
             return outageModels;
         }
 
-        public List<OutageData> GetArchivedOutages()
+        public List<ArchivedOutage> GetArchivedOutages()
         {
-            List<OutageData> outageModels = null;
+            List<ArchivedOutage> outageModels = null;
             try
             {
                 outageModels = Channel.GetArchivedOutages();
