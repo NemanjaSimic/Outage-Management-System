@@ -51,10 +51,18 @@ namespace Outage.SCADA.SCADAService
         #region Public Members
         public void Start()
         {
-            ModbusSimulatorHandler.StartModbusSimulator();
-            functionExecutor.StartExecutorThread();
-            StartDataAcquisition();
-            StartHosts();
+            try
+            {
+                ModbusSimulatorHandler.StartModbusSimulator();
+                functionExecutor.StartExecutorThread();
+                StartDataAcquisition();
+                StartHosts();
+            }
+            catch (Exception e)
+            {
+                Logger.LogError("Exception in Start()", e);
+                Console.WriteLine(e.Message);
+            }
         }
 
         public void Dispose()

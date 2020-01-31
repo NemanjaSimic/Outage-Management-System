@@ -186,6 +186,7 @@ namespace Outage.SCADA.SCADAData.Repository
                     }
                 }
 
+                //IMPORT ALL measurements from NMS and create PointItems for them
                 CreatePointItemsFromNetworkModelMeasurements(out Dictionary<long, ISCADAModelPointItem> incomingPointItems);
 
                 //ORDER IS IMPORTANT due to IncomingAddressToGidMap validity: DELETE => UPDATE => INSERT

@@ -61,8 +61,8 @@ namespace Outage.SCADA.ModBus.Acquisitor
 
         private void AcquisitionThread()
         {
-            ushort quantity = 1;
-            ushort length = 6;
+            //ushort length = 6;
+            //ushort quantity;
 
             try
             {
@@ -80,46 +80,56 @@ namespace Outage.SCADA.ModBus.Acquisitor
                     }
 
                     //MODEL UPDATE -> will swap incoming and current SCADAModel in commit step, so we have to save the reference locally
-                    Dictionary<long, ISCADAModelPointItem> currentScadaModel = scadaModel.CurrentScadaModel;
+                    Dictionary<PointType, Dictionary<ushort, long>> currentAddressToGidMap = scadaModel.CurrentAddressToGidMap;
 
-                    foreach (ISCADAModelPointItem pointItem in currentScadaModel.Values)
+                    foreach (PointType pointType in currentAddressToGidMap.Keys)
                     {
-                        ushort address = pointItem.Address;
+                        ushort length = 6;  //expected by protocol
+                        ushort startAddress = 1;
+                        ushort quantity;
+
                         ModbusFunction modbusFunction;
 
-                        //DIGITAL_OUTPUT
-                        if (pointItem.RegisterType == PointType.DIGITAL_OUTPUT)
+                        if (pointType == PointType.DIGITAL_OUTPUT)
                         {
+                            quantity = (ushort)currentAddressToGidMap[PointType.DIGITAL_OUTPUT].Count;
+
                             ModbusReadCommandParameters mdb_read = new ModbusReadCommandParameters(length,
                                                                                                    (byte)ModbusFunctionCode.READ_COILS,
-                                                                                                   address, 
+                                                                                                   startAddress,
                                                                                                    quantity);
                             modbusFunction = FunctionFactory.CreateModbusFunction(mdb_read);
                         }
                         //DIGITAL_INPUT
-                        else if (pointItem.RegisterType == PointType.DIGITAL_INPUT)
+                        else if (pointType == PointType.DIGITAL_INPUT)
                         {
+                            quantity = (ushort)currentAddressToGidMap[PointType.DIGITAL_INPUT].Count;
+
                             ModbusReadCommandParameters mdb_read = new ModbusReadCommandParameters(length,
                                                                                                    (byte)ModbusFunctionCode.READ_DISCRETE_INPUTS,
-                                                                                                   address,
+                                                                                                   startAddress,
                                                                                                    quantity);
                             modbusFunction = FunctionFactory.CreateModbusFunction(mdb_read);
                         }
                         //ANALOG_OUTPUT
-                        else if (pointItem.RegisterType == PointType.ANALOG_OUTPUT)
+                        else if (pointType == PointType.ANALOG_OUTPUT)
                         {
+                            quantity = (ushort)currentAddressToGidMap[PointType.ANALOG_OUTPUT].Count;
+
                             ModbusReadCommandParameters mdb_read = new ModbusReadCommandParameters(length,
                                                                                                    (byte)ModbusFunctionCode.READ_HOLDING_REGISTERS,
-                                                                                                   address,
+                                                                                                   startAddress,
                                                                                                    quantity);
                             modbusFunction = FunctionFactory.CreateModbusFunction(mdb_read);
                         }
                         //ANALOG_INPUT
-                        else if (pointItem.RegisterType == PointType.ANALOG_INPUT)
+                        else if (pointType == PointType.ANALOG_INPUT)
                         {
+                            quantity = (ushort)currentAddressToGidMap[PointType.ANALOG_INPUT].Count;
+
                             ModbusReadCommandParameters mdb_read = new ModbusReadCommandParameters(length,
                                                                                                    (byte)ModbusFunctionCode.READ_INPUT_REGISTERS,
-                                                                                                   address,
+                                                                                                   startAddress,
                                                                                                    quantity);
                             modbusFunction = FunctionFactory.CreateModbusFunction(mdb_read);
                         }
@@ -133,7 +143,7 @@ namespace Outage.SCADA.ModBus.Acquisitor
 
                         if (this.functionExecutor.EnqueueCommand(modbusFunction))
                         {
-                            Logger.LogDebug($"Modbus function enquided. Point type is {pointItem.RegisterType}");
+                            Logger.LogDebug($"Modbus function enquided. Point type is {pointType}, quantity {quantity}.");
                         }
                     }
 
