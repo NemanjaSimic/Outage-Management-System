@@ -9,6 +9,6 @@ namespace CECommon.Interfaces
     public interface IModelTopologyServis
     {
         List<ITopology> CreateTopology();
-        void UpdateTopology(long startingGid);
+        List<ITopology> UpdateTopology(long topologyElement);
     }
 }

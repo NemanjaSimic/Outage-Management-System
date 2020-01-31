@@ -45,10 +45,10 @@ namespace CalculationEngineService
             modelManager = new NMSManager();
 
             sCADAResultProvider = new SCADAResultHandler();
+            cacheProvider = new CacheProvider();
             modelProvider = new ModelProvider(modelManager);
             topologyProvider = new TopologyProvider(modelTopologyServis);
             webTopologyModelProvider = new WebTopologyModelProvider(webTopologyBuilder);
-            cacheProvider = new CacheProvider();
             topologyPublisher = new TopologyPublisher();
             InitializeHosts();
         }
