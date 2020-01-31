@@ -5,11 +5,11 @@
   <PropertyGroup>
     <Configuration Condition=" '$(Configuration)' == '' ">Debug</Configuration>
     <Platform Condition=" '$(Platform)' == '' ">AnyCPU</Platform>
-    <ProjectGuid>{6F2AB5E9-8313-4954-9D1C-EDBB772FD276}</ProjectGuid>
+    <ProjectGuid>{F2CFC053-2CFC-41F4-8FCC-2887E4757E87}</ProjectGuid>
     <OutputType>Library</OutputType>
     <AppDesignerFolder>Properties</AppDesignerFolder>
-    <RootNamespace>OutageManagementService</RootNamespace>
-    <AssemblyName>OutageManagementService</AssemblyName>
+    <RootNamespace>OutageDatabase</RootNamespace>
+    <AssemblyName>OutageDatabase</AssemblyName>
     <TargetFrameworkVersion>v4.8</TargetFrameworkVersion>
     <FileAlignment>512</FileAlignment>
     <Deterministic>true</Deterministic>
@@ -42,9 +42,7 @@
     </Reference>
     <Reference Include="System" />
     <Reference Include="System.ComponentModel.DataAnnotations" />
-    <Reference Include="System.Configuration" />
     <Reference Include="System.Core" />
-    <Reference Include="System.ServiceModel" />
     <Reference Include="System.Xml.Linq" />
     <Reference Include="System.Data.DataSetExtensions" />
     <Reference Include="Microsoft.CSharp" />
@@ -53,29 +51,18 @@
     <Reference Include="System.Xml" />
   </ItemGroup>
   <ItemGroup>
-    <Compile Include="Calling\CallingService.cs" />
-    <Compile Include="OutageModel.cs" />
-    <Compile Include="OutageManagementService.cs" />
-    <Compile Include="Outage\OutageService.cs" />
+    <Compile Include="OutageContext.cs" />
     <Compile Include="Properties\AssemblyInfo.cs" />
-  </ItemGroup>
-  <ItemGroup>
-    <ProjectReference Include="..\..\CalculationEngineService\CECommon\CECommon.csproj">
-      <Project>{E1D2D69D-E03D-4FD7-8E4F-0FC95B68F0DD}</Project>
-      <Name>CECommon</Name>
-    </ProjectReference>
-    <ProjectReference Include="..\..\Common\Common.csproj">
-      <Project>{892CBE15-9ED7-4540-81FA-0EAABA592138}</Project>
-      <Name>Common</Name>
-    </ProjectReference>
-    <ProjectReference Include="..\OutageDatabase\OutageDatabase.csproj">
-      <Project>{F2CFC053-2CFC-41F4-8FCC-2887E4757E87}</Project>
-      <Name>OutageDatabase</Name>
-    </ProjectReference>
   </ItemGroup>
   <ItemGroup>
     <None Include="App.config" />
     <None Include="packages.config" />
+  </ItemGroup>
+  <ItemGroup>
+    <ProjectReference Include="..\..\Common\Common.csproj">
+      <Project>{892CBE15-9ED7-4540-81FA-0EAABA592138}</Project>
+      <Name>Common</Name>
+    </ProjectReference>
   </ItemGroup>
   <Import Project="$(MSBuildToolsPath)\Microsoft.CSharp.targets" />
   <Target Name="EnsureNuGetPackageBuildImports" BeforeTargets="PrepareForBuild">

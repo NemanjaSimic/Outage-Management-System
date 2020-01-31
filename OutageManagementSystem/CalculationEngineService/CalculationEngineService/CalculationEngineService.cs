@@ -30,8 +30,16 @@ namespace CalculationEngineService
 
         public void Start()
         {
-            StartHosts();
-            SubscribeToSCADA();
+            try
+            {
+                StartHosts();
+                SubscribeToSCADA();
+            }
+            catch (Exception e)
+            {
+                Logger.LogError("Exception in Start()", e);
+                Console.WriteLine(e.Message);
+            }
         }
 
         public void Dispose()

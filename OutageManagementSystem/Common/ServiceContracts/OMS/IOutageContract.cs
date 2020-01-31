@@ -14,10 +14,10 @@ namespace Outage.Common.ServiceContracts.OMS
         bool ReportOutage(long elementGid);
 
         [OperationContract]
-        List<OutageData> GetActiveOutages();
+        List<ActiveOutage> GetActiveOutages();
 
         [OperationContract]
-        List<OutageData> GetArchivedOutages();
+        List<ArchivedOutage> GetArchivedOutages();
 
     }
 }
