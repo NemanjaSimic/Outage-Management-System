@@ -38,6 +38,12 @@ namespace Outage.SCADA.ModBus.Connection
         public SCADAModel SCADAModel { get; private set; }
         public ModbusClient ModbusClient { get; private set; }
 
+        private Dictionary<long, IModbusData> scadaCache;
+        public Dictionary<long, IModbusData> SCADACache
+        {
+            get { return scadaCache ?? (scadaCache = new Dictionary<long, IModbusData>()); }
+        }
+
         #region Proxies
 
         private PublisherProxy publisherProxy = null;
@@ -174,6 +180,9 @@ namespace Outage.SCADA.ModBus.Connection
         {
             bool success;
             ushort length = 6;
+
+            SCADACache.Clear();
+
             try
             {
                 foreach(long measurementGID in measurementGids)
@@ -226,6 +235,7 @@ namespace Outage.SCADA.ModBus.Connection
         private void ConnectToModbusClient()
         {
             int numberOfTries = 0;
+            int sleepInterval = 500;
 
             string message = $"Connecting to modbus client...";
             Console.WriteLine(message);
@@ -246,9 +256,15 @@ namespace Outage.SCADA.ModBus.Connection
                 {
                     numberOfTries++;
                     Logger.LogDebug($"Connecting try number: {numberOfTries}.");
-                    Thread.Sleep(500);
+
+                    if (numberOfTries >= 100)
+                    {
+                        sleepInterval = 1000;
+                    }
+
+                    Thread.Sleep(sleepInterval);
                 }
-                else if (!ModbusClient.Connected && numberOfTries == 40)
+                else if (!ModbusClient.Connected && numberOfTries == int.MaxValue)
                 {
                     string timeoutMessage = "Failed to connect to Modbus client by exceeding the maximum number of connection retries.";
                     Logger.LogError(timeoutMessage);
@@ -328,25 +344,82 @@ namespace Outage.SCADA.ModBus.Connection
                 Logger.LogWarn(message, e);
             }
 
+            if (command is IReadAnalogModusFunction || command is IReadDiscreteModbusFunction)
+            {
+                WriteToSCADACache(command);
+            }
+
+        }
+
+        private void WriteToSCADACache(IModbusFunction command)
+        {
             if (command is IReadAnalogModusFunction readAnalogCommand)
             {
+                Dictionary<long, AnalogModbusData> publicationData = new Dictionary<long, AnalogModbusData>();
+
                 Dictionary<long, AnalogModbusData> data = readAnalogCommand.Data;
 
-                //if data is empty that means that there are no new values in the current acquisition cycle
-                if (data != null && data.Count > 0)
+                if (data == null)
                 {
-                    SCADAMessage scadaMessage = new MultipleAnalogValueSCADAMessage(data);
+                    throw new NullReferenceException();
+                }
+
+                foreach (long gid in data.Keys)
+                {
+                    if (!SCADACache.ContainsKey(gid))
+                    {
+                        SCADACache.Add(gid, data[gid]);
+                        publicationData.Add(gid, data[gid]);
+                    }
+                    else if (SCADACache[gid] is AnalogModbusData analogCacheItem)
+                    {
+                        if (analogCacheItem.Value != data[gid].Value)
+                        {
+                            SCADACache[gid] = data[gid];
+                            publicationData.Add(gid, SCADACache[gid] as AnalogModbusData);
+                        }
+                    }
+                }
+
+                //if data is empty that means that there are no new values in the current acquisition cycle
+                if (publicationData.Count > 0)
+                {
+                    SCADAMessage scadaMessage = new MultipleAnalogValueSCADAMessage(publicationData);
                     PublishScadaData(Topic.MEASUREMENT, scadaMessage);
                 }
             }
             else if (command is IReadDiscreteModbusFunction readDiscreteCommand)
             {
+                Dictionary<long, DiscreteModbusData> publicationData = new Dictionary<long, DiscreteModbusData>();
+
                 Dictionary<long, DiscreteModbusData> data = readDiscreteCommand.Data;
 
-                //if data is empty that means that there are no new values in the current acquisition cycle
-                if (data != null && data.Count > 0)
+                if (data == null)
                 {
-                    SCADAMessage scadaMessage = new MultipleDiscreteValueSCADAMessage(data);
+                    throw new NullReferenceException();
+                }
+
+                foreach (long gid in data.Keys)
+                {
+                    if(!SCADACache.ContainsKey(gid))
+                    {
+                        SCADACache.Add(gid, data[gid]);
+                        publicationData.Add(gid, data[gid]);
+                    }
+                    else if (SCADACache[gid] is DiscreteModbusData discreteCacheItem)
+                    {
+                        if (discreteCacheItem.Value != data[gid].Value)
+                        {
+                            SCADACache[gid] = data[gid];
+                            publicationData.Add(gid, SCADACache[gid] as DiscreteModbusData);
+                        }
+                    }
+                }
+
+                //if data is empty that means that there are no new values in the current acquisition cycle
+                if (publicationData.Count > 0)
+                {
+                    SCADAMessage scadaMessage = new MultipleDiscreteValueSCADAMessage(publicationData);
                     PublishScadaData(Topic.SWITCH_STATUS, scadaMessage);
                 }
             }

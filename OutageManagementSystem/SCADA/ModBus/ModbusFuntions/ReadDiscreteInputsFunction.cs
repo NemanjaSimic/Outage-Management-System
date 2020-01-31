@@ -67,21 +67,18 @@ namespace Outage.SCADA.ModBus.ModbusFuntions
                     Logger.LogError(message);
                     throw new Exception(message);
                 }
-                
-                if(pointItem.CurrentValue != value)
-                {
-                    pointItem.CurrentValue = value; 
-                
-                    bool alarmChanged = pointItem.SetAlarms();
-                    if (alarmChanged)
-                    {
-                        Logger.LogInfo($"Alarm for Point [Gid: 0x{pointItem.Gid:X16}, Point type: {PointType.DIGITAL_INPUT}, Address: {pointItem.Address}] set to {pointItem.Alarm}.");
-                    }
 
-                    DiscreteModbusData digitalData = new DiscreteModbusData(value, pointItem.Alarm);
-                    Data.Add(gid, digitalData);
-                    Logger.LogDebug($"ReadDiscreteInputsFunction execute => Current value: {value} from address: {address}, point type: {PointType.DIGITAL_INPUT}, gid: 0x{gid:X16}.");
+                pointItem.CurrentValue = value;
+
+                bool alarmChanged = pointItem.SetAlarms();
+                if (alarmChanged)
+                {
+                    Logger.LogInfo($"Alarm for Point [Gid: 0x{pointItem.Gid:X16}, Point type: {PointType.DIGITAL_INPUT}, Address: {pointItem.Address}] set to {pointItem.Alarm}.");
                 }
+
+                DiscreteModbusData digitalData = new DiscreteModbusData(value, pointItem.Alarm);
+                Data.Add(gid, digitalData);
+                Logger.LogDebug($"ReadDiscreteInputsFunction execute => Current value: {value} from address: {address}, point type: {PointType.DIGITAL_INPUT}, gid: 0x{gid:X16}.");
             }
 
             Logger.LogDebug($"ReadDiscreteInputsFunction executed SUCCESSFULLY. StartAddress: {startAddress}, Quantity: {quantity}");

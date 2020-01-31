@@ -68,21 +68,18 @@ namespace Outage.SCADA.ModBus.ModbusFuntions
                     throw new Exception(message);
                 }
 
-                if (pointItem.CurrentValue != value)
+                pointItem.CurrentValue = value;
+
+                bool alarmChanged = pointItem.SetAlarms();
+
+                if (alarmChanged)
                 {
-                    pointItem.CurrentValue = value;
-
-                    bool alarmChanged = pointItem.SetAlarms();
-
-                    if (alarmChanged)
-                    {
-                        Logger.LogInfo($"Alarm for Point [Gid: 0x{pointItem.Gid:X16}, Address: {pointItem.Address}] set to {pointItem.Alarm}.");
-                    }
-
-                    DiscreteModbusData digitalData = new DiscreteModbusData(value, pointItem.Alarm);
-                    Data.Add(gid, digitalData);
-                    Logger.LogDebug($"ReadCoilsFunction execute => Current value: {value} from address: {address}, gid: 0x{gid:X16}.");
+                    Logger.LogInfo($"Alarm for Point [Gid: 0x{pointItem.Gid:X16}, Address: {pointItem.Address}] set to {pointItem.Alarm}.");
                 }
+
+                DiscreteModbusData digitalData = new DiscreteModbusData(value, pointItem.Alarm);
+                Data.Add(gid, digitalData);
+                Logger.LogDebug($"ReadCoilsFunction execute => Current value: {value} from address: {address}, gid: 0x{gid:X16}.");
             }
 
             Logger.LogDebug($"ReadCoilsFunction executed SUCCESSFULLY. StartAddress: {startAddress}, Quantity: {quantity}");

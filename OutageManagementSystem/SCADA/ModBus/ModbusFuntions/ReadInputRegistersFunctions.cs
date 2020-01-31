@@ -70,21 +70,17 @@ namespace Outage.SCADA.ModBus.ModbusFuntions
                 }
 
                 float eguValue = pointItem.RawToEguValueConversion(rawValue);
+                pointItem.CurrentEguValue = eguValue;
 
-                if(pointItem.CurrentEguValue != eguValue)
+                bool alarmChanged = pointItem.SetAlarms();
+                if (alarmChanged)
                 {
-                    pointItem.CurrentEguValue = eguValue;
-
-                    bool alarmChanged = pointItem.SetAlarms();
-                    if (alarmChanged)
-                    {
-                        Logger.LogInfo($"Alarm for Point [Gid: 0x{pointItem.Gid:X16}, Address: {pointItem.Address}] set to {pointItem.Alarm}.");
-                    }
-
-                    AnalogModbusData analogData = new AnalogModbusData(pointItem.CurrentEguValue, pointItem.Alarm);
-                    Data.Add(gid, analogData);
-                    Logger.LogDebug($"ReadInputRegistersFunction execute => Current value: {pointItem.CurrentEguValue} from address: {address}, gid: 0x{gid:X16}.");
+                    Logger.LogInfo($"Alarm for Point [Gid: 0x{pointItem.Gid:X16}, Address: {pointItem.Address}] set to {pointItem.Alarm}.");
                 }
+
+                AnalogModbusData analogData = new AnalogModbusData(pointItem.CurrentEguValue, pointItem.Alarm);
+                Data.Add(gid, analogData);
+                Logger.LogDebug($"ReadInputRegistersFunction execute => Current value: {pointItem.CurrentEguValue} from address: {address}, gid: 0x{gid:X16}.");
             }
 
             Logger.LogDebug($"ReadInputRegistersFunction executed SUCCESSFULLY. StartAddress: {startAddress}, Quantity: {quantity}");

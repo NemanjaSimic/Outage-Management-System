@@ -85,54 +85,51 @@ namespace Outage.SCADA.ModBus.Acquisitor
                     foreach (PointType pointType in currentAddressToGidMap.Keys)
                     {
                         ushort length = 6;  //expected by protocol
-                        ushort address;
+                        ushort startAddress = 1;
                         ushort quantity;
+
                         ModbusFunction modbusFunction;
 
                         if (pointType == PointType.DIGITAL_OUTPUT)
                         {
-                            address = 1;
-                            quantity = (ushort)currentAddressToGidMap.Count;
+                            quantity = (ushort)currentAddressToGidMap[PointType.DIGITAL_OUTPUT].Count;
 
                             ModbusReadCommandParameters mdb_read = new ModbusReadCommandParameters(length,
                                                                                                    (byte)ModbusFunctionCode.READ_COILS,
-                                                                                                   address,
+                                                                                                   startAddress,
                                                                                                    quantity);
                             modbusFunction = FunctionFactory.CreateModbusFunction(mdb_read);
                         }
                         //DIGITAL_INPUT
                         else if (pointType == PointType.DIGITAL_INPUT)
                         {
-                            address = 1;
-                            quantity = (ushort)currentAddressToGidMap.Count;
+                            quantity = (ushort)currentAddressToGidMap[PointType.DIGITAL_INPUT].Count;
 
                             ModbusReadCommandParameters mdb_read = new ModbusReadCommandParameters(length,
                                                                                                    (byte)ModbusFunctionCode.READ_DISCRETE_INPUTS,
-                                                                                                   address,
+                                                                                                   startAddress,
                                                                                                    quantity);
                             modbusFunction = FunctionFactory.CreateModbusFunction(mdb_read);
                         }
                         //ANALOG_OUTPUT
                         else if (pointType == PointType.ANALOG_OUTPUT)
                         {
-                            address = 1;
-                            quantity = (ushort)currentAddressToGidMap.Count;
+                            quantity = (ushort)currentAddressToGidMap[PointType.ANALOG_OUTPUT].Count;
 
                             ModbusReadCommandParameters mdb_read = new ModbusReadCommandParameters(length,
                                                                                                    (byte)ModbusFunctionCode.READ_HOLDING_REGISTERS,
-                                                                                                   address,
+                                                                                                   startAddress,
                                                                                                    quantity);
                             modbusFunction = FunctionFactory.CreateModbusFunction(mdb_read);
                         }
                         //ANALOG_INPUT
                         else if (pointType == PointType.ANALOG_INPUT)
                         {
-                            address = 1;
-                            quantity = (ushort)currentAddressToGidMap.Count;
+                            quantity = (ushort)currentAddressToGidMap[PointType.ANALOG_INPUT].Count;
 
                             ModbusReadCommandParameters mdb_read = new ModbusReadCommandParameters(length,
                                                                                                    (byte)ModbusFunctionCode.READ_INPUT_REGISTERS,
-                                                                                                   address,
+                                                                                                   startAddress,
                                                                                                    quantity);
                             modbusFunction = FunctionFactory.CreateModbusFunction(mdb_read);
                         }
