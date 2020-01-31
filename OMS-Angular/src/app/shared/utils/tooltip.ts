@@ -48,7 +48,7 @@ export const addGraphTooltip = (cy, node) => {
           if (node.data('state') == "active") {
             const command: SwitchCommand = {
               guid,
-              type: SwitchCommandType.TURN_OFF
+              command: SwitchCommandType.TURN_OFF
             };
 
             node.sendSwitchCommand(command);
@@ -59,7 +59,7 @@ export const addGraphTooltip = (cy, node) => {
 
             const command: SwitchCommand = {
               guid,
-              type: SwitchCommandType.TURN_ON
+              command: SwitchCommandType.TURN_ON
             };
 
             node.sendSwitchCommand(command);
