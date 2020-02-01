@@ -19,7 +19,7 @@ export const addGraphTooltip = (cy, node) => {
       // node information - mozemo preko stringa da dodamo u div
       const div = document.createElement('div');
       div.innerHTML = graphTooltipBody
-        .replace("[[id]]", node.data('id'))
+        .replace("[[id]]", (+node.data('id')).toString(16))
         .replace("[[type]]", node.data('dmsType'))
         .replace("[[name]]", node.data('name'))
         .replace("[[mrid]]", node.data('mrid'))
