@@ -54,7 +54,8 @@
                     Relation graphRelation = new Relation
                     {
                         SourceNodeId = keyValue.Key.ToString(),
-                        TargetNodeId = targetNodeId.ToString()
+                        TargetNodeId = targetNodeId.ToString(),
+                        IsActive = topologyModel.Nodes[keyValue.Key].IsActive
                     };
 
                     graph.Relations.Add(graphRelation);
