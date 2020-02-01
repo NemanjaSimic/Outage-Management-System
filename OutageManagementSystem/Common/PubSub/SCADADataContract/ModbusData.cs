@@ -10,20 +10,19 @@ namespace Outage.Common.PubSub.SCADADataContract
     [DataContract]
     public class AnalogModbusData : IModbusData
     {
-        public AnalogModbusData(double value, AlarmType alarm)
+        public AnalogModbusData(float value, AlarmType alarm)
         {
             Value = value;
             Alarm = alarm;
         }
 
         [DataMember]
-        public double Value { get; private set; }
+        public float Value { get; private set; }
 
         [DataMember]
         public AlarmType Alarm { get; private set; }
     }
 
-    //[Serializable]
     [DataContract]
     public class DiscreteModbusData : IModbusData
     {
