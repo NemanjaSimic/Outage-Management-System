@@ -2,10 +2,6 @@
 using Outage.Common.ServiceContracts.SCADA;
 using Outage.Common.ServiceProxies;
 using System;
-using System.Collections.Generic;
-using System.Linq;
-using System.Text;
-using System.Threading.Tasks;
 
 namespace SCADACommanding
 {

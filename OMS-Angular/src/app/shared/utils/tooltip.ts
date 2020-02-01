@@ -29,8 +29,8 @@ export const addGraphTooltip = (cy, node) => {
         .replace("[[nominalVoltage]]", node.data('nominalVoltage'));
 
       // button - mozemo i preko document.createElement() pa appendChild()
-      if (node.data('dmsType') == "LOADBREAKSWITCH" || node.data('dmsType') == "DISCONNECTOR" 
-            || node.data('dmsType') == "BREAKER" || node.data('dmsType') == "FUSE") {
+      //if (node.data('dmsType') == "LOADBREAKSWITCH" || node.data('dmsType') == "DISCONNECTOR" 
+        //    || node.data('dmsType') == "BREAKER" || node.data('dmsType') == "FUSE") {
         const button = document.createElement('button');
 
         if (node.data('state') == "active") {
@@ -53,8 +53,8 @@ export const addGraphTooltip = (cy, node) => {
 
             node.sendSwitchCommand(command);
 
-            node.data('state', 'inactive');
-            button.innerHTML = 'Switch on';
+            //node.data('state', 'inactive');
+            //button.innerHTML = 'Switch on';
           } else {
 
             const command: SwitchCommand = {
@@ -64,14 +64,14 @@ export const addGraphTooltip = (cy, node) => {
 
             node.sendSwitchCommand(command);
 
-            node.data('state', 'active');
-            button.innerHTML = 'Switch off';
+           // node.data('state', 'active');
+            //button.innerHTML = 'Switch off';
           }
 
         });
 
         div.appendChild(button);
-      }
+     // }
 
       return div;
     },

@@ -30,63 +30,44 @@ namespace Topology
 
             foreach (var rootElement in roots)
             {
-                topologyModel.Add(topologyBuilder.CreateGraphTopology(rootElement));
+                ITopology newTopology = topologyBuilder.CreateGraphTopology(rootElement);
+                topologyModel.Add(CalulateLoadFlow(rootElement, newTopology));
             }
-
+            
             return topologyModel;
         }
 
-        public List<ITopology> UpdateTopology(long elementGid)
+        public ITopology CalulateLoadFlow(long startingElementGid, ITopology topology)
         {
-            logger.LogDebug("Updating topology started.");
-            List<ITopology> topologies = Provider.Instance.TopologyProvider.GetTopologies();
-            List<ITopology> tempTopologies = new List<ITopology>(topologies);
-            ITopology topology = new TopologyModel();
+            logger.LogDebug("CalulateLoadFlow started.");
             Stack<long> stack = new Stack<long>();
 
-            foreach (var topologyModel in tempTopologies)
+            if (topology.GetElementByGid(startingElementGid, out ITopologyElement element))
             {
-                if (topologyModel.GetElementByGid(elementGid, out ITopologyElement firstTopologyElement))
+                stack.Push(startingElementGid);
+                while (stack.Count > 0)
                 {
-                    topologies.Remove(topologyModel);
-                    topology = topologyModel;
-                    stack.Push(elementGid);
-                    while (stack.Count > 0)
+                    element = topology.TopologyElements[stack.Pop()];
+                    //element.IsActive = IsElementActive(element, topology);
+                    IsElementActive(element, topology);
+
+                    if (!element.IsActive)
                     {
-                        ITopologyElement element = topology.TopologyElements[stack.Pop()];
-                        foreach (var measurement in element.Measurements)
-                        {
-                            if (measurement is DiscreteMeasurement discreteMeasurement)
-                            {
-
-                                if (Provider.Instance.CacheProvider.GetDiscreteValue(measurement.Id) == true)
-                                {
-                                    topology.TopologyElements[element.Id].IsActive = false;
-                                    TurnOffAllElements(element.Id, topology);
-                                    break;
-                                }
-                                else
-                                {
-                                    topology.TopologyElements[element.Id].IsActive = true;
-                                }
-                            }
-                        }
-
+                        TurnOffAllElements(element.Id, topology);                 
+                    }
+                    else
+                    {
                         foreach (var child in element.SecondEnd)
                         {
                             stack.Push(child);
                         }
-
                     }
-                    break;
                 }
             }
-            topologies.Add(topology);
+ 
             logger.LogDebug("Updating topology finished.");
-            return topologies;
-
+            return topology;
         }
-
         private void TurnOffAllElements(long topologyElement, ITopology topology)
         {
             Stack<long> stack = new Stack<long>();
@@ -100,6 +81,53 @@ namespace Topology
                     stack.Push(child);
                 }
             }
+        }
+        public List<ITopology> UpdateLoadFlow(long startingSignalGid, List<ITopology> topologies)
+        {
+            List<ITopology> retVal = new List<ITopology>(topologies);
+            foreach (var topology in topologies)
+            {
+                if (topology.GetElementByGid(startingSignalGid, out ITopologyElement element))
+                {
+                    retVal.Remove(topology);
+                    retVal.Add(CalulateLoadFlow(startingSignalGid, topology));
+                    break;
+                }
+            }
+
+            return retVal;
+        }
+        private bool IsElementActive(ITopologyElement element, ITopology topology)
+        {
+            bool isActive = true;
+            element.IsActive = true;
+            if (element is Field field)
+            {
+                foreach (var member in field.Members)
+                {                    
+                    if (topology.GetElementByGid(member, out ITopologyElement memberElement) && !IsElementActive(memberElement, topology))
+                    {
+                        isActive = false;
+                        element.IsActive = false;
+                    }
+                }
+            }
+            else
+            {
+                foreach (var measurement in element.Measurements)
+                {
+                    if (measurement is DiscreteMeasurement discreteMeasurement)
+                    {
+                        if (Provider.Instance.CacheProvider.GetDiscreteValue(measurement.Id) == true)
+                        {
+                            isActive = false;
+                            element.IsActive = false;
+                        }
+                        break;
+                    }
+                }
+            }
+            return isActive;
         }
     }
 }

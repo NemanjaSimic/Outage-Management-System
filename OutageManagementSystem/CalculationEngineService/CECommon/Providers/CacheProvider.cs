@@ -14,12 +14,16 @@ namespace CECommon.Providers
     {
 		private ILogger logger = LoggerWrapper.Instance;
 		private Dictionary<long, AnalogMeasurement> analogMeasurements;
+		//private Dictionary<long, AnalogMeasurementInfo> analogMeasurements;
 		private Dictionary<long, DiscreteMeasurement> discreteMeasurements;
-        public CacheProvider()
-		{ 
+		//private Dictionary<long, DiscreteMeasurementInfo> discreteMeasurements;
+		public CacheProvider()
+		{
 			analogMeasurements = new Dictionary<long, AnalogMeasurement>();
-			discreteMeasurements = new Dictionary<long, DiscreteMeasurement>();     
-            Provider.Instance.CacheProvider = this;
+			//analogMeasurements = new Dictionary<long, AnalogMeasurementInfo>();
+			discreteMeasurements = new Dictionary<long, DiscreteMeasurement>();
+			//discreteMeasurements = new Dictionary<long, DiscreteMeasurementInfo>();
+			Provider.Instance.CacheProvider = this;
         }
 
 		public DiscreteMeasurementDelegate DiscreteMeasurementDelegate { get; set; }
@@ -90,7 +94,7 @@ namespace CECommon.Providers
 					measurement.CurrentOpen = true;
 				}
 				discreteMeasurements[measurementGid] = measurement;
-				DiscreteMeasurementDelegate?.Invoke(measurement.Id);
+				DiscreteMeasurementDelegate?.Invoke(measurement.ElementId);
 			}
 			else
 			{
@@ -105,5 +109,30 @@ namespace CECommon.Providers
 			}
 		}
 
+		struct AnalogMeasurementInfo
+		{
+			public long Gid;
+			public long ElementGid;
+			public float Value;
+			public AnalogMeasurementInfo(long Gid, long ElementGid, float Value)
+			{
+				this.Gid = Gid;
+				this.ElementGid = ElementGid;
+				this.Value = Value;
+			}
+		}
+
+		struct DiscreteMeasurementInfo
+		{
+			public long Gid;
+			public long ElementGid;
+			public bool IsOpen;
+			public DiscreteMeasurementInfo(long Gid, long ElementGid, bool IsOpen)
+			{
+				this.Gid = Gid;
+				this.ElementGid = ElementGid;
+				this.IsOpen = IsOpen;
+			}
+		}
 	}
 }

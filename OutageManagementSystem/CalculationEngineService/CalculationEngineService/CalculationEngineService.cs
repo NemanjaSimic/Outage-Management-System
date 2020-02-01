@@ -42,10 +42,10 @@ namespace CalculationEngineService
             topologyBuilder = new GraphBuilder();
             modelTopologyServis = new TopologyManager(topologyBuilder);
             webTopologyBuilder = new WebTopologyBuilder();
-            modelManager = new NMSManager();
 
             sCADAResultProvider = new SCADAResultHandler();
             cacheProvider = new CacheProvider();
+            modelManager = new NMSManager();
             modelProvider = new ModelProvider(modelManager);
             topologyProvider = new TopologyProvider(modelTopologyServis);
             webTopologyModelProvider = new WebTopologyModelProvider(webTopologyBuilder);

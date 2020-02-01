@@ -19,19 +19,16 @@ namespace TopologyBuilder
         private List<Field> fields;
         private HashSet<long> visited;
         private Stack<long> stack;
-        private Stopwatch stopwatch = new Stopwatch();
         private Dictionary<long, ITopologyElement> elements;
-        private Dictionary<long, IMeasurement> measurements;
         private Dictionary<long, List<long>> connections;
         #endregion
 
         public ITopology CreateGraphTopology(long firstElementGid)
         { 
             elements = Provider.Instance.ModelProvider.GetElementModels();
-            measurements = Provider.Instance.ModelProvider.GetMeasurementModels();
             connections = Provider.Instance.ModelProvider.GetConnections();
             
-            logger.LogInfo($"Creating graph topology from first element with GID {firstElementGid}.");
+            logger.LogInfo($"Creating topology from first element with GID {firstElementGid.ToString("X")}.");
 
             visited = new HashSet<long>();
             stack = new Stack<long>();
@@ -39,7 +36,7 @@ namespace TopologyBuilder
 
             ITopology topology = new TopologyModel();
             topology.FirstNode = firstElementGid;
- 
+            elements[firstElementGid].IsActive = true;
             stack.Push(firstElementGid);
 
             while (stack.Count > 0)
@@ -50,7 +47,7 @@ namespace TopologyBuilder
                     visited.Add(currentElementId);
                 }
                 ITopologyElement currentElement = elements[currentElementId];
-
+              
                 foreach (var element in GetReferencedElementsWithoutIgnorables(currentElementId))
                 {
                     if (elements.ContainsKey(element))
@@ -58,25 +55,12 @@ namespace TopologyBuilder
                         ConnectTwoNodes(element, currentElement);
                         stack.Push(element);
                     }
-                    else if (measurements.ContainsKey(element))
+                    else
                     {
-                        IMeasurement newMeasurement = measurements[element];
-                        newMeasurement.ElementId = currentElement.Id;
-                        currentElement.Measurements.Add(newMeasurement);
-                        //if (Enum.TryParse<AnalogMeasurementType>(newMeasurement.GetMeasurementType(), out AnalogMeasurementType type))
-                        //{
-                            //SCADACommandingCache.Instance.AddAnalogMeasurement(newMeasurement.Id, currentElementId, newMeasurement.GetCurrentVaule());
-                       // }
-                        //else
-                        //{
-                            //SCADACommandingCache.Instance.AddDiscreteMeasurement(newMeasurement.Id, currentElementId, (ushort)newMeasurement.GetCurrentVaule());
-                       // }
-
+                        logger.LogError($"[GraphBuilder] Element with GID {element.ToString("X")} does not exist in collection of elements.");
                     }
-                    
-
-                }  
-               
+                }
+                
                 topology.AddElement(currentElement);
             }
 
@@ -85,26 +69,33 @@ namespace TopologyBuilder
                 topology.AddElement(field);
             }
 
-            logger.LogInfo("Topology graph created.");
+            logger.LogInfo("Topology successfully created.");
             return topology;
         }
 
         #region HelperFunctions
         private List<long> GetReferencedElementsWithoutIgnorables(long gid)
         {
-            var list = connections[gid].Where(e => !visited.Contains(e)).ToList();
             List<long> refElements = new List<long>();
-            foreach (var element in list)
+            if (connections.TryGetValue(gid, out List<long> list))
             {
-                if (TopologyHelper.Instance.GetElementTopologyStatus(element) == TopologyStatus.Ignorable)
+                list = list.Where(e => !visited.Contains(e)).ToList();
+                foreach (var element in list)
                 {
-                    visited.Add(element);
-                    refElements.AddRange(GetReferencedElementsWithoutIgnorables(element));
+                    if (TopologyHelper.Instance.GetElementTopologyStatus(element) == TopologyStatus.Ignorable)
+                    {
+                        visited.Add(element);
+                        refElements.AddRange(GetReferencedElementsWithoutIgnorables(element));
+                    }
+                    else
+                    {
+                        refElements.Add(element);
+                    }
                 }
-                else
-                {
-                    refElements.Add(element);
-                }
+            }
+            else
+            {
+                logger.LogWarn($"[GraphBuilder] Failed to get connected elements for element with GID {gid.ToString("X")}.");
             }
             return refElements;
         }
@@ -112,71 +103,59 @@ namespace TopologyBuilder
         {
             bool newElementIsField = TopologyHelper.Instance.GetElementTopologyStatus(newElementGid) == TopologyStatus.Field;
             bool parentElementIsField = TopologyHelper.Instance.GetElementTopologyStatus(parent.Id) == TopologyStatus.Field;
-            
-            ITopologyElement newNode = elements[newElementGid];
 
-            if (newElementIsField && !parentElementIsField)
+            if (elements.TryGetValue(newElementGid, out ITopologyElement newNode))
             {
-                var field = new Field(newNode.Id);
-                field.FirstEnd = parent.Id;
-                newNode.FirstEnd = parent.Id;
-                fields.Add(field);
-                parent.SecondEnd.Add(field.Id);
-            }
-            else if (newElementIsField && parentElementIsField)
-            {
-                try
+                if (newElementIsField && !parentElementIsField)
                 {
-                    GetField(parent.Id).Members.Add(newNode.Id);
+                    var field = new Field(newNode.Id);
+                    field.FirstEnd = parent.Id;
                     newNode.FirstEnd = parent.Id;
-                    parent.SecondEnd.Add(newNode.Id);
+                    fields.Add(field);
+                    parent.SecondEnd.Add(field.Id);
                 }
-                catch (Exception)
+                else if (newElementIsField && parentElementIsField)
                 {
-                    string message = $"Element with GID {parent.Id.ToString("X")} has no field.";
-                    logger.LogDebug(message);
-                    throw new Exception(message);
-                }
+                    try
+                    {
+                        GetField(parent.Id).Members.Add(newNode.Id);
+                        newNode.FirstEnd = parent.Id;
+                        parent.SecondEnd.Add(newNode.Id);
+                    }
+                    catch (Exception)
+                    {
+                        string message = $"Element with GID {parent.Id.ToString("X")} has no field.";
+                        logger.LogDebug(message);
+                        throw new Exception(message);
+                    }
 
-            }
-            else if (!newElementIsField && parentElementIsField)
-            {
-                var field = GetField(parent.Id);
-                if (field == null)
+                }
+                else if (!newElementIsField && parentElementIsField)
                 {
-                    string message = $"Element with GID {parent.Id.ToString("X")} has no field.";
-                    logger.LogDebug(message);
-                    throw new Exception(message);
+                    var field = GetField(parent.Id);
+                    if (field == null)
+                    {
+                        string message = $"Element with GID {parent.Id.ToString("X")} has no field.";
+                        logger.LogDebug(message);
+                        throw new Exception(message);
+                    }
+                    else
+                    {
+                        field.SecondEnd.Add(newNode.Id);
+                        parent.SecondEnd.Add(newNode.Id);
+                        newNode.FirstEnd = field.Id;
+                    }
                 }
                 else
                 {
-                    field.SecondEnd.Add(newNode.Id);
+                    newNode.FirstEnd = parent.Id;
                     parent.SecondEnd.Add(newNode.Id);
-                    newNode.FirstEnd = field.Id;
                 }
             }
             else
             {
-                newNode.FirstEnd = parent.Id;
-                parent.SecondEnd.Add(newNode.Id);
+                logger.LogError($"[GraphBuilder] Element with GID {newElementGid.ToString("X")} does not exist in collection of elements.");
             }
-
-            newNode.IsActive = parent.IsActive;
-            foreach (var measurement in newNode.Measurements)
-            {
-                if (measurement is DiscreteMeasurement && parent.IsActive)
-                {
-                    if (measurement.GetCurrentVaule() == 1)
-                    {
-                        newNode.IsActive = false;
-                    }
-                    else
-                    {
-                        newNode.IsActive = true;
-                    }
-                }
-            }
-
         }
         private Field GetField(long memberGid)
         {
@@ -190,6 +169,7 @@ namespace TopologyBuilder
             }
             return field;
         }
+
         #endregion
     }
 }

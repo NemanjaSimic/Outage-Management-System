@@ -19,8 +19,6 @@ namespace CECommon
 		private float nominalVoltage;
 		private bool isRemote;
 		private bool isActive;
-		private List<long> allConnectedElements;
-
 		#endregion
 
 		#region Properties

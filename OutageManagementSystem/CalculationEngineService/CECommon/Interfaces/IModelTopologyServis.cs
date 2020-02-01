@@ -9,6 +9,7 @@ namespace CECommon.Interfaces
     public interface IModelTopologyServis
     {
         List<ITopology> CreateTopology();
-        List<ITopology> UpdateTopology(long topologyElement);
+        ITopology CalulateLoadFlow(long startingElementGid, ITopology topology);
+        List<ITopology> UpdateLoadFlow(long startingSignalGid, List<ITopology> topologies);
     }
 }

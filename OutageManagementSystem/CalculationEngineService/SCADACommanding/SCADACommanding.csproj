@@ -47,13 +47,13 @@
     <Compile Include="SCADASubscriber.cs" />
   </ItemGroup>
   <ItemGroup>
-    <ProjectReference Include="..\CalculationEngineService\CECommon\CECommon.csproj">
-      <Project>{E1D2D69D-E03D-4FD7-8E4F-0FC95B68F0DD}</Project>
-      <Name>CECommon</Name>
-    </ProjectReference>
-    <ProjectReference Include="..\Common\Common.csproj">
+    <ProjectReference Include="..\..\Common\Common.csproj">
       <Project>{892CBE15-9ED7-4540-81FA-0EAABA592138}</Project>
       <Name>Common</Name>
+    </ProjectReference>
+    <ProjectReference Include="..\CECommon\CECommon.csproj">
+      <Project>{E1D2D69D-E03D-4FD7-8E4F-0FC95B68F0DD}</Project>
+      <Name>CECommon</Name>
     </ProjectReference>
   </ItemGroup>
   <Import Project="$(MSBuildToolsPath)\Microsoft.CSharp.targets" />
