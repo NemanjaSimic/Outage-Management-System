@@ -19,7 +19,7 @@ export const addGraphTooltip = (cy, node) => {
       // node information - mozemo preko stringa da dodamo u div
       const div = document.createElement('div');
       div.innerHTML = graphTooltipBody
-        .replace("[[id]]", node.data('id'))
+        .replace("[[id]]", (+node.data('id')).toString(16))
         .replace("[[type]]", node.data('dmsType'))
         .replace("[[name]]", node.data('name'))
         .replace("[[mrid]]", node.data('mrid'))
@@ -48,7 +48,7 @@ export const addGraphTooltip = (cy, node) => {
           if (node.data('state') == "active") {
             const command: SwitchCommand = {
               guid,
-              type: SwitchCommandType.TURN_OFF
+              command: SwitchCommandType.TURN_OFF
             };
 
             node.sendSwitchCommand(command);
@@ -59,7 +59,7 @@ export const addGraphTooltip = (cy, node) => {
 
             const command: SwitchCommand = {
               guid,
-              type: SwitchCommandType.TURN_ON
+              command: SwitchCommandType.TURN_ON
             };
 
             node.sendSwitchCommand(command);
