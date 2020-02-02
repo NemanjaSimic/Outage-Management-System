@@ -116,7 +116,7 @@ namespace NetworkModelServiceFunctions
 		}
 		private void PutMeasurementsInElements(Measurement measurement)
 		{
-			string message = $"[NMSManager]Putting measurement with GID {measurement.Id.ToString("X")} in element.";
+			string message = $"[NMSManager]Putting measurement with GID 0x{measurement.Id.ToString("X16")} in element.";
 			if (measurementToConnectedTerminalMap.TryGetValue(measurement.Id, out long terminalId))
 			{
 				if (terminalToConnectedElementsMap.TryGetValue(terminalId, out List<long> connectedElements))
@@ -142,12 +142,12 @@ namespace NetworkModelServiceFunctions
 				}
 				else
 				{
-					logger.LogWarn($"{message} Terminal with GID {terminalId.ToString("X")} does not exist in terminal to element map.");
+					logger.LogWarn($"{message} Terminal with GID 0x{terminalId.ToString("X16")} does not exist in terminal to element map.");
 				}
 			}
 			else
 			{
-				logger.LogWarn($"{message} Measurement with GID {measurement.Id.ToString("X")} does not exist in mesurement to terminal map.");
+				logger.LogWarn($"{message} Measurement with GID 0x{measurement.Id.ToString("X16")} does not exist in mesurement to terminal map.");
 			}
 
 		}
@@ -176,7 +176,7 @@ namespace NetworkModelServiceFunctions
 				long baseVoltageGid = modelEntity.GetProperty(ModelCode.IDOBJ_GID).AsLong();
 				if (baseVoltages.ContainsKey(baseVoltageGid))
 				{
-					logger.LogDebug($"[NMSManager] Basevoltage with GID {baseVoltageGid.ToString("X")} is already in basevoltage collection. Elements can share basevoltage.");
+					logger.LogDebug($"[NMSManager] Basevoltage with GID 0x{baseVoltageGid.ToString("X16")} is already in basevoltage collection. Elements can share basevoltage.");
 				}
 				else
 				{
@@ -206,7 +206,7 @@ namespace NetworkModelServiceFunctions
 		}
 		private List<long> GetAllReferencedElements(ResourceDescription element)
 		{
-			logger.LogDebug($"[NMSManager] Getting all referenced elements for GID {element.Id}.");
+			logger.LogDebug($"[NMSManager] Getting all referenced elements for GID 0x{element.Id:X16}.");
 			List<long> elements = new List<long>();
 			DMSType type = GetDMSTypeOfTopologyElement(element.Id);
 
@@ -313,7 +313,7 @@ namespace NetworkModelServiceFunctions
 		}
 		public ITopologyElement GetPopulatedElement(ResourceDescription rs)
 		{
-			string errorMessage = $"[NMSManager] Failed to populate element with GID {rs.Id}. ";
+			string errorMessage = $"[NMSManager] Failed to populate element with GID 0x{rs.Id:X16}. ";
 			ITopologyElement topologyElement = new TopologyElement(rs.Id);
 			try
 			{
@@ -340,13 +340,13 @@ namespace NetworkModelServiceFunctions
 					}
 					else
 					{
-						logger.LogError($"{errorMessage} BaseVoltage with GID {baseVoltageGid.ToString("X")} does not exist in baseVoltages collection.");
+						logger.LogError($"{errorMessage} BaseVoltage with GID 0x{baseVoltageGid.ToString("X16")} does not exist in baseVoltages collection.");
 					}
 				}
 				else
 				{
 					topologyElement.NominalVoltage = 0;
-					logger.LogError($"{errorMessage} Failed to get BaseVoltage. Element with GID {rs.Id} does not have BASEVOLTAGE_NOMINALVOLTAGE property.");
+					logger.LogError($"{errorMessage} Failed to get BaseVoltage. Element with GID 0x{rs.Id:X16} does not have BASEVOLTAGE_NOMINALVOLTAGE property.");
 				}			
 			}
 			catch (Exception ex)
@@ -374,12 +374,12 @@ namespace NetworkModelServiceFunctions
 				var connection = GetAllReferencedElements(rs);
 				if (connection.Count < 0)
 				{
-					logger.LogWarn($"Analog measurement with GID: {rs.Id} is not connected to any element.");
+					logger.LogWarn($"Analog measurement with GID: 0x{rs.Id:X16} is not connected to any element.");
 
 				}
 				else if (connection.Count > 1)
 				{
-					logger.LogWarn($"Analog measurement with GID: {rs.Id} is connected to more then one element.");
+					logger.LogWarn($"Analog measurement with GID: 0x{rs.Id:X16} is connected to more then one element.");
 					measurementToConnectedTerminalMap.Add(rs.Id, connection.First());
 				}
 				else
@@ -389,7 +389,7 @@ namespace NetworkModelServiceFunctions
 			}
 			catch (Exception)
 			{
-				logger.LogDebug($"Failed to populate analog measurement with GID: {rs.Id}.");
+				logger.LogDebug($"Failed to populate analog measurement with GID: 0x{rs.Id:X16}.");
 			}
 			return measurement;
 		}
@@ -410,12 +410,12 @@ namespace NetworkModelServiceFunctions
 				var connection = GetAllReferencedElements(rs);
 				if (connection.Count < 0)
 				{
-					logger.LogWarn($"[NMSManager] Discrete measurement with GID: {rs.Id} is not connected to any element.");
+					logger.LogWarn($"[NMSManager] Discrete measurement with GID: 0x{rs.Id:X16} is not connected to any element.");
 
 				}
 				else if (connection.Count > 1)
 				{
-					logger.LogWarn($"[NMSManager] Discrete measurement with GID: {rs.Id} is connected to more then one element.");
+					logger.LogWarn($"[NMSManager] Discrete measurement with GID: 0x{rs.Id:X16} is connected to more then one element.");
 					measurementToConnectedTerminalMap.Add(rs.Id, connection.First());
 				}
 				else
@@ -425,7 +425,7 @@ namespace NetworkModelServiceFunctions
 			}
 			catch (Exception ex)
 			{
-				logger.LogError($"[NMSManager] Failed to populate discrete measurement with GID: {rs.Id}. Exception message: {ex.Message}");
+				logger.LogError($"[NMSManager] Failed to populate discrete measurement with GID: 0x{rs.Id:X16}. Exception message: {ex.Message}");
 			}
 			return measurement;
 		}
@@ -435,7 +435,7 @@ namespace NetworkModelServiceFunctions
 		}
 		public string GetDMSTypeOfTopologyElementString(long gid)
 		{
-			logger.LogDebug($"Getting element DMStype for GID {gid}.");		
+			logger.LogDebug($"Getting element DMStype for GID 0x{gid:X16}.");		
 			DMSType type = GetDMSTypeOfTopologyElement(gid);
 			if (type != 0)
 			{
