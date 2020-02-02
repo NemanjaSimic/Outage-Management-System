@@ -1,15 +1,10 @@
-﻿using Outage.Common;
-using Outage.Common.PubSub;
+﻿using Outage.Common.PubSub;
 using Outage.Common.PubSub.CalculationEngineDataContract;
 using Outage.Common.PubSub.SCADADataContract;
 using Outage.Common.ServiceContracts.PubSub;
 using Outage.Common.UI;
 using System;
-using System.Collections.Generic;
-using System.Linq;
 using System.ServiceModel;
-using System.Text;
-using System.Threading.Tasks;
 
 namespace TopologyServiceClientMock
 {
@@ -58,10 +53,11 @@ namespace TopologyServiceClientMock
 				{
 					Console.WriteLine($"{parent.DMSType} with gid {parent.Id.ToString("X")} connected to {topology.Nodes[connectedElement].DMSType} with gid {topology.Nodes[connectedElement].Id.ToString("X")}");
 					Console.WriteLine($"NominalVoltage: {parent.NominalVoltage}; IsActive: {parent.IsActive}");
-					//foreach (var measurement in parent.Measurements)
-					//{
-					//	Console.WriteLine($"MeasurementTypes: {measurement.Item2}; MeasurementValue: { measurement.Item1};");
-					//}
+					foreach (var measurement in parent.Measurements)
+					{
+						Console.WriteLine($"--Measurement-- Type: {measurement.Type}; Value: { measurement.Value};");
+						
+					}
 					Print(topology.Nodes[connectedElement], topology);
 				}
 			}

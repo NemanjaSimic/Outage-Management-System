@@ -5,7 +5,7 @@
     type="search" 
     [(ngModel)]="gidSearchQuery" 
     [ngModelOptions]="{standalone: true}">
-  <i class="fa fa-search"></i>
+  <i class="fa fa-search" (click)="onSearch()"></i>
 </form>
 
 <div id="graph"></div>

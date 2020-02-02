@@ -28,13 +28,13 @@ namespace Topology
                     foreach (long child in element.SecondEnd)
                     {
                         long nextElement = child;
-                        if (NMSManager.Instance.GetDMSTypeOfTopologyElementString(child).Equals("FIELD"))
+                        if (ModelCodeHelper.ExtractTypeFromGlobalId(child) == 0)
                         {
                             try
                             {
                                 topology.GetElementByGid(child, out ITopologyElement fieldElement);
                                 Field field = fieldElement as Field;
-                                nextElement = field.Members.First();
+                                nextElement = field.Members.First();                       
                             }
                             catch (Exception)
                             {

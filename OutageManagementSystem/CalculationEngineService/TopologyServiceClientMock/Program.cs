@@ -23,8 +23,9 @@ namespace TopologyServiceClientMock
 			}
 			SubscriberProxy subProxy = new SubscriberProxy(sub, EndpointNames.SubscriberEndpoint);
 			subProxy.Subscribe(Topic.TOPOLOGY);
-			subProxy.Subscribe(Topic.MEASUREMENT);
+			//subProxy.Subscribe(Topic.MEASUREMENT);
 			Console.ReadLine();
+
         }
 
 		//static void PrintUI(UIModel topology)

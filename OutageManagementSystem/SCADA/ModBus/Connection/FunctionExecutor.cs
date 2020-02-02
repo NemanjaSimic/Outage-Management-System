@@ -54,7 +54,7 @@ namespace Outage.SCADA.ModBus.Connection
             int numberOfTries = 0;
             int sleepInterval = 500;
 
-            while (numberOfTries < 10)
+            while (numberOfTries <= int.MaxValue)
             {
                 try
                 {

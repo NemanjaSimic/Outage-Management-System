@@ -33,6 +33,7 @@ namespace CECommon
 		public List<IMeasurement> Measurements { get => measurements; set => measurements = value; }
 		public bool IsRemote { get => isRemote; set => isRemote = value; }
 		public bool IsActive { get => isActive; set => isActive = value; }
+
 		#endregion
 		public TopologyElement(long gid)
 		{

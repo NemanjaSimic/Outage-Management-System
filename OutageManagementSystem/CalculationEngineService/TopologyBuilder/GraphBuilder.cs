@@ -1,11 +1,13 @@
 ﻿using CECommon;
 using CECommon.Interfaces;
 using CECommon.Model;
+using CECommon.Providers;
 using NetworkModelServiceFunctions;
 using Outage.Common;
 using SCADACommanding;
 using System;
 using System.Collections.Generic;
+using System.Diagnostics;
 using System.Linq;
 
 namespace TopologyBuilder
@@ -16,189 +18,144 @@ namespace TopologyBuilder
         private ILogger logger = LoggerWrapper.Instance;
         private List<Field> fields;
         private HashSet<long> visited;
-        private Stack<ITopologyElement> stack;
+        private Stack<long> stack;
+        private Dictionary<long, ITopologyElement> elements;
+        private Dictionary<long, List<long>> connections;
         #endregion
 
         public ITopology CreateGraphTopology(long firstElementGid)
-        {
-            logger.LogInfo($"Creating graph topology from first element with GID {firstElementGid}.");
+        { 
+            elements = Provider.Instance.ModelProvider.GetElementModels();
+            connections = Provider.Instance.ModelProvider.GetConnections();
+            
+            logger.LogInfo($"Creating topology from first element with GID {firstElementGid.ToString("X")}.");
 
             visited = new HashSet<long>();
-            stack = new Stack<ITopologyElement>();
+            stack = new Stack<long>();
             fields = new List<Field>();
 
             ITopology topology = new TopologyModel();
-            ITopologyElement firstNode = NMSManager.Instance.GetPopulatedElement(firstElementGid);
-                
-            firstNode.IsActive = true;
-            stack.Push(firstNode);
+            topology.FirstNode = firstElementGid;
+            elements[firstElementGid].IsActive = true;
+            stack.Push(firstElementGid);
 
             while (stack.Count > 0)
             {
-                var currentNode = stack.Pop();
-                if (!visited.Contains(currentNode.Id))
+                var currentElementId = stack.Pop();
+                if (!visited.Contains(currentElementId))
                 {
-                    visited.Add(currentNode.Id);
+                    visited.Add(currentElementId);
                 }
-
-                var connectedElements = GetReferencedElementsWithoutIgnorables(currentNode.Id);
-                foreach (var element in connectedElements)
+                ITopologyElement currentElement = elements[currentElementId];
+              
+                foreach (var element in GetReferencedElementsWithoutIgnorables(currentElementId))
                 {
-                    if (TopologyHelper.Instance.GetElementTopologyType(element) == TopologyType.Measurement)
+                    if (elements.ContainsKey(element))
                     {
-                        string elementType = NMSManager.Instance.GetDMSTypeOfTopologyElementString(element);
-                        if (elementType.Equals("BASEVOLTAGE"))
-                        {
-                            float voltage = NMSManager.Instance.GetBaseVoltageForElement(element);
-                            currentNode.NominalVoltage = voltage;
-                        }
-                        else if (elementType.Equals("ANALOG"))
-                        {
-                            Measurement newMeasurement = NMSManager.Instance.GetPopulatedAnalogMeasurement(element);
-                            currentNode.Measurements.Add(newMeasurement);
-                            SCADACommandingCache.Instance.AddAnalogMeasurement(newMeasurement.Id, currentNode.Id, newMeasurement.GetCurrentVaule());
-                        }
-                        else if (elementType.Equals("DISCRETE"))
-                        {
-                            Measurement newMeasurement = NMSManager.Instance.GetPopulatedAnalogMeasurement(element);
-                            currentNode.Measurements.Add(newMeasurement);
-                            SCADACommandingCache.Instance.AddDiscreteMeasurement(newMeasurement.Id, currentNode.Id, (ushort)newMeasurement.GetCurrentVaule());
-                        
-                        }                      
-                        else
-                        {
-                            logger.LogError($"Failed to procces element of type Measurement. Element is neither Analog,Discrete nor BaseVoltage.");
-                        }
+                        ConnectTwoNodes(element, currentElement);
+                        stack.Push(element);
                     }
                     else
                     {
-                        var newNode = ConnectTwoNodes(element, currentNode);
-                        //ITopologyElement newNode = NMSManager.Instance.GetTopologyElement(element);
-                        //currentNode.SecondEnd.Add(newNode.Id);
-                        //newNode.FirstEnd = currentNode.Id;
-
-                        //newNode.IsActive = currentNode.IsActive;
-                        //foreach (var measurement in newNode.Measurements)
-                        //{
-                        //    if (measurement is DiscreteMeasurement && currentNode.IsActive)
-                        //    {
-                        //        if (measurement.GetCurrentVaule() == 1)
-                        //        {
-                        //            newNode.IsActive = false;
-                        //        }
-                        //        else
-                        //        {
-                        //            newNode.IsActive = true;
-                        //        }
-                        //    }
-                        //}
-                        stack.Push(newNode);
+                        logger.LogError($"[GraphBuilder] Element with GID {element.ToString("X")} does not exist in collection of elements.");
                     }
                 }
-                currentNode.DmsType = NMSManager.Instance.GetDMSTypeOfTopologyElementString(currentNode.Id);
-                topology.AddElement(currentNode);
+                
+                topology.AddElement(currentElement);
             }
-            topology.FirstNode = firstNode.Id;
 
             foreach (var field in fields)
             {
                 topology.AddElement(field);
             }
 
-            logger.LogInfo("Topology graph created.");
+            logger.LogInfo("Topology successfully created.");
             return topology;
         }
 
         #region HelperFunctions
-
         private List<long> GetReferencedElementsWithoutIgnorables(long gid)
         {
-            var list = NMSManager.Instance.GetAllReferencedElements(gid).Where(e => !visited.Contains(e)).ToList();
-            List<long> elements = new List<long>();
-            foreach (var element in list)
+            List<long> refElements = new List<long>();
+            if (connections.TryGetValue(gid, out List<long> list))
             {
-                if (TopologyHelper.Instance.GetElementTopologyStatus(element) == TopologyStatus.Ignorable)
+                list = list.Where(e => !visited.Contains(e)).ToList();
+                foreach (var element in list)
                 {
-                    visited.Add(element);
-                    elements.AddRange(GetReferencedElementsWithoutIgnorables(element));
-                }
-                else
-                {
-                    elements.Add(element);
-                }
-            }
-            return elements;
-        }
-        private ITopologyElement ConnectTwoNodes(long newElementGid, ITopologyElement parent)
-        {
-            bool newElementIsField = TopologyHelper.Instance.GetElementTopologyStatus(newElementGid) == TopologyStatus.Field;
-            bool parentElementIsField = TopologyHelper.Instance.GetElementTopologyStatus(parent.Id) == TopologyStatus.Field;
-
-            ITopologyElement newNode = NMSManager.Instance.GetPopulatedElement(newElementGid);
-               
-
-            if (newElementIsField && !parentElementIsField)
-            {
-                var field = new Field(newNode.Id);
-                field.FirstEnd = parent.Id;
-                newNode.FirstEnd = parent.Id;
-                fields.Add(field);
-                parent.SecondEnd.Add(field.Id);
-            }
-            else if (newElementIsField && parentElementIsField)
-            {
-                try
-                {
-                    GetField(parent.Id).Members.Add(newNode.Id);
-                    newNode.FirstEnd = parent.Id;
-                    parent.SecondEnd.Add(newNode.Id);
-                }
-                catch (Exception)
-                {
-                    string message = $"Element with GID {parent.Id.ToString("X")} has no field.";
-                    logger.LogDebug(message);
-                    throw new Exception(message);
-                }
-
-            }
-            else if (!newElementIsField && parentElementIsField)
-            {
-                var field = GetField(parent.Id);
-                if (field == null)
-                {
-                    string message = $"Element with GID {parent.Id.ToString("X")} has no field.";
-                    logger.LogDebug(message);
-                    throw new Exception(message);
-                }
-                else
-                {
-                    field.SecondEnd.Add(newNode.Id);
-                    parent.SecondEnd.Add(newNode.Id);
-                    newNode.FirstEnd = field.Id;
+                    if (TopologyHelper.Instance.GetElementTopologyStatus(element) == TopologyStatus.Ignorable)
+                    {
+                        visited.Add(element);
+                        refElements.AddRange(GetReferencedElementsWithoutIgnorables(element));
+                    }
+                    else
+                    {
+                        refElements.Add(element);
+                    }
                 }
             }
             else
             {
-                newNode.FirstEnd = parent.Id;
-                parent.SecondEnd.Add(newNode.Id);
+                logger.LogWarn($"[GraphBuilder] Failed to get connected elements for element with GID {gid.ToString("X")}.");
             }
+            return refElements;
+        }
+        private void ConnectTwoNodes(long newElementGid, ITopologyElement parent)
+        {
+            bool newElementIsField = TopologyHelper.Instance.GetElementTopologyStatus(newElementGid) == TopologyStatus.Field;
+            bool parentElementIsField = TopologyHelper.Instance.GetElementTopologyStatus(parent.Id) == TopologyStatus.Field;
 
-            newNode.IsActive = parent.IsActive;
-            foreach (var measurement in newNode.Measurements)
+            if (elements.TryGetValue(newElementGid, out ITopologyElement newNode))
             {
-                if (measurement is DiscreteMeasurement && parent.IsActive)
+                if (newElementIsField && !parentElementIsField)
                 {
-                    if (measurement.GetCurrentVaule() == 1)
+                    var field = new Field(newNode.Id);
+                    field.FirstEnd = parent.Id;
+                    newNode.FirstEnd = parent.Id;
+                    fields.Add(field);
+                    parent.SecondEnd.Add(field.Id);
+                }
+                else if (newElementIsField && parentElementIsField)
+                {
+                    try
                     {
-                        newNode.IsActive = false;
+                        GetField(parent.Id).Members.Add(newNode.Id);
+                        newNode.FirstEnd = parent.Id;
+                        parent.SecondEnd.Add(newNode.Id);
+                    }
+                    catch (Exception)
+                    {
+                        string message = $"Element with GID {parent.Id.ToString("X")} has no field.";
+                        logger.LogDebug(message);
+                        throw new Exception(message);
+                    }
+
+                }
+                else if (!newElementIsField && parentElementIsField)
+                {
+                    var field = GetField(parent.Id);
+                    if (field == null)
+                    {
+                        string message = $"Element with GID {parent.Id.ToString("X")} has no field.";
+                        logger.LogDebug(message);
+                        throw new Exception(message);
                     }
                     else
                     {
-                        newNode.IsActive = true;
+                        field.SecondEnd.Add(newNode.Id);
+                        parent.SecondEnd.Add(newNode.Id);
+                        newNode.FirstEnd = field.Id;
                     }
                 }
+                else
+                {
+                    newNode.FirstEnd = parent.Id;
+                    parent.SecondEnd.Add(newNode.Id);
+                }
             }
-            return newNode;
+            else
+            {
+                logger.LogError($"[GraphBuilder] Element with GID {newElementGid.ToString("X")} does not exist in collection of elements.");
+            }
         }
         private Field GetField(long memberGid)
         {
@@ -212,6 +169,7 @@ namespace TopologyBuilder
             }
             return field;
         }
+
         #endregion
     }
 }

@@ -41,9 +41,18 @@ namespace OutageManagementService
         #region Public Members
         public void Start()
         {
-            StartHosts();
-            //TODO: Start what is needed
+            try
+            {
+                StartHosts();
+                //TODO: Start what is needed
+            }
+            catch (Exception e)
+            {
+                Logger.LogError("Exception in Start()", e);
+                Console.WriteLine(e.Message);
+            }
         }
+
         public void Dispose()
         {
             CloseHosts();

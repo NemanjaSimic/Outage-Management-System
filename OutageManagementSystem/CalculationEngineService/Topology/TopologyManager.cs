@@ -1,140 +1,133 @@
 ﻿using CECommon;
 using CECommon.Interfaces;
 using CECommon.Model;
-using NetworkModelServiceFunctions;
+using CECommon.Providers;
 using Outage.Common;
-using Outage.Common.GDA;
-using Outage.Common.PubSub.CalculationEngineDataContract;
-using Outage.Common.ServiceProxies.PubSub;
-using System;
 using System.Collections.Generic;
-using System.Linq;
-using TopologyBuilder;
 
 namespace Topology
 {
-    public class TopologyManager
+    public class TopologyManager : IModelTopologyServis
     {
         #region Fields
         ILogger logger = LoggerWrapper.Instance;
         private ITopologyBuilder topologyBuilder;
-        private IWebTopologyBuilder webTopologyBuilder;
         private List<long> roots;
-
-        public List<ITopology> TopologyModel { get; private set; }
-        public List<ITopology> TransactionTopologyModel { get; private set; }
         #endregion
 
-        private TopologyManager()
+        public TopologyManager(ITopologyBuilder topologyBuilder)
         {
-            topologyBuilder = new GraphBuilder();
-            webTopologyBuilder = new WebTopologyBuilder();
-            TopologyModel = new List<ITopology>();
-            TransactionTopologyModel = new List<ITopology>();
+            this.topologyBuilder = topologyBuilder;
         }
 
-        #region Singleton
-        private static TopologyManager instance;
-        private static object syncObj = new object();
-
-        public static TopologyManager Instance
-        {
-            get 
-            {
-                lock (syncObj)
-                {
-                    if (instance == null)
-                    {
-                        instance = new TopologyManager();
-                    }
-                    return instance;
-                }
-            }
-        }
-        #endregion
-
-        public void InitializeTopology()
-        {
-            logger.LogDebug("Initializing topology started.");
-            TopologyModel = CreateTopology();
-            logger.LogDebug("Initializing topology finished.");
-        }
-        private List<ITopology> CreateTopology()
+        public List<ITopology> CreateTopology()
         {
             logger.LogDebug("Get all energy sources started.");
-            roots = NMSManager.Instance.GetAllEnergySources();
+            roots = Provider.Instance.ModelProvider.GetEnergySources();
             logger.LogDebug("Get all energy sources finished.");
 
             List<ITopology> topologyModel = new List<ITopology>();
 
             foreach (var rootElement in roots)
             {
-                topologyModel.Add(topologyBuilder.CreateGraphTopology(rootElement));
+                ITopology newTopology = topologyBuilder.CreateGraphTopology(rootElement);
+                topologyModel.Add(CalulateLoadFlow(rootElement, newTopology));
             }
-
+            
             return topologyModel;
         }
 
-        public bool PrepareForTransaction()
+        public ITopology CalulateLoadFlow(long startingElementGid, ITopology topology)
         {
-            bool success = true;
-            try
-            {
-                logger.LogInfo($"Topology manager prepare for transaction started.");
-                TransactionTopologyModel = CreateTopology();
-            }
-            catch (Exception ex)
-            {
-                logger.LogInfo($"Topology manager failed to prepare for transaction. Exception message: {ex.Message}");
-                success = false;
-            }
-            return success;
-        }
+            logger.LogDebug("CalulateLoadFlow started.");
+            Stack<long> stack = new Stack<long>();
 
-        public void CommitTransaction()
-        {
-            TopologyModel = new List<ITopology>(TransactionTopologyModel);
-            logger.LogDebug("TopologyManager commited transaction successfully.");
-            Publish();
-        }
-
-        public void RollbackTransaction()
-        {
-            TransactionTopologyModel = new List<ITopology>();
-            logger.LogDebug("TopologyManager rolled back topology.");
-        }
-
-        public void UpdateTopology()
-        {
-            logger.LogDebug("Updating topology started.");
-            TopologyModel = CreateTopology();
-            logger.LogDebug("Updating topology finished.");
-            Publish();
-        }
-
-        public void Publish()
-        {
-            //Dok se ne sredi logika za vise root-ova na WEB-u
-            ITopology topology = new TopologyModel();
-            if (TopologyModel.Count > 0)
+            if (topology.GetElementByGid(startingElementGid, out ITopologyElement element))
             {
-                topology = TopologyModel.First();
-            }
-            TopologyForUIMessage message = new TopologyForUIMessage(webTopologyBuilder.CreateTopologyForWeb(topology)); //privremeno resenje, dok se ne razradi logika
-            CalcualtionEnginePublication publication = new CalcualtionEnginePublication(Topic.TOPOLOGY, message);
-            try
-            {
-                using (var publisherProxy = new PublisherProxy(EndpointNames.PublisherEndpoint))
+                stack.Push(startingElementGid);
+                while (stack.Count > 0)
                 {
-                    publisherProxy.Publish(publication);
-                    logger.LogDebug("TopologyManager published new topology successfully.");
+                    element = topology.TopologyElements[stack.Pop()];
+                    //element.IsActive = IsElementActive(element, topology);
+                    IsElementActive(element, topology);
+
+                    if (!element.IsActive)
+                    {
+                        TurnOffAllElements(element.Id, topology);                 
+                    }
+                    else
+                    {
+                        foreach (var child in element.SecondEnd)
+                        {
+                            stack.Push(child);
+                        }
+                    }
                 }
             }
-            catch (Exception ex)
+ 
+            logger.LogDebug("Updating topology finished.");
+            return topology;
+        }
+        private void TurnOffAllElements(long topologyElement, ITopology topology)
+        {
+            Stack<long> stack = new Stack<long>();
+            stack.Push(topologyElement);
+            while (stack.Count > 0)
             {
-                logger.LogError($"TopologyManager failed to publish new topology. Exception: {ex.Message}");
+                var element = stack.Pop();
+                topology.TopologyElements[element].IsActive = false;
+                foreach (var child in topology.TopologyElements[element].SecondEnd)
+                {
+                    stack.Push(child);
+                }
             }
-            
+        }
+        public List<ITopology> UpdateLoadFlow(long startingSignalGid, List<ITopology> topologies)
+        {
+            List<ITopology> retVal = new List<ITopology>(topologies);
+            foreach (var topology in topologies)
+            {
+                if (topology.GetElementByGid(startingSignalGid, out ITopologyElement element))
+                {
+                    retVal.Remove(topology);
+                    retVal.Add(CalulateLoadFlow(startingSignalGid, topology));
+                    break;
+                }
+            }
+
+            return retVal;
+        }
+        private bool IsElementActive(ITopologyElement element, ITopology topology)
+        {
+            bool isActive = true;
+            element.IsActive = true;
+            if (element is Field field)
+            {
+                foreach (var member in field.Members)
+                {                    
+                    if (topology.GetElementByGid(member, out ITopologyElement memberElement) && !IsElementActive(memberElement, topology))
+                    {
+                        isActive = false;
+                        element.IsActive = false;
+                    }
+                }
+            }
+            else
+            {
+                foreach (var measurement in element.Measurements)
+                {
+                    if (measurement is DiscreteMeasurement discreteMeasurement)
+                    {
+                        if (Provider.Instance.CacheProvider.GetDiscreteValue(measurement.Id) == true)
+                        {
+                            isActive = false;
+                            element.IsActive = false;
+                        }
+                        break;
+                    }
+                }
+            }
+            return isActive;
         }
     }
 }

@@ -27,7 +27,15 @@ namespace PubSubEngine
 
         public void Start()
         {
-            StartHosts();
+            try
+            {
+                StartHosts();
+            }
+            catch (Exception e)
+            {
+                Logger.LogError("Exception in Start()", e);
+                Console.WriteLine(e.Message);
+            }
         }
 
         public void Dispose()
