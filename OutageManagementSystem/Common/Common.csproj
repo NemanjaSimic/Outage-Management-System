@@ -103,6 +103,7 @@
   </ItemGroup>
   <ItemGroup>
     <Compile Include="EndpointNames.cs" />
+    <Compile Include="Exceptions\SCADA\InternalSCADAServiceException.cs" />
     <Compile Include="PubSub\CalculationEngineDataContract\CalcualtionEnginePublication.cs" />
     <Compile Include="PubSub\CalculationEngineDataContract\CalculationEngineMessage.cs" />
     <Compile Include="PubSub\EmailDataContract\EmailServiceMessage.cs" />
@@ -123,6 +124,7 @@
     <Compile Include="ServiceContracts\CalculationEngine\ITopologyServiceContract.cs" />
     <Compile Include="ServiceContracts\PubSub\IPublisher.cs" />
     <Compile Include="ServiceContracts\PubSub\ISubscriber.cs" />
+    <Compile Include="ServiceContracts\SCADA\ISCADAIntegrityUpdateContract.cs" />
     <Compile Include="ServiceNames.cs" />
     <Compile Include="ServiceContracts\DistributedTransaction\ITransactionCoordinatorContract.cs" />
     <Compile Include="ServiceContracts\GDA\INetworkModelGDAContract.cs" />
@@ -144,7 +146,8 @@
     <Compile Include="ServiceProxies\Outage\OutageServiceProxy.cs" />
     <Compile Include="ServiceProxies\PubSub\PublisherProxy.cs" />
     <Compile Include="ServiceProxies\PubSub\SubscriberProxy.cs" />
-    <Compile Include="ServiceProxies\SCADACommandProxy.cs" />
+    <Compile Include="ServiceProxies\SCADA\SCADACommandProxy.cs" />
+    <Compile Include="ServiceProxies\SCADA\SCADAIntegrityUpdateProxy.cs" />
     <Compile Include="ServiceProxies\TopologyServiceProxy.cs" />
     <Compile Include="ModelCodeHelper.cs" />
     <Compile Include="ModelResourcesDesc.cs" />

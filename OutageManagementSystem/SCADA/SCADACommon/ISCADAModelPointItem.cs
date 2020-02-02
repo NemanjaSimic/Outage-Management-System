@@ -16,7 +16,6 @@ namespace Outage.SCADA.SCADACommon
 
     public interface IAnalogSCADAModelPointItem : ISCADAModelPointItem
     {
-
         float CurrentEguValue { get; set; }
         float NormalValue { get; set; }
         float EGU_Min { get; set; }
@@ -40,7 +39,6 @@ namespace Outage.SCADA.SCADACommon
         ushort NormalValue { get; set; }
         ushort CurrentValue { get; set; }
         ushort AbnormalValue { get; set; }
-        DiscreteMeasurementType DiscreteType { get; set; }
-        
+        DiscreteMeasurementType DiscreteType { get; set; }   
     }
 }

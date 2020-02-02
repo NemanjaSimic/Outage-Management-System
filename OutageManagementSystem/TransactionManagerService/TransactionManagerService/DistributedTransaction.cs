@@ -71,7 +71,7 @@ namespace Outage.TransactionManagerService
                 catch (Exception ex)
                 {
                     string message = $"Exception on TransactionActorProxy initialization. Message: {ex.Message}";
-                    Logger.LogError(message, ex);
+                    Logger.LogWarn(message, ex);
                     transactionActorProxy = null;
                 }
                 finally

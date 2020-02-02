@@ -1,24 +1,23 @@
 ﻿using Outage.Common.Exceptions.SCADA;
+using Outage.Common.PubSub.SCADADataContract;
 using System;
 using System.Collections.Generic;
-using System.Linq;
 using System.ServiceModel;
-using System.Text;
-using System.Threading.Tasks;
 
 namespace Outage.Common.ServiceContracts.SCADA
 {
     [ServiceContract]
-    public interface ISCADACommand
+    public interface ISCADAIntegrityUpdateContract
     {
-        [OperationContract]
-        [FaultContract(typeof(ArgumentException))]
-        [FaultContract(typeof(InternalSCADAServiceException))]
-        bool SendAnalogCommand(long gid, float commandingValue);
 
         [OperationContract]
         [FaultContract(typeof(ArgumentException))]
         [FaultContract(typeof(InternalSCADAServiceException))]
-        bool SendDiscreteCommand(long gid, ushort commandingValue);
+        Dictionary<Topic, SCADAPublication> GetIntegrityUpdate();
+
+        [OperationContract]
+        [FaultContract(typeof(ArgumentException))]
+        [FaultContract(typeof(InternalSCADAServiceException))]
+        SCADAPublication GetIntegrityUpdateForSpecificTopic(Topic topic);
     }
 }

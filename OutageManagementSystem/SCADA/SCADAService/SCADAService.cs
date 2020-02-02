@@ -11,6 +11,7 @@ using System;
 using System.Text;
 using System.Collections.Generic;
 using System.ServiceModel;
+using Outage.SCADA.SCADAService.IntegrityUpdate;
 
 namespace Outage.SCADA.SCADAService
 {
@@ -39,10 +40,13 @@ namespace Outage.SCADA.SCADAService
             functionExecutor = new FunctionExecutor(scadaModel);
 
             FunctionFactory.SCADAModel = scadaModel;
-            CommandService.SCADAModel = scadaModel;
             SCADAModelUpdateNotification.SCADAModel = scadaModel;
             SCADATransactionActor.SCADAModel = scadaModel;
+            CommandService.SCADAModel = scadaModel;
+            IntegrityUpdateService.SCADAModel = scadaModel;
+
             CommandService.FunctionExecutor = functionExecutor;
+
             scadaModel.ImportModel();
 
             InitializeHosts();
@@ -82,6 +86,7 @@ namespace Outage.SCADA.SCADAService
         {
             hosts = new List<ServiceHost>()
             {
+                new ServiceHost(typeof(IntegrityUpdateService)),
                 new ServiceHost(typeof(CommandService)),
                 new ServiceHost(typeof(SCADATransactionActor)),
                 new ServiceHost(typeof(SCADAModelUpdateNotification))

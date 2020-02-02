@@ -55,7 +55,7 @@ namespace OutageManagementService
                 catch (Exception ex)
                 {
                     string message = $"Exception on TopologyServiceProxy initialization. Message: {ex.Message}";
-                    Logger.LogError(message, ex);
+                    Logger.LogWarn(message, ex);
                     topologyProxy = null;
                 }
                 finally

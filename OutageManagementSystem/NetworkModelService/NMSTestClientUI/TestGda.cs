@@ -51,7 +51,7 @@ namespace TelventDMS.Services.NetworkModelService.TestClient.TestsUI
 				catch (Exception ex)
 				{
 					string message = $"Exception on NetworkModelGDAProxy initialization. Message: {ex.Message}";
-					Logger.LogError(message, ex);
+					Logger.LogWarn(message, ex);
 					gdaQueryProxy = null;
 				}
 				finally

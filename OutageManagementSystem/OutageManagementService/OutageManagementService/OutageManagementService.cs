@@ -58,7 +58,6 @@ namespace OutageManagementService
         {
             hosts = new List<ServiceHost>()
             {
-                new ServiceHost(typeof(CallingService)),
                 new ServiceHost(typeof(OutageService))
             };
         }

@@ -1,8 +1,6 @@
 ﻿using EasyModbus;
 using Outage.Common;
-using Outage.Common.PubSub;
 using Outage.Common.ServiceProxies.PubSub;
-using Outage.SCADA.ModBus.ModbusFuntions;
 using Outage.SCADA.SCADACommon;
 using Outage.SCADA.SCADAData.Configuration;
 using Outage.SCADA.SCADAData.Repository;
@@ -14,6 +12,7 @@ using Outage.Common.PubSub.SCADADataContract;
 using EasyModbus.Exceptions;
 using Outage.SCADA.ModBus.FunctionParameters;
 using System.ServiceModel;
+using Outage.Common.Exceptions.SCADA;
 
 namespace Outage.SCADA.ModBus.Connection
 {
@@ -38,10 +37,10 @@ namespace Outage.SCADA.ModBus.Connection
         public SCADAModel SCADAModel { get; private set; }
         public ModbusClient ModbusClient { get; private set; }
 
-        private Dictionary<long, IModbusData> scadaCache;
-        public Dictionary<long, IModbusData> SCADACache
+        private Dictionary<long, IModbusData> measurementsCache;
+        public Dictionary<long, IModbusData> MeasurementsCache
         {
-            get { return scadaCache ?? (scadaCache = new Dictionary<long, IModbusData>()); }
+            get { return measurementsCache ?? (measurementsCache = new Dictionary<long, IModbusData>()); }
         }
 
         #region Proxies
@@ -76,7 +75,7 @@ namespace Outage.SCADA.ModBus.Connection
                 catch (Exception ex)
                 {
                     string message = $"Exception on PublisherProxy initialization. Message: {ex.Message}";
-                    Logger.LogError(message, ex);
+                    Logger.LogWarn(message, ex);
                     publisherProxy = null;
                 }
                 finally
@@ -181,13 +180,15 @@ namespace Outage.SCADA.ModBus.Connection
             bool success;
             ushort length = 6;
 
-            SCADACache.Clear();
+            MeasurementsCache.Clear();
 
             try
             {
-                foreach(long measurementGID in measurementGids)
+                Dictionary<long, ISCADAModelPointItem> currentScadaModel = SCADAModel.CurrentScadaModel;
+                
+                foreach (long measurementGID in measurementGids)
                 {
-                    ISCADAModelPointItem scadaPointItem = SCADAModel.CurrentScadaModel[measurementGID];
+                    ISCADAModelPointItem scadaPointItem = currentScadaModel[measurementGID];
                     IModbusFunction modbusFunction;
 
                     if (scadaPointItem is IAnalogSCADAModelPointItem analogSCADAModelPointItem)
@@ -346,12 +347,12 @@ namespace Outage.SCADA.ModBus.Connection
 
             if (command is IReadAnalogModusFunction || command is IReadDiscreteModbusFunction)
             {
-                WriteToSCADACache(command);
+                WriteToMeasurementsCache(command);
             }
 
         }
 
-        private void WriteToSCADACache(IModbusFunction command)
+        private void WriteToMeasurementsCache(IModbusFunction command)
         {
             if (command is IReadAnalogModusFunction readAnalogCommand)
             {
@@ -361,22 +362,24 @@ namespace Outage.SCADA.ModBus.Connection
 
                 if (data == null)
                 {
-                    throw new NullReferenceException();
+                    string message = $"WriteToMeasurementsCache() => readAnalogCommand.Data is null.";
+                    Logger.LogError(message);
+                    throw new NullReferenceException(message);
                 }
 
                 foreach (long gid in data.Keys)
                 {
-                    if (!SCADACache.ContainsKey(gid))
+                    if (!MeasurementsCache.ContainsKey(gid))
                     {
-                        SCADACache.Add(gid, data[gid]);
+                        MeasurementsCache.Add(gid, data[gid]);
                         publicationData.Add(gid, data[gid]);
                     }
-                    else if (SCADACache[gid] is AnalogModbusData analogCacheItem)
+                    else if (MeasurementsCache[gid] is AnalogModbusData analogCacheItem)
                     {
                         if (analogCacheItem.Value != data[gid].Value)
                         {
-                            SCADACache[gid] = data[gid];
-                            publicationData.Add(gid, SCADACache[gid] as AnalogModbusData);
+                            MeasurementsCache[gid] = data[gid];
+                            publicationData.Add(gid, MeasurementsCache[gid] as AnalogModbusData);
                         }
                     }
                 }
@@ -396,22 +399,24 @@ namespace Outage.SCADA.ModBus.Connection
 
                 if (data == null)
                 {
-                    throw new NullReferenceException();
+                    string message = $"WriteToMeasurementsCache() => readAnalogCommand.Data is null.";
+                    Logger.LogError(message);
+                    throw new NullReferenceException(message);
                 }
 
                 foreach (long gid in data.Keys)
                 {
-                    if(!SCADACache.ContainsKey(gid))
+                    if(!MeasurementsCache.ContainsKey(gid))
                     {
-                        SCADACache.Add(gid, data[gid]);
+                        MeasurementsCache.Add(gid, data[gid]);
                         publicationData.Add(gid, data[gid]);
                     }
-                    else if (SCADACache[gid] is DiscreteModbusData discreteCacheItem)
+                    else if (MeasurementsCache[gid] is DiscreteModbusData discreteCacheItem)
                     {
                         if (discreteCacheItem.Value != data[gid].Value)
                         {
-                            SCADACache[gid] = data[gid];
-                            publicationData.Add(gid, SCADACache[gid] as DiscreteModbusData);
+                            MeasurementsCache[gid] = data[gid];
+                            publicationData.Add(gid, MeasurementsCache[gid] as DiscreteModbusData);
                         }
                     }
                 }
