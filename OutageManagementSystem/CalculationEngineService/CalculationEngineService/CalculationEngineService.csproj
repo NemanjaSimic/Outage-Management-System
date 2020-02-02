@@ -68,6 +68,7 @@
     <ProjectReference Include="..\SCADACommanding\SCADACommanding.csproj">
       <Project>{2E72183F-B2D1-4F43-8396-377AA1950078}</Project>
       <Name>SCADACommanding</Name>
+    </ProjectReference>
     <ProjectReference Include="..\TopologyBuilder\TopologyBuilder.csproj">
       <Project>{F83B7FD0-C28B-4C96-A49C-7EA0E2B579F1}</Project>
       <Name>TopologyBuilder</Name>
