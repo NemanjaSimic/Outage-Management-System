@@ -33,7 +33,7 @@ namespace CECommon.Providers
         
         public void DiscreteMeasurementDelegate(long meausrementGid)
         {
-            Topology = this.modelTopologyServis.UpdateTopology(meausrementGid);
+            Topology = this.modelTopologyServis.UpdateLoadFlow(meausrementGid, Topology);
         }
 
         public List<ITopology> GetTopologies()
