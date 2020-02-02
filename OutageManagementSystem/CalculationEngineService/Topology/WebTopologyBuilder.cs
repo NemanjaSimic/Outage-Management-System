@@ -28,7 +28,7 @@ namespace Topology
                     foreach (long child in element.SecondEnd)
                     {
                         long nextElement = child;
-                        if (NMSManager.Instance.GetDMSTypeOfTopologyElementString(child).Equals("FIELD"))
+                        if (ModelCodeHelper.ExtractTypeFromGlobalId(child).ToString().Equals("FIELD"))
                         {
                             try
                             {

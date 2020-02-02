@@ -1,4 +1,7 @@
 ﻿using CalculationEngineService.DistributedTransaction;
+using CECommon.Interfaces;
+using CECommon.Providers;
+using NetworkModelServiceFunctions;
 using Outage.Common;
 using Outage.Common.ServiceContracts.PubSub;
 using Outage.Common.ServiceProxies.PubSub;
@@ -8,6 +11,7 @@ using System.Collections.Generic;
 using System.ServiceModel;
 using System.Text;
 using Topology;
+using TopologyBuilder;
 
 namespace CalculationEngineService
 {
@@ -15,7 +19,17 @@ namespace CalculationEngineService
     {
         private ILogger logger;
         private ISubscriber proxy;
-
+        private IModelTopologyServis modelTopologyServis;
+        private IWebTopologyBuilder webTopologyBuilder;
+        private IModelManager modelManager;
+        private ITopologyBuilder topologyBuilder;
+        private ICacheProvider cacheProvider;
+        
+        private SCADAResultHandler sCADAResultProvider;
+        private TopologyProvider topologyProvider;
+        private ModelProvider modelProvider;
+        private WebTopologyModelProvider webTopologyModelProvider;
+        private TopologyPublisher topologyPublisher;
         protected ILogger Logger
         {
             get { return logger ?? (logger = LoggerWrapper.Instance); }
@@ -25,6 +39,17 @@ namespace CalculationEngineService
 
         public CalculationEngineService()
         {
+            topologyBuilder = new GraphBuilder();
+            modelTopologyServis = new TopologyManager(topologyBuilder);
+            webTopologyBuilder = new WebTopologyBuilder();
+            modelManager = new NMSManager();
+
+            sCADAResultProvider = new SCADAResultHandler();
+            cacheProvider = new CacheProvider();
+            modelProvider = new ModelProvider(modelManager);
+            topologyProvider = new TopologyProvider(modelTopologyServis);
+            webTopologyModelProvider = new WebTopologyModelProvider(webTopologyBuilder);
+            topologyPublisher = new TopologyPublisher();
             InitializeHosts();
         }
 

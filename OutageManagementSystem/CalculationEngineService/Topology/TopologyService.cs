@@ -1,8 +1,11 @@
 ﻿using CECommon.Interfaces;
+using CECommon.Providers;
 using Outage.Common;
 using Outage.Common.ServiceContracts;
 using Outage.Common.UI;
 using System;
+using System.Collections.Generic;
+using System.Diagnostics;
 using System.Linq;
 
 namespace Topology
@@ -10,17 +13,20 @@ namespace Topology
 	public class TopologyService : ITopologyServiceContract
 	{
 		private ILogger logger = LoggerWrapper.Instance;
-		private IWebTopologyBuilder webTopologyBuilder = new WebTopologyBuilder();
 		public UIModel GetTopology()
 		{
 			try
 			{
-				UIModel uIModel = new UIModel();
-				if (TopologyManager.Instance.TopologyModel.Count > 0)
+				List<UIModel> uIModels = Provider.Instance.WebTopologyModelProvider.GetUIModels();
+				if (uIModels.Count > 0)
 				{
-					uIModel = webTopologyBuilder.CreateTopologyForWeb(TopologyManager.Instance.TopologyModel.First());
+					return uIModels.First();
 				}
-				return uIModel; 
+				else
+				{
+					//privremeno jer se salje jedna topologija
+					return new UIModel();
+				}
 			}
 			catch (Exception ex)
 			{

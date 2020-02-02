@@ -10,10 +10,32 @@ namespace CECommon
 {
     public class SmartCache
     {
-        public ITopology Topology { get; set; }
-        public Dictionary<long, ResourceDescription> ModelEntities { get; set; }
-        public Dictionary<long, ResourceDescription> TransactionModelEntities { get; set; }
+        public SmartCache()
+        {
+           
+        }
+    }
 
+    struct AnalogMeasurementInforamtion
+    {
+        public long elementGid;
+        public float value;
+        public AnalogMeasurementInforamtion(long elementGid, float value)
+        {
+            this.elementGid = elementGid;
+            this.value = value;
+        }
+
+    }
+    struct DiscreteMeasurementInforamtion
+    {
+        public long elementGid;
+        public ushort value;
+        public DiscreteMeasurementInforamtion(long elementGid, ushort value)
+        {
+            this.elementGid = elementGid;
+            this.value = value;
+        }
 
     }
 }
