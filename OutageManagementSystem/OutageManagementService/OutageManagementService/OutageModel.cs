@@ -1,6 +1,9 @@
-﻿using CECommon.Model;
+﻿using CECommon.Interfaces;
+using CECommon.Model;
 using Outage.Common;
+using Outage.Common.ServiceContracts.OMS;
 using Outage.Common.UI;
+using OutageDatabase;
 using System;
 using System.Collections.Concurrent;
 using System.Collections.Generic;
@@ -101,6 +104,63 @@ namespace OutageManagementService
             }
         }
 
-        
+        public bool ReportPotentialOutage(long gid)
+        {
+            bool success = false;
+
+            List<long> affectedConsumers = new List<long>();
+
+            //TODO: special case: potenitial outage is remote (and closed)...
+
+            affectedConsumers = GetAffectedConsumers(gid);
+
+            if (affectedConsumers.Count > 0)
+            {
+                using (OutageContext db = new OutageContext())
+                {
+                    db.ActiveOutages.Add(new ActiveOutage { AffectedConsumers = affectedConsumers, ElementGid = gid, ReportTime = DateTime.Now }); 
+                }
+                //TODO: Publish
+                success = true;
+            }
+            else
+            {
+                success = false;
+            }
+
+            return success;
+        }
+
+        private List<long> GetAffectedConsumers(long potentialOutageGid)
+        {
+            List<long> affectedConsumers = new List<long>();
+            Stack<long> nodesToBeVisited = new Stack<long>();
+            nodesToBeVisited.Push(potentialOutageGid);
+            HashSet<long> visited = new HashSet<long>();
+
+
+            while (nodesToBeVisited.Count > 0)
+            {
+                long currentNode = nodesToBeVisited.Pop();
+
+                if (!visited.Contains(currentNode))
+                {
+                    visited.Add(currentNode);
+                    ITopologyElement topologyElement = topologyModel.TopologyElements[currentNode];
+
+                    if (topologyElement.SecondEnd.Count == 0 && topologyElement.DmsType == "ENERGYSOURCE") 
+                    {
+                        affectedConsumers.Add(currentNode);
+                    }
+
+                    foreach(long adjNode in topologyElement.SecondEnd)
+                    {
+                        nodesToBeVisited.Push(adjNode);
+                    }
+                }
+            }
+
+            return affectedConsumers;
+        }
     }
 }

@@ -33,10 +33,7 @@ namespace OutageManagementService.Calling
 
         public CallTracker(string subscriberName, OutageModel outageModel)
         {
-            this.timer = new Timer();
-            this.timer.Interval = timeInterval;
-            this.timer.Elapsed += TimerElapsedMethod;
-            this.timer.AutoReset = false;
+           
 
             this.trackingAlgorithm = new TrackingAlgorithm(outageModel);
             this.calls = new ConcurrentQueue<long>();
@@ -54,6 +51,11 @@ namespace OutageManagementService.Calling
                 Logger.LogError("String in config file is not in valid format.", e);
                 throw e;
             }
+
+            this.timer = new Timer();
+            this.timer.Interval = timeInterval;
+            this.timer.Elapsed += TimerElapsedMethod;
+            this.timer.AutoReset = false;
         }
 
         public string GetSubscriberName()
@@ -69,7 +71,7 @@ namespace OutageManagementService.Calling
                 {
                     Logger.LogWarn("Received GID is not id of energy consumer.");
                 }
-                else if (!outageModel.topology.Nodes.ContainsKey(emailMessage.Gid))
+                else if (!outageModel.topology.Nodes.ContainsKey(emailMessage.Gid) && outageModel.topology.FirstNode != emailMessage.Gid)
                 {
                     Logger.LogWarn("Received GID is not part of topology");
                 }

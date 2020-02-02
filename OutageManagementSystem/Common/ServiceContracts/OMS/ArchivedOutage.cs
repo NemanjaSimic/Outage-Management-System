@@ -26,5 +26,8 @@ namespace Outage.Common.ServiceContracts.OMS
 
         [DataMember]
         public DateTime ArchiveTime { get; set; }
+
+        [DataMember]
+        public List<long> AffectedConsumers { get; set; }
     }
 }
