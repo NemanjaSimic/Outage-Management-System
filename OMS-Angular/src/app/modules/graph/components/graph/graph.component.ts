@@ -21,6 +21,7 @@ import { SwitchCommand } from '@shared/models/switch-command.model';
 import { zoom } from '@shared/utils/zoom';
 import { ScadaService } from '@services/notification/scada.service';
 import { ScadaData } from '@shared/models/scada-data.model';
+import { modifyNodeDistance } from '@shared/utils/graph-distance';
 cytoscape.use(dagre);
 cytoscape.use(popper);
 
@@ -192,11 +193,8 @@ export class GraphComponent implements OnInit, OnDestroy {
       elements: this.graphData
     });
 
-<<<<<<< HEAD
     this.addTooltips();
-=======
-    this.addTooltips();    
->>>>>>> cc169672c2013c6224b8801884c74de337c5fb68
+    modifyNodeDistance(this.cy.nodes().filter(x => x.data('dmsType') == "ENERGYCONSUMER"));
   };
 
   public drawBackupEdges(): void {

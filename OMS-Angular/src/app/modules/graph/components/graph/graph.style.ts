@@ -16,7 +16,6 @@ export const style = cytoscape.stylesheet()
     })
     .selector('node[dmsType="ENERGYCONSUMER"]')
     .style({
-        'label': '',
         'background-fit': 'cover',
         'background-opacity': '0',
         'background-image': 'assets/img/consumer.png',
@@ -43,7 +42,6 @@ export const style = cytoscape.stylesheet()
     })
     .selector('node[dmsType="ENERGYSOURCE"]')
     .style({
-        'label': '',
         'background-fit': 'cover',
         'background-image': 'assets/img/energy2.png',
         'background-opacity': '0',
@@ -52,7 +50,6 @@ export const style = cytoscape.stylesheet()
     })
     .selector('node[dmsType="POWERTRANSFORMER"]')
     .style({
-        'label': '',
         'background-fit': 'cover',
         'background-image': 'assets/img/power-transformer.png',
         'background-opacity': '0',
@@ -61,7 +58,6 @@ export const style = cytoscape.stylesheet()
     })
     .selector('node[dmsType="FUSE"]')
     .style({
-        'label': '',
         'background-fit': 'cover',
         'background-image': 'assets/img/fuse.png',
         'background-opacity': '0',
@@ -70,7 +66,6 @@ export const style = cytoscape.stylesheet()
     })
     .selector('node[dmsType="DISCONNECTOR"]')
     .style({
-        'label': '',
         'background-fit': 'cover',
         'background-image': 'assets/img/disconnector.png',
         'background-opacity': '0',
@@ -79,7 +74,6 @@ export const style = cytoscape.stylesheet()
     })
     .selector('node[dmsType="LOADBREAKSWITCH"]')
     .style({
-        'label': '',
         'background-fit': 'cover',
         'background-image': 'assets/img/load-break-switch.png',
         'background-opacity': '0',
@@ -88,14 +82,13 @@ export const style = cytoscape.stylesheet()
     })
     .selector('node[dmsType="BREAKER"]')
     .style({
-        'label': '',
         'background-fit': 'cover',
         'background-image': 'assets/img/breaker.png',
         'background-opacity': '0',
         'height': '60px',
         'width': '60px'
     })
-    .selector('node[type="FUSE"]')
+    .selector('node[dmsType="FUSE"]')
     .style({
         'shape': 'rectangle',
         'background-color': '#2b2935',
@@ -104,7 +97,7 @@ export const style = cytoscape.stylesheet()
         'height': '20px',
         'width': '20px',
     })
-    .selector('node[type="ACLINESEGMENT"]')
+    .selector('node[dmsType="ACLINESEGMENT"]')
     .style({
         'width': '2px',
         'height': '150px'
@@ -112,6 +105,10 @@ export const style = cytoscape.stylesheet()
     .selector('node[deviceType = "remote"]')
     .style({
         'opacity': 1.0 // change this
+    })
+    .selector('node')
+    .style({
+        'shape': 'rectangle'
     })
     .selector('edge')
     .style({
