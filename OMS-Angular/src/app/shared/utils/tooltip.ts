@@ -98,6 +98,12 @@ export const addGraphTooltip = (cy, node) => {
 }
 
 export const addOutageTooltip = (cy, node, outage) => {
+  
+  if(outage == undefined)
+  {
+    return;
+  }
+  
   let ref = node.popperRef();
 
   node.tooltip = tippy(ref, {

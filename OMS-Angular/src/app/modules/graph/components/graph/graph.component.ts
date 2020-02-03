@@ -71,7 +71,7 @@ export class GraphComponent implements OnInit, OnDestroy {
     //this.graphData.backup_edges = graphMock.backup_edges;
     //this.graphData.outages = graphMock.outages;
 
-    this.drawGraph(); // initial test
+    //this.drawGraph(); // initial test
 
     // zoom on + and -
     this.zoomSubscription = fromEvent(document, 'keypress').subscribe(
