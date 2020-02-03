@@ -1,21 +1,18 @@
 import * as cytoscape from 'cytoscape';
 
+export const ACTIVE_NODE_COLOR = 'green'; 
+export const ACTIVE_EDGE_COLOR = 'green'; 
+export const INACTIVE_NODE_COLOR = 'blue'; 
+export const INACTIVE_EDGE_COLOR = 'blue';
+
 export const style = cytoscape.stylesheet()
     .selector('node[state = "active"]')
     .style({
-        'label': 'data(dmsType)',
-        'text-valign': 'center',
-        'text-halign': 'center',
-        'shape': 'rectangle',
-        'background-color': 'green'
+        'background-color': ACTIVE_NODE_COLOR
     })
     .selector('node[state = "inactive"]')
     .style({
-        'label': 'data(dmsType)',
-        'text-valign': 'center',
-        'text-halign': 'center',
-        'shape': 'rectangle',
-        'background-color': 'blue'
+        'background-color': INACTIVE_NODE_COLOR
     })
     .selector('node[dmsType="ENERGYCONSUMER"]')
     .style({
@@ -109,27 +106,13 @@ export const style = cytoscape.stylesheet()
     })
     .selector('node[type="ACLINESEGMENT"]')
     .style({
-        'label': 'data(dmsType)',
-        'text-valign': 'center',
-        'text-halign': 'center',
-        'shape': 'rectangle',
         'width': '2px',
-        'height': '100px',
-        'background-color': 'green'
+        'height': '150px'
     })
     .selector('node[deviceType = "remote"]')
     .style({
         'opacity': 1.0 // change this
     })
-    // .selector('node[deviceType = "remote"]')
-    // .style({
-    //     'label': 'data(dmsType)',
-    //     'text-valign': 'center',
-    //     'text-halign': 'center',
-    //     'shape': 'rectangle',
-    //     'background-color': 'green',
-    //     'opacity': 0.7
-    // })
     .selector('edge')
     .style({
         'line-color': 'data(color)',

@@ -5,7 +5,7 @@ import { OmsGraph } from '@shared/models/oms-graph.model';
 
 import cyConfig from './graph.config';
 import { drawBackupEdge } from '@shared/utils/backup-edge';
-import { addGraphTooltip, addOutageTooltip } from '@shared/utils/tooltip';
+import { addGraphTooltip, addOutageTooltip, addEdgeTooltip } from '@shared/utils/tooltip';
 import { drawWarning } from '@shared/utils/warning';
 import { drawCallWarning } from '@shared/utils/outage';
 
@@ -17,7 +17,7 @@ import * as graphMock from './graph-mock.json';
 import dagre from 'cytoscape-dagre';
 import popper from 'cytoscape-popper';
 import { CommandService } from '@services/command/command.service';
-import { SwitchCommandType, SwitchCommand } from '@shared/models/switch-command.model';
+import { SwitchCommand } from '@shared/models/switch-command.model';
 import { zoom } from '@shared/utils/zoom';
 import { ScadaService } from '@services/notification/scada.service';
 import { ScadaData } from '@shared/models/scada-data.model';
@@ -38,7 +38,7 @@ export class GraphComponent implements OnInit, OnDestroy {
 
   public scadaServiceConnectionSubscription: Subscription;
   public scadaSubscription: Subscription;
-  
+
   public zoomSubscription: Subscription;
   public panSubscription: Subscription;
 
@@ -192,7 +192,7 @@ export class GraphComponent implements OnInit, OnDestroy {
       elements: this.graphData
     });
 
-    this.addTooltips();    
+    this.addTooltips();
   };
 
   public drawBackupEdges(): void {
@@ -207,22 +207,25 @@ export class GraphComponent implements OnInit, OnDestroy {
     this.cy.ready(() => {
       this.cy.nodes().forEach(node => {
         node.sendSwitchCommand = (command) => this.onCommandHandler(command);
-        if(node.data("type") == 'warning')
-        {
-          //Za sad ovako jer su hardkodovani i Outage simboli, ovako je testirano samo
+        if (node.data("type") == 'warning') {
           var outage;
           this.graphData.outages.forEach(o => {
-             var outageId = o["data"]["elementId"];
-              if(node.data("targetId") == outageId)
-              {
-                outage = o;
-              }
-           });
-           addOutageTooltip(this.cy, node, outage);
-        }else
-        {
+            var outageId = o["data"]["elementId"];
+            if (node.data("targetId") == outageId) {
+              outage = o;
+            }
+          });
+
+          addOutageTooltip(this.cy, node, outage);
+        } else {
+
           addGraphTooltip(this.cy, node);
-        }
+          if (node.data('dmsType') == "ACLINESEGMENT") {
+            const connectedEdges = node.connectedEdges();
+            if (connectedEdges.length)
+              connectedEdges.map(acLineEdge => addEdgeTooltip(this.cy, node, acLineEdge));
+          }
+        };
       });
     });
   }
@@ -247,7 +250,7 @@ export class GraphComponent implements OnInit, OnDestroy {
     console.log(data);
   }
 
-  public onSearch() : void {
+  public onSearch(): void {
     this.cy.ready(() => {
       zoom(this.cy, this.gidSearchQuery);
     })
