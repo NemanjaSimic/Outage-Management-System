@@ -26,6 +26,15 @@ export const style = cytoscape.stylesheet()
         'height': '20px',
         'width': '20px',
     })
+    .selector('node[type = "analogMeasurement"]')
+    .style({
+        'shape': 'rectangle',
+        'background-color': '#2b2935',
+        'background-fit': 'contain',
+        'background-image': 'assets/img/bulb.png',
+        'height': '15px',
+        'width': '15px',
+    })
     .selector('node[type = "outage-call"]')
     .style({
         'shape': 'rectangle',

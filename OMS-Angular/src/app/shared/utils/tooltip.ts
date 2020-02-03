@@ -1,5 +1,6 @@
 import tippy from 'tippy.js';
 import { SwitchCommand, SwitchCommandType } from '@shared/models/switch-command.model';
+import { GetUnitMeasurement } from './measurement';
 
 const graphTooltipBody: string =
   `<p>ID: [[id]]</p>
@@ -16,6 +17,10 @@ const outageTooltipBody: string =
   <p>ElementID: [[elementId]]</p>
   <p>ReportTime: [[reportTime]]</p>
   <p>ArchiveTime: [[archiveTime]]</p>`;
+
+const measurementsToolTipBody: string =
+`<h3>MEASUREMENTS</h3>
+<p>Type: [[type]] Value:[[value]] [[unit]]</p>`;
 
 export const addGraphTooltip = (cy, node) => {
   let ref = node.popperRef();
@@ -129,10 +134,35 @@ export const addOutageTooltip = (cy, node, outage) => {
       node.tooltip.show();
     }, 0);
   });
+}
 
-  cy.on('zoom pan', () => {
+export const addMeasurementTooltip = (cy, node) => {
+  let ref = node.popperRef();
+  let measurements = node.data("measurements");
+  if(measurements == undefined)
+    return;
+
+  node.tooltip = tippy(ref, {
+    content: () => {
+      const div = document.createElement('div');
+      measurements.forEach(element => {
+        div.innerHTML = measurementsToolTipBody
+        .replace("[[type]]", element.Type)
+        .replace("[[value]]", element.Value)
+        .replace("[[unit]]", GetUnitMeasurement(element.Type))    
+      });  
+      return div;
+    },
+    animation: 'scale',
+    trigger: 'manual',
+    placement: 'left',
+    arrow: true,
+    interactive: true
+  })
+
+  node.on('tap', () => {
     setTimeout(() => {
-      node.tooltip.hide();
+      node.tooltip.show();
     }, 0);
   });
 }

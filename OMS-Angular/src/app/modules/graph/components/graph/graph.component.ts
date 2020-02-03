@@ -5,9 +5,10 @@ import { OmsGraph } from '@shared/models/oms-graph.model';
 
 import cyConfig from './graph.config';
 import { drawBackupEdge } from '@shared/utils/backup-edge';
-import { addGraphTooltip, addOutageTooltip } from '@shared/utils/tooltip';
+import { addGraphTooltip, addOutageTooltip, addMeasurementTooltip } from '@shared/utils/tooltip';
 import { drawWarning } from '@shared/utils/warning';
 import { drawCallWarning } from '@shared/utils/outage';
+import { drawMeasurements } from '@shared/utils/measurement';
 
 import * as cytoscape from 'cytoscape';
 import * as mapper from '@shared/utils/mapper';
@@ -21,6 +22,7 @@ import { SwitchCommandType, SwitchCommand } from '@shared/models/switch-command.
 import { zoom } from '@shared/utils/zoom';
 import { ScadaService } from '@services/notification/scada.service';
 import { ScadaData } from '@shared/models/scada-data.model';
+import { IMeasurement } from '@shared/models/node.model';
 cytoscape.use(dagre);
 cytoscape.use(popper);
 
@@ -194,6 +196,7 @@ export class GraphComponent implements OnInit, OnDestroy {
 
     //this.drawBackupEdges();
     this.drawWarnings();
+    this.drawMeasurements();
     this.addTooltips();
   };
 
@@ -221,11 +224,30 @@ export class GraphComponent implements OnInit, OnDestroy {
               }
            });
            addOutageTooltip(this.cy, node, outage);
-        }else
+        }else if(node.data("type") == 'analogMeasurement')
         {
-          addGraphTooltip(this.cy, node);
+          addMeasurementTooltip(this.cy, node);
+        }
+        else
+        {
+          addGraphTooltip(this.cy, node);     
         }
       });
+    });
+  }
+
+  public drawMeasurements() : void {
+    this.cy.ready(() => {
+      this.cy.nodes().forEach(node => {
+        let measurements : IMeasurement[] = node.data("measurements");
+        if(measurements != undefined 
+            && !(measurements.length == 1 
+            && measurements[0].Type == "SWITCH_STATUS") 
+            && measurements.length != 0)
+        {
+            drawMeasurements(this.cy, node);
+        }
+      })
     });
   }
 
@@ -235,7 +257,7 @@ export class GraphComponent implements OnInit, OnDestroy {
             drawWarning(this.cy, line);
       })
     });
-  };
+  }
 
   public onCommandHandler = (command: SwitchCommand) => {
     this.commandService.sendSwitchCommand(command).subscribe(
