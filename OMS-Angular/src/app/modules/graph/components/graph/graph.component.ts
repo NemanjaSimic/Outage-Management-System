@@ -192,7 +192,11 @@ export class GraphComponent implements OnInit, OnDestroy {
       elements: this.graphData
     });
 
+<<<<<<< HEAD
     this.addTooltips();
+=======
+    this.addTooltips();    
+>>>>>>> cc169672c2013c6224b8801884c74de337c5fb68
   };
 
   public drawBackupEdges(): void {
