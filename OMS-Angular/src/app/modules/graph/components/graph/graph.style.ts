@@ -109,6 +109,16 @@ export const style = cytoscape.stylesheet()
     })
     .selector('node[type="ACLINESEGMENT"]')
     .style({
+        'label': 'data(dmsType)',
+        'text-valign': 'center',
+        'text-halign': 'center',
+        'shape': 'rectangle',
+        'width': '2px',
+        'height': '100px',
+        'background-color': 'green'
+    })
+    .selector('node[deviceType = "remote"]')
+    .style({
         'opacity': 1.0 // change this
     })
     // .selector('node[deviceType = "remote"]')
@@ -122,7 +132,7 @@ export const style = cytoscape.stylesheet()
     // })
     .selector('edge')
     .style({
-        'line-color': 'data(color)',
+        'line-color': 'green',
         'width': '2px',
         'curve-style': 'taxi',
         'taxi-direction': 'vertical',
