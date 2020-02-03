@@ -17,6 +17,15 @@ export const style = cytoscape.stylesheet()
         'shape': 'rectangle',
         'background-color': 'red'
     })
+    .selector('node[dmsType="ENERGYCONSUMER"]')
+    .style({
+        'label': '',
+        'background-fit': 'cover',
+        'background-opacity': '0',
+        'background-image': 'assets/img/consumer.png',
+        'height': '45px',
+        'width': '45px',
+    })
     .selector('node[type = "warning"]')
     .style({
         'shape': 'rectangle',
@@ -37,12 +46,57 @@ export const style = cytoscape.stylesheet()
     })
     .selector('node[dmsType="ENERGYSOURCE"]')
     .style({
-        'label': 'data(dmsType)',
-        'text-valign': 'center',
-        'text-halign': 'center',
-        'rotate': '90',
-        'shape': 'triangle',
-        'background-color': 'green'
+        'label': '',
+        'background-fit': 'cover',
+        'background-image': 'assets/img/energy2.png',
+        'background-opacity': '0',
+        'height': '100px',
+        'width': '100px'
+    })
+    .selector('node[dmsType="POWERTRANSFORMER"]')
+    .style({
+        'label': '',
+        'background-fit': 'cover',
+        'background-image': 'assets/img/power-transformer.png',
+        'background-opacity': '0',
+        'height': '100px',
+        'width': '100px'
+    })
+    .selector('node[dmsType="FUSE"]')
+    .style({
+        'label': '',
+        'background-fit': 'cover',
+        'background-image': 'assets/img/fuse.png',
+        'background-opacity': '0',
+        'height': '35px',
+        'width': '35px'
+    })
+    .selector('node[dmsType="DISCONNECTOR"]')
+    .style({
+        'label': '',
+        'background-fit': 'cover',
+        'background-image': 'assets/img/disconnector.png',
+        'background-opacity': '0',
+        'height': '65px',
+        'width': '65px'
+    })
+    .selector('node[dmsType="LOADBREAKSWITCH"]')
+    .style({
+        'label': '',
+        'background-fit': 'cover',
+        'background-image': 'assets/img/load-break-switch.png',
+        'background-opacity': '0',
+        'height': '60px',
+        'width': '60px'
+    })
+    .selector('node[dmsType="BREAKER"]')
+    .style({
+        'label': '',
+        'background-fit': 'cover',
+        'background-image': 'assets/img/breaker.png',
+        'background-opacity': '0',
+        'height': '60px',
+        'width': '60px'
     })
     .selector('node[dmsType="ACLINESEGMENT"]')
     .style({
@@ -53,15 +107,15 @@ export const style = cytoscape.stylesheet()
         'width': '2px',
         'background-color': 'red'
     })
-    .selector('node[deviceType = "remote"]')
-    .style({
-        'label': 'data(dmsType)',
-        'text-valign': 'center',
-        'text-halign': 'center',
-        'shape': 'rectangle',
-        'background-color': 'green',
-        'opacity': 0.7
-    })
+    // .selector('node[deviceType = "remote"]')
+    // .style({
+    //     'label': 'data(dmsType)',
+    //     'text-valign': 'center',
+    //     'text-halign': 'center',
+    //     'shape': 'rectangle',
+    //     'background-color': 'green',
+    //     'opacity': 0.7
+    // })
     .selector('edge')
     .style({
         'line-color': 'data(color)',
