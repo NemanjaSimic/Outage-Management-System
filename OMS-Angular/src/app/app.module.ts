@@ -6,8 +6,9 @@ import { SharedModule } from '@shared/shared.module';
 import { ServicesModule } from '@services/services.module';
 
 import { GraphModule } from './modules/graph/graph.module';
-import { ActiveBrowserComponent } from './modules/active-browser/active-browser.component';
-import { HistoricalBrowserComponent } from './modules/historical-browser/historical-browser.component';
+//TOOD: check this
+// import { ActiveBrowserComponent } from './modules/active-browser/active-browser.component';
+// import { HistoricalBrowserComponent } from './modules/historical-browser/historical-browser.component';
 
 import { MatSidenavModule } from '@angular/material/sidenav';
 import { MatCheckboxModule } from '@angular/material/checkbox';
@@ -21,8 +22,8 @@ import { MatTableModule } from '@angular/material/table';
 @NgModule({
   declarations: [
     AppComponent,
-    ActiveBrowserComponent,
-    HistoricalBrowserComponent
+    // ActiveBrowserComponent,
+    // HistoricalBrowserComponent
   ],
   imports: [
     RoutingModule,
