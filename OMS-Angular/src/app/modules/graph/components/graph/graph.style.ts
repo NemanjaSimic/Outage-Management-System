@@ -132,7 +132,7 @@ export const style = cytoscape.stylesheet()
     // })
     .selector('edge')
     .style({
-        'line-color': 'green',
+        'line-color': 'data(color)',
         'width': '2px',
         'curve-style': 'taxi',
         'taxi-direction': 'vertical',
