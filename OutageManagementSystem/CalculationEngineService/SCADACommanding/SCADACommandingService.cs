@@ -1,4 +1,5 @@
-﻿using Outage.Common;
+﻿using CECommon.Providers;
+using Outage.Common;
 using Outage.Common.ServiceContracts.SCADA;
 using Outage.Common.ServiceProxies;
 using System;
@@ -20,10 +21,17 @@ namespace SCADACommanding
             bool success = false;
             try
             {
-                using (var proxy = new SCADACommandProxy(EndpointNames.SCADACommandService))
+                if (Provider.Instance.TopologyProvider.IsElementRemote(gid))
                 {
-                    proxy.SendDiscreteCommand(gid, commandingValue);
-                    success = true;
+                    using (var proxy = new SCADACommandProxy(EndpointNames.SCADACommandService))
+                    {
+                        proxy.SendDiscreteCommand(gid, commandingValue);
+                        success = true;
+                    }
+                }
+                else
+                {
+                    Provider.Instance.CacheProvider.UpdateDiscreteMeasurement(gid, commandingValue);
                 }
             }
             catch (Exception ex)

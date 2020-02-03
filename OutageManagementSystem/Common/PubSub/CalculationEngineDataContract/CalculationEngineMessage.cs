@@ -1,9 +1,5 @@
-﻿using System;
-using System.Collections.Generic;
-using System.Linq;
-using System.Text;
-using System.Threading.Tasks;
-using System.Runtime.Serialization;
+﻿using System.Runtime.Serialization;
+using Outage.Common.OutageService.Interface;
 using Outage.Common.UI;
 
 namespace Outage.Common.PubSub.CalculationEngineDataContract
@@ -26,5 +22,17 @@ namespace Outage.Common.PubSub.CalculationEngineDataContract
             UIModel = uIModel;
         }
         
+    }
+
+    [DataContract]
+    public class OMSModelMessage : CalculationEngineMessage
+    {
+        [DataMember]
+        public IOutageTopologyModel OutageTopologyModel { get; set; }
+
+        public OMSModelMessage(IOutageTopologyModel outageTopologyModel)
+        {
+            OutageTopologyModel = outageTopologyModel;
+        }
     }
 }

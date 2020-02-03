@@ -34,7 +34,7 @@ namespace CECommon.Providers
         public ITopologyProvider TopologyProvider { get; set; } 
         public IModelProvider ModelProvider { get; set; }
         public ModelResourcesDesc ModelResourcesDesc { get; private set; }
-        public IWebTopologyModelProvider WebTopologyModelProvider { get; set; }
+        public ITopologyConverterProvider TopologyConverterProvider { get; set; }
         public ISCADAResultHandler SCADAResultHandler { get; set; }
         public ICacheProvider CacheProvider { get; set; }
     }

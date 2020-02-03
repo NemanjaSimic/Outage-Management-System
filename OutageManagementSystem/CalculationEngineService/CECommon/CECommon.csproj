@@ -55,9 +55,9 @@
     <Compile Include="Interfaces\ITopologyBuilder.cs" />
     <Compile Include="Interfaces\ITopologyElement.cs" />
     <Compile Include="Interfaces\ITopologyProvider.cs" />
-    <Compile Include="Interfaces\IWebTopologyBuilder.cs" />
+    <Compile Include="Interfaces\ITopologyConverter.cs" />
     <Compile Include="Enums.cs" />
-    <Compile Include="Interfaces\IWebTopologyModelProvider.cs" />
+    <Compile Include="Interfaces\ITopologyConverterProvider.cs" />
     <Compile Include="Model\BaseVoltage.cs" />
     <Compile Include="Model\Field.cs" />
     <Compile Include="Model\Measurement.cs" />
@@ -68,7 +68,7 @@
     <Compile Include="Providers\Provider.cs" />
     <Compile Include="Providers\SCADAResultHandler.cs" />
     <Compile Include="Providers\TopologyProvider.cs" />
-    <Compile Include="Providers\WebTopologyModelProvider.cs" />
+    <Compile Include="Providers\TopologyConverterProvider.cs" />
     <Compile Include="SmartCache.cs" />
     <Compile Include="TopologyConfiguration\Config.cs" />
     <Compile Include="TopologyConfiguration\ConfigurationParse.cs" />

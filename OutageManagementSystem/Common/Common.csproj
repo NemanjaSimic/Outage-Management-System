@@ -103,6 +103,10 @@
   <ItemGroup>
     <Compile Include="EndpointNames.cs" />
     <Compile Include="Exceptions\SCADA\InternalSCADAServiceException.cs" />
+    <Compile Include="OutageService\Interface\IOutageTopologyElement.cs" />
+    <Compile Include="OutageService\Interface\IOutageTopologyModel.cs" />
+    <Compile Include="OutageService\Model\OutageTopologyElement.cs" />
+    <Compile Include="OutageService\Model\OutageTopologyModel.cs" />
     <Compile Include="PubSub\CalculationEngineDataContract\CalcualtionEnginePublication.cs" />
     <Compile Include="PubSub\CalculationEngineDataContract\CalculationEngineMessage.cs" />
     <Compile Include="PubSub\EmailDataContract\EmailServiceMessage.cs" />
@@ -114,6 +118,7 @@
     <Compile Include="PubSub\SCADADataContract\SCADAMessage.cs" />
     <Compile Include="PubSub\SCADADataContract\SCADAPublication.cs" />
     <Compile Include="ServiceContracts\CalculationEngine\ICECommand.cs" />
+    <Compile Include="ServiceContracts\CalculationEngine\ITopologyOMSService.cs" />
     <Compile Include="ServiceContracts\DistributedTransaction\IModelUpdateNotificationContract.cs" />
     <Compile Include="ServiceContracts\DistributedTransaction\ITransactionEnlistmentContract.cs" />
     <Compile Include="ServiceContracts\OMS\ArchivedOutage.cs" />
@@ -138,6 +143,7 @@
     <Compile Include="LoggerWrapper.cs" />
     <Compile Include="ModelException\ErrorCode.cs" />
     <Compile Include="ModelException\ModelException.cs" />
+    <Compile Include="ServiceProxies\CalcualtionEngine\OMSTopologyServiceProxy.cs" />
     <Compile Include="ServiceProxies\DistributedTransaction\ModelUpdateNotificationProxy.cs" />
     <Compile Include="ServiceProxies\DistributedTransaction\TransactionCoordinatorProxy.cs" />
     <Compile Include="ServiceProxies\NetworkModelGDAProxy.cs" />
