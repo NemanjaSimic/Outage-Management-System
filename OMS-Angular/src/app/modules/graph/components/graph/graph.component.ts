@@ -19,6 +19,8 @@ import popper from 'cytoscape-popper';
 import { CommandService } from '@services/command/command.service';
 import { SwitchCommandType, SwitchCommand } from '@shared/models/switch-command.model';
 import { zoom } from '@shared/utils/zoom';
+import { ScadaService } from '@services/notification/scada.service';
+import { ScadaData } from '@shared/models/scada-data.model';
 cytoscape.use(dagre);
 cytoscape.use(popper);
 
@@ -33,6 +35,10 @@ export class GraphComponent implements OnInit, OnDestroy {
   public topologySubscription: Subscription;
   public updateSubscription: Subscription;
   public outageSubscription: Subscription;
+
+  public scadaServiceConnectionSubscription: Subscription;
+  public scadaSubscription: Subscription;
+  
   public zoomSubscription: Subscription;
   public panSubscription: Subscription;
 
@@ -49,6 +55,7 @@ export class GraphComponent implements OnInit, OnDestroy {
 
   constructor(
     private graphService: GraphService,
+    private scadaService: ScadaService,
     private commandService: CommandService,
     private ngZone: NgZone
   ) {
@@ -64,6 +71,7 @@ export class GraphComponent implements OnInit, OnDestroy {
     // web api
     this.getTopology();
     this.startConnection();
+    this.startScadaConnection();
 
     // local testing
     //this.graphData.nodes = graphMock.nodes;
@@ -118,6 +126,9 @@ export class GraphComponent implements OnInit, OnDestroy {
     if (this.updateSubscription)
       this.updateSubscription.unsubscribe();
 
+    if (this.scadaSubscription)
+      this.scadaSubscription.unsubscribe();
+
     if (this.zoomSubscription)
       this.zoomSubscription.unsubscribe();
 
@@ -151,6 +162,23 @@ export class GraphComponent implements OnInit, OnDestroy {
         }
         else {
           console.log('Could not connect to graph service');
+        }
+      },
+      (err) => console.log(err)
+    );
+  }
+
+  public startScadaConnection(): void {
+    this.scadaServiceConnectionSubscription = this.scadaService.startConnection().subscribe(
+      (didConnect) => {
+        if (didConnect) {
+          console.log('Connected to scada service');
+
+          this.scadaSubscription = this.scadaService.updateRecieved.subscribe(
+            (data: ScadaData) => this.onScadaNotification(data));
+        }
+        else {
+          console.log('Could not connect to scada service');
         }
       },
       (err) => console.log(err)
@@ -223,6 +251,10 @@ export class GraphComponent implements OnInit, OnDestroy {
       this.graphData.edges = data.Relations.map(mapper.mapRelation);
       this.drawGraph();
     });
+  }
+
+  public onScadaNotification(data: ScadaData): void {
+    //todo: measurements update
   }
 
   public onSearch() : void {

@@ -50,9 +50,4 @@ export class ScadaService {
       this.updateRecieved.emit(data);
     });
   }
-
-//   public getTopology(): Observable<ScadaData> {
-//     return this.http.get(`${this.envService.apiUrl}/topology`) as Observable<ScadaData>;
-//   }
-
 }
