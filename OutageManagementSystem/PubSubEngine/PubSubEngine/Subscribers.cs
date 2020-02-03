@@ -108,7 +108,7 @@ namespace PubSubEngine
                 message = queueOfMessages.Dequeue();
                 Logger.LogDebug($"Published message [{message}] SUCCESSFYLLY dequeued from Subscriber's queue of messages [Subscriber name: '{subscriberName}'].");
             }
-            else if(queueOfMessages.Count == 0)
+            else if(queueOfMessages != null && queueOfMessages.Count == 0)
             {
                 Logger.LogDebug($"Queue of messages for subscriber [{subscriberName}] is empty.");
             }

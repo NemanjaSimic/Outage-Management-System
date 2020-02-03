@@ -1,5 +1,5 @@
-﻿using Outage.Common.PubSub;
-using Outage.Common.PubSub.CalculationEngineDataContract;
+﻿using OMS.Web.Adapter.HubDispatchers;
+using Outage.Common.PubSub;
 using Outage.Common.PubSub.SCADADataContract;
 using Outage.Common.ServiceContracts.PubSub;
 using System;
@@ -17,24 +17,39 @@ namespace OMS.Web.Adapter.SCADA
     public class SCADANotification : ISubscriberCallback
     {
         private readonly string _subscriberName;
-        private readonly Dictionary<long, double> _analogValues;
+        private readonly ScadaHubDipatcher _dispatcher;
 
         public SCADANotification(string subscriberName)
         {
             _subscriberName = subscriberName;
 
+            _dispatcher = new ScadaHubDipatcher();
         }
 
         public string GetSubscriberName() => _subscriberName;
 
         public void Notify(IPublishableMessage message)
         {
-            if (message is MultipleAnalogValueSCADAMessage scadaMessage)
+
+            if (message is MultipleAnalogValueSCADAMessage analogValuesMessage)
             {
-                foreach (var item in scadaMessage.Data)
+                Dictionary<long, AnalogModbusData> analogModbusData = new Dictionary<long, AnalogModbusData>(analogValuesMessage.Data);
+
+                _dispatcher.Connect();
+                
+                try
                 {
-                    _analogValues.Add(item.Key, item.Value.Value);
+                    _dispatcher.NotifyScadaDataUpdate(analogModbusData);
                 }
+                catch (Exception e)
+                {
+                    //log error
+                    // retry ?
+                }
+            }
+            else
+            {
+                //todo: if anything?
             }
         }
     }

@@ -20,9 +20,6 @@ namespace OMS.Web.Adapter
                 EndpointNames.SubscriberEndpoint
                 );
 
-            SubscriberProxy _subscriberSCADA = new SubscriberProxy(
-                new SCADANotification("WEB_SUBSCRIBER"), EndpointNames.SCADAAnalogRecieverEndpoint);
-
             try
             {
                 _subscriberClient.Subscribe(Topic.TOPOLOGY);
@@ -30,6 +27,20 @@ namespace OMS.Web.Adapter
             catch (Exception e)
             {
                 Console.WriteLine($"Exception occured during SubscriberClient.Subscribe(): {e.Message}");
+                throw;
+            }
+
+
+            SCADANotification scadaNotification = new SCADANotification("SCADA_ADAPTER_SUBSCRIBER");
+            SubscriberProxy subscriberSCADAproxy = new SubscriberProxy(scadaNotification, EndpointNames.SubscriberEndpoint);
+
+            try
+            {
+                subscriberSCADAproxy.Subscribe(Topic.MEASUREMENT);
+            }
+            catch (Exception e)
+            {
+                Console.WriteLine($"Exception occured during subscriberSCADAproxy.Subscribe({Topic.MEASUREMENT}): {e.Message}");
                 throw;
             }
 
