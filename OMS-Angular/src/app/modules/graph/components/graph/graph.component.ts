@@ -254,7 +254,7 @@ export class GraphComponent implements OnInit, OnDestroy {
   }
 
   public onScadaNotification(data: ScadaData): void {
-    //todo: measurements update
+    console.log(data);
   }
 
   public onSearch() : void {
