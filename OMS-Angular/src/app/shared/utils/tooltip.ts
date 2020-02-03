@@ -1,6 +1,8 @@
 import tippy from 'tippy.js';
 import { SwitchCommand, SwitchCommandType } from '@shared/models/switch-command.model';
 
+const commandableTypes: string[] = ["LOADBREAKSWITCH", "DISCONNECTOR", "BREAKER", "FUSE"];
+
 const graphTooltipBody: string =
   `<p>ID: [[id]]</p>
   <p>Type: [[type]]</p>
@@ -28,9 +30,7 @@ export const addGraphTooltip = (cy, node) => {
         .replace("[[state]]", node.data('state'))
         .replace("[[nominalVoltage]]", node.data('nominalVoltage'));
 
-      // button - mozemo i preko document.createElement() pa appendChild()
-      if (node.data('dmsType') == "LOADBREAKSWITCH" || node.data('dmsType') == "DISCONNECTOR" 
-            || node.data('dmsType') == "BREAKER" || node.data('dmsType') == "FUSE") {
+      if (commandableTypes.includes(node.data('dmsType'))) {
         const button = document.createElement('button');
 
         const meas = node.data('measurements');

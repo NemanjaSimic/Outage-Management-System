@@ -162,10 +162,7 @@ export class GraphComponent implements OnInit, OnDestroy {
       elements: this.graphData
     });
 
-    //this.drawBackupEdges();
-    this.addTooltips();
-    this.drawWarnings();
-    
+    this.addTooltips();    
   };
 
   public drawBackupEdges(): void {
@@ -185,14 +182,6 @@ export class GraphComponent implements OnInit, OnDestroy {
     });
   }
 
-  public drawWarnings(): void {
-    this.cy.ready(() => {
-      this.cy.edges().forEach(line => {
-        drawWarning(this.cy, line);
-      })
-    });
-  };
-
   public onCommandHandler = (command: SwitchCommand) => {
     this.commandService.sendSwitchCommand(command).subscribe(
       data => console.log(data),
@@ -202,9 +191,9 @@ export class GraphComponent implements OnInit, OnDestroy {
 
   public onNotification(data: OmsGraph): void {
     this.ngZone.run(() => {
-      console.log(data);
       this.graphData.nodes = data.Nodes.map(mapper.mapNode);
       this.graphData.edges = data.Relations.map(mapper.mapRelation);
+      console.log(this.graphData);
       this.drawGraph();
     });
   }
