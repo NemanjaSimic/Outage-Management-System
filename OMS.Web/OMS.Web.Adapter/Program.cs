@@ -1,4 +1,12 @@
-﻿namespace OMS.Web.Adapter
+﻿using OMS.Web.Adapter.SCADA;
+using OMS.Web.Adapter.Topology;
+using OMS.Web.Common;
+using OMS.Web.Common.Mappers;
+using Outage.Common;
+using Outage.Common.ServiceProxies.PubSub;
+using System;
+
+namespace OMS.Web.Adapter
 {
     using OMS.Web.Adapter.Topology;
     using OMS.Web.Common;
@@ -34,6 +42,20 @@
             catch (Exception)
             {
                 Console.WriteLine("Failed to subscribe on Topology topic.");
+            }
+
+
+            SCADANotification scadaNotification = new SCADANotification("SCADA_ADAPTER_SUBSCRIBER");
+            SubscriberProxy subscriberSCADAproxy = new SubscriberProxy(scadaNotification, EndpointNames.SubscriberEndpoint);
+
+            try
+            {
+                subscriberSCADAproxy.Subscribe(Topic.MEASUREMENT);
+            }
+            catch (Exception e)
+            {
+                Console.WriteLine($"Exception occured during subscriberSCADAproxy.Subscribe({Topic.MEASUREMENT}): {e.Message}");
+                throw;
             }
 
             Console.WriteLine("Press enter to close the app.");

@@ -3,6 +3,7 @@ import { EnvironmentService } from '@services/environment/environment.service';
 import { OmsGraph } from '@shared/models/oms-graph.model';
 import { Observable, Observer } from 'rxjs';
 import { HttpClient } from '@angular/common/http';
+import { ScadaData } from '@shared/models/scada-data.model';
 
 // TODO: add jquery in a different way, this may result in prod. build errors
 declare var $;

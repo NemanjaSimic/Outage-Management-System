@@ -5,7 +5,7 @@ import { OmsGraph } from '@shared/models/oms-graph.model';
 
 import cyConfig from './graph.config';
 import { drawBackupEdge } from '@shared/utils/backup-edge';
-import { addGraphTooltip } from '@shared/utils/tooltip';
+import { addGraphTooltip, addOutageTooltip } from '@shared/utils/tooltip';
 import { drawWarning } from '@shared/utils/warning';
 import { drawCallWarning } from '@shared/utils/outage';
 
@@ -19,6 +19,8 @@ import popper from 'cytoscape-popper';
 import { CommandService } from '@services/command/command.service';
 import { SwitchCommandType, SwitchCommand } from '@shared/models/switch-command.model';
 import { zoom } from '@shared/utils/zoom';
+import { ScadaService } from '@services/notification/scada.service';
+import { ScadaData } from '@shared/models/scada-data.model';
 cytoscape.use(dagre);
 cytoscape.use(popper);
 
@@ -33,6 +35,10 @@ export class GraphComponent implements OnInit, OnDestroy {
   public topologySubscription: Subscription;
   public updateSubscription: Subscription;
   public outageSubscription: Subscription;
+
+  public scadaServiceConnectionSubscription: Subscription;
+  public scadaSubscription: Subscription;
+  
   public zoomSubscription: Subscription;
   public panSubscription: Subscription;
 
@@ -43,11 +49,13 @@ export class GraphComponent implements OnInit, OnDestroy {
   private graphData: any = {
     nodes: [],
     edges: [],
-    backup_edges: []
+    backup_edges: [],
+    outages: []
   };
 
   constructor(
     private graphService: GraphService,
+    private scadaService: ScadaService,
     private commandService: CommandService,
     private ngZone: NgZone
   ) {
@@ -63,11 +71,13 @@ export class GraphComponent implements OnInit, OnDestroy {
     // web api
     this.getTopology();
     this.startConnection();
+    this.startScadaConnection();
 
     // local testing
     //this.graphData.nodes = graphMock.nodes;
     //this.graphData.edges = graphMock.edges;
     //this.graphData.backup_edges = graphMock.backup_edges;
+    //this.graphData.outages = graphMock.outages;
 
     //this.drawGraph(); // initial test
 
@@ -116,6 +126,9 @@ export class GraphComponent implements OnInit, OnDestroy {
     if (this.updateSubscription)
       this.updateSubscription.unsubscribe();
 
+    if (this.scadaSubscription)
+      this.scadaSubscription.unsubscribe();
+
     if (this.zoomSubscription)
       this.zoomSubscription.unsubscribe();
 
@@ -155,6 +168,23 @@ export class GraphComponent implements OnInit, OnDestroy {
     );
   }
 
+  public startScadaConnection(): void {
+    this.scadaServiceConnectionSubscription = this.scadaService.startConnection().subscribe(
+      (didConnect) => {
+        if (didConnect) {
+          console.log('Connected to scada service');
+
+          this.scadaSubscription = this.scadaService.updateRecieved.subscribe(
+            (data: ScadaData) => this.onScadaNotification(data));
+        }
+        else {
+          console.log('Could not connect to scada service');
+        }
+      },
+      (err) => console.log(err)
+    );
+  }
+
   public drawGraph(): void {
     this.cy = cytoscape({
       ...cyConfig,
@@ -163,9 +193,8 @@ export class GraphComponent implements OnInit, OnDestroy {
     });
 
     //this.drawBackupEdges();
-    this.addTooltips();
     this.drawWarnings();
-    
+    this.addTooltips();
   };
 
   public drawBackupEdges(): void {
@@ -180,7 +209,22 @@ export class GraphComponent implements OnInit, OnDestroy {
     this.cy.ready(() => {
       this.cy.nodes().forEach(node => {
         node.sendSwitchCommand = (command) => this.onCommandHandler(command);
-        addGraphTooltip(this.cy, node);
+        if(node.data("type") == 'warning')
+        {
+          //Za sad ovako jer su hardkodovani i Outage simboli, ovako je testirano samo
+          var outage;
+          this.graphData.outages.forEach(o => {
+             var outageId = o["data"]["elementId"];
+              if(node.data("targetId") == outageId)
+              {
+                outage = o;
+              }
+           });
+           addOutageTooltip(this.cy, node, outage);
+        }else
+        {
+          addGraphTooltip(this.cy, node);
+        }
       });
     });
   }
@@ -188,7 +232,7 @@ export class GraphComponent implements OnInit, OnDestroy {
   public drawWarnings(): void {
     this.cy.ready(() => {
       this.cy.edges().forEach(line => {
-        drawWarning(this.cy, line);
+            drawWarning(this.cy, line);
       })
     });
   };
@@ -207,6 +251,10 @@ export class GraphComponent implements OnInit, OnDestroy {
       this.graphData.edges = data.Relations.map(mapper.mapRelation);
       this.drawGraph();
     });
+  }
+
+  public onScadaNotification(data: ScadaData): void {
+    console.log(data);
   }
 
   public onSearch() : void {

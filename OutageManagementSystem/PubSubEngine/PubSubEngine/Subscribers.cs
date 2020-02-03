@@ -92,8 +92,10 @@ namespace PubSubEngine
                 message = queueOfMessages.Dequeue();
                 Logger.LogDebug($"Published message [{message}] SUCCESSFYLLY dequeued from Subscriber's queue of messages [Subscriber name: '{subscriberName}'].");
             }
+
             return message;
         }
+        
         public string GetSubscriberName(ISubscriberCallback subscriber)
         {
             string subscriberName;

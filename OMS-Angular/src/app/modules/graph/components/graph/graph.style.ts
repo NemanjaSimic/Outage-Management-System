@@ -98,7 +98,16 @@ export const style = cytoscape.stylesheet()
         'height': '60px',
         'width': '60px'
     })
-    .selector('node[dmsType="ACLINESEGMENT"]')
+    .selector('node[type="FUSE"]')
+    .style({
+        'shape': 'rectangle',
+        'background-color': '#2b2935',
+        'background-fit': 'cover',
+        'background-image': 'assets/img/fuse.png',
+        'height': '20px',
+        'width': '20px',
+    })
+    .selector('node[type="ACLINESEGMENT"]')
     .style({
         'label': 'data(dmsType)',
         'text-valign': 'center',
