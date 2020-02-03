@@ -10,6 +10,7 @@ namespace CECommon
 	{
 		Node = 1,
 		Edge,
+		Measurement,
 		None
 	}
 
@@ -24,5 +25,11 @@ namespace CECommon
 	{
 		InTransaction = 1,
 		NoTransaction
+	}
+
+	public enum MeasurementType
+	{
+		Analog = 1,
+		Discrete
 	}
 }

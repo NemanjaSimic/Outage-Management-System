@@ -47,8 +47,8 @@
   <ItemGroup>
     <Compile Include="NMSManager.cs" />
     <Compile Include="NetworkModelGDA.cs" />
-    <Compile Include="NetworkModelGDAProxy.cs" />
     <Compile Include="Properties\AssemblyInfo.cs" />
+    <Compile Include="TopologyHelper.cs" />
   </ItemGroup>
   <ItemGroup>
     <WCFMetadata Include="Connected Services\" />

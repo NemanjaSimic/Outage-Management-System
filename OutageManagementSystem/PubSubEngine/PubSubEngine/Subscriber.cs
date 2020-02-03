@@ -14,61 +14,63 @@ namespace PubSubEngine
 
         public void Subscribe(Topic topic)
         {
-            string subscriberName = "";
+            string subscriberName = "FAILED TO GET A NAME";
             ISubscriberCallback subscriber = OperationContext.Current.GetCallbackChannel<ISubscriberCallback>();
             try
             {
                 subscriberName = subscriber.GetSubscriberName();
+
+                if (Subscribers.Instance.TryAddSubscriber(subscriber, subscriberName))
+                {
+                    Logger.LogInfo($"Subscriber [{subscriberName}] added to list of all subscribers SUCCESSFULLY.");
+                    Thread thread = new Thread(() => TrackPublications(subscriber, subscriberName));
+                    thread.Start();
+                }
+                else
+                {
+                    Logger.LogDebug($"Failed to add subscriber [{subscriberName}] to list of subsribers.");
+                }
+
+                if (Publications.Instance.TryAddSubscriber(topic, subscriber, subscriberName))
+                {
+                    string message = $"Subscriber [{subscriberName}], added to map Topic -> subscriber SUCCESSFULLY. Topic: '{topic}'.";
+                    Logger.LogInfo(message);
+                }
+                else
+                {
+                    Logger.LogWarn($"Failed to add subscriber [{subscriberName}] to map Topic -> subsriber. Topic: {topic}");
+                }
             }
             catch (Exception ex)
             {
-                Logger.LogDebug($"Couldn't get subscriber name. Execption message: {ex.Message}");
-            }
-
-            if (Subscribers.Instance.TryAddSubscriber(subscriber))
-            {
-                Logger.LogInfo($"Subscriber [{subscriberName}] added to list of all subscribers SUCCESSFULLY.");
-                Thread thread = new Thread(() => TrackPublications(subscriber, subscriberName));
-                thread.Start();
-            }
-            else
-            {
-                Logger.LogDebug($"Failed to add subscriber [{subscriberName}] to list of subsribers.");
-            }
-
-            if (Publications.Instance.TryAddSubscriber(topic, subscriber))
-            {
-                string message = $"Subscriber [{subscriberName}], added to map Topic -> subscriber SUCCESSFULLY. Topic: '{topic}'.";
-                Logger.LogInfo(message);
-            }
-            else
-            {
-                Logger.LogDebug($"Failed to add subscriber [{subscriberName}] to map Topic -> subsriber. Topic: {topic}");
+                Logger.LogDebug($"Failed while subscribing. Execption message: {ex.Message}");
+                Subscribers.Instance.RemoveSubscriber(subscriber);
             }
 
         }
 
         private void TrackPublications(ISubscriberCallback subscriber, string subscriberName)
         {
-            bool end = false;
-
             Logger.LogInfo($"Thread for tracking publications STARTED. Subscriber [{subscriberName}]");
+            bool end = false;
+            bool isMessageNull = false;
 
             while (!end)
             {
-                IPublishableMessage message = Subscribers.Instance.GetNextMessage(subscriber);
+                IPublishableMessage message = Subscribers.Instance.GetNextMessage(subscriber, isMessageNull);
 
-                if (message != null)
+                isMessageNull = message == null;
+
+                if (!isMessageNull)
                 {
                     try
                     {
                         subscriber.Notify(message);
                         Logger.LogDebug($"Subscriber [{subscriberName}] notified SUCCESSFULLY.");
                     }
-                    catch (Exception ex)
+                    catch (Exception)
                     {
-                        Logger.LogError($"Exception on notifying Subscriber [{subscriberName}].", ex);
-
+                        Logger.LogWarn($"Subscriber [{subscriberName}] is no longer in subscriber list.");
                         Subscribers.Instance.RemoveSubscriber(subscriber);
                         Publications.Instance.RemoveSubscriber(subscriber);
                         end = true;

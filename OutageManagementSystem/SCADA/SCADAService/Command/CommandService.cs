@@ -1,6 +1,7 @@
 ﻿using System;
 using System.Text;
 using Outage.Common;
+using Outage.Common.Exceptions.SCADA;
 using Outage.Common.ServiceContracts.SCADA;
 using Outage.SCADA.ModBus;
 using Outage.SCADA.ModBus.Connection;
@@ -59,20 +60,21 @@ namespace Outage.SCADA.SCADAService.Command
 
             if(CommandService.scadaModel == null)
             {
-                string message = $"SendAnalogCommand => model is null.";
+                string message = $"SendAnalogCommand => SCADA model is null.";
                 Logger.LogError(message);
-                //TODO: InternalSCADAServiceException
-                throw new Exception(message);
+                throw new InternalSCADAServiceException(message);
             }
 
-            if(!CommandService.scadaModel.CurrentScadaModel.ContainsKey(gid))
+            var currentScadaModel = CommandService.scadaModel.CurrentScadaModel;
+
+            if (!currentScadaModel.ContainsKey(gid))
             {
                 string message = $"Entity with gid: 0x{gid:X16} does not exist in current SCADA model.";
                 Logger.LogError(message);
                 throw new ArgumentException(message);
             }
 
-            ISCADAModelPointItem pointItem = CommandService.scadaModel.CurrentScadaModel[gid];
+            ISCADAModelPointItem pointItem = currentScadaModel[gid];
 
             if (pointItem is IAnalogSCADAModelPointItem analogPointItem && pointItem.RegisterType == PointType.ANALOG_OUTPUT)
             {
@@ -81,21 +83,21 @@ namespace Outage.SCADA.SCADAService.Command
                     int modbusValue = analogPointItem.EguToRawValueConversion(commandingValue);
                     success = SendCommand(pointItem, modbusValue);
                 }
-                //TODO: catch (InternalSCADAServiceException e)
                 catch (Exception e)
                 {
                     string message = $"Exception in SendAnalogCommand() method.";
                     Logger.LogError(message, e);
-                    throw e;
+                    throw new InternalSCADAServiceException(message, e);
                 }
             }
             else
             {
                 string message = $"Either RegistarType of entity with gid: 0x{gid:X16} is not ANALOG_OUTPUT or entity does not implement IAnalogSCADAModelPointItem interface.";
                 Logger.LogError(message);
-                //TODO: InternalSCADAServiceException
-                throw new Exception(message);
+                throw new ArgumentException(message);
             }
+
+
 
             return success;
         }
@@ -108,18 +110,19 @@ namespace Outage.SCADA.SCADAService.Command
             {
                 string message = $"SendDiscreteCommand => SCADA model is null.";
                 Logger.LogError(message);
-                //TODO: InternalSCADAServiceException
-                throw new Exception(message);
+                throw new InternalSCADAServiceException(message);
             }
 
-            if (!CommandService.scadaModel.CurrentScadaModel.ContainsKey(gid))
+            var currentScadaModel = CommandService.scadaModel.CurrentScadaModel;
+
+            if (!currentScadaModel.ContainsKey(gid))
             {
                 string message = $"Entity with gid: 0x{gid:X16} does not exist in current SCADA model.";
                 Logger.LogError(message);
                 throw new ArgumentException(message);
             }
 
-            ISCADAModelPointItem pointItem = CommandService.scadaModel.CurrentScadaModel[gid];
+            ISCADAModelPointItem pointItem = currentScadaModel[gid];
 
             if (pointItem is IDiscreteSCADAModelPointItem && pointItem.RegisterType == PointType.DIGITAL_OUTPUT)
             {
@@ -127,20 +130,18 @@ namespace Outage.SCADA.SCADAService.Command
                 {
                     success = SendCommand(pointItem, commandingValue);
                 }
-                //TODO: catch (InternalSCADAServiceException e)
                 catch (Exception e)
                 {
                     string message = $"Exception in SendDiscreteCommand() method.";
                     Logger.LogError(message, e);
-                    throw e;
+                    throw new InternalSCADAServiceException(message, e);
                 }
             }
             else
             {
                 string message = $"RegistarType of entity with gid: 0x{gid:X16} is not DIGITAL_OUTPUT or entity does not implement IDiscreteSCADAModelPointItem interface.";
                 Logger.LogError(message);
-                //TODO: InternalSCADAServiceException
-                throw new Exception(message);
+                throw new ArgumentException(message);
             }
 
             return success;
@@ -157,13 +158,11 @@ namespace Outage.SCADA.SCADAService.Command
             {
                 string message = $"SendCommand => Function Executor is null.";
                 Logger.LogError(message);
-                //TODO: InternalSCADAServiceException
-                throw new Exception(message);
+                throw new InternalSCADAServiceException(message);
             }
 
             try
             {
-
                 if (pointItem.RegisterType == PointType.ANALOG_OUTPUT && commandingValue is int analogCommandingValue)
                 {
                     modbusWriteCommandParams = new ModbusWriteCommandParameters(length,
@@ -185,10 +184,9 @@ namespace Outage.SCADA.SCADAService.Command
                 else
                 {
                     modbusWriteCommandParams = null;
-                    string message = $"Commanding arguments are not valid.";
+                    string message = $"Commanding arguments are not valid. Registry type: {pointItem.RegisterType}, value type: {commandingValue.GetType()}";
                     Logger.LogError(message);
-                    //TODO: InternalSCADAServiceException
-                    throw new Exception(message);
+                    throw new ArgumentException(message);
                 }
 
                 ModbusFunction modbusFunction = FunctionFactory.CreateModbusFunction(modbusWriteCommandParams);
@@ -205,12 +203,11 @@ namespace Outage.SCADA.SCADAService.Command
 
                 Logger.LogInfo(sb.ToString());
             }
-            //TODO: InternalSCADAServiceException
             catch (Exception e)
             {
                 string message = $"Exception in SendCommand() method.";
                 Logger.LogError(message, e);
-                throw e;
+                throw new InternalSCADAServiceException(message, e);
             }
 
             return success;

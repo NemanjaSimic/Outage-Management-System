@@ -1,7 +1,12 @@
-﻿using Outage.Common;
+﻿using CECommon.Interfaces;
+using CECommon.Providers;
+using Outage.Common;
 using Outage.Common.ServiceContracts;
 using Outage.Common.UI;
 using System;
+using System.Collections.Generic;
+using System.Diagnostics;
+using System.Linq;
 
 namespace Topology
 {
@@ -12,7 +17,16 @@ namespace Topology
 		{
 			try
 			{
-				return TopologyManager.Instance.TopologyModel.UIModel;
+				List<UIModel> uIModels = Provider.Instance.WebTopologyModelProvider.GetUIModels();
+				if (uIModels.Count > 0)
+				{
+					return uIModels.First();
+				}
+				else
+				{
+					//privremeno jer se salje jedna topologija
+					return new UIModel();
+				}
 			}
 			catch (Exception ex)
 			{

@@ -1,4 +1,5 @@
-﻿using System;
+﻿using Outage.Common.Exceptions.SCADA;
+using System;
 using System.Collections.Generic;
 using System.Linq;
 using System.ServiceModel;
@@ -12,14 +13,12 @@ namespace Outage.Common.ServiceContracts.SCADA
     {
         [OperationContract]
         [FaultContract(typeof(ArgumentException))]
-        //TODO: InternalSCADAServiceException
-        //[FaultContract(typeof(InternalSCADAServiceException))]
+        [FaultContract(typeof(InternalSCADAServiceException))]
         bool SendAnalogCommand(long gid, float commandingValue);
 
         [OperationContract]
         [FaultContract(typeof(ArgumentException))]
-        //TODO: InternalSCADAServiceException
-        //[FaultContract(typeof(InternalSCADAServiceException))]
+        [FaultContract(typeof(InternalSCADAServiceException))]
         bool SendDiscreteCommand(long gid, ushort commandingValue);
     }
 }

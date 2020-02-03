@@ -7,6 +7,7 @@ import cyConfig from './graph.config';
 import { drawBackupEdge } from '@shared/utils/backup-edge';
 import { addGraphTooltip, addOutageTooltip } from '@shared/utils/tooltip';
 import { drawWarning } from '@shared/utils/warning';
+import { drawCallWarning } from '@shared/utils/outage';
 
 import * as cytoscape from 'cytoscape';
 import * as mapper from '@shared/utils/mapper';
@@ -17,6 +18,7 @@ import dagre from 'cytoscape-dagre';
 import popper from 'cytoscape-popper';
 import { CommandService } from '@services/command/command.service';
 import { SwitchCommandType, SwitchCommand } from '@shared/models/switch-command.model';
+import { zoom } from '@shared/utils/zoom';
 cytoscape.use(dagre);
 cytoscape.use(popper);
 
@@ -30,9 +32,11 @@ export class GraphComponent implements OnInit, OnDestroy {
   public connectionSubscription: Subscription;
   public topologySubscription: Subscription;
   public updateSubscription: Subscription;
+  public outageSubscription: Subscription;
   public zoomSubscription: Subscription;
   public panSubscription: Subscription;
 
+  public gidSearchQuery: string;
   public didLoadGraph: boolean;
   private cy: any;
 
@@ -50,21 +54,15 @@ export class GraphComponent implements OnInit, OnDestroy {
   ) {
     this.connectionSubscription = Subscription.EMPTY;
     this.updateSubscription = Subscription.EMPTY;
+    this.outageSubscription = Subscription.EMPTY;
   }
 
   ngOnInit() {
-
     // testing splash screen look, will change logic after we connect to the api
-    this.didLoadGraph = false;
-
-    setTimeout(() => {
-      this.didLoadGraph = true;
-
-      // initial topology
-      this.getTopology();      
-    }, 2000);
+    this.didLoadGraph = true;
 
     // web api
+    this.getTopology();
     this.startConnection();
 
     // local testing
@@ -73,6 +71,7 @@ export class GraphComponent implements OnInit, OnDestroy {
     this.graphData.backup_edges = graphMock.backup_edges;
     this.graphData.outages = graphMock.outages;
 
+    //this.drawGraph(); // initial test
 
     // zoom on + and -
     this.zoomSubscription = fromEvent(document, 'keypress').subscribe(
@@ -115,12 +114,15 @@ export class GraphComponent implements OnInit, OnDestroy {
 
     if (this.topologySubscription)
       this.topologySubscription.unsubscribe();
-    
+
     if (this.updateSubscription)
       this.updateSubscription.unsubscribe();
 
     if (this.zoomSubscription)
       this.zoomSubscription.unsubscribe();
+
+    if (this.outageSubscription)
+      this.outageSubscription.unsubscribe();
   }
 
   public getTopology(): void {
@@ -141,6 +143,9 @@ export class GraphComponent implements OnInit, OnDestroy {
 
           this.updateSubscription = this.graphService.updateRecieved.subscribe(
             data => this.onNotification(data));
+
+          this.outageSubscription = this.graphService.outageRecieved.subscribe(
+            data => drawCallWarning(this.cy, data));
 
           this.drawGraph();
         }
@@ -218,6 +223,12 @@ export class GraphComponent implements OnInit, OnDestroy {
       this.graphData.edges = data.Relations.map(mapper.mapRelation);
       this.drawGraph();
     });
+  }
+
+  public onSearch() : void {
+    this.cy.ready(() => {
+      zoom(this.cy, this.gidSearchQuery);
+    })
   }
 
 }

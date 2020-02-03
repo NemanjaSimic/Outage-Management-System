@@ -57,9 +57,9 @@
       <Project>{D4553E8A-C694-4EBD-BA3C-0444A1D0C1EF}</Project>
       <Name>NetworkModelServiceFunctions</Name>
     </ProjectReference>
-    <ProjectReference Include="..\TopologyElementsFuntions\TopologyElementsFuntions.csproj">
-      <Project>{7F4CFEB1-0253-4A00-83C4-FE2CA5E2A5B3}</Project>
-      <Name>TopologyElementsFuntions</Name>
+    <ProjectReference Include="..\SCADACommanding\SCADACommanding.csproj">
+      <Project>{2E72183F-B2D1-4F43-8396-377AA1950078}</Project>
+      <Name>SCADACommanding</Name>
     </ProjectReference>
   </ItemGroup>
   <Import Project="$(MSBuildToolsPath)\Microsoft.CSharp.targets" />

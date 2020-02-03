@@ -1,17 +1,35 @@
 ﻿using CalculationEngineService.DistributedTransaction;
+using CECommon.Interfaces;
+using CECommon.Providers;
+using NetworkModelServiceFunctions;
 using Outage.Common;
+using Outage.Common.ServiceContracts.PubSub;
+using Outage.Common.ServiceProxies.PubSub;
+using SCADACommanding;
 using System;
 using System.Collections.Generic;
 using System.ServiceModel;
 using System.Text;
 using Topology;
+using TopologyBuilder;
 
 namespace CalculationEngineService
 {
     public class CalculationEngineService : IDisposable
     {
         private ILogger logger;
-
+        private ISubscriber proxy;
+        private IModelTopologyServis modelTopologyServis;
+        private IWebTopologyBuilder webTopologyBuilder;
+        private IModelManager modelManager;
+        private ITopologyBuilder topologyBuilder;
+        private ICacheProvider cacheProvider;
+        
+        private SCADAResultHandler sCADAResultProvider;
+        private TopologyProvider topologyProvider;
+        private ModelProvider modelProvider;
+        private WebTopologyModelProvider webTopologyModelProvider;
+        private TopologyPublisher topologyPublisher;
         protected ILogger Logger
         {
             get { return logger ?? (logger = LoggerWrapper.Instance); }
@@ -21,12 +39,32 @@ namespace CalculationEngineService
 
         public CalculationEngineService()
         {
+            topologyBuilder = new GraphBuilder();
+            modelTopologyServis = new TopologyManager(topologyBuilder);
+            webTopologyBuilder = new WebTopologyBuilder();
+
+            sCADAResultProvider = new SCADAResultHandler();
+            cacheProvider = new CacheProvider();
+            modelManager = new NMSManager();
+            modelProvider = new ModelProvider(modelManager);
+            topologyProvider = new TopologyProvider(modelTopologyServis);
+            webTopologyModelProvider = new WebTopologyModelProvider(webTopologyBuilder);
+            topologyPublisher = new TopologyPublisher();
             InitializeHosts();
         }
 
         public void Start()
         {
-            StartHosts();
+            try
+            {
+                StartHosts();
+                SubscribeToSCADA();
+            }
+            catch (Exception e)
+            {
+                Logger.LogError("Exception in Start()", e);
+                Console.WriteLine(e.Message);
+            }
         }
 
         public void Dispose()
@@ -41,7 +79,8 @@ namespace CalculationEngineService
             {
                 new ServiceHost(typeof(CEModelUpdateNotification)),
                 new ServiceHost(typeof(CETransactionActor)),
-                new ServiceHost(typeof(TopologyService))
+                new ServiceHost(typeof(TopologyService)),
+                new ServiceHost(typeof(SCADACommandingService))
             };
         }
 
@@ -104,6 +143,14 @@ namespace CalculationEngineService
             string message = "Calculation Engine Service is gracefully closed.";
             Logger.LogInfo(message);
             Console.WriteLine("\n\n{0}", message);
+        }
+
+        private void SubscribeToSCADA()
+        {
+            Logger.LogDebug("Subcribing on SCADA measurements.");
+            proxy = new SubscriberProxy(new SCADASubscriber(), EndpointNames.SubscriberEndpoint);
+            proxy.Subscribe(Topic.MEASUREMENT);
+            proxy.Subscribe(Topic.SWITCH_STATUS);
         }
     }
 }

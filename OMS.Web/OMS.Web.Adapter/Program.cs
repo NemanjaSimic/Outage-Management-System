@@ -8,26 +8,40 @@ using System;
 
 namespace OMS.Web.Adapter
 {
+    using OMS.Web.Adapter.Topology;
+    using OMS.Web.Common;
+    using OMS.Web.Common.Mappers;
+    using Outage.Common;
+    using Outage.Common.ServiceProxies.PubSub;
+    using System;
+    using System.Threading;
+    using System.Threading.Tasks;
+
     class Program
     {
         static void Main(string[] args)
         {
-            // ovo vise ne treba jer ne salje CE update na web nego na pubsub
-            //WebServiceHost host = new WebServiceHost(AppSettings.Get<string>("webServiceUrl"));
-
             SubscriberProxy _subscriberClient = new SubscriberProxy(
-                new TopologyNotification("WEB_SUBSCRIBER", new GraphMapper()),
-                EndpointNames.SubscriberEndpoint
-                );
+                new TopologyNotification("WEB_SUBSCRIBER",
+                new GraphMapper()),
+                EndpointNames.SubscriberEndpoint);
 
+            var cancelTokenSource = new CancellationTokenSource();
+            var cancelToken = cancelTokenSource.Token;
             try
             {
-                _subscriberClient.Subscribe(Topic.TOPOLOGY);
+                Task.Factory.StartNew(() =>
+                {
+                    Retry.Do(
+                        action: StartTopologySubscription,
+                        retryInterval: TimeSpan.FromSeconds(1),
+                        maxAttemptCount: 5);
+                }, cancelToken);
+
             }
-            catch (Exception e)
+            catch (Exception)
             {
-                Console.WriteLine($"Exception occured during SubscriberClient.Subscribe(): {e.Message}");
-                throw;
+                Console.WriteLine("Failed to subscribe on Topology topic.");
             }
 
 
@@ -45,7 +59,16 @@ namespace OMS.Web.Adapter
             }
 
             Console.WriteLine("Press enter to close the app.");
+
             Console.ReadLine();
+            cancelTokenSource.Cancel();
         }
+
+        public static void StartTopologySubscription()
+            => new SubscriberProxy(
+                new TopologyNotification("WEB_SUBSCRIBER",
+                new GraphMapper()),
+                EndpointNames.SubscriberEndpoint).Subscribe(Topic.TOPOLOGY);
+
     }
 }

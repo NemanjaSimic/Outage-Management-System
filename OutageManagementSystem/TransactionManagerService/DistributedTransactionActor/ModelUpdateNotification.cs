@@ -4,6 +4,8 @@ using Outage.Common.ServiceContracts.DistributedTransaction;
 using Outage.Common.ServiceProxies.DistributedTransaction;
 using System;
 using System.Collections.Generic;
+using System.ServiceModel;
+using System.Threading;
 
 namespace Outage.DistributedTransactionActor
 {
@@ -17,9 +19,13 @@ namespace Outage.DistributedTransactionActor
 
         #region Proxies
         private TransactionEnlistmentProxy transactionEnlistmentProxy = null;
-        protected TransactionEnlistmentProxy TransactionEnlistmentProxy
+        
+        protected TransactionEnlistmentProxy GetTransactionEnlistmentProxy()
         {
-            get
+            int numberOfTries = 0;
+            int sleepInterval = 500;
+
+            while (numberOfTries <= int.MaxValue)
             {
                 try
                 {
@@ -31,16 +37,33 @@ namespace Outage.DistributedTransactionActor
 
                     transactionEnlistmentProxy = new TransactionEnlistmentProxy(TransactionEnlistmentEndpointName);
                     transactionEnlistmentProxy.Open();
+
+                    if (transactionEnlistmentProxy.State == CommunicationState.Opened)
+                    {
+                        break;
+                    }
                 }
                 catch (Exception ex)
                 {
                     string message = $"Exception on TransactionEnlistmentProxy initialization. Message: {ex.Message}";
-                    Logger.LogError(message, ex);
+                    Logger.LogWarn(message, ex);
                     transactionEnlistmentProxy = null;
                 }
+                finally
+                {
+                    numberOfTries++;
+                    Logger.LogDebug($"ModelUpdateNotification: TransactionEnlistmentProxy getter, try number: {numberOfTries}.");
 
-                return transactionEnlistmentProxy;
+                    if (numberOfTries >= 100)
+                    {
+                        sleepInterval = 1000;
+                    }
+
+                    Thread.Sleep(sleepInterval);
+                }
             }
+
+            return transactionEnlistmentProxy;
         }
         #endregion
 

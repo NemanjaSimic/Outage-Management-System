@@ -44,7 +44,9 @@
   <ItemGroup>
     <Compile Include="TopologyManager.cs" />
     <Compile Include="Properties\AssemblyInfo.cs" />
+    <Compile Include="TopologyPublisher.cs" />
     <Compile Include="TopologyService.cs" />
+    <Compile Include="WebTopologyBuilder.cs" />
   </ItemGroup>
   <ItemGroup>
     <ProjectReference Include="..\..\Common\Common.csproj">

@@ -1,9 +1,9 @@
-﻿using NLog;
-using System;
-using ILogger = Outage.Common.ILogger;
-
-namespace OMS.Web.Common.Loggers
+﻿namespace OMS.Web.Common.Loggers
 {
+    using NLog;
+    using System;
+    using ILogger = Outage.Common.ILogger;
+
     public class FileLogger : ILogger
     {
         private static Logger _logger;

@@ -17,7 +17,7 @@ namespace OutageManagementService
         private ILogger logger;
         private List<ServiceHost> hosts = null;
         private OutageModel outageModel;
-
+        private CallingService callingService;
         #endregion
 
 
@@ -29,6 +29,9 @@ namespace OutageManagementService
         public OutageManagementService()
         {
             //TODO: Initialize what is needed
+            callingService = new CallingService("OutageService");
+            callingService.outageModel = outageModel;
+
             outageModel = new OutageModel();
             InitializeHosts();
 
@@ -38,9 +41,18 @@ namespace OutageManagementService
         #region Public Members
         public void Start()
         {
-            StartHosts();
-            //TODO: Start what is needed
+            try
+            {
+                StartHosts();
+                //TODO: Start what is needed
+            }
+            catch (Exception e)
+            {
+                Logger.LogError("Exception in Start()", e);
+                Console.WriteLine(e.Message);
+            }
         }
+
         public void Dispose()
         {
             CloseHosts();
@@ -55,7 +67,6 @@ namespace OutageManagementService
         {
             hosts = new List<ServiceHost>()
             {
-                new ServiceHost(typeof(CallingService)),
                 new ServiceHost(typeof(OutageService))
             };
         }

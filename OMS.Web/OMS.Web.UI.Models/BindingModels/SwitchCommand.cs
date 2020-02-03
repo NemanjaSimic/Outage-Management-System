@@ -1,11 +1,11 @@
-﻿using System.ComponentModel.DataAnnotations;
-
-namespace OMS.Web.UI.Models.BindingModels
+﻿namespace OMS.Web.UI.Models.BindingModels
 {
+    using System.ComponentModel.DataAnnotations;
+
     public enum SwitchCommandType
     {
-        TURN_OFF = 0,
-        TURN_ON = 1
+        TURN_OFF = 1,
+        TURN_ON = 0
     }
 
     public class SwitchCommand

@@ -1,8 +1,11 @@
-﻿using Outage.Common;
+﻿using CECommon.Model;
+using Outage.Common;
 using Outage.Common.UI;
 using System;
+using System.Collections.Concurrent;
 using System.Collections.Generic;
 using System.Linq;
+using System.ServiceModel;
 using System.Text;
 using System.Threading;
 using System.Threading.Tasks;
@@ -13,9 +16,11 @@ namespace OutageManagementService
     public class OutageModel
     {
 
-        public static UIModel topology = new UIModel();
+        public UIModel topology = new UIModel();
+        public TopologyModel topologyModel = new TopologyModel();
         private ILogger logger;
-
+        public ConcurrentQueue<long> EmailMsg;
+        public List<long> CalledOutages;
         protected ILogger Logger
         {
             get { return logger ?? (logger = LoggerWrapper.Instance); }
@@ -24,76 +29,97 @@ namespace OutageManagementService
         #region Proxies
         private TopologyServiceProxy topologyProxy = null;
 
-        protected TopologyServiceProxy TopologyProxy
+        private TopologyServiceProxy GetTopologyProxy()
         {
-            get
-            {
-                int numberOfTries = 0;
-                while (numberOfTries < 10)
-                {
-                    try
-                    {
-                        if(topologyProxy != null)
-                        {
-                            topologyProxy.Abort();
-                            topologyProxy = null;
-                        }
+            int numberOfTries = 0;
+            int sleepInterval = 500;
 
-                        topologyProxy = new TopologyServiceProxy(EndpointNames.TopologyServiceEndpoint);
-                        topologyProxy.Open();
-                        break;
-                    }
-                    catch(Exception ex)
+            while (numberOfTries <= int.MaxValue)
+            {
+                try
+                {
+                    if (topologyProxy != null)
                     {
-                        string message = $"Exception on TopologyServiceProxy initialization. Message: {ex.Message}";
-                        Logger.LogError(message, ex);
+                        topologyProxy.Abort();
                         topologyProxy = null;
                     }
-                    finally
+
+                    topologyProxy = new TopologyServiceProxy(EndpointNames.TopologyServiceEndpoint);
+                    topologyProxy.Open();
+
+                    if (topologyProxy.State == CommunicationState.Opened)
                     {
-                        numberOfTries++;
-                        Logger.LogDebug($"OutageModel: TopologyServiceProxy getter, try number: {numberOfTries}.");
-                        Thread.Sleep(500);
+                        break;
                     }
                 }
+                catch (Exception ex)
+                {
+                    string message = $"Exception on TopologyServiceProxy initialization. Message: {ex.Message}";
+                    Logger.LogWarn(message, ex);
+                    topologyProxy = null;
+                }
+                finally
+                {
+                    numberOfTries++;
+                    Logger.LogDebug($"OutageModel: TopologyServiceProxy getter, try number: {numberOfTries}.");
 
-                return topologyProxy;
+                    if (numberOfTries >= 100)
+                    {
+                        sleepInterval = 1000;
+                    }
+
+                    Thread.Sleep(sleepInterval);
+                }
             }
+
+            return topologyProxy;
         }
         #endregion
+
         public OutageModel()
         {
+            EmailMsg = new ConcurrentQueue<long>();
+            CalledOutages = new List<long>();
             ImportTopologyModel();
         }
 
         private void ImportTopologyModel()
         {
-            using (TopologyServiceProxy topologyServiceProxy = TopologyProxy)
+            using (TopologyServiceProxy topologyServiceProxy = GetTopologyProxy())
             {
-                topology = TopologyProxy.GetTopology();
-                PrintUI(topology);
-            }
-        }
-
-        private void PrintUI(UIModel topology)
-        {
-            if (topology.Nodes.Count > 0)
-            {
-                Print(topology.Nodes[topology.FirstNode], topology);
-            }
-        }
-
-        private void Print(UINode parent, UIModel topology)
-        {
-            var connectedElements = topology.GetRelatedElements(parent.Gid);
-            if (connectedElements != null)
-            {
-                foreach (var connectedElement in connectedElements)
+                if (topologyServiceProxy != null)
                 {
-                    Console.WriteLine($"{parent.Type} with gid {parent.Gid.ToString("X")} connected to {topology.Nodes[connectedElement].Type} with gid {topology.Nodes[connectedElement].Gid.ToString("X")}");
-                    Print(topology.Nodes[connectedElement], topology);
+                    topology = topologyServiceProxy.GetTopology();
+                    //PrintUI(topology);
+                }
+                else
+                {
+                    string message = "From method ImportTopologyModel(): TopologyServiceProxy is null.";
+                    logger.LogError(message);
+                    throw new NullReferenceException(message);
                 }
             }
         }
+
+        //private void PrintUI(UIModel topology)
+        //{
+        //    if (topology.Nodes.Count > 0)
+        //    {
+        //        Print(topology.Nodes[topology.FirstNode], topology);
+        //    }
+        //}
+
+        //private void Print(UINode parent, UIModel topology)
+        //{
+        //    var connectedElements = topology.GetRelatedElements(parent.Gid);
+        //    if (connectedElements != null)
+        //    {
+        //        foreach (var connectedElement in connectedElements)
+        //        {
+        //            Console.WriteLine($"{parent.Type} with gid {parent.Gid.ToString("X")} connected to {topology.Nodes[connectedElement].Type} with gid {topology.Nodes[connectedElement].Gid.ToString("X")}");
+        //            Print(topology.Nodes[connectedElement], topology);
+        //        }
+        //    }
+        //}
     }
 }

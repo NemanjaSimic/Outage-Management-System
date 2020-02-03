@@ -14,6 +14,7 @@ using System;
 using System.Collections.Generic;
 using System.IO;
 using System.Linq;
+using System.ServiceModel;
 using System.Text;
 using System.Threading;
 using System.Threading.Tasks;
@@ -78,42 +79,50 @@ namespace Outage.NetworkModelService
         /// </summary>
         private TransactionCoordinatorProxy transactionCoordinatorProxy = null;
 
-        protected TransactionCoordinatorProxy TransactionCoordinatorProxy
+        private TransactionCoordinatorProxy GetTransactionCoordinatorProxy()
         {
-            get
+            int numberOfTries = 0;
+            int sleepInterval = 500;
+
+            while (numberOfTries <= int.MaxValue)
             {
-                int numberOfTries = 0;
-
-                while (numberOfTries < 10)
+                try
                 {
-                    try
+                    if (transactionCoordinatorProxy != null)
                     {
-                        if (transactionCoordinatorProxy != null)
-                        {
-                            transactionCoordinatorProxy.Abort();
-                            transactionCoordinatorProxy = null;
-                        }
-
-                        transactionCoordinatorProxy = new TransactionCoordinatorProxy(EndpointNames.TransactionCoordinatorEndpoint);
-                        transactionCoordinatorProxy.Open();
-                        break;
-                    }
-                    catch (Exception ex)
-                    {
-                        string message = $"Exception on TransactionCoordinatorProxy initialization. Message: {ex.Message}";
-                        Logger.LogError(message, ex);
+                        transactionCoordinatorProxy.Abort();
                         transactionCoordinatorProxy = null;
                     }
-                    finally
+
+                    transactionCoordinatorProxy = new TransactionCoordinatorProxy(EndpointNames.TransactionCoordinatorEndpoint);
+                    transactionCoordinatorProxy.Open();
+
+                    if(transactionCoordinatorProxy.State == CommunicationState.Opened)
                     {
-                        numberOfTries++;
-                        Logger.LogDebug($"NetworkModel: TransactionCoordinatorProxy getter, try number: {numberOfTries}.");
-                        Thread.Sleep(500);
+                        break;
                     }
                 }
+                catch (Exception ex)
+                {
+                    string message = $"Exception on TransactionCoordinatorProxy initialization. Message: {ex.Message}";
+                    Logger.LogWarn(message, ex);
+                    transactionCoordinatorProxy = null;
+                }
+                finally
+                {
+                    numberOfTries++;
+                    Logger.LogDebug($"NetworkModel: TransactionCoordinatorProxy getter, try number: {numberOfTries}.");
 
-                return transactionCoordinatorProxy;
+                    if (numberOfTries >= 100)
+                    {
+                        sleepInterval = 1000;
+                    }
+
+                    Thread.Sleep(sleepInterval);
+                }
             }
+
+            return transactionCoordinatorProxy;
         }
 
         /// <summary>
@@ -121,9 +130,12 @@ namespace Outage.NetworkModelService
         /// </summary>
         private TransactionEnlistmentProxy transactionEnlistmentProxy = null;
 
-        protected TransactionEnlistmentProxy TransactionEnlistmentProxy
+        private TransactionEnlistmentProxy GetTransactionEnlistmentProxy()
         {
-            get
+            int numberOfTries = 0;
+            int sleepInterval = 500;
+
+            while (numberOfTries <= int.MaxValue)
             {
                 try
                 {
@@ -135,16 +147,33 @@ namespace Outage.NetworkModelService
 
                     transactionEnlistmentProxy = new TransactionEnlistmentProxy(EndpointNames.TransactionEnlistmentEndpoint);
                     transactionEnlistmentProxy.Open();
+
+                    if (transactionEnlistmentProxy.State == CommunicationState.Opened)
+                    {
+                        break;
+                    }
                 }
                 catch (Exception ex)
                 {
-                    string message = $"Exception on TransactionCoordinatorProxy initialization. Message: {ex.Message}";
-                    Logger.LogError(message, ex);
+                    string message = $"Exception on TransactionEnlistmentProxy initialization. Message: {ex.Message}";
+                    Logger.LogWarn(message, ex);
                     transactionEnlistmentProxy = null;
                 }
+                finally
+                {
+                    numberOfTries++;
+                    logger.LogDebug($"NetworkModel: TransactionEnlistmentProxy getter, try number: {numberOfTries}.");
 
-                return transactionEnlistmentProxy;
+                    if (numberOfTries >= 100)
+                    {
+                        sleepInterval = 1000;
+                    }
+
+                    Thread.Sleep(sleepInterval);
+                }
             }
+
+            return transactionEnlistmentProxy;
         }
 
         /// <summary>
@@ -152,11 +181,12 @@ namespace Outage.NetworkModelService
         /// </summary>
         private ModelUpdateNotificationProxy modelUpdateNotifierProxy = null;
 
-        protected ModelUpdateNotificationProxy GetModelUpdateNotificationProxy(string endpointName)
+        private ModelUpdateNotificationProxy GetModelUpdateNotificationProxy(string endpointName)
         {
             int numberOfTries = 0;
+            int sleepInterval = 500;
 
-            while(numberOfTries < 10)
+            while (numberOfTries <= int.MaxValue)
             {
                 try
                 {
@@ -168,24 +198,35 @@ namespace Outage.NetworkModelService
 
                     modelUpdateNotifierProxy = new ModelUpdateNotificationProxy(endpointName);
                     modelUpdateNotifierProxy.Open();
-                    break;
+
+                    if (modelUpdateNotifierProxy.State == CommunicationState.Opened)
+                    {
+                        break;
+                    }
                 }
                 catch (Exception ex)
                 {
                     string message = $"Exception on ModelUpdateNotificationProxy initialization. EndpointName: {endpointName}, Message: {ex.Message}";
-                    Logger.LogError(message, ex);
+                    Logger.LogWarn(message, ex);
                     modelUpdateNotifierProxy = null;
                 }
                 finally
                 {
                     numberOfTries++;
-                    Logger.LogDebug($"NetworkModel: GetModelUpdateNotificationProxy(), EndpointName: {endpointName}, try number: {numberOfTries}.");
-                    Thread.Sleep(500);
+                    Logger.LogDebug($"NetworkModel: ModelUpdateNotificationProxy getter, EndpointName: {endpointName}, try number: {numberOfTries}.");
+
+                    if (numberOfTries >= 100)
+                    {
+                        sleepInterval = 1000;
+                    }
+
+                    Thread.Sleep(sleepInterval);
                 }
             }
 
             return modelUpdateNotifierProxy;
         }
+
         #endregion
 
         /// <summary>
@@ -504,7 +545,7 @@ namespace Outage.NetworkModelService
 
         private void StartDistributedTransaction(Delta delta)
         {
-            using (TransactionCoordinatorProxy transactionCoordinatorProxy = TransactionCoordinatorProxy)
+            using (TransactionCoordinatorProxy transactionCoordinatorProxy = GetTransactionCoordinatorProxy())
             {
                 if (transactionCoordinatorProxy == null)
                 {
@@ -575,7 +616,7 @@ namespace Outage.NetworkModelService
 
                 if (success)
                 {
-                    using (TransactionEnlistmentProxy transactionEnlistmentProxy = TransactionEnlistmentProxy)
+                    using (TransactionEnlistmentProxy transactionEnlistmentProxy = GetTransactionEnlistmentProxy())
                     {
                         if (transactionEnlistmentProxy != null)
                         {
@@ -592,7 +633,7 @@ namespace Outage.NetworkModelService
                 }
             }
 
-            using (TransactionCoordinatorProxy transactionCoordinatorProxy = TransactionCoordinatorProxy)
+            using (TransactionCoordinatorProxy transactionCoordinatorProxy = GetTransactionCoordinatorProxy())
             {
                 if (transactionCoordinatorProxy != null)
                 {
@@ -1367,27 +1408,5 @@ namespace Outage.NetworkModelService
         }
         #endregion
 
-        ///// <summary>
-        ///// Writes delta to log
-        ///// </summary>
-        ///// <param name="delta">delta instance which will be logged</param>
-        //public static void TraceDelta(Delta delta)
-        //{
-        //    try
-        //    {
-        //        StringWriter stringWriter = new StringWriter();
-        //        XmlTextWriter xmlWriter = new XmlTextWriter(stringWriter);
-        //        xmlWriter.Formatting = Formatting.Indented;
-        //        delta.ExportToXml(xmlWriter);
-        //        xmlWriter.Flush();
-        //        LoggerWrapper.Instance.LogInfo(stringWriter.ToString());
-        //        xmlWriter.Close();
-        //        stringWriter.Close();
-        //    }
-        //    catch (Exception ex)
-        //    {
-        //        LoggerWrapper.Instance.LogError($"Failed to trace delta with id: {delta.Id}. Reason: {ex.Message}", ex);
-        //    }
-        //}
     }
 }

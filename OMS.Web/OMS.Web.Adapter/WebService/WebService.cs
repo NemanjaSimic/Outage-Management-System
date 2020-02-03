@@ -7,6 +7,12 @@ using System.Collections.Generic;
 
 namespace OMS.Web.Adapter.WebService
 {
+    using OMS.Web.Adapter.Contracts;
+    using OMS.Web.Adapter.HubDispatchers;
+    using OMS.Web.UI.Models.ViewModels;
+    using System;
+    using System.Collections.Generic;
+
     public class WebService : IWebService
     {
         private GraphHubDispatcher _graphDispatcher = null;

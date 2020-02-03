@@ -1,4 +1,5 @@
-﻿using NetworkModelServiceFunctions;
+﻿using CECommon.Providers;
+using NetworkModelServiceFunctions;
 using Outage.Common.GDA;
 using System;
 using System.Collections.Generic;
@@ -46,7 +47,7 @@ namespace CalculationEngineService
         {
             bool success;
 
-            if(NMSManager.Instance.PrepareForTransaction(delta) && TopologyManager.Instance.PrepareForTransaction())
+            if(Provider.Instance.ModelProvider.PrepareForTransaction() && Provider.Instance.TopologyProvider.PrepareForTransaction())
             {
                 success = true;
             }
@@ -60,14 +61,14 @@ namespace CalculationEngineService
 
         public void CommitTransaction()
         {
-            NMSManager.Instance.CommitTransaction();
-            TopologyManager.Instance.CommitTransaction();
+            Provider.Instance.ModelProvider.CommitTransaction();
+            Provider.Instance.TopologyProvider.CommitTransaction();
         }
 
         public void RollbackTransaction()
         {
-            NMSManager.Instance.RollbackTransaction();
-            TopologyManager.Instance.RollbackTransaction();
+            Provider.Instance.ModelProvider.RollbackTransaction();
+            Provider.Instance.TopologyProvider.RollbackTransaction();
         }
     }
 }

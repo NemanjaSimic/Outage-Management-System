@@ -908,7 +908,7 @@
 		<ftn:IdentifiedObject.name>TM_124</ftn:IdentifiedObject.name>
 	</cim:Terminal>
 	<cim:Terminal rdf:ID="TM_125">
-		<cim:Terminal.ConductingEquipment rdf:resource="#ACL_25"/>
+		<cim:Terminal.ConductingEquipment rdf:resource="#ACL_24"/>
 		<cim:Terminal.ConnectivityNode rdf:resource="#CN_57"/>
 		<cim:IdentifiedObject.description>Terminal125</cim:IdentifiedObject.description>
 		<cim:IdentifiedObject.mRID>TM_125</cim:IdentifiedObject.mRID>
@@ -999,7 +999,7 @@
 		<ftn:IdentifiedObject.name>TM_137</ftn:IdentifiedObject.name>
 	</cim:Terminal>
 	<cim:Terminal rdf:ID="TM_138">
-		<cim:Terminal.ConductingEquipment rdf:resource="#ACL_43"/>
+		<cim:Terminal.ConductingEquipment rdf:resource="#ACL_44"/>
 		<cim:Terminal.ConnectivityNode rdf:resource="#CN_63"/>
 		<cim:IdentifiedObject.description>Terminal138</cim:IdentifiedObject.description>
 		<cim:IdentifiedObject.mRID>TM_138</cim:IdentifiedObject.mRID>
@@ -1286,7 +1286,7 @@
 		<ftn:IdentifiedObject.name>TM_178</ftn:IdentifiedObject.name>
 	</cim:Terminal>
 	<cim:Terminal rdf:ID="TM_179">
-		<cim:Terminal.ConductingEquipment rdf:resource="#ACL_34"/>
+		<cim:Terminal.ConductingEquipment rdf:resource="#ACL_32"/>
 		<cim:Terminal.ConnectivityNode rdf:resource="#CN_82"/>
 		<cim:IdentifiedObject.description>Terminal179</cim:IdentifiedObject.description>
 		<cim:IdentifiedObject.mRID>TM_179</cim:IdentifiedObject.mRID>
@@ -1613,6 +1613,62 @@
 		<cim:IdentifiedObject.description>Terminal225</cim:IdentifiedObject.description>
 		<cim:IdentifiedObject.mRID>TM_225</cim:IdentifiedObject.mRID>
 		<ftn:IdentifiedObject.name>TM_225</ftn:IdentifiedObject.name>
+	</cim:Terminal>
+	<cim:Terminal rdf:ID="TM_226">
+		<cim:Terminal.ConductingEquipment rdf:resource="#ACL_20"/>
+		<cim:Terminal.ConnectivityNode rdf:resource="#CN_103"/>
+		<cim:IdentifiedObject.description>Terminal226</cim:IdentifiedObject.description>
+		<cim:IdentifiedObject.mRID>TM_226</cim:IdentifiedObject.mRID>
+		<ftn:IdentifiedObject.name>TM_226</ftn:IdentifiedObject.name>
+	</cim:Terminal>
+	<cim:Terminal rdf:ID="TM_227">
+		<cim:Terminal.ConductingEquipment rdf:resource="#FS_8"/>
+		<cim:Terminal.ConnectivityNode rdf:resource="#CN_103"/>
+		<cim:IdentifiedObject.description>Terminal227</cim:IdentifiedObject.description>
+		<cim:IdentifiedObject.mRID>TM_227</cim:IdentifiedObject.mRID>
+		<ftn:IdentifiedObject.name>TM_227</ftn:IdentifiedObject.name>
+	</cim:Terminal>
+	<cim:Terminal rdf:ID="TM_228">
+		<cim:Terminal.ConductingEquipment rdf:resource="#FS_8"/>
+		<cim:Terminal.ConnectivityNode rdf:resource="#CN_104"/>
+		<cim:IdentifiedObject.description>Terminal228</cim:IdentifiedObject.description>
+		<cim:IdentifiedObject.mRID>TM_228</cim:IdentifiedObject.mRID>
+		<ftn:IdentifiedObject.name>TM_228</ftn:IdentifiedObject.name>
+	</cim:Terminal>
+	<cim:Terminal rdf:ID="TM_229">
+		<cim:Terminal.ConductingEquipment rdf:resource="#EC_8"/>
+		<cim:Terminal.ConnectivityNode rdf:resource="#CN_104"/>
+		<cim:IdentifiedObject.description>Terminal229</cim:IdentifiedObject.description>
+		<cim:IdentifiedObject.mRID>TM_229</cim:IdentifiedObject.mRID>
+		<ftn:IdentifiedObject.name>TM_229</ftn:IdentifiedObject.name>
+	</cim:Terminal>
+	<cim:Terminal rdf:ID="TM_230">
+		<cim:Terminal.ConductingEquipment rdf:resource="#ACL_21"/>
+		<cim:Terminal.ConnectivityNode rdf:resource="#CN_105"/>
+		<cim:IdentifiedObject.description>Terminal230</cim:IdentifiedObject.description>
+		<cim:IdentifiedObject.mRID>TM_230</cim:IdentifiedObject.mRID>
+		<ftn:IdentifiedObject.name>TM_230</ftn:IdentifiedObject.name>
+	</cim:Terminal>
+	<cim:Terminal rdf:ID="TM_231">
+		<cim:Terminal.ConductingEquipment rdf:resource="#FS_9"/>
+		<cim:Terminal.ConnectivityNode rdf:resource="#CN_105"/>
+		<cim:IdentifiedObject.description>Terminal231</cim:IdentifiedObject.description>
+		<cim:IdentifiedObject.mRID>TM_231</cim:IdentifiedObject.mRID>
+		<ftn:IdentifiedObject.name>TM_231</ftn:IdentifiedObject.name>
+	</cim:Terminal>
+	<cim:Terminal rdf:ID="TM_232">
+		<cim:Terminal.ConductingEquipment rdf:resource="#FS_9"/>
+		<cim:Terminal.ConnectivityNode rdf:resource="#CN_106"/>
+		<cim:IdentifiedObject.description>Terminal232</cim:IdentifiedObject.description>
+		<cim:IdentifiedObject.mRID>TM_232</cim:IdentifiedObject.mRID>
+		<ftn:IdentifiedObject.name>TM_232</ftn:IdentifiedObject.name>
+	</cim:Terminal>
+	<cim:Terminal rdf:ID="TM_233">
+		<cim:Terminal.ConductingEquipment rdf:resource="#EC_9"/>
+		<cim:Terminal.ConnectivityNode rdf:resource="#CN_106"/>
+		<cim:IdentifiedObject.description>Terminal233</cim:IdentifiedObject.description>
+		<cim:IdentifiedObject.mRID>TM_233</cim:IdentifiedObject.mRID>
+		<ftn:IdentifiedObject.name>TM_233</ftn:IdentifiedObject.name>
 	</cim:Terminal>
 	<!--END Terminal-->
 <!--[END Package_Core ]-->
@@ -3252,6 +3308,26 @@
 		<cim:IdentifiedObject.mRID>CN_102</cim:IdentifiedObject.mRID>
 		<ftn:IdentifiedObject.name>CN_102</ftn:IdentifiedObject.name>
 	</cim:ConnectivityNode>
+	<cim:ConnectivityNode rdf:ID="CN_103">
+		<cim:IdentifiedObject.description>ConnectivityNode103</cim:IdentifiedObject.description>
+		<cim:IdentifiedObject.mRID>CN_103</cim:IdentifiedObject.mRID>
+		<ftn:IdentifiedObject.name>CN_103</ftn:IdentifiedObject.name>
+	</cim:ConnectivityNode>
+	<cim:ConnectivityNode rdf:ID="CN_104">
+		<cim:IdentifiedObject.description>ConnectivityNode104</cim:IdentifiedObject.description>
+		<cim:IdentifiedObject.mRID>CN_104</cim:IdentifiedObject.mRID>
+		<ftn:IdentifiedObject.name>CN_104</ftn:IdentifiedObject.name>
+	</cim:ConnectivityNode>
+	<cim:ConnectivityNode rdf:ID="CN_105">
+		<cim:IdentifiedObject.description>ConnectivityNode105</cim:IdentifiedObject.description>
+		<cim:IdentifiedObject.mRID>CN_105</cim:IdentifiedObject.mRID>
+		<ftn:IdentifiedObject.name>CN_105</ftn:IdentifiedObject.name>
+	</cim:ConnectivityNode>
+	<cim:ConnectivityNode rdf:ID="CN_106">
+		<cim:IdentifiedObject.description>ConnectivityNode106</cim:IdentifiedObject.description>
+		<cim:IdentifiedObject.mRID>CN_106</cim:IdentifiedObject.mRID>
+		<ftn:IdentifiedObject.name>CN_106</ftn:IdentifiedObject.name>
+	</cim:ConnectivityNode>
 	<!--END ConnectivityNode-->
 <!--[END Package_Topology ]-->	
 	
@@ -3277,17 +3353,321 @@
 	<cim:Analog rdf:ID="AN_1">
 		<cim:Analog.scalingFactor>1</cim:Analog.scalingFactor>
 		<cim:Analog.deviation>0</cim:Analog.deviation>
-		<cim:Analog.currentValue>12</cim:Analog.currentValue>
-		<cim:Analog.maxValue>20</cim:Analog.maxValue>
-		<cim:Analog.measurementType>Power</cim:Analog.measurementType>
-		<cim:Analog.minValue>10</cim:Analog.minValue>
+		<cim:Analog.currentValue>1100</cim:Analog.currentValue>
+		<cim:Analog.maxValue>2000</cim:Analog.maxValue>
+		<cim:Analog.measurementType>Voltage</cim:Analog.measurementType>
+		<cim:Analog.minValue>0</cim:Analog.minValue>
 		<cim:Analog.normalValue>15</cim:Analog.normalValue>
-		<cim:Measurement.address>3</cim:Measurement.address>
+		<cim:Measurement.address>1</cim:Measurement.address>
 		<cim:Measurement.isInput>false</cim:Measurement.isInput>
-		<cim:Measurement.Terminal rdf:resource="#TM_29"/>
+		<cim:Measurement.Terminal rdf:resource="#TM_1"/>
 		<cim:IdentifiedObject.description> </cim:IdentifiedObject.description>
 		<cim:IdentifiedObject.mRID>AN_1</cim:IdentifiedObject.mRID>
 		<ftn:IdentifiedObject.name>AN_1</ftn:IdentifiedObject.name>
+	</cim:Analog>
+
+	<cim:Analog rdf:ID="AN_2">
+		<cim:Analog.scalingFactor>1</cim:Analog.scalingFactor>
+		<cim:Analog.deviation>0</cim:Analog.deviation>
+		<cim:Analog.currentValue>1100</cim:Analog.currentValue>
+		<cim:Analog.maxValue>2000</cim:Analog.maxValue>
+		<cim:Analog.measurementType>Voltage</cim:Analog.measurementType>
+		<cim:Analog.minValue>0</cim:Analog.minValue>
+		<cim:Analog.normalValue>15</cim:Analog.normalValue>
+		<cim:Measurement.address>2</cim:Measurement.address>
+		<cim:Measurement.isInput>false</cim:Measurement.isInput>
+		<cim:Measurement.Terminal rdf:resource="#TM_3"/>
+		<cim:IdentifiedObject.description> </cim:IdentifiedObject.description>
+		<cim:IdentifiedObject.mRID>AN_2</cim:IdentifiedObject.mRID>
+		<ftn:IdentifiedObject.name>AN_2</ftn:IdentifiedObject.name>
+	</cim:Analog>
+
+	<cim:Analog rdf:ID="AN_3">
+		<cim:Analog.scalingFactor>1</cim:Analog.scalingFactor>
+		<cim:Analog.deviation>0</cim:Analog.deviation>
+		<cim:Analog.currentValue>1100</cim:Analog.currentValue>
+		<cim:Analog.maxValue>2000</cim:Analog.maxValue>
+		<cim:Analog.measurementType>Voltage</cim:Analog.measurementType>
+		<cim:Analog.minValue>0</cim:Analog.minValue>
+		<cim:Analog.normalValue>15</cim:Analog.normalValue>
+		<cim:Measurement.address>3</cim:Measurement.address>
+		<cim:Measurement.isInput>false</cim:Measurement.isInput>
+		<cim:Measurement.Terminal rdf:resource="#TM_4"/>
+		<cim:IdentifiedObject.description> </cim:IdentifiedObject.description>
+		<cim:IdentifiedObject.mRID>AN_3</cim:IdentifiedObject.mRID>
+		<ftn:IdentifiedObject.name>AN_3</ftn:IdentifiedObject.name>
+	</cim:Analog>
+
+	<cim:Analog rdf:ID="AN_4">
+		<cim:Analog.scalingFactor>1</cim:Analog.scalingFactor>
+		<cim:Analog.deviation>0</cim:Analog.deviation>
+		<cim:Analog.currentValue>1100</cim:Analog.currentValue>
+		<cim:Analog.maxValue>2000</cim:Analog.maxValue>
+		<cim:Analog.measurementType>Voltage</cim:Analog.measurementType>
+		<cim:Analog.minValue>0</cim:Analog.minValue>
+		<cim:Analog.normalValue>15</cim:Analog.normalValue>
+		<cim:Measurement.address>4</cim:Measurement.address>
+		<cim:Measurement.isInput>false</cim:Measurement.isInput>
+		<cim:Measurement.Terminal rdf:resource="#TM_5"/>
+		<cim:IdentifiedObject.description> </cim:IdentifiedObject.description>
+		<cim:IdentifiedObject.mRID>AN_4</cim:IdentifiedObject.mRID>
+		<ftn:IdentifiedObject.name>AN_4</ftn:IdentifiedObject.name>
+	</cim:Analog>
+
+	<cim:Analog rdf:ID="AN_5">
+		<cim:Analog.scalingFactor>1</cim:Analog.scalingFactor>
+		<cim:Analog.deviation>0</cim:Analog.deviation>
+		<cim:Analog.currentValue>1100</cim:Analog.currentValue>
+		<cim:Analog.maxValue>2000</cim:Analog.maxValue>
+		<cim:Analog.measurementType>Voltage</cim:Analog.measurementType>
+		<cim:Analog.minValue>0</cim:Analog.minValue>
+		<cim:Analog.normalValue>15</cim:Analog.normalValue>
+		<cim:Measurement.address>5</cim:Measurement.address>
+		<cim:Measurement.isInput>false</cim:Measurement.isInput>
+		<cim:Measurement.Terminal rdf:resource="#TM_13"/>
+		<cim:IdentifiedObject.description> </cim:IdentifiedObject.description>
+		<cim:IdentifiedObject.mRID>AN_5</cim:IdentifiedObject.mRID>
+		<ftn:IdentifiedObject.name>AN_5</ftn:IdentifiedObject.name>
+	</cim:Analog>
+
+	<cim:Analog rdf:ID="AN_6">
+		<cim:Analog.scalingFactor>1</cim:Analog.scalingFactor>
+		<cim:Analog.deviation>0</cim:Analog.deviation>
+		<cim:Analog.currentValue>220</cim:Analog.currentValue>
+		<cim:Analog.maxValue>2000</cim:Analog.maxValue>
+		<cim:Analog.measurementType>Voltage</cim:Analog.measurementType>
+		<cim:Analog.minValue>0</cim:Analog.minValue>
+		<cim:Analog.normalValue>15</cim:Analog.normalValue>
+		<cim:Measurement.address>6</cim:Measurement.address>
+		<cim:Measurement.isInput>false</cim:Measurement.isInput>
+		<cim:Measurement.Terminal rdf:resource="#TM_14"/>
+		<cim:IdentifiedObject.description> </cim:IdentifiedObject.description>
+		<cim:IdentifiedObject.mRID>AN_6</cim:IdentifiedObject.mRID>
+		<ftn:IdentifiedObject.name>AN_6</ftn:IdentifiedObject.name>
+	</cim:Analog>
+	
+	<cim:Analog rdf:ID="AN_7">
+		<cim:Analog.scalingFactor>1</cim:Analog.scalingFactor>
+		<cim:Analog.deviation>0</cim:Analog.deviation>
+		<cim:Analog.currentValue>220</cim:Analog.currentValue>
+		<cim:Analog.maxValue>2000</cim:Analog.maxValue>
+		<cim:Analog.measurementType>Voltage</cim:Analog.measurementType>
+		<cim:Analog.minValue>0</cim:Analog.minValue>
+		<cim:Analog.normalValue>15</cim:Analog.normalValue>
+		<cim:Measurement.address>7</cim:Measurement.address>
+		<cim:Measurement.isInput>false</cim:Measurement.isInput>
+		<cim:Measurement.Terminal rdf:resource="#TM_21"/>
+		<cim:IdentifiedObject.description> </cim:IdentifiedObject.description>
+		<cim:IdentifiedObject.mRID>AN_7</cim:IdentifiedObject.mRID>
+		<ftn:IdentifiedObject.name>AN_7</ftn:IdentifiedObject.name>
+	</cim:Analog>
+
+	<cim:Analog rdf:ID="AN_8">
+		<cim:Analog.scalingFactor>1</cim:Analog.scalingFactor>
+		<cim:Analog.deviation>0</cim:Analog.deviation>
+		<cim:Analog.currentValue>1100</cim:Analog.currentValue>
+		<cim:Analog.maxValue>2000</cim:Analog.maxValue>
+		<cim:Analog.measurementType>Voltage</cim:Analog.measurementType>
+		<cim:Analog.minValue>0</cim:Analog.minValue>
+		<cim:Analog.normalValue>15</cim:Analog.normalValue>
+		<cim:Measurement.address>8</cim:Measurement.address>
+		<cim:Measurement.isInput>false</cim:Measurement.isInput>
+		<cim:Measurement.Terminal rdf:resource="#TM_91"/>
+		<cim:IdentifiedObject.description> </cim:IdentifiedObject.description>
+		<cim:IdentifiedObject.mRID>AN_8</cim:IdentifiedObject.mRID>
+		<ftn:IdentifiedObject.name>AN_8</ftn:IdentifiedObject.name>
+	</cim:Analog>
+
+	<cim:Analog rdf:ID="AN_9">
+		<cim:Analog.scalingFactor>1</cim:Analog.scalingFactor>
+		<cim:Analog.deviation>0</cim:Analog.deviation>
+		<cim:Analog.currentValue>220</cim:Analog.currentValue>
+		<cim:Analog.maxValue>2000</cim:Analog.maxValue>
+		<cim:Analog.measurementType>Voltage</cim:Analog.measurementType>
+		<cim:Analog.minValue>0</cim:Analog.minValue>
+		<cim:Analog.normalValue>15</cim:Analog.normalValue>
+		<cim:Measurement.address>9</cim:Measurement.address>
+		<cim:Measurement.isInput>false</cim:Measurement.isInput>
+		<cim:Measurement.Terminal rdf:resource="#TM_92"/>
+		<cim:IdentifiedObject.description> </cim:IdentifiedObject.description>
+		<cim:IdentifiedObject.mRID>AN_9</cim:IdentifiedObject.mRID>
+		<ftn:IdentifiedObject.name>AN_9</ftn:IdentifiedObject.name>
+	</cim:Analog>
+
+	<cim:Analog rdf:ID="AN_10">
+		<cim:Analog.scalingFactor>1</cim:Analog.scalingFactor>
+		<cim:Analog.deviation>0</cim:Analog.deviation>
+		<cim:Analog.currentValue>220</cim:Analog.currentValue>
+		<cim:Analog.maxValue>2000</cim:Analog.maxValue>
+		<cim:Analog.measurementType>Voltage</cim:Analog.measurementType>
+		<cim:Analog.minValue>0</cim:Analog.minValue>
+		<cim:Analog.normalValue>15</cim:Analog.normalValue>
+		<cim:Measurement.address>10</cim:Measurement.address>
+		<cim:Measurement.isInput>false</cim:Measurement.isInput>
+		<cim:Measurement.Terminal rdf:resource="#TM_99"/>
+		<cim:IdentifiedObject.description> </cim:IdentifiedObject.description>
+		<cim:IdentifiedObject.mRID>AN_10</cim:IdentifiedObject.mRID>
+		<ftn:IdentifiedObject.name>AN_10</ftn:IdentifiedObject.name>
+	</cim:Analog>
+
+	<cim:Analog rdf:ID="AN_11">
+		<cim:Analog.scalingFactor>1</cim:Analog.scalingFactor>
+		<cim:Analog.deviation>0</cim:Analog.deviation>
+		<cim:Analog.currentValue>220</cim:Analog.currentValue>
+		<cim:Analog.maxValue>2000</cim:Analog.maxValue>
+		<cim:Analog.measurementType>Voltage</cim:Analog.measurementType>
+		<cim:Analog.minValue>0</cim:Analog.minValue>
+		<cim:Analog.normalValue>15</cim:Analog.normalValue>
+		<cim:Measurement.address>11</cim:Measurement.address>
+		<cim:Measurement.isInput>false</cim:Measurement.isInput>
+		<cim:Measurement.Terminal rdf:resource="#TM_23"/>
+		<cim:IdentifiedObject.description> </cim:IdentifiedObject.description>
+		<cim:IdentifiedObject.mRID>AN_11</cim:IdentifiedObject.mRID>
+		<ftn:IdentifiedObject.name>AN_11</ftn:IdentifiedObject.name>
+	</cim:Analog>
+
+	<cim:Analog rdf:ID="AN_12">
+		<cim:Analog.scalingFactor>1</cim:Analog.scalingFactor>
+		<cim:Analog.deviation>0</cim:Analog.deviation>
+		<cim:Analog.currentValue>220</cim:Analog.currentValue>
+		<cim:Analog.maxValue>2000</cim:Analog.maxValue>
+		<cim:Analog.measurementType>Voltage</cim:Analog.measurementType>
+		<cim:Analog.minValue>0</cim:Analog.minValue>
+		<cim:Analog.normalValue>15</cim:Analog.normalValue>
+		<cim:Measurement.address>12</cim:Measurement.address>
+		<cim:Measurement.isInput>false</cim:Measurement.isInput>
+		<cim:Measurement.Terminal rdf:resource="#TM_28"/>
+		<cim:IdentifiedObject.description> </cim:IdentifiedObject.description>
+		<cim:IdentifiedObject.mRID>AN_12</cim:IdentifiedObject.mRID>
+		<ftn:IdentifiedObject.name>AN_12</ftn:IdentifiedObject.name>
+	</cim:Analog>
+
+	<cim:Analog rdf:ID="AN_13">
+		<cim:Analog.scalingFactor>1</cim:Analog.scalingFactor>
+		<cim:Analog.deviation>0</cim:Analog.deviation>
+		<cim:Analog.currentValue>220</cim:Analog.currentValue>
+		<cim:Analog.maxValue>2000</cim:Analog.maxValue>
+		<cim:Analog.measurementType>Voltage</cim:Analog.measurementType>
+		<cim:Analog.minValue>0</cim:Analog.minValue>
+		<cim:Analog.normalValue>15</cim:Analog.normalValue>
+		<cim:Measurement.address>13</cim:Measurement.address>
+		<cim:Measurement.isInput>false</cim:Measurement.isInput>
+		<cim:Measurement.Terminal rdf:resource="#TM_30"/>
+		<cim:IdentifiedObject.description> </cim:IdentifiedObject.description>
+		<cim:IdentifiedObject.mRID>AN_13</cim:IdentifiedObject.mRID>
+		<ftn:IdentifiedObject.name>AN_13</ftn:IdentifiedObject.name>
+	</cim:Analog>
+
+	<cim:Analog rdf:ID="AN_14">
+		<cim:Analog.scalingFactor>1</cim:Analog.scalingFactor>
+		<cim:Analog.deviation>0</cim:Analog.deviation>
+		<cim:Analog.currentValue>220</cim:Analog.currentValue>
+		<cim:Analog.maxValue>2000</cim:Analog.maxValue>
+		<cim:Analog.measurementType>Voltage</cim:Analog.measurementType>
+		<cim:Analog.minValue>0</cim:Analog.minValue>
+		<cim:Analog.normalValue>15</cim:Analog.normalValue>
+		<cim:Measurement.address>14</cim:Measurement.address>
+		<cim:Measurement.isInput>false</cim:Measurement.isInput>
+		<cim:Measurement.Terminal rdf:resource="#TM_35"/>
+		<cim:IdentifiedObject.description> </cim:IdentifiedObject.description>
+		<cim:IdentifiedObject.mRID>AN_14</cim:IdentifiedObject.mRID>
+		<ftn:IdentifiedObject.name>AN_14</ftn:IdentifiedObject.name>
+	</cim:Analog>
+
+	<cim:Analog rdf:ID="AN_15">
+		<cim:Analog.scalingFactor>1</cim:Analog.scalingFactor>
+		<cim:Analog.deviation>0</cim:Analog.deviation>
+		<cim:Analog.currentValue>220</cim:Analog.currentValue>
+		<cim:Analog.maxValue>2000</cim:Analog.maxValue>
+		<cim:Analog.measurementType>Voltage</cim:Analog.measurementType>
+		<cim:Analog.minValue>0</cim:Analog.minValue>
+		<cim:Analog.normalValue>15</cim:Analog.normalValue>
+		<cim:Measurement.address>15</cim:Measurement.address>
+		<cim:Measurement.isInput>false</cim:Measurement.isInput>
+		<cim:Measurement.Terminal rdf:resource="#TM_31"/>
+		<cim:IdentifiedObject.description> </cim:IdentifiedObject.description>
+		<cim:IdentifiedObject.mRID>AN_15</cim:IdentifiedObject.mRID>
+		<ftn:IdentifiedObject.name>AN_15</ftn:IdentifiedObject.name>
+	</cim:Analog>
+
+	<cim:Analog rdf:ID="AN_16">
+		<cim:Analog.scalingFactor>1</cim:Analog.scalingFactor>
+		<cim:Analog.deviation>0</cim:Analog.deviation>
+		<cim:Analog.currentValue>220</cim:Analog.currentValue>
+		<cim:Analog.maxValue>2000</cim:Analog.maxValue>
+		<cim:Analog.measurementType>Voltage</cim:Analog.measurementType>
+		<cim:Analog.minValue>0</cim:Analog.minValue>
+		<cim:Analog.normalValue>15</cim:Analog.normalValue>
+		<cim:Measurement.address>16</cim:Measurement.address>
+		<cim:Measurement.isInput>false</cim:Measurement.isInput>
+		<cim:Measurement.Terminal rdf:resource="#TM_39"/>
+		<cim:IdentifiedObject.description> </cim:IdentifiedObject.description>
+		<cim:IdentifiedObject.mRID>AN_16</cim:IdentifiedObject.mRID>
+		<ftn:IdentifiedObject.name>AN_16</ftn:IdentifiedObject.name>
+	</cim:Analog>
+
+	<cim:Analog rdf:ID="AN_17">
+		<cim:Analog.scalingFactor>1</cim:Analog.scalingFactor>
+		<cim:Analog.deviation>0</cim:Analog.deviation>
+		<cim:Analog.currentValue>220</cim:Analog.currentValue>
+		<cim:Analog.maxValue>2000</cim:Analog.maxValue>
+		<cim:Analog.measurementType>Voltage</cim:Analog.measurementType>
+		<cim:Analog.minValue>0</cim:Analog.minValue>
+		<cim:Analog.normalValue>15</cim:Analog.normalValue>
+		<cim:Measurement.address>17</cim:Measurement.address>
+		<cim:Measurement.isInput>false</cim:Measurement.isInput>
+		<cim:Measurement.Terminal rdf:resource="#TM_24"/>
+		<cim:IdentifiedObject.description> </cim:IdentifiedObject.description>
+		<cim:IdentifiedObject.mRID>AN_17</cim:IdentifiedObject.mRID>
+		<ftn:IdentifiedObject.name>AN_17</ftn:IdentifiedObject.name>
+	</cim:Analog>
+
+	<cim:Analog rdf:ID="AN_18">
+		<cim:Analog.scalingFactor>1</cim:Analog.scalingFactor>
+		<cim:Analog.deviation>0</cim:Analog.deviation>
+		<cim:Analog.currentValue>220</cim:Analog.currentValue>
+		<cim:Analog.maxValue>2000</cim:Analog.maxValue>
+		<cim:Analog.measurementType>Voltage</cim:Analog.measurementType>
+		<cim:Analog.minValue>0</cim:Analog.minValue>
+		<cim:Analog.normalValue>15</cim:Analog.normalValue>
+		<cim:Measurement.address>18</cim:Measurement.address>
+		<cim:Measurement.isInput>false</cim:Measurement.isInput>
+		<cim:Measurement.Terminal rdf:resource="#TM_44"/>
+		<cim:IdentifiedObject.description> </cim:IdentifiedObject.description>
+		<cim:IdentifiedObject.mRID>AN_18</cim:IdentifiedObject.mRID>
+		<ftn:IdentifiedObject.name>AN_18</ftn:IdentifiedObject.name>
+	</cim:Analog>
+
+	<cim:Analog rdf:ID="AN_19">
+		<cim:Analog.scalingFactor>1</cim:Analog.scalingFactor>
+		<cim:Analog.deviation>0</cim:Analog.deviation>
+		<cim:Analog.currentValue>220</cim:Analog.currentValue>
+		<cim:Analog.maxValue>2000</cim:Analog.maxValue>
+		<cim:Analog.measurementType>Voltage</cim:Analog.measurementType>
+		<cim:Analog.minValue>0</cim:Analog.minValue>
+		<cim:Analog.normalValue>15</cim:Analog.normalValue>
+		<cim:Measurement.address>19</cim:Measurement.address>
+		<cim:Measurement.isInput>false</cim:Measurement.isInput>
+		<cim:Measurement.Terminal rdf:resource="#TM_47"/>
+		<cim:IdentifiedObject.description> </cim:IdentifiedObject.description>
+		<cim:IdentifiedObject.mRID>AN_19</cim:IdentifiedObject.mRID>
+		<ftn:IdentifiedObject.name>AN_19</ftn:IdentifiedObject.name>
+	</cim:Analog>
+
+	<cim:Analog rdf:ID="AN_20">
+		<cim:Analog.scalingFactor>1</cim:Analog.scalingFactor>
+		<cim:Analog.deviation>0</cim:Analog.deviation>
+		<cim:Analog.currentValue>220</cim:Analog.currentValue>
+		<cim:Analog.maxValue>2000</cim:Analog.maxValue>
+		<cim:Analog.measurementType>Voltage</cim:Analog.measurementType>
+		<cim:Analog.minValue>0</cim:Analog.minValue>
+		<cim:Analog.normalValue>15</cim:Analog.normalValue>
+		<cim:Measurement.address>20</cim:Measurement.address>
+		<cim:Measurement.isInput>false</cim:Measurement.isInput>
+		<cim:Measurement.Terminal rdf:resource="#TM_72"/>
+		<cim:IdentifiedObject.description> </cim:IdentifiedObject.description>
+		<cim:IdentifiedObject.mRID>AN_20</cim:IdentifiedObject.mRID>
+		<ftn:IdentifiedObject.name>AN_20</ftn:IdentifiedObject.name>
 	</cim:Analog>
 	<!--END Analog-->
 	
@@ -3309,17 +3689,255 @@
 	</cim:Discrete>
 	-->
 	<cim:Discrete rdf:ID="DS_1">
-		<cim:Discrete.currentOpen>true</cim:Discrete.currentOpen>
+		<cim:Discrete.currentOpen>false</cim:Discrete.currentOpen>
+		<cim:Discrete.maxValue>1</cim:Discrete.maxValue>
+		<cim:Discrete.measurementType>SwitchStatus</cim:Discrete.measurementType>
+		<cim:Discrete.minValue>0</cim:Discrete.minValue>
+		<cim:Discrete.normalValue>0</cim:Discrete.normalValue>
+		<cim:Measurement.address>1</cim:Measurement.address>
+		<cim:Measurement.isInput>false</cim:Measurement.isInput>
+		<cim:Measurement.Terminal rdf:resource="#TM_7"/>
+		<cim:IdentifiedObject.description> </cim:IdentifiedObject.description>
+		<cim:IdentifiedObject.mRID>DS_1</cim:IdentifiedObject.mRID>
+		<ftn:IdentifiedObject.name>DS_1</ftn:IdentifiedObject.name>
+	</cim:Discrete>
+
+	<cim:Discrete rdf:ID="DS_2">
+		<cim:Discrete.currentOpen>false</cim:Discrete.currentOpen>
+		<cim:Discrete.maxValue>1</cim:Discrete.maxValue>
+		<cim:Discrete.measurementType>SwitchStatus</cim:Discrete.measurementType>
+		<cim:Discrete.minValue>0</cim:Discrete.minValue>
+		<cim:Discrete.normalValue>0</cim:Discrete.normalValue>
+		<cim:Measurement.address>2</cim:Measurement.address>
+		<cim:Measurement.isInput>false</cim:Measurement.isInput>
+		<cim:Measurement.Terminal rdf:resource="#TM_9"/>
+		<cim:IdentifiedObject.description> </cim:IdentifiedObject.description>
+		<cim:IdentifiedObject.mRID>DS_2</cim:IdentifiedObject.mRID>
+		<ftn:IdentifiedObject.name>DS_2</ftn:IdentifiedObject.name>
+	</cim:Discrete>
+
+	<cim:Discrete rdf:ID="DS_3">
+		<cim:Discrete.currentOpen>false</cim:Discrete.currentOpen>
 		<cim:Discrete.maxValue>1</cim:Discrete.maxValue>
 		<cim:Discrete.measurementType>SwitchStatus</cim:Discrete.measurementType>
 		<cim:Discrete.minValue>0</cim:Discrete.minValue>
 		<cim:Discrete.normalValue>0</cim:Discrete.normalValue>
 		<cim:Measurement.address>3</cim:Measurement.address>
 		<cim:Measurement.isInput>false</cim:Measurement.isInput>
-		<cim:Measurement.Terminal rdf:resource="#TM_23"/>
+		<cim:Measurement.Terminal rdf:resource="#TM_11"/>
 		<cim:IdentifiedObject.description> </cim:IdentifiedObject.description>
-		<cim:IdentifiedObject.mRID>DS_1</cim:IdentifiedObject.mRID>
-		<ftn:IdentifiedObject.name>DS_1</ftn:IdentifiedObject.name>
+		<cim:IdentifiedObject.mRID>DS_3</cim:IdentifiedObject.mRID>
+		<ftn:IdentifiedObject.name>DS_3</ftn:IdentifiedObject.name>
+	</cim:Discrete>
+
+	<cim:Discrete rdf:ID="DS_4">
+		<cim:Discrete.currentOpen>false</cim:Discrete.currentOpen>
+		<cim:Discrete.maxValue>1</cim:Discrete.maxValue>
+		<cim:Discrete.measurementType>SwitchStatus</cim:Discrete.measurementType>
+		<cim:Discrete.minValue>0</cim:Discrete.minValue>
+		<cim:Discrete.normalValue>0</cim:Discrete.normalValue>
+		<cim:Measurement.address>4</cim:Measurement.address>
+		<cim:Measurement.isInput>false</cim:Measurement.isInput>
+		<cim:Measurement.Terminal rdf:resource="#TM_16"/>
+		<cim:IdentifiedObject.description> </cim:IdentifiedObject.description>
+		<cim:IdentifiedObject.mRID>DS_4</cim:IdentifiedObject.mRID>
+		<ftn:IdentifiedObject.name>DS_4</ftn:IdentifiedObject.name>
+	</cim:Discrete>
+
+	<cim:Discrete rdf:ID="DS_5">
+		<cim:Discrete.currentOpen>false</cim:Discrete.currentOpen>
+		<cim:Discrete.maxValue>1</cim:Discrete.maxValue>
+		<cim:Discrete.measurementType>SwitchStatus</cim:Discrete.measurementType>
+		<cim:Discrete.minValue>0</cim:Discrete.minValue>
+		<cim:Discrete.normalValue>0</cim:Discrete.normalValue>
+		<cim:Measurement.address>5</cim:Measurement.address>
+		<cim:Measurement.isInput>false</cim:Measurement.isInput>
+		<cim:Measurement.Terminal rdf:resource="#TM_17"/>
+		<cim:IdentifiedObject.description> </cim:IdentifiedObject.description>
+		<cim:IdentifiedObject.mRID>DS_5</cim:IdentifiedObject.mRID>
+		<ftn:IdentifiedObject.name>DS_5</ftn:IdentifiedObject.name>
+	</cim:Discrete>
+
+	<cim:Discrete rdf:ID="DS_6">
+		<cim:Discrete.currentOpen>false</cim:Discrete.currentOpen>
+		<cim:Discrete.maxValue>1</cim:Discrete.maxValue>
+		<cim:Discrete.measurementType>SwitchStatus</cim:Discrete.measurementType>
+		<cim:Discrete.minValue>0</cim:Discrete.minValue>
+		<cim:Discrete.normalValue>0</cim:Discrete.normalValue>
+		<cim:Measurement.address>6</cim:Measurement.address>
+		<cim:Measurement.isInput>false</cim:Measurement.isInput>
+		<cim:Measurement.Terminal rdf:resource="#TM_19"/>
+		<cim:IdentifiedObject.description> </cim:IdentifiedObject.description>
+		<cim:IdentifiedObject.mRID>DS_6</cim:IdentifiedObject.mRID>
+		<ftn:IdentifiedObject.name>DS_6</ftn:IdentifiedObject.name>
+	</cim:Discrete>
+
+	<cim:Discrete rdf:ID="DS_7">
+		<cim:Discrete.currentOpen>false</cim:Discrete.currentOpen>
+		<cim:Discrete.maxValue>1</cim:Discrete.maxValue>
+		<cim:Discrete.measurementType>SwitchStatus</cim:Discrete.measurementType>
+		<cim:Discrete.minValue>0</cim:Discrete.minValue>
+		<cim:Discrete.normalValue>0</cim:Discrete.normalValue>
+		<cim:Measurement.address>7</cim:Measurement.address>
+		<cim:Measurement.isInput>false</cim:Measurement.isInput>
+		<cim:Measurement.Terminal rdf:resource="#TM_85"/>
+		<cim:IdentifiedObject.description> </cim:IdentifiedObject.description>
+		<cim:IdentifiedObject.mRID>DS_7</cim:IdentifiedObject.mRID>
+		<ftn:IdentifiedObject.name>DS_7</ftn:IdentifiedObject.name>
+	</cim:Discrete>
+
+	<cim:Discrete rdf:ID="DS_8">
+		<cim:Discrete.currentOpen>false</cim:Discrete.currentOpen>
+		<cim:Discrete.maxValue>1</cim:Discrete.maxValue>
+		<cim:Discrete.measurementType>SwitchStatus</cim:Discrete.measurementType>
+		<cim:Discrete.minValue>0</cim:Discrete.minValue>
+		<cim:Discrete.normalValue>0</cim:Discrete.normalValue>
+		<cim:Measurement.address>8</cim:Measurement.address>
+		<cim:Measurement.isInput>false</cim:Measurement.isInput>
+		<cim:Measurement.Terminal rdf:resource="#TM_87"/>
+		<cim:IdentifiedObject.description> </cim:IdentifiedObject.description>
+		<cim:IdentifiedObject.mRID>DS_8</cim:IdentifiedObject.mRID>
+		<ftn:IdentifiedObject.name>DS_8</ftn:IdentifiedObject.name>
+	</cim:Discrete>
+
+	<cim:Discrete rdf:ID="DS_9">
+		<cim:Discrete.currentOpen>false</cim:Discrete.currentOpen>
+		<cim:Discrete.maxValue>1</cim:Discrete.maxValue>
+		<cim:Discrete.measurementType>SwitchStatus</cim:Discrete.measurementType>
+		<cim:Discrete.minValue>0</cim:Discrete.minValue>
+		<cim:Discrete.normalValue>0</cim:Discrete.normalValue>
+		<cim:Measurement.address>9</cim:Measurement.address>
+		<cim:Measurement.isInput>false</cim:Measurement.isInput>
+		<cim:Measurement.Terminal rdf:resource="#TM_89"/>
+		<cim:IdentifiedObject.description> </cim:IdentifiedObject.description>
+		<cim:IdentifiedObject.mRID>DS_9</cim:IdentifiedObject.mRID>
+		<ftn:IdentifiedObject.name>DS_9</ftn:IdentifiedObject.name>
+	</cim:Discrete>
+
+	<cim:Discrete rdf:ID="DS_10">
+		<cim:Discrete.currentOpen>false</cim:Discrete.currentOpen>
+		<cim:Discrete.maxValue>1</cim:Discrete.maxValue>
+		<cim:Discrete.measurementType>SwitchStatus</cim:Discrete.measurementType>
+		<cim:Discrete.minValue>0</cim:Discrete.minValue>
+		<cim:Discrete.normalValue>0</cim:Discrete.normalValue>
+		<cim:Measurement.address>10</cim:Measurement.address>
+		<cim:Measurement.isInput>false</cim:Measurement.isInput>
+		<cim:Measurement.Terminal rdf:resource="#TM_94"/>
+		<cim:IdentifiedObject.description> </cim:IdentifiedObject.description>
+		<cim:IdentifiedObject.mRID>DS_10</cim:IdentifiedObject.mRID>
+		<ftn:IdentifiedObject.name>DS_10</ftn:IdentifiedObject.name>
+	</cim:Discrete>
+
+	<cim:Discrete rdf:ID="DS_11">
+		<cim:Discrete.currentOpen>false</cim:Discrete.currentOpen>
+		<cim:Discrete.maxValue>1</cim:Discrete.maxValue>
+		<cim:Discrete.measurementType>SwitchStatus</cim:Discrete.measurementType>
+		<cim:Discrete.minValue>0</cim:Discrete.minValue>
+		<cim:Discrete.normalValue>0</cim:Discrete.normalValue>
+		<cim:Measurement.address>11</cim:Measurement.address>
+		<cim:Measurement.isInput>false</cim:Measurement.isInput>
+		<cim:Measurement.Terminal rdf:resource="#TM_95"/>
+		<cim:IdentifiedObject.description> </cim:IdentifiedObject.description>
+		<cim:IdentifiedObject.mRID>DS_11</cim:IdentifiedObject.mRID>
+		<ftn:IdentifiedObject.name>DS_11</ftn:IdentifiedObject.name>
+	</cim:Discrete>
+
+	<cim:Discrete rdf:ID="DS_12">
+		<cim:Discrete.currentOpen>false</cim:Discrete.currentOpen>
+		<cim:Discrete.maxValue>1</cim:Discrete.maxValue>
+		<cim:Discrete.measurementType>SwitchStatus</cim:Discrete.measurementType>
+		<cim:Discrete.minValue>0</cim:Discrete.minValue>
+		<cim:Discrete.normalValue>0</cim:Discrete.normalValue>
+		<cim:Measurement.address>12</cim:Measurement.address>
+		<cim:Measurement.isInput>false</cim:Measurement.isInput>
+		<cim:Measurement.Terminal rdf:resource="#TM_97"/>
+		<cim:IdentifiedObject.description> </cim:IdentifiedObject.description>
+		<cim:IdentifiedObject.mRID>DS_12</cim:IdentifiedObject.mRID>
+		<ftn:IdentifiedObject.name>DS_12</ftn:IdentifiedObject.name>
+	</cim:Discrete>
+
+	<cim:Discrete rdf:ID="DS_13">
+		<cim:Discrete.currentOpen>false</cim:Discrete.currentOpen>
+		<cim:Discrete.maxValue>1</cim:Discrete.maxValue>
+		<cim:Discrete.measurementType>SwitchStatus</cim:Discrete.measurementType>
+		<cim:Discrete.minValue>0</cim:Discrete.minValue>
+		<cim:Discrete.normalValue>0</cim:Discrete.normalValue>
+		<cim:Measurement.address>13</cim:Measurement.address>
+		<cim:Measurement.isInput>false</cim:Measurement.isInput>
+		<cim:Measurement.Terminal rdf:resource="#TM_26"/>
+		<cim:IdentifiedObject.description> </cim:IdentifiedObject.description>
+		<cim:IdentifiedObject.mRID>DS_13</cim:IdentifiedObject.mRID>
+		<ftn:IdentifiedObject.name>DS_13</ftn:IdentifiedObject.name>
+	</cim:Discrete>
+
+	<cim:Discrete rdf:ID="DS_14">
+		<cim:Discrete.currentOpen>false</cim:Discrete.currentOpen>
+		<cim:Discrete.maxValue>1</cim:Discrete.maxValue>
+		<cim:Discrete.measurementType>SwitchStatus</cim:Discrete.measurementType>
+		<cim:Discrete.minValue>0</cim:Discrete.minValue>
+		<cim:Discrete.normalValue>0</cim:Discrete.normalValue>
+		<cim:Measurement.address>14</cim:Measurement.address>
+		<cim:Measurement.isInput>false</cim:Measurement.isInput>
+		<cim:Measurement.Terminal rdf:resource="#TM_33"/>
+		<cim:IdentifiedObject.description> </cim:IdentifiedObject.description>
+		<cim:IdentifiedObject.mRID>DS_14</cim:IdentifiedObject.mRID>
+		<ftn:IdentifiedObject.name>DS_14</ftn:IdentifiedObject.name>
+	</cim:Discrete>
+
+	<cim:Discrete rdf:ID="DS_15">
+		<cim:Discrete.currentOpen>false</cim:Discrete.currentOpen>
+		<cim:Discrete.maxValue>1</cim:Discrete.maxValue>
+		<cim:Discrete.measurementType>SwitchStatus</cim:Discrete.measurementType>
+		<cim:Discrete.minValue>0</cim:Discrete.minValue>
+		<cim:Discrete.normalValue>0</cim:Discrete.normalValue>
+		<cim:Measurement.address>15</cim:Measurement.address>
+		<cim:Measurement.isInput>false</cim:Measurement.isInput>
+		<cim:Measurement.Terminal rdf:resource="#TM_38"/>
+		<cim:IdentifiedObject.description> </cim:IdentifiedObject.description>
+		<cim:IdentifiedObject.mRID>DS_15</cim:IdentifiedObject.mRID>
+		<ftn:IdentifiedObject.name>DS_15</ftn:IdentifiedObject.name>
+	</cim:Discrete>
+
+	<cim:Discrete rdf:ID="DS_16">
+		<cim:Discrete.currentOpen>false</cim:Discrete.currentOpen>
+		<cim:Discrete.maxValue>1</cim:Discrete.maxValue>
+		<cim:Discrete.measurementType>SwitchStatus</cim:Discrete.measurementType>
+		<cim:Discrete.minValue>0</cim:Discrete.minValue>
+		<cim:Discrete.normalValue>0</cim:Discrete.normalValue>
+		<cim:Measurement.address>16</cim:Measurement.address>
+		<cim:Measurement.isInput>false</cim:Measurement.isInput>
+		<cim:Measurement.Terminal rdf:resource="#TM_42"/>
+		<cim:IdentifiedObject.description> </cim:IdentifiedObject.description>
+		<cim:IdentifiedObject.mRID>DS_16</cim:IdentifiedObject.mRID>
+		<ftn:IdentifiedObject.name>DS_16</ftn:IdentifiedObject.name>
+	</cim:Discrete>
+
+	<cim:Discrete rdf:ID="DS_17">
+		<cim:Discrete.currentOpen>false</cim:Discrete.currentOpen>
+		<cim:Discrete.maxValue>1</cim:Discrete.maxValue>
+		<cim:Discrete.measurementType>SwitchStatus</cim:Discrete.measurementType>
+		<cim:Discrete.minValue>0</cim:Discrete.minValue>
+		<cim:Discrete.normalValue>0</cim:Discrete.normalValue>
+		<cim:Measurement.address>17</cim:Measurement.address>
+		<cim:Measurement.isInput>false</cim:Measurement.isInput>
+		<cim:Measurement.Terminal rdf:resource="#TM_49"/>
+		<cim:IdentifiedObject.description> </cim:IdentifiedObject.description>
+		<cim:IdentifiedObject.mRID>DS_17</cim:IdentifiedObject.mRID>
+		<ftn:IdentifiedObject.name>DS_17</ftn:IdentifiedObject.name>
+	</cim:Discrete>
+
+	<cim:Discrete rdf:ID="DS_18">
+		<cim:Discrete.currentOpen>false</cim:Discrete.currentOpen>
+		<cim:Discrete.maxValue>1</cim:Discrete.maxValue>
+		<cim:Discrete.measurementType>SwitchStatus</cim:Discrete.measurementType>
+		<cim:Discrete.minValue>0</cim:Discrete.minValue>
+		<cim:Discrete.normalValue>0</cim:Discrete.normalValue>
+		<cim:Measurement.address>18</cim:Measurement.address>
+		<cim:Measurement.isInput>false</cim:Measurement.isInput>
+		<cim:Measurement.Terminal rdf:resource="#TM_74"/>
+		<cim:IdentifiedObject.description> </cim:IdentifiedObject.description>
+		<cim:IdentifiedObject.mRID>DS_18</cim:IdentifiedObject.mRID>
+		<ftn:IdentifiedObject.name>DS_18</ftn:IdentifiedObject.name>
 	</cim:Discrete>
 	<!--END Discrete-->
 <!--[END Package_Meas ]-->	

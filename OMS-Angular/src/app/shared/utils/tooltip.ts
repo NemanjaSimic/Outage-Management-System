@@ -4,7 +4,12 @@ import { SwitchCommand, SwitchCommandType } from '@shared/models/switch-command.
 const graphTooltipBody: string =
   `<p>ID: [[id]]</p>
   <p>Type: [[type]]</p>
-  <p>State: [[state]]</p>`;
+  <p>Name: [[name]]</p>
+  <p>Mrid: [[mrid]]</p>
+  <p>Description: [[description]]</p>
+  <p>Device type: [[deviceType]]</p>
+  <p>State: [[state]]</p>
+  <p>Nominal voltage: [[nominalVoltage]]</p>`;
 
 const outageTooltipBody: string =
   `<p>ID: [[id]]</p>
@@ -20,53 +25,53 @@ export const addGraphTooltip = (cy, node) => {
       // node information - mozemo preko stringa da dodamo u div
       const div = document.createElement('div');
       div.innerHTML = graphTooltipBody
-        .replace("[[id]]", node.data('id'))
-        .replace("[[type]]", node.data('type'))
-        .replace("[[state]]", node.data('state'));
+        .replace("[[id]]", (+node.data('id')).toString(16))
+        .replace("[[type]]", node.data('dmsType'))
+        .replace("[[name]]", node.data('name'))
+        .replace("[[mrid]]", node.data('mrid'))
+        .replace("[[description]]", node.data('description'))
+        .replace("[[deviceType]]", node.data('deviceType'))
+        .replace("[[state]]", node.data('state'))
+        .replace("[[nominalVoltage]]", node.data('nominalVoltage'));
 
       // button - mozemo i preko document.createElement() pa appendChild()
-      if (node.data('type') == "Breaker" || node.data('type') == "Disconnector") {
+      if (node.data('dmsType') == "LOADBREAKSWITCH" || node.data('dmsType') == "DISCONNECTOR" 
+            || node.data('dmsType') == "BREAKER" || node.data('dmsType') == "FUSE") {
         const button = document.createElement('button');
 
-        if (node.data('state') == "active") {
-          button.innerHTML = 'Switch off';
-        }
-        else {
-          button.innerHTML = 'Switch on';
-        }
-
-        button.addEventListener('click', () => {
-
-          // jer je u mocku string, a u sistemu je long
-          const guid = Math.random() * 1000; 
-
-          if (node.data('state') == "active") {
-            const command: SwitchCommand = {
-              guid,
-              type: SwitchCommandType.TURN_OFF
-            };
-
-            node.sendSwitchCommand(command);
-
-            node.data('state', 'inactive');
-            button.innerHTML = 'Switch on';
-          } else {
-
-            const command: SwitchCommand = {
-              guid,
-              type: SwitchCommandType.TURN_ON
-            };
-
-            node.sendSwitchCommand(command);
-
-            node.data('state', 'active');
+        const meas = node.data('measurements');
+        if(meas.length > 0){
+          if (meas[0].Value == 0) {
             button.innerHTML = 'Switch off';
           }
+          else {
+            button.innerHTML = 'Switch on';
+          }
 
-        });
+          button.addEventListener('click', () => {
+            // jer je u mocku string, a u sistemu je long       
+            const guid = meas[0].Id;
+            if (meas[0].Value == 0) {
+            const command: SwitchCommand = {
+                guid,
+                command: SwitchCommandType.TURN_OFF
+              };
 
-        div.appendChild(button);
-      }
+              node.sendSwitchCommand(command);
+
+            } else {
+
+              const command: SwitchCommand = {
+                guid,
+                command: SwitchCommandType.TURN_ON
+              };
+
+              node.sendSwitchCommand(command);
+              }
+            });
+          }
+          div.appendChild(button);
+        }
 
       return div;
     },

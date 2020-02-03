@@ -1,12 +1,14 @@
 ﻿using CECommon;
 using CECommon.Interfaces;
 using CECommon.Model;
+using CECommon.Providers;
 using NetworkModelServiceFunctions;
 using Outage.Common;
+using SCADACommanding;
 using System;
 using System.Collections.Generic;
+using System.Diagnostics;
 using System.Linq;
-using TopologyElementsFuntions;
 
 namespace TopologyBuilder
 {
@@ -14,133 +16,160 @@ namespace TopologyBuilder
     {
         #region Fields
         private ILogger logger = LoggerWrapper.Instance;
-        private readonly TopologyElementFactory topologyElementFactory = new TopologyElementFactory();
         private List<Field> fields;
         private HashSet<long> visited;
-        private Stack<TopologyElement> stack;
+        private Stack<long> stack;
+        private Dictionary<long, ITopologyElement> elements;
+        private Dictionary<long, List<long>> connections;
         #endregion
 
-        public TopologyModel CreateGraphTopology(long firstElementGid, TransactionFlag flag)
-        {
-            string message = $"Creating graph topology from first element with GID {firstElementGid}.";
-            logger.LogInfo(message);
+        public ITopology CreateGraphTopology(long firstElementGid)
+        { 
+            elements = Provider.Instance.ModelProvider.GetElementModels();
+            connections = Provider.Instance.ModelProvider.GetConnections();
+            
+            logger.LogInfo($"Creating topology from first element with GID 0x{firstElementGid.ToString("X16")}.");
 
             visited = new HashSet<long>();
-            stack = new Stack<TopologyElement>();
+            stack = new Stack<long>();
             fields = new List<Field>();
 
-            TopologyModel topology = new TopologyModel();
-            TopologyElement firstNode = topologyElementFactory.CreateTopologyElement(firstElementGid);
-
-            stack.Push(firstNode);
+            ITopology topology = new TopologyModel();
+            topology.FirstNode = firstElementGid;
+            elements[firstElementGid].IsActive = true;
+            stack.Push(firstElementGid);
 
             while (stack.Count > 0)
             {
-                var currentNode = stack.Pop();
-                if (!visited.Contains(currentNode.Id))
+                var currentElementId = stack.Pop();
+                if (!visited.Contains(currentElementId))
                 {
-                    visited.Add(currentNode.Id);
+                    visited.Add(currentElementId);
                 }
-
-                var connectedElements = CheckIgnorable(currentNode.Id, flag);
-                foreach (var element in connectedElements)
+                ITopologyElement currentElement = elements[currentElementId];
+              
+                foreach (var element in GetReferencedElementsWithoutIgnorables(currentElementId))
                 {
-                    var newNode = ConnectTwoNodes(element, currentNode);
-                    topology.AddRelation(currentNode.Id, newNode.Id);
-                    stack.Push(newNode);
+                    if (elements.ContainsKey(element))
+                    {
+                        ConnectTwoNodes(element, currentElement);
+                        stack.Push(element);
+                    }
+                    else
+                    {
+                        logger.LogError($"[GraphBuilder] Element with GID 0x{element.ToString("X16")} does not exist in collection of elements.");
+                    }
                 }
-                currentNode.DmsType = TopologyHelper.Instance.GetDMSTypeOfTopologyElement(currentNode.Id);
-                topology.AddElement(currentNode);
+                
+                topology.AddElement(currentElement);
             }
-            topology.FirstNode = firstNode;
 
-            message = $"Topology graph created.";
-            logger.LogInfo(message);
+            foreach (var field in fields)
+            {
+                topology.AddElement(field);
+            }
+
+            logger.LogInfo("Topology successfully created.");
             return topology;
         }
 
         #region HelperFunctions
-        private List<long> CheckIgnorable(long gid, TransactionFlag flag)
+        private List<long> GetReferencedElementsWithoutIgnorables(long gid)
         {
-            var list = NMSManager.Instance.GetAllReferencedElements(gid, flag).Where(e => !visited.Contains(e)).ToList();
-            List<long> elements = new List<long>();
-            foreach (var element in list)
+            List<long> refElements = new List<long>();
+            if (connections.TryGetValue(gid, out List<long> list))
             {
-                if (TopologyHelper.Instance.GetElementTopologyStatus(element) == TopologyStatus.Ignorable)
+                list = list.Where(e => !visited.Contains(e)).ToList();
+                foreach (var element in list)
                 {
-                    visited.Add(element);
-                    elements.AddRange(CheckIgnorable(element, flag));
-                }
-                else
-                {
-                    elements.Add(element);
-                }
-            }
-            return elements;
-        }
-        private TopologyElement ConnectTwoNodes(long newElementGid, TopologyElement parent)
-        {
-            bool newElementIsField = TopologyHelper.Instance.GetElementTopologyStatus(newElementGid) == TopologyStatus.Field;
-            bool parentElementIsField = TopologyHelper.Instance.GetElementTopologyStatus(parent.Id) == TopologyStatus.Field;
-
-            TopologyElement newNode = topologyElementFactory.CreateTopologyElement(newElementGid);
-
-            if (newElementIsField && !parentElementIsField)
-            {
-                var field = new Field(newNode);
-                fields.Add(field);
-                parent.SecondEnd.Add(field);
-            }
-            else if (newElementIsField && parentElementIsField)
-            {
-                try
-                {
-                    GetField(parent.Id).Members.Add(newNode);
-                    newNode.FirstEnd = parent;
-                    parent.SecondEnd.Add(newNode);
-                }
-                catch (Exception)
-                {
-                    string message = $"Element with GID {parent.Id.ToString("X")} has no field.";
-                    logger.LogDebug(message);
-                    throw new Exception(message);
-                }
-
-            }
-            else if (!newElementIsField && parentElementIsField)
-            {
-                var field = GetField(parent.Id);
-                if (field == null)
-                {
-                    string message = $"Element with GID {parent.Id.ToString("X")} has no field.";
-                    logger.LogDebug(message);
-                    throw new Exception(message);
-                }
-                else
-                {
-                    field.SecondEnd.Add(newNode);
-                    newNode.FirstEnd = field;
+                    if (TopologyHelper.Instance.GetElementTopologyStatus(element) == TopologyStatus.Ignorable)
+                    {
+                        visited.Add(element);
+                        refElements.AddRange(GetReferencedElementsWithoutIgnorables(element));
+                    }
+                    else
+                    {
+                        refElements.Add(element);
+                    }
                 }
             }
             else
             {
-                newNode.FirstEnd = parent;
-                parent.SecondEnd.Add(newNode);
+                logger.LogWarn($"[GraphBuilder] Failed to get connected elements for element with GID 0x{gid.ToString("X16")}.");
             }
-            return newNode;
+            return refElements;
+        }
+        private void ConnectTwoNodes(long newElementGid, ITopologyElement parent)
+        {
+            bool newElementIsField = TopologyHelper.Instance.GetElementTopologyStatus(newElementGid) == TopologyStatus.Field;
+            bool parentElementIsField = TopologyHelper.Instance.GetElementTopologyStatus(parent.Id) == TopologyStatus.Field;
+
+            if (elements.TryGetValue(newElementGid, out ITopologyElement newNode))
+            {
+                if (newElementIsField && !parentElementIsField)
+                {
+                    var field = new Field(newNode.Id);
+                    field.FirstEnd = parent.Id;
+                    newNode.FirstEnd = parent.Id;
+                    fields.Add(field);
+                    parent.SecondEnd.Add(field.Id);
+                }
+                else if (newElementIsField && parentElementIsField)
+                {
+                    try
+                    {
+                        GetField(parent.Id).Members.Add(newNode.Id);
+                        newNode.FirstEnd = parent.Id;
+                        parent.SecondEnd.Add(newNode.Id);
+                    }
+                    catch (Exception)
+                    {
+                        string message = $"Element with GID 0x{parent.Id.ToString("X16")} has no field.";
+                        logger.LogDebug(message);
+                        throw new Exception(message);
+                    }
+
+                }
+                else if (!newElementIsField && parentElementIsField)
+                {
+                    var field = GetField(parent.Id);
+                    if (field == null)
+                    {
+                        string message = $"Element with GID 0x{parent.Id.ToString("X16")} has no field.";
+                        logger.LogDebug(message);
+                        throw new Exception(message);
+                    }
+                    else
+                    {
+                        field.SecondEnd.Add(newNode.Id);
+                        parent.SecondEnd.Add(newNode.Id);
+                        newNode.FirstEnd = field.Id;
+                    }
+                }
+                else
+                {
+                    newNode.FirstEnd = parent.Id;
+                    parent.SecondEnd.Add(newNode.Id);
+                }
+            }
+            else
+            {
+                logger.LogError($"[GraphBuilder] Element with GID 0x{newElementGid.ToString("X16")} does not exist in collection of elements.");
+            }
         }
         private Field GetField(long memberGid)
         {
             Field field = null;
             for (int i = 0; i < fields.Count; i++)
             {
-                if (fields[i].Members.Where(e => e.Id == memberGid).ToList().Count > 0)
+                if (fields[i].Members.Where(e => e == memberGid).ToList().Count > 0)
                 {
                     return fields[i];
                 }
             }
             return field;
         }
+
         #endregion
     }
 }

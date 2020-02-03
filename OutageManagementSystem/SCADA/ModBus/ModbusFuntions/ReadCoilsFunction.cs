@@ -30,6 +30,13 @@ namespace Outage.SCADA.ModBus.ModbusFuntions
             ushort startAddress = mdb_read_comm_pars.StartAddress;
             ushort quantity = mdb_read_comm_pars.Quantity;
 
+            if (quantity <= 0)
+            {
+                string message = $"Reading Quantity: {quantity} does not make sense.";
+                Logger.LogError(message);
+                throw new Exception(message);
+            }
+
             if (startAddress + quantity >= ushort.MaxValue || startAddress + quantity == ushort.MinValue || startAddress == ushort.MinValue)
             {
                 string message = $"Address is out of bound. Start address: {startAddress}, Quantity: {quantity}";
@@ -40,28 +47,31 @@ namespace Outage.SCADA.ModBus.ModbusFuntions
             bool[] data = modbusClient.ReadCoils(startAddress - 1, quantity);
             Data = new Dictionary<long, DiscreteModbusData>(data.Length);
 
+            var currentSCADAModel = SCADAModel.CurrentScadaModel;
+            var currentAddressToGidMap = SCADAModel.CurrentAddressToGidMap;
+
             for (ushort i = 0; i < quantity; i++)
             {
                 ushort address = (ushort)(startAddress + i);
                 ushort value = (ushort)(data[i] ? 1 : 0);
 
                 //for commands enqueued during model update
-                if (!SCADAModel.CurrentAddressToGidMap[PointType.DIGITAL_OUTPUT].ContainsKey(address))
+                if (!currentAddressToGidMap[PointType.DIGITAL_OUTPUT].ContainsKey(address))
                 {
                     Logger.LogWarn($"ReadCoilsFunction execute => trying to read value on address {address}, Point type: {PointType.DIGITAL_OUTPUT}, which is not in the current SCADA Model.");
                     continue;
                 }
 
-                long gid = SCADAModel.CurrentAddressToGidMap[PointType.DIGITAL_OUTPUT][address];
+                long gid = currentAddressToGidMap[PointType.DIGITAL_OUTPUT][address];
 
                 //for commands enqueued during model update
-                if (!SCADAModel.CurrentScadaModel.ContainsKey(gid))
+                if (!currentSCADAModel.ContainsKey(gid))
                 {
                     Logger.LogWarn($"ReadCoilsFunction execute => trying to read value for measurement with gid: 0x{gid:X16}, which is not in the current SCADA Model.");
                     continue;
                 }
 
-                if (!(SCADAModel.CurrentScadaModel[gid] is DiscreteSCADAModelPointItem pointItem))
+                if (!(currentSCADAModel[gid] is DiscreteSCADAModelPointItem pointItem))
                 {
                     string message = $"PointItem [Gid: 0x{gid:X16}] is not type DiscreteSCADAModelPointItem.";
                     Logger.LogError(message);
@@ -71,6 +81,7 @@ namespace Outage.SCADA.ModBus.ModbusFuntions
                 pointItem.CurrentValue = value;
 
                 bool alarmChanged = pointItem.SetAlarms();
+
                 if (alarmChanged)
                 {
                     Logger.LogInfo($"Alarm for Point [Gid: 0x{pointItem.Gid:X16}, Address: {pointItem.Address}] set to {pointItem.Alarm}.");

@@ -1,15 +1,15 @@
-﻿using System;
-using System.ServiceModel;
-using Outage.Common.PubSub;
-using OMS.Web.Common.Mappers;
-using System.Runtime.Serialization;
-using OMS.Web.UI.Models.ViewModels;
-using OMS.Web.Adapter.HubDispatchers;
-using Outage.Common.ServiceContracts.PubSub;
-using Outage.Common.PubSub.CalculationEngineDataContract;
-
-namespace OMS.Web.Adapter.Topology
+﻿namespace OMS.Web.Adapter.Topology
 {
+    using System;
+    using System.ServiceModel;
+    using Outage.Common.PubSub;
+    using OMS.Web.Common.Mappers;
+    using System.Runtime.Serialization;
+    using OMS.Web.UI.Models.ViewModels;
+    using OMS.Web.Adapter.HubDispatchers;
+    using Outage.Common.ServiceContracts.PubSub;
+    using Outage.Common.PubSub.CalculationEngineDataContract;
+
     [DataContract]
     [CallbackBehavior(ConcurrencyMode = ConcurrencyMode.Multiple)]
     public class TopologyNotification : ISubscriberCallback

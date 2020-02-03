@@ -76,6 +76,7 @@
     <Reference Include="Microsoft.CSharp" />
     <Reference Include="System" />
     <Reference Include="System.ComponentModel.Composition" />
+    <Reference Include="System.ComponentModel.DataAnnotations" />
     <Reference Include="System.Configuration" />
     <Reference Include="System.Core">
       <RequiredTargetFramework>3.5</RequiredTargetFramework>
@@ -101,23 +102,29 @@
   </ItemGroup>
   <ItemGroup>
     <Compile Include="EndpointNames.cs" />
+    <Compile Include="Exceptions\SCADA\InternalSCADAServiceException.cs" />
     <Compile Include="PubSub\CalculationEngineDataContract\CalcualtionEnginePublication.cs" />
     <Compile Include="PubSub\CalculationEngineDataContract\CalculationEngineMessage.cs" />
+    <Compile Include="PubSub\EmailDataContract\EmailServiceMessage.cs" />
+    <Compile Include="PubSub\EmailDataContract\OutageEmailPublication.cs" />
     <Compile Include="PubSub\IPublication.cs" />
     <Compile Include="PubSub\Publication.cs" />
     <Compile Include="PubSub\SCADADataContract\IModbusData.cs" />
     <Compile Include="PubSub\SCADADataContract\ModbusData.cs" />
     <Compile Include="PubSub\SCADADataContract\SCADAMessage.cs" />
     <Compile Include="PubSub\SCADADataContract\SCADAPublication.cs" />
+    <Compile Include="ServiceContracts\CalculationEngine\ICECommand.cs" />
     <Compile Include="ServiceContracts\DistributedTransaction\IModelUpdateNotificationContract.cs" />
     <Compile Include="ServiceContracts\DistributedTransaction\ITransactionEnlistmentContract.cs" />
+    <Compile Include="ServiceContracts\OMS\ArchivedOutage.cs" />
     <Compile Include="ServiceContracts\OMS\ICallingContract.cs" />
     <Compile Include="ServiceContracts\OMS\IOutageContract.cs" />
-    <Compile Include="ServiceContracts\OMS\OutageData.cs" />
+    <Compile Include="ServiceContracts\OMS\ActiveOutage.cs" />
     <Compile Include="ServiceContracts\SCADA\ISCADACommand.cs" />
-    <Compile Include="ServiceContracts\ITopologyServiceContract.cs" />
+    <Compile Include="ServiceContracts\CalculationEngine\ITopologyServiceContract.cs" />
     <Compile Include="ServiceContracts\PubSub\IPublisher.cs" />
     <Compile Include="ServiceContracts\PubSub\ISubscriber.cs" />
+    <Compile Include="ServiceContracts\SCADA\ISCADAIntegrityUpdateContract.cs" />
     <Compile Include="ServiceNames.cs" />
     <Compile Include="ServiceContracts\DistributedTransaction\ITransactionCoordinatorContract.cs" />
     <Compile Include="ServiceContracts\GDA\INetworkModelGDAContract.cs" />
@@ -139,7 +146,8 @@
     <Compile Include="ServiceProxies\Outage\OutageServiceProxy.cs" />
     <Compile Include="ServiceProxies\PubSub\PublisherProxy.cs" />
     <Compile Include="ServiceProxies\PubSub\SubscriberProxy.cs" />
-    <Compile Include="ServiceProxies\SCADACommandProxy.cs" />
+    <Compile Include="ServiceProxies\SCADA\SCADACommandProxy.cs" />
+    <Compile Include="ServiceProxies\SCADA\SCADAIntegrityUpdateProxy.cs" />
     <Compile Include="ServiceProxies\TopologyServiceProxy.cs" />
     <Compile Include="ModelCodeHelper.cs" />
     <Compile Include="ModelResourcesDesc.cs" />
@@ -154,6 +162,7 @@
     <Compile Include="GDA\Property.cs" />
     <Compile Include="GDA\ResourceDescription.cs" />
     <Compile Include="GDA\PropertyValue.cs" />
+    <Compile Include="UI\UIMeasurement.cs" />
     <Compile Include="UI\UIModel.cs" />
     <Compile Include="UI\UINode.cs" />
     <Compile Include="Versioning\DeltaDB.cs" />

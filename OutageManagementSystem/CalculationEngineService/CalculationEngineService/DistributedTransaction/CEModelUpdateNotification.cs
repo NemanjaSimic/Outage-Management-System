@@ -10,8 +10,6 @@ namespace CalculationEngineService.DistributedTransaction
 {
     public class CEModelUpdateNotification : ModelUpdateNotification
     {
-        //public static CalculationEngineService calculationEngineService = null;
-
         public CEModelUpdateNotification()
             : base(EndpointNames.TransactionEnlistmentEndpoint, ServiceNames.CalculationEngineService)
         {
@@ -21,7 +19,7 @@ namespace CalculationEngineService.DistributedTransaction
         {
             TransactionManager.Intance.UpdateNotify(modelChanges);
 
-            using (TransactionEnlistmentProxy transactionEnlistmentProxy = TransactionEnlistmentProxy)
+            using (TransactionEnlistmentProxy transactionEnlistmentProxy = GetTransactionEnlistmentProxy())
             {
                 if(transactionEnlistmentProxy != null)
                 {
@@ -35,7 +33,6 @@ namespace CalculationEngineService.DistributedTransaction
                     throw new NullReferenceException(message);
                 }
             }
-
 
             Logger.LogInfo("Calculation Engine SUCCESSFULLY notified about network model update.");
             return true;

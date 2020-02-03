@@ -21,7 +21,7 @@ namespace Outage.Common.ServiceProxies.Outage
             {
                 Channel.ReportMalfunction(consumerGid);
             }
-            catch(Exception e)
+            catch (Exception e)
             {
                 string message = "Exception in ReportMalfunction() proxy method.";
                 LoggerWrapper.Instance.LogError(message, e);

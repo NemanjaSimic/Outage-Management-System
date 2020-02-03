@@ -11,6 +11,7 @@ using System;
 using System.Text;
 using System.Collections.Generic;
 using System.ServiceModel;
+using Outage.SCADA.SCADAService.IntegrityUpdate;
 
 namespace Outage.SCADA.SCADAService
 {
@@ -27,16 +28,24 @@ namespace Outage.SCADA.SCADAService
         private SCADAModel scadaModel = null;
         private Acquisition acquisition = null;
         private FunctionExecutor functionExecutor = null;
+        private EnumDescs enumDescs = null;
+        private ModelResourcesDesc modelResourcesDesc = null;
 
         public SCADAService()
         {
-            scadaModel = new SCADAModel();
+            modelResourcesDesc = new ModelResourcesDesc();
+            enumDescs = new EnumDescs();
+
+            scadaModel = new SCADAModel(modelResourcesDesc, enumDescs);
             functionExecutor = new FunctionExecutor(scadaModel);
 
             FunctionFactory.SCADAModel = scadaModel;
-            CommandService.SCADAModel = scadaModel;
             SCADAModelUpdateNotification.SCADAModel = scadaModel;
             SCADATransactionActor.SCADAModel = scadaModel;
+            CommandService.SCADAModel = scadaModel;
+            IntegrityUpdateService.SCADAModel = scadaModel;
+
+            CommandService.FunctionExecutor = functionExecutor;
 
             scadaModel.ImportModel();
 
@@ -46,10 +55,18 @@ namespace Outage.SCADA.SCADAService
         #region Public Members
         public void Start()
         {
-            ModbusSimulatorHandler.StartModbusSimulator();
-            functionExecutor.StartExecutorThread();
-            StartDataAcquisition();
-            StartHosts();
+            try
+            {
+                ModbusSimulatorHandler.StartModbusSimulator();
+                functionExecutor.StartExecutorThread();
+                StartDataAcquisition();
+                StartHosts();
+            }
+            catch (Exception e)
+            {
+                Logger.LogError("Exception in Start()", e);
+                Console.WriteLine(e.Message);
+            }
         }
 
         public void Dispose()
@@ -77,6 +94,7 @@ namespace Outage.SCADA.SCADAService
         {
             hosts = new List<ServiceHost>()
             {
+                new ServiceHost(typeof(IntegrityUpdateService)),
                 new ServiceHost(typeof(CommandService)),
                 new ServiceHost(typeof(SCADATransactionActor)),
                 new ServiceHost(typeof(SCADAModelUpdateNotification))

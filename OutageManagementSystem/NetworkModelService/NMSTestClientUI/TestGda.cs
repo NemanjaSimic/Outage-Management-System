@@ -1,5 +1,6 @@
 ﻿using System;
 using System.Collections.Generic;
+using System.ServiceModel;
 using System.Text;
 using System.Threading;
 using FTN.Services.NetworkModelService.TestClientUI;
@@ -23,43 +24,53 @@ namespace TelventDMS.Services.NetworkModelService.TestClient.TestsUI
 
         #region Proxies
         private NetworkModelGDAProxy gdaQueryProxy = null;
-		protected NetworkModelGDAProxy GdaQueryProxy
+
+		private NetworkModelGDAProxy GetGdaQueryProxy()
 		{
-			get
-			{
-                int numberOfTries = 0;
+            int numberOfTries = 0;
+			int sleepInterval = 500;
 
-                while (numberOfTries < 10)
+			while (numberOfTries <= int.MaxValue)
+            {
+                try
+				{
+					if (gdaQueryProxy != null)
+					{
+						gdaQueryProxy.Abort();
+						gdaQueryProxy = null;
+					}
+
+					gdaQueryProxy = new NetworkModelGDAProxy(EndpointNames.NetworkModelGDAEndpoint);
+					gdaQueryProxy.Open();
+
+					if (gdaQueryProxy.State == CommunicationState.Opened)
+					{
+						break;
+					}
+				}
+				catch (Exception ex)
+				{
+					string message = $"Exception on NetworkModelGDAProxy initialization. Message: {ex.Message}";
+					Logger.LogWarn(message, ex);
+					gdaQueryProxy = null;
+				}
+				finally
                 {
-                    try
-				    {
-					    if (gdaQueryProxy != null)
-					    {
-						    gdaQueryProxy.Abort();
-						    gdaQueryProxy = null;
-					    }
+                    numberOfTries++;
+                    Logger.LogDebug($"TestGda: NetworkModelGDAProxy getter, try number: {numberOfTries}.");
 
-					    gdaQueryProxy = new NetworkModelGDAProxy(EndpointNames.NetworkModelGDAEndpoint);
-					    gdaQueryProxy.Open();
-                        break;
-				    }
-				    catch (Exception ex)
-				    {
-					    string message = $"Exception on NetworkModelGDAProxy initialization. Message: {ex.Message}";
-					    Logger.LogError(message, ex);
-					    gdaQueryProxy = null;
-				    }
-				    finally
-                    {
-                        numberOfTries++;
-                        Logger.LogDebug($"TestGda: GdaQueryProxy getter, try number: {numberOfTries}.");
-                        Thread.Sleep(500);
-                    }
+					if (numberOfTries >= 100)
+					{
+						sleepInterval = 1000;
+					}
+
+					Thread.Sleep(sleepInterval);
                 }
+            }
 
-				return gdaQueryProxy;
-			}
+			return gdaQueryProxy;
 		}
+
         #endregion
 
         public TestGda()
@@ -77,7 +88,7 @@ namespace TelventDMS.Services.NetworkModelService.TestClient.TestsUI
 						
 			try
 			{
-				using(NetworkModelGDAProxy gdaQueryProxy = GdaQueryProxy)
+				using(NetworkModelGDAProxy gdaQueryProxy = GetGdaQueryProxy())
 				{
 					if(gdaQueryProxy != null)
 					{
@@ -115,65 +126,63 @@ namespace TelventDMS.Services.NetworkModelService.TestClient.TestsUI
 
 			try
 			{
-				using(NetworkModelGDAProxy gdaQueryProxy = GdaQueryProxy)
+				using(NetworkModelGDAProxy gdaQueryProxy = GetGdaQueryProxy())
 				{
-					if(gdaQueryProxy != null)
-					{
-						iteratorId = gdaQueryProxy.GetExtentValues(modelCodeType, properties);
-						resourcesLeft = gdaQueryProxy.IteratorResourcesLeft(iteratorId);
-
-						while (resourcesLeft > 0)
-						{
-							List<ResourceDescription> rds = gdaQueryProxy.IteratorNext(numberOfResources, iteratorId);
-
-							for (int i = 0; i < rds.Count; i++)
-							{
-								if (rds[i] != null)
-								{
-									tempSb.Append($"Entity with gid: 0x{rds[i].Id:X16}" + Environment.NewLine);
-
-									foreach (Property property in rds[i].Properties)
-									{
-										switch (property.Type)
-										{
-											case PropertyType.Int64:
-												StringAppender.AppendLong(tempSb, property);
-												break;
-											case PropertyType.Float:
-												StringAppender.AppendFloat(tempSb, property);
-												break;
-											case PropertyType.String:
-												StringAppender.AppendString(tempSb, property);
-												break;
-											case PropertyType.Reference:
-												StringAppender.AppendReference(tempSb, property);
-												break;
-											case PropertyType.ReferenceVector:
-												StringAppender.AppendReferenceVector(tempSb, property);
-												break;
-
-											default:
-												tempSb.Append($"{property.Id}: {property.PropertyValue.LongValue}{Environment.NewLine}");
-												break;
-										}
-									}
-								}
-								ids.Add(rds[i].Id);
-							}
-							resourcesLeft = gdaQueryProxy.IteratorResourcesLeft(iteratorId);
-						}
-
-						gdaQueryProxy.IteratorClose(iteratorId);
-
-						message = "Getting extent values method successfully finished.";
-						Logger.LogInfo(message);
-					}
-					else
+					if(gdaQueryProxy == null)
 					{
 						string errMsg = "NetworkModelGDAProxy is null.";
 						Logger.LogWarn(errMsg);
 						throw new NullReferenceException(errMsg);
 					}
+
+					iteratorId = gdaQueryProxy.GetExtentValues(modelCodeType, properties);
+					resourcesLeft = gdaQueryProxy.IteratorResourcesLeft(iteratorId);
+
+					while (resourcesLeft > 0)
+					{
+						List<ResourceDescription> rds = gdaQueryProxy.IteratorNext(numberOfResources, iteratorId);
+
+						for (int i = 0; i < rds.Count; i++)
+						{
+							if (rds[i] != null)
+							{
+								tempSb.Append($"Entity with gid: 0x{rds[i].Id:X16}" + Environment.NewLine);
+
+								foreach (Property property in rds[i].Properties)
+								{
+									switch (property.Type)
+									{
+										case PropertyType.Int64:
+											StringAppender.AppendLong(tempSb, property);
+											break;
+										case PropertyType.Float:
+											StringAppender.AppendFloat(tempSb, property);
+											break;
+										case PropertyType.String:
+											StringAppender.AppendString(tempSb, property);
+											break;
+										case PropertyType.Reference:
+											StringAppender.AppendReference(tempSb, property);
+											break;
+										case PropertyType.ReferenceVector:
+											StringAppender.AppendReferenceVector(tempSb, property);
+											break;
+
+										default:
+											tempSb.Append($"{property.Id}: {property.PropertyValue.LongValue}{Environment.NewLine}");
+											break;
+									}
+								}
+							}
+							ids.Add(rds[i].Id);
+						}
+						resourcesLeft = gdaQueryProxy.IteratorResourcesLeft(iteratorId);
+					}
+
+					gdaQueryProxy.IteratorClose(iteratorId);
+
+					message = "Getting extent values method successfully finished.";
+					Logger.LogInfo(message);
 				}
 			}			
 			catch (Exception e)
@@ -203,7 +212,7 @@ namespace TelventDMS.Services.NetworkModelService.TestClient.TestsUI
 
 			try
 			{
-				using(NetworkModelGDAProxy gdaQueryProxy = GdaQueryProxy)
+				using(NetworkModelGDAProxy gdaQueryProxy = GetGdaQueryProxy())
 				{
 					if(gdaQueryProxy != null)
 					{

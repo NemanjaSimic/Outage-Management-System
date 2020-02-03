@@ -83,6 +83,7 @@
     <Compile Include="SCADA\SCADANotification.cs" />
     <Compile Include="Topology\TopologyClientProxy.cs" />
     <Compile Include="Topology\TopologyNotification.cs" />
+    <Compile Include="Topology\TopologySCADACommandProxy.cs" />
     <Compile Include="WebService\WebService.cs" />
     <Compile Include="WebService\WebServiceHost.cs" />
   </ItemGroup>

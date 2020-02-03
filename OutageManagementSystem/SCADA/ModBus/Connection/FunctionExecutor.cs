@@ -1,8 +1,6 @@
 ﻿using EasyModbus;
 using Outage.Common;
-using Outage.Common.PubSub;
 using Outage.Common.ServiceProxies.PubSub;
-using Outage.SCADA.ModBus.ModbusFuntions;
 using Outage.SCADA.SCADACommon;
 using Outage.SCADA.SCADAData.Configuration;
 using Outage.SCADA.SCADAData.Repository;
@@ -13,6 +11,8 @@ using System.Threading;
 using Outage.Common.PubSub.SCADADataContract;
 using EasyModbus.Exceptions;
 using Outage.SCADA.ModBus.FunctionParameters;
+using System.ServiceModel;
+using Outage.Common.Exceptions.SCADA;
 
 namespace Outage.SCADA.ModBus.Connection
 {
@@ -37,47 +37,62 @@ namespace Outage.SCADA.ModBus.Connection
         public SCADAModel SCADAModel { get; private set; }
         public ModbusClient ModbusClient { get; private set; }
 
+        private Dictionary<long, IModbusData> measurementsCache;
+        public Dictionary<long, IModbusData> MeasurementsCache
+        {
+            get { return measurementsCache ?? (measurementsCache = new Dictionary<long, IModbusData>()); }
+        }
+
         #region Proxies
 
         private PublisherProxy publisherProxy = null;
 
-        public PublisherProxy PublisherProxy
+        private PublisherProxy GetPublisherProxy()
         {
             //TODO: diskusija statefull vs stateless
-            get
+
+            int numberOfTries = 0;
+            int sleepInterval = 500;
+
+            while (numberOfTries <= int.MaxValue)
             {
-                int numberOfTries = 0;
-
-                while (numberOfTries < 10)
+                try
                 {
-                    try
+                    if (publisherProxy != null)
                     {
-                        if (publisherProxy != null)
-                        {
-                            publisherProxy.Abort();
-                            publisherProxy = null;
-                        }
-
-                        publisherProxy = new PublisherProxy(EndpointNames.PublisherEndpoint);
-                        publisherProxy.Open();
-                        break;
-                    }
-                    catch (Exception ex)
-                    {
-                        string message = $"Exception on PublisherProxy initialization. Message: {ex.Message}";
-                        Logger.LogError(message, ex);
+                        publisherProxy.Abort();
                         publisherProxy = null;
                     }
-                    finally
+
+                    publisherProxy = new PublisherProxy(EndpointNames.PublisherEndpoint);
+                    publisherProxy.Open();
+
+                    if (publisherProxy.State == CommunicationState.Opened)
                     {
-                        numberOfTries++;
-                        Logger.LogDebug($"FunctionExecutor: PublisherProxy getter, try number: {numberOfTries}.");
-                        Thread.Sleep(500);
+                        break;
                     }
                 }
+                catch (Exception ex)
+                {
+                    string message = $"Exception on PublisherProxy initialization. Message: {ex.Message}";
+                    Logger.LogWarn(message, ex);
+                    publisherProxy = null;
+                }
+                finally
+                {
+                    numberOfTries++;
+                    Logger.LogDebug($"FunctionExecutor: PublisherProxy getter, try number: {numberOfTries}.");
 
-                return publisherProxy;
+                    if (numberOfTries >= 100)
+                    {
+                        sleepInterval = 1000;
+                    }
+
+                    Thread.Sleep(sleepInterval);
+                }
             }
+
+            return publisherProxy;
         }
 
         #endregion Proxies
@@ -92,7 +107,7 @@ namespace Outage.SCADA.ModBus.Connection
             SCADAModel.SignalIncomingModelConfirmation += EnqueueModelUpdateCommands;
 
             ConfigData = SCADAConfigData.Instance;
-            ModbusClient = new ModbusClient(ConfigData.IpAddress, ConfigData.TcpPort);
+            ModbusClient = new ModbusClient(ConfigData.IpAddress.ToString(), ConfigData.TcpPort);
 
         }
 
@@ -164,11 +179,16 @@ namespace Outage.SCADA.ModBus.Connection
         {
             bool success;
             ushort length = 6;
+
+            MeasurementsCache.Clear();
+
             try
             {
-                foreach(long measurementGID in measurementGids)
+                Dictionary<long, ISCADAModelPointItem> currentScadaModel = SCADAModel.CurrentScadaModel;
+                
+                foreach (long measurementGID in measurementGids)
                 {
-                    ISCADAModelPointItem scadaPointItem = SCADAModel.CurrentScadaModel[measurementGID];
+                    ISCADAModelPointItem scadaPointItem = currentScadaModel[measurementGID];
                     IModbusFunction modbusFunction;
 
                     if (scadaPointItem is IAnalogSCADAModelPointItem analogSCADAModelPointItem)
@@ -216,6 +236,7 @@ namespace Outage.SCADA.ModBus.Connection
         private void ConnectToModbusClient()
         {
             int numberOfTries = 0;
+            int sleepInterval = 500;
 
             string message = $"Connecting to modbus client...";
             Console.WriteLine(message);
@@ -236,9 +257,15 @@ namespace Outage.SCADA.ModBus.Connection
                 {
                     numberOfTries++;
                     Logger.LogDebug($"Connecting try number: {numberOfTries}.");
-                    Thread.Sleep(500);
+
+                    if (numberOfTries >= 100)
+                    {
+                        sleepInterval = 1000;
+                    }
+
+                    Thread.Sleep(sleepInterval);
                 }
-                else if (!ModbusClient.Connected && numberOfTries == 40)
+                else if (!ModbusClient.Connected && numberOfTries == int.MaxValue)
                 {
                     string timeoutMessage = "Failed to connect to Modbus client by exceeding the maximum number of connection retries.";
                     Logger.LogError(timeoutMessage);
@@ -265,7 +292,7 @@ namespace Outage.SCADA.ModBus.Connection
                 {
                     if (ModbusClient == null)
                     {
-                        ModbusClient = new ModbusClient(ConfigData.IpAddress, ConfigData.TcpPort);
+                        ModbusClient = new ModbusClient(ConfigData.IpAddress.ToString(), ConfigData.TcpPort);
                     }
 
                     Logger.LogDebug("Connected and waiting for command event.");
@@ -314,38 +341,100 @@ namespace Outage.SCADA.ModBus.Connection
             }
             catch (Exception e)
             {
-                //todo: retry
                 string message = "Exception on currentCommand.Execute().";
                 Logger.LogWarn(message, e);
             }
 
+            if (command is IReadAnalogModusFunction || command is IReadDiscreteModbusFunction)
+            {
+                WriteToMeasurementsCache(command);
+            }
+
+        }
+
+        private void WriteToMeasurementsCache(IModbusFunction command)
+        {
             if (command is IReadAnalogModusFunction readAnalogCommand)
             {
-                PublishAnalogData(readAnalogCommand.Data);
+                Dictionary<long, AnalogModbusData> publicationData = new Dictionary<long, AnalogModbusData>();
+
+                Dictionary<long, AnalogModbusData> data = readAnalogCommand.Data;
+
+                if (data == null)
+                {
+                    string message = $"WriteToMeasurementsCache() => readAnalogCommand.Data is null.";
+                    Logger.LogError(message);
+                    throw new NullReferenceException(message);
+                }
+
+                foreach (long gid in data.Keys)
+                {
+                    if (!MeasurementsCache.ContainsKey(gid))
+                    {
+                        MeasurementsCache.Add(gid, data[gid]);
+                        publicationData.Add(gid, data[gid]);
+                    }
+                    else if (MeasurementsCache[gid] is AnalogModbusData analogCacheItem)
+                    {
+                        if (analogCacheItem.Value != data[gid].Value)
+                        {
+                            MeasurementsCache[gid] = data[gid];
+                            publicationData.Add(gid, MeasurementsCache[gid] as AnalogModbusData);
+                        }
+                    }
+                }
+
+                //if data is empty that means that there are no new values in the current acquisition cycle
+                if (publicationData.Count > 0)
+                {
+                    SCADAMessage scadaMessage = new MultipleAnalogValueSCADAMessage(publicationData);
+                    PublishScadaData(Topic.MEASUREMENT, scadaMessage);
+                }
             }
             else if (command is IReadDiscreteModbusFunction readDiscreteCommand)
             {
-                PublishDigitalData(readDiscreteCommand.Data);
+                Dictionary<long, DiscreteModbusData> publicationData = new Dictionary<long, DiscreteModbusData>();
+
+                Dictionary<long, DiscreteModbusData> data = readDiscreteCommand.Data;
+
+                if (data == null)
+                {
+                    string message = $"WriteToMeasurementsCache() => readAnalogCommand.Data is null.";
+                    Logger.LogError(message);
+                    throw new NullReferenceException(message);
+                }
+
+                foreach (long gid in data.Keys)
+                {
+                    if(!MeasurementsCache.ContainsKey(gid))
+                    {
+                        MeasurementsCache.Add(gid, data[gid]);
+                        publicationData.Add(gid, data[gid]);
+                    }
+                    else if (MeasurementsCache[gid] is DiscreteModbusData discreteCacheItem)
+                    {
+                        if (discreteCacheItem.Value != data[gid].Value)
+                        {
+                            MeasurementsCache[gid] = data[gid];
+                            publicationData.Add(gid, MeasurementsCache[gid] as DiscreteModbusData);
+                        }
+                    }
+                }
+
+                //if data is empty that means that there are no new values in the current acquisition cycle
+                if (publicationData.Count > 0)
+                {
+                    SCADAMessage scadaMessage = new MultipleDiscreteValueSCADAMessage(publicationData);
+                    PublishScadaData(Topic.SWITCH_STATUS, scadaMessage);
+                }
             }
-        }
-
-        private void PublishAnalogData(Dictionary<long, AnalogModbusData> data)
-        {
-            SCADAMessage scadaMessage = new MultipleAnalogValueSCADAMessage(data);
-            PublishScadaData(Topic.MEASUREMENT, scadaMessage);
-        }
-
-        private void PublishDigitalData(Dictionary<long, DiscreteModbusData> data)
-        {
-            SCADAMessage scadaMessage = new MultipleDiscreteValueSCADAMessage(data);
-            PublishScadaData(Topic.SWITCH_STATUS, scadaMessage);
         }
 
         private void PublishScadaData(Topic topic, SCADAMessage scadaMessage)
         {
             SCADAPublication scadaPublication = new SCADAPublication(topic, scadaMessage);
 
-            using (PublisherProxy publisherProxy = PublisherProxy)
+            using (PublisherProxy publisherProxy = GetPublisherProxy())
             {
                 if (publisherProxy != null)
                 {
