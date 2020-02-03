@@ -21,7 +21,7 @@ namespace SCADACommanding
             bool success = false;
             try
             {
-                if (Provider.Instance.TopologyProvider.IsElementRemote(gid))
+                if (Provider.Instance.TopologyProvider.IsElementRemote(Provider.Instance.CacheProvider.GetElementGidForMeasurement(gid)))
                 {
                     using (var proxy = new SCADACommandProxy(EndpointNames.SCADACommandService))
                     {

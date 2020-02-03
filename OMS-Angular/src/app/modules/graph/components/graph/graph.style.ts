@@ -37,8 +37,8 @@ export const style = cytoscape.stylesheet()
         'background-color': '#2b2935',
         'background-fit': 'contain',
         'background-image': 'assets/img/bulb.png',
-        'height': '15px',
-        'width': '15px',
+        'height': '20px',
+        'width': '20px',
     })
     .selector('node[type = "outage-call"]')
     .style({
