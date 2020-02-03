@@ -7,12 +7,33 @@ using System.Runtime.Serialization;
 using System.Text;
 using System.Threading.Tasks;
 
-namespace Outage.Common.ServiceContracts.OMS
+namespace Outage.Common.PubSub.OutageDataContract
 {
     [DataContract]
-    public class ArchivedOutage
+    public abstract class OutageMessage : IPublishableMessage
     {
+    }
 
+    [DataContract]
+    public class ActiveOutage : OutageMessage
+    {
+        [Key]
+        [DataMember]
+        [DatabaseGenerated(DatabaseGeneratedOption.Identity)]
+        public long OutageId { get; set; }
+
+        [DataMember]
+        public long ElementGid { get; set; }
+
+        [DataMember]
+        public DateTime ReportTime { get; set; }
+
+        [DataMember]
+        public List<long> AffectedConsumers { get; set; }
+    }
+
+    public class ArchivedOutage : OutageMessage
+    {
         [Key]
         [DataMember]
         [DatabaseGenerated(DatabaseGeneratedOption.Identity)]
@@ -30,4 +51,5 @@ namespace Outage.Common.ServiceContracts.OMS
         [DataMember]
         public List<long> AffectedConsumers { get; set; }
     }
+    
 }

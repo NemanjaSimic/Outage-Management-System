@@ -24,8 +24,8 @@ namespace Topology
         public void WebTopologyModelProviderDelegate(List<UIModel> uIModels)
         {
             //Dok se ne sredi logika za vise root-ova na WEB-u
-            TopologyForUIMessage message = new TopologyForUIMessage(uIModels.First()); 
-            CalcualtionEnginePublication publication = new CalcualtionEnginePublication(Topic.TOPOLOGY, message);
+            TopologyForUIMessage message = new TopologyForUIMessage(uIModels.First());
+            CalculationEnginePublication publication = new CalculationEnginePublication(Topic.TOPOLOGY, message);
             try
             {
                 using (var publisherProxy = new PublisherProxy(EndpointNames.PublisherEndpoint))

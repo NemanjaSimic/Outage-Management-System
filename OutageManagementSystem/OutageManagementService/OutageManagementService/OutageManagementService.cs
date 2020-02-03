@@ -1,4 +1,6 @@
 ﻿using Outage.Common;
+using Outage.Common.ServiceContracts.PubSub;
+using Outage.Common.ServiceProxies.PubSub;
 using OutageManagementService.Calling;
 using OutageManagementService.Outage;
 using System;
@@ -16,8 +18,7 @@ namespace OutageManagementService
 
         private ILogger logger;
         private List<ServiceHost> hosts = null;
-        private OutageModel outageModel;
-        private CallingService callingService;
+        private ISubscriber subscriber;
         #endregion
 
 
@@ -28,11 +29,7 @@ namespace OutageManagementService
 
         public OutageManagementService()
         {
-            //TODO: Initialize what is needed
-            callingService = new CallingService("OutageService");
-            callingService.outageModel = outageModel;
-
-            outageModel = new OutageModel();
+            //TODO: Initialize what is ne
             InitializeHosts();
 
         }
@@ -88,6 +85,8 @@ namespace OutageManagementService
             Logger.LogInfo(message);
             Console.WriteLine("\n\n{0}", message);
         }
+
+        
 
         private void StartHosts()
         {

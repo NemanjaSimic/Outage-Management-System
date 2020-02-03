@@ -33,8 +33,7 @@ namespace OutageManagementService.Calling
 
         public CallTracker(string subscriberName, OutageModel outageModel)
         {
-           
-
+     
             this.trackingAlgorithm = new TrackingAlgorithm(outageModel);
             this.calls = new ConcurrentQueue<long>();
             this.subscriberName = subscriberName;
@@ -44,12 +43,22 @@ namespace OutageManagementService.Calling
             try
             {
                 timeInterval = Int32.Parse(ConfigurationManager.AppSettings["TimerInterval"]);
-                expectedCalls = Int32.Parse(ConfigurationManager.AppSettings["ExpectedCalls"]);
+                
             }
             catch(Exception e)
             {
-                Logger.LogError("String in config file is not in valid format.", e);
-                throw e;
+                Logger.LogWarn("String in config file is not in valid format. Default values for timeInterval will be set.", e);
+                timeInterval = 60000;
+            }
+
+            try
+            {
+                expectedCalls = Int32.Parse(ConfigurationManager.AppSettings["ExpectedCalls"]);
+            }
+            catch (Exception e)
+            {
+                Logger.LogWarn("String in config file is not in valid format. Default values for expected calls will be set.", e);
+                expectedCalls = 3;
             }
 
             this.timer = new Timer();

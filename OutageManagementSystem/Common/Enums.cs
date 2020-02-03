@@ -30,7 +30,13 @@ namespace Outage.Common
         TOPOLOGY,
 
         [EnumMember]
-        OUTAGE_EMAIL
+        OUTAGE_EMAIL,
+
+        [EnumMember]
+        ACTIVE_OUTAGE,
+
+        [EnumMember]
+        ARCHIVED_OUTAGE
     }
 
     //SCADA

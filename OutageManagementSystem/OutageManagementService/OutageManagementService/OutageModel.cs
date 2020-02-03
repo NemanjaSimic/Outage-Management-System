@@ -1,7 +1,9 @@
 ﻿using CECommon.Interfaces;
 using CECommon.Model;
 using Outage.Common;
+using Outage.Common.PubSub.OutageDataContract;
 using Outage.Common.ServiceContracts.OMS;
+using Outage.Common.ServiceProxies.PubSub;
 using Outage.Common.UI;
 using OutageDatabase;
 using System;
@@ -27,6 +29,56 @@ namespace OutageManagementService
         protected ILogger Logger
         {
             get { return logger ?? (logger = LoggerWrapper.Instance); }
+        }
+
+        private PublisherProxy publisherProxy = null;
+
+        private PublisherProxy GetPublisherProxy()
+        {
+            //TODO: diskusija statefull vs stateless
+
+            int numberOfTries = 0;
+            int sleepInterval = 500;
+
+            while (numberOfTries <= int.MaxValue)
+            {
+                try
+                {
+                    if (publisherProxy != null)
+                    {
+                        publisherProxy.Abort();
+                        publisherProxy = null;
+                    }
+
+                    publisherProxy = new PublisherProxy(EndpointNames.PublisherEndpoint);
+                    publisherProxy.Open();
+
+                    if (publisherProxy.State == CommunicationState.Opened)
+                    {
+                        break;
+                    }
+                }
+                catch (Exception ex)
+                {
+                    string message = $"Exception on PublisherProxy initialization. Message: {ex.Message}";
+                    Logger.LogError(message, ex);
+                    publisherProxy = null;
+                }
+                finally
+                {
+                    numberOfTries++;
+                    Logger.LogDebug($"OutageModel: PublisherProxy getter, try number: {numberOfTries}.");
+
+                    if (numberOfTries >= 100)
+                    {
+                        sleepInterval = 1000;
+                    }
+
+                    Thread.Sleep(sleepInterval);
+                }
+            }
+
+            return publisherProxy;
         }
 
         #region Proxies
@@ -116,12 +168,32 @@ namespace OutageManagementService
 
             if (affectedConsumers.Count > 0)
             {
+                ActiveOutage activeOutageInDb = null;
                 using (OutageContext db = new OutageContext())
                 {
-                    db.ActiveOutages.Add(new ActiveOutage { AffectedConsumers = affectedConsumers, ElementGid = gid, ReportTime = DateTime.Now }); 
+                    try
+                    {
+                        activeOutageInDb = db.ActiveOutages.Add(new ActiveOutage { AffectedConsumers = affectedConsumers, ElementGid = gid, ReportTime = DateTime.Now }); 
+                    }
+                    catch (Exception e)
+                    {
+                        Logger.LogError("Error while adding active outage into database. ", e);
+                        success = false;
+                    }
                 }
                 //TODO: Publish
-                success = true;
+                if (activeOutageInDb != null)
+                {
+                    try
+                    {
+                        PublishActiveOutage(Topic.ACTIVE_OUTAGE, activeOutageInDb);
+                        success = true;
+                    }
+                    catch (Exception) //TODO: Exception over proxy or enum...
+                    {
+                    }
+                    
+                }
             }
             else
             {
@@ -129,6 +201,26 @@ namespace OutageManagementService
             }
 
             return success;
+        }
+
+        private void PublishActiveOutage(Topic topic, OutageMessage outageMessage)
+        {
+            OutagePublication outagePublication = new OutagePublication(topic, outageMessage);
+
+            using (PublisherProxy publisherProxy = GetPublisherProxy())
+            {
+                if (publisherProxy != null)
+                {
+                    publisherProxy.Publish(outagePublication);
+                    Logger.LogInfo($"Outage service published data from topic: {outagePublication.Topic}");
+                }
+                else
+                {
+                    string errMsg = "Publisher proxy is null";
+                    Logger.LogWarn(errMsg);
+                    throw new NullReferenceException(errMsg);
+                }
+            }
         }
 
         private List<long> GetAffectedConsumers(long potentialOutageGid)

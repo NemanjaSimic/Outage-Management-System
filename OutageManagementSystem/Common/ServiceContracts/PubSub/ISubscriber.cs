@@ -26,7 +26,7 @@ namespace Outage.Common.ServiceContracts.PubSub
         [ServiceKnownType(typeof(SingleDiscreteValueSCADAMessage))]
         [ServiceKnownType(typeof(MultipleDiscreteValueSCADAMessage))]
         [ServiceKnownType(typeof(CalculationEngineMessage))]
-        [ServiceKnownType(typeof(CalcualtionEnginePublication))]
+        [ServiceKnownType(typeof(CalculationEnginePublication))]
         [ServiceKnownType(typeof(TopologyForUIMessage))]
         [ServiceKnownType(typeof(EmailServiceMessage))]
         [ServiceKnownType(typeof(EmailToOutageMessage))]
