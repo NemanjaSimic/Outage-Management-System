@@ -18,5 +18,4 @@ namespace Outage.SCADA.SCADACommon
     {
         Dictionary<long, DiscreteModbusData> Data { get; }
     }
-    
 }

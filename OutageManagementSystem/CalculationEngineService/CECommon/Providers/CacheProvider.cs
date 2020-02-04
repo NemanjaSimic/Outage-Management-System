@@ -109,6 +109,16 @@ namespace CECommon.Providers
 			}
 		}
 
+		public long GetElementGidForMeasurement(long measurementGid)
+		{
+			long signalGid = 0;
+			if (discreteMeasurements.TryGetValue(measurementGid, out DiscreteMeasurement measurement))
+			{
+				signalGid = measurement.ElementId;
+			}
+			return signalGid;
+		}
+
 		struct AnalogMeasurementInfo
 		{
 			public long Gid;

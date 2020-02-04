@@ -36,7 +36,10 @@ namespace Outage.Common
         ACTIVE_OUTAGE,
 
         [EnumMember]
-        ARCHIVED_OUTAGE
+        ARCHIVED_OUTAGE,
+
+        [EnumMember]
+        OMS_MODEL
     }
 
     //SCADA

@@ -53,6 +53,7 @@ namespace OMS.Web.API
         {
             // We register our types here
             container.RegisterType<GraphHub>();
+            container.RegisterType<ScadaHub>();
             container.RegisterType<ICustomExceptionHandler, TopologyException>();
             container.RegisterType<IGraphMapper, GraphMapper>();
             container.RegisterType<ILogger, FileLogger>(new ContainerControlledLifetimeManager());

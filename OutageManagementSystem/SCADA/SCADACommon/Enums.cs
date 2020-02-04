@@ -10,12 +10,6 @@
         WRITE_SINGLE_REGISTER = 0x06,
     }
 
-    //public enum AnalogType : short
-    //{
-    //    Power = 0x01,
-    //    Voltage = 0x02
-    //}
-
     public enum PointType : short
     {
         DIGITAL_OUTPUT = 0x01,
@@ -23,11 +17,5 @@
         ANALOG_INPUT = 0x03,
         ANALOG_OUTPUT = 0x04,
         HR_LONG = 0x05,
-    }
-
-    public enum DState : short
-    {
-        CLOSED = 0,
-        OPENED = 1,
     }
 }

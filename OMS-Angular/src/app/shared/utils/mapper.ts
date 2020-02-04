@@ -18,7 +18,7 @@ export const mapRelation = (relation) => {
     data: {
       source: relation.SourceNodeId,
       target: relation.TargetNodeId,
-      color: relation.IsActive ? "blue" : "red"
+      color: relation.IsActive ? "green" : "blue"
     }
   }
 }
@@ -51,8 +51,8 @@ const mapTransformerNode = (node) => {
       measurements: node.Measurements,
       nominalVoltage: node.NominalVoltage,
       deviceType: node.IsRemote ? "remote" : "local",
-      firstWinding: node.firstWinding,
-      secondWinding: node.secondWinding
+      firstWinding: node.FirstWinding,
+      secondWinding: node.SecondWinding
     }
   }
 }

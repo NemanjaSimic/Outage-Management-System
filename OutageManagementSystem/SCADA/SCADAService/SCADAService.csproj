@@ -48,6 +48,7 @@
     <Compile Include="Command\CommandService.cs" />
     <Compile Include="DistributedTransaction\SCADAModelUpdateNotification.cs" />
     <Compile Include="DistributedTransaction\SCADATransactionActor.cs" />
+    <Compile Include="IntegrityUpdate\IntegrityUpdateService.cs" />
     <Compile Include="SCADAService.cs" />
     <Compile Include="Properties\AssemblyInfo.cs" />
   </ItemGroup>

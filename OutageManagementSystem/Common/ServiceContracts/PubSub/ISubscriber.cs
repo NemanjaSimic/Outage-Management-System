@@ -30,6 +30,7 @@ namespace Outage.Common.ServiceContracts.PubSub
         [ServiceKnownType(typeof(TopologyForUIMessage))]
         [ServiceKnownType(typeof(EmailServiceMessage))]
         [ServiceKnownType(typeof(EmailToOutageMessage))]
+        [ServiceKnownType(typeof(OMSModelMessage))]
         void Notify(IPublishableMessage message);
     }
 }

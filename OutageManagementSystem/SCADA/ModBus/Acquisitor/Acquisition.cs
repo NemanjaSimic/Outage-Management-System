@@ -61,9 +61,6 @@ namespace Outage.SCADA.ModBus.Acquisitor
 
         private void AcquisitionThread()
         {
-            //ushort length = 6;
-            //ushort quantity;
-
             try
             {
                 Logger.LogInfo("AcquisitionThread is started.");
@@ -94,6 +91,11 @@ namespace Outage.SCADA.ModBus.Acquisitor
                         {
                             quantity = (ushort)currentAddressToGidMap[PointType.DIGITAL_OUTPUT].Count;
 
+                            if (quantity == 0)
+                            {
+                                continue;
+                            }
+
                             ModbusReadCommandParameters mdb_read = new ModbusReadCommandParameters(length,
                                                                                                    (byte)ModbusFunctionCode.READ_COILS,
                                                                                                    startAddress,
@@ -104,6 +106,11 @@ namespace Outage.SCADA.ModBus.Acquisitor
                         else if (pointType == PointType.DIGITAL_INPUT)
                         {
                             quantity = (ushort)currentAddressToGidMap[PointType.DIGITAL_INPUT].Count;
+
+                            if (quantity == 0)
+                            {
+                                continue;
+                            }
 
                             ModbusReadCommandParameters mdb_read = new ModbusReadCommandParameters(length,
                                                                                                    (byte)ModbusFunctionCode.READ_DISCRETE_INPUTS,
@@ -116,6 +123,11 @@ namespace Outage.SCADA.ModBus.Acquisitor
                         {
                             quantity = (ushort)currentAddressToGidMap[PointType.ANALOG_OUTPUT].Count;
 
+                            if (quantity == 0)
+                            {
+                                continue;
+                            }
+
                             ModbusReadCommandParameters mdb_read = new ModbusReadCommandParameters(length,
                                                                                                    (byte)ModbusFunctionCode.READ_HOLDING_REGISTERS,
                                                                                                    startAddress,
@@ -127,16 +139,25 @@ namespace Outage.SCADA.ModBus.Acquisitor
                         {
                             quantity = (ushort)currentAddressToGidMap[PointType.ANALOG_INPUT].Count;
 
+                            if(quantity == 0)
+                            {
+                                continue;
+                            }
+
                             ModbusReadCommandParameters mdb_read = new ModbusReadCommandParameters(length,
                                                                                                    (byte)ModbusFunctionCode.READ_INPUT_REGISTERS,
                                                                                                    startAddress,
                                                                                                    quantity);
                             modbusFunction = FunctionFactory.CreateModbusFunction(mdb_read);
                         }
+                        else if(pointType == PointType.HR_LONG)
+                        {
+                            continue;
+                        }
                         else
                         {
                             modbusFunction = null;
-                            string message = $"PointType value is invalid";
+                            string message = $"PointType:{pointType} value is invalid";
                             Logger.LogError(message);
                             continue;
                         }

@@ -32,7 +32,6 @@ namespace Outage.SCADA.SCADAData.Repository
         private Dictionary<PointType, Dictionary<ushort, long>> currentAddressToGidMap;
         
 
-
         #region Properties
 
         protected Dictionary<DeltaOpType, List<long>> ModelChanges
@@ -120,7 +119,7 @@ namespace Outage.SCADA.SCADAData.Repository
                 catch (Exception ex)
                 {
                     string message = $"Exception on NetworkModelGDAProxy initialization. Message: {ex.Message}";
-                    Logger.LogError(message, ex);
+                    Logger.LogWarn(message, ex);
                     gdaQueryProxy = null;
                 }
                 finally

@@ -46,7 +46,7 @@ namespace Outage.DistributedTransactionActor
                 catch (Exception ex)
                 {
                     string message = $"Exception on TransactionEnlistmentProxy initialization. Message: {ex.Message}";
-                    Logger.LogError(message, ex);
+                    Logger.LogWarn(message, ex);
                     transactionEnlistmentProxy = null;
                 }
                 finally

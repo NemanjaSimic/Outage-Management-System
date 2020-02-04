@@ -105,7 +105,7 @@ namespace Outage.NetworkModelService
                 catch (Exception ex)
                 {
                     string message = $"Exception on TransactionCoordinatorProxy initialization. Message: {ex.Message}";
-                    Logger.LogError(message, ex);
+                    Logger.LogWarn(message, ex);
                     transactionCoordinatorProxy = null;
                 }
                 finally
@@ -156,7 +156,7 @@ namespace Outage.NetworkModelService
                 catch (Exception ex)
                 {
                     string message = $"Exception on TransactionEnlistmentProxy initialization. Message: {ex.Message}";
-                    Logger.LogError(message, ex);
+                    Logger.LogWarn(message, ex);
                     transactionEnlistmentProxy = null;
                 }
                 finally
@@ -207,7 +207,7 @@ namespace Outage.NetworkModelService
                 catch (Exception ex)
                 {
                     string message = $"Exception on ModelUpdateNotificationProxy initialization. EndpointName: {endpointName}, Message: {ex.Message}";
-                    Logger.LogError(message, ex);
+                    Logger.LogWarn(message, ex);
                     modelUpdateNotifierProxy = null;
                 }
                 finally

@@ -34,7 +34,7 @@ namespace Topology
                 topologyModel.Add(CalulateLoadFlow(rootElement, newTopology));
             }
             
-            return topologyModel;
+             return topologyModel;
         }
 
         public ITopology CalulateLoadFlow(long startingElementGid, ITopology topology)

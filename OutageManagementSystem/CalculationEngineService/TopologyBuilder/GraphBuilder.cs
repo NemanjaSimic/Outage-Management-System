@@ -27,7 +27,7 @@ namespace TopologyBuilder
             elements = Provider.Instance.ModelProvider.GetElementModels();
             connections = Provider.Instance.ModelProvider.GetConnections();
             
-            logger.LogInfo($"Creating topology from first element with GID {firstElementGid.ToString("X")}.");
+            logger.LogInfo($"Creating topology from first element with GID 0x{firstElementGid.ToString("X16")}.");
 
             visited = new HashSet<long>();
             stack = new Stack<long>();
@@ -56,7 +56,7 @@ namespace TopologyBuilder
                     }
                     else
                     {
-                        logger.LogError($"[GraphBuilder] Element with GID {element.ToString("X")} does not exist in collection of elements.");
+                        logger.LogError($"[GraphBuilder] Element with GID 0x{element.ToString("X16")} does not exist in collection of elements.");
                     }
                 }
                 
@@ -94,7 +94,7 @@ namespace TopologyBuilder
             }
             else
             {
-                logger.LogWarn($"[GraphBuilder] Failed to get connected elements for element with GID {gid.ToString("X")}.");
+                logger.LogWarn($"[GraphBuilder] Failed to get connected elements for element with GID 0x{gid.ToString("X16")}.");
             }
             return refElements;
         }
@@ -123,7 +123,7 @@ namespace TopologyBuilder
                     }
                     catch (Exception)
                     {
-                        string message = $"Element with GID {parent.Id.ToString("X")} has no field.";
+                        string message = $"Element with GID 0x{parent.Id.ToString("X16")} has no field.";
                         logger.LogDebug(message);
                         throw new Exception(message);
                     }
@@ -134,7 +134,7 @@ namespace TopologyBuilder
                     var field = GetField(parent.Id);
                     if (field == null)
                     {
-                        string message = $"Element with GID {parent.Id.ToString("X")} has no field.";
+                        string message = $"Element with GID 0x{parent.Id.ToString("X16")} has no field.";
                         logger.LogDebug(message);
                         throw new Exception(message);
                     }
@@ -153,7 +153,7 @@ namespace TopologyBuilder
             }
             else
             {
-                logger.LogError($"[GraphBuilder] Element with GID {newElementGid.ToString("X")} does not exist in collection of elements.");
+                logger.LogError($"[GraphBuilder] Element with GID 0x{newElementGid.ToString("X16")} does not exist in collection of elements.");
             }
         }
         private Field GetField(long memberGid)
