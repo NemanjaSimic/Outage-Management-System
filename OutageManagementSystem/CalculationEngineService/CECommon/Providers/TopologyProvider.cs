@@ -22,6 +22,7 @@ namespace CECommon.Providers
         }
         private List<ITopology> TransactionTopology { get; set; }
         public ProviderTopologyDelegate ProviderTopologyDelegate { get; set; }
+        public ProviderTopologyConnectionDelegate ProviderTopologyConnectionDelegate{get; set;}
         public TopologyProvider(IModelTopologyServis modelTopologyServis)
         {
             this.modelTopologyServis = modelTopologyServis;
@@ -51,6 +52,7 @@ namespace CECommon.Providers
         {
             Topology = TransactionTopology;
             transactionFlag = TransactionFlag.NoTransaction;
+            ProviderTopologyConnectionDelegate?.Invoke(Topology);
         }
         public bool PrepareForTransaction()
         {
@@ -73,5 +75,20 @@ namespace CECommon.Providers
             TransactionTopology = null;
             transactionFlag = TransactionFlag.NoTransaction;
         }
+
+        public bool IsElementRemote(long elementGid)
+        {
+            bool isRemote = false;
+            foreach (var topology in Topology)
+            {
+                if (topology.TopologyElements.TryGetValue(elementGid, out ITopologyElement element))
+                {
+                    isRemote = element.IsRemote;
+                    break;
+                }
+            }
+            return isRemote;
+        }
+            
     }
 }

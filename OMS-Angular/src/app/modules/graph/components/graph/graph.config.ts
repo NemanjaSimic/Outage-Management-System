@@ -5,7 +5,7 @@ const cyConfig: Object = {
   autoungrabify: true,
   style: style,
   wheelSensitivity: 0.1,
-  minZoom: 1,
+  minZoom: 0.25,
   maxZoom: 3
 };
 

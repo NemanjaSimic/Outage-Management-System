@@ -20,7 +20,7 @@ namespace CalculationEngineService
         private ILogger logger;
         private ISubscriber proxy;
         private IModelTopologyServis modelTopologyServis;
-        private IWebTopologyBuilder webTopologyBuilder;
+        private ITopologyConverter webTopologyBuilder;
         private IModelManager modelManager;
         private ITopologyBuilder topologyBuilder;
         private ICacheProvider cacheProvider;
@@ -28,7 +28,7 @@ namespace CalculationEngineService
         private SCADAResultHandler sCADAResultProvider;
         private TopologyProvider topologyProvider;
         private ModelProvider modelProvider;
-        private WebTopologyModelProvider webTopologyModelProvider;
+        private TopologyConverterProvider webTopologyModelProvider;
         private TopologyPublisher topologyPublisher;
         protected ILogger Logger
         {
@@ -41,14 +41,14 @@ namespace CalculationEngineService
         {
             topologyBuilder = new GraphBuilder();
             modelTopologyServis = new TopologyManager(topologyBuilder);
-            webTopologyBuilder = new WebTopologyBuilder();
+            webTopologyBuilder = new TopologyConverter();
 
             sCADAResultProvider = new SCADAResultHandler();
             cacheProvider = new CacheProvider();
             modelManager = new NMSManager();
             modelProvider = new ModelProvider(modelManager);
             topologyProvider = new TopologyProvider(modelTopologyServis);
-            webTopologyModelProvider = new WebTopologyModelProvider(webTopologyBuilder);
+            webTopologyModelProvider = new TopologyConverterProvider(webTopologyBuilder);
             topologyPublisher = new TopologyPublisher();
             InitializeHosts();
         }

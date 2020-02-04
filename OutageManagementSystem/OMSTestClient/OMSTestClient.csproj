@@ -4,16 +4,17 @@
   <PropertyGroup>
     <Configuration Condition=" '$(Configuration)' == '' ">Debug</Configuration>
     <Platform Condition=" '$(Platform)' == '' ">AnyCPU</Platform>
-    <ProjectGuid>{831A52CF-75FF-4EAB-BCEC-24547C588009}</ProjectGuid>
-    <OutputType>Library</OutputType>
-    <AppDesignerFolder>Properties</AppDesignerFolder>
-    <RootNamespace>Topology</RootNamespace>
-    <AssemblyName>Topology</AssemblyName>
+    <ProjectGuid>{5272C603-5EFF-4248-BB3D-563D05B48185}</ProjectGuid>
+    <OutputType>Exe</OutputType>
+    <RootNamespace>OMSTestClient</RootNamespace>
+    <AssemblyName>OMSTestClient</AssemblyName>
     <TargetFrameworkVersion>v4.8</TargetFrameworkVersion>
     <FileAlignment>512</FileAlignment>
+    <AutoGenerateBindingRedirects>true</AutoGenerateBindingRedirects>
     <Deterministic>true</Deterministic>
   </PropertyGroup>
   <PropertyGroup Condition=" '$(Configuration)|$(Platform)' == 'Debug|AnyCPU' ">
+    <PlatformTarget>AnyCPU</PlatformTarget>
     <DebugSymbols>true</DebugSymbols>
     <DebugType>full</DebugType>
     <Optimize>false</Optimize>
@@ -23,6 +24,7 @@
     <WarningLevel>4</WarningLevel>
   </PropertyGroup>
   <PropertyGroup Condition=" '$(Configuration)|$(Platform)' == 'Release|AnyCPU' ">
+    <PlatformTarget>AnyCPU</PlatformTarget>
     <DebugType>pdbonly</DebugType>
     <Optimize>true</Optimize>
     <OutputPath>bin\Release\</OutputPath>
@@ -42,28 +44,17 @@
     <Reference Include="System.Xml" />
   </ItemGroup>
   <ItemGroup>
-    <Compile Include="TopologyManager.cs" />
+    <Compile Include="Program.cs" />
     <Compile Include="Properties\AssemblyInfo.cs" />
-    <Compile Include="TopologyPublisher.cs" />
-    <Compile Include="TopologyService.cs" />
-    <Compile Include="TopologyConverter.cs" />
+    <Compile Include="Subscriber.cs" />
   </ItemGroup>
   <ItemGroup>
-    <ProjectReference Include="..\..\Common\Common.csproj">
+    <None Include="App.config" />
+  </ItemGroup>
+  <ItemGroup>
+    <ProjectReference Include="..\Common\Common.csproj">
       <Project>{892CBE15-9ED7-4540-81FA-0EAABA592138}</Project>
       <Name>Common</Name>
-    </ProjectReference>
-    <ProjectReference Include="..\CECommon\CECommon.csproj">
-      <Project>{E1D2D69D-E03D-4FD7-8E4F-0FC95B68F0DD}</Project>
-      <Name>CECommon</Name>
-    </ProjectReference>
-    <ProjectReference Include="..\NetworkModelServiceFunctions\NetworkModelServiceFunctions.csproj">
-      <Project>{D4553E8A-C694-4EBD-BA3C-0444A1D0C1EF}</Project>
-      <Name>NetworkModelServiceFunctions</Name>
-    </ProjectReference>
-    <ProjectReference Include="..\TopologyBuilder\TopologyBuilder.csproj">
-      <Project>{F83B7FD0-C28B-4C96-A49C-7EA0E2B579F1}</Project>
-      <Name>TopologyBuilder</Name>
     </ProjectReference>
   </ItemGroup>
   <Import Project="$(MSBuildToolsPath)\Microsoft.CSharp.targets" />

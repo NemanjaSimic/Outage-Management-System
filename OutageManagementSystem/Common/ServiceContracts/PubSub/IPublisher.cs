@@ -23,6 +23,7 @@ namespace Outage.Common.ServiceContracts.PubSub
         [ServiceKnownType(typeof(OutageEmailPublication))]
         [ServiceKnownType(typeof(EmailServiceMessage))]
         [ServiceKnownType(typeof(EmailToOutageMessage))]
+        [ServiceKnownType(typeof(OMSModelMessage))]
         //[ServiceKnownType(typeof(AnalogModbusData))]
         //[ServiceKnownType(typeof(DigitalModbusData))]
         void Publish(IPublication publication);
