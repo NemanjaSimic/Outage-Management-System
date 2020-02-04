@@ -40,7 +40,7 @@ namespace Topology
         public void TopologyToOMSConvertDelegate(List<IOutageTopologyModel> outageTopologyModels)
         {
             OMSModelMessage message = new OMSModelMessage(outageTopologyModels.First());
-            CalcualtionEnginePublication publication = new CalcualtionEnginePublication(Topic.OMS_MODEL, message);
+            CalculationEnginePublication publication = new CalculationEnginePublication(Topic.OMS_MODEL, message);
             try
             {
                 using (var publisherProxy = new PublisherProxy(EndpointNames.PublisherEndpoint))

@@ -110,8 +110,8 @@
     <Compile Include="OutageService\Interface\IOutageTopologyModel.cs" />
     <Compile Include="OutageService\Model\OutageTopologyElement.cs" />
     <Compile Include="OutageService\Model\OutageTopologyModel.cs" />
-    <Compile Include="PubSub\CalculationEngineDataContract\CalcualtionEnginePublication.cs" />
     <Compile Include="PubSub\CalculationEngineDataContract\CalculationEngineMessage.cs" />
+    <Compile Include="PubSub\CalculationEngineDataContract\CalculationEnginePublication.cs" />
     <Compile Include="PubSub\EmailDataContract\EmailServiceMessage.cs" />
     <Compile Include="PubSub\EmailDataContract\OutageEmailPublication.cs" />
     <Compile Include="PubSub\IPublication.cs" />
