@@ -81,6 +81,9 @@
     <Reference Include="System.Xml" />
   </ItemGroup>
   <ItemGroup>
+    <Compile Include="Handlers\OutageQueryHandler.cs" />
+    <Compile Include="Queries\GetActiveOutagesQuery.cs" />
+    <Compile Include="Queries\GetArchivedOutagesQuery.cs" />
     <Compile Include="Queries\GetTopologyQuery.cs" />
     <Compile Include="Commands\SwitchCommandBase.cs" />
     <Compile Include="Commands\TurnOffSwitchCommand.cs" />
