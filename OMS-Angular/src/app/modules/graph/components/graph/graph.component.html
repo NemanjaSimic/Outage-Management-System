@@ -1,14 +1,16 @@
 <app-splash *ngIf="!didLoadGraph"></app-splash>
 
 <form (keyup.enter)="onSearch()">
-  <input 
-    type="search" 
-    [(ngModel)]="gidSearchQuery" 
-    [ngModelOptions]="{standalone: true}">
+  <input type="search" [(ngModel)]="gidSearchQuery" [ngModelOptions]="{standalone: true}">
   <i class="fa fa-search" (click)="onSearch()"></i>
 </form>
 
 <div id="legend">
-  
+  <div class="legendColumn" *ngFor="let item of legendItems let item = item">
+    <div class="legendRow">
+      <img class="legendIcon" [src]='item.icon'>
+      <div class="legendLabels">{{item.label}}</div>
+    </div>
+  </div>
 </div>
 <div id="graph"></div>

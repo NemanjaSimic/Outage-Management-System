@@ -8,12 +8,42 @@
 
 #legend {
   position: absolute;
-  box-sizing: content-box;
-  width: 300px;
-  height: 200px;
+  display: grid;
+  grid-template-columns: auto auto;
+  grid-gap: 2px;
+  padding: 5px;
+  width: 350px;
+  height: 150px;
   left: 40px;
-  bottom: 40px;
-  background: rgba(92, 92, 92, 0.3);
+  bottom: 30px;
+  background: rgba(63, 63, 63, 0.5);
+}
+
+.legendColumn {
+  /* padding: 2px; */
+  display: grid;
+  /* grid-gap: 10px; */
+  grid-template-columns: auto;
+  background: rgba(51, 51, 51, 0.3);
+}
+
+.legendRow {
+  padding: 5px;
+  display: grid;
+  grid-template-columns: auto auto;
+  grid-gap: 10px;
+  background: rgba(51, 51, 51, 0.3);
+}
+
+.legendIcon {
+  width: 18px;
+  max-height: 18px;
+}
+
+.legendLabels {
+  text-align: left;
+  font-size: 8pt;
+  font-family: 'Courier New';
 }
 
 /*

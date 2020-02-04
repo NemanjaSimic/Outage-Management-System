@@ -1,0 +1,32 @@
+{
+    "items": [
+        {
+            "icon": "assets/img/energy2.png",
+            "label": "Energy Source"
+        },
+        {
+            "icon": "assets/img/power-transformer.png",
+            "label": "Power Transformer"
+        },
+        {
+            "icon": "assets/img/disconnector.png",
+            "label": "Disconnector"
+        },
+        {
+            "icon": "assets/img/load-break-switch.png",
+            "label": "Load Break Switch"
+        },
+        {
+            "icon": "assets/img/breaker.png",
+            "label": "Breaker"
+        },
+        {
+            "icon": "assets/img/fuse.png",
+            "label": "Fuse"
+        },
+        {
+            "icon": "assets/img/consumer.png",
+            "label": "Energy Consumer"
+        }
+    ]
+}
