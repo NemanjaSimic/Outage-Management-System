@@ -9,7 +9,6 @@ using System.Threading.Tasks;
 
 namespace Outage.Common.ServiceContracts.OMS
 {
-    //[Serializable]
     [DataContract]
     public class ActiveOutage
     {
