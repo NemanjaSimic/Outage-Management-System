@@ -23,11 +23,6 @@ namespace OutageDatabase
                 ActiveOutages.Remove(activeOutage);
             }
 
-            foreach(ArchivedOutage archivedOutage in ArchivedOutages)
-            {
-                ArchivedOutages.Remove(archivedOutage);
-            }
-
             SaveChanges();
         }
         public DbSet<ActiveOutage> ActiveOutages { get; set; }
