@@ -1,4 +1,4 @@
-﻿﻿﻿namespace OMS.Web.API.Controllers
+﻿﻿﻿﻿namespace OMS.Web.API.Controllers
 {
     using MediatR;
     using OMS.Web.Services.Queries;
