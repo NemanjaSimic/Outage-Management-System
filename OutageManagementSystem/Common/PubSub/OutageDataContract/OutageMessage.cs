@@ -49,7 +49,7 @@ namespace Outage.Common.PubSub.OutageDataContract
         public DateTime ArchiveTime { get; set; }
 
         [DataMember]
-        public List<long> AffectedConsumers { get; set; }
+        public string AffectedConsumers { get; set; }
     }
     
 }
