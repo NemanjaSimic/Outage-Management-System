@@ -1,4 +1,6 @@
 ﻿using Outage.Common;
+using Outage.Common.OutageService.Interface;
+using Outage.Common.OutageService.Model;
 using Outage.Common.PubSub;
 using Outage.Common.PubSub.EmailDataContract;
 using Outage.Common.ServiceContracts.PubSub;
@@ -80,7 +82,7 @@ namespace OutageManagementService.Calling
                 {
                     Logger.LogWarn("Received GID is not id of energy consumer.");
                 }
-                else if (!outageModel.topology.Nodes.ContainsKey(emailMessage.Gid) && outageModel.topology.FirstNode != emailMessage.Gid)
+                else if (!outageModel.TopologyModel.OutageTopology.ContainsKey(emailMessage.Gid) && outageModel.TopologyModel.FirstNode != emailMessage.Gid)
                 {
                     Logger.LogWarn("Received GID is not part of topology");
                 }

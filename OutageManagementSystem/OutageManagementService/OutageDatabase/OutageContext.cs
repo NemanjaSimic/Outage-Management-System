@@ -13,19 +13,27 @@ namespace OutageDatabase
     {
         public OutageContext() : base("OutageContext")
         {
+            
+        }
 
+        public void DeleteAllData()
+        {
+            foreach(ActiveOutage activeOutage in ActiveOutages)
+            {
+                ActiveOutages.Remove(activeOutage);
+            }
+
+            foreach(ArchivedOutage archivedOutage in ArchivedOutages)
+            {
+                ArchivedOutages.Remove(archivedOutage);
+            }
+
+            SaveChanges();
         }
         public DbSet<ActiveOutage> ActiveOutages { get; set; }
         public DbSet<ArchivedOutage> ArchivedOutages { get; set; }
 
-        protected override void OnModelCreating(DbModelBuilder modelBuilder)
-        {
-            modelBuilder.Entity<ArchivedOutage>().Map(m =>
-            {
-                m.MapInheritedProperties();
-                m.ToTable("ArchivedOutages");
-            });
+        
 
-        }
     }
 }

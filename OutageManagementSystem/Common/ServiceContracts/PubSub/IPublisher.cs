@@ -3,6 +3,7 @@ using System.ServiceModel;
 using Outage.Common.PubSub.SCADADataContract;
 using Outage.Common.PubSub.CalculationEngineDataContract;
 using Outage.Common.PubSub.EmailDataContract;
+using Outage.Common.PubSub.OutageDataContract;
 
 namespace Outage.Common.ServiceContracts.PubSub
 {
@@ -24,6 +25,10 @@ namespace Outage.Common.ServiceContracts.PubSub
         [ServiceKnownType(typeof(EmailServiceMessage))]
         [ServiceKnownType(typeof(EmailToOutageMessage))]
         [ServiceKnownType(typeof(OMSModelMessage))]
+        [ServiceKnownType(typeof(ActiveOutage))]
+        [ServiceKnownType(typeof(ArchivedOutage))]
+        [ServiceKnownType(typeof(OutagePublication))]
+        [ServiceKnownType(typeof(OutageMessage))]
         //[ServiceKnownType(typeof(AnalogModbusData))]
         //[ServiceKnownType(typeof(DigitalModbusData))]
         void Publish(IPublication publication);

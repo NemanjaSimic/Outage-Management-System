@@ -5,6 +5,7 @@ using Outage.Common.PubSub;
 using Outage.Common.ServiceContracts.PubSub;
 using Outage.Common.PubSub.SCADADataContract;
 using Outage.Common;
+using Outage.Common.PubSub.OutageDataContract;
 
 namespace TestSub
 {
@@ -45,6 +46,10 @@ namespace TestSub
                     AlarmType alarm = multipleDiscreteValue.Data[gid].Alarm;
                     Console.WriteLine($"Discrete => Gid: 0x{gid:X16}, Value: {currentValue}, Alarm: {alarm}");
                 }
+            }
+            else if (msg is ActiveOutage activeOutage)
+            {
+                Console.WriteLine($"Active outage id: {activeOutage.OutageId}, affected consumers:{activeOutage.AffectedConsumers}, affected element: 0x{activeOutage.ElementGid:x16}");
             }
         }
 	}

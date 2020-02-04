@@ -1,4 +1,6 @@
 ﻿using Outage.Common;
+using Outage.Common.OutageService.Interface;
+using Outage.Common.OutageService.Model;
 using Outage.Common.PubSub.OutageDataContract;
 using Outage.Common.ServiceContracts.OMS;
 using Outage.Common.ServiceContracts.PubSub;
@@ -14,28 +16,15 @@ namespace OutageManagementService.Outage
     public class OutageService : IOutageContract
     {
         private ILogger logger;
-        private ISubscriber subscriber;
+       
         protected ILogger Logger
         {
             get { return logger ?? (logger = LoggerWrapper.Instance); }
         }
 
-        private OutageModel outageModel;
-        private CallTracker callTracker;
-
-        public OutageService()
-        {
-            outageModel = new OutageModel();
-            callTracker = new CallTracker("CallTrackerSubscriber", outageModel);
-            SubscribeOnEmailService();
-        }
-
-        private void SubscribeOnEmailService()
-        {
-            subscriber = new SubscriberProxy(callTracker, EndpointNames.SubscriberEndpoint);
-            subscriber.Subscribe(Topic.OUTAGE_EMAIL);
-            
-        }
+        public static OutageModel outageModel;
+       
+       
 
         public List<ActiveOutage> GetActiveOutages()
         {

@@ -29,7 +29,7 @@ namespace Outage.Common.PubSub.OutageDataContract
         public DateTime ReportTime { get; set; }
 
         [DataMember]
-        public List<long> AffectedConsumers { get; set; }
+        public string AffectedConsumers { get; set; }
     }
 
     public class ArchivedOutage : OutageMessage
