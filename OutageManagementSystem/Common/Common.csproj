@@ -110,11 +110,13 @@
     <Compile Include="OutageService\Interface\IOutageTopologyModel.cs" />
     <Compile Include="OutageService\Model\OutageTopologyElement.cs" />
     <Compile Include="OutageService\Model\OutageTopologyModel.cs" />
-    <Compile Include="PubSub\CalculationEngineDataContract\CalcualtionEnginePublication.cs" />
     <Compile Include="PubSub\CalculationEngineDataContract\CalculationEngineMessage.cs" />
+    <Compile Include="PubSub\CalculationEngineDataContract\CalculationEnginePublication.cs" />
     <Compile Include="PubSub\EmailDataContract\EmailServiceMessage.cs" />
     <Compile Include="PubSub\EmailDataContract\OutageEmailPublication.cs" />
     <Compile Include="PubSub\IPublication.cs" />
+    <Compile Include="PubSub\OutageDataContract\OutagePublication.cs" />
+    <Compile Include="PubSub\OutageDataContract\OutageMessage.cs" />
     <Compile Include="PubSub\Publication.cs" />
     <Compile Include="PubSub\SCADADataContract\IModbusData.cs" />
     <Compile Include="PubSub\SCADADataContract\ModbusData.cs" />
@@ -124,10 +126,8 @@
     <Compile Include="ServiceContracts\CalculationEngine\ITopologyOMSService.cs" />
     <Compile Include="ServiceContracts\DistributedTransaction\IModelUpdateNotificationContract.cs" />
     <Compile Include="ServiceContracts\DistributedTransaction\ITransactionEnlistmentContract.cs" />
-    <Compile Include="ServiceContracts\OMS\ArchivedOutage.cs" />
     <Compile Include="ServiceContracts\OMS\ICallingContract.cs" />
     <Compile Include="ServiceContracts\OMS\IOutageContract.cs" />
-    <Compile Include="ServiceContracts\OMS\ActiveOutage.cs" />
     <Compile Include="ServiceContracts\SCADA\ISCADACommand.cs" />
     <Compile Include="ServiceContracts\CalculationEngine\ITopologyServiceContract.cs" />
     <Compile Include="ServiceContracts\PubSub\IPublisher.cs" />

@@ -5,9 +5,9 @@ namespace Outage.Common.PubSub.CalculationEngineDataContract
 
     //[Serializable]
     [DataContract]
-    public class CalcualtionEnginePublication : Publication
+    public class CalculationEnginePublication : Publication
     {
-        public CalcualtionEnginePublication(Topic topic, CalculationEngineMessage message) : base(topic, message)
+        public CalculationEnginePublication(Topic topic, CalculationEngineMessage message) : base(topic, message)
         {
 
         }

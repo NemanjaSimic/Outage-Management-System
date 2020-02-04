@@ -33,6 +33,12 @@ namespace Outage.Common
         OUTAGE_EMAIL,
 
         [EnumMember]
+        ACTIVE_OUTAGE,
+
+        [EnumMember]
+        ARCHIVED_OUTAGE,
+
+        [EnumMember]
         OMS_MODEL
     }
 
