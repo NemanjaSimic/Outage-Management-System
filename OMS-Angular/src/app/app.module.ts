@@ -4,10 +4,8 @@ import { AppComponent } from './app.component';
 import { RoutingModule } from '@modules/routing/routing.module';
 import { SharedModule } from '@shared/shared.module';
 import { ServicesModule } from '@services/services.module';
-
 import { GraphModule } from './modules/graph/graph.module';
-//TOOD: check this
-// import { ActiveBrowserComponent } from './modules/active-browser/active-browser.component';
+import { ActiveBrowserComponent } from './modules/active-browser/active-browser.component';
 // import { HistoricalBrowserComponent } from './modules/historical-browser/historical-browser.component';
 
 import { MatSidenavModule } from '@angular/material/sidenav';
@@ -22,7 +20,7 @@ import { MatTableModule } from '@angular/material/table';
 @NgModule({
   declarations: [
     AppComponent,
-    // ActiveBrowserComponent,
+    ActiveBrowserComponent,
     // HistoricalBrowserComponent
   ],
   imports: [
