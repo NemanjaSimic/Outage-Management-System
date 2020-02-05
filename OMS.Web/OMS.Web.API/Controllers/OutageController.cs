@@ -28,8 +28,8 @@ namespace OMS.Web.API.Controllers
         [Route("api/outage/archived")]
         public async Task<IHttpActionResult> GetArchived()
         {
-            IEnumerable<ArchivedOutageViewModel> activeOutages = await _mediator.Send(new GetArchivedOutagesQuery());
-            return Ok(activeOutages);
+            IEnumerable<ArchivedOutageViewModel> archivedOutages = await _mediator.Send(new GetArchivedOutagesQuery());
+            return Ok(archivedOutages);
         }
     }
 }
