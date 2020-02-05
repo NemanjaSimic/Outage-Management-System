@@ -8,11 +8,11 @@ namespace OMS.Web.UI.Models.ViewModels
         public long Id { get; set; }
         public long ElementId { get; set; }
         public DateTime DateCreated { get; set; }
-        public List<long> AfectedConsumers { get; set; }
+        public List<Consumer> AfectedConsumers { get; set; }
 
         public ArchivedOutage()
         {
-            AfectedConsumers = new List<long>();
+            AfectedConsumers = new List<Consumer>();
         }
 
         //TODO: IF NEEDED 
