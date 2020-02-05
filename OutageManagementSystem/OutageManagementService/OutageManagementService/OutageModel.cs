@@ -173,26 +173,36 @@ namespace OutageManagementService
         {
             bool success = false;
 
-            List<long> affectedConsumers = new List<long>();
+            List<long> affectedConsumersIds = new List<long>();
 
             //TODO: special case: potenitial outage is remote (and closed)...
 
-            affectedConsumers = GetAffectedConsumers(gid);
+            affectedConsumersIds = GetAffectedConsumers(gid);
 
-            if (affectedConsumers.Count > 0)
+            if (affectedConsumersIds.Count > 0)
             {
                 ActiveOutage activeOutageInDb = null;
                 using (OutageContext db = new OutageContext())
                 {
                     try
                     {
-                        activeOutageInDb = db.ActiveOutages.Add(new ActiveOutage { AffectedConsumers = GetAffectedConsumersString(affectedConsumers), ElementGid = gid, ReportTime = DateTime.Now });
-                        db.SaveChanges();
-                        Logger.LogDebug($"Outage on element with gid: 0x{activeOutageInDb.ElementGid:x16} is successfully stored in database");
+                        List<Consumer> consumers = GetAffectedConsumersFromDatabase(affectedConsumersIds, db);
+                        if(consumers.Count == affectedConsumersIds.Count)
+                        {
+                            activeOutageInDb = db.ActiveOutages.Add(new ActiveOutage { AffectedConsumers = consumers, ElementGid = gid, ReportTime = DateTime.Now });
+                            db.SaveChanges();
+                            Logger.LogDebug($"Outage on element with gid: 0x{activeOutageInDb.ElementGid:x16} is successfully stored in database");
+                        }
+                        else
+                        {
+                            Logger.LogWarn("Some of affected consumers are not present in database.");
+                            success = false;
+                        }
+                        
                     }
                     catch (Exception e)
                     {
-                        Logger.LogError("Error while adding active outage into database. ", e);
+                        Logger.LogError("Error while adding active outage into database.", e);
                         success = false;
                     }
                 }
@@ -221,20 +231,25 @@ namespace OutageManagementService
             return success;
         }
 
-        private string GetAffectedConsumersString(List<long> affectedConsumers)
+        private List<Consumer> GetAffectedConsumersFromDatabase(List<long> affectedConsumersIds, OutageContext db)
         {
-            StringBuilder sb = new StringBuilder();
-
-            for(int i = 0; i < affectedConsumers.Count; i++)
+            List<Consumer> affectedConsumers = new List<Consumer>();
+            
+            foreach(long affectedConsumerId in affectedConsumersIds)
             {
-                sb.Append(affectedConsumers[i]);
-                if (i < affectedConsumers.Count - 1)
+                Consumer affectedConsumer = db.Consumers.Find(affectedConsumerId);
+
+                if(affectedConsumer != null)
                 {
-                    sb.Append("|");
+                    affectedConsumers.Add(affectedConsumer);
+                }
+                else
+                {
+                    break;
                 }
             }
 
-            return sb.ToString();
+            return affectedConsumers;
         }
 
         private void PublishActiveOutage(Topic topic, OutageMessage outageMessage)
