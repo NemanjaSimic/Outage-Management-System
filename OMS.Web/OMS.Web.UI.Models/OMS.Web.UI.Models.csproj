@@ -71,6 +71,7 @@
   <ItemGroup>
     <Compile Include="BindingModels\SwitchCommand.cs" />
     <Compile Include="ViewModels\ArchivedOutage.cs" />
+    <Compile Include="ViewModels\Consumer.cs" />
     <Compile Include="ViewModels\Measurement.cs" />
     <Compile Include="ViewModels\Node.cs" />
     <Compile Include="ViewModels\OmsGraph.cs" />
