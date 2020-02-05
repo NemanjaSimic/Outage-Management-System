@@ -1,5 +1,8 @@
 ﻿using Outage.Common;
+using Outage.Common.GDA;
+using Outage.Common.PubSub.OutageDataContract;
 using Outage.Common.ServiceContracts.PubSub;
+using Outage.Common.ServiceProxies;
 using Outage.Common.ServiceProxies.PubSub;
 using OutageDatabase;
 using OutageManagementService.Calling;
@@ -9,6 +12,7 @@ using System.Collections.Generic;
 using System.Linq;
 using System.ServiceModel;
 using System.Text;
+using System.Threading;
 using System.Threading.Tasks;
 
 namespace OutageManagementService
@@ -22,7 +26,60 @@ namespace OutageManagementService
         private OutageModel outageModel;
         private ISubscriber subscriber;
         private CallTracker callTracker;
+        private ModelResourcesDesc modelResourcesDesc;
         #endregion
+
+        #region Proxies
+
+        private NetworkModelGDAProxy gdaQueryProxy = null;
+
+        private NetworkModelGDAProxy GetGdaQueryProxy()
+        {
+            int numberOfTries = 0;
+            int sleepInterval = 500;
+
+            while (numberOfTries <= int.MaxValue)
+            {
+                try
+                {
+                    if (gdaQueryProxy != null)
+                    {
+                        gdaQueryProxy.Abort();
+                        gdaQueryProxy = null;
+                    }
+
+                    gdaQueryProxy = new NetworkModelGDAProxy(EndpointNames.NetworkModelGDAEndpoint);
+                    gdaQueryProxy.Open();
+
+                    if (gdaQueryProxy.State == CommunicationState.Opened)
+                    {
+                        break;
+                    }
+                }
+                catch (Exception ex)
+                {
+                    string message = $"Exception on NetworkModelGDAProxy initialization. Message: {ex.Message}";
+                    Logger.LogWarn(message, ex);
+                    gdaQueryProxy = null;
+                }
+                finally
+                {
+                    numberOfTries++;
+                    Logger.LogDebug($"NetworkModelGDA: GdaQueryProxy getter, try number: {numberOfTries}.");
+
+                    if (numberOfTries >= 100)
+                    {
+                        sleepInterval = 1000;
+                    }
+
+                    Thread.Sleep(sleepInterval);
+                }
+            }
+
+            return gdaQueryProxy;
+        }
+
+        #endregion Proxies
 
 
         protected ILogger Logger
@@ -35,23 +92,113 @@ namespace OutageManagementService
 
             //TODO: Initialize what is needed
             //Delete database(TODO: restauration of data...)
+            modelResourcesDesc = new ModelResourcesDesc();
             using (OutageContext db = new OutageContext())
             {
                 db.DeleteAllData();
+                InitializeEnergyConsumers(db);
             }
+           
             outageModel = new OutageModel();
             OutageService.outageModel = outageModel;
             callTracker = new CallTracker("CallTrackerSubscriber", outageModel);
             SubscribeOnEmailService();
+            
             InitializeHosts();
 
         }
+
+        #region GDAHelper
+        private List<ResourceDescription> GetExtentValues(ModelCode entityType, List<ModelCode> propIds)
+        {
+            int iteratorId = 0;
+            int numberOfTries = 0;
+            while (numberOfTries < 5)
+            {
+                try
+                {
+                    numberOfTries++;
+                    using (var proxy = GetGdaQueryProxy())
+                    {
+                        iteratorId = proxy.GetExtentValues(entityType, propIds);
+                    }
+                    break;
+                }
+                catch (Exception ex)
+                {
+                    logger.LogError($"Failed to get extent values for entity type {entityType.ToString()}. Exception message: " + ex.Message);
+                    logger.LogWarn($"Retrying to connect to NMSProxy. Number of tries: {numberOfTries}.");
+                }
+            }
+
+            return ProcessIterator(iteratorId);
+        }
+
+        private List<ResourceDescription> ProcessIterator(int iteratorId)
+        {
+            //TODO: mozda vec ovde napakovati dictionary<long, rd> ?
+            int numberOfResources = 10000, resourcesLeft = 0;
+            List<ResourceDescription> resourceDescriptions = new List<ResourceDescription>();
+
+            try
+            {
+                using (var gdaProxy = GetGdaQueryProxy())
+                {
+                    if (gdaProxy != null)
+                    {
+                        do
+                        {
+                            List<ResourceDescription> rds = gdaProxy.IteratorNext(numberOfResources, iteratorId);
+                            resourceDescriptions.AddRange(rds);
+
+                            resourcesLeft = gdaProxy.IteratorResourcesLeft(iteratorId);
+
+                        } while (resourcesLeft > 0);
+
+                        gdaProxy.IteratorClose(iteratorId);
+                    }
+                    else
+                    {
+                        string message = "From method ProcessIterator(): NetworkModelGDAProxy is null.";
+                        logger.LogError(message);
+                        throw new NullReferenceException(message);
+                    }
+                }
+            }
+            catch (Exception ex)
+            {
+                string message = $"Failed to retrieve all Resourse descriptions with iterator {iteratorId}. Exception message: " + ex.Message;
+                logger.LogError(message);
+            }
+            return resourceDescriptions;
+        }
+        #endregion
 
         private void SubscribeOnEmailService()
         {
             subscriber = new SubscriberProxy(callTracker, EndpointNames.SubscriberEndpoint);
             subscriber.Subscribe(Topic.OUTAGE_EMAIL);
 
+        }
+
+        private void InitializeEnergyConsumers(OutageContext db)
+        {
+            List<ResourceDescription> energyConsumers = GetExtentValues(ModelCode.ENERGYCONSUMER, modelResourcesDesc.GetAllPropertyIds(ModelCode.ENERGYCONSUMER));
+
+            int i = 0;
+            foreach(ResourceDescription energyConsumer in energyConsumers)
+            {
+                Consumer consumer = new Consumer();
+                consumer.ConsumerId = energyConsumer.GetProperty(ModelCode.IDOBJ_GID).AsLong();
+                consumer.ConsumerMRID = energyConsumer.GetProperty(ModelCode.IDOBJ_MRID).AsString();
+                consumer.FirstName = $"FirstName{i}";
+                consumer.LastName = $"LastName{i}";
+                i++;
+
+                db.Consumers.Add(consumer);
+            }
+
+            db.SaveChanges();
         }
 
 
