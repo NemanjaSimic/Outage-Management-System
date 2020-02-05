@@ -1,5 +1,5 @@
 ﻿using MediatR;
-using Outage.Common.ServiceContracts.OMS;
+using OMS.Web.UI.Models.ViewModels;
 using System.Collections.Generic;
 
 namespace OMS.Web.Services.Queries

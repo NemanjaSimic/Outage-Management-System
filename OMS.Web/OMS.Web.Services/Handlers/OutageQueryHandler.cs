@@ -1,19 +1,17 @@
 ﻿using MediatR;
 using OMS.Web.Services.Queries;
+using OMS.Web.UI.Models.ViewModels;
 using Outage.Common;
-using Outage.Common.ServiceContracts.OMS;
 using Outage.Common.ServiceProxies.Outage;
 using System;
 using System.Collections.Generic;
-using System.Linq;
 using System.ServiceModel;
-using System.Text;
 using System.Threading;
 using System.Threading.Tasks;
 
 namespace OMS.Web.Services.Handlers
 {
-    public class OutageQueryHandler : IRequestHandler<GetActiveOutagesQuery, IEnumerable<ActiveOutage>>, IRequestHandler<GetArchivedOutagesQuery, IEnumerable<ArchivedOutage>>
+    public class OutageQueryHandler : IRequestHandler<GetActiveOutagesQuery, IEnumerable<Outage.Common.ServiceContracts.OMS.ActiveOutage>>, IRequestHandler<GetArchivedOutagesQuery, IEnumerable<ArchivedOutage>>
     {
         private ILogger _logger;
 
@@ -74,7 +72,7 @@ namespace OMS.Web.Services.Handlers
 
         #endregion
 
-        public Task<IEnumerable<ActiveOutage>> Handle(GetActiveOutagesQuery request, CancellationToken cancellationToken)
+        public Task<IEnumerable<Outage.Common.ServiceContracts.OMS.ActiveOutage>> Handle(GetActiveOutagesQuery request, CancellationToken cancellationToken)
         {
             return Task.Run(() =>
             {
@@ -82,7 +80,7 @@ namespace OMS.Web.Services.Handlers
                 {
                     try
                     {
-                        IEnumerable<ActiveOutage> activeOutages = outageProxy.GetActiveOutages();
+                        IEnumerable<Outage.Common.ServiceContracts.OMS.ActiveOutage> activeOutages = outageProxy.GetActiveOutages();
                         return activeOutages;
                     }
                     catch (Exception e)
@@ -100,16 +98,32 @@ namespace OMS.Web.Services.Handlers
             {
                 using (OutageServiceProxy outageProxy = GetOutageProxy())
                 {
+                    IEnumerable<ArchivedOutage> archivedOutages = new List<ArchivedOutage>();
+                    
                     try
                     {
-                        IEnumerable<ArchivedOutage> archivedOutages = outageProxy.GetArchivedOutages();
-                        return archivedOutages;
+                        var dbArchivedOutages = outageProxy.GetArchivedOutages();
+
+                        foreach(var dbArchivedOutage in dbArchivedOutages)
+                        {
+                            ArchivedOutage archivedOutage = new ArchivedOutage()
+                            {
+                                Id = dbArchivedOutage.ElementGid,
+                                ElementId = dbArchivedOutage.ElementGid,
+                                DateCreated = dbArchivedOutage.ReportTime,
+                                AfectedConsumers = new List<long>(),
+                            };
+
+                            //archivedOutage.AfectedConsumers.AddRange(dbArchivedOutage.AffectedConsumers);
+                        }
                     }
                     catch (Exception e)
                     {
                         Logger.LogError("Task<IEnumerable<ArchivedOutage>> Handle => exception", e);
                         throw e;
                     }
+                    
+                    return archivedOutages;
                 }
             });
         }
