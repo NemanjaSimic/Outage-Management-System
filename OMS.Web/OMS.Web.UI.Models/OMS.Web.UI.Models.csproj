@@ -36,6 +36,7 @@
     <Reference Include="System.ComponentModel.DataAnnotations" />
   </ItemGroup>
   <ItemGroup>
+<<<<<<< 0b0479d7e08eae707c0d643b2d945a989f6ead4e
     <Compile Include="BindingModels\SwitchCommandBindingModel.cs" />
     <Compile Include="IViewModel.cs" />
     <Compile Include="ViewModels\ArchivedOutageViewModel.cs" />
@@ -45,6 +46,15 @@
     <Compile Include="ViewModels\OmsGraphViewModel.cs" />
     <Compile Include="ViewModels\ActiveOutageViewModel.cs" />
     <Compile Include="ViewModels\RelationViewModel.cs" />
+=======
+    <Compile Include="BindingModels\SwitchCommand.cs" />
+    <Compile Include="ViewModels\ArchivedOutage.cs" />
+    <Compile Include="ViewModels\Consumer.cs" />
+    <Compile Include="ViewModels\Measurement.cs" />
+    <Compile Include="ViewModels\Node.cs" />
+    <Compile Include="ViewModels\OmsGraph.cs" />
+    <Compile Include="ViewModels\Relation.cs" />
+>>>>>>> post merge modifications
     <Compile Include="Properties\AssemblyInfo.cs" />
     <Compile Include="ViewModels\TransformerNodeViewModel.cs" />
   </ItemGroup>
