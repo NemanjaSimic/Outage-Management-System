@@ -1,3 +1,34 @@
-table {
-    width: 100%;
-  }
+/* TODO:
+* - make table layout responsive 
+*/
+
+.active-outages {
+  width: 97%;  
+  font-family: 'PT Serif', serif;
+}
+
+.active-outages > h1 {
+  font-size: 40px;
+  margin-left: 60px;
+}
+
+.fa-bolt {
+  color: #fffb00fd;
+}
+
+.active-outages > table {
+  width: 95%;
+  border: 1px solid white;
+  margin-top: 30px;
+  margin-left: 60px;
+  margin-right: 15px;
+}
+
+.dark-header {
+  background-color: #292d33;
+}
+
+.table-data {
+  border-left: 1px solid #373c42;
+  padding-left: 10px;
+}
