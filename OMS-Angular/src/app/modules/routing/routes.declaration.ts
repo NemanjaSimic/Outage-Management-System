@@ -10,7 +10,7 @@ export const rootRoutes: Route[] = [
   { path: '', component: GraphComponent },
   { path: 'graph', component: GraphComponent },
   { path: 'splash', component: SplashComponent },
-  { path: 'active_browser', component: ActiveBrowserComponent },
+  { path: 'active-browser', component: ActiveBrowserComponent },
   // { path: 'historical_browser', component: HistoricalBrowserComponent },
   { path: '**', component: NotFoundComponent }
 ]
