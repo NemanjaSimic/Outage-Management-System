@@ -1,14 +1,22 @@
-﻿using System;
-using MediatR;
-using System.Web.Http;
-using OMS.Web.Services.Commands;
-using OMS.Web.UI.Models.BindingModels;
-
-namespace OMS.Web.API.Controllers
+﻿namespace OMS.Web.API.Controllers
 {
+    using System;
+    using MediatR;
+    using System.Web.Http;
+    using OMS.Web.Services.Commands;
+    using OMS.Web.UI.Models.BindingModels;
+    using System.Collections.Generic;
+
     public class ScadaController : ApiController
     {
         private readonly IMediator _mediator;
+
+        private readonly Dictionary<SwitchCommandType, Func<long, SwitchCommandBase>> switchCommandMap =
+            new Dictionary<SwitchCommandType, Func<long, SwitchCommandBase>>
+            {
+                { SwitchCommandType.TURN_OFF, (long gid) => new TurnOffSwitchCommand(gid) },
+                { SwitchCommandType.TURN_ON, (long gid) => new TurnOnSwitchCommand(gid) }
+            };
 
         public ScadaController(IMediator mediator)
         {
@@ -23,20 +31,7 @@ namespace OMS.Web.API.Controllers
                 return BadRequest(ModelState);
             }
 
-            SwitchCommandBase switchCommand;
-
-            if (command.Command == SwitchCommandType.TURN_ON)
-            {
-                switchCommand = new TurnOnSwitchCommand(command.Guid);
-            }
-            else if (command.Command == SwitchCommandType.TURN_OFF)
-            {
-                switchCommand = new TurnOffSwitchCommand(command.Guid);
-            }
-            else
-            {
-                return BadRequest("Invalid CommandType.");
-            }
+            SwitchCommandBase switchCommand = switchCommandMap[command.Command](command.Guid);
 
             try
             {

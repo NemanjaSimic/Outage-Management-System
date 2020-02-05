@@ -27,7 +27,7 @@ namespace PubSubEngine
                         Subscribers.Instance.PublishMessage(subscriber, publication.Message);
                         logger.LogInfo($"Publication [Topic: {publication.Topic}] SUCCESSFULLY published to Subscriber [{subscriberName}]");
                     }
-                    catch (Exception)
+                    catch (Exception e)
                     {
                         Subscribers.Instance.RemoveSubscriber(subscriber);
                         Publications.Instance.RemoveSubscriber(subscriber);

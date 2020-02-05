@@ -54,6 +54,8 @@
   </ItemGroup>
   <ItemGroup>
     <Compile Include="Calling\CallingService.cs" />
+    <Compile Include="Calling\CallTracker.cs" />
+    <Compile Include="Calling\TrackingAlgorithm.cs" />
     <Compile Include="OutageModel.cs" />
     <Compile Include="OutageManagementService.cs" />
     <Compile Include="Outage\OutageService.cs" />

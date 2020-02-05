@@ -13,6 +13,7 @@ import { drawMeasurements } from '@shared/utils/measurement';
 import * as cytoscape from 'cytoscape';
 import * as mapper from '@shared/utils/mapper';
 import * as graphMock from './graph-mock.json';
+import * as legendData from './legend.json';
 
 // cytoscape plugins
 import dagre from 'cytoscape-dagre';
@@ -47,6 +48,7 @@ export class GraphComponent implements OnInit, OnDestroy {
   public panSubscription: Subscription;
 
   public gidSearchQuery: string;
+  public legendItems;
   public didLoadGraph: boolean;
   private cy: any;
 
@@ -118,6 +120,8 @@ export class GraphComponent implements OnInit, OnDestroy {
           });
       }
     )
+
+    this.legendItems = legendData.items;
   }
 
   ngOnDestroy() {

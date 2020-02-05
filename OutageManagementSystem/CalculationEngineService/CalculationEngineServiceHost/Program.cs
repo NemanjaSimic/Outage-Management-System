@@ -3,6 +3,7 @@ using NetworkModelServiceFunctions;
 using System;
 using System.Diagnostics;
 using Topology;
+using CalculationEngineService;
 
 namespace CalculationEngineServiceHost
 {

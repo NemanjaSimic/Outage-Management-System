@@ -1,4 +1,7 @@
 ﻿using Outage.Common;
+using Outage.Common.ServiceContracts.PubSub;
+using Outage.Common.ServiceProxies.PubSub;
+using OutageDatabase;
 using OutageManagementService.Calling;
 using OutageManagementService.Outage;
 using System;
@@ -17,7 +20,8 @@ namespace OutageManagementService
         private ILogger logger;
         private List<ServiceHost> hosts = null;
         private OutageModel outageModel;
-        private CallingService callingService;
+        private ISubscriber subscriber;
+        private CallTracker callTracker;
         #endregion
 
 
@@ -28,12 +32,25 @@ namespace OutageManagementService
 
         public OutageManagementService()
         {
-            //TODO: Initialize what is needed
-            callingService = new CallingService("OutageService");
-            callingService.outageModel = outageModel;
 
+            //TODO: Initialize what is needed
+            //Delete database(TODO: restauration of data...)
+            using (OutageContext db = new OutageContext())
+            {
+                db.DeleteAllData();
+            }
             outageModel = new OutageModel();
+            OutageService.outageModel = outageModel;
+            callTracker = new CallTracker("CallTrackerSubscriber", outageModel);
+            SubscribeOnEmailService();
             InitializeHosts();
+
+        }
+
+        private void SubscribeOnEmailService()
+        {
+            subscriber = new SubscriberProxy(callTracker, EndpointNames.SubscriberEndpoint);
+            subscriber.Subscribe(Topic.OUTAGE_EMAIL);
 
         }
 
@@ -88,6 +105,8 @@ namespace OutageManagementService
             Logger.LogInfo(message);
             Console.WriteLine("\n\n{0}", message);
         }
+
+        
 
         private void StartHosts()
         {

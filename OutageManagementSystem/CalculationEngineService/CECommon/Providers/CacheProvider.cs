@@ -2,10 +2,13 @@
 using CECommon.Model;
 using Outage.Common;
 using Outage.Common.PubSub.SCADADataContract;
+using Outage.Common.ServiceProxies.Outage;
 using System;
 using System.Collections.Generic;
 using System.Linq;
+using System.ServiceModel;
 using System.Text;
+using System.Threading;
 using System.Threading.Tasks;
 
 namespace CECommon.Providers
@@ -17,6 +20,54 @@ namespace CECommon.Providers
 		//private Dictionary<long, AnalogMeasurementInfo> analogMeasurements;
 		private Dictionary<long, DiscreteMeasurement> discreteMeasurements;
 		//private Dictionary<long, DiscreteMeasurementInfo> discreteMeasurements;
+
+		private OutageServiceProxy outageServiceProxy;
+
+		private OutageServiceProxy GetOutageServiceProxy()
+		{
+			int numberOfTries = 0;
+			int sleepInterval = 500;
+
+			while (numberOfTries <= int.MaxValue)
+			{
+				try
+				{
+					if (outageServiceProxy != null)
+					{
+						outageServiceProxy.Abort();
+						outageServiceProxy = null;
+					}
+
+					outageServiceProxy = new OutageServiceProxy(EndpointNames.OutageServiceEndpoint);
+					outageServiceProxy.Open();
+
+					if (outageServiceProxy.State == CommunicationState.Opened)
+					{
+						break;
+					}
+				}
+				catch (Exception ex)
+				{
+					string message = $"Exception on OutageServiceProxy initialization. Message: {ex.Message}";
+					logger.LogWarn(message, ex);
+					outageServiceProxy = null;
+				}
+				finally
+				{
+					numberOfTries++;
+					logger.LogDebug($"ModelUpdateNotification: TransactionEnlistmentProxy getter, try number: {numberOfTries}.");
+
+					if (numberOfTries >= 100)
+					{
+						sleepInterval = 1000;
+					}
+
+					Thread.Sleep(sleepInterval);
+				}
+			}
+
+			return outageServiceProxy;
+		}
 		public CacheProvider()
 		{
 			analogMeasurements = new Dictionary<long, AnalogMeasurement>();
@@ -91,6 +142,20 @@ namespace CECommon.Providers
 				}
 				else
 				{
+					if (!measurement.CurrentOpen)
+					{
+						using (OutageServiceProxy outageProxy = GetOutageServiceProxy())
+						{
+							try
+							{
+								outageProxy.ReportOutage(measurement.ElementId);
+							}
+							catch (Exception e)
+							{
+								logger.LogError("Failed to report outage.", e);
+							}
+						}
+					}
 					measurement.CurrentOpen = true;
 				}
 				discreteMeasurements[measurementGid] = measurement;

@@ -19,6 +19,7 @@
         public static readonly string CalculationEngineTransactionActorEndpoint = "CalculationEngineTransactionActorEndpoint";
         public static readonly string CalculationEngineModelUpdateNotifierEndpoint = "CalculationEngineModelUpdateNotifierEndpoint";
         public static readonly string TopologyServiceEndpoint = "TopologyServiceEndpoint";
+        public static readonly string TopologyOMSServiceEndpoint = "TopologyOMSServiceEndpoint";
 
         //PUBSUB - 4
         public static readonly string PublisherEndpoint = "PublisherEndpoint";
