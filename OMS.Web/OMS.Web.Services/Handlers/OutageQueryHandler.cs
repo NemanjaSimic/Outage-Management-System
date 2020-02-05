@@ -111,10 +111,23 @@ namespace OMS.Web.Services.Handlers
                                 Id = dbArchivedOutage.ElementGid,
                                 ElementId = dbArchivedOutage.ElementGid,
                                 DateCreated = dbArchivedOutage.ReportTime,
-                                AfectedConsumers = new List<long>(),
+                                AfectedConsumers = new List<Consumer>(),
                             };
 
-                            //archivedOutage.AfectedConsumers.AddRange(dbArchivedOutage.AffectedConsumers);
+                            //TODO: mapper badly needed
+                            foreach (var dbAfectedConsumer in dbArchivedOutage.AffectedConsumers)
+                            {
+                                Consumer consumer = new Consumer()
+                                {
+                                    ConsumerId = dbAfectedConsumer.ConsumerId,
+                                    ConsumerMRID = dbAfectedConsumer.ConsumerMRID,
+                                    FirstName = dbAfectedConsumer.FirstName,
+                                    LastName = dbAfectedConsumer.LastName,
+                                    ArchivedOutages = new List<ArchivedOutage>(),
+                                };
+
+                                archivedOutage.AfectedConsumers.Add(consumer);
+                            }
                         }
                     }
                     catch (Exception e)
