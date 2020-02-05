@@ -1,5 +1,5 @@
 ﻿using MediatR;
-using Outage.Common.ServiceContracts.OMS;
+using Outage.Common.PubSub.OutageDataContract;
 using System.Collections.Generic;
 
 namespace OMS.Web.Services.Queries

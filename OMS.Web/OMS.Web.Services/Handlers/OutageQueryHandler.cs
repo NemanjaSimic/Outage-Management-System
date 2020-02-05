@@ -11,7 +11,7 @@ using System.Threading.Tasks;
 
 namespace OMS.Web.Services.Handlers
 {
-    public class OutageQueryHandler : IRequestHandler<GetActiveOutagesQuery, IEnumerable<Outage.Common.ServiceContracts.OMS.ActiveOutage>>, IRequestHandler<GetArchivedOutagesQuery, IEnumerable<ArchivedOutage>>
+    public class OutageQueryHandler : IRequestHandler<GetActiveOutagesQuery, IEnumerable<Outage.Common.PubSub.OutageDataContract.ActiveOutage>>, IRequestHandler<GetArchivedOutagesQuery, IEnumerable<ArchivedOutage>>
     {
         private ILogger _logger;
 
@@ -72,7 +72,7 @@ namespace OMS.Web.Services.Handlers
 
         #endregion
 
-        public Task<IEnumerable<Outage.Common.ServiceContracts.OMS.ActiveOutage>> Handle(GetActiveOutagesQuery request, CancellationToken cancellationToken)
+        public Task<IEnumerable<Outage.Common.PubSub.OutageDataContract.ActiveOutage>> Handle(GetActiveOutagesQuery request, CancellationToken cancellationToken)
         {
             return Task.Run(() =>
             {
@@ -80,7 +80,7 @@ namespace OMS.Web.Services.Handlers
                 {
                     try
                     {
-                        IEnumerable<Outage.Common.ServiceContracts.OMS.ActiveOutage> activeOutages = outageProxy.GetActiveOutages();
+                        IEnumerable<Outage.Common.PubSub.OutageDataContract.ActiveOutage> activeOutages = outageProxy.GetActiveOutages();
                         return activeOutages;
                     }
                     catch (Exception e)
