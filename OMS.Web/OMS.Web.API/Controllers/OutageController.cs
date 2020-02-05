@@ -18,11 +18,11 @@ namespace OMS.Web.API.Controllers
         }
 
         [HttpGet]
-        [ResponseType(typeof(IEnumerable<Outage.Common.ServiceContracts.OMS.ActiveOutage>))]
+        [ResponseType(typeof(IEnumerable<Outage.Common.PubSub.OutageDataContract.ActiveOutage>))]
         [Route("api/outage/getActive")]
         public async Task<IHttpActionResult> GetActive()
         {
-            IEnumerable<Outage.Common.ServiceContracts.OMS.ActiveOutage> activeOutages = await _mediator.Send<IEnumerable<Outage.Common.ServiceContracts.OMS.ActiveOutage>>(new GetActiveOutagesQuery());
+            IEnumerable<Outage.Common.PubSub.OutageDataContract.ActiveOutage> activeOutages = await _mediator.Send<IEnumerable<Outage.Common.PubSub.OutageDataContract.ActiveOutage>>(new GetActiveOutagesQuery());
             return Ok(activeOutages);
         }
 
