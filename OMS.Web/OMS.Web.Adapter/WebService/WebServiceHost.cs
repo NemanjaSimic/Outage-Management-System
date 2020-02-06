@@ -19,7 +19,6 @@
         public void Open()
         {
             NetTcpBinding binding = new NetTcpBinding();
-            string address = AppSettings.Get<string>("webServiceAddress");
 
             _host = new ServiceHost(typeof(WebService));
             _host.AddServiceEndpoint(typeof(IWebService), binding, _address);
