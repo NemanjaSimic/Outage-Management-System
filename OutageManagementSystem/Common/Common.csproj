@@ -128,6 +128,7 @@
     <Compile Include="ServiceContracts\DistributedTransaction\ITransactionEnlistmentContract.cs" />
     <Compile Include="ServiceContracts\OMS\ICallingContract.cs" />
     <Compile Include="ServiceContracts\OMS\IOutageContract.cs" />
+    <Compile Include="ServiceContracts\OMS\IOutageService.cs" />
     <Compile Include="ServiceContracts\SCADA\ISCADACommand.cs" />
     <Compile Include="ServiceContracts\CalculationEngine\ITopologyServiceContract.cs" />
     <Compile Include="ServiceContracts\PubSub\IPublisher.cs" />

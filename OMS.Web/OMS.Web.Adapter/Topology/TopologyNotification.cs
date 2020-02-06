@@ -38,7 +38,7 @@
         {
             if(message is TopologyForUIMessage topologyMessage)
             {
-                OmsGraph graph = _mapper.MapTopology(topologyMessage.UIModel);
+                OmsGraphViewModel graph = _mapper.Map(topologyMessage.UIModel);
 
                 _dispatcher.Connect();
                 try

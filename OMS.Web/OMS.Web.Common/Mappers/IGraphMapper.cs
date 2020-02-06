@@ -5,6 +5,6 @@
 
     public interface IGraphMapper
     {
-        OmsGraph MapTopology(UIModel topologyModel);
+        OmsGraphViewModel Map(UIModel topologyModel);
     }
 }

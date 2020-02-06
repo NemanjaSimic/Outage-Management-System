@@ -9,41 +9,41 @@
         public const string PowerTransformerDmsTypeName = "POWERTRANSFORMER";
         public const string TransformerWindingDmsTypeName = "TRANSFORMERWINDING";
 
-        public static OmsGraph SquashTransformerWindings(this OmsGraph graph)
+        public static OmsGraphViewModel SquashTransformerWindings(this OmsGraphViewModel graph)
         {
-            IEnumerable<TransformerNode> transformerNodes
+            IEnumerable<TransformerNodeViewModel> transformerNodes
                 = graph
                 .Nodes
                 .Where(x => x.DMSType.Equals(PowerTransformerDmsTypeName))
-                ?.Select(n => n as TransformerNode)
+                ?.Select(n => n as TransformerNodeViewModel)
                 ?.ToList();
 
-            IEnumerable<Node> windingNodes
+            IEnumerable<NodeViewModel> windingNodes
                 = graph
                 .Nodes
                 .Where(x => x.DMSType.Equals(TransformerWindingDmsTypeName))
                 ?.ToList();
 
-            IEnumerable<Relation> firstWindingRelations
+            IEnumerable<RelationViewModel> firstWindingRelations
                 = graph
                 .Relations
                 .Where(x => windingNodes.Any(w => w.Id.Equals(x.SourceNodeId)))
                 .Where(x => transformerNodes.Any(t => t.Id.Equals(x.TargetNodeId)))
                 ?.ToList();
 
-            IEnumerable<Relation> secondWindingRelations
+            IEnumerable<RelationViewModel> secondWindingRelations
                 = graph
                 .Relations
                 .Where(x => windingNodes.Any(w => w.Id.Equals(x.TargetNodeId)))
                 .Where(x => transformerNodes.Any(t => t.Id.Equals(x.SourceNodeId)))
                 ?.ToList();
 
-            IEnumerable<Relation> firstWindingSourceRelations
+            IEnumerable<RelationViewModel> firstWindingSourceRelations
                 = graph
                 .Relations
                 .Where(x => firstWindingRelations.Any(f => f.SourceNodeId.Equals(x.TargetNodeId)))
                 ?.Select(x =>
-                    new Relation
+                    new RelationViewModel
                     {
                         SourceNodeId = x.SourceNodeId,
                         TargetNodeId = firstWindingRelations
@@ -53,12 +53,12 @@
                 )
                 ?.ToList();
 
-            IEnumerable<Relation> secondWindingTargetRelations
+            IEnumerable<RelationViewModel> secondWindingTargetRelations
                 = graph
                 .Relations
                 .Where(x => secondWindingRelations.Any(f => f.TargetNodeId.Equals(x.SourceNodeId)))
                 ?.Select(x =>
-                    new Relation
+                    new RelationViewModel
                     {
                         TargetNodeId = x.TargetNodeId,
                         SourceNodeId = secondWindingRelations
@@ -68,7 +68,7 @@
                 )
                 ?.ToList();
 
-            IEnumerable<Relation> windingRelationsForDelete
+            IEnumerable<RelationViewModel> windingRelationsForDelete
                 = graph
                 .Relations
                 .Where(x => windingNodes
@@ -92,7 +92,7 @@
             return graph;
         }
 
-        public static OmsGraph RemoveNodes(this OmsGraph graph, IEnumerable<Node> nodes)
+        public static OmsGraphViewModel RemoveNodes(this OmsGraphViewModel graph, IEnumerable<NodeViewModel> nodes)
         {
             foreach (var node in nodes)
                 graph.Nodes.Remove(node);
@@ -100,7 +100,7 @@
             return graph;
         }
 
-        public static OmsGraph AddRelations(this OmsGraph graph, IEnumerable<Relation> relations)
+        public static OmsGraphViewModel AddRelations(this OmsGraphViewModel graph, IEnumerable<RelationViewModel> relations)
         {
             foreach (var relation in relations)
                 graph.Relations.Add(relation);
@@ -108,7 +108,7 @@
             return graph;
         }
 
-        public static OmsGraph RemoveRelations(this OmsGraph graph, IEnumerable<Relation> relations)
+        public static OmsGraphViewModel RemoveRelations(this OmsGraphViewModel graph, IEnumerable<RelationViewModel> relations)
         {
             foreach (var relation in relations)
                 graph.Relations.Remove(relation);
@@ -116,39 +116,39 @@
             return graph;
         }
 
-        public static OmsGraph ResolveWindings(
-            this OmsGraph graph,
-            IEnumerable<Relation> firstWindingRelations,
-            IEnumerable<Relation> secondWindingRelations)
+        public static OmsGraphViewModel ResolveWindings(
+            this OmsGraphViewModel graph,
+            IEnumerable<RelationViewModel> firstWindingRelations,
+            IEnumerable<RelationViewModel> secondWindingRelations)
         {
             foreach (var firstWindingRelation in firstWindingRelations)
             {
-                Node firstWinding
+                NodeViewModel firstWinding
                     = graph
                     .Nodes
                     .First(x => x.Id.Equals(firstWindingRelation.SourceNodeId));
 
-                TransformerNode transformer
+                TransformerNodeViewModel transformer
                     = graph
                     .Nodes
                     .First(x => x.Id.Equals(firstWindingRelation.TargetNodeId))
-                    as TransformerNode;
+                    as TransformerNodeViewModel;
 
                 transformer.AddFirstWinding(firstWinding);
             }
 
             foreach (var secondWindingRelation in secondWindingRelations)
             {
-                Node secondWinding
+                NodeViewModel secondWinding
                     = graph
                     .Nodes
                     .First(x => x.Id.Equals(secondWindingRelation.TargetNodeId));
 
-                TransformerNode transformer
+                TransformerNodeViewModel transformer
                     = graph
                     .Nodes
                     .First(x => x.Id.Equals(secondWindingRelation.SourceNodeId))
-                    as TransformerNode;
+                    as TransformerNodeViewModel;
 
                 transformer.AddSecondWinding(secondWinding);
             }
