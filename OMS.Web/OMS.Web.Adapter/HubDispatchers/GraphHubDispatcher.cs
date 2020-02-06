@@ -17,8 +17,8 @@
 
         public GraphHubDispatcher()
         {
-            _url = AppSettings.Get<string>("hubUrl");
-            _hubName = AppSettings.Get<string>("hubName");
+            _url = AppSettings.Get<string>(HubAddress.GraphHubUrl);
+            _hubName = AppSettings.Get<string>(HubAddress.GraphHubName);
 
             _connection = new HubConnection(_url);
             _proxy = _connection.CreateHubProxy(_hubName);

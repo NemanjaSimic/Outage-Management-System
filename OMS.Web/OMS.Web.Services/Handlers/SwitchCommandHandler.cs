@@ -18,7 +18,7 @@
         public SwitchCommandHandler(ILogger logger)
         {
             _logger = logger;
-            string scadaCommandServiceAddress = AppSettings.Get<string>("scadaCommandServiceAddress");
+            string scadaCommandServiceAddress = AppSettings.Get<string>(ServiceAddress.ScadaCommandServiceAddress);
             _scadaClient = new TopologySCADACommandProxy(scadaCommandServiceAddress);
         }
 

@@ -26,7 +26,7 @@
             _logger = logger;
 
             // nece dependency injection zbog nekog unity updatea
-            string topologyServiceAddress = AppSettings.Get<string>("topologyServiceAddress");
+            string topologyServiceAddress = AppSettings.Get<string>(ServiceAddress.TopologyServiceAddress);
             _topologyClient = new TopologyClientProxy(topologyServiceAddress);
         }
 
