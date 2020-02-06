@@ -7,6 +7,13 @@
 
     public class ConsumerMapper : IConsumerMapper
     {
+        private IOutageMapper _outageMapper;
+
+        public ConsumerMapper(IOutageMapper outageMapper)
+        {
+            _outageMapper = outageMapper;
+        }
+
         public ConsumerViewModel MapConsumer(Consumer consumer)
             => new ConsumerViewModel
             {
@@ -14,7 +21,8 @@
                 Mrid = consumer.ConsumerMRID,
                 FirstName = consumer.FirstName,
                 LastName = consumer.LastName,
-                //ArchivedOutages = consumer.ArchivedOutages // kada uradite mapper za ovo
+                ActiveOutages = _outageMapper.MapActiveOutages(consumer.ActiveOutages),
+                ArchivedOutages = _outageMapper.MapArchivedOutages(consumer.ArchivedOutages)
             };
 
         public IEnumerable<ConsumerViewModel> MapConsumers(IEnumerable<Consumer> consumers)

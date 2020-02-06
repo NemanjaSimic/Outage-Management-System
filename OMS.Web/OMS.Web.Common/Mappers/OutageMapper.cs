@@ -28,13 +28,16 @@
             => outages.Select(o => MapActiveOutage(o)).ToList();
 
         public ArchivedOutageViewModel MapArchivedOutage(ArchivedOutage outage)
-        {
-            throw new NotImplementedException();
-        }
+            => new ArchivedOutageViewModel
+            {
+                Id = outage.OutageId,
+                ReportedAt = outage.ReportTime,
+                ArchivedAt = outage.ArchiveTime,
+                ElementId = outage.ElementGid,
+                AffectedConsumers = _consumerMapper.MapConsumers(outage.AffectedConsumers)
+            };
 
         public IEnumerable<ArchivedOutageViewModel> MapArchivedOutages(IEnumerable<ArchivedOutage> outages)
-        {
-            throw new NotImplementedException();
-        }
+            => outages.Select(o => MapArchivedOutage(o));
     }
 }

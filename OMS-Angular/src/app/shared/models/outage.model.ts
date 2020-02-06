@@ -1,10 +1,12 @@
+import { Consumer } from './consumer.model';
+
 export interface ActiveOutage {
     Id: number;
     ElementId: number;
-    DateCreated: Date;
-    AfectedConsumers: number[];
+    ReportedAt: Date;
+    AfectedConsumers: Consumer[];
 }
 
 export interface ArchivedOutage extends ActiveOutage {
-    DateArchived : Date;
+    ArchivedAt : Date;
 }
