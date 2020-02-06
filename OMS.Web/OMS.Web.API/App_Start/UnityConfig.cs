@@ -1,8 +1,5 @@
 using MediatR;
-using OMS.Web.Adapter.Contracts;
-using OMS.Web.Adapter.Topology;
 using OMS.Web.API.Hubs;
-using OMS.Web.Common;
 using OMS.Web.Common.Exceptions;
 using OMS.Web.Common.Loggers;
 using OMS.Web.Common.Mappers;
@@ -14,7 +11,6 @@ using System.Collections.Generic;
 using System.Linq;
 using System.Reflection;
 using Unity;
-using Unity.Injection;
 using Unity.Lifetime;
 
 namespace OMS.Web.API
@@ -56,6 +52,8 @@ namespace OMS.Web.API
             container.RegisterType<ScadaHub>();
             container.RegisterType<ICustomExceptionHandler, TopologyException>();
             container.RegisterType<IGraphMapper, GraphMapper>();
+            container.RegisterType<IConsumerMapper, ConsumerMapper>();
+            container.RegisterType<IOutageMapper, OutageMapper>();
             container.RegisterType<ILogger, FileLogger>(new ContainerControlledLifetimeManager());
 
             // We register our mediatr commands here (concrete, not abstract)

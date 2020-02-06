@@ -2,13 +2,13 @@
 {
     using System;
 
-    public class Measurement : IEquatable<Measurement>
+    public class MeasurementViewModel : IEquatable<MeasurementViewModel>
     {
         public string Id { get; set; }
         public string Type { get; set; }
         public float Value { get; set; }
 
-        public bool Equals(Measurement other)
+        public bool Equals(MeasurementViewModel other)
             => Id == other.Id
             && Type == other.Type
             && Value == other.Value;

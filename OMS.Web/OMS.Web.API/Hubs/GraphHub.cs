@@ -11,9 +11,9 @@ namespace OMS.Web.API.Hubs
     {
         private static IHubContext _hubContext = GlobalHost.ConnectionManager.GetHubContext<GraphHub>();
 
-        public void NotifyGraphUpdate(List<Node> nodes, List<Relation> relations)
+        public void NotifyGraphUpdate(List<NodeViewModel> nodes, List<RelationViewModel> relations)
         {
-            Clients.All.updateGraph(new OmsGraph { Nodes = nodes, Relations = relations });
+            Clients.All.updateGraph(new OmsGraphViewModel { Nodes = nodes, Relations = relations });
         }
 
         public void NotifyGraphOutageCall(long gid)
