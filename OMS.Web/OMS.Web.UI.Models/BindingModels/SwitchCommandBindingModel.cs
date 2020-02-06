@@ -8,7 +8,7 @@
         TURN_ON = 0
     }
 
-    public class SwitchCommand
+    public class SwitchCommandBindingModel
     {
         [Required]
         public long Guid;

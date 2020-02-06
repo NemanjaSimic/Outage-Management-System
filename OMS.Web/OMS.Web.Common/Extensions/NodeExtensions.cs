@@ -4,8 +4,8 @@
     
     public static class NodeExtensions
     {
-        public static TransformerNode ToTransformerNode(this Node node)
-            => new TransformerNode
+        public static TransformerNodeViewModel ToTransformerNode(this NodeViewModel node)
+            => new TransformerNodeViewModel
             {
                 Id = node.Id,
                 Mrid = node.Mrid,
@@ -16,8 +16,8 @@
                 IsRemote = node.IsRemote,
                 Measurements = node.Measurements,
                 NominalVoltage = node.NominalVoltage,
-                FirstWinding = new Node(),
-                SecondWinding = new Node()
+                FirstWinding = new NodeViewModel(),
+                SecondWinding = new NodeViewModel()
             };
     }
 }

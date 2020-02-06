@@ -18,7 +18,7 @@
         [HttpGet]
         public async Task<IHttpActionResult> Get()
         {
-            OmsGraph graph = await _mediator.Send<OmsGraph>(new GetTopologyQuery());
+            OmsGraphViewModel graph = await _mediator.Send<OmsGraphViewModel>(new GetTopologyQuery());
             return Ok(graph);
         }
     }

@@ -1,10 +1,9 @@
-﻿using MediatR;
-using Outage.Common.PubSub.OutageDataContract;
-using System.Collections.Generic;
-
-namespace OMS.Web.Services.Queries
+﻿namespace OMS.Web.Services.Queries
 {
-    public class GetActiveOutagesQuery : IRequest<IEnumerable<ActiveOutage>>
-    {
-    }
+    using MediatR;
+    using OMS.Web.UI.Models.ViewModels;
+    using System.Collections.Generic;
+    
+    public class GetActiveOutagesQuery : IRequest<IEnumerable<ActiveOutageViewModel>>
+    {}
 }
