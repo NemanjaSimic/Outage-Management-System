@@ -14,7 +14,7 @@
     using System.Threading;
     using System.Threading.Tasks;
 
-    public class TopologyQueryHandler : IRequestHandler<GetTopologyQuery, OmsGraph>
+    public class TopologyQueryHandler : IRequestHandler<GetTopologyQuery, OmsGraphViewModel>
     {
         private readonly ITopologyClient _topologyClient;
         private readonly IGraphMapper _mapper;
@@ -30,7 +30,7 @@
             _topologyClient = new TopologyClientProxy(topologyServiceAddress);
         }
 
-        public Task<OmsGraph> Handle(GetTopologyQuery request, CancellationToken cancellationToken)
+        public Task<OmsGraphViewModel> Handle(GetTopologyQuery request, CancellationToken cancellationToken)
         {
             return Task.Run(() =>
             {
@@ -38,7 +38,7 @@
                 {
                     _logger.LogInfo("[TopologyQueryHandler::GetTopologyQuery] Sending GET query to topology client.");
                     UIModel topologyModel = _topologyClient.GetTopology();
-                    OmsGraph graph = _mapper.MapTopology(topologyModel);
+                    OmsGraphViewModel graph = _mapper.Map(topologyModel);
                     return graph;
                 }
                 catch (Exception ex)

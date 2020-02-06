@@ -24,7 +24,7 @@ namespace OMS.Web.Adapter.WebService
             _scadaDipatcher = new ScadaHubDipatcher();
         }
 
-        public void UpdateGraph(List<Node> nodes, List<Relation> relations)
+        public void UpdateGraph(List<NodeViewModel> nodes, List<RelationViewModel> relations)
         {
             Console.WriteLine("Hello from UpdateGraph()");
 

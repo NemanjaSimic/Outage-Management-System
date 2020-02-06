@@ -39,7 +39,7 @@
             }).Wait();
         }
 
-        public void NotifyGraphUpdate(List<Node> nodes, List<Relation> relations)
+        public void NotifyGraphUpdate(List<NodeViewModel> nodes, List<RelationViewModel> relations)
         {
             Console.WriteLine($"Sending graph update to Graph Hub");
             _proxy.Invoke<string>("NotifyGraphUpdate", nodes, relations).Wait();

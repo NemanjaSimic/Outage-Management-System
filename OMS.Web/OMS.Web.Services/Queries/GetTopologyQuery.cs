@@ -3,7 +3,7 @@
     using MediatR;
     using OMS.Web.UI.Models.ViewModels;
 
-    public class GetTopologyQuery : IRequest<OmsGraph>
+    public class GetTopologyQuery : IRequest<OmsGraphViewModel>
     {
     }
 }

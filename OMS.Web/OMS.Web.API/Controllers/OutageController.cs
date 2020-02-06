@@ -1,13 +1,12 @@
-﻿using MediatR;
-using OMS.Web.Services.Queries;
-using OMS.Web.UI.Models.ViewModels;
-using System.Collections.Generic;
-using System.Threading.Tasks;
-using System.Web.Http;
-using System.Web.Http.Description;
-
-namespace OMS.Web.API.Controllers
+﻿namespace OMS.Web.API.Controllers
 {
+    using MediatR;
+    using OMS.Web.Services.Queries;
+    using OMS.Web.UI.Models.ViewModels;
+    using System.Collections.Generic;
+    using System.Threading.Tasks;
+    using System.Web.Http;
+
     public class OutageController : ApiController
     {
         private readonly IMediator _mediator;
@@ -18,20 +17,18 @@ namespace OMS.Web.API.Controllers
         }
 
         [HttpGet]
-        [ResponseType(typeof(IEnumerable<Outage.Common.PubSub.OutageDataContract.ActiveOutage>))]
-        [Route("api/outage/getActive")]
+        [Route("api/outage/active")]
         public async Task<IHttpActionResult> GetActive()
         {
-            IEnumerable<Outage.Common.PubSub.OutageDataContract.ActiveOutage> activeOutages = await _mediator.Send<IEnumerable<Outage.Common.PubSub.OutageDataContract.ActiveOutage>>(new GetActiveOutagesQuery());
+            IEnumerable<ActiveOutageViewModel> activeOutages = await _mediator.Send(new GetActiveOutagesQuery());
             return Ok(activeOutages);
         }
 
         [HttpGet]
-        [ResponseType(typeof(IEnumerable<ArchivedOutage>))]
-        [Route("api/outage/getArchived")]
+        [Route("api/outage/archived")]
         public async Task<IHttpActionResult> GetArchived()
         {
-            IEnumerable<ArchivedOutage> activeOutages = await _mediator.Send<IEnumerable<ArchivedOutage>>(new GetArchivedOutagesQuery());
+            IEnumerable<ArchivedOutageViewModel> activeOutages = await _mediator.Send(new GetArchivedOutagesQuery());
             return Ok(activeOutages);
         }
     }

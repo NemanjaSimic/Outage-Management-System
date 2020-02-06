@@ -24,7 +24,7 @@
         }
 
         [HttpPost]
-        public IHttpActionResult Post(SwitchCommand command)
+        public IHttpActionResult Post(SwitchCommandBindingModel command)
         {
             if (!ModelState.IsValid)
             {

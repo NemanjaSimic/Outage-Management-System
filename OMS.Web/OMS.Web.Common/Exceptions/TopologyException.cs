@@ -17,7 +17,7 @@
         public TopologyException(string message, Exception innerException) : base(message, innerException) { }
 
         public void Handle(HttpActionExecutedContext context)
-        {
+        { 
             context.Response = new HttpResponseMessage()
             {
                 Content = new StringContent(Message, Encoding.UTF8, "application/json"),
