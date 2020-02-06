@@ -24,15 +24,16 @@
 
         public Task<Unit> Handle(TurnOffSwitchCommand request, CancellationToken cancellationToken)
         {
-            _logger.LogDebug($"Sending {request.Command.ToString()} command to {request.Gid}");
+            _logger.LogInfo($"[SwitchCommandHandler::TurnOffSwitchCommand] Sending {request.Command.ToString()} command to {request.Gid}");
 
             try
             {
                 _scadaClient.SendCommand(request.Gid, (int)request.Command);
             }
-            catch (Exception e)
+            catch (Exception ex)
             {
-                _logger.LogError("SwitchCommandHandler failed on TurnOffSwitch handler.", e);
+                _logger.LogError("[SwitchCommandHandler::TurnOffSwitchCommand] SwitchCommandHandler failed on TurnOffSwitch handler.", ex);
+                throw;
             }
 
             return null;
@@ -40,16 +41,15 @@
 
         public Task<Unit> Handle(TurnOnSwitchCommand request, CancellationToken cancellationToken)
         {
-            _logger.LogDebug($"Sending {request.Command.ToString()} command to {request.Gid}");
+            _logger.LogDebug($"[SwitchCommandHandler::TurnOnSwitchCommand] Sending {request.Command.ToString()} command to {request.Gid}");
 
             try
             {
                 _scadaClient.SendCommand(request.Gid, (int)request.Command);
             }
-            catch (Exception e)
+            catch (Exception ex)
             {
-                _logger.LogDebug("SwitchCommandHandler failed on TurnOnSwitch handler.");
-                _logger.LogError(null, e);
+                _logger.LogError("[SwitchCommandHandler::TurnOnSwitchCommand] Failed on TurnOnSwitch handler.", ex);
                 throw;
             }
 
