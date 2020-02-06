@@ -133,45 +133,47 @@ namespace CECommon.Providers
 		}
 		public void UpdateDiscreteMeasurement(long measurementGid, ushort value)
 		{
-			if (discreteMeasurements.ContainsKey(measurementGid))
+			DiscreteMeasurement measurement = discreteMeasurements[measurementGid] as DiscreteMeasurement;
+			if (value == 0)
 			{
-				DiscreteMeasurement measurement = discreteMeasurements[measurementGid] as DiscreteMeasurement;
-				if (value == 0)
-				{
-					measurement.CurrentOpen = false;
-				}
-				else
-				{
-					if (!measurement.CurrentOpen)
-					{
-						using (OutageServiceProxy outageProxy = GetOutageServiceProxy())
-						{
-							try
-							{
-								outageProxy.ReportOutage(measurement.ElementId);
-							}
-							catch (Exception e)
-							{
-								logger.LogError("Failed to report outage.", e);
-							}
-						}
-					}
-					measurement.CurrentOpen = true;
-				}
-				discreteMeasurements[measurementGid] = measurement;
-				DiscreteMeasurementDelegate?.Invoke(measurement.ElementId);
+				measurement.CurrentOpen = false;
 			}
 			else
 			{
-				logger.LogWarn($"Failed to update analog measurement with GID {measurementGid}. There is no such a measurement.");
+				if (!measurement.CurrentOpen)
+				{
+					using (OutageServiceProxy outageProxy = GetOutageServiceProxy())
+					{
+						try
+						{
+							outageProxy.ReportOutage(measurement.ElementId);
+						}
+						catch (Exception e)
+						{
+							logger.LogError("Failed to report outage.", e);
+						}
+					}
+				}
+				measurement.CurrentOpen = true;
 			}
+			discreteMeasurements[measurementGid] = measurement;
 		}
 		public void UpdateDiscreteMeasurement(Dictionary<long, DiscreteModbusData> data)
 		{
-			foreach (var measurement in data)
+			List<long> signalGids = new List<long>();
+			foreach (var measurementData in data)
 			{
-				UpdateDiscreteMeasurement(measurement.Key, measurement.Value.Value);
+				if (discreteMeasurements.TryGetValue(measurementData.Key, out DiscreteMeasurement measurement))
+				{
+					signalGids.Add(measurement.ElementId);
+					UpdateDiscreteMeasurement(measurementData.Key, measurementData.Value.Value);
+				}
+				else
+				{
+					logger.LogError($"Failed to update discrete measurement with GID {measurementData.Key}. Measurement does not exists.");
+				}
 			}
+			DiscreteMeasurementDelegate?.Invoke(signalGids);
 		}
 
 		public long GetElementGidForMeasurement(long measurementGid)
