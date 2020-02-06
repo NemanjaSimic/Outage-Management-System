@@ -28,6 +28,8 @@
         //OMS - 5
         public static readonly string CallingEndpoint = "CallingEndpoint";
         public static readonly string OutageServiceEndpoint = "OutageServiceEndpoint";
+        public static readonly string OutageTransactionActorEndpoint = "OutageTransactionActorEndpoint";
+        public static readonly string OutageModelUpdateNotifierEndpoint = "OutageModelUpdateNotifierEndpoint";
 
     }
 }

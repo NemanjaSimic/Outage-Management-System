@@ -1,10 +1,12 @@
 ﻿using CECommon.Interfaces;
 using CECommon.Model;
 using Outage.Common;
+using Outage.Common.GDA;
 using Outage.Common.OutageService.Interface;
 using Outage.Common.OutageService.Model;
 using Outage.Common.PubSub.OutageDataContract;
 using Outage.Common.ServiceContracts.OMS;
+using Outage.Common.ServiceProxies;
 using Outage.Common.ServiceProxies.CalcualtionEngine;
 using Outage.Common.ServiceProxies.PubSub;
 using Outage.Common.UI;
@@ -40,6 +42,9 @@ namespace OutageManagementService
         private ILogger logger;
         public ConcurrentQueue<long> EmailMsg;
         public List<long> CalledOutages;
+        private Dictionary<DeltaOpType, List<long>> modelChanges;
+        private ModelResourcesDesc modelResourcesDesc;
+        private OutageContext transactionOutageContext;
         protected ILogger Logger
         {
             get { return logger ?? (logger = LoggerWrapper.Instance); }
@@ -143,14 +148,140 @@ namespace OutageManagementService
 
             return omsTopologyServiceProxy;
         }
+
+        private NetworkModelGDAProxy gdaQueryProxy = null;
+
+        private NetworkModelGDAProxy GetGdaQueryProxy()
+        {
+            int numberOfTries = 0;
+            int sleepInterval = 500;
+
+            while (numberOfTries <= int.MaxValue)
+            {
+                try
+                {
+                    if (gdaQueryProxy != null)
+                    {
+                        gdaQueryProxy.Abort();
+                        gdaQueryProxy = null;
+                    }
+
+                    gdaQueryProxy = new NetworkModelGDAProxy(EndpointNames.NetworkModelGDAEndpoint);
+                    gdaQueryProxy.Open();
+
+                    if (gdaQueryProxy.State == CommunicationState.Opened)
+                    {
+                        break;
+                    }
+                }
+                catch (Exception ex)
+                {
+                    string message = $"Exception on NetworkModelGDAProxy initialization. Message: {ex.Message}";
+                    Logger.LogWarn(message, ex);
+                    gdaQueryProxy = null;
+                }
+                finally
+                {
+                    numberOfTries++;
+                    Logger.LogDebug($"NetworkModelGDA: GdaQueryProxy getter, try number: {numberOfTries}.");
+
+                    if (numberOfTries >= 100)
+                    {
+                        sleepInterval = 1000;
+                    }
+
+                    Thread.Sleep(sleepInterval);
+                }
+            }
+
+            return gdaQueryProxy;
+        }
         #endregion
 
         public OutageModel()
         {
             EmailMsg = new ConcurrentQueue<long>();
             CalledOutages = new List<long>();
+            modelResourcesDesc = new ModelResourcesDesc();
             ImportTopologyModel();
         }
+
+        #region IModelUpdateNotificationContract
+        public bool Notify(Dictionary<DeltaOpType, List<long>> modelChanges)
+        {
+            this.modelChanges = modelChanges;
+            return true;
+        }
+        #endregion
+
+        #region ITransactionActorContract
+
+        public bool Prepare()
+        {
+            bool success = false;
+            transactionOutageContext = new OutageContext();
+            Dictionary<long, ResourceDescription> resourceDescriptions = GetExtentValues(ModelCode.ENERGYCONSUMER, modelResourcesDesc.GetAllPropertyIds(ModelCode.ENERGYCONSUMER));
+
+            List<Consumer> consumersInDb = transactionOutageContext.Consumers.ToList();
+
+            foreach(Consumer consumer in consumersInDb)
+            {
+                if (modelChanges[DeltaOpType.Delete].Contains(consumer.ConsumerId))
+                {
+                    transactionOutageContext.Consumers.Remove(consumer);
+                }
+                else if (modelChanges[DeltaOpType.Update].Contains(consumer.ConsumerId))
+                {
+                    consumer.ConsumerMRID = resourceDescriptions[consumer.ConsumerId].GetProperty(ModelCode.IDOBJ_MRID).AsString(); //TODO other prop, when added in model
+                }
+            }
+
+            foreach(long gid in modelChanges[DeltaOpType.Insert])
+            {
+                ModelCode type = modelResourcesDesc.GetModelCodeFromId(gid);
+
+                if (type == ModelCode.ENERGYCONSUMER)
+                {
+                    ResourceDescription resourceDescription = resourceDescriptions[gid];
+
+                    if (resourceDescription != null)
+                    {
+                        Consumer consumer = new Consumer();
+                        consumer.ConsumerId = resourceDescription.Id;
+                        consumer.ConsumerMRID = resourceDescription.GetProperty(ModelCode.IDOBJ_MRID).AsString();
+                        consumer.FirstName = "Added";
+                        consumer.LastName = "Consumer"; //TODO other prop, when added in model
+
+                        transactionOutageContext.Consumers.Add(consumer);
+                    }
+                    else
+                    {
+                        Logger.LogWarn($"Consumer with gid 0x{gid:X16} is not in network model");
+                    }
+                }
+            }
+
+            success = true;
+
+            return success;
+        }
+
+
+        public void Commit()
+        {
+            transactionOutageContext.SaveChanges();
+            transactionOutageContext.Dispose();
+            transactionOutageContext = null;
+        }
+
+        public void Rollback()
+        {
+            transactionOutageContext.Dispose();
+            transactionOutageContext = null;
+            modelChanges = null;
+        }
+        #endregion
+
 
         private void ImportTopologyModel()
         {
@@ -303,5 +434,74 @@ namespace OutageManagementService
 
             return affectedConsumers;
         }
+
+        #region GDAHelper
+        private Dictionary<long, ResourceDescription> GetExtentValues(ModelCode entityType, List<ModelCode> propIds)
+        {
+            int iteratorId = 0;
+            int numberOfTries = 0;
+            while (numberOfTries < 5)
+            {
+                try
+                {
+                    numberOfTries++;
+                    using (var proxy = GetGdaQueryProxy())
+                    {
+                        iteratorId = proxy.GetExtentValues(entityType, propIds);
+                    }
+                    break;
+                }
+                catch (Exception ex)
+                {
+                    logger.LogError($"Failed to get extent values for entity type {entityType.ToString()}. Exception message: " + ex.Message);
+                    logger.LogWarn($"Retrying to connect to NMSProxy. Number of tries: {numberOfTries}.");
+                }
+            }
+
+            return ProcessIterator(iteratorId);
+        }
+
+        private Dictionary<long, ResourceDescription> ProcessIterator(int iteratorId)
+        {
+            //TODO: mozda vec ovde napakovati dictionary<long, rd> ?
+            int numberOfResources = 10000, resourcesLeft = 0;
+            Dictionary<long, ResourceDescription> resourceDescriptions = new Dictionary<long, ResourceDescription>();
+
+            try
+            {
+                using (var gdaProxy = GetGdaQueryProxy())
+                {
+                    if (gdaProxy != null)
+                    {
+                        do
+                        {
+                            List<ResourceDescription> rds = gdaProxy.IteratorNext(numberOfResources, iteratorId);
+                            foreach(var rd in rds)
+                            {
+                                resourceDescriptions.Add(rd.Id, rd);
+                            }
+
+                            resourcesLeft = gdaProxy.IteratorResourcesLeft(iteratorId);
+
+                        } while (resourcesLeft > 0);
+
+                        gdaProxy.IteratorClose(iteratorId);
+                    }
+                    else
+                    {
+                        string message = "From method ProcessIterator(): NetworkModelGDAProxy is null.";
+                        logger.LogError(message);
+                        throw new NullReferenceException(message);
+                    }
+                }
+            }
+            catch (Exception ex)
+            {
+                string message = $"Failed to retrieve all Resourse descriptions with iterator {iteratorId}. Exception message: " + ex.Message;
+                logger.LogError(message);
+            }
+            return resourceDescriptions;
+        }
+        #endregion
     }
 }

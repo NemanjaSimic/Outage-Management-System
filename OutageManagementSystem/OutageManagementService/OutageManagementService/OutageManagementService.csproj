@@ -56,6 +56,8 @@
     <Compile Include="Calling\CallingService.cs" />
     <Compile Include="Calling\CallTracker.cs" />
     <Compile Include="Calling\TrackingAlgorithm.cs" />
+    <Compile Include="DistribuedTransaction\OutageModelUpdateNotification.cs" />
+    <Compile Include="DistribuedTransaction\OutageTransactionActor.cs" />
     <Compile Include="OutageModel.cs" />
     <Compile Include="OutageManagementService.cs" />
     <Compile Include="Outage\OutageService.cs" />
@@ -69,6 +71,10 @@
     <ProjectReference Include="..\..\Common\Common.csproj">
       <Project>{892CBE15-9ED7-4540-81FA-0EAABA592138}</Project>
       <Name>Common</Name>
+    </ProjectReference>
+    <ProjectReference Include="..\..\TransactionManagerService\DistributedTransactionActor\DistributedTransactionActor.csproj">
+      <Project>{D2B436C8-C9AF-4FE2-B881-B8D28228637B}</Project>
+      <Name>DistributedTransactionActor</Name>
     </ProjectReference>
     <ProjectReference Include="..\OutageDatabase\OutageDatabase.csproj">
       <Project>{F2CFC053-2CFC-41F4-8FCC-2887E4757E87}</Project>

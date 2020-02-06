@@ -616,21 +616,42 @@ namespace Outage.NetworkModelService
 
                 if (success)
                 {
-                    using (TransactionEnlistmentProxy transactionEnlistmentProxy = GetTransactionEnlistmentProxy())
+                    using (ModelUpdateNotificationProxy outageModelUpdateNotifierProxy = GetModelUpdateNotificationProxy(EndpointNames.OutageModelUpdateNotifierEndpoint))
                     {
-                        if (transactionEnlistmentProxy != null)
+                        if (outageModelUpdateNotifierProxy != null)
                         {
-                            success = transactionEnlistmentProxy.Enlist(ServiceNames.NetworkModelService);
-                            Logger.LogDebug("Enlist() method invoked on Transaction Coordinator.");
+                            success = outageModelUpdateNotifierProxy.NotifyAboutUpdate(modelChanges);
+                            Logger.LogDebug("NotifyAboutUpdate() method invoked on Outage Transaction actor. ");
                         }
                         else
                         {
-                            string message = "TransactionEnlistmentProxy is null.";
+                            string message = "ModelUpdateNotificationProxy for Outage is null.";
                             Logger.LogWarn(message);
                             throw new NullReferenceException(message);
                         }
                     }
+
+                    if (success)
+                    {
+                        using (TransactionEnlistmentProxy transactionEnlistmentProxy = GetTransactionEnlistmentProxy())
+                        {
+                            if (transactionEnlistmentProxy != null)
+                            {
+                                success = transactionEnlistmentProxy.Enlist(ServiceNames.NetworkModelService);
+                                Logger.LogDebug("Enlist() method invoked on Transaction Coordinator.");
+                            }
+                            else
+                            {
+                                string message = "TransactionEnlistmentProxy is null.";
+                                Logger.LogWarn(message);
+                                throw new NullReferenceException(message);
+                            }
+                        }
+
+                    }
                 }
+
+                
             }
 
             using (TransactionCoordinatorProxy transactionCoordinatorProxy = GetTransactionCoordinatorProxy())

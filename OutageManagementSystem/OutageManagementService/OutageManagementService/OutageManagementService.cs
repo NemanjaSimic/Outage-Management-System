@@ -6,6 +6,7 @@ using Outage.Common.ServiceProxies;
 using Outage.Common.ServiceProxies.PubSub;
 using OutageDatabase;
 using OutageManagementService.Calling;
+using OutageManagementService.DistribuedTransaction;
 using OutageManagementService.Outage;
 using System;
 using System.Collections.Generic;
@@ -101,6 +102,8 @@ namespace OutageManagementService
            
             outageModel = new OutageModel();
             OutageService.outageModel = outageModel;
+            OutageTransactionActor.OutageModel = outageModel;
+            OutageModelUpdateNotification.OutageModel = outageModel;
             callTracker = new CallTracker("CallTrackerSubscriber", outageModel);
             SubscribeOnEmailService();
             
@@ -231,7 +234,9 @@ namespace OutageManagementService
         {
             hosts = new List<ServiceHost>()
             {
-                new ServiceHost(typeof(OutageService))
+                new ServiceHost(typeof(OutageService)),
+                new ServiceHost(typeof(OutageTransactionActor)),
+                new ServiceHost(typeof(OutageModelUpdateNotification)),
             };
         }
 

@@ -19,6 +19,7 @@ namespace Outage.TransactionManagerService
             {   ServiceNames.NetworkModelService,       EndpointNames.NetworkModelTransactionActorEndpoint          },
             {   ServiceNames.SCADAService,              EndpointNames.SCADATransactionActorEndpoint                 },
             {   ServiceNames.CalculationEngineService,  EndpointNames.CalculationEngineTransactionActorEndpoint     },
+            {   ServiceNames.OutageManagementService,   EndpointNames.OutageTransactionActorEndpoint                },
         };
 
         private static Dictionary<string, bool> transactionLedger = null;
