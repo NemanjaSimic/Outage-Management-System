@@ -1,11 +1,13 @@
-﻿namespace OMS.Web.Adapter
+﻿using Outage.Common.ServiceProxies.PubSub;
+using Outage.Common;
+
+namespace OMS.Web.Adapter
 {
+    using OMS.Web.Adapter.Outage;
     using OMS.Web.Adapter.SCADA;
     using OMS.Web.Adapter.Topology;
     using OMS.Web.Common;
     using OMS.Web.Common.Mappers;
-    using Outage.Common;
-    using Outage.Common.ServiceProxies.PubSub;
     using System;
     using System.Threading;
     using System.Threading.Tasks;
@@ -39,15 +41,29 @@
 
 
             SCADANotification scadaNotification = new SCADANotification("SCADA_ADAPTER_SUBSCRIBER");
-            SubscriberProxy subscriberSCADAproxy = new SubscriberProxy(scadaNotification, EndpointNames.SubscriberEndpoint);
+            SubscriberProxy scadaSubscriberPRoxy = new SubscriberProxy(scadaNotification, EndpointNames.SubscriberEndpoint);
 
             try
             {
-                subscriberSCADAproxy.Subscribe(Topic.MEASUREMENT);
+                scadaSubscriberPRoxy.Subscribe(Topic.MEASUREMENT);
             }
             catch (Exception e)
             {
-                Console.WriteLine($"Exception occured during subscriberSCADAproxy.Subscribe({Topic.MEASUREMENT}): {e.Message}");
+                Console.WriteLine($"Exception occured during scadaSubscriberPRoxy.Subscribe({Topic.MEASUREMENT}): {e.Message}");
+                throw;
+            }
+
+            OutageNotification outageNotification = new OutageNotification("OUTAGE_ADAPTER_SUBSCRIBER", new OutageMapper(new ConsumerMapper()));
+            SubscriberProxy outageSubscriberProxy = new SubscriberProxy(outageNotification, EndpointNames.SubscriberEndpoint);
+
+            try
+            {
+                outageSubscriberProxy.Subscribe(Topic.ACTIVE_OUTAGE);
+                outageSubscriberProxy.Subscribe(Topic.ARCHIVED_OUTAGE);
+            }
+            catch (Exception e)
+            {
+                Console.WriteLine($"Exception occured during outageSubscriberProxy.Subscribe({Topic.ACTIVE_OUTAGE} or {Topic.ARCHIVED_OUTAGE}): {e.Message}");
                 throw;
             }
 

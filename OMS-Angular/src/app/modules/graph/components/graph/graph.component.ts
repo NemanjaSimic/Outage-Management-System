@@ -25,6 +25,7 @@ import { ScadaService } from '@services/notification/scada.service';
 import { ScadaData } from '@shared/models/scada-data.model';
 import { IMeasurement } from '@shared/models/node.model';
 import { modifyNodeDistance } from '@shared/utils/graph-distance';
+import { OutageService } from '@services/outage/outage.service';
 
 cytoscape.use(dagre);
 cytoscape.use(popper);
@@ -44,6 +45,10 @@ export class GraphComponent implements OnInit, OnDestroy {
   public scadaServiceConnectionSubscription: Subscription;
   public scadaSubscription: Subscription;
 
+  public outageServiceConnectionSubscription: Subscription;
+  public activeOutageSubcription: Subscription;
+  public archivedOutageSubcription: Subscription;
+
   public zoomSubscription: Subscription;
   public panSubscription: Subscription;
 
@@ -62,6 +67,7 @@ export class GraphComponent implements OnInit, OnDestroy {
   constructor(
     private graphService: GraphService,
     private scadaService: ScadaService,
+    private outageService: OutageService,
     private commandService: CommandService,
     private ngZone: NgZone
   ) {
@@ -192,6 +198,23 @@ export class GraphComponent implements OnInit, OnDestroy {
       (err) => console.log(err)
     );
   }
+
+  // public startOutageConnection(): void {
+  //   this.outageServiceConnectionSubscription = this.outageService.startConnection().subscribe(
+  //     (didConnect) => {
+  //       if (didConnect) {
+  //         console.log('Connected to scada service');
+
+  //         this.scadaSubscription = this.scadaService.updateRecieved.subscribe(
+  //           (data: ScadaData) => this.onScadaNotification(data));
+  //       }
+  //       else {
+  //         console.log('Could not connect to scada service');
+  //       }
+  //     },
+  //     (err) => console.log(err)
+  //   );
+  // }
 
   public drawGraph(): void {
     this.cy = cytoscape({

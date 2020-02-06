@@ -13,9 +13,13 @@ namespace OutageDatabase
     {
         public OutageContext() : base("OutageContext")
         {
-            
+            Database.SetInitializer(new MigrateDatabaseToLatestVersion<OutageContext, Configuration>());
         }
 
+        public DbSet<ActiveOutage> ActiveOutages { get; set; }
+        public DbSet<ArchivedOutage> ArchivedOutages { get; set; }
+        public DbSet<Consumer> Consumers { get; set; }
+        
         public void DeleteAllData()
         {
             foreach(ActiveOutage activeOutage in ActiveOutages)
@@ -30,9 +34,6 @@ namespace OutageDatabase
 
             SaveChanges();
         }
-        public DbSet<ActiveOutage> ActiveOutages { get; set; }
-        public DbSet<ArchivedOutage> ArchivedOutages { get; set; }
-        public DbSet<Consumer> Consumers { get; set; }
 
     }
 }

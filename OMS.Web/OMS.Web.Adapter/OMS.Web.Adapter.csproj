@@ -77,7 +77,9 @@
   </ItemGroup>
   <ItemGroup>
     <Compile Include="HubDispatchers\GraphHubDispatcher.cs" />
+    <Compile Include="HubDispatchers\OutageHubDispatcher.cs" />
     <Compile Include="HubDispatchers\ScadaHubDipatcher.cs" />
+    <Compile Include="Outage\OutageNotification.cs" />
     <Compile Include="Program.cs" />
     <Compile Include="Properties\AssemblyInfo.cs" />
     <Compile Include="SCADA\SCADANotification.cs" />
