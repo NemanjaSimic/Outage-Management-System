@@ -16,7 +16,7 @@ namespace Outage.TransactionManagerService
         //TODO: get from config
         private static readonly Dictionary<string, string> distributedTransactionActors = new Dictionary<string, string>()
         {
-            {   ServiceNames.NetworkModelService,       EndpointNames.NetworkModelTransactionActorEndpoint       },
+            {   ServiceNames.NetworkModelService,       EndpointNames.NetworkModelTransactionActorEndpoint          },
             {   ServiceNames.SCADAService,              EndpointNames.SCADATransactionActorEndpoint                 },
             {   ServiceNames.CalculationEngineService,  EndpointNames.CalculationEngineTransactionActorEndpoint     },
         };

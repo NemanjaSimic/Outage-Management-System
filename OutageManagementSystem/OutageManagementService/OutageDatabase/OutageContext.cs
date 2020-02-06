@@ -23,17 +23,16 @@ namespace OutageDatabase
                 ActiveOutages.Remove(activeOutage);
             }
 
-            foreach(ArchivedOutage archivedOutage in ArchivedOutages)
+            foreach(Consumer consumer in Consumers) //TODO: restauration...
             {
-                ArchivedOutages.Remove(archivedOutage);
+                Consumers.Remove(consumer);
             }
 
             SaveChanges();
         }
         public DbSet<ActiveOutage> ActiveOutages { get; set; }
         public DbSet<ArchivedOutage> ArchivedOutages { get; set; }
-
-        
+        public DbSet<Consumer> Consumers { get; set; }
 
     }
 }

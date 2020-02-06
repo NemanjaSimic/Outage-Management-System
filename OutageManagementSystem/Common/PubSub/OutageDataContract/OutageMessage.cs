@@ -9,12 +9,14 @@ using System.Threading.Tasks;
 
 namespace Outage.Common.PubSub.OutageDataContract
 {
-    [DataContract]
+    [DataContract(IsReference = true)]
     public abstract class OutageMessage : IPublishableMessage
     {
     }
 
-    [DataContract]
+
+
+    [DataContract(IsReference = true)]
     public class ActiveOutage : OutageMessage
     {
         [Key]
@@ -29,14 +31,15 @@ namespace Outage.Common.PubSub.OutageDataContract
         public DateTime ReportTime { get; set; }
 
         [DataMember]
-        public string AffectedConsumers { get; set; }
+        public List<Consumer> AffectedConsumers { get; set; }
     }
 
+    [DataContract]
     public class ArchivedOutage : OutageMessage
     {
         [Key]
         [DataMember]
-        [DatabaseGenerated(DatabaseGeneratedOption.Identity)]
+        [DatabaseGenerated(DatabaseGeneratedOption.None)]
         public long OutageId { get; set; }
 
         [DataMember]
@@ -49,7 +52,31 @@ namespace Outage.Common.PubSub.OutageDataContract
         public DateTime ArchiveTime { get; set; }
 
         [DataMember]
-        public string AffectedConsumers { get; set; }
+        public List<Consumer> AffectedConsumers { get; set; }
+    }
+
+    [DataContract]
+    public class Consumer
+    {
+        [Key]
+        [DataMember]
+        [DatabaseGenerated(DatabaseGeneratedOption.None)]
+        public long ConsumerId { get; set; }
+
+        [DataMember]
+        public string ConsumerMRID { get; set; }
+
+        [DataMember]
+        public string FirstName { get; set; }
+
+        [DataMember]
+        public string LastName { get; set; }
+
+        [DataMember]
+        public List<ArchivedOutage> ArchivedOutages { get; set; }
+
+        [DataMember]
+        public List<ActiveOutage> ActiveOutages { get; set; }
     }
     
 }
