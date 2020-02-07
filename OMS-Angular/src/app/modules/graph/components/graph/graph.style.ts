@@ -14,7 +14,7 @@ export const style = cytoscape.stylesheet()
     .style({
         'background-color': INACTIVE_NODE_COLOR
     })
-    .selector('node[dmsType = "ENERGYCONSUMER"][IsActive = true]')
+    .selector('node[dmsType = "ENERGYCONSUMER"][state = "active"]')
     .style({
         'background-fit': 'cover',
         'background-opacity': '0',
@@ -22,7 +22,7 @@ export const style = cytoscape.stylesheet()
         'height': '45px',
         'width': '45px',
     })
-    .selector('node[dmsType = "ENERGYCONSUMER"][IsActive = false]')
+    .selector('node[dmsType = "ENERGYCONSUMER"][state = "inactive"]')
     .style({
         'background-fit': 'cover',
         'background-opacity': '0',
