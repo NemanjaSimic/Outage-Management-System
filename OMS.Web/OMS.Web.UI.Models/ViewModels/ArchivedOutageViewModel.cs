@@ -7,9 +7,11 @@
     {
         public long Id { get; set; }
         public long ElementId { get; set; }
-        public DateTime CreatedAt { get; set; }
-        public List<ConsumerViewModel> AfectedConsumers { get; set; }
+        public DateTime ReportedAt { get; set; }
+        public DateTime ArchivedAt { get; set; }
+        public IEnumerable<ConsumerViewModel> AffectedConsumers { get; set; }
 
-        public ArchivedOutageViewModel() => AfectedConsumers = new List<ConsumerViewModel>();
+
+        public ArchivedOutageViewModel() => AffectedConsumers = new List<ConsumerViewModel>();
     }
 }

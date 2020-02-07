@@ -82,21 +82,25 @@ namespace Topology
                 }
             }
         }
-        public List<ITopology> UpdateLoadFlow(long startingSignalGid, List<ITopology> topologies)
+        public List<ITopology> UpdateLoadFlow(List<long> signalGids, List<ITopology> topologies)
         {
             List<ITopology> retVal = new List<ITopology>(topologies);
-            foreach (var topology in topologies)
+            foreach (long signalGid in signalGids)
             {
-                if (topology.GetElementByGid(startingSignalGid, out ITopologyElement element))
+                foreach (var topology in topologies)
                 {
-                    retVal.Remove(topology);
-                    retVal.Add(CalulateLoadFlow(startingSignalGid, topology));
-                    break;
+                    if (topology.GetElementByGid(signalGid, out ITopologyElement element))
+                    {
+                        retVal.Remove(topology);
+                        retVal.Add(CalulateLoadFlow(signalGid, topology));
+                        break;
+                    }
                 }
             }
-
             return retVal;
         }
+
+
         private bool IsElementActive(ITopologyElement element, ITopology topology)
         {
             bool isActive = true;

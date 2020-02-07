@@ -4,6 +4,7 @@ using Outage.Common.PubSub.SCADADataContract;
 using Outage.Common.PubSub.CalculationEngineDataContract;
 using Outage.Common.PubSub.EmailDataContract;
 using Outage.Common.PubSub.OutageDataContract;
+using Outage.Common.OutageService.Model;
 
 namespace Outage.Common.ServiceContracts.PubSub
 {
@@ -29,6 +30,8 @@ namespace Outage.Common.ServiceContracts.PubSub
         [ServiceKnownType(typeof(ArchivedOutage))]
         [ServiceKnownType(typeof(OutagePublication))]
         [ServiceKnownType(typeof(OutageMessage))]
+        [ServiceKnownType(typeof(OutageTopologyModel))]
+        [ServiceKnownType(typeof(OutageTopologyElement))]
         //[ServiceKnownType(typeof(AnalogModbusData))]
         //[ServiceKnownType(typeof(DigitalModbusData))]
         void Publish(IPublication publication);

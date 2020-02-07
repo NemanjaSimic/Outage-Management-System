@@ -12,10 +12,14 @@
 
         public string LastName { get; set; }
 
-        public List<ArchivedOutageViewModel> ArchivedOutages { get; set; }
+        public IEnumerable<ActiveOutageViewModel> ActiveOutages { get; set; }
+
+        public IEnumerable<ArchivedOutageViewModel> ArchivedOutages { get; set; }
+
 
         public ConsumerViewModel()
         {
+            ActiveOutages = new List<ActiveOutageViewModel>();
             ArchivedOutages = new List<ArchivedOutageViewModel>();
         }
     }

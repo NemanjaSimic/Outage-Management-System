@@ -22,5 +22,7 @@
         public const string GraphHubName = nameof(GraphHubName);
         public const string ScadaHubUrl = nameof(ScadaHubUrl);
         public const string ScadaHubName = nameof(ScadaHubName);
+        public const string OutageHubUrl = nameof(OutageHubUrl);
+        public const string OutageHubName = nameof(OutageHubName);
     }
 }
