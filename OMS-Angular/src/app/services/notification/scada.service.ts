@@ -17,7 +17,10 @@ export class ScadaService {
   private connection: any;
   private proxyName: string = 'scadahub';
 
-  constructor(private envService: EnvironmentService, private http: HttpClient) {
+  constructor(
+    private envService: EnvironmentService,
+    private http: HttpClient
+  ) {
     this.updateRecieved = new EventEmitter<ScadaData>();
 
     this.connection = $.hubConnection(`${this.envService.serverUrl}`);

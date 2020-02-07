@@ -17,8 +17,8 @@
 
         public GraphHubDispatcher()
         {
-            _url = AppSettings.Get<string>("hubUrl");
-            _hubName = AppSettings.Get<string>("hubName");
+            _url = AppSettings.Get<string>(HubAddress.GraphHubUrl);
+            _hubName = AppSettings.Get<string>(HubAddress.GraphHubName);
 
             _connection = new HubConnection(_url);
             _proxy = _connection.CreateHubProxy(_hubName);
@@ -39,7 +39,7 @@
             }).Wait();
         }
 
-        public void NotifyGraphUpdate(List<Node> nodes, List<Relation> relations)
+        public void NotifyGraphUpdate(List<NodeViewModel> nodes, List<RelationViewModel> relations)
         {
             Console.WriteLine($"Sending graph update to Graph Hub");
             _proxy.Invoke<string>("NotifyGraphUpdate", nodes, relations).Wait();
