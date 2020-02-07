@@ -8,7 +8,7 @@ using System.Threading.Tasks;
 
 namespace CECommon.Interfaces
 {
-    public delegate void DiscreteMeasurementDelegate(long signalGid);
+    public delegate void DiscreteMeasurementDelegate(List<long> signalsGid);
     public interface ICacheProvider
     {
         DiscreteMeasurementDelegate DiscreteMeasurementDelegate { get; set; }

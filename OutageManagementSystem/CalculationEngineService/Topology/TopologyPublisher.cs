@@ -1,6 +1,7 @@
 ﻿using CECommon.Providers;
 using Outage.Common;
 using Outage.Common.OutageService.Interface;
+using Outage.Common.OutageService.Model;
 using Outage.Common.PubSub.CalculationEngineDataContract;
 using Outage.Common.ServiceProxies.PubSub;
 using Outage.Common.UI;
@@ -21,7 +22,16 @@ namespace Topology
         public void WebTopologyModelProviderDelegate(List<UIModel> uIModels)
         {
             //Dok se ne sredi logika za vise root-ova na WEB-u
-            TopologyForUIMessage message = new TopologyForUIMessage(uIModels.First());
+            UIModel uIModel;
+            if (uIModels.Count == 0)
+            {
+                uIModel = new UIModel();
+            }
+            else
+            {
+                uIModel = uIModels.First();
+            }
+            TopologyForUIMessage message = new TopologyForUIMessage(uIModel);
             CalculationEnginePublication publication = new CalculationEnginePublication(Topic.TOPOLOGY, message);
             try
             {
@@ -39,7 +49,17 @@ namespace Topology
 
         public void TopologyToOMSConvertDelegate(List<IOutageTopologyModel> outageTopologyModels)
         {
-            OMSModelMessage message = new OMSModelMessage(outageTopologyModels.First());
+            IOutageTopologyModel outageTopologyModel;
+            if (outageTopologyModels.Count == 0)
+            {
+                outageTopologyModel = new OutageTopologyModel();
+            }
+            else
+            {
+                outageTopologyModel = outageTopologyModels.First();
+            }
+
+            OMSModelMessage message = new OMSModelMessage(outageTopologyModel);
             CalculationEnginePublication publication = new CalculationEnginePublication(Topic.OMS_MODEL, message);
             try
             {
@@ -53,6 +73,7 @@ namespace Topology
             {
                 logger.LogError($"Topology publisher failed to publish new oms model. Exception: {ex.Message}");
             }
+
         }
 
     }
