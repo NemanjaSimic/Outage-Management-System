@@ -1,6 +1,7 @@
 import { Component, OnInit } from '@angular/core';
 
 import { ActiveOutage } from '@shared/models/outage.model';
+import { OutageService } from '@services/outage/outage.service';
 
 export interface PeriodicElement {
   name: string;
@@ -28,9 +29,10 @@ export class ActiveBrowserComponent implements OnInit {
   private activeOutages: ActiveOutage[] = AO_MOCK;
   private columns: string[] = ["id", "elementId", "reportedAt"];
 
-  constructor() { }
+  constructor(private outageService: OutageService) { }
 
   ngOnInit() {
+    // subscribe to outage service and get real data from db
     console.log(this.activeOutages);
   }
 
