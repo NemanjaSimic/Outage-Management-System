@@ -41,7 +41,7 @@ namespace OMS.Web.Adapter.Outage
                 {
                     _dispatcher.NotifyActiveOutageUpdate(activeOutage);
                 }
-                catch (Exception e)
+                catch (Exception)
                 {
                     //log error
                     // retry ?
@@ -55,7 +55,7 @@ namespace OMS.Web.Adapter.Outage
                 {
                     _dispatcher.NotifyArchiveOutageUpdate(archivedOutage);
                 }
-                catch (Exception e)
+                catch (Exception)
                 {
                     //log error
                     // retry ?
