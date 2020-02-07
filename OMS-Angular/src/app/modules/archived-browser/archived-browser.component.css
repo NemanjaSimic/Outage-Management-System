@@ -1,0 +1,38 @@
+/* TODO:
+* - make table layout responsive 
+*/
+
+.archived-outages {
+  width: 97%;  
+  font-family: 'PT Serif', serif;
+}
+
+.archived-outages > h1 {
+  font-size: 40px;
+  margin-left: 60px;
+}
+
+.fa-bolt {
+  color: #fffb00fd;
+}
+
+.archived-outages > table {
+  width: 95%;
+  border: 1px solid white;
+  margin-top: 30px;
+  margin-left: 60px;
+  margin-right: 15px;
+  border-radius: 10px;
+  padding-top: 5px;
+  padding-left: 3px;
+  padding-right: 3px;
+}
+
+.dark-header {
+  background-color: #292d33;
+}
+
+.table-data {
+  border-left: 1px solid #373c42;
+  padding-left: 10px;
+}

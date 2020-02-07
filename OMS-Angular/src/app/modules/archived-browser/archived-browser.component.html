@@ -1,0 +1,28 @@
+<div class="archived-outages">
+  <h1><i class="fas fa-bolt"></i> Archived Outages</h1>
+  <table mat-table [dataSource]="archivedOutages" class="mat-elevation-z8">
+      <ng-container matColumnDef="id">
+        <th [class.dark-header]="true" mat-header-cell *matHeaderCellDef> ID </th>
+        <td [class.table-data]="true" mat-cell *matCellDef="let archivedOutage"> {{ archivedOutage.Id }} </td>
+      </ng-container>
+    
+      <ng-container matColumnDef="elementId">
+        <th [class.dark-header]="true" mat-header-cell *matHeaderCellDef> Element ID </th>
+        <td [class.table-data]="true" mat-cell *matCellDef="let archivedOutage"> {{ archivedOutage.ElementId }} </td>
+      </ng-container>
+    
+      <ng-container matColumnDef="reportedAt">
+        <th [class.dark-header]="true" mat-header-cell *matHeaderCellDef> Reported At </th>
+        <td [class.table-data]="true" mat-cell *matCellDef="let archivedOutage"> {{ archivedOutage.ReportedAt | date:'medium' }} </td>
+      </ng-container>
+
+      <ng-container matColumnDef="archivedAt">
+        <th [class.dark-header]="true" mat-header-cell *matHeaderCellDef> Archived At </th>
+        <td [class.table-data]="true" mat-cell *matCellDef="let archivedOutage"> {{ archivedOutage.ArchivedAt | date:'medium' }} </td>
+      </ng-container>
+    
+      <tr mat-header-row *matHeaderRowDef="columns"></tr>
+      <tr mat-row *matRowDef="let row; columns: columns;"></tr>
+    </table>
+</div>
+

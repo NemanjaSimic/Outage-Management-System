@@ -11,9 +11,9 @@
           <td [class.table-data]="true" mat-cell *matCellDef="let activeOutage"> {{ activeOutage.ElementId }} </td>
         </ng-container>
       
-        <ng-container matColumnDef="dateCreated">
+        <ng-container matColumnDef="reportedAt">
           <th [class.dark-header]="true" mat-header-cell *matHeaderCellDef> Reported At </th>
-          <td [class.table-data]="true" mat-cell *matCellDef="let activeOutage"> {{ activeOutage.DateCreated | date:'medium' }} </td>
+          <td [class.table-data]="true" mat-cell *matCellDef="let activeOutage"> {{ activeOutage.ReportedAt | date:'medium' }} </td>
         </ng-container>
       
         <tr mat-header-row *matHeaderRowDef="columns"></tr>

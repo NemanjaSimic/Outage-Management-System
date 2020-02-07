@@ -1,10 +1,10 @@
 export interface ActiveOutage {
     Id: number;
     ElementId: number;
-    DateCreated: Date;
+    ReportedAt: Date;
     AfectedConsumers: number[];
 }
 
 export interface ArchivedOutage extends ActiveOutage {
-    DateArchived : Date;
+    ArchivedAt : Date;
 }
