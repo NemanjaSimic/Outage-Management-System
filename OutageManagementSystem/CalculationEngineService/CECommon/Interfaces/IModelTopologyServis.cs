@@ -10,6 +10,6 @@ namespace CECommon.Interfaces
     {
         List<ITopology> CreateTopology();
         ITopology CalulateLoadFlow(long startingElementGid, ITopology topology);
-        List<ITopology> UpdateLoadFlow(long startingSignalGid, List<ITopology> topologies);
+        List<ITopology> UpdateLoadFlow(List<long> startingSignalGid, List<ITopology> topologies);
     }
 }
