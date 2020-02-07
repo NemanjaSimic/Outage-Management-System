@@ -1,6 +1,5 @@
 import { Component, OnInit, NgZone, OnDestroy } from '@angular/core';
 import { Subscription, Observable, fromEvent } from 'rxjs';
-import { GraphService } from '@services/notification/graph.service';
 import { OmsGraph } from '@shared/models/oms-graph.model';
 
 import cyConfig from './graph.config';
@@ -18,14 +17,18 @@ import * as legendData from './legend.json';
 // cytoscape plugins
 import dagre from 'cytoscape-dagre';
 import popper from 'cytoscape-popper';
-import { CommandService } from '@services/command/command.service';
 import { SwitchCommand } from '@shared/models/switch-command.model';
 import { zoom } from '@shared/utils/zoom';
-import { ScadaService } from '@services/notification/scada.service';
 import { ScadaData } from '@shared/models/scada-data.model';
 import { IMeasurement } from '@shared/models/node.model';
 import { modifyNodeDistance } from '@shared/utils/graph-distance';
-import { OutageService } from '@services/outage/outage.service';
+
+import { GraphService } from '@services/notification/graph.service';
+import { CommandService } from '@services/command/command.service';
+import { ScadaService } from '@services/notification/scada.service';
+import { OutageNotificationService } from '@services/notification/outage-notification.service';
+
+import { ActiveOutage, ArchivedOutage } from '@shared/models/outage.model';
 
 cytoscape.use(dagre);
 cytoscape.use(popper);
@@ -67,7 +70,7 @@ export class GraphComponent implements OnInit, OnDestroy {
   constructor(
     private graphService: GraphService,
     private scadaService: ScadaService,
-    private outageService: OutageService,
+    private outageNotificationService: OutageNotificationService,
     private commandService: CommandService,
     private ngZone: NgZone
   ) {
@@ -84,6 +87,7 @@ export class GraphComponent implements OnInit, OnDestroy {
     this.getTopology();
     this.startConnection();
     this.startScadaConnection();
+    this.startOutageConnection();
 
     // local testing
     //this.graphData.nodes = graphMock.nodes;
@@ -199,22 +203,27 @@ export class GraphComponent implements OnInit, OnDestroy {
     );
   }
 
-  // public startOutageConnection(): void {
-  //   this.outageServiceConnectionSubscription = this.outageService.startConnection().subscribe(
-  //     (didConnect) => {
-  //       if (didConnect) {
-  //         console.log('Connected to scada service');
+  public startOutageConnection(): void {
+    this.outageServiceConnectionSubscription = this.outageNotificationService.startConnection().subscribe(
+      (didConnect) => {
+        if (didConnect) {
+          console.log('Connected to Outage Notification service');
 
-  //         this.scadaSubscription = this.scadaService.updateRecieved.subscribe(
-  //           (data: ScadaData) => this.onScadaNotification(data));
-  //       }
-  //       else {
-  //         console.log('Could not connect to scada service');
-  //       }
-  //     },
-  //     (err) => console.log(err)
-  //   );
-  // }
+          this.activeOutageSubcription = this.outageNotificationService.activeOutageUpdateRecieved.subscribe(
+            (data: ActiveOutage) => this.onActiveOutageNotification(data)
+          );
+
+          this.archivedOutageSubcription = this.outageNotificationService.archivedOutageUpdateRecieved.subscribe(
+            (data: ArchivedOutage) => this.onArchivedOutageNotification(data)
+          );
+        }
+        else {
+          console.log('Could not connect to Outage Notification service');
+        }
+      },
+      (err) => console.log(err)
+    );
+  }
 
   public drawGraph(): void {
     this.cy = cytoscape({
@@ -310,6 +319,16 @@ export class GraphComponent implements OnInit, OnDestroy {
   }
 
   public onScadaNotification(data: ScadaData): void {
+    console.log(data);
+  }
+
+  public onActiveOutageNotification(data: ActiveOutage): void {
+    console.log('onActiveOutageNotification');
+    console.log(data);
+  }
+
+  public onArchivedOutageNotification(data: ArchivedOutage): void {
+    console.log('onArchivedOutageNotification');
     console.log(data);
   }
 
