@@ -3,7 +3,7 @@ import { Injectable } from '@angular/core';
 import { HttpClient } from '@angular/common/http';
 
 import { EnvironmentService } from '@services/environment/environment.service';
-import { ActiveOutage } from '@shared/models/outage.model';
+import { ActiveOutage, ArchivedOutage } from '@shared/models/outage.model';
 
 @Injectable({
   providedIn: 'root'
@@ -15,13 +15,11 @@ export class OutageService {
     private envService: EnvironmentService
   ) { }
 
-  getAllActiveOutages(): Observable<any> {
-    console.log(this.http);
-    return this.http.get(`${this.envService.apiUrl}/outage/getActive`);
+  getAllActiveOutages(): Observable<ActiveOutage[]> {
+    return this.http.get(`${this.envService.apiUrl}/outage/active`) as Observable<ActiveOutage[]>;
   }
 
-  getAllArchivedOutages(): Observable<any> {
-    console.log(this.http);
-    return this.http.get(`${this.envService.apiUrl}/outage/getArchived`);
+  getAllArchivedOutages(): Observable<ArchivedOutage[]> {
+    return this.http.get(`${this.envService.apiUrl}/outage/archived`) as Observable<ArchivedOutage[]>;
   }
 }
