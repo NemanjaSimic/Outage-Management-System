@@ -3,9 +3,6 @@ using OMS.Web.Common;
 using Outage.Common.PubSub.SCADADataContract;
 using System;
 using System.Collections.Generic;
-using System.Linq;
-using System.Text;
-using System.Threading.Tasks;
 
 namespace OMS.Web.Adapter.HubDispatchers
 {
@@ -20,8 +17,8 @@ namespace OMS.Web.Adapter.HubDispatchers
 
         public ScadaHubDipatcher()
         {
-            _url = AppSettings.Get<string>("scadaHubUrl");
-            _hubName = AppSettings.Get<string>("scadaHubName");
+            _url = AppSettings.Get<string>(HubAddress.ScadaHubUrl);
+            _hubName = AppSettings.Get<string>(HubAddress.ScadaHubName);
 
             _connection = new HubConnection(_url);
             _proxy = _connection.CreateHubProxy(_hubName);

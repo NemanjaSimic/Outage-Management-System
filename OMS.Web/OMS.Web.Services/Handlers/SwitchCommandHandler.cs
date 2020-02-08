@@ -1,14 +1,14 @@
 ﻿namespace OMS.Web.Services.Handlers
 {
-    using System;
     using MediatR;
-    using System.Threading;
-    using System.Threading.Tasks;
     using OMS.Web.Adapter.Contracts;
-    using OMS.Web.Services.Commands;
-    using Outage.Common;
     using OMS.Web.Adapter.Topology;
     using OMS.Web.Common;
+    using OMS.Web.Services.Commands;
+    using Outage.Common;
+    using System;
+    using System.Threading;
+    using System.Threading.Tasks;
 
     public class SwitchCommandHandler : IRequestHandler<TurnOffSwitchCommand>, IRequestHandler<TurnOnSwitchCommand>
     {
@@ -18,40 +18,38 @@
         public SwitchCommandHandler(ILogger logger)
         {
             _logger = logger;
-            string scadaCommandServiceAddress = AppSettings.Get<string>("scadaCommandServiceAddress");
+            string scadaCommandServiceAddress = AppSettings.Get<string>(ServiceAddress.ScadaCommandServiceAddress);
             _scadaClient = new TopologySCADACommandProxy(scadaCommandServiceAddress);
         }
 
         public Task<Unit> Handle(TurnOffSwitchCommand request, CancellationToken cancellationToken)
         {
-            _logger.LogDebug($"Sending {request.Command.ToString()} command to {request.Gid}");
-            
+            _logger.LogInfo($"[SwitchCommandHandler::TurnOffSwitchCommand] Sending {request.Command.ToString()} command to {request.Gid}");
+
             try
             {
-                // treba nam implementacija scada klijenta
-                // jer sad treba da bude preko CE
                 _scadaClient.SendCommand(request.Gid, (int)request.Command);
             }
-            catch(Exception e)
+            catch (Exception ex)
             {
-                _logger.LogError("SwitchCommandHandler failed on TurnOffSwitch handler.", e);
+                _logger.LogError("[SwitchCommandHandler::TurnOffSwitchCommand] SwitchCommandHandler failed on TurnOffSwitch handler.", ex);
+                throw;
             }
-            
-            return null; // vracanje null vrednosti je anti-pattern ali ovde nemam drugog izbora
+
+            return null;
         }
 
         public Task<Unit> Handle(TurnOnSwitchCommand request, CancellationToken cancellationToken)
         {
-            _logger.LogDebug($"Sending {request.Command.ToString()} command to {request.Gid}");
+            _logger.LogDebug($"[SwitchCommandHandler::TurnOnSwitchCommand] Sending {request.Command.ToString()} command to {request.Gid}");
 
             try
             {
                 _scadaClient.SendCommand(request.Gid, (int)request.Command);
             }
-            catch (Exception e)
+            catch (Exception ex)
             {
-                _logger.LogDebug("SwitchCommandHandler failed on TurnOnSwitch handler.");
-                _logger.LogError(null, e);
+                _logger.LogError("[SwitchCommandHandler::TurnOnSwitchCommand] Failed on TurnOnSwitch handler.", ex);
                 throw;
             }
 

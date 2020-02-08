@@ -41,7 +41,7 @@ namespace OMS.Web.Adapter.SCADA
                 {
                     _dispatcher.NotifyScadaDataUpdate(analogModbusData);
                 }
-                catch (Exception e)
+                catch (Exception)
                 {
                     //log error
                     // retry ?

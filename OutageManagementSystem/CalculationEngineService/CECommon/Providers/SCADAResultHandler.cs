@@ -32,7 +32,8 @@ namespace CECommon.Providers
 			}
 			else if (message is SingleDiscreteValueSCADAMessage singleDiscrete)
 			{
-				Provider.Instance.CacheProvider.UpdateDiscreteMeasurement(singleDiscrete.Gid, singleDiscrete.Value);
+				Dictionary<long, DiscreteModbusData> data = new Dictionary<long, DiscreteModbusData>(1) { { singleDiscrete.Gid, new DiscreteModbusData(singleDiscrete.Value, singleDiscrete.Alarm) } };
+				Provider.Instance.CacheProvider.UpdateDiscreteMeasurement(data);
 			}
 			else if (message is MultipleDiscreteValueSCADAMessage multipleDiscrete)
 			{

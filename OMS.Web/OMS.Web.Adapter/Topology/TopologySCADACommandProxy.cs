@@ -1,7 +1,8 @@
-﻿namespace OMS.Web.Adapter.Topology
+﻿using Outage.Common.ServiceContracts.SCADA;
+
+namespace OMS.Web.Adapter.Topology
 {
     using OMS.Web.Adapter.Contracts;
-    using Outage.Common.ServiceContracts.SCADA;
     using System.ServiceModel;
 
     public class TopologySCADACommandProxy : ChannelFactory<ISCADACommand>, IScadaClient

@@ -14,11 +14,19 @@ export const style = cytoscape.stylesheet()
     .style({
         'background-color': INACTIVE_NODE_COLOR
     })
-    .selector('node[dmsType="ENERGYCONSUMER"]')
+    .selector('node[dmsType = "ENERGYCONSUMER"][state = "active"]')
     .style({
         'background-fit': 'cover',
         'background-opacity': '0',
         'background-image': 'assets/img/consumer.png',
+        'height': '45px',
+        'width': '45px',
+    })
+    .selector('node[dmsType = "ENERGYCONSUMER"][state = "inactive"]')
+    .style({
+        'background-fit': 'cover',
+        'background-opacity': '0',
+        'background-image': 'assets/img/plug.png',
         'height': '45px',
         'width': '45px',
     })

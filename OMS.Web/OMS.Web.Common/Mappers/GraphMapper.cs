@@ -9,14 +9,14 @@
     {
         private const string PowerTransformerDmsTypeName = "POWERTRANSFORMER";
 
-        public OmsGraph MapTopology(UIModel topologyModel)
+        public OmsGraphViewModel Map(UIModel topologyModel)
         {
-            OmsGraph graph = new OmsGraph();
+            OmsGraphViewModel graph = new OmsGraphViewModel();
             
             // map nodes
             foreach (KeyValuePair<long, UINode> keyValue in topologyModel.Nodes)
             {
-                Node graphNode = new Node
+                NodeViewModel graphNode = new NodeViewModel
                 {
                     Id = keyValue.Value.Id.ToString(),
                     Name = keyValue.Value.Name,
@@ -26,12 +26,12 @@
                     DMSType = keyValue.Value.DMSType,
                     IsRemote = keyValue.Value.IsRemote,
                     NominalVoltage = keyValue.Value.NominalVoltage.ToString(),
-                    Measurements = new List<Measurement>()
+                    Measurements = new List<MeasurementViewModel>()
                 };
 
                 foreach (var measurement in keyValue.Value.Measurements)
                 {
-                    graphNode.Measurements.Add(new Measurement()
+                    graphNode.Measurements.Add(new MeasurementViewModel()
                     {
                         Id = measurement.Gid.ToString(),
                         Type = measurement.Type,
@@ -51,7 +51,7 @@
             {
                 foreach(long targetNodeId in keyValue.Value)
                 {
-                    Relation graphRelation = new Relation
+                    RelationViewModel graphRelation = new RelationViewModel
                     {
                         SourceNodeId = keyValue.Key.ToString(),
                         TargetNodeId = targetNodeId.ToString(),

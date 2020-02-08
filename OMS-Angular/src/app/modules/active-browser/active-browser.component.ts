@@ -1,20 +1,40 @@
-//TOOD: check this file
-// import { Component, OnInit } from '@angular/core';
+import { Component, OnInit } from '@angular/core';
 
-// // import * as outages from './outage-mock.json'
+import { ActiveOutage } from '@shared/models/outage.model';
+import { OutageService } from '@services/outage/outage.service';
 
-// @Component({
-//   selector: 'app-active-browser',
-//   templateUrl: './active-browser.component.html',
-//   styleUrls: ['./active-browser.component.css']
-// })
-// export class ActiveBrowserComponent implements OnInit {
-//   displayedColumns: string[] = ['id', 'dateCreated'];
-//   dataSource = outages;
+export interface PeriodicElement {
+  name: string;
+  position: number;
+  weight: number;
+  symbol: string;
+};
 
-//   constructor() { }
+const AO_MOCK: ActiveOutage[] = [
+  { Id: 1, ElementId: 2321619, ReportedAt: new Date(), AfectedConsumers: [] },
+  { Id: 2, ElementId: 3311516, ReportedAt: new Date(), AfectedConsumers: [] },
+  { Id: 3, ElementId: 4321512, ReportedAt: new Date(), AfectedConsumers: [] },
+  { Id: 4, ElementId: 5684515, ReportedAt: new Date(), AfectedConsumers: [] },
+  { Id: 5, ElementId: 6151715, ReportedAt: new Date(), AfectedConsumers: [] },
+  { Id: 6, ElementId: 7236541, ReportedAt: new Date(), AfectedConsumers: [] }
+];
 
-//   ngOnInit() {
-//   }
+@Component({
+  selector: 'app-active-browser',
+  templateUrl: './active-browser.component.html',
+  styleUrls: ['./active-browser.component.css']
+})
 
-// }
+export class ActiveBrowserComponent implements OnInit {
+  private activeOutages: ActiveOutage[] = AO_MOCK;
+  private columns: string[] = ["id", "elementId", "reportedAt"];
+
+  constructor(private outageService: OutageService) { }
+
+  ngOnInit() {
+    // subscribe to outage service and get real data from db
+    console.log(this.activeOutages);
+  }
+
+}
+

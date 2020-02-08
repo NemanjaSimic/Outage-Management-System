@@ -1,15 +1,16 @@
-﻿namespace OMS.Web.Adapter.Topology
+﻿using Outage.Common.ServiceContracts.PubSub;
+using Outage.Common.PubSub;
+using Outage.Common.PubSub.CalculationEngineDataContract;
+
+namespace OMS.Web.Adapter.Topology
 {
     using System;
     using System.ServiceModel;
-    using Outage.Common.PubSub;
     using OMS.Web.Common.Mappers;
     using System.Runtime.Serialization;
     using OMS.Web.UI.Models.ViewModels;
     using OMS.Web.Adapter.HubDispatchers;
-    using Outage.Common.ServiceContracts.PubSub;
-    using Outage.Common.PubSub.CalculationEngineDataContract;
-
+    
     [DataContract]
     [CallbackBehavior(ConcurrencyMode = ConcurrencyMode.Multiple)]
     public class TopologyNotification : ISubscriberCallback
@@ -38,7 +39,7 @@
         {
             if(message is TopologyForUIMessage topologyMessage)
             {
-                OmsGraph graph = _mapper.MapTopology(topologyMessage.UIModel);
+                OmsGraphViewModel graph = _mapper.Map(topologyMessage.UIModel);
 
                 _dispatcher.Connect();
                 try

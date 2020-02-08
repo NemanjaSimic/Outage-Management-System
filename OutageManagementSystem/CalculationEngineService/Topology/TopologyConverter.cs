@@ -101,7 +101,9 @@ namespace Topology
                             SecondEnd = element.SecondEnd
                         });
 
-                    foreach (long child in element.SecondEnd)
+                    var children = new List<long>(element.SecondEnd);
+
+                    foreach (long child in children)
                     {
                         long nextElement = child;
                         if (ModelCodeHelper.ExtractTypeFromGlobalId(child) == 0)
@@ -111,6 +113,8 @@ namespace Topology
                                 topology.GetElementByGid(child, out ITopologyElement fieldElement);
                                 Field field = fieldElement as Field;
                                 nextElement = field.Members.First();
+                                element.SecondEnd.Remove(child);
+                                element.SecondEnd.Add(nextElement);
                             }
                             catch (Exception)
                             {

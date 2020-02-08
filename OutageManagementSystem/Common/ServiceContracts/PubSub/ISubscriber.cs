@@ -1,4 +1,5 @@
-﻿using Outage.Common.PubSub;
+﻿using Outage.Common.OutageService.Model;
+using Outage.Common.PubSub;
 using Outage.Common.PubSub.CalculationEngineDataContract;
 using Outage.Common.PubSub.EmailDataContract;
 using Outage.Common.PubSub.OutageDataContract;
@@ -35,6 +36,8 @@ namespace Outage.Common.ServiceContracts.PubSub
         [ServiceKnownType(typeof(ActiveOutage))]
         [ServiceKnownType(typeof(ArchivedOutage))]
         [ServiceKnownType(typeof(OutageMessage))]
+        [ServiceKnownType(typeof(OutageTopologyModel))]
+        [ServiceKnownType(typeof(OutageTopologyElement))]
         void Notify(IPublishableMessage message);
     }
 }
