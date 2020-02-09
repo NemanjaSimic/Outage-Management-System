@@ -234,7 +234,7 @@ export class GraphComponent implements OnInit, OnDestroy {
 
 
     //this.drawBackupEdges();
-    this.drawWarnings();
+    //this.drawWarnings();
     this.drawMeasurements();
     this.addTooltips();
     modifyNodeDistance(this.cy.nodes().filter(x => x.data('dmsType') == "ENERGYCONSUMER"));
@@ -339,11 +339,21 @@ export class GraphComponent implements OnInit, OnDestroy {
 
   public onActiveOutageNotification(data: ActiveOutage): void {
     console.log('onActiveOutageNotification');
+    drawCallWarning(this.cy, data.ElementId);
+    this.ngZone.run(() => {
+    this.cy.nodes().forEach(node => {
+      if(node.data("id") == data.ElementId)
+      {
+        drawWarning(this.cy, node);
+      }
+    });
     console.log(data);
+  });
   }
 
   public onArchivedOutageNotification(data: ArchivedOutage): void {
     console.log('onArchivedOutageNotification');
+  
     console.log(data);
   }
 
