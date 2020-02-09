@@ -5,7 +5,7 @@ using System.ServiceModel;
 
 namespace Outage.Common.ServiceProxies.CalcualtionEngine
 {
-    public class OMSTopologyServiceProxy : ClientBase<ITopologyOMSService>, ITopologyOMSService, IDisposable
+    public class OMSTopologyServiceProxy : BaseProxy<ITopologyOMSService>, ITopologyOMSService, IDisposable
     {
         public OMSTopologyServiceProxy(string endpointName)
             : base(endpointName)

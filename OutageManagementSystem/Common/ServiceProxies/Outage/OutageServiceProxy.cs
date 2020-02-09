@@ -6,7 +6,7 @@ using System.ServiceModel;
 
 namespace Outage.Common.ServiceProxies.Outage
 {
-    public class OutageServiceProxy : ClientBase<IOutageContract>, IOutageContract, IOutageService
+    public class OutageServiceProxy : BaseProxy<IOutageContract>, IOutageContract, IOutageService
     {
         public OutageServiceProxy(string endpointName)
             : base(endpointName)

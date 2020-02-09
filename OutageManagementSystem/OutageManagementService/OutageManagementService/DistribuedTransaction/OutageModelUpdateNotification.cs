@@ -1,5 +1,6 @@
 ﻿using Outage.Common;
 using Outage.Common.GDA;
+using Outage.Common.ServiceContracts.DistributedTransaction;
 using Outage.Common.ServiceProxies.DistributedTransaction;
 using Outage.DistributedTransactionActor;
 using System;
@@ -41,7 +42,7 @@ namespace OutageManagementService.DistribuedTransaction
 
             if (success)
             {
-                using (TransactionEnlistmentProxy transactionEnlistmentProxy = GetTransactionEnlistmentProxy())
+                using (TransactionEnlistmentProxy transactionEnlistmentProxy = proxyFactory.CreateProxy<TransactionEnlistmentProxy, ITransactionEnlistmentContract>(EndpointNames.TransactionEnlistmentEndpoint))
                 {
                     if (transactionEnlistmentProxy != null)
                     {

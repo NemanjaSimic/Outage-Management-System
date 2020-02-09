@@ -1,6 +1,7 @@
 ﻿using Outage.Common;
 using Outage.Common.GDA;
 using Outage.Common.PubSub.OutageDataContract;
+using Outage.Common.ServiceContracts.GDA;
 using Outage.Common.ServiceContracts.PubSub;
 using Outage.Common.ServiceProxies;
 using Outage.Common.ServiceProxies.PubSub;
@@ -28,59 +29,60 @@ namespace OutageManagementService
         private ISubscriber subscriber;
         private CallTracker callTracker;
         private ModelResourcesDesc modelResourcesDesc;
+        private ProxyFactory proxyFactory;
         #endregion
 
-        #region Proxies
+        //#region Proxies
 
-        private NetworkModelGDAProxy gdaQueryProxy = null;
+        //private NetworkModelGDAProxy gdaQueryProxy = null;
 
-        private NetworkModelGDAProxy GetGdaQueryProxy()
-        {
-            int numberOfTries = 0;
-            int sleepInterval = 500;
+        //private NetworkModelGDAProxy GetGdaQueryProxy()
+        //{
+        //    int numberOfTries = 0;
+        //    int sleepInterval = 500;
 
-            while (numberOfTries <= int.MaxValue)
-            {
-                try
-                {
-                    if (gdaQueryProxy != null)
-                    {
-                        gdaQueryProxy.Abort();
-                        gdaQueryProxy = null;
-                    }
+        //    while (numberOfTries <= int.MaxValue)
+        //    {
+        //        try
+        //        {
+        //            if (gdaQueryProxy != null)
+        //            {
+        //                gdaQueryProxy.Abort();
+        //                gdaQueryProxy = null;
+        //            }
 
-                    gdaQueryProxy = new NetworkModelGDAProxy(EndpointNames.NetworkModelGDAEndpoint);
-                    gdaQueryProxy.Open();
+        //            gdaQueryProxy = new NetworkModelGDAProxy(EndpointNames.NetworkModelGDAEndpoint);
+        //            gdaQueryProxy.Open();
 
-                    if (gdaQueryProxy.State == CommunicationState.Opened)
-                    {
-                        break;
-                    }
-                }
-                catch (Exception ex)
-                {
-                    string message = $"Exception on NetworkModelGDAProxy initialization. Message: {ex.Message}";
-                    Logger.LogWarn(message, ex);
-                    gdaQueryProxy = null;
-                }
-                finally
-                {
-                    numberOfTries++;
-                    Logger.LogDebug($"NetworkModelGDA: GdaQueryProxy getter, try number: {numberOfTries}.");
+        //            if (gdaQueryProxy.State == CommunicationState.Opened)
+        //            {
+        //                break;
+        //            }
+        //        }
+        //        catch (Exception ex)
+        //        {
+        //            string message = $"Exception on NetworkModelGDAProxy initialization. Message: {ex.Message}";
+        //            Logger.LogWarn(message, ex);
+        //            gdaQueryProxy = null;
+        //        }
+        //        finally
+        //        {
+        //            numberOfTries++;
+        //            Logger.LogDebug($"NetworkModelGDA: GdaQueryProxy getter, try number: {numberOfTries}.");
 
-                    if (numberOfTries >= 100)
-                    {
-                        sleepInterval = 1000;
-                    }
+        //            if (numberOfTries >= 100)
+        //            {
+        //                sleepInterval = 1000;
+        //            }
 
-                    Thread.Sleep(sleepInterval);
-                }
-            }
+        //            Thread.Sleep(sleepInterval);
+        //        }
+        //    }
 
-            return gdaQueryProxy;
-        }
+        //    return gdaQueryProxy;
+        //}
 
-        #endregion Proxies
+        //#endregion Proxies
 
 
         protected ILogger Logger
@@ -90,6 +92,7 @@ namespace OutageManagementService
 
         public OutageManagementService()
         {
+            proxyFactory = new ProxyFactory();
 
             //TODO: Initialize what is needed
             //Delete database(TODO: restauration of data...)
@@ -121,7 +124,7 @@ namespace OutageManagementService
                 try
                 {
                     numberOfTries++;
-                    using (var proxy = GetGdaQueryProxy())
+                    using (NetworkModelGDAProxy proxy = proxyFactory.CreateProxy<NetworkModelGDAProxy, INetworkModelGDAContract>(EndpointNames.NetworkModelGDAEndpoint))
                     {
                         iteratorId = proxy.GetExtentValues(entityType, propIds);
                     }
@@ -145,7 +148,7 @@ namespace OutageManagementService
 
             try
             {
-                using (var gdaProxy = GetGdaQueryProxy())
+                using (NetworkModelGDAProxy gdaProxy = proxyFactory.CreateProxy<NetworkModelGDAProxy, INetworkModelGDAContract>(EndpointNames.NetworkModelGDAEndpoint))
                 {
                     if (gdaProxy != null)
                     {
@@ -179,6 +182,9 @@ namespace OutageManagementService
 
         private void SubscribeOnEmailService()
         {
+            //ProxyFactory proxyFactory = new ProxyFactory();
+            //proxy = proxyFactory.CreatePRoxy<SubscriberProxy, ISubscriber>(new SCADASubscriber(), EndpointNames.SubscriberEndpoint);
+
             subscriber = new SubscriberProxy(callTracker, EndpointNames.SubscriberEndpoint);
             subscriber.Subscribe(Topic.OUTAGE_EMAIL);
 

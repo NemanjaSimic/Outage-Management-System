@@ -1,9 +1,12 @@
 ﻿using CIM.Model;
 using Outage.Common;
 using Outage.Common.GDA;
+using Outage.Common.ServiceContracts.GDA;
 using Outage.Common.ServiceProxies;
 using System;
 using System.Collections.Generic;
+using System.ServiceModel;
+using System.Threading;
 
 namespace Outage.DataImporter.CIMAdapter.Importer
 {
@@ -22,7 +25,6 @@ namespace Outage.DataImporter.CIMAdapter.Importer
 		private ConcreteModel concreteModel;
 		private Delta delta;
 
-		//private Dictionary<long, ResourceDescription> negativeGidToResource;
 		private Dictionary<string, long> mridToPositiveGidFromServer;
 
 		private HashSet<string> mridsFromConcreteModel;
@@ -98,7 +100,6 @@ namespace Outage.DataImporter.CIMAdapter.Importer
 		{
 			concreteModel = null;
 			delta = new Delta();
-			//mridToResource = new Dictionary<string, ResourceDescription>();
 			mridToPositiveGidFromServer = new Dictionary<string, long>();
 			mridsFromConcreteModel = new HashSet<string>();
 			negativeGidToMrid = new Dictionary<long, string>();
@@ -106,14 +107,12 @@ namespace Outage.DataImporter.CIMAdapter.Importer
 			report = null;
 		}
 
-		public TransformAndLoadReport CreateNMSDelta(ConcreteModel cimConcreteModel, NetworkModelGDAProxy gdaQueryProxy, ModelResourcesDesc resourcesDesc)
+		public TransformAndLoadReport CreateNMSDelta(ConcreteModel cimConcreteModel, ProxyFactory proxyFactory, ModelResourcesDesc resourcesDesc)
 		{
 			Logger.LogInfo("Importing Outage Elements...");
 			report = new TransformAndLoadReport();
 			concreteModel = cimConcreteModel;
 			delta.ClearDeltaOperations();
-			//mridToResource.Clear();
-			//negativeGidToResource.Clear();
 			MridToPositiveGidFromServer.Clear();
 			MridsFromConcreteModel.Clear();
 			NegativeGidToMrid.Clear();
@@ -122,7 +121,7 @@ namespace Outage.DataImporter.CIMAdapter.Importer
 			{
 				try
 				{
-					ConvertModelAndPopulateDelta(gdaQueryProxy, resourcesDesc);
+					ConvertModelAndPopulateDelta(proxyFactory, resourcesDesc);
 				}
 				catch (Exception ex)
 				{
@@ -133,17 +132,26 @@ namespace Outage.DataImporter.CIMAdapter.Importer
 					report.Success = false;
 				}
 			}
-			//LogManager.Log("Importing Outage Elements - END", LogLevel.Info);
 			Logger.LogInfo("Importing Outage Elements - END");
 			return report;
 		}
 
-		private void ConvertModelAndPopulateDelta(NetworkModelGDAProxy gdaQueryProxy, ModelResourcesDesc resourcesDesc)
+		private void ConvertModelAndPopulateDelta(ProxyFactory proxyFactory, ModelResourcesDesc resourcesDesc)
 		{
-			//LogManager.Log("Loading elements and creating delta...", LogLevel.Info);
 			Logger.LogInfo("Loading elements and creating delta...");
 
-			PopulateNmsDataFromServer(gdaQueryProxy, resourcesDesc);
+
+			using (NetworkModelGDAProxy gdaQueryProxy = proxyFactory.CreateProxy<NetworkModelGDAProxy, INetworkModelGDAContract>(EndpointNames.NetworkModelGDAEndpoint))
+			{
+				if (gdaQueryProxy == null)
+				{
+					string message = "ProcessIterator() => NetworkModelGDAProxy is null.";
+					Logger.LogError(message);
+					throw new NullReferenceException(message);
+				}
+
+				PopulateNmsDataFromServer(gdaQueryProxy, resourcesDesc);
+			}
 
 			//// import all concrete model types (DMSType enum)
 			ImportBaseVoltages();
@@ -163,7 +171,6 @@ namespace Outage.DataImporter.CIMAdapter.Importer
 
 			CorrectNegativeReferences();
 			CreateAndInsertDeleteOperations();
-			//LogManager.Log("Loading elements and creating delta completed.", LogLevel.Info);
 			Logger.LogInfo("Loading elements and creating delta completed.");
 		}
 

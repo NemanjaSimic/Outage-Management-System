@@ -5,6 +5,7 @@ using MongoDB.Driver;
 using Outage.Common;
 using Outage.Common.GDA;
 using Outage.Common.ServiceContracts;
+using Outage.Common.ServiceContracts.DistributedTransaction;
 using Outage.Common.ServiceProxies;
 using Outage.Common.ServiceProxies.DistributedTransaction;
 using Outage.DataModel;
@@ -33,18 +34,19 @@ namespace Outage.NetworkModelService
         }
 
         private IMongoDatabase db;
-
         private Delta currentDelta;
+
+        ProxyFactory proxyFactory;
 
         /// <summary>
         /// ModelResourceDesc class contains metadata of the model
         /// </summary>
         private ModelResourcesDesc resourcesDescs;
-        
+
         /// <summary>
-		/// Dictionary which contains all data: Key - DMSType, Value - Container
-		/// </summary>
-		private  Dictionary<DMSType, Container> networkDataModel;
+        /// Dictionary which contains all data: Key - DMSType, Value - Container
+        /// </summary>
+        private Dictionary<DMSType, Container> networkDataModel;
 
         /// <summary>
 		/// Dictionaru which contains all incoming data: Key - DMSType, Value - Container;
@@ -73,189 +75,174 @@ namespace Outage.NetworkModelService
 
         #endregion
 
-        #region Proxies
-        /// <summary>
-        /// 
-        /// </summary>
-        private TransactionCoordinatorProxy transactionCoordinatorProxy = null;
+        //#region Proxies
+        ///// <summary>
+        ///// 
+        ///// </summary>
+        //private TransactionCoordinatorProxy transactionCoordinatorProxy = null;
 
-        private TransactionCoordinatorProxy GetTransactionCoordinatorProxy()
-        {
-            int numberOfTries = 0;
-            int sleepInterval = 500;
+        //private TransactionCoordinatorProxy GetTransactionCoordinatorProxy()
+        //{
+        //    int numberOfTries = 1;
+        //    int sleepInterval = 500;
 
-            while (numberOfTries <= int.MaxValue)
-            {
-                try
-                {
-                    if (transactionCoordinatorProxy != null)
-                    {
-                        transactionCoordinatorProxy.Abort();
-                        transactionCoordinatorProxy = null;
-                    }
+        //    while (numberOfTries <= int.MaxValue)
+        //    {
+        //        try
+        //        {
+        //            if (transactionCoordinatorProxy != null)
+        //            {
+        //                transactionCoordinatorProxy.Abort();
+        //                transactionCoordinatorProxy = null;
+        //            }
 
-                    transactionCoordinatorProxy = new TransactionCoordinatorProxy(EndpointNames.TransactionCoordinatorEndpoint);
-                    transactionCoordinatorProxy.Open();
+        //            transactionCoordinatorProxy = new TransactionCoordinatorProxy(EndpointNames.TransactionCoordinatorEndpoint);
+        //            transactionCoordinatorProxy.Open();
 
-                    if(transactionCoordinatorProxy.State == CommunicationState.Opened)
-                    {
-                        break;
-                    }
-                }
-                catch (Exception ex)
-                {
-                    string message = $"Exception on TransactionCoordinatorProxy initialization. Message: {ex.Message}";
-                    Logger.LogWarn(message, ex);
-                    transactionCoordinatorProxy = null;
-                }
-                finally
-                {
-                    numberOfTries++;
-                    Logger.LogDebug($"NetworkModel: TransactionCoordinatorProxy getter, try number: {numberOfTries}.");
+        //            if(transactionCoordinatorProxy.State == CommunicationState.Opened)
+        //            {
+        //                break;
+        //            }
+        //        }
+        //        catch (Exception ex)
+        //        {
+        //            string message = $"Exception on TransactionCoordinatorProxy initialization. Message: {ex.Message}";
+        //            Logger.LogWarn(message, ex);
+        //            transactionCoordinatorProxy = null;
+        //        }
+        //        finally
+        //        {
+        //            numberOfTries++;
+        //            Logger.LogDebug($"NetworkModel: TransactionCoordinatorProxy getter, try number: {numberOfTries}.");
 
-                    if (numberOfTries >= 100)
-                    {
-                        sleepInterval = 1000;
-                    }
+        //            if (numberOfTries >= 100)
+        //            {
+        //                sleepInterval = 1000;
+        //            }
 
-                    Thread.Sleep(sleepInterval);
-                }
-            }
+        //            Thread.Sleep(sleepInterval);
+        //        }
+        //    }
 
-            return transactionCoordinatorProxy;
-        }
+        //    return transactionCoordinatorProxy;
+        //}
 
-        /// <summary>
-        /// 
-        /// </summary>
-        private TransactionEnlistmentProxy transactionEnlistmentProxy = null;
+        ///// <summary>
+        ///// 
+        ///// </summary>
+        //private TransactionEnlistmentProxy transactionEnlistmentProxy = null;
 
-        private TransactionEnlistmentProxy GetTransactionEnlistmentProxy()
-        {
-            int numberOfTries = 0;
-            int sleepInterval = 500;
+        //private TransactionEnlistmentProxy GetTransactionEnlistmentProxy()
+        //{
+        //    int numberOfTries = 0;
+        //    int sleepInterval = 500;
 
-            while (numberOfTries <= int.MaxValue)
-            {
-                try
-                {
-                    if (transactionEnlistmentProxy != null)
-                    {
-                        transactionEnlistmentProxy.Abort();
-                        transactionEnlistmentProxy = null;
-                    }
+        //    while (numberOfTries <= int.MaxValue)
+        //    {
+        //        try
+        //        {
+        //            if (transactionEnlistmentProxy != null)
+        //            {
+        //                transactionEnlistmentProxy.Abort();
+        //                transactionEnlistmentProxy = null;
+        //            }
 
-                    transactionEnlistmentProxy = new TransactionEnlistmentProxy(EndpointNames.TransactionEnlistmentEndpoint);
-                    transactionEnlistmentProxy.Open();
+        //            transactionEnlistmentProxy = new TransactionEnlistmentProxy(EndpointNames.TransactionEnlistmentEndpoint);
+        //            transactionEnlistmentProxy.Open();
 
-                    if (transactionEnlistmentProxy.State == CommunicationState.Opened)
-                    {
-                        break;
-                    }
-                }
-                catch (Exception ex)
-                {
-                    string message = $"Exception on TransactionEnlistmentProxy initialization. Message: {ex.Message}";
-                    Logger.LogWarn(message, ex);
-                    transactionEnlistmentProxy = null;
-                }
-                finally
-                {
-                    numberOfTries++;
-                    logger.LogDebug($"NetworkModel: TransactionEnlistmentProxy getter, try number: {numberOfTries}.");
+        //            if (transactionEnlistmentProxy.State == CommunicationState.Opened)
+        //            {
+        //                break;
+        //            }
+        //        }
+        //        catch (Exception ex)
+        //        {
+        //            string message = $"Exception on TransactionEnlistmentProxy initialization. Message: {ex.Message}";
+        //            Logger.LogWarn(message, ex);
+        //            transactionEnlistmentProxy = null;
+        //        }
+        //        finally
+        //        {
+        //            numberOfTries++;
+        //            logger.LogDebug($"NetworkModel: TransactionEnlistmentProxy getter, try number: {numberOfTries}.");
 
-                    if (numberOfTries >= 100)
-                    {
-                        sleepInterval = 1000;
-                    }
+        //            if (numberOfTries >= 100)
+        //            {
+        //                sleepInterval = 1000;
+        //            }
 
-                    Thread.Sleep(sleepInterval);
-                }
-            }
+        //            Thread.Sleep(sleepInterval);
+        //        }
+        //    }
 
-            return transactionEnlistmentProxy;
-        }
+        //    return transactionEnlistmentProxy;
+        //}
 
-        /// <summary>
-        /// 
-        /// </summary>
-        private ModelUpdateNotificationProxy modelUpdateNotifierProxy = null;
+        ///// <summary>
+        ///// 
+        ///// </summary>
+        //private ModelUpdateNotificationProxy modelUpdateNotifierProxy = null;
 
-        private ModelUpdateNotificationProxy GetModelUpdateNotificationProxy(string endpointName)
-        {
-            int numberOfTries = 0;
-            int sleepInterval = 500;
+        //private ModelUpdateNotificationProxy GetModelUpdateNotificationProxy(string endpointName)
+        //{
+        //    int numberOfTries = 0;
+        //    int sleepInterval = 500;
 
-            while (numberOfTries <= int.MaxValue)
-            {
-                try
-                {
-                    if (modelUpdateNotifierProxy != null)
-                    {
-                        modelUpdateNotifierProxy.Abort();
-                        modelUpdateNotifierProxy = null;
-                    }
+        //    while (numberOfTries <= int.MaxValue)
+        //    {
+        //        try
+        //        {
+        //            if (modelUpdateNotifierProxy != null)
+        //            {
+        //                modelUpdateNotifierProxy.Abort();
+        //                modelUpdateNotifierProxy = null;
+        //            }
 
-                    modelUpdateNotifierProxy = new ModelUpdateNotificationProxy(endpointName);
-                    modelUpdateNotifierProxy.Open();
+        //            modelUpdateNotifierProxy = new ModelUpdateNotificationProxy(endpointName);
+        //            modelUpdateNotifierProxy.Open();
 
-                    if (modelUpdateNotifierProxy.State == CommunicationState.Opened)
-                    {
-                        break;
-                    }
-                }
-                catch (Exception ex)
-                {
-                    string message = $"Exception on ModelUpdateNotificationProxy initialization. EndpointName: {endpointName}, Message: {ex.Message}";
-                    Logger.LogWarn(message, ex);
-                    modelUpdateNotifierProxy = null;
-                }
-                finally
-                {
-                    numberOfTries++;
-                    Logger.LogDebug($"NetworkModel: ModelUpdateNotificationProxy getter, EndpointName: {endpointName}, try number: {numberOfTries}.");
+        //            if (modelUpdateNotifierProxy.State == CommunicationState.Opened)
+        //            {
+        //                break;
+        //            }
+        //        }
+        //        catch (Exception ex)
+        //        {
+        //            string message = $"Exception on ModelUpdateNotificationProxy initialization. EndpointName: {endpointName}, Message: {ex.Message}";
+        //            Logger.LogWarn(message, ex);
+        //            modelUpdateNotifierProxy = null;
+        //        }
+        //        finally
+        //        {
+        //            numberOfTries++;
+        //            Logger.LogDebug($"NetworkModel: ModelUpdateNotificationProxy getter, EndpointName: {endpointName}, try number: {numberOfTries}.");
 
-                    if (numberOfTries >= 100)
-                    {
-                        sleepInterval = 1000;
-                    }
+        //            if (numberOfTries >= 100)
+        //            {
+        //                sleepInterval = 1000;
+        //            }
 
-                    Thread.Sleep(sleepInterval);
-                }
-            }
+        //            Thread.Sleep(sleepInterval);
+        //        }
+        //    }
 
-            return modelUpdateNotifierProxy;
-        }
+        //    return modelUpdateNotifierProxy;
+        //}
 
-        #endregion
+        //#endregion
+
+
 
         /// <summary>
         /// Initializes a new instance of the Model class.
         /// </summary>
         public NetworkModel()
         {
-
-            BsonSerializer.RegisterSerializer(new EnumSerializer<DMSType>(BsonType.String));
-            BsonSerializer.RegisterSerializer(new Int64Serializer(BsonType.String));
-
-            BsonClassMap.RegisterClassMap<BaseVoltage>();
-            BsonClassMap.RegisterClassMap<Terminal>();
-            BsonClassMap.RegisterClassMap<ConnectivityNode>();
-            BsonClassMap.RegisterClassMap<PowerTransformer>();
-            BsonClassMap.RegisterClassMap<EnergySource>();
-            BsonClassMap.RegisterClassMap<EnergyConsumer>();
-            BsonClassMap.RegisterClassMap<TransformerWinding>();
-            BsonClassMap.RegisterClassMap<Fuse>();
-            BsonClassMap.RegisterClassMap<Disconnector>();
-            BsonClassMap.RegisterClassMap<Breaker>();
-            BsonClassMap.RegisterClassMap<LoadBreakSwitch>();
-            BsonClassMap.RegisterClassMap<ACLineSegment>();
-            BsonClassMap.RegisterClassMap<Discrete>();
-            BsonClassMap.RegisterClassMap<Analog>();
-
+            InitializeBsonSerializer();
 
             networkDataModel = new Dictionary<DMSType, Container>();
             resourcesDescs = new ModelResourcesDesc();
+            proxyFactory = new ProxyFactory();
 
             try
             {
@@ -269,6 +256,7 @@ namespace Outage.NetworkModelService
 
             Initialize();
         }
+
 
         #region Find
 
@@ -337,6 +325,7 @@ namespace Outage.NetworkModelService
         }
 
         #endregion Find
+
 
         #region GDA query
 
@@ -460,6 +449,7 @@ namespace Outage.NetworkModelService
 
         #endregion GDA query	
 
+
         public Common.GDA.UpdateResult ApplyDelta(Delta delta, bool isInitialization = false)
         {
             currentDelta = delta;
@@ -480,7 +470,7 @@ namespace Outage.NetworkModelService
                 if (!isInitialization)
                 {
                     delta.FixNegativeToPositiveIds(ref typesCounters, ref globalIdPairs);
-           
+
                 }
 
                 updateResult.GlobalIdPairs = globalIdPairs;
@@ -506,8 +496,8 @@ namespace Outage.NetworkModelService
 
                 networkDataModel = incomingNetworkDataModel;
                 Logger.LogDebug($"Current model [HashCode: 0x{networkDataModel.GetHashCode():X16}] becomes Incoming model [HashCode: 0x{incomingNetworkDataModel.GetHashCode():X16}].");
-                
-                if(isInitialization)
+
+                if (isInitialization)
                 {
                     Commit(isInitialization);
                 }
@@ -543,132 +533,6 @@ namespace Outage.NetworkModelService
             return updateResult;
         }
 
-        private void StartDistributedTransaction(Delta delta)
-        {
-            using (TransactionCoordinatorProxy transactionCoordinatorProxy = GetTransactionCoordinatorProxy())
-            {
-                if (transactionCoordinatorProxy == null)
-                {
-                    Logger.LogWarn("TransactionCoordinatorProxy is not initialized. This can be due to TransactionCoordinator not being stared.");
-                    Commit(false);
-                    return;
-                }
-                
-                transactionCoordinatorProxy.StartDistributedUpdate();
-                Logger.LogDebug("StartDistributedUpdate() invoked on Transaction Coordinator.");
-            }
-
-            Dictionary<DeltaOpType, List<long>> modelChanges = new Dictionary<DeltaOpType, List<long>>()
-            {
-                { DeltaOpType.Insert, new List<long>(delta.InsertOperations.Count) },
-                { DeltaOpType.Update, new List<long>(delta.UpdateOperations.Count) },
-                { DeltaOpType.Delete, new List<long>(delta.DeleteOperations.Count) },
-            };
-
-            foreach (ResourceDescription rd in delta.InsertOperations)
-            {
-                modelChanges[DeltaOpType.Insert].Add(rd.Id);
-            }
-
-            foreach (ResourceDescription rd in delta.UpdateOperations)
-            {
-                modelChanges[DeltaOpType.Update].Add(rd.Id);
-            }
-
-            foreach (ResourceDescription rd in delta.DeleteOperations)
-            {
-                modelChanges[DeltaOpType.Delete].Add(rd.Id);
-            }
-
-            bool success = false;
-
-            using (ModelUpdateNotificationProxy scadaModelUpdateNotifierProxy = GetModelUpdateNotificationProxy(EndpointNames.SCADAModelUpdateNotifierEndpoint))
-            {
-                if (scadaModelUpdateNotifierProxy != null)
-                {
-                    success = scadaModelUpdateNotifierProxy.NotifyAboutUpdate(modelChanges);
-                    Logger.LogDebug("NotifyAboutUpdate() method invoked on SCADA Transaction actor.");
-                }
-                else
-                {
-                    string message = "ModelUpdateNotificationProxy for SCADA is null.";
-                    Logger.LogWarn(message);
-                    throw new NullReferenceException(message);
-                }
-            }
-
-            if (success)
-            {
-                using (ModelUpdateNotificationProxy calculationEngineModelUpdateNotifierProxy = GetModelUpdateNotificationProxy(EndpointNames.CalculationEngineModelUpdateNotifierEndpoint))
-                {
-                    if (calculationEngineModelUpdateNotifierProxy != null)
-                    {
-                        success = calculationEngineModelUpdateNotifierProxy.NotifyAboutUpdate(modelChanges);
-                        Logger.LogDebug("NotifyAboutUpdate() method invoked on CE Transaction actor.");
-                    }
-                    else
-                    {
-                        string message = "ModelUpdateNotificationProxy for CalculationEngine is null.";
-                        Logger.LogWarn(message);
-                        throw new NullReferenceException(message);
-                    }
-                }
-
-                if (success)
-                {
-                    using (ModelUpdateNotificationProxy outageModelUpdateNotifierProxy = GetModelUpdateNotificationProxy(EndpointNames.OutageModelUpdateNotifierEndpoint))
-                    {
-                        if (outageModelUpdateNotifierProxy != null)
-                        {
-                            success = outageModelUpdateNotifierProxy.NotifyAboutUpdate(modelChanges);
-                            Logger.LogDebug("NotifyAboutUpdate() method invoked on Outage Transaction actor. ");
-                        }
-                        else
-                        {
-                            string message = "ModelUpdateNotificationProxy for Outage is null.";
-                            Logger.LogWarn(message);
-                            throw new NullReferenceException(message);
-                        }
-                    }
-
-                    if (success)
-                    {
-                        using (TransactionEnlistmentProxy transactionEnlistmentProxy = GetTransactionEnlistmentProxy())
-                        {
-                            if (transactionEnlistmentProxy != null)
-                            {
-                                success = transactionEnlistmentProxy.Enlist(ServiceNames.NetworkModelService);
-                                Logger.LogDebug("Enlist() method invoked on Transaction Coordinator.");
-                            }
-                            else
-                            {
-                                string message = "TransactionEnlistmentProxy is null.";
-                                Logger.LogWarn(message);
-                                throw new NullReferenceException(message);
-                            }
-                        }
-
-                    }
-                }
-
-                
-            }
-
-            using (TransactionCoordinatorProxy transactionCoordinatorProxy = GetTransactionCoordinatorProxy())
-            {
-                if (transactionCoordinatorProxy != null)
-                {
-                    transactionCoordinatorProxy.FinishDistributedUpdate(success);
-                    Logger.LogDebug($"FinishDistributedUpdate() invoked on Transaction Coordinator with parameter 'success' value: {success}.");
-                }
-                else
-                {
-                    string message = "TransactionCoordinatorProxy is null.";
-                    Logger.LogWarn(message);
-                    throw new NullReferenceException(message);
-                }
-            }
-        }
 
         #region ITransactionActorContract
         public bool Prepare()
@@ -704,6 +568,189 @@ namespace Outage.NetworkModelService
         #endregion
 
         #region Private Members
+        private void Initialize()
+        {
+            long networkModelVersion = 0, deltaVersion = 0;
+            var versionsCollection = db.GetCollection<ModelVersionDocument>("versions");
+            var networkDataModelCollection = db.GetCollection<NetworkDataModelDocument>("networkModels");
+
+            GetVersions(ref networkModelVersion, ref deltaVersion, versionsCollection);
+
+            if (deltaVersion > networkModelVersion)
+            {
+                Logger.LogDebug("Delta version is higher then network model version.");
+                List<Delta> result = ReadAllDeltas(deltaVersion, networkModelVersion);
+
+                var networkModelFilter = Builders<NetworkDataModelDocument>.Filter.Eq("_id", networkModelVersion);
+                if (networkModelVersion > 0)
+                {
+                    networkDataModel = networkDataModelCollection.Find(networkModelFilter).First().NetworkModel;
+                }
+
+                foreach (Delta delta in result)
+                {
+                    try
+                    {
+                        ApplyDelta(delta, true);
+                    }
+                    catch (Exception ex)
+                    {
+                        Logger.LogError($"Error while applying delta (id: {delta.Id}) durning service initialization. {ex.Message}", ex);
+                    }
+                }
+                SaveNetworkModel();
+            }
+            else if (networkModelVersion > 0)
+            {
+                var networkDataModelFilter = Builders<NetworkDataModelDocument>.Filter.Eq("_id", networkModelVersion);
+                networkDataModel = networkDataModelCollection.Find(networkDataModelFilter).First().NetworkModel;
+            }
+        }
+
+        private void StartDistributedTransaction(Delta delta)
+        {
+            using (TransactionCoordinatorProxy transactionCoordinatorProxy = proxyFactory.CreateProxy<TransactionCoordinatorProxy, ITransactionCoordinatorContract>(EndpointNames.TransactionCoordinatorEndpoint))
+            {
+                if (transactionCoordinatorProxy == null)
+                {
+                    Logger.LogWarn("TransactionCoordinatorProxy is not initialized. This can be due to TransactionCoordinator not being stared.");
+                    Commit(false);
+                    return;
+                }
+
+                transactionCoordinatorProxy.StartDistributedUpdate();
+                Logger.LogDebug("StartDistributedUpdate() invoked on Transaction Coordinator.");
+            }
+
+            Dictionary<DeltaOpType, List<long>> modelChanges = new Dictionary<DeltaOpType, List<long>>()
+            {
+                { DeltaOpType.Insert, new List<long>(delta.InsertOperations.Count) },
+                { DeltaOpType.Update, new List<long>(delta.UpdateOperations.Count) },
+                { DeltaOpType.Delete, new List<long>(delta.DeleteOperations.Count) },
+            };
+
+            foreach (ResourceDescription rd in delta.InsertOperations)
+            {
+                modelChanges[DeltaOpType.Insert].Add(rd.Id);
+            }
+
+            foreach (ResourceDescription rd in delta.UpdateOperations)
+            {
+                modelChanges[DeltaOpType.Update].Add(rd.Id);
+            }
+
+            foreach (ResourceDescription rd in delta.DeleteOperations)
+            {
+                modelChanges[DeltaOpType.Delete].Add(rd.Id);
+            }
+
+            bool success = false;
+
+            using (ModelUpdateNotificationProxy scadaModelUpdateNotifierProxy = proxyFactory.CreateProxy<ModelUpdateNotificationProxy, IModelUpdateNotificationContract>(EndpointNames.SCADAModelUpdateNotifierEndpoint))
+            {
+                if (scadaModelUpdateNotifierProxy != null)
+                {
+                    success = scadaModelUpdateNotifierProxy.NotifyAboutUpdate(modelChanges);
+                    Logger.LogDebug("NotifyAboutUpdate() method invoked on SCADA Transaction actor.");
+                }
+                else
+                {
+                    string message = "ModelUpdateNotificationProxy for SCADA is null.";
+                    Logger.LogWarn(message);
+                    throw new NullReferenceException(message);
+                }
+            }
+
+            if (success)
+            {
+                using (ModelUpdateNotificationProxy calculationEngineModelUpdateNotifierProxy = proxyFactory.CreateProxy<ModelUpdateNotificationProxy, IModelUpdateNotificationContract>(EndpointNames.CalculationEngineModelUpdateNotifierEndpoint))
+                {
+                    if (calculationEngineModelUpdateNotifierProxy != null)
+                    {
+                        success = calculationEngineModelUpdateNotifierProxy.NotifyAboutUpdate(modelChanges);
+                        Logger.LogDebug("NotifyAboutUpdate() method invoked on CE Transaction actor.");
+                    }
+                    else
+                    {
+                        string message = "ModelUpdateNotificationProxy for CalculationEngine is null.";
+                        Logger.LogWarn(message);
+                        throw new NullReferenceException(message);
+                    }
+                }
+
+                if (success)
+                {
+                    using (ModelUpdateNotificationProxy outageModelUpdateNotifierProxy = proxyFactory.CreateProxy<ModelUpdateNotificationProxy, IModelUpdateNotificationContract>(EndpointNames.OutageModelUpdateNotifierEndpoint))
+                    {
+                        if (outageModelUpdateNotifierProxy != null)
+                        {
+                            success = outageModelUpdateNotifierProxy.NotifyAboutUpdate(modelChanges);
+                            Logger.LogDebug("NotifyAboutUpdate() method invoked on Outage Transaction actor. ");
+                        }
+                        else
+                        {
+                            string message = "ModelUpdateNotificationProxy for Outage is null.";
+                            Logger.LogWarn(message);
+                            throw new NullReferenceException(message);
+                        }
+                    }
+
+                    if (success)
+                    {
+                        using (TransactionEnlistmentProxy transactionEnlistmentProxy = proxyFactory.CreateProxy<TransactionEnlistmentProxy, ITransactionEnlistmentContract>(EndpointNames.TransactionEnlistmentEndpoint))
+                        {
+                            if (transactionEnlistmentProxy != null)
+                            {
+                                success = transactionEnlistmentProxy.Enlist(ServiceNames.NetworkModelService);
+                                Logger.LogDebug("Enlist() method invoked on Transaction Coordinator.");
+                            }
+                            else
+                            {
+                                string message = "TransactionEnlistmentProxy is null.";
+                                Logger.LogWarn(message);
+                                throw new NullReferenceException(message);
+                            }
+                        }
+
+                    }
+                }
+
+
+            }
+
+            using (TransactionCoordinatorProxy transactionCoordinatorProxy = proxyFactory.CreateProxy<TransactionCoordinatorProxy, ITransactionCoordinatorContract>(EndpointNames.TransactionCoordinatorEndpoint))
+            {
+                if (transactionCoordinatorProxy != null)
+                {
+                    transactionCoordinatorProxy.FinishDistributedUpdate(success);
+                    Logger.LogDebug($"FinishDistributedUpdate() invoked on Transaction Coordinator with parameter 'success' value: {success}.");
+                }
+                else
+                {
+                    string message = "TransactionCoordinatorProxy is null.";
+                    Logger.LogWarn(message);
+                    throw new NullReferenceException(message);
+                }
+            }
+        }
+
+        private Dictionary<short, int> GetCounters()
+        {
+            Dictionary<short, int> typesCounters = new Dictionary<short, int>();
+
+            foreach (DMSType type in Enum.GetValues(typeof(DMSType)))
+            {
+                typesCounters[(short)type] = 0;
+
+                if (networkDataModel.ContainsKey(type))
+                {
+                    typesCounters[(short)type] = networkDataModel[type].Count;
+                }
+            }
+
+            return typesCounters;
+        }
+
         /// <summary>
         /// Inserts entity into the network model.
         /// </summary>
@@ -795,7 +842,7 @@ namespace Outage.NetworkModelService
                                 // get referenced entity for update from incoming model
                                 IdentifiedObject incomingTargetEntity = incomingTargetContainer.Entities[targetGlobalId];
 
-                                if(EntityExists(targetGlobalId))
+                                if (EntityExists(targetGlobalId))
                                 {
                                     Container currentTargetContainer = networkDataModel[targetType];
 
@@ -806,7 +853,7 @@ namespace Outage.NetworkModelService
 
                                     IdentifiedObject currentTargetEntity = currentTargetContainer.Entities[targetGlobalId];
 
-                                    if(incomingTargetEntity.GetHashCode() == currentTargetEntity.GetHashCode())
+                                    if (incomingTargetEntity.GetHashCode() == currentTargetEntity.GetHashCode())
                                     {
                                         incomingTargetEntity = GetEntityShallowCopy(targetGlobalId, incomingTargetContainer, currentTargetEntity);
                                     }
@@ -879,13 +926,13 @@ namespace Outage.NetworkModelService
                     {
                         IdentifiedObject currentEntity = currentContainer.Entities[globalId];
 
-                        if(currentEntity.GetHashCode() == incomingEntity.GetHashCode())
+                        if (currentEntity.GetHashCode() == incomingEntity.GetHashCode())
                         {
                             incomingEntity = GetEntityShallowCopy(globalId, incomingContainer, currentEntity);
                         }
                     }
                 }
-                
+
                 // updating properties of entity
                 foreach (Property property in rd.Properties)
                 {
@@ -894,7 +941,7 @@ namespace Outage.NetworkModelService
                         long oldTargetGlobalId = incomingEntity.GetProperty(property.Id).AsReference();
 
                         if (oldTargetGlobalId != 0)
-                        { 
+                        {
                             if (!EntityExistsInIncomingData(oldTargetGlobalId))
                             {
                                 string message = string.Format("Failed to get old target entity with GID: 0x{0:X16}.", oldTargetGlobalId);
@@ -922,7 +969,7 @@ namespace Outage.NetworkModelService
 
                                 if (incomingOldTargetEntity.GetHashCode() == currentOldTargetEntity.GetHashCode())
                                 {
-                                    incomingOldTargetEntity = GetEntityShallowCopy(oldTargetGlobalId, incomingOldTargetContainer, currentOldTargetEntity);  
+                                    incomingOldTargetEntity = GetEntityShallowCopy(oldTargetGlobalId, incomingOldTargetContainer, currentOldTargetEntity);
                                 }
                             }
 
@@ -954,14 +1001,14 @@ namespace Outage.NetworkModelService
 
                                 if (currentTargetContainer.GetHashCode() == incomingTargetContainer.GetHashCode())
                                 {
-                                    incomingTargetContainer = GetContainerShallowCopy(targetType, currentTargetContainer); 
+                                    incomingTargetContainer = GetContainerShallowCopy(targetType, currentTargetContainer);
                                 }
 
                                 IdentifiedObject currentTargetEntity = currentTargetContainer.Entities[targetGlobalId];
 
                                 if (incomingTargetEntity.GetHashCode() == currentTargetEntity.GetHashCode())
                                 {
-                                    incomingTargetEntity = GetEntityShallowCopy(targetGlobalId, incomingTargetContainer, currentTargetEntity); 
+                                    incomingTargetEntity = GetEntityShallowCopy(targetGlobalId, incomingTargetContainer, currentTargetEntity);
                                 }
                             }
 
@@ -1092,7 +1139,7 @@ namespace Outage.NetworkModelService
                             Container incomingTargetContainer = incomingNetworkDataModel[targetType];
                             // get incoming target entity
                             IdentifiedObject incomingTargetEntity = incomingTargetContainer.Entities[targetGlobalId];
-                                
+
                             //get container from current model
                             if (EntityExists(targetGlobalId))
                             {
@@ -1203,113 +1250,51 @@ namespace Outage.NetworkModelService
             Logger.LogDebug($"Incoming model Entity [0x{globalId:X16}, HashCode: 0x{incomingEntity.GetHashCode():X16}] is shallow copy of Current model Entity [HashCode: 0x{currentEntity.GetHashCode():X16}].");
             return incomingEntity;
         }
+        #endregion
 
-        private void Initialize()
+        #region MongoDB
+        private void InitializeBsonSerializer()
         {
-            long networkModelVersion = 0, deltaVersion = 0;
-            var versionsCollection = db.GetCollection<ModelVersionDocument>("versions");
-            var networkDataModelCollection = db.GetCollection<NetworkDataModelDocument>("networkModels");
+            BsonSerializer.RegisterSerializer(new EnumSerializer<DMSType>(BsonType.String));
+            BsonSerializer.RegisterSerializer(new Int64Serializer(BsonType.String));
 
-            GetVersions(ref networkModelVersion, ref deltaVersion, versionsCollection);
-
-            if (deltaVersion > networkModelVersion)
-            {
-                Logger.LogDebug("Delta version is higher then network model version.");
-                List<Delta> result = ReadAllDeltas(deltaVersion, networkModelVersion);
-
-                var networkModelFilter = Builders<NetworkDataModelDocument>.Filter.Eq("_id", networkModelVersion);
-                if (networkModelVersion > 0)
-                {
-                    networkDataModel = networkDataModelCollection.Find(networkModelFilter).First().NetworkModel;
-                }
-
-                foreach (Delta delta in result)
-                {
-                    try
-                    {
-                        ApplyDelta(delta, true);
-                    }
-                    catch (Exception ex)
-                    {
-                        Logger.LogError($"Error while applying delta (id: {delta.Id}) durning service initialization. {ex.Message}", ex);
-                    }
-                }
-                SaveNetworkModel();
-            }
-            else if (networkModelVersion > 0)
-            {
-                var networkDataModelFilter = Builders<NetworkDataModelDocument>.Filter.Eq("_id", networkModelVersion);
-                networkDataModel = networkDataModelCollection.Find(networkDataModelFilter).First().NetworkModel;
-            }
-
-            
+            BsonClassMap.RegisterClassMap<BaseVoltage>();
+            BsonClassMap.RegisterClassMap<Terminal>();
+            BsonClassMap.RegisterClassMap<ConnectivityNode>();
+            BsonClassMap.RegisterClassMap<PowerTransformer>();
+            BsonClassMap.RegisterClassMap<EnergySource>();
+            BsonClassMap.RegisterClassMap<EnergyConsumer>();
+            BsonClassMap.RegisterClassMap<TransformerWinding>();
+            BsonClassMap.RegisterClassMap<Fuse>();
+            BsonClassMap.RegisterClassMap<Disconnector>();
+            BsonClassMap.RegisterClassMap<Breaker>();
+            BsonClassMap.RegisterClassMap<LoadBreakSwitch>();
+            BsonClassMap.RegisterClassMap<ACLineSegment>();
+            BsonClassMap.RegisterClassMap<Discrete>();
+            BsonClassMap.RegisterClassMap<Analog>();
         }
 
         private void SaveDelta(Delta delta)
         {
-            //bool fileExisted = false;
-
-            //if (File.Exists(Config.Instance.ConnectionString))
-            //{
-            //    fileExisted = true;
-            //}
-
-            //FileStream fs = new FileStream(Config.Instance.ConnectionString, FileMode.OpenOrCreate, FileAccess.ReadWrite);
-            //fs.Seek(0, SeekOrigin.Begin);
-
-            //BinaryReader br = null;
             long deltaVersion = 0, networkModelVersion = 0, newestVersion = 0;
             var counterCollection = db.GetCollection<ModelVersionDocument>("versions");
 
             GetVersions(ref networkModelVersion, ref deltaVersion, counterCollection);
 
-            //var filter = Builders<ModelVersionDocument>.Filter.Eq("Id", "deltaVersion");
-            //if(counterCollection.Find(filter).CountDocuments() > 0)
-            //{
-            //    ModelVersionDocument finded = counterCollection.Find(filter).First();
-            //    deltaCount = finded.Version;
-            //}
             newestVersion = deltaVersion > networkModelVersion ? deltaVersion : networkModelVersion;
 
-
-            //if (fileExisted)
-            //{
-            //    br = new BinaryReader(fs);
-            //    deltaCount = br.ReadInt32();
-            //}
-
-            //BinaryWriter bw = new BinaryWriter(fs);
-            //fs.Seek(0, SeekOrigin.Begin);
-
             delta.Id = ++newestVersion;
-            //byte[] deltaSerialized = delta.Serialize();
-            //int deltaLength = deltaSerialized.Length;
-
-            //bw.Write(deltaCount);
-            //fs.Seek(0, SeekOrigin.End);
-            //bw.Write(deltaLength);
-            //bw.Write(deltaSerialized);
-
-            //if (br != null)
-            //{
-            //    br.Close();
-            //}
-
-            //bw.Close();
-            //fs.Close();
-
 
             try
-            {    
+            {
                 counterCollection.ReplaceOne(new BsonDocument("_id", "deltaVersion"), new ModelVersionDocument { Id = "deltaVersion", Version = delta.Id }, new UpdateOptions { IsUpsert = true });
                 var deltaCollection = db.GetCollection<Delta>("deltas");
-                deltaCollection.InsertOne(delta);   
+                deltaCollection.InsertOne(delta);
             }
             catch (Exception e)
             {
                 Logger.LogError($"Error on database: {e.Message}.", e);
             }
-
         }
 
         public void SaveNetworkModel()
@@ -1330,15 +1315,11 @@ namespace Outage.NetworkModelService
 
                 networkModelCollection.InsertOne(new NetworkDataModelDocument { Id = deltaVersion + 1, NetworkModel = networkDataModel });
                 versionsCollection.ReplaceOne(new BsonDocument("_id", "networkModelVersion"), new ModelVersionDocument { Id = "networkModelVersion", Version = deltaVersion + 1 }, new UpdateOptions { IsUpsert = true });
-
             }
             else
             {
                 throw new Exception("SaveNetwrokModel error!");  //better message needed :((
             }
-
-
-
         }
 
         private void GetVersions(ref long networkModelVersion, ref long deltaVersion, IMongoCollection<ModelVersionDocument> versionsCollection)
@@ -1363,71 +1344,15 @@ namespace Outage.NetworkModelService
             List<Delta> deltasFromDb = new List<Delta>();
 
             var collection = db.GetCollection<Delta>("deltas");
-            
+
             for (long deltaV = networkModelVersion + 1; deltaV <= deltaVersion; deltaV++)
             {
                 var deltaFilter = Builders<Delta>.Filter.Eq("_id", deltaV);
                 deltasFromDb.Add(collection.Find(deltaFilter).First());
             }
-            
-            //deltasFromDb = collection.Find(new BsonDocument()).ToList();
-
-            //if (deltasFromDb.Count <= 0)
-            //{
-            //    return deltasFromDb;
-            //}
-
-            //if (!File.Exists(Config.Instance.ConnectionString))
-            //{
-            //    return result;
-            //}
-
-            //FileStream fs = new FileStream(Config.Instance.ConnectionString, FileMode.OpenOrCreate, FileAccess.Read);
-            //fs.Seek(0, SeekOrigin.Begin);
-
-            //if (fs.Position < fs.Length) // if it is not empty stream
-            //{
-            //    BinaryReader br = new BinaryReader(fs);
-
-            //    int deltaCount = br.ReadInt32();
-            //    int deltaLength = 0;
-            //    byte[] deltaSerialized = null;
-            //    Delta delta = null;
-
-            //    for (int i = 0; i < deltaCount; i++)
-            //    {
-            //        deltaLength = br.ReadInt32();
-            //        deltaSerialized = new byte[deltaLength];
-            //        br.Read(deltaSerialized, 0, deltaLength);
-            //        delta = Delta.Deserialize(deltaSerialized);
-            //        result.Add(delta);
-            //    }
-
-            //    br.Close();
-            //}
-
-            //fs.Close();
 
             return deltasFromDb;
         }
-
-        private Dictionary<short, int> GetCounters()
-        {
-            Dictionary<short, int> typesCounters = new Dictionary<short, int>();
-
-            foreach (DMSType type in Enum.GetValues(typeof(DMSType)))
-            {
-                typesCounters[(short)type] = 0;
-
-                if (networkDataModel.ContainsKey(type))
-                {
-                    typesCounters[(short)type] = networkDataModel[type].Count;
-                }
-            }
-
-            return typesCounters;
-        }
-        #endregion
-
+        #endregion MongoDB
     }
 }

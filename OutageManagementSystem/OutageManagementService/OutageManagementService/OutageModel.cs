@@ -5,7 +5,10 @@ using Outage.Common.GDA;
 using Outage.Common.OutageService.Interface;
 using Outage.Common.OutageService.Model;
 using Outage.Common.PubSub.OutageDataContract;
+using Outage.Common.ServiceContracts.CalculationEngine;
+using Outage.Common.ServiceContracts.GDA;
 using Outage.Common.ServiceContracts.OMS;
+using Outage.Common.ServiceContracts.PubSub;
 using Outage.Common.ServiceProxies;
 using Outage.Common.ServiceProxies.CalcualtionEngine;
 using Outage.Common.ServiceProxies.PubSub;
@@ -40,169 +43,174 @@ namespace OutageManagementService
         }
 
         private ILogger logger;
+        private ProxyFactory proxyFactory;
+
         public ConcurrentQueue<long> EmailMsg;
         public List<long> CalledOutages;
         private Dictionary<DeltaOpType, List<long>> modelChanges;
         private ModelResourcesDesc modelResourcesDesc;
         private OutageContext transactionOutageContext;
+
         protected ILogger Logger
         {
             get { return logger ?? (logger = LoggerWrapper.Instance); }
         }
 
-        private PublisherProxy publisherProxy = null;
+        //private PublisherProxy publisherProxy = null;
 
-        private PublisherProxy GetPublisherProxy()
-        {
-            //TODO: diskusija statefull vs stateless
+        //private PublisherProxy GetPublisherProxy()
+        //{
+        //    //TODO: diskusija statefull vs stateless
 
-            int numberOfTries = 0;
-            int sleepInterval = 500;
+        //    int numberOfTries = 0;
+        //    int sleepInterval = 500;
 
-            while (numberOfTries <= int.MaxValue)
-            {
-                try
-                {
-                    if (publisherProxy != null)
-                    {
-                        publisherProxy.Abort();
-                        publisherProxy = null;
-                    }
+        //    while (numberOfTries <= int.MaxValue)
+        //    {
+        //        try
+        //        {
+        //            if (publisherProxy != null)
+        //            {
+        //                publisherProxy.Abort();
+        //                publisherProxy = null;
+        //            }
 
-                    publisherProxy = new PublisherProxy(EndpointNames.PublisherEndpoint);
-                    publisherProxy.Open();
+        //            publisherProxy = new PublisherProxy(EndpointNames.PublisherEndpoint);
+        //            publisherProxy.Open();
 
-                    if (publisherProxy.State == CommunicationState.Opened)
-                    {
-                        break;
-                    }
-                }
-                catch (Exception ex)
-                {
-                    string message = $"Exception on PublisherProxy initialization. Message: {ex.Message}";
-                    Logger.LogError(message, ex);
-                    publisherProxy = null;
-                }
-                finally
-                {
-                    numberOfTries++;
-                    Logger.LogDebug($"OutageModel: PublisherProxy getter, try number: {numberOfTries}.");
+        //            if (publisherProxy.State == CommunicationState.Opened)
+        //            {
+        //                break;
+        //            }
+        //        }
+        //        catch (Exception ex)
+        //        {
+        //            string message = $"Exception on PublisherProxy initialization. Message: {ex.Message}";
+        //            Logger.LogError(message, ex);
+        //            publisherProxy = null;
+        //        }
+        //        finally
+        //        {
+        //            numberOfTries++;
+        //            Logger.LogDebug($"OutageModel: PublisherProxy getter, try number: {numberOfTries}.");
 
-                    if (numberOfTries >= 100)
-                    {
-                        sleepInterval = 1000;
-                    }
+        //            if (numberOfTries >= 100)
+        //            {
+        //                sleepInterval = 1000;
+        //            }
 
-                    Thread.Sleep(sleepInterval);
-                }
-            }
+        //            Thread.Sleep(sleepInterval);
+        //        }
+        //    }
 
-            return publisherProxy;
-        }
+        //    return publisherProxy;
+        //}
 
-        #region Proxies
-        private OMSTopologyServiceProxy omsTopologyServiceProxy = null;
+        //#region Proxies
+        //private OMSTopologyServiceProxy omsTopologyServiceProxy = null;
 
-        private OMSTopologyServiceProxy GetTopologyProxy()
-        {
-            int numberOfTries = 0;
-            int sleepInterval = 500;
+        //private OMSTopologyServiceProxy GetTopologyProxy()
+        //{
+        //    int numberOfTries = 0;
+        //    int sleepInterval = 500;
 
-            while (numberOfTries <= int.MaxValue)
-            {
-                try
-                {
-                    if (omsTopologyServiceProxy != null)
-                    {
-                        omsTopologyServiceProxy.Abort();
-                        omsTopologyServiceProxy = null;
-                    }
+        //    while (numberOfTries <= int.MaxValue)
+        //    {
+        //        try
+        //        {
+        //            if (omsTopologyServiceProxy != null)
+        //            {
+        //                omsTopologyServiceProxy.Abort();
+        //                omsTopologyServiceProxy = null;
+        //            }
 
-                    omsTopologyServiceProxy = new OMSTopologyServiceProxy(EndpointNames.TopologyOMSServiceEndpoint);
-                    omsTopologyServiceProxy.Open();
+        //            omsTopologyServiceProxy = new OMSTopologyServiceProxy(EndpointNames.TopologyOMSServiceEndpoint);
+        //            omsTopologyServiceProxy.Open();
 
-                    if (omsTopologyServiceProxy.State == CommunicationState.Opened)
-                    {
-                        break;
-                    }
-                }
-                catch (Exception ex)
-                {
-                    string message = $"Exception on OMSTopologyServiceProxy initialization. Message: {ex.Message}";
-                    Logger.LogWarn(message, ex);
-                    omsTopologyServiceProxy = null;
-                }
-                finally
-                {
-                    numberOfTries++;
-                    Logger.LogDebug($"OutageModel: OMSTopologyServiceProxy getter, try number: {numberOfTries}.");
+        //            if (omsTopologyServiceProxy.State == CommunicationState.Opened)
+        //            {
+        //                break;
+        //            }
+        //        }
+        //        catch (Exception ex)
+        //        {
+        //            string message = $"Exception on OMSTopologyServiceProxy initialization. Message: {ex.Message}";
+        //            Logger.LogWarn(message, ex);
+        //            omsTopologyServiceProxy = null;
+        //        }
+        //        finally
+        //        {
+        //            numberOfTries++;
+        //            Logger.LogDebug($"OutageModel: OMSTopologyServiceProxy getter, try number: {numberOfTries}.");
 
-                    if (numberOfTries >= 100)
-                    {
-                        sleepInterval = 1000;
-                    }
+        //            if (numberOfTries >= 100)
+        //            {
+        //                sleepInterval = 1000;
+        //            }
 
-                    Thread.Sleep(sleepInterval);
-                }
-            }
+        //            Thread.Sleep(sleepInterval);
+        //        }
+        //    }
 
-            return omsTopologyServiceProxy;
-        }
+        //    return omsTopologyServiceProxy;
+        //}
 
-        private NetworkModelGDAProxy gdaQueryProxy = null;
+        //private NetworkModelGDAProxy gdaQueryProxy = null;
 
-        private NetworkModelGDAProxy GetGdaQueryProxy()
-        {
-            int numberOfTries = 0;
-            int sleepInterval = 500;
+        //private NetworkModelGDAProxy GetGdaQueryProxy()
+        //{
+        //    int numberOfTries = 0;
+        //    int sleepInterval = 500;
 
-            while (numberOfTries <= int.MaxValue)
-            {
-                try
-                {
-                    if (gdaQueryProxy != null)
-                    {
-                        gdaQueryProxy.Abort();
-                        gdaQueryProxy = null;
-                    }
+        //    while (numberOfTries <= int.MaxValue)
+        //    {
+        //        try
+        //        {
+        //            if (gdaQueryProxy != null)
+        //            {
+        //                gdaQueryProxy.Abort();
+        //                gdaQueryProxy = null;
+        //            }
 
-                    gdaQueryProxy = new NetworkModelGDAProxy(EndpointNames.NetworkModelGDAEndpoint);
-                    gdaQueryProxy.Open();
+        //            gdaQueryProxy = new NetworkModelGDAProxy(EndpointNames.NetworkModelGDAEndpoint);
+        //            gdaQueryProxy.Open();
 
-                    if (gdaQueryProxy.State == CommunicationState.Opened)
-                    {
-                        break;
-                    }
-                }
-                catch (Exception ex)
-                {
-                    string message = $"Exception on NetworkModelGDAProxy initialization. Message: {ex.Message}";
-                    Logger.LogWarn(message, ex);
-                    gdaQueryProxy = null;
-                }
-                finally
-                {
-                    numberOfTries++;
-                    Logger.LogDebug($"NetworkModelGDA: GdaQueryProxy getter, try number: {numberOfTries}.");
+        //            if (gdaQueryProxy.State == CommunicationState.Opened)
+        //            {
+        //                break;
+        //            }
+        //        }
+        //        catch (Exception ex)
+        //        {
+        //            string message = $"Exception on NetworkModelGDAProxy initialization. Message: {ex.Message}";
+        //            Logger.LogWarn(message, ex);
+        //            gdaQueryProxy = null;
+        //        }
+        //        finally
+        //        {
+        //            numberOfTries++;
+        //            Logger.LogDebug($"NetworkModelGDA: GdaQueryProxy getter, try number: {numberOfTries}.");
 
-                    if (numberOfTries >= 100)
-                    {
-                        sleepInterval = 1000;
-                    }
+        //            if (numberOfTries >= 100)
+        //            {
+        //                sleepInterval = 1000;
+        //            }
 
-                    Thread.Sleep(sleepInterval);
-                }
-            }
+        //            Thread.Sleep(sleepInterval);
+        //        }
+        //    }
 
-            return gdaQueryProxy;
-        }
-        #endregion
+        //    return gdaQueryProxy;
+        //}
+        //#endregion
 
         public OutageModel()
         {
             EmailMsg = new ConcurrentQueue<long>();
             CalledOutages = new List<long>();
             modelResourcesDesc = new ModelResourcesDesc();
+            proxyFactory = new ProxyFactory();
+
             ImportTopologyModel();
         }
 
@@ -285,7 +293,7 @@ namespace OutageManagementService
 
         private void ImportTopologyModel()
         {
-            using (OMSTopologyServiceProxy omsTopologyProxy = GetTopologyProxy())
+            using (OMSTopologyServiceProxy omsTopologyProxy = proxyFactory.CreateProxy<OMSTopologyServiceProxy, ITopologyOMSService>(EndpointNames.TopologyOMSServiceEndpoint))
             {
                 if (omsTopologyProxy != null)
                 {
@@ -387,7 +395,7 @@ namespace OutageManagementService
         {
             OutagePublication outagePublication = new OutagePublication(topic, outageMessage);
 
-            using (PublisherProxy publisherProxy = GetPublisherProxy())
+            using (PublisherProxy publisherProxy = proxyFactory.CreateProxy<PublisherProxy, IPublisher>(EndpointNames.PublisherEndpoint))
             {
                 if (publisherProxy != null)
                 {
@@ -445,7 +453,7 @@ namespace OutageManagementService
                 try
                 {
                     numberOfTries++;
-                    using (var proxy = GetGdaQueryProxy())
+                    using (NetworkModelGDAProxy proxy = proxyFactory.CreateProxy<NetworkModelGDAProxy, INetworkModelGDAContract>(EndpointNames.NetworkModelGDAEndpoint))
                     {
                         iteratorId = proxy.GetExtentValues(entityType, propIds);
                     }
@@ -469,7 +477,7 @@ namespace OutageManagementService
 
             try
             {
-                using (var gdaProxy = GetGdaQueryProxy())
+                using (NetworkModelGDAProxy gdaProxy = proxyFactory.CreateProxy<NetworkModelGDAProxy, INetworkModelGDAContract>(EndpointNames.NetworkModelGDAEndpoint))
                 {
                     if (gdaProxy != null)
                     {

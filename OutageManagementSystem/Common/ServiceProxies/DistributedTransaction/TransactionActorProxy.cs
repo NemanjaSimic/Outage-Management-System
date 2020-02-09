@@ -4,7 +4,7 @@ using System.ServiceModel;
 
 namespace Outage.Common.ServiceProxies.DistributedTransaction
 {
-    public class TransactionActorProxy : ClientBase<ITransactionActorContract>, ITransactionActorContract
+    public class TransactionActorProxy : BaseProxy<ITransactionActorContract>, ITransactionActorContract
     {
         public TransactionActorProxy(string endpointName)
             : base(endpointName)

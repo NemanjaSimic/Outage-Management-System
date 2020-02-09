@@ -4,6 +4,7 @@ using CECommon.Providers;
 using NetworkModelServiceFunctions;
 using Outage.Common;
 using Outage.Common.ServiceContracts.PubSub;
+using Outage.Common.ServiceProxies;
 using Outage.Common.ServiceProxies.PubSub;
 using SCADACommanding;
 using System;
@@ -147,6 +148,9 @@ namespace CalculationEngineService
 
         private void SubscribeToSCADA()
         {
+            //ProxyFactory proxyFactory = new ProxyFactory();
+            //proxy = proxyFactory.CreatePRoxy<SubscriberProxy, ISubscriber>(new SCADASubscriber(), EndpointNames.SubscriberEndpoint);
+
             Logger.LogDebug("Subcribing on SCADA measurements.");
             proxy = new SubscriberProxy(new SCADASubscriber(), EndpointNames.SubscriberEndpoint);
             proxy.Subscribe(Topic.MEASUREMENT);

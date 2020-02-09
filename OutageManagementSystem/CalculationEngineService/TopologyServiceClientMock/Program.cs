@@ -21,6 +21,10 @@ namespace TopologyServiceClientMock
 			{
 				Console.WriteLine(ex.Message);
 			}
+
+			//ProxyFactory proxyFactory = new ProxyFactory();
+			//proxy = proxyFactory.CreatePRoxy<SubscriberProxy, ISubscriber>(new SCADASubscriber(), EndpointNames.SubscriberEndpoint);
+
 			SubscriberProxy subProxy = new SubscriberProxy(sub, EndpointNames.SubscriberEndpoint);
 			subProxy.Subscribe(Topic.TOPOLOGY);
 			//subProxy.Subscribe(Topic.MEASUREMENT);

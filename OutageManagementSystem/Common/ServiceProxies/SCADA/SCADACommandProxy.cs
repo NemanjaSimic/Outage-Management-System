@@ -7,7 +7,7 @@ using System.ServiceModel;
 
 namespace Outage.Common.ServiceProxies
 {
-    public class SCADACommandProxy : ClientBase<ISCADACommand>, ISCADACommand
+    public class SCADACommandProxy : BaseProxy<ISCADACommand>, ISCADACommand
     {
         public SCADACommandProxy(string endpointName)
             : base(endpointName)

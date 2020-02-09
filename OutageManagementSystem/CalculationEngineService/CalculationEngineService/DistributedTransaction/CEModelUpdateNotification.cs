@@ -1,6 +1,7 @@
 ﻿using Outage.Common;
 using Outage.Common.GDA;
 using Outage.Common.ServiceContracts.DistributedTransaction;
+using Outage.Common.ServiceProxies;
 using Outage.Common.ServiceProxies.DistributedTransaction;
 using Outage.DistributedTransactionActor;
 using System;
@@ -13,15 +14,16 @@ namespace CalculationEngineService.DistributedTransaction
         public CEModelUpdateNotification()
             : base(EndpointNames.TransactionEnlistmentEndpoint, ServiceNames.CalculationEngineService)
         {
+            proxyFactory = new ProxyFactory();
         }
 
         public override bool NotifyAboutUpdate(Dictionary<DeltaOpType, List<long>> modelChanges)
         {
             TransactionManager.Intance.UpdateNotify(modelChanges);
 
-            using (TransactionEnlistmentProxy transactionEnlistmentProxy = GetTransactionEnlistmentProxy())
+            using (TransactionEnlistmentProxy transactionEnlistmentProxy = proxyFactory.CreateProxy<TransactionEnlistmentProxy, ITransactionEnlistmentContract>(EndpointNames.TransactionEnlistmentEndpoint))
             {
-                if(transactionEnlistmentProxy != null)
+                if (transactionEnlistmentProxy != null)
                 {
                     transactionEnlistmentProxy.Enlist(ActorName);
                 }

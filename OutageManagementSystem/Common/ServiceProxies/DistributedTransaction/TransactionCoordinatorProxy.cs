@@ -4,7 +4,7 @@ using System.ServiceModel;
 
 namespace Outage.Common.ServiceProxies.DistributedTransaction
 {
-    public class TransactionCoordinatorProxy : ClientBase<ITransactionCoordinatorContract>, ITransactionCoordinatorContract
+    public class TransactionCoordinatorProxy : BaseProxy<ITransactionCoordinatorContract>, ITransactionCoordinatorContract
     {
         public TransactionCoordinatorProxy(string endpointName)
             : base(endpointName)
@@ -41,7 +41,7 @@ namespace Outage.Common.ServiceProxies.DistributedTransaction
         }
     }
 
-    public class TransactionEnlistmentProxy : ClientBase<ITransactionEnlistmentContract>, ITransactionEnlistmentContract
+    public class TransactionEnlistmentProxy : BaseProxy<ITransactionEnlistmentContract>, ITransactionEnlistmentContract
     { 
         public TransactionEnlistmentProxy(string endpointName)
             : base(endpointName)

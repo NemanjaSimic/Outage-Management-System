@@ -6,7 +6,7 @@ using System.ServiceModel;
 
 namespace Outage.Common.ServiceProxies.DistributedTransaction
 {
-    public class ModelUpdateNotificationProxy : ClientBase<IModelUpdateNotificationContract>, IModelUpdateNotificationContract
+    public class ModelUpdateNotificationProxy : BaseProxy<IModelUpdateNotificationContract>, IModelUpdateNotificationContract
     {
         public ModelUpdateNotificationProxy(string endpointName)
             : base(endpointName)
