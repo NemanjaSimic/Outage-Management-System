@@ -319,6 +319,21 @@ export class GraphComponent implements OnInit, OnDestroy {
   }
 
   public onScadaNotification(data: ScadaData): void {
+    this.ngZone.run(() => {
+      let gids = Object.keys(data);
+      gids.forEach(gid => {
+        this.graphData.nodes.forEach(node => {
+          let msms = node.data["measurements"];
+          msms.forEach(measurement => {
+            if(measurement.Id == gid)
+            {
+              measurement.Value = data[gid].Value;
+            }
+          });
+        });
+      });
+      this.drawGraph();
+    });
     console.log(data);
   }
 
