@@ -48,7 +48,8 @@
                         SourceNodeId = x.SourceNodeId,
                         TargetNodeId = firstWindingRelations
                                         ?.First(f => f.SourceNodeId.Equals(x.TargetNodeId))
-                                        ?.TargetNodeId
+                                        ?.TargetNodeId,
+                        IsActive = x.IsActive
                     }
                 )
                 ?.ToList();
@@ -63,7 +64,8 @@
                         TargetNodeId = x.TargetNodeId,
                         SourceNodeId = secondWindingRelations
                                         ?.First(f => f.TargetNodeId.Equals(x.SourceNodeId))
-                                        ?.SourceNodeId
+                                        ?.SourceNodeId,
+                        IsActive = x.IsActive
                     }
                 )
                 ?.ToList();
