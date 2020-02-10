@@ -1,6 +1,6 @@
 import uuid from 'uuid';
 
-export const drawWarning = (cy, line) => {
+/* export const drawWarning = (cy, line) => {
   if (line.data('color') == 'red') {
     const source = line.sourceEndpoint();
     const target = line.targetEndpoint();
@@ -23,4 +23,20 @@ export const drawWarning = (cy, line) => {
       }
     ]);
   }
+} */
+
+export const drawWarning = (cy, node) => {
+  cy.add([
+      {
+        group: "nodes",
+        data: {
+          id: `${uuid()}`,
+          type: 'warning'
+      },
+      position: {
+          x: node.position("x") + 20,
+          y: node.position("y") - 25
+      }
+      }
+  ]);
 }

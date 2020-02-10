@@ -234,7 +234,7 @@ export class GraphComponent implements OnInit, OnDestroy {
 
 
     //this.drawBackupEdges();
-    this.drawWarnings();
+    //this.drawWarnings();
     this.drawMeasurements();
     this.addTooltips();
     modifyNodeDistance(this.cy.nodes().filter(x => x.data('dmsType') == "ENERGYCONSUMER"));
@@ -319,16 +319,41 @@ export class GraphComponent implements OnInit, OnDestroy {
   }
 
   public onScadaNotification(data: ScadaData): void {
+    this.ngZone.run(() => {
+      let gids = Object.keys(data);
+      gids.forEach(gid => {
+        this.graphData.nodes.forEach(node => {
+          let msms = node.data["measurements"];
+          msms.forEach(measurement => {
+            if(measurement.Id == gid)
+            {
+              measurement.Value = data[gid].Value;
+            }
+          });
+        });
+      });
+      this.drawGraph();
+    });
     console.log(data);
   }
 
   public onActiveOutageNotification(data: ActiveOutage): void {
     console.log('onActiveOutageNotification');
+    drawCallWarning(this.cy, data.ElementId);
+    this.ngZone.run(() => {
+    this.cy.nodes().forEach(node => {
+      if(node.data("id") == data.ElementId)
+      {
+        drawWarning(this.cy, node);
+      }
+    });
     console.log(data);
+  });
   }
 
   public onArchivedOutageNotification(data: ArchivedOutage): void {
     console.log('onArchivedOutageNotification');
+  
     console.log(data);
   }
 
