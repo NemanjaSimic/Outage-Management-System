@@ -42,59 +42,6 @@ namespace Outage.TransactionManagerService
             get { return logger ?? (logger = LoggerWrapper.Instance); }
         }
 
-
-        //#region Proxies
-
-        //private TransactionActorProxy transactionActorProxy = null;
-
-        //private TransactionActorProxy GetTransactionActorProxy(string endpointName)
-        //{
-        //    int numberOfTries = 0;
-        //    int sleepInterval = 500;  
-
-        //    while (numberOfTries <= int.MaxValue)
-        //    {
-        //        try
-        //        {
-        //            if (transactionActorProxy != null)
-        //            {
-        //                transactionActorProxy.Abort();
-        //                transactionActorProxy = null;
-        //            }
-
-        //            transactionActorProxy = new TransactionActorProxy(endpointName);
-        //            transactionActorProxy.Open();
-
-        //            if (transactionActorProxy.State == CommunicationState.Opened)
-        //            {
-        //                break;
-        //            }
-        //        }
-        //        catch (Exception ex)
-        //        {
-        //            string message = $"Exception on TransactionActorProxy initialization. Message: {ex.Message}";
-        //            Logger.LogWarn(message, ex);
-        //            transactionActorProxy = null;
-        //        }
-        //        finally
-        //        {
-        //            numberOfTries++;
-        //            Logger.LogDebug($"DistributedTransaction: GetTransactionActorProxy(), EndpointName: {endpointName}, try number: {numberOfTries}.");
-
-        //            if (numberOfTries >= 100)
-        //            {
-        //                sleepInterval = 1000;
-        //            }
-
-        //            Thread.Sleep(sleepInterval);
-        //        }
-        //    }
-
-        //    return transactionActorProxy;
-        //}
-
-        //#endregion Proxies
-
         public DistributedTransaction()
         {
             proxyFactory = new ProxyFactory();
@@ -175,41 +122,39 @@ namespace Outage.TransactionManagerService
 
             foreach (string actor in TransactionLedger.Keys)
             {
-                if (TransactionLedger[actor] && distributedTransactionActors.ContainsKey(actor))
-                {
-                    string endpointName = distributedTransactionActors[actor];
-
-                    using (TransactionActorProxy transactionActorProxy = proxyFactory.CreateProxy<TransactionActorProxy, ITransactionActorContract>(endpointName))
-                    {
-                        if (transactionActorProxy != null)
-                        {
-                            success = transactionActorProxy.Prepare();
-                        }
-                        else
-                        {
-                            success = false;
-                            string message = "TransactionActorProxy is null.";
-                            Logger.LogError(message);
-                            throw new NullReferenceException(message);
-                        }
-                    }
-
-                    if (success)
-                    {
-                        Logger.LogInfo($"Preparation on Transaction actor: {actor} finsihed SUCCESSFULLY.");
-                    }
-                    else
-                    {
-                        Logger.LogInfo($"Preparation on Transaction actor: {actor} finsihed UNSUCCESSFULLY.");
-                        break;
-                    }
-                }
-                else
+                if (!TransactionLedger[actor] || !distributedTransactionActors.ContainsKey(actor))
                 {
                     success = false;
                     Logger.LogError($"Preparation failed either because Transaction actor: {actor} was not enlisted or do not belong to distributed transaction.");
                     break;
                 }
+                
+                string endpointName = distributedTransactionActors[actor];
+
+                using (TransactionActorProxy transactionActorProxy = proxyFactory.CreateProxy<TransactionActorProxy, ITransactionActorContract>(endpointName))
+                {
+                    if (transactionActorProxy == null)
+                    {
+                        success = false;
+                        string message = "TransactionActorProxy is null.";
+                        Logger.LogError(message);
+                        throw new NullReferenceException(message);
+
+                    }
+                        
+                    success = transactionActorProxy.Prepare();
+                }
+
+                if (success)
+                {
+                    Logger.LogInfo($"Preparation on Transaction actor: {actor} finsihed SUCCESSFULLY.");
+                }
+                else
+                {
+                    Logger.LogInfo($"Preparation on Transaction actor: {actor} finsihed UNSUCCESSFULLY.");
+                    break;
+                }
+
             }
 
             return success;
@@ -225,17 +170,15 @@ namespace Outage.TransactionManagerService
 
                     using (TransactionActorProxy transactionActorProxy = proxyFactory.CreateProxy<TransactionActorProxy, ITransactionActorContract>(endpointName))
                     {
-                        if (transactionActorProxy != null)
-                        {
-                            transactionActorProxy.Commit();
-                            Logger.LogInfo($"Commit invoked on Transaction actor: {actor}.");
-                        }
-                        else
+                        if (transactionActorProxy == null)
                         {
                             string message = "TransactionActorProxy is null.";
                             Logger.LogError(message);
                             throw new NullReferenceException(message);
                         }
+
+                        transactionActorProxy.Commit();
+                        Logger.LogInfo($"Commit invoked on Transaction actor: {actor}.");
                     }
                 }
             }
@@ -251,17 +194,15 @@ namespace Outage.TransactionManagerService
 
                     using (TransactionActorProxy transactionActorProxy = proxyFactory.CreateProxy<TransactionActorProxy, ITransactionActorContract>(endpointName))
                     {
-                        if (transactionActorProxy != null)
-                        {
-                            transactionActorProxy.Rollback();
-                            Logger.LogInfo($"Rollback invoked on Transaction actor: {actor}.");
-                        }
-                        else
+                        if (transactionActorProxy == null)
                         {
                             string message = "TransactionActorProxy is null.";
                             Logger.LogError(message);
                             throw new NullReferenceException(message);
                         }
+                        
+                        transactionActorProxy.Rollback();
+                        Logger.LogInfo($"Rollback invoked on Transaction actor: {actor}.");
                     }
                 }
             }

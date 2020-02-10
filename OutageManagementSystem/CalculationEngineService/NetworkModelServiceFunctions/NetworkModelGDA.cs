@@ -21,60 +21,6 @@ namespace NetworkModelServiceFunctions
 			get { return logger ?? (logger = LoggerWrapper.Instance); }
 		}
 
-		//#region Proxies
-
-		//private NetworkModelGDAProxy gdaQueryProxy = null;
-
-		//private NetworkModelGDAProxy GetGdaQueryProxy()
-		//{
-		//	int numberOfTries = 1;
-		//	int sleepInterval = 500;
-
-		//	while (numberOfTries <= int.MaxValue)
-		//	{
-		//		try
-		//		{
-		//			if (gdaQueryProxy != null)
-		//			{
-		//				gdaQueryProxy.Abort();
-		//				gdaQueryProxy = null;
-		//			}
-
-		//			gdaQueryProxy = new NetworkModelGDAProxy(EndpointNames.NetworkModelGDAEndpoint);
-		//			gdaQueryProxy.Open();
-
-		//			if (gdaQueryProxy.State == CommunicationState.Opened)
-		//			{
-		//				//SUCCESS
-		//				Logger.LogDebug($"NetworkModelGDA: NetworkModelGDAProxy SUCCESSFULL get [number of tries: {numberOfTries}].");
-		//				break;
-		//			}
-		//		}
-		//		catch (Exception ex)
-		//		{
-		//			string message = $"Exception on NetworkModelGDAProxy initialization. Message: {ex.Message}";
-		//			Logger.LogWarn(message, ex);
-		//			gdaQueryProxy = null;
-
-		//			numberOfTries++;
-		//			Logger.LogDebug($"NetworkModelGDA: NetworkModelGDAProxy getter, try number: {numberOfTries}.");
-
-		//			if (numberOfTries >= 100)
-		//			{
-		//				sleepInterval = 1000;
-		//			}
-
-		//			Thread.Sleep(sleepInterval);
-		//		}
-		//	}
-
-		//	return gdaQueryProxy;
-		//}
-
-		//#endregion Proxies
-
-
-
 		public NetworkModelGDA()
 		{
 			proxyFactory = new ProxyFactory();

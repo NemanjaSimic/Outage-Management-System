@@ -75,163 +75,6 @@ namespace Outage.NetworkModelService
 
         #endregion
 
-        //#region Proxies
-        ///// <summary>
-        ///// 
-        ///// </summary>
-        //private TransactionCoordinatorProxy transactionCoordinatorProxy = null;
-
-        //private TransactionCoordinatorProxy GetTransactionCoordinatorProxy()
-        //{
-        //    int numberOfTries = 1;
-        //    int sleepInterval = 500;
-
-        //    while (numberOfTries <= int.MaxValue)
-        //    {
-        //        try
-        //        {
-        //            if (transactionCoordinatorProxy != null)
-        //            {
-        //                transactionCoordinatorProxy.Abort();
-        //                transactionCoordinatorProxy = null;
-        //            }
-
-        //            transactionCoordinatorProxy = new TransactionCoordinatorProxy(EndpointNames.TransactionCoordinatorEndpoint);
-        //            transactionCoordinatorProxy.Open();
-
-        //            if(transactionCoordinatorProxy.State == CommunicationState.Opened)
-        //            {
-        //                break;
-        //            }
-        //        }
-        //        catch (Exception ex)
-        //        {
-        //            string message = $"Exception on TransactionCoordinatorProxy initialization. Message: {ex.Message}";
-        //            Logger.LogWarn(message, ex);
-        //            transactionCoordinatorProxy = null;
-        //        }
-        //        finally
-        //        {
-        //            numberOfTries++;
-        //            Logger.LogDebug($"NetworkModel: TransactionCoordinatorProxy getter, try number: {numberOfTries}.");
-
-        //            if (numberOfTries >= 100)
-        //            {
-        //                sleepInterval = 1000;
-        //            }
-
-        //            Thread.Sleep(sleepInterval);
-        //        }
-        //    }
-
-        //    return transactionCoordinatorProxy;
-        //}
-
-        ///// <summary>
-        ///// 
-        ///// </summary>
-        //private TransactionEnlistmentProxy transactionEnlistmentProxy = null;
-
-        //private TransactionEnlistmentProxy GetTransactionEnlistmentProxy()
-        //{
-        //    int numberOfTries = 0;
-        //    int sleepInterval = 500;
-
-        //    while (numberOfTries <= int.MaxValue)
-        //    {
-        //        try
-        //        {
-        //            if (transactionEnlistmentProxy != null)
-        //            {
-        //                transactionEnlistmentProxy.Abort();
-        //                transactionEnlistmentProxy = null;
-        //            }
-
-        //            transactionEnlistmentProxy = new TransactionEnlistmentProxy(EndpointNames.TransactionEnlistmentEndpoint);
-        //            transactionEnlistmentProxy.Open();
-
-        //            if (transactionEnlistmentProxy.State == CommunicationState.Opened)
-        //            {
-        //                break;
-        //            }
-        //        }
-        //        catch (Exception ex)
-        //        {
-        //            string message = $"Exception on TransactionEnlistmentProxy initialization. Message: {ex.Message}";
-        //            Logger.LogWarn(message, ex);
-        //            transactionEnlistmentProxy = null;
-        //        }
-        //        finally
-        //        {
-        //            numberOfTries++;
-        //            logger.LogDebug($"NetworkModel: TransactionEnlistmentProxy getter, try number: {numberOfTries}.");
-
-        //            if (numberOfTries >= 100)
-        //            {
-        //                sleepInterval = 1000;
-        //            }
-
-        //            Thread.Sleep(sleepInterval);
-        //        }
-        //    }
-
-        //    return transactionEnlistmentProxy;
-        //}
-
-        ///// <summary>
-        ///// 
-        ///// </summary>
-        //private ModelUpdateNotificationProxy modelUpdateNotifierProxy = null;
-
-        //private ModelUpdateNotificationProxy GetModelUpdateNotificationProxy(string endpointName)
-        //{
-        //    int numberOfTries = 0;
-        //    int sleepInterval = 500;
-
-        //    while (numberOfTries <= int.MaxValue)
-        //    {
-        //        try
-        //        {
-        //            if (modelUpdateNotifierProxy != null)
-        //            {
-        //                modelUpdateNotifierProxy.Abort();
-        //                modelUpdateNotifierProxy = null;
-        //            }
-
-        //            modelUpdateNotifierProxy = new ModelUpdateNotificationProxy(endpointName);
-        //            modelUpdateNotifierProxy.Open();
-
-        //            if (modelUpdateNotifierProxy.State == CommunicationState.Opened)
-        //            {
-        //                break;
-        //            }
-        //        }
-        //        catch (Exception ex)
-        //        {
-        //            string message = $"Exception on ModelUpdateNotificationProxy initialization. EndpointName: {endpointName}, Message: {ex.Message}";
-        //            Logger.LogWarn(message, ex);
-        //            modelUpdateNotifierProxy = null;
-        //        }
-        //        finally
-        //        {
-        //            numberOfTries++;
-        //            Logger.LogDebug($"NetworkModel: ModelUpdateNotificationProxy getter, EndpointName: {endpointName}, try number: {numberOfTries}.");
-
-        //            if (numberOfTries >= 100)
-        //            {
-        //                sleepInterval = 1000;
-        //            }
-
-        //            Thread.Sleep(sleepInterval);
-        //        }
-        //    }
-
-        //    return modelUpdateNotifierProxy;
-        //}
-
-        //#endregion
-
-
 
         /// <summary>
         /// Initializes a new instance of the Model class.
@@ -648,89 +491,77 @@ namespace Outage.NetworkModelService
 
             using (ModelUpdateNotificationProxy scadaModelUpdateNotifierProxy = proxyFactory.CreateProxy<ModelUpdateNotificationProxy, IModelUpdateNotificationContract>(EndpointNames.SCADAModelUpdateNotifierEndpoint))
             {
-                if (scadaModelUpdateNotifierProxy != null)
-                {
-                    success = scadaModelUpdateNotifierProxy.NotifyAboutUpdate(modelChanges);
-                    Logger.LogDebug("NotifyAboutUpdate() method invoked on SCADA Transaction actor.");
-                }
-                else
+                if (scadaModelUpdateNotifierProxy == null)
                 {
                     string message = "ModelUpdateNotificationProxy for SCADA is null.";
                     Logger.LogWarn(message);
                     throw new NullReferenceException(message);
                 }
+
+                success = scadaModelUpdateNotifierProxy.NotifyAboutUpdate(modelChanges);
+                Logger.LogDebug("NotifyAboutUpdate() method invoked on SCADA Transaction actor.");
             }
 
             if (success)
             {
                 using (ModelUpdateNotificationProxy calculationEngineModelUpdateNotifierProxy = proxyFactory.CreateProxy<ModelUpdateNotificationProxy, IModelUpdateNotificationContract>(EndpointNames.CalculationEngineModelUpdateNotifierEndpoint))
                 {
-                    if (calculationEngineModelUpdateNotifierProxy != null)
-                    {
-                        success = calculationEngineModelUpdateNotifierProxy.NotifyAboutUpdate(modelChanges);
-                        Logger.LogDebug("NotifyAboutUpdate() method invoked on CE Transaction actor.");
-                    }
-                    else
+                    if (calculationEngineModelUpdateNotifierProxy == null)
                     {
                         string message = "ModelUpdateNotificationProxy for CalculationEngine is null.";
                         Logger.LogWarn(message);
                         throw new NullReferenceException(message);
                     }
+
+                    success = calculationEngineModelUpdateNotifierProxy.NotifyAboutUpdate(modelChanges);
+                    Logger.LogDebug("NotifyAboutUpdate() method invoked on CE Transaction actor.");
                 }
 
                 if (success)
                 {
                     using (ModelUpdateNotificationProxy outageModelUpdateNotifierProxy = proxyFactory.CreateProxy<ModelUpdateNotificationProxy, IModelUpdateNotificationContract>(EndpointNames.OutageModelUpdateNotifierEndpoint))
                     {
-                        if (outageModelUpdateNotifierProxy != null)
-                        {
-                            success = outageModelUpdateNotifierProxy.NotifyAboutUpdate(modelChanges);
-                            Logger.LogDebug("NotifyAboutUpdate() method invoked on Outage Transaction actor. ");
-                        }
-                        else
+                        if (outageModelUpdateNotifierProxy == null)
                         {
                             string message = "ModelUpdateNotificationProxy for Outage is null.";
                             Logger.LogWarn(message);
                             throw new NullReferenceException(message);
                         }
+
+                        success = outageModelUpdateNotifierProxy.NotifyAboutUpdate(modelChanges);
+                        Logger.LogDebug("NotifyAboutUpdate() method invoked on Outage Transaction actor. ");
                     }
 
                     if (success)
                     {
                         using (TransactionEnlistmentProxy transactionEnlistmentProxy = proxyFactory.CreateProxy<TransactionEnlistmentProxy, ITransactionEnlistmentContract>(EndpointNames.TransactionEnlistmentEndpoint))
                         {
-                            if (transactionEnlistmentProxy != null)
-                            {
-                                success = transactionEnlistmentProxy.Enlist(ServiceNames.NetworkModelService);
-                                Logger.LogDebug("Enlist() method invoked on Transaction Coordinator.");
-                            }
-                            else
+                            if (transactionEnlistmentProxy == null)
                             {
                                 string message = "TransactionEnlistmentProxy is null.";
                                 Logger.LogWarn(message);
-                                throw new NullReferenceException(message);
+                                throw new NullReferenceException(message);    
                             }
+
+                            success = transactionEnlistmentProxy.Enlist(ServiceNames.NetworkModelService);
+                            Logger.LogDebug("Enlist() method invoked on Transaction Coordinator.");
                         }
 
                     }
                 }
-
-
             }
 
             using (TransactionCoordinatorProxy transactionCoordinatorProxy = proxyFactory.CreateProxy<TransactionCoordinatorProxy, ITransactionCoordinatorContract>(EndpointNames.TransactionCoordinatorEndpoint))
             {
-                if (transactionCoordinatorProxy != null)
-                {
-                    transactionCoordinatorProxy.FinishDistributedUpdate(success);
-                    Logger.LogDebug($"FinishDistributedUpdate() invoked on Transaction Coordinator with parameter 'success' value: {success}.");
-                }
-                else
+                if (transactionCoordinatorProxy == null)
                 {
                     string message = "TransactionCoordinatorProxy is null.";
                     Logger.LogWarn(message);
                     throw new NullReferenceException(message);
                 }
+                
+                transactionCoordinatorProxy.FinishDistributedUpdate(success);
+                Logger.LogDebug($"FinishDistributedUpdate() invoked on Transaction Coordinator with parameter 'success' value: {success}.");
             }
         }
 

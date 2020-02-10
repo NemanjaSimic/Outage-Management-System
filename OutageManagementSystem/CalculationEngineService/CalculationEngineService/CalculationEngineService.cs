@@ -25,7 +25,8 @@ namespace CalculationEngineService
         private IModelManager modelManager;
         private ITopologyBuilder topologyBuilder;
         private ICacheProvider cacheProvider;
-        
+
+        private ProxyFactory proxyFactory;
         private SCADAResultHandler sCADAResultProvider;
         private TopologyProvider topologyProvider;
         private ModelProvider modelProvider;
@@ -40,6 +41,8 @@ namespace CalculationEngineService
 
         public CalculationEngineService()
         {
+            proxyFactory = new ProxyFactory();
+
             topologyBuilder = new GraphBuilder();
             modelTopologyServis = new TopologyManager(topologyBuilder);
             webTopologyBuilder = new TopologyConverter();
@@ -148,11 +151,17 @@ namespace CalculationEngineService
 
         private void SubscribeToSCADA()
         {
-            //ProxyFactory proxyFactory = new ProxyFactory();
-            //proxy = proxyFactory.CreatePRoxy<SubscriberProxy, ISubscriber>(new SCADASubscriber(), EndpointNames.SubscriberEndpoint);
-
             Logger.LogDebug("Subcribing on SCADA measurements.");
-            proxy = new SubscriberProxy(new SCADASubscriber(), EndpointNames.SubscriberEndpoint);
+            proxy = proxyFactory.CreateProxy<SubscriberProxy, ISubscriber>(new SCADASubscriber(), EndpointNames.SubscriberEndpoint);
+            //proxy = new SubscriberProxy(new SCADASubscriber(), EndpointNames.SubscriberEndpoint);
+
+            if (proxy == null)
+            {
+                string message = "SubscribeToSCADA() => SubscriberProxy is null.";
+                Logger.LogError(message);
+                throw new NullReferenceException(message);
+            }
+
             proxy.Subscribe(Topic.MEASUREMENT);
             proxy.Subscribe(Topic.SWITCH_STATUS);
         }

@@ -32,56 +32,6 @@ namespace Outage.DataImporter.CIMAdapter
         private TransformAndLoadReport report;
         private ProxyFactory proxyFactory;
 
-        //#region Proxies
-        //private NetworkModelGDAProxy gdaQueryProxy = null;
-
-        //private NetworkModelGDAProxy GetGdaQueryProxy()
-        //{
-        //    int numberOfTries = 1;
-        //    int sleepInterval = 500;
-
-        //    while (numberOfTries <= int.MaxValue)
-        //    {
-        //        try
-        //        {
-        //            if (gdaQueryProxy != null)
-        //            {
-        //                gdaQueryProxy.Abort();
-        //                gdaQueryProxy = null;
-        //            }
-
-        //            gdaQueryProxy = new NetworkModelGDAProxy(EndpointNames.NetworkModelGDAEndpoint);
-        //            gdaQueryProxy.Open();
-
-        //            if (gdaQueryProxy.State == CommunicationState.Opened)
-        //            {
-        //                //SUCCESS
-        //                Logger.LogDebug($"CIMAdapterClass: NetworkModelGDAProxy SUCCESSFULL get [number of tries: {numberOfTries}].");
-        //                break;
-        //            }
-        //        }
-        //        catch (Exception ex)
-        //        {
-        //            string message = $"Exception on NetworkModelGDAProxy initialization. Message: {ex.Message}";
-        //            logger.LogWarn(message, ex);
-        //            gdaQueryProxy = null;
-
-        //            numberOfTries++;
-        //            logger.LogDebug($"CIMAdapterClass: NetworkModelGDAProxy getter, try number: {numberOfTries}.");
-
-        //            if (numberOfTries >= 100)
-        //            {
-        //                sleepInterval = 1000;
-        //            }
-
-        //            Thread.Sleep(sleepInterval);
-        //        }
-        //    }
-
-        //    return gdaQueryProxy;
-        //}
-        //#endregion
-
         public CIMAdapterClass()
         {
             proxyFactory = new ProxyFactory();
@@ -119,16 +69,14 @@ namespace Outage.DataImporter.CIMAdapter
                 //// NetworkModelService->ApplyUpdates
                 using (NetworkModelGDAProxy gdaQueryProxy = proxyFactory.CreateProxy<NetworkModelGDAProxy, INetworkModelGDAContract>(EndpointNames.NetworkModelGDAEndpoint))
                 {
-                    if (gdaQueryProxy != null)
-                    {
-                        updateResult = gdaQueryProxy.ApplyUpdate(delta).ToString();
-                    }
-                    else
+                    if (gdaQueryProxy == null)
                     {
                         string message = "NetworkModelGDAProxy is null.";
                         Logger.LogWarn(message);
                         throw new NullReferenceException(message);
                     }
+                    
+                    updateResult = gdaQueryProxy.ApplyUpdate(delta).ToString();
                 }
             }
 

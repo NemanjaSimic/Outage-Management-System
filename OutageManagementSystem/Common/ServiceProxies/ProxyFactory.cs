@@ -66,7 +66,7 @@ namespace Outage.Common.ServiceProxies
             return proxy;
         }
     
-        public TProxy CreatePRoxy<TProxy, TChannel>(object callback, string endpointName) where TChannel : class
+        public TProxy CreateProxy<TProxy, TChannel>(object callback, string endpointName) where TChannel : class
                                                                                           where TProxy : DuplexClientBase<TChannel>
         {
             TProxy proxy = null;

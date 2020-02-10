@@ -3,6 +3,8 @@ using Outage.Common;
 using Outage.Common.OutageService.Interface;
 using Outage.Common.OutageService.Model;
 using Outage.Common.PubSub.CalculationEngineDataContract;
+using Outage.Common.ServiceContracts.PubSub;
+using Outage.Common.ServiceProxies;
 using Outage.Common.ServiceProxies.PubSub;
 using Outage.Common.UI;
 using System;
@@ -14,8 +16,12 @@ namespace Topology
     public class TopologyPublisher
     {
         private ILogger logger = LoggerWrapper.Instance;
+        private ProxyFactory proxyFactory;
+
         public TopologyPublisher()
         {
+            proxyFactory = new ProxyFactory();
+
             Provider.Instance.TopologyConverterProvider.TopologyConverterToUIModelProviderDelegate += WebTopologyModelProviderDelegate;
             Provider.Instance.TopologyConverterProvider.TopologyConverterToOMSModelProviderDelegate += TopologyToOMSConvertDelegate;
         }
@@ -35,8 +41,15 @@ namespace Topology
             CalculationEnginePublication publication = new CalculationEnginePublication(Topic.TOPOLOGY, message);
             try
             {
-                using (var publisherProxy = new PublisherProxy(EndpointNames.PublisherEndpoint))
+                using (PublisherProxy publisherProxy = proxyFactory.CreateProxy<PublisherProxy, IPublisher>(EndpointNames.PublisherEndpoint))
                 {
+                    if (publisherProxy == null)
+                    {
+                        string errMessage = "WebTopologyModelProviderDelegate => PublisherProxy is null.";
+                        logger.LogError(errMessage);
+                        throw new NullReferenceException(errMessage);
+                    }
+
                     publisherProxy.Publish(publication);
                     logger.LogDebug("Topology publisher published new ui model successfully.");
                 }
@@ -63,8 +76,15 @@ namespace Topology
             CalculationEnginePublication publication = new CalculationEnginePublication(Topic.OMS_MODEL, message);
             try
             {
-                using (var publisherProxy = new PublisherProxy(EndpointNames.PublisherEndpoint))
+                using (PublisherProxy publisherProxy = proxyFactory.CreateProxy<PublisherProxy, IPublisher>(EndpointNames.PublisherEndpoint))
                 {
+                    if (publisherProxy == null)
+                    {
+                        string errMessage = "TopologyToOMSConvertDelegate => PublisherProxy is null.";
+                        logger.LogError(errMessage);
+                        throw new NullReferenceException(errMessage);
+                    }
+
                     publisherProxy.Publish(publication);
                     logger.LogDebug("Topology publisher published new oms model successfully.");
                 }

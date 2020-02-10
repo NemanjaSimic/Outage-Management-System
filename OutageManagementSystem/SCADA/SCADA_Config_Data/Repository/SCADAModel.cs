@@ -91,58 +91,6 @@ namespace Outage.SCADA.SCADAData.Repository
 
         #endregion Properties
 
-        //#region Proxies
-
-        //private NetworkModelGDAProxy gdaQueryProxy = null;
-
-        //private NetworkModelGDAProxy GetGdaQueryProxy()
-        //{
-        //    int numberOfTries = 0;
-        //    int sleepInterval = 500;
-
-        //    while (numberOfTries <= int.MaxValue)
-        //    {
-        //        try
-        //        {
-        //            if (gdaQueryProxy != null)
-        //            {
-        //                gdaQueryProxy.Abort();
-        //                gdaQueryProxy = null;
-        //            }
-
-        //            gdaQueryProxy = new NetworkModelGDAProxy(EndpointNames.NetworkModelGDAEndpoint);
-        //            gdaQueryProxy.Open();
-
-        //            if (gdaQueryProxy.State == CommunicationState.Opened)
-        //            {
-        //                break;
-        //            }
-        //        }
-        //        catch (Exception ex)
-        //        {
-        //            string message = $"Exception on NetworkModelGDAProxy initialization. Message: {ex.Message}";
-        //            Logger.LogWarn(message, ex);
-        //            gdaQueryProxy = null;
-        //        }
-        //        finally
-        //        {
-        //            numberOfTries++;
-        //            Logger.LogDebug($"SCADAModel: NetworkModelGDAProxy getter, try number: {numberOfTries}.");
-
-        //            if (numberOfTries >= 100)
-        //            {
-        //                sleepInterval = 1000;
-        //            }
-
-        //            Thread.Sleep(sleepInterval);
-        //        }
-        //    }
-
-        //    return gdaQueryProxy;
-        //}
-
-        //#endregion Proxies
-
         public SCADAModel(ModelResourcesDesc modelResourceDesc, EnumDescs enumDescs)
         {
             this.modelResourceDesc = modelResourceDesc;
@@ -363,50 +311,50 @@ namespace Outage.SCADA.SCADAData.Repository
             bool success;
             int numberOfResources = 1000;
             List<ModelCode> props = modelResourceDesc.GetAllPropertyIds(ModelCode.ANALOG);
-            try
+
+            using (NetworkModelGDAProxy gdaProxy = proxyFactory.CreateProxy<NetworkModelGDAProxy, INetworkModelGDAContract>(EndpointNames.NetworkModelGDAEndpoint))
             {
-                using (NetworkModelGDAProxy gdaProxy = proxyFactory.CreateProxy<NetworkModelGDAProxy, INetworkModelGDAContract>(EndpointNames.NetworkModelGDAEndpoint))
+                if (gdaProxy == null)
                 {
-                    if (gdaProxy != null)
-                    {
-                        int iteratorId = gdaProxy.GetExtentValues(ModelCode.ANALOG, props);
-                        int resourcesLeft = gdaProxy.IteratorResourcesLeft(iteratorId);
-
-                        while (resourcesLeft > 0)
-                        {
-                            List<ResourceDescription> rds = gdaProxy.IteratorNext(numberOfResources, iteratorId);
-                            for (int i = 0; i < rds.Count; i++)
-                            {
-                                if (rds[i] != null)
-                                {
-                                    long gid = rds[i].Id;
-                                    ModelCode type = modelResourceDesc.GetModelCodeFromId(gid);
-                                    ISCADAModelPointItem pointItem = new AnalogSCADAModelPointItem(rds[i].Properties, ModelCode.ANALOG, enumDescs);
-                                    CurrentScadaModel.Add(rds[i].Id, pointItem);
-                                    CurrentAddressToGidMap[pointItem.RegisterType].Add(pointItem.Address, rds[i].Id);
-
-                                    Logger.LogDebug($"ANALOG measurement added to SCADA model [Gid: {gid}, Address: {pointItem.Address}]");
-                                }
-                            }
-                            resourcesLeft = gdaProxy.IteratorResourcesLeft(iteratorId);
-                        }
-
-                        success = true;
-                    }
-                    else
-                    {
-                        success = false;
-                        string errMsg = "From ImportAnalog() method: NetworkModelGDAProxy is null.";
-                        Logger.LogWarn(errMsg);
-                    }
+                    success = false;
+                    string errMsg = "From ImportAnalog() method: NetworkModelGDAProxy is null.";
+                    Logger.LogWarn(errMsg);
                 }
-            }
-            catch (Exception ex)
-            {
-                success = false;
-                string errorMessage = $"ImportAnalog failed with error: {ex.Message}";
-                Console.WriteLine(errorMessage);
-                Logger.LogError(errorMessage, ex);
+
+                try
+                {
+                    int iteratorId = gdaProxy.GetExtentValues(ModelCode.ANALOG, props);
+                    int resourcesLeft = gdaProxy.IteratorResourcesLeft(iteratorId);
+
+                    while (resourcesLeft > 0)
+                    {
+                        List<ResourceDescription> rds = gdaProxy.IteratorNext(numberOfResources, iteratorId);
+                        for (int i = 0; i < rds.Count; i++)
+                        {
+                            if (rds[i] != null)
+                            {
+                                long gid = rds[i].Id;
+                                ModelCode type = modelResourceDesc.GetModelCodeFromId(gid);
+                                ISCADAModelPointItem pointItem = new AnalogSCADAModelPointItem(rds[i].Properties, ModelCode.ANALOG, enumDescs);
+                                CurrentScadaModel.Add(rds[i].Id, pointItem);
+                                CurrentAddressToGidMap[pointItem.RegisterType].Add(pointItem.Address, rds[i].Id);
+
+                                Logger.LogDebug($"ANALOG measurement added to SCADA model [Gid: {gid}, Address: {pointItem.Address}]");
+                            }
+                        }
+                        resourcesLeft = gdaProxy.IteratorResourcesLeft(iteratorId);
+                    }
+
+                    success = true;
+                }
+                catch (Exception ex)
+                {
+
+                    success = false;
+                    string errorMessage = $"ImportAnalog failed with error: {ex.Message}";
+                    Console.WriteLine(errorMessage);
+                    Logger.LogError(errorMessage, ex);
+                }
             }
 
             return success;
@@ -417,49 +365,49 @@ namespace Outage.SCADA.SCADAData.Repository
             bool success;
             int numberOfResources = 1000;
             List<ModelCode> props = modelResourceDesc.GetAllPropertyIds(ModelCode.DISCRETE);
-            try
+
+            using (NetworkModelGDAProxy gdaProxy = proxyFactory.CreateProxy<NetworkModelGDAProxy, INetworkModelGDAContract>(EndpointNames.NetworkModelGDAEndpoint))
             {
-                using (NetworkModelGDAProxy gdaProxy = proxyFactory.CreateProxy<NetworkModelGDAProxy, INetworkModelGDAContract>(EndpointNames.NetworkModelGDAEndpoint))
+                if (gdaProxy == null)
                 {
-                    if (gdaProxy != null)
-                    {
-                        int iteratorId = gdaProxy.GetExtentValues(ModelCode.DISCRETE, props);
-                        int resourcesLeft = gdaProxy.IteratorResourcesLeft(iteratorId);
-
-                        while (resourcesLeft > 0)
-                        {
-                            List<ResourceDescription> rds = gdaProxy.IteratorNext(numberOfResources, iteratorId);
-                            for (int i = 0; i < rds.Count; i++)
-                            {
-                                if (rds[i] != null)
-                                {
-                                    long gid = rds[i].Id;
-                                    ModelCode type = modelResourceDesc.GetModelCodeFromId(gid);
-                                    ISCADAModelPointItem pointItem = new DiscreteSCADAModelPointItem(rds[i].Properties, ModelCode.DISCRETE, enumDescs);
-                                    CurrentScadaModel.Add(gid, pointItem);
-                                    CurrentAddressToGidMap[pointItem.RegisterType].Add(pointItem.Address, gid);
-                                    Logger.LogDebug($"DISCRETE measurement added to SCADA model [Gid: {gid}, Address: {pointItem.Address}]");
-                                }
-                            }
-                            resourcesLeft = gdaProxy.IteratorResourcesLeft(iteratorId);
-                        }
-
-                        success = true;
-                    }
-                    else
-                    {
-                        success = false;
-                        string errMsg = "From ImportDiscrete() method: NetworkModelGDAProxy is null.";
-                        Logger.LogWarn(errMsg);
-                    }
+                    success = false;
+                    string errMsg = "From ImportDiscrete() method: NetworkModelGDAProxy is null.";
+                    Logger.LogWarn(errMsg);
                 }
-            }
-            catch (Exception ex)
-            {
-                success = false;
-                string errorMessage = $"ImportDiscrete failed with error: {ex.Message}";
-                Console.WriteLine(errorMessage);
-                Logger.LogError(errorMessage, ex);
+
+                try
+                {
+                    int iteratorId = gdaProxy.GetExtentValues(ModelCode.DISCRETE, props);
+                    int resourcesLeft = gdaProxy.IteratorResourcesLeft(iteratorId);
+
+                    while (resourcesLeft > 0)
+                    {
+                        List<ResourceDescription> rds = gdaProxy.IteratorNext(numberOfResources, iteratorId);
+                        for (int i = 0; i < rds.Count; i++)
+                        {
+                            if (rds[i] != null)
+                            {
+                                long gid = rds[i].Id;
+                                ModelCode type = modelResourceDesc.GetModelCodeFromId(gid);
+                                ISCADAModelPointItem pointItem = new DiscreteSCADAModelPointItem(rds[i].Properties, ModelCode.DISCRETE, enumDescs);
+                                CurrentScadaModel.Add(gid, pointItem);
+                                CurrentAddressToGidMap[pointItem.RegisterType].Add(pointItem.Address, gid);
+                                Logger.LogDebug($"DISCRETE measurement added to SCADA model [Gid: {gid}, Address: {pointItem.Address}]");
+                            }
+                        }
+                        resourcesLeft = gdaProxy.IteratorResourcesLeft(iteratorId);
+                    }
+
+                    success = true;
+                }
+                catch (Exception ex)
+                {
+
+                    success = false;
+                    string errorMessage = $"ImportDiscrete failed with error: {ex.Message}";
+                    Console.WriteLine(errorMessage);
+                    Logger.LogError(errorMessage, ex);
+                } 
             }
 
             return success;
@@ -512,36 +460,45 @@ namespace Outage.SCADA.SCADAData.Repository
 
                     props = modelResourceDesc.GetAllPropertyIds(type);
 
-                    iteratorId = gdaProxy.GetExtentValues(type, props);
-                    resourcesLeft = gdaProxy.IteratorResourcesLeft(iteratorId);
-
-                    while (resourcesLeft > 0)
+                    try
                     {
-                        List<ResourceDescription> resources = gdaProxy.IteratorNext(numberOfResources, iteratorId);
+                        iteratorId = gdaProxy.GetExtentValues(type, props);
+                        resourcesLeft = gdaProxy.IteratorResourcesLeft(iteratorId);
 
-                        foreach (ResourceDescription rd in resources)
+                        while (resourcesLeft > 0)
                         {
-                            if (pointItems.ContainsKey(rd.Id))
+                            List<ResourceDescription> resources = gdaProxy.IteratorNext(numberOfResources, iteratorId);
+
+                            foreach (ResourceDescription rd in resources)
                             {
-                                string message = $"Trying to create point item for resource that already exists in model. Gid: 0x{rd.Id:X16}";
-                                Logger.LogError(message);
-                                throw new ArgumentException(message);
+                                if (pointItems.ContainsKey(rd.Id))
+                                {
+                                    string message = $"Trying to create point item for resource that already exists in model. Gid: 0x{rd.Id:X16}";
+                                    Logger.LogError(message);
+                                    throw new ArgumentException(message);
+                                }
+
+                                ISCADAModelPointItem point;
+
+                                //change service contract IModelUpdateNotificationContract => change List<long> to Hashset<long> 
+                                if (ModelChanges[DeltaOpType.Update].Contains(rd.Id) || ModelChanges[DeltaOpType.Insert].Contains(rd.Id))
+                                {
+                                    point = CreatePointItemFromResource(rd);
+                                    pointItems.Add(rd.Id, point);
+                                }
                             }
 
-                            ISCADAModelPointItem point;
-
-                            //change service contract IModelUpdateNotificationContract => change List<long> to Hashset<long> 
-                            if (ModelChanges[DeltaOpType.Update].Contains(rd.Id) || ModelChanges[DeltaOpType.Insert].Contains(rd.Id))
-                            {
-                                point = CreatePointItemFromResource(rd);
-                                pointItems.Add(rd.Id, point);
-                            }
+                            resourcesLeft = gdaProxy.IteratorResourcesLeft(iteratorId);
                         }
 
-                        resourcesLeft = gdaProxy.IteratorResourcesLeft(iteratorId);
+                        gdaProxy.IteratorClose(iteratorId);
                     }
-
-                    gdaProxy.IteratorClose(iteratorId);
+                    catch (Exception ex)
+                    {
+                        string errorMessage = $"CreatePointItemsFromNetworkModelMeasurements failed with error: {ex.Message}";
+                        Console.WriteLine(errorMessage);
+                        Logger.LogError(errorMessage, ex);
+                    }
                 }
             }
         }

@@ -46,61 +46,6 @@ namespace Outage.SCADA.ModBus.Connection
             get { return measurementsCache ?? (measurementsCache = new Dictionary<long, IModbusData>()); }
         }
 
-        //#region Proxies
-
-        //private PublisherProxy publisherProxy = null;
-
-        //private PublisherProxy GetPublisherProxy()
-        //{
-        //    //TODO: diskusija statefull vs stateless
-
-        //    int numberOfTries = 0;
-        //    int sleepInterval = 500;
-
-        //    while (numberOfTries <= int.MaxValue)
-        //    {
-        //        try
-        //        {
-        //            if (publisherProxy != null)
-        //            {
-        //                publisherProxy.Abort();
-        //                publisherProxy = null;
-        //            }
-
-        //            publisherProxy = new PublisherProxy(EndpointNames.PublisherEndpoint);
-        //            publisherProxy.Open();
-
-        //            if (publisherProxy.State == CommunicationState.Opened)
-        //            {
-        //                break;
-        //            }
-        //        }
-        //        catch (Exception ex)
-        //        {
-        //            string message = $"Exception on PublisherProxy initialization. Message: {ex.Message}";
-        //            Logger.LogWarn(message, ex);
-        //            publisherProxy = null;
-        //        }
-        //        finally
-        //        {
-        //            numberOfTries++;
-        //            Logger.LogDebug($"FunctionExecutor: PublisherProxy getter, try number: {numberOfTries}.");
-
-        //            if (numberOfTries >= 100)
-        //            {
-        //                sleepInterval = 1000;
-        //            }
-
-        //            Thread.Sleep(sleepInterval);
-        //        }
-        //    }
-
-        //    return publisherProxy;
-        //}
-
-        //#endregion Proxies
-
-
         public FunctionExecutor(SCADAModel scadaModel)
         {
             this.commandQueue = new ConcurrentQueue<IModbusFunction>();
@@ -446,17 +391,15 @@ namespace Outage.SCADA.ModBus.Connection
 
             using (PublisherProxy publisherProxy = proxyFactory.CreateProxy<PublisherProxy, IPublisher>(EndpointNames.PublisherEndpoint))
             {
-                if (publisherProxy != null)
-                {
-                    publisherProxy.Publish(scadaPublication);
-                    Logger.LogInfo($"SCADA service published data from topic: {scadaPublication.Topic}");
-                }
-                else
+                if (publisherProxy == null)
                 {
                     string errMsg = "PublisherProxy is null.";
                     Logger.LogWarn(errMsg);
-                    throw new NullReferenceException(errMsg);
+                    throw new NullReferenceException(errMsg);    
                 }
+
+                publisherProxy.Publish(scadaPublication);
+                Logger.LogInfo($"SCADA service published data from topic: {scadaPublication.Topic}");
             }
         }
 

@@ -53,7 +53,6 @@
     <Reference Include="System.Xml" />
   </ItemGroup>
   <ItemGroup>
-    <Compile Include="Calling\CallingService.cs" />
     <Compile Include="Calling\CallTracker.cs" />
     <Compile Include="Calling\TrackingAlgorithm.cs" />
     <Compile Include="DistribuedTransaction\OutageModelUpdateNotification.cs" />

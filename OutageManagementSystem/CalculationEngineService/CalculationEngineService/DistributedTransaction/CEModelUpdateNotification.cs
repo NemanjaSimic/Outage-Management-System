@@ -19,25 +19,24 @@ namespace CalculationEngineService.DistributedTransaction
 
         public override bool NotifyAboutUpdate(Dictionary<DeltaOpType, List<long>> modelChanges)
         {
+            bool success;
+
             TransactionManager.Intance.UpdateNotify(modelChanges);
 
             using (TransactionEnlistmentProxy transactionEnlistmentProxy = proxyFactory.CreateProxy<TransactionEnlistmentProxy, ITransactionEnlistmentContract>(EndpointNames.TransactionEnlistmentEndpoint))
             {
-                if (transactionEnlistmentProxy != null)
+                if (transactionEnlistmentProxy == null)
                 {
-                    transactionEnlistmentProxy.Enlist(ActorName);
-                }
-                else
-                {
-                    string message = "TransactionEnlistmentProxy is null.";
-                    Logger.LogWarn(message);
-                    //TODO: retry logic?
+                    string message = "NotifyAboutUpdate => TransactionEnlistmentProxy is null.";
+                    Logger.LogError(message);
                     throw new NullReferenceException(message);
                 }
+
+                success = transactionEnlistmentProxy.Enlist(ActorName);
             }
 
             Logger.LogInfo("Calculation Engine SUCCESSFULLY notified about network model update.");
-            return true;
+            return success;
         }
     }
 }

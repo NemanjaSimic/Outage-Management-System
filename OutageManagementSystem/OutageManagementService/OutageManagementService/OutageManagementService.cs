@@ -26,64 +26,11 @@ namespace OutageManagementService
         private ILogger logger;
         private List<ServiceHost> hosts = null;
         private OutageModel outageModel;
-        private ISubscriber subscriber;
+        private SubscriberProxy subscriberProxy;
         private CallTracker callTracker;
         private ModelResourcesDesc modelResourcesDesc;
         private ProxyFactory proxyFactory;
         #endregion
-
-        //#region Proxies
-
-        //private NetworkModelGDAProxy gdaQueryProxy = null;
-
-        //private NetworkModelGDAProxy GetGdaQueryProxy()
-        //{
-        //    int numberOfTries = 0;
-        //    int sleepInterval = 500;
-
-        //    while (numberOfTries <= int.MaxValue)
-        //    {
-        //        try
-        //        {
-        //            if (gdaQueryProxy != null)
-        //            {
-        //                gdaQueryProxy.Abort();
-        //                gdaQueryProxy = null;
-        //            }
-
-        //            gdaQueryProxy = new NetworkModelGDAProxy(EndpointNames.NetworkModelGDAEndpoint);
-        //            gdaQueryProxy.Open();
-
-        //            if (gdaQueryProxy.State == CommunicationState.Opened)
-        //            {
-        //                break;
-        //            }
-        //        }
-        //        catch (Exception ex)
-        //        {
-        //            string message = $"Exception on NetworkModelGDAProxy initialization. Message: {ex.Message}";
-        //            Logger.LogWarn(message, ex);
-        //            gdaQueryProxy = null;
-        //        }
-        //        finally
-        //        {
-        //            numberOfTries++;
-        //            Logger.LogDebug($"NetworkModelGDA: GdaQueryProxy getter, try number: {numberOfTries}.");
-
-        //            if (numberOfTries >= 100)
-        //            {
-        //                sleepInterval = 1000;
-        //            }
-
-        //            Thread.Sleep(sleepInterval);
-        //        }
-        //    }
-
-        //    return gdaQueryProxy;
-        //}
-
-        //#endregion Proxies
-
 
         protected ILogger Logger
         {
@@ -115,25 +62,28 @@ namespace OutageManagementService
         }
 
         #region GDAHelper
-        private List<ResourceDescription> GetExtentValues(ModelCode entityType, List<ModelCode> propIds)
+        public List<ResourceDescription> GetExtentValues(ModelCode entityType, List<ModelCode> propIds)
         {
-            int iteratorId = 0;
-            int numberOfTries = 0;
-            while (numberOfTries < 5)
+            int iteratorId;
+
+            using (NetworkModelGDAProxy gdaQueryProxy = proxyFactory.CreateProxy<NetworkModelGDAProxy, INetworkModelGDAContract>(EndpointNames.NetworkModelGDAEndpoint))
             {
+                if (gdaQueryProxy == null)
+                {
+                    string message = "GetExtentValues() => NetworkModelGDAProxy is null.";
+                    Logger.LogError(message);
+                    throw new NullReferenceException(message);
+                }
+
                 try
                 {
-                    numberOfTries++;
-                    using (NetworkModelGDAProxy proxy = proxyFactory.CreateProxy<NetworkModelGDAProxy, INetworkModelGDAContract>(EndpointNames.NetworkModelGDAEndpoint))
-                    {
-                        iteratorId = proxy.GetExtentValues(entityType, propIds);
-                    }
-                    break;
+                    iteratorId = gdaQueryProxy.GetExtentValues(entityType, propIds);
                 }
-                catch (Exception ex)
+                catch (Exception e)
                 {
-                    logger.LogError($"Failed to get extent values for entity type {entityType.ToString()}. Exception message: " + ex.Message);
-                    logger.LogWarn($"Retrying to connect to NMSProxy. Number of tries: {numberOfTries}.");
+                    string message = $"Failed to get extent values for dms type {entityType}.";
+                    Logger.LogError(message, e);
+                    throw e;
                 }
             }
 
@@ -143,50 +93,61 @@ namespace OutageManagementService
         private List<ResourceDescription> ProcessIterator(int iteratorId)
         {
             //TODO: mozda vec ovde napakovati dictionary<long, rd> ?
-            int numberOfResources = 10000, resourcesLeft = 0;
-            List<ResourceDescription> resourceDescriptions = new List<ResourceDescription>();
+            int resourcesLeft;
+            int numberOfResources = 10000;
+            List<ResourceDescription> resourceDescriptions;
 
-            try
+            using (NetworkModelGDAProxy gdaQueryProxy = proxyFactory.CreateProxy<NetworkModelGDAProxy, INetworkModelGDAContract>(EndpointNames.NetworkModelGDAEndpoint))
             {
-                using (NetworkModelGDAProxy gdaProxy = proxyFactory.CreateProxy<NetworkModelGDAProxy, INetworkModelGDAContract>(EndpointNames.NetworkModelGDAEndpoint))
+                if (gdaQueryProxy == null)
                 {
-                    if (gdaProxy != null)
+                    string message = "ProcessIterator() => NetworkModelGDAProxy is null.";
+                    Logger.LogError(message);
+                    throw new NullReferenceException(message);
+                }
+
+                try
+                {
+                    resourcesLeft = gdaQueryProxy.IteratorResourcesTotal(iteratorId);
+                    resourceDescriptions = new List<ResourceDescription>(resourcesLeft);
+
+                    while (resourcesLeft > 0)
                     {
-                        do
-                        {
-                            List<ResourceDescription> rds = gdaProxy.IteratorNext(numberOfResources, iteratorId);
-                            resourceDescriptions.AddRange(rds);
+                        List<ResourceDescription> rds = gdaQueryProxy.IteratorNext(numberOfResources, iteratorId);
+                        resourceDescriptions.AddRange(rds);
 
-                            resourcesLeft = gdaProxy.IteratorResourcesLeft(iteratorId);
-
-                        } while (resourcesLeft > 0);
-
-                        gdaProxy.IteratorClose(iteratorId);
+                        resourcesLeft = gdaQueryProxy.IteratorResourcesLeft(iteratorId);
                     }
-                    else
-                    {
-                        string message = "From method ProcessIterator(): NetworkModelGDAProxy is null.";
-                        logger.LogError(message);
-                        throw new NullReferenceException(message);
-                    }
+
+                    gdaQueryProxy.IteratorClose(iteratorId);
+                }
+                catch (Exception e)
+                {
+                    string message = $"Failed to retrieve all Resourse descriptions with iterator {iteratorId}.";
+                    Logger.LogError(message, e);
+                    throw e;
                 }
             }
-            catch (Exception ex)
-            {
-                string message = $"Failed to retrieve all Resourse descriptions with iterator {iteratorId}. Exception message: " + ex.Message;
-                logger.LogError(message);
-            }
+
             return resourceDescriptions;
         }
+
         #endregion
 
         private void SubscribeOnEmailService()
         {
-            //ProxyFactory proxyFactory = new ProxyFactory();
-            //proxy = proxyFactory.CreatePRoxy<SubscriberProxy, ISubscriber>(new SCADASubscriber(), EndpointNames.SubscriberEndpoint);
+            ProxyFactory proxyFactory = new ProxyFactory();
+            subscriberProxy = proxyFactory.CreateProxy<SubscriberProxy, ISubscriber>(callTracker, EndpointNames.SubscriberEndpoint);
+            //proxyFactory = new SubscriberProxy(callTracker, EndpointNames.SubscriberEndpoint);
 
-            subscriber = new SubscriberProxy(callTracker, EndpointNames.SubscriberEndpoint);
-            subscriber.Subscribe(Topic.OUTAGE_EMAIL);
+            if (subscriberProxy == null)
+            {
+                string message = "SubscribeOnEmailService() => SubscriberProxy is null.";
+                Logger.LogError(message);
+                throw new NullReferenceException(message);
+            }
+
+            subscriberProxy.Subscribe(Topic.OUTAGE_EMAIL);
 
         }
 

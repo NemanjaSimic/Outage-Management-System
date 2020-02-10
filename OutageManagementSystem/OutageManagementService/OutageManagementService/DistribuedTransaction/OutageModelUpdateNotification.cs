@@ -44,16 +44,14 @@ namespace OutageManagementService.DistribuedTransaction
             {
                 using (TransactionEnlistmentProxy transactionEnlistmentProxy = proxyFactory.CreateProxy<TransactionEnlistmentProxy, ITransactionEnlistmentContract>(EndpointNames.TransactionEnlistmentEndpoint))
                 {
-                    if (transactionEnlistmentProxy != null)
-                    {
-                        transactionEnlistmentProxy.Enlist(ActorName);
-                    }
-                    else
+                    if (transactionEnlistmentProxy == null)
                     {
                         string message = "TransactionEnlistmentProxy is null";
                         Logger.LogWarn(message);
                         throw new NullReferenceException(message);
                     }
+
+                    success = transactionEnlistmentProxy.Enlist(ActorName);
                 }
 
                 Logger.LogInfo("Outage SUCCESSFULLY notified about network model update.");

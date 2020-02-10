@@ -43,7 +43,6 @@
     <Reference Include="System.Xml" />
   </ItemGroup>
   <ItemGroup>
-    <Compile Include="Config.cs" />
     <Compile Include="DistributedTransaction.cs" />
     <Compile Include="TransactionManagerService.cs" />
     <Compile Include="Properties\AssemblyInfo.cs" />

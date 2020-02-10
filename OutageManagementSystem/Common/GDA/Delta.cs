@@ -15,7 +15,6 @@ namespace Outage.Common.GDA
 		Delete = 2 
 	}
 
-	//[Serializable]
 	[DataContract]	
 	public class Delta
 	{

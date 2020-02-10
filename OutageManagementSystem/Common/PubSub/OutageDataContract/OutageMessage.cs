@@ -34,7 +34,6 @@ namespace Outage.Common.PubSub.OutageDataContract
         public List<Consumer> AffectedConsumers { get; set; }
     }
 
-    //[DataContract(IsReference = true)]
     [DataContract]
     public class ArchivedOutage : OutageMessage
     {

@@ -56,154 +56,6 @@ namespace OutageManagementService
             get { return logger ?? (logger = LoggerWrapper.Instance); }
         }
 
-        //private PublisherProxy publisherProxy = null;
-
-        //private PublisherProxy GetPublisherProxy()
-        //{
-        //    //TODO: diskusija statefull vs stateless
-
-        //    int numberOfTries = 0;
-        //    int sleepInterval = 500;
-
-        //    while (numberOfTries <= int.MaxValue)
-        //    {
-        //        try
-        //        {
-        //            if (publisherProxy != null)
-        //            {
-        //                publisherProxy.Abort();
-        //                publisherProxy = null;
-        //            }
-
-        //            publisherProxy = new PublisherProxy(EndpointNames.PublisherEndpoint);
-        //            publisherProxy.Open();
-
-        //            if (publisherProxy.State == CommunicationState.Opened)
-        //            {
-        //                break;
-        //            }
-        //        }
-        //        catch (Exception ex)
-        //        {
-        //            string message = $"Exception on PublisherProxy initialization. Message: {ex.Message}";
-        //            Logger.LogError(message, ex);
-        //            publisherProxy = null;
-        //        }
-        //        finally
-        //        {
-        //            numberOfTries++;
-        //            Logger.LogDebug($"OutageModel: PublisherProxy getter, try number: {numberOfTries}.");
-
-        //            if (numberOfTries >= 100)
-        //            {
-        //                sleepInterval = 1000;
-        //            }
-
-        //            Thread.Sleep(sleepInterval);
-        //        }
-        //    }
-
-        //    return publisherProxy;
-        //}
-
-        //#region Proxies
-        //private OMSTopologyServiceProxy omsTopologyServiceProxy = null;
-
-        //private OMSTopologyServiceProxy GetTopologyProxy()
-        //{
-        //    int numberOfTries = 0;
-        //    int sleepInterval = 500;
-
-        //    while (numberOfTries <= int.MaxValue)
-        //    {
-        //        try
-        //        {
-        //            if (omsTopologyServiceProxy != null)
-        //            {
-        //                omsTopologyServiceProxy.Abort();
-        //                omsTopologyServiceProxy = null;
-        //            }
-
-        //            omsTopologyServiceProxy = new OMSTopologyServiceProxy(EndpointNames.TopologyOMSServiceEndpoint);
-        //            omsTopologyServiceProxy.Open();
-
-        //            if (omsTopologyServiceProxy.State == CommunicationState.Opened)
-        //            {
-        //                break;
-        //            }
-        //        }
-        //        catch (Exception ex)
-        //        {
-        //            string message = $"Exception on OMSTopologyServiceProxy initialization. Message: {ex.Message}";
-        //            Logger.LogWarn(message, ex);
-        //            omsTopologyServiceProxy = null;
-        //        }
-        //        finally
-        //        {
-        //            numberOfTries++;
-        //            Logger.LogDebug($"OutageModel: OMSTopologyServiceProxy getter, try number: {numberOfTries}.");
-
-        //            if (numberOfTries >= 100)
-        //            {
-        //                sleepInterval = 1000;
-        //            }
-
-        //            Thread.Sleep(sleepInterval);
-        //        }
-        //    }
-
-        //    return omsTopologyServiceProxy;
-        //}
-
-        //private NetworkModelGDAProxy gdaQueryProxy = null;
-
-        //private NetworkModelGDAProxy GetGdaQueryProxy()
-        //{
-        //    int numberOfTries = 0;
-        //    int sleepInterval = 500;
-
-        //    while (numberOfTries <= int.MaxValue)
-        //    {
-        //        try
-        //        {
-        //            if (gdaQueryProxy != null)
-        //            {
-        //                gdaQueryProxy.Abort();
-        //                gdaQueryProxy = null;
-        //            }
-
-        //            gdaQueryProxy = new NetworkModelGDAProxy(EndpointNames.NetworkModelGDAEndpoint);
-        //            gdaQueryProxy.Open();
-
-        //            if (gdaQueryProxy.State == CommunicationState.Opened)
-        //            {
-        //                break;
-        //            }
-        //        }
-        //        catch (Exception ex)
-        //        {
-        //            string message = $"Exception on NetworkModelGDAProxy initialization. Message: {ex.Message}";
-        //            Logger.LogWarn(message, ex);
-        //            gdaQueryProxy = null;
-        //        }
-        //        finally
-        //        {
-        //            numberOfTries++;
-        //            Logger.LogDebug($"NetworkModelGDA: GdaQueryProxy getter, try number: {numberOfTries}.");
-
-        //            if (numberOfTries >= 100)
-        //            {
-        //                sleepInterval = 1000;
-        //            }
-
-        //            Thread.Sleep(sleepInterval);
-        //        }
-        //    }
-
-        //    return gdaQueryProxy;
-        //}
-        //#endregion
-
         public OutageModel()
         {
             EmailMsg = new ConcurrentQueue<long>();
@@ -295,16 +147,14 @@ namespace OutageManagementService
         {
             using (OMSTopologyServiceProxy omsTopologyProxy = proxyFactory.CreateProxy<OMSTopologyServiceProxy, ITopologyOMSService>(EndpointNames.TopologyOMSServiceEndpoint))
             {
-                if (omsTopologyProxy != null)
-                {
-                    TopologyModel = (OutageTopologyModel)omsTopologyProxy.GetOMSModel();
-                }
-                else
+                if (omsTopologyProxy == null)
                 {
                     string message = "From method ImportTopologyModel(): TopologyServiceProxy is null.";
                     logger.LogError(message);
                     throw new NullReferenceException(message);
                 }
+                
+                TopologyModel = (OutageTopologyModel)omsTopologyProxy.GetOMSModel();
             }
         }
 
@@ -378,14 +228,12 @@ namespace OutageManagementService
             {
                 Consumer affectedConsumer = db.Consumers.Find(affectedConsumerId);
 
-                if(affectedConsumer != null)
-                {
-                    affectedConsumers.Add(affectedConsumer);
-                }
-                else
+                if(affectedConsumer == null)
                 {
                     break;
                 }
+             
+                affectedConsumers.Add(affectedConsumer);
             }
 
             return affectedConsumers;
@@ -397,17 +245,15 @@ namespace OutageManagementService
 
             using (PublisherProxy publisherProxy = proxyFactory.CreateProxy<PublisherProxy, IPublisher>(EndpointNames.PublisherEndpoint))
             {
-                if (publisherProxy != null)
-                {
-                    publisherProxy.Publish(outagePublication);
-                    Logger.LogInfo($"Outage service published data from topic: {outagePublication.Topic}");
-                }
-                else
+                if (publisherProxy == null)
                 {
                     string errMsg = "Publisher proxy is null";
                     Logger.LogWarn(errMsg);
                     throw new NullReferenceException(errMsg);
                 }
+
+                publisherProxy.Publish(outagePublication);
+                Logger.LogInfo($"Outage service published data from topic: {outagePublication.Topic}");
             }
         }
 
@@ -446,23 +292,26 @@ namespace OutageManagementService
         #region GDAHelper
         private Dictionary<long, ResourceDescription> GetExtentValues(ModelCode entityType, List<ModelCode> propIds)
         {
-            int iteratorId = 0;
-            int numberOfTries = 0;
-            while (numberOfTries < 5)
+            int iteratorId;
+
+            using (NetworkModelGDAProxy gdaQueryProxy = proxyFactory.CreateProxy<NetworkModelGDAProxy, INetworkModelGDAContract>(EndpointNames.NetworkModelGDAEndpoint))
             {
+                if (gdaQueryProxy == null)
+                {
+                    string message = "GetExtentValues() => NetworkModelGDAProxy is null.";
+                    Logger.LogError(message);
+                    throw new NullReferenceException(message);
+                }
+
                 try
                 {
-                    numberOfTries++;
-                    using (NetworkModelGDAProxy proxy = proxyFactory.CreateProxy<NetworkModelGDAProxy, INetworkModelGDAContract>(EndpointNames.NetworkModelGDAEndpoint))
-                    {
-                        iteratorId = proxy.GetExtentValues(entityType, propIds);
-                    }
-                    break;
+                    iteratorId = gdaQueryProxy.GetExtentValues(entityType, propIds);
                 }
-                catch (Exception ex)
+                catch (Exception e)
                 {
-                    logger.LogError($"Failed to get extent values for entity type {entityType.ToString()}. Exception message: " + ex.Message);
-                    logger.LogWarn($"Retrying to connect to NMSProxy. Number of tries: {numberOfTries}.");
+                    string message = $"Failed to get extent values for dms type {entityType}.";
+                    Logger.LogError(message, e);
+                    throw e;
                 }
             }
 
@@ -472,42 +321,46 @@ namespace OutageManagementService
         private Dictionary<long, ResourceDescription> ProcessIterator(int iteratorId)
         {
             //TODO: mozda vec ovde napakovati dictionary<long, rd> ?
-            int numberOfResources = 10000, resourcesLeft = 0;
-            Dictionary<long, ResourceDescription> resourceDescriptions = new Dictionary<long, ResourceDescription>();
+            int resourcesLeft;
+            int numberOfResources = 10000;
+            Dictionary<long, ResourceDescription> resourceDescriptions;
 
-            try
+            using (NetworkModelGDAProxy gdaQueryProxy = proxyFactory.CreateProxy<NetworkModelGDAProxy, INetworkModelGDAContract>(EndpointNames.NetworkModelGDAEndpoint))
             {
-                using (NetworkModelGDAProxy gdaProxy = proxyFactory.CreateProxy<NetworkModelGDAProxy, INetworkModelGDAContract>(EndpointNames.NetworkModelGDAEndpoint))
+                if (gdaQueryProxy == null)
                 {
-                    if (gdaProxy != null)
+                    string message = "ProcessIterator() => NetworkModelGDAProxy is null.";
+                    Logger.LogError(message);
+                    throw new NullReferenceException(message);
+                }
+
+                try
+                {
+                    resourcesLeft = gdaQueryProxy.IteratorResourcesTotal(iteratorId);
+                    resourceDescriptions = new Dictionary<long, ResourceDescription>(resourcesLeft);
+
+                    while (resourcesLeft > 0)
                     {
-                        do
+                        List<ResourceDescription> resources = gdaQueryProxy.IteratorNext(numberOfResources, iteratorId);
+                        
+                        foreach (ResourceDescription resource in resources)
                         {
-                            List<ResourceDescription> rds = gdaProxy.IteratorNext(numberOfResources, iteratorId);
-                            foreach(var rd in rds)
-                            {
-                                resourceDescriptions.Add(rd.Id, rd);
-                            }
+                            resourceDescriptions.Add(resource.Id, resource);
+                        }
 
-                            resourcesLeft = gdaProxy.IteratorResourcesLeft(iteratorId);
-
-                        } while (resourcesLeft > 0);
-
-                        gdaProxy.IteratorClose(iteratorId);
+                        resourcesLeft = gdaQueryProxy.IteratorResourcesLeft(iteratorId);
                     }
-                    else
-                    {
-                        string message = "From method ProcessIterator(): NetworkModelGDAProxy is null.";
-                        logger.LogError(message);
-                        throw new NullReferenceException(message);
-                    }
+
+                    gdaQueryProxy.IteratorClose(iteratorId);
+                }
+                catch (Exception e)
+                {
+                    string message = $"Failed to retrieve all Resourse descriptions with iterator {iteratorId}.";
+                    Logger.LogError(message, e);
+                    throw e;
                 }
             }
-            catch (Exception ex)
-            {
-                string message = $"Failed to retrieve all Resourse descriptions with iterator {iteratorId}. Exception message: " + ex.Message;
-                logger.LogError(message);
-            }
+
             return resourceDescriptions;
         }
         #endregion
