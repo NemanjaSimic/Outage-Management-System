@@ -26,13 +26,28 @@ const AO_MOCK: ActiveOutage[] = [
 })
 
 export class ActiveBrowserComponent implements OnInit {
-  private activeOutages: ActiveOutage[] = AO_MOCK;
+  private activeOutages: ActiveOutage[];
   private columns: string[] = ["id", "elementId", "reportedAt"];
 
   constructor(private outageService: OutageService) { }
 
   ngOnInit() {
     // subscribe to outage service and get real data from db
+    
+    this.activeOutages = [];
+    this.GetActiveOutages();
+    //console.log(this.activeOutages);
+  }
+
+  private GetActiveOutages(): void {
+    this.outageService.getAllActiveOutages().subscribe(
+      outages => { 
+        outages.forEach(outage => {
+          this.activeOutages.push(outage);
+        })
+      }
+    );
+
     console.log(this.activeOutages);
   }
 

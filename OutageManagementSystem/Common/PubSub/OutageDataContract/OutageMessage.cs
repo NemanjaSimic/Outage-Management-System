@@ -32,6 +32,11 @@ namespace Outage.Common.PubSub.OutageDataContract
 
         [DataMember]
         public List<Consumer> AffectedConsumers { get; set; }
+
+        public ActiveOutage()
+        {
+            AffectedConsumers = new List<Consumer>();
+        }
     }
 
     [DataContract]
@@ -53,6 +58,11 @@ namespace Outage.Common.PubSub.OutageDataContract
 
         [DataMember]
         public List<Consumer> AffectedConsumers { get; set; }
+
+        public ArchivedOutage()
+        {
+            AffectedConsumers = new List<Consumer>();
+        }
     }
 
     [DataContract]
@@ -77,6 +87,12 @@ namespace Outage.Common.PubSub.OutageDataContract
 
         [DataMember]
         public List<ActiveOutage> ActiveOutages { get; set; }
+
+        public Consumer()
+        {
+            ArchivedOutages = new List<ArchivedOutage>();
+            ActiveOutages = new List<ActiveOutage>();
+        }
     }
     
 }

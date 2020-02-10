@@ -1,15 +1,10 @@
 ﻿using Outage.Common;
-using Outage.Common.OutageService.Interface;
-using Outage.Common.OutageService.Model;
 using Outage.Common.PubSub.OutageDataContract;
 using Outage.Common.ServiceContracts.OMS;
-using Outage.Common.ServiceContracts.PubSub;
-using Outage.Common.ServiceProxies.PubSub;
 using OutageDatabase;
-using OutageManagementService.Calling;
-using System;
 using System.Collections.Generic;
 using System.Linq;
+using System.Data.Entity;
 
 namespace OutageManagementService.Outage
 {
@@ -32,7 +27,7 @@ namespace OutageManagementService.Outage
             List<ActiveOutage> activeOutages = null;
             using (OutageContext db = new OutageContext())
             {
-                activeOutages = db.ActiveOutages.ToList();
+                activeOutages = db.ActiveOutages.Include(a => a.AffectedConsumers).ToList();
             }
 
             return activeOutages;
