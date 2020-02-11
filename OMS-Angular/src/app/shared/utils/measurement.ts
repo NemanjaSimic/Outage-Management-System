@@ -23,14 +23,14 @@ export const GetUnitMeasurement = (type : string ) => {
     return retVal;
 }
 
-export const drawMeasurements = (cy, node) => {
+export const drawMeasurements = (cy, node, measurementString) => {
     cy.add([
         {
         group: "nodes",
         data: {
             id: `${uuid()}`,
             type: 'analogMeasurement',
-            measurements: node.data("measurements")
+            content: measurementString
         },
         position: {
             x: node.position("x") - 20,

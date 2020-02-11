@@ -1,6 +1,6 @@
 import tippy from 'tippy.js';
 import { SwitchCommand, SwitchCommandType } from '@shared/models/switch-command.model';
-import { GetUnitMeasurement } from './measurement';
+//import { GetUnitMeasurement } from './measurement';
 
 const commandableTypes: string[] = ["LOADBREAKSWITCH", "DISCONNECTOR", "BREAKER", "FUSE"];
 
@@ -19,10 +19,10 @@ const outageTooltipBody: string =
   <p>ElementID: [[elementId]]</p>
   <p>ReportedTime: [[reportedAt]]</p>`;
 
-const measurementsToolTipBody: string =
+/* const measurementsToolTipBody: string =
 `<h3>MEASUREMENTS</h3>
 <p>Type: [[type]] Value:[[value]] [[unit]]</p>`;
-
+ */
 export const addGraphTooltip = (cy, node) => {
   let ref = node.popperRef();
 
@@ -131,7 +131,7 @@ export const addOutageTooltip = (cy, node, outage) => {
   });
 }
 
-export const addMeasurementTooltip = (cy, node) => {
+/* export const addMeasurementTooltip = (cy, node) => {
   let ref = node.popperRef();
   let measurements = node.data("measurements");
   if(measurements == undefined)
@@ -160,7 +160,7 @@ export const addMeasurementTooltip = (cy, node) => {
       node.tooltip.show();
     }, 0);
   });
-}
+} */
 
 export const addEdgeTooltip = (cy, node, edge) => {
   let ref = edge.popperRef();

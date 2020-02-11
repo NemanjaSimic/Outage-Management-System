@@ -7,7 +7,7 @@ import { drawBackupEdge } from '@shared/utils/backup-edge';
 import { addGraphTooltip, addOutageTooltip, addEdgeTooltip, addMeasurementTooltip } from '@shared/utils/tooltip';
 import { drawWarning } from '@shared/utils/warning';
 import { drawCallWarning } from '@shared/utils/outage';
-import { drawMeasurements } from '@shared/utils/measurement';
+import { drawMeasurements, GetUnitMeasurement } from '@shared/utils/measurement';
 
 import * as cytoscape from 'cytoscape';
 import * as mapper from '@shared/utils/mapper';
@@ -266,8 +266,9 @@ export class GraphComponent implements OnInit, OnDestroy {
 
           addOutageTooltip(this.cy, node, outage);
         }
-        else if (node.data("type") == 'analogMeasurement') {
-          addMeasurementTooltip(this.cy, node);
+		else if(node.data("type") == 'analogMeasurement')
+        {
+          //addMeasurementTooltip(this.cy, node);
         }
         else {
 
@@ -285,12 +286,17 @@ export class GraphComponent implements OnInit, OnDestroy {
   public drawMeasurements(): void {
     this.cy.ready(() => {
       this.cy.nodes().forEach(node => {
-        let measurements: IMeasurement[] = node.data("measurements");
-        if (measurements != undefined
-          && !(measurements.length == 1
-            && measurements[0].Type == "SWITCH_STATUS")
-          && measurements.length != 0) {
-          drawMeasurements(this.cy, node);
+        let measurements : IMeasurement[] = node.data("measurements");
+        if(measurements != undefined 
+            && !(measurements.length == 1 
+            && measurements[0].Type == "SWITCH_STATUS") 
+            && measurements.length != 0)
+        {
+          let measurementString = "";
+          measurements.forEach(meas => {
+            measurementString += meas.Value + " " + GetUnitMeasurement(meas.Type) + "\A";
+          });
+          drawMeasurements(this.cy, node, measurementString);
         }
       })
     });
