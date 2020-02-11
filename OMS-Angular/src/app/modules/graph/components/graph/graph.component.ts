@@ -257,10 +257,10 @@ export class GraphComponent implements OnInit, OnDestroy {
         node.sendSwitchCommand = (command) => this.onCommandHandler(command);
         if (node.data("type") == 'warning') {
           var outage;
-          this.graphData.outages.forEach(o => {
-            var outageId = o["data"]["elementId"];
+          this.graphData.outages.forEach(out => {
+            var outageId = out["data"]["elementId"];
             if (node.data("targetId") == outageId) {
-              outage = o;
+              outage = out;
             }
           });
 
@@ -342,12 +342,12 @@ export class GraphComponent implements OnInit, OnDestroy {
     console.log('onActiveOutageNotification');
     drawCallWarning(this.cy, data.ElementId);
     this.ngZone.run(() => {
-      this.cy.nodes().forEach(node => {
-        if (node.data("id") == data.ElementId) {
-          drawWarning(this.cy, node);
-        }
-      });
-      console.log(data);
+    this.cy.nodes().forEach(node => {
+      if(node.data("id") == data.ElementId)
+      {
+        drawWarning(this.cy, node);
+        addOutageTooltip(this.cy, node, data);
+      }
     });
   }
 

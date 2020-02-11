@@ -17,8 +17,7 @@ const graphTooltipBody: string =
 const outageTooltipBody: string =
   `<p>ID: [[id]]</p>
   <p>ElementID: [[elementId]]</p>
-  <p>ReportTime: [[reportTime]]</p>
-  <p>ArchiveTime: [[archiveTime]]</p>`;
+  <p>ReportedTime: [[reportedAt]]</p>`;
 
 const measurementsToolTipBody: string =
 `<h3>MEASUREMENTS</h3>
@@ -114,8 +113,7 @@ export const addOutageTooltip = (cy, node, outage) => {
       div.innerHTML = outageTooltipBody
         .replace("[[id]]", outage["data"]['id'])
         .replace("[[elementId]]", outage["data"]['elementId'])
-        .replace("[[reportTime]]", outage["data"]['reportTime'])
-        .replace("[[archiveTime]]", outage["data"]['archiveTime']);
+        .replace("[[reportedAt]]", outage["data"]['reportedAt']);
     
         return div;
       },
