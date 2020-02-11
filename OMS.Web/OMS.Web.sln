@@ -19,6 +19,8 @@ Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "Common", "..\OutageManageme
 EndProject
 Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "OMS.Web.Tests", "OMS.Web.Tests\OMS.Web.Tests.csproj", "{ED17A08B-1246-473C-AC5B-947012C482DF}"
 EndProject
+Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "OMS.Web.Adapter.TestConsole", "OMS.Web.Adapter.TestConsole\OMS.Web.Adapter.TestConsole.csproj", "{8220180A-DCA1-4A55-A252-5CAAFCF09355}"
+EndProject
 Global
 	GlobalSection(SolutionConfigurationPlatforms) = preSolution
 		Debug|Any CPU = Debug|Any CPU
@@ -124,6 +126,18 @@ Global
 		{ED17A08B-1246-473C-AC5B-947012C482DF}.Release|x64.Build.0 = Release|Any CPU
 		{ED17A08B-1246-473C-AC5B-947012C482DF}.Release|x86.ActiveCfg = Release|Any CPU
 		{ED17A08B-1246-473C-AC5B-947012C482DF}.Release|x86.Build.0 = Release|Any CPU
+		{8220180A-DCA1-4A55-A252-5CAAFCF09355}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
+		{8220180A-DCA1-4A55-A252-5CAAFCF09355}.Debug|Any CPU.Build.0 = Debug|Any CPU
+		{8220180A-DCA1-4A55-A252-5CAAFCF09355}.Debug|x64.ActiveCfg = Debug|Any CPU
+		{8220180A-DCA1-4A55-A252-5CAAFCF09355}.Debug|x64.Build.0 = Debug|Any CPU
+		{8220180A-DCA1-4A55-A252-5CAAFCF09355}.Debug|x86.ActiveCfg = Debug|Any CPU
+		{8220180A-DCA1-4A55-A252-5CAAFCF09355}.Debug|x86.Build.0 = Debug|Any CPU
+		{8220180A-DCA1-4A55-A252-5CAAFCF09355}.Release|Any CPU.ActiveCfg = Release|Any CPU
+		{8220180A-DCA1-4A55-A252-5CAAFCF09355}.Release|Any CPU.Build.0 = Release|Any CPU
+		{8220180A-DCA1-4A55-A252-5CAAFCF09355}.Release|x64.ActiveCfg = Release|Any CPU
+		{8220180A-DCA1-4A55-A252-5CAAFCF09355}.Release|x64.Build.0 = Release|Any CPU
+		{8220180A-DCA1-4A55-A252-5CAAFCF09355}.Release|x86.ActiveCfg = Release|Any CPU
+		{8220180A-DCA1-4A55-A252-5CAAFCF09355}.Release|x86.Build.0 = Release|Any CPU
 	EndGlobalSection
 	GlobalSection(SolutionProperties) = preSolution
 		HideSolutionNode = FALSE
