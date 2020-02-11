@@ -4,7 +4,7 @@ import { OmsGraph } from '@shared/models/oms-graph.model';
 
 import cyConfig from './graph.config';
 import { drawBackupEdge } from '@shared/utils/backup-edge';
-import { addGraphTooltip, addOutageTooltip, addEdgeTooltip, addMeasurementTooltip } from '@shared/utils/tooltip';
+import { addGraphTooltip, addOutageTooltip, addEdgeTooltip} from '@shared/utils/tooltip';
 import { drawWarning } from '@shared/utils/warning';
 import { drawCallWarning } from '@shared/utils/outage';
 import { drawMeasurements, GetUnitMeasurement } from '@shared/utils/measurement';
@@ -294,7 +294,7 @@ export class GraphComponent implements OnInit, OnDestroy {
         {
           let measurementString = "";
           measurements.forEach(meas => {
-            measurementString += meas.Value + " " + GetUnitMeasurement(meas.Type) + "\A";
+            measurementString += meas.Value + " " + GetUnitMeasurement(meas.Type) + "\n";
           });
           drawMeasurements(this.cy, node, measurementString);
         }

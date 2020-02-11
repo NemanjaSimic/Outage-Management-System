@@ -33,7 +33,7 @@ export const drawMeasurements = (cy, node, measurementString) => {
             content: measurementString
         },
         position: {
-            x: node.position("x") - 20,
+            x: node.position("x") - 30,
             y: node.position("y") - 25
         }
         }

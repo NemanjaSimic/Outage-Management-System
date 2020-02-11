@@ -122,29 +122,33 @@ namespace Topology
                 }
                 field.IsActive = isFieldActive;
             }
-            else if(element.Measurements.Count > 0)
+            else
             {
+                bool hasDiscrete = false;
                 foreach (var measurement in element.Measurements)
                 {
                     if ((DMSType)ModelCodeHelper.ExtractTypeFromGlobalId(measurement) == DMSType.DISCRETE)
                     {
                         // Value je true ako je prekidac otvoren, tada je element neaktivan
                         element.IsActive = !Provider.Instance.CacheProvider.GetDiscreteValue(measurement);
+                        hasDiscrete = true;
                         break;
                     }
                 }
-            }
-            else
-            {
-                if (topology.GetElementByGid(element.FirstEnd, out ITopologyElement parent))
+
+                if (!hasDiscrete)
                 {
-                    element.IsActive = parent.IsActive;
-                }
-                else
-                {
-                    logger.LogDebug($"[Caluclate load flow] Parent with GID {element.FirstEnd.ToString("X")} of element with GID {element.Id.ToString("X")} does not exist.");
+                    if (topology.GetElementByGid(element.FirstEnd, out ITopologyElement parent))
+                    {
+                        element.IsActive = parent.IsActive;
+                    }
+                    else
+                    {
+                        logger.LogDebug($"[Caluclate load flow] Parent with GID {element.FirstEnd.ToString("X")} of element with GID {element.Id.ToString("X")} does not exist.");
+                    }
                 }
             }
+           
             return element.IsActive;
         }
     }

@@ -49,16 +49,24 @@ namespace Topology
                         stack.Push(nextElement);
                     }
                     List<UIMeasurement> measurements = new List<UIMeasurement>();
-                    DiscreteMeasurement measurement;
                     foreach (var meausrementGid in element.Measurements)
                     {
-                        if (Provider.Instance.CacheProvider.TryGetDiscreteMeasurement(meausrementGid, out measurement))
+                        if (Provider.Instance.CacheProvider.TryGetDiscreteMeasurement(meausrementGid, out DiscreteMeasurement discreteMeasurement))
                         {
                             measurements.Add(new UIMeasurement()
                             {
-                                Gid = measurement.Id,
-                                Type = measurement.GetMeasurementType(),
-                                Value = measurement.GetCurrentVaule()
+                                Gid = discreteMeasurement.Id,
+                                Type = discreteMeasurement.GetMeasurementType(),
+                                Value = discreteMeasurement.GetCurrentVaule()
+                            });
+                        }
+                        else if (Provider.Instance.CacheProvider.TryGetAnalogMeasurement(meausrementGid, out AnalogMeasurement analogMeasurement))
+                        {
+                            measurements.Add(new UIMeasurement()
+                            {
+                                Gid = analogMeasurement.Id,
+                                Type = analogMeasurement.GetMeasurementType(),
+                                Value = analogMeasurement.GetCurrentVaule()
                             });
                         }
                         else

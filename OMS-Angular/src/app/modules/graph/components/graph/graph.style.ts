@@ -43,14 +43,15 @@ export const style = cytoscape.stylesheet()
     .style({
         'shape': 'rectangle',
         'background-color': '#2b2935',
+        'background-opacity': '0',
         'border' : '3px',
         'border-color' : "#40E609",
         'color' : "#40E609",
         'background-fit': 'contain',
         'content': 'data(content)',
         'align-content' : 'center',
-        'height': '40px',
-        'width': '30px',
+        'height': '1px',
+        'width': '1px',
     })
     .selector('node[type = "outage-call"]')
     .style({
