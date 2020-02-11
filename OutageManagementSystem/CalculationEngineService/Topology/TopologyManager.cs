@@ -103,35 +103,49 @@ namespace Topology
 
         private bool IsElementActive(ITopologyElement element, ITopology topology)
         {
-            bool isActive = true;
-            element.IsActive = true;
             if (element is Field field)
             {
+                bool isFieldActive = true;
                 foreach (var member in field.Members)
                 {                    
-                    if (topology.GetElementByGid(member, out ITopologyElement memberElement) && !IsElementActive(memberElement, topology))
+                    if (topology.GetElementByGid(member, out ITopologyElement memberElement))
                     {
-                        isActive = false;
-                        element.IsActive = false;
+                        if(!IsElementActive(memberElement, topology))
+                        {
+                            isFieldActive = false;
+                        }
+                    }
+                    else
+                    {
+                        logger.LogError($"[Caluclate load flow] Element with GID {member.ToString("X")} does not exist.");
+                    }
+                }
+                field.IsActive = isFieldActive;
+            }
+            else if(element.Measurements.Count > 0)
+            {
+                foreach (var measurement in element.Measurements)
+                {
+                    if ((DMSType)ModelCodeHelper.ExtractTypeFromGlobalId(measurement) == DMSType.DISCRETE)
+                    {
+                        // Value je true ako je prekidac otvoren, tada je element neaktivan
+                        element.IsActive = !Provider.Instance.CacheProvider.GetDiscreteValue(measurement);
+                        break;
                     }
                 }
             }
             else
             {
-                foreach (var measurement in element.Measurements)
+                if (topology.GetElementByGid(element.FirstEnd, out ITopologyElement parent))
                 {
-                    if (measurement is DiscreteMeasurement discreteMeasurement)
-                    {
-                        if (Provider.Instance.CacheProvider.GetDiscreteValue(measurement.Id) == true)
-                        {
-                            isActive = false;
-                            element.IsActive = false;
-                        }
-                        break;
-                    }
+                    element.IsActive = parent.IsActive;
+                }
+                else
+                {
+                    logger.LogDebug($"[Caluclate load flow] Parent with GID {element.FirstEnd.ToString("X")} of element with GID {element.Id.ToString("X")} does not exist.");
                 }
             }
-            return isActive;
+            return element.IsActive;
         }
     }
 }

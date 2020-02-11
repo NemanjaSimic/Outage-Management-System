@@ -127,7 +127,7 @@ namespace NetworkModelServiceFunctions
 								&& GetDMSTypeOfTopologyElement(e) != DMSType.ANALOG);
 						if (elements.ContainsKey(elementId))
 						{
-							elements[elementId].Measurements.Add(measurement);
+							elements[elementId].Measurements.Add(measurement.Id);
 							measurement.ElementId = elementId;
 						}
 						else

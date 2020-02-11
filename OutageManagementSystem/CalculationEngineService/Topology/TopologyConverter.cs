@@ -1,5 +1,7 @@
 ﻿using CECommon;
 using CECommon.Interfaces;
+using CECommon.Model;
+using CECommon.Providers;
 using NetworkModelServiceFunctions;
 using Outage.Common;
 using Outage.Common.OutageService.Interface;
@@ -47,14 +49,22 @@ namespace Topology
                         stack.Push(nextElement);
                     }
                     List<UIMeasurement> measurements = new List<UIMeasurement>();
-                    foreach (var meas in element.Measurements)
+                    DiscreteMeasurement measurement;
+                    foreach (var meausrementGid in element.Measurements)
                     {
-                        measurements.Add(new UIMeasurement()
+                        if (Provider.Instance.CacheProvider.TryGetDiscreteMeasurement(meausrementGid, out measurement))
                         {
-                            Gid = meas.Id,
-                            Type = meas.GetMeasurementType(),
-                            Value = meas.GetCurrentVaule()
-                        });
+                            measurements.Add(new UIMeasurement()
+                            {
+                                Gid = measurement.Id,
+                                Type = measurement.GetMeasurementType(),
+                                Value = measurement.GetCurrentVaule()
+                            });
+                        }
+                        else
+                        {
+                            logger.LogWarn($"[Topology converter] Measurement with GID {meausrementGid.ToString("X")} does not exist.");
+                        }
                     }
 
                     UINode newUINode = new UINode()

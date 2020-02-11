@@ -17,6 +17,8 @@ namespace CECommon.Interfaces
         float GetAnalogValue(long measurementGid);
         bool GetDiscreteValue(long measurementGid);
         long GetElementGidForMeasurement(long measurementGid);
+        bool TryGetAnalogMeasurement(long measurementGid, out AnalogMeasurement measurement);
+        bool TryGetDiscreteMeasurement(long measurementGid, out DiscreteMeasurement measurement);
         void UpdateAnalogMeasurement(long measurementGid, float value);
         void UpdateAnalogMeasurement(Dictionary<long, AnalogModbusData> data);
         void UpdateDiscreteMeasurement(long measurementGid, ushort value);
