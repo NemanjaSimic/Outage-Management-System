@@ -50,7 +50,8 @@ namespace OMS.Web.Adapter
             catch (Exception e)
             {
                 Console.WriteLine($"Exception occured during scadaSubscriberPRoxy.Subscribe({Topic.MEASUREMENT}): {e.Message}");
-                throw;
+                //neka retry logika ili nesto, ovako bezveze puca
+                //throw; 
             }
 
             OutageNotification outageNotification = new OutageNotification("OUTAGE_ADAPTER_SUBSCRIBER", new OutageMapper(new ConsumerMapper()));
@@ -64,7 +65,8 @@ namespace OMS.Web.Adapter
             catch (Exception e)
             {
                 Console.WriteLine($"Exception occured during outageSubscriberProxy.Subscribe({Topic.ACTIVE_OUTAGE} or {Topic.ARCHIVED_OUTAGE}): {e.Message}");
-                throw;
+                //neka retry logika ili nesto, ovako bezveze puca
+                //throw; 
             }
 
             Console.WriteLine("Press enter to close the app.");

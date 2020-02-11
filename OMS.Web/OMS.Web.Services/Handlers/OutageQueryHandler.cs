@@ -27,7 +27,7 @@
             _logger = logger;
             _mapper = mapper;
 
-            // nece dependency injection zbog nekog unity updatea
+            // ovo treba promeniti da koristi factory i preko DI da ide
             string outageServiceAddress = AppSettings.Get<string>(ServiceAddress.OutageServiceAddress);
             _outageService = new OutageServiceProxy(outageServiceAddress);
         }
