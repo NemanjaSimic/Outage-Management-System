@@ -9,7 +9,7 @@ using System.Threading.Tasks;
 
 namespace Outage.Common.ServiceProxies.PubSub
 {
-    public class PublisherProxy : ClientBase<IPublisher>, IPublisher
+    public class PublisherProxy : BaseProxy<IPublisher>, IPublisher
     {
         public PublisherProxy(string endPointConfiguration) 
             : base(endPointConfiguration)

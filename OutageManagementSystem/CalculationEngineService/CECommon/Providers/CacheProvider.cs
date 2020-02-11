@@ -2,6 +2,8 @@
 using CECommon.Model;
 using Outage.Common;
 using Outage.Common.PubSub.SCADADataContract;
+using Outage.Common.ServiceContracts.OMS;
+using Outage.Common.ServiceProxies;
 using Outage.Common.ServiceProxies.Outage;
 using System;
 using System.Collections.Generic;
@@ -21,61 +23,17 @@ namespace CECommon.Providers
 		private Dictionary<long, DiscreteMeasurement> discreteMeasurements;
 		//private Dictionary<long, DiscreteMeasurementInfo> discreteMeasurements;
 
-		private OutageServiceProxy outageServiceProxy;
+		private ProxyFactory proxyFactory; 
 
-		private OutageServiceProxy GetOutageServiceProxy()
-		{
-			int numberOfTries = 0;
-			int sleepInterval = 500;
-
-			while (numberOfTries <= int.MaxValue)
-			{
-				try
-				{
-					if (outageServiceProxy != null)
-					{
-						outageServiceProxy.Abort();
-						outageServiceProxy = null;
-					}
-
-					outageServiceProxy = new OutageServiceProxy(EndpointNames.OutageServiceEndpoint);
-					outageServiceProxy.Open();
-
-					if (outageServiceProxy.State == CommunicationState.Opened)
-					{
-						break;
-					}
-				}
-				catch (Exception ex)
-				{
-					string message = $"Exception on OutageServiceProxy initialization. Message: {ex.Message}";
-					logger.LogWarn(message, ex);
-					outageServiceProxy = null;
-				}
-				finally
-				{
-					numberOfTries++;
-					logger.LogDebug($"ModelUpdateNotification: TransactionEnlistmentProxy getter, try number: {numberOfTries}.");
-
-					if (numberOfTries >= 100)
-					{
-						sleepInterval = 1000;
-					}
-
-					Thread.Sleep(sleepInterval);
-				}
-			}
-
-			return outageServiceProxy;
-		}
 		public CacheProvider()
 		{
 			analogMeasurements = new Dictionary<long, AnalogMeasurement>();
 			//analogMeasurements = new Dictionary<long, AnalogMeasurementInfo>();
 			discreteMeasurements = new Dictionary<long, DiscreteMeasurement>();
 			//discreteMeasurements = new Dictionary<long, DiscreteMeasurementInfo>();
+			proxyFactory = new ProxyFactory();
 			Provider.Instance.CacheProvider = this;
-        }
+		}
 
 		public DiscreteMeasurementDelegate DiscreteMeasurementDelegate { get; set; }
 		public void AddAnalogMeasurement(AnalogMeasurement analogMeasurement)
@@ -142,8 +100,15 @@ namespace CECommon.Providers
 			{
 				if (!measurement.CurrentOpen)
 				{
-					using (OutageServiceProxy outageProxy = GetOutageServiceProxy())
+					using (OutageServiceProxy outageProxy = proxyFactory.CreateProxy<OutageServiceProxy, IOutageContract>(EndpointNames.OutageServiceEndpoint))
 					{
+						if (outageProxy == null)
+						{
+							string message = "UpdateDiscreteMeasurement => OutageServiceProxy is null.";
+							logger.LogError(message);
+							throw new NullReferenceException(message);
+						}
+
 						try
 						{
 							outageProxy.ReportOutage(measurement.ElementId);

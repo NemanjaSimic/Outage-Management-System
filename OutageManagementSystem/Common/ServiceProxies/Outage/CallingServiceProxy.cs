@@ -8,7 +8,7 @@ using System.Threading.Tasks;
 
 namespace Outage.Common.ServiceProxies.Outage
 {
-    public class CallingServiceProxy : ClientBase<ICallingContract>, ICallingContract
+    public class CallingServiceProxy : BaseProxy<ICallingContract>, ICallingContract
     {
         public CallingServiceProxy(string endpointName)
             : base(endpointName)

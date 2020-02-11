@@ -2,8 +2,6 @@
 
 namespace Outage.Common.PubSub.CalculationEngineDataContract
 {
-
-    //[Serializable]
     [DataContract]
     public class CalculationEnginePublication : Publication
     {

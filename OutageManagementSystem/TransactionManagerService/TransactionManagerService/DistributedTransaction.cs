@@ -1,10 +1,9 @@
 ﻿using Outage.Common;
 using Outage.Common.ServiceContracts.DistributedTransaction;
+using Outage.Common.ServiceProxies;
 using Outage.Common.ServiceProxies.DistributedTransaction;
 using System;
 using System.Collections.Generic;
-using System.ServiceModel;
-using System.Threading;
 
 namespace Outage.TransactionManagerService
 {
@@ -34,6 +33,8 @@ namespace Outage.TransactionManagerService
 
         #endregion Static Members
 
+        private ProxyFactory proxyFactory;
+
         private ILogger logger;
 
         protected ILogger Logger
@@ -41,58 +42,10 @@ namespace Outage.TransactionManagerService
             get { return logger ?? (logger = LoggerWrapper.Instance); }
         }
 
-
-        #region Proxies
-
-        private TransactionActorProxy transactionActorProxy = null;
-
-        private TransactionActorProxy GetTransactionActorProxy(string endpointName)
+        public DistributedTransaction()
         {
-            int numberOfTries = 0;
-            int sleepInterval = 500;  
-
-            while (numberOfTries <= int.MaxValue)
-            {
-                try
-                {
-                    if (transactionActorProxy != null)
-                    {
-                        transactionActorProxy.Abort();
-                        transactionActorProxy = null;
-                    }
-
-                    transactionActorProxy = new TransactionActorProxy(endpointName);
-                    transactionActorProxy.Open();
-
-                    if (transactionActorProxy.State == CommunicationState.Opened)
-                    {
-                        break;
-                    }
-                }
-                catch (Exception ex)
-                {
-                    string message = $"Exception on TransactionActorProxy initialization. Message: {ex.Message}";
-                    Logger.LogWarn(message, ex);
-                    transactionActorProxy = null;
-                }
-                finally
-                {
-                    numberOfTries++;
-                    Logger.LogDebug($"DistributedTransaction: GetTransactionActorProxy(), EndpointName: {endpointName}, try number: {numberOfTries}.");
-
-                    if (numberOfTries >= 100)
-                    {
-                        sleepInterval = 1000;
-                    }
-
-                    Thread.Sleep(sleepInterval);
-                }
-            }
-
-            return transactionActorProxy;
+            proxyFactory = new ProxyFactory();
         }
-
-        #endregion Proxies
 
         #region ITransactionCoordinatorContract
 
@@ -169,41 +122,39 @@ namespace Outage.TransactionManagerService
 
             foreach (string actor in TransactionLedger.Keys)
             {
-                if (TransactionLedger[actor] && distributedTransactionActors.ContainsKey(actor))
-                {
-                    string endpointName = distributedTransactionActors[actor];
-
-                    using (TransactionActorProxy transactionActorProxy = GetTransactionActorProxy(endpointName))
-                    {
-                        if (transactionActorProxy != null)
-                        {
-                            success = transactionActorProxy.Prepare();
-                        }
-                        else
-                        {
-                            success = false;
-                            string message = "TransactionActorProxy is null.";
-                            Logger.LogError(message);
-                            throw new NullReferenceException(message);
-                        }
-                    }
-
-                    if (success)
-                    {
-                        Logger.LogInfo($"Preparation on Transaction actor: {actor} finsihed SUCCESSFULLY.");
-                    }
-                    else
-                    {
-                        Logger.LogInfo($"Preparation on Transaction actor: {actor} finsihed UNSUCCESSFULLY.");
-                        break;
-                    }
-                }
-                else
+                if (!TransactionLedger[actor] || !distributedTransactionActors.ContainsKey(actor))
                 {
                     success = false;
                     Logger.LogError($"Preparation failed either because Transaction actor: {actor} was not enlisted or do not belong to distributed transaction.");
                     break;
                 }
+                
+                string endpointName = distributedTransactionActors[actor];
+
+                using (TransactionActorProxy transactionActorProxy = proxyFactory.CreateProxy<TransactionActorProxy, ITransactionActorContract>(endpointName))
+                {
+                    if (transactionActorProxy == null)
+                    {
+                        success = false;
+                        string message = "TransactionActorProxy is null.";
+                        Logger.LogError(message);
+                        throw new NullReferenceException(message);
+
+                    }
+                        
+                    success = transactionActorProxy.Prepare();
+                }
+
+                if (success)
+                {
+                    Logger.LogInfo($"Preparation on Transaction actor: {actor} finsihed SUCCESSFULLY.");
+                }
+                else
+                {
+                    Logger.LogInfo($"Preparation on Transaction actor: {actor} finsihed UNSUCCESSFULLY.");
+                    break;
+                }
+
             }
 
             return success;
@@ -217,19 +168,17 @@ namespace Outage.TransactionManagerService
                 {
                     string endpointName = distributedTransactionActors[actor];
 
-                    using (TransactionActorProxy transactionActorProxy = GetTransactionActorProxy(endpointName))
+                    using (TransactionActorProxy transactionActorProxy = proxyFactory.CreateProxy<TransactionActorProxy, ITransactionActorContract>(endpointName))
                     {
-                        if (transactionActorProxy != null)
-                        {
-                            transactionActorProxy.Commit();
-                            Logger.LogInfo($"Commit invoked on Transaction actor: {actor}.");
-                        }
-                        else
+                        if (transactionActorProxy == null)
                         {
                             string message = "TransactionActorProxy is null.";
                             Logger.LogError(message);
                             throw new NullReferenceException(message);
                         }
+
+                        transactionActorProxy.Commit();
+                        Logger.LogInfo($"Commit invoked on Transaction actor: {actor}.");
                     }
                 }
             }
@@ -243,19 +192,17 @@ namespace Outage.TransactionManagerService
                 {
                     string endpointName = distributedTransactionActors[actor];
 
-                    using (TransactionActorProxy transactionActorProxy = GetTransactionActorProxy(endpointName))
+                    using (TransactionActorProxy transactionActorProxy = proxyFactory.CreateProxy<TransactionActorProxy, ITransactionActorContract>(endpointName))
                     {
-                        if (transactionActorProxy != null)
-                        {
-                            transactionActorProxy.Rollback();
-                            Logger.LogInfo($"Rollback invoked on Transaction actor: {actor}.");
-                        }
-                        else
+                        if (transactionActorProxy == null)
                         {
                             string message = "TransactionActorProxy is null.";
                             Logger.LogError(message);
                             throw new NullReferenceException(message);
                         }
+                        
+                        transactionActorProxy.Rollback();
+                        Logger.LogInfo($"Rollback invoked on Transaction actor: {actor}.");
                     }
                 }
             }
@@ -263,25 +210,4 @@ namespace Outage.TransactionManagerService
 
         #endregion Private Members
     }
-
-    //public class DistributedTransactionEnlistment : ITransactionEnlistmentContract
-    //{
-    //    private ILogger logger;
-
-    //    #region ITransactionEnlistmentContract
-    //    public bool Enlist(string actorName)
-    //    {
-    //        bool success = false;
-
-    //        if (TransactionLedger.ContainsKey(actorName))
-    //        {
-    //            TransactionLedger[actorName] = true;
-    //            success = true;
-    //            Logger.LogInfo($"Transaction actor: {actorName} enlisted for transaction.");
-    //        }
-
-    //        return success;
-    //    }
-    //    #endregion
-    //}
 }

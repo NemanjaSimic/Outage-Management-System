@@ -23,21 +23,32 @@ namespace SCADACommanding
             {
                 if (Provider.Instance.TopologyProvider.IsElementRemote(Provider.Instance.CacheProvider.GetElementGidForMeasurement(gid)))
                 {
-                    using (var proxy = new SCADACommandProxy(EndpointNames.SCADACommandService))
+                    ProxyFactory proxyFactory = new ProxyFactory();
+
+                    using (SCADACommandProxy proxy = proxyFactory.CreateProxy<SCADACommandProxy, ISCADACommand>(EndpointNames.SCADACommandService))
                     {
-                        proxy.SendDiscreteCommand(gid, commandingValue);
-                        success = true;
+                        if (proxy == null)
+                        {
+                            string message = "SendDiscreteCommand => SCADACommandProxy is null.";
+                            logger.LogError(message);
+                            throw new NullReferenceException(message);
+                        }
+
+                        success = proxy.SendDiscreteCommand(gid, commandingValue);
                     }
                 }
                 else
                 {
+                    //todo: sucess = what?
                     Provider.Instance.CacheProvider.UpdateDiscreteMeasurement(gid, commandingValue);
                 }
             }
             catch (Exception ex)
             {
+                success = false;
                 logger.LogError($"Sending discrete command for measurement with GID {gid} failed. Exception: {ex.Message}");
             }
+
             return success;
         }
     }

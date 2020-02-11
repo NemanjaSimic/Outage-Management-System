@@ -4,6 +4,7 @@ using CECommon.Providers;
 using NetworkModelServiceFunctions;
 using Outage.Common;
 using Outage.Common.ServiceContracts.PubSub;
+using Outage.Common.ServiceProxies;
 using Outage.Common.ServiceProxies.PubSub;
 using SCADACommanding;
 using System;
@@ -24,7 +25,8 @@ namespace CalculationEngineService
         private IModelManager modelManager;
         private ITopologyBuilder topologyBuilder;
         private ICacheProvider cacheProvider;
-        
+
+        private ProxyFactory proxyFactory;
         private SCADAResultHandler sCADAResultProvider;
         private TopologyProvider topologyProvider;
         private ModelProvider modelProvider;
@@ -39,6 +41,8 @@ namespace CalculationEngineService
 
         public CalculationEngineService()
         {
+            proxyFactory = new ProxyFactory();
+
             topologyBuilder = new GraphBuilder();
             modelTopologyServis = new TopologyManager(topologyBuilder);
             webTopologyBuilder = new TopologyConverter();
@@ -148,7 +152,16 @@ namespace CalculationEngineService
         private void SubscribeToSCADA()
         {
             Logger.LogDebug("Subcribing on SCADA measurements.");
-            proxy = new SubscriberProxy(new SCADASubscriber(), EndpointNames.SubscriberEndpoint);
+            proxy = proxyFactory.CreateProxy<SubscriberProxy, ISubscriber>(new SCADASubscriber(), EndpointNames.SubscriberEndpoint);
+            //proxy = new SubscriberProxy(new SCADASubscriber(), EndpointNames.SubscriberEndpoint);
+
+            if (proxy == null)
+            {
+                string message = "SubscribeToSCADA() => SubscriberProxy is null.";
+                Logger.LogError(message);
+                throw new NullReferenceException(message);
+            }
+
             proxy.Subscribe(Topic.MEASUREMENT);
             proxy.Subscribe(Topic.SWITCH_STATUS);
         }

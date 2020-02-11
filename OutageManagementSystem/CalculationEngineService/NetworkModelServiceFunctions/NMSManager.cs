@@ -247,69 +247,6 @@ namespace NetworkModelServiceFunctions
 			}
 
 			return properties;
-			//return ReferenceProperties[type];
-			//List<ModelCode> propertyIds = new List<ModelCode>();
-
-			//switch (type)
-			//{
-			//	case DMSType.TERMINAL:
-			//		propertyIds.Add(ModelCode.TERMINAL_CONDUCTINGEQUIPMENT);
-			//		propertyIds.Add(ModelCode.TERMINAL_CONNECTIVITYNODE);
-			//		propertyIds.Add(ModelCode.TERMINAL_MEASUREMENTS);
-			//		break;
-			//	case DMSType.CONNECTIVITYNODE:
-			//		propertyIds.Add(ModelCode.CONNECTIVITYNODE_TERMINALS);
-			//		break;
-			//	case DMSType.POWERTRANSFORMER:
-			//		propertyIds.Add(ModelCode.POWERTRANSFORMER_TRANSFORMERWINDINGS);
-			//		break;
-			//	case DMSType.ENERGYSOURCE:
-			//		propertyIds.Add(ModelCode.CONDUCTINGEQUIPMENT_TERMINALS);
-			//		propertyIds.Add(ModelCode.CONDUCTINGEQUIPMENT_BASEVOLTAGE);
-			//		break;
-			//	case DMSType.ENERGYCONSUMER:
-			//		propertyIds.Add(ModelCode.CONDUCTINGEQUIPMENT_TERMINALS);
-			//		propertyIds.Add(ModelCode.CONDUCTINGEQUIPMENT_BASEVOLTAGE);
-			//		break;
-			//	case DMSType.TRANSFORMERWINDING:
-			//		propertyIds.Add(ModelCode.CONDUCTINGEQUIPMENT_BASEVOLTAGE);
-			//		propertyIds.Add(ModelCode.CONDUCTINGEQUIPMENT_TERMINALS);
-			//		propertyIds.Add(ModelCode.TRANSFORMERWINDING_POWERTRANSFORMER);
-			//		break;
-			//	case DMSType.FUSE:
-			//		propertyIds.Add(ModelCode.CONDUCTINGEQUIPMENT_BASEVOLTAGE);
-			//		propertyIds.Add(ModelCode.CONDUCTINGEQUIPMENT_TERMINALS);
-			//		break;
-			//	case DMSType.DISCONNECTOR:
-			//		propertyIds.Add(ModelCode.CONDUCTINGEQUIPMENT_BASEVOLTAGE);
-			//		propertyIds.Add(ModelCode.CONDUCTINGEQUIPMENT_TERMINALS);
-			//		break;
-			//	case DMSType.BREAKER:
-			//		propertyIds.Add(ModelCode.CONDUCTINGEQUIPMENT_BASEVOLTAGE);
-			//		propertyIds.Add(ModelCode.CONDUCTINGEQUIPMENT_TERMINALS);
-			//		break;
-			//	case DMSType.LOADBREAKSWITCH:
-			//		propertyIds.Add(ModelCode.CONDUCTINGEQUIPMENT_BASEVOLTAGE);
-			//		propertyIds.Add(ModelCode.CONDUCTINGEQUIPMENT_TERMINALS);
-			//		break;
-			//	case DMSType.ACLINESEGMENT:
-			//		propertyIds.Add(ModelCode.CONDUCTINGEQUIPMENT_TERMINALS);
-			//		propertyIds.Add(ModelCode.CONDUCTINGEQUIPMENT_BASEVOLTAGE);
-			//		break;
-			//	case DMSType.ANALOG:
-			//		propertyIds.Add(ModelCode.MEASUREMENT_TERMINAL);
-			//		break;
-			//	case DMSType.DISCRETE:
-			//		propertyIds.Add(ModelCode.MEASUREMENT_TERMINAL);
-			//		break;
-			//	case DMSType.BASEVOLTAGE:
-			//		propertyIds.Add(ModelCode.BASEVOLTAGE_CONDUCTINGEQUIPMENTS);
-			//		break;
-			//	default:
-			//		break;
-			//}
-
-			//return propertyIds;
 		}
 		public ITopologyElement GetPopulatedElement(ResourceDescription rs)
 		{

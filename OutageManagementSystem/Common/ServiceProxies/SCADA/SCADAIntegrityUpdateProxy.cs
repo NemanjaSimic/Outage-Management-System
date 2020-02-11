@@ -9,7 +9,7 @@ using System.Threading.Tasks;
 
 namespace Outage.Common.ServiceProxies.SCADA
 {
-    public class SCADAIntegrityUpdateProxy : ClientBase<ISCADAIntegrityUpdateContract>, ISCADAIntegrityUpdateContract
+    public class SCADAIntegrityUpdateProxy : BaseProxy<ISCADAIntegrityUpdateContract>, ISCADAIntegrityUpdateContract
     {
         public SCADAIntegrityUpdateProxy(string endpoint)
             : base(endpoint)

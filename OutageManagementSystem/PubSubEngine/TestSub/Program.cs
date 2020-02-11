@@ -12,9 +12,13 @@ namespace TestSub
 			{
 				Console.WriteLine("Created..");
 				Notification notification = new Notification("TEST_SUBSCRIBER");
+
+				//ProxyFactory proxyFactory = new ProxyFactory();
+				//proxy = proxyFactory.CreatePRoxy<SubscriberProxy, ISubscriber>(new SCADASubscriber(), EndpointNames.SubscriberEndpoint);
+
 				SubscriberProxy proxy = new SubscriberProxy(notification, EndpointNames.SubscriberEndpoint);
-				//proxy.Subscribe(Topic.MEASUREMENT);
-				//proxy.Subscribe(Topic.SWITCH_STATUS);
+				proxy.Subscribe(Topic.MEASUREMENT);
+				proxy.Subscribe(Topic.SWITCH_STATUS);
 				proxy.Subscribe(Topic.ACTIVE_OUTAGE);
 
 				Console.WriteLine("Subscribed..");

@@ -32,8 +32,6 @@ namespace Outage.Common.ServiceContracts.PubSub
         [ServiceKnownType(typeof(OutageMessage))]
         [ServiceKnownType(typeof(OutageTopologyModel))]
         [ServiceKnownType(typeof(OutageTopologyElement))]
-        //[ServiceKnownType(typeof(AnalogModbusData))]
-        //[ServiceKnownType(typeof(DigitalModbusData))]
         void Publish(IPublication publication);
     }
 }

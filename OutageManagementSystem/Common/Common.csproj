@@ -144,6 +144,7 @@
     <Compile Include="LoggerWrapper.cs" />
     <Compile Include="ModelException\ErrorCode.cs" />
     <Compile Include="ModelException\ModelException.cs" />
+    <Compile Include="ServiceProxies\BaseProxy.cs" />
     <Compile Include="ServiceProxies\CalcualtionEngine\OMSTopologyServiceProxy.cs" />
     <Compile Include="ServiceProxies\DistributedTransaction\ModelUpdateNotificationProxy.cs" />
     <Compile Include="ServiceProxies\DistributedTransaction\TransactionCoordinatorProxy.cs" />
@@ -151,6 +152,7 @@
     <Compile Include="ServiceProxies\DistributedTransaction\TransactionActorProxy.cs" />
     <Compile Include="ServiceProxies\Outage\CallingServiceProxy.cs" />
     <Compile Include="ServiceProxies\Outage\OutageServiceProxy.cs" />
+    <Compile Include="ServiceProxies\ProxyFactory.cs" />
     <Compile Include="ServiceProxies\PubSub\PublisherProxy.cs" />
     <Compile Include="ServiceProxies\PubSub\SubscriberProxy.cs" />
     <Compile Include="ServiceProxies\SCADA\SCADACommandProxy.cs" />
