@@ -4,7 +4,7 @@ import { OmsGraph } from '@shared/models/oms-graph.model';
 
 import cyConfig from './graph.config';
 import { drawBackupEdge } from '@shared/utils/backup-edge';
-import { addGraphTooltip, addOutageTooltip, addEdgeTooltip, addMeasurementTooltip  } from '@shared/utils/tooltip';
+import { addGraphTooltip, addOutageTooltip, addEdgeTooltip, addMeasurementTooltip } from '@shared/utils/tooltip';
 import { drawWarning } from '@shared/utils/warning';
 import { drawCallWarning } from '@shared/utils/outage';
 import { drawMeasurements } from '@shared/utils/measurement';
@@ -40,25 +40,24 @@ cytoscape.use(popper);
   styleUrls: ['./graph.component.css']
 })
 export class GraphComponent implements OnInit, OnDestroy {
-  public connectionSubscription: Subscription;
-  public topologySubscription: Subscription;
+  public panSubscription: Subscription;
+  public zoomSubscription: Subscription;
+  public scadaSubscription: Subscription;
   public updateSubscription: Subscription;
   public outageSubscription: Subscription;
-
-  public scadaServiceConnectionSubscription: Subscription;
-  public scadaSubscription: Subscription;
-
-  public outageServiceConnectionSubscription: Subscription;
+  public topologySubscription: Subscription;
+  public connectionSubscription: Subscription;
   public activeOutageSubcription: Subscription;
   public archivedOutageSubcription: Subscription;
+  public scadaServiceConnectionSubscription: Subscription;
+  public outageServiceConnectionSubscription: Subscription;
 
-  public zoomSubscription: Subscription;
-  public panSubscription: Subscription;
-
-  public gidSearchQuery: string;
-  public legendItems;
-  public didLoadGraph: boolean;
   private cy: any;
+  public legendItems;
+  public gidSearchQuery: string;
+
+  public zoomLevel: number;
+  public panPosition: object;
 
   private graphData: any = {
     nodes: [],
@@ -80,22 +79,13 @@ export class GraphComponent implements OnInit, OnDestroy {
   }
 
   ngOnInit() {
-    // testing splash screen look, will change logic after we connect to the api
-    this.didLoadGraph = true;
-
     // web api
     this.getTopology();
     this.startConnection();
     this.startScadaConnection();
     this.startOutageConnection();
 
-    // local testing
-    //this.graphData.nodes = graphMock.nodes;
-    //this.graphData.edges = graphMock.edges;
-    //this.graphData.backup_edges = graphMock.backup_edges;
-    //this.graphData.outages = graphMock.outages;
-
-    //this.drawGraph(); // initial test
+    this.cy = cytoscape({});
 
     // zoom on + and -
     this.zoomSubscription = fromEvent(document, 'keypress').subscribe(
@@ -226,15 +216,28 @@ export class GraphComponent implements OnInit, OnDestroy {
   }
 
   public drawGraph(): void {
+    const hasNodes = this.graphData.nodes.length ? true : false;
+
+    if (hasNodes && this.zoomLevel && this.panPosition) {
+      this.zoomLevel = this.cy.zoom();
+      this.panPosition = this.cy.pan();
+    }
+
     this.cy = cytoscape({
       ...cyConfig,
       container: document.getElementById('graph'),
       elements: this.graphData
-    });
+    }); 
 
+    if(hasNodes && !this.zoomLevel)
+      this.zoomLevel = this.cy.zoom();
+    
+    if(hasNodes && !this.panPosition)
+      this.panPosition = this.cy.pan();
+      
+    this.cy.zoom(this.zoomLevel);
+    this.cy.pan(this.panPosition);
 
-    //this.drawBackupEdges();
-    //this.drawWarnings();
     this.drawMeasurements();
     this.addTooltips();
     modifyNodeDistance(this.cy.nodes().filter(x => x.data('dmsType') == "ENERGYCONSUMER"));
@@ -263,11 +266,10 @@ export class GraphComponent implements OnInit, OnDestroy {
 
           addOutageTooltip(this.cy, node, outage);
         }
-		else if(node.data("type") == 'analogMeasurement')
-        {
+        else if (node.data("type") == 'analogMeasurement') {
           addMeasurementTooltip(this.cy, node);
         }
-		else {
+        else {
 
           addGraphTooltip(this.cy, node);
           if (node.data('dmsType') == "ACLINESEGMENT") {
@@ -280,16 +282,15 @@ export class GraphComponent implements OnInit, OnDestroy {
     });
   }
 
-  public drawMeasurements() : void {
+  public drawMeasurements(): void {
     this.cy.ready(() => {
       this.cy.nodes().forEach(node => {
-        let measurements : IMeasurement[] = node.data("measurements");
-        if(measurements != undefined 
-            && !(measurements.length == 1 
-            && measurements[0].Type == "SWITCH_STATUS") 
-            && measurements.length != 0)
-        {
-            drawMeasurements(this.cy, node);
+        let measurements: IMeasurement[] = node.data("measurements");
+        if (measurements != undefined
+          && !(measurements.length == 1
+            && measurements[0].Type == "SWITCH_STATUS")
+          && measurements.length != 0) {
+          drawMeasurements(this.cy, node);
         }
       })
     });
@@ -298,10 +299,11 @@ export class GraphComponent implements OnInit, OnDestroy {
   public drawWarnings(): void {
     this.cy.ready(() => {
       this.cy.edges().forEach(line => {
-            drawWarning(this.cy, line);
+        drawWarning(this.cy, line);
       })
     });
   }
+
   public onCommandHandler = (command: SwitchCommand) => {
     this.commandService.sendSwitchCommand(command).subscribe(
       data => console.log(data),
@@ -325,8 +327,7 @@ export class GraphComponent implements OnInit, OnDestroy {
         this.graphData.nodes.forEach(node => {
           let msms = node.data["measurements"];
           msms.forEach(measurement => {
-            if(measurement.Id == gid)
-            {
+            if (measurement.Id == gid) {
               measurement.Value = data[gid].Value;
             }
           });
@@ -348,13 +349,10 @@ export class GraphComponent implements OnInit, OnDestroy {
         addOutageTooltip(this.cy, node, data);
       }
     });
-    console.log(data);
-  });
   }
 
   public onArchivedOutageNotification(data: ArchivedOutage): void {
     console.log('onArchivedOutageNotification');
-  
     console.log(data);
   }
 
@@ -363,5 +361,4 @@ export class GraphComponent implements OnInit, OnDestroy {
       zoom(this.cy, this.gidSearchQuery);
     })
   }
-
 }

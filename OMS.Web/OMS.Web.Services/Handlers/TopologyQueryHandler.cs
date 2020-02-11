@@ -43,8 +43,8 @@
                 }
                 catch (Exception ex)
                 {
-                    _logger.LogInfo("[TopologyQueryHandler::GetTopologyQuery] Sending GET query to topology client.");
-                    throw new TopologyException("GET query on topology failed.", ex);
+                    _logger.LogError("[TopologyQueryHandler::GetTopologyQuery] Sending GET query to topology client failed.", ex);
+                    return null;
                 }
             });
         }
