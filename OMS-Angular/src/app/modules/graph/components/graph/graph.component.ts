@@ -342,12 +342,13 @@ export class GraphComponent implements OnInit, OnDestroy {
     console.log('onActiveOutageNotification');
     drawCallWarning(this.cy, data.ElementId);
     this.ngZone.run(() => {
-    this.cy.nodes().forEach(node => {
-      if(node.data("id") == data.ElementId)
-      {
-        drawWarning(this.cy, node);
-        addOutageTooltip(this.cy, node, data);
-      }
+      this.cy.nodes().forEach(node => {
+        if(node.data("id") == data.ElementId)
+        {
+          drawWarning(this.cy, node);
+          addOutageTooltip(this.cy, node, data);
+        }
+        });
     });
   }
 
