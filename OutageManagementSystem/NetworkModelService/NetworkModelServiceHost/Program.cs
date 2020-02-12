@@ -1,5 +1,4 @@
 ﻿using Outage.Common;
-using Outage.DataImporter.CIMAdapter;
 using System;
 
 namespace Outage.NetworkModelServiceHost
@@ -8,12 +7,12 @@ namespace Outage.NetworkModelServiceHost
     {
         private static void Main(string[] args)
         {
-            ILogger Logger = LoggerWrapper.Instance;
+            ILogger logger = LoggerWrapper.Instance;
 
             try
             {                
                 string message = "Starting Network Model Service...";
-                Logger.LogInfo(message);
+                logger.LogInfo(message);
                 Console.WriteLine("\n{0}\n", message);
 
                 using (NetworkModelService.NetworkModelService nms = new NetworkModelService.NetworkModelService())
@@ -30,7 +29,7 @@ namespace Outage.NetworkModelServiceHost
                 Console.WriteLine(ex.Message);
                 Console.WriteLine("Network Model Service failed.");
                 Console.WriteLine(ex.StackTrace);
-                Logger.LogError($"Network Model Service failed.{Environment.NewLine}Message: {ex.Message} ", ex);
+                logger.LogError($"Network Model Service failed.{Environment.NewLine}Message: {ex.Message} ", ex);
                 Console.ReadLine();
             }
         }

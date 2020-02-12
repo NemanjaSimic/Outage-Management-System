@@ -20,6 +20,7 @@
         public static readonly string CalculationEngineModelUpdateNotifierEndpoint = "CalculationEngineModelUpdateNotifierEndpoint";
         public static readonly string TopologyServiceEndpoint = "TopologyServiceEndpoint";
         public static readonly string TopologyOMSServiceEndpoint = "TopologyOMSServiceEndpoint";
+        public static readonly string SwitchStatusCommandingEndpoint = "SwitchStatusCommandingEndpoint";
 
         //PUBSUB - 4
         public static readonly string PublisherEndpoint = "PublisherEndpoint";
