@@ -3,6 +3,7 @@ import { SwitchCommand, SwitchCommandType } from '@shared/models/switch-command.
 //import { GetUnitMeasurement } from './measurement';
 
 const commandableTypes: string[] = ["LOADBREAKSWITCH", "DISCONNECTOR", "BREAKER", "FUSE"];
+const ACTIVE_STATE = 'active';
 
 // global var - lose (trebali bi naci drugacije resenje)
 // mozda da cuvamo u komponenti, pa da prosledjujemo
@@ -78,15 +79,18 @@ const createTooltipContent =  (node) => {
     const button = document.createElement('button');
 
     const meas = node.data('measurements');
-    if (meas.length > 0) {
-      if (meas[0].Value == 0) {
-        button.innerHTML = 'Switch off';
-      }
-      else {
-        button.innerHTML = 'Switch on';
-      }
+    const isActive = node.data('state') == ACTIVE_STATE; 
 
-      button.addEventListener('click', () => {
+    if (isActive) {
+      button.innerHTML = 'Switch off';
+    }
+    else {
+      button.innerHTML = 'Switch on';
+    }
+
+    button.addEventListener('click', () => {
+      // @TODO: ovo treba izmeniti
+      if(meas.length) {
         const guid = meas[0].Id;
         if (meas[0].Value == 0) {
           const command: SwitchCommand = {
@@ -103,8 +107,12 @@ const createTooltipContent =  (node) => {
           node.sendSwitchCommand(command);
           commandedNodeIds.push(node.data('id'));
         }
-      });
-    }
+      }
+    });
+
+    if(node.data('name') == "FS_13")
+      console.log(button.innerHTML);
+
     div.appendChild(button);
   }
 
