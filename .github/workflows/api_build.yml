@@ -14,4 +14,6 @@ jobs:
       with:
         dotnet-version: 2.2.108
     - name: Build API with dotnet
-      run: cd OMS.Web && dotnet build
+      run: |
+        cd OMS.Web
+        dotnet build
