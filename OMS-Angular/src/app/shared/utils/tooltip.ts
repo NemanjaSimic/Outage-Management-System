@@ -25,6 +25,7 @@ const outageTooltipBody: string =
  */
 export const addGraphTooltip = (cy, node) => {
   let ref = node.popperRef();
+  tippy.hideAll();
 
   node.tooltip = tippy(ref, {
     content: () => {
