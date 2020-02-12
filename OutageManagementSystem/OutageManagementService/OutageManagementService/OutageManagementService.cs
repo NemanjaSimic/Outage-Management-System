@@ -46,7 +46,7 @@ namespace OutageManagementService
             modelResourcesDesc = new ModelResourcesDesc();
             using (OutageContext db = new OutageContext())
             {
-                db.DeleteAllData();
+                //db.DeleteAllData();
                 InitializeEnergyConsumers(db);
             }
            
@@ -166,9 +166,11 @@ namespace OutageManagementService
                 i++;
 
                 db.Consumers.Add(consumer);
+                Logger.LogDebug($"Add consumer: {consumer.ConsumerMRID}");
             }
 
             db.SaveChanges();
+            Logger.LogDebug("Init energy consumers: SaveChanges()");
         }
 
 
