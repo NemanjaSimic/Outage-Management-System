@@ -51,7 +51,7 @@
     <Reference Include="System.Xml" />
   </ItemGroup>
   <ItemGroup>
-    <Compile Include="Initializers\CustomInitializer.cs" />
+    <Compile Include="Initializers\OutageInitializer.cs" />
     <Compile Include="Migrations\202002121057388_InitMigration.cs" />
     <Compile Include="Migrations\202002121057388_InitMigration.designer.cs">
       <DependentUpon>202002121057388_InitMigration.cs</DependentUpon>

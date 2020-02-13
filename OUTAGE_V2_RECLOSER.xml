@@ -483,7 +483,6 @@
 		<ftn:IdentifiedObject.name>TM_63</ftn:IdentifiedObject.name>
 	</cim:Terminal>
 	<!--TODO: RECLOSER-->
-	<!--
 	<cim:Terminal rdf:ID="TM_64">
 		<cim:Terminal.ConductingEquipment rdf:resource="#ACL_R1"/>
 		<cim:Terminal.ConnectivityNode rdf:resource="#CN_29"/>
@@ -491,7 +490,6 @@
 		<cim:IdentifiedObject.mRID>TM_64</cim:IdentifiedObject.mRID>
 		<ftn:IdentifiedObject.name>TM_64</ftn:IdentifiedObject.name>
 	</cim:Terminal>
-	-->
 	<cim:Terminal rdf:ID="TM_65">
 		<cim:Terminal.ConductingEquipment rdf:resource="#ACL_8"/>
 		<cim:Terminal.ConnectivityNode rdf:resource="#CN_30"/>
@@ -1130,7 +1128,6 @@
 		<ftn:IdentifiedObject.name>TM_155</ftn:IdentifiedObject.name>
 	</cim:Terminal>
 	<!--TODO: RECLOSER-->
-	<!--
 	<cim:Terminal rdf:ID="TM_156">
 		<cim:Terminal.ConductingEquipment rdf:resource="#ACL_R2"/>
 		<cim:Terminal.ConnectivityNode rdf:resource="#CN_69"/>
@@ -1138,7 +1135,6 @@
 		<cim:IdentifiedObject.mRID>TM_156</cim:IdentifiedObject.mRID>
 		<ftn:IdentifiedObject.name>TM_156</ftn:IdentifiedObject.name>
 	</cim:Terminal>
-	-->
 	<cim:Terminal rdf:ID="TM_157">
 		<cim:Terminal.ConductingEquipment rdf:resource="#ACL_31"/>
 		<cim:Terminal.ConnectivityNode rdf:resource="#CN_70"/>
@@ -1399,7 +1395,6 @@
 		<ftn:IdentifiedObject.name>TM_193</ftn:IdentifiedObject.name>
 	</cim:Terminal>
 	<!--TODO: RECLOSER-->
-	<!--
 	<cim:Terminal rdf:ID="TM_194">
 		<cim:Terminal.ConductingEquipment rdf:resource="#ACL_R1"/>
 		<cim:Terminal.ConnectivityNode rdf:resource="#CN_86"/>
@@ -1428,7 +1423,6 @@
 		<cim:IdentifiedObject.mRID>TM_197</cim:IdentifiedObject.mRID>
 		<ftn:IdentifiedObject.name>TM_197</ftn:IdentifiedObject.name>
 	</cim:Terminal>
-	-->
 	<cim:Terminal rdf:ID="TM_198">
 		<cim:Terminal.ConductingEquipment rdf:resource="#ACL_6"/>
 		<cim:Terminal.ConnectivityNode rdf:resource="#CN_88"/>
@@ -2091,7 +2085,6 @@
 	-->
 	
 	<!--TODO: RECLOSER-->
-	<!--
 	<cim:ACLineSegment rdf:ID="ACL_R1">
 		<cim:ConductingEquipment.BaseVoltage rdf:resource="#BV_2"/>
 		<cim:ConductingEquipment.isRemote>true</cim:ConductingEquipment.isRemote>
@@ -2106,7 +2099,6 @@
 		<cim:IdentifiedObject.mRID>ACL_R2</cim:IdentifiedObject.mRID>
 		<ftn:IdentifiedObject.name>ACL_R2</ftn:IdentifiedObject.name>
 	</cim:ACLineSegment>
-	-->
 	<!--END ACLineSegment-->
 	
 	
@@ -2239,7 +2231,6 @@
 	</cim:Breaker>
 	-->
 	<!--TODO: RECLOSER-->
-	<!--
 	<cim:Breaker rdf:ID="RC_1">
 		<cim:Breaker.noReclosing>false</cim:Breaker.noReclosing>
 		<cim:ConductingEquipment.isRemote>true</cim:ConductingEquipment.isRemote>
@@ -2248,7 +2239,6 @@
 		<cim:IdentifiedObject.mRID>RC_1</cim:IdentifiedObject.mRID>
 		<ftn:IdentifiedObject.name>RC_1</ftn:IdentifiedObject.name>
 	</cim:Breaker>
-	-->
 	<!--END Breaker-->
 	
 	
@@ -4325,21 +4315,19 @@
 		<ftn:IdentifiedObject.name>DS_20</ftn:IdentifiedObject.name>
 	</cim:Discrete>
 	<!--TODO: RECLOSER-->
-	<!--
-	<cim:Discrete rdf:ID="DS_18">
+	<cim:Discrete rdf:ID="DS_21">
 		<cim:Discrete.currentOpen>true</cim:Discrete.currentOpen>
 		<cim:Discrete.maxValue>1</cim:Discrete.maxValue>
 		<cim:Discrete.measurementType>SwitchStatus</cim:Discrete.measurementType>
 		<cim:Discrete.minValue>0</cim:Discrete.minValue>
-		<cim:Discrete.normalValue>0</cim:Discrete.normalValue>
-		<cim:Measurement.address>18</cim:Measurement.address>
+		<cim:Discrete.normalValue>1</cim:Discrete.normalValue>
+		<cim:Measurement.address>21</cim:Measurement.address>
 		<cim:Measurement.isInput>false</cim:Measurement.isInput>
 		<cim:Measurement.Terminal rdf:resource="#TM_196"/>
 		<cim:IdentifiedObject.description> </cim:IdentifiedObject.description>
-		<cim:IdentifiedObject.mRID>DS_18</cim:IdentifiedObject.mRID>
-		<ftn:IdentifiedObject.name>DS_18</ftn:IdentifiedObject.name>
+		<cim:IdentifiedObject.mRID>DS_21</cim:IdentifiedObject.mRID>
+		<ftn:IdentifiedObject.name>DS_21</ftn:IdentifiedObject.name>
 	</cim:Discrete>
-	-->
 	<!--END Discrete-->
 <!--[END Package_Meas ]-->	
 </rdf:RDF>
