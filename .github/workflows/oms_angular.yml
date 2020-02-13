@@ -6,17 +6,13 @@ jobs:
   build:
     runs-on: ubuntu-latest
 
-    strategy:
-      matrix:
-        node-version: [8.x, 10.x, 12.x]
-
     steps:
     - uses: actions/checkout@v2
     
-    - name: Setup Node.js ${{ matrix.node-version }}
+    - name: Setup Node.js 12
       uses: actions/setup-node@v1
       with:
-        node-version: ${{ matrix.node-version }}    
+        node-version: 12.x 
     
     - name: Install dependencies
       run: |
