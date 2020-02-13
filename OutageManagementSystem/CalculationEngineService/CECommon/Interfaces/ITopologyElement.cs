@@ -18,6 +18,6 @@ namespace CECommon.Interfaces
         bool IsRemote { get; set; }
         bool IsActive { get; set; }
         float NominalVoltage { get; set; }
-        List<IMeasurement> Measurements { get; set; }
+        List<long> Measurements { get; set; }
     }
 }

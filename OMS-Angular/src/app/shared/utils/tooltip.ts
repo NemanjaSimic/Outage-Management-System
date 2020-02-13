@@ -1,8 +1,12 @@
 import tippy from 'tippy.js';
 import { SwitchCommand, SwitchCommandType } from '@shared/models/switch-command.model';
-import { GetUnitMeasurement } from './measurement';
+//import { GetUnitMeasurement } from './measurement';
 
 const commandableTypes: string[] = ["LOADBREAKSWITCH", "DISCONNECTOR", "BREAKER", "FUSE"];
+
+// global var - lose (trebali bi naci drugacije resenje)
+// mozda da cuvamo u komponenti, pa da prosledjujemo
+let commandedNodeIds: string[] = []; 
 
 const graphTooltipBody: string =
   `<p>ID: [[id]]</p>
@@ -19,70 +23,30 @@ const outageTooltipBody: string =
   <p>ElementID: [[elementId]]</p>
   <p>ReportedTime: [[reportedAt]]</p>`;
 
-const measurementsToolTipBody: string =
+/* const measurementsToolTipBody: string =
 `<h3>MEASUREMENTS</h3>
 <p>Type: [[type]] Value:[[value]] [[unit]]</p>`;
-
+ */
 export const addGraphTooltip = (cy, node) => {
   let ref = node.popperRef();
-
+  
   node.tooltip = tippy(ref, {
-    content: () => {
-      const div = document.createElement('div');
-      div.innerHTML = graphTooltipBody
-        .replace("[[id]]", (+node.data('id')).toString(16))
-        .replace("[[type]]", node.data('dmsType'))
-        .replace("[[name]]", node.data('name'))
-        .replace("[[mrid]]", node.data('mrid'))
-        .replace("[[description]]", node.data('description'))
-        .replace("[[deviceType]]", node.data('deviceType'))
-        .replace("[[state]]", node.data('state'))
-        .replace("[[nominalVoltage]]", node.data('nominalVoltage'));
-
-      if (commandableTypes.includes(node.data('dmsType'))) {
-        const button = document.createElement('button');
-
-        const meas = node.data('measurements');
-        if (meas.length > 0) {
-          if (meas[0].Value == 0) {
-            button.innerHTML = 'Switch off';
-          }
-          else {
-            button.innerHTML = 'Switch on';
-          }
-
-          button.addEventListener('click', () => {
-            const guid = meas[0].Id;
-            if (meas[0].Value == 0) {
-              const command: SwitchCommand = {
-                guid,
-                command: SwitchCommandType.TURN_OFF
-              };
-
-              node.sendSwitchCommand(command);
-
-            } else {
-
-              const command: SwitchCommand = {
-                guid,
-                command: SwitchCommandType.TURN_ON
-              };
-
-              node.sendSwitchCommand(command);
-            }
-          });
-        }
-        div.appendChild(button);
-      }
-
-      return div;
-    },
+    content: createTooltipContent(node),
     animation: 'scale',
     trigger: 'manual',
     placement: 'right',
     arrow: true,
     interactive: true
   });
+  
+  tippy.hideAll();
+  setTimeout(() => {
+    if(commandedNodeIds.includes(node.data('id'))) {
+      node.tooltip.setContent(createTooltipContent(node));
+      node.tooltip.show();
+      commandedNodeIds = commandedNodeIds.filter(c => c != node.data('id'));
+    }
+  }, 0);
 
   node.on('tap', () => {
     setTimeout(() => {
@@ -98,6 +62,54 @@ export const addGraphTooltip = (cy, node) => {
   });
 }
 
+const createTooltipContent =  (node) => {
+  const div = document.createElement('div');
+  div.innerHTML = graphTooltipBody
+    .replace("[[id]]", (+node.data('id')).toString(16))
+    .replace("[[type]]", node.data('dmsType'))
+    .replace("[[name]]", node.data('name'))
+    .replace("[[mrid]]", node.data('mrid'))
+    .replace("[[description]]", node.data('description'))
+    .replace("[[deviceType]]", node.data('deviceType'))
+    .replace("[[state]]", node.data('state'))
+    .replace("[[nominalVoltage]]", node.data('nominalVoltage'));
+
+  if (commandableTypes.includes(node.data('dmsType'))) {
+    const button = document.createElement('button');
+
+    const meas = node.data('measurements');
+    if (meas.length > 0) {
+      if (meas[0].Value == 0) {
+        button.innerHTML = 'Switch off';
+      }
+      else {
+        button.innerHTML = 'Switch on';
+      }
+
+      button.addEventListener('click', () => {
+        const guid = meas[0].Id;
+        if (meas[0].Value == 0) {
+          const command: SwitchCommand = {
+            guid,
+            command: SwitchCommandType.TURN_OFF
+          };
+          node.sendSwitchCommand(command);
+          commandedNodeIds.push(node.data('id'));
+        } else {
+          const command: SwitchCommand = {
+            guid,
+            command: SwitchCommandType.TURN_ON
+          };
+          node.sendSwitchCommand(command);
+          commandedNodeIds.push(node.data('id'));
+        }
+      });
+    }
+    div.appendChild(button);
+  }
+
+  return div;
+};
 
 export const addOutageTooltip = (cy, node, outage) => {
   if(outage == undefined)
@@ -131,7 +143,7 @@ export const addOutageTooltip = (cy, node, outage) => {
   });
 }
 
-export const addMeasurementTooltip = (cy, node) => {
+/* export const addMeasurementTooltip = (cy, node) => {
   let ref = node.popperRef();
   let measurements = node.data("measurements");
   if(measurements == undefined)
@@ -160,7 +172,7 @@ export const addMeasurementTooltip = (cy, node) => {
       node.tooltip.show();
     }, 0);
   });
-}
+} */
 
 export const addEdgeTooltip = (cy, node, edge) => {
   let ref = edge.popperRef();

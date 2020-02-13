@@ -151,30 +151,34 @@ namespace CECommon.Providers
 			return signalGid;
 		}
 
-		struct AnalogMeasurementInfo
+		public bool TryGetDiscreteMeasurement(long measurementGid, out DiscreteMeasurement measurement)
 		{
-			public long Gid;
-			public long ElementGid;
-			public float Value;
-			public AnalogMeasurementInfo(long Gid, long ElementGid, float Value)
+			bool success = false;
+			if (discreteMeasurements.TryGetValue(measurementGid, out measurement))
 			{
-				this.Gid = Gid;
-				this.ElementGid = ElementGid;
-				this.Value = Value;
+				success = true;
 			}
+			else
+			{
+				measurement = null;
+				logger.LogWarn($"Discrete measurement with GID {measurementGid.ToString("X")} does not exist.");
+			}
+			return success;
 		}
 
-		struct DiscreteMeasurementInfo
+		public bool TryGetAnalogMeasurement(long measurementGid, out AnalogMeasurement measurement)
 		{
-			public long Gid;
-			public long ElementGid;
-			public bool IsOpen;
-			public DiscreteMeasurementInfo(long Gid, long ElementGid, bool IsOpen)
+			bool success = false;
+			if (analogMeasurements.TryGetValue(measurementGid, out measurement))
 			{
-				this.Gid = Gid;
-				this.ElementGid = ElementGid;
-				this.IsOpen = IsOpen;
+				success = true;
 			}
+			else
+			{
+				measurement = null;
+				logger.LogWarn($"Aalog measurement with GID {measurementGid.ToString("X")} does not exist.");
+			}
+			return success;
 		}
 	}
 }

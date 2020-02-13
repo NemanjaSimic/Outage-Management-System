@@ -12,7 +12,7 @@ namespace CECommon
 		private long firstEnd;
 		private List<long> secondEnd;
 		private string dmsType;
-		private List<IMeasurement> measurements;
+		private List<long> measurements;
 		private string descritption;
 		private string mrid;
 		private string name;
@@ -30,7 +30,7 @@ namespace CECommon
 		public long FirstEnd { get => firstEnd; set => firstEnd = value; }
 		public List<long> SecondEnd { get => secondEnd; set => secondEnd = value; }
 		public string DmsType { get => dmsType; set => dmsType = value; }
-		public List<IMeasurement> Measurements { get => measurements; set => measurements = value; }
+		public List<long> Measurements { get => measurements; set => measurements = value; }
 		public bool IsRemote { get => isRemote; set => isRemote = value; }
 		public bool IsActive { get => isActive; set => isActive = value; }
 
@@ -39,7 +39,7 @@ namespace CECommon
 		{
 			Id = gid;
 			SecondEnd = new List<long>();
-			Measurements = new List<IMeasurement>();
+			Measurements = new List<long>();
 		}
 	}
 }

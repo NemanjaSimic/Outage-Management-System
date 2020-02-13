@@ -1,5 +1,7 @@
 ﻿using Outage.Common.PubSub.OutageDataContract;
 using Outage.Common.ServiceContracts.OMS;
+using OutageDatabase.Initializers;
+using OutageDatabase.Migrations;
 using System;
 using System.Collections.Generic;
 using System.Data.Entity;
@@ -13,7 +15,7 @@ namespace OutageDatabase
     {
         public OutageContext() : base("OutageContext")
         {
-            Database.SetInitializer(new MigrateDatabaseToLatestVersion<OutageContext, Configuration>());
+            Database.SetInitializer(new OutageInitializer());
         }
 
         public DbSet<ActiveOutage> ActiveOutages { get; set; }
