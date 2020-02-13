@@ -1,0 +1,31 @@
+name: OMS Angular 
+
+on: [pull_request]
+
+jobs:
+  build:
+    runs-on: ubuntu-latest
+
+    strategy:
+      matrix:
+        node-version: [8.x, 10.x, 12.x]
+
+    steps:
+    - uses: actions/checkout@v2
+    
+    - name: Setup Node.js ${{ matrix.node-version }}
+      uses: actions/setup-node@v1
+      with:
+        node-version: ${{ matrix.node-version }}    
+    
+    - name: Install dependencies
+      run: |
+        cd ./OMS-Angular
+        npm i
+    
+    - name: Build Angular application for production
+      run: |
+        cd ./OMS-Angular
+        npm run build --prod
+      env:
+        CI: true
