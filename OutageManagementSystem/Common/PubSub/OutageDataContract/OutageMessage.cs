@@ -34,10 +34,30 @@ namespace Outage.Common.PubSub.OutageDataContract
         [DatabaseGenerated(DatabaseGeneratedOption.Identity)]
         public long OutageId { get; set; }
 
-        
+        [DataMember]
+        public long OutageElementGid { get; set; }
+
+        [DataMember]
+        public List<long> ReportedElements { get; set; }
+
+        [DataMember]
+        public DateTime CreatedTime { get; set; }
+
+        [DataMember]
+        public DateTime IsolatedTime { get; set; }
+
+        [DataMember]
+        public DateTime ResolvedTime { get; set; }
+
+        [DataMember]
+        public OutageState OutageState { get; set; }
+
+        [DataMember]
+        public List<Consumer> AffectedConsumers { get; set; }
         public ActiveOutage()
         {
             AffectedConsumers = new List<Consumer>();
+            ReportedElements = new List<long>();
         }
     }
 
