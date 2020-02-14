@@ -12,6 +12,16 @@ namespace Outage.Common.PubSub.OutageDataContract
     [DataContract(IsReference = true)]
     public abstract class OutageMessage : IPublishableMessage
     {
+        [DataMember]
+        public long ElementGid { get; set; }
+
+        [DataMember]
+        public DateTime ReportTime { get; set; }
+
+       
+
+        [DataMember]
+        public List<Consumer> AffectedConsumers { get; set; }
     }
 
 
@@ -24,15 +34,7 @@ namespace Outage.Common.PubSub.OutageDataContract
         [DatabaseGenerated(DatabaseGeneratedOption.Identity)]
         public long OutageId { get; set; }
 
-        [DataMember]
-        public long ElementGid { get; set; }
-
-        [DataMember]
-        public DateTime ReportTime { get; set; }
-
-        [DataMember]
-        public List<Consumer> AffectedConsumers { get; set; }
-
+        
         public ActiveOutage()
         {
             AffectedConsumers = new List<Consumer>();
@@ -47,18 +49,9 @@ namespace Outage.Common.PubSub.OutageDataContract
         [DatabaseGenerated(DatabaseGeneratedOption.None)]
         public long OutageId { get; set; }
 
-        [DataMember]
-        public long ElementGid { get; set; }
-
-        [DataMember]
-        public DateTime ReportTime { get; set; }
 
         [DataMember]
         public DateTime ArchiveTime { get; set; }
-
-        [DataMember]
-        public List<Consumer> AffectedConsumers { get; set; }
-
         public ArchivedOutage()
         {
             AffectedConsumers = new List<Consumer>();
