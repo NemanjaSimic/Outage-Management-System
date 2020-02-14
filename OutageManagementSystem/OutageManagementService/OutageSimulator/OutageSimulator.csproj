@@ -6,8 +6,8 @@
     <Platform Condition=" '$(Platform)' == '' ">AnyCPU</Platform>
     <ProjectGuid>{59746F56-A820-4DD3-8140-8AB4AA135B28}</ProjectGuid>
     <OutputType>WinExe</OutputType>
-    <RootNamespace>OutageSimulator</RootNamespace>
-    <AssemblyName>OutageSimulator</AssemblyName>
+    <RootNamespace>OMS.OutageSimulator</RootNamespace>
+    <AssemblyName>OMS.OutageSimulator</AssemblyName>
     <TargetFrameworkVersion>v4.8</TargetFrameworkVersion>
     <FileAlignment>512</FileAlignment>
     <ProjectTypeGuids>{60dc8134-eba5-43b8-bcc9-bb4bc16c2548};{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}</ProjectTypeGuids>
@@ -35,8 +35,12 @@
     <WarningLevel>4</WarningLevel>
   </PropertyGroup>
   <ItemGroup>
+    <Reference Include="log4net, Version=2.0.8.0, Culture=neutral, PublicKeyToken=669e0ddf0bb1aa2a, processorArchitecture=MSIL">
+      <HintPath>..\..\packages\log4net.2.0.8\lib\net45-full\log4net.dll</HintPath>
+    </Reference>
     <Reference Include="System" />
     <Reference Include="System.Data" />
+    <Reference Include="System.ServiceModel" />
     <Reference Include="System.Xml" />
     <Reference Include="Microsoft.CSharp" />
     <Reference Include="System.Core" />
@@ -54,6 +58,14 @@
     <ApplicationDefinition Include="App.xaml">
       <Generator>MSBuild:Compile</Generator>
     </ApplicationDefinition>
+    <Compile Include="BindingModels\GlobalIDBindingModel.cs" />
+    <Compile Include="BindingModels\OutageBindingModel.cs" />
+    <Compile Include="UserControls\ActiveOutages.xaml.cs">
+      <DependentUpon>ActiveOutages.xaml</DependentUpon>
+    </Compile>
+    <Compile Include="UserControls\GenerateOutage.xaml.cs">
+      <DependentUpon>GenerateOutage.xaml</DependentUpon>
+    </Compile>
     <Page Include="MainWindow.xaml">
       <Generator>MSBuild:Compile</Generator>
       <SubType>Designer</SubType>
@@ -66,6 +78,14 @@
       <DependentUpon>MainWindow.xaml</DependentUpon>
       <SubType>Code</SubType>
     </Compile>
+    <Page Include="UserControls\ActiveOutages.xaml">
+      <SubType>Designer</SubType>
+      <Generator>MSBuild:Compile</Generator>
+    </Page>
+    <Page Include="UserControls\GenerateOutage.xaml">
+      <SubType>Designer</SubType>
+      <Generator>MSBuild:Compile</Generator>
+    </Page>
   </ItemGroup>
   <ItemGroup>
     <Compile Include="Properties\AssemblyInfo.cs">
@@ -85,6 +105,7 @@
       <Generator>ResXFileCodeGenerator</Generator>
       <LastGenOutput>Resources.Designer.cs</LastGenOutput>
     </EmbeddedResource>
+    <None Include="packages.config" />
     <None Include="Properties\Settings.settings">
       <Generator>SettingsSingleFileGenerator</Generator>
       <LastGenOutput>Settings.Designer.cs</LastGenOutput>
@@ -92,6 +113,12 @@
   </ItemGroup>
   <ItemGroup>
     <None Include="App.config" />
+  </ItemGroup>
+  <ItemGroup>
+    <ProjectReference Include="..\..\Common\Common.csproj">
+      <Project>{892CBE15-9ED7-4540-81FA-0EAABA592138}</Project>
+      <Name>Common</Name>
+    </ProjectReference>
   </ItemGroup>
   <Import Project="$(MSBuildToolsPath)\Microsoft.CSharp.targets" />
 </Project>

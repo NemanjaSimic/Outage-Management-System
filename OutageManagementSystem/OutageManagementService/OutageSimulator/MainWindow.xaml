@@ -6,7 +6,7 @@
         xmlns:local="clr-namespace:OMS.OutageSimulator"
         xmlns:controls="clr-namespace:OMS.OutageSimulator.UserControls"
         mc:Ignorable="d"
-        Title="MainWindow" Height="450" Width="800">
+        Title="MainWindow" Height="820" Width="640">
     <Grid>
         <Grid.RowDefinitions>
             <RowDefinition Height="10"/>
@@ -19,21 +19,17 @@
             <ColumnDefinition Width="10"/>
         </Grid.ColumnDefinitions>
         <TabControl  x:Name="TabControl" Grid.Row="1" Grid.Column="1">
-            <TabItem Header="Get Values">
+            <TabItem Header="Overwiew">
                 <Grid>
-                    <controls:GetValues/>
+                    <controls:ActiveOutages/>
                 </Grid>
             </TabItem>
-            <TabItem Header="Get Extent Values">
+            <TabItem Header="Generate Outage">
                 <Grid>
-                    <controls:GetExtentValues/>
+                    <controls:GenerateOutage/>
                 </Grid>
             </TabItem>
-            <TabItem Header="Get Related Values">
-                <Grid>
-                    <controls:GetRelatedValues/>
-                </Grid>
-            </TabItem>
+
         </TabControl>
     </Grid>
 </Window>

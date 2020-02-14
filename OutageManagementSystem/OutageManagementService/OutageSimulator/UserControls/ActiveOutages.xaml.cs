@@ -1,4 +1,5 @@
-﻿using System;
+﻿using OMS.OutageSimulator.BindingModels;
+using System;
 using System.Collections.Generic;
 using System.Linq;
 using System.Text;
@@ -20,9 +21,16 @@ namespace OMS.OutageSimulator.UserControls
     /// </summary>
     public partial class ActiveOutages : UserControl
     {
+       public List<OutageBindingModel> ActiveOutageList { get; set; }
+
         public ActiveOutages()
         {
             InitializeComponent();
+        }
+
+        private void DataGrid_SelectionChanged(object sender, SelectionChangedEventArgs e)
+        {
+
         }
     }
 }
