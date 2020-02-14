@@ -25,17 +25,29 @@ namespace Outage.Common.PubSub.OutageDataContract
         public long OutageId { get; set; }
 
         [DataMember]
-        public long ElementGid { get; set; }
+        public long OutageElementGid { get; set; }
 
         [DataMember]
-        public DateTime ReportTime { get; set; }
+        public List<long> ReportedElements { get; set; }
+
+        [DataMember]
+        public DateTime CreatedTime { get; set; }
+
+        [DataMember]
+        public DateTime IsolatedTime { get; set; }
+
+        [DataMember]
+        public DateTime ResolvedTime { get; set; }
+
+        [DataMember]
+        public OutageState OutageState { get; set; }
 
         [DataMember]
         public List<Consumer> AffectedConsumers { get; set; }
-
         public ActiveOutage()
         {
             AffectedConsumers = new List<Consumer>();
+            ReportedElements = new List<long>();
         }
     }
 

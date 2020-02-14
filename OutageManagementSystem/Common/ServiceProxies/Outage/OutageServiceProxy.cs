@@ -64,5 +64,41 @@ namespace Outage.Common.ServiceProxies.Outage
 
             return success;
         }
+
+        public bool UpdateActiveOutageIsolated(long elementGid, List<long> locatedElements)
+        {
+            bool success;
+
+            try
+            {
+                success = Channel.UpdateActiveOutageIsolated(elementGid,locatedElements);
+            }
+            catch (Exception e)
+            {
+                string message = "Exception in UpdateActiveOutageIsolated() proxy method.";
+                LoggerWrapper.Instance.LogError(message, e);
+                throw e;
+            }
+
+            return success;
+        }
+
+        public bool UpdateActiveOutageResolved(long elementGid)
+        {
+            bool success;
+
+            try
+            {
+                success = Channel.UpdateActiveOutageResolved(elementGid);
+            }
+            catch (Exception e)
+            {
+                string message = "Exception in UpdateActiveOutageResolved() proxy method.";
+                LoggerWrapper.Instance.LogError(message, e);
+                throw e;
+            }
+
+            return success;
+        }
     }
 }

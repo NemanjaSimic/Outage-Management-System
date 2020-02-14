@@ -71,4 +71,13 @@ namespace Outage.Common
         [DataMember]
         Local
     }
+
+    [DataContract]
+    public enum OutageState : short
+    {
+        CREATED = 1,
+        ISOLATED = 2,
+        RESOLVED = 3,
+        ARCHIVED = 4
+    }
 }

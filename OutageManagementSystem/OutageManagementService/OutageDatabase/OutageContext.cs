@@ -36,6 +36,14 @@ namespace OutageDatabase
 
             SaveChanges();
         }
+        public ActiveOutage GetActiveOutage(long elementGid)
+        {
+            var outage = from active in ActiveOutages
+                         where active.OutageElementGid == elementGid
+                         select active;
 
+
+            return outage.First();
+        }
     }
 }

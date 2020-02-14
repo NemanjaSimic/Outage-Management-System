@@ -51,10 +51,14 @@
     <Reference Include="System.Xml" />
   </ItemGroup>
   <ItemGroup>
-    <Compile Include="Initializers\CustomInitializer.cs" />
+    <Compile Include="Initializers\OutageInitializer.cs" />
     <Compile Include="Migrations\202002121057388_InitMigration.cs" />
     <Compile Include="Migrations\202002121057388_InitMigration.designer.cs">
       <DependentUpon>202002121057388_InitMigration.cs</DependentUpon>
+    </Compile>
+    <Compile Include="Migrations\202002141544238_OutageModelChanges.cs" />
+    <Compile Include="Migrations\202002141544238_OutageModelChanges.designer.cs">
+      <DependentUpon>202002141544238_OutageModelChanges.cs</DependentUpon>
     </Compile>
     <Compile Include="Migrations\Configuration.cs" />
     <Compile Include="OutageContext.cs" />
@@ -73,6 +77,9 @@
   <ItemGroup>
     <EmbeddedResource Include="Migrations\202002121057388_InitMigration.resx">
       <DependentUpon>202002121057388_InitMigration.cs</DependentUpon>
+    </EmbeddedResource>
+    <EmbeddedResource Include="Migrations\202002141544238_OutageModelChanges.resx">
+      <DependentUpon>202002141544238_OutageModelChanges.cs</DependentUpon>
     </EmbeddedResource>
   </ItemGroup>
   <Import Project="$(MSBuildToolsPath)\Microsoft.CSharp.targets" />
