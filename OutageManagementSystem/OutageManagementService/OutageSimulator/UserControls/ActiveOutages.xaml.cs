@@ -13,14 +13,14 @@ using System.Windows.Media.Imaging;
 using System.Windows.Navigation;
 using System.Windows.Shapes;
 
-namespace NMSTestClientUI
+namespace OMS.OutageSimulator.UserControls
 {
     /// <summary>
-    /// Interaction logic for MainWindow.xaml
+    /// Interaction logic for ActiveOutages.xaml
     /// </summary>
-    public partial class MainWindow : Window
+    public partial class ActiveOutages : UserControl
     {
-        public MainWindow()
+        public ActiveOutages()
         {
             InitializeComponent();
         }
