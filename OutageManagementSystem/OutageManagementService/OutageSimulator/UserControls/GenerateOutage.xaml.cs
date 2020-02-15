@@ -33,8 +33,26 @@ namespace OMS.OutageSimulator.UserControls
             get { return logger ?? (logger = LoggerWrapper.Instance); }
         }
 
+        private readonly HashSet<DMSType> ignorableTypes = new HashSet<DMSType>()
+        {
+            DMSType.ANALOG,
+            DMSType.BASEVOLTAGE,
+            DMSType.CONNECTIVITYNODE,
+            DMSType.DISCRETE,
+            DMSType.ENERGYSOURCE,
+            DMSType.POWERTRANSFORMER,
+            DMSType.TERMINAL,
+            DMSType.ENERGYCONSUMER,
+            DMSType.ENERGYSOURCE,
+            DMSType.TRANSFORMERWINDING,
+        };
+
         private ProxyFactory proxyFactory;
         private ModelResourcesDesc modelResourcesDesc;
+
+        private HashSet<long> outageElementGids;
+        private HashSet<long> optimumIsolationPointsGids;
+        private HashSet<long> defaultIsolationPointsGids;
 
         #region Bindings
         public GlobalIDBindingModel SelectedGID { get; set; }
@@ -62,6 +80,10 @@ namespace OMS.OutageSimulator.UserControls
             OptimumIsolationPoints = new ObservableCollection<GlobalIDBindingModel>();
             DefaultIsolationPoints = new ObservableCollection<GlobalIDBindingModel>();
 
+            outageElementGids = new HashSet<long>();
+            optimumIsolationPointsGids = new HashSet<long>();
+            defaultIsolationPointsGids = new HashSet<long>();
+
             InitializeGlobalIdentifiers();
         }
 
@@ -74,12 +96,11 @@ namespace OMS.OutageSimulator.UserControls
                     throw new NullReferenceException("InitializeGlobalIdentifiers => NetworkModelGDAProxy is null.");
                 }
 
-
                 List<ModelCode> propIds = new List<ModelCode> { ModelCode.IDOBJ_GID };
 
                 foreach (DMSType dmsType in Enum.GetValues(typeof(DMSType)))
                 {
-                    if (dmsType == DMSType.MASK_TYPE)
+                    if (dmsType == DMSType.MASK_TYPE || ignorableTypes.Contains(dmsType))
                     {
                         continue;
                     }
@@ -124,38 +145,38 @@ namespace OMS.OutageSimulator.UserControls
             }
         }
 
-        private void DataGrid_SelectionChanged(object sender, SelectionChangedEventArgs e)
-        {
-
-        }
-
         private void SelectOutageElementButton_Click(object sender, RoutedEventArgs e)
         {
-            if (SelectedGID != null)
+            if (SelectedGID != null && !outageElementGids.Contains(SelectedGID.GID) && IsOutageElementType(SelectedGID.GID))
             {
+                //todo: potencijalno vise outage elemenata?
                 OutageElement.Clear();
+
                 OutageElement.Add(SelectedGID);
+                outageElementGids.Add(SelectedGID.GID);
             }
         }
 
         private void DeSelectOutageElementButton_Click(object sender, RoutedEventArgs e)
         {
             OutageElement.Clear();
+            outageElementGids.Clear();
         }
 
         private void AddOptimumIsolationPointButton_Click(object sender, RoutedEventArgs e)
         {
-            if (SelectedGID != null)
+            if (SelectedGID != null && !optimumIsolationPointsGids.Contains(SelectedGID.GID) && IsIsolationPointType(SelectedGID.GID))
             {
-                //TODO: is switch
                 OptimumIsolationPoints.Add(SelectedGID);
+                optimumIsolationPointsGids.Add(SelectedGID.GID);
             }
         }
 
         private void RemoveOptimumIsolationPointButton_Click(object sender, RoutedEventArgs e)
         {
-            if (SelectedOptimumIsolationPoint != null)
+            if (SelectedOptimumIsolationPoint != null && optimumIsolationPointsGids.Contains(SelectedOptimumIsolationPoint.GID))
             {
+                optimumIsolationPointsGids.Remove(SelectedOptimumIsolationPoint.GID);
                 //svesno neoptimalno izbacivanje iz liste
                 OptimumIsolationPoints.Remove(SelectedOptimumIsolationPoint);
             }
@@ -163,18 +184,19 @@ namespace OMS.OutageSimulator.UserControls
 
         private void AddDefaultIsolationPointButton_Click(object sender, RoutedEventArgs e)
         {
-            if (SelectedGID != null)
+            if (SelectedGID != null && !defaultIsolationPointsGids.Contains(SelectedGID.GID) && IsIsolationPointType(SelectedGID.GID))
             {
-                //TODO: is switch
                 DefaultIsolationPoints.Add(SelectedGID);
+                defaultIsolationPointsGids.Add(SelectedGID.GID);
             }
         }
 
         private void RemoveDefaultIsolationPointButton_Click(object sender, RoutedEventArgs e)
         {
-            if (SelectedDefaultIsolationPoint != null)
+            if (SelectedDefaultIsolationPoint != null && defaultIsolationPointsGids.Contains(SelectedDefaultIsolationPoint.GID))
             {
-                //svesno neoptimalno izbacivanje iz liste
+                defaultIsolationPointsGids.Remove(SelectedDefaultIsolationPoint.GID);
+                //svesno neoptimalno izbacivanje iz liste DefaultIsolationPoints
                 DefaultIsolationPoints.Remove(SelectedDefaultIsolationPoint);
             }
         }
@@ -182,8 +204,38 @@ namespace OMS.OutageSimulator.UserControls
         private void ButtonRefreshGids_Click(object sender, RoutedEventArgs e)
         {
             GlobalIdentifiers.Clear();
-
             InitializeGlobalIdentifiers();
+        }
+
+        private bool IsIsolationPointType(long gid)
+        {
+            DMSType type = (DMSType)ModelCodeHelper.ExtractTypeFromGlobalId(gid);
+            switch (type)
+            {
+                case DMSType.BREAKER:
+                case DMSType.DISCONNECTOR:
+                case DMSType.FUSE:
+                case DMSType.LOADBREAKSWITCH:
+                    return true;
+                default:
+                    return false;
+            }
+        }
+
+        private bool IsOutageElementType(long gid)
+        {
+            DMSType type = (DMSType)ModelCodeHelper.ExtractTypeFromGlobalId(gid);
+            switch (type)
+            {
+                case DMSType.ACLINESEGMENT:
+                //case DMSType.BREAKER:
+                //case DMSType.DISCONNECTOR:
+                //case DMSType.FUSE:
+                //case DMSType.LOADBREAKSWITCH:
+                    return true;
+                default:
+                    return false;
+            }
         }
     }
 }
