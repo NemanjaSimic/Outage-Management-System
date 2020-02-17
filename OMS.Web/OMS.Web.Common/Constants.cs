@@ -5,12 +5,12 @@
     /// </summary>
     public static class ServiceAddress
     {
-        public const string TopologyServiceAddress = nameof(TopologyServiceAddress);
-        public const string OutageServiceAddress = nameof(OutageServiceAddress);
-        public const string ScadaServiceAddress = nameof(ScadaServiceAddress);
-        public const string ScadaCommandServiceAddress = nameof(ScadaCommandServiceAddress);
-        public const string PubSubServiceAddress = nameof(PubSubServiceAddress);
-        public const string WebServiceAddress = nameof(WebServiceAddress);
+        //public const string TopologyServiceAddress = nameof(TopologyServiceAddress);
+        //public const string OutageServiceAddress = nameof(OutageServiceAddress);
+        //public const string ScadaServiceAddress = nameof(ScadaServiceAddress);
+        //public const string ScadaCommandServiceAddress = nameof(ScadaCommandServiceAddress);
+        //public const string PubSubServiceAddress = nameof(PubSubServiceAddress);
+        //public const string WebServiceAddress = nameof(WebServiceAddress);
     }
 
     /// <summary>

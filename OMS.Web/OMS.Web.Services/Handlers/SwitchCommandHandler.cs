@@ -1,11 +1,11 @@
 ﻿namespace OMS.Web.Services.Handlers
 {
     using MediatR;
-    using OMS.Web.Adapter.Contracts;
-    using OMS.Web.Adapter.Topology;
-    using OMS.Web.Common;
     using OMS.Web.Services.Commands;
     using Outage.Common;
+    using Outage.Common.ServiceContracts.CalculationEngine;
+    using Outage.Common.ServiceProxies;
+    using Outage.Common.ServiceProxies.Commanding;
     using System;
     using System.Threading;
     using System.Threading.Tasks;
@@ -13,27 +13,33 @@
     public class SwitchCommandHandler : IRequestHandler<TurnOffSwitchCommand>, IRequestHandler<TurnOnSwitchCommand>
     {
         private readonly ILogger _logger;
-        private readonly IScadaClient _scadaClient;
+        //private readonly IScadaClient _scadaClient;
+        private ProxyFactory _proxyFactory;
 
         public SwitchCommandHandler(ILogger logger)
         {
             _logger = logger;
-            string scadaCommandServiceAddress = AppSettings.Get<string>(ServiceAddress.ScadaCommandServiceAddress);
-            _scadaClient = new TopologySCADACommandProxy(scadaCommandServiceAddress);
+            //string scadaCommandServiceAddress = AppSettings.Get<string>(ServiceAddress.ScadaCommandServiceAddress);
+            //_scadaClient = new TopologySCADACommandProxy(scadaCommandServiceAddress);
+            _proxyFactory = new ProxyFactory();
         }
 
         public Task<Unit> Handle(TurnOffSwitchCommand request, CancellationToken cancellationToken)
         {
             _logger.LogInfo($"[SwitchCommandHandler::TurnOffSwitchCommand] Sending {request.Command.ToString()} command to {request.Gid}");
 
-            try
+
+            using (SwitchStatusCommadningProxy commandingProxy = _proxyFactory.CreateProxy<SwitchStatusCommadningProxy, ISwitchStatusCommandingContract>(EndpointNames.SwitchStatusCommandingEndpoint))
             {
-                _scadaClient.SendCommand(request.Gid, (int)request.Command);
-            }
-            catch (Exception ex)
-            {
-                _logger.LogError("[SwitchCommandHandler::TurnOffSwitchCommand] SwitchCommandHandler failed on TurnOffSwitch handler.", ex);
-                throw;
+                try
+                {
+                    commandingProxy.SendCommand(request.Gid, (int)request.Command);
+                }
+                catch (Exception ex)
+                {
+                    _logger.LogError("[SwitchCommandHandler::TurnOffSwitchCommand] SwitchCommandHandler failed on TurnOffSwitch handler.", ex);
+                    throw;
+                }
             }
 
             return null;
@@ -43,14 +49,18 @@
         {
             _logger.LogDebug($"[SwitchCommandHandler::TurnOnSwitchCommand] Sending {request.Command.ToString()} command to {request.Gid}");
 
-            try
+
+            using (SwitchStatusCommadningProxy commandingProxy = _proxyFactory.CreateProxy<SwitchStatusCommadningProxy, ISwitchStatusCommandingContract>(EndpointNames.SwitchStatusCommandingEndpoint))
             {
-                _scadaClient.SendCommand(request.Gid, (int)request.Command);
-            }
-            catch (Exception ex)
-            {
-                _logger.LogError("[SwitchCommandHandler::TurnOnSwitchCommand] Failed on TurnOnSwitch handler.", ex);
-                throw;
+                try
+                {
+                    commandingProxy.SendCommand(request.Gid, (int)request.Command);
+                }
+                catch (Exception ex)
+                {
+                    _logger.LogError("[SwitchCommandHandler::TurnOnSwitchCommand] Failed on TurnOnSwitch handler.", ex);
+                    throw;
+                }
             }
 
             return null;

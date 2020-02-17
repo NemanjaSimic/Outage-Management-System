@@ -10,10 +10,12 @@ namespace Outage.SCADA.SCADAData.Configuration
     public class AlarmConfigData
     {
 
-		public ushort LowPowerLimit { get; set; }
-		public ushort HighPowerLimit { get; set; }
-		public ushort LowVoltageLimit { get; set; }
-		public ushort HighVolageLimit { get; set; }
+		public float LowPowerLimit { get; set; }
+		public float HighPowerLimit { get; set; }
+		public float LowVoltageLimit { get; set; }
+		public float HighVolageLimit { get; set; }
+		public float LowCurrentLimit { get; set; }
+		public float HighCurrentLimit { get; set; }
 
 		#region Instance
 
@@ -40,33 +42,53 @@ namespace Outage.SCADA.SCADAData.Configuration
 		{
 			if(ConfigurationManager.AppSettings["LowPowerLimit"] is string lowPowerLimitSetting)
 			{
-				if(ushort.TryParse(lowPowerLimitSetting,out ushort lowPowerLimit))
+				if(float.TryParse(lowPowerLimitSetting, out float lowPowerLimit))
 				{
 					LowPowerLimit = lowPowerLimit;
 				}
 
 			}
+
 			if (ConfigurationManager.AppSettings["HighPowerLimit"] is string highPowerLimitSetting)
 			{
-				if (ushort.TryParse(highPowerLimitSetting, out ushort highPowerLimit))
+				if (float.TryParse(highPowerLimitSetting, out float highPowerLimit))
 				{
 					HighPowerLimit = highPowerLimit;
 				}
 
 			}
+
 			if (ConfigurationManager.AppSettings["LowVoltageLimit"] is string lowVoltageLimitSetting)
 			{
-				if (ushort.TryParse(lowVoltageLimitSetting, out ushort lowVolageLimit))
+				if (float.TryParse(lowVoltageLimitSetting, out float lowVolageLimit))
 				{
 					LowVoltageLimit = lowVolageLimit;
 				}
 
 			}
+
 			if(ConfigurationManager.AppSettings["HighVoltageLimit"] is string highVoltageLimitSetting)
 			{
-				if(ushort.TryParse(highVoltageLimitSetting,out ushort highVoltageLimit))
+				if(float.TryParse(highVoltageLimitSetting, out float highVoltageLimit))
 				{
 					HighVolageLimit = highVoltageLimit;
+				}
+			}
+
+			if (ConfigurationManager.AppSettings["LowCurrentLimit"] is string lowCurrentLimitSetting)
+			{
+				if (float.TryParse(lowCurrentLimitSetting, out float lowCurrentLimit))
+				{
+					LowCurrentLimit = lowCurrentLimit;
+				}
+
+			}
+
+			if (ConfigurationManager.AppSettings["HighCurrentLimit"] is string highCurrentLimitSetting)
+			{
+				if (float.TryParse(highCurrentLimitSetting, out float highCurrentLimit))
+				{
+					HighCurrentLimit = highCurrentLimit;
 				}
 			}
 		}
