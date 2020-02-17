@@ -5,6 +5,7 @@ using System.ServiceModel;
 using System.Text;
 using System.Threading.Tasks;
 
+//TODO: sta smo planirali sa ovim?
 namespace Outage.Common.ServiceContracts.CalculationEngine
 {
     [ServiceContract]

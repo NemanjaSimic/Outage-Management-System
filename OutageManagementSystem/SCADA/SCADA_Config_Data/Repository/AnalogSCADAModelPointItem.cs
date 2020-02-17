@@ -91,8 +91,8 @@ namespace Outage.SCADA.SCADAData.Repository
         public override bool SetAlarms()
         {
             bool alarmChanged = false;
-            ushort LowLimit;
-            ushort HighLimit;
+            float LowLimit;
+            float HighLimit;
             AlarmType currentAlarm = Alarm;
 
             if (AnalogType == AnalogMeasurementType.POWER)
@@ -104,6 +104,11 @@ namespace Outage.SCADA.SCADAData.Repository
             {
                 LowLimit = AlarmConfigData.Instance.LowVoltageLimit;
                 HighLimit = AlarmConfigData.Instance.HighVolageLimit;
+            }
+            else if(AnalogType == AnalogMeasurementType.CURRENT)
+            {
+                LowLimit = AlarmConfigData.Instance.LowCurrentLimit;
+                HighLimit = AlarmConfigData.Instance.HighCurrentLimit;
             }
             else
             {

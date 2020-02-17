@@ -1,12 +1,14 @@
 ﻿using CECommon.Providers;
 using Outage.Common;
+using Outage.Common.ServiceContracts.CalculationEngine;
 using Outage.Common.ServiceContracts.SCADA;
 using Outage.Common.ServiceProxies;
 using System;
 
+//TODO: namspace rename
 namespace SCADACommanding
 {
-    public class SCADACommandingService : ISCADACommand
+    public class SCADACommandingService : ISwitchStatusCommandingContract
     {
         private ILogger logger = LoggerWrapper.Instance;
         public bool SendAnalogCommand(long gid, float commandingValue)
@@ -16,12 +18,12 @@ namespace SCADACommanding
             return success;
         }
 
-        public bool SendDiscreteCommand(long gid, ushort commandingValue)
+        public void SendCommand(long guid, int value)
         {
             bool success = false;
             try
             {
-                if (Provider.Instance.TopologyProvider.IsElementRemote(Provider.Instance.CacheProvider.GetElementGidForMeasurement(gid)))
+                if (Provider.Instance.TopologyProvider.IsElementRemote(Provider.Instance.CacheProvider.GetElementGidForMeasurement(guid)))
                 {
                     ProxyFactory proxyFactory = new ProxyFactory();
 
@@ -34,22 +36,22 @@ namespace SCADACommanding
                             throw new NullReferenceException(message);
                         }
 
-                        success = proxy.SendDiscreteCommand(gid, commandingValue);
+                        success = proxy.SendDiscreteCommand(guid, (ushort)value);
                     }
                 }
                 else
                 {
                     //todo: sucess = what?
-                    Provider.Instance.CacheProvider.UpdateDiscreteMeasurement(gid, commandingValue);
+                    Provider.Instance.CacheProvider.UpdateDiscreteMeasurement(guid, (ushort)value);
                 }
             }
             catch (Exception ex)
             {
                 success = false;
-                logger.LogError($"Sending discrete command for measurement with GID {gid} failed. Exception: {ex.Message}");
+                logger.LogError($"Sending discrete command for measurement with GID {guid} failed. Exception: {ex.Message}");
             }
 
-            return success;
+            //return success;
         }
     }
 }
