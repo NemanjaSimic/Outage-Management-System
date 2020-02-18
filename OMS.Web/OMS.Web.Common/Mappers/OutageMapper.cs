@@ -33,7 +33,7 @@
                 Id = outage.OutageId,
                 ReportedAt = outage.ReportTime,
                 ArchivedAt = outage.ArchiveTime,
-                ElementId = outage.ElementGid,
+                ElementId = outage.OutageElementGid,
                 AffectedConsumers = _consumerMapper.MapConsumers(outage.AffectedConsumers)
             };
 
