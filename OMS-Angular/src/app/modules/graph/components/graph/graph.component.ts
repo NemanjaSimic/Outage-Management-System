@@ -7,7 +7,7 @@ import { drawBackupEdge } from '@shared/utils/backup-edge';
 import { addGraphTooltip, addOutageTooltip, addEdgeTooltip} from '@shared/utils/tooltip';
 import { drawWarning } from '@shared/utils/warning';
 import { drawCallWarning } from '@shared/utils/outage';
-import { drawMeasurements, GetUnitMeasurement } from '@shared/utils/measurement';
+import { drawMeasurements, GetUnitMeasurement, GetAlarmColorForMeasurement } from '@shared/utils/measurement';
 
 import * as cytoscape from 'cytoscape';
 import * as mapper from '@shared/utils/mapper';
@@ -19,7 +19,7 @@ import dagre from 'cytoscape-dagre';
 import popper from 'cytoscape-popper';
 import { SwitchCommand } from '@shared/models/switch-command.model';
 import { zoom } from '@shared/utils/zoom';
-import { ScadaData } from '@shared/models/scada-data.model';
+import { ScadaData, AlarmType } from '@shared/models/scada-data.model';
 import { IMeasurement } from '@shared/models/node.model';
 import { modifyNodeDistance } from '@shared/utils/graph-distance';
 
@@ -268,7 +268,6 @@ export class GraphComponent implements OnInit, OnDestroy {
         }
 		else if(node.data("type") == 'analogMeasurement')
         {
-          //addMeasurementTooltip(this.cy, node);
         }
         else {
 
@@ -293,10 +292,14 @@ export class GraphComponent implements OnInit, OnDestroy {
             && measurements.length != 0)
         {
           let measurementString = "";
+          let nodePosition = 30;
+          let counter = 1;
+          let color = "#40E609";
           measurements.forEach(meas => {
-            measurementString += meas.Value + " " + GetUnitMeasurement(meas.Type) + "\n";
+            measurementString = meas.Value + " " + GetUnitMeasurement(meas.Type) + "\n";
+            drawMeasurements(this.cy, node, measurementString, color, nodePosition*counter);
+            counter++;
           });
-          drawMeasurements(this.cy, node, measurementString);
         }
       })
     });
@@ -332,10 +335,18 @@ export class GraphComponent implements OnInit, OnDestroy {
       gids.forEach(gid => {
         this.graphData.nodes.forEach(node => {
           let msms = node.data["measurements"];
+          let color = "";
+          let nodePosition = 30;
+          let counter = 1;
+          let measurementString = "";
           msms.forEach(measurement => {
             if (measurement.Id == gid) {
               measurement.Value = data[gid].Value;
+              color = GetAlarmColorForMeasurement(data[gid].Alarm);
+              measurementString = measurement.Value + " " + GetUnitMeasurement(measurement.Type) + "\n";
+              drawMeasurements(this.cy, node, measurementString, color, counter*nodePosition);
             }
+            counter++;
           });
         });
       });

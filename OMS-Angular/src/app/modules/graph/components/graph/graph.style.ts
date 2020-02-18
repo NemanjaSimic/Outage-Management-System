@@ -46,7 +46,7 @@ export const style = cytoscape.stylesheet()
         'background-opacity': '0',
         'border' : '3px',
         'border-color' : "#40E609",
-        'color' : "#40E609",
+        'color' : 'data(color)',
         'background-fit': 'contain',
         'content': 'data(content)',
         'align-content' : 'center',
