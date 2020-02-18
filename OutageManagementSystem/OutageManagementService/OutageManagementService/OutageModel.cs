@@ -397,16 +397,27 @@ namespace OutageManagementService
                 if (!visited.Contains(currentNode))
                 {
                     visited.Add(currentNode);
-                    IOutageTopologyElement topologyElement = topologyModel.OutageTopology[currentNode];
 
-                    if (topologyElement.SecondEnd.Count == 0 && topologyElement.DmsType == "ENERGYCONSUMER") 
+                    if (topologyModel.OutageTopology.ContainsKey(currentNode))
                     {
-                        affectedConsumers.Add(currentNode);
+                        IOutageTopologyElement topologyElement = topologyModel.OutageTopology[currentNode];
+
+                        if (topologyElement.SecondEnd.Count == 0 && topologyElement.DmsType == "ENERGYCONSUMER")
+                        {
+                            affectedConsumers.Add(currentNode);
+                        }
+
+                        foreach (long adjNode in topologyElement.SecondEnd)
+                        {
+                            nodesToBeVisited.Push(adjNode);
+                        }
                     }
-
-                    foreach(long adjNode in topologyElement.SecondEnd)
+                    else
                     {
-                        nodesToBeVisited.Push(adjNode);
+                        //TOOD
+                        string message = $"GID: 0x{currentNode:X16} not found in topologyModel.OutageTopology dictionary....";
+                        Logger.LogError(message);
+                        Console.WriteLine(message);
                     }
                 }
             }
