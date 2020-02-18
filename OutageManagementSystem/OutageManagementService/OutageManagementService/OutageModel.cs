@@ -180,7 +180,7 @@ namespace OutageManagementService
                             List<Consumer> consumers = GetAffectedConsumersFromDatabase(affectedConsumersIds, db);
                             if (consumers.Count == affectedConsumersIds.Count)
                             {
-                                activeOutage = db.ActiveOutages.Add(new ActiveOutage { AffectedConsumers = consumers, OutageState = OutageState.CREATED, OutageElementGid = gid, CreatedTime = DateTime.UtcNow });
+                                activeOutage = db.ActiveOutages.Add(new ActiveOutage { AffectedConsumers = consumers, OutageState = OutageState.CREATED, OutageElementGid = gid, ReportTime = DateTime.UtcNow });
                                 db.SaveChanges();
                             }
                             else
