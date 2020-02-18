@@ -19,7 +19,7 @@
             => new ActiveOutageViewModel
             {
                 Id = outage.OutageId,
-                ReportedAt = outage.CreatedTime,
+                ReportedAt = outage.ReportTime,
                 ElementId = outage.OutageElementGid,
                 AffectedConsumers = _consumerMapper.MapConsumers(outage.AffectedConsumers)
             };
