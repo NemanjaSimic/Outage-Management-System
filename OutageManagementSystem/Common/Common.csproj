@@ -120,6 +120,7 @@
     <Compile Include="PubSub\SCADADataContract\SCADAMessage.cs" />
     <Compile Include="PubSub\SCADADataContract\SCADAPublication.cs" />
     <Compile Include="ServiceContracts\CalculationEngine\ICECommand.cs" />
+    <Compile Include="ServiceContracts\CalculationEngine\IMeasurementMapContract.cs" />
     <Compile Include="ServiceContracts\CalculationEngine\ITopologyOMSService.cs" />
     <Compile Include="ServiceContracts\CalculationEngine\ISwitchCommandingContract.cs" />
     <Compile Include="ServiceContracts\DistributedTransaction\IModelUpdateNotificationContract.cs" />
@@ -146,6 +147,7 @@
     <Compile Include="ModelException\ErrorCode.cs" />
     <Compile Include="ModelException\ModelException.cs" />
     <Compile Include="ServiceProxies\BaseProxy.cs" />
+    <Compile Include="ServiceProxies\CalcualtionEngine\MeasurementMapProxy.cs" />
     <Compile Include="ServiceProxies\CalcualtionEngine\OMSTopologyServiceProxy.cs" />
     <Compile Include="ServiceProxies\CalcualtionEngine\SwitchCommadningProxy.cs" />
     <Compile Include="ServiceProxies\CalcualtionEngine\UITopologyServiceProxy.cs" />

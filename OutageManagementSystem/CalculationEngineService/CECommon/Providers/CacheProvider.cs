@@ -22,11 +22,12 @@ namespace CECommon.Providers
 		//private Dictionary<long, AnalogMeasurementInfo> analogMeasurements;
 		private Dictionary<long, DiscreteMeasurement> discreteMeasurements;
 		//private Dictionary<long, DiscreteMeasurementInfo> discreteMeasurements;
-
+		private Dictionary<long, List<Tuple<string, long>>> elementToMeasurementMap;
 		private ProxyFactory proxyFactory; 
 
 		public CacheProvider()
 		{
+			elementToMeasurementMap = new Dictionary<long, List<Tuple<string, long>>>();
 			analogMeasurements = new Dictionary<long, AnalogMeasurement>();
 			//analogMeasurements = new Dictionary<long, AnalogMeasurementInfo>();
 			discreteMeasurements = new Dictionary<long, DiscreteMeasurement>();
@@ -41,6 +42,21 @@ namespace CECommon.Providers
 			if (!analogMeasurements.ContainsKey(analogMeasurement.Id))
 			{
 				analogMeasurements.Add(analogMeasurement.Id, analogMeasurement);
+
+				if (elementToMeasurementMap.TryGetValue(analogMeasurement.ElementId, out var measurements))
+				{
+
+					measurements.Add(new Tuple<string, long>(analogMeasurement.GetMeasurementType(), analogMeasurement.Id));
+				}
+				else
+				{
+					elementToMeasurementMap.Add(
+						analogMeasurement.ElementId,
+						new List<Tuple<string, long>>()
+						{
+								new Tuple<string, long>(analogMeasurement.GetMeasurementType(), analogMeasurement.Id)
+						});
+				}
 			}
 		}
 		public void AddDiscreteMeasurement(DiscreteMeasurement discreteMeasurement)
@@ -48,8 +64,29 @@ namespace CECommon.Providers
 			if (!discreteMeasurements.ContainsKey(discreteMeasurement.Id))
 			{
 				discreteMeasurements.Add(discreteMeasurement.Id, discreteMeasurement);
+				if (elementToMeasurementMap.ContainsKey(discreteMeasurement.ElementId))
+				{
+
+				}
+
+
+				if (elementToMeasurementMap.TryGetValue(discreteMeasurement.ElementId, out var measurements))
+				{
+
+					measurements.Add(new Tuple<string, long>(discreteMeasurement.GetMeasurementType(), discreteMeasurement.Id));
+				}
+				else
+				{
+					elementToMeasurementMap.Add(
+						discreteMeasurement.ElementId,
+						new List<Tuple<string, long>>()
+						{
+								new Tuple<string, long>(discreteMeasurement.GetMeasurementType(), discreteMeasurement.Id)
+						});
+				}
 			}
 		}
+		
 		public float GetAnalogValue(long measurementGid)
 		{
 			float value = 0;
@@ -151,6 +188,18 @@ namespace CECommon.Providers
 			return signalGid;
 		}
 
+		public List<Tuple<string, long>> GetMeasurementsForElement(long elementGid)
+		{
+			if (elementToMeasurementMap.TryGetValue(elementGid, out var measurements))
+			{
+				return measurements;
+			}
+			else
+			{
+				return new List<Tuple<string, long>>();
+			}
+		}
+
 		public bool TryGetDiscreteMeasurement(long measurementGid, out DiscreteMeasurement measurement)
 		{
 			bool success = false;
@@ -161,7 +210,7 @@ namespace CECommon.Providers
 			else
 			{
 				measurement = null;
-				logger.LogWarn($"Discrete measurement with GID {measurementGid.ToString("X")} does not exist.");
+				logger.LogDebug($"Discrete measurement with GID {measurementGid.ToString("X")} does not exist.");
 			}
 			return success;
 		}
@@ -176,7 +225,7 @@ namespace CECommon.Providers
 			else
 			{
 				measurement = null;
-				logger.LogWarn($"Aalog measurement with GID {measurementGid.ToString("X")} does not exist.");
+				logger.LogDebug($"Aalog measurement with GID {measurementGid.ToString("X")} does not exist.");
 			}
 			return success;
 		}
