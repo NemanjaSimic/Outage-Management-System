@@ -5,7 +5,7 @@
              xmlns:d="http://schemas.microsoft.com/expression/blend/2008" 
              xmlns:local="clr-namespace:OMS.OutageSimulator.UserControls"
              mc:Ignorable="d" 
-             d:DesignHeight="600" d:DesignWidth="620">
+             d:DesignHeight="620" d:DesignWidth="750">
     <Grid>
         <Grid.RowDefinitions>
             <RowDefinition Height="10"/>
@@ -20,23 +20,23 @@
         <Grid.ColumnDefinitions>
             <ColumnDefinition Width="10"/>
             <ColumnDefinition Width="250"/>
-            <ColumnDefinition Width="130"/>
+            <ColumnDefinition Width="180"/>
             <ColumnDefinition Width="*"/>
             <ColumnDefinition Width="10"/>
         </Grid.ColumnDefinitions>
-        <StackPanel Grid.Row="1" Grid.Column="3" Grid.RowSpan="4">
+        <StackPanel Grid.Row="1" Grid.Column="3" Grid.RowSpan="5">
             <DataGrid ItemsSource="{Binding GlobalIdentifiers, UpdateSourceTrigger=PropertyChanged}" 
                   SelectedItem="{Binding SelectedGID, Mode=OneWayToSource}" 
                   IsReadOnly="True" 
                   SelectionMode="Single" 
                   AutoGenerateColumns="False"
-                  Height="Auto">
+                  MaxHeight="440">
                 <DataGrid.Columns>
                     <DataGridTextColumn Binding="{Binding GID, StringFormat={}0x{0:X16}}" Header="Global Identifiers" Width="auto"/>
                     <DataGridTextColumn Binding="{Binding Type}" Header="Type" Width="*"/>
                 </DataGrid.Columns>
             </DataGrid>
-            <Button Click="ButtonRefreshGids_Click" 
+            <Button Click="ButtonRefreshGids_Click"  Width="150"
                     HorizontalAlignment="Center" Margin="0,20,0,0"  
                     Content="Refresh Global Identifiers" Height="30"/>
         </StackPanel>
@@ -48,7 +48,8 @@
                       SelectedItem="{Binding SelectedOutageElement, Mode=OneWayToSource}" 
                       IsReadOnly="True" 
                       SelectionMode="Single" 
-                      AutoGenerateColumns="False">
+                      AutoGenerateColumns="False"
+                      MaxHeight="137">
                 <DataGrid.Columns>
                     <DataGridTextColumn Binding="{Binding GID, StringFormat={}0x{0:X16}}" Header="Global Identifiers" Width="auto"/>
                     <DataGridTextColumn Binding="{Binding Type}" Header="Type" Width="*"/>
@@ -61,7 +62,8 @@
                       SelectedItem="{Binding SelectedOptimumIsolationPoint, Mode=OneWayToSource}" 
                       IsReadOnly="True" 
                       SelectionMode="Single" 
-                      AutoGenerateColumns="False">
+                      AutoGenerateColumns="False"
+                      MaxHeight="137">
                 <DataGrid.Columns>
                     <DataGridTextColumn Binding="{Binding GID, StringFormat={}0x{0:X16}}" Header="Global Identifiers" Width="auto"/>
                     <DataGridTextColumn Binding="{Binding Type}" Header="Type" Width="*"/>
@@ -74,7 +76,8 @@
                       SelectedItem="{Binding SelectedDefaultIsolationPoint, Mode=OneWayToSource}" 
                       IsReadOnly="True" 
                       SelectionMode="Single" 
-                      AutoGenerateColumns="False">
+                      AutoGenerateColumns="False"
+                      MaxHeight="137">
                 <DataGrid.Columns>
                     <DataGridTextColumn Binding="{Binding GID, StringFormat={}0x{0:X16}}" Header="Global Identifiers" Width="auto"/>
                     <DataGridTextColumn Binding="{Binding Type}" Header="Type" Width="*"/>
@@ -82,24 +85,34 @@
             </DataGrid>
         </StackPanel>
         
-        <StackPanel Grid.Row="1" Grid.Column="2" Margin="0,50,0,0">
-            <Button Content="Select" Margin="20,20,20,0"
+        <StackPanel Grid.Row="1" Grid.Column="2" Margin="0,50,30,0">
+            <Button Content="Select" Margin="20,20,20,0" Width="90"
+                    IsEnabled="{Binding IsSelectOutageElementEnabled, UpdateSourceTrigger=PropertyChanged}"
                     Click="SelectOutageElementButton_Click"/>
-            <Button Content="De-Select" Margin="20,20,20,0"
+            <Button Content="De-Select" Margin="20,20,20,0" Width="90"
+                    IsEnabled="{Binding IsDeSelectOutageElementEnabled, UpdateSourceTrigger=PropertyChanged}"
                     Click="DeSelectOutageElementButton_Click"/>
         </StackPanel>
-        <StackPanel Grid.Row="3" Grid.Column="2" Margin="0,50,0,0">
-            <Button Content="Add" Margin="20,20,20,0"
+        <StackPanel Grid.Row="3" Grid.Column="2" Margin="0,50,30,0">
+            <Button Content="Add" Margin="20,20,20,0" Width="90"
+                    IsEnabled="{Binding IsAddOptimumIsolationPointEnabled, UpdateSourceTrigger=PropertyChanged}"
                     Click="AddOptimumIsolationPointButton_Click"/>
-            <Button Content="Remove" Margin="20,20,20,0"
+            <Button Content="Remove" Margin="20,20,20,0" Width="90"
+                    IsEnabled="{Binding IsRemoveOptimumIsolationPointEnabled, UpdateSourceTrigger=PropertyChanged}"
                     Click="RemoveOptimumIsolationPointButton_Click"/>
         </StackPanel>
-        <StackPanel Grid.Row="5" Grid.Column="2" Margin="0,50,0,0">
-            <Button Content="Add" Margin="20,20,20,0"
+        <StackPanel Grid.Row="5" Grid.Column="2" Margin="0,50,30,0">
+            <Button Content="Add" Margin="20,20,20,0" Width="90"
+                    IsEnabled="{Binding IsAddDefaultIsolationPointEnabled, UpdateSourceTrigger=PropertyChanged}"
                     Click="AddDefaultIsolationPointButton_Click"/>
-            <Button Content="Remove" Margin="20,20,20,0"
+            <Button Content="Remove" Margin="20,20,20,0" Width="90"
+                    IsEnabled="{Binding IsRemoveDefaultIsolationPointEnabled, UpdateSourceTrigger=PropertyChanged}"
                     Click="RemoveDefaultIsolationPointButton_Click"/>
         </StackPanel>
-        <Button Grid.Row="6" Grid.Column="1" Grid.ColumnSpan="3" Content="GENERATE OUTAGE" Height="30" Width="200" />
+        <Button Grid.Row="6" Grid.Column="1" Grid.ColumnSpan="3" 
+                Content="GENERATE OUTAGE" 
+                Height="30" Width="200" 
+                IsEnabled="{Binding IsGenerateOutageEnabled, UpdateSourceTrigger=PropertyChanged}"
+                Click="GenerateOutageButton_Click" />
     </Grid>
 </UserControl>

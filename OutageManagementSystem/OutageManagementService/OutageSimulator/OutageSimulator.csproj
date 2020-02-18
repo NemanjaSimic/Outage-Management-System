@@ -58,10 +58,12 @@
     <ApplicationDefinition Include="App.xaml">
       <Generator>MSBuild:Compile</Generator>
     </ApplicationDefinition>
+    <Compile Include="BindingModels\ActiveOutageBindingModel.cs" />
     <Compile Include="BindingModels\GlobalIDBindingModel.cs" />
     <Compile Include="BindingModels\OutageBindingModel.cs" />
-    <Compile Include="UserControls\ActiveOutages.xaml.cs">
-      <DependentUpon>ActiveOutages.xaml</DependentUpon>
+    <Compile Include="ScadaSubscriber\ScadaNotification.cs" />
+    <Compile Include="UserControls\Overview.xaml.cs">
+      <DependentUpon>Overview.xaml</DependentUpon>
     </Compile>
     <Compile Include="UserControls\GenerateOutage.xaml.cs">
       <DependentUpon>GenerateOutage.xaml</DependentUpon>
@@ -78,7 +80,7 @@
       <DependentUpon>MainWindow.xaml</DependentUpon>
       <SubType>Code</SubType>
     </Compile>
-    <Page Include="UserControls\ActiveOutages.xaml">
+    <Page Include="UserControls\Overview.xaml">
       <SubType>Designer</SubType>
       <Generator>MSBuild:Compile</Generator>
     </Page>
