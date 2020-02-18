@@ -68,6 +68,7 @@
     <Compile Include="Migrations\202002180650507_fields_in_model.designer.cs">
       <DependentUpon>202002180650507_fields_in_model.cs</DependentUpon>
     </Compile>
+
     <Compile Include="Migrations\Configuration.cs" />
     <Compile Include="OutageContext.cs" />
     <Compile Include="Properties\AssemblyInfo.cs" />
