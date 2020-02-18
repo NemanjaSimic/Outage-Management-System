@@ -38,12 +38,12 @@ namespace OutageDatabase
         }
         public ActiveOutage GetActiveOutage(long elementGid)
         {
-            var outage = from active in ActiveOutages
-                         where active.OutageElementGid == elementGid
-                         select active;
+            IQueryable<ActiveOutage> outages = from active in ActiveOutages
+                                               where active.OutageElementGid == elementGid
+                                               select active;
 
 
-            return outage.First();
+            return outages.FirstOrDefault();
         }
     }
 }
