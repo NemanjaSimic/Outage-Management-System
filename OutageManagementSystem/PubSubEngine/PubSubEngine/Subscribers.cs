@@ -88,9 +88,12 @@ namespace PubSubEngine
             string subscriberName = GetSubscriberName(subscriber);
 
             if (success)
-            {
-                message = queueOfMessages.Dequeue();
-                Logger.LogDebug($"Published message [{message}] SUCCESSFYLLY dequeued from Subscriber's queue of messages [Subscriber name: '{subscriberName}'].");
+            { 
+                if(queueOfMessages.Count > 0)
+                {
+                    message = queueOfMessages.Dequeue();
+                    Logger.LogDebug($"Published message [{message}] SUCCESSFYLLY dequeued from Subscriber's queue of messages [Subscriber name: '{subscriberName}'].");
+                }
             }
 
             return message;

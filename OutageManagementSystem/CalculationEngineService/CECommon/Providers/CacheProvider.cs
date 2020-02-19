@@ -22,16 +22,19 @@ namespace CECommon.Providers
 		//private Dictionary<long, AnalogMeasurementInfo> analogMeasurements;
 		private Dictionary<long, DiscreteMeasurement> discreteMeasurements;
 		//private Dictionary<long, DiscreteMeasurementInfo> discreteMeasurements;
-		private Dictionary<long, List<Tuple<string, long>>> elementToMeasurementMap;
+		private Dictionary<long, List<long>> elementToMeasurementMap;
+		private Dictionary<long, long> measurementToElementMap;
 		private ProxyFactory proxyFactory; 
 
 		public CacheProvider()
 		{
-			elementToMeasurementMap = new Dictionary<long, List<Tuple<string, long>>>();
+			elementToMeasurementMap = new Dictionary<long, List<long>>();
+			measurementToElementMap = new Dictionary<long, long>();
 			analogMeasurements = new Dictionary<long, AnalogMeasurement>();
 			//analogMeasurements = new Dictionary<long, AnalogMeasurementInfo>();
 			discreteMeasurements = new Dictionary<long, DiscreteMeasurement>();
 			//discreteMeasurements = new Dictionary<long, DiscreteMeasurementInfo>();
+
 			proxyFactory = new ProxyFactory();
 			Provider.Instance.CacheProvider = this;
 		}
@@ -45,17 +48,25 @@ namespace CECommon.Providers
 
 				if (elementToMeasurementMap.TryGetValue(analogMeasurement.ElementId, out var measurements))
 				{
-
-					measurements.Add(new Tuple<string, long>(analogMeasurement.GetMeasurementType(), analogMeasurement.Id));
+					measurements.Add(analogMeasurement.Id);
 				}
 				else
 				{
 					elementToMeasurementMap.Add(
 						analogMeasurement.ElementId,
-						new List<Tuple<string, long>>()
+						new List<long>()
 						{
-								new Tuple<string, long>(analogMeasurement.GetMeasurementType(), analogMeasurement.Id)
+							analogMeasurement.Id
 						});
+				}
+
+				if (!measurementToElementMap.ContainsKey(analogMeasurement.Id))
+				{
+					measurementToElementMap.Add(analogMeasurement.Id, analogMeasurement.ElementId);
+				}
+				else
+				{
+					//TOOD: log err/warn?
 				}
 			}
 		}
@@ -64,25 +75,28 @@ namespace CECommon.Providers
 			if (!discreteMeasurements.ContainsKey(discreteMeasurement.Id))
 			{
 				discreteMeasurements.Add(discreteMeasurement.Id, discreteMeasurement);
-				if (elementToMeasurementMap.ContainsKey(discreteMeasurement.ElementId))
-				{
-
-				}
-
-
+				
 				if (elementToMeasurementMap.TryGetValue(discreteMeasurement.ElementId, out var measurements))
 				{
-
-					measurements.Add(new Tuple<string, long>(discreteMeasurement.GetMeasurementType(), discreteMeasurement.Id));
+					measurements.Add(discreteMeasurement.Id);
 				}
 				else
 				{
 					elementToMeasurementMap.Add(
 						discreteMeasurement.ElementId,
-						new List<Tuple<string, long>>()
+						new List<long>()
 						{
-								new Tuple<string, long>(discreteMeasurement.GetMeasurementType(), discreteMeasurement.Id)
+							discreteMeasurement.Id
 						});
+				}
+
+				if(!measurementToElementMap.ContainsKey(discreteMeasurement.Id))
+				{
+					measurementToElementMap.Add(discreteMeasurement.Id, discreteMeasurement.ElementId);
+				}
+				else
+				{
+					//TOOD: log err/warn?
 				}
 			}
 		}
@@ -188,7 +202,7 @@ namespace CECommon.Providers
 			return signalGid;
 		}
 
-		public List<Tuple<string, long>> GetMeasurementsForElement(long elementGid)
+		public List<long> GetMeasurementsForElement(long elementGid)
 		{
 			if (elementToMeasurementMap.TryGetValue(elementGid, out var measurements))
 			{
@@ -196,8 +210,18 @@ namespace CECommon.Providers
 			}
 			else
 			{
-				return new List<Tuple<string, long>>();
+				return new List<long>();
 			}
+		}
+
+		public Dictionary<long, List<long>> GetElementToMeasurementMap()
+		{
+			return elementToMeasurementMap;
+		}
+
+		public Dictionary<long, long> GetMeasurementToElementMap()
+		{
+			return measurementToElementMap;
 		}
 
 		public bool TryGetDiscreteMeasurement(long measurementGid, out DiscreteMeasurement measurement)

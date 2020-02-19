@@ -380,6 +380,14 @@ namespace OMS.OutageSimulator.UserControls
             outage.OutageElement = OutageElement.First();
             outage.OptimumIsolationPoints.AddRange(OptimumIsolationPoints);
             outage.DefaultIsolationPoints.AddRange(DefaultIsolationPoints);
+            
+            for(int i = 0; i < DefaultIsolationPoints.Count; i++)
+            {
+                if(!outage.DefaultToOptimumIsolationPointMap.ContainsKey(DefaultIsolationPoints[i].GID))
+                {
+                    outage.DefaultToOptimumIsolationPointMap.Add(DefaultIsolationPoints[i].GID, OptimumIsolationPoints[i].GID);
+                }
+            }
 
             overviewUserControl.GenerateOutage(outage);
 

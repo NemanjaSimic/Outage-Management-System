@@ -93,8 +93,9 @@ namespace OMS.OutageSimulator.UserControls
                 }
 
                 scadaSubscriber.Subscribe(Topic.SWITCH_STATUS);
-                
-                while (true)
+
+                bool toContinue = !token.IsCancellationRequested;
+                while (toContinue)
                 {
                     //TODO: OUTAGE LOGIC
 
@@ -102,7 +103,8 @@ namespace OMS.OutageSimulator.UserControls
                     {
                         // Clean up here
                         scadaSubscriber.Close();
-                        token.ThrowIfCancellationRequested();
+                        toContinue = false;
+                        //token.ThrowIfCancellationRequested();
                     }
                 }
 
@@ -126,6 +128,7 @@ namespace OMS.OutageSimulator.UserControls
         {
             //TODO: END TASK HERE
             outageTokenMap[SelectedOutege.OutageElement.GID].Cancel();
+            outageTokenMap.Remove(SelectedOutege.OutageElement.GID);
 
             ActiveOutages.Remove(SelectedOutege);
 
