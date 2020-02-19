@@ -25,18 +25,8 @@ namespace Outage.Common.PubSub.OutageDataContract
         [DataMember]
         public DateTime? ResolvedTime { get; set; }
 
-
         [DataMember]
         public long OutageElementGid { get; set; }
-
-        [DataMember]
-        public List<long> ReportedElements { get; set; }
-
-        [DataMember]
-        public DateTime? IsolatedTime { get; set; }
-
-        [DataMember]
-        public DateTime? ResolvedTime { get; set; }
 
         [DataMember]
         public OutageState OutageState { get; set; }
