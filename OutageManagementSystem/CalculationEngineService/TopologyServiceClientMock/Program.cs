@@ -23,9 +23,9 @@ namespace TopologyServiceClientMock
 						var measurements = proxy.GetMeasurementsForElement(elementGid);
 						if (measurements.Count > 0)
 						{
-							foreach (var measurementTuple in measurements)
+							foreach (long measurementId in measurements)
 							{
-								Console.WriteLine($"Measurement type: {measurementTuple.Item1}, measurement gid {measurementTuple.Item2}");
+								Console.WriteLine($"Masurement gid {measurementId}");
 							}
 						}
 						else

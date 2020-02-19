@@ -1,16 +1,5 @@
-﻿using OMS.Web.Adapter.Outage;
-using OMS.Web.Adapter.SCADA;
-using OMS.Web.Adapter.Topology;
-using OMS.Web.Common;
-using OMS.Web.Common.Mappers;
-using Outage.Common;
-using Outage.Common.ServiceProxies.PubSub;
+﻿using Outage.Common;
 using System;
-using System.Collections.Generic;
-using System.Linq;
-using System.Text;
-using System.Threading;
-using System.Threading.Tasks;
 
 namespace OMS.Web.Adapter.Host
 {

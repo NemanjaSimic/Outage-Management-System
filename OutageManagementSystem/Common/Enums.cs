@@ -21,7 +21,7 @@ namespace Outage.Common
     public enum Topic
     {
         [EnumMember]
-        MEASUREMENT = 0,
+        MEASUREMENT = 1,
 
         [EnumMember]
         SWITCH_STATUS,
@@ -60,6 +60,16 @@ namespace Outage.Common
 
         [EnumMember]
         ABNORMAL_VALUE = 0x05,
+    }
+
+    [DataContract]
+    public enum DiscreteCommandingType : ushort
+    {
+        [EnumMember]
+        CLOSE = 0x00,
+        
+        [EnumMember]
+        OPEN = 0x01,
     }
 
     [DataContract]
