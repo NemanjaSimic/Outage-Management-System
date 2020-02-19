@@ -84,7 +84,8 @@ namespace CalculationEngineService
                 new ServiceHost(typeof(CEModelUpdateNotification)),
                 new ServiceHost(typeof(CETransactionActor)),
                 new ServiceHost(typeof(TopologyService)),
-                new ServiceHost(typeof(SCADACommandingService))
+                new ServiceHost(typeof(SCADACommandingService)),
+                new ServiceHost(typeof(MeasurementMapService))
             };
         }
 

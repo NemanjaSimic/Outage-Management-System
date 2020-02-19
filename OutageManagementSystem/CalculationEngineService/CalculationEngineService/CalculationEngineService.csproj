@@ -45,6 +45,7 @@
     <Compile Include="CalculationEngineService.cs" />
     <Compile Include="DistributedTransaction\CEModelUpdateNotification.cs" />
     <Compile Include="DistributedTransaction\CETransactionActor.cs" />
+    <Compile Include="MeasurementMapService.cs" />
     <Compile Include="Properties\AssemblyInfo.cs" />
     <Compile Include="TransactionManager.cs" />
   </ItemGroup>
