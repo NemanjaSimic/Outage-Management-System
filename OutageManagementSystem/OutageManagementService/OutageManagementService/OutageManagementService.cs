@@ -42,7 +42,7 @@ namespace OutageManagementService
             proxyFactory = new ProxyFactory();
 
             //TODO: Initialize what is needed
-            //Delete database(TODO: restauration of data...)
+            //TODO: restauration of data...
             modelResourcesDesc = new ModelResourcesDesc();
             using (OutageContext db = new OutageContext())
             {

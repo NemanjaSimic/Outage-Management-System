@@ -16,5 +16,11 @@ namespace Outage.Common.ServiceContracts.OMS
         [OperationContract]
         List<ArchivedOutage> GetArchivedOutages();
 
+        [OperationContract]
+        bool UpdateActiveOutageIsolated(long elementGid, List<long> locatedElements);
+
+        [OperationContract]
+        bool UpdateActiveOutageResolved(long elementGid);
+
     }
 }
