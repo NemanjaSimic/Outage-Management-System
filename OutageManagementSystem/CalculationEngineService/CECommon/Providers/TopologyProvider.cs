@@ -17,6 +17,7 @@ namespace CECommon.Providers
             set
             {
                 topology = value;
+                ProviderTopologyDelegate?.Invoke(Topology);
             }
         }
         private List<ITopology> TransactionTopology { get; set; }
@@ -33,11 +34,7 @@ namespace CECommon.Providers
         
         public void DiscreteMeasurementDelegate(List<long> elementGids)
         {
-            Topology = this.modelTopologyServis.UpdateLoadFlow(elementGids, Topology);
-            if (transactionFlag == TransactionFlag.NoTransaction)
-            {
-                ProviderTopologyDelegate?.Invoke(Topology);
-            }
+            Topology = this.modelTopologyServis.UpdateLoadFlow(elementGids, Topology); 
         }
 
         public List<ITopology> GetTopologies()
@@ -56,7 +53,6 @@ namespace CECommon.Providers
             Topology = TransactionTopology;
             transactionFlag = TransactionFlag.NoTransaction;
             ProviderTopologyConnectionDelegate?.Invoke(Topology);
-            ProviderTopologyDelegate?.Invoke(Topology);
         }
         public bool PrepareForTransaction()
         {

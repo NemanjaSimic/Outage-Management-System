@@ -22,6 +22,7 @@
         public static readonly string TopologyServiceEndpoint = "TopologyServiceEndpoint";
         public static readonly string TopologyOMSServiceEndpoint = "TopologyOMSServiceEndpoint";
         public static readonly string SwitchStatusCommandingEndpoint = "SwitchStatusCommandingEndpoint";
+        public static readonly string MeasurementMapEndpoint = "MeasurementMapEndpoint";
 
         //PUBSUB - 4
         public static readonly string PublisherEndpoint = "PublisherEndpoint";

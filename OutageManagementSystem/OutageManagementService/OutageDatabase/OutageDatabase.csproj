@@ -56,6 +56,10 @@
     <Compile Include="Migrations\202002121057388_InitMigration.designer.cs">
       <DependentUpon>202002121057388_InitMigration.cs</DependentUpon>
     </Compile>
+    <Compile Include="Migrations\202002130914535_common fields.cs" />
+    <Compile Include="Migrations\202002130914535_common fields.designer.cs">
+      <DependentUpon>202002130914535_common fields.cs</DependentUpon>
+    </Compile>
     <Compile Include="Migrations\Configuration.cs" />
     <Compile Include="OutageContext.cs" />
     <Compile Include="Properties\AssemblyInfo.cs" />
@@ -73,6 +77,9 @@
   <ItemGroup>
     <EmbeddedResource Include="Migrations\202002121057388_InitMigration.resx">
       <DependentUpon>202002121057388_InitMigration.cs</DependentUpon>
+    </EmbeddedResource>
+    <EmbeddedResource Include="Migrations\202002130914535_common fields.resx">
+      <DependentUpon>202002130914535_common fields.cs</DependentUpon>
     </EmbeddedResource>
   </ItemGroup>
   <Import Project="$(MSBuildToolsPath)\Microsoft.CSharp.targets" />
