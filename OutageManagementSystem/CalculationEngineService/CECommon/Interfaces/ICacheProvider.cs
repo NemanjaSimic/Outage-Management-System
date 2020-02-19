@@ -17,6 +17,7 @@ namespace CECommon.Interfaces
         float GetAnalogValue(long measurementGid);
         bool GetDiscreteValue(long measurementGid);
         long GetElementGidForMeasurement(long measurementGid);
+        List<Tuple<string, long>> GetMeasurementsForElement(long elementGid);
         bool TryGetAnalogMeasurement(long measurementGid, out AnalogMeasurement measurement);
         bool TryGetDiscreteMeasurement(long measurementGid, out DiscreteMeasurement measurement);
         void UpdateAnalogMeasurement(long measurementGid, float value);

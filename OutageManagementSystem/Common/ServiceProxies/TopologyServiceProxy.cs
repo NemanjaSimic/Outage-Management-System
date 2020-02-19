@@ -3,7 +3,6 @@ using Outage.Common.ServiceContracts;
 using Outage.Common.ServiceProxies;
 using Outage.Common.UI;
 using System;
-using System.ServiceModel;
 
 namespace TopologyServiceClientMock
 {
