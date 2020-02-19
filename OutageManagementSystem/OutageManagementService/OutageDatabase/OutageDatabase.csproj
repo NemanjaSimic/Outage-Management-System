@@ -61,14 +61,6 @@
       <DependentUpon>202002130914535_common fields.cs</DependentUpon>
     </Compile>
     <Compile Include="Migrations\202002141544238_OutageModelChanges.cs" />
-    <Compile Include="Migrations\202002141544238_OutageModelChanges.designer.cs">
-      <DependentUpon>202002141544238_OutageModelChanges.cs</DependentUpon>
-    </Compile>
-    <Compile Include="Migrations\202002130914535_common fields.cs" />
-    <Compile Include="Migrations\202002130914535_common fields.designer.cs">
-      <DependentUpon>202002130914535_common fields.cs</DependentUpon>
-    </Compile>
-    <Compile Include="Migrations\202002141544238_OutageModelChanges.cs" />
     <Compile Include="Migrations\202002141544238_OutageModelChanges.Designer.cs">
       <DependentUpon>202002141544238_OutageModelChanges.cs</DependentUpon>
     </Compile>
@@ -98,12 +90,6 @@
     <EmbeddedResource Include="Migrations\202002121057388_InitMigration.resx">
       <DependentUpon>202002121057388_InitMigration.cs</DependentUpon>
     </EmbeddedResource>
-    <EmbeddedResource Include="Migrations\202002130914535_common fields.resx">
-      <DependentUpon>202002130914535_common fields.cs</DependentUpon>
-    </EmbeddedResource>
-    <EmbeddedResource Include="Migrations\202002141544238_OutageModelChanges.resx">
-      <DependentUpon>202002141544238_OutageModelChanges.cs</DependentUpon>
-    </EmbeddedResource>>
     <EmbeddedResource Include="Migrations\202002130914535_common fields.resx">
       <DependentUpon>202002130914535_common fields.cs</DependentUpon>
     </EmbeddedResource>

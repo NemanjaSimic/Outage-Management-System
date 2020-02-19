@@ -201,7 +201,7 @@ namespace OutageManagementService
                         Logger.LogError("Error while adding reported outage into database.", e);
                     }
                 }
-                //TODO: Publish
+                
                 if (activeOutage != null)
                 {
                     try
