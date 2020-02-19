@@ -65,10 +65,24 @@ namespace Outage.Common
     [DataContract]
     public enum ElementType
     {
-        [DataMember]
+        
+        [EnumMember]
         Remote = 1,
 
-        [DataMember]
+        [EnumMember]
         Local
+    }
+
+    [DataContract]
+    public enum OutageState : short
+    {
+        [EnumMember]
+        CREATED = 1,
+        [EnumMember]
+        ISOLATED = 2,
+        [EnumMember]
+        RESOLVED = 3,
+        [EnumMember]
+        ARCHIVED = 4
     }
 }

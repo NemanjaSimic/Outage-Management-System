@@ -49,7 +49,7 @@ namespace TestSub
             }
             else if (msg is ActiveOutage activeOutage)
             {
-                Console.WriteLine($"Active outage id: {activeOutage.OutageId}, affected consumers:{activeOutage.AffectedConsumers}, affected element: 0x{activeOutage.ElementGid:x16}");
+                Console.WriteLine($"Active outage id: {activeOutage.OutageId}, affected consumers:{activeOutage.AffectedConsumers}, affected element: 0x{activeOutage.OutageElementGid:x16}");
             }
         }
 	}

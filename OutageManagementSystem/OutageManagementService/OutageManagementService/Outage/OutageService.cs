@@ -49,5 +49,15 @@ namespace OutageManagementService.Outage
         {
             return outageModel.ReportPotentialOutage(elementGid); //TODO: enum (error, noAffectedConsumers, success,...)
         }
+
+        public bool UpdateActiveOutageIsolated(long elementGid, List<long> locatedElements)
+        {
+            return outageModel.UpdateActiveOutageIsolated(elementGid, locatedElements);
+        }
+
+        public bool UpdateActiveOutageResolved(long elementGid)
+        {
+            return outageModel.UpdateActiveOutageResolved(elementGid);
+        }
     }
 }
