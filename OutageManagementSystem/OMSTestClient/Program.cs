@@ -1,5 +1,6 @@
 ﻿using Outage.Common;
 using Outage.Common.ServiceProxies.CalcualtionEngine;
+using Outage.Common.ServiceProxies.Outage;
 using Outage.Common.ServiceProxies.PubSub;
 using System;
 using System.Collections.Generic;
@@ -20,6 +21,11 @@ namespace OMSTestClient
 				using (var proxy = new OMSTopologyServiceProxy("TopologyServiceEndpoint"))
 				{
 					var ui = proxy.GetOMSModel();	
+				}
+
+				using (var proxy = new OutageSimulatorServiceProxy(EndpointNames.OutageSimulatorServiceEndpoint))
+				{
+					proxy.ResolvedOutage(0x0000000c00000029);
 				}
 			}
 			catch (Exception ex)

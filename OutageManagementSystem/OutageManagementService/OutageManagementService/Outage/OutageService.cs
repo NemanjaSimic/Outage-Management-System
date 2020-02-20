@@ -8,7 +8,7 @@ using System.Data.Entity;
 
 namespace OutageManagementService.Outage
 {
-    public class OutageService : IOutageContract
+    public class OutageService : IOutageContract, IOutageLifecycleContract
     {
         private ILogger logger;
        
@@ -18,9 +18,9 @@ namespace OutageManagementService.Outage
         }
 
         public static OutageModel outageModel;
-       
-       
 
+
+        #region IOutageAccessContract
         public List<ActiveOutage> GetActiveOutages()
         {
             //TODO: Logic
@@ -44,20 +44,14 @@ namespace OutageManagementService.Outage
 
             return archivedOutages;
         }
+        #endregion
 
+        #region IOutageLifecycleContract
         public bool ReportOutage(long elementGid)
         {
             return outageModel.ReportPotentialOutage(elementGid); //TODO: enum (error, noAffectedConsumers, success,...)
         }
+        #endregion
 
-        public bool UpdateActiveOutageIsolated(long elementGid, List<long> locatedElements)
-        {
-            return outageModel.UpdateActiveOutageIsolated(elementGid, locatedElements);
-        }
-
-        public bool UpdateActiveOutageResolved(long elementGid)
-        {
-            return outageModel.UpdateActiveOutageResolved(elementGid);
-        }
     }
 }

@@ -151,18 +151,18 @@ namespace CECommon.Providers
 			{
 				if (!measurement.CurrentOpen)
 				{
-					using (OutageServiceProxy outageProxy = proxyFactory.CreateProxy<OutageServiceProxy, IOutageContract>(EndpointNames.OutageServiceEndpoint))
+					using (OutageLifecycleProxy outageLifecycleProxy = proxyFactory.CreateProxy<OutageLifecycleProxy, IOutageLifecycleContract>(EndpointNames.OutageLifecycleEndpoint))
 					{
-						if (outageProxy == null)
+						if (outageLifecycleProxy == null)
 						{
-							string message = "UpdateDiscreteMeasurement => OutageServiceProxy is null.";
+							string message = "UpdateDiscreteMeasurement => OutageLifecycleProxy is null.";
 							logger.LogError(message);
 							throw new NullReferenceException(message);
 						}
 
 						try
 						{
-							outageProxy.ReportOutage(measurement.ElementId);
+							outageLifecycleProxy.ReportOutage(measurement.ElementId);
 						}
 						catch (Exception e)
 						{
