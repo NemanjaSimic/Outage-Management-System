@@ -2,6 +2,6 @@
 {
     public class ValidateOutageCommand : OutageLifecycleCommandBase
     {
-        public ValidateOutageCommand(long gid) : base(gid) { }
+        public ValidateOutageCommand(long id) : base(id) { }
     }
 }

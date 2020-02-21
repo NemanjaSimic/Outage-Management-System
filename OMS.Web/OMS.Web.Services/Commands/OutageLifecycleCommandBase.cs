@@ -4,14 +4,14 @@
     
     public abstract class OutageLifecycleCommandBase : IRequest
     {
-        protected long _gid;
+        protected long _id;
 
-        public long Gid
+        public long Id
         {
-            get => _gid;
-            set => _gid = value;
+            get => _id;
+            set => _id = value;
         }
 
-        public OutageLifecycleCommandBase(long gid) => _gid = gid;
+        public OutageLifecycleCommandBase(long id) => _id = id;
     }
 }

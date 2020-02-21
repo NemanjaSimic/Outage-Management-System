@@ -2,6 +2,6 @@
 {
     public class IsolateOutageCommand : OutageLifecycleCommandBase
     {
-        public IsolateOutageCommand(long gid): base(gid) { }
+        public IsolateOutageCommand(long id): base(id) { }
     }
 }

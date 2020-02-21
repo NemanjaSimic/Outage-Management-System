@@ -2,6 +2,6 @@
 {
     public class ResolveOutageCommand : OutageLifecycleCommandBase
     {
-        public ResolveOutageCommand(long gid) : base(gid) { }
+        public ResolveOutageCommand(long id) : base(id) { }
     }
 }

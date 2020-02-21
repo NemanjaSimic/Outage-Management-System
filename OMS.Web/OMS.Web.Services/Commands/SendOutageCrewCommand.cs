@@ -2,6 +2,6 @@
 {
     public class SendOutageCrewCommand : OutageLifecycleCommandBase
     {
-        public SendOutageCrewCommand(long gid): base(gid) { }
+        public SendOutageCrewCommand(long id): base(id) { }
     }
 }
