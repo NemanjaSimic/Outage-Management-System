@@ -35,12 +35,12 @@ namespace OMS.Web.API.Controllers
         }
 
         [HttpPost]
-        [Route("api/outage/isolate/{gid}")]
-        public async Task<IHttpActionResult> IsolateOutage([FromUri]long gid)
+        [Route("api/outage/isolate/{id}")]
+        public async Task<IHttpActionResult> IsolateOutage([FromUri]long id)
         {
             try
             {
-                _ = await _mediator.Send(new IsolateOutageCommand(gid));
+                _ = await _mediator.Send(new IsolateOutageCommand(id));
             }
             catch (Exception e)
             {
