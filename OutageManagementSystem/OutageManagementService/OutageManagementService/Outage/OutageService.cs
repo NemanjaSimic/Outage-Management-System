@@ -5,6 +5,7 @@ using OutageDatabase;
 using System.Collections.Generic;
 using System.Linq;
 using System.Data.Entity;
+using System;
 
 namespace OutageManagementService.Outage
 {
@@ -50,6 +51,11 @@ namespace OutageManagementService.Outage
         public bool ReportOutage(long elementGid)
         {
             return outageModel.ReportPotentialOutage(elementGid); //TODO: enum (error, noAffectedConsumers, success,...)
+        }
+
+        public bool IsolateOutage(long outageId)
+        {
+            return outageModel.IsolateOutage(outageId);
         }
         #endregion
 

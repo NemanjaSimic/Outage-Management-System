@@ -14,6 +14,10 @@ namespace Outage.Common.ServiceProxies.Outage
         {
         }
 
+        public bool IsolateOutage(long outageId)
+        {
+            throw new NotImplementedException();
+        }
 
         public bool ReportOutage(long elementGid)
         {

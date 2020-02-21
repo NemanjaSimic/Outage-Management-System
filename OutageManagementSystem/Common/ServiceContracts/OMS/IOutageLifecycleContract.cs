@@ -12,5 +12,8 @@ namespace Outage.Common.ServiceContracts.OMS
     {
         [OperationContract]
         bool ReportOutage(long elementGid);
+
+        [OperationContract]
+        bool IsolateOutage(long outageId);
     }
 }

@@ -17,7 +17,10 @@ namespace Outage.Common.PubSub.OutageDataContract
         public DateTime ReportTime { get; set; }
         
         [DataMember]
-        public List<long> ReportedElements { get; set; }
+        public string DefaultIsolationPoints { get; set; }
+
+        [DataMember]
+        public string OptimumIsolationPoints { get; set; }
 
         [DataMember]
         public DateTime? IsolatedTime { get; set; }
@@ -50,7 +53,6 @@ namespace Outage.Common.PubSub.OutageDataContract
         public ActiveOutage()
         {
             AffectedConsumers = new List<Consumer>();
-            ReportedElements = new List<long>();
         }
     }
 
