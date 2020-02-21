@@ -11,6 +11,11 @@
           <td [class.table-data]="true" mat-cell *matCellDef="let activeOutage"> 0x{{ (+activeOutage.ElementId).toString(16).toUpperCase() }} </td>
         </ng-container>
       
+        <ng-container matColumnDef="state">
+          <th [class.dark-header]="true" mat-header-cell *matHeaderCellDef> State </th>
+          <td [class.table-data]="true" mat-cell *matCellDef="let activeOutage"> {{ activeOutage.State.toString() }} </td>
+        </ng-container>
+
         <ng-container matColumnDef="reportedAt">
           <th [class.dark-header]="true" mat-header-cell *matHeaderCellDef> Reported At </th>
           <td [class.table-data]="true" mat-cell *matCellDef="let activeOutage"> {{ activeOutage.ReportedAt | date:'medium' }} </td>

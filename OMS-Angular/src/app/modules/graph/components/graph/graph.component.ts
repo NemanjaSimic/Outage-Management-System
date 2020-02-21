@@ -26,6 +26,7 @@ import { modifyNodeDistance } from '@shared/utils/graph-distance';
 import { GraphService } from '@services/notification/graph.service';
 import { CommandService } from '@services/command/command.service';
 import { ScadaService } from '@services/notification/scada.service';
+import { OutageService } from '@services/outage/outage.service';
 import { OutageNotificationService } from '@services/notification/outage-notification.service';
 
 import { ActiveOutage, ArchivedOutage } from '@shared/models/outage.model';
@@ -71,6 +72,7 @@ export class GraphComponent implements OnInit, OnDestroy {
     private scadaService: ScadaService,
     private outageNotificationService: OutageNotificationService,
     private commandService: CommandService,
+    private outageCommandService: OutageService,
     private ngZone: NgZone
   ) {
     this.connectionSubscription = Subscription.EMPTY;
@@ -266,9 +268,9 @@ export class GraphComponent implements OnInit, OnDestroy {
 
           addOutageTooltip(this.cy, node, outage);
         }
-		else if(node.data("type") == 'analogMeasurement')
+	    	else if(node.data("type") == 'analogMeasurement')
         {
-          //addMeasurementTooltip(this.cy, node);
+          //ako se bude dodavao tooltip sa tipom alarma
         }
         else {
 
