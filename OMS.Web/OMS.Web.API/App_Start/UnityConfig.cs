@@ -6,6 +6,7 @@ using OMS.Web.Common.Mappers;
 using OMS.Web.Services.Commands;
 using OMS.Web.Services.Queries;
 using Outage.Common;
+using Outage.Common.ServiceProxies;
 using System;
 using System.Collections.Generic;
 using System.Linq;
@@ -54,6 +55,7 @@ namespace OMS.Web.API
             container.RegisterType<IGraphMapper, GraphMapper>();
             container.RegisterType<IConsumerMapper, ConsumerMapper>();
             container.RegisterType<IOutageMapper, OutageMapper>();
+            container.RegisterType<IProxyFactory, ProxyFactory>();
             container.RegisterType<ILogger, FileLogger>(new ContainerControlledLifetimeManager());
 
             // We register our mediatr commands here (concrete, not abstract)

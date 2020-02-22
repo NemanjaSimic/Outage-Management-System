@@ -4,7 +4,7 @@ using System.Threading;
 
 namespace Outage.Common.ServiceProxies
 {
-    public class ProxyFactory
+    public class ProxyFactory : IProxyFactory
     {
         private ILogger logger;
 

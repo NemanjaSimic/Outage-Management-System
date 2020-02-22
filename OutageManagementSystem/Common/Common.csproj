@@ -155,6 +155,7 @@
     <Compile Include="ServiceProxies\CalcualtionEngine\UITopologyServiceProxy.cs" />
     <Compile Include="ServiceProxies\DistributedTransaction\ModelUpdateNotificationProxy.cs" />
     <Compile Include="ServiceProxies\DistributedTransaction\TransactionCoordinatorProxy.cs" />
+    <Compile Include="ServiceProxies\IProxyFactory.cs" />
     <Compile Include="ServiceProxies\NetworkModelGDAProxy.cs" />
     <Compile Include="ServiceProxies\DistributedTransaction\TransactionActorProxy.cs" />
     <Compile Include="ServiceProxies\Outage\CallingServiceProxy.cs" />

@@ -1,10 +1,6 @@
 ﻿namespace OMS.Web.Services.Handlers
 {
     using MediatR;
-    using OMS.Web.Adapter.Contracts;
-    using OMS.Web.Adapter.Topology;
-    using OMS.Web.Common;
-    using OMS.Web.Common.Exceptions;
     using OMS.Web.Common.Mappers;
     using OMS.Web.Services.Queries;
     using OMS.Web.UI.Models.ViewModels;
@@ -19,7 +15,6 @@
 
     public class TopologyQueryHandler : IRequestHandler<GetTopologyQuery, OmsGraphViewModel>
     {
-        //private readonly ITopologyClient _topologyClient;
         private readonly IGraphMapper _mapper;
         private readonly ILogger _logger;
         private ProxyFactory _proxyFactory;
@@ -30,10 +25,6 @@
             _logger = logger;
 
             _proxyFactory = new ProxyFactory();
-
-            // nece dependency injection zbog nekog unity updatea
-            //string topologyServiceAddress = AppSettings.Get<string>(ServiceAddress.TopologyServiceAddress);
-            //_topologyClient = new TopologyClientProxy(topologyServiceAddress);
         }
 
         public Task<OmsGraphViewModel> Handle(GetTopologyQuery request, CancellationToken cancellationToken)
