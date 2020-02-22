@@ -12,7 +12,7 @@ namespace CalculationEngineService
         {
             try
             {
-                return Provider.Instance.CacheProvider.GetElementToMeasurementMap();
+                return Provider.Instance.MeasurementProvider.GetElementToMeasurementMap();
             }
             catch (Exception ex)
             {
@@ -38,7 +38,7 @@ namespace CalculationEngineService
         {
             try
             {
-                return Provider.Instance.CacheProvider.GetMeasurementToElementMap();
+                return Provider.Instance.MeasurementProvider.GetMeasurementToElementMap();
             }
             catch (Exception ex)
             {
