@@ -14,6 +14,7 @@ namespace Outage.Common.OutageService.Model
         private string dmsType;
         private bool isRemote;
         private ushort distanceFromSource;
+        private bool isActive;
         #endregion
 
 
@@ -28,6 +29,8 @@ namespace Outage.Common.OutageService.Model
         public string DmsType { get { return dmsType; } set { dmsType = value; } }
         [DataMember]
         public bool IsRemote { get { return isRemote; } set { isRemote = value; } }
+        [DataMember]
+        public bool IsActive { get { return isActive; } set { isActive = value; } }
         [DataMember]
         public ushort DistanceFromSource { get { return distanceFromSource; } set { distanceFromSource = value; } }
         #endregion

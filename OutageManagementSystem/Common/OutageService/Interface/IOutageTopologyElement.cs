@@ -9,6 +9,7 @@ namespace Outage.Common.OutageService.Interface
         List<long> SecondEnd { get; set; }
         string DmsType { get; set; }
         bool IsRemote { get; set; }
+        bool IsActive { get; set; }
         ushort DistanceFromSource { get; set; }
     }
 }
