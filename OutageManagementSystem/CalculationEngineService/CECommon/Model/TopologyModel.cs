@@ -1,25 +1,13 @@
 ﻿using CECommon.Interfaces;
-using Outage.Common.UI;
 using System.Collections.Generic;
 using Logger = Outage.Common.LoggerWrapper;
 
 namespace CECommon.Model
 {
-
 	public class TopologyModel : ITopology
     {
-		private long firstNode;
-		private Dictionary<long, ITopologyElement> topologyElements;
-
-		public long FirstNode
-		{
-			get { return firstNode; }
-			set 
-			{ 
-				firstNode = value;			
-			}
-		}
-		public Dictionary<long, ITopologyElement> TopologyElements { get => topologyElements; set => topologyElements = value; }
+		public long FirstNode { get; set; }
+		public Dictionary<long, ITopologyElement> TopologyElements { get; set; }
 		public TopologyModel()
 		{
 			TopologyElements = new Dictionary<long, ITopologyElement>();
@@ -32,15 +20,15 @@ namespace CECommon.Model
 			}
 			else
 			{
-				Logger.Instance.LogWarn($"Topology element with GID {newElement.Id} is already added.");
+				Logger.Instance.LogWarn($"Topology element with GID 0x{newElement.Id.ToString("16X")} is already added.");
 			}
 		}
 		public bool GetElementByGid(long gid, out ITopologyElement topologyElement)
 		{
 			bool success = false;
-			if (topologyElements.ContainsKey(gid))
+			if (TopologyElements.ContainsKey(gid))
 			{
-				topologyElement = topologyElements[gid];
+				topologyElement = TopologyElements[gid];
 				success = true;
 			}
 			else

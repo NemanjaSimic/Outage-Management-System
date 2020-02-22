@@ -36,7 +36,6 @@ namespace Topology
 				throw;
 			}
 		}
-
 		public UIModel GetTopology()
 		{
 			try

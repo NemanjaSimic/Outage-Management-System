@@ -2,15 +2,11 @@
 using Outage.Common;
 using Outage.Common.PubSub;
 using Outage.Common.PubSub.SCADADataContract;
-using System;
 using System.Collections.Generic;
-using System.Linq;
-using System.Text;
-using System.Threading.Tasks;
 
 namespace CECommon.Providers
 {
-    public class SCADAResultHandler : ISCADAResultHandler
+	public class SCADAResultHandler : ISCADAResultHandler
 	{
 		private ILogger logger = LoggerWrapper.Instance;
 		public SCADAResultHandler()

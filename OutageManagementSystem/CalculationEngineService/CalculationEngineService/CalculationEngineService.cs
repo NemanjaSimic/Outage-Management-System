@@ -25,7 +25,7 @@ namespace CalculationEngineService
         private IModelManager modelManager;
         private ITopologyBuilder topologyBuilder;
         private IMeasurementProvider cacheProvider;
-        private IVoltageFlow voltageFlow;
+        private ILoadFlow voltageFlow;
 
         private ProxyFactory proxyFactory;
         private SCADAResultHandler sCADAResultProvider;
@@ -45,7 +45,7 @@ namespace CalculationEngineService
             proxyFactory = new ProxyFactory();
 
             topologyBuilder = new GraphBuilder();
-            voltageFlow = new VoltageFlow();
+            voltageFlow = new LoadFlow();
             modelTopologyServis = new ModelTopologyService(topologyBuilder, voltageFlow);
             webTopologyBuilder = new TopologyConverter();
 
@@ -156,7 +156,6 @@ namespace CalculationEngineService
         {
             Logger.LogDebug("Subcribing on SCADA measurements.");
             proxy = proxyFactory.CreateProxy<SubscriberProxy, ISubscriber>(new SCADASubscriber(), EndpointNames.SubscriberEndpoint);
-            //proxy = new SubscriberProxy(new SCADASubscriber(), EndpointNames.SubscriberEndpoint);
 
             if (proxy == null)
             {

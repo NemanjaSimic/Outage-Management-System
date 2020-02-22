@@ -7,32 +7,18 @@ namespace CECommon
 {
 	public class TopologyElement : ITopologyElement
 	{
-        #region Fields
-        private long id;
-		private ITopologyElement firstEnd;
-		private List<ITopologyElement> secondEnd;
-		private string dmsType;
-		private List<long> measurements;
-		private string descritption;
-		private string mrid;
-		private string name;
-		private float nominalVoltage;
-		private bool isRemote;
-		private bool isActive;
-		#endregion
-
 		#region Properties
-		public long Id { get => id; set => id = value; }
-		public string Description { get => descritption; set => descritption = value; }
-		public string Mrid { get => mrid; set => mrid = value; }
-		public string Name { get => name; set => name = value; }
-		public float NominalVoltage { get => nominalVoltage; set => nominalVoltage = value; }
-		public ITopologyElement FirstEnd { get => firstEnd; set => firstEnd = value; }
-		public List<ITopologyElement> SecondEnd { get => secondEnd; set => secondEnd = value; }
-		public string DmsType { get => dmsType; set => dmsType = value; }
-		public List<long> Measurements { get => measurements; set => measurements = value; }
-		public bool IsRemote { get => isRemote; set => isRemote = value; }
-		public bool IsActive { get => isActive; set => isActive = value; }
+		public long Id { get; set; }
+		public string Description { get; set; }
+		public string Mrid { get; set; }
+		public string Name { get; set; }
+		public float NominalVoltage { get; set; }
+		public ITopologyElement FirstEnd { get; set; }
+		public List<ITopologyElement> SecondEnd { get; set; }
+		public string DmsType { get; set; }
+		public List<long> Measurements { get; set; }
+		public bool IsRemote { get; set; }
+		public bool IsActive { get; set; }
 
 		#endregion
 		public TopologyElement(long gid)

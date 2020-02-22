@@ -34,7 +34,6 @@ namespace SCADACommanding
                             logger.LogError(message);
                             throw new NullReferenceException(message);
                         }
-
                         proxy.SendDiscreteCommand(guid, (ushort)value);
                     }
                 }
@@ -45,7 +44,7 @@ namespace SCADACommanding
             }
             catch (Exception ex)
             {
-                logger.LogError($"Sending discrete command for measurement with GID {guid} failed. Exception: {ex.Message}");
+                logger.LogError($"Sending discrete command for measurement with GID 0x{guid.ToString("X16")} failed. Exception: {ex.Message}");
             }
         }
     }

@@ -51,7 +51,7 @@
     <Compile Include="TopologyPublisher.cs" />
     <Compile Include="TopologyService.cs" />
     <Compile Include="TopologyConverter.cs" />
-    <Compile Include="VoltageFlow.cs" />
+    <Compile Include="LoadFlow.cs" />
   </ItemGroup>
   <ItemGroup>
     <ProjectReference Include="..\..\Common\Common.csproj">

@@ -58,7 +58,6 @@ namespace NetworkModelServiceFunctions
 		ILogger logger = LoggerWrapper.Instance;
 		private readonly ModelResourcesDesc modelResourcesDesc;
 		private readonly NetworkModelGDA networkModelGDA;
-
 		private Dictionary<long, IMeasurement> Measurements { get; set; }
 		private Dictionary<long, ITopologyElement> TopologyElements { get; set; }
 		private List<long> EnergySources { get; set; }

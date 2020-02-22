@@ -44,7 +44,7 @@
     <Reference Include="System.Xml" />
   </ItemGroup>
   <ItemGroup>
-    <Compile Include="Interfaces\ICacheProvider.cs" />
+    <Compile Include="Interfaces\IMeasurementProvider.cs" />
     <Compile Include="Interfaces\IGraphElement.cs" />
     <Compile Include="Interfaces\IMeasurement.cs" />
     <Compile Include="Interfaces\IModelManager.cs" />
@@ -58,8 +58,7 @@
     <Compile Include="Interfaces\ITopologyConverter.cs" />
     <Compile Include="Enums.cs" />
     <Compile Include="Interfaces\ITopologyConverterProvider.cs" />
-    <Compile Include="Interfaces\IVoltageFlow.cs" />
-    <Compile Include="Model\BaseVoltage.cs" />
+    <Compile Include="Interfaces\ILoadFlow.cs" />
     <Compile Include="Model\Field.cs" />
     <Compile Include="Model\Measurement.cs" />
     <Compile Include="Model\TopologyModel.cs" />
@@ -70,7 +69,6 @@
     <Compile Include="Providers\SCADAResultHandler.cs" />
     <Compile Include="Providers\TopologyProvider.cs" />
     <Compile Include="Providers\TopologyConverterProvider.cs" />
-    <Compile Include="SmartCache.cs" />
     <Compile Include="TopologyConfiguration\Config.cs" />
     <Compile Include="TopologyConfiguration\ConfigurationParse.cs" />
     <Compile Include="Model\TopologyElement.cs" />

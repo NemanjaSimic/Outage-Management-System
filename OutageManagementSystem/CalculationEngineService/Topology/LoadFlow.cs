@@ -1,6 +1,5 @@
 ﻿using CECommon;
 using CECommon.Interfaces;
-using CECommon.Model;
 using CECommon.Providers;
 using Outage.Common;
 using Outage.Common.ServiceContracts.CalculationEngine;
@@ -11,12 +10,11 @@ using System.Linq;
 
 namespace Topology
 {
-    public class VoltageFlow : IVoltageFlow
+    public class LoadFlow : ILoadFlow
     {
         readonly ILogger logger = LoggerWrapper.Instance;
         private readonly ISwitchStatusCommandingContract commandingService = new SCADACommandingService();
         private HashSet<long> reclosers;
-
 
         public void UpdateLoadFlow(List<ITopology> topologies)
         {
@@ -25,7 +23,6 @@ namespace Topology
             {
                 CalculateLoadFlow(topology);
             }
-
             UpdateLoadFlowFromRecloser(topologies);
         }
         private void CalculateLoadFlow(ITopology topology)
@@ -62,7 +59,6 @@ namespace Topology
             {
                 logger.LogFatal("[Calulate load flow] First element of topology does not exist in collection.");
             }
-
             logger.LogDebug("Calulate load flow successfully finished.");
         }
         private bool IsElementEnergized(ITopologyElement element)
@@ -128,7 +124,6 @@ namespace Topology
                     }
                 }
             }
-
         }
         private ITopology CalculateLoadFlowFromRecloser(long recloserGid, ITopology topology)
         {

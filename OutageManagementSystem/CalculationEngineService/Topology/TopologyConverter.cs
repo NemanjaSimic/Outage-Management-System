@@ -104,7 +104,6 @@ namespace Topology
             logger.LogDebug("Topology to UIModel convert finished successfully.");
             return uIModel;
         }
-
         public IOutageTopologyModel ConvertTopologyToOMSModel(ITopology topology)
         {
             logger.LogDebug("Topology to OMS model convert started.");
