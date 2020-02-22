@@ -110,18 +110,20 @@ namespace Topology
             logger.LogDebug("Topology to OMS model convert started.");
             IOutageTopologyModel outageTopologyModel = new OutageTopologyModel();
             Stack<long> stack = new Stack<long>();
+
             var reclosers = Provider.Instance.ModelProvider.GetReclosers();
             outageTopologyModel.FirstNode = topology.FirstNode;
             stack.Push(topology.FirstNode);
+
             List<long> secondEnd = new List<long>();
             long nextElement = 0;
             long nextElementGid = 0;
-
+            ITopologyElement element;
 
             while (stack.Count > 0)
             {
                 nextElementGid = stack.Pop();
-                if (topology.GetElementByGid(nextElementGid, out ITopologyElement element))
+                if (topology.GetElementByGid(nextElementGid, out element))
                 {
                     secondEnd.Clear();
                     if (!reclosers.Contains(nextElementGid))
@@ -155,6 +157,7 @@ namespace Topology
                                 FirstEnd = (element.FirstEnd != null) ? element.FirstEnd.Id : 0,
                                 DmsType = element.DmsType,
                                 IsRemote = element.IsRemote,
+                                IsActive = element.IsActive,
                                 SecondEnd = new List<long>(secondEnd)
                             });
                     }
