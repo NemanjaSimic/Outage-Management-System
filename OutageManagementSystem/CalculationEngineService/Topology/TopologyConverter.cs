@@ -155,7 +155,7 @@ namespace Topology
                                 FirstEnd = (element.FirstEnd != null) ? element.FirstEnd.Id : 0,
                                 DmsType = element.DmsType,
                                 IsRemote = element.IsRemote,
-                                SecondEnd = secondEnd
+                                SecondEnd = new List<long>(secondEnd)
                             });
                     }
                 }
