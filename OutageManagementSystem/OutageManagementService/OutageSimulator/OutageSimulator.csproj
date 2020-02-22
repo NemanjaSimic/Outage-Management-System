@@ -62,6 +62,8 @@
     <Compile Include="BindingModels\GlobalIDBindingModel.cs" />
     <Compile Include="BindingModels\OutageBindingModel.cs" />
     <Compile Include="ScadaSubscriber\ScadaNotification.cs" />
+    <Compile Include="Services\OutageSimulatorService.cs" />
+    <Compile Include="Services\OutageSimulatorServiceHost.cs" />
     <Compile Include="UserControls\Overview.xaml.cs">
       <DependentUpon>Overview.xaml</DependentUpon>
     </Compile>

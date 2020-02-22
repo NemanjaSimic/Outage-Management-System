@@ -23,15 +23,15 @@ namespace Outage.SCADA.SCADAService.Command
 
         #region Static Members
 
-        protected static FunctionExecutor functionExecutor = null;
+        protected static IWriteCommandEnqueuer writeCommandEnqueuer = null;
 
-        public static FunctionExecutor FunctionExecutor
+        public static IWriteCommandEnqueuer WriteCommandEnqueuer
         {
             set
             {
-                if (functionExecutor == null)
+                if (writeCommandEnqueuer == null)
                 {
-                    functionExecutor = value;
+                    writeCommandEnqueuer = value;
                 }
             }
         }
@@ -50,9 +50,6 @@ namespace Outage.SCADA.SCADAService.Command
         }
 
         #endregion
-
-
-
 
         public bool SendAnalogCommand(long gid, float commandingValue)
         {
@@ -154,7 +151,7 @@ namespace Outage.SCADA.SCADAService.Command
             ModbusWriteCommandParameters modbusWriteCommandParams;
             StringBuilder sb = new StringBuilder();
 
-            if(CommandService.functionExecutor == null)
+            if(CommandService.writeCommandEnqueuer == null)
             {
                 string message = $"SendCommand => Function Executor is null.";
                 Logger.LogError(message);
@@ -190,7 +187,7 @@ namespace Outage.SCADA.SCADAService.Command
                 }
 
                 ModbusFunction modbusFunction = FunctionFactory.CreateModbusFunction(modbusWriteCommandParams);
-                success = CommandService.functionExecutor.EnqueueCommand(modbusFunction);
+                success = CommandService.writeCommandEnqueuer.EnqueueWriteCommand(modbusFunction);
 
                 if (success)
                 {

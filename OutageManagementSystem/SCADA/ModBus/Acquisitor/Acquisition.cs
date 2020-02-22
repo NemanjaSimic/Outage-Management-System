@@ -21,15 +21,15 @@ namespace Outage.SCADA.ModBus.Acquisitor
         }
 
         private readonly ISCADAConfigData scadaConfig;
-        private readonly FunctionExecutor functionExecutor;
+        private readonly IReadCommandEnqueuer readCommandEnqueuer;
         private readonly SCADAModel scadaModel;
         
         private bool threadActiveSignal = true;
         private Thread acquisitionThread;
 
-        public Acquisition(FunctionExecutor functionExecutor, SCADAModel scadaModel)
+        public Acquisition(IReadCommandEnqueuer readCommandEnqueuer, SCADAModel scadaModel)
         {
-            this.functionExecutor = functionExecutor;
+            this.readCommandEnqueuer = readCommandEnqueuer;
             this.scadaModel = scadaModel;
             this.scadaConfig = SCADAConfigData.Instance;
 
@@ -67,9 +67,9 @@ namespace Outage.SCADA.ModBus.Acquisitor
 
                 while (threadActiveSignal)
                 {
-                    if (this.functionExecutor == null)
+                    if (this.readCommandEnqueuer == null)
                     {
-                        string message = $"Function Executor is null.";
+                        string message = $"Read command enqueuer is null.";
                         Logger.LogError(message);
                         
                         Thread.Sleep(scadaConfig.Interval);
@@ -162,7 +162,7 @@ namespace Outage.SCADA.ModBus.Acquisitor
                             continue;
                         }
 
-                        if (this.functionExecutor.EnqueueCommand(modbusFunction))
+                        if (this.readCommandEnqueuer.EnqueueReadCommand(modbusFunction))
                         {
                             Logger.LogDebug($"Modbus function enquided. Point type is {pointType}, quantity {quantity}.");
                         }

@@ -126,8 +126,11 @@
     <Compile Include="ServiceContracts\DistributedTransaction\IModelUpdateNotificationContract.cs" />
     <Compile Include="ServiceContracts\DistributedTransaction\ITransactionEnlistmentContract.cs" />
     <Compile Include="ServiceContracts\OMS\ICallingContract.cs" />
-    <Compile Include="ServiceContracts\OMS\IOutageContract.cs" />
+    <Compile Include="ServiceContracts\OMS\IOutageAccessContract.cs" />
+    <Compile Include="ServiceContracts\OMS\IOutageLifecycleUICommandingContract.cs" />
+    <Compile Include="ServiceContracts\OMS\IReportPotentialOutageContract.cs" />
     <Compile Include="ServiceContracts\OMS\IOutageService.cs" />
+    <Compile Include="ServiceContracts\OMS\IOutageSimulatorContract.cs" />
     <Compile Include="ServiceContracts\SCADA\ISCADACommand.cs" />
     <Compile Include="ServiceContracts\CalculationEngine\ITopologyServiceContract.cs" />
     <Compile Include="ServiceContracts\PubSub\IPublisher.cs" />
@@ -157,7 +160,10 @@
     <Compile Include="ServiceProxies\NetworkModelGDAProxy.cs" />
     <Compile Include="ServiceProxies\DistributedTransaction\TransactionActorProxy.cs" />
     <Compile Include="ServiceProxies\Outage\CallingServiceProxy.cs" />
-    <Compile Include="ServiceProxies\Outage\OutageServiceProxy.cs" />
+    <Compile Include="ServiceProxies\Outage\ReportPotentialOutageProxy.cs" />
+    <Compile Include="ServiceProxies\Outage\OutageAccessProxy.cs" />
+    <Compile Include="ServiceProxies\Outage\OutageLifecycleUICommandingProxy.cs" />
+    <Compile Include="ServiceProxies\Outage\OutageSimulatorServiceProxy.cs" />
     <Compile Include="ServiceProxies\ProxyFactory.cs" />
     <Compile Include="ServiceProxies\PubSub\PublisherProxy.cs" />
     <Compile Include="ServiceProxies\PubSub\SubscriberProxy.cs" />

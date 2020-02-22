@@ -19,7 +19,7 @@ using Outage.Common.ServiceContracts.PubSub;
 namespace Outage.SCADA.ModBus.Connection
 {
 
-    public class FunctionExecutor
+    public class FunctionExecutor : IReadCommandEnqueuer, IWriteCommandEnqueuer, IModelUpdateCommandEnqueuer
     {
         private ILogger logger;
 
@@ -32,8 +32,12 @@ namespace Outage.SCADA.ModBus.Connection
         private bool threadCancellationSignal = false;
 
         private AutoResetEvent commandEvent;
-        private ConcurrentQueue<IModbusFunction> commandQueue;
+        private AutoResetEvent modelUpdateQueueEmptyEvent;
+        private AutoResetEvent writeCommandQueueEmptyEvent;
+
         private ConcurrentQueue<IModbusFunction> modelUpdateQueue;
+        private ConcurrentQueue<IModbusFunction> writeCommandQueue;
+        private ConcurrentQueue<IModbusFunction> readCommandQueue;
         private ProxyFactory proxyFactory;
 
         public ISCADAConfigData ConfigData { get; private set; }
@@ -48,9 +52,12 @@ namespace Outage.SCADA.ModBus.Connection
 
         public FunctionExecutor(SCADAModel scadaModel)
         {
-            this.commandQueue = new ConcurrentQueue<IModbusFunction>();
             this.modelUpdateQueue = new ConcurrentQueue<IModbusFunction>();
+            this.writeCommandQueue = new ConcurrentQueue<IModbusFunction>();
+            this.readCommandQueue = new ConcurrentQueue<IModbusFunction>();
             this.commandEvent = new AutoResetEvent(true);
+            this.modelUpdateQueueEmptyEvent = new AutoResetEvent(false);
+            this.writeCommandQueueEmptyEvent = new AutoResetEvent(false);
             this.proxyFactory = new ProxyFactory();
 
             SCADAModel = scadaModel;
@@ -105,13 +112,63 @@ namespace Outage.SCADA.ModBus.Connection
 
         }
 
-        public bool EnqueueCommand(IModbusFunction modbusFunction)
+        public bool EnqueueReadCommand(IModbusFunction modbusFunction)
         {
             bool success;
 
+            if(!(modbusFunction is IReadAnalogModusFunction || modbusFunction is IReadDiscreteModbusFunction))
+            {
+                string message = "EnqueueReadCommand => trying to enqueue modbus function that implements neither IReadDiscreteModbusFunction nor IReadDiscreteModbusFunction interface.";
+                Logger.LogError(message);
+                throw new ArgumentException(message);
+            }
+
+            if(!modelUpdateQueue.IsEmpty)
+            {
+                this.modelUpdateQueueEmptyEvent.WaitOne();
+            }
+
+            if(!writeCommandQueue.IsEmpty)
+            {
+                this.writeCommandQueueEmptyEvent.WaitOne();
+            }
+
             try
             {
-                this.commandQueue.Enqueue(modbusFunction);
+                this.readCommandQueue.Enqueue(modbusFunction);
+                this.commandEvent.Set();
+                success = true;
+            }
+            catch (Exception e)
+            {
+                success = false;
+                string message = "Exception caught in EnqueueCommand() method.";
+                Logger.LogError(message, e);
+            }            
+
+            return success;
+        }
+
+        public bool EnqueueWriteCommand(IModbusFunction modbusFunction)
+        {
+            bool success;
+
+            if (modbusFunction is IReadAnalogModusFunction || modbusFunction is IReadDiscreteModbusFunction)
+            {
+                string message = "EnqueueWriteCommand => trying to enqueue modbus function that implements IReadDiscreteModbusFunction or IReadDiscreteModbusFunction interface.";
+                Logger.LogError(message);
+                throw new ArgumentException(message);
+            }
+
+            if (!modelUpdateQueue.IsEmpty)
+            {
+                this.modelUpdateQueueEmptyEvent.WaitOne();
+            }
+
+            try
+            {
+                this.writeCommandQueue.Enqueue(modbusFunction);
+                this.readCommandQueue = new ConcurrentQueue<IModbusFunction>();
                 this.commandEvent.Set();
                 success = true;
             }
@@ -180,6 +237,8 @@ namespace Outage.SCADA.ModBus.Connection
                 MakeDiscreteEntryToMeasurementCache(discreteData, false);
 
                 success = true;
+                this.writeCommandQueue = new ConcurrentQueue<IModbusFunction>();
+                this.readCommandQueue = new ConcurrentQueue<IModbusFunction>();
                 this.commandEvent.Set();
             }
             catch (Exception e)
@@ -276,8 +335,18 @@ namespace Outage.SCADA.ModBus.Connection
                         ExecuteCommand(currentCommand);
                     }
 
-                    //REGULAR COMMANDS - acquisition and user commands
-                    while (commandQueue.TryDequeue(out IModbusFunction currentCommand))
+                    this.modelUpdateQueueEmptyEvent.Set();
+
+                    //WRITE COMMANDS
+                    while (writeCommandQueue.TryDequeue(out IModbusFunction currentCommand))
+                    {
+                        ExecuteCommand(currentCommand);
+                    }
+
+                    this.writeCommandQueueEmptyEvent.Set();
+
+                    //READ COMMANDS - acquisition
+                    while (readCommandQueue.TryDequeue(out IModbusFunction currentCommand))
                     {
                         ExecuteCommand(currentCommand);
                     }

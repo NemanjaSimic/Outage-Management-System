@@ -1,4 +1,7 @@
-﻿using OMS.OutageSimulator.UserControls;
+﻿using OMS.OutageSimulator.Services;
+using OMS.OutageSimulator.UserControls;
+using System.Collections.Generic;
+using System.ServiceModel;
 using System.Windows;
 using System.Windows.Controls;
 
@@ -9,6 +12,8 @@ namespace OMS.OutageSimulator
     /// </summary>
     public partial class MainWindow : Window
     {
+        private OutageSimulatorServiceHost outageSimulatorServiceHost;
+
         public MainWindow()
         {
             InitializeComponent();
@@ -16,6 +21,14 @@ namespace OMS.OutageSimulator
             this.ResizeMode = ResizeMode.NoResize;
             
             InitializeTabControl();
+
+            outageSimulatorServiceHost = new OutageSimulatorServiceHost();
+            outageSimulatorServiceHost.Start();
+        }
+        
+        ~MainWindow()
+        {
+            outageSimulatorServiceHost.Dispose();
         }
 
         private void InitializeTabControl()
@@ -32,9 +45,10 @@ namespace OMS.OutageSimulator
                 Content = new GenerateOutage(overview.Content as Overview),
             };
             
-
             TabControl.Items.Add(overview);
             TabControl.Items.Add(generateOutage);
+
+            OutageSimulatorService.Overview = overview.Content as Overview;
         }
     }
 }

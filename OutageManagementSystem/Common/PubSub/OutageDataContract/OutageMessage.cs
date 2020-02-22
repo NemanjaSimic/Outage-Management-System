@@ -12,12 +12,14 @@ namespace Outage.Common.PubSub.OutageDataContract
     [DataContract(IsReference = true)]
     public abstract class OutageMessage : IPublishableMessage
     {
-
         [DataMember]
         public DateTime ReportTime { get; set; }
         
         [DataMember]
-        public List<long> ReportedElements { get; set; }
+        public string DefaultIsolationPoints { get; set; }
+
+        [DataMember]
+        public string OptimumIsolationPoints { get; set; }
 
         [DataMember]
         public DateTime? IsolatedTime { get; set; }
@@ -33,6 +35,13 @@ namespace Outage.Common.PubSub.OutageDataContract
 
         [DataMember]
         public List<Consumer> AffectedConsumers { get; set; }
+
+        public OutageMessage()
+        {
+            DefaultIsolationPoints = string.Empty;
+            OptimumIsolationPoints = string.Empty;
+            AffectedConsumers = new List<Consumer>();
+        }
     }
 
 
@@ -45,12 +54,9 @@ namespace Outage.Common.PubSub.OutageDataContract
         [DatabaseGenerated(DatabaseGeneratedOption.Identity)]
         public long OutageId { get; set; }
 
-
-
-        public ActiveOutage()
+        public ActiveOutage() 
+            : base()
         {
-            AffectedConsumers = new List<Consumer>();
-            ReportedElements = new List<long>();
         }
     }
 
@@ -62,12 +68,12 @@ namespace Outage.Common.PubSub.OutageDataContract
         [DatabaseGenerated(DatabaseGeneratedOption.None)]
         public long OutageId { get; set; }
 
-
         [DataMember]
         public DateTime ArchiveTime { get; set; }
+
         public ArchivedOutage()
+            : base()
         {
-            AffectedConsumers = new List<Consumer>();
         }
     }
 
@@ -96,9 +102,11 @@ namespace Outage.Common.PubSub.OutageDataContract
 
         public Consumer()
         {
+            ConsumerMRID = string.Empty;
+            FirstName = string.Empty;
+            LastName = string.Empty;
             ArchivedOutages = new List<ArchivedOutage>();
             ActiveOutages = new List<ActiveOutage>();
         }
     }
-    
 }

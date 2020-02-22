@@ -149,22 +149,22 @@ namespace CECommon.Providers
 			{
 				if (!measurement.CurrentOpen)
 				{
-					using (OutageServiceProxy outageProxy = proxyFactory.CreateProxy<OutageServiceProxy, IOutageContract>(EndpointNames.OutageServiceEndpoint))
+					using (ReportPotentialOutageProxy reportPotentialOutageProxy = proxyFactory.CreateProxy<ReportPotentialOutageProxy, IReportPotentialOutageContract>(EndpointNames.ReportPotentialOutageEndpoint))
 					{
-						if (outageProxy == null)
+						if (reportPotentialOutageProxy == null)
 						{
-							string message = "UpdateDiscreteMeasurement => OutageServiceProxy is null.";
+							string message = "UpdateDiscreteMeasurement => ReportPotentialOutageProxy is null.";
 							logger.LogError(message);
 							throw new NullReferenceException(message);
 						}
 
 						try
 						{
-							outageProxy.ReportOutage(measurement.ElementId);
+							reportPotentialOutageProxy.ReportPotentialOutage(measurement.ElementId);
 						}
 						catch (Exception e)
 						{
-							logger.LogError("Failed to report outage.", e);
+							logger.LogError("Failed to report potential outage.", e);
 						}
 					}
 				}

@@ -32,6 +32,8 @@ namespace OMS.OutageSimulator.UserControls
             get { return logger ?? (logger = LoggerWrapper.Instance); }
         }
 
+        private Dictionary<long, ActiveOutageBindingModel> activeOutagesMap;
+
         #region INotifyPropertyChanged
         public event PropertyChangedEventHandler PropertyChanged;
 
@@ -71,6 +73,8 @@ namespace OMS.OutageSimulator.UserControls
             proxyFactory = new ProxyFactory();
             outageTokenMap = new Dictionary<long, CancellationTokenSource>();
             ActiveOutages = new ObservableCollection<ActiveOutageBindingModel>();
+
+            activeOutagesMap = new Dictionary<long, ActiveOutageBindingModel>();
         }
 
         public void GenerateOutage(ActiveOutageBindingModel outage)
@@ -113,6 +117,8 @@ namespace OMS.OutageSimulator.UserControls
             outageTokenMap.Add(outage.OutageElement.GID, tokenSource);
 
             ActiveOutages.Add(outage);
+            activeOutagesMap.Add(outage.OutageElement.GID, outage);
+
             Dispatcher.BeginInvoke((Action)(() => parent.TabControl.SelectedIndex = 0));
         }
 
@@ -126,16 +132,36 @@ namespace OMS.OutageSimulator.UserControls
 
         private void EndOutageButton_Click(object sender, RoutedEventArgs e)
         {
-            //TODO: END TASK HERE
-            outageTokenMap[SelectedOutege.OutageElement.GID].Cancel();
-            outageTokenMap.Remove(SelectedOutege.OutageElement.GID);
+            ResolveOutage(SelectedOutege.OutageElement.GID);
+        }
 
-            ActiveOutages.Remove(SelectedOutege);
+        public bool ResolveOutage(long outageElementId)
+        {
+            //TODO: END TASK HERE
+
+            if(!outageTokenMap.ContainsKey(outageElementId))
+            {
+                return false;
+            }
+
+            outageTokenMap[outageElementId].Cancel();
+            outageTokenMap.Remove(outageElementId);
+
+            if(!activeOutagesMap.ContainsKey(outageElementId))
+            {
+                return false;
+            }
+
+            ActiveOutageBindingModel outage = activeOutagesMap[outageElementId];
+            ActiveOutages.Remove(outage);
+            activeOutagesMap.Remove(outageElementId);
 
             OnPropertyChanged("IsSelectedOutageGridVisible");
             OnPropertyChanged("OutageElement");
             OnPropertyChanged("OptimumIsolationPoints");
             OnPropertyChanged("DefaultIsolationPoints");
+
+            return true;
         }
     }
 }
