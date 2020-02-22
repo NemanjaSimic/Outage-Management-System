@@ -9,7 +9,7 @@ using System;
 
 namespace OutageManagementService.Outage
 {
-    public class OutageService : IOutageContract, IOutageLifecycleContract
+    public class OutageService : IOutageAccessContract, IReportPotentialOutageContract, IOutageLifecycleUICommandingContract
     {
         private ILogger logger;
        
@@ -47,8 +47,8 @@ namespace OutageManagementService.Outage
         }
         #endregion
 
-        #region IOutageLifecycleContract
-        public bool ReportOutage(long elementGid)
+        #region IReportPotentialOutageContract
+        public bool ReportPotentialOutage(long elementGid)
         {
             bool result;
 
@@ -66,7 +66,9 @@ namespace OutageManagementService.Outage
 
             return result;
         }
+        #endregion
 
+        #region IOutageLifecycleUICommandingContract
         public bool IsolateOutage(long outageId)
         {
             bool result;
@@ -162,6 +164,5 @@ namespace OutageManagementService.Outage
             return result;
         }
         #endregion
-
     }
 }

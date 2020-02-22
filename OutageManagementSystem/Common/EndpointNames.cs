@@ -30,10 +30,11 @@
 
         //OMS - 5
         public static readonly string CallingEndpoint = "CallingEndpoint";
-        public static readonly string OutageServiceEndpoint = "OutageServiceEndpoint";
+        public static readonly string OutageAccessEndpoint = "OutageAccessEndpoint";
         public static readonly string OutageTransactionActorEndpoint = "OutageTransactionActorEndpoint";
         public static readonly string OutageModelUpdateNotifierEndpoint = "OutageModelUpdateNotifierEndpoint";
-        public static readonly string OutageLifecycleEndpoint = "OutageLifecycleEndpoint";
+        public static readonly string OutageLifecycleUICommandingEndpoint = "OutageLifecycleUICommandingEndpoint";
+        public static readonly string ReportPotentialOutageEndpoint = "ReportPotentialOutageEndpoint";
 
         public static readonly string OutageSimulatorServiceEndpoint = "OutageSimulatorServiceEndpoint";
 

@@ -1,53 +1,26 @@
 ﻿using Outage.Common.ServiceContracts.OMS;
 using System;
-using System.Collections.Generic;
-using System.Linq;
-using System.Text;
-using System.Threading.Tasks;
 
 namespace Outage.Common.ServiceProxies.Outage
 {
-    public class OutageLifecycleProxy : BaseProxy<IOutageLifecycleContract>, IOutageLifecycleContract
+    public class OutageLifecycleUICommandingProxy : BaseProxy<IOutageLifecycleUICommandingContract>, IOutageLifecycleUICommandingContract
     {
-        public OutageLifecycleProxy(string endpointName)
-           : base(endpointName)
+        public OutageLifecycleUICommandingProxy(string endpointName) 
+            : base(endpointName)
         {
         }
 
         public bool IsolateOutage(long outageId)
         {
-            throw new NotImplementedException();
-        }
-
-        public bool ReportOutage(long elementGid)
-        {
             bool success;
 
             try
             {
-                success = Channel.ReportOutage(elementGid);
+                success = Channel.IsolateOutage(outageId);
             }
             catch (Exception e)
             {
-                string message = "Exception in ReportOutage() proxy method.";
-                LoggerWrapper.Instance.LogError(message, e);
-                throw e;
-            }
-
-            return success;
-        }
-
-        public bool ResolveOutage(long outageId)
-        {
-            bool success;
-
-            try
-            {
-                success = Channel.ResolveOutage(outageId);
-            }
-            catch (Exception e)
-            {
-                string message = "Exception in ResolveOutage() proxy method.";
+                string message = "Exception in IsolateOutage() proxy method.";
                 LoggerWrapper.Instance.LogError(message, e);
                 throw e;
             }
@@ -102,6 +75,24 @@ namespace Outage.Common.ServiceProxies.Outage
             catch (Exception e)
             {
                 string message = "Exception in ValidateResolveConditions() proxy method.";
+                LoggerWrapper.Instance.LogError(message, e);
+                throw e;
+            }
+
+            return success;
+        }
+
+        public bool ResolveOutage(long outageId)
+        {
+            bool success;
+
+            try
+            {
+                success = Channel.ResolveOutage(outageId);
+            }
+            catch (Exception e)
+            {
+                string message = "Exception in ResolveOutage() proxy method.";
                 LoggerWrapper.Instance.LogError(message, e);
                 throw e;
             }

@@ -143,22 +143,6 @@ namespace OutageManagementService
         }
         #endregion
 
-
-        private void ImportTopologyModel()
-        {
-            using (OMSTopologyServiceProxy omsTopologyProxy = proxyFactory.CreateProxy<OMSTopologyServiceProxy, ITopologyOMSService>(EndpointNames.TopologyOMSServiceEndpoint))
-            {
-                if (omsTopologyProxy == null)
-                {
-                    string message = "From method ImportTopologyModel(): TopologyServiceProxy is null.";
-                    logger.LogError(message);
-                    throw new NullReferenceException(message);
-                }
-                
-                TopologyModel = (OutageTopologyModel)omsTopologyProxy.GetOMSModel();
-            }
-        }
-
         #region IOutageLifecycleContract
         public bool ReportPotentialOutage(long gid)
         {
@@ -291,8 +275,22 @@ namespace OutageManagementService
         }
         #endregion
 
-
         #region Private Methods
+        private void ImportTopologyModel()
+        {
+            using (OMSTopologyServiceProxy omsTopologyProxy = proxyFactory.CreateProxy<OMSTopologyServiceProxy, ITopologyOMSService>(EndpointNames.TopologyOMSServiceEndpoint))
+            {
+                if (omsTopologyProxy == null)
+                {
+                    string message = "From method ImportTopologyModel(): TopologyServiceProxy is null.";
+                    logger.LogError(message);
+                    throw new NullReferenceException(message);
+                }
+
+                TopologyModel = (OutageTopologyModel)omsTopologyProxy.GetOMSModel();
+            }
+        }
+
         private List<Consumer> GetAffectedConsumersFromDatabase(List<long> affectedConsumersIds, OutageContext db)
         {
             List<Consumer> affectedConsumers = new List<Consumer>();

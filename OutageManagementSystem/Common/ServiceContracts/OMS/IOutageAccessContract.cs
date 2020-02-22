@@ -4,9 +4,8 @@ using System.ServiceModel;
 
 namespace Outage.Common.ServiceContracts.OMS
 {
-    //TODO: IOutageContract => IOutageAccessContract
     [ServiceContract]
-    public interface IOutageContract
+    public interface IOutageAccessContract
     {
         [OperationContract]
         List<ActiveOutage> GetActiveOutages();

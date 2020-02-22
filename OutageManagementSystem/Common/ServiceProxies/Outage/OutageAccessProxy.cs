@@ -2,20 +2,19 @@
 using Outage.Common.ServiceContracts.OMS;
 using System;
 using System.Collections.Generic;
-using System.ServiceModel;
 
 namespace Outage.Common.ServiceProxies.Outage
 {
-    public class OutageServiceProxy : BaseProxy<IOutageContract>, IOutageContract, IOutageService
+    public class OutageAccessProxy : BaseProxy<IOutageAccessContract>, IOutageAccessContract, IOutageService
     {
-        public OutageServiceProxy(string endpointName)
+        public OutageAccessProxy(string endpointName)
             : base(endpointName)
         {
         }
 
         public List<ActiveOutage> GetActiveOutages()
         {
-            List<ActiveOutage> outageModels = null;
+            List<ActiveOutage> outageModels;
             try
             {
                 outageModels = Channel.GetActiveOutages();
@@ -32,7 +31,7 @@ namespace Outage.Common.ServiceProxies.Outage
 
         public List<ArchivedOutage> GetArchivedOutages()
         {
-            List<ArchivedOutage> outageModels = null;
+            List<ArchivedOutage> outageModels;
             try
             {
                 outageModels = Channel.GetArchivedOutages();
@@ -46,9 +45,5 @@ namespace Outage.Common.ServiceProxies.Outage
 
             return outageModels;
         }
-
-       
-
-        
     }
 }

@@ -36,7 +36,7 @@
         {
             return Task.Run(() =>
             {
-                using (OutageServiceProxy outageProxy = _proxyFactory.CreateProxy<OutageServiceProxy, IOutageContract>(EndpointNames.OutageServiceEndpoint))
+                using (OutageAccessProxy outageProxy = _proxyFactory.CreateProxy<OutageAccessProxy, IOutageAccessContract>(EndpointNames.OutageAccessEndpoint))
                 {
                     try
                     {
@@ -59,7 +59,7 @@
         {
             return Task.Run(() =>
             {
-                using (OutageServiceProxy outageProxy = _proxyFactory.CreateProxy<OutageServiceProxy, IOutageContract>(EndpointNames.OutageServiceEndpoint))
+                using (OutageAccessProxy outageProxy = _proxyFactory.CreateProxy<OutageAccessProxy, IOutageAccessContract>(EndpointNames.OutageAccessEndpoint))
                 {
                     try
                     {
