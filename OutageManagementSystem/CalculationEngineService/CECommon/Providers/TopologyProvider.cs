@@ -39,46 +39,8 @@ namespace CECommon.Providers
 
         public void DiscreteMeasurementDelegate(List<long> elementGids)
         {
-            //List<ITopology> topologies = voltageFlow.UpdateVoltageFlow(elementGids, Topology); 
-            //Topology = topologies;
             voltageFlow.UpdateLoadFlow(Topology);
             ProviderTopologyDelegate?.Invoke(Topology);
-            //var changedReclosers = elementGids.FindAll(el => reclosers.Contains(el));
-            //if (changedReclosers.Count > 0)
-            //{
-            //    Topology = this.voltageFlow.UpdateVoltageFlowFromRecloser(changedReclosers, topologies);
-            //}
-
-            //Dictionary<long, bool> recloserCommands = new Dictionary<long, bool>();
-
-            //foreach (var recloser in reclosers)
-            //{
-            //    foreach (var topology in Topology)
-            //    {
-            //        if (topology.GetElementByGid(recloser, out ITopologyElement recloserElement))
-            //        {
-            //            if (!recloserElement.FirstEnd.IsActive)
-            //            {
-            //                recloserCommands.Add(recloser, false);
-            //            }
-            //            else
-            //            {
-            //                var InactiveElements = recloserElement.SecondEnd.FindAll(el => !el.IsActive);
-            //                if (InactiveElements.Count > 0)
-            //                {
-            //                    recloserCommands.Add(recloser, false);
-            //                }
-            //            }
-            //            break;
-            //        }
-            //    }
-            //}
-
-            //if (recloserCommands.Count > 0)
-            //{
-            //    Provider.Instance.MeasurementProvider.InternalUpdateDiscreteMeasurement(recloserCommands);
-            //}
-
         }
 
         public List<ITopology> GetTopologies()

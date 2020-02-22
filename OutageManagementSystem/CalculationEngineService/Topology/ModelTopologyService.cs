@@ -30,10 +30,11 @@ namespace Topology
 
             foreach (var rootElement in roots)
             {
-                ITopology newTopology = topologyBuilder.CreateGraphTopology(rootElement);
-                topologyModel.Add(voltageFlow.CalulateVoltageFlow(rootElement, newTopology));
-            }        
-             return topologyModel;
+                topologyModel.Add(topologyBuilder.CreateGraphTopology(rootElement));
+            }
+            voltageFlow.UpdateLoadFlow(topologyModel);
+
+            return topologyModel;
         }
 
        

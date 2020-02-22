@@ -110,6 +110,14 @@ export const style = cytoscape.stylesheet()
         'height': '60px',
         'width': '60px'
     })
+    .selector('node[dmsType="BREAKER"][state = "inactive"]')
+    .style({
+        'background-fit': 'cover',
+        'background-image': 'assets/img/breakerOff.png',
+        'background-opacity': '0',
+        'height': '60px',
+        'width': '60px'
+    })
     .selector('node[dmsType="FUSE"]')
     .style({
         'shape': 'rectangle',
