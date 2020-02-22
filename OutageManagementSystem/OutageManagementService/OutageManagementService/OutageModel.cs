@@ -170,51 +170,176 @@ namespace OutageManagementService
 
             if (affectedConsumersIds.Count > 0)
             {
-                ActiveOutage activeOutageInDb = null;
+                ActiveOutage activeOutage = null;
                 using (OutageContext db = new OutageContext())
                 {
                     try
                     {
-                        List<Consumer> consumers = GetAffectedConsumersFromDatabase(affectedConsumersIds, db);
-                        if(consumers.Count == affectedConsumersIds.Count)
+                        if (db.GetActiveOutage(gid) == null)
                         {
-                            activeOutageInDb = db.ActiveOutages.Add(new ActiveOutage { AffectedConsumers = consumers, ElementGid = gid, ReportTime = DateTime.Now });
-                            db.SaveChanges();
-                            Logger.LogDebug($"Outage on element with gid: 0x{activeOutageInDb.ElementGid:x16} is successfully stored in database");
+                            List<Consumer> consumers = GetAffectedConsumersFromDatabase(affectedConsumersIds, db);
+                            if (consumers.Count == affectedConsumersIds.Count)
+                            {
+                                activeOutage = db.ActiveOutages.Add(new ActiveOutage { AffectedConsumers = consumers, OutageState = OutageState.CREATED, OutageElementGid = gid, ReportTime = DateTime.UtcNow });
+                                db.SaveChanges();
+                            }
+                            else
+                            {
+                                Logger.LogWarn("Some of affected consumers are not present in database");
+                            }
+                            Logger.LogDebug($"Outage on element with gid: 0x{activeOutage.OutageElementGid:x16} is successfully stored in database.");
                         }
                         else
                         {
-                            Logger.LogWarn("Some of affected consumers are not present in database.");
-                            success = false;
+                            Logger.LogWarn($"Reported element with gid: 0x{activeOutage.OutageElementGid:x16} has already been reported.");
                         }
-                        
+
                     }
                     catch (Exception e)
                     {
-                        Logger.LogError("Error while adding active outage into database.", e);
-                        success = false;
+                        activeOutage = null;
+                        Logger.LogError("Error while adding reported outage into database.", e);
                     }
                 }
-                //TODO: Publish
-                if (activeOutageInDb != null)
+                
+                if (activeOutage != null)
                 {
                     try
                     {
-                        PublishActiveOutage(Topic.ACTIVE_OUTAGE, activeOutageInDb);
-                        Logger.LogInfo($"Outage on element with gid: 0x{activeOutageInDb.ElementGid:x16} is successfully reported");
+                        PublishActiveOutage(Topic.ACTIVE_OUTAGE, activeOutage);
+                        Logger.LogInfo($"Outage on element with gid: 0x{activeOutage.OutageElementGid:x16} is successfully published");
                         success = true;
                     }
                     catch (Exception e) //TODO: Exception over proxy or enum...
                     {
                         Logger.LogError("Error occured while trying to publish outage.", e);
                     }
-                    
+
                 }
             }
             else
             {
                 Logger.LogInfo("There is no affected consumers, so reported outage is not valid.");
                 success = false;
+            }
+
+            return success;
+        }
+        public bool UpdateActiveOutageIsolated(long gid, List<long> locatedElements)
+        {
+            bool success = false;
+            if (locatedElements.Count <= 2)
+            {
+                Logger.LogError("Number of locatedElements must be 3 or higher");
+                return success;
+            }
+            ActiveOutage activeOutage = null;
+            using (OutageContext db = new OutageContext())
+            {
+                try
+                {
+
+                    activeOutage = db.GetActiveOutage(gid);
+
+                    if (activeOutage != null)
+                    {
+                        if (activeOutage.OutageState != OutageState.CREATED)
+                        {
+                            activeOutage.ReportedElements = new List<long>(locatedElements);
+                            activeOutage.OutageState = OutageState.ISOLATED;
+                            activeOutage.IsolatedTime = DateTime.UtcNow;
+                            db.SaveChanges();
+                            Logger.LogInfo($"State of active outage on element with gid:0x{activeOutage.OutageElementGid:x16} was successfully updated from CREATED => LOCATED");
+                        }
+                        else
+                        {
+                            Logger.LogWarn($"Reported outage is in state {activeOutage.OutageState}");
+                        }
+                    }
+                    else
+                    {
+                        Logger.LogWarn($"There is no active outage on element gid: 0x:{gid:x16}");
+                    }
+                }
+                catch (Exception e)
+                {
+                    activeOutage = null;
+                    Logger.LogError("Error occured while updating active outage in database to LOCATED", e);
+                }
+            }
+
+            if (activeOutage != null)
+            {
+                PublishActiveOutage(Topic.ACTIVE_OUTAGE, activeOutage);
+                Logger.LogInfo($"Outage on element with gid: 0x{activeOutage.OutageElementGid:x16} is successfully published");
+                success = true;
+            }
+            else
+            {
+                Logger.LogError("Error occured while trying to publish updated active outage");
+            }
+
+            return success;
+        }
+
+        public bool UpdateActiveOutageResolved(long gid)
+        {
+            bool success = false;
+            ActiveOutage activeOutage = null;
+            using (OutageContext db = new OutageContext())
+            {
+                try
+                {
+                    activeOutage = db.GetActiveOutage(gid);
+                    if (activeOutage != null)
+                    {
+                        List<long> affectedConsumers = GetAffectedConsumers(gid);
+                        if (affectedConsumers.Count != activeOutage.AffectedConsumers.Count)
+                        {
+                            List<Consumer> consumers = GetAffectedConsumersFromDatabase(affectedConsumers, db);
+                            if (consumers.Count != affectedConsumers.Count)
+                            {
+                                if (activeOutage.OutageState != OutageState.ISOLATED)
+                                {
+                                    activeOutage.OutageState = OutageState.RESOLVED;
+                                    activeOutage.ResolvedTime = DateTime.UtcNow;
+                                    activeOutage.AffectedConsumers = consumers;
+                                    db.SaveChanges();
+                                    Logger.LogInfo($"State of active outage on element with gid:0x{activeOutage.OutageElementGid:x16} was successfully updated from LOCATED => SOLVED");
+
+                                }
+                                else
+                                {
+                                    Logger.LogWarn($"Reported outage is in state {activeOutage.OutageState}");
+                                }
+                            }
+                            else
+                            {
+                                Logger.LogWarn("Some of affected consumers are not present in database");
+                            }
+                        }
+                    }
+                    else
+                    {
+                        Logger.LogWarn($"There is no active outage on element gid: 0x:{gid:x16}");
+                    }
+                }
+                catch (Exception e)
+                {
+                    activeOutage = null;
+                    Logger.LogError("Error occured while updating active outage in database to state SOLVED", e);
+                }
+            }
+
+            if (activeOutage != null)
+            {
+                PublishActiveOutage(Topic.ACTIVE_OUTAGE, activeOutage);
+                Logger.LogInfo($"Outage on element with gid: 0x{activeOutage.OutageElementGid:x16} is successfully published");
+                success = true;
+            }
+            else
+            {
+                Logger.LogError("Error occured while trying to publish updated active outage");
             }
 
             return success;

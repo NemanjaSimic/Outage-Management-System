@@ -16,7 +16,6 @@
 
         public IEnumerable<ArchivedOutageViewModel> ArchivedOutages { get; set; }
 
-
         public ConsumerViewModel()
         {
             ActiveOutages = new List<ActiveOutageViewModel>();

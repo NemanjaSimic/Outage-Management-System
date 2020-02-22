@@ -26,7 +26,7 @@ namespace Outage.Common.ServiceProxies.SCADA
             }
             catch (Exception e)
             {
-                string message = "Exception in SendAnalogCommand() proxy method.";
+                string message = "Exception in GetIntegrityUpdate() proxy method.";
                 LoggerWrapper.Instance.LogError(message, e);
                 throw e;
             }
@@ -44,7 +44,7 @@ namespace Outage.Common.ServiceProxies.SCADA
             }
             catch (Exception e)
             {
-                string message = "Exception in SendAnalogCommand() proxy method.";
+                string message = "Exception in GetIntegrityUpdateForSpecificTopic() proxy method.";
                 LoggerWrapper.Instance.LogError(message, e);
                 throw e;
             }

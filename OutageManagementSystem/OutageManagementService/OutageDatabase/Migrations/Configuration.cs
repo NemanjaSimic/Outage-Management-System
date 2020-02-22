@@ -26,7 +26,7 @@
                 archivedOutage = new ArchivedOutage()
                 {
                     OutageId = archivedId,
-                    ElementGid = 0x0000000a00000007,
+                    OutageElementGid = 0x0000000a00000007,
                     ReportTime = DateTime.Now,
                     AffectedConsumers = new List<Consumer>(),
                     ArchiveTime = DateTime.Now,
