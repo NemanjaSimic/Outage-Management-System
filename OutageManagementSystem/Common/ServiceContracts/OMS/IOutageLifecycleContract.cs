@@ -15,5 +15,18 @@ namespace Outage.Common.ServiceContracts.OMS
 
         [OperationContract]
         bool IsolateOutage(long outageId);
+
+        [OperationContract]
+        bool SendRepairCrew(long outageId);
+
+        //TODO: mozda posebni contract-i za SCADA i NoSCADA deo...
+        [OperationContract]
+        bool SendLocationIsolationCrew(long outageId);
+
+        [OperationContract]
+        bool ValidateResolveConditions(long outageId);
+
+        [OperationContract]
+        bool ResolveOutage(long outageId);
     }
 }

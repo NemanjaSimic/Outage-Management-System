@@ -5,6 +5,7 @@ using Outage.Common.OutageService.Model;
 using Outage.Common.PubSub.OutageDataContract;
 using Outage.Common.ServiceContracts.CalculationEngine;
 using Outage.Common.ServiceContracts.GDA;
+using Outage.Common.ServiceContracts.OMS;
 using Outage.Common.ServiceContracts.PubSub;
 using Outage.Common.ServiceContracts.SCADA;
 using Outage.Common.ServiceProxies;
@@ -158,6 +159,7 @@ namespace OutageManagementService
             }
         }
 
+        #region IOutageLifecycleContract
         public bool ReportPotentialOutage(long gid)
         {
             bool success = false;
@@ -201,7 +203,7 @@ namespace OutageManagementService
                         Logger.LogError("Error while adding reported outage into database.", e);
                     }
                 }
-                
+
                 if (activeOutage != null)
                 {
                     try
@@ -225,44 +227,6 @@ namespace OutageManagementService
 
             return success;
         }
-       
-
-        private List<Consumer> GetAffectedConsumersFromDatabase(List<long> affectedConsumersIds, OutageContext db)
-        {
-            List<Consumer> affectedConsumers = new List<Consumer>();
-            
-            foreach(long affectedConsumerId in affectedConsumersIds)
-            {
-                Consumer affectedConsumer = db.Consumers.Find(affectedConsumerId);
-
-                if(affectedConsumer == null)
-                {
-                    break;
-                }
-             
-                affectedConsumers.Add(affectedConsumer);
-            }
-
-            return affectedConsumers;
-        }
-
-        private void PublishActiveOutage(Topic topic, OutageMessage outageMessage)
-        {
-            OutagePublication outagePublication = new OutagePublication(topic, outageMessage);
-
-            using (PublisherProxy publisherProxy = proxyFactory.CreateProxy<PublisherProxy, IPublisher>(EndpointNames.PublisherEndpoint))
-            {
-                if (publisherProxy == null)
-                {
-                    string errMsg = "Publisher proxy is null";
-                    Logger.LogWarn(errMsg);
-                    throw new NullReferenceException(errMsg);
-                }
-
-                publisherProxy.Publish(outagePublication);
-                Logger.LogInfo($"Outage service published data from topic: {outagePublication.Topic}");
-            }
-        }
 
         public bool IsolateOutage(long outageId)
         {
@@ -278,7 +242,7 @@ namespace OutageManagementService
                         {
                             success = StartIsolationAlgorthm(outageToIsolate);
                         }
-                        catch(Exception e)
+                        catch (Exception e)
                         {
                             success = false;
                             Logger.LogError("Exception on StartIsolationAlgorthm() method.", e);
@@ -304,6 +268,66 @@ namespace OutageManagementService
 
 
             return success;
+        }
+
+        public bool SendRepairCrew(long outageId)
+        {
+            throw new NotImplementedException();
+        }
+
+        public bool SendLocationIsolationCrew(long outageId)
+        {
+            throw new NotImplementedException();
+        }
+
+        public bool ValidateResolveConditions(long outageId)
+        {
+            throw new NotImplementedException();
+        }
+
+        public bool ResolveOutage(long outageId)
+        {
+            throw new NotImplementedException();
+        }
+        #endregion
+
+
+        #region Private Methods
+        private List<Consumer> GetAffectedConsumersFromDatabase(List<long> affectedConsumersIds, OutageContext db)
+        {
+            List<Consumer> affectedConsumers = new List<Consumer>();
+
+            foreach (long affectedConsumerId in affectedConsumersIds)
+            {
+                Consumer affectedConsumer = db.Consumers.Find(affectedConsumerId);
+
+                if (affectedConsumer == null)
+                {
+                    break;
+                }
+
+                affectedConsumers.Add(affectedConsumer);
+            }
+
+            return affectedConsumers;
+        }
+
+        private void PublishActiveOutage(Topic topic, OutageMessage outageMessage)
+        {
+            OutagePublication outagePublication = new OutagePublication(topic, outageMessage);
+
+            using (PublisherProxy publisherProxy = proxyFactory.CreateProxy<PublisherProxy, IPublisher>(EndpointNames.PublisherEndpoint))
+            {
+                if (publisherProxy == null)
+                {
+                    string errMsg = "Publisher proxy is null";
+                    Logger.LogWarn(errMsg);
+                    throw new NullReferenceException(errMsg);
+                }
+
+                publisherProxy.Publish(outagePublication);
+                Logger.LogInfo($"Outage service published data from topic: {outagePublication.Topic}");
+            }
         }
 
         private bool StartIsolationAlgorthm(ActiveOutage outageToIsolate)
@@ -346,11 +370,11 @@ namespace OutageManagementService
                             isIsolated = false;
                         }
                     }
-                } 
+                }
                 catch (Exception e)
                 {
                     Logger.LogWarn("Exception on method CheckIfBreakerIsRecloser()", e);
-                    
+
                 }
 
 
@@ -485,7 +509,7 @@ namespace OutageManagementService
                                 //TODO: remove from list
                             }
                         }
-                    } 
+                    }
                     catch (Exception e)
                     {
                         throw e;
@@ -500,7 +524,7 @@ namespace OutageManagementService
             timer.Elapsed += (sender, e) => AlgorthmTimerElapsedCallback(sender, e, cancelationSignal, autoResetEvent);
             timer.Interval = 10000; //TODO: Config
             timer.AutoReset = false;
-            
+
             return timer;
         }
 
@@ -516,7 +540,7 @@ namespace OutageManagementService
 
             string[] separatedElementIdsString = elementIdsString.Split('|');
 
-            foreach(string elementIdString in separatedElementIdsString)
+            foreach (string elementIdString in separatedElementIdsString)
             {
                 if (long.TryParse(elementIdString, out long elementId))
                 {
@@ -606,6 +630,7 @@ namespace OutageManagementService
 
             return affectedConsumers;
         }
+        #endregion
 
         #region GDAHelper
         private Dictionary<long, ResourceDescription> GetExtentValues(ModelCode entityType, List<ModelCode> propIds)

@@ -50,12 +50,116 @@ namespace OutageManagementService.Outage
         #region IOutageLifecycleContract
         public bool ReportOutage(long elementGid)
         {
-            return outageModel.ReportPotentialOutage(elementGid); //TODO: enum (error, noAffectedConsumers, success,...)
+            bool result;
+
+            try
+            {
+                result = outageModel.ReportPotentialOutage(elementGid); //TODO: enum (error, noAffectedConsumers, success,...)
+            }
+            catch (Exception e)
+            {
+                result = false;
+                string message = "ReportPotentialOutage => exception caught";
+                Logger.LogError(message, e);
+                //todo throw;
+            }
+
+            return result;
         }
 
         public bool IsolateOutage(long outageId)
         {
-            return outageModel.IsolateOutage(outageId);
+            bool result;
+
+            try
+            {
+                result = outageModel.IsolateOutage(outageId);
+            }
+            catch (Exception e)
+            {
+                result = false;
+                string message = "IsolateOutage => exception caught";
+                Logger.LogError(message, e);
+                //todo: throw;
+            }
+
+            return result;
+        }
+
+        public bool SendRepairCrew(long outageId)
+        {
+            bool result;
+
+            try
+            {
+                result = outageModel.SendRepairCrew(outageId);
+            }
+            catch (Exception e)
+            {
+                result = false;
+                string message = "SendRepairCrew => exception caught";
+                Logger.LogError(message, e);
+                //todo throw;
+            }
+
+            return result;
+        }
+
+        public bool SendLocationIsolationCrew(long outageId)
+        {
+            bool result;
+
+            try
+            {
+                result = outageModel.SendLocationIsolationCrew(outageId);
+            }
+            catch (Exception e)
+            {
+                result = false;
+                string message = "SendLocationIsolationCrew => exception caught";
+                Logger.LogError(message, e);
+                //todo throw;
+            }
+
+            return result;
+        }
+
+        public bool ValidateResolveConditions(long outageId)
+        {
+            bool result;
+
+            try
+            {
+                result = outageModel.ValidateResolveConditions(outageId);
+            }
+            catch (Exception e)
+            {
+                result = false;
+                string message = "ValidateResolveConditions => exception caught";
+                Logger.LogError(message, e);
+                //todo throw;
+            }
+
+            return result;
+        }
+
+        public bool ResolveOutage(long outageId)
+        {
+            bool result;
+
+            try
+            {
+                result = outageModel.ResolveOutage(outageId);
+            }
+            catch (Exception e)
+            {
+                result = false;
+                string message = "ResolveOutage => exception caught";
+                Logger.LogError(message, e);
+                //todo throw;
+            }
+
+            return result;
         }
         #endregion
 
