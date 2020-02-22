@@ -6,7 +6,6 @@ using NetworkModelServiceFunctions;
 using Outage.Common;
 using System;
 using System.Collections.Generic;
-using System.Diagnostics;
 using System.Linq;
 
 namespace TopologyBuilder
@@ -17,6 +16,7 @@ namespace TopologyBuilder
         private ILogger logger = LoggerWrapper.Instance;
         private List<Field> fields;
         private HashSet<long> visited;
+        private HashSet<long> reclosers;
         private Stack<long> stack;
         private Dictionary<long, ITopologyElement> elements;
         private Dictionary<long, List<long>> connections;
@@ -26,6 +26,7 @@ namespace TopologyBuilder
         { 
             elements = Provider.Instance.ModelProvider.GetElementModels();
             connections = Provider.Instance.ModelProvider.GetConnections();
+            reclosers = Provider.Instance.ModelProvider.GetReclosers();
             
             logger.LogInfo($"Creating topology from first element with GID 0x{firstElementGid.ToString("X16")}.");
 
@@ -33,11 +34,21 @@ namespace TopologyBuilder
             stack = new Stack<long>();
             fields = new List<Field>();
 
-            ITopology topology = new TopologyModel();
-            topology.FirstNode = firstElementGid;
-            elements[firstElementGid].IsActive = true;
-            stack.Push(firstElementGid);
+            ITopology topology = new TopologyModel
+            {
+                FirstNode = firstElementGid
+            };
 
+            if (elements.ContainsKey(firstElementGid))
+            {
+                elements[firstElementGid].IsActive = true;
+            }
+            else
+            {
+                logger.LogFatal($"Failed to build topology.Topology elements do not contain element with GID 0x{firstElementGid.ToString("X16")}which appear to be first element of topology.");
+            }
+            stack.Push(firstElementGid);
+            ITopologyElement currentElement;
             while (stack.Count > 0)
             {
                 var currentElementId = stack.Pop();
@@ -45,14 +56,43 @@ namespace TopologyBuilder
                 {
                     visited.Add(currentElementId);
                 }
-                ITopologyElement currentElement = elements[currentElementId];
+
+                if (!elements.TryGetValue(currentElementId, out currentElement))
+                {
+                    logger.LogFatal($"Failed to build topology.Topology elements do not contain element with GID 0x{currentElementId.ToString("X16")}.");
+                }
+
               
                 foreach (var element in GetReferencedElementsWithoutIgnorables(currentElementId))
                 {
                     if (elements.ContainsKey(element))
                     {
-                        ConnectTwoNodes(element, currentElement);
-                        stack.Push(element);
+                        if (!reclosers.Contains(element))
+                        {
+                            ConnectTwoNodes(element, currentElement);
+                            stack.Push(element);
+                        }
+                        else if (elements.TryGetValue(element, out ITopologyElement newNode))
+                        {
+                            currentElement.SecondEnd.Add(newNode);
+                            if (newNode.FirstEnd == null)
+                            {
+                                newNode.FirstEnd = currentElement;
+                            }
+                            else
+                            {
+                                newNode.SecondEnd.Add(currentElement);
+                            }
+
+                            if (!topology.TopologyElements.ContainsKey(newNode.Id))
+                            {
+                                topology.AddElement(newNode);
+                            }
+                        }
+                        else
+                        {
+                            logger.LogWarn($"[GraphBuilder] Recloser with GID 0x{element.ToString("X16")} does not exist in collection of elements.");
+                        }
                     }
                     else
                     {
@@ -107,19 +147,19 @@ namespace TopologyBuilder
             {
                 if (newElementIsField && !parentElementIsField)
                 {
-                    var field = new Field(newNode.Id);
-                    field.FirstEnd = parent.Id;
-                    newNode.FirstEnd = parent.Id;
+                    var field = new Field(newNode);
+                    field.FirstEnd = parent;
+                    newNode.FirstEnd = parent;
                     fields.Add(field);
-                    parent.SecondEnd.Add(field.Id);
+                    parent.SecondEnd.Add(field);
                 }
                 else if (newElementIsField && parentElementIsField)
                 {
                     try
                     {
-                        GetField(parent.Id).Members.Add(newNode.Id);
-                        newNode.FirstEnd = parent.Id;
-                        parent.SecondEnd.Add(newNode.Id);
+                        GetField(parent.Id).Members.Add(newNode);
+                        newNode.FirstEnd = parent;
+                        parent.SecondEnd.Add(newNode);
                     }
                     catch (Exception)
                     {
@@ -140,15 +180,15 @@ namespace TopologyBuilder
                     }
                     else
                     {
-                        field.SecondEnd.Add(newNode.Id);
-                        parent.SecondEnd.Add(newNode.Id);
-                        newNode.FirstEnd = field.Id;
+                        field.SecondEnd.Add(newNode);
+                        parent.SecondEnd.Add(newNode);
+                        newNode.FirstEnd = field;
                     }
                 }
                 else
                 {
-                    newNode.FirstEnd = parent.Id;
-                    parent.SecondEnd.Add(newNode.Id);
+                    newNode.FirstEnd = parent;
+                    parent.SecondEnd.Add(newNode);
                 }
             }
             else
@@ -161,7 +201,7 @@ namespace TopologyBuilder
             Field field = null;
             for (int i = 0; i < fields.Count; i++)
             {
-                if (fields[i].Members.Where(e => e == memberGid).ToList().Count > 0)
+                if (fields[i].Members.Where(e => e.Id == memberGid).ToList().Count > 0)
                 {
                     return fields[i];
                 }

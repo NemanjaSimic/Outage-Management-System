@@ -12,8 +12,8 @@ namespace CECommon.Interfaces
         string Description { get; set; }
         string Mrid { get; set; }
         string Name { get; set; }
-        long FirstEnd { get; set; }
-        List<long> SecondEnd { get; set; }
+        ITopologyElement FirstEnd { get; set; }
+        List<ITopologyElement> SecondEnd { get; set; }
         string DmsType { get; set; }
         bool IsRemote { get; set; }
         bool IsActive { get; set; }

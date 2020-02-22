@@ -6,10 +6,8 @@ using System.Threading.Tasks;
 
 namespace CECommon.Interfaces
 {
-    public interface IModelTopologyServis
+    public interface IModelTopologyService
     {
         List<ITopology> CreateTopology();
-        ITopology CalulateLoadFlow(long startingElementGid, ITopology topology);
-        List<ITopology> UpdateLoadFlow(List<long> startingSignalGid, List<ITopology> topologies);
     }
 }

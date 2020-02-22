@@ -13,33 +13,32 @@ namespace CECommon.Providers
         private TransactionFlag transactionFlag;
         private ILogger logger = LoggerWrapper.Instance;
         private IModelManager modelManager;
+
         private List<long> energySources;
-        private List<long> transactionEnergySources;
-        private Dictionary<long, IMeasurement> measurementModels;
         private Dictionary<long, ITopologyElement> elementModels;
         private Dictionary<long, List<long>> allElementConnections;
-        private Dictionary<long, IMeasurement> transactionMeasurementModels;
+        private HashSet<long> reclosers;
+
+        private List<long> transactionEnergySources;
         private Dictionary<long, ITopologyElement> transactionElementModels;
         private Dictionary<long, List<long>> transactionAllElementConnections;
-        
+        private HashSet<long> transactionReclosers;
+
         public ModelProvider(IModelManager modelManager)
         {
             this.modelManager = modelManager;
             transactionFlag = TransactionFlag.NoTransaction;
-            energySources = this.modelManager.GetAllEnergySources();
-            this.modelManager.GetAllModels(out elementModels, out measurementModels, out allElementConnections);
+
+            if(!modelManager.TryGetAllModelEntities(
+                out elementModels,
+                out allElementConnections,
+                out reclosers,
+                out energySources))
+            {
+                logger.LogFatal($"[Model provider] Failed to get all model entities.");
+            }
+
             Provider.Instance.ModelProvider = this;
-        }
-        public Dictionary<long, IMeasurement> GetMeasurementModels()
-        {
-            if (transactionFlag == TransactionFlag.NoTransaction)
-            {
-                return measurementModels;
-            }
-            else
-            {
-                return transactionMeasurementModels;
-            }
         }
         public Dictionary<long, ITopologyElement> GetElementModels()
         {
@@ -63,6 +62,17 @@ namespace CECommon.Providers
                 return transactionAllElementConnections;
             }
         }
+        public HashSet<long> GetReclosers()
+        {
+            if (transactionFlag == TransactionFlag.NoTransaction)
+            {
+                return reclosers;
+            }
+            else
+            {
+                return transactionReclosers;
+            }
+        }
         public List<long> GetEnergySources()
         {
             if (transactionFlag == TransactionFlag.NoTransaction)
@@ -81,9 +91,16 @@ namespace CECommon.Providers
             {
                 logger.LogInfo($"Topology manager prepare for transaction started.");
                 transactionFlag = TransactionFlag.InTransaction;
-                this.modelManager.PrepareTransaction();
-                this.modelManager.GetAllModels(out transactionElementModels, out transactionMeasurementModels, out transactionAllElementConnections);
-                transactionEnergySources = this.modelManager.GetAllEnergySources();
+
+                if (!modelManager.TryGetAllModelEntities(
+                    out transactionElementModels,
+                    out transactionAllElementConnections,
+                    out transactionReclosers,
+                    out transactionEnergySources))
+                {
+                    logger.LogError($"[Model provider] Failed to get all model entities in transaction.");
+                    success = false;
+                }
             }
             catch (Exception ex)
             {
@@ -95,7 +112,6 @@ namespace CECommon.Providers
         public void CommitTransaction()
         {
             elementModels = transactionElementModels;
-            measurementModels = transactionMeasurementModels;
             allElementConnections = transactionAllElementConnections;
             energySources = transactionEnergySources;
             transactionFlag = TransactionFlag.NoTransaction;
@@ -104,7 +120,6 @@ namespace CECommon.Providers
         public void RollbackTransaction()
         {
             transactionElementModels = null;
-            transactionMeasurementModels = null;
             transactionAllElementConnections = null;
             transactionEnergySources = null;
             transactionFlag = TransactionFlag.NoTransaction;

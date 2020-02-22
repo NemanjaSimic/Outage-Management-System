@@ -20,10 +20,9 @@ namespace SCADACommanding
 
         public void SendCommand(long guid, int value)
         {
-            bool success = false;
             try
             {
-                if (Provider.Instance.TopologyProvider.IsElementRemote(Provider.Instance.CacheProvider.GetElementGidForMeasurement(guid)))
+                if (Provider.Instance.TopologyProvider.IsElementRemote(Provider.Instance.MeasurementProvider.GetElementGidForMeasurement(guid)))
                 {
                     ProxyFactory proxyFactory = new ProxyFactory();
 
@@ -36,22 +35,18 @@ namespace SCADACommanding
                             throw new NullReferenceException(message);
                         }
 
-                        success = proxy.SendDiscreteCommand(guid, (ushort)value);
+                        proxy.SendDiscreteCommand(guid, (ushort)value);
                     }
                 }
                 else
                 {
-                    //todo: sucess = what?
-                    Provider.Instance.CacheProvider.UpdateDiscreteMeasurement(guid, (ushort)value);
+                    Provider.Instance.MeasurementProvider.UpdateDiscreteMeasurement(guid, (ushort)value);
                 }
             }
             catch (Exception ex)
             {
-                success = false;
                 logger.LogError($"Sending discrete command for measurement with GID {guid} failed. Exception: {ex.Message}");
             }
-
-            //return success;
         }
     }
 }

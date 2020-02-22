@@ -12,7 +12,7 @@ namespace CalculationEngineService
         {
             try
             {
-                return Provider.Instance.CacheProvider.GetMeasurementsForElement(elementId);
+                return Provider.Instance.MeasurementProvider.GetMeasurementsForElement(elementId);
             }
             catch (Exception ex)
             {

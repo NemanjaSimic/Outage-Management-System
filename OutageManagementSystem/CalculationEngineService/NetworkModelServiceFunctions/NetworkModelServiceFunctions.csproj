@@ -45,7 +45,7 @@
     <Reference Include="System.Xml" />
   </ItemGroup>
   <ItemGroup>
-    <Compile Include="NMSManager.cs" />
+    <Compile Include="ModelManager.cs" />
     <Compile Include="NetworkModelGDA.cs" />
     <Compile Include="Properties\AssemblyInfo.cs" />
     <Compile Include="TopologyHelper.cs" />

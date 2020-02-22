@@ -15,8 +15,8 @@ namespace Topology
 {
     public class TopologyPublisher
     {
-        private ILogger logger = LoggerWrapper.Instance;
-        private ProxyFactory proxyFactory;
+        private readonly ILogger logger = LoggerWrapper.Instance;
+        private readonly ProxyFactory proxyFactory;
 
         public TopologyPublisher()
         {
@@ -50,6 +50,7 @@ namespace Topology
                         throw new NullReferenceException(errMessage);
                     }
 
+                    
                     publisherProxy.Publish(publication);
                     logger.LogDebug("Topology publisher published new ui model successfully.");
                 }

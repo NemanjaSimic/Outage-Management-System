@@ -2,7 +2,6 @@
 using CECommon.Interfaces;
 using CECommon.Model;
 using CECommon.Providers;
-using NetworkModelServiceFunctions;
 using Outage.Common;
 using Outage.Common.OutageService.Interface;
 using Outage.Common.OutageService.Model;
@@ -10,7 +9,6 @@ using Outage.Common.UI;
 using System;
 using System.Collections.Generic;
 using System.Linq;
-using TopologyBuilder;
 
 namespace Topology
 {
@@ -22,36 +20,41 @@ namespace Topology
             logger.LogDebug("Topology to UIModel convert started.");
             UIModel uIModel = new UIModel();
             Stack<long> stack = new Stack<long>();
+            var reclosers = Provider.Instance.ModelProvider.GetReclosers();
             uIModel.FirstNode = topology.FirstNode;
             stack.Push(topology.FirstNode);
-
+            long nextElementGid;
             while (stack.Count > 0)
             {
-                if (topology.GetElementByGid(stack.Pop(), out ITopologyElement element))
+                nextElementGid = stack.Pop();
+                if (topology.GetElementByGid(nextElementGid, out ITopologyElement element))
                 {
-                    foreach (long child in element.SecondEnd)
+                    if (!reclosers.Contains(nextElementGid))
                     {
-                        long nextElement = child;
-                        if (ModelCodeHelper.ExtractTypeFromGlobalId(child) == 0)
+                        foreach (var child in element.SecondEnd)
                         {
-                            try
+                            long nextElement = child.Id;
+                            if (ModelCodeHelper.ExtractTypeFromGlobalId(child.Id) == 0)
                             {
-                                topology.GetElementByGid(child, out ITopologyElement fieldElement);
-                                Field field = fieldElement as Field;
-                                nextElement = field.Members.First();                       
+                                try
+                                {
+                                    //topology.GetElementByGid(child, out ITopologyElement fieldElement);
+                                    Field field = child as Field;
+                                    nextElement = field.Members.First().Id;
+                                }
+                                catch (Exception)
+                                {
+                                    logger.LogError($"[TopologyConverter] Error while getting field in Topology to UIModel convert. Element is not field or field is empty.");
+                                }
                             }
-                            catch (Exception)
-                            {
-                                logger.LogError($"[TopologyConverter] Error while getting field in Topology to UIModel convert. Element is not field or field is empty.");
-                            }
+                            uIModel.AddRelation(element.Id, nextElement);
+                            stack.Push(nextElement);
                         }
-                        uIModel.AddRelation(element.Id, nextElement);
-                        stack.Push(nextElement);
                     }
                     List<UIMeasurement> measurements = new List<UIMeasurement>();
                     foreach (var meausrementGid in element.Measurements)
                     {
-                        if (Provider.Instance.CacheProvider.TryGetDiscreteMeasurement(meausrementGid, out DiscreteMeasurement discreteMeasurement))
+                        if (Provider.Instance.MeasurementProvider.TryGetDiscreteMeasurement(meausrementGid, out DiscreteMeasurement discreteMeasurement))
                         {
                             measurements.Add(new UIMeasurement()
                             {
@@ -60,7 +63,7 @@ namespace Topology
                                 Value = discreteMeasurement.GetCurrentVaule()
                             });
                         }
-                        else if (Provider.Instance.CacheProvider.TryGetAnalogMeasurement(meausrementGid, out AnalogMeasurement analogMeasurement))
+                        else if (Provider.Instance.MeasurementProvider.TryGetAnalogMeasurement(meausrementGid, out AnalogMeasurement analogMeasurement))
                         {
                             measurements.Add(new UIMeasurement()
                             {
@@ -75,23 +78,27 @@ namespace Topology
                         }
                     }
 
-                    UINode newUINode = new UINode()
+
+                    if (!uIModel.Nodes.ContainsKey(element.Id))
                     {
-                        Id = element.Id,
-                        Name = element.Name,
-                        Mrid = element.Mrid,
-                        Description = element.Description,
-                        DMSType = element.DmsType,
-                        NominalVoltage = element.NominalVoltage,
-                        Measurements = measurements,
-                        IsActive = element.IsActive,
-                        IsRemote = element.IsRemote
-                    };
-                    uIModel.AddNode(newUINode);
+                        UINode newUINode = new UINode()
+                        {
+                            Id = element.Id,
+                            Name = element.Name,
+                            Mrid = element.Mrid,
+                            Description = element.Description,
+                            DMSType = element.DmsType,
+                            NominalVoltage = element.NominalVoltage,
+                            Measurements = measurements,
+                            IsActive = element.IsActive,
+                            IsRemote = element.IsRemote
+                        };
+                        uIModel.AddNode(newUINode);
+                    }
                 }
                 else
                 {
-                    logger.LogWarn($"[TopologyConverter] Error while getting topology element from topology. It does not exist in topology.");
+                    logger.LogWarn($"[TopologyConverter - UIModel] Error while getting topology element with GID 0x{nextElementGid.ToString("X16")} from topology. It does not exist in topology.");
                 }
             }
             logger.LogDebug("Topology to UIModel convert finished successfully.");
@@ -103,43 +110,53 @@ namespace Topology
             logger.LogDebug("Topology to OMS model convert started.");
             IOutageTopologyModel outageTopologyModel = new OutageTopologyModel();
             Stack<long> stack = new Stack<long>();
+            var reclosers = Provider.Instance.ModelProvider.GetReclosers();
             outageTopologyModel.FirstNode = topology.FirstNode;
             stack.Push(topology.FirstNode);
+            List<long> secondEnd = new List<long>();
+            long nextElement = 0;
+            long nextElementGid = 0;
+
 
             while (stack.Count > 0)
             {
-                if (topology.GetElementByGid(stack.Pop(), out ITopologyElement element))
+                nextElementGid = stack.Pop();
+                if (topology.GetElementByGid(nextElementGid, out ITopologyElement element))
                 {
-                    outageTopologyModel.AddElement(
-                        new OutageTopologyElement(element.Id)
-                        {
-                            FirstEnd = element.FirstEnd,
-                            DmsType = element.DmsType,
-                            IsRemote = element.IsRemote,
-                            SecondEnd = element.SecondEnd
-                        });
-
-                    var children = new List<long>(element.SecondEnd);
-
-                    foreach (long child in children)
+                    secondEnd.Clear();
+                    if (!reclosers.Contains(nextElementGid))
                     {
-                        long nextElement = child;
-                        if (ModelCodeHelper.ExtractTypeFromGlobalId(child) == 0)
+                        foreach (var child in element.SecondEnd)
                         {
-                            try
+                            nextElement = child.Id;
+                            if (ModelCodeHelper.ExtractTypeFromGlobalId(nextElement) == 0)
                             {
-                                topology.GetElementByGid(child, out ITopologyElement fieldElement);
-                                Field field = fieldElement as Field;
-                                nextElement = field.Members.First();
-                                element.SecondEnd.Remove(child);
-                                element.SecondEnd.Add(nextElement);
+                                try
+                                {
+                                    Field field = child as Field;
+                                    nextElement = field.Members.First().Id;
+                                }
+                                catch (Exception)
+                                {
+                                    logger.LogError($"[TopologyConverter] Error while getting field in Topology to OMSModel convert. Element is not field or field is empty.");
+                                }
                             }
-                            catch (Exception)
-                            {
-                                logger.LogError($"[TopologyConverter] Error while getting field in Topology to OMSModel convert. Element is not field or field is empty.");
-                            }
+                            secondEnd.Add(nextElement);
+                            stack.Push(nextElement);
                         }
-                        stack.Push(nextElement);
+                    }
+
+                    if (!outageTopologyModel.GetElementByGid(nextElement, out var _))
+                    {
+
+                        outageTopologyModel.AddElement(
+                            new OutageTopologyElement(element.Id)
+                            {
+                                FirstEnd = (element.FirstEnd != null) ? element.FirstEnd.Id : 0,
+                                DmsType = element.DmsType,
+                                IsRemote = element.IsRemote,
+                                SecondEnd = secondEnd
+                            });
                     }
                 }
                 else

@@ -9,7 +9,7 @@ using System.Threading.Tasks;
 namespace CECommon.Interfaces
 {
     public delegate void DiscreteMeasurementDelegate(List<long> signalsGid);
-    public interface ICacheProvider
+    public interface IMeasurementProvider
     {
         DiscreteMeasurementDelegate DiscreteMeasurementDelegate { get; set; }
         void AddAnalogMeasurement(AnalogMeasurement analogMeasurement);
@@ -18,6 +18,7 @@ namespace CECommon.Interfaces
         bool GetDiscreteValue(long measurementGid);
         long GetElementGidForMeasurement(long measurementGid);
         List<Tuple<string, long>> GetMeasurementsForElement(long elementGid);
+        void InternalUpdateDiscreteMeasurement(Dictionary<long, bool> commands);
         bool TryGetAnalogMeasurement(long measurementGid, out AnalogMeasurement measurement);
         bool TryGetDiscreteMeasurement(long measurementGid, out DiscreteMeasurement measurement);
         void UpdateAnalogMeasurement(long measurementGid, float value);
