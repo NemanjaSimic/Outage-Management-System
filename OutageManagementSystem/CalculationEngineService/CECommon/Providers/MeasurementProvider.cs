@@ -15,28 +15,26 @@ using System.Threading.Tasks;
 
 namespace CECommon.Providers
 {
-    public class CacheProvider : ICacheProvider
+    public class MeasurementProvider : IMeasurementProvider
     {
-		private ILogger logger = LoggerWrapper.Instance;
+		private readonly ILogger logger = LoggerWrapper.Instance;
 		private Dictionary<long, AnalogMeasurement> analogMeasurements;
-		//private Dictionary<long, AnalogMeasurementInfo> analogMeasurements;
 		private Dictionary<long, DiscreteMeasurement> discreteMeasurements;
 		//private Dictionary<long, DiscreteMeasurementInfo> discreteMeasurements;
 		private Dictionary<long, List<long>> elementToMeasurementMap;
 		private Dictionary<long, long> measurementToElementMap;
-		private ProxyFactory proxyFactory; 
+		private ProxyFactory proxyFactory;
 
-		public CacheProvider()
+		public MeasurementProvider()
 		{
 			elementToMeasurementMap = new Dictionary<long, List<long>>();
 			measurementToElementMap = new Dictionary<long, long>();
 			analogMeasurements = new Dictionary<long, AnalogMeasurement>();
-			//analogMeasurements = new Dictionary<long, AnalogMeasurementInfo>();
 			discreteMeasurements = new Dictionary<long, DiscreteMeasurement>();
 			//discreteMeasurements = new Dictionary<long, DiscreteMeasurementInfo>();
-
+      
 			proxyFactory = new ProxyFactory();
-			Provider.Instance.CacheProvider = this;
+			Provider.Instance.MeasurementProvider = this;
 		}
 
 		public DiscreteMeasurementDelegate DiscreteMeasurementDelegate { get; set; }
@@ -75,7 +73,7 @@ namespace CECommon.Providers
 			if (!discreteMeasurements.ContainsKey(discreteMeasurement.Id))
 			{
 				discreteMeasurements.Add(discreteMeasurement.Id, discreteMeasurement);
-				
+
 				if (elementToMeasurementMap.TryGetValue(discreteMeasurement.ElementId, out var measurements))
 				{
 					measurements.Add(discreteMeasurement.Id);
@@ -100,7 +98,7 @@ namespace CECommon.Providers
 				}
 			}
 		}
-		
+
 		public float GetAnalogValue(long measurementGid)
 		{
 			float value = 0;
@@ -116,7 +114,7 @@ namespace CECommon.Providers
 			bool isOpen = false;
 			if (discreteMeasurements.ContainsKey(measurementGid))
 			{
-				isOpen = discreteMeasurements[measurementGid].CurrentOpen;			
+				isOpen = discreteMeasurements[measurementGid].CurrentOpen;
 			}
 			return isOpen;
 		}
@@ -191,7 +189,24 @@ namespace CECommon.Providers
 			}
 			DiscreteMeasurementDelegate?.Invoke(signalGids);
 		}
-
+		public void InternalUpdateDiscreteMeasurement(Dictionary<long, bool> commands)
+		{
+			var tempMeasurements = new Dictionary<long, DiscreteMeasurement>(discreteMeasurements);
+			List<long> changedMeasurements = new List<long>();
+			foreach (var pair in commands)
+			{
+				foreach (var measPair in tempMeasurements)
+				{
+					if (measPair.Value.ElementId == pair.Key)
+					{
+						discreteMeasurements[measPair.Key].CurrentOpen = pair.Value;
+						changedMeasurements.Add(discreteMeasurements[measPair.Key].ElementId);
+						break;
+					}
+				}
+			}
+			DiscreteMeasurementDelegate?.Invoke(changedMeasurements);
+		}
 		public long GetElementGidForMeasurement(long measurementGid)
 		{
 			long signalGid = 0;
@@ -238,7 +253,6 @@ namespace CECommon.Providers
 			}
 			return success;
 		}
-
 		public bool TryGetAnalogMeasurement(long measurementGid, out AnalogMeasurement measurement)
 		{
 			bool success = false;

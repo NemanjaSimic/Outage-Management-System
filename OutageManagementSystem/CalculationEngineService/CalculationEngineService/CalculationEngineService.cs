@@ -20,11 +20,12 @@ namespace CalculationEngineService
     {
         private ILogger logger;
         private ISubscriber proxy;
-        private IModelTopologyServis modelTopologyServis;
+        private IModelTopologyService modelTopologyServis;
         private ITopologyConverter webTopologyBuilder;
         private IModelManager modelManager;
         private ITopologyBuilder topologyBuilder;
-        private ICacheProvider cacheProvider;
+        private IMeasurementProvider cacheProvider;
+        private IVoltageFlow voltageFlow;
 
         private ProxyFactory proxyFactory;
         private SCADAResultHandler sCADAResultProvider;
@@ -44,14 +45,15 @@ namespace CalculationEngineService
             proxyFactory = new ProxyFactory();
 
             topologyBuilder = new GraphBuilder();
-            modelTopologyServis = new TopologyManager(topologyBuilder);
+            voltageFlow = new VoltageFlow();
+            modelTopologyServis = new ModelTopologyService(topologyBuilder, voltageFlow);
             webTopologyBuilder = new TopologyConverter();
 
             sCADAResultProvider = new SCADAResultHandler();
-            cacheProvider = new CacheProvider();
-            modelManager = new NMSManager();
+            cacheProvider = new MeasurementProvider();
+            modelManager = new ModelManager();
             modelProvider = new ModelProvider(modelManager);
-            topologyProvider = new TopologyProvider(modelTopologyServis);
+            topologyProvider = new TopologyProvider(modelTopologyServis, voltageFlow);
             webTopologyModelProvider = new TopologyConverterProvider(webTopologyBuilder);
             topologyPublisher = new TopologyPublisher();
             InitializeHosts();

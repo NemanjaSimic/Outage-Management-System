@@ -13,7 +13,7 @@ namespace Topology
 {
 	public class TopologyService : ITopologyServiceContract, ITopologyOMSService
 	{
-		private ILogger logger = LoggerWrapper.Instance;
+		private readonly ILogger logger = LoggerWrapper.Instance;
 
 		public IOutageTopologyModel GetOMSModel()
 		{

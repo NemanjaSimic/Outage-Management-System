@@ -9,8 +9,8 @@ namespace CECommon
 	{
         #region Fields
         private long id;
-		private long firstEnd;
-		private List<long> secondEnd;
+		private ITopologyElement firstEnd;
+		private List<ITopologyElement> secondEnd;
 		private string dmsType;
 		private List<long> measurements;
 		private string descritption;
@@ -27,8 +27,8 @@ namespace CECommon
 		public string Mrid { get => mrid; set => mrid = value; }
 		public string Name { get => name; set => name = value; }
 		public float NominalVoltage { get => nominalVoltage; set => nominalVoltage = value; }
-		public long FirstEnd { get => firstEnd; set => firstEnd = value; }
-		public List<long> SecondEnd { get => secondEnd; set => secondEnd = value; }
+		public ITopologyElement FirstEnd { get => firstEnd; set => firstEnd = value; }
+		public List<ITopologyElement> SecondEnd { get => secondEnd; set => secondEnd = value; }
 		public string DmsType { get => dmsType; set => dmsType = value; }
 		public List<long> Measurements { get => measurements; set => measurements = value; }
 		public bool IsRemote { get => isRemote; set => isRemote = value; }
@@ -38,7 +38,7 @@ namespace CECommon
 		public TopologyElement(long gid)
 		{
 			Id = gid;
-			SecondEnd = new List<long>();
+			SecondEnd = new List<ITopologyElement>();
 			Measurements = new List<long>();
 		}
 	}

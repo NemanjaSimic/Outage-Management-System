@@ -24,20 +24,20 @@ namespace CECommon.Providers
 
 			if (message is SingleAnalogValueSCADAMessage singleAnalog)
 			{
-				Provider.Instance.CacheProvider.UpdateAnalogMeasurement(singleAnalog.Gid, singleAnalog.Value);
+				Provider.Instance.MeasurementProvider.UpdateAnalogMeasurement(singleAnalog.Gid, singleAnalog.Value);
 			}
 			else if (message is MultipleAnalogValueSCADAMessage multipleAnalog)
 			{
-				Provider.Instance.CacheProvider.UpdateAnalogMeasurement(multipleAnalog.Data);
+				Provider.Instance.MeasurementProvider.UpdateAnalogMeasurement(multipleAnalog.Data);
 			}
 			else if (message is SingleDiscreteValueSCADAMessage singleDiscrete)
 			{
 				Dictionary<long, DiscreteModbusData> data = new Dictionary<long, DiscreteModbusData>(1) { { singleDiscrete.Gid, new DiscreteModbusData(singleDiscrete.Value, singleDiscrete.Alarm) } };
-				Provider.Instance.CacheProvider.UpdateDiscreteMeasurement(data);
+				Provider.Instance.MeasurementProvider.UpdateDiscreteMeasurement(data);
 			}
 			else if (message is MultipleDiscreteValueSCADAMessage multipleDiscrete)
 			{
-				Provider.Instance.CacheProvider.UpdateDiscreteMeasurement(multipleDiscrete.Data);
+				Provider.Instance.MeasurementProvider.UpdateDiscreteMeasurement(multipleDiscrete.Data);
 			}
 			else
 			{

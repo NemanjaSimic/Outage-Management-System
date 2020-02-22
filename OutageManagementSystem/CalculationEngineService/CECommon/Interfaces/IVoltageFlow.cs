@@ -6,8 +6,8 @@ using System.Threading.Tasks;
 
 namespace CECommon.Interfaces
 {
-    public interface IModelTopologyService
+    public interface IVoltageFlow
     {
-        List<ITopology> CreateTopology();
+        void UpdateLoadFlow(List<ITopology> topologies);
     }
 }

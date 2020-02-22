@@ -2,15 +2,18 @@
 using Outage.Common;
 using System;
 using System.Collections.Generic;
+using System.Linq;
 
 namespace CECommon.Providers
 {
     public class TopologyProvider : ITopologyProvider
     {
-        //private ILogger logger = new LoggerWrapper.Instance;
+        private ILogger logger =  LoggerWrapper.Instance;
         private TransactionFlag transactionFlag;
+        private IVoltageFlow voltageFlow;
         private List<ITopology> topology;
-        private IModelTopologyServis modelTopologyServis;
+        private IModelTopologyService modelTopologyServis;
+        private HashSet<long> reclosers;
         private List<ITopology> Topology
         {
             get { return topology; }
@@ -23,18 +26,21 @@ namespace CECommon.Providers
         private List<ITopology> TransactionTopology { get; set; }
         public ProviderTopologyDelegate ProviderTopologyDelegate { get; set; }
         public ProviderTopologyConnectionDelegate ProviderTopologyConnectionDelegate{get; set;}
-        public TopologyProvider(IModelTopologyServis modelTopologyServis)
+        public TopologyProvider(IModelTopologyService modelTopologyServis, IVoltageFlow voltageFlow)
         {
+            this.voltageFlow = voltageFlow;
             this.modelTopologyServis = modelTopologyServis;
             transactionFlag = TransactionFlag.NoTransaction;
             Topology = this.modelTopologyServis.CreateTopology();
-            Provider.Instance.CacheProvider.DiscreteMeasurementDelegate += DiscreteMeasurementDelegate;
+            reclosers = Provider.Instance.ModelProvider.GetReclosers();
+            Provider.Instance.MeasurementProvider.DiscreteMeasurementDelegate += DiscreteMeasurementDelegate;
             Provider.Instance.TopologyProvider = this;
-        }  
-        
+        }
+
         public void DiscreteMeasurementDelegate(List<long> elementGids)
         {
-            Topology = this.modelTopologyServis.UpdateLoadFlow(elementGids, Topology); 
+            voltageFlow.UpdateLoadFlow(Topology);
+            ProviderTopologyDelegate?.Invoke(Topology);
         }
 
         public List<ITopology> GetTopologies()
@@ -52,6 +58,7 @@ namespace CECommon.Providers
         {
             Topology = TransactionTopology;
             transactionFlag = TransactionFlag.NoTransaction;
+            reclosers = Provider.Instance.ModelProvider.GetReclosers();
             ProviderTopologyConnectionDelegate?.Invoke(Topology);
         }
         public bool PrepareForTransaction()
@@ -59,13 +66,13 @@ namespace CECommon.Providers
             bool success = true;
             try
             {
-                //logger.LogInfo($"Topology manager prepare for transaction started.");
-                TransactionTopology = this.modelTopologyServis.CreateTopology();
+                logger.LogInfo($"Model provider preparing for transaction.");
+                TransactionTopology = modelTopologyServis.CreateTopology();
                 transactionFlag = TransactionFlag.InTransaction;
             }
             catch (Exception ex)
             {
-                //logger.LogInfo($"Model provider failed to prepare for transaction. Exception message: {ex.Message}");
+                logger.LogInfo($"Model provider failed to prepare for transaction. Exception message: {ex.Message}");
                 success = false;
             }
             return success;
@@ -75,7 +82,6 @@ namespace CECommon.Providers
             TransactionTopology = null;
             transactionFlag = TransactionFlag.NoTransaction;
         }
-
         public bool IsElementRemote(long elementGid)
         {
             bool isRemote = false;
@@ -89,6 +95,5 @@ namespace CECommon.Providers
             }
             return isRemote;
         }
-            
     }
 }
