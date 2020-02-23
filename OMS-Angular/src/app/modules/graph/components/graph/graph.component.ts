@@ -4,7 +4,7 @@ import { OmsGraph } from '@shared/models/oms-graph.model';
 
 import cyConfig from './graph.config';
 import { drawBackupEdge } from '@shared/utils/backup-edge';
-import { addGraphTooltip, addOutageTooltip, addEdgeTooltip} from '@shared/utils/tooltip';
+import { addGraphTooltip, addOutageTooltip, addEdgeTooltip, addAnalogMeasurementTooltip} from '@shared/utils/tooltip';
 import { drawWarning } from '@shared/utils/warning';
 import { drawCallWarning } from '@shared/utils/outage';
 import { drawMeasurements, GetUnitMeasurement, GetAlarmColorForMeasurement } from '@shared/utils/measurement';
@@ -266,11 +266,7 @@ export class GraphComponent implements OnInit, OnDestroy {
 
           addOutageTooltip(this.cy, node, outage);
         }
-		else if(node.data("type") == 'analogMeasurement')
-        {
-        }
-        else {
-
+        else if(node.data("type") != 'analogMeasurement'){
           addGraphTooltip(this.cy, node);
           if (node.data('dmsType') == "ACLINESEGMENT") {
             const connectedEdges = node.connectedEdges();
@@ -296,9 +292,12 @@ export class GraphComponent implements OnInit, OnDestroy {
           let counter = 1;
           let color = "#40E609";
           measurements.forEach(meas => {
+            color = GetAlarmColorForMeasurement(meas.AlarmType);
             measurementString = meas.Value + " " + GetUnitMeasurement(meas.Type) + "\n";
-            drawMeasurements(this.cy, node, measurementString, color, nodePosition*counter);
+            drawMeasurements(this.cy, node, measurementString, color, nodePosition*counter, meas.Id);
             counter++;
+            let newNode = this.cy.$id(meas.Id);
+            addAnalogMeasurementTooltip(this.cy, newNode, meas.AlarmType);
           });
         }
       })
@@ -335,18 +334,13 @@ export class GraphComponent implements OnInit, OnDestroy {
       gids.forEach(gid => {
         this.graphData.nodes.forEach(node => {
           let msms = node.data["measurements"];
-          let color = "";
-          let nodePosition = 30;
-          let counter = 1;
-          let measurementString = "";
           msms.forEach(measurement => {
             if (measurement.Id == gid) {
               measurement.Value = data[gid].Value;
-              color = GetAlarmColorForMeasurement(data[gid].Alarm);
-              measurementString = measurement.Value + " " + GetUnitMeasurement(measurement.Type) + "\n";
-              drawMeasurements(this.cy, node, measurementString, color, counter*nodePosition);
+              measurement.AlarmType = data[gid].Alarm;
+              /*color = GetAlarmColorForMeasurement(data[gid].Alarm);
+              measurementString = measurement.Value + " " + GetUnitMeasurement(measurement.Type) + "\n";*/
             }
-            counter++;
           });
         });
       });

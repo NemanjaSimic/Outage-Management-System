@@ -48,19 +48,20 @@ export const GetAlarmColorForMeasurement = (alarm : AlarmType) => {
             break;
         }
         default:{
-            retVal = "#000000"; //crnilo
+            retVal = "#40E609"; //green
             break;
         }
     }
     return retVal;
 }
 
-export const drawMeasurements = (cy, node, measurementString, alarmColor, nodePosition) => {
-    cy.add([
+export const drawMeasurements = (cy, node, measurementString, alarmColor, nodePosition, measId) => {
+    
+    cy.add( [
         {
         group: "nodes",
         data: {
-            id: `${uuid()}`,
+            id: measId,
             type: 'analogMeasurement',
             content: measurementString,
             color : alarmColor
@@ -70,5 +71,5 @@ export const drawMeasurements = (cy, node, measurementString, alarmColor, nodePo
             y: node.position("y") - nodePosition
         }
         }
-    ])
+    ]);
 }

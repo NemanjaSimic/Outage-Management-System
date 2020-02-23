@@ -47,11 +47,12 @@ export const style = cytoscape.stylesheet()
         'border' : '3px',
         'border-color' : "#40E609",
         'color' : 'data(color)',
-        'background-fit': 'contain',
+        'background-fit': 'cover',
         'content': 'data(content)',
-        'align-content' : 'center',
-        'height': '1px',
-        'width': '1px',
+        'height': 'auto',
+        'width': 'auto',
+        'text-wrap': 'wrap',
+        'text-margin-y': '25px',
     })
     .selector('node[type = "outage-call"]')
     .style({
