@@ -28,7 +28,7 @@ namespace SCADAFunctions
 			measurementToElementMap = new Dictionary<long, long>();
 			analogMeasurements = new Dictionary<long, AnalogMeasurement>();
 			discreteMeasurements = new Dictionary<long, DiscreteMeasurement>();
-      
+
 			proxyFactory = new ProxyFactory();
 			Provider.Instance.MeasurementProvider = this;
 		}
@@ -116,7 +116,7 @@ namespace SCADAFunctions
 		public void UpdateAnalogMeasurement(long measurementGid, float value)
 		{
 			if (analogMeasurements.TryGetValue(measurementGid, out AnalogMeasurement measurement))
-			{	
+			{
 				measurement.CurrentValue = value;
 			}
 			else
@@ -144,24 +144,24 @@ namespace SCADAFunctions
 				{
 					if (!measurement.CurrentOpen)
 					{
-						using (OutageServiceProxy outageProxy = proxyFactory.CreateProxy<OutageServiceProxy, IOutageContract>(EndpointNames.OutageServiceEndpoint))
+					using (ReportPotentialOutageProxy reportPotentialOutageProxy = proxyFactory.CreateProxy<ReportPotentialOutageProxy, IReportPotentialOutageContract>(EndpointNames.ReportPotentialOutageEndpoint))
+					{
+						if (reportPotentialOutageProxy == null)
 						{
-							if (outageProxy == null)
-							{
-								string message = "UpdateDiscreteMeasurement => OutageServiceProxy is null.";
-								logger.LogError(message);
-								throw new NullReferenceException(message);
-							}
-
-							try
-							{
-								outageProxy.ReportOutage(measurement.ElementId);
-							}
-							catch (Exception e)
-							{
-								logger.LogError("Failed to report outage.", e);
-							}
+							string message = "UpdateDiscreteMeasurement => ReportPotentialOutageProxy is null.";
+							logger.LogError(message);
+							throw new NullReferenceException(message);
 						}
+
+						try
+						{
+							reportPotentialOutageProxy.ReportPotentialOutage(measurement.ElementId);
+						}
+						catch (Exception e)
+						{
+							logger.LogError("Failed to report potential outage.", e);
+						}
+					}
 					}
 					measurement.CurrentOpen = true;
 				}

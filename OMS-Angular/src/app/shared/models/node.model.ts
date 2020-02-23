@@ -1,3 +1,5 @@
+import { AlarmType } from './scada-data.model';
+
 export interface Node {
   Id: string;
   Name: string;
@@ -13,5 +15,6 @@ export interface Node {
 export interface IMeasurement {
   Id: string;
   Type: string;
-  Value: Number; 
+  Value: Number;
+  AlarmType: AlarmType; 
 }

@@ -51,19 +51,51 @@ namespace OMS.Web.API.Controllers
         }
 
         [HttpPost]
-        [Route("api/outage/sendcrew/{gid}")]
-        public async Task<IHttpActionResult> SendOutageCrew([FromUri]long gid)
+        [Route("api/outage/sendlocationisolationcrew/{gid}")]
+        public async Task<IHttpActionResult> SendOutageLocationIsolationCrew([FromUri]long gid)
         {
             try
             {
-                _ = await _mediator.Send(new SendOutageCrewCommand(gid));
+                _ = await _mediator.Send(new SendOutageLocationIsolationCrewCommand(gid));
             }
             catch (Exception)
             {
                 return InternalServerError();
             }
 
-            return Ok("Crew sent.");
+            return Ok("Isolated.");
+        }
+
+        [HttpPost]
+        [Route("api/outage/sendrepaircrew/{gid}")]
+        public async Task<IHttpActionResult> SendOutageRepairCrew([FromUri]long gid)
+        {
+            try
+            {
+                _ = await _mediator.Send(new SendOutageRepairCrewCommand(gid));
+            }
+            catch (Exception)
+            {
+                return InternalServerError();
+            }
+
+            return Ok("Repair crew sent.");
+        }
+
+        [HttpPost]
+        [Route("api/outage/validateresolve/{gid}")]
+        public async Task<IHttpActionResult> ValidateOutage([FromUri]long gid)
+        {
+            try
+            {
+                _ = await _mediator.Send(new ValidateResolveConditionsCommand(gid));
+            }
+            catch (Exception)
+            {
+                return InternalServerError();
+            }
+
+            return Ok("Resolve conditions validated.");
         }
 
         [HttpPost]
@@ -81,22 +113,5 @@ namespace OMS.Web.API.Controllers
 
             return Ok("Resolved.");
         }
-
-        [HttpPost]
-        [Route("api/outage/validate/{gid}")]
-        public async Task<IHttpActionResult> ValidateOutage([FromUri]long gid)
-        {
-            try
-            {
-                _ = await _mediator.Send(new ValidateOutageCommand(gid));
-            }
-            catch (Exception)
-            {
-                return InternalServerError();
-            }
-
-            return Ok("Validated.");
-        }
-
     }
 }

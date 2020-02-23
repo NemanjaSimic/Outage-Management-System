@@ -5,22 +5,12 @@ using System.ServiceModel;
 namespace Outage.Common.ServiceContracts.OMS
 {
     [ServiceContract]
-    public interface IOutageContract
+    public interface IOutageAccessContract
     {
-        [OperationContract]
-        bool ReportOutage(long elementGid);
-
         [OperationContract]
         List<ActiveOutage> GetActiveOutages();
 
         [OperationContract]
         List<ArchivedOutage> GetArchivedOutages();
-
-        [OperationContract]
-        bool UpdateActiveOutageIsolated(long elementGid, List<long> locatedElements);
-
-        [OperationContract]
-        bool UpdateActiveOutageResolved(long elementGid);
-
     }
 }
