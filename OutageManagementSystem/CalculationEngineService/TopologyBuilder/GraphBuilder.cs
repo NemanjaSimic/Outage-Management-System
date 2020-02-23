@@ -47,6 +47,7 @@ namespace TopologyBuilder
             {
                 logger.LogFatal($"Failed to build topology.Topology elements do not contain element with GID 0x{firstElementGid.ToString("X16")}which appear to be first element of topology.");
             }
+
             stack.Push(firstElementGid);
             ITopologyElement currentElement;
             while (stack.Count > 0)
