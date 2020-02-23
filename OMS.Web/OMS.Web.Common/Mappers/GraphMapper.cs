@@ -57,7 +57,7 @@
                     {
                         SourceNodeId = keyValue.Key.ToString(),
                         TargetNodeId = targetNodeId.ToString(),
-                        IsActive = topologyModel.Nodes[keyValue.Key].IsActive
+                        IsActive = topologyModel.Nodes[keyValue.Key].IsActive || topologyModel.Nodes[targetNodeId].IsActive
                     };
 
                     graph.Relations.Add(graphRelation);
