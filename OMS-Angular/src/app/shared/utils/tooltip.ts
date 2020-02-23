@@ -1,12 +1,9 @@
 import tippy from 'tippy.js';
 import { SwitchCommand, SwitchCommandType } from '@shared/models/switch-command.model';
-//import { GetUnitMeasurement } from './measurement';
+import { ActiveOutage, OutageLifeCycleState } from '@shared/models/outage.model';
 
 const commandableTypes: string[] = ["LOADBREAKSWITCH", "DISCONNECTOR", "BREAKER", "FUSE"];
-
-// global var - lose (trebali bi naci drugacije resenje)
-// mozda da cuvamo u komponenti, pa da prosledjujemo
-let commandedNodeIds: string[] = []; 
+let commandedNodeIds: string[] = [];
 
 const graphTooltipBody: string =
   `<p>ID: [[id]]</p>
@@ -24,26 +21,22 @@ const outageTooltipBody: string =
   <p>State: [[state]]</p>
   <p>ReportedTime: [[reportedAt]]</p>`;
 
-/* const measurementsToolTipBody: string =
-`<h3>MEASUREMENTS</h3>
-<p>Type: [[type]] Value:[[value]] [[unit]]</p>`;
- */
 export const addGraphTooltip = (cy, node) => {
   let ref = node.popperRef();
-  
+
   node.tooltip = tippy(ref, {
-    content: createTooltipContent(node),
+    content: createNodeTooltipContent(node),
     animation: 'scale',
     trigger: 'manual',
     placement: 'right',
     arrow: true,
     interactive: true
   });
-  
+
   tippy.hideAll();
   setTimeout(() => {
-    if(commandedNodeIds.includes(node.data('id'))) {
-      node.tooltip.setContent(createTooltipContent(node));
+    if (commandedNodeIds.includes(node.data('id'))) {
+      node.tooltip.setContent(createNodeTooltipContent(node));
       node.tooltip.show();
       commandedNodeIds = commandedNodeIds.filter(c => c != node.data('id'));
     }
@@ -63,7 +56,7 @@ export const addGraphTooltip = (cy, node) => {
   });
 }
 
-const createTooltipContent =  (node) => {
+const createNodeTooltipContent = (node) => {
   const div = document.createElement('div');
   div.innerHTML = graphTooltipBody
     .replace("[[id]]", (+node.data('id')).toString(16))
@@ -112,69 +105,56 @@ const createTooltipContent =  (node) => {
   return div;
 };
 
-export const addOutageTooltip = (cy, node, outage) => {
-  if(outage == undefined)
-  {
-    return;
-  }
-  
+export const addOutageTooltip = (cy, node, outage: ActiveOutage) => {
+  if (!outage) return;
+
   let ref = node.popperRef();
 
   node.tooltip = tippy(ref, {
     content: () => {
       const div = document.createElement('div');
       div.innerHTML = outageTooltipBody
-        .replace("[[id]]", outage["data"]['id'])
-        .replace("[[elementId]]", outage["data"]['elementId'])
-        .replace("[[state]]", outage["data"]['state'])
-        .replace("[[reportedAt]]", outage["data"]['reportedAt']);
-    
-        return div;
-      },
-      animation: 'scale',
-      trigger: 'manual',
-      placement: 'right',
-      arrow: true,
-      interactive: true
-  });
+        .replace("[[id]]", outage.Id.toString())
+        .replace("[[elementId]]", outage.ElementId.toString())
+        .replace("[[state]]", OutageLifeCycleState[outage.State])
+        .replace("[[reportedAt]]", outage.ReportedAt.toString());
 
-  node.on('tap', () => {
-    setTimeout(() => {
-      node.tooltip.show();
-    }, 0);
-  });
-}
+      const button = document.createElement('button');
 
-/* export const addMeasurementTooltip = (cy, node) => {
-  let ref = node.popperRef();
-  let measurements = node.data("measurements");
-  if(measurements == undefined)
-    return;
+      if(outage.State == OutageLifeCycleState.Created) {
+        button.innerHTML = "Isolate";
+        button.addEventListener('click', () => {
+          node.sendIsolateOutageCommand(outage.Id);
+          commandedNodeIds.push(node.data('id'));
+        });
+      }
+      else
+        // logika ostalih button-a, treba ovo odvojiti u poseban dictionary
+        button.innerHTML = "Other button texts"
 
-  node.tooltip = tippy(ref, {
-    content: () => {
-      const div = document.createElement('div');
-      measurements.forEach(element => {
-        div.innerHTML = measurementsToolTipBody
-        .replace("[[type]]", element.Type)
-        .replace("[[value]]", element.Value)
-        .replace("[[unit]]", GetUnitMeasurement(element.Type))    
-      });  
+      div.appendChild(button);
       return div;
     },
     animation: 'scale',
     trigger: 'manual',
-    placement: 'left',
+    placement: 'right',
     arrow: true,
     interactive: true
-  })
+  });
 
   node.on('tap', () => {
     setTimeout(() => {
       node.tooltip.show();
     }, 0);
   });
-} */
+
+  // hide the tooltip on zoom and pan
+  cy.on('zoom pan', () => {
+    setTimeout(() => {
+      node.tooltip.hide();
+    }, 0);
+  });
+}
 
 export const addEdgeTooltip = (cy, node, edge) => {
   let ref = edge.popperRef();
@@ -193,14 +173,14 @@ export const addEdgeTooltip = (cy, node, edge) => {
         .replace("[[state]]", node.data('state'))
         .replace("[[nominalVoltage]]", node.data('nominalVoltage'));
 
-      return div;
+        return div;
     },
     animation: 'scale',
     trigger: 'manual',
     placement: 'right',
     arrow: true,
     interactive: true
-  });  
+  });
 
   edge.unbind('tap');
   edge.on('tap', () => {

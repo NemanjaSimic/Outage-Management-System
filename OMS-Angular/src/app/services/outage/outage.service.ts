@@ -23,24 +23,29 @@ export class OutageService {
     return this.http.get(`${this.envService.apiUrl}/outage/archived`) as Observable<ArchivedOutage[]>;
   }
 
-  isolateOutageCommand(id: Number) : Observable<any>{
-    console.log(this.http);
-    return this.http.post(`${this.envService.apiUrl}/outage/isolate/${id}`);
+  sendIsolateOutageCommand(id: Number) : Observable<any>{
+    // return this.http.post(`${this.envService.apiUrl}/outage/isolate/${id}`, {});
+    return this.http.post(`${this.envService.apiUrl}/test/isolate/${id}`, {});
   }
 
-  sendCrewOutageCommand(id: Number) : Observable<any>{
-    console.log(this.http);
-    return this.http.post(`${this.envService.apiUrl}/outage/sendcrew/${id}`);
+  sendLocationIsolationCrewCommand(id: Number) : Observable<any>{
+    return this.http.post(`${this.envService.apiUrl}/outage/sendlocationisolationcrew/${id}`, {});
   }
 
-  resolveOutageCommand(id: Number) : Observable<any>{
-    console.log(this.http);
-    return this.http.post(`${this.envService.apiUrl}/outage/resolve/${id}`);
+  sendOutageRepairCrew(id: Number) : Observable<any>{
+    return this.http.post(`${this.envService.apiUrl}/outage/sendrepaircrew/${id}`, {});
   }
 
-  validateOutageCommand(id: Number) : Observable<any>{
-    console.log(this.http);
-    return this.http.post(`${this.envService.apiUrl}/outage/validate/${id}`);
+  sendValidateOutageCommand(id: Number) : Observable<any>{
+    return this.http.post(`${this.envService.apiUrl}/outage/validateresolve/${id}`, {});
+  }
+
+  sendResolveOutageCommand(id: Number) : Observable<any>{
+    return this.http.post(`${this.envService.apiUrl}/outage/resolve/${id}`, {});
+  }
+
+  getInitialOutage(): Observable<any> {
+    return this.http.get(`${this.envService.apiUrl}/test/initialoutage`);
   }
 
 }
