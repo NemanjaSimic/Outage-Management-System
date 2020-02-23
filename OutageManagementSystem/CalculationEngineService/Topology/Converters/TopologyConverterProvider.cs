@@ -1,9 +1,10 @@
 ﻿using CECommon.Interfaces;
+using CECommon.Providers;
 using Outage.Common.OutageService.Interface;
 using Outage.Common.UI;
 using System.Collections.Generic;
 
-namespace CECommon.Providers
+namespace Topology
 {
     public class TopologyConverterProvider : ITopologyConverterProvider
     {

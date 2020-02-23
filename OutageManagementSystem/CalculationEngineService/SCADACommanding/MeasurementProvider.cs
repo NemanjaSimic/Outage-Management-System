@@ -1,5 +1,6 @@
 ﻿using CECommon.Interfaces;
 using CECommon.Model;
+using CECommon.Providers;
 using Outage.Common;
 using Outage.Common.PubSub.SCADADataContract;
 using Outage.Common.ServiceContracts.OMS;
@@ -8,7 +9,7 @@ using Outage.Common.ServiceProxies.Outage;
 using System;
 using System.Collections.Generic;
 
-namespace CECommon.Providers
+namespace SCADAFunctions
 {
 	public class MeasurementProvider : IMeasurementProvider
     {

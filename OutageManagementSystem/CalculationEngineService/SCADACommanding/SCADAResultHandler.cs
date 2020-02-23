@@ -1,10 +1,11 @@
 ﻿using CECommon.Interfaces;
+using CECommon.Providers;
 using Outage.Common;
 using Outage.Common.PubSub;
 using Outage.Common.PubSub.SCADADataContract;
 using System.Collections.Generic;
 
-namespace CECommon.Providers
+namespace SCADAFunctions
 {
 	public class SCADAResultHandler : ISCADAResultHandler
 	{

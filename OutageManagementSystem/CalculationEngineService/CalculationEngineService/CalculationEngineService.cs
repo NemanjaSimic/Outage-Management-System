@@ -6,13 +6,12 @@ using Outage.Common;
 using Outage.Common.ServiceContracts.PubSub;
 using Outage.Common.ServiceProxies;
 using Outage.Common.ServiceProxies.PubSub;
-using SCADACommanding;
+using SCADAFunctions;
 using System;
 using System.Collections.Generic;
 using System.ServiceModel;
 using System.Text;
 using Topology;
-using TopologyBuilder;
 
 namespace CalculationEngineService
 {
@@ -20,7 +19,6 @@ namespace CalculationEngineService
     {
         private ILogger logger;
         private ISubscriber proxy;
-        private IModelTopologyService modelTopologyServis;
         private ITopologyConverter webTopologyBuilder;
         private IModelManager modelManager;
         private ITopologyBuilder topologyBuilder;
@@ -46,14 +44,13 @@ namespace CalculationEngineService
 
             topologyBuilder = new GraphBuilder();
             voltageFlow = new LoadFlow();
-            modelTopologyServis = new ModelTopologyService(topologyBuilder);
             webTopologyBuilder = new TopologyConverter();
 
             sCADAResultProvider = new SCADAResultHandler();
             cacheProvider = new MeasurementProvider();
             modelManager = new ModelManager();
             modelProvider = new ModelProvider(modelManager);
-            topologyProvider = new TopologyProvider(modelTopologyServis, voltageFlow);
+            topologyProvider = new TopologyProvider(topologyBuilder, voltageFlow);
             webTopologyModelProvider = new TopologyConverterProvider(webTopologyBuilder);
             topologyPublisher = new TopologyPublisher();
             InitializeHosts();

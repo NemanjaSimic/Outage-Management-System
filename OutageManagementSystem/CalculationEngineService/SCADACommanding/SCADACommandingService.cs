@@ -5,8 +5,7 @@ using Outage.Common.ServiceContracts.SCADA;
 using Outage.Common.ServiceProxies;
 using System;
 
-//TODO: namspace rename
-namespace SCADACommanding
+namespace SCADAFunctions
 {
     public class SCADACommandingService : ISwitchStatusCommandingContract
     {

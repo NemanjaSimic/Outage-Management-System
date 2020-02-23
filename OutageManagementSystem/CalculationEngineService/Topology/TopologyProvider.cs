@@ -1,18 +1,20 @@
-﻿using CECommon.Interfaces;
+﻿using CECommon;
+using CECommon.Interfaces;
+using CECommon.Providers;
 using Outage.Common;
 using System;
 using System.Collections.Generic;
 
-namespace CECommon.Providers
+namespace Topology
 {
     public class TopologyProvider : ITopologyProvider
     {
         #region Fields
         private ILogger logger =  LoggerWrapper.Instance;
         private TransactionFlag transactionFlag;
+        private ITopologyBuilder topologyBuilder;
         private ILoadFlow loadFlow;
         private List<ITopology> topology;
-        private IModelTopologyService modelTopologyServis;
         #endregion
         private List<ITopology> Topology
         {
@@ -23,20 +25,32 @@ namespace CECommon.Providers
                 ProviderTopologyDelegate?.Invoke(Topology);
             }
         }
-        private List<ITopology> TransactionTopology { get; set; }
-        public ProviderTopologyDelegate ProviderTopologyDelegate { get; set; }
-        public ProviderTopologyConnectionDelegate ProviderTopologyConnectionDelegate{get; set;}
-        public TopologyProvider(IModelTopologyService modelTopologyServis, ILoadFlow voltageFlow)
+        public TopologyProvider(ITopologyBuilder topologyBuilder, ILoadFlow loadFlow)
         {
             Provider.Instance.TopologyProvider = this;
             Provider.Instance.MeasurementProvider.DiscreteMeasurementDelegate += DiscreteMeasurementDelegate;
             
-            this.loadFlow = voltageFlow;
-            this.modelTopologyServis = modelTopologyServis;
+            this.loadFlow = loadFlow;
+            this.topologyBuilder = topologyBuilder;
             transactionFlag = TransactionFlag.NoTransaction;
-            Topology = this.modelTopologyServis.CreateTopology();
-            voltageFlow.UpdateLoadFlow(Topology);
+            Topology = CreateTopology();
+            loadFlow.UpdateLoadFlow(Topology);
         }
+        private List<ITopology> CreateTopology()
+        {
+            List<long> roots = Provider.Instance.ModelProvider.GetEnergySources();
+            List<ITopology> topologyModel = new List<ITopology>();
+
+            foreach (var rootElement in roots)
+            {
+                topologyModel.Add(topologyBuilder.CreateGraphTopology(rootElement));
+            }
+
+            return topologyModel;
+        }
+        private List<ITopology> TransactionTopology { get; set; }
+        public ProviderTopologyDelegate ProviderTopologyDelegate { get; set; }
+        public ProviderTopologyConnectionDelegate ProviderTopologyConnectionDelegate{get; set;}
         public void DiscreteMeasurementDelegate(List<long> elementGids)
         {
             loadFlow.UpdateLoadFlow(Topology);
@@ -80,7 +94,7 @@ namespace CECommon.Providers
             try
             {
                 logger.LogDebug($"Topology provider preparing for transaction.");
-                TransactionTopology = modelTopologyServis.CreateTopology();
+                TransactionTopology = CreateTopology();
                 this.loadFlow.UpdateLoadFlow(TransactionTopology);
                 transactionFlag = TransactionFlag.InTransaction;
             }

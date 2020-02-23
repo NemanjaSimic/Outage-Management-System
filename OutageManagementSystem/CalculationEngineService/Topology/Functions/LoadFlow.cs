@@ -3,7 +3,7 @@ using CECommon.Interfaces;
 using CECommon.Providers;
 using Outage.Common;
 using Outage.Common.ServiceContracts.CalculationEngine;
-using SCADACommanding;
+using SCADAFunctions;
 using System;
 using System.Collections.Generic;
 using System.Linq;
