@@ -19,6 +19,7 @@ namespace CECommon
 		private float nominalVoltage;
 		private bool isRemote;
 		private bool isActive;
+		private bool noReclosing;
 		#endregion
 
 		#region Properties
@@ -33,6 +34,7 @@ namespace CECommon
 		public List<long> Measurements { get => measurements; set => measurements = value; }
 		public bool IsRemote { get => isRemote; set => isRemote = value; }
 		public bool IsActive { get => isActive; set => isActive = value; }
+		public bool NoReclosing { get => noReclosing; set => noReclosing = value; }
 
 		#endregion
 		public TopologyElement(long gid)

@@ -51,6 +51,7 @@ namespace OutageManagementService
         private Dictionary<DeltaOpType, List<long>> modelChanges;
         private ModelResourcesDesc modelResourcesDesc;
         private OutageContext transactionOutageContext;
+        private HashSet<long> commandedElements;
 
         protected ILogger Logger
         {
@@ -63,6 +64,7 @@ namespace OutageManagementService
             CalledOutages = new List<long>();
             modelResourcesDesc = new ModelResourcesDesc();
             proxyFactory = new ProxyFactory();
+            commandedElements = new HashSet<long>();
 
             ImportTopologyModel();
         }
@@ -148,6 +150,11 @@ namespace OutageManagementService
         {
             bool success = false;
 
+            if (commandedElements.Contains(gid))
+            {
+                return false;
+            }
+
             List<long> affectedConsumersIds = new List<long>();
 
             //TODO: special case: potenitial outage is remote (and closed)...
@@ -163,10 +170,30 @@ namespace OutageManagementService
                     {
                         if (db.GetActiveOutage(gid) == null)
                         {
+                            long recloserId;
+                            try
+                            {
+                                recloserId = GetRecloserForHeadBreaker(gid);
+                            }
+                            catch (Exception e)
+                            {
+                                throw e;
+                            }
+
+                            string defaultIsolationEndpoints = "";
+                            if(recloserId != -1)
+                            {
+                                defaultIsolationEndpoints = $"{gid}|{recloserId}";
+                            }
+                            else
+                            {
+                                defaultIsolationEndpoints = $"{gid}";
+                            }
+
                             List<Consumer> consumers = GetAffectedConsumersFromDatabase(affectedConsumersIds, db);
                             if (consumers.Count == affectedConsumersIds.Count)
                             {
-                                activeOutage = db.ActiveOutages.Add(new ActiveOutage { AffectedConsumers = consumers, OutageState = OutageState.CREATED, OutageElementGid = gid, ReportTime = DateTime.UtcNow });
+                                activeOutage = db.ActiveOutages.Add(new ActiveOutage { AffectedConsumers = consumers, OutageState = OutageState.CREATED, DefaultIsolationPoints = defaultIsolationEndpoints, ReportTime = DateTime.UtcNow });
                                 db.SaveChanges();
                             }
                             else
@@ -289,6 +316,42 @@ namespace OutageManagementService
 
                 TopologyModel = (OutageTopologyModel)omsTopologyProxy.GetOMSModel();
             }
+        }
+
+        private long GetRecloserForHeadBreaker(long headBreakerId)
+        {
+            long recolserId = -1;
+
+            if (!topologyModel.OutageTopology.ContainsKey(headBreakerId))
+            {
+                string message = $"Head switch with gid: {headBreakerId} is not in a topology model.";
+                Logger.LogError(message);
+                throw new Exception(message);
+            }
+            long currentBreakerId = headBreakerId;
+            while (currentBreakerId != 0)
+            {
+                currentBreakerId = TopologyModel.OutageTopology[currentBreakerId].SecondEnd.Where(element => modelResourcesDesc.GetModelCodeFromId(element) == ModelCode.BREAKER).FirstOrDefault();
+                if (currentBreakerId == 0)
+                {
+                    continue;
+                }
+
+                if (!topologyModel.OutageTopology.ContainsKey(currentBreakerId))
+                {
+                    string message = $"Head switch with gid: {currentBreakerId} is not in a topology model.";
+                    Logger.LogError(message);
+                    throw new Exception(message);
+                }
+
+                if (!topologyModel.OutageTopology[currentBreakerId].NoReclosing)
+                {
+                    recolserId = currentBreakerId;
+                    break;
+                }
+            }
+
+            return recolserId; 
         }
 
         private List<Consumer> GetAffectedConsumersFromDatabase(List<long> affectedConsumersIds, OutageContext db)
@@ -491,6 +554,17 @@ namespace OutageManagementService
 
             if (measrement != -1)
             {
+                if (discreteCommandingType == DiscreteCommandingType.OPEN && !commandedElements.Contains(currentBreakerId))
+                {
+                    //TODO: add at list
+                    commandedElements.Add(currentBreakerId);
+                }
+                else if (discreteCommandingType == DiscreteCommandingType.CLOSE && commandedElements.Contains(currentBreakerId))
+                {
+                    //TODO: remove from list
+                    commandedElements.Remove(currentBreakerId);
+                }
+
                 using (SCADACommandProxy scadaCommandProxy = proxyFactory.CreateProxy<SCADACommandProxy, ISCADACommand>(EndpointNames.SCADACommandService))
                 {
                     try
@@ -498,18 +572,15 @@ namespace OutageManagementService
                         bool success = scadaCommandProxy.SendDiscreteCommand(measrement, (ushort)discreteCommandingType);
                         if (success)
                         {
-                            if (discreteCommandingType == DiscreteCommandingType.OPEN)
-                            {
-                                //TODO: add at list
-                            }
-                            else if (discreteCommandingType == DiscreteCommandingType.CLOSE)
-                            {
-                                //TODO: remove from list
-                            }
+                            
                         }
                     }
                     catch (Exception e)
                     {
+                        if (discreteCommandingType == DiscreteCommandingType.OPEN && commandedElements.Contains(currentBreakerId))
+                        {
+                            commandedElements.Remove(currentBreakerId);
+                        }
                         throw e;
                     }
                 }

@@ -276,6 +276,15 @@ namespace NetworkModelServiceFunctions
 					topologyElement.IsRemote = false;
 				}
 
+				if (rs.ContainsProperty(ModelCode.BREAKER_NORECLOSING))
+				{
+					topologyElement.NoReclosing = rs.GetProperty(ModelCode.BREAKER_NORECLOSING).AsBool();
+				}
+				else
+				{
+					topologyElement.NoReclosing = true;
+				}
+
 				if (rs.ContainsProperty(ModelCode.CONDUCTINGEQUIPMENT_BASEVOLTAGE))
 				{
 					long baseVoltageGid = rs.GetProperty(ModelCode.CONDUCTINGEQUIPMENT_BASEVOLTAGE).AsLong();
