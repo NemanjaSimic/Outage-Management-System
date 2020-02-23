@@ -4,14 +4,18 @@ import { OmsGraph } from '@shared/models/oms-graph.model';
 
 import cyConfig from './graph.config';
 import { drawBackupEdge } from '@shared/utils/backup-edge';
+<<<<<<< HEAD
 import { addGraphTooltip, addOutageTooltip, addEdgeTooltip, addAnalogMeasurementTooltip} from '@shared/utils/tooltip';
 import { drawWarning } from '@shared/utils/warning';
+=======
+import { addGraphTooltip, addOutageTooltip, addEdgeTooltip} from '@shared/utils/tooltip';
+import { drawWarningOnNode, drawWarningOnLine } from '@shared/utils/warning';
+>>>>>>> Add test use cases for outage lifecycle commanding and UI tooltips based on hub notifications
 import { drawCallWarning } from '@shared/utils/outage';
 import { drawMeasurements, GetUnitMeasurement, GetAlarmColorForMeasurement } from '@shared/utils/measurement';
 
 import * as cytoscape from 'cytoscape';
 import * as mapper from '@shared/utils/mapper';
-import * as graphMock from './graph-mock.json';
 import * as legendData from './legend.json';
 
 // cytoscape plugins
@@ -29,7 +33,7 @@ import { ScadaService } from '@services/notification/scada.service';
 import { OutageService } from '@services/outage/outage.service';
 import { OutageNotificationService } from '@services/notification/outage-notification.service';
 
-import { ActiveOutage, ArchivedOutage } from '@shared/models/outage.model';
+import { ActiveOutage, ArchivedOutage, OutageLifeCycleState } from '@shared/models/outage.model';
 
 cytoscape.use(dagre);
 cytoscape.use(popper);
@@ -72,7 +76,7 @@ export class GraphComponent implements OnInit, OnDestroy {
     private scadaService: ScadaService,
     private outageNotificationService: OutageNotificationService,
     private commandService: CommandService,
-    private outageCommandService: OutageService,
+    private outageService: OutageService,
     private ngZone: NgZone
   ) {
     this.connectionSubscription = Subscription.EMPTY;
@@ -88,40 +92,6 @@ export class GraphComponent implements OnInit, OnDestroy {
     this.startOutageConnection();
 
     this.cy = cytoscape({});
-
-    // zoom on + and -
-    this.zoomSubscription = fromEvent(document, 'keypress').subscribe(
-      (e: KeyboardEvent) => {
-        if (e.key == '+')
-          this.cy.zoom(this.cy.zoom() + 0.1);
-        else if (e.key == '-')
-          this.cy.zoom(this.cy.zoom() - 0.1);
-      });
-
-    this.panSubscription = fromEvent(document, 'keydown').subscribe(
-      (e: KeyboardEvent) => {
-        if (e.key == 'ArrowLeft')
-          this.cy.panBy({
-            x: 50,
-            y: 0
-          });
-        else if (e.key == 'ArrowRight')
-          this.cy.panBy({
-            x: -50,
-            y: 0
-          });
-        else if (e.key == 'ArrowUp')
-          this.cy.panBy({
-            x: 0,
-            y: 50
-          });
-        else if (e.key == 'ArrowDown')
-          this.cy.panBy({
-            x: 0,
-            y: -50
-          });
-      }
-    )
 
     this.legendItems = legendData.items;
   }
@@ -148,10 +118,7 @@ export class GraphComponent implements OnInit, OnDestroy {
 
   public getTopology(): void {
     this.topologySubscription = this.graphService.getTopology().subscribe(
-      graph => {
-        console.log(graph);
-        this.onNotification(graph);
-      },
+      graph => this.onNotification(graph),
       error => console.log(error)
     );
   }
@@ -163,10 +130,12 @@ export class GraphComponent implements OnInit, OnDestroy {
           console.log('Connected to graph service');
 
           this.updateSubscription = this.graphService.updateRecieved.subscribe(
-            data => this.onNotification(data));
+            data => this.onNotification(data),
+            err => console.log(err));
 
           this.outageSubscription = this.graphService.outageRecieved.subscribe(
-            data => drawCallWarning(this.cy, data));
+            data => drawCallWarning(this.cy, data),
+            err => console.log(err));
 
           this.drawGraph();
         }
@@ -185,7 +154,8 @@ export class GraphComponent implements OnInit, OnDestroy {
           console.log('Connected to scada service');
 
           this.scadaSubscription = this.scadaService.updateRecieved.subscribe(
-            (data: ScadaData) => this.onScadaNotification(data));
+            (data: ScadaData) => this.onScadaNotification(data),
+            err => console.log(err));
         }
         else {
           console.log('Could not connect to scada service');
@@ -202,11 +172,16 @@ export class GraphComponent implements OnInit, OnDestroy {
           console.log('Connected to Outage Notification service');
 
           this.activeOutageSubcription = this.outageNotificationService.activeOutageUpdateRecieved.subscribe(
-            (data: ActiveOutage) => this.onActiveOutageNotification(data)
-          );
+            (data: ActiveOutage) => this.onActiveOutageNotification(data),
+            err => console.log(err));
 
           this.archivedOutageSubcription = this.outageNotificationService.archivedOutageUpdateRecieved.subscribe(
-            (data: ArchivedOutage) => this.onArchivedOutageNotification(data)
+            (data: ArchivedOutage) => this.onArchivedOutageNotification(data),
+            err => console.log(err));
+
+          this.outageService.getInitialOutage().subscribe(
+            data => console.log(data),
+            err => console.log(err)
           );
         }
         else {
@@ -256,6 +231,7 @@ export class GraphComponent implements OnInit, OnDestroy {
   public addTooltips(): void {
     this.cy.ready(() => {
       this.cy.nodes().forEach(node => {
+<<<<<<< HEAD
         node.sendSwitchCommand = (command) => this.onCommandHandler(command);
         if (node.data("type") == 'warning') {
           var outage;
@@ -276,6 +252,15 @@ export class GraphComponent implements OnInit, OnDestroy {
               connectedEdges.map(acLineEdge => addEdgeTooltip(this.cy, node, acLineEdge));
           }
         };
+=======
+        node.sendSwitchCommand = (command) => this.onSwitchCommandHandler(command);
+        addGraphTooltip(this.cy, node);
+        if (node.data('dmsType') == "ACLINESEGMENT") {
+          const connectedEdges = node.connectedEdges();
+          if (connectedEdges.length)
+            connectedEdges.map(acLineEdge => addEdgeTooltip(this.cy, node, acLineEdge));
+        }
+>>>>>>> Add test use cases for outage lifecycle commanding and UI tooltips based on hub notifications
       });
     });
   }
@@ -309,12 +294,12 @@ export class GraphComponent implements OnInit, OnDestroy {
   public drawWarnings(): void {
     this.cy.ready(() => {
       this.cy.edges().forEach(line => {
-        drawWarning(this.cy, line);
+        drawWarningOnLine(this.cy, line);
       })
     });
   }
 
-  public onCommandHandler = (command: SwitchCommand) => {
+  public onSwitchCommandHandler = (command: SwitchCommand) => {
     this.commandService.sendSwitchCommand(command).subscribe(
       data => console.log(data),
       err => console.log(err)
@@ -325,7 +310,6 @@ export class GraphComponent implements OnInit, OnDestroy {
     this.ngZone.run(() => {
       this.graphData.nodes = data.Nodes.map(mapper.mapNode);
       this.graphData.edges = data.Relations.map(mapper.mapRelation);
-      console.log(this.graphData);
       this.drawGraph();
     });
   }
@@ -352,17 +336,23 @@ export class GraphComponent implements OnInit, OnDestroy {
   }
 
   public onActiveOutageNotification(data: ActiveOutage): void {
-    console.log('onActiveOutageNotification');
-    drawCallWarning(this.cy, data.ElementId);
-    this.ngZone.run(() => {
-      this.cy.nodes().forEach(node => {
-        if(node.data("id") == data.ElementId)
-        {
-          drawWarning(this.cy, node);
-          addOutageTooltip(this.cy, node, data);
-        }
-        });
-    });
+    let outageElement;
+    if(data.State == OutageLifeCycleState.Created)
+      outageElement = this.cy.nodes().filter(node => node.data('id') == data.DefaultIsolationPoints[0].toString())[0];
+    else if (data.State == OutageLifeCycleState.Isolated)
+      outageElement = this.cy.nodes().filter(node => node.data('id') == data.ElementId)[0];
+    
+    const outageNodeId = drawWarningOnNode(this.cy, outageElement);
+    const outageNode = this.cy.nodes().filter(node => node.data('id') == outageNodeId)[0];
+    outageNode.sendIsolateOutageCommand = (id) => this.onIsolateOutageCommand(id);
+    addOutageTooltip(this.cy, outageNode, data);
+  }
+
+  public onIsolateOutageCommand(id: Number): void {
+    this.outageService.sendIsolateOutageCommand(id).subscribe(
+      status => console.log(status),
+      err => console.log(err)
+    );
   }
 
   public onArchivedOutageNotification(data: ArchivedOutage): void {

@@ -52,11 +52,11 @@ namespace OMS.Web.API.Controllers
 
         [HttpPost]
         [Route("api/outage/sendlocationisolationcrew/{gid}")]
-        public async Task<IHttpActionResult> SendOutageLocationIsolationCrew([FromUri]long gid)
+        public async Task<IHttpActionResult> SendOutageLocationIsolationCrew([FromUri]long id   )
         {
             try
             {
-                _ = await _mediator.Send(new SendOutageLocationIsolationCrewCommand(gid));
+                _ = await _mediator.Send(new SendOutageLocationIsolationCrewCommand(id));
             }
             catch (Exception)
             {
@@ -68,11 +68,11 @@ namespace OMS.Web.API.Controllers
 
         [HttpPost]
         [Route("api/outage/sendrepaircrew/{gid}")]
-        public async Task<IHttpActionResult> SendOutageRepairCrew([FromUri]long gid)
+        public async Task<IHttpActionResult> SendOutageRepairCrew([FromUri]long id)
         {
             try
             {
-                _ = await _mediator.Send(new SendOutageRepairCrewCommand(gid));
+                _ = await _mediator.Send(new SendOutageRepairCrewCommand(id));
             }
             catch (Exception)
             {
@@ -84,11 +84,11 @@ namespace OMS.Web.API.Controllers
 
         [HttpPost]
         [Route("api/outage/validateresolve/{gid}")]
-        public async Task<IHttpActionResult> ValidateOutage([FromUri]long gid)
+        public async Task<IHttpActionResult> ValidateOutage([FromUri]long id)
         {
             try
             {
-                _ = await _mediator.Send(new ValidateResolveConditionsCommand(gid));
+                _ = await _mediator.Send(new ValidateResolveConditionsCommand(id));
             }
             catch (Exception)
             {
@@ -100,11 +100,11 @@ namespace OMS.Web.API.Controllers
 
         [HttpPost]
         [Route("api/outage/resolve/{gid}")]
-        public async Task<IHttpActionResult> ResolveOutage([FromUri]long gid)
+        public async Task<IHttpActionResult> ResolveOutage([FromUri]long id)
         {
             try
             {
-                _ = await _mediator.Send(new ResolveOutageCommand(gid));
+                _ = await _mediator.Send(new ResolveOutageCommand(id));
             }
             catch (Exception)
             {

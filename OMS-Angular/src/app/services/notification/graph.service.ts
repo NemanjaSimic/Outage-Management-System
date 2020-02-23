@@ -63,8 +63,8 @@ export class GraphService {
 
   public getTopology(): Observable<OmsGraph> {
     // /test je endpoint gde se dobiju mock podaci sa spojenim transformatorima
-    // return this.http.get(`${this.envService.apiUrl}/test`) as Observable<OmsGraph>;
-    return this.http.get(`${this.envService.apiUrl}/topology`) as Observable<OmsGraph>;
+    return this.http.get(`${this.envService.apiUrl}/test`) as Observable<OmsGraph>;
+    // return this.http.get(`${this.envService.apiUrl}/topology`) as Observable<OmsGraph>;
   }
 
 }

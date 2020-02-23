@@ -1,18 +1,20 @@
 import uuid from 'uuid';
 
-/* export const drawWarning = (cy, line) => {
+export const drawWarningOnLine = (cy, line) => {
+  const id = uuid();
+  
   if (line.data('color') == 'red') {
     const source = line.sourceEndpoint();
     const target = line.targetEndpoint();
 
-    // ako je levo, onda je verovatno prvi, pa da iscrta sa leve strane
+    //ako je levo, onda je verovatno prvi, pa da iscrta sa leve strane
     const isFirstChild = source.x > target.x;
 
     cy.add([
       {
         group: "nodes",
         data: {
-          id: `${uuid()}`,
+          id,
           type: 'warning',
           targetId: line.data('target')
         },
@@ -23,20 +25,26 @@ import uuid from 'uuid';
       }
     ]);
   }
-} */
 
-export const drawWarning = (cy, node) => {
+  return id;
+}
+
+export const drawWarningOnNode = (cy, node) => {
+  const id = uuid();
+
   cy.add([
       {
         group: "nodes",
         data: {
-          id: `${uuid()}`,
+          id,
           type: 'warning'
       },
       position: {
-          x: node.position("x") + 20,
-          y: node.position("y") - 25
+          x: node.position("x") + 50,
+          y: node.position("y")
       }
       }
   ]);
+
+  return id;
 }

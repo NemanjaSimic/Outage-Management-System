@@ -1,23 +1,8 @@
-import { Component, OnInit } from '@angular/core';
+import { Component, OnInit, OnDestroy } from '@angular/core';
 
 import { ArchivedOutage } from '@shared/models/outage.model';
 import { OutageService } from '@services/outage/outage.service';
-
-export interface PeriodicElement {
-  name: string;
-  position: number;
-  weight: number;
-  symbol: string;
-};
-
-const AO_MOCK: ArchivedOutage[] = [
-  { Id: 1, ElementId: 2321619, ReportedAt: new Date(), AfectedConsumers: [], ArchivedAt: new Date() },
-  { Id: 2, ElementId: 3311516, ReportedAt: new Date(), AfectedConsumers: [], ArchivedAt: new Date() },
-  { Id: 3, ElementId: 4321512, ReportedAt: new Date(), AfectedConsumers: [], ArchivedAt: new Date() },
-  { Id: 4, ElementId: 5684515, ReportedAt: new Date(), AfectedConsumers: [], ArchivedAt: new Date() },
-  { Id: 5, ElementId: 6151715, ReportedAt: new Date(), AfectedConsumers: [], ArchivedAt: new Date() },
-  { Id: 6, ElementId: 7236541, ReportedAt: new Date(), AfectedConsumers: [], ArchivedAt: new Date() }
-];
+import { Subscription } from 'rxjs';
 
 @Component({
   selector: 'app-archived-browser',
@@ -25,15 +10,24 @@ const AO_MOCK: ArchivedOutage[] = [
   styleUrls: ['./archived-browser.component.css']
 })
 
-export class ArchivedBrowserComponent implements OnInit {
-  private archivedOutages: ArchivedOutage[] = AO_MOCK;
+export class ArchivedBrowserComponent implements OnInit, OnDestroy {
+  private archivedOutagesSubscription: Subscription;
+
+  private archivedOutages: ArchivedOutage[] = [];
   private columns: string[] = ["id", "elementId", "reportedAt", "archivedAt"];
 
   constructor(private outageService: OutageService) { }
 
   ngOnInit() {
-    // sub to outage service and get real data from db
-    console.log(this.archivedOutages);
+    this.archivedOutagesSubscription = this.outageService.getAllArchivedOutages().subscribe(
+      outages => this.archivedOutages = outages,
+      err => console.log(err)
+    );
+  }
+
+  ngOnDestroy() {
+    if(!this.archivedOutagesSubscription)
+      this.archivedOutagesSubscription.unsubscribe();
   }
 
 }
