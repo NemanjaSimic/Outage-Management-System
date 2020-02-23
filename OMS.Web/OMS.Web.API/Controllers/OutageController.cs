@@ -57,7 +57,6 @@ namespace OMS.Web.API.Controllers
             try
             {
                 _ = await _mediator.Send(new SendOutageLocationIsolationCrewCommand(gid));
-
             }
             catch (Exception)
             {
