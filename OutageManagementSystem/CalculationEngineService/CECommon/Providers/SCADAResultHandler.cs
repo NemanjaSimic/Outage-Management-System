@@ -16,8 +16,6 @@ namespace CECommon.Providers
 
 		public void HandleResult(IPublishableMessage message)
 		{
-			logger.LogDebug($"Message recived from PubSub with type {message.GetType().ToString()}.");
-
 			if (message is SingleAnalogValueSCADAMessage singleAnalog)
 			{
 				Provider.Instance.MeasurementProvider.UpdateAnalogMeasurement(singleAnalog.Gid, singleAnalog.Value);
@@ -28,7 +26,10 @@ namespace CECommon.Providers
 			}
 			else if (message is SingleDiscreteValueSCADAMessage singleDiscrete)
 			{
-				Dictionary<long, DiscreteModbusData> data = new Dictionary<long, DiscreteModbusData>(1) { { singleDiscrete.Gid, new DiscreteModbusData(singleDiscrete.Value, singleDiscrete.Alarm) } };
+				Dictionary<long, DiscreteModbusData> data = new Dictionary<long, DiscreteModbusData>(1) 
+				{ 
+					{ singleDiscrete.Gid, new DiscreteModbusData(singleDiscrete.Value, singleDiscrete.Alarm) } 
+				};
 				Provider.Instance.MeasurementProvider.UpdateDiscreteMeasurement(data);
 			}
 			else if (message is MultipleDiscreteValueSCADAMessage multipleDiscrete)

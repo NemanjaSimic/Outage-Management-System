@@ -222,7 +222,6 @@ namespace CECommon.Providers
 			else
 			{
 				measurement = null;
-				logger.LogDebug($"Discrete measurement with GID 0x{measurementGid.ToString("X16")} does not exist.");
 			}
 			return success;
 		}
@@ -236,7 +235,6 @@ namespace CECommon.Providers
 			else
 			{
 				measurement = null;
-				logger.LogDebug($"Aalog measurement with GID 0x{measurementGid.ToString("X16")} does not exist.");
 			}
 			return success;
 		}

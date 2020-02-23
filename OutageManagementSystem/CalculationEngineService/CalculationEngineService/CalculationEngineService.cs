@@ -46,7 +46,7 @@ namespace CalculationEngineService
 
             topologyBuilder = new GraphBuilder();
             voltageFlow = new LoadFlow();
-            modelTopologyServis = new ModelTopologyService(topologyBuilder, voltageFlow);
+            modelTopologyServis = new ModelTopologyService(topologyBuilder);
             webTopologyBuilder = new TopologyConverter();
 
             sCADAResultProvider = new SCADAResultHandler();

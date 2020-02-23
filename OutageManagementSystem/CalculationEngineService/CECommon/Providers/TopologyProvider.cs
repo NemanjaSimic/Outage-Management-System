@@ -10,7 +10,7 @@ namespace CECommon.Providers
         #region Fields
         private ILogger logger =  LoggerWrapper.Instance;
         private TransactionFlag transactionFlag;
-        private ILoadFlow voltageFlow;
+        private ILoadFlow loadFlow;
         private List<ITopology> topology;
         private IModelTopologyService modelTopologyServis;
         #endregion
@@ -28,16 +28,18 @@ namespace CECommon.Providers
         public ProviderTopologyConnectionDelegate ProviderTopologyConnectionDelegate{get; set;}
         public TopologyProvider(IModelTopologyService modelTopologyServis, ILoadFlow voltageFlow)
         {
-            this.voltageFlow = voltageFlow;
+            Provider.Instance.TopologyProvider = this;
+            Provider.Instance.MeasurementProvider.DiscreteMeasurementDelegate += DiscreteMeasurementDelegate;
+            
+            this.loadFlow = voltageFlow;
             this.modelTopologyServis = modelTopologyServis;
             transactionFlag = TransactionFlag.NoTransaction;
             Topology = this.modelTopologyServis.CreateTopology();
-            Provider.Instance.MeasurementProvider.DiscreteMeasurementDelegate += DiscreteMeasurementDelegate;
-            Provider.Instance.TopologyProvider = this;
+            voltageFlow.UpdateLoadFlow(Topology);
         }
         public void DiscreteMeasurementDelegate(List<long> elementGids)
         {
-            voltageFlow.UpdateLoadFlow(Topology);
+            loadFlow.UpdateLoadFlow(Topology);
             ProviderTopologyDelegate?.Invoke(Topology);
         }
         public List<ITopology> GetTopologies()
@@ -79,6 +81,7 @@ namespace CECommon.Providers
             {
                 logger.LogDebug($"Topology provider preparing for transaction.");
                 TransactionTopology = modelTopologyServis.CreateTopology();
+                this.loadFlow.UpdateLoadFlow(TransactionTopology);
                 transactionFlag = TransactionFlag.InTransaction;
             }
             catch (Exception ex)

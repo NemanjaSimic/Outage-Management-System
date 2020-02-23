@@ -6,7 +6,6 @@ using Outage.Common;
 using Outage.Common.GDA;
 using System;
 using System.Collections.Generic;
-using System.Diagnostics;
 using System.Linq;
 using System.Threading.Tasks;
 
@@ -104,6 +103,7 @@ namespace NetworkModelServiceFunctions
 			bool success = true;
 			try
 			{
+				logger.LogInfo("Getting all network model elements and converting them...");
 				GetBaseVoltages();
 				Parallel.For(0, ConcreteModels.Count, (i) =>
 				{
@@ -131,7 +131,7 @@ namespace NetworkModelServiceFunctions
 			}
 			catch (Exception ex)
 			{
-				logger.LogError($"[NMSManager] Failed in get all model entities. Exception message: {ex.Message}");
+				logger.LogError($"[NMSManager] Failed in get all network model elements. Exception message: {ex.Message}");
 				topologyElements = null;
 				elementConnections = null;
 				reclosers = null;
@@ -218,13 +218,11 @@ namespace NetworkModelServiceFunctions
 		}
 		private List<long> GetAllReferencedElements(ResourceDescription element)
 		{
-			logger.LogDebug($"[NMSManager] Getting all referenced elements for GID 0x{element.Id:X16}.");
 			List<long> elements = new List<long>();
 			DMSType type = GetDMSTypeOfTopologyElement(element.Id);
 
 			foreach (var property in GetAllReferenceProperties(type))
 			{
-
 				if (property == ModelCode.POWERTRANSFORMER_TRANSFORMERWINDINGS ||
 					property == ModelCode.CONDUCTINGEQUIPMENT_TERMINALS ||
 					property == ModelCode.CONNECTIVITYNODE_TERMINALS ||
@@ -288,15 +286,14 @@ namespace NetworkModelServiceFunctions
 					{
 						topologyElement.NominalVoltage = voltage;
 					}
-					else
+					else if (baseVoltageGid == 0)
 					{
 						logger.LogError($"{errorMessage} BaseVoltage with GID 0x{baseVoltageGid.ToString("X16")} does not exist in baseVoltages collection.");
 					}
 				}
 				else
 				{
-					topologyElement.NominalVoltage = 0;
-					logger.LogDebug($"{errorMessage} Element with GID 0x{rs.Id:X16} does not have BASEVOLTAGE_NOMINALVOLTAGE property.");
+					topologyElement.NominalVoltage = 0;	
 				}
 
 				if (rs.ContainsProperty(ModelCode.BREAKER_NORECLOSING) && !rs.GetProperty(ModelCode.BREAKER_NORECLOSING).AsBool())

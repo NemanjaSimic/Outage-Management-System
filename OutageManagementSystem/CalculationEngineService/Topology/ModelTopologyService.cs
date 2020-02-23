@@ -10,28 +10,22 @@ namespace Topology
         #region Fields
         private readonly ILogger logger = LoggerWrapper.Instance;
         private ITopologyBuilder topologyBuilder;
-        private ILoadFlow voltageFlow;
         private List<long> roots;
         #endregion
 
-        public ModelTopologyService(ITopologyBuilder topologyBuilder, ILoadFlow voltageFlow)
+        public ModelTopologyService(ITopologyBuilder topologyBuilder)
         {
             this.topologyBuilder = topologyBuilder;
-            this.voltageFlow = voltageFlow;
         }
         public List<ITopology> CreateTopology()
         {
-            logger.LogDebug("Get all energy sources started.");
             roots = Provider.Instance.ModelProvider.GetEnergySources();
-            logger.LogDebug("Get all energy sources finished.");
-
             List<ITopology> topologyModel = new List<ITopology>();
 
             foreach (var rootElement in roots)
             {
                 topologyModel.Add(topologyBuilder.CreateGraphTopology(rootElement));
             }
-            voltageFlow.UpdateLoadFlow(topologyModel);
 
             return topologyModel;
         }     

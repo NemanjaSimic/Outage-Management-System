@@ -38,7 +38,6 @@ namespace Topology
                             {
                                 try
                                 {
-                                    //topology.GetElementByGid(child, out ITopologyElement fieldElement);
                                     Field field = child as Field;
                                     nextElement = field.Members.First().Id;
                                 }
@@ -74,7 +73,7 @@ namespace Topology
                         }
                         else
                         {
-                            logger.LogWarn($"[Topology converter] Measurement with GID {meausrementGid.ToString("X")} does not exist.");
+                            logger.LogWarn($"[Topology converter] Measurement with GID 0x{meausrementGid.ToString("X16")} does not exist.");
                         }
                     }
 
@@ -147,7 +146,6 @@ namespace Topology
 
                     if (!outageTopologyModel.GetElementByGid(nextElement, out var _))
                     {
-
                         outageTopologyModel.AddElement(
                             new OutageTopologyElement(element.Id)
                             {
