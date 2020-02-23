@@ -10,6 +10,7 @@ namespace CECommon.Providers
 {
     public class Provider
     {
+        #region Singleton
         private static Provider instance;
         private static object syncObj = new object();
         public static Provider Instance
@@ -26,16 +27,16 @@ namespace CECommon.Providers
                 return instance;
             }
         }
-      
+        #endregion
         private Provider()
         {
-            ModelResourcesDesc = new ModelResourcesDesc();
+            //ModelResourcesDesc = new ModelResourcesDesc();
         }
         public ITopologyProvider TopologyProvider { get; set; } 
         public IModelProvider ModelProvider { get; set; }
         public ModelResourcesDesc ModelResourcesDesc { get; private set; }
         public ITopologyConverterProvider TopologyConverterProvider { get; set; }
         public ISCADAResultHandler SCADAResultHandler { get; set; }
-        public ICacheProvider CacheProvider { get; set; }
+        public IMeasurementProvider MeasurementProvider { get; set; }
     }
 }

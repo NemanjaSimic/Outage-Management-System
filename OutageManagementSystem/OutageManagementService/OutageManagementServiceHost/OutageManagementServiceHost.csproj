@@ -62,7 +62,6 @@
   </ItemGroup>
   <ItemGroup>
     <None Include="App.config" />
-    <None Include="Log4NetConfig.config" />
     <None Include="packages.config" />
   </ItemGroup>
   <ItemGroup>

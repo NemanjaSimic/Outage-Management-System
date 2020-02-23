@@ -42,7 +42,7 @@ namespace OutageManagementService
             proxyFactory = new ProxyFactory();
 
             //TODO: Initialize what is needed
-            //Delete database(TODO: restauration of data...)
+            //TODO: restauration of data...
             modelResourcesDesc = new ModelResourcesDesc();
             using (OutageContext db = new OutageContext())
             {
@@ -54,11 +54,11 @@ namespace OutageManagementService
             OutageService.outageModel = outageModel;
             OutageTransactionActor.OutageModel = outageModel;
             OutageModelUpdateNotification.OutageModel = outageModel;
+
             callTracker = new CallTracker("CallTrackerSubscriber", outageModel);
             SubscribeOnEmailService();
             
             InitializeHosts();
-
         }
 
         #region GDAHelper
@@ -209,26 +209,6 @@ namespace OutageManagementService
             };
         }
 
-        private void CloseHosts()
-        {
-            
-            if (hosts == null || hosts.Count == 0)
-            {
-                throw new Exception("Outage Management Service hosts can not be closed because they are not initialized.");
-            }
-
-            foreach (ServiceHost host in hosts)
-            {
-                host.Close();
-            }
-
-            string message = "Outage Management Service is gracefully closed.";
-            Logger.LogInfo(message);
-            Console.WriteLine("\n\n{0}", message);
-        }
-
-        
-
         private void StartHosts()
         {
             if (hosts == null || hosts.Count == 0)
@@ -270,6 +250,23 @@ namespace OutageManagementService
             message = "The Outage Management Service is started.";
             Console.WriteLine("\n{0}", message);
             Logger.LogInfo(message);
+        }
+        
+        private void CloseHosts()
+        {
+            if (hosts == null || hosts.Count == 0)
+            {
+                throw new Exception("Outage Management Service hosts can not be closed because they are not initialized.");
+            }
+
+            foreach (ServiceHost host in hosts)
+            {
+                host.Close();
+            }
+
+            string message = "Outage Management Service is gracefully closed.";
+            Logger.LogInfo(message);
+            Console.WriteLine("\n\n{0}", message);
         }
 
         #endregion

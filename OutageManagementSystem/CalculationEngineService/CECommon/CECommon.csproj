@@ -21,7 +21,7 @@
     <DefineConstants>DEBUG;TRACE</DefineConstants>
     <ErrorReport>queue</ErrorReport>
     <WarningLevel>4</WarningLevel>
-    <PlatformTarget>x86</PlatformTarget>
+    <PlatformTarget>AnyCPU</PlatformTarget>
   </PropertyGroup>
   <PropertyGroup Condition=" '$(Configuration)|$(Platform)' == 'Release|AnyCPU' ">
     <DebugType>pdbonly</DebugType>
@@ -58,12 +58,13 @@
     <Compile Include="Interfaces\ITopologyConverter.cs" />
     <Compile Include="Enums.cs" />
     <Compile Include="Interfaces\ITopologyConverterProvider.cs" />
+    <Compile Include="Interfaces\IVoltageFlow.cs" />
     <Compile Include="Model\BaseVoltage.cs" />
     <Compile Include="Model\Field.cs" />
     <Compile Include="Model\Measurement.cs" />
     <Compile Include="Model\TopologyModel.cs" />
     <Compile Include="Properties\AssemblyInfo.cs" />
-    <Compile Include="Providers\CacheProvider.cs" />
+    <Compile Include="Providers\MeasurementProvider.cs" />
     <Compile Include="Providers\ModelProvider.cs" />
     <Compile Include="Providers\Provider.cs" />
     <Compile Include="Providers\SCADAResultHandler.cs" />

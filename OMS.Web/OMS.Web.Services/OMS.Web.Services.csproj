@@ -38,6 +38,13 @@
     <Reference Include="System.ServiceModel" />
   </ItemGroup>
   <ItemGroup>
+    <Compile Include="Commands\IsolateOutageCommand.cs" />
+    <Compile Include="Commands\OutageLifecycleCommandBase.cs" />
+    <Compile Include="Commands\ResolveOutageCommand.cs" />
+    <Compile Include="Commands\SendOutageRepairCrewCommand.cs" />
+    <Compile Include="Commands\SendOutageLocationIsolationCrewCommand.cs" />
+    <Compile Include="Commands\ValidateResolveConditionsCommand.cs" />
+    <Compile Include="Handlers\OutageLifecycleCommandHandler.cs" />
     <Compile Include="Handlers\OutageQueryHandler.cs" />
     <Compile Include="Queries\GetActiveOutagesQuery.cs" />
     <Compile Include="Queries\GetArchivedOutagesQuery.cs" />

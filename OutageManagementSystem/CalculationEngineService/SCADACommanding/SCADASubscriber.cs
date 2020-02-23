@@ -21,8 +21,8 @@ namespace SCADACommanding
 		public void Notify(IPublishableMessage message)
 		{
 			Logger.LogDebug($"Message recived from PubSub with type {message.GetType().ToString()}.");
+			
 			Provider.Instance.SCADAResultHandler.HandleResult(message);
-
 		}
 	}
 }

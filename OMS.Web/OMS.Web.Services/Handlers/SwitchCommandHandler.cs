@@ -13,14 +13,11 @@
     public class SwitchCommandHandler : IRequestHandler<TurnOffSwitchCommand>, IRequestHandler<TurnOnSwitchCommand>
     {
         private readonly ILogger _logger;
-        //private readonly IScadaClient _scadaClient;
         private ProxyFactory _proxyFactory;
 
         public SwitchCommandHandler(ILogger logger)
         {
             _logger = logger;
-            //string scadaCommandServiceAddress = AppSettings.Get<string>(ServiceAddress.ScadaCommandServiceAddress);
-            //_scadaClient = new TopologySCADACommandProxy(scadaCommandServiceAddress);
             _proxyFactory = new ProxyFactory();
         }
 

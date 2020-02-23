@@ -32,6 +32,7 @@ namespace Outage.Common.ServiceContracts.PubSub
         [ServiceKnownType(typeof(OutageMessage))]
         [ServiceKnownType(typeof(OutageTopologyModel))]
         [ServiceKnownType(typeof(OutageTopologyElement))]
+        [ServiceKnownType(typeof(Consumer))]
         void Publish(IPublication publication);
     }
 }

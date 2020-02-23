@@ -5,10 +5,11 @@ using OutageDatabase;
 using System.Collections.Generic;
 using System.Linq;
 using System.Data.Entity;
+using System;
 
 namespace OutageManagementService.Outage
 {
-    public class OutageService : IOutageContract
+    public class OutageService : IOutageAccessContract, IReportPotentialOutageContract, IOutageLifecycleUICommandingContract
     {
         private ILogger logger;
        
@@ -18,9 +19,9 @@ namespace OutageManagementService.Outage
         }
 
         public static OutageModel outageModel;
-       
-       
 
+
+        #region IOutageAccessContract
         public List<ActiveOutage> GetActiveOutages()
         {
             //TODO: Logic
@@ -44,10 +45,124 @@ namespace OutageManagementService.Outage
 
             return archivedOutages;
         }
+        #endregion
 
-        public bool ReportOutage(long elementGid)
+        #region IReportPotentialOutageContract
+        public bool ReportPotentialOutage(long elementGid)
         {
-            return outageModel.ReportPotentialOutage(elementGid); //TODO: enum (error, noAffectedConsumers, success,...)
+            bool result;
+
+            try
+            {
+                result = outageModel.ReportPotentialOutage(elementGid); //TODO: enum (error, noAffectedConsumers, success,...)
+            }
+            catch (Exception e)
+            {
+                result = false;
+                string message = "ReportPotentialOutage => exception caught";
+                Logger.LogError(message, e);
+                //todo throw;
+            }
+
+            return result;
         }
+        #endregion
+
+        #region IOutageLifecycleUICommandingContract
+        public bool IsolateOutage(long outageId)
+        {
+            bool result;
+
+            try
+            {
+                result = outageModel.IsolateOutage(outageId);
+            }
+            catch (Exception e)
+            {
+                result = false;
+                string message = "IsolateOutage => exception caught";
+                Logger.LogError(message, e);
+                //todo: throw;
+            }
+
+            return result;
+        }
+
+        public bool SendRepairCrew(long outageId)
+        {
+            bool result;
+
+            try
+            {
+                result = outageModel.SendRepairCrew(outageId);
+            }
+            catch (Exception e)
+            {
+                result = false;
+                string message = "SendRepairCrew => exception caught";
+                Logger.LogError(message, e);
+                //todo throw;
+            }
+
+            return result;
+        }
+
+        public bool SendLocationIsolationCrew(long outageId)
+        {
+            bool result;
+
+            try
+            {
+                result = outageModel.SendLocationIsolationCrew(outageId);
+            }
+            catch (Exception e)
+            {
+                result = false;
+                string message = "SendLocationIsolationCrew => exception caught";
+                Logger.LogError(message, e);
+                //todo throw;
+            }
+
+            return result;
+        }
+
+        public bool ValidateResolveConditions(long outageId)
+        {
+            bool result;
+
+            try
+            {
+                result = outageModel.ValidateResolveConditions(outageId);
+            }
+            catch (Exception e)
+            {
+                result = false;
+                string message = "ValidateResolveConditions => exception caught";
+                Logger.LogError(message, e);
+                //todo throw;
+            }
+
+            return result;
+        }
+
+        public bool ResolveOutage(long outageId)
+        {
+            bool result;
+
+            try
+            {
+                result = outageModel.ResolveOutage(outageId);
+            }
+            catch (Exception e)
+            {
+                result = false;
+                string message = "ResolveOutage => exception caught";
+                Logger.LogError(message, e);
+                //todo throw;
+            }
+
+            return result;
+        }
+        #endregion
     }
 }

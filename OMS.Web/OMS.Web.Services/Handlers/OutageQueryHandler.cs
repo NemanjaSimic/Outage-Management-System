@@ -30,17 +30,13 @@
             _mapper = mapper;
 
             _proxyFactory = new ProxyFactory();
-
-            // ovo treba promeniti da koristi factory i preko DI da ide
-            //string outageServiceAddress = AppSettings.Get<string>(ServiceAddress.OutageServiceAddress);
-            //_outageService = new OutageServiceProxy(outageServiceAddress);
         }
 
         public Task<IEnumerable<ActiveOutageViewModel>> Handle(GetActiveOutagesQuery request, CancellationToken cancellationToken)
         {
             return Task.Run(() =>
             {
-                using (OutageServiceProxy outageProxy = _proxyFactory.CreateProxy<OutageServiceProxy, IOutageContract>(EndpointNames.OutageServiceEndpoint))
+                using (OutageAccessProxy outageProxy = _proxyFactory.CreateProxy<OutageAccessProxy, IOutageAccessContract>(EndpointNames.OutageAccessEndpoint))
                 {
                     try
                     {
@@ -63,7 +59,7 @@
         {
             return Task.Run(() =>
             {
-                using (OutageServiceProxy outageProxy = _proxyFactory.CreateProxy<OutageServiceProxy, IOutageContract>(EndpointNames.OutageServiceEndpoint))
+                using (OutageAccessProxy outageProxy = _proxyFactory.CreateProxy<OutageAccessProxy, IOutageAccessContract>(EndpointNames.OutageAccessEndpoint))
                 {
                     try
                     {

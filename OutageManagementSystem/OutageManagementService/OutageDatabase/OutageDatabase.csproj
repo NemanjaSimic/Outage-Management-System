@@ -60,6 +60,22 @@
     <Compile Include="Migrations\202002130914535_common fields.designer.cs">
       <DependentUpon>202002130914535_common fields.cs</DependentUpon>
     </Compile>
+    <Compile Include="Migrations\202002141544238_OutageModelChanges.cs" />
+    <Compile Include="Migrations\202002141544238_OutageModelChanges.Designer.cs">
+      <DependentUpon>202002141544238_OutageModelChanges.cs</DependentUpon>
+    </Compile>
+    <Compile Include="Migrations\202002180650507_fields_in_model.cs" />
+    <Compile Include="Migrations\202002180650507_fields_in_model.designer.cs">
+      <DependentUpon>202002180650507_fields_in_model.cs</DependentUpon>
+    </Compile>
+    <Compile Include="Migrations\202002181256469_Common fields and nullable properties.cs" />
+    <Compile Include="Migrations\202002181256469_Common fields and nullable properties.designer.cs">
+      <DependentUpon>202002181256469_Common fields and nullable properties.cs</DependentUpon>
+    </Compile>
+    <Compile Include="Migrations\202002210903165_List properties to string.cs" />
+    <Compile Include="Migrations\202002210903165_List properties to string.designer.cs">
+      <DependentUpon>202002210903165_List properties to string.cs</DependentUpon>
+    </Compile>
     <Compile Include="Migrations\Configuration.cs" />
     <Compile Include="OutageContext.cs" />
     <Compile Include="Properties\AssemblyInfo.cs" />
@@ -80,6 +96,18 @@
     </EmbeddedResource>
     <EmbeddedResource Include="Migrations\202002130914535_common fields.resx">
       <DependentUpon>202002130914535_common fields.cs</DependentUpon>
+    </EmbeddedResource>
+    <EmbeddedResource Include="Migrations\202002141544238_OutageModelChanges.resx">
+      <DependentUpon>202002141544238_OutageModelChanges.cs</DependentUpon>
+    </EmbeddedResource>
+    <EmbeddedResource Include="Migrations\202002180650507_fields_in_model.resx">
+      <DependentUpon>202002180650507_fields_in_model.cs</DependentUpon>
+    </EmbeddedResource>
+    <EmbeddedResource Include="Migrations\202002181256469_Common fields and nullable properties.resx">
+      <DependentUpon>202002181256469_Common fields and nullable properties.cs</DependentUpon>
+    </EmbeddedResource>
+    <EmbeddedResource Include="Migrations\202002210903165_List properties to string.resx">
+      <DependentUpon>202002210903165_List properties to string.cs</DependentUpon>
     </EmbeddedResource>
   </ItemGroup>
   <Import Project="$(MSBuildToolsPath)\Microsoft.CSharp.targets" />

@@ -48,6 +48,7 @@
     <Reference Include="System.Xml" />
   </ItemGroup>
   <ItemGroup>
+    <Compile Include="CommandEnqueuer.cs" />
     <Compile Include="Enums.cs" />
     <Compile Include="ISCADAConfigData.cs" />
     <Compile Include="IModBusFunction.cs" />
