@@ -4,13 +4,8 @@ import { OmsGraph } from '@shared/models/oms-graph.model';
 
 import cyConfig from './graph.config';
 import { drawBackupEdge } from '@shared/utils/backup-edge';
-<<<<<<< HEAD
-import { addGraphTooltip, addOutageTooltip, addEdgeTooltip, addAnalogMeasurementTooltip} from '@shared/utils/tooltip';
-import { drawWarning } from '@shared/utils/warning';
-=======
 import { addGraphTooltip, addOutageTooltip, addEdgeTooltip} from '@shared/utils/tooltip';
 import { drawWarningOnNode, drawWarningOnLine } from '@shared/utils/warning';
->>>>>>> Add test use cases for outage lifecycle commanding and UI tooltips based on hub notifications
 import { drawCallWarning } from '@shared/utils/outage';
 import { drawMeasurements, GetUnitMeasurement, GetAlarmColorForMeasurement } from '@shared/utils/measurement';
 
@@ -231,28 +226,6 @@ export class GraphComponent implements OnInit, OnDestroy {
   public addTooltips(): void {
     this.cy.ready(() => {
       this.cy.nodes().forEach(node => {
-<<<<<<< HEAD
-        node.sendSwitchCommand = (command) => this.onCommandHandler(command);
-        if (node.data("type") == 'warning') {
-          var outage;
-          this.graphData.outages.forEach(out => {
-            var outageId = out["data"]["elementId"];
-            if (node.data("targetId") == outageId) {
-              outage = out;
-            }
-          });
-
-          addOutageTooltip(this.cy, node, outage);
-        }
-        else {
-          addGraphTooltip(this.cy, node);
-          if (node.data('dmsType') == "ACLINESEGMENT") {
-            const connectedEdges = node.connectedEdges();
-            if (connectedEdges.length)
-              connectedEdges.map(acLineEdge => addEdgeTooltip(this.cy, node, acLineEdge));
-          }
-        };
-=======
         node.sendSwitchCommand = (command) => this.onSwitchCommandHandler(command);
         addGraphTooltip(this.cy, node);
         if (node.data('dmsType') == "ACLINESEGMENT") {
@@ -260,7 +233,6 @@ export class GraphComponent implements OnInit, OnDestroy {
           if (connectedEdges.length)
             connectedEdges.map(acLineEdge => addEdgeTooltip(this.cy, node, acLineEdge));
         }
->>>>>>> Add test use cases for outage lifecycle commanding and UI tooltips based on hub notifications
       });
     });
   }
@@ -284,7 +256,7 @@ export class GraphComponent implements OnInit, OnDestroy {
             drawMeasurements(this.cy, node, measurementString, color, nodePosition*counter, meas.Id);
             counter++;
             let newNode = this.cy.$id(meas.Id);
-            addAnalogMeasurementTooltip(this.cy, newNode, meas.AlarmType);
+            // addAnalogMeasurementTooltip(this.cy, newNode, meas.AlarmType);
           });
         }
       })
