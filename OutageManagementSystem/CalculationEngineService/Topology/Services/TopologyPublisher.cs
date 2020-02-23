@@ -60,7 +60,6 @@ namespace Topology
                 logger.LogError($"Topology publisher failed to publish new ui model. Exception: {ex.Message}");
             }
         }
-
         public void TopologyToOMSConvertDelegate(List<IOutageTopologyModel> outageTopologyModels)
         {
             IOutageTopologyModel outageTopologyModel;
@@ -96,6 +95,5 @@ namespace Topology
             }
 
         }
-
     }
 }

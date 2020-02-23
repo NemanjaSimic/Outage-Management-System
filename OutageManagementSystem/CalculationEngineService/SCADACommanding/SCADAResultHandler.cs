@@ -1,16 +1,13 @@
 ﻿using CECommon.Interfaces;
+using CECommon.Providers;
 using Outage.Common;
 using Outage.Common.PubSub;
 using Outage.Common.PubSub.SCADADataContract;
-using System;
 using System.Collections.Generic;
-using System.Linq;
-using System.Text;
-using System.Threading.Tasks;
 
-namespace CECommon.Providers
+namespace SCADAFunctions
 {
-    public class SCADAResultHandler : ISCADAResultHandler
+	public class SCADAResultHandler : ISCADAResultHandler
 	{
 		private ILogger logger = LoggerWrapper.Instance;
 		public SCADAResultHandler()
@@ -20,8 +17,6 @@ namespace CECommon.Providers
 
 		public void HandleResult(IPublishableMessage message)
 		{
-			logger.LogDebug($"Message recived from PubSub with type {message.GetType().ToString()}.");
-
 			if (message is SingleAnalogValueSCADAMessage singleAnalog)
 			{
 				Provider.Instance.MeasurementProvider.UpdateAnalogMeasurement(singleAnalog.Gid, singleAnalog.Value);
@@ -32,7 +27,10 @@ namespace CECommon.Providers
 			}
 			else if (message is SingleDiscreteValueSCADAMessage singleDiscrete)
 			{
-				Dictionary<long, DiscreteModbusData> data = new Dictionary<long, DiscreteModbusData>(1) { { singleDiscrete.Gid, new DiscreteModbusData(singleDiscrete.Value, singleDiscrete.Alarm) } };
+				Dictionary<long, DiscreteModbusData> data = new Dictionary<long, DiscreteModbusData>(1) 
+				{ 
+					{ singleDiscrete.Gid, new DiscreteModbusData(singleDiscrete.Value, singleDiscrete.Alarm) } 
+				};
 				Provider.Instance.MeasurementProvider.UpdateDiscreteMeasurement(data);
 			}
 			else if (message is MultipleDiscreteValueSCADAMessage multipleDiscrete)

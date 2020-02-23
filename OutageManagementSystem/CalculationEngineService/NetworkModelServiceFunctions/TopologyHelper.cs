@@ -1,6 +1,5 @@
 ﻿using CECommon;
 using CECommon.TopologyConfiguration;
-using NetworkModelServiceFunctions;
 using Outage.Common;
 using System.Collections.Generic;
 
@@ -39,7 +38,6 @@ namespace NetworkModelServiceFunctions
 		}
 		public TopologyStatus GetElementTopologyStatus(long gid)
 		{
-			logger.LogDebug($"Getting element topology status for GID {gid}.");
 			TopologyStatus retVal;
 			DMSType type = (DMSType)ModelCodeHelper.ExtractTypeFromGlobalId(gid);
 			foreach (var item in elementsStatus)
@@ -54,7 +52,6 @@ namespace NetworkModelServiceFunctions
 		}
 		public TopologyType GetElementTopologyType(long gid)
 		{
-			logger.LogDebug($"Getting element topology type for GID {gid}.");
 			TopologyType retVal;
 			DMSType type = (DMSType)ModelCodeHelper.ExtractTypeFromGlobalId(gid);
 			foreach (var item in topologyTypes)
