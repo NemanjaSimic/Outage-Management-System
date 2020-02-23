@@ -51,21 +51,13 @@ namespace OMS.Web.API.Controllers
         }
 
         [HttpPost]
-<<<<<<< HEAD
         [Route("api/outage/sendlocationisolationcrew/{gid}")]
         public async Task<IHttpActionResult> SendOutageLocationIsolationCrew([FromUri]long gid)
         {
             try
             {
                 _ = await _mediator.Send(new SendOutageLocationIsolationCrewCommand(gid));
-=======
-        [Route("api/outage/sendcrew/{id}")]
-        public async Task<IHttpActionResult> SendOutageCrew([FromUri]long id)
-        {
-            try
-            {
-                _ = await _mediator.Send(new SendOutageCrewCommand(id));
->>>>>>> Outage Lifecycle services
+
             }
             catch (Exception)
             {
@@ -76,21 +68,12 @@ namespace OMS.Web.API.Controllers
         }
 
         [HttpPost]
-<<<<<<< HEAD
         [Route("api/outage/sendrepaircrew/{gid}")]
         public async Task<IHttpActionResult> SendOutageRepairCrew([FromUri]long gid)
         {
             try
             {
                 _ = await _mediator.Send(new SendOutageRepairCrewCommand(gid));
-=======
-        [Route("api/outage/resolve/{id}")]
-        public async Task<IHttpActionResult> ResolveOutage([FromUri]long id)
-        {
-            try
-            {
-                _ = await _mediator.Send(new ResolveOutageCommand(id));
->>>>>>> Outage Lifecycle services
             }
             catch (Exception)
             {
@@ -101,21 +84,12 @@ namespace OMS.Web.API.Controllers
         }
 
         [HttpPost]
-<<<<<<< HEAD
         [Route("api/outage/validateresolve/{gid}")]
         public async Task<IHttpActionResult> ValidateOutage([FromUri]long gid)
         {
             try
             {
                 _ = await _mediator.Send(new ValidateResolveConditionsCommand(gid));
-=======
-        [Route("api/outage/validate/{id}")]
-        public async Task<IHttpActionResult> ValidateOutage([FromUri]long id)
-        {
-            try
-            {
-                _ = await _mediator.Send(new ValidateOutageCommand(id));
->>>>>>> Outage Lifecycle services
             }
             catch (Exception)
             {
