@@ -1,5 +1,6 @@
 ﻿using CECommon.Interfaces;
 using CECommon.Model;
+using CECommon.Providers;
 using Outage.Common;
 using Outage.Common.PubSub.SCADADataContract;
 using Outage.Common.ServiceContracts.OMS;
@@ -7,32 +8,27 @@ using Outage.Common.ServiceProxies;
 using Outage.Common.ServiceProxies.Outage;
 using System;
 using System.Collections.Generic;
-using System.Linq;
-using System.ServiceModel;
-using System.Text;
-using System.Threading;
-using System.Threading.Tasks;
 
-namespace CECommon.Providers
+namespace SCADAFunctions
 {
-    public class MeasurementProvider : IMeasurementProvider
+	public class MeasurementProvider : IMeasurementProvider
     {
-		private readonly ILogger logger = LoggerWrapper.Instance;
+        #region Fields
+        private readonly ILogger logger = LoggerWrapper.Instance;
 		private Dictionary<long, AnalogMeasurement> analogMeasurements;
 		private Dictionary<long, DiscreteMeasurement> discreteMeasurements;
-		//private Dictionary<long, DiscreteMeasurementInfo> discreteMeasurements;
 		private Dictionary<long, List<long>> elementToMeasurementMap;
 		private Dictionary<long, long> measurementToElementMap;
 		private ProxyFactory proxyFactory;
+        #endregion
 
-		public MeasurementProvider()
+        public MeasurementProvider()
 		{
 			elementToMeasurementMap = new Dictionary<long, List<long>>();
 			measurementToElementMap = new Dictionary<long, long>();
 			analogMeasurements = new Dictionary<long, AnalogMeasurement>();
 			discreteMeasurements = new Dictionary<long, DiscreteMeasurement>();
-			//discreteMeasurements = new Dictionary<long, DiscreteMeasurementInfo>();
-      
+
 			proxyFactory = new ProxyFactory();
 			Provider.Instance.MeasurementProvider = this;
 		}
@@ -98,7 +94,6 @@ namespace CECommon.Providers
 				}
 			}
 		}
-
 		public float GetAnalogValue(long measurementGid)
 		{
 			float value = 0;
@@ -120,15 +115,13 @@ namespace CECommon.Providers
 		}
 		public void UpdateAnalogMeasurement(long measurementGid, float value)
 		{
-			if (analogMeasurements.ContainsKey(measurementGid))
+			if (analogMeasurements.TryGetValue(measurementGid, out AnalogMeasurement measurement))
 			{
-				AnalogMeasurement measurement = analogMeasurements[measurementGid] as AnalogMeasurement;
 				measurement.CurrentValue = value;
-				analogMeasurements[measurementGid] = measurement;
 			}
 			else
 			{
-				logger.LogWarn($"Failed to update analog measurement with GID {measurementGid}. There is no such a measurement.");
+				logger.LogWarn($"Failed to update analog measurement with GID 0x{measurementGid.ToString("X16")}. There is no such a measurement.");
 			}
 		}
 		public void UpdateAnalogMeasurement(Dictionary<long, AnalogModbusData> data)
@@ -138,17 +131,19 @@ namespace CECommon.Providers
 				UpdateAnalogMeasurement(measurement.Key, (float)measurement.Value.Value);
 			}
 		}
-		public void UpdateDiscreteMeasurement(long measurementGid, ushort value)
+		public bool UpdateDiscreteMeasurement(long measurementGid, ushort value)
 		{
-			DiscreteMeasurement measurement = discreteMeasurements[measurementGid] as DiscreteMeasurement;
-			if (value == 0)
+			bool success = true;
+			if (discreteMeasurements.TryGetValue(measurementGid, out DiscreteMeasurement measurement))
 			{
-				measurement.CurrentOpen = false;
-			}
-			else
-			{
-				if (!measurement.CurrentOpen)
+				if (value == 0)
 				{
+					measurement.CurrentOpen = false;
+				}
+				else
+				{
+					if (!measurement.CurrentOpen)
+					{
 					using (ReportPotentialOutageProxy reportPotentialOutageProxy = proxyFactory.CreateProxy<ReportPotentialOutageProxy, IReportPotentialOutageContract>(EndpointNames.ReportPotentialOutageEndpoint))
 					{
 						if (reportPotentialOutageProxy == null)
@@ -167,45 +162,28 @@ namespace CECommon.Providers
 							logger.LogError("Failed to report potential outage.", e);
 						}
 					}
+					}
+					measurement.CurrentOpen = true;
 				}
-				measurement.CurrentOpen = true;
 			}
-			discreteMeasurements[measurementGid] = measurement;
+			else
+			{
+				logger.LogWarn($"Failed to update discrete measurement with GID 0x{measurementGid.ToString("X16")}. There is no such a measurement.");
+				success = false;
+			}
+			return success;
 		}
 		public void UpdateDiscreteMeasurement(Dictionary<long, DiscreteModbusData> data)
 		{
 			List<long> signalGids = new List<long>();
 			foreach (var measurementData in data)
 			{
-				if (discreteMeasurements.TryGetValue(measurementData.Key, out DiscreteMeasurement measurement))
+				if (UpdateDiscreteMeasurement(measurementData.Key, measurementData.Value.Value))
 				{
-					signalGids.Add(measurement.ElementId);
-					UpdateDiscreteMeasurement(measurementData.Key, measurementData.Value.Value);
-				}
-				else
-				{
-					logger.LogError($"Failed to update discrete measurement with GID {measurementData.Key}. Measurement does not exists.");
+					signalGids.Add(measurementData.Key);
 				}
 			}
 			DiscreteMeasurementDelegate?.Invoke(signalGids);
-		}
-		public void InternalUpdateDiscreteMeasurement(Dictionary<long, bool> commands)
-		{
-			var tempMeasurements = new Dictionary<long, DiscreteMeasurement>(discreteMeasurements);
-			List<long> changedMeasurements = new List<long>();
-			foreach (var pair in commands)
-			{
-				foreach (var measPair in tempMeasurements)
-				{
-					if (measPair.Value.ElementId == pair.Key)
-					{
-						discreteMeasurements[measPair.Key].CurrentOpen = pair.Value;
-						changedMeasurements.Add(discreteMeasurements[measPair.Key].ElementId);
-						break;
-					}
-				}
-			}
-			DiscreteMeasurementDelegate?.Invoke(changedMeasurements);
 		}
 		public long GetElementGidForMeasurement(long measurementGid)
 		{
@@ -216,7 +194,6 @@ namespace CECommon.Providers
 			}
 			return signalGid;
 		}
-
 		public List<long> GetMeasurementsForElement(long elementGid)
 		{
 			if (elementToMeasurementMap.TryGetValue(elementGid, out var measurements))
@@ -228,17 +205,14 @@ namespace CECommon.Providers
 				return new List<long>();
 			}
 		}
-
 		public Dictionary<long, List<long>> GetElementToMeasurementMap()
 		{
 			return elementToMeasurementMap;
 		}
-
 		public Dictionary<long, long> GetMeasurementToElementMap()
 		{
 			return measurementToElementMap;
 		}
-
 		public bool TryGetDiscreteMeasurement(long measurementGid, out DiscreteMeasurement measurement)
 		{
 			bool success = false;
@@ -249,7 +223,6 @@ namespace CECommon.Providers
 			else
 			{
 				measurement = null;
-				logger.LogDebug($"Discrete measurement with GID {measurementGid.ToString("X")} does not exist.");
 			}
 			return success;
 		}
@@ -263,7 +236,6 @@ namespace CECommon.Providers
 			else
 			{
 				measurement = null;
-				logger.LogDebug($"Aalog measurement with GID {measurementGid.ToString("X")} does not exist.");
 			}
 			return success;
 		}

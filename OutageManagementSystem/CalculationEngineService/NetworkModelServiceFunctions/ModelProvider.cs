@@ -2,14 +2,12 @@
 using Outage.Common;
 using System;
 using System.Collections.Generic;
-using System.Linq;
-using System.Text;
-using System.Threading.Tasks;
 
 namespace CECommon.Providers
 {
     public class ModelProvider : IModelProvider
     {
+        #region Fields
         private TransactionFlag transactionFlag;
         private ILogger logger = LoggerWrapper.Instance;
         private IModelManager modelManager;
@@ -23,7 +21,7 @@ namespace CECommon.Providers
         private Dictionary<long, ITopologyElement> transactionElementModels;
         private Dictionary<long, List<long>> transactionAllElementConnections;
         private HashSet<long> transactionReclosers;
-
+        #endregion
         public ModelProvider(IModelManager modelManager)
         {
             this.modelManager = modelManager;
@@ -84,6 +82,8 @@ namespace CECommon.Providers
                 return transactionEnergySources;
             }
         }
+
+        #region Distributed Transaction
         public bool PrepareForTransaction()
         {
             bool success = true;
@@ -123,7 +123,8 @@ namespace CECommon.Providers
             transactionAllElementConnections = null;
             transactionEnergySources = null;
             transactionFlag = TransactionFlag.NoTransaction;
-            logger.LogDebug("Model provider rolled back topology.");
+            logger.LogDebug("Model provider rolled back successfully.");
         }
+        #endregion
     }
 }
