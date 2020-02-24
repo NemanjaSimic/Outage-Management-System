@@ -8,9 +8,9 @@ namespace Outage.Common.ServiceContracts.OMS
     public interface IOutageAccessContract
     {
         [OperationContract]
-        List<ActiveOutage> GetActiveOutages();
+        IEnumerable<ActiveOutageMessage> GetActiveOutages();
 
         [OperationContract]
-        List<ArchivedOutage> GetArchivedOutages();
+        IEnumerable<ArchivedOutageMessage> GetArchivedOutages();
     }
 }

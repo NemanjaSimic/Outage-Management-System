@@ -1,13 +1,7 @@
-﻿using Outage.Common.PubSub.OutageDataContract;
-using Outage.Common.ServiceContracts.OMS;
+﻿using OMSCommon.OutageDatabaseModel;
 using OutageDatabase.Initializers;
-using OutageDatabase.Migrations;
-using System;
-using System.Collections.Generic;
 using System.Data.Entity;
 using System.Linq;
-using System.Text;
-using System.Threading.Tasks;
 
 namespace OutageDatabase
 {
@@ -41,8 +35,6 @@ namespace OutageDatabase
             IQueryable<ActiveOutage> outages = from active in ActiveOutages
                                                where active.OutageElementGid == elementGid
                                                select active;
-
-
             return outages.FirstOrDefault();
         }
     }

@@ -30,7 +30,7 @@ namespace OMS.Web.Adapter.Outage
 
         public void Notify(IPublishableMessage message)
         {
-            if (message is ActiveOutage activeOutage)
+            if (message is ActiveOutageMessage activeOutage)
             {
                 _dispatcher.Connect();
 
@@ -44,7 +44,7 @@ namespace OMS.Web.Adapter.Outage
                     // retry ?
                 }
             }
-            else if(message is ArchivedOutage archivedOutage)
+            else if(message is ArchivedOutageMessage archivedOutage)
             {
                 _dispatcher.Connect();
 

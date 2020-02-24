@@ -76,6 +76,14 @@
     <Compile Include="Migrations\202002210903165_List properties to string.designer.cs">
       <DependentUpon>202002210903165_List properties to string.cs</DependentUpon>
     </Compile>
+    <Compile Include="Migrations\202002240038525_model refactor.cs" />
+    <Compile Include="Migrations\202002240038525_model refactor.designer.cs">
+      <DependentUpon>202002240038525_model refactor.cs</DependentUpon>
+    </Compile>
+    <Compile Include="Migrations\202002241003148_Move OutageState prop to ActiveOutage.cs" />
+    <Compile Include="Migrations\202002241003148_Move OutageState prop to ActiveOutage.designer.cs">
+      <DependentUpon>202002241003148_Move OutageState prop to ActiveOutage.cs</DependentUpon>
+    </Compile>
     <Compile Include="Migrations\Configuration.cs" />
     <Compile Include="OutageContext.cs" />
     <Compile Include="Properties\AssemblyInfo.cs" />
@@ -88,6 +96,10 @@
     <ProjectReference Include="..\..\Common\Common.csproj">
       <Project>{892CBE15-9ED7-4540-81FA-0EAABA592138}</Project>
       <Name>Common</Name>
+    </ProjectReference>
+    <ProjectReference Include="..\OMSCommon\OMSCommon.csproj">
+      <Project>{BC054AA3-2DD3-4657-B27B-6C2126803106}</Project>
+      <Name>OMSCommon</Name>
     </ProjectReference>
   </ItemGroup>
   <ItemGroup>
@@ -108,6 +120,12 @@
     </EmbeddedResource>
     <EmbeddedResource Include="Migrations\202002210903165_List properties to string.resx">
       <DependentUpon>202002210903165_List properties to string.cs</DependentUpon>
+    </EmbeddedResource>
+    <EmbeddedResource Include="Migrations\202002240038525_model refactor.resx">
+      <DependentUpon>202002240038525_model refactor.cs</DependentUpon>
+    </EmbeddedResource>
+    <EmbeddedResource Include="Migrations\202002241003148_Move OutageState prop to ActiveOutage.resx">
+      <DependentUpon>202002241003148_Move OutageState prop to ActiveOutage.cs</DependentUpon>
     </EmbeddedResource>
   </ItemGroup>
   <Import Project="$(MSBuildToolsPath)\Microsoft.CSharp.targets" />

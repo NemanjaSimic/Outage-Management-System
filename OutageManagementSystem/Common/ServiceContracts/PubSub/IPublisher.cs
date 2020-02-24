@@ -14,7 +14,7 @@ namespace Outage.Common.ServiceContracts.PubSub
         [OperationContract]
         [ServiceKnownType(typeof(Publication))]
         [ServiceKnownType(typeof(SCADAPublication))]
-        [ServiceKnownType(typeof(SCADAMessage))]
+        [ServiceKnownType(typeof(SCADAMessage))]                        //TODO: delete?
         [ServiceKnownType(typeof(SingleAnalogValueSCADAMessage))]
         [ServiceKnownType(typeof(MultipleAnalogValueSCADAMessage))]
         [ServiceKnownType(typeof(SingleDiscreteValueSCADAMessage))]
@@ -26,13 +26,13 @@ namespace Outage.Common.ServiceContracts.PubSub
         [ServiceKnownType(typeof(EmailServiceMessage))]
         [ServiceKnownType(typeof(EmailToOutageMessage))]
         [ServiceKnownType(typeof(OMSModelMessage))]
-        [ServiceKnownType(typeof(ActiveOutage))]
-        [ServiceKnownType(typeof(ArchivedOutage))]
         [ServiceKnownType(typeof(OutagePublication))]
-        [ServiceKnownType(typeof(OutageMessage))]
+        [ServiceKnownType(typeof(OutageMessage))]                       //TODO: delete?
         [ServiceKnownType(typeof(OutageTopologyModel))]
         [ServiceKnownType(typeof(OutageTopologyElement))]
-        [ServiceKnownType(typeof(Consumer))]
+        [ServiceKnownType(typeof(ActiveOutageMessage))]
+        [ServiceKnownType(typeof(ArchivedOutageMessage))]
+        [ServiceKnownType(typeof(ConsumerMessage))]
         void Publish(IPublication publication);
     }
 }
