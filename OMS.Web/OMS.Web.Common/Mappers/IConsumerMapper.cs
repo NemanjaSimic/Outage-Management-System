@@ -6,7 +6,7 @@
 
     public interface IConsumerMapper
     {
-        IEnumerable<ConsumerViewModel> MapConsumers(IEnumerable<Consumer> consumers);
-        ConsumerViewModel MapConsumer(Consumer consumer);
+        IEnumerable<ConsumerViewModel> MapConsumers(IEnumerable<ConsumerMessage> consumers);
+        ConsumerViewModel MapConsumer(ConsumerMessage consumer);
     }
 }

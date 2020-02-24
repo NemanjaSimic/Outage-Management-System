@@ -41,7 +41,7 @@
                     try
                     {
                         _logger.LogInfo("[OutageQueryHandler::GetActiveOutages] Sending a GET query to Outage service for active outages.");
-                        IEnumerable<ActiveOutage> activeOutages = outageProxy.GetActiveOutages();
+                        IEnumerable<ActiveOutageMessage> activeOutages = outageProxy.GetActiveOutages();
 
                         IEnumerable<ActiveOutageViewModel> activeOutageViewModels = _mapper.MapActiveOutages(activeOutages);
                         return activeOutageViewModels;
@@ -64,7 +64,7 @@
                     try
                     {
                         _logger.LogInfo("[OutageQueryHandler::GetArchivedOutages] Sending a GET query to Outage service for archived outages.");
-                        IEnumerable<ArchivedOutage> archivedOutages = outageProxy.GetArchivedOutages();
+                        IEnumerable<ArchivedOutageMessage> archivedOutages = outageProxy.GetArchivedOutages();
 
                         IEnumerable<ArchivedOutageViewModel> archivedOutageViewModels = _mapper.MapArchivedOutages(archivedOutages);
                         return archivedOutageViewModels;

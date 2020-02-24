@@ -1,11 +1,8 @@
-﻿using Outage.Common;
-using Outage.Common.PubSub.OutageDataContract;
+﻿using OMSCommon.OutageDatabaseModel;
+using Outage.Common;
 using System;
 using System.Collections.Generic;
 using System.Data.Entity;
-using System.Linq;
-using System.Text;
-using System.Threading.Tasks;
 
 namespace OutageDatabase.Initializers
 {

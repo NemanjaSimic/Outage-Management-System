@@ -84,7 +84,7 @@ namespace Outage.Common
     }
 
     [DataContract]
-    public enum OutageState : short
+    public enum ActiveOutageState : short
     {
         [EnumMember]
         CREATED = 1,
@@ -92,7 +92,7 @@ namespace Outage.Common
         ISOLATED = 2,
         [EnumMember]
         RESOLVED = 3,
-        [EnumMember]
-        ARCHIVED = 4
+        //[EnumMember]
+        //ARCHIVED = 4
     }
 }
