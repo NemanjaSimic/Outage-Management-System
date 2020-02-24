@@ -1,11 +1,9 @@
 ﻿namespace OutageDatabase.Migrations
 {
-    using Outage.Common.PubSub.OutageDataContract;
+    using OMSCommon.OutageDatabaseModel;
     using System;
     using System.Collections.Generic;
-    using System.Data.Entity;
     using System.Data.Entity.Migrations;
-    using System.Linq;
 
     internal sealed class Configuration : DbMigrationsConfiguration<OutageContext>
     {
@@ -27,14 +25,17 @@
                 {
                     OutageId = archivedId,
                     OutageElementGid = 0x0000000a00000007,
-                    ReportTime = DateTime.Now,
+                    ReportTime = DateTime.UtcNow,
+                    IsolatedTime = DateTime.UtcNow,
+                    ResolvedTime = DateTime.UtcNow,
+                    ArchiveTime = DateTime.UtcNow,
+                    DefaultIsolationPoints = string.Empty,
+                    OptimumIsolationPoints = string.Empty,
                     AffectedConsumers = new List<Consumer>(),
-                    ArchiveTime = DateTime.Now,
                 };
 
                 archivedOutage = context.ArchivedOutages.Add(archivedOutage);
             }
-
 
             context.SaveChanges();
 

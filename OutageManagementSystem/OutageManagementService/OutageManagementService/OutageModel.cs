@@ -1,11 +1,12 @@
-﻿using Outage.Common;
+﻿using OMSCommon.Mappers;
+using OMSCommon.OutageDatabaseModel;
+using Outage.Common;
 using Outage.Common.GDA;
 using Outage.Common.OutageService.Interface;
 using Outage.Common.OutageService.Model;
 using Outage.Common.PubSub.OutageDataContract;
 using Outage.Common.ServiceContracts.CalculationEngine;
 using Outage.Common.ServiceContracts.GDA;
-using Outage.Common.ServiceContracts.OMS;
 using Outage.Common.ServiceContracts.PubSub;
 using Outage.Common.ServiceContracts.SCADA;
 using Outage.Common.ServiceProxies;
@@ -45,6 +46,7 @@ namespace OutageManagementService
 
         private ILogger logger;
         private ProxyFactory proxyFactory;
+        private OutageMessageMapper outageMessageMapper;
 
         public ConcurrentQueue<long> EmailMsg;
         public List<long> CalledOutages;
@@ -59,10 +61,12 @@ namespace OutageManagementService
 
         public OutageModel()
         {
-            EmailMsg = new ConcurrentQueue<long>();
-            CalledOutages = new List<long>();
             modelResourcesDesc = new ModelResourcesDesc();
             proxyFactory = new ProxyFactory();
+            outageMessageMapper = new OutageMessageMapper();
+
+            CalledOutages = new List<long>();
+            EmailMsg = new ConcurrentQueue<long>();
 
             ImportTopologyModel();
         }
@@ -107,11 +111,13 @@ namespace OutageManagementService
 
                     if (resourceDescription != null)
                     {
-                        Consumer consumer = new Consumer();
-                        consumer.ConsumerId = resourceDescription.Id;
-                        consumer.ConsumerMRID = resourceDescription.GetProperty(ModelCode.IDOBJ_MRID).AsString();
-                        consumer.FirstName = "Added";
-                        consumer.LastName = "Consumer"; //TODO other prop, when added in model
+                        Consumer consumer = new Consumer
+                        {
+                            ConsumerId = resourceDescription.Id,
+                            ConsumerMRID = resourceDescription.GetProperty(ModelCode.IDOBJ_MRID).AsString(),
+                            FirstName = "Added", //TODO: resourceDescription.GetProperty(ModelCode.ENERGYCONSUMER_FIRSTNAME).AsString()
+                            LastName = "Consumer" //TODO: resourceDescription.GetProperty(ModelCode.ENERGYCONSUMER_LASTNAME).AsString() other prop, when added in model
+                        };
 
                         transactionOutageContext.Consumers.Add(consumer);
                     }
@@ -166,7 +172,7 @@ namespace OutageManagementService
                             List<Consumer> consumers = GetAffectedConsumersFromDatabase(affectedConsumersIds, db);
                             if (consumers.Count == affectedConsumersIds.Count)
                             {
-                                activeOutage = db.ActiveOutages.Add(new ActiveOutage { AffectedConsumers = consumers, OutageState = OutageState.CREATED, OutageElementGid = gid, ReportTime = DateTime.UtcNow });
+                                activeOutage = db.ActiveOutages.Add(new ActiveOutage { AffectedConsumers = consumers, OutageState = ActiveOutageState.CREATED, OutageElementGid = gid, ReportTime = DateTime.UtcNow });
                                 db.SaveChanges();
                             }
                             else
@@ -192,7 +198,7 @@ namespace OutageManagementService
                 {
                     try
                     {
-                        PublishActiveOutage(Topic.ACTIVE_OUTAGE, activeOutage);
+                        PublishActiveOutage(Topic.ACTIVE_OUTAGE, outageMessageMapper.MapActiveOutage(activeOutage));
                         Logger.LogInfo($"Outage on element with gid: 0x{activeOutage.OutageElementGid:x16} is successfully published");
                         success = true;
                     }
@@ -220,7 +226,7 @@ namespace OutageManagementService
                 ActiveOutage outageToIsolate = db.ActiveOutages.Find(outageId);
                 if (outageToIsolate != null)
                 {
-                    if (outageToIsolate.OutageState == OutageState.CREATED)
+                    if (outageToIsolate.OutageState == ActiveOutageState.CREATED)
                     {
                         try
                         {
@@ -248,8 +254,6 @@ namespace OutageManagementService
                     success = false;
                 }
             }
-
-
 
             return success;
         }
