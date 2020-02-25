@@ -33,6 +33,6 @@ namespace Outage.Common.ServiceContracts.PubSub
         [ServiceKnownType(typeof(ActiveOutageMessage))]
         [ServiceKnownType(typeof(ArchivedOutageMessage))]
         [ServiceKnownType(typeof(ConsumerMessage))]
-        void Publish(IPublication publication);
+        void Publish(IPublication publication, string publisherName);
     }
 }

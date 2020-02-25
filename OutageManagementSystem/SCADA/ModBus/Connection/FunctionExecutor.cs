@@ -15,6 +15,7 @@ using System.ServiceModel;
 using Outage.Common.Exceptions.SCADA;
 using Outage.Common.ServiceProxies;
 using Outage.Common.ServiceContracts.PubSub;
+using System.Text;
 
 namespace Outage.SCADA.ModBus.Connection
 {
@@ -467,8 +468,31 @@ namespace Outage.SCADA.ModBus.Connection
                     throw new NullReferenceException(errMsg);    
                 }
 
-                publisherProxy.Publish(scadaPublication);
+                publisherProxy.Publish(scadaPublication, "SCADA_PUBLISHER");
                 Logger.LogInfo($"SCADA service published data from topic: {scadaPublication.Topic}");
+
+                StringBuilder sb = new StringBuilder();
+                sb.AppendLine("MeasurementCache content: ");
+
+                foreach(long gid in MeasurementsCache.Keys)
+                {
+                    IModbusData data = MeasurementsCache[gid];
+
+                    if(data is AnalogModbusData analogModbusData)
+                    { 
+                        sb.AppendLine($"Analog data line: [gid] 0x{gid:X16}, [value] {analogModbusData.Value}, [alarm] {analogModbusData.Alarm}");
+                    }
+                    else if(data is DiscreteModbusData discreteModbusData)
+                    {
+                        sb.AppendLine($"Analog data line: [gid] 0x{gid:X16}, [value] {discreteModbusData.Value}, [alarm] {discreteModbusData.Alarm}");
+                    }
+                    else
+                    {
+                        sb.AppendLine($"UNKNOWN data type: {data.GetType()}");
+                    }
+                }
+
+                Logger.LogDebug(sb.ToString());
             }
         }
 
