@@ -4,7 +4,7 @@ import { OmsGraph } from '@shared/models/oms-graph.model';
 
 import cyConfig from './graph.config';
 import { drawBackupEdge } from '@shared/utils/backup-edge';
-import { addGraphTooltip, addOutageTooltip, addEdgeTooltip} from '@shared/utils/tooltip';
+import { addGraphTooltip, addOutageTooltip, addEdgeTooltip } from '@shared/utils/tooltip';
 import { drawWarningOnNode, drawWarningOnLine } from '@shared/utils/warning';
 import { drawCallWarning } from '@shared/utils/outage';
 import { drawMeasurements, GetUnitMeasurement, GetAlarmColorForMeasurement } from '@shared/utils/measurement';
@@ -62,9 +62,10 @@ export class GraphComponent implements OnInit, OnDestroy {
   private graphData: any = {
     nodes: [],
     edges: [],
-    backup_edges: [],
-    outages: []
+    backup_edges: []
   };
+
+  private activeOutages: ActiveOutage[] = [];
 
   constructor(
     private graphService: GraphService,
@@ -199,19 +200,20 @@ export class GraphComponent implements OnInit, OnDestroy {
       ...cyConfig,
       container: document.getElementById('graph'),
       elements: this.graphData
-    }); 
+    });
 
-    if(hasNodes && !this.zoomLevel)
+    if (hasNodes && !this.zoomLevel)
       this.zoomLevel = this.cy.zoom();
-    
-    if(hasNodes && !this.panPosition)
+
+    if (hasNodes && !this.panPosition)
       this.panPosition = this.cy.pan();
-      
+
     this.cy.zoom(this.zoomLevel);
     this.cy.pan(this.panPosition);
 
     this.drawMeasurements();
     this.addTooltips();
+    this.addOutageTooltips();
     modifyNodeDistance(this.cy.nodes().filter(x => x.data('dmsType') == "ENERGYCONSUMER"));
   };
 
@@ -240,12 +242,11 @@ export class GraphComponent implements OnInit, OnDestroy {
   public drawMeasurements(): void {
     this.cy.ready(() => {
       this.cy.nodes().forEach(node => {
-        let measurements : IMeasurement[] = node.data("measurements");
-        if(measurements != undefined 
-            && !(measurements.length == 1 
-            && measurements[0].Type == "SWITCH_STATUS") 
-            && measurements.length != 0)
-        {
+        let measurements: IMeasurement[] = node.data("measurements");
+        if (measurements != undefined
+          && !(measurements.length == 1
+            && measurements[0].Type == "SWITCH_STATUS")
+          && measurements.length != 0) {
           let measurementString = "";
           let nodePosition = 30;
           let counter = 1;
@@ -307,17 +308,26 @@ export class GraphComponent implements OnInit, OnDestroy {
     console.log(data);
   }
 
-  public onActiveOutageNotification(data: ActiveOutage): void {
-    let outageElement;
-    if(data.State == OutageLifeCycleState.Created)
-      outageElement = this.cy.nodes().filter(node => node.data('id') == data.DefaultIsolationPoints[0].toString())[0];
-    else if (data.State == OutageLifeCycleState.Isolated)
-      outageElement = this.cy.nodes().filter(node => node.data('id') == data.ElementId)[0];
-    
-    const outageNodeId = drawWarningOnNode(this.cy, outageElement);
-    const outageNode = this.cy.nodes().filter(node => node.data('id') == outageNodeId)[0];
-    outageNode.sendIsolateOutageCommand = (id) => this.onIsolateOutageCommand(id);
-    addOutageTooltip(this.cy, outageNode, data);
+  public onActiveOutageNotification(outage: ActiveOutage): void {
+    this.activeOutages = this.activeOutages.filter(o => o.Id !== outage.Id);
+    this.activeOutages.push(outage);
+    this.drawGraph(); // da bi resetovao tooltip-ove, ako je velika mreza, optimizovacemo
+  }
+
+  public addOutageTooltips(): void {
+    for (const activeOutage of this.activeOutages) {
+      let outageElement;
+
+      if (activeOutage.State == OutageLifeCycleState.Created)
+        outageElement = this.cy.nodes().filter(node => node.data('id') == activeOutage.DefaultIsolationPoints[0].toString())[0];
+      else if (activeOutage.State == OutageLifeCycleState.Isolated)
+        outageElement = this.cy.nodes().filter(node => node.data('id') == activeOutage.ElementId)[0];
+
+      const outageNodeId = drawWarningOnNode(this.cy, outageElement);
+      const outageNode = this.cy.nodes().filter(node => node.data('id') == outageNodeId)[0];
+      outageNode.sendIsolateOutageCommand = (id) => this.onIsolateOutageCommand(id);
+      addOutageTooltip(this.cy, outageNode, activeOutage);
+    }
   }
 
   public onIsolateOutageCommand(id: Number): void {
