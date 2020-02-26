@@ -111,7 +111,7 @@ export const style = cytoscape.stylesheet()
         'height': '60px',
         'width': '60px'
     })
-    .selector('node[dmsType="BREAKER"][isClosed = false]')
+    .selector('node[dmsType="BREAKER"][isClosed = "closed"]')
     .style({
         'background-fit': 'cover',
         'background-image': 'assets/img/breakerOff.png',

@@ -72,14 +72,7 @@ const mapBreakerNode = (node) => {
       measurements: node.Measurements,
       nominalVoltage: node.NominalVoltage,
       deviceType: node.IsRemote ? "remote" : "local",
-      isClosed: 
-        // 1. Find tooltip
-        // 2. Find 'Open'/'Close' button in tooltip
-        // 3. Set value of 'IsClosed' according to contents of button
-        // Array.from(document.getElementsByClassName('tippy-content'))
-        //   .filter(tooltip => tooltip.innerHTML.includes(node.Id))[0]
-        //     .getElementsByTagName('button')[0].innerText
-        node.Measurements[0].Value != 0 ? true : false
+      isClosed: node.Measurements[0].Value != 0 ? "closed" : "open"
   }
 }
 }
