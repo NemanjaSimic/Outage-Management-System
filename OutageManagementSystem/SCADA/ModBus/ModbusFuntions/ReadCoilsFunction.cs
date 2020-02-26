@@ -79,13 +79,8 @@ namespace Outage.SCADA.ModBus.ModbusFuntions
                 }
 
                 pointItem.CurrentValue = value;
+                Logger.LogInfo($"Alarm for Point [Gid: 0x{pointItem.Gid:X16}, Address: {pointItem.Address}] set to {pointItem.Alarm}.");
 
-                bool alarmChanged = pointItem.SetAlarms();
-
-                if (alarmChanged)
-                {
-                    Logger.LogInfo($"Alarm for Point [Gid: 0x{pointItem.Gid:X16}, Address: {pointItem.Address}] set to {pointItem.Alarm}.");
-                }
 
                 DiscreteModbusData digitalData = new DiscreteModbusData(value, pointItem.Alarm);
                 Data.Add(gid, digitalData);

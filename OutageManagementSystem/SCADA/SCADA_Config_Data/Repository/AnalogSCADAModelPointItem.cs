@@ -9,6 +9,8 @@ namespace Outage.SCADA.SCADAData.Repository
 {
     public class AnalogSCADAModelPointItem : SCADAModelPointItem, IAnalogSCADAModelPointItem
     {
+        private float currentEguValue;
+
         public AnalogSCADAModelPointItem() 
             : base()
         {
@@ -56,7 +58,15 @@ namespace Outage.SCADA.SCADAData.Repository
         }
 
         public float NormalValue { get; set; }
-        public float CurrentEguValue { get; set; }
+        public float CurrentEguValue
+        {
+            get { return currentEguValue; }
+            set
+            {
+                currentEguValue = value;
+                SetAlarms();
+            }
+        }
         public float EGU_Min { get; set; }
         public float EGU_Max { get; set; }
         public float ScalingFactor { get; set; }
@@ -88,7 +98,7 @@ namespace Outage.SCADA.SCADAData.Repository
         }
 
 
-        public override bool SetAlarms()
+        protected override bool SetAlarms()
         {
             bool alarmChanged = false;
             float LowLimit;

@@ -76,7 +76,7 @@ namespace Outage.SCADA.SCADAData.Repository
             }
         }
 
-        public abstract bool SetAlarms();
+        protected abstract bool SetAlarms();
 
         #region IClonable
 
