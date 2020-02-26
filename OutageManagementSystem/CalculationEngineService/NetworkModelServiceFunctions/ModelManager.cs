@@ -7,6 +7,7 @@ using Outage.Common.GDA;
 using System;
 using System.Collections.Generic;
 using System.Linq;
+using System.Threading.Tasks;
 
 namespace NetworkModelServiceFunctions
 {
@@ -58,7 +59,6 @@ namespace NetworkModelServiceFunctions
 		ILogger logger = LoggerWrapper.Instance;
 		private readonly ModelResourcesDesc modelResourcesDesc;
 		private readonly NetworkModelGDA networkModelGDA;
-
 		private Dictionary<long, IMeasurement> Measurements { get; set; }
 		private Dictionary<long, ITopologyElement> TopologyElements { get; set; }
 		private List<long> EnergySources { get; set; }
@@ -103,15 +103,27 @@ namespace NetworkModelServiceFunctions
 			bool success = true;
 			try
 			{
-				foreach (var item in ConcreteModels)
+				logger.LogInfo("Getting all network model elements and converting them...");
+				GetBaseVoltages();
+				Parallel.For(0, ConcreteModels.Count, (i) =>
 				{
-					List<ModelCode> properties = modelResourcesDesc.GetAllPropertyIds(item);
-					var elements = networkModelGDA.GetExtentValues(item, properties);
-					foreach (var element in elements)
+					var model = ConcreteModels.ElementAt(i);
+					if (model != ModelCode.BASEVOLTAGE)
 					{
-						TransformToTopologyElement(element);
+						List<ModelCode> properties = modelResourcesDesc.GetAllPropertyIds(model);
+						var elements = networkModelGDA.GetExtentValues(model, properties);
+						foreach (var element in elements)
+						{
+							TransformToTopologyElement(element);
+						}
 					}
+				});
+				
+				foreach (var measurement in Measurements.Values)
+				{
+					PutMeasurementsInElements(measurement);
 				}
+
 				topologyElements = TopologyElements;
 				elementConnections = ElementConnections;
 				reclosers = Reclosers;
@@ -119,7 +131,7 @@ namespace NetworkModelServiceFunctions
 			}
 			catch (Exception ex)
 			{
-				logger.LogError($"[NMSManager] Failed in get all model entities. Exception message: {ex.Message}");
+				logger.LogError($"[NMSManager] Failed in get all network model elements. Exception message: {ex.Message}");
 				topologyElements = null;
 				elementConnections = null;
 				reclosers = null;
@@ -128,8 +140,16 @@ namespace NetworkModelServiceFunctions
 			}
 			return success;
 		}
-
-        private void PutMeasurementsInElements(Measurement measurement)
+		private void GetBaseVoltages()
+		{
+			List<ModelCode> properties = modelResourcesDesc.GetAllPropertyIds(ModelCode.BASEVOLTAGE);
+			var elements = networkModelGDA.GetExtentValues(ModelCode.BASEVOLTAGE, properties);
+			foreach (var element in elements)
+			{
+				TransformToTopologyElement(element);
+			}
+		}
+		private void PutMeasurementsInElements(IMeasurement measurement)
 		{
 			string message = $"[NMSManager]Putting measurement with GID 0x{measurement.Id.ToString("X16")} in element.";
 			if (MeasurementToConnectedTerminalMap.TryGetValue(measurement.Id, out long terminalId))
@@ -177,30 +197,15 @@ namespace NetworkModelServiceFunctions
 			{
 				Measurement newDiscrete = GetPopulatedDiscreteMeasurement(modelEntity);
 				Measurements.Add(newDiscrete.Id, newDiscrete);
-				PutMeasurementsInElements(newDiscrete);
 				Provider.Instance.MeasurementProvider.AddDiscreteMeasurement(newDiscrete as DiscreteMeasurement);
 			}
 			else if (dmsType == DMSType.ANALOG)
 			{
 				Measurement newAnalog = GetPopulatedAnalogMeasurement(modelEntity);
-				PutMeasurementsInElements(newAnalog);
 				Measurements.Add(newAnalog.Id, newAnalog);
 				Provider.Instance.MeasurementProvider.AddAnalogMeasurement(newAnalog as AnalogMeasurement);
 			}
-			else if (dmsType == DMSType.BASEVOLTAGE)
-			{
-				float voltage = modelEntity.GetProperty(ModelCode.BASEVOLTAGE_NOMINALVOLTAGE).AsFloat();
-				long baseVoltageGid = modelEntity.GetProperty(ModelCode.IDOBJ_GID).AsLong();
-				if (BaseVoltages.ContainsKey(baseVoltageGid))
-				{
-					logger.LogDebug($"[NMSManager] Basevoltage with GID 0x{baseVoltageGid.ToString("X16")} is already in basevoltage collection. Elements can share basevoltage.");
-				}
-				else
-				{
-					BaseVoltages.Add(baseVoltageGid, voltage);
-				}
-			}
-			else if (dmsType != DMSType.MASK_TYPE)
+			else if (dmsType != DMSType.MASK_TYPE && dmsType != DMSType.BASEVOLTAGE)
 			{
 				ITopologyElement newElement = GetPopulatedElement(modelEntity);
 				TopologyElements.Add(newElement.Id, newElement);
@@ -213,13 +218,11 @@ namespace NetworkModelServiceFunctions
 		}
 		private List<long> GetAllReferencedElements(ResourceDescription element)
 		{
-			logger.LogDebug($"[NMSManager] Getting all referenced elements for GID 0x{element.Id:X16}.");
 			List<long> elements = new List<long>();
 			DMSType type = GetDMSTypeOfTopologyElement(element.Id);
 
 			foreach (var property in GetAllReferenceProperties(type))
 			{
-
 				if (property == ModelCode.POWERTRANSFORMER_TRANSFORMERWINDINGS ||
 					property == ModelCode.CONDUCTINGEQUIPMENT_TERMINALS ||
 					property == ModelCode.CONNECTIVITYNODE_TERMINALS ||
@@ -288,19 +291,18 @@ namespace NetworkModelServiceFunctions
 				if (rs.ContainsProperty(ModelCode.CONDUCTINGEQUIPMENT_BASEVOLTAGE))
 				{
 					long baseVoltageGid = rs.GetProperty(ModelCode.CONDUCTINGEQUIPMENT_BASEVOLTAGE).AsLong();
-					if (BaseVoltages.TryGetValue(baseVoltageGid,out float voltage))
+					if (BaseVoltages.TryGetValue(baseVoltageGid, out float voltage))
 					{
 						topologyElement.NominalVoltage = voltage;
 					}
-					else
+					else if (baseVoltageGid == 0)
 					{
 						logger.LogError($"{errorMessage} BaseVoltage with GID 0x{baseVoltageGid.ToString("X16")} does not exist in baseVoltages collection.");
 					}
 				}
 				else
 				{
-					topologyElement.NominalVoltage = 0;
-					logger.LogError($"{errorMessage} Failed to get BaseVoltage. Element with GID 0x{rs.Id:X16} does not have BASEVOLTAGE_NOMINALVOLTAGE property.");
+					topologyElement.NominalVoltage = 0;	
 				}
 
 				if (rs.ContainsProperty(ModelCode.BREAKER_NORECLOSING) && !rs.GetProperty(ModelCode.BREAKER_NORECLOSING).AsBool())
@@ -391,19 +393,6 @@ namespace NetworkModelServiceFunctions
 		private DMSType GetDMSTypeOfTopologyElement(long gid)
 		{	
 			return (DMSType)ModelCodeHelper.ExtractTypeFromGlobalId(gid);
-		}
-		public string GetDMSTypeOfTopologyElementString(long gid)
-		{
-			logger.LogDebug($"Getting element DMStype for GID 0x{gid:X16}.");		
-			DMSType type = GetDMSTypeOfTopologyElement(gid);
-			if (type != 0)
-			{
-				return type.ToString();
-			}
-			else
-			{
-				return "FIELD";
-			}			
 		}
         #endregion
     }

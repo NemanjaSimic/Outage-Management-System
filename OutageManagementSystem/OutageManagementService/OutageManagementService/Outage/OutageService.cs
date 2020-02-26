@@ -6,6 +6,8 @@ using System.Collections.Generic;
 using System.Linq;
 using System.Data.Entity;
 using System;
+using OMSCommon.OutageDatabaseModel;
+using OMSCommon.Mappers;
 
 namespace OutageManagementService.Outage
 {
@@ -22,26 +24,30 @@ namespace OutageManagementService.Outage
 
 
         #region IOutageAccessContract
-        public List<ActiveOutage> GetActiveOutages()
+        public IEnumerable<ActiveOutageMessage> GetActiveOutages()
         {
-            //TODO: Logic
-            List<ActiveOutage> activeOutages = null;
+            OutageMessageMapper mapper = new OutageMessageMapper();
+
+            List<ActiveOutageMessage> activeOutages = new List<ActiveOutageMessage>();
+
             using (OutageContext db = new OutageContext())
             {
-                activeOutages = db.ActiveOutages.Include(a => a.AffectedConsumers).ToList();
+                activeOutages.AddRange(mapper.MapActiveOutages(db.ActiveOutages.Include(a => a.AffectedConsumers)));
             }
 
             return activeOutages;
         }
 
-        public List<ArchivedOutage> GetArchivedOutages()
+        public IEnumerable<ArchivedOutageMessage> GetArchivedOutages()
         {
-            List<ArchivedOutage> archivedOutages = null;
+            OutageMessageMapper mapper = new OutageMessageMapper();
+
+            List<ArchivedOutageMessage> archivedOutages = new List<ArchivedOutageMessage>();
+
             using (OutageContext db = new OutageContext())
             {
-                archivedOutages = db.ArchivedOutages.ToList();
+                archivedOutages.AddRange(mapper.MapArchivedOutages(db.ArchivedOutages.Include(a => a.AffectedConsumers)));
             }
-
 
             return archivedOutages;
         }

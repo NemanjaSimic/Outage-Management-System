@@ -35,7 +35,7 @@ namespace TestSub
                 {
                     double currentValue = multipleAnalogValue.Data[gid].Value;
                     AlarmType alarm = multipleAnalogValue.Data[gid].Alarm;
-                    Console.WriteLine($"Analog => Gid: 0x{gid:X16}, Value: {currentValue}, Alarm: {alarm}");
+                    Console.WriteLine($"Analog => Gid: 0x{gid:X16} Value: {currentValue}, Alarm: {alarm}");
                 }
             }
             else if (msg is MultipleDiscreteValueSCADAMessage multipleDiscreteValue)
@@ -47,7 +47,7 @@ namespace TestSub
                     Console.WriteLine($"Discrete => Gid: 0x{gid:X16}, Value: {currentValue}, Alarm: {alarm}");
                 }
             }
-            else if (msg is ActiveOutage activeOutage)
+            else if (msg is ActiveOutageMessage activeOutage)
             {
                 Console.WriteLine($"Active outage id: {activeOutage.OutageId}, affected consumers:{activeOutage.AffectedConsumers}, affected element: 0x{activeOutage.OutageElementGid:x16}");
             }

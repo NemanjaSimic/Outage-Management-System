@@ -1,9 +1,6 @@
 ﻿using Outage.Common;
 using System;
 using System.Collections.Generic;
-using System.Linq;
-using System.Text;
-using System.Threading.Tasks;
 
 namespace CECommon.TopologyConfiguration
 {
@@ -32,12 +29,10 @@ namespace CECommon.TopologyConfiguration
 				}
 				catch (Exception ex)
 				{
-					string message = $"Failed to parse configuration file on path {path}. Exception message: " + ex.Message;
-					logger.LogError(message);
+					logger.LogError($"Failed to parse configuration file on path {path}. Exception message: {ex.Message}");
 					throw ex;
 				}
 			}
-
 			return retValue;
 		}
 		public Dictionary<TopologyStatus, List<DMSType>> GetAllElementStatus()
@@ -47,7 +42,6 @@ namespace CECommon.TopologyConfiguration
 				{ TopologyStatus.Ignorable, new List<DMSType>(ParseConfigFile(ignorableFilePath)) },
 				{ TopologyStatus.Field, new List<DMSType>(ParseConfigFile(fieldFilePath)) }
 			};
-
 			return elements;
 		}
 		public Dictionary<TopologyType, List<DMSType>> GetAllTopologyTypes()
@@ -58,9 +52,7 @@ namespace CECommon.TopologyConfiguration
 				{TopologyType.Edge, new List<DMSType>(ParseConfigFile(edgeFilePath))},
 				{TopologyType.Measurement, new List<DMSType>(ParseConfigFile(measurementFilePath))}
 			};
-
 			return elements;
 		}
-
 	}
 }

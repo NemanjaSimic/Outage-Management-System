@@ -6,13 +6,12 @@ using Outage.Common;
 using Outage.Common.ServiceContracts.PubSub;
 using Outage.Common.ServiceProxies;
 using Outage.Common.ServiceProxies.PubSub;
-using SCADACommanding;
+using SCADAFunctions;
 using System;
 using System.Collections.Generic;
 using System.ServiceModel;
 using System.Text;
 using Topology;
-using TopologyBuilder;
 
 namespace CalculationEngineService
 {
@@ -20,12 +19,11 @@ namespace CalculationEngineService
     {
         private ILogger logger;
         private ISubscriber proxy;
-        private IModelTopologyService modelTopologyServis;
         private ITopologyConverter webTopologyBuilder;
         private IModelManager modelManager;
         private ITopologyBuilder topologyBuilder;
         private IMeasurementProvider cacheProvider;
-        private IVoltageFlow voltageFlow;
+        private ILoadFlow voltageFlow;
 
         private ProxyFactory proxyFactory;
         private SCADAResultHandler sCADAResultProvider;
@@ -45,15 +43,14 @@ namespace CalculationEngineService
             proxyFactory = new ProxyFactory();
 
             topologyBuilder = new GraphBuilder();
-            voltageFlow = new VoltageFlow();
-            modelTopologyServis = new ModelTopologyService(topologyBuilder, voltageFlow);
+            voltageFlow = new LoadFlow();
             webTopologyBuilder = new TopologyConverter();
 
             sCADAResultProvider = new SCADAResultHandler();
             cacheProvider = new MeasurementProvider();
             modelManager = new ModelManager();
             modelProvider = new ModelProvider(modelManager);
-            topologyProvider = new TopologyProvider(modelTopologyServis, voltageFlow);
+            topologyProvider = new TopologyProvider(topologyBuilder, voltageFlow);
             webTopologyModelProvider = new TopologyConverterProvider(webTopologyBuilder);
             topologyPublisher = new TopologyPublisher();
             InitializeHosts();
@@ -156,7 +153,6 @@ namespace CalculationEngineService
         {
             Logger.LogDebug("Subcribing on SCADA measurements.");
             proxy = proxyFactory.CreateProxy<SubscriberProxy, ISubscriber>(new SCADASubscriber(), EndpointNames.SubscriberEndpoint);
-            //proxy = new SubscriberProxy(new SCADASubscriber(), EndpointNames.SubscriberEndpoint);
 
             if (proxy == null)
             {

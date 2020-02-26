@@ -12,9 +12,10 @@ namespace Outage.Common.ServiceProxies.Outage
         {
         }
 
-        public List<ActiveOutage> GetActiveOutages()
+        public IEnumerable<ActiveOutageMessage> GetActiveOutages()
         {
-            List<ActiveOutage> outageModels;
+            IEnumerable<ActiveOutageMessage> outageModels;
+
             try
             {
                 outageModels = Channel.GetActiveOutages();
@@ -29,9 +30,10 @@ namespace Outage.Common.ServiceProxies.Outage
             return outageModels;
         }
 
-        public List<ArchivedOutage> GetArchivedOutages()
+        public IEnumerable<ArchivedOutageMessage> GetArchivedOutages()
         {
-            List<ArchivedOutage> outageModels;
+            IEnumerable<ArchivedOutageMessage> outageModels;
+
             try
             {
                 outageModels = Channel.GetArchivedOutages();

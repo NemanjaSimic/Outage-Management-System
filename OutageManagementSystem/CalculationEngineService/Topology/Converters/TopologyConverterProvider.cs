@@ -1,13 +1,10 @@
 ﻿using CECommon.Interfaces;
+using CECommon.Providers;
 using Outage.Common.OutageService.Interface;
 using Outage.Common.UI;
-using System;
 using System.Collections.Generic;
-using System.Linq;
-using System.Text;
-using System.Threading.Tasks;
 
-namespace CECommon.Providers
+namespace Topology
 {
     public class TopologyConverterProvider : ITopologyConverterProvider
     {
@@ -48,11 +45,11 @@ namespace CECommon.Providers
         {
             UIModel = ConvertTopologyToWebTopology(topologies);
         }
-
         public void ProviderTopologyConnectionDelegate(List<ITopology> topologies)
         {
             OMSModel = ConvertTopologyToOMSModel(topologies);
         }
+
         public List<UIModel> GetUIModels()
         {
             if (UIModel != null)
@@ -64,7 +61,6 @@ namespace CECommon.Providers
                 return new List<UIModel>();
             }
         }
-
         public List<IOutageTopologyModel> GetOMSModel()
         {
             if (OMSModel != null)
@@ -76,7 +72,6 @@ namespace CECommon.Providers
                 return new List<IOutageTopologyModel>();
             }
         }
-
         private List<UIModel> ConvertTopologyToWebTopology(List<ITopology> topologies)
         {
             List<UIModel> newUiModel = new List<UIModel>();
@@ -86,7 +81,6 @@ namespace CECommon.Providers
             }
             return newUiModel;
         }
-
         private List<IOutageTopologyModel> ConvertTopologyToOMSModel(List<ITopology> topologies)
         {
             List<IOutageTopologyModel> newUiModel = new List<IOutageTopologyModel>();

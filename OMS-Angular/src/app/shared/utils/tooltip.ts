@@ -1,5 +1,6 @@
 import tippy from 'tippy.js';
 import { SwitchCommand, SwitchCommandType } from '@shared/models/switch-command.model';
+import { AlarmType } from '@shared/models/scada-data.model';
 //import { GetUnitMeasurement } from './measurement';
 
 const commandableTypes: string[] = ["LOADBREAKSWITCH", "DISCONNECTOR", "BREAKER", "FUSE"];
@@ -23,10 +24,9 @@ const outageTooltipBody: string =
   <p>ElementID: [[elementId]]</p>
   <p>ReportedTime: [[reportedAt]]</p>`;
 
-/* const measurementsToolTipBody: string =
-`<h3>MEASUREMENTS</h3>
-<p>Type: [[type]] Value:[[value]] [[unit]]</p>`;
- */
+ const measurementsToolTipBody: string =
+`<h3>[[alarmType]]</h3>`;
+ 
 export const addGraphTooltip = (cy, node) => {
   let ref = node.popperRef();
   
@@ -79,7 +79,11 @@ const createTooltipContent =  (node) => {
 
     const meas = node.data('measurements');
     if (meas.length > 0) {
-      if (meas[0].Value == 0) {
+      if (node.data('dmsType') == "BREAKER" && meas[0].Value == 0)
+        button.innerHTML = 'Open';
+      else if (node.data('dmsType') == "BREAKER" && meas[0].Value != 0)
+        button.innerHTML = 'Close';
+      else if (meas[0].Value == 0) {
         button.innerHTML = 'Switch off';
       }
       else {
@@ -143,36 +147,28 @@ export const addOutageTooltip = (cy, node, outage) => {
   });
 }
 
-/* export const addMeasurementTooltip = (cy, node) => {
+ export const addAnalogMeasurementTooltip = (cy, node, alarmType) => {
   let ref = node.popperRef();
-  let measurements = node.data("measurements");
-  if(measurements == undefined)
-    return;
 
   node.tooltip = tippy(ref, {
     content: () => {
       const div = document.createElement('div');
-      measurements.forEach(element => {
-        div.innerHTML = measurementsToolTipBody
-        .replace("[[type]]", element.Type)
-        .replace("[[value]]", element.Value)
-        .replace("[[unit]]", GetUnitMeasurement(element.Type))    
-      });  
+      div.innerHTML = measurementsToolTipBody.replace("[[alarmType]]", AlarmType[alarmType]);
+
       return div;
     },
     animation: 'scale',
     trigger: 'manual',
     placement: 'left',
     arrow: true,
-    interactive: true
+    interactive: true 
   })
 
-  node.on('tap', () => {
-    setTimeout(() => {
-      node.tooltip.show();
-    }, 0);
-  });
-} */
+   node.on('mouseover', () => {
+    node.tooltip.show();
+    setTimeout(function(){ node.tooltip.hide(); }, 2000);
+  }); 
+} 
 
 export const addEdgeTooltip = (cy, node, edge) => {
   let ref = edge.popperRef();

@@ -1,19 +1,15 @@
 ﻿using Outage.Common;
 using Outage.Common.GDA;
-using Outage.Common.ServiceContracts;
 using Outage.Common.ServiceContracts.GDA;
 using Outage.Common.ServiceProxies;
 using System;
 using System.Collections.Generic;
-using System.ServiceModel;
-using System.Threading;
 
 namespace NetworkModelServiceFunctions
 {
 	public class NetworkModelGDA
 	{
-		private ProxyFactory proxyFactory;
-
+		private IProxyFactory proxyFactory;
 		private ILogger logger = LoggerWrapper.Instance;
 
 		protected ILogger Logger
@@ -53,7 +49,6 @@ namespace NetworkModelServiceFunctions
 
 			return ProcessIterator(iteratorId);
 		}
-
 		public List<ResourceDescription> GetRelatedValues(long source, List<ModelCode> propIds, Association association)
 		{
 			int iteratorId;
@@ -81,7 +76,6 @@ namespace NetworkModelServiceFunctions
 
 			return ProcessIterator(iteratorId);
 		}
-
 		public ResourceDescription GetValues(long resourceId, List<ModelCode> propIds)
 		{
 			ResourceDescription resource;
@@ -109,10 +103,8 @@ namespace NetworkModelServiceFunctions
 
 			return resource;
 		}
-
 		private List<ResourceDescription> ProcessIterator(int iteratorId)
 		{
-			//TODO: mozda vec ovde napakovati dictionary<long, rd> ?
 			int resourcesLeft;
 			int numberOfResources = 10000;
 			List<ResourceDescription> resourceDescriptions;

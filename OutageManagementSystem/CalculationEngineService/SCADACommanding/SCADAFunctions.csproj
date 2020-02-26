@@ -42,8 +42,10 @@
     <Reference Include="System.Xml" />
   </ItemGroup>
   <ItemGroup>
+    <Compile Include="MeasurementProvider.cs" />
     <Compile Include="Properties\AssemblyInfo.cs" />
     <Compile Include="SCADACommandingService.cs" />
+    <Compile Include="SCADAResultHandler.cs" />
     <Compile Include="SCADASubscriber.cs" />
   </ItemGroup>
   <ItemGroup>
