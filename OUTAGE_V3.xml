@@ -2051,66 +2051,77 @@
 		<ftn:IdentifiedObject.name>ACL_40</ftn:IdentifiedObject.name>
 	</cim:ACLineSegment>
 	<cim:ACLineSegment rdf:ID="ACL_41">
+		<cim:ConductingEquipment.BaseVoltage rdf:resource="#BV_2"/>
 		<cim:ConductingEquipment.isRemote>false</cim:ConductingEquipment.isRemote>
 		<cim:IdentifiedObject.description>ACLineSegment</cim:IdentifiedObject.description>
 		<cim:IdentifiedObject.mRID>ACL_41</cim:IdentifiedObject.mRID>
 		<ftn:IdentifiedObject.name>ACL_41</ftn:IdentifiedObject.name>
 	</cim:ACLineSegment>
 	<cim:ACLineSegment rdf:ID="ACL_42">
+		<cim:ConductingEquipment.BaseVoltage rdf:resource="#BV_2"/>
 		<cim:ConductingEquipment.isRemote>false</cim:ConductingEquipment.isRemote>
 		<cim:IdentifiedObject.description>ACLineSegment</cim:IdentifiedObject.description>
 		<cim:IdentifiedObject.mRID>ACL_42</cim:IdentifiedObject.mRID>
 		<ftn:IdentifiedObject.name>ACL_42</ftn:IdentifiedObject.name>
 	</cim:ACLineSegment>
 	<cim:ACLineSegment rdf:ID="ACL_43">
+		<cim:ConductingEquipment.BaseVoltage rdf:resource="#BV_2"/>
 		<cim:ConductingEquipment.isRemote>false</cim:ConductingEquipment.isRemote>
 		<cim:IdentifiedObject.description>ACLineSegment</cim:IdentifiedObject.description>
 		<cim:IdentifiedObject.mRID>ACL_43</cim:IdentifiedObject.mRID>
 		<ftn:IdentifiedObject.name>ACL_43</ftn:IdentifiedObject.name>
 	</cim:ACLineSegment>
 	<cim:ACLineSegment rdf:ID="ACL_44">
+		<cim:ConductingEquipment.BaseVoltage rdf:resource="#BV_2"/>
 		<cim:ConductingEquipment.isRemote>false</cim:ConductingEquipment.isRemote>
 		<cim:IdentifiedObject.description>ACLineSegment</cim:IdentifiedObject.description>
 		<cim:IdentifiedObject.mRID>ACL_44</cim:IdentifiedObject.mRID>
 		<ftn:IdentifiedObject.name>ACL_44</ftn:IdentifiedObject.name>
 	</cim:ACLineSegment>
 	<cim:ACLineSegment rdf:ID="ACL_45">
+		<cim:ConductingEquipment.BaseVoltage rdf:resource="#BV_2"/>
 		<cim:ConductingEquipment.isRemote>false</cim:ConductingEquipment.isRemote>
 		<cim:IdentifiedObject.description>ACLineSegment</cim:IdentifiedObject.description>
 		<cim:IdentifiedObject.mRID>ACL_45</cim:IdentifiedObject.mRID>
 		<ftn:IdentifiedObject.name>ACL_45</ftn:IdentifiedObject.name>
 	</cim:ACLineSegment>
 	<cim:ACLineSegment rdf:ID="ACL_46">
+		<cim:ConductingEquipment.BaseVoltage rdf:resource="#BV_2"/>
 		<cim:ConductingEquipment.isRemote>false</cim:ConductingEquipment.isRemote>
 		<cim:IdentifiedObject.description>ACLineSegment</cim:IdentifiedObject.description>
 		<cim:IdentifiedObject.mRID>ACL_46</cim:IdentifiedObject.mRID>
 		<ftn:IdentifiedObject.name>ACL_46</ftn:IdentifiedObject.name>
 	</cim:ACLineSegment>
 	<cim:ACLineSegment rdf:ID="ACL_47">
+		<cim:ConductingEquipment.BaseVoltage rdf:resource="#BV_2"/>
 		<cim:ConductingEquipment.isRemote>false</cim:ConductingEquipment.isRemote>
 		<cim:IdentifiedObject.description>ACLineSegment</cim:IdentifiedObject.description>
 		<cim:IdentifiedObject.mRID>ACL_47</cim:IdentifiedObject.mRID>
 		<ftn:IdentifiedObject.name>ACL_47</ftn:IdentifiedObject.name>
 	</cim:ACLineSegment>
 	<cim:ACLineSegment rdf:ID="ACL_48">
+		<cim:ConductingEquipment.BaseVoltage rdf:resource="#BV_2"/>
 		<cim:ConductingEquipment.isRemote>false</cim:ConductingEquipment.isRemote>
 		<cim:IdentifiedObject.description>ACLineSegment</cim:IdentifiedObject.description>
 		<cim:IdentifiedObject.mRID>ACL_48</cim:IdentifiedObject.mRID>
 		<ftn:IdentifiedObject.name>ACL_48</ftn:IdentifiedObject.name>
 	</cim:ACLineSegment>
 	<cim:ACLineSegment rdf:ID="ACL_49">
+		<cim:ConductingEquipment.BaseVoltage rdf:resource="#BV_2"/>
 		<cim:ConductingEquipment.isRemote>false</cim:ConductingEquipment.isRemote>
 		<cim:IdentifiedObject.description>ACLineSegment</cim:IdentifiedObject.description>
 		<cim:IdentifiedObject.mRID>ACL_49</cim:IdentifiedObject.mRID>
 		<ftn:IdentifiedObject.name>ACL_49</ftn:IdentifiedObject.name>
 	</cim:ACLineSegment>
 	<cim:ACLineSegment rdf:ID="ACL_50">
+		<cim:ConductingEquipment.BaseVoltage rdf:resource="#BV_2"/>
 		<cim:ConductingEquipment.isRemote>false</cim:ConductingEquipment.isRemote>
 		<cim:IdentifiedObject.description>ACLineSegment</cim:IdentifiedObject.description>
 		<cim:IdentifiedObject.mRID>ACL_50</cim:IdentifiedObject.mRID>
 		<ftn:IdentifiedObject.name>ACL_50</ftn:IdentifiedObject.name>
 	</cim:ACLineSegment>
 	<cim:ACLineSegment rdf:ID="ACL_51">
+		<cim:ConductingEquipment.BaseVoltage rdf:resource="#BV_2"/>
 		<cim:ConductingEquipment.isRemote>false</cim:ConductingEquipment.isRemote>
 		<cim:IdentifiedObject.description>ACLineSegment</cim:IdentifiedObject.description>
 		<cim:IdentifiedObject.mRID>ACL_51</cim:IdentifiedObject.mRID>
@@ -2123,84 +2134,98 @@
 		<ftn:IdentifiedObject.name>ACL_52</ftn:IdentifiedObject.name>
 	</cim:ACLineSegment>
 	<cim:ACLineSegment rdf:ID="ACL_53">
+		<cim:ConductingEquipment.BaseVoltage rdf:resource="#BV_2"/>
 		<cim:ConductingEquipment.isRemote>false</cim:ConductingEquipment.isRemote>
 		<cim:IdentifiedObject.description>ACLineSegment</cim:IdentifiedObject.description>
 		<cim:IdentifiedObject.mRID>ACL_53</cim:IdentifiedObject.mRID>
 		<ftn:IdentifiedObject.name>ACL_53</ftn:IdentifiedObject.name>
 	</cim:ACLineSegment>
 	<cim:ACLineSegment rdf:ID="ACL_54">
+		<cim:ConductingEquipment.BaseVoltage rdf:resource="#BV_2"/>
 		<cim:ConductingEquipment.isRemote>false</cim:ConductingEquipment.isRemote>
 		<cim:IdentifiedObject.description>ACLineSegment</cim:IdentifiedObject.description>
 		<cim:IdentifiedObject.mRID>ACL_54</cim:IdentifiedObject.mRID>
 		<ftn:IdentifiedObject.name>ACL_54</ftn:IdentifiedObject.name>
 	</cim:ACLineSegment>
 	<cim:ACLineSegment rdf:ID="ACL_55">
+		<cim:ConductingEquipment.BaseVoltage rdf:resource="#BV_2"/>
 		<cim:ConductingEquipment.isRemote>false</cim:ConductingEquipment.isRemote>
 		<cim:IdentifiedObject.description>ACLineSegment</cim:IdentifiedObject.description>
 		<cim:IdentifiedObject.mRID>ACL_55</cim:IdentifiedObject.mRID>
 		<ftn:IdentifiedObject.name>ACL_55</ftn:IdentifiedObject.name>
 	</cim:ACLineSegment>
 	<cim:ACLineSegment rdf:ID="ACL_56">
+		<cim:ConductingEquipment.BaseVoltage rdf:resource="#BV_2"/>
 		<cim:ConductingEquipment.isRemote>false</cim:ConductingEquipment.isRemote>
 		<cim:IdentifiedObject.description>ACLineSegment</cim:IdentifiedObject.description>
 		<cim:IdentifiedObject.mRID>ACL_56</cim:IdentifiedObject.mRID>
 		<ftn:IdentifiedObject.name>ACL_56</ftn:IdentifiedObject.name>
 	</cim:ACLineSegment>
 	<cim:ACLineSegment rdf:ID="ACL_57">
+		<cim:ConductingEquipment.BaseVoltage rdf:resource="#BV_2"/>
 		<cim:ConductingEquipment.isRemote>false</cim:ConductingEquipment.isRemote>
 		<cim:IdentifiedObject.description>ACLineSegment</cim:IdentifiedObject.description>
 		<cim:IdentifiedObject.mRID>ACL_57</cim:IdentifiedObject.mRID>
 		<ftn:IdentifiedObject.name>ACL_57</ftn:IdentifiedObject.name>
 	</cim:ACLineSegment>
 	<cim:ACLineSegment rdf:ID="ACL_58">
+		<cim:ConductingEquipment.BaseVoltage rdf:resource="#BV_2"/>
 		<cim:ConductingEquipment.isRemote>false</cim:ConductingEquipment.isRemote>
 		<cim:IdentifiedObject.description>ACLineSegment</cim:IdentifiedObject.description>
 		<cim:IdentifiedObject.mRID>ACL_58</cim:IdentifiedObject.mRID>
 		<ftn:IdentifiedObject.name>ACL_58</ftn:IdentifiedObject.name>
 	</cim:ACLineSegment>
 	<cim:ACLineSegment rdf:ID="ACL_59">
+		<cim:ConductingEquipment.BaseVoltage rdf:resource="#BV_2"/>
 		<cim:ConductingEquipment.isRemote>false</cim:ConductingEquipment.isRemote>
 		<cim:IdentifiedObject.description>ACLineSegment</cim:IdentifiedObject.description>
 		<cim:IdentifiedObject.mRID>ACL_59</cim:IdentifiedObject.mRID>
 		<ftn:IdentifiedObject.name>ACL_59</ftn:IdentifiedObject.name>
 	</cim:ACLineSegment>
 	<cim:ACLineSegment rdf:ID="ACL_60">
+		<cim:ConductingEquipment.BaseVoltage rdf:resource="#BV_2"/>
 		<cim:ConductingEquipment.isRemote>false</cim:ConductingEquipment.isRemote>
 		<cim:IdentifiedObject.description>ACLineSegment</cim:IdentifiedObject.description>
 		<cim:IdentifiedObject.mRID>ACL_60</cim:IdentifiedObject.mRID>
 		<ftn:IdentifiedObject.name>ACL_60</ftn:IdentifiedObject.name>
 	</cim:ACLineSegment>
 		<cim:ACLineSegment rdf:ID="ACL_61">
+		<cim:ConductingEquipment.BaseVoltage rdf:resource="#BV_2"/>
 		<cim:ConductingEquipment.isRemote>false</cim:ConductingEquipment.isRemote>
 		<cim:IdentifiedObject.description>ACLineSegment</cim:IdentifiedObject.description>
 		<cim:IdentifiedObject.mRID>ACL_61</cim:IdentifiedObject.mRID>
 		<ftn:IdentifiedObject.name>ACL_61</ftn:IdentifiedObject.name>
 	</cim:ACLineSegment>
 		<cim:ACLineSegment rdf:ID="ACL_62">
+		<cim:ConductingEquipment.BaseVoltage rdf:resource="#BV_2"/>
 		<cim:ConductingEquipment.isRemote>false</cim:ConductingEquipment.isRemote>
 		<cim:IdentifiedObject.description>ACLineSegment</cim:IdentifiedObject.description>
 		<cim:IdentifiedObject.mRID>ACL_62</cim:IdentifiedObject.mRID>
 		<ftn:IdentifiedObject.name>ACL_62</ftn:IdentifiedObject.name>
 	</cim:ACLineSegment>
 		<cim:ACLineSegment rdf:ID="ACL_63">
+		<cim:ConductingEquipment.BaseVoltage rdf:resource="#BV_2"/>
 		<cim:ConductingEquipment.isRemote>false</cim:ConductingEquipment.isRemote>
 		<cim:IdentifiedObject.description>ACLineSegment</cim:IdentifiedObject.description>
 		<cim:IdentifiedObject.mRID>ACL_63</cim:IdentifiedObject.mRID>
 		<ftn:IdentifiedObject.name>ACL_63</ftn:IdentifiedObject.name>
 	</cim:ACLineSegment>
 		<cim:ACLineSegment rdf:ID="ACL_64">
+		<cim:ConductingEquipment.BaseVoltage rdf:resource="#BV_2"/>
 		<cim:ConductingEquipment.isRemote>false</cim:ConductingEquipment.isRemote>
 		<cim:IdentifiedObject.description>ACLineSegment</cim:IdentifiedObject.description>
 		<cim:IdentifiedObject.mRID>ACL_64</cim:IdentifiedObject.mRID>
 		<ftn:IdentifiedObject.name>ACL_64</ftn:IdentifiedObject.name>
 	</cim:ACLineSegment>
 		<cim:ACLineSegment rdf:ID="ACL_65">
+		<cim:ConductingEquipment.BaseVoltage rdf:resource="#BV_2"/>
 		<cim:ConductingEquipment.isRemote>false</cim:ConductingEquipment.isRemote>
 		<cim:IdentifiedObject.description>ACLineSegment</cim:IdentifiedObject.description>
 		<cim:IdentifiedObject.mRID>ACL_65</cim:IdentifiedObject.mRID>
 		<ftn:IdentifiedObject.name>ACL_65</ftn:IdentifiedObject.name>
 	</cim:ACLineSegment>
 		<cim:ACLineSegment rdf:ID="ACL_66">
+		<cim:ConductingEquipment.BaseVoltage rdf:resource="#BV_2"/>
 		<cim:ConductingEquipment.isRemote>false</cim:ConductingEquipment.isRemote>
 		<cim:IdentifiedObject.description>ACLineSegment</cim:IdentifiedObject.description>
 		<cim:IdentifiedObject.mRID>ACL_66</cim:IdentifiedObject.mRID>
@@ -2223,6 +2248,7 @@
 		<ftn:IdentifiedObject.name>ACL_R2</ftn:IdentifiedObject.name>
 	</cim:ACLineSegment>
 	<cim:ACLineSegment rdf:ID="ACL_R3">
+		<cim:ConductingEquipment.BaseVoltage rdf:resource="#BV_2"/>
 		<cim:ConductingEquipment.isRemote>false</cim:ConductingEquipment.isRemote>
 		<cim:IdentifiedObject.description>ACLineSegment</cim:IdentifiedObject.description>
 		<cim:IdentifiedObject.mRID>ACL_R3</cim:IdentifiedObject.mRID>
@@ -2317,6 +2343,7 @@
 	<cim:Breaker rdf:ID="BR_10">
 		<cim:Breaker.noReclosing>true</cim:Breaker.noReclosing>
 		<cim:ConductingEquipment.isRemote>false</cim:ConductingEquipment.isRemote>
+		<cim:ConductingEquipment.BaseVoltage rdf:resource="#BV_2"/>
 		<cim:IdentifiedObject.description> </cim:IdentifiedObject.description>
 		<cim:IdentifiedObject.mRID>BR_10</cim:IdentifiedObject.mRID>
 		<ftn:IdentifiedObject.name>BR_10</ftn:IdentifiedObject.name>
@@ -2324,6 +2351,7 @@
 	<cim:Breaker rdf:ID="BR_11">
 		<cim:Breaker.noReclosing>true</cim:Breaker.noReclosing>
 		<cim:ConductingEquipment.isRemote>false</cim:ConductingEquipment.isRemote>
+		<cim:ConductingEquipment.BaseVoltage rdf:resource="#BV_2"/>
 		<cim:IdentifiedObject.description> </cim:IdentifiedObject.description>
 		<cim:IdentifiedObject.mRID>BR_11</cim:IdentifiedObject.mRID>
 		<ftn:IdentifiedObject.name>BR_11</ftn:IdentifiedObject.name>
@@ -2331,6 +2359,7 @@
 	<cim:Breaker rdf:ID="BR_13">
 		<cim:Breaker.noReclosing>true</cim:Breaker.noReclosing>
 		<cim:ConductingEquipment.isRemote>false</cim:ConductingEquipment.isRemote>
+		<cim:ConductingEquipment.BaseVoltage rdf:resource="#BV_2"/>
 		<cim:IdentifiedObject.description> </cim:IdentifiedObject.description>
 		<cim:IdentifiedObject.mRID>BR_13</cim:IdentifiedObject.mRID>
 		<ftn:IdentifiedObject.name>BR_13</ftn:IdentifiedObject.name>
@@ -2338,6 +2367,7 @@
 	<cim:Breaker rdf:ID="BR_15">
 		<cim:Breaker.noReclosing>true</cim:Breaker.noReclosing>
 		<cim:ConductingEquipment.isRemote>false</cim:ConductingEquipment.isRemote>
+		<cim:ConductingEquipment.BaseVoltage rdf:resource="#BV_2"/>
 		<cim:IdentifiedObject.description> </cim:IdentifiedObject.description>
 		<cim:IdentifiedObject.mRID>BR_15</cim:IdentifiedObject.mRID>
 		<ftn:IdentifiedObject.name>BR_15</ftn:IdentifiedObject.name>
@@ -2345,6 +2375,7 @@
 	<cim:Breaker rdf:ID="BR_16">
 		<cim:Breaker.noReclosing>true</cim:Breaker.noReclosing>
 		<cim:ConductingEquipment.isRemote>false</cim:ConductingEquipment.isRemote>
+		<cim:ConductingEquipment.BaseVoltage rdf:resource="#BV_2"/>
 		<cim:IdentifiedObject.description> </cim:IdentifiedObject.description>
 		<cim:IdentifiedObject.mRID>BR_16</cim:IdentifiedObject.mRID>
 		<ftn:IdentifiedObject.name>BR_16</ftn:IdentifiedObject.name>
@@ -2362,6 +2393,7 @@
 	<cim:Breaker rdf:ID="RC_2">
 		<cim:Breaker.noReclosing>false</cim:Breaker.noReclosing>
 		<cim:ConductingEquipment.isRemote>false</cim:ConductingEquipment.isRemote>
+		<cim:ConductingEquipment.BaseVoltage rdf:resource="#BV_2"/>
 		<cim:IdentifiedObject.description> </cim:IdentifiedObject.description>
 		<cim:IdentifiedObject.mRID>RC_2</cim:IdentifiedObject.mRID>
 		<ftn:IdentifiedObject.name>RC_2</ftn:IdentifiedObject.name>
@@ -2622,90 +2654,105 @@
 		<ftn:IdentifiedObject.name>EC_22</ftn:IdentifiedObject.name>
 	</cim:EnergyConsumer>
 	<cim:EnergyConsumer rdf:ID="EC_23">
+		<cim:ConductingEquipment.BaseVoltage rdf:resource="#BV_2"/>
 		<cim:ConductingEquipment.isRemote>false</cim:ConductingEquipment.isRemote>
 		<cim:IdentifiedObject.description> </cim:IdentifiedObject.description>
 		<cim:IdentifiedObject.mRID>EC_23</cim:IdentifiedObject.mRID>
 		<ftn:IdentifiedObject.name>EC_23</ftn:IdentifiedObject.name>
 	</cim:EnergyConsumer>
 	<cim:EnergyConsumer rdf:ID="EC_24">
+		<cim:ConductingEquipment.BaseVoltage rdf:resource="#BV_2"/>
 		<cim:ConductingEquipment.isRemote>false</cim:ConductingEquipment.isRemote>
 		<cim:IdentifiedObject.description> </cim:IdentifiedObject.description>
 		<cim:IdentifiedObject.mRID>EC_24</cim:IdentifiedObject.mRID>
 		<ftn:IdentifiedObject.name>EC_24</ftn:IdentifiedObject.name>
 	</cim:EnergyConsumer>
 	<cim:EnergyConsumer rdf:ID="EC_25">
+		<cim:ConductingEquipment.BaseVoltage rdf:resource="#BV_2"/>
 		<cim:ConductingEquipment.isRemote>false</cim:ConductingEquipment.isRemote>
 		<cim:IdentifiedObject.description> </cim:IdentifiedObject.description>
 		<cim:IdentifiedObject.mRID>EC_25</cim:IdentifiedObject.mRID>
 		<ftn:IdentifiedObject.name>EC_25</ftn:IdentifiedObject.name>
 	</cim:EnergyConsumer>
 	<cim:EnergyConsumer rdf:ID="EC_26">
+		<cim:ConductingEquipment.BaseVoltage rdf:resource="#BV_2"/>
 		<cim:ConductingEquipment.isRemote>false</cim:ConductingEquipment.isRemote>
 		<cim:IdentifiedObject.description> </cim:IdentifiedObject.description>
 		<cim:IdentifiedObject.mRID>EC_26</cim:IdentifiedObject.mRID>
 		<ftn:IdentifiedObject.name>EC_26</ftn:IdentifiedObject.name>
 	</cim:EnergyConsumer>
 	<cim:EnergyConsumer rdf:ID="EC_27">
+		<cim:ConductingEquipment.BaseVoltage rdf:resource="#BV_2"/>
 		<cim:ConductingEquipment.isRemote>false</cim:ConductingEquipment.isRemote>
 		<cim:IdentifiedObject.description> </cim:IdentifiedObject.description>
 		<cim:IdentifiedObject.mRID>EC_27</cim:IdentifiedObject.mRID>
 		<ftn:IdentifiedObject.name>EC_27</ftn:IdentifiedObject.name>
 	</cim:EnergyConsumer>
 	<cim:EnergyConsumer rdf:ID="EC_28">
+		<cim:ConductingEquipment.BaseVoltage rdf:resource="#BV_2"/>
 		<cim:ConductingEquipment.isRemote>false</cim:ConductingEquipment.isRemote>
 		<cim:IdentifiedObject.description> </cim:IdentifiedObject.description>
 		<cim:IdentifiedObject.mRID>EC_28</cim:IdentifiedObject.mRID>
 		<ftn:IdentifiedObject.name>EC_28</ftn:IdentifiedObject.name>
 	</cim:EnergyConsumer>
 	<cim:EnergyConsumer rdf:ID="EC_29">
+		<cim:ConductingEquipment.BaseVoltage rdf:resource="#BV_2"/>
 		<cim:ConductingEquipment.isRemote>false</cim:ConductingEquipment.isRemote>
 		<cim:IdentifiedObject.description> </cim:IdentifiedObject.description>
 		<cim:IdentifiedObject.mRID>EC_29</cim:IdentifiedObject.mRID>
 		<ftn:IdentifiedObject.name>EC_29</ftn:IdentifiedObject.name>
 	</cim:EnergyConsumer>
 	<cim:EnergyConsumer rdf:ID="EC_30">
+		<cim:ConductingEquipment.BaseVoltage rdf:resource="#BV_2"/>
 		<cim:ConductingEquipment.isRemote>false</cim:ConductingEquipment.isRemote>
 		<cim:IdentifiedObject.description> </cim:IdentifiedObject.description>
 		<cim:IdentifiedObject.mRID>EC_30</cim:IdentifiedObject.mRID>
 		<ftn:IdentifiedObject.name>EC_30</ftn:IdentifiedObject.name>
 	</cim:EnergyConsumer>
 	<cim:EnergyConsumer rdf:ID="EC_31">
+		<cim:ConductingEquipment.BaseVoltage rdf:resource="#BV_2"/>
 		<cim:ConductingEquipment.isRemote>false</cim:ConductingEquipment.isRemote>
 		<cim:IdentifiedObject.description> </cim:IdentifiedObject.description>
 		<cim:IdentifiedObject.mRID>EC_31</cim:IdentifiedObject.mRID>
 		<ftn:IdentifiedObject.name>EC_31</ftn:IdentifiedObject.name>
 	</cim:EnergyConsumer>
 	<cim:EnergyConsumer rdf:ID="EC_32">
+		<cim:ConductingEquipment.BaseVoltage rdf:resource="#BV_2"/>
 		<cim:ConductingEquipment.isRemote>false</cim:ConductingEquipment.isRemote>
 		<cim:IdentifiedObject.description> </cim:IdentifiedObject.description>
 		<cim:IdentifiedObject.mRID>EC_32</cim:IdentifiedObject.mRID>
 		<ftn:IdentifiedObject.name>EC_32</ftn:IdentifiedObject.name>
 	</cim:EnergyConsumer>
 	<cim:EnergyConsumer rdf:ID="EC_33">
+		<cim:ConductingEquipment.BaseVoltage rdf:resource="#BV_2"/>
 		<cim:ConductingEquipment.isRemote>false</cim:ConductingEquipment.isRemote>
 		<cim:IdentifiedObject.description> </cim:IdentifiedObject.description>
 		<cim:IdentifiedObject.mRID>EC_33</cim:IdentifiedObject.mRID>
 		<ftn:IdentifiedObject.name>EC_33</ftn:IdentifiedObject.name>
 	</cim:EnergyConsumer>
 	<cim:EnergyConsumer rdf:ID="EC_34">
+		<cim:ConductingEquipment.BaseVoltage rdf:resource="#BV_2"/>
 		<cim:ConductingEquipment.isRemote>false</cim:ConductingEquipment.isRemote>
 		<cim:IdentifiedObject.description> </cim:IdentifiedObject.description>
 		<cim:IdentifiedObject.mRID>EC_34</cim:IdentifiedObject.mRID>
 		<ftn:IdentifiedObject.name>EC_34</ftn:IdentifiedObject.name>
 	</cim:EnergyConsumer>
 	<cim:EnergyConsumer rdf:ID="EC_35">
+		<cim:ConductingEquipment.BaseVoltage rdf:resource="#BV_2"/>
 		<cim:ConductingEquipment.isRemote>false</cim:ConductingEquipment.isRemote>
 		<cim:IdentifiedObject.description> </cim:IdentifiedObject.description>
 		<cim:IdentifiedObject.mRID>EC_35</cim:IdentifiedObject.mRID>
 		<ftn:IdentifiedObject.name>EC_35</ftn:IdentifiedObject.name>
 	</cim:EnergyConsumer>
 	<cim:EnergyConsumer rdf:ID="EC_36">
+		<cim:ConductingEquipment.BaseVoltage rdf:resource="#BV_2"/>
 		<cim:ConductingEquipment.isRemote>false</cim:ConductingEquipment.isRemote>
 		<cim:IdentifiedObject.description> </cim:IdentifiedObject.description>
 		<cim:IdentifiedObject.mRID>EC_36</cim:IdentifiedObject.mRID>
 		<ftn:IdentifiedObject.name>EC_36</ftn:IdentifiedObject.name>
 	</cim:EnergyConsumer>
 	<cim:EnergyConsumer rdf:ID="EC_37">
+		<cim:ConductingEquipment.BaseVoltage rdf:resource="#BV_2"/>
 		<cim:ConductingEquipment.isRemote>false</cim:ConductingEquipment.isRemote>
 		<cim:IdentifiedObject.description> </cim:IdentifiedObject.description>
 		<cim:IdentifiedObject.mRID>EC_37</cim:IdentifiedObject.mRID>
@@ -2920,90 +2967,106 @@
 		<ftn:IdentifiedObject.name>FS_22</ftn:IdentifiedObject.name>
 	</cim:Fuse>
 	<cim:Fuse rdf:ID="FS_23">
+		<cim:ConductingEquipment.BaseVoltage rdf:resource="#BV_2"/>
 		<cim:ConductingEquipment.isRemote>false</cim:ConductingEquipment.isRemote>
 		<cim:IdentifiedObject.description> </cim:IdentifiedObject.description>
 		<cim:IdentifiedObject.mRID>FS_23</cim:IdentifiedObject.mRID>
 		<ftn:IdentifiedObject.name>FS_23</ftn:IdentifiedObject.name>
 	</cim:Fuse>
 	<cim:Fuse rdf:ID="FS_24">
+		<cim:ConductingEquipment.BaseVoltage rdf:resource="#BV_2"/>
 		<cim:ConductingEquipment.isRemote>false</cim:ConductingEquipment.isRemote>
 		<cim:IdentifiedObject.description> </cim:IdentifiedObject.description>
 		<cim:IdentifiedObject.mRID>FS_24</cim:IdentifiedObject.mRID>
 		<ftn:IdentifiedObject.name>FS_24</ftn:IdentifiedObject.name>
 	</cim:Fuse>
 	<cim:Fuse rdf:ID="FS_25">
+		<cim:ConductingEquipment.BaseVoltage rdf:resource="#BV_2"/>
 		<cim:ConductingEquipment.isRemote>false</cim:ConductingEquipment.isRemote>
 		<cim:IdentifiedObject.description> </cim:IdentifiedObject.description>
 		<cim:IdentifiedObject.mRID>FS_25</cim:IdentifiedObject.mRID>
 		<ftn:IdentifiedObject.name>FS_25</ftn:IdentifiedObject.name>
 	</cim:Fuse>
 	<cim:Fuse rdf:ID="FS_26">
+		<cim:ConductingEquipment.BaseVoltage rdf:resource="#BV_2"/>
 		<cim:ConductingEquipment.isRemote>false</cim:ConductingEquipment.isRemote>
 		<cim:IdentifiedObject.description> </cim:IdentifiedObject.description>
 		<cim:IdentifiedObject.mRID>FS_26</cim:IdentifiedObject.mRID>
 		<ftn:IdentifiedObject.name>FS_26</ftn:IdentifiedObject.name>
 	</cim:Fuse>
 	<cim:Fuse rdf:ID="FS_27">
+		<cim:ConductingEquipment.BaseVoltage rdf:resource="#BV_2"/>
 		<cim:ConductingEquipment.isRemote>false</cim:ConductingEquipment.isRemote>
 		<cim:IdentifiedObject.description> </cim:IdentifiedObject.description>
 		<cim:IdentifiedObject.mRID>FS_27</cim:IdentifiedObject.mRID>
 		<ftn:IdentifiedObject.name>FS_27</ftn:IdentifiedObject.name>
 	</cim:Fuse>
 	<cim:Fuse rdf:ID="FS_28">
+		<cim:ConductingEquipment.BaseVoltage rdf:resource="#BV_2"/>
 		<cim:ConductingEquipment.isRemote>false</cim:ConductingEquipment.isRemote>
 		<cim:IdentifiedObject.description> </cim:IdentifiedObject.description>
 		<cim:IdentifiedObject.mRID>FS_28</cim:IdentifiedObject.mRID>
 		<ftn:IdentifiedObject.name>FS_28</ftn:IdentifiedObject.name>
 	</cim:Fuse>
 	<cim:Fuse rdf:ID="FS_29">
+		<cim:ConductingEquipment.BaseVoltage rdf:resource="#BV_2"/>
+		<cim:ConductingEquipment.BaseVoltage rdf:resource="#BV_2"/>
 		<cim:ConductingEquipment.isRemote>false</cim:ConductingEquipment.isRemote>
 		<cim:IdentifiedObject.description> </cim:IdentifiedObject.description>
 		<cim:IdentifiedObject.mRID>FS_29</cim:IdentifiedObject.mRID>
 		<ftn:IdentifiedObject.name>FS_29</ftn:IdentifiedObject.name>
 	</cim:Fuse>
 	<cim:Fuse rdf:ID="FS_30">
+		<cim:ConductingEquipment.BaseVoltage rdf:resource="#BV_2"/>
 		<cim:ConductingEquipment.isRemote>false</cim:ConductingEquipment.isRemote>
 		<cim:IdentifiedObject.description> </cim:IdentifiedObject.description>
 		<cim:IdentifiedObject.mRID>FS_30</cim:IdentifiedObject.mRID>
 		<ftn:IdentifiedObject.name>FS_30</ftn:IdentifiedObject.name>
 	</cim:Fuse>
 	<cim:Fuse rdf:ID="FS_31">
+		<cim:ConductingEquipment.BaseVoltage rdf:resource="#BV_2"/>
 		<cim:ConductingEquipment.isRemote>false</cim:ConductingEquipment.isRemote>
 		<cim:IdentifiedObject.description> </cim:IdentifiedObject.description>
 		<cim:IdentifiedObject.mRID>FS_31</cim:IdentifiedObject.mRID>
 		<ftn:IdentifiedObject.name>FS_31</ftn:IdentifiedObject.name>
 	</cim:Fuse>
 	<cim:Fuse rdf:ID="FS_32">
+		<cim:ConductingEquipment.BaseVoltage rdf:resource="#BV_2"/>
 		<cim:ConductingEquipment.isRemote>false</cim:ConductingEquipment.isRemote>
 		<cim:IdentifiedObject.description> </cim:IdentifiedObject.description>
 		<cim:IdentifiedObject.mRID>FS_32</cim:IdentifiedObject.mRID>
 		<ftn:IdentifiedObject.name>FS_32</ftn:IdentifiedObject.name>
 	</cim:Fuse>
 	<cim:Fuse rdf:ID="FS_33">
+		<cim:ConductingEquipment.BaseVoltage rdf:resource="#BV_2"/>
 		<cim:ConductingEquipment.isRemote>false</cim:ConductingEquipment.isRemote>
 		<cim:IdentifiedObject.description> </cim:IdentifiedObject.description>
 		<cim:IdentifiedObject.mRID>FS_33</cim:IdentifiedObject.mRID>
 		<ftn:IdentifiedObject.name>FS_33</ftn:IdentifiedObject.name>
 	</cim:Fuse>
 	<cim:Fuse rdf:ID="FS_34">
+		<cim:ConductingEquipment.BaseVoltage rdf:resource="#BV_2"/>
 		<cim:ConductingEquipment.isRemote>false</cim:ConductingEquipment.isRemote>
 		<cim:IdentifiedObject.description> </cim:IdentifiedObject.description>
 		<cim:IdentifiedObject.mRID>FS_34</cim:IdentifiedObject.mRID>
 		<ftn:IdentifiedObject.name>FS_34</ftn:IdentifiedObject.name>
 	</cim:Fuse>
 	<cim:Fuse rdf:ID="FS_35">
+		<cim:ConductingEquipment.BaseVoltage rdf:resource="#BV_2"/>
 		<cim:ConductingEquipment.isRemote>false</cim:ConductingEquipment.isRemote>
 		<cim:IdentifiedObject.description> </cim:IdentifiedObject.description>
 		<cim:IdentifiedObject.mRID>FS_35</cim:IdentifiedObject.mRID>
 		<ftn:IdentifiedObject.name>FS_35</ftn:IdentifiedObject.name>
 	</cim:Fuse>
 	<cim:Fuse rdf:ID="FS_36">
+		<cim:ConductingEquipment.BaseVoltage rdf:resource="#BV_2"/>
 		<cim:ConductingEquipment.isRemote>false</cim:ConductingEquipment.isRemote>
 		<cim:IdentifiedObject.description> </cim:IdentifiedObject.description>
 		<cim:IdentifiedObject.mRID>FS_36</cim:IdentifiedObject.mRID>
 		<ftn:IdentifiedObject.name>FS_36</ftn:IdentifiedObject.name>
 	</cim:Fuse>
 	<cim:Fuse rdf:ID="FS_37">
+		<cim:ConductingEquipment.BaseVoltage rdf:resource="#BV_2"/>
 		<cim:ConductingEquipment.isRemote>false</cim:ConductingEquipment.isRemote>
 		<cim:IdentifiedObject.description> </cim:IdentifiedObject.description>
 		<cim:IdentifiedObject.mRID>FS_37</cim:IdentifiedObject.mRID>
