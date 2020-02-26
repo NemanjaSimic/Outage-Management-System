@@ -19,6 +19,7 @@ namespace CECommon
 		public List<long> Measurements { get; set; }
 		public bool IsRemote { get; set; }
 		public bool IsActive { get; set; }
+		public bool NoReclosing { get; set; }
 
 		#endregion
 		public TopologyElement(long gid)

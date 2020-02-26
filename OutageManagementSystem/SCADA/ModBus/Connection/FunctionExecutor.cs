@@ -441,6 +441,7 @@ namespace Outage.SCADA.ModBus.Connection
                 }
                 else if (MeasurementsCache[gid] is DiscreteModbusData discreteCacheItem && discreteCacheItem.Value != data[gid].Value)
                 {
+                    Logger.LogDebug($"Value changed. Old value: {discreteCacheItem.Value}; new value: {data[gid].Value}");
                     MeasurementsCache[gid] = data[gid];
                     publicationData.Add(gid, MeasurementsCache[gid] as DiscreteModbusData);
                 }

@@ -35,7 +35,7 @@ namespace TestSub
                 {
                     double currentValue = multipleAnalogValue.Data[gid].Value;
                     AlarmType alarm = multipleAnalogValue.Data[gid].Alarm;
-                    Console.WriteLine($"Analog => Gid: 0x{gid:X16}, Value: {currentValue}, Alarm: {alarm}");
+                    Console.WriteLine($"Analog => Gid: 0x{gid:X16} Value: {currentValue}, Alarm: {alarm}");
                 }
             }
             else if (msg is MultipleDiscreteValueSCADAMessage multipleDiscreteValue)

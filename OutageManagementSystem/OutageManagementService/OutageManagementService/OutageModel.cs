@@ -53,6 +53,8 @@ namespace OutageManagementService
         private Dictionary<DeltaOpType, List<long>> modelChanges;
         private ModelResourcesDesc modelResourcesDesc;
         private OutageContext transactionOutageContext;
+        private HashSet<long> commandedElements;
+        private HashSet<long> optimumIsolationPoints;
 
         protected ILogger Logger
         {
@@ -63,6 +65,8 @@ namespace OutageManagementService
         {
             modelResourcesDesc = new ModelResourcesDesc();
             proxyFactory = new ProxyFactory();
+            commandedElements = new HashSet<long>();
+            optimumIsolationPoints = new HashSet<long>();
             outageMessageMapper = new OutageMessageMapper();
 
             CalledOutages = new List<long>();
@@ -153,6 +157,17 @@ namespace OutageManagementService
         public bool ReportPotentialOutage(long gid)
         {
             bool success = false;
+            Logger.LogDebug($"Reporting outage for gid: 0x{gid:X16}");
+            Logger.LogDebug("Commanded elements: ");
+            foreach(long id in commandedElements)
+            {
+                logger.LogDebug($"{id}");
+            }
+
+            if (commandedElements.Contains(gid) || optimumIsolationPoints.Contains(gid))
+            {
+                return false;
+            }
 
             List<long> affectedConsumersIds = new List<long>();
 
@@ -169,10 +184,30 @@ namespace OutageManagementService
                     {
                         if (db.GetActiveOutage(gid) == null)
                         {
+                            long recloserId;
+                            try
+                            {
+                                recloserId = GetRecloserForHeadBreaker(gid);
+                            }
+                            catch (Exception e)
+                            {
+                                throw e;
+                            }
+
+                            string defaultIsolationEndpoints = "";
+                            if(recloserId != -1)
+                            {
+                                defaultIsolationEndpoints = $"{gid}|{recloserId}";
+                            }
+                            else
+                            {
+                                defaultIsolationEndpoints = $"{gid}";
+                            }
+
                             List<Consumer> consumers = GetAffectedConsumersFromDatabase(affectedConsumersIds, db);
                             if (consumers.Count == affectedConsumersIds.Count)
                             {
-                                activeOutage = db.ActiveOutages.Add(new ActiveOutage { AffectedConsumers = consumers, OutageState = ActiveOutageState.CREATED, OutageElementGid = gid, ReportTime = DateTime.UtcNow });
+                                activeOutage = db.ActiveOutages.Add(new ActiveOutage { AffectedConsumers = consumers, OutageState = ActiveOutageState.CREATED, DefaultIsolationPoints = defaultIsolationEndpoints, ReportTime = DateTime.UtcNow });
                                 db.SaveChanges();
                             }
                             else
@@ -242,6 +277,22 @@ namespace OutageManagementService
                         {
                             db.SaveChanges();
                         }
+
+                        if (success)
+                        {
+                            try
+                            {
+                                PublishActiveOutage(Topic.ACTIVE_OUTAGE, outageMessageMapper.MapActiveOutage(outageToIsolate));
+                                Logger.LogInfo($"Outage with id: 0x{outageToIsolate.OutageId:x16} is successfully published");
+                                success = true;
+                            }
+                            catch (Exception e) //TODO: Exception over proxy or enum...
+                            {
+                                Logger.LogError("Error occured while trying to publish outage.", e);
+                            }
+                        }
+
+                        
                     }
                     else
                     {
@@ -293,6 +344,78 @@ namespace OutageManagementService
 
                 TopologyModel = (OutageTopologyModel)omsTopologyProxy.GetOMSModel();
             }
+        }
+
+        private long GetNextBreaker(long breakerId)
+        {
+            if (!topologyModel.OutageTopology.ContainsKey(breakerId))
+            {
+                string message = $"Breaker with gid: {breakerId} is not in a topology model.";
+                Logger.LogError(message);
+                throw new Exception(message);
+            }
+
+            long nextBreakerId = -1;
+
+            foreach(long elementId in topologyModel.OutageTopology[breakerId].SecondEnd)
+            {
+                if (modelResourcesDesc.GetModelCodeFromId(elementId) == ModelCode.ACLINESEGMENT)
+                {
+                    nextBreakerId = GetNextBreaker(elementId);
+                }
+                else if (modelResourcesDesc.GetModelCodeFromId(elementId) != ModelCode.BREAKER)
+                {
+                    return -1;
+                }
+                else
+                {
+                    return elementId;
+                }
+
+                if(nextBreakerId != -1)
+                {
+                    break;
+                }
+            }
+
+            return nextBreakerId;
+        }
+        
+
+        private long GetRecloserForHeadBreaker(long headBreakerId)
+        {
+            long recolserId = -1;
+
+            if (!topologyModel.OutageTopology.ContainsKey(headBreakerId))
+            {
+                string message = $"Head switch with gid: {headBreakerId} is not in a topology model.";
+                Logger.LogError(message);
+                throw new Exception(message);
+            }
+            long currentBreakerId = headBreakerId;
+            while (currentBreakerId != 0)
+            {
+                currentBreakerId = TopologyModel.OutageTopology[currentBreakerId].SecondEnd.Where(element => modelResourcesDesc.GetModelCodeFromId(element) == ModelCode.BREAKER).FirstOrDefault();
+                if (currentBreakerId == 0)
+                {
+                    continue;
+                }
+
+                if (!topologyModel.OutageTopology.ContainsKey(currentBreakerId))
+                {
+                    string message = $"Head switch with gid: {currentBreakerId} is not in a topology model.";
+                    Logger.LogError(message);
+                    throw new Exception(message);
+                }
+
+                if (!topologyModel.OutageTopology[currentBreakerId].NoReclosing)
+                {
+                    recolserId = currentBreakerId;
+                    break;
+                }
+            }
+
+            return recolserId; 
         }
 
         private List<Consumer> GetAffectedConsumersFromDatabase(List<long> affectedConsumersIds, OutageContext db)
@@ -359,18 +482,23 @@ namespace OutageManagementService
                             headBreaker = defaultIsolationPoints[0];
                             recloser = defaultIsolationPoints[1];
                         }
+                        commandedElements.Add(headBreaker);
+                        commandedElements.Add(recloser);
                     }
                     else
                     {
                         if (!isFirstBreakerRecloser)
                         {
                             headBreaker = defaultIsolationPoints[0];
+                            commandedElements.Add(headBreaker);
                         }
                         else
                         {
                             Logger.LogWarn($"Invalid state: breaker with id 0x{defaultIsolationPoints[0]:X16} is the only default isolation element, but it is also a recloser.");
                             isIsolated = false;
                         }
+
+                        
                     }
                 }
                 catch (Exception e)
@@ -385,13 +513,35 @@ namespace OutageManagementService
                     ModelCode mc = modelResourcesDesc.GetModelCodeFromId(headBreaker);
                     if (mc == ModelCode.BREAKER)
                     {
+                        long headBreakerMeasurementId, recloserMeasurementId;
+                        using (MeasurementMapProxy measurementMapProxy = proxyFactory.CreateProxy<MeasurementMapProxy, IMeasurementMapContract>(EndpointNames.MeasurementMapEndpoint))
+                        {
+                            try
+                            {
+                                headBreakerMeasurementId = measurementMapProxy.GetMeasurementsForElement(headBreaker)[0];
+                                if (recloser != -1)
+                                {
+                                    recloserMeasurementId = measurementMapProxy.GetMeasurementsForElement(recloser)[0];
+                                }
+                                else
+                                {
+                                    recloserMeasurementId = -1;
+                                }
+                            }
+                            catch(Exception e)
+                            {
+                                Logger.LogError("Error on GetMeasurementsForElement() method.", e);
+                                throw e;
+                            }
+                        }
+
                         Logger.LogInfo($"Head breaker id: 0x{headBreaker:X16}, recloser id: 0x{recloser:X16} (-1 if no recloser).");
 
                         //ALGORITHM
                         AutoResetEvent autoResetEvent = new AutoResetEvent(false);
                         CancelationObject cancelationObject = new CancelationObject() { CancelationSignal = false };
                         Timer timer = InitalizeAlgorthmTimer(cancelationObject, autoResetEvent);
-                        ScadaNotification scadaNotification = new ScadaNotification("OutageModel_SCADA_Subscriber", new OutageIsolationAlgorithm.OutageIsolationAlgorithmParameters(headBreaker, recloser, autoResetEvent));
+                        ScadaNotification scadaNotification = new ScadaNotification("OutageModel_SCADA_Subscriber", new OutageIsolationAlgorithm.OutageIsolationAlgorithmParameters(headBreakerMeasurementId, recloserMeasurementId, autoResetEvent));
                         SubscriberProxy subscriberProxy = proxyFactory.CreateProxy<SubscriberProxy, ISubscriber>(scadaNotification, EndpointNames.SubscriberEndpoint);
                         subscriberProxy.Subscribe(Topic.SWITCH_STATUS);
 
@@ -401,37 +551,69 @@ namespace OutageManagementService
                         {
                             if (TopologyModel.OutageTopology.ContainsKey(currentBreakerId))
                             {
-                                currentBreakerId = TopologyModel.OutageTopology[currentBreakerId].SecondEnd.Where(element => modelResourcesDesc.GetModelCodeFromId(element) == ModelCode.BREAKER).FirstOrDefault();
-                                if (currentBreakerId == 0 || currentBreakerId == recloser)
+                                currentBreakerId = GetNextBreaker(currentBreakerId);
+                                Logger.LogDebug($"Next breaker is 0x{currentBreakerId:X16}.");
+
+                                if (currentBreakerId == -1 || currentBreakerId == recloser)
                                 {
                                     //TODO: planned outage
                                     string message = "End of the feeder, no outage detected.";
                                     Logger.LogWarn(message);
                                     isIsolated = false;
                                     subscriberProxy.Close();
+                                    commandedElements.Clear();
                                     throw new Exception(message);
                                 }
                                 //TODO: SCADACommand
                                 SendSCADACommand(currentBreakerId, DiscreteCommandingType.OPEN);
+                                SendSCADACommand(headBreaker, DiscreteCommandingType.CLOSE);
+
                                 timer.Start();
+                                Logger.LogDebug("Timer started.");
                                 autoResetEvent.WaitOne();
                                 if (timer.Enabled)
                                 {
                                     timer.Stop();
+                                    Logger.LogDebug("Timer stoped");
                                     SendSCADACommand(currentBreakerId, DiscreteCommandingType.CLOSE);
                                 }
 
                             }
                         }
 
-                        long nextBreakerId = TopologyModel.OutageTopology[currentBreakerId].SecondEnd.Where(element => modelResourcesDesc.GetModelCodeFromId(element) == ModelCode.BREAKER).FirstOrDefault();
+                        long nextBreakerId = GetNextBreaker(currentBreakerId);
                         if (currentBreakerId != 0 && currentBreakerId != recloser)
                         {
                             outageToIsolate.OptimumIsolationPoints = $"{currentBreakerId}|{nextBreakerId}";
+                           
+
+                            if (!topologyModel.OutageTopology.ContainsKey(nextBreakerId))
+                            {
+                                string message = $"Breaker (next breaker) with id: 0x{nextBreakerId:X16} is not in topology";
+                                Logger.LogError(message);
+                                throw new Exception(message);
+                            }
+
+                            long outageElement = topologyModel.OutageTopology[nextBreakerId].FirstEnd;
+
+                            if (!topologyModel.OutageTopology[currentBreakerId].SecondEnd.Contains(outageElement))
+                            {
+                                string message = $"Outage element with gid: 0x{outageElement:X16} is not on a second end of current breaker id";
+                                Logger.LogError(message);
+                                throw new Exception(message);
+                            }
                             //TODO: SCADA Command
+                            subscriberProxy.Close();
+                            optimumIsolationPoints.Add(currentBreakerId);
+                            optimumIsolationPoints.Add(nextBreakerId);
                             SendSCADACommand(currentBreakerId, DiscreteCommandingType.OPEN);
+                            SendSCADACommand(nextBreakerId, DiscreteCommandingType.OPEN);
+
                             outageToIsolate.IsolatedTime = DateTime.UtcNow;
-                            Logger.LogInfo($"Isolation of outage with id {outageToIsolate.OutageId}. Optimum isolation points: {currentBreakerId} and {nextBreakerId}");
+                            outageToIsolate.OutageElementGid = outageElement;
+                            outageToIsolate.OutageState = ActiveOutageState.ISOLATED;
+
+                            Logger.LogInfo($"Isolation of outage with id {outageToIsolate.OutageId}. Optimum isolation points: 0x{currentBreakerId:X16} and 0x{nextBreakerId:X16}, and outage element id is 0x{outageElement:X16}");
                             isIsolated = true;
                         }
                         else
@@ -440,9 +622,9 @@ namespace OutageManagementService
                             Logger.LogWarn(message);
                             isIsolated = false;
                             subscriberProxy.Close();
+                            commandedElements.Clear();
                             throw new Exception(message);
                         }
-                        subscriberProxy.Close();
 
                     }
                     else
@@ -465,9 +647,11 @@ namespace OutageManagementService
             }
 
 
-
+            commandedElements.Clear();
             return isIsolated;
         }
+
+        
 
         private void SendSCADACommand(long currentBreakerId, DiscreteCommandingType discreteCommandingType)
         {
@@ -495,6 +679,13 @@ namespace OutageManagementService
 
             if (measrement != -1)
             {
+                if (discreteCommandingType == DiscreteCommandingType.OPEN && !commandedElements.Contains(currentBreakerId))
+                {
+                    //TODO: add at list
+                    commandedElements.Add(currentBreakerId);
+                }
+                
+
                 using (SCADACommandProxy scadaCommandProxy = proxyFactory.CreateProxy<SCADACommandProxy, ISCADACommand>(EndpointNames.SCADACommandService))
                 {
                     try
@@ -502,18 +693,15 @@ namespace OutageManagementService
                         bool success = scadaCommandProxy.SendDiscreteCommand(measrement, (ushort)discreteCommandingType);
                         if (success)
                         {
-                            if (discreteCommandingType == DiscreteCommandingType.OPEN)
-                            {
-                                //TODO: add at list
-                            }
-                            else if (discreteCommandingType == DiscreteCommandingType.CLOSE)
-                            {
-                                //TODO: remove from list
-                            }
+                            
                         }
                     }
                     catch (Exception e)
                     {
+                        if (discreteCommandingType == DiscreteCommandingType.OPEN && commandedElements.Contains(currentBreakerId))
+                        {
+                            commandedElements.Remove(currentBreakerId);
+                        }
                         throw e;
                     }
                 }
@@ -532,6 +720,7 @@ namespace OutageManagementService
 
         private void AlgorthmTimerElapsedCallback(object sender, ElapsedEventArgs e, CancelationObject cancelationSignal, AutoResetEvent autoResetEvent)
         {
+            Logger.LogDebug("Timer elapsed.");
             cancelationSignal.CancelationSignal = true;
             autoResetEvent.Set();
         }
