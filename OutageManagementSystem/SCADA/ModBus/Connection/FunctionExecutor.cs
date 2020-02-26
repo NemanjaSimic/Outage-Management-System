@@ -15,6 +15,7 @@ using System.ServiceModel;
 using Outage.Common.Exceptions.SCADA;
 using Outage.Common.ServiceProxies;
 using Outage.Common.ServiceContracts.PubSub;
+using System.Text;
 
 namespace Outage.SCADA.ModBus.Connection
 {
@@ -207,8 +208,6 @@ namespace Outage.SCADA.ModBus.Connection
                                                                                                                analogSCADAModelPointItem.Address,
                                                                                                                analogSCADAModelPointItem.CurrentRawValue));
 
-                        //TODO: SetAlarm to private method -> call on current value setter
-                        analogSCADAModelPointItem.SetAlarms();
                         AnalogModbusData analogModbusData = new AnalogModbusData(analogSCADAModelPointItem.CurrentEguValue, analogSCADAModelPointItem.Alarm);
                         analogData.Add(measurementGID, analogModbusData);
                     }
@@ -219,8 +218,6 @@ namespace Outage.SCADA.ModBus.Connection
                                                                                                                discreteSCADAModelPointItem.Address,
                                                                                                                discreteSCADAModelPointItem.CurrentValue));
                         
-                        //TODO: SetAlarm to private method -> call on current value setter
-                        discreteSCADAModelPointItem.SetAlarms();
                         DiscreteModbusData discreteModbusData = new DiscreteModbusData(discreteSCADAModelPointItem.CurrentValue, discreteSCADAModelPointItem.Alarm);
                         discreteData.Add(measurementGID, discreteModbusData);
                     }
@@ -404,12 +401,29 @@ namespace Outage.SCADA.ModBus.Connection
                 if (!MeasurementsCache.ContainsKey(gid))
                 {
                     MeasurementsCache.Add(gid, data[gid]);
-                    publicationData.Add(gid, data[gid]);
+
+                    if (!publicationData.ContainsKey(gid))
+                    {
+                        publicationData.Add(gid, data[gid]);
+                    }
+                    else
+                    {
+                        publicationData[gid] = data[gid];
+                    }
                 }
                 else if (MeasurementsCache[gid] is AnalogModbusData analogCacheItem && analogCacheItem.Value != data[gid].Value)
                 {
                     MeasurementsCache[gid] = data[gid];
-                    publicationData.Add(gid, MeasurementsCache[gid] as AnalogModbusData);
+                    
+
+                    if (!publicationData.ContainsKey(gid))
+                    {
+                        publicationData.Add(gid, MeasurementsCache[gid] as AnalogModbusData);
+                    }
+                    else
+                    {
+                        publicationData[gid] = MeasurementsCache[gid] as AnalogModbusData;
+                    }
                 }
             }
 
@@ -437,13 +451,29 @@ namespace Outage.SCADA.ModBus.Connection
                 if (!MeasurementsCache.ContainsKey(gid))
                 {
                     MeasurementsCache.Add(gid, data[gid]);
-                    publicationData.Add(gid, data[gid]);
+
+                    if(!publicationData.ContainsKey(gid))
+                    {
+                        publicationData.Add(gid, data[gid]);
+                    }
+                    else
+                    {
+                        publicationData[gid] = data[gid];
+                    }
                 }
                 else if (MeasurementsCache[gid] is DiscreteModbusData discreteCacheItem && discreteCacheItem.Value != data[gid].Value)
                 {
                     Logger.LogDebug($"Value changed. Old value: {discreteCacheItem.Value}; new value: {data[gid].Value}");
                     MeasurementsCache[gid] = data[gid];
-                    publicationData.Add(gid, MeasurementsCache[gid] as DiscreteModbusData);
+
+                    if (!publicationData.ContainsKey(gid))
+                    {
+                        publicationData.Add(gid, MeasurementsCache[gid] as DiscreteModbusData);
+                    }
+                    else
+                    {
+                        publicationData[gid] = MeasurementsCache[gid] as DiscreteModbusData;
+                    }
                 }
             }
 
@@ -468,8 +498,31 @@ namespace Outage.SCADA.ModBus.Connection
                     throw new NullReferenceException(errMsg);    
                 }
 
-                publisherProxy.Publish(scadaPublication);
+                publisherProxy.Publish(scadaPublication, "SCADA_PUBLISHER");
                 Logger.LogInfo($"SCADA service published data from topic: {scadaPublication.Topic}");
+
+                StringBuilder sb = new StringBuilder();
+                sb.AppendLine("MeasurementCache content: ");
+
+                foreach(long gid in MeasurementsCache.Keys)
+                {
+                    IModbusData data = MeasurementsCache[gid];
+
+                    if(data is AnalogModbusData analogModbusData)
+                    { 
+                        sb.AppendLine($"Analog data line: [gid] 0x{gid:X16}, [value] {analogModbusData.Value}, [alarm] {analogModbusData.Alarm}");
+                    }
+                    else if(data is DiscreteModbusData discreteModbusData)
+                    {
+                        sb.AppendLine($"Analog data line: [gid] 0x{gid:X16}, [value] {discreteModbusData.Value}, [alarm] {discreteModbusData.Alarm}");
+                    }
+                    else
+                    {
+                        sb.AppendLine($"UNKNOWN data type: {data.GetType()}");
+                    }
+                }
+
+                Logger.LogDebug(sb.ToString());
             }
         }
 

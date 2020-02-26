@@ -51,6 +51,11 @@
     <Reference Include="System.Xml" />
   </ItemGroup>
   <ItemGroup>
+    <Compile Include="Repository\ActiveOutageRepository.cs" />
+    <Compile Include="Repository\ArchivedOutageRepository.cs" />
+    <Compile Include="Repository\ConsumerRepository.cs" />
+    <Compile Include="Repository\Repository.cs" />
+    <Compile Include="Repository\UnitOfWork.cs" />
     <Compile Include="Initializers\OutageInitializer.cs" />
     <Compile Include="Migrations\202002121057388_InitMigration.cs" />
     <Compile Include="Migrations\202002121057388_InitMigration.designer.cs">

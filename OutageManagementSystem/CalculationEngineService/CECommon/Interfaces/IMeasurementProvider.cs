@@ -10,10 +10,11 @@ namespace CECommon.Interfaces
         DiscreteMeasurementDelegate DiscreteMeasurementDelegate { get; set; }
         void AddAnalogMeasurement(AnalogMeasurement analogMeasurement);
         void AddDiscreteMeasurement(DiscreteMeasurement discreteMeasurement);
+        void AddMeasurementElementPair(long measurementId, long elementId);
         float GetAnalogValue(long measurementGid);
         bool GetDiscreteValue(long measurementGid);
         long GetElementGidForMeasurement(long measurementGid);
-        List<long> GetMeasurementsForElement(long elementGid);
+        List<long> GetMeasurementsOfElement(long elementGid);
         Dictionary<long, List<long>> GetElementToMeasurementMap();
         bool TryGetAnalogMeasurement(long measurementGid, out AnalogMeasurement measurement);
         bool TryGetDiscreteMeasurement(long measurementGid, out DiscreteMeasurement measurement);

@@ -22,7 +22,6 @@ namespace OutageManagementService.Outage
 
         public static OutageModel outageModel;
 
-
         #region IOutageAccessContract
         public IEnumerable<ActiveOutageMessage> GetActiveOutages()
         {
