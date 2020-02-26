@@ -24,8 +24,8 @@ export class OutageService {
   }
 
   sendIsolateOutageCommand(id: Number) : Observable<any>{
-    // return this.http.post(`${this.envService.apiUrl}/outage/isolate/${id}`, {});
-    return this.http.post(`${this.envService.apiUrl}/test/isolate/${id}`, {});
+    return this.http.post(`${this.envService.apiUrl}/outage/isolate/${id}`, {});
+    // return this.http.post(`${this.envService.apiUrl}/test/isolate/${id}`, {});
   }
 
   sendLocationIsolationCrewCommand(id: Number) : Observable<any>{
@@ -34,14 +34,17 @@ export class OutageService {
 
   sendOutageRepairCrew(id: Number) : Observable<any>{
     return this.http.post(`${this.envService.apiUrl}/outage/sendrepaircrew/${id}`, {});
+    // return this.http.post(`${this.envService.apiUrl}/test/sendcrew/${id}`, {});
   }
 
   sendValidateOutageCommand(id: Number) : Observable<any>{
     return this.http.post(`${this.envService.apiUrl}/outage/validateresolve/${id}`, {});
+    // return this.http.post(`${this.envService.apiUrl}/test/validate/${id}`, {});
   }
 
   sendResolveOutageCommand(id: Number) : Observable<any>{
     return this.http.post(`${this.envService.apiUrl}/outage/resolve/${id}`, {});
+    // return this.http.post(`${this.envService.apiUrl}/test/resolve/${id}`, {});
   }
 
   getInitialOutage(): Observable<any> {

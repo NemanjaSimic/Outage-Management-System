@@ -9,6 +9,7 @@
         public long ElementId { get; set; }
         public DateTime ReportedAt { get; set; }
         public IEnumerable<ConsumerViewModel> AffectedConsumers { get; set; }
+        public DateTime? RepairedAt { get; set; }
 
         public OutageViewModel() => AffectedConsumers = new List<ConsumerViewModel>();
     }

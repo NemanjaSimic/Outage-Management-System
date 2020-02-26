@@ -103,6 +103,60 @@
             return Ok();
         }
 
+        [HttpPost]
+        [Route("api/test/sendcrew/{id}")]
+        public IHttpActionResult SendRepairCrew([FromUri]long id)
+        {
+            ActiveOutageViewModel initialActiveOutage = new ActiveOutageViewModel
+            {
+                Id = id,
+                DefaultIsolationPoints = new List<long> { 6 },
+                ElementId = 12, // ACLINE segment
+                // breaker iznad i fuse ispod (stavio sam elemente okolo aclinesegmenta), ali front ce raditi sa bilo kojim vasim id-evima
+                // mada ovo nije ni bitno toliko za front ?
+                OptimalIsolationPoints = new List<long> { 6, 14 },
+                State = OutageLifecycleState.Isolated,
+                ReportedAt = DateTime.Now, // ovo nije isto, al test je
+                RepairedAt = DateTime.Now
+            };
+
+            var outageHubContext = GetOutageHubContext();
+            outageHubContext.Clients.All.activeOutageUpdate(initialActiveOutage);
+
+            return Ok();
+        }
+
+        [HttpPost]
+        [Route("api/test/resolve/{id}")]
+        public IHttpActionResult ResolveOutage([FromUri]long id)
+        {
+            // ovde se prebacuje u archived stanje
+            return Ok();
+        }
+
+        [HttpPost]
+        [Route("api/test/validate/{id}")]
+        public IHttpActionResult ValidateOutage([FromUri]long id)
+        {
+            ActiveOutageViewModel initialActiveOutage = new ActiveOutageViewModel
+            {
+                Id = id,
+                DefaultIsolationPoints = new List<long> { 6 },
+                ElementId = 12, // ACLINE segment
+                // breaker iznad i fuse ispod (stavio sam elemente okolo aclinesegmenta), ali front ce raditi sa bilo kojim vasim id-evima
+                // mada ovo nije ni bitno toliko za front ?
+                OptimalIsolationPoints = new List<long> { 6, 14 },
+                State = OutageLifecycleState.Isolated,
+                ReportedAt = DateTime.Now, // ovo nije isto, al test je
+                RepairedAt = DateTime.Now,
+                IsValidated = true  // validiramo ga
+            };
+
+            var outageHubContext = GetOutageHubContext();
+            outageHubContext.Clients.All.activeOutageUpdate(initialActiveOutage);
+
+            return Ok();
+        }
 
         private IHubContext GetOutageHubContext() => GlobalHost.ConnectionManager.GetHubContext<OutageHub>();
     }

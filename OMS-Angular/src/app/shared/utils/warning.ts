@@ -19,7 +19,7 @@ export const drawWarningOnLine = (cy, line) => {
           targetId: line.data('target')
         },
         position: {
-          x: isFirstChild ? target.x - 15 : target.x + 15,
+          x: isFirstChild ? target.x - 25 : target.x + 25,
           y: target.y - 25
         }
       }
@@ -40,7 +40,7 @@ export const drawWarningOnNode = (cy, node) => {
           type: 'warning'
       },
       position: {
-          x: node.position("x") + 50,
+          x: node.position("x") + 60,
           y: node.position("y")
       }
       }

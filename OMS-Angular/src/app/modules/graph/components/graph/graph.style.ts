@@ -36,8 +36,8 @@ export const style = cytoscape.stylesheet()
         'background-opacity': '0',
         'background-fit': 'cover',
         'background-image': 'assets/img/warning.png',
-        'height': '20px',
-        'width': '20px'
+        'height': '35px',
+        'width': '35px'
     })
     .selector('node[type = "analogMeasurement"]')
     .style({
