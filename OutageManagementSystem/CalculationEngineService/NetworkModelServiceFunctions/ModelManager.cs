@@ -122,6 +122,7 @@ namespace NetworkModelServiceFunctions
 				foreach (var measurement in Measurements.Values)
 				{
 					PutMeasurementsInElements(measurement);
+					Provider.Instance.MeasurementProvider.AddMeasurementElementPair(measurement.Id, measurement.ElementId);
 				}
 
 				topologyElements = TopologyElements;

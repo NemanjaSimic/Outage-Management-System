@@ -24,12 +24,12 @@ using AutoResetEvent = System.Threading.AutoResetEvent;
 
 namespace OutageManagementService
 {
-    public class CancelationObject
+    public class CancelationObject 
     {
         public bool CancelationSignal { get; set; }
     }
 
-    public class OutageModel : IDisposable
+    public sealed class OutageModel : IDisposable
     {
         private OutageTopologyModel topologyModel;
 
@@ -39,7 +39,7 @@ namespace OutageManagementService
             {
                 return topologyModel;
             }
-            protected set
+            private set
             {
                 topologyModel = value;
             }
@@ -52,26 +52,36 @@ namespace OutageManagementService
 
         private UnitOfWork dbContext;
         private UnitOfWork transactionDbContext;
+        
         public ConcurrentQueue<long> EmailMsg;
         public List<long> CalledOutages;
         private Dictionary<DeltaOpType, List<long>> modelChanges;
 
-        protected ILogger Logger
+        private ILogger Logger
         {
             get { return logger ?? (logger = LoggerWrapper.Instance); }
         }
 
         public OutageModel()
         {
-            modelResourcesDesc = new ModelResourcesDesc();
             proxyFactory = new ProxyFactory();
             outageMessageMapper = new OutageMessageMapper();
+            modelResourcesDesc = new ModelResourcesDesc();
+
+            dbContext = new UnitOfWork();
 
             CalledOutages = new List<long>();
             EmailMsg = new ConcurrentQueue<long>();
 
             ImportTopologyModel();
         }
+
+        #region IDisposable
+        public void Dispose()
+        {
+            dbContext.Dispose();
+        }
+        #endregion
 
         #region IModelUpdateNotificationContract
         public bool Notify(Dictionary<DeltaOpType, List<long>> modelChanges)
@@ -182,7 +192,7 @@ namespace OutageManagementService
 
             ActiveOutage activeOutageDb = null;
 
-            if (dbContext.ActiveOutageRepository.Find(o => o.OutageElementGid == gid).FirstOrDefault() == null)
+            if (dbContext.ActiveOutageRepository.Find(o => o.OutageElementGid == gid).FirstOrDefault() != null)
             {
                 Logger.LogWarn($"Reported malfunction on element with gid: 0x{gid:x16} has already been reported.");
                 return false;
@@ -350,25 +360,6 @@ namespace OutageManagementService
                 TopologyModel = (OutageTopologyModel)omsTopologyProxy.GetOMSModel();
             }
         }
-
-        //private List<Consumer> GetAffectedConsumersFromDatabase(List<long> affectedConsumersIds, OutageContext db)
-        //{
-        //    List<Consumer> affectedConsumers = new List<Consumer>();
-
-        //    foreach (long affectedConsumerId in affectedConsumersIds)
-        //    {
-        //        Consumer affectedConsumer = db.Consumers.Find(affectedConsumerId);
-
-        //        if (affectedConsumer == null)
-        //        {
-        //            break;
-        //        }
-
-        //        affectedConsumers.Add(affectedConsumer);
-        //    }
-
-        //    return affectedConsumers;
-        //}
 
         private List<Consumer> GetAffectedConsumersFromDatabase(List<long> affectedConsumersIds)
         {
@@ -566,7 +557,7 @@ namespace OutageManagementService
                 List<long> measuremnts = new List<long>();
                 try
                 {
-                    measuremnts = measurementMapProxy.GetMeasurementsForElement(currentBreakerId);
+                    measuremnts = measurementMapProxy.GetMeasurementsOfElement(currentBreakerId);
 
                 }
                 catch (Exception e)
@@ -799,10 +790,5 @@ namespace OutageManagementService
         }
 
         #endregion
-
-        public void Dispose()
-        {
-            dbContext.Dispose();
-        }
     }
 }

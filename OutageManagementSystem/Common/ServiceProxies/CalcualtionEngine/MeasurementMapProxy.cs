@@ -27,11 +27,11 @@ namespace Outage.Common.ServiceProxies.CalcualtionEngine
             }
         }
 
-        public List<long> GetMeasurementsForElement(long elementId)
+        public List<long> GetMeasurementsOfElement(long elementId)
         {
             try
             {
-                return Channel.GetMeasurementsForElement(elementId);
+                return Channel.GetMeasurementsOfElement(elementId);
             }
             catch (Exception ex)
             {
