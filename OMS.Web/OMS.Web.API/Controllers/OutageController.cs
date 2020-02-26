@@ -42,7 +42,7 @@ namespace OMS.Web.API.Controllers
             {
                 _ = await _mediator.Send(new IsolateOutageCommand(gid));
             }
-            catch (Exception)
+            catch (Exception e)
             {
                 return InternalServerError();
             }
@@ -58,7 +58,7 @@ namespace OMS.Web.API.Controllers
             {
                 _ = await _mediator.Send(new SendOutageLocationIsolationCrewCommand(gid));
             }
-            catch (Exception)
+            catch (Exception e)
             {
                 return InternalServerError();
             }

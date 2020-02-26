@@ -155,7 +155,8 @@ namespace Topology
                                 DmsType = element.DmsType,
                                 IsRemote = element.IsRemote,
                                 IsActive = element.IsActive,
-                                SecondEnd = new List<long>(secondEnd)
+                                SecondEnd = new List<long>(secondEnd),
+                                NoReclosing = element.NoReclosing,
                             });
                     }
                 }
