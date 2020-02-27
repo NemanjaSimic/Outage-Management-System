@@ -60,8 +60,8 @@ namespace OMS.Web.API
 
             // We register our mediatr commands here (concrete, not abstract)
             container.RegisterMediator();
-            container.RegisterMediatorHandlers(Assembly.GetAssembly(typeof(TurnOffSwitchCommand)));
-            container.RegisterMediatorHandlers(Assembly.GetAssembly(typeof(TurnOnSwitchCommand)));
+            container.RegisterMediatorHandlers(Assembly.GetAssembly(typeof(OpenSwitchCommand)));
+            container.RegisterMediatorHandlers(Assembly.GetAssembly(typeof(CloseSwitchCommand)));
             container.RegisterMediatorHandlers(Assembly.GetAssembly(typeof(GetTopologyQuery)));
             container.RegisterMediatorHandlers(Assembly.GetAssembly(typeof(GetActiveOutagesQuery)));
             container.RegisterMediatorHandlers(Assembly.GetAssembly(typeof(GetArchivedOutagesQuery)));

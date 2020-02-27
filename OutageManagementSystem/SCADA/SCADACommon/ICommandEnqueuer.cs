@@ -8,12 +8,12 @@ namespace Outage.SCADA.SCADACommon
 {
     public interface IReadCommandEnqueuer
     {
-        bool EnqueueReadCommand(IModbusFunction modbusFunction);
+        bool EnqueueReadCommand(IReadModbusFunction modbusFunction);
     }
 
     public interface IWriteCommandEnqueuer
     {
-        bool EnqueueWriteCommand(IModbusFunction modbusFunction);
+        bool EnqueueWriteCommand(IWriteModbusFunction modbusFunction);
     }
 
     public interface IModelUpdateCommandEnqueuer
