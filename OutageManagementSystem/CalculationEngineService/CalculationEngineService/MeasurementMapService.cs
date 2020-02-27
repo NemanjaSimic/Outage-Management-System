@@ -21,11 +21,11 @@ namespace CalculationEngineService
             }
         }
 
-        public List<long> GetMeasurementsForElement(long elementId)
+        public List<long> GetMeasurementsOfElement(long elementId)
         {
             try
             {
-                return Provider.Instance.MeasurementProvider.GetMeasurementsForElement(elementId);
+                return Provider.Instance.MeasurementProvider.GetMeasurementsOfElement(elementId);
             }
             catch (Exception ex)
             {
