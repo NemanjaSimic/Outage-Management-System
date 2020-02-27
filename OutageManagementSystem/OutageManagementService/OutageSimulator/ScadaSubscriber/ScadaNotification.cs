@@ -249,7 +249,7 @@ namespace OMS.OutageSimulator.ScadaSubscriber
                     if(isolationPoints[gid].Value != (ushort)DiscreteCommandingType.OPEN)
                     {
                         //TODO: COMMANDING ENUM u COMMON
-                        proxy.SendDiscreteCommand(gid, (ushort)DiscreteCommandingType.OPEN);
+                        proxy.SendDiscreteCommand(gid, (ushort)DiscreteCommandingType.OPEN, CommandOriginType.OUTAGE_SIMULATOR);
                     }
                 }
             }

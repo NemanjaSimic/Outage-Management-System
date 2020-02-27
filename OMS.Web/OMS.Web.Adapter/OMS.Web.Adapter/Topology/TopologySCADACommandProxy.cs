@@ -2,6 +2,7 @@
 
 namespace OMS.Web.Adapter.Topology
 {
+    using global::Outage.Common;
     using OMS.Web.Adapter.Contracts;
     using System;
     using System.ServiceModel;
@@ -23,7 +24,7 @@ namespace OMS.Web.Adapter.Topology
 
         public void SendCommand(long guid, int value)
         {
-            proxy.SendDiscreteCommand(guid, (ushort)value);
+            proxy.SendDiscreteCommand(guid, (ushort)value, CommandOriginType.USER_COMMAND);
         }
     }
 }

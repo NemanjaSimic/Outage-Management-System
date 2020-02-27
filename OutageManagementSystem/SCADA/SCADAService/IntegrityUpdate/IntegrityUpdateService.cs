@@ -44,20 +44,33 @@ namespace Outage.SCADA.SCADAService.IntegrityUpdate
             }
 
             var currentScadaModel = IntegrityUpdateService.scadaModel.CurrentScadaModel;
+            var commandValuesCache = IntegrityUpdateService.scadaModel.CommandedValuesCache;
 
             Dictionary<long, AnalogModbusData> analogModbusData = new Dictionary<long, AnalogModbusData>();
             Dictionary<long, DiscreteModbusData> discreteModbusData = new Dictionary<long, DiscreteModbusData>();
 
             foreach(long gid in currentScadaModel.Keys)
             {
-                if(currentScadaModel[gid] is AnalogSCADAModelPointItem analogPointItem)
+                CommandOriginType commandOrigin = CommandOriginType.OTHER_COMMAND;
+
+                if (currentScadaModel[gid] is AnalogSCADAModelPointItem analogPointItem)
                 {
-                    AnalogModbusData analogValue = new AnalogModbusData(analogPointItem.CurrentEguValue, analogPointItem.Alarm);
+                    if (commandValuesCache.ContainsKey(gid) && commandValuesCache[gid].Value == analogPointItem.CurrentRawValue)
+                    {
+                        commandOrigin = commandValuesCache[gid].CommandOrigin;
+                    }
+
+                    AnalogModbusData analogValue = new AnalogModbusData(analogPointItem.CurrentEguValue, analogPointItem.Alarm, gid, commandOrigin);
                     analogModbusData.Add(gid, analogValue);
                 }
                 else if(currentScadaModel[gid] is DiscreteSCADAModelPointItem discretePointItem)
                 {
-                    DiscreteModbusData discreteValue = new DiscreteModbusData(discretePointItem.CurrentValue, discretePointItem.Alarm);
+                    if (commandValuesCache.ContainsKey(gid) && commandValuesCache[gid].Value == discretePointItem.CurrentValue)
+                    {
+                        commandOrigin = commandValuesCache[gid].CommandOrigin;
+                    }
+
+                    DiscreteModbusData discreteValue = new DiscreteModbusData(discretePointItem.CurrentValue, discretePointItem.Alarm, gid, commandOrigin);
                     discreteModbusData.Add(gid, discreteValue);
                 }
             }
@@ -87,21 +100,35 @@ namespace Outage.SCADA.SCADAService.IntegrityUpdate
             }
 
             SCADAPublication scadaPublication;
+
             var currentScadaModel = IntegrityUpdateService.scadaModel.CurrentScadaModel;
+            var commandValuesCache = IntegrityUpdateService.scadaModel.CommandedValuesCache;
 
             Dictionary<long, AnalogModbusData> analogModbusData = new Dictionary<long, AnalogModbusData>();
             Dictionary<long, DiscreteModbusData> discreteModbusData = new Dictionary<long, DiscreteModbusData>();
 
             foreach (long gid in currentScadaModel.Keys)
             {
+                CommandOriginType commandOrigin = CommandOriginType.OTHER_COMMAND;
+
                 if (topic == Topic.MEASUREMENT && currentScadaModel[gid] is AnalogSCADAModelPointItem analogPointItem)
                 {
-                    AnalogModbusData analogValue = new AnalogModbusData(analogPointItem.CurrentEguValue, analogPointItem.Alarm);
+                    if (commandValuesCache.ContainsKey(gid) && commandValuesCache[gid].Value == analogPointItem.CurrentRawValue)
+                    {
+                        commandOrigin = commandValuesCache[gid].CommandOrigin;
+                    }
+
+                    AnalogModbusData analogValue = new AnalogModbusData(analogPointItem.CurrentEguValue, analogPointItem.Alarm, gid, commandOrigin);
                     analogModbusData.Add(gid, analogValue);
                 }
                 else if (topic == Topic.SWITCH_STATUS && currentScadaModel[gid] is DiscreteSCADAModelPointItem discretePointItem)
                 {
-                    DiscreteModbusData discreteValue = new DiscreteModbusData(discretePointItem.CurrentValue, discretePointItem.Alarm);
+                    if (commandValuesCache.ContainsKey(gid) && commandValuesCache[gid].Value == discretePointItem.CurrentValue)
+                    {
+                        commandOrigin = commandValuesCache[gid].CommandOrigin;
+                    }
+
+                    DiscreteModbusData discreteValue = new DiscreteModbusData(discretePointItem.CurrentValue, discretePointItem.Alarm, gid, commandOrigin);
                     discreteModbusData.Add(gid, discreteValue);
                 }
             }
