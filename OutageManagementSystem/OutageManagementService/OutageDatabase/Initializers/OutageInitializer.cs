@@ -22,10 +22,12 @@ namespace OutageDatabase.Initializers
         {
             base.Seed(context);
 
+            UnitOfWork dbContext = new UnitOfWork(outageContext);
 
             //TODO: rethink
             context.DeleteAllData();
 
+            
             ArchivedOutage archivedOutage;
 
             long archivedId = 1;
@@ -45,8 +47,21 @@ namespace OutageDatabase.Initializers
                 archivedOutage = context.ArchivedOutages.Add(archivedOutage);
             }
 
-
-            context.SaveChanges();
+            try
+            {
+                dbContext.Complete();
+            }
+            catch (Exception e)
+            {
+                string message = "OutageInitializer::Seed method => exception on Complete()";
+                Logger.LogError(message, e);
+                Console.WriteLine($"{message}, Message: {e.Message})");
+            }
+            //finally
+            //{
+            //    //dbContext.Dispose();
+            //    //exception thrown if dispose is called...
+            //}
         }
     }
 }

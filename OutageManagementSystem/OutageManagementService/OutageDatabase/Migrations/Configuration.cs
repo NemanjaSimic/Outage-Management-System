@@ -12,34 +12,53 @@
         public Configuration()
         {
             AutomaticMigrationsEnabled = false;
+            
         }
 
-        protected override void Seed(OutageContext context)
-        {
-            ArchivedOutage archivedOutage;
+        //protected override void Seed(OutageContext otageContext)
+        //{
+        //    UnitOfWork dbContext = new UnitOfWork(otageContext);
 
-            long archivedId = 1;
-            archivedOutage = context.ArchivedOutages.Find(archivedId);
+        //    ArchivedOutage archivedOutage;
 
-            if (archivedOutage == null)
-            {
-                archivedOutage = new ArchivedOutage()
-                {
-                    OutageId = archivedId,
-                    OutageElementGid = 0x0000000a00000007,
-                    ReportTime = DateTime.Now,
-                    AffectedConsumers = new List<Consumer>(),
-                    ArchiveTime = DateTime.Now,
-                };
+        //    long archivedId = 1;
+        //    archivedOutage = dbContext.ArchivedOutageRepository.Get(archivedId);
 
-                archivedOutage = context.ArchivedOutages.Add(archivedOutage);
-            }
+        //    if (archivedOutage == null)
+        //    {
+        //        archivedOutage = new ArchivedOutage()
+        //        {
+        //            OutageId = archivedId,
+        //            OutageElementGid = 0x0000000a00000007,
+        //            ReportTime = DateTime.UtcNow,
+        //            IsolatedTime = DateTime.UtcNow,
+        //            ResolvedTime = DateTime.UtcNow,
+        //            ArchiveTime = DateTime.UtcNow,
+        //            DefaultIsolationPoints = string.Empty,
+        //            OptimumIsolationPoints = string.Empty,
+        //            AffectedConsumers = new List<Consumer>(),
+        //        };
 
+        //        archivedOutage = dbContext.ArchivedOutageRepository.Add(archivedOutage);
+        //    }
 
-            context.SaveChanges();
+        //    dbContext.ConsumerRepository.RemoveAll();
+        //    dbContext.ActiveOutageRepository.RemoveAll();
 
-            context.DeleteAllData();
-            //context.Dispose();
-        }
+        //    try
+        //    {
+        //        dbContext.Complete();
+        //    }
+        //    catch (Exception e)
+        //    {
+        //        string message = "Configuration::Seed method => exception on Complete()";
+        //        Logger.LogError(message, e);
+        //        Console.WriteLine($"{message}, Message: {e.Message})");
+        //    }
+        //    finally
+        //    {
+        //        //dbContext.Dispose();
+        //    }
+        //}
     }
 }
