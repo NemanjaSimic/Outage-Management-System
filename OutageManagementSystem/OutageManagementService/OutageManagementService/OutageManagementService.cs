@@ -1,6 +1,6 @@
-﻿using Outage.Common;
+﻿using OMSCommon.OutageDatabaseModel;
+using Outage.Common;
 using Outage.Common.GDA;
-using Outage.Common.PubSub.OutageDataContract;
 using Outage.Common.ServiceContracts.GDA;
 using Outage.Common.ServiceContracts.PubSub;
 using Outage.Common.ServiceProxies;
@@ -11,11 +11,8 @@ using OutageManagementService.DistribuedTransaction;
 using OutageManagementService.Outage;
 using System;
 using System.Collections.Generic;
-using System.Linq;
 using System.ServiceModel;
 using System.Text;
-using System.Threading;
-using System.Threading.Tasks;
 
 namespace OutageManagementService
 {
@@ -155,14 +152,18 @@ namespace OutageManagementService
         {
             List<ResourceDescription> energyConsumers = GetExtentValues(ModelCode.ENERGYCONSUMER, modelResourcesDesc.GetAllPropertyIds(ModelCode.ENERGYCONSUMER));
 
-            int i = 0;
+            int i = 0; //TODO: delete, for first/last name placeholder
+
             foreach(ResourceDescription energyConsumer in energyConsumers)
             {
-                Consumer consumer = new Consumer();
-                consumer.ConsumerId = energyConsumer.GetProperty(ModelCode.IDOBJ_GID).AsLong();
-                consumer.ConsumerMRID = energyConsumer.GetProperty(ModelCode.IDOBJ_MRID).AsString();
-                consumer.FirstName = $"FirstName{i}";
-                consumer.LastName = $"LastName{i}";
+                Consumer consumer = new Consumer
+                {
+                    ConsumerId = energyConsumer.GetProperty(ModelCode.IDOBJ_GID).AsLong(),
+                    ConsumerMRID = energyConsumer.GetProperty(ModelCode.IDOBJ_MRID).AsString(),
+                    FirstName = $"FirstName{i}", //TODO: energyConsumer.GetProperty(ModelCode.ENERGYCONSUMER_FIRSTNAME).AsString(); 
+                    LastName = $"LastName{i}"   //TODO: energyConsumer.GetProperty(ModelCode.ENERGYCONSUMER_LASTNAME).AsString();
+                };
+
                 i++;
 
                 db.Consumers.Add(consumer);

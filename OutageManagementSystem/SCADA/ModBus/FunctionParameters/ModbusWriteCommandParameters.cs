@@ -1,6 +1,8 @@
-﻿namespace Outage.SCADA.ModBus.FunctionParameters
+﻿using Outage.SCADA.SCADACommon.FunctionParameters;
+
+namespace Outage.SCADA.ModBus.FunctionParameters
 {
-    public class ModbusWriteCommandParameters : ModbusCommandParameters
+    public class ModbusWriteCommandParameters : ModbusCommandParameters, IModbusWriteCommandParameters
     {
         private ushort outputAddress;
         private int value;

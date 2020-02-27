@@ -11,6 +11,8 @@ namespace Outage.SCADA.SCADAData.Repository
 {
     public class DiscreteSCADAModelPointItem : SCADAModelPointItem, IDiscreteSCADAModelPointItem
     {
+        private ushort currentValue;
+
         public DiscreteSCADAModelPointItem()
             : base()
         {
@@ -51,11 +53,19 @@ namespace Outage.SCADA.SCADAData.Repository
         public ushort MinValue { get; set; }
         public ushort MaxValue { get; set; }
         public ushort NormalValue { get; set; }
-        public ushort CurrentValue { get; set; }
+        public ushort CurrentValue 
+        {
+            get { return currentValue; }
+            set
+            {
+                currentValue = value;
+                SetAlarms();
+            }
+        }
         public ushort AbnormalValue { get; set; }
         public DiscreteMeasurementType DiscreteType { get; set; }
 
-        public override bool SetAlarms()
+        protected override bool SetAlarms()
         {
             bool alarmChanged = false;
             AlarmType currentAlarm = Alarm;

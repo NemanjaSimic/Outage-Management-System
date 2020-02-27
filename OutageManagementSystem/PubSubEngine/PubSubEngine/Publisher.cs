@@ -10,7 +10,7 @@ namespace PubSubEngine
     [ServiceBehavior(InstanceContextMode = InstanceContextMode.Single, ConcurrencyMode = ConcurrencyMode.Multiple)]
     internal class Publisher : IPublisher
     {
-        public void Publish(IPublication publication)
+        public void Publish(IPublication publication, string publisherName)
         {
             ILogger logger = LoggerWrapper.Instance;
 
@@ -25,7 +25,7 @@ namespace PubSubEngine
                     {
                         string subscriberName = subscriber.GetSubscriberName();
                         Subscribers.Instance.PublishMessage(subscriber, publication.Message);
-                        logger.LogInfo($"Publication [Topic: {publication.Topic}] SUCCESSFULLY published to Subscriber [{subscriberName}]");
+                        logger.LogInfo($"Publication [Topic: {publication.Topic}, Publisher:{publisherName}] SUCCESSFULLY published to Subscriber [{subscriberName}]");
                     }
                     catch (Exception e)
                     {

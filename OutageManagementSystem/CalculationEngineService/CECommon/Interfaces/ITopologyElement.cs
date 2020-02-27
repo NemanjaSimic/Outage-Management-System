@@ -1,8 +1,4 @@
-﻿using System;
-using System.Collections.Generic;
-using System.Linq;
-using System.Text;
-using System.Threading.Tasks;
+﻿using System.Collections.Generic;
 
 namespace CECommon.Interfaces
 {
@@ -19,5 +15,6 @@ namespace CECommon.Interfaces
         bool IsActive { get; set; }
         float NominalVoltage { get; set; }
         List<long> Measurements { get; set; }
+        bool NoReclosing { get; set; }
     }
 }

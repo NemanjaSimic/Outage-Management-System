@@ -24,8 +24,7 @@ export class OutageService {
   }
 
   sendIsolateOutageCommand(id: Number) : Observable<any>{
-    // return this.http.post(`${this.envService.apiUrl}/outage/isolate/${id}`, {});
-    return this.http.post(`${this.envService.apiUrl}/test/isolate/${id}`, {});
+    return this.http.post(`${this.envService.apiUrl}/outage/isolate/${id}`, {});
   }
 
   sendLocationIsolationCrewCommand(id: Number) : Observable<any>{

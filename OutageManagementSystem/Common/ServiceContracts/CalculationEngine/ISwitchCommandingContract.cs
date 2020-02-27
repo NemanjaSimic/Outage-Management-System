@@ -1,24 +1,21 @@
 ﻿using System;
-using System.Collections.Generic;
-using System.Linq;
 using System.ServiceModel;
-using System.Text;
-using System.Threading.Tasks;
 
 namespace Outage.Common.ServiceContracts.CalculationEngine
 {
     [ServiceContract]
     public interface ISwitchStatusCommandingContract
     {
+        //TERMINOLOGY: using 'gid' because UI can send gid of either element (for noSCADA commanding) or measurement (for SCADA commanding)
+
         [OperationContract]
-        void SendCommand(long guid, int value);
+        [Obsolete("Use SendOpenCommand and SendCloseCommand methods instead")]
+        void SendSwitchCommand(long gid, int value);
 
-        //TOOD:
-        //[OperationContract]
-        //void SendOpenCommand(long guid);
+        [OperationContract]
+        void SendOpenCommand(long gid);
 
-        //TOOD:
-        //[OperationContract]
-        //void SendCloseCommand(long guid);
+        [OperationContract]
+        void SendCloseCommand(long gid);
     }
 }

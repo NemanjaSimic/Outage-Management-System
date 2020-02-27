@@ -6,9 +6,11 @@ export interface Outage {
     AffectedConsumers: Number[];
     IsolatedAt: Date;
     FixedAt: Date;
+    RepairedAt: Date;
 }
 
 export interface ActiveOutage extends Outage {
+    IsValidated: Boolean;
     State: OutageLifeCycleState;
     DefaultIsolationPoints: Number[];
     OptimalIsolationPoints: Number[];

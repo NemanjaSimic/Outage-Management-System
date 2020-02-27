@@ -27,13 +27,13 @@ namespace Outage.SCADA.ModBus
         #endregion
 
 
-        public static ModbusFunction CreateModbusFunction(ModbusCommandParameters commandParameters)
+        public static IReadModbusFunction CreateReadModbusFunction(ModbusReadCommandParameters commandParameters)
         {
-            ModbusFunction modbusFunction;
+            IReadModbusFunction modbusFunction;
 
             if(FunctionFactory.scadaModel == null)
             {
-                string message = $"CreateModbusFunction => SCADA model is null.";
+                string message = $"CreateReadModbusFunction => SCADA model is null.";
                 LoggerWrapper.Instance.LogError(message);
                 //TODO: InternalSCADAServiceException
                 throw new Exception(message);
@@ -57,16 +57,42 @@ namespace Outage.SCADA.ModBus
                     modbusFunction = new ReadHoldingRegistersFunction(commandParameters, FunctionFactory.scadaModel);
                     break;
 
+                default:
+                    modbusFunction = null;
+                    string message = $"CreateReadModbusFunction => Wrong function code {(ModbusFunctionCode)commandParameters.FunctionCode}.";
+                    LoggerWrapper.Instance.LogError(message);
+                    break;
+            }
+
+            return modbusFunction;
+        }
+
+        public static IWriteModbusFunction CreateWriteModbusFunction(ModbusWriteCommandParameters commandParameters, CommandOriginType commandOrigin)
+        {
+            IWriteModbusFunction modbusFunction;
+
+            if (FunctionFactory.scadaModel == null)
+            {
+                string message = $"CreateWriteModbusFunction => SCADA model is null.";
+                LoggerWrapper.Instance.LogError(message);
+                //TODO: InternalSCADAServiceException
+                throw new Exception(message);
+            }
+
+            switch ((ModbusFunctionCode)commandParameters.FunctionCode)
+            {
                 case ModbusFunctionCode.WRITE_SINGLE_COIL:
-                    modbusFunction = new WriteSingleCoilFunction(commandParameters);
+                    modbusFunction = new WriteSingleCoilFunction(commandParameters, commandOrigin);
                     break;
 
                 case ModbusFunctionCode.WRITE_SINGLE_REGISTER:
-                    modbusFunction = new WriteSingleRegisterFunction(commandParameters);
+                    modbusFunction = new WriteSingleRegisterFunction(commandParameters, commandOrigin);
                     break;
 
                 default:
                     modbusFunction = null;
+                    string message = $"CreateWriteModbusFunction => Wrong function code {(ModbusFunctionCode)commandParameters.FunctionCode}.";
+                    LoggerWrapper.Instance.LogError(message);
                     break;
             }
 

@@ -42,7 +42,7 @@ namespace OMS.Web.API.Controllers
             {
                 _ = await _mediator.Send(new IsolateOutageCommand(id));
             }
-            catch (Exception)
+            catch (Exception e)
             {
                 return InternalServerError();
             }

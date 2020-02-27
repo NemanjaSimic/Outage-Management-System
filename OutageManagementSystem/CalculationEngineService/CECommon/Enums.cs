@@ -26,10 +26,4 @@ namespace CECommon
 		InTransaction = 1,
 		NoTransaction
 	}
-
-	public enum MeasurementType
-	{
-		Analog = 1,
-		Discrete
-	}
 }

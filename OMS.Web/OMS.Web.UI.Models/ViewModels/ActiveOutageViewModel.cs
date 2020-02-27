@@ -4,6 +4,7 @@
 
     public class ActiveOutageViewModel : OutageViewModel
     {
+        public bool IsValidated { get; set; }
         public OutageLifecycleState State { get; set; }
         public IEnumerable<long> DefaultIsolationPoints { get; set; }
         public IEnumerable<long> OptimalIsolationPoints { get; set; }

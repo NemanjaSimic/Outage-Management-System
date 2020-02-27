@@ -6,10 +6,10 @@
 
     public interface IOutageMapper
     {
-        IEnumerable<ActiveOutageViewModel> MapActiveOutages(IEnumerable<ActiveOutage> outages);
-        IEnumerable<ArchivedOutageViewModel> MapArchivedOutages(IEnumerable<ArchivedOutage> outages);
+        IEnumerable<ActiveOutageViewModel> MapActiveOutages(IEnumerable<ActiveOutageMessage> outages);
+        IEnumerable<ArchivedOutageViewModel> MapArchivedOutages(IEnumerable<ArchivedOutageMessage> outages);
         
-        ActiveOutageViewModel MapActiveOutage(ActiveOutage outage);
-        ArchivedOutageViewModel MapArchivedOutage(ArchivedOutage outage);
+        ActiveOutageViewModel MapActiveOutage(ActiveOutageMessage outage);
+        ArchivedOutageViewModel MapArchivedOutage(ArchivedOutageMessage outage);
     }
 }

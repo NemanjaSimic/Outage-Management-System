@@ -14,8 +14,8 @@
         private readonly Dictionary<SwitchCommandType, Func<long, SwitchCommandBase>> switchCommandMap =
             new Dictionary<SwitchCommandType, Func<long, SwitchCommandBase>>
             {
-                { SwitchCommandType.TURN_OFF, (long gid) => new TurnOffSwitchCommand(gid) },
-                { SwitchCommandType.TURN_ON, (long gid) => new TurnOnSwitchCommand(gid) }
+                { SwitchCommandType.OPEN, (long gid) => new OpenSwitchCommand(gid) },
+                { SwitchCommandType.CLOSE, (long gid) => new CloseSwitchCommand(gid) }
             };
 
         public ScadaController(IMediator mediator)

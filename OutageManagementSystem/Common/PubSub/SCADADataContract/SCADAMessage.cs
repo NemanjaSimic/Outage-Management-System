@@ -15,21 +15,13 @@ namespace Outage.Common.PubSub.SCADADataContract
     [DataContract]
     public class SingleAnalogValueSCADAMessage : SCADAMessage
     {
-        public SingleAnalogValueSCADAMessage(long gid, float value, AlarmType alarm)
+        public SingleAnalogValueSCADAMessage(AnalogModbusData analogModbusData)
         {
-            Gid = gid;
-            Value = value;
-            Alarm = alarm;
+            AnalogModbusData = analogModbusData;
         }
 
         [DataMember]
-        public long Gid { get; private set; }
-
-        [DataMember]
-        public float Value { get; private set; }
-
-        [DataMember]
-        public AlarmType Alarm { get; private set; }
+        public AnalogModbusData AnalogModbusData { get; private set; }
     }
 
     [DataContract]
@@ -47,19 +39,13 @@ namespace Outage.Common.PubSub.SCADADataContract
     [DataContract]
     public class SingleDiscreteValueSCADAMessage : SCADAMessage
     {
-        public SingleDiscreteValueSCADAMessage(long gid, ushort value, AlarmType alarm)
+        public SingleDiscreteValueSCADAMessage(DiscreteModbusData discreteModbusData)
         {
-            Gid = gid;
-            Value = value;
-            Alarm = alarm;
+            DiscreteModbusData = discreteModbusData;
         }
 
-        public long Gid { get; private set; }
-
-        public ushort Value { get; private set; }
-
         [DataMember]
-        public AlarmType Alarm { get; private set; }
+        public DiscreteModbusData DiscreteModbusData { get; private set; }
     }
 
     [DataContract]
