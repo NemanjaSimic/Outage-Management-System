@@ -4,6 +4,8 @@ export interface Outage {
     State: OutageLifeCycleState;
     ReportedAt: Date;
     AffectedConsumers: Number[];
+    IsolatedAt: Date;
+    FixedAt: Date;
 }
 
 export interface ActiveOutage extends Outage {
