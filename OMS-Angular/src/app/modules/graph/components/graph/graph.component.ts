@@ -183,10 +183,6 @@ export class GraphComponent implements OnInit, OnDestroy {
             (data: ArchivedOutage) => this.onArchivedOutageNotification(data),
             err => console.log(err));
 
-          this.outageService.getInitialOutage().subscribe(
-            data => console.log(data),
-            err => console.log(err)
-          );
         }
         else {
           console.log('Could not connect to Outage Notification service');
@@ -323,21 +319,28 @@ export class GraphComponent implements OnInit, OnDestroy {
   }
 
   public addOutageTooltips(): void {
+    console.log(this.activeOutages);
     for (const activeOutage of this.activeOutages) {
       let outageElement;
 
       if (activeOutage.State == OutageLifeCycleState.Created)
-        outageElement = this.cy.nodes().filter(node => node.data('id') == activeOutage.DefaultIsolationPoints[0].toString())[0];
+        if(activeOutage.DefaultIsolationPoints.length)
+          outageElement = this.cy.nodes().filter(node => node.data('id') == activeOutage.DefaultIsolationPoints[0].toString())[0];
+        else
+        outageElement = undefined; //hhmmm
       else if (activeOutage.State == OutageLifeCycleState.Isolated)
         outageElement = this.cy.nodes().filter(node => node.data('id') == activeOutage.ElementId)[0];
 
-      const outageNodeId = drawWarningOnNode(this.cy, outageElement);
-      const outageNode = this.cy.nodes().filter(node => node.data('id') == outageNodeId)[0];
-      outageNode.sendIsolateOutageCommand = (id) => this.onIsolateOutageCommand(id);
-      outageNode.sendRepairCrewCommand = (id) => this.onSendCrewOutageCommand(id);
-      outageNode.sendValidateOutageCommand = (id) => this.onValidateOutageCommand(id);
-      outageNode.sendResolveOutageCommand = (id) => this.onResolveOutageCommand(id);
-      addOutageTooltip(this.cy, outageNode, activeOutage);
+        if(outageElement){
+          const outageNodeId = drawWarningOnNode(this.cy, outageElement);
+          const outageNode = this.cy.nodes().filter(node => node.data('id') == outageNodeId)[0];
+          outageNode.sendIsolateOutageCommand = (id) => this.onIsolateOutageCommand(id);
+          outageNode.sendRepairCrewCommand = (id) => this.onSendCrewOutageCommand(id);
+          outageNode.sendValidateOutageCommand = (id) => this.onValidateOutageCommand(id);
+          outageNode.sendResolveOutageCommand = (id) => this.onResolveOutageCommand(id);
+          addOutageTooltip(this.cy, outageNode, activeOutage);
+        }
+      
     }
   }
 

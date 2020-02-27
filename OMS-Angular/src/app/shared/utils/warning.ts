@@ -1,6 +1,8 @@
 import uuid from 'uuid';
 
 export const drawWarningOnLine = (cy, line) => {
+  if(!line) return;
+
   const id = uuid();
   
   if (line.data('color') == 'red') {
@@ -30,6 +32,8 @@ export const drawWarningOnLine = (cy, line) => {
 }
 
 export const drawWarningOnNode = (cy, node) => {
+  if(!node) return;
+
   const id = uuid();
 
   cy.add([
