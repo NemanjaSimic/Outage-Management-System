@@ -79,15 +79,11 @@ const createTooltipContent =  (node) => {
 
     const meas = node.data('measurements');
     if (meas.length > 0) {
-      if (node.data('dmsType') == "BREAKER" && meas[0].Value == 0)
+      if (meas[0].Value == 0) {
         button.innerHTML = 'Open';
-      else if (node.data('dmsType') == "BREAKER" && meas[0].Value != 0)
-        button.innerHTML = 'Close';
-      else if (meas[0].Value == 0) {
-        button.innerHTML = 'Switch off';
       }
       else {
-        button.innerHTML = 'Switch on';
+        button.innerHTML = 'Close';
       }
 
       button.addEventListener('click', () => {

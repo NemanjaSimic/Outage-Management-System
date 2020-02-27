@@ -13,6 +13,7 @@ using Outage.Common.ServiceProxies;
 using Outage.Common.ServiceProxies.CalcualtionEngine;
 using Outage.Common.ServiceProxies.PubSub;
 using OutageDatabase;
+using OutageDatabase.Repository;
 using OutageManagementService.ScadaSubscriber;
 using System;
 using System.Collections.Concurrent;
@@ -23,12 +24,12 @@ using AutoResetEvent = System.Threading.AutoResetEvent;
 
 namespace OutageManagementService
 {
-    public class CancelationObject
+    public class CancelationObject 
     {
         public bool CancelationSignal { get; set; }
     }
 
-    public class OutageModel
+    public sealed class OutageModel : IDisposable
     {
         private OutageTopologyModel topologyModel;
 
@@ -38,42 +39,55 @@ namespace OutageManagementService
             {
                 return topologyModel;
             }
-            protected set
+            private set
             {
                 topologyModel = value;
             }
         }
 
         private ILogger logger;
-        private ProxyFactory proxyFactory;
-        private OutageMessageMapper outageMessageMapper;
 
-        public ConcurrentQueue<long> EmailMsg;
-        public List<long> CalledOutages;
-        private Dictionary<DeltaOpType, List<long>> modelChanges;
-        private ModelResourcesDesc modelResourcesDesc;
-        private OutageContext transactionOutageContext;
-        private HashSet<long> commandedElements;
-        private HashSet<long> optimumIsolationPoints;
-
-        protected ILogger Logger
+        private ILogger Logger
         {
             get { return logger ?? (logger = LoggerWrapper.Instance); }
         }
 
+        private ProxyFactory proxyFactory;
+        private OutageMessageMapper outageMessageMapper;
+        private ModelResourcesDesc modelResourcesDesc;
+
+        private UnitOfWork dbContext;
+        private UnitOfWork transactionDbContext;
+        
+        private HashSet<long> commandedElements;
+        private HashSet<long> optimumIsolationPoints;
+        private Dictionary<DeltaOpType, List<long>> modelChanges;
+        
+        public List<long> CalledOutages;
+        public ConcurrentQueue<long> EmailMsg;
+
         public OutageModel()
         {
-            modelResourcesDesc = new ModelResourcesDesc();
             proxyFactory = new ProxyFactory();
             commandedElements = new HashSet<long>();
             optimumIsolationPoints = new HashSet<long>();
             outageMessageMapper = new OutageMessageMapper();
+            modelResourcesDesc = new ModelResourcesDesc();
+
+            dbContext = new UnitOfWork();
 
             CalledOutages = new List<long>();
             EmailMsg = new ConcurrentQueue<long>();
 
             ImportTopologyModel();
         }
+
+        #region IDisposable
+        public void Dispose()
+        {
+            dbContext.Dispose();
+        }
+        #endregion
 
         #region IModelUpdateNotificationContract
         public bool Notify(Dictionary<DeltaOpType, List<long>> modelChanges)
@@ -88,16 +102,16 @@ namespace OutageManagementService
         public bool Prepare()
         {
             bool success = false;
-            transactionOutageContext = new OutageContext();
+            transactionDbContext = new UnitOfWork();
             Dictionary<long, ResourceDescription> resourceDescriptions = GetExtentValues(ModelCode.ENERGYCONSUMER, modelResourcesDesc.GetAllPropertyIds(ModelCode.ENERGYCONSUMER));
 
-            List<Consumer> consumersInDb = transactionOutageContext.Consumers.ToList();
+            List<Consumer> consumersInDb = transactionDbContext.ConsumerRepository.GetAll().ToList();
 
             foreach(Consumer consumer in consumersInDb)
             {
                 if (modelChanges[DeltaOpType.Delete].Contains(consumer.ConsumerId))
                 {
-                    transactionOutageContext.Consumers.Remove(consumer);
+                    transactionDbContext.ConsumerRepository.Remove(consumer);
                 }
                 else if (modelChanges[DeltaOpType.Update].Contains(consumer.ConsumerId))
                 {
@@ -123,7 +137,7 @@ namespace OutageManagementService
                             LastName = "Consumer" //TODO: resourceDescription.GetProperty(ModelCode.ENERGYCONSUMER_LASTNAME).AsString() other prop, when added in model
                         };
 
-                        transactionOutageContext.Consumers.Add(consumer);
+                        transactionDbContext.ConsumerRepository.Add(consumer);
                     }
                     else
                     {
@@ -140,15 +154,27 @@ namespace OutageManagementService
 
         public void Commit()
         {
-            transactionOutageContext.SaveChanges();
-            transactionOutageContext.Dispose();
-            transactionOutageContext = null;
+            try
+            {
+                transactionDbContext.Complete();
+            }
+            catch (Exception e)
+            {
+                string message = "OutageModel::Commit method => exception on Complete()";
+                Logger.LogError(message, e);
+                Console.WriteLine($"{message}, Message: {e.Message})");
+            }
+            finally
+            {
+                transactionDbContext.Dispose();
+                transactionDbContext = null;
+            }
         }
 
         public void Rollback()
         {
-            transactionOutageContext.Dispose();
-            transactionOutageContext = null;
+            transactionDbContext.Dispose();
+            transactionDbContext = null;
             modelChanges = null;
         }
         #endregion
@@ -175,79 +201,93 @@ namespace OutageManagementService
 
             affectedConsumersIds = GetAffectedConsumers(gid);
 
-            if (affectedConsumersIds.Count > 0)
+            if (affectedConsumersIds.Count == 0)
             {
-                ActiveOutage activeOutage = null;
-                using (OutageContext db = new OutageContext())
-                {
-                    try
-                    {
-                        if (db.GetActiveOutage(gid) == null)
-                        {
-                            long recloserId;
-                            try
-                            {
-                                recloserId = GetRecloserForHeadBreaker(gid);
-                            }
-                            catch (Exception e)
-                            {
-                                throw e;
-                            }
+                Logger.LogInfo("There is no affected consumers => outage report is not valid.");
+                return false;
+            }
 
-                            string defaultIsolationEndpoints = "";
-                            if(recloserId != -1)
-                            {
-                                defaultIsolationEndpoints = $"{gid}|{recloserId}";
-                            }
-                            else
-                            {
-                                defaultIsolationEndpoints = $"{gid}";
-                            }
+            ActiveOutage activeOutageDb = null;
 
-                            List<Consumer> consumers = GetAffectedConsumersFromDatabase(affectedConsumersIds, db);
-                            if (consumers.Count == affectedConsumersIds.Count)
-                            {
-                                activeOutage = db.ActiveOutages.Add(new ActiveOutage { AffectedConsumers = consumers, OutageState = ActiveOutageState.CREATED, DefaultIsolationPoints = defaultIsolationEndpoints, ReportTime = DateTime.UtcNow });
-                                db.SaveChanges();
-                            }
-                            else
-                            {
-                                Logger.LogWarn("Some of affected consumers are not present in database");
-                            }
-                            Logger.LogDebug($"Outage on element with gid: 0x{activeOutage.OutageElementGid:x16} is successfully stored in database.");
-                        }
-                        else
-                        {
-                            Logger.LogWarn($"Reported element with gid: 0x{activeOutage.OutageElementGid:x16} has already been reported.");
-                        }
+            if (dbContext.ActiveOutageRepository.Find(o => o.OutageElementGid == gid).FirstOrDefault() != null)
+            {
+                Logger.LogWarn($"Reported malfunction on element with gid: 0x{gid:x16} has already been reported.");
+                return false;
+            }
 
-                    }
-                    catch (Exception e)
-                    {
-                        activeOutage = null;
-                        Logger.LogError("Error while adding reported outage into database.", e);
-                    }
-                }
+            List<Consumer> consumersDb = GetAffectedConsumersFromDatabase(affectedConsumersIds);
 
-                if (activeOutage != null)
-                {
-                    try
-                    {
-                        PublishActiveOutage(Topic.ACTIVE_OUTAGE, outageMessageMapper.MapActiveOutage(activeOutage));
-                        Logger.LogInfo($"Outage on element with gid: 0x{activeOutage.OutageElementGid:x16} is successfully published");
-                        success = true;
-                    }
-                    catch (Exception e) //TODO: Exception over proxy or enum...
-                    {
-                        Logger.LogError("Error occured while trying to publish outage.", e);
-                    }
+            if (consumersDb.Count != affectedConsumersIds.Count)
+            {
+                Logger.LogWarn("Some of affected consumers are not present in database");
+                return false;
+            }
 
-                }
+            long recloserId;
+            
+            try
+            {
+                recloserId = GetRecloserForHeadBreaker(gid);
+            }
+            catch (Exception e)
+            {
+                throw e;
+            }
+
+            string defaultIsolationEndpoints = "";
+            if (recloserId != -1)
+            {
+                defaultIsolationEndpoints = $"{gid}|{recloserId}";
             }
             else
             {
-                Logger.LogInfo("There is no affected consumers, so reported outage is not valid.");
+                defaultIsolationEndpoints = $"{gid}";
+            }
+
+            ActiveOutage createdActiveOutage = new ActiveOutage
+            {
+                AffectedConsumers = consumersDb,
+                OutageState = ActiveOutageState.CREATED,
+                ReportTime = DateTime.UtcNow,
+                DefaultIsolationPoints = defaultIsolationEndpoints,
+            };
+
+            activeOutageDb = dbContext.ActiveOutageRepository.Add(createdActiveOutage);
+
+            try
+            {
+                dbContext.Complete();
+                Logger.LogDebug($"Outage on element with gid: 0x{activeOutageDb.OutageElementGid:x16} is successfully stored in database.");
+                success = true;
+            }
+            catch (Exception e)
+            {
+                string message = "OutageModel::ReportPotentialOutage method => exception on Complete()";
+                Logger.LogError(message, e);
+                Console.WriteLine($"{message}, Message: {e.Message})");
+
+                //TODO: da li je dobar handle?
+                dbContext.Dispose();
+                dbContext = new UnitOfWork();
                 success = false;
+            }
+
+            if (success && activeOutageDb != null)
+            {
+                try
+                {
+                    success = PublishActiveOutage(Topic.ACTIVE_OUTAGE, outageMessageMapper.MapActiveOutage(activeOutageDb));
+                    
+                    if(success)
+                    {
+                        Logger.LogInfo($"Outage on element with gid: 0x{activeOutageDb.OutageElementGid:x16} is successfully published");
+                    }
+                }
+                catch (Exception e) //TODO: Exception over proxy or enum...
+                {
+                    Logger.LogError("OutageModel::ReportPotentialOutage => exception on PublishActiveOutage()", e);
+                    success = false;
+                }
             }
 
             return success;
@@ -256,54 +296,51 @@ namespace OutageManagementService
         public bool IsolateOutage(long outageId)
         {
             bool success = false;
-            using (OutageContext db = new OutageContext())
+         
+            ActiveOutage outageToIsolate = dbContext.ActiveOutageRepository.Get(outageId);
+
+            if (outageToIsolate != null)
             {
-                ActiveOutage outageToIsolate = db.ActiveOutages.Find(outageId);
-                if (outageToIsolate != null)
+                if (outageToIsolate.OutageState == ActiveOutageState.CREATED)
                 {
-                    if (outageToIsolate.OutageState == ActiveOutageState.CREATED)
+                    try
+                    {
+                        success = StartIsolationAlgorthm(outageToIsolate);
+                    }
+                    catch (Exception e)
+                    {
+                        success = false;
+                        Logger.LogError("Exception on StartIsolationAlgorthm() method.", e);
+                    }
+
+                    if (success)
+                    {
+                        dbContext.Complete();
+                    }
+
+                    if (success)
                     {
                         try
                         {
-                            success = StartIsolationAlgorthm(outageToIsolate);
+                            PublishActiveOutage(Topic.ACTIVE_OUTAGE, outageMessageMapper.MapActiveOutage(outageToIsolate));
+                            Logger.LogInfo($"Outage with id: 0x{outageToIsolate.OutageId:x16} is successfully published");
+                            success = true;
                         }
-                        catch (Exception e)
+                        catch (Exception e) //TODO: Exception over proxy or enum...
                         {
-                            success = false;
-                            Logger.LogError("Exception on StartIsolationAlgorthm() method.", e);
+                            Logger.LogError("Error occured while trying to publish outage.", e);
                         }
-
-                        if (success)
-                        {
-                            db.SaveChanges();
-                        }
-
-                        if (success)
-                        {
-                            try
-                            {
-                                PublishActiveOutage(Topic.ACTIVE_OUTAGE, outageMessageMapper.MapActiveOutage(outageToIsolate));
-                                Logger.LogInfo($"Outage with id: 0x{outageToIsolate.OutageId:x16} is successfully published");
-                                success = true;
-                            }
-                            catch (Exception e) //TODO: Exception over proxy or enum...
-                            {
-                                Logger.LogError("Error occured while trying to publish outage.", e);
-                            }
-                        }
-
-                        
-                    }
-                    else
-                    {
-                        Logger.LogWarn($"Outage with id 0x{outageId:X16} is in state {outageToIsolate.OutageState}, and thus cannot be isolated.");
                     }
                 }
                 else
                 {
-                    Logger.LogWarn($"Outage with id 0x{outageId:X16} is not found in database.");
-                    success = false;
+                    Logger.LogWarn($"Outage with id 0x{outageId:X16} is in state {outageToIsolate.OutageState}, and thus cannot be isolated.");
                 }
+            }
+            else
+            {
+                Logger.LogWarn($"Outage with id 0x{outageId:X16} is not found in database.");
+                success = false;
             }
 
             return success;
@@ -311,7 +348,35 @@ namespace OutageManagementService
 
         public bool SendRepairCrew(long outageId)
         {
-            throw new NotImplementedException();
+            bool success;
+
+            ActiveOutage outageDB = null;
+
+            try
+            {
+                outageDB = dbContext.ActiveOutageRepository.Get(outageId);
+            }
+            catch (Exception e)
+            {
+                string message = "OutageModel::SendRepairCrew => exception in UnitOfWork.ActiveOutageRepository.Get()";
+                Logger.LogError(message, e);
+                throw e;
+            }
+            
+            if(outageDB == null)
+            {
+                Logger.LogError($"Outage with id 0x{outageId:X16} is not found in database.");
+                return false;
+            }
+
+            if(outageDB.OutageState != ActiveOutageState.ISOLATED)
+            {
+                Logger.LogError($"Outage with id 0x{outageId:X16} is in state {outageDB.OutageState}, and thus repair crew can not be sent. (Expected state: {ActiveOutageState.CREATED})");
+                return false;
+            }
+
+            success = false;
+            return success;
         }
 
         public bool SendLocationIsolationCrew(long outageId)
@@ -345,7 +410,6 @@ namespace OutageManagementService
                 TopologyModel = (OutageTopologyModel)omsTopologyProxy.GetOMSModel();
             }
         }
-
         private long GetNextBreaker(long breakerId)
         {
             if (!topologyModel.OutageTopology.ContainsKey(breakerId))
@@ -418,13 +482,13 @@ namespace OutageManagementService
             return recolserId; 
         }
 
-        private List<Consumer> GetAffectedConsumersFromDatabase(List<long> affectedConsumersIds, OutageContext db)
+        private List<Consumer> GetAffectedConsumersFromDatabase(List<long> affectedConsumersIds)
         {
             List<Consumer> affectedConsumers = new List<Consumer>();
 
             foreach (long affectedConsumerId in affectedConsumersIds)
             {
-                Consumer affectedConsumer = db.Consumers.Find(affectedConsumerId);
+                Consumer affectedConsumer = dbContext.ConsumerRepository.Get(affectedConsumerId);
 
                 if (affectedConsumer == null)
                 {
@@ -437,8 +501,10 @@ namespace OutageManagementService
             return affectedConsumers;
         }
 
-        private void PublishActiveOutage(Topic topic, OutageMessage outageMessage)
+        private bool PublishActiveOutage(Topic topic, OutageMessage outageMessage)
         {
+            bool success;
+
             OutagePublication outagePublication = new OutagePublication(topic, outageMessage);
 
             using (PublisherProxy publisherProxy = proxyFactory.CreateProxy<PublisherProxy, IPublisher>(EndpointNames.PublisherEndpoint))
@@ -450,9 +516,21 @@ namespace OutageManagementService
                     throw new NullReferenceException(errMsg);
                 }
 
-                publisherProxy.Publish(outagePublication);
-                Logger.LogInfo($"Outage service published data from topic: {outagePublication.Topic}");
+                try
+                {
+                    publisherProxy.Publish(outagePublication, "OUTAGE_PUBLISHER");
+                    Logger.LogInfo($"Outage service published data from topic: {outagePublication.Topic}");
+                    success = true;
+                }
+                catch (Exception e)
+                {
+                    string message = $"OutageModel::PublishActiveOutage => exception on PublisherProxy.Publish()";
+                    Logger.LogError(message, e);
+                    success = false;
+                }
             }
+
+            return success;
         }
 
         private bool StartIsolationAlgorthm(ActiveOutage outageToIsolate)
@@ -497,8 +575,6 @@ namespace OutageManagementService
                             Logger.LogWarn($"Invalid state: breaker with id 0x{defaultIsolationPoints[0]:X16} is the only default isolation element, but it is also a recloser.");
                             isIsolated = false;
                         }
-
-                        
                     }
                 }
                 catch (Exception e)
@@ -518,10 +594,10 @@ namespace OutageManagementService
                         {
                             try
                             {
-                                headBreakerMeasurementId = measurementMapProxy.GetMeasurementsForElement(headBreaker)[0];
+                                headBreakerMeasurementId = measurementMapProxy.GetMeasurementsOfElement(headBreaker)[0];
                                 if (recloser != -1)
                                 {
-                                    recloserMeasurementId = measurementMapProxy.GetMeasurementsForElement(recloser)[0];
+                                    recloserMeasurementId = measurementMapProxy.GetMeasurementsOfElement(recloser)[0];
                                 }
                                 else
                                 {
@@ -651,8 +727,6 @@ namespace OutageManagementService
             return isIsolated;
         }
 
-        
-
         private void SendSCADACommand(long currentBreakerId, DiscreteCommandingType discreteCommandingType)
         {
             long measrement = -1;
@@ -661,7 +735,7 @@ namespace OutageManagementService
                 List<long> measuremnts = new List<long>();
                 try
                 {
-                    measuremnts = measurementMapProxy.GetMeasurementsForElement(currentBreakerId);
+                    measuremnts = measurementMapProxy.GetMeasurementsOfElement(currentBreakerId);
 
                 }
                 catch (Exception e)
@@ -893,6 +967,7 @@ namespace OutageManagementService
 
             return resourceDescriptions;
         }
+
         #endregion
     }
 }

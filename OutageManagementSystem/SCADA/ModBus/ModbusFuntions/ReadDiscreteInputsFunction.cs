@@ -84,12 +84,7 @@ namespace Outage.SCADA.ModBus.ModbusFuntions
                 }
 
                 pointItem.CurrentValue = value;
-
-                bool alarmChanged = pointItem.SetAlarms();
-                if (alarmChanged)
-                {
-                    Logger.LogInfo($"Alarm for Point [Gid: 0x{pointItem.Gid:X16}, Point type: {PointType.DIGITAL_INPUT}, Address: {pointItem.Address}] set to {pointItem.Alarm}.");
-                }
+                Logger.LogInfo($"Alarm for Point [Gid: 0x{pointItem.Gid:X16}, Point type: {PointType.DIGITAL_INPUT}, Address: {pointItem.Address}] set to {pointItem.Alarm}.");
 
                 CommandOriginType commandOrigin = CommandOriginType.OTHER_COMMAND;
 

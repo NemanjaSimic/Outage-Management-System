@@ -41,29 +41,6 @@ namespace CalculationEngine.SCADAFunctions
 			if (!analogMeasurements.ContainsKey(analogMeasurement.Id))
 			{
 				analogMeasurements.Add(analogMeasurement.Id, analogMeasurement);
-
-				if (elementToMeasurementMap.TryGetValue(analogMeasurement.ElementId, out var measurements))
-				{
-					measurements.Add(analogMeasurement.Id);
-				}
-				else
-				{
-					elementToMeasurementMap.Add(
-						analogMeasurement.ElementId,
-						new List<long>()
-						{
-							analogMeasurement.Id
-						});
-				}
-
-				if (!measurementToElementMap.ContainsKey(analogMeasurement.Id))
-				{
-					measurementToElementMap.Add(analogMeasurement.Id, analogMeasurement.ElementId);
-				}
-				else
-				{
-					//TOOD: log err/warn?
-				}
 			}
 		}
 		public void AddDiscreteMeasurement(DiscreteMeasurement discreteMeasurement)
@@ -71,29 +48,6 @@ namespace CalculationEngine.SCADAFunctions
 			if (!discreteMeasurements.ContainsKey(discreteMeasurement.Id))
 			{
 				discreteMeasurements.Add(discreteMeasurement.Id, discreteMeasurement);
-
-				if (elementToMeasurementMap.TryGetValue(discreteMeasurement.ElementId, out var measurements))
-				{
-					measurements.Add(discreteMeasurement.Id);
-				}
-				else
-				{
-					elementToMeasurementMap.Add(
-						discreteMeasurement.ElementId,
-						new List<long>()
-						{
-							discreteMeasurement.Id
-						});
-				}
-
-				if(!measurementToElementMap.ContainsKey(discreteMeasurement.Id))
-				{
-					measurementToElementMap.Add(discreteMeasurement.Id, discreteMeasurement.ElementId);
-				}
-				else
-				{
-					//TOOD: log err/warn?
-				}
 			}
 		}
 		public float GetAnalogValue(long measurementGid)
@@ -200,26 +154,7 @@ namespace CalculationEngine.SCADAFunctions
 			}
 			return signalGid;
 		}
-		public List<long> GetMeasurementsForElement(long elementGid)
-		{
-			if (elementToMeasurementMap.TryGetValue(elementGid, out var measurements))
-			{
-				return measurements;
-			}
-			else
-			{
-				return new List<long>();
-			}
-		}
-		public Dictionary<long, List<long>> GetElementToMeasurementMap()
-		{
-			return elementToMeasurementMap;
-		}
-		public Dictionary<long, long> GetMeasurementToElementMap()
-		{
-			return measurementToElementMap;
-		}
-		public bool TryGetDiscreteMeasurement(long measurementGid, out DiscreteMeasurement measurement)
+        public bool TryGetDiscreteMeasurement(long measurementGid, out DiscreteMeasurement measurement)
 		{
 			bool success = false;
 			if (discreteMeasurements.TryGetValue(measurementGid, out measurement))
@@ -245,5 +180,48 @@ namespace CalculationEngine.SCADAFunctions
 			}
 			return success;
 		}
+
+		public void AddMeasurementElementPair(long measurementId, long elementId)
+		{
+			if (measurementToElementMap.ContainsKey(measurementId))
+			{
+				string message = $"Measurement with id 0x{measurementId:X16} already exists in measurement-element mapping.";
+				logger.LogError(message);
+				throw new ArgumentException(message);
+			}
+
+			measurementToElementMap.Add(measurementId, elementId);
+			
+			if (elementToMeasurementMap.TryGetValue(elementId, out List<long> measurements))
+			{
+				measurements.Add(measurementId);
+			}
+			else
+			{
+				elementToMeasurementMap.Add(elementId, new List<long>() { measurementId });
+			}
+		}
+
+		#region IMeasurementMapContract
+		public List<long> GetMeasurementsOfElement(long elementGid)
+		{
+			if (elementToMeasurementMap.TryGetValue(elementGid, out var measurements))
+			{
+				return measurements;
+			}
+			else
+			{
+				return new List<long>();
+			}
+		}
+		public Dictionary<long, List<long>> GetElementToMeasurementMap()
+		{
+			return elementToMeasurementMap;
+		}
+		public Dictionary<long, long> GetMeasurementToElementMap()
+		{
+			return measurementToElementMap;
+		}
+		#endregion
 	}
 }

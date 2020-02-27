@@ -86,12 +86,7 @@ namespace Outage.SCADA.ModBus.ModbusFuntions
 
                 float eguValue = pointItem.RawToEguValueConversion(rawValue);
                 pointItem.CurrentEguValue = eguValue;
-
-                bool alarmChanged = pointItem.SetAlarms();
-                if (alarmChanged)
-                {
-                    Logger.LogInfo($"Alarm for Point [Gid: 0x{pointItem.Gid:X16}, Address: {pointItem.Address}] set to {pointItem.Alarm}.");
-                }
+                Logger.LogInfo($"Alarm for Point [Gid: 0x{pointItem.Gid:X16}, Address: {pointItem.Address}] set to {pointItem.Alarm}.");
 
                 CommandOriginType commandOrigin = CommandOriginType.OTHER_COMMAND;
 
