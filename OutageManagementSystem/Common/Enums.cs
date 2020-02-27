@@ -91,8 +91,8 @@ namespace Outage.Common
         [EnumMember]
         ISOLATED = 2,
         [EnumMember]
-        RESOLVED = 3,
+        REPAIRED = 3,
         //[EnumMember]
-        //ARCHIVED = 4
+        //RESOLVED = 4,
     }
 }

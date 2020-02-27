@@ -7,10 +7,12 @@ using Outage.Common.OutageService.Model;
 using Outage.Common.PubSub.OutageDataContract;
 using Outage.Common.ServiceContracts.CalculationEngine;
 using Outage.Common.ServiceContracts.GDA;
+using Outage.Common.ServiceContracts.OMS;
 using Outage.Common.ServiceContracts.PubSub;
 using Outage.Common.ServiceContracts.SCADA;
 using Outage.Common.ServiceProxies;
 using Outage.Common.ServiceProxies.CalcualtionEngine;
+using Outage.Common.ServiceProxies.Outage;
 using Outage.Common.ServiceProxies.PubSub;
 using OutageDatabase;
 using OutageDatabase.Repository;
@@ -19,6 +21,7 @@ using System;
 using System.Collections.Concurrent;
 using System.Collections.Generic;
 using System.Linq;
+using System.Threading.Tasks;
 using System.Timers;
 using AutoResetEvent = System.Threading.AutoResetEvent;
 
@@ -276,7 +279,7 @@ namespace OutageManagementService
             {
                 try
                 {
-                    success = PublishActiveOutage(Topic.ACTIVE_OUTAGE, outageMessageMapper.MapActiveOutage(activeOutageDb));
+                    success = PublishOutage(Topic.ACTIVE_OUTAGE, outageMessageMapper.MapActiveOutage(activeOutageDb));
                     
                     if(success)
                     {
@@ -322,7 +325,7 @@ namespace OutageManagementService
                     {
                         try
                         {
-                            PublishActiveOutage(Topic.ACTIVE_OUTAGE, outageMessageMapper.MapActiveOutage(outageToIsolate));
+                            PublishOutage(Topic.ACTIVE_OUTAGE, outageMessageMapper.MapActiveOutage(outageToIsolate));
                             Logger.LogInfo($"Outage with id: 0x{outageToIsolate.OutageId:x16} is successfully published");
                             success = true;
                         }
@@ -348,8 +351,6 @@ namespace OutageManagementService
 
         public bool SendRepairCrew(long outageId)
         {
-            bool success;
-
             ActiveOutage outageDB = null;
 
             try
@@ -375,8 +376,45 @@ namespace OutageManagementService
                 return false;
             }
 
-            success = false;
-            return success;
+            Task task = Task.Run(() =>
+            {
+                Task.Delay(new TimeSpan(15000));
+
+                using(OutageSimulatorServiceProxy proxy = proxyFactory.CreateProxy<OutageSimulatorServiceProxy, IOutageSimulatorContract>(EndpointNames.OutageSimulatorServiceEndpoint))
+                {
+                    if(proxy == null)
+                    {
+                        string message = "OutageModel::SendRepairCrew => OutageSimulatorServiceProxy is null";
+                        Logger.LogError(message);
+                        throw new NullReferenceException(message);
+                    }
+
+                    if(proxy.ResolvedOutage(outageDB.OutageElementGid))
+                    {
+                        outageDB.OutageState = ActiveOutageState.REPAIRED;
+                        outageDB.RepairedTime = DateTime.UtcNow;
+                        dbContext.ActiveOutageRepository.Update(outageDB);
+
+                        try
+                        {
+                            dbContext.Complete();
+                            PublishOutage(Topic.ACTIVE_OUTAGE, outageMessageMapper.MapActiveOutage(outageDB));
+                        }
+                        catch (Exception e)
+                        {
+                            string message = "OutageModel::SendRepairCrew => exception in Complete method.";
+                            Logger.LogError(message, e);
+                        }
+                    }
+                    else
+                    {
+                        string message = "OutageModel::SendRepairCrew => ResolvedOutage() not finished with SUCCESS";
+                        Logger.LogError(message);
+                    }
+                }
+            });
+
+            return true;
         }
 
         public bool SendLocationIsolationCrew(long outageId)
@@ -501,7 +539,7 @@ namespace OutageManagementService
             return affectedConsumers;
         }
 
-        private bool PublishActiveOutage(Topic topic, OutageMessage outageMessage)
+        private bool PublishOutage(Topic topic, OutageMessage outageMessage)
         {
             bool success;
 

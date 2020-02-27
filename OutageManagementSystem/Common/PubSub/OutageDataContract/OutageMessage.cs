@@ -12,7 +12,7 @@ namespace Outage.Common.PubSub.OutageDataContract
         [DataMember]
         public DateTime? IsolatedTime { get; set; }
         [DataMember]
-        public DateTime? ResolvedTime { get; set; }
+        public DateTime? RepairedTime { get; set; }
 
         [DataMember]
         public long OutageElementGid { get; set; }
