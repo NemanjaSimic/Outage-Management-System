@@ -4,7 +4,7 @@ using Outage.Common.PubSub;
 using Outage.Common.ServiceContracts.PubSub;
 using System.ServiceModel;
 
-namespace SCADAFunctions
+namespace CalculationEngine.SCADAFunctions
 {
 	[CallbackBehavior(ConcurrencyMode = ConcurrencyMode.Multiple)]
 	public class SCADASubscriber : ISubscriberCallback

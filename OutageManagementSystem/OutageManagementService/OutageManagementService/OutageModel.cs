@@ -690,11 +690,7 @@ namespace OutageManagementService
                 {
                     try
                     {
-                        bool success = scadaCommandProxy.SendDiscreteCommand(measrement, (ushort)discreteCommandingType);
-                        if (success)
-                        {
-                            
-                        }
+                        bool success = scadaCommandProxy.SendDiscreteCommand(measrement, (ushort)discreteCommandingType, CommandOriginType.ISOLATING_ALGORITHM_COMMAND);
                     }
                     catch (Exception e)
                     {
