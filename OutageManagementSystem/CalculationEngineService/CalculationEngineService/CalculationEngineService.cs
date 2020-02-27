@@ -6,12 +6,13 @@ using Outage.Common;
 using Outage.Common.ServiceContracts.PubSub;
 using Outage.Common.ServiceProxies;
 using Outage.Common.ServiceProxies.PubSub;
-using SCADAFunctions;
+using CalculationEngine.SCADAFunctions;
 using System;
 using System.Collections.Generic;
 using System.ServiceModel;
 using System.Text;
 using Topology;
+using CalculationEngineService.SwitchCommanding;
 
 namespace CalculationEngineService
 {
@@ -83,7 +84,7 @@ namespace CalculationEngineService
                 new ServiceHost(typeof(CEModelUpdateNotification)),
                 new ServiceHost(typeof(CETransactionActor)),
                 new ServiceHost(typeof(TopologyService)),
-                new ServiceHost(typeof(SCADACommandingService)),
+                new ServiceHost(typeof(SwitchStatusCommandingService)),
                 new ServiceHost(typeof(MeasurementMapService))
             };
         }

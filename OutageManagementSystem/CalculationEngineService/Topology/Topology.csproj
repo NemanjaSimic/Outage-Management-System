@@ -69,7 +69,7 @@
       <Name>NetworkModelServiceFunctions</Name>
     </ProjectReference>
     <ProjectReference Include="..\SCADACommanding\SCADAFunctions.csproj">
-      <Project>{2E72183F-B2D1-4F43-8396-377AA1950078}</Project>
+      <Project>{2e72183f-b2d1-4f43-8396-377aa1950078}</Project>
       <Name>SCADAFunctions</Name>
     </ProjectReference>
   </ItemGroup>
