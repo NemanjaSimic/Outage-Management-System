@@ -1,6 +1,8 @@
-﻿namespace Outage.SCADA.ModBus.FunctionParameters
+﻿using Outage.SCADA.SCADACommon.FunctionParameters;
+
+namespace Outage.SCADA.ModBus.FunctionParameters
 {
-    public abstract class ModbusCommandParameters
+    public abstract class ModbusCommandParameters : IModbusCommandParameters
     {
         private ushort transactionId;
         private ushort protocolId;

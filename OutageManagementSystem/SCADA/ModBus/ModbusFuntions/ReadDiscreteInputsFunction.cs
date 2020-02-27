@@ -1,7 +1,9 @@
 ﻿using EasyModbus;
+using Outage.Common;
 using Outage.Common.PubSub.SCADADataContract;
 using Outage.SCADA.ModBus.FunctionParameters;
 using Outage.SCADA.SCADACommon;
+using Outage.SCADA.SCADACommon.FunctionParameters;
 using Outage.SCADA.SCADAData.Repository;
 using System;
 using System.Collections.Generic;
@@ -13,12 +15,14 @@ namespace Outage.SCADA.ModBus.ModbusFuntions
     public class ReadDiscreteInputsFunction : ModbusFunction, IReadDiscreteModbusFunction
     {
         public SCADAModel SCADAModel { get; private set; }
+        public IModbusReadCommandParameters ModbusReadCommandParameters { get; private set; }
 
         public ReadDiscreteInputsFunction(ModbusCommandParameters commandParameters, SCADAModel scadaModel)
             : base(commandParameters)
         {
             CheckArguments(MethodBase.GetCurrentMethod(), typeof(ModbusReadCommandParameters));
             SCADAModel = scadaModel;
+            ModbusReadCommandParameters = commandParameters as IModbusReadCommandParameters;
         }
 
         #region IModBusFunction
@@ -49,6 +53,7 @@ namespace Outage.SCADA.ModBus.ModbusFuntions
 
             var currentSCADAModel = SCADAModel.CurrentScadaModel;
             var currentAddressToGidMap = SCADAModel.CurrentAddressToGidMap;
+            var commandValuesCache = SCADAModel.CommandedValuesCache;
 
             for (ushort i = 0; i < quantity; i++)
             {
@@ -81,7 +86,16 @@ namespace Outage.SCADA.ModBus.ModbusFuntions
                 pointItem.CurrentValue = value;
                 Logger.LogInfo($"Alarm for Point [Gid: 0x{pointItem.Gid:X16}, Point type: {PointType.DIGITAL_INPUT}, Address: {pointItem.Address}] set to {pointItem.Alarm}.");
 
-                DiscreteModbusData digitalData = new DiscreteModbusData(value, pointItem.Alarm);
+                CommandOriginType commandOrigin = CommandOriginType.OTHER_COMMAND;
+
+                if (commandValuesCache.ContainsKey(gid) && commandValuesCache[gid].Value == value)
+                {
+                    commandOrigin = commandValuesCache[gid].CommandOrigin;
+                    commandValuesCache.Remove(gid);
+                    Logger.LogDebug($"[ReadDiscreteInputsFunction] Command origin of command address: {pointItem.Address} is set to {commandOrigin}.");
+                }
+
+                DiscreteModbusData digitalData = new DiscreteModbusData(value, pointItem.Alarm, gid, commandOrigin);
                 Data.Add(gid, digitalData);
                 Logger.LogDebug($"ReadDiscreteInputsFunction execute => Current value: {value} from address: {address}, point type: {PointType.DIGITAL_INPUT}, gid: 0x{gid:X16}.");
             }

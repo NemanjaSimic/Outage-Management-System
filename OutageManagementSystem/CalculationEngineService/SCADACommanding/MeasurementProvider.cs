@@ -9,7 +9,7 @@ using Outage.Common.ServiceProxies.Outage;
 using System;
 using System.Collections.Generic;
 
-namespace SCADAFunctions
+namespace CalculationEngine.SCADAFunctions
 {
 	public class MeasurementProvider : IMeasurementProvider
     {
@@ -20,6 +20,7 @@ namespace SCADAFunctions
 		private Dictionary<long, List<long>> elementToMeasurementMap;
 		private Dictionary<long, long> measurementToElementMap;
 		private ProxyFactory proxyFactory;
+		private readonly HashSet<CommandOriginType> ignorableOriginTypes;
         #endregion
 
         public MeasurementProvider()
@@ -28,6 +29,7 @@ namespace SCADAFunctions
 			measurementToElementMap = new Dictionary<long, long>();
 			analogMeasurements = new Dictionary<long, AnalogMeasurement>();
 			discreteMeasurements = new Dictionary<long, DiscreteMeasurement>();
+			ignorableOriginTypes = new HashSet<CommandOriginType>() { CommandOriginType.USER_COMMAND, CommandOriginType.ISOLATING_ALGORITHM_COMMAND };
 
 			proxyFactory = new ProxyFactory();
 			Provider.Instance.MeasurementProvider = this;
@@ -67,7 +69,7 @@ namespace SCADAFunctions
 			}
 			return isOpen;
 		}
-		public void UpdateAnalogMeasurement(long measurementGid, float value)
+		public void UpdateAnalogMeasurement(long measurementGid, float value, CommandOriginType commandOrigin)
 		{
 			if (analogMeasurements.TryGetValue(measurementGid, out AnalogMeasurement measurement))
 			{
@@ -80,42 +82,44 @@ namespace SCADAFunctions
 		}
 		public void UpdateAnalogMeasurement(Dictionary<long, AnalogModbusData> data)
 		{
-			foreach (var measurement in data)
+			foreach (long gid in data.Keys)
 			{
-				UpdateAnalogMeasurement(measurement.Key, (float)measurement.Value.Value);
+				AnalogModbusData measurementData = data[gid];
+
+				UpdateAnalogMeasurement(gid, (float)measurementData.Value, measurementData.CommandOrigin);
 			}
 		}
-		public bool UpdateDiscreteMeasurement(long measurementGid, ushort value)
+		public bool UpdateDiscreteMeasurement(long measurementGid, int value, CommandOriginType commandOrigin)
 		{
 			bool success = true;
 			if (discreteMeasurements.TryGetValue(measurementGid, out DiscreteMeasurement measurement))
 			{
-				if (value == 0)
+				if (value == (ushort)DiscreteCommandingType.CLOSE)
 				{
 					measurement.CurrentOpen = false;
 				}
 				else
 				{
-					if (!measurement.CurrentOpen)
+					if (!measurement.CurrentOpen && !ignorableOriginTypes.Contains(commandOrigin))
 					{
-					using (ReportPotentialOutageProxy reportPotentialOutageProxy = proxyFactory.CreateProxy<ReportPotentialOutageProxy, IReportPotentialOutageContract>(EndpointNames.ReportPotentialOutageEndpoint))
-					{
-						if (reportPotentialOutageProxy == null)
+						using (ReportPotentialOutageProxy reportPotentialOutageProxy = proxyFactory.CreateProxy<ReportPotentialOutageProxy, IReportPotentialOutageContract>(EndpointNames.ReportPotentialOutageEndpoint))
 						{
-							string message = "UpdateDiscreteMeasurement => ReportPotentialOutageProxy is null.";
-							logger.LogError(message);
-							throw new NullReferenceException(message);
-						}
+							if (reportPotentialOutageProxy == null)
+							{
+								string message = "UpdateDiscreteMeasurement => ReportPotentialOutageProxy is null.";
+								logger.LogError(message);
+								throw new NullReferenceException(message);
+							}
 
-						try
-						{
-							reportPotentialOutageProxy.ReportPotentialOutage(measurement.ElementId);
+							try
+							{
+								reportPotentialOutageProxy.ReportPotentialOutage(measurement.ElementId);
+							}
+							catch (Exception e)
+							{
+								logger.LogError("Failed to report potential outage.", e);
+							}
 						}
-						catch (Exception e)
-						{
-							logger.LogError("Failed to report potential outage.", e);
-						}
-					}
 					}
 					measurement.CurrentOpen = true;
 				}
@@ -130,11 +134,13 @@ namespace SCADAFunctions
 		public void UpdateDiscreteMeasurement(Dictionary<long, DiscreteModbusData> data)
 		{
 			List<long> signalGids = new List<long>();
-			foreach (var measurementData in data)
+			foreach (long gid in data.Keys)
 			{
-				if (UpdateDiscreteMeasurement(measurementData.Key, measurementData.Value.Value))
+				DiscreteModbusData measurementData = data[gid];
+
+				if (UpdateDiscreteMeasurement(measurementData.MeasurementGid, measurementData.Value, measurementData.CommandOrigin))
 				{
-					signalGids.Add(measurementData.Key);
+					signalGids.Add(gid);
 				}
 			}
 			DiscreteMeasurementDelegate?.Invoke(signalGids);

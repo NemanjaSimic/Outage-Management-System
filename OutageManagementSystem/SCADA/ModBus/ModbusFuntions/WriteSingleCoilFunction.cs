@@ -1,6 +1,8 @@
 ﻿using EasyModbus;
+using Outage.Common;
 using Outage.SCADA.ModBus.FunctionParameters;
 using Outage.SCADA.SCADACommon;
+using Outage.SCADA.SCADACommon.FunctionParameters;
 using System;
 using System.Collections.Generic;
 using System.Net;
@@ -8,13 +10,19 @@ using System.Reflection;
 
 namespace Outage.SCADA.ModBus.ModbusFuntions
 {
-    public class WriteSingleCoilFunction : ModbusFunction
+    public class WriteSingleCoilFunction : ModbusFunction, IWriteModbusFunction
     {
-        public WriteSingleCoilFunction(ModbusCommandParameters commandParameters)
+        public CommandOriginType CommandOrigin { get; private set; }
+        public IModbusWriteCommandParameters ModbusWriteCommandParameters { get; private set; }
+
+        public WriteSingleCoilFunction(ModbusCommandParameters commandParameters, CommandOriginType commandOrigin)
             : base(commandParameters)
         {
             CheckArguments(MethodBase.GetCurrentMethod(), typeof(ModbusWriteCommandParameters));
+            CommandOrigin = commandOrigin;
+            ModbusWriteCommandParameters = commandParameters as IModbusWriteCommandParameters;
         }
+
 
         #region IModBusFunction
 

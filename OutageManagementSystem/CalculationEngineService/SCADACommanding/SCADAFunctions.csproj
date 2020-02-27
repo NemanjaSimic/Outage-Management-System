@@ -7,8 +7,8 @@
     <ProjectGuid>{2E72183F-B2D1-4F43-8396-377AA1950078}</ProjectGuid>
     <OutputType>Library</OutputType>
     <AppDesignerFolder>Properties</AppDesignerFolder>
-    <RootNamespace>SCADACommanding</RootNamespace>
-    <AssemblyName>SCADACommanding</AssemblyName>
+    <RootNamespace>CalculationEngine.SCADAFunctions</RootNamespace>
+    <AssemblyName>CalculationEngine.SCADAFunctions</AssemblyName>
     <TargetFrameworkVersion>v4.8</TargetFrameworkVersion>
     <FileAlignment>512</FileAlignment>
     <Deterministic>true</Deterministic>
@@ -44,7 +44,7 @@
   <ItemGroup>
     <Compile Include="MeasurementProvider.cs" />
     <Compile Include="Properties\AssemblyInfo.cs" />
-    <Compile Include="SCADACommandingService.cs" />
+    <Compile Include="SCADACommanding.cs" />
     <Compile Include="SCADAResultHandler.cs" />
     <Compile Include="SCADASubscriber.cs" />
   </ItemGroup>
