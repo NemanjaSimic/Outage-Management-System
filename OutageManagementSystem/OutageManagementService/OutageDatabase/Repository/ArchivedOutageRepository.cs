@@ -16,7 +16,6 @@ namespace OutageDatabase.Repository
         {
             return context.Set<ArchivedOutage>().Include(a => a.AffectedConsumers)
                                                 .Where(a => a.OutageId == id)
-                                                .ToList()
                                                 .FirstOrDefault();
         }
 

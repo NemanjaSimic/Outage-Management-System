@@ -47,6 +47,7 @@
     <Compile Include="DistributedTransaction\CETransactionActor.cs" />
     <Compile Include="MeasurementMapService.cs" />
     <Compile Include="Properties\AssemblyInfo.cs" />
+    <Compile Include="SwitchCommanding\SwitchStatusCommandingService.cs" />
     <Compile Include="TransactionManager.cs" />
   </ItemGroup>
   <ItemGroup>
@@ -66,18 +67,15 @@
       <Project>{D4553E8A-C694-4EBD-BA3C-0444A1D0C1EF}</Project>
       <Name>NetworkModelServiceFunctions</Name>
     </ProjectReference>
-    <ProjectReference Include="..\SCADACommanding\SCADACommanding.csproj">
+    <ProjectReference Include="..\SCADACommanding\SCADAFunctions.csproj">
       <Project>{2E72183F-B2D1-4F43-8396-377AA1950078}</Project>
-      <Name>SCADACommanding</Name>
-    </ProjectReference>
-    <ProjectReference Include="..\TopologyBuilder\TopologyBuilder.csproj">
-      <Project>{F83B7FD0-C28B-4C96-A49C-7EA0E2B579F1}</Project>
-      <Name>TopologyBuilder</Name>
+      <Name>SCADAFunctions</Name>
     </ProjectReference>
     <ProjectReference Include="..\Topology\Topology.csproj">
       <Project>{831A52CF-75FF-4EAB-BCEC-24547C588009}</Project>
       <Name>Topology</Name>
     </ProjectReference>
   </ItemGroup>
+  <ItemGroup />
   <Import Project="$(MSBuildToolsPath)\Microsoft.CSharp.targets" />
 </Project>

@@ -1,10 +1,4 @@
 ﻿using CECommon.Interfaces;
-using Outage.Common;
-using System;
-using System.Collections.Generic;
-using System.Linq;
-using System.Text;
-using System.Threading.Tasks;
 
 namespace CECommon.Providers
 {
@@ -28,13 +22,9 @@ namespace CECommon.Providers
             }
         }
         #endregion
-        private Provider()
-        {
-            //ModelResourcesDesc = new ModelResourcesDesc();
-        }
+        private Provider(){ }
         public ITopologyProvider TopologyProvider { get; set; } 
         public IModelProvider ModelProvider { get; set; }
-        public ModelResourcesDesc ModelResourcesDesc { get; private set; }
         public ITopologyConverterProvider TopologyConverterProvider { get; set; }
         public ISCADAResultHandler SCADAResultHandler { get; set; }
         public IMeasurementProvider MeasurementProvider { get; set; }

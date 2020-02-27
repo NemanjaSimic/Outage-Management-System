@@ -2,7 +2,6 @@
 {
     using OMS.Web.UI.Models.ViewModels;
     using Outage.Common.PubSub.OutageDataContract;
-    using System;
     using System.Collections.Generic;
     using System.Linq;
 
@@ -15,7 +14,7 @@
             _consumerMapper = consumerMapper;
         }
 
-        public ActiveOutageViewModel MapActiveOutage(ActiveOutage outage)
+        public ActiveOutageViewModel MapActiveOutage(ActiveOutageMessage outage)
             => new ActiveOutageViewModel
             {
                 Id = outage.OutageId,
@@ -24,10 +23,10 @@
                 AffectedConsumers = _consumerMapper.MapConsumers(outage.AffectedConsumers)
             };
 
-        public IEnumerable<ActiveOutageViewModel> MapActiveOutages(IEnumerable<ActiveOutage> outages)
+        public IEnumerable<ActiveOutageViewModel> MapActiveOutages(IEnumerable<ActiveOutageMessage> outages)
             => outages.Select(o => MapActiveOutage(o)).ToList();
 
-        public ArchivedOutageViewModel MapArchivedOutage(ArchivedOutage outage)
+        public ArchivedOutageViewModel MapArchivedOutage(ArchivedOutageMessage outage)
             => new ArchivedOutageViewModel
             {
                 Id = outage.OutageId,
@@ -37,7 +36,7 @@
                 AffectedConsumers = _consumerMapper.MapConsumers(outage.AffectedConsumers)
             };
 
-        public IEnumerable<ArchivedOutageViewModel> MapArchivedOutages(IEnumerable<ArchivedOutage> outages)
+        public IEnumerable<ArchivedOutageViewModel> MapArchivedOutages(IEnumerable<ArchivedOutageMessage> outages)
             => outages.Select(o => MapArchivedOutage(o));
     }
 }

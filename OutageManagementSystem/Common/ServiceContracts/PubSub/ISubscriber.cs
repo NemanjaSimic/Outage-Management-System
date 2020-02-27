@@ -22,7 +22,7 @@ namespace Outage.Common.ServiceContracts.PubSub
         string GetSubscriberName();
 
         [OperationContract(IsOneWay = true)]
-        [ServiceKnownType(typeof(SCADAMessage))]
+        [ServiceKnownType(typeof(SCADAMessage))]                            //TODO: delete?
         [ServiceKnownType(typeof(SingleAnalogValueSCADAMessage))]
         [ServiceKnownType(typeof(MultipleAnalogValueSCADAMessage))]
         [ServiceKnownType(typeof(SingleDiscreteValueSCADAMessage))]
@@ -33,9 +33,9 @@ namespace Outage.Common.ServiceContracts.PubSub
         [ServiceKnownType(typeof(EmailServiceMessage))]
         [ServiceKnownType(typeof(EmailToOutageMessage))]
         [ServiceKnownType(typeof(OMSModelMessage))]
-        [ServiceKnownType(typeof(ActiveOutage))]
-        [ServiceKnownType(typeof(ArchivedOutage))]
-        [ServiceKnownType(typeof(OutageMessage))]
+        [ServiceKnownType(typeof(ActiveOutageMessage))]
+        [ServiceKnownType(typeof(ArchivedOutageMessage))]
+        [ServiceKnownType(typeof(OutageMessage))]                           //TODO: delete?
         [ServiceKnownType(typeof(OutageTopologyModel))]
         [ServiceKnownType(typeof(OutageTopologyElement))]
         void Notify(IPublishableMessage message);

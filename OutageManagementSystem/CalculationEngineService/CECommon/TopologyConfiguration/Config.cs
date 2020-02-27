@@ -7,6 +7,7 @@ namespace CECommon.TopologyConfiguration
 	public class Config
 	{
 		ILogger logger = LoggerWrapper.Instance;
+
         #region Singleton
         private static object syncObj = new object();
 		private static Config instance;
@@ -39,11 +40,9 @@ namespace CECommon.TopologyConfiguration
 			}
 			catch (Exception ex)
 			{
-				string message = $"Failed to read configuration file on path {path}. Exception message: " + ex.Message;
-				logger.LogError(message);
+				logger.LogError($"Failed to read configuration file on path {path}. Exception message: {ex.Message}");
 				throw ex;
 			}
-
 			return retValue;
 		}
 	}

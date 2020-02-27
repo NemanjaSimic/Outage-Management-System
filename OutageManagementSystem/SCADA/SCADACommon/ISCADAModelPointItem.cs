@@ -10,7 +10,6 @@ namespace Outage.SCADA.SCADACommon
         PointType RegisterType { get; set; }
         AlarmType Alarm { get; set; }
 
-        bool SetAlarms();
         ISCADAModelPointItem Clone();
     }
 

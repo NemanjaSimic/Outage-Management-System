@@ -1,16 +1,21 @@
-﻿using Outage.Common;
-using Outage.Common.PubSub.OutageDataContract;
+﻿using OMSCommon.OutageDatabaseModel;
+using Outage.Common;
+using OutageDatabase.Repository;
 using System;
 using System.Collections.Generic;
 using System.Data.Entity;
-using System.Linq;
-using System.Text;
-using System.Threading.Tasks;
 
 namespace OutageDatabase.Initializers
 {
     public class OutageInitializer : DropCreateDatabaseIfModelChanges<OutageContext>
     {
+        private ILogger logger;
+
+        private ILogger Logger
+        {
+            get { return logger ?? (logger = LoggerWrapper.Instance); }
+        }
+
         public override void InitializeDatabase(OutageContext context)
         {
             LoggerWrapper.Instance.LogDebug("InitializeDatabase called.");
@@ -18,20 +23,21 @@ namespace OutageDatabase.Initializers
             Seed(context);
         }
 
-        protected override void Seed(OutageContext context)
+        protected override void Seed(OutageContext outageContext)
         {
-            base.Seed(context);
+            base.Seed(outageContext);
 
             UnitOfWork dbContext = new UnitOfWork(outageContext);
 
-            //TODO: rethink
-            context.DeleteAllData();
+            dbContext.ActiveOutageRepository.RemoveAll();
+            dbContext.ArchivedOutageRepository.RemoveAll();
+            dbContext.ConsumerRepository.RemoveAll();
 
             
             ArchivedOutage archivedOutage;
 
             long archivedId = 1;
-            archivedOutage = context.ArchivedOutages.Find(archivedId);
+            archivedOutage = dbContext.ArchivedOutageRepository.Get(archivedId);
 
             if (archivedOutage == null)
             {
@@ -39,12 +45,16 @@ namespace OutageDatabase.Initializers
                 {
                     OutageId = archivedId,
                     OutageElementGid = 0x0000000a00000007,
-                    ReportTime = DateTime.Now,
+                    ReportTime = DateTime.UtcNow,
+                    IsolatedTime = DateTime.UtcNow,
+                    ResolvedTime = DateTime.UtcNow,
+                    ArchiveTime = DateTime.UtcNow,
+                    DefaultIsolationPoints = string.Empty,
+                    OptimumIsolationPoints = string.Empty,
                     AffectedConsumers = new List<Consumer>(),
-                    ArchiveTime = DateTime.Now,
                 };
 
-                archivedOutage = context.ArchivedOutages.Add(archivedOutage);
+                archivedOutage = dbContext.ArchivedOutageRepository.Add(archivedOutage);
             }
 
             try
@@ -57,11 +67,11 @@ namespace OutageDatabase.Initializers
                 Logger.LogError(message, e);
                 Console.WriteLine($"{message}, Message: {e.Message})");
             }
-            //finally
-            //{
-            //    //dbContext.Dispose();
-            //    //exception thrown if dispose is called...
-            //}
+            finally
+            {
+                //dbContext.Dispose();
+                //exception thrown if dispose is called...
+            }
         }
     }
 }

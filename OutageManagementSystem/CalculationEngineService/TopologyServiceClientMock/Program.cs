@@ -20,7 +20,7 @@ namespace TopologyServiceClientMock
 				{
 					using (MeasurementMapProxy proxy = proxyFactory.CreateProxy<MeasurementMapProxy, IMeasurementMapContract>(EndpointNames.MeasurementMapEndpoint))
 					{
-						var measurements = proxy.GetMeasurementsForElement(elementGid);
+						var measurements = proxy.GetMeasurementsOfElement(elementGid);
 						if (measurements.Count > 0)
 						{
 							foreach (long measurementId in measurements)
