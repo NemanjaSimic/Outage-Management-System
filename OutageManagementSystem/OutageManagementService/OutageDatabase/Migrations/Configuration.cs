@@ -38,7 +38,7 @@
                     OutageElementGid = 0x0000000a00000007,
                     ReportTime = DateTime.UtcNow,
                     IsolatedTime = DateTime.UtcNow,
-                    ResolvedTime = DateTime.UtcNow,
+                    RepairedTime = DateTime.UtcNow,
                     ArchiveTime = DateTime.UtcNow,
                     DefaultIsolationPoints = string.Empty,
                     OptimumIsolationPoints = string.Empty,
@@ -55,16 +55,16 @@
             {
                 dbContext.Complete();
             }
-            catch(Exception e)
+            catch (Exception e)
             {
                 string message = "Configuration::Seed method => exception on Complete()";
                 Logger.LogError(message, e);
                 Console.WriteLine($"{message}, Message: {e.Message})");
             }
-            finally
-            {
-                dbContext.Dispose();
-            }
+            //finally
+            //{
+            //    dbContext.Dispose();
+            //}
         }
     }
 }
