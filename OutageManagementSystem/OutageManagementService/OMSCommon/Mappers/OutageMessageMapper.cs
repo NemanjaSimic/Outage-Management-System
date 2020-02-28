@@ -31,9 +31,10 @@ namespace OMSCommon.Mappers
                 OutageState = outage.OutageState,
                 ReportTime = outage.ReportTime,
                 IsolatedTime = outage.IsolatedTime,
-                ResolvedTime = outage.ResolvedTime,
+                RepairedTime = outage.RepairedTime,
                 OutageElementGid = outage.OutageElementGid,
-                AffectedConsumers = consumerMapper.MapConsumers(outage.AffectedConsumers)
+                AffectedConsumers = consumerMapper.MapConsumers(outage.AffectedConsumers),
+                IsResolveConditionValidated = outage.IsResolveConditionValidated,
             };
 
             if (TryParseIsolationPointsFromCSVFormat(outage.DefaultIsolationPoints, out List<long> defaultIsolationPoints))
@@ -61,7 +62,7 @@ namespace OMSCommon.Mappers
                 OutageId = outage.OutageId,
                 ReportTime = outage.ReportTime,
                 IsolatedTime = outage.IsolatedTime,
-                ResolvedTime = outage.ResolvedTime,
+                RepairedTime = outage.RepairedTime,
                 ArchiveTime = outage.ArchiveTime,
                 OutageElementGid = outage.OutageElementGid,
                 AffectedConsumers = consumerMapper.MapConsumers(outage.AffectedConsumers)

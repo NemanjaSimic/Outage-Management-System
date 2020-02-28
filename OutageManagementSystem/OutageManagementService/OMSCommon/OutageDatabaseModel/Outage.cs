@@ -8,7 +8,7 @@ namespace OMSCommon.OutageDatabaseModel
     {
         public DateTime ReportTime { get; set; }
         public DateTime? IsolatedTime { get; set; }
-        public DateTime? ResolvedTime { get; set; }
+        public DateTime? RepairedTime { get; set; }
 
         public long OutageElementGid { get; set; }
         //CSV, separator '|'

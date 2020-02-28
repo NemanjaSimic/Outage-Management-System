@@ -22,4 +22,29 @@ export class OutageService {
   getAllArchivedOutages(): Observable<ArchivedOutage[]> {
     return this.http.get(`${this.envService.apiUrl}/outage/archived`) as Observable<ArchivedOutage[]>;
   }
+
+  sendIsolateOutageCommand(id: Number) : Observable<any>{
+    return this.http.post(`${this.envService.apiUrl}/outage/isolate/${id}`, {});
+  }
+
+  sendLocationIsolationCrewCommand(id: Number) : Observable<any>{
+    return this.http.post(`${this.envService.apiUrl}/outage/sendlocationisolationcrew/${id}`, {});
+  }
+
+  sendOutageRepairCrew(id: Number) : Observable<any>{
+    return this.http.post(`${this.envService.apiUrl}/outage/sendrepaircrew/${id}`, {});
+  }
+
+  sendValidateOutageCommand(id: Number) : Observable<any>{
+    return this.http.post(`${this.envService.apiUrl}/outage/validateresolve/${id}`, {});
+  }
+
+  sendResolveOutageCommand(id: Number) : Observable<any>{
+    return this.http.post(`${this.envService.apiUrl}/outage/resolve/${id}`, {});
+  }
+
+  getInitialOutage(): Observable<any> {
+    return this.http.get(`${this.envService.apiUrl}/test/initialoutage`);
+  }
+
 }

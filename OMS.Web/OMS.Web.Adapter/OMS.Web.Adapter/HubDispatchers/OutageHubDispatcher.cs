@@ -45,13 +45,13 @@ namespace OMS.Web.Adapter.HubDispatchers
 
         public void NotifyActiveOutageUpdate(ActiveOutageMessage activeOutage)
         {
-            Console.WriteLine($"Sending active outage update to Outage Hub");
+            Console.WriteLine($"Sending active outage update to Outage Hub. ActiveOutage[ID: {activeOutage.OutageId}, State: {activeOutage.OutageState}, ElementGid: {activeOutage.OutageElementGid}, ReportedAt: {activeOutage.ReportTime} IsolatedAt: {activeOutage.IsolatedTime} RepairedAt {activeOutage.RepairedTime}]");
             _proxy.Invoke<string>("NotifyActiveOutageUpdate", _mapper.MapActiveOutage(activeOutage)).Wait();
         }
 
         public void NotifyArchiveOutageUpdate(ArchivedOutageMessage archivedOutage)
         {
-            Console.WriteLine($"Sending archive outage update to Outage Hub");
+            Console.WriteLine($"Sending archived outage update to Outage Hub. ArchivedOutage[ID: {archivedOutage.OutageId}, ElementGid: {archivedOutage.OutageElementGid}, ArchivedAt: {archivedOutage.ArchiveTime}]");
             _proxy.Invoke<string>("NotifyArchiveOutageUpdate", _mapper.MapArchivedOutage(archivedOutage)).Wait();
         }
 
