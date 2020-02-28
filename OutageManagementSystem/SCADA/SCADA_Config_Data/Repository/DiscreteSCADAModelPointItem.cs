@@ -13,11 +13,6 @@ namespace Outage.SCADA.SCADAData.Repository
     {
         private ushort currentValue;
 
-        public DiscreteSCADAModelPointItem()
-            : base()
-        {
-        }
-
         public DiscreteSCADAModelPointItem(List<Property> props, ModelCode type, EnumDescs enumDescs)
             : base(props, type)
         {
@@ -48,6 +43,9 @@ namespace Outage.SCADA.SCADAData.Repository
                         break;
                 }
             }
+
+            Initialized = true;
+            SetAlarms();
         }
 
         public ushort MinValue { get; set; }
@@ -67,6 +65,11 @@ namespace Outage.SCADA.SCADAData.Repository
 
         protected override bool SetAlarms()
         {
+            if(!Initialized)
+            {
+                return false;
+            }
+
             bool alarmChanged = false;
             AlarmType currentAlarm = Alarm;
 

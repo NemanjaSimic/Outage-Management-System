@@ -3441,8 +3441,6 @@
 		<cim:IdentifiedObject.mRID>AN_3</cim:IdentifiedObject.mRID>
 		<ftn:IdentifiedObject.name>AN_3</ftn:IdentifiedObject.name>
 	</cim:Analog>
-	<!-- NO SCADA -->
-	<!--
 	<cim:Analog rdf:ID="AN_4">
 		<cim:Analog.scalingFactor>1</cim:Analog.scalingFactor>
 		<cim:Analog.deviation>0</cim:Analog.deviation>
@@ -3458,7 +3456,6 @@
 		<cim:IdentifiedObject.mRID>AN_4</cim:IdentifiedObject.mRID>
 		<ftn:IdentifiedObject.name>AN_4</ftn:IdentifiedObject.name>
 	</cim:Analog>
-	-->
 	<cim:Analog rdf:ID="AN_5">
 		<cim:Analog.scalingFactor>1</cim:Analog.scalingFactor>
 		<cim:Analog.deviation>0</cim:Analog.deviation>

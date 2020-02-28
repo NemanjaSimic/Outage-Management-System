@@ -11,11 +11,6 @@ namespace Outage.SCADA.SCADAData.Repository
     {
         private float currentEguValue;
 
-        public AnalogSCADAModelPointItem() 
-            : base()
-        {
-        }
-
         public AnalogSCADAModelPointItem(List<Property> props, ModelCode type, EnumDescs enumDescs)
             : base(props, type)
         {
@@ -54,7 +49,10 @@ namespace Outage.SCADA.SCADAData.Repository
                     default:
                         break;
                 }
-            }                       
+            }
+
+            Initialized = true;
+            SetAlarms();
         }
 
         public float NormalValue { get; set; }
@@ -97,9 +95,13 @@ namespace Outage.SCADA.SCADAData.Repository
             }
         }
 
-
         protected override bool SetAlarms()
         {
+            if (!Initialized)
+            {
+                return false;
+            }
+
             bool alarmChanged = false;
             float LowLimit;
             float HighLimit;
