@@ -71,7 +71,7 @@
             {
                 Id = 111,
                 DefaultIsolationPoints = new List<long> { 6 },
-                State = OutageLifecycleState.Created,
+                State = ActiveOutageLifecycleState.Created,
                 ReportedAt = DateTime.Now
             };
 
@@ -93,7 +93,7 @@
                 // breaker iznad i fuse ispod (stavio sam elemente okolo aclinesegmenta), ali front ce raditi sa bilo kojim vasim id-evima
                 // mada ovo nije ni bitno toliko za front ?
                 OptimalIsolationPoints = new List<long> { 6, 14 }, 
-                State = OutageLifecycleState.Isolated,
+                State = ActiveOutageLifecycleState.Isolated,
                 ReportedAt = DateTime.Now // ovo se ne menja al test
             };
 
@@ -115,7 +115,7 @@
                 // breaker iznad i fuse ispod (stavio sam elemente okolo aclinesegmenta), ali front ce raditi sa bilo kojim vasim id-evima
                 // mada ovo nije ni bitno toliko za front ?
                 OptimalIsolationPoints = new List<long> { 6, 14 },
-                State = OutageLifecycleState.Isolated,
+                State = ActiveOutageLifecycleState.Isolated,
                 ReportedAt = DateTime.Now, // ovo nije isto, al test je
                 RepairedAt = DateTime.Now
             };
@@ -146,10 +146,10 @@
                 // breaker iznad i fuse ispod (stavio sam elemente okolo aclinesegmenta), ali front ce raditi sa bilo kojim vasim id-evima
                 // mada ovo nije ni bitno toliko za front ?
                 OptimalIsolationPoints = new List<long> { 6, 14 },
-                State = OutageLifecycleState.Isolated,
+                State = ActiveOutageLifecycleState.Isolated,
                 ReportedAt = DateTime.Now, // ovo nije isto, al test je
                 RepairedAt = DateTime.Now,
-                IsValidated = true  // validiramo ga
+                IsResolveConditionValidated = true  // validiramo ga
             };
 
             var outageHubContext = GetOutageHubContext();

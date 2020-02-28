@@ -41,6 +41,9 @@ namespace Outage.Common.PubSub.OutageDataContract
         [DataMember]
         public ActiveOutageState OutageState { get; set; }
 
+        [DataMember]
+        public bool IsResolveConditionValidated { get; set; }
+
         public ActiveOutageMessage() 
             : base()
         {

@@ -4,8 +4,8 @@
 
     public class ActiveOutageViewModel : OutageViewModel
     {
-        public bool IsValidated { get; set; }
-        public OutageLifecycleState State { get; set; }
+        public bool IsResolveConditionValidated { get; set; }
+        public ActiveOutageLifecycleState State { get; set; }
         
 
         public ActiveOutageViewModel()

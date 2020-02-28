@@ -33,7 +33,8 @@ namespace OMSCommon.Mappers
                 IsolatedTime = outage.IsolatedTime,
                 RepairedTime = outage.RepairedTime,
                 OutageElementGid = outage.OutageElementGid,
-                AffectedConsumers = consumerMapper.MapConsumers(outage.AffectedConsumers)
+                AffectedConsumers = consumerMapper.MapConsumers(outage.AffectedConsumers),
+                IsResolveConditionValidated = outage.IsResolveConditionValidated,
             };
 
             if (TryParseIsolationPointsFromCSVFormat(outage.DefaultIsolationPoints, out List<long> defaultIsolationPoints))
