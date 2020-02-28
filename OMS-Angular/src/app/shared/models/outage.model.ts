@@ -24,5 +24,6 @@ export interface ArchivedOutage extends Outage {
 export enum OutageLifeCycleState {
     Created,
     Isolated,
+    Repaired,
     Archived
 }
