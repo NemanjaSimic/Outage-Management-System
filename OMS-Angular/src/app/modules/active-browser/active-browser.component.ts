@@ -1,7 +1,10 @@
 import { Component, OnInit } from '@angular/core';
 
-import { ActiveOutage } from '@shared/models/outage.model';
+import { ActiveOutage, OutageLifeCycleState } from '@shared/models/outage.model';
 import { OutageService } from '@services/outage/outage.service';
+
+import { MatDialog } from '@angular/material';
+import { ModalComponent } from '@modules/modal/modal.component';
 
 @Component({
   selector: 'app-active-browser',
@@ -11,9 +14,9 @@ import { OutageService } from '@services/outage/outage.service';
 
 export class ActiveBrowserComponent implements OnInit {
   private activeOutages: ActiveOutage[];
-  private columns: string[] = ["id", "elementId", "reportedAt"];
+  private columns: string[] = ["id", "elementId", "state", "reportedAt", "moreDetails"];
 
-  constructor(private outageService: OutageService) { }
+  constructor(private dialog: MatDialog, private outageService: OutageService) { }
 
   ngOnInit() {
     this.activeOutages = [];
@@ -27,6 +30,16 @@ export class ActiveBrowserComponent implements OnInit {
     );
 
     console.log(this.activeOutages);
+  }
+
+  MoreDetails(outage: ActiveOutage) : void{
+     const dialogRef = this.dialog.open(ModalComponent, {
+       data: outage
+     })
+  }
+
+  public getOutageStateString(state: any) : string {
+    return OutageLifeCycleState[state];
   }
 
 }

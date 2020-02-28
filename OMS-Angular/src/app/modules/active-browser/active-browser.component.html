@@ -13,12 +13,17 @@
       
         <ng-container matColumnDef="state">
           <th [class.dark-header]="true" mat-header-cell *matHeaderCellDef> State </th>
-          <td [class.table-data]="true" mat-cell *matCellDef="let activeOutage"> {{ activeOutage.State.toString() }} </td>
+          <td [class.table-data]="true" mat-cell *matCellDef="let activeOutage"> {{ getOutageStateString(activeOutage.State) }} </td>
         </ng-container>
 
         <ng-container matColumnDef="reportedAt">
           <th [class.dark-header]="true" mat-header-cell *matHeaderCellDef> Reported At </th>
           <td [class.table-data]="true" mat-cell *matCellDef="let activeOutage"> {{ activeOutage.ReportedAt | date:'medium' }} </td>
+        </ng-container>
+
+        <ng-container matColumnDef="moreDetails">
+          <th [class.dark-header]="true" mat-header-cell *matHeaderCellDef> </th>
+          <td [class.table-data]="true" mat-cell *matCellDef="let activeOutage"><button id="moreDetails-button" (click)="MoreDetails(activeOutage)" >More Details</button> </td>
         </ng-container>
       
         <tr mat-header-row *matHeaderRowDef="columns"></tr>
