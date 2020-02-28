@@ -20,7 +20,9 @@
                 Id = outage.OutageId,
                 ReportedAt = outage.ReportTime,
                 ElementId = outage.OutageElementGid,
-                AffectedConsumers = _consumerMapper.MapConsumers(outage.AffectedConsumers)
+                AffectedConsumers = _consumerMapper.MapConsumers(outage.AffectedConsumers),
+                DefaultIsolationPoints = outage.DefaultIsolationPoints,
+                OptimalIsolationPoints = outage.OptimumIsolationPoints,
             };
 
         public IEnumerable<ActiveOutageViewModel> MapActiveOutages(IEnumerable<ActiveOutageMessage> outages)
@@ -33,7 +35,9 @@
                 ReportedAt = outage.ReportTime,
                 ArchivedAt = outage.ArchiveTime,
                 ElementId = outage.OutageElementGid,
-                AffectedConsumers = _consumerMapper.MapConsumers(outage.AffectedConsumers)
+                AffectedConsumers = _consumerMapper.MapConsumers(outage.AffectedConsumers),
+                DefaultIsolationPoints = outage.DefaultIsolationPoints,
+                OptimalIsolationPoints = outage.OptimumIsolationPoints,
             };
 
         public IEnumerable<ArchivedOutageViewModel> MapArchivedOutages(IEnumerable<ArchivedOutageMessage> outages)

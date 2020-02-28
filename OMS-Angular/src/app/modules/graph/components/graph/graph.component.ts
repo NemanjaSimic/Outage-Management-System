@@ -313,6 +313,7 @@ export class GraphComponent implements OnInit, OnDestroy {
   }
 
   public onActiveOutageNotification(outage: ActiveOutage): void {
+    console.log(outage);
     this.activeOutages = this.activeOutages.filter(o => o.Id !== outage.Id);
     this.activeOutages.push(outage);
     this.drawGraph(); // da bi resetovao tooltip-ove, ako je velika mreza, optimizovacemo

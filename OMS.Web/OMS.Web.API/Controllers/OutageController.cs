@@ -51,7 +51,7 @@ namespace OMS.Web.API.Controllers
         }
 
         [HttpPost]
-        [Route("api/outage/sendlocationisolationcrew/{gid}")]
+        [Route("api/outage/sendlocationisolationcrew/{id}")]
         public async Task<IHttpActionResult> SendOutageLocationIsolationCrew([FromUri]long id   )
         {
             try
@@ -67,7 +67,7 @@ namespace OMS.Web.API.Controllers
         }
 
         [HttpPost]
-        [Route("api/outage/sendrepaircrew/{gid}")]
+        [Route("api/outage/sendrepaircrew/{id}")]
         public async Task<IHttpActionResult> SendOutageRepairCrew([FromUri]long id)
         {
             try
@@ -83,7 +83,7 @@ namespace OMS.Web.API.Controllers
         }
 
         [HttpPost]
-        [Route("api/outage/validateresolve/{gid}")]
+        [Route("api/outage/validateresolve/{id}")]
         public async Task<IHttpActionResult> ValidateOutage([FromUri]long id)
         {
             try
@@ -99,7 +99,7 @@ namespace OMS.Web.API.Controllers
         }
 
         [HttpPost]
-        [Route("api/outage/resolve/{gid}")]
+        [Route("api/outage/resolve/{id}")]
         public async Task<IHttpActionResult> ResolveOutage([FromUri]long id)
         {
             try
