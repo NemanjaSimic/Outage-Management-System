@@ -8,7 +8,7 @@ namespace Outage.Common.ServiceContracts.CalculationEngine
     public interface IMeasurementMapContract
     {
         [OperationContract]
-        List<long> GetMeasurementsForElement(long elementId);
+        List<long> GetMeasurementsOfElement(long elementId);
 
         [OperationContract]
         Dictionary<long, long> GetMeasurementToElementMap();

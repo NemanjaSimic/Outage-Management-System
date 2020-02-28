@@ -2,11 +2,11 @@
 {
     using OMS.Web.UI.Models.BindingModels;  
     
-    public class TurnOffSwitchCommand : SwitchCommandBase
+    public class OpenSwitchCommand : SwitchCommandBase
     {
-        public TurnOffSwitchCommand(long gid) : base(gid) 
+        public OpenSwitchCommand(long gid) : base(gid) 
         {
-            Command = SwitchCommandType.TURN_OFF;
+            Command = SwitchCommandType.OPEN;
         }
     }
 }

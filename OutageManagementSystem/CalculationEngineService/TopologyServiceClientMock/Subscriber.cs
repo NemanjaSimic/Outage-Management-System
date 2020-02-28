@@ -21,7 +21,7 @@ namespace TopologyServiceClientMock
 			if (message is SingleAnalogValueSCADAMessage)
 			{
 				SingleAnalogValueSCADAMessage msg = (SingleAnalogValueSCADAMessage)message;
-				Console.WriteLine($"Merenje: {msg.Gid} {msg.Value}");
+				Console.WriteLine($"Merenje: {msg.AnalogModbusData.MeasurementGid} {msg.AnalogModbusData.Value}");
 			}
 			else if(message is MultipleAnalogValueSCADAMessage)
 			{

@@ -38,13 +38,15 @@ namespace OutageManagementService.ScadaSubscriber
         {
             if (message is MultipleDiscreteValueSCADAMessage multipleDiscreteValueSCADAMessage)
             {
-                long headBreakerID = OutageIsolationAlgorithmParameters.HeadBreakerId;
-                long recloserID = OutageIsolationAlgorithmParameters.RecloserId;
+                long headBreakerID = OutageIsolationAlgorithmParameters.HeadBreakerMeasurementId;
+                long recloserID = OutageIsolationAlgorithmParameters.RecloserMeasurementId;
 
+                Logger.LogDebug("ScadaNotify from outage.");
                 if (multipleDiscreteValueSCADAMessage.Data.ContainsKey(headBreakerID))
                 {
                     if (multipleDiscreteValueSCADAMessage.Data[headBreakerID].Value == (ushort)DiscreteCommandingType.OPEN)
                     {
+                        Logger.LogDebug("ScadaNotify from outage, open command.");
                         OutageIsolationAlgorithmParameters.AutoResetEvent.Set();
                     }
 

@@ -2,18 +2,17 @@
 using CECommon.Interfaces;
 using CECommon.Providers;
 using Outage.Common;
-using Outage.Common.ServiceContracts.CalculationEngine;
-using SCADAFunctions;
 using System;
 using System.Collections.Generic;
 using System.Linq;
+using CalculationEngine.SCADAFunctions;
 
 namespace Topology
 {
     public class LoadFlow : ILoadFlow
     {
         readonly ILogger logger = LoggerWrapper.Instance;
-        private readonly ISwitchStatusCommandingContract commandingService = new SCADACommandingService();
+        private readonly ISCADACommanding scadaCommanding = new SCADACommanding();
         private HashSet<long> reclosers;
 
         public void UpdateLoadFlow(List<ITopology> topologies)
@@ -146,17 +145,18 @@ namespace Topology
                     {
                         CalculateLoadFlowUpsideDown(element.SecondEnd.First(), recloserGid);
                         element.IsActive = true;
-                        commandingService.SendCommand(measurementGid, 0);
+                        scadaCommanding.SendDiscreteCommand(measurementGid, 0, CommandOriginType.CE_COMMAND);
                     }
                     else if (!element.FirstEnd.IsActive && element.SecondEnd.First().IsActive)
                     {
                         CalculateLoadFlowUpsideDown(element.FirstEnd, recloserGid);
                         element.IsActive = true;
-                        commandingService.SendCommand(measurementGid, 0);
+                        scadaCommanding.SendDiscreteCommand(measurementGid, 0, CommandOriginType.CE_COMMAND);
                     }
                     else
                     {
-                        commandingService.SendCommand(measurementGid, 1);
+                        //TODO: pitati asistente, da li da se prenese na Validate
+                        scadaCommanding.SendDiscreteCommand(measurementGid, 1, CommandOriginType.CE_COMMAND);
                         element.IsActive = false;
                     }
                 }

@@ -122,6 +122,7 @@ namespace NetworkModelServiceFunctions
 				foreach (var measurement in Measurements.Values)
 				{
 					PutMeasurementsInElements(measurement);
+					Provider.Instance.MeasurementProvider.AddMeasurementElementPair(measurement.Id, measurement.ElementId);
 				}
 
 				topologyElements = TopologyElements;
@@ -277,6 +278,15 @@ namespace NetworkModelServiceFunctions
 				else
 				{
 					topologyElement.IsRemote = false;
+				}
+
+				if (rs.ContainsProperty(ModelCode.BREAKER_NORECLOSING))
+				{
+					topologyElement.NoReclosing = rs.GetProperty(ModelCode.BREAKER_NORECLOSING).AsBool();
+				}
+				else
+				{
+					topologyElement.NoReclosing = true;
 				}
 
 				if (rs.ContainsProperty(ModelCode.CONDUCTINGEQUIPMENT_BASEVOLTAGE))

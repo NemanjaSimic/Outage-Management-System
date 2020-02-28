@@ -15,5 +15,6 @@ namespace CECommon.Interfaces
         bool IsActive { get; set; }
         float NominalVoltage { get; set; }
         List<long> Measurements { get; set; }
+        bool NoReclosing { get; set; }
     }
 }
