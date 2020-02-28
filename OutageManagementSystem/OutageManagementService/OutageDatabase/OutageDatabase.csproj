@@ -51,6 +51,14 @@
     <Reference Include="System.Xml" />
   </ItemGroup>
   <ItemGroup>
+    <Compile Include="Migrations\202002271531103_ResolvedTime to RepairedTime.cs" />
+    <Compile Include="Migrations\202002271531103_ResolvedTime to RepairedTime.designer.cs">
+      <DependentUpon>202002271531103_ResolvedTime to RepairedTime.cs</DependentUpon>
+    </Compile>
+    <Compile Include="Migrations\202002281444367_Property IsResolveConditionValidated.cs" />
+    <Compile Include="Migrations\202002281444367_Property IsResolveConditionValidated.designer.cs">
+      <DependentUpon>202002281444367_Property IsResolveConditionValidated.cs</DependentUpon>
+    </Compile>
     <Compile Include="Repository\ActiveOutageRepository.cs" />
     <Compile Include="Repository\ArchivedOutageRepository.cs" />
     <Compile Include="Repository\ConsumerRepository.cs" />
@@ -131,6 +139,12 @@
     </EmbeddedResource>
     <EmbeddedResource Include="Migrations\202002241003148_Move OutageState prop to ActiveOutage.resx">
       <DependentUpon>202002241003148_Move OutageState prop to ActiveOutage.cs</DependentUpon>
+    </EmbeddedResource>
+    <EmbeddedResource Include="Migrations\202002271531103_ResolvedTime to RepairedTime.resx">
+      <DependentUpon>202002271531103_ResolvedTime to RepairedTime.cs</DependentUpon>
+    </EmbeddedResource>
+    <EmbeddedResource Include="Migrations\202002281444367_Property IsResolveConditionValidated.resx">
+      <DependentUpon>202002281444367_Property IsResolveConditionValidated.cs</DependentUpon>
     </EmbeddedResource>
   </ItemGroup>
   <Import Project="$(MSBuildToolsPath)\Microsoft.CSharp.targets" />

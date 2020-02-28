@@ -12,6 +12,8 @@ namespace OMSCommon.OutageDatabaseModel
 
         public ActiveOutageState OutageState { get; set; }
 
+        public bool IsResolveConditionValidated { get; set; }
+
         public ActiveOutage()
             : base()
         {

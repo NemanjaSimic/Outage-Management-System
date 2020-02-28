@@ -12,7 +12,7 @@ namespace Outage.Common.PubSub.OutageDataContract
         [DataMember]
         public DateTime? IsolatedTime { get; set; }
         [DataMember]
-        public DateTime? ResolvedTime { get; set; }
+        public DateTime? RepairedTime { get; set; }
 
         [DataMember]
         public long OutageElementGid { get; set; }
@@ -40,6 +40,9 @@ namespace Outage.Common.PubSub.OutageDataContract
 
         [DataMember]
         public ActiveOutageState OutageState { get; set; }
+
+        [DataMember]
+        public bool IsResolveConditionValidated { get; set; }
 
         public ActiveOutageMessage() 
             : base()

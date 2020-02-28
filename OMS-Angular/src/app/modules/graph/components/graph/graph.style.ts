@@ -33,11 +33,11 @@ export const style = cytoscape.stylesheet()
     .selector('node[type = "warning"]')
     .style({
         'shape': 'rectangle',
-        'background-color': '#2b2935',
+        'background-opacity': '0',
         'background-fit': 'cover',
         'background-image': 'assets/img/warning.png',
-        'height': '20px',
-        'width': '20px'
+        'height': '35px',
+        'width': '35px'
     })
     .selector('node[type = "analogMeasurement"]')
     .style({

@@ -1,13 +1,8 @@
 import tippy from 'tippy.js';
 import { SwitchCommand, SwitchCommandType } from '@shared/models/switch-command.model';
-import { AlarmType } from '@shared/models/scada-data.model';
-//import { GetUnitMeasurement } from './measurement';
 
 const commandableTypes: string[] = ["LOADBREAKSWITCH", "DISCONNECTOR", "BREAKER", "FUSE"];
-
-// global var - lose (trebali bi naci drugacije resenje)
-// mozda da cuvamo u komponenti, pa da prosledjujemo
-let commandedNodeIds: string[] = []; 
+let commandedNodeIds: string[] = [];
 
 const graphTooltipBody: string =
   `<p>ID: [[id]]</p>
@@ -19,30 +14,22 @@ const graphTooltipBody: string =
   <p>State: [[state]]</p>
   <p>Nominal voltage: [[nominalVoltage]]</p>`;
 
-const outageTooltipBody: string =
-  `<p>ID: [[id]]</p>
-  <p>ElementID: [[elementId]]</p>
-  <p>ReportedTime: [[reportedAt]]</p>`;
-
- const measurementsToolTipBody: string =
-`<h3>[[alarmType]]</h3>`;
- 
 export const addGraphTooltip = (cy, node) => {
   let ref = node.popperRef();
-  
+
   node.tooltip = tippy(ref, {
-    content: createTooltipContent(node),
+    content: createNodeTooltipContent(node),
     animation: 'scale',
     trigger: 'manual',
     placement: 'right',
     arrow: true,
     interactive: true
   });
-  
+
   tippy.hideAll();
   setTimeout(() => {
-    if(commandedNodeIds.includes(node.data('id'))) {
-      node.tooltip.setContent(createTooltipContent(node));
+    if (commandedNodeIds.includes(node.data('id'))) {
+      node.tooltip.setContent(createNodeTooltipContent(node));
       node.tooltip.show();
       commandedNodeIds = commandedNodeIds.filter(c => c != node.data('id'));
     }
@@ -62,7 +49,7 @@ export const addGraphTooltip = (cy, node) => {
   });
 }
 
-const createTooltipContent =  (node) => {
+const createNodeTooltipContent = (node) => {
   const div = document.createElement('div');
   div.innerHTML = graphTooltipBody
     .replace("[[id]]", (+node.data('id')).toString(16))
@@ -111,61 +98,6 @@ const createTooltipContent =  (node) => {
   return div;
 };
 
-export const addOutageTooltip = (cy, node, outage) => {
-  if(outage == undefined)
-  {
-    return;
-  }
-  
-  let ref = node.popperRef();
-
-  node.tooltip = tippy(ref, {
-    content: () => {
-      const div = document.createElement('div');
-      div.innerHTML = outageTooltipBody
-        .replace("[[id]]", outage["data"]['id'])
-        .replace("[[elementId]]", outage["data"]['elementId'])
-        .replace("[[reportedAt]]", outage["data"]['reportedAt']);
-    
-        return div;
-      },
-      animation: 'scale',
-      trigger: 'manual',
-      placement: 'right',
-      arrow: true,
-      interactive: true
-  });
-
-  node.on('tap', () => {
-    setTimeout(() => {
-      node.tooltip.show();
-    }, 0);
-  });
-}
-
- export const addAnalogMeasurementTooltip = (cy, node, alarmType) => {
-  let ref = node.popperRef();
-
-  node.tooltip = tippy(ref, {
-    content: () => {
-      const div = document.createElement('div');
-      div.innerHTML = measurementsToolTipBody.replace("[[alarmType]]", AlarmType[alarmType]);
-
-      return div;
-    },
-    animation: 'scale',
-    trigger: 'manual',
-    placement: 'left',
-    arrow: true,
-    interactive: true 
-  })
-
-   node.on('mouseover', () => {
-    node.tooltip.show();
-    setTimeout(function(){ node.tooltip.hide(); }, 2000);
-  }); 
-} 
-
 export const addEdgeTooltip = (cy, node, edge) => {
   let ref = edge.popperRef();
   edge.nodeId = node.data('id');
@@ -183,14 +115,14 @@ export const addEdgeTooltip = (cy, node, edge) => {
         .replace("[[state]]", node.data('state'))
         .replace("[[nominalVoltage]]", node.data('nominalVoltage'));
 
-      return div;
+        return div;
     },
     animation: 'scale',
     trigger: 'manual',
     placement: 'right',
     arrow: true,
     interactive: true
-  });  
+  });
 
   edge.unbind('tap');
   edge.on('tap', () => {
