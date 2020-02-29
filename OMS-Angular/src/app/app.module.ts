@@ -16,12 +16,15 @@ import { MatButtonModule } from '@angular/material/button';
 import { MatIconModule } from '@angular/material/icon';
 import { MatTableModule } from '@angular/material/table';
 import { ArchivedBrowserComponent } from './modules/archived-browser/archived-browser.component';
+import { ModalComponent } from './modules/modal/modal.component';
+import { MatDialogModule} from '@angular/material';
 
 @NgModule({
   declarations: [
     AppComponent,
     ActiveBrowserComponent,
-    ArchivedBrowserComponent
+    ArchivedBrowserComponent,
+    ModalComponent
   ],
   imports: [
     RoutingModule,
@@ -35,11 +38,13 @@ import { ArchivedBrowserComponent } from './modules/archived-browser/archived-br
     MatToolbarModule,
     MatButtonModule,
     MatIconModule,
-    MatTableModule
+    MatTableModule,
+    MatDialogModule
   ],
   providers: [
     ServicesModule
   ],
-  bootstrap: [AppComponent]
+  bootstrap: [AppComponent],
+  entryComponents: [ModalComponent]
 })
 export class AppModule { }

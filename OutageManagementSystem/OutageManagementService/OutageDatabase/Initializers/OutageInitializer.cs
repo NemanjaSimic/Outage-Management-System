@@ -47,7 +47,7 @@ namespace OutageDatabase.Initializers
                     OutageElementGid = 0x0000000a00000007,
                     ReportTime = DateTime.UtcNow,
                     IsolatedTime = DateTime.UtcNow,
-                    ResolvedTime = DateTime.UtcNow,
+                    RepairedTime = DateTime.UtcNow,
                     ArchiveTime = DateTime.UtcNow,
                     DefaultIsolationPoints = string.Empty,
                     OptimumIsolationPoints = string.Empty,
