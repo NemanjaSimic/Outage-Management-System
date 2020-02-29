@@ -14,7 +14,6 @@ using Outage.Common.ServiceProxies;
 using Outage.Common.ServiceProxies.CalcualtionEngine;
 using Outage.Common.ServiceProxies.Outage;
 using Outage.Common.ServiceProxies.PubSub;
-using OutageDatabase;
 using OutageDatabase.Repository;
 using OutageManagementService.ScadaSubscriber;
 using System;
@@ -24,6 +23,7 @@ using System.Linq;
 using System.Threading.Tasks;
 using System.Timers;
 using AutoResetEvent = System.Threading.AutoResetEvent;
+using OMSCommon.OutageDatabaseModel;
 
 namespace OutageManagementService
 {
@@ -187,11 +187,6 @@ namespace OutageManagementService
         {
             bool success = false;
             Logger.LogDebug($"Reporting outage for gid: 0x{gid:X16}");
-            Logger.LogDebug("Commanded elements: ");
-            foreach(long id in commandedElements)
-            {
-                logger.LogDebug($"{id}");
-            }
 
             if (commandedElements.Contains(gid) || optimumIsolationPoints.Contains(gid))
             {
@@ -200,7 +195,6 @@ namespace OutageManagementService
 
             List<long> affectedConsumersIds = new List<long>();
 
-            //TODO: special case: potenitial outage is remote (and closed)...
 
             affectedConsumersIds = GetAffectedConsumers(gid);
 
@@ -214,7 +208,7 @@ namespace OutageManagementService
 
             if (dbContext.ActiveOutageRepository.Find(o => o.OutageElementGid == gid).FirstOrDefault() != null)
             {
-                Logger.LogWarn($"Reported malfunction on element with gid: 0x{gid:x16} has already been reported.");
+                Logger.LogWarn($"Malfunction on element with gid: 0x{gid:x16} has already been reported.");
                 return false;
             }
 
@@ -227,7 +221,7 @@ namespace OutageManagementService
             }
 
             long recloserId;
-            
+
             try
             {
                 recloserId = GetRecloserForHeadBreaker(gid);
@@ -237,15 +231,7 @@ namespace OutageManagementService
                 throw e;
             }
 
-            string defaultIsolationEndpoints = "";
-            if (recloserId != -1)
-            {
-                defaultIsolationEndpoints = $"{gid}|{recloserId}";
-            }
-            else
-            {
-                defaultIsolationEndpoints = $"{gid}";
-            }
+            string defaultIsolationEndpoints = GetDefaultIsolationEndpointsString(gid, recloserId);
 
             ActiveOutage createdActiveOutage = new ActiveOutage
             {
@@ -280,8 +266,8 @@ namespace OutageManagementService
                 try
                 {
                     success = PublishOutage(Topic.ACTIVE_OUTAGE, outageMessageMapper.MapActiveOutage(activeOutageDb));
-                    
-                    if(success)
+
+                    if (success)
                     {
                         Logger.LogInfo($"Outage on element with gid: 0x{activeOutageDb.OutageElementGid:x16} is successfully published");
                     }
@@ -296,9 +282,11 @@ namespace OutageManagementService
             return success;
         }
 
-        public bool IsolateOutage(long outageId)
+        
+
+        public void IsolateOutage(long outageId)
         {
-            bool success = false;
+            //bool success = false;
          
             ActiveOutage outageToIsolate = dbContext.ActiveOutageRepository.Get(outageId);
 
@@ -306,34 +294,58 @@ namespace OutageManagementService
             {
                 if (outageToIsolate.OutageState == ActiveOutageState.CREATED)
                 {
-                    try
-                    {
-                        success = StartIsolationAlgorthm(outageToIsolate);
-                    }
-                    catch (Exception e)
-                    {
-                        success = false;
-                        Logger.LogError("Exception on StartIsolationAlgorthm() method.", e);
-                    }
+                    //try
+                    //{
+                    //    success = StartIsolationAlgorthm(outageToIsolate);
 
-                    if (success)
-                    {
-                        dbContext.Complete();
-                    }
 
-                    if (success)
-                    {
-                        try
-                        {
-                            PublishOutage(Topic.ACTIVE_OUTAGE, outageMessageMapper.MapActiveOutage(outageToIsolate));
-                            Logger.LogInfo($"Outage with id: 0x{outageToIsolate.OutageId:x16} is successfully published");
-                            success = true;
-                        }
-                        catch (Exception e) //TODO: Exception over proxy or enum...
-                        {
-                            Logger.LogError("Error occured while trying to publish outage.", e);
-                        }
-                    }
+                        Task.Run(() => StartIsolationAlgorthm(outageToIsolate))
+                            .ContinueWith(task =>
+                            {
+                                if (task.Result) 
+                                { 
+                                    dbContext.Complete();
+                                }
+                            }, TaskContinuationOptions.OnlyOnRanToCompletion)
+                            .ContinueWith(task =>
+                            {
+                                try
+                                {
+                                    PublishOutage(Topic.ACTIVE_OUTAGE, outageMessageMapper.MapActiveOutage(outageToIsolate));
+                                    Logger.LogInfo($"Outage with id: 0x{outageToIsolate.OutageId:x16} is successfully published.");
+                                }
+                                catch (Exception e) 
+                                {
+                                    //TODO: mozda publish neke greske??
+                                    Logger.LogError("Error occured while trying to publish outage.", e);
+                                }
+                            }, TaskContinuationOptions.OnlyOnRanToCompletion);
+                    //}
+                    //catch (Exception e)
+                    //{
+                    //    success = false;
+                    //    Logger.LogError("Exception on StartIsolationAlgorthm() method.", e);
+                    //}
+
+                    //if (success)
+                    //{
+                    //    dbContext.Complete();
+                    //}
+
+                    //if (success)
+                    //{
+                    //    try
+                    //    {
+                    //        PublishOutage(Topic.ACTIVE_OUTAGE, outageMessageMapper.MapActiveOutage(outageToIsolate));
+                    //        Logger.LogInfo($"Outage with id: 0x{outageToIsolate.OutageId:x16} is successfully published");
+                    //        success = true;
+                    //    }
+                    //    catch (Exception e) //TODO: Exception over proxy or enum...
+                    //    {
+                    //        Logger.LogError("Error occured while trying to publish outage.", e);
+                    //        throw e;
+                    //    }
+                    //}
                 }
                 else
                 {
@@ -343,11 +355,13 @@ namespace OutageManagementService
             else
             {
                 Logger.LogWarn($"Outage with id 0x{outageId:X16} is not found in database.");
-                success = false;
+                //success = false;
             }
 
-            return success;
+            //return success;
         }
+
+        
 
         public bool SendRepairCrew(long outageId)
         {
@@ -379,7 +393,7 @@ namespace OutageManagementService
             Task task = Task.Run(() =>
             {
                 Task.Delay(new TimeSpan(15000));
-
+                
                 using(OutageSimulatorServiceProxy proxy = proxyFactory.CreateProxy<OutageSimulatorServiceProxy, IOutageSimulatorContract>(EndpointNames.OutageSimulatorServiceEndpoint))
                 {
                     if(proxy == null)
@@ -434,6 +448,21 @@ namespace OutageManagementService
         #endregion
 
         #region Private Methods
+        private string GetDefaultIsolationEndpointsString(long gid, long recloserId)
+        {
+            string defaultIsolationEndpoints = "";
+            if (recloserId != -1)
+            {
+                defaultIsolationEndpoints = $"{gid}|{recloserId}";
+            }
+            else
+            {
+                defaultIsolationEndpoints = $"{gid}";
+            }
+
+            return defaultIsolationEndpoints;
+        }
+
         private void ImportTopologyModel()
         {
             using (OMSTopologyServiceProxy omsTopologyProxy = proxyFactory.CreateProxy<OMSTopologyServiceProxy, ITopologyOMSService>(EndpointNames.TopologyOMSServiceEndpoint))
@@ -573,53 +602,28 @@ namespace OutageManagementService
 
         private bool StartIsolationAlgorthm(ActiveOutage outageToIsolate)
         {
-            bool isIsolated = false;
-
-
             List<long> defaultIsolationPoints = GetElementIdsFromString(outageToIsolate.DefaultIsolationPoints);
 
+            bool isIsolated;
+            bool isFirstBreakerRecloser;
             if (defaultIsolationPoints.Count > 0 && defaultIsolationPoints.Count < 3)
             {
                 long headBreaker = -1;
                 long recloser = -1;
                 try
                 {
-                    bool isFirstBreakerRecloser = CheckIfBreakerIsRecloser(defaultIsolationPoints[0]);
+                    isFirstBreakerRecloser = CheckIfBreakerIsRecloser(defaultIsolationPoints[0]);
                     //TODO is second recloser (future)
-                    if (defaultIsolationPoints.Count == 2)
-                    {
-                        if (isFirstBreakerRecloser)
-                        {
-                            headBreaker = defaultIsolationPoints[1];
-                            recloser = defaultIsolationPoints[0];
-                        }
-                        else
-                        {
-                            headBreaker = defaultIsolationPoints[0];
-                            recloser = defaultIsolationPoints[1];
-                        }
-                        commandedElements.Add(headBreaker);
-                        commandedElements.Add(recloser);
-                    }
-                    else
-                    {
-                        if (!isFirstBreakerRecloser)
-                        {
-                            headBreaker = defaultIsolationPoints[0];
-                            commandedElements.Add(headBreaker);
-                        }
-                        else
-                        {
-                            Logger.LogWarn($"Invalid state: breaker with id 0x{defaultIsolationPoints[0]:X16} is the only default isolation element, but it is also a recloser.");
-                            isIsolated = false;
-                        }
-                    }
+                    
                 }
                 catch (Exception e)
                 {
                     Logger.LogWarn("Exception on method CheckIfBreakerIsRecloser()", e);
+                    throw e;
 
                 }
+
+                GetHeadBreakerAndRecloser(defaultIsolationPoints, isFirstBreakerRecloser, ref headBreaker, ref recloser);
 
 
                 if (headBreaker != -1)
@@ -642,7 +646,7 @@ namespace OutageManagementService
                                     recloserMeasurementId = -1;
                                 }
                             }
-                            catch(Exception e)
+                            catch (Exception e)
                             {
                                 Logger.LogError("Error on GetMeasurementsForElement() method.", e);
                                 throw e;
@@ -691,7 +695,6 @@ namespace OutageManagementService
                                     Logger.LogDebug("Timer stoped");
                                     SendSCADACommand(currentBreakerId, DiscreteCommandingType.CLOSE);
                                 }
-
                             }
                         }
 
@@ -699,7 +702,7 @@ namespace OutageManagementService
                         if (currentBreakerId != 0 && currentBreakerId != recloser)
                         {
                             outageToIsolate.OptimumIsolationPoints = $"{currentBreakerId}|{nextBreakerId}";
-                           
+
 
                             if (!topologyModel.OutageTopology.ContainsKey(nextBreakerId))
                             {
@@ -743,7 +746,7 @@ namespace OutageManagementService
                     }
                     else
                     {
-                        Logger.LogWarn($"Head breaker type is {mc}, not a BREAKER.");
+                        Logger.LogWarn($"Head breaker type is {mc}, not a {ModelCode.BREAKER}.");
                         isIsolated = false;
                     }
 
@@ -765,6 +768,37 @@ namespace OutageManagementService
             return isIsolated;
         }
 
+
+        private void GetHeadBreakerAndRecloser(List<long>defaultIsolationPoints, bool isFirstBreakerRecloser, ref long headBreaker, ref long recloser)
+        {
+            if (defaultIsolationPoints.Count == 2)
+            {
+                if (isFirstBreakerRecloser)
+                {
+                    headBreaker = defaultIsolationPoints[1];
+                    recloser = defaultIsolationPoints[0];
+                }
+                else
+                {
+                    headBreaker = defaultIsolationPoints[0];
+                    recloser = defaultIsolationPoints[1];
+                }
+                commandedElements.Add(headBreaker);
+                commandedElements.Add(recloser);
+            }
+            else
+            {
+                if (!isFirstBreakerRecloser)
+                {
+                    headBreaker = defaultIsolationPoints[0];
+                    commandedElements.Add(headBreaker);
+                }
+                else
+                {
+                    Logger.LogWarn($"Invalid state: breaker with id 0x{defaultIsolationPoints[0]:X16} is the only default isolation element, but it is also a recloser.");
+                }
+            }
+        }
         private void SendSCADACommand(long currentBreakerId, DiscreteCommandingType discreteCommandingType)
         {
             long measrement = -1;
