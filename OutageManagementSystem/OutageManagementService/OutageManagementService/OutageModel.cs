@@ -389,7 +389,7 @@ namespace OutageManagementService
                         throw new NullReferenceException(message);
                     }
 
-                    if(proxy.ResolvedOutage(outageDB.OutageElementGid))
+                    if(proxy.StopOutageSimulation(outageDB.OutageElementGid))
                     {
                         outageDB.OutageState = ActiveOutageState.REPAIRED;
                         outageDB.RepairedTime = DateTime.UtcNow;

@@ -383,7 +383,7 @@ namespace OMS.OutageSimulator.UserControls
             
             for(int i = 0; i < DefaultIsolationPoints.Count; i++)
             {
-                if(!outage.DefaultToOptimumIsolationPointMap.ContainsKey(DefaultIsolationPoints[i].GID))
+                if(!outage.DefaultToOptimumIsolationPointMap.ContainsKey(DefaultIsolationPoints[i].GID) && i < OptimumIsolationPoints.Count)
                 {
                     outage.DefaultToOptimumIsolationPointMap.Add(DefaultIsolationPoints[i].GID, OptimumIsolationPoints[i].GID);
                 }
