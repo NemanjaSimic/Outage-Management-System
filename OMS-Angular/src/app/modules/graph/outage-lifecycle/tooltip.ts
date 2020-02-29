@@ -52,9 +52,6 @@ const generateTemplate = (outage: ActiveOutage) => {
             : generateIsolatedOutageTemplate(outage)
 }
 
-// ughh
-// @TODO:
-// - change to a map function
 const generateButton = (outage: ActiveOutage, node) => {
 
     if (outage.State == OutageLifeCycleState.Created) {
@@ -67,43 +64,7 @@ const generateButton = (outage: ActiveOutage, node) => {
         return button;
     }
 
-    if (outage.State == OutageLifeCycleState.Isolated)
-        if (outage.ReportedAt) {
-            if (!outage.IsValidated) {
-                const resolveButton = document.createElement('button');
-                resolveButton.innerHTML = "Resolve";
-                resolveButton.disabled = true;
-
-                const validateButton = document.createElement('button');
-                validateButton.innerHTML = "Validate";
-                validateButton.addEventListener('click', () => {
-                    node.sendValidateOutageCommand(outage.Id);
-                    commandedNodeIds.push(node.data('id'));
-                });
-
-                const buttonDiv = document.createElement('div');
-                buttonDiv.append(resolveButton);
-                buttonDiv.append(validateButton);
-                return buttonDiv;
-            } else {
-                const resolveButton = document.createElement('button');
-                resolveButton.innerHTML = "Resolve";
-                resolveButton.addEventListener('click', () => {
-                    node.sendResolveOutageCommand(outage.Id);
-                    commandedNodeIds.push(node.data('id'));
-                });
-
-                const validateButton = document.createElement('button');
-                validateButton.innerHTML = "Validate";
-                validateButton.disabled = true;
-
-                const buttonDiv = document.createElement('div');
-                buttonDiv.append(resolveButton);
-                buttonDiv.append(validateButton);
-                return buttonDiv;
-            }
-
-        } else {
+    if (outage.State == OutageLifeCycleState.Isolated) {
             const button = document.createElement('button');
             button.innerHTML = "Send Repair Crew";
             button.addEventListener('click', () => {
@@ -111,5 +72,41 @@ const generateButton = (outage: ActiveOutage, node) => {
                 commandedNodeIds.push(node.data('id'));
             });
             return button;
+    }
+
+    if(outage.State == OutageLifeCycleState.Repaired) {
+        if (!outage.IsValidated) {
+            const resolveButton = document.createElement('button');
+            resolveButton.innerHTML = "Resolve";
+            resolveButton.disabled = true;
+
+            const validateButton = document.createElement('button');
+            validateButton.innerHTML = "Validate";
+            validateButton.addEventListener('click', () => {
+                node.sendValidateOutageCommand(outage.Id);
+                commandedNodeIds.push(node.data('id'));
+            });
+
+            const buttonDiv = document.createElement('div');
+            buttonDiv.append(resolveButton);
+            buttonDiv.append(validateButton);
+            return buttonDiv;
+        } else {
+            const resolveButton = document.createElement('button');
+            resolveButton.innerHTML = "Resolve";
+            resolveButton.addEventListener('click', () => {
+                node.sendResolveOutageCommand(outage.Id);
+                commandedNodeIds.push(node.data('id'));
+            });
+
+            const validateButton = document.createElement('button');
+            validateButton.innerHTML = "Validate";
+            validateButton.disabled = true;
+
+            const buttonDiv = document.createElement('div');
+            buttonDiv.append(resolveButton);
+            buttonDiv.append(validateButton);
+            return buttonDiv;
         }
+    }        
 }
