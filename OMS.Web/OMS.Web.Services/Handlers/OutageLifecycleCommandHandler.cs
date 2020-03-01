@@ -120,7 +120,7 @@
             {
                 try
                 {
-                    commandingProxy.IsolateOutage(request.OutageId);
+                    commandingProxy.ResolveOutage(request.OutageId);
                 }
                 catch (Exception ex)
                 {
