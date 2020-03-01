@@ -1,7 +1,9 @@
 import tippy from 'tippy.js';
 
 import {
-    generateCreatedOutageTemplate, generateRepairCrewOutageTemplate, generateIsolatedOutageTemplate
+    generateCreatedOutageTemplate,
+    generateRepairCrewOutageTemplate,
+    generateIsolatedOutageTemplate
 } from './contents';
 import { ActiveOutage, OutageLifeCycleState } from '@shared/models/outage.model';
 
@@ -55,9 +57,6 @@ const generateTemplate = (outage: ActiveOutage) => {
         return generateRepairCrewOutageTemplate(outage);
 }
 
-// ughh
-// @TODO:
-// - change to a map function
 const generateButton = (outage: ActiveOutage, node) => {
     if (outage.State == OutageLifeCycleState.Created) {
         const button = document.createElement('button');
