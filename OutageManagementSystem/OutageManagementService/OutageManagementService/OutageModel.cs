@@ -14,13 +14,13 @@ using Outage.Common.ServiceProxies;
 using Outage.Common.ServiceProxies.CalcualtionEngine;
 using Outage.Common.ServiceProxies.Outage;
 using Outage.Common.ServiceProxies.PubSub;
-using OutageDatabase;
 using OutageDatabase.Repository;
 using OutageManagementService.ScadaSubscriber;
 using System;
 using System.Collections.Concurrent;
 using System.Collections.Generic;
 using System.Linq;
+using System.Text;
 using System.Threading.Tasks;
 using System.Timers;
 using AutoResetEvent = System.Threading.AutoResetEvent;
@@ -372,13 +372,13 @@ namespace OutageManagementService
 
             if(outageDB.OutageState != ActiveOutageState.ISOLATED)
             {
-                Logger.LogError($"Outage with id 0x{outageId:X16} is in state {outageDB.OutageState}, and thus repair crew can not be sent. (Expected state: {ActiveOutageState.CREATED})");
+                Logger.LogError($"Outage with id 0x{outageId:X16} is in state {outageDB.OutageState}, and thus repair crew can not be sent. (Expected state: {ActiveOutageState.ISOLATED})");
                 return false;
             }
 
             Task task = Task.Run(() =>
             {
-                Task.Delay(new TimeSpan(15000));
+                Task.Delay(10000).Wait();
 
                 using(OutageSimulatorServiceProxy proxy = proxyFactory.CreateProxy<OutageSimulatorServiceProxy, IOutageSimulatorContract>(EndpointNames.OutageSimulatorServiceEndpoint))
                 {
@@ -424,12 +424,154 @@ namespace OutageManagementService
 
         public bool ValidateResolveConditions(long outageId)
         {
-            throw new NotImplementedException();
+            ActiveOutage outageDB = null;
+
+            try
+            {
+                outageDB = dbContext.ActiveOutageRepository.Get(outageId);
+            }
+            catch (Exception e)
+            {
+                string message = "OutageModel::SendRepairCrew => exception in UnitOfWork.ActiveOutageRepository.Get()";
+                Logger.LogError(message, e);
+                throw e;
+            }
+
+            if (outageDB == null)
+            {
+                Logger.LogError($"Outage with id 0x{outageId:X16} is not found in database.");
+                return false;
+            }
+
+            if (outageDB.OutageState != ActiveOutageState.REPAIRED)
+            {
+                Logger.LogError($"Outage with id 0x{outageId:X16} is in state {outageDB.OutageState}, and thus repair crew can not be sent. (Expected state: {ActiveOutageState.REPAIRED})");
+                return false;
+            }
+
+            List<long> isolationPoints = new List<long>();
+            isolationPoints.AddRange(ParseIsolationPointsFromCSV(outageDB.DefaultIsolationPoints));
+            isolationPoints.AddRange(ParseIsolationPointsFromCSV(outageDB.OptimumIsolationPoints));
+
+            bool resolveCondition = true;
+
+            foreach (long isolationPointId in isolationPoints)
+            {
+                if(TopologyModel.GetElementByGid(isolationPointId, out IOutageTopologyElement element))
+                {
+                    if(element.NoReclosing != element.IsActive)
+                    {
+                        resolveCondition = false;
+                        break;
+                    }
+                }
+            }
+
+            outageDB.IsResolveConditionValidated = resolveCondition;
+
+            dbContext.ActiveOutageRepository.Update(outageDB);
+
+            try
+            {
+                dbContext.Complete();
+                PublishOutage(Topic.ACTIVE_OUTAGE, outageMessageMapper.MapActiveOutage(outageDB));
+            }
+            catch(Exception e)
+            {
+                string message = "OutageModel::ValidateResolveConditions => exception in Complete method.";
+                Logger.LogError(message, e);
+            }
+
+            return true;
         }
 
         public bool ResolveOutage(long outageId)
         {
-            throw new NotImplementedException();
+            ActiveOutage outageDB = null;
+
+            try
+            {
+                outageDB = dbContext.ActiveOutageRepository.Get(outageId);
+            }
+            catch (Exception e)
+            {
+                string message = "OutageModel::SendRepairCrew => exception in UnitOfWork.ActiveOutageRepository.Get()";
+                Logger.LogError(message, e);
+                throw e;
+            }
+
+            if (outageDB == null)
+            {
+                Logger.LogError($"Outage with id 0x{outageId:X16} is not found in database.");
+                return false;
+            }
+
+            if (outageDB.OutageState != ActiveOutageState.REPAIRED)
+            {
+                Logger.LogError($"Outage with id 0x{outageId:X16} is in state {outageDB.OutageState}, and thus repair crew can not be sent. (Expected state: {ActiveOutageState.REPAIRED})");
+                return false;
+            }
+
+            if(!outageDB.IsResolveConditionValidated)
+            {
+                //TODO: mozda i ovde odraditi proveru uslova?
+                Logger.LogWarn("ResolveOutage => resolve conditions not validated.");
+                return false;
+            }
+
+            ArchivedOutage createdArchivedOutage = new ArchivedOutage()
+            {
+                OutageId = outageDB.OutageId,
+                OutageElementGid = outageDB.OutageElementGid,
+                ReportTime = outageDB.ReportTime,
+                IsolatedTime = outageDB.IsolatedTime,
+                RepairedTime = outageDB.RepairedTime,
+                ArchiveTime = DateTime.UtcNow,
+                DefaultIsolationPoints = outageDB.DefaultIsolationPoints,
+                OptimumIsolationPoints = outageDB.OptimumIsolationPoints,
+                AffectedConsumers = outageDB.AffectedConsumers,
+            };
+
+            bool success; 
+            ArchivedOutage archivedOutageDb = dbContext.ArchivedOutageRepository.Add(createdArchivedOutage);
+
+            try
+            {
+                dbContext.Complete();
+                Logger.LogDebug($"ArchivedOutage on element with gid: 0x{archivedOutageDb.OutageElementGid:x16} is successfully stored in database.");
+                success = true;
+            }
+            catch (Exception e)
+            {
+                string message = "OutageModel::ResolveOutage method => exception on Complete()";
+                Logger.LogError(message, e);
+                Console.WriteLine($"{message}, Message: {e.Message})");
+
+                //TODO: da li je dobar handle?
+                dbContext.Dispose();
+                dbContext = new UnitOfWork();
+                success = false;
+            }
+
+            if (success && archivedOutageDb != null) //TODO: ne svidja mi se ova konstrukcija...
+            {
+                try
+                {
+                    success = PublishOutage(Topic.ARCHIVED_OUTAGE, outageMessageMapper.MapArchivedOutage(archivedOutageDb));
+
+                    if (success)
+                    {
+                        Logger.LogInfo($"ArchivedOutage on element with gid: 0x{archivedOutageDb.OutageElementGid:x16} is successfully published");
+                    }
+                }
+                catch (Exception e) //TODO: Exception over proxy or enum...
+                {
+                    Logger.LogError("OutageModel::ResolveOutage => exception on PublishActiveOutage()", e);
+                    success = false;
+                }
+            }
+
+            return success;
         }
         #endregion
 
@@ -448,6 +590,7 @@ namespace OutageManagementService
                 TopologyModel = (OutageTopologyModel)omsTopologyProxy.GetOMSModel();
             }
         }
+        
         private long GetNextBreaker(long breakerId)
         {
             if (!topologyModel.OutageTopology.ContainsKey(breakerId))
@@ -483,7 +626,6 @@ namespace OutageManagementService
             return nextBreakerId;
         }
         
-
         private long GetRecloserForHeadBreaker(long headBreakerId)
         {
             long recolserId = -1;
@@ -928,6 +1070,44 @@ namespace OutageManagementService
             }
 
             return affectedConsumers;
+        }
+
+        private List<long> ParseIsolationPointsFromCSV(string isolationPointsCSV)
+        {
+            List<long> isolationPoints = new List<long>();
+
+            foreach(string isolationPointString in isolationPointsCSV.Split('|'))
+            {
+                if(long.TryParse(isolationPointString, out long isolationPointId))
+                {
+                    isolationPoints.Add(isolationPointId);
+                }
+                else
+                {
+                    Logger.LogError("Parsing error in ParseIsolationPointsFromCSV.");
+                    isolationPoints.Clear();
+                    //throw?
+                }
+            }
+
+            return isolationPoints;
+        }
+
+        private string ParseIsolationPointsToCSV(List<long> isolationPoints)
+        {
+            StringBuilder isolationPointsCSV = new StringBuilder();
+
+            for (int i = 0; i < isolationPoints.Count; i++)
+            {
+                isolationPointsCSV.Append($"{isolationPoints[i]}");
+
+                if(i < isolationPoints.Count - 1)
+                {
+                    isolationPointsCSV.Append("|");
+                }
+            }
+
+            return isolationPointsCSV.ToString();
         }
         #endregion
 
