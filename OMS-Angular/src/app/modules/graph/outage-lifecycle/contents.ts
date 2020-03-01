@@ -12,7 +12,7 @@ export const generateCreatedOutageTemplate = (outage: ActiveOutage) => {
     return createdOutageTooltipContent
         .replace("[[id]]", outage.Id.toString())
         .replace("[[defaultIsolationPoints]]", outage.DefaultIsolationPoints.join(separator))
-        .replace("[[affectedConsumers]]", outage.AffectedConsumers.join(separator))
+        .replace("[[affectedConsumers]]", outage.AffectedConsumers.map(aff => aff.Id).join(separator))
         .replace("[[state]]", OutageLifeCycleState[outage.State])
         .replace("[[reportedAt]]", formatDate(outage.ReportedAt));
 }
@@ -23,7 +23,7 @@ export const generateIsolatedOutageTemplate = (outage: ActiveOutage) => {
         .replace("[[elementId]]", outage.ElementId.toString())
         .replace("[[defaultIsolationPoints]]", outage.DefaultIsolationPoints.join(separator))
         .replace("[[optimalIsolationPoints]]", outage.OptimalIsolationPoints.join(separator))
-        .replace("[[affectedConsumers]]", outage.AffectedConsumers.join(','))
+        .replace("[[affectedConsumers]]", outage.AffectedConsumers.map(aff => aff.Id).join(separator))
         .replace("[[state]]", OutageLifeCycleState[outage.State])
         .replace("[[reportedAt]]", formatDate(outage.ReportedAt));
 }
@@ -34,7 +34,7 @@ export const generateRepairCrewOutageTemplate = (outage: ActiveOutage) => {
         .replace("[[elementId]]", outage.ElementId.toString())
         .replace("[[defaultIsolationPoints]]", outage.DefaultIsolationPoints.join(separator))
         .replace("[[optimalIsolationPoints]]", outage.OptimalIsolationPoints.join(separator))
-        .replace("[[affectedConsumers]]", outage.AffectedConsumers.join(','))
+        .replace("[[affectedConsumers]]", outage.AffectedConsumers.map(aff => aff.Id).join(separator))
         .replace("[[state]]", OutageLifeCycleState[outage.State])
         .replace("[[reportedAt]]", formatDate(outage.ReportedAt))
         .replace("[[repairedAt]]", formatDate(outage.RepairedAt));

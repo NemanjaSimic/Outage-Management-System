@@ -96,6 +96,7 @@ export class GraphComponent implements OnInit, OnDestroy {
     this.startOutageConnection();
 
     this.cy = cytoscape({});
+    this.getActiveOutages();
 
     this.legendItems = legendData.items;
   }
@@ -124,6 +125,16 @@ export class GraphComponent implements OnInit, OnDestroy {
     this.topologySubscription = this.graphService.getTopology().subscribe(
       graph => this.onNotification(graph),
       error => console.log(error)
+    );
+  }
+
+  public getActiveOutages(): void {
+    this.outageService.getAllActiveOutages().subscribe(
+      outages => {
+        console.log(outages);
+        this.activeOutages = outages;
+      },
+      err => console.log(err)
     );
   }
 
@@ -321,27 +332,32 @@ export class GraphComponent implements OnInit, OnDestroy {
 
   public addOutageTooltips(): void {
     console.log(this.activeOutages);
+    console.log('heeeejj')
     for (const activeOutage of this.activeOutages) {
       let outageElement;
 
-      if (activeOutage.State == OutageLifeCycleState.Created)
-        if(activeOutage.DefaultIsolationPoints.length)
-          outageElement = this.cy.nodes().filter(node => node.data('id') == activeOutage.DefaultIsolationPoints[0].toString())[0];
-        else
-        outageElement = undefined; //hhmmm
-      else if (activeOutage.State == OutageLifeCycleState.Isolated)
-        outageElement = this.cy.nodes().filter(node => node.data('id') == activeOutage.ElementId)[0];
+      if (activeOutage.State == OutageLifeCycleState.Created) {
+        if (activeOutage.DefaultIsolationPoints.length)
+          outageElement = this.cy.nodes().filter(node => node.data('id') == activeOutage.DefaultIsolationPoints[0].toString(16))[0];
+      }
 
-        if(outageElement){
-          const outageNodeId = drawWarningOnNode(this.cy, outageElement);
-          const outageNode = this.cy.nodes().filter(node => node.data('id') == outageNodeId)[0];
-          outageNode.sendIsolateOutageCommand = (id) => this.onIsolateOutageCommand(id);
-          outageNode.sendRepairCrewCommand = (id) => this.onSendCrewOutageCommand(id);
-          outageNode.sendValidateOutageCommand = (id) => this.onValidateOutageCommand(id);
-          outageNode.sendResolveOutageCommand = (id) => this.onResolveOutageCommand(id);
-          addOutageTooltip(this.cy, outageNode, activeOutage);
-        }
-      
+      // @TODO:
+      // - proveriti sa Dimitrijem gde se iscrta kad je Repaired ?
+      if (activeOutage.State == OutageLifeCycleState.Isolated 
+        || activeOutage.State == OutageLifeCycleState.Repaired) 
+      {
+        outageElement = this.cy.nodes().filter(node => node.data('id') == activeOutage.ElementId)[0];
+      }    
+
+      if (outageElement) {
+        const outageNodeId = drawWarningOnNode(this.cy, outageElement);
+        const outageNode = this.cy.nodes().filter(node => node.data('id') == outageNodeId)[0];
+        outageNode.sendIsolateOutageCommand = (id) => this.onIsolateOutageCommand(id);
+        outageNode.sendRepairCrewCommand = (id) => this.onSendCrewOutageCommand(id);
+        outageNode.sendValidateOutageCommand = (id) => this.onValidateOutageCommand(id);
+        outageNode.sendResolveOutageCommand = (id) => this.onResolveOutageCommand(id);
+        addOutageTooltip(this.cy, outageNode, activeOutage);
+      }
     }
   }
 

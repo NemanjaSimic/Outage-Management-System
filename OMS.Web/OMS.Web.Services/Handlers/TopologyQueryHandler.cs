@@ -17,14 +17,13 @@
     {
         private readonly IGraphMapper _mapper;
         private readonly ILogger _logger;
-        private ProxyFactory _proxyFactory;
+        private IProxyFactory _proxyFactory;
 
-        public TopologyQueryHandler(IGraphMapper mapper, ILogger logger)
+        public TopologyQueryHandler(IGraphMapper mapper, ILogger logger, IProxyFactory factory)
         {
             _mapper = mapper;
             _logger = logger;
-
-            _proxyFactory = new ProxyFactory();
+            _proxyFactory = factory;
         }
 
         public Task<OmsGraphViewModel> Handle(GetTopologyQuery request, CancellationToken cancellationToken)
