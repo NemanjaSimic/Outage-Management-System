@@ -50,8 +50,8 @@
                     }
                 }
 
-                return null;
-            });
+                return Task.FromResult(new Unit());
+            }, cancellationToken);
         }
 
         public Task<Unit> Handle(SendOutageLocationIsolationCrewCommand request, CancellationToken cancellationToken)
@@ -77,8 +77,8 @@
                     }
                 }
 
-                return null;
-            });
+                return Task.FromResult(new Unit()); 
+            }, cancellationToken);
         }
 
         public Task<Unit> Handle(SendOutageRepairCrewCommand request, CancellationToken cancellationToken)
@@ -101,8 +101,8 @@
                     }
                 }
 
-                return null;
-            });
+                return Task.FromResult(new Unit());
+            }, cancellationToken);
         }
 
         public Task<Unit> Handle(ValidateResolveConditionsCommand request, CancellationToken cancellationToken)
@@ -128,8 +128,8 @@
                     }
                 }
 
-                return null;
-            });
+                return Task.FromResult(new Unit());
+            }, cancellationToken);
         }
 
         public Task<Unit> Handle(ResolveOutageCommand request, CancellationToken cancellationToken)
@@ -155,8 +155,8 @@
                     }
                 }
 
-                return null;
-            });
+                return Task.FromResult(new Unit());
+            }, cancellationToken);
         }
     }
 }

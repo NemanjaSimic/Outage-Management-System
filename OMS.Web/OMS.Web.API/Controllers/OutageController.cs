@@ -56,7 +56,7 @@ namespace OMS.Web.API.Controllers
         {
             try
             {
-                _ = await _mediator.Send(new SendOutageLocationIsolationCrewCommand(id));
+                await _mediator.Send(new SendOutageLocationIsolationCrewCommand(id));
             }
             catch (Exception)
             {
@@ -72,7 +72,7 @@ namespace OMS.Web.API.Controllers
         {
             try
             {
-                _ = await _mediator.Send(new SendOutageRepairCrewCommand(id));
+                await _mediator.Send(new SendOutageRepairCrewCommand(id));
             }
             catch (Exception e)
             {
@@ -104,7 +104,7 @@ namespace OMS.Web.API.Controllers
         {
             try
             {
-                _ = await _mediator.Send(new ResolveOutageCommand(id));
+                await _mediator.Send(new ResolveOutageCommand(id));
             }
             catch (Exception)
             {

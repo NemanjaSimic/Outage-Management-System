@@ -320,7 +320,6 @@ export class GraphComponent implements OnInit, OnDestroy {
       });
       this.drawGraph();
     });
-    console.log(data);
   }
 
   public onActiveOutageNotification(outage: ActiveOutage): void {
@@ -331,14 +330,12 @@ export class GraphComponent implements OnInit, OnDestroy {
   }
 
   public addOutageTooltips(): void {
-    console.log(this.activeOutages);
-    console.log('heeeejj')
     for (const activeOutage of this.activeOutages) {
       let outageElement;
-
+      
       if (activeOutage.State == OutageLifeCycleState.Created) {
         if (activeOutage.DefaultIsolationPoints.length)
-          outageElement = this.cy.nodes().filter(node => node.data('id') == activeOutage.DefaultIsolationPoints[0].toString(16))[0];
+          outageElement = this.cy.nodes().filter(node => node.data('id') == activeOutage.DefaultIsolationPoints[0])[0];
       }
 
       // @TODO:
