@@ -27,12 +27,12 @@ namespace Outage.Common.ServiceProxies.Outage
             return result;
         }
 
-        public bool ResolvedOutage(long outageElementId)
+        public bool StopOutageSimulation(long outageElementId)
         {
             bool resolved;
             try
             {
-                resolved = Channel.ResolvedOutage(outageElementId);
+                resolved = Channel.StopOutageSimulation(outageElementId);
             }
             catch (Exception e)
             {

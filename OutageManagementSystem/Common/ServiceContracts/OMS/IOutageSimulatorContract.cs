@@ -6,7 +6,7 @@ namespace Outage.Common.ServiceContracts.OMS
     public interface IOutageSimulatorContract
     {
         [OperationContract]
-        bool ResolvedOutage(long outageElementId);
+        bool StopOutageSimulation(long outageElementId);
 
         [OperationContract]
         bool IsOutageElement(long outageElementId);

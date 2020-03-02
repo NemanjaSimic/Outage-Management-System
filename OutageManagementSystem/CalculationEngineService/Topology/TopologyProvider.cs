@@ -55,6 +55,7 @@ namespace Topology
         {
             loadFlow.UpdateLoadFlow(Topology);
             ProviderTopologyDelegate?.Invoke(Topology);
+            ProviderTopologyConnectionDelegate?.Invoke(Topology);
         }
         public List<ITopology> GetTopologies()
         {
