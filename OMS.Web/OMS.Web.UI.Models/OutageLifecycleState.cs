@@ -2,7 +2,7 @@
 {
     public enum ActiveOutageLifecycleState
     {
-        Created,
+        Created = 0,
         Isolated,
         Repaired,
     }

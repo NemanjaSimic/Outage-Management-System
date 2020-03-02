@@ -13,24 +13,22 @@
     public class SwitchCommandHandler : IRequestHandler<OpenSwitchCommand>, IRequestHandler<CloseSwitchCommand>
     {
         private readonly ILogger _logger;
-        private ProxyFactory _proxyFactory;
+        private IProxyFactory _proxyFactory;
 
-        public SwitchCommandHandler(ILogger logger)
+        public SwitchCommandHandler(ILogger logger, IProxyFactory factory)
         {
             _logger = logger;
-            _proxyFactory = new ProxyFactory();
+            _proxyFactory = factory;
         }
 
         public Task<Unit> Handle(OpenSwitchCommand request, CancellationToken cancellationToken)
         {
             _logger.LogInfo($"[SwitchCommandHandler::TurnOffSwitchCommand] Sending {request.Command.ToString()} command to {request.Gid}");
 
-
             using (SwitchStatusCommandingProxy commandingProxy = _proxyFactory.CreateProxy<SwitchStatusCommandingProxy, ISwitchStatusCommandingContract>(EndpointNames.SwitchStatusCommandingEndpoint))
             {
                 try
                 {
-                    //commandingProxy.SendSwitchCommand(request.Gid, (int)request.Command);
                     commandingProxy.SendOpenCommand(request.Gid);
                 }
                 catch (Exception ex)

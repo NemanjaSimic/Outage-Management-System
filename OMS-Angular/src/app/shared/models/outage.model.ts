@@ -1,16 +1,18 @@
+import { Consumer } from './consumer.model';
+
 export interface Outage {
     Id: Number;
     ElementId: Number;
     State: OutageLifeCycleState;
     ReportedAt: Date;
-    AffectedConsumers: Number[];
+    AffectedConsumers: Consumer[];
     IsolatedAt: Date;
     FixedAt: Date;
     RepairedAt: Date;
 }
 
 export interface ActiveOutage extends Outage {
-    IsValidated: Boolean;
+    IsResolveConditionValidated: Boolean;
     State: OutageLifeCycleState;
     DefaultIsolationPoints: Number[];
     OptimalIsolationPoints: Number[];
