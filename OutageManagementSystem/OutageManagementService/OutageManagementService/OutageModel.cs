@@ -63,7 +63,8 @@ namespace OutageManagementService
 
         private UnitOfWork dbContext;
         private UnitOfWork transactionDbContext;
-        
+        private SubscriberProxy subscriberProxy; 
+
         private HashSet<long> commandedElements;
         private HashSet<long> optimumIsolationPoints;
         private Dictionary<DeltaOpType, List<long>> modelChanges;
@@ -92,6 +93,7 @@ namespace OutageManagementService
         public void Dispose()
         {
             dbContext.Dispose();
+            subscriberProxy.Close();
         }
         #endregion
 
@@ -598,16 +600,16 @@ namespace OutageManagementService
         private void SubscribeToOMSTopologyPublications()
         {
             Logger.LogDebug("Subcribing on OMS Topology.");
-            SubscriberProxy proxy = proxyFactory.CreateProxy<SubscriberProxy, ISubscriber>(this, EndpointNames.SubscriberEndpoint);
+            subscriberProxy = proxyFactory.CreateProxy<SubscriberProxy, ISubscriber>(this, EndpointNames.SubscriberEndpoint);
 
-            if (proxy == null)
+            if (subscriberProxy == null)
             {
                 string message = "SubscribeToOMSTopologyPublications() => SubscriberProxy is null.";
                 Logger.LogError(message);
                 throw new NullReferenceException(message);
             }
 
-            proxy.Subscribe(Topic.OMS_MODEL);
+            subscriberProxy.Subscribe(Topic.OMS_MODEL);
         }
 
         private long GetNextBreaker(long breakerId)
