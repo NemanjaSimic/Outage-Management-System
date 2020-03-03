@@ -16,11 +16,11 @@ namespace Outage.Common.ServiceProxies.PubSub
         {
         }
 
-        public void Publish(IPublication publication)
+        public void Publish(IPublication publication, string pubslisherName)
         {
             try
             {
-                Channel.Publish(publication);
+                Channel.Publish(publication, pubslisherName);
             }
             catch (Exception e)
             {

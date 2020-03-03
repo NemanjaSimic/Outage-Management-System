@@ -12,10 +12,11 @@ namespace OMS.OutageSimulator.Services
     {
         public static Overview Overview { get; set; }
 
-        public bool ResolvedOutage(long outageElementId)
+        public bool StopOutageSimulation(long outageElementId)
         {
-            return Overview.ResolveOutage(outageElementId);
+            return Overview.StopOutageSimulation(outageElementId);
         }
+
         public bool IsOutageElement(long outageElementId)
         {
             return Overview.ActiveOutages.Any(outage => outage.OutageElement.GID == outageElementId);

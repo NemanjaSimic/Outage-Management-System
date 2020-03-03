@@ -1,8 +1,9 @@
 ﻿namespace OMS.Web.UI.Models
 {
-    public enum OutageLifecycleState
+    public enum ActiveOutageLifecycleState
     {
-        Created,
-        Isolated
+        Created = 0,
+        Isolated,
+        Repaired,
     }
 }

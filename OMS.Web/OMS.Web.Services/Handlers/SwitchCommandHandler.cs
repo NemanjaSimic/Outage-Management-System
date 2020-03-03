@@ -10,27 +10,26 @@
     using System.Threading;
     using System.Threading.Tasks;
 
-    public class SwitchCommandHandler : IRequestHandler<TurnOffSwitchCommand>, IRequestHandler<TurnOnSwitchCommand>
+    public class SwitchCommandHandler : IRequestHandler<OpenSwitchCommand>, IRequestHandler<CloseSwitchCommand>
     {
         private readonly ILogger _logger;
-        private ProxyFactory _proxyFactory;
+        private IProxyFactory _proxyFactory;
 
-        public SwitchCommandHandler(ILogger logger)
+        public SwitchCommandHandler(ILogger logger, IProxyFactory factory)
         {
             _logger = logger;
-            _proxyFactory = new ProxyFactory();
+            _proxyFactory = factory;
         }
 
-        public Task<Unit> Handle(TurnOffSwitchCommand request, CancellationToken cancellationToken)
+        public Task<Unit> Handle(OpenSwitchCommand request, CancellationToken cancellationToken)
         {
             _logger.LogInfo($"[SwitchCommandHandler::TurnOffSwitchCommand] Sending {request.Command.ToString()} command to {request.Gid}");
 
-
-            using (SwitchStatusCommadningProxy commandingProxy = _proxyFactory.CreateProxy<SwitchStatusCommadningProxy, ISwitchStatusCommandingContract>(EndpointNames.SwitchStatusCommandingEndpoint))
+            using (SwitchStatusCommandingProxy commandingProxy = _proxyFactory.CreateProxy<SwitchStatusCommandingProxy, ISwitchStatusCommandingContract>(EndpointNames.SwitchStatusCommandingEndpoint))
             {
                 try
                 {
-                    commandingProxy.SendCommand(request.Gid, (int)request.Command);
+                    commandingProxy.SendOpenCommand(request.Gid);
                 }
                 catch (Exception ex)
                 {
@@ -42,16 +41,17 @@
             return null;
         }
 
-        public Task<Unit> Handle(TurnOnSwitchCommand request, CancellationToken cancellationToken)
+        public Task<Unit> Handle(CloseSwitchCommand request, CancellationToken cancellationToken)
         {
             _logger.LogDebug($"[SwitchCommandHandler::TurnOnSwitchCommand] Sending {request.Command.ToString()} command to {request.Gid}");
 
 
-            using (SwitchStatusCommadningProxy commandingProxy = _proxyFactory.CreateProxy<SwitchStatusCommadningProxy, ISwitchStatusCommandingContract>(EndpointNames.SwitchStatusCommandingEndpoint))
+            using (SwitchStatusCommandingProxy commandingProxy = _proxyFactory.CreateProxy<SwitchStatusCommandingProxy, ISwitchStatusCommandingContract>(EndpointNames.SwitchStatusCommandingEndpoint))
             {
                 try
                 {
-                    commandingProxy.SendCommand(request.Gid, (int)request.Command);
+                    //commandingProxy.SendSwitchCommand(request.Gid, (int)request.Command);
+                    commandingProxy.SendCloseCommand(request.Gid);
                 }
                 catch (Exception ex)
                 {

@@ -9,7 +9,7 @@ using Outage.Common.ServiceProxies.Outage;
 using System;
 using System.Collections.Generic;
 
-namespace SCADAFunctions
+namespace CalculationEngine.SCADAFunctions
 {
 	public class MeasurementProvider : IMeasurementProvider
     {
@@ -20,6 +20,7 @@ namespace SCADAFunctions
 		private Dictionary<long, List<long>> elementToMeasurementMap;
 		private Dictionary<long, long> measurementToElementMap;
 		private ProxyFactory proxyFactory;
+		private readonly HashSet<CommandOriginType> ignorableOriginTypes;
         #endregion
 
         public MeasurementProvider()
@@ -28,6 +29,7 @@ namespace SCADAFunctions
 			measurementToElementMap = new Dictionary<long, long>();
 			analogMeasurements = new Dictionary<long, AnalogMeasurement>();
 			discreteMeasurements = new Dictionary<long, DiscreteMeasurement>();
+			ignorableOriginTypes = new HashSet<CommandOriginType>() { CommandOriginType.USER_COMMAND, CommandOriginType.ISOLATING_ALGORITHM_COMMAND };
 
 			proxyFactory = new ProxyFactory();
 			Provider.Instance.MeasurementProvider = this;
@@ -39,29 +41,6 @@ namespace SCADAFunctions
 			if (!analogMeasurements.ContainsKey(analogMeasurement.Id))
 			{
 				analogMeasurements.Add(analogMeasurement.Id, analogMeasurement);
-
-				if (elementToMeasurementMap.TryGetValue(analogMeasurement.ElementId, out var measurements))
-				{
-					measurements.Add(analogMeasurement.Id);
-				}
-				else
-				{
-					elementToMeasurementMap.Add(
-						analogMeasurement.ElementId,
-						new List<long>()
-						{
-							analogMeasurement.Id
-						});
-				}
-
-				if (!measurementToElementMap.ContainsKey(analogMeasurement.Id))
-				{
-					measurementToElementMap.Add(analogMeasurement.Id, analogMeasurement.ElementId);
-				}
-				else
-				{
-					//TOOD: log err/warn?
-				}
 			}
 		}
 		public void AddDiscreteMeasurement(DiscreteMeasurement discreteMeasurement)
@@ -69,29 +48,6 @@ namespace SCADAFunctions
 			if (!discreteMeasurements.ContainsKey(discreteMeasurement.Id))
 			{
 				discreteMeasurements.Add(discreteMeasurement.Id, discreteMeasurement);
-
-				if (elementToMeasurementMap.TryGetValue(discreteMeasurement.ElementId, out var measurements))
-				{
-					measurements.Add(discreteMeasurement.Id);
-				}
-				else
-				{
-					elementToMeasurementMap.Add(
-						discreteMeasurement.ElementId,
-						new List<long>()
-						{
-							discreteMeasurement.Id
-						});
-				}
-
-				if(!measurementToElementMap.ContainsKey(discreteMeasurement.Id))
-				{
-					measurementToElementMap.Add(discreteMeasurement.Id, discreteMeasurement.ElementId);
-				}
-				else
-				{
-					//TOOD: log err/warn?
-				}
 			}
 		}
 		public float GetAnalogValue(long measurementGid)
@@ -113,7 +69,7 @@ namespace SCADAFunctions
 			}
 			return isOpen;
 		}
-		public void UpdateAnalogMeasurement(long measurementGid, float value)
+		public void UpdateAnalogMeasurement(long measurementGid, float value, CommandOriginType commandOrigin)
 		{
 			if (analogMeasurements.TryGetValue(measurementGid, out AnalogMeasurement measurement))
 			{
@@ -126,42 +82,44 @@ namespace SCADAFunctions
 		}
 		public void UpdateAnalogMeasurement(Dictionary<long, AnalogModbusData> data)
 		{
-			foreach (var measurement in data)
+			foreach (long gid in data.Keys)
 			{
-				UpdateAnalogMeasurement(measurement.Key, (float)measurement.Value.Value);
+				AnalogModbusData measurementData = data[gid];
+
+				UpdateAnalogMeasurement(gid, (float)measurementData.Value, measurementData.CommandOrigin);
 			}
 		}
-		public bool UpdateDiscreteMeasurement(long measurementGid, ushort value)
+		public bool UpdateDiscreteMeasurement(long measurementGid, int value, CommandOriginType commandOrigin)
 		{
 			bool success = true;
 			if (discreteMeasurements.TryGetValue(measurementGid, out DiscreteMeasurement measurement))
 			{
-				if (value == 0)
+				if (value == (ushort)DiscreteCommandingType.CLOSE)
 				{
 					measurement.CurrentOpen = false;
 				}
 				else
 				{
-					if (!measurement.CurrentOpen)
+					if (!measurement.CurrentOpen && !ignorableOriginTypes.Contains(commandOrigin))
 					{
-					using (ReportPotentialOutageProxy reportPotentialOutageProxy = proxyFactory.CreateProxy<ReportPotentialOutageProxy, IReportPotentialOutageContract>(EndpointNames.ReportPotentialOutageEndpoint))
-					{
-						if (reportPotentialOutageProxy == null)
+						using (ReportPotentialOutageProxy reportPotentialOutageProxy = proxyFactory.CreateProxy<ReportPotentialOutageProxy, IReportPotentialOutageContract>(EndpointNames.ReportPotentialOutageEndpoint))
 						{
-							string message = "UpdateDiscreteMeasurement => ReportPotentialOutageProxy is null.";
-							logger.LogError(message);
-							throw new NullReferenceException(message);
-						}
+							if (reportPotentialOutageProxy == null)
+							{
+								string message = "UpdateDiscreteMeasurement => ReportPotentialOutageProxy is null.";
+								logger.LogError(message);
+								throw new NullReferenceException(message);
+							}
 
-						try
-						{
-							reportPotentialOutageProxy.ReportPotentialOutage(measurement.ElementId);
+							try
+							{
+								reportPotentialOutageProxy.ReportPotentialOutage(measurement.ElementId);
+							}
+							catch (Exception e)
+							{
+								logger.LogError("Failed to report potential outage.", e);
+							}
 						}
-						catch (Exception e)
-						{
-							logger.LogError("Failed to report potential outage.", e);
-						}
-					}
 					}
 					measurement.CurrentOpen = true;
 				}
@@ -176,11 +134,13 @@ namespace SCADAFunctions
 		public void UpdateDiscreteMeasurement(Dictionary<long, DiscreteModbusData> data)
 		{
 			List<long> signalGids = new List<long>();
-			foreach (var measurementData in data)
+			foreach (long gid in data.Keys)
 			{
-				if (UpdateDiscreteMeasurement(measurementData.Key, measurementData.Value.Value))
+				DiscreteModbusData measurementData = data[gid];
+
+				if (UpdateDiscreteMeasurement(measurementData.MeasurementGid, measurementData.Value, measurementData.CommandOrigin))
 				{
-					signalGids.Add(measurementData.Key);
+					signalGids.Add(gid);
 				}
 			}
 			DiscreteMeasurementDelegate?.Invoke(signalGids);
@@ -194,26 +154,7 @@ namespace SCADAFunctions
 			}
 			return signalGid;
 		}
-		public List<long> GetMeasurementsForElement(long elementGid)
-		{
-			if (elementToMeasurementMap.TryGetValue(elementGid, out var measurements))
-			{
-				return measurements;
-			}
-			else
-			{
-				return new List<long>();
-			}
-		}
-		public Dictionary<long, List<long>> GetElementToMeasurementMap()
-		{
-			return elementToMeasurementMap;
-		}
-		public Dictionary<long, long> GetMeasurementToElementMap()
-		{
-			return measurementToElementMap;
-		}
-		public bool TryGetDiscreteMeasurement(long measurementGid, out DiscreteMeasurement measurement)
+        public bool TryGetDiscreteMeasurement(long measurementGid, out DiscreteMeasurement measurement)
 		{
 			bool success = false;
 			if (discreteMeasurements.TryGetValue(measurementGid, out measurement))
@@ -239,5 +180,48 @@ namespace SCADAFunctions
 			}
 			return success;
 		}
+
+		public void AddMeasurementElementPair(long measurementId, long elementId)
+		{
+			if (measurementToElementMap.ContainsKey(measurementId))
+			{
+				string message = $"Measurement with id 0x{measurementId:X16} already exists in measurement-element mapping.";
+				logger.LogError(message);
+				throw new ArgumentException(message);
+			}
+
+			measurementToElementMap.Add(measurementId, elementId);
+			
+			if (elementToMeasurementMap.TryGetValue(elementId, out List<long> measurements))
+			{
+				measurements.Add(measurementId);
+			}
+			else
+			{
+				elementToMeasurementMap.Add(elementId, new List<long>() { measurementId });
+			}
+		}
+
+		#region IMeasurementMapContract
+		public List<long> GetMeasurementsOfElement(long elementGid)
+		{
+			if (elementToMeasurementMap.TryGetValue(elementGid, out var measurements))
+			{
+				return measurements;
+			}
+			else
+			{
+				return new List<long>();
+			}
+		}
+		public Dictionary<long, List<long>> GetElementToMeasurementMap()
+		{
+			return elementToMeasurementMap;
+		}
+		public Dictionary<long, long> GetMeasurementToElementMap()
+		{
+			return measurementToElementMap;
+		}
+		#endregion
 	}
 }

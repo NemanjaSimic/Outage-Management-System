@@ -51,7 +51,7 @@ namespace Topology
                     }
 
                     
-                    publisherProxy.Publish(publication);
+                    publisherProxy.Publish(publication, "CE_PUBLISHER");
                     logger.LogDebug("Topology publisher published new ui model successfully.");
                 }
             }
@@ -85,7 +85,7 @@ namespace Topology
                         throw new NullReferenceException(errMessage);
                     }
 
-                    publisherProxy.Publish(publication);
+                    publisherProxy.Publish(publication, "CE_PUBLICATION");
                     logger.LogDebug("Topology publisher published new oms model successfully.");
                 }
             }

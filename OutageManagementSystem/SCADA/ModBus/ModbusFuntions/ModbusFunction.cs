@@ -1,6 +1,5 @@
 ﻿using EasyModbus;
 using Outage.Common;
-using Outage.Common.PubSub.SCADADataContract;
 using Outage.SCADA.ModBus.FunctionParameters;
 using Outage.SCADA.SCADACommon;
 using System;
@@ -76,6 +75,8 @@ namespace Outage.SCADA.ModBus.ModbusFuntions
         /// </returns>
         [Obsolete]
         public abstract Dictionary<Tuple<PointType, ushort>, ushort> ParseResponse(byte[] response);
+
+       
 
         #endregion Obsolete
     }

@@ -82,7 +82,30 @@ namespace Outage.Common
         [EnumMember]
         Local
     }
+    
+    [DataContract]
+    public enum CommandOriginType : short
+    {
+        [EnumMember]
+        USER_COMMAND = 0x1,
 
+        [EnumMember]
+        ISOLATING_ALGORITHM_COMMAND,
+
+        [EnumMember]
+        CE_COMMAND,
+
+        [EnumMember]
+        MODEL_UPDATE_COMMAND,
+
+        [EnumMember]
+        OUTAGE_SIMULATOR,
+
+        [EnumMember]
+        OTHER_COMMAND, //TODO: rethink of name, add others like CE ili tako nesto
+    }
+
+    //OMS
     [DataContract]
     public enum ActiveOutageState : short
     {
@@ -91,8 +114,8 @@ namespace Outage.Common
         [EnumMember]
         ISOLATED = 2,
         [EnumMember]
-        RESOLVED = 3,
+        REPAIRED = 3,
         //[EnumMember]
-        //ARCHIVED = 4
+        //RESOLVED = 4,
     }
 }

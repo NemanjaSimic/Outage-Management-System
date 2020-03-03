@@ -1,7 +1,10 @@
 ﻿namespace OMS.Web.Common.Mappers
 {
+    using OMS.Web.UI.Models;
     using OMS.Web.UI.Models.ViewModels;
+    using Outage.Common;
     using Outage.Common.PubSub.OutageDataContract;
+    using System;
     using System.Collections.Generic;
     using System.Linq;
 
@@ -18,9 +21,15 @@
             => new ActiveOutageViewModel
             {
                 Id = outage.OutageId,
+                State = MapActiveOutageState(outage.OutageState),
                 ReportedAt = outage.ReportTime,
+                IsolatedAt = outage.IsolatedTime,
+                RepairedAt = outage.RepairedTime,
                 ElementId = outage.OutageElementGid,
-                AffectedConsumers = _consumerMapper.MapConsumers(outage.AffectedConsumers)
+                DefaultIsolationPoints = outage.DefaultIsolationPoints,
+                AffectedConsumers = _consumerMapper.MapConsumers(outage.AffectedConsumers),
+                OptimalIsolationPoints = outage.OptimumIsolationPoints,
+                IsResolveConditionValidated = outage.IsResolveConditionValidated,
             };
 
         public IEnumerable<ActiveOutageViewModel> MapActiveOutages(IEnumerable<ActiveOutageMessage> outages)
@@ -31,12 +40,31 @@
             {
                 Id = outage.OutageId,
                 ReportedAt = outage.ReportTime,
+                IsolatedAt = outage.IsolatedTime,
+                RepairedAt = outage.RepairedTime,
                 ArchivedAt = outage.ArchiveTime,
                 ElementId = outage.OutageElementGid,
-                AffectedConsumers = _consumerMapper.MapConsumers(outage.AffectedConsumers)
+                DefaultIsolationPoints = outage.DefaultIsolationPoints,
+                AffectedConsumers = _consumerMapper.MapConsumers(outage.AffectedConsumers),
+                OptimalIsolationPoints = outage.OptimumIsolationPoints,
             };
 
         public IEnumerable<ArchivedOutageViewModel> MapArchivedOutages(IEnumerable<ArchivedOutageMessage> outages)
             => outages.Select(o => MapArchivedOutage(o));
+
+        public ActiveOutageLifecycleState MapActiveOutageState(ActiveOutageState activeOutageState)
+        {
+            switch(activeOutageState)
+            {
+                case ActiveOutageState.CREATED:
+                    return ActiveOutageLifecycleState.Created;
+                case ActiveOutageState.ISOLATED:
+                    return ActiveOutageLifecycleState.Isolated;
+                case ActiveOutageState.REPAIRED:
+                    return ActiveOutageLifecycleState.Repaired;
+                default:
+                    throw new ArgumentException("Unsupported enum type. ActiveOutageState required.");
+            }
+        }
     }
 }

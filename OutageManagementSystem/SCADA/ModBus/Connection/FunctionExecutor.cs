@@ -15,6 +15,7 @@ using System.ServiceModel;
 using Outage.Common.Exceptions.SCADA;
 using Outage.Common.ServiceProxies;
 using Outage.Common.ServiceContracts.PubSub;
+using System.Text;
 
 namespace Outage.SCADA.ModBus.Connection
 {
@@ -35,9 +36,9 @@ namespace Outage.SCADA.ModBus.Connection
         private AutoResetEvent modelUpdateQueueEmptyEvent;
         private AutoResetEvent writeCommandQueueEmptyEvent;
 
-        private ConcurrentQueue<IModbusFunction> modelUpdateQueue;
-        private ConcurrentQueue<IModbusFunction> writeCommandQueue;
-        private ConcurrentQueue<IModbusFunction> readCommandQueue;
+        private ConcurrentQueue<IWriteModbusFunction> modelUpdateQueue;
+        private ConcurrentQueue<IWriteModbusFunction> writeCommandQueue;
+        private ConcurrentQueue<IReadModbusFunction> readCommandQueue;
         private ProxyFactory proxyFactory;
 
         public ISCADAConfigData ConfigData { get; private set; }
@@ -52,9 +53,9 @@ namespace Outage.SCADA.ModBus.Connection
 
         public FunctionExecutor(SCADAModel scadaModel)
         {
-            this.modelUpdateQueue = new ConcurrentQueue<IModbusFunction>();
-            this.writeCommandQueue = new ConcurrentQueue<IModbusFunction>();
-            this.readCommandQueue = new ConcurrentQueue<IModbusFunction>();
+            this.modelUpdateQueue = new ConcurrentQueue<IWriteModbusFunction>();
+            this.writeCommandQueue = new ConcurrentQueue<IWriteModbusFunction>();
+            this.readCommandQueue = new ConcurrentQueue<IReadModbusFunction>();
             this.commandEvent = new AutoResetEvent(true);
             this.modelUpdateQueueEmptyEvent = new AutoResetEvent(false);
             this.writeCommandQueueEmptyEvent = new AutoResetEvent(false);
@@ -112,7 +113,7 @@ namespace Outage.SCADA.ModBus.Connection
 
         }
 
-        public bool EnqueueReadCommand(IModbusFunction modbusFunction)
+        public bool EnqueueReadCommand(IReadModbusFunction modbusFunction)
         {
             bool success;
 
@@ -149,16 +150,9 @@ namespace Outage.SCADA.ModBus.Connection
             return success;
         }
 
-        public bool EnqueueWriteCommand(IModbusFunction modbusFunction)
+        public bool EnqueueWriteCommand(IWriteModbusFunction modbusFunction)
         {
             bool success;
-
-            if (modbusFunction is IReadAnalogModusFunction || modbusFunction is IReadDiscreteModbusFunction)
-            {
-                string message = "EnqueueWriteCommand => trying to enqueue modbus function that implements IReadDiscreteModbusFunction or IReadDiscreteModbusFunction interface.";
-                Logger.LogError(message);
-                throw new ArgumentException(message);
-            }
 
             if (!modelUpdateQueue.IsEmpty)
             {
@@ -168,7 +162,7 @@ namespace Outage.SCADA.ModBus.Connection
             try
             {
                 this.writeCommandQueue.Enqueue(modbusFunction);
-                this.readCommandQueue = new ConcurrentQueue<IModbusFunction>();
+                this.readCommandQueue = new ConcurrentQueue<IReadModbusFunction>();
                 this.commandEvent.Set();
                 success = true;
             }
@@ -198,30 +192,34 @@ namespace Outage.SCADA.ModBus.Connection
                 foreach (long measurementGID in measurementGids)
                 {
                     ISCADAModelPointItem scadaPointItem = currentScadaModel[measurementGID];
-                    IModbusFunction modbusFunction;
+                    IWriteModbusFunction modbusFunction;
 
                     if (scadaPointItem is IAnalogSCADAModelPointItem analogSCADAModelPointItem)
                     {
-                        modbusFunction = FunctionFactory.CreateModbusFunction(new ModbusWriteCommandParameters(length,
+                        modbusFunction = FunctionFactory.CreateWriteModbusFunction(new ModbusWriteCommandParameters(length,
                                                                                                                (byte)ModbusFunctionCode.WRITE_SINGLE_REGISTER,
                                                                                                                analogSCADAModelPointItem.Address,
-                                                                                                               analogSCADAModelPointItem.CurrentRawValue));
+                                                                                                               analogSCADAModelPointItem.CurrentRawValue),
+                                                                                                               CommandOriginType.MODEL_UPDATE_COMMAND);
 
-                        //TODO: SetAlarm to private method -> call on current value setter
-                        analogSCADAModelPointItem.SetAlarms();
-                        AnalogModbusData analogModbusData = new AnalogModbusData(analogSCADAModelPointItem.CurrentEguValue, analogSCADAModelPointItem.Alarm);
+                        AnalogModbusData analogModbusData = new AnalogModbusData(analogSCADAModelPointItem.CurrentEguValue, 
+                                                                                 analogSCADAModelPointItem.Alarm, 
+                                                                                 measurementGID, 
+                                                                                 CommandOriginType.MODEL_UPDATE_COMMAND);
                         analogData.Add(measurementGID, analogModbusData);
                     }
                     else if (scadaPointItem is IDiscreteSCADAModelPointItem discreteSCADAModelPointItem)
                     {
-                        modbusFunction = FunctionFactory.CreateModbusFunction(new ModbusWriteCommandParameters(length,
+                        modbusFunction = FunctionFactory.CreateWriteModbusFunction(new ModbusWriteCommandParameters(length,
                                                                                                                (byte)ModbusFunctionCode.WRITE_SINGLE_COIL,
                                                                                                                discreteSCADAModelPointItem.Address,
-                                                                                                               discreteSCADAModelPointItem.CurrentValue));
+                                                                                                               discreteSCADAModelPointItem.CurrentValue),
+                                                                                                               CommandOriginType.MODEL_UPDATE_COMMAND);
                         
-                        //TODO: SetAlarm to private method -> call on current value setter
-                        discreteSCADAModelPointItem.SetAlarms();
-                        DiscreteModbusData discreteModbusData = new DiscreteModbusData(discreteSCADAModelPointItem.CurrentValue, discreteSCADAModelPointItem.Alarm);
+                        DiscreteModbusData discreteModbusData = new DiscreteModbusData(discreteSCADAModelPointItem.CurrentValue, 
+                                                                                       discreteSCADAModelPointItem.Alarm,
+                                                                                       measurementGID,
+                                                                                       CommandOriginType.MODEL_UPDATE_COMMAND);
                         discreteData.Add(measurementGID, discreteModbusData);
                     }
                     else
@@ -237,8 +235,8 @@ namespace Outage.SCADA.ModBus.Connection
                 MakeDiscreteEntryToMeasurementCache(discreteData, false);
 
                 success = true;
-                this.writeCommandQueue = new ConcurrentQueue<IModbusFunction>();
-                this.readCommandQueue = new ConcurrentQueue<IModbusFunction>();
+                this.writeCommandQueue = new ConcurrentQueue<IWriteModbusFunction>();
+                this.readCommandQueue = new ConcurrentQueue<IReadModbusFunction>();
                 this.commandEvent.Set();
             }
             catch (Exception e)
@@ -318,11 +316,11 @@ namespace Outage.SCADA.ModBus.Connection
                         ModbusClient = new ModbusClient(ConfigData.IpAddress.ToString(), ConfigData.TcpPort);
                     }
 
-                    Logger.LogDebug("Connected and waiting for command event.");
+                    //Logger.LogDebug("Connected and waiting for command event.");
 
                     this.commandEvent.WaitOne();
 
-                    Logger.LogDebug("Command event happened.");
+                    //Logger.LogDebug("Command event happened.");
 
                     if (!ModbusClient.Connected)
                     {
@@ -330,7 +328,7 @@ namespace Outage.SCADA.ModBus.Connection
                     }
 
                     //HIGH PRIORITY COMMANDS - model update commands
-                    while (modelUpdateQueue.TryDequeue(out IModbusFunction currentCommand))
+                    while (modelUpdateQueue.TryDequeue(out IWriteModbusFunction currentCommand))
                     {
                         ExecuteCommand(currentCommand);
                     }
@@ -338,7 +336,7 @@ namespace Outage.SCADA.ModBus.Connection
                     this.modelUpdateQueueEmptyEvent.Set();
 
                     //WRITE COMMANDS
-                    while (writeCommandQueue.TryDequeue(out IModbusFunction currentCommand))
+                    while (writeCommandQueue.TryDequeue(out IWriteModbusFunction currentCommand))
                     {
                         ExecuteCommand(currentCommand);
                     }
@@ -346,7 +344,7 @@ namespace Outage.SCADA.ModBus.Connection
                     this.writeCommandQueueEmptyEvent.Set();
 
                     //READ COMMANDS - acquisition
-                    while (readCommandQueue.TryDequeue(out IModbusFunction currentCommand))
+                    while (readCommandQueue.TryDequeue(out IReadModbusFunction currentCommand))
                     {
                         ExecuteCommand(currentCommand);
                     }
@@ -376,6 +374,8 @@ namespace Outage.SCADA.ModBus.Connection
             {
                 string message = "Exception on currentCommand.Execute().";
                 Logger.LogWarn(message, e);
+                ModbusClient.Disconnect();
+                return;
             }
 
             if (command is IReadAnalogModusFunction readAnalogCommand)
@@ -385,6 +385,36 @@ namespace Outage.SCADA.ModBus.Connection
             else if (command is IReadDiscreteModbusFunction readDiscreteCommand)
             {
                 MakeDiscreteEntryToMeasurementCache(readDiscreteCommand.Data, true);
+            }
+            else if(command is IWriteModbusFunction writeModbusCommand)
+            {
+                CommandValue commandValue = new CommandValue()
+                {
+                    Address = writeModbusCommand.ModbusWriteCommandParameters.OutputAddress,
+                    Value = writeModbusCommand.ModbusWriteCommandParameters.Value,
+                    CommandOrigin = writeModbusCommand.CommandOrigin,
+                };
+
+                PointType pointType;
+                switch (writeModbusCommand.ModbusWriteCommandParameters.FunctionCode) 
+                {
+                    case (byte)ModbusFunctionCode.WRITE_SINGLE_REGISTER:
+                        pointType = PointType.ANALOG_OUTPUT;
+                        break;
+                    case (byte)ModbusFunctionCode.WRITE_SINGLE_COIL:
+                        pointType = PointType.DIGITAL_OUTPUT;
+                        break;
+                    default:
+                        Logger.LogError($"Function code {writeModbusCommand.ModbusWriteCommandParameters.FunctionCode} is not comatible with write command.");
+                        return;
+                }
+
+                if (SCADAModel.CurrentAddressToGidMap[pointType].ContainsKey(commandValue.Address))
+                {
+                    long gid = SCADAModel.CurrentAddressToGidMap[pointType][commandValue.Address];
+
+                    SCADAModel.CommandedValuesCache[gid] = commandValue;
+                }
             }
         }
 
@@ -404,12 +434,30 @@ namespace Outage.SCADA.ModBus.Connection
                 if (!MeasurementsCache.ContainsKey(gid))
                 {
                     MeasurementsCache.Add(gid, data[gid]);
-                    publicationData.Add(gid, data[gid]);
+
+                    if (!publicationData.ContainsKey(gid))
+                    {
+                        publicationData.Add(gid, data[gid]);
+                    }
+                    else
+                    {
+                        publicationData[gid] = data[gid];
+                    }
                 }
                 else if (MeasurementsCache[gid] is AnalogModbusData analogCacheItem && analogCacheItem.Value != data[gid].Value)
                 {
+                    Logger.LogDebug($"Value changed on element with id: {analogCacheItem.MeasurementGid}. Old value: {analogCacheItem.Value}; new value: {data[gid].Value}");
                     MeasurementsCache[gid] = data[gid];
-                    publicationData.Add(gid, MeasurementsCache[gid] as AnalogModbusData);
+                    
+
+                    if (!publicationData.ContainsKey(gid))
+                    {
+                        publicationData.Add(gid, MeasurementsCache[gid] as AnalogModbusData);
+                    }
+                    else
+                    {
+                        publicationData[gid] = MeasurementsCache[gid] as AnalogModbusData;
+                    }
                 }
             }
 
@@ -437,12 +485,29 @@ namespace Outage.SCADA.ModBus.Connection
                 if (!MeasurementsCache.ContainsKey(gid))
                 {
                     MeasurementsCache.Add(gid, data[gid]);
-                    publicationData.Add(gid, data[gid]);
+
+                    if(!publicationData.ContainsKey(gid))
+                    {
+                        publicationData.Add(gid, data[gid]);
+                    }
+                    else
+                    {
+                        publicationData[gid] = data[gid];
+                    }
                 }
                 else if (MeasurementsCache[gid] is DiscreteModbusData discreteCacheItem && discreteCacheItem.Value != data[gid].Value)
                 {
+                    Logger.LogDebug($"Value changed on element with id :{discreteCacheItem.MeasurementGid};. Old value: {discreteCacheItem.Value}; new value: {data[gid].Value}");
                     MeasurementsCache[gid] = data[gid];
-                    publicationData.Add(gid, MeasurementsCache[gid] as DiscreteModbusData);
+
+                    if (!publicationData.ContainsKey(gid))
+                    {
+                        publicationData.Add(gid, MeasurementsCache[gid] as DiscreteModbusData);
+                    }
+                    else
+                    {
+                        publicationData[gid] = MeasurementsCache[gid] as DiscreteModbusData;
+                    }
                 }
             }
 
@@ -467,8 +532,31 @@ namespace Outage.SCADA.ModBus.Connection
                     throw new NullReferenceException(errMsg);    
                 }
 
-                publisherProxy.Publish(scadaPublication);
+                publisherProxy.Publish(scadaPublication, "SCADA_PUBLISHER");
                 Logger.LogInfo($"SCADA service published data from topic: {scadaPublication.Topic}");
+
+                StringBuilder sb = new StringBuilder();
+                sb.AppendLine("MeasurementCache content: ");
+
+                foreach(long gid in MeasurementsCache.Keys)
+                {
+                    IModbusData data = MeasurementsCache[gid];
+
+                    if(data is AnalogModbusData analogModbusData)
+                    { 
+                        sb.AppendLine($"Analog data line: [gid] 0x{gid:X16}, [value] {analogModbusData.Value}, [alarm] {analogModbusData.Alarm}");
+                    }
+                    else if(data is DiscreteModbusData discreteModbusData)
+                    {
+                        sb.AppendLine($"Discrete data line: [gid] 0x{gid:X16}, [value] {discreteModbusData.Value}, [alarm] {discreteModbusData.Alarm}");
+                    }
+                    else
+                    {
+                        sb.AppendLine($"UNKNOWN data type: {data.GetType()}");
+                    }
+                }
+
+                Logger.LogDebug(sb.ToString());
             }
         }
 

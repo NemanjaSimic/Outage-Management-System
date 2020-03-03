@@ -2,18 +2,17 @@
 using CECommon.Interfaces;
 using CECommon.Providers;
 using Outage.Common;
-using Outage.Common.ServiceContracts.CalculationEngine;
-using SCADAFunctions;
 using System;
 using System.Collections.Generic;
 using System.Linq;
+using CalculationEngine.SCADAFunctions;
 
 namespace Topology
 {
     public class LoadFlow : ILoadFlow
     {
         readonly ILogger logger = LoggerWrapper.Instance;
-        private readonly ISwitchStatusCommandingContract commandingService = new SCADACommandingService();
+        private readonly ISCADACommanding scadaCommanding = new SCADACommanding();
         private HashSet<long> reclosers;
 
         public void UpdateLoadFlow(List<ITopology> topologies)
@@ -39,17 +38,25 @@ namespace Topology
                 {
                     nextElement = stack.Pop();
 
-                    if (!IsElementEnergized(nextElement))
+                    if (nextElement is Field field)
                     {
-                        DeEnergizeElementsAbove(nextElement);
+                        stack.Push(field.Members.First());
                     }
                     else
                     {
-                        foreach (var child in nextElement.SecondEnd)
+
+                        if (!IsElementEnergized(nextElement))
                         {
-                            if (!reclosers.Contains(child.Id))
+                            DeEnergizeElementsAbove(nextElement);
+                        }
+                        else
+                        {
+                            foreach (var child in nextElement.SecondEnd)
                             {
-                                stack.Push(child);
+                                if (!reclosers.Contains(child.Id))
+                                {
+                                    stack.Push(child);
+                                }
                             }
                         }
                     }
@@ -64,29 +71,16 @@ namespace Topology
         private bool IsElementEnergized(ITopologyElement element)
         {
             element.IsActive = true;
-            if (element is Field field)
+            foreach (var measurement in element.Measurements)
             {
-                field.IsActive = true;
-                foreach (var member in field.Members)
+                if ((DMSType)ModelCodeHelper.ExtractTypeFromGlobalId(measurement) == DMSType.DISCRETE)
                 {
-                    if (!IsElementEnergized(member))
-                    {
-                        field.IsActive = false;
-                    }
+                    // Value je true ako je prekidac otvoren, tada je element neaktivan
+                    element.IsActive = !Provider.Instance.MeasurementProvider.GetDiscreteValue(measurement);
+                    break;
                 }
             }
-            else
-            {
-                foreach (var measurement in element.Measurements)
-                {
-                    if ((DMSType)ModelCodeHelper.ExtractTypeFromGlobalId(measurement) == DMSType.DISCRETE)
-                    {
-                        // Value je true ako je prekidac otvoren, tada je element neaktivan
-                        element.IsActive = !Provider.Instance.MeasurementProvider.GetDiscreteValue(measurement);
-                        break;
-                    }
-                }
-            }
+
             return element.IsActive;
         }
         private void DeEnergizeElementsAbove(ITopologyElement element)
@@ -99,6 +93,15 @@ namespace Topology
             {
                 nextElement = stack.Pop();
                 nextElement.IsActive = false;
+
+                if (nextElement is Field field)
+                {
+                    foreach (var member in field.Members)
+                    {
+                        member.IsActive = false;
+                    }
+                }
+
                 foreach (var child in nextElement.SecondEnd)
                 {
                     if (!reclosers.Contains(child.Id))
@@ -146,17 +149,18 @@ namespace Topology
                     {
                         CalculateLoadFlowUpsideDown(element.SecondEnd.First(), recloserGid);
                         element.IsActive = true;
-                        commandingService.SendCommand(measurementGid, 0);
+                        scadaCommanding.SendDiscreteCommand(measurementGid, 0, CommandOriginType.CE_COMMAND);
                     }
                     else if (!element.FirstEnd.IsActive && element.SecondEnd.First().IsActive)
                     {
                         CalculateLoadFlowUpsideDown(element.FirstEnd, recloserGid);
                         element.IsActive = true;
-                        commandingService.SendCommand(measurementGid, 0);
+                        scadaCommanding.SendDiscreteCommand(measurementGid, 0, CommandOriginType.CE_COMMAND);
                     }
                     else
                     {
-                        commandingService.SendCommand(measurementGid, 1);
+                        //TODO: pitati asistente, da li da se prenese na Validate
+                        scadaCommanding.SendDiscreteCommand(measurementGid, 1, CommandOriginType.CE_COMMAND);
                         element.IsActive = false;
                     }
                 }
