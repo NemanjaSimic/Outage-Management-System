@@ -60,7 +60,8 @@
                 try
                 {
                     _publisher.Publish(
-                        publication: new OutageEmailPublication(Topic.OUTAGE_EMAIL, new EmailToOutageMessage(tracingModel.Gid))
+                        publication: new OutageEmailPublication(Topic.OUTAGE_EMAIL, new EmailToOutageMessage(tracingModel.Gid)),
+                        publisherName: "ImapIdleEmailClient"
                         );
                 }
                 catch (Exception)
