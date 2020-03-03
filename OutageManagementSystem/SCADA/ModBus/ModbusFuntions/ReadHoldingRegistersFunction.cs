@@ -23,6 +23,7 @@ namespace Outage.SCADA.ModBus.ModbusFuntions
             CheckArguments(MethodBase.GetCurrentMethod(), typeof(ModbusReadCommandParameters));
             SCADAModel = scadaModel;
             ModbusReadCommandParameters = commandParameters as IModbusReadCommandParameters;
+            Data = new Dictionary<long, AnalogModbusData>();
         }
 
         #region IModBusFunction
@@ -49,14 +50,32 @@ namespace Outage.SCADA.ModBus.ModbusFuntions
                 throw new Exception(message);
             }
 
-            int[] data = modbusClient.ReadHoldingRegisters(startAddress - 1, quantity);
+            int[] data = new int[0];
+
+            try
+            {
+                if (modbusClient.Connected)
+                {
+                    data = modbusClient.ReadHoldingRegisters(startAddress - 1, quantity);
+                }
+                else
+                {
+                    Logger.LogError("modbusClient is disconected ");
+                }
+            }
+            catch(Exception e)
+            {
+                Logger.LogError("Error on ReadHoldingRegisters()", e);
+                throw e;
+            }
+
             Data = new Dictionary<long, AnalogModbusData>(data.Length);
 
             var currentAddressToGidMap = SCADAModel.CurrentAddressToGidMap;
             var currentSCADAModel = SCADAModel.CurrentScadaModel;
             var commandValuesCache = SCADAModel.CommandedValuesCache;
 
-            for (ushort i = 0; i < quantity; i++)
+            for (ushort i = 0; i < data.Length; i++)
             {
                 ushort address = (ushort)(startAddress + i);
                 int rawValue = data[i];
@@ -84,9 +103,13 @@ namespace Outage.SCADA.ModBus.ModbusFuntions
                     throw new Exception(message);
                 }
 
+
                 float eguValue = pointItem.RawToEguValueConversion(rawValue);
-                pointItem.CurrentEguValue = eguValue;
-                Logger.LogInfo($"Alarm for Point [Gid: 0x{pointItem.Gid:X16}, Address: {pointItem.Address}] set to {pointItem.Alarm}.");
+                if(pointItem.CurrentEguValue != eguValue)
+                {
+                    pointItem.CurrentEguValue = eguValue;
+                    Logger.LogInfo($"Alarm for Point [Gid: 0x{pointItem.Gid:X16}, Address: {pointItem.Address}] set to {pointItem.Alarm}.");
+                }
 
                 CommandOriginType commandOrigin = CommandOriginType.OTHER_COMMAND;
 
@@ -99,10 +122,10 @@ namespace Outage.SCADA.ModBus.ModbusFuntions
 
                 AnalogModbusData digitalData = new AnalogModbusData(pointItem.CurrentEguValue, pointItem.Alarm, gid, commandOrigin);
                 Data.Add(gid, digitalData);
-                Logger.LogDebug($"ReadHoldingRegistersFunction execute => Current value: {pointItem.CurrentEguValue} from address: {address}, gid: 0x{gid:X16}.");
+                //Logger.LogDebug($"ReadHoldingRegistersFunction execute => Current value: {pointItem.CurrentEguValue} from address: {address}, gid: 0x{gid:X16}.");
             }
 
-            Logger.LogDebug($"ReadHoldingRegistersFunction executed SUCCESSFULLY. StartAddress: {startAddress}, Quantity: {quantity}");
+            //Logger.LogDebug($"ReadHoldingRegistersFunction executed SUCCESSFULLY. StartAddress: {startAddress}, Quantity: {quantity}");
         }
 
         #endregion IModBusFunction
