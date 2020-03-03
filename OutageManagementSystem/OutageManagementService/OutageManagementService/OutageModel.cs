@@ -4,6 +4,8 @@ using Outage.Common;
 using Outage.Common.GDA;
 using Outage.Common.OutageService.Interface;
 using Outage.Common.OutageService.Model;
+using Outage.Common.PubSub;
+using Outage.Common.PubSub.CalculationEngineDataContract;
 using Outage.Common.PubSub.OutageDataContract;
 using Outage.Common.ServiceContracts.CalculationEngine;
 using Outage.Common.ServiceContracts.GDA;
@@ -20,6 +22,7 @@ using System;
 using System.Collections.Concurrent;
 using System.Collections.Generic;
 using System.Linq;
+using System.Text;
 using System.Threading.Tasks;
 using System.Timers;
 using AutoResetEvent = System.Threading.AutoResetEvent;
@@ -27,16 +30,16 @@ using OMSCommon.OutageDatabaseModel;
 
 namespace OutageManagementService
 {
-    public class CancelationObject 
+    public class CancelationObject
     {
         public bool CancelationSignal { get; set; }
     }
 
-    public sealed class OutageModel : IDisposable
+    public sealed class OutageModel : ISubscriberCallback, IDisposable
     {
-        private OutageTopologyModel topologyModel;
+        private IOutageTopologyModel topologyModel;
 
-        public OutageTopologyModel TopologyModel
+        public IOutageTopologyModel TopologyModel
         {
             get
             {
@@ -61,7 +64,8 @@ namespace OutageManagementService
 
         private UnitOfWork dbContext;
         private UnitOfWork transactionDbContext;
-        
+        private SubscriberProxy subscriberProxy; 
+
         private HashSet<long> commandedElements;
         private HashSet<long> optimumIsolationPoints;
         private Dictionary<DeltaOpType, List<long>> modelChanges;
@@ -83,12 +87,14 @@ namespace OutageManagementService
             EmailMsg = new ConcurrentQueue<long>();
 
             ImportTopologyModel();
+            SubscribeToOMSTopologyPublications();
         }
 
         #region IDisposable
         public void Dispose()
         {
             dbContext.Dispose();
+            subscriberProxy.Close();
         }
         #endregion
 
@@ -108,9 +114,9 @@ namespace OutageManagementService
             transactionDbContext = new UnitOfWork();
             Dictionary<long, ResourceDescription> resourceDescriptions = GetExtentValues(ModelCode.ENERGYCONSUMER, modelResourcesDesc.GetAllPropertyIds(ModelCode.ENERGYCONSUMER));
 
-            List<Consumer> consumersInDb = transactionDbContext.ConsumerRepository.GetAll().ToList();
+            List<Consumer> consumerDbEntities = transactionDbContext.ConsumerRepository.GetAll().ToList();
 
-            foreach(Consumer consumer in consumersInDb)
+            foreach(Consumer consumer in consumerDbEntities)
             {
                 if (modelChanges[DeltaOpType.Delete].Contains(consumer.ConsumerId))
                 {
@@ -204,7 +210,7 @@ namespace OutageManagementService
                 return false;
             }
 
-            ActiveOutage activeOutageDb = null;
+            ActiveOutage activeOutageDbEntity = null;
 
             if (dbContext.ActiveOutageRepository.Find(o => o.OutageElementGid == gid).FirstOrDefault() != null)
             {
@@ -212,9 +218,9 @@ namespace OutageManagementService
                 return false;
             }
 
-            List<Consumer> consumersDb = GetAffectedConsumersFromDatabase(affectedConsumersIds);
+            List<Consumer> consumerDbEntities = GetAffectedConsumersFromDatabase(affectedConsumersIds);
 
-            if (consumersDb.Count != affectedConsumersIds.Count)
+            if (consumerDbEntities.Count != affectedConsumersIds.Count)
             {
                 Logger.LogWarn("Some of affected consumers are not present in database");
                 return false;
@@ -235,18 +241,18 @@ namespace OutageManagementService
 
             ActiveOutage createdActiveOutage = new ActiveOutage
             {
-                AffectedConsumers = consumersDb,
+                AffectedConsumers = consumerDbEntities,
                 OutageState = ActiveOutageState.CREATED,
                 ReportTime = DateTime.UtcNow,
                 DefaultIsolationPoints = defaultIsolationEndpoints,
             };
 
-            activeOutageDb = dbContext.ActiveOutageRepository.Add(createdActiveOutage);
+            activeOutageDbEntity = dbContext.ActiveOutageRepository.Add(createdActiveOutage);
 
             try
             {
                 dbContext.Complete();
-                Logger.LogDebug($"Outage on element with gid: 0x{activeOutageDb.OutageElementGid:x16} is successfully stored in database.");
+                Logger.LogDebug($"Outage on element with gid: 0x{activeOutageDbEntity.OutageElementGid:x16} is successfully stored in database.");
                 success = true;
             }
             catch (Exception e)
@@ -261,15 +267,15 @@ namespace OutageManagementService
                 success = false;
             }
 
-            if (success && activeOutageDb != null)
+            if (success && activeOutageDbEntity != null)
             {
                 try
                 {
-                    success = PublishOutage(Topic.ACTIVE_OUTAGE, outageMessageMapper.MapActiveOutage(activeOutageDb));
-
-                    if (success)
+                    success = PublishOutage(Topic.ACTIVE_OUTAGE, outageMessageMapper.MapActiveOutage(activeOutageDbEntity));
+                    
+                    if(success)
                     {
-                        Logger.LogInfo($"Outage on element with gid: 0x{activeOutageDb.OutageElementGid:x16} is successfully published");
+                        Logger.LogInfo($"Outage on element with gid: 0x{activeOutageDbEntity.OutageElementGid:x16} is successfully published");
                     }
                 }
                 catch (Exception e) //TODO: Exception over proxy or enum...
@@ -365,11 +371,11 @@ namespace OutageManagementService
 
         public bool SendRepairCrew(long outageId)
         {
-            ActiveOutage outageDB = null;
+            ActiveOutage outageDbEntity = null;
 
             try
             {
-                outageDB = dbContext.ActiveOutageRepository.Get(outageId);
+                outageDbEntity = dbContext.ActiveOutageRepository.Get(outageId);
             }
             catch (Exception e)
             {
@@ -378,22 +384,22 @@ namespace OutageManagementService
                 throw e;
             }
             
-            if(outageDB == null)
+            if(outageDbEntity == null)
             {
                 Logger.LogError($"Outage with id 0x{outageId:X16} is not found in database.");
                 return false;
             }
 
-            if(outageDB.OutageState != ActiveOutageState.ISOLATED)
+            if(outageDbEntity.OutageState != ActiveOutageState.ISOLATED)
             {
-                Logger.LogError($"Outage with id 0x{outageId:X16} is in state {outageDB.OutageState}, and thus repair crew can not be sent. (Expected state: {ActiveOutageState.CREATED})");
+                Logger.LogError($"Outage with id 0x{outageId:X16} is in state {outageDbEntity.OutageState}, and thus repair crew can not be sent. (Expected state: {ActiveOutageState.ISOLATED})");
                 return false;
             }
 
             Task task = Task.Run(() =>
             {
-                Task.Delay(new TimeSpan(15000));
-                
+                Task.Delay(10000).Wait();
+
                 using(OutageSimulatorServiceProxy proxy = proxyFactory.CreateProxy<OutageSimulatorServiceProxy, IOutageSimulatorContract>(EndpointNames.OutageSimulatorServiceEndpoint))
                 {
                     if(proxy == null)
@@ -403,16 +409,16 @@ namespace OutageManagementService
                         throw new NullReferenceException(message);
                     }
 
-                    if(proxy.ResolvedOutage(outageDB.OutageElementGid))
+                    if(proxy.StopOutageSimulation(outageDbEntity.OutageElementGid))
                     {
-                        outageDB.OutageState = ActiveOutageState.REPAIRED;
-                        outageDB.RepairedTime = DateTime.UtcNow;
-                        dbContext.ActiveOutageRepository.Update(outageDB);
+                        outageDbEntity.OutageState = ActiveOutageState.REPAIRED;
+                        outageDbEntity.RepairedTime = DateTime.UtcNow;
+                        dbContext.ActiveOutageRepository.Update(outageDbEntity);
 
                         try
                         {
                             dbContext.Complete();
-                            PublishOutage(Topic.ACTIVE_OUTAGE, outageMessageMapper.MapActiveOutage(outageDB));
+                            PublishOutage(Topic.ACTIVE_OUTAGE, outageMessageMapper.MapActiveOutage(outageDbEntity));
                         }
                         catch (Exception e)
                         {
@@ -438,12 +444,155 @@ namespace OutageManagementService
 
         public bool ValidateResolveConditions(long outageId)
         {
-            throw new NotImplementedException();
+            ActiveOutage outageDbEntity = null;
+
+            try
+            {
+                outageDbEntity = dbContext.ActiveOutageRepository.Get(outageId);
+            }
+            catch (Exception e)
+            {
+                string message = "OutageModel::SendRepairCrew => exception in UnitOfWork.ActiveOutageRepository.Get()";
+                Logger.LogError(message, e);
+                throw e;
+            }
+
+            if (outageDbEntity == null)
+            {
+                Logger.LogError($"Outage with id 0x{outageId:X16} is not found in database.");
+                return false;
+            }
+
+            if (outageDbEntity.OutageState != ActiveOutageState.REPAIRED)
+            {
+                Logger.LogError($"Outage with id 0x{outageId:X16} is in state {outageDbEntity.OutageState}, and thus repair crew can not be sent. (Expected state: {ActiveOutageState.REPAIRED})");
+                return false;
+            }
+
+            List<long> isolationPoints = new List<long>();
+            isolationPoints.AddRange(ParseIsolationPointsFromCSV(outageDbEntity.DefaultIsolationPoints));
+            isolationPoints.AddRange(ParseIsolationPointsFromCSV(outageDbEntity.OptimumIsolationPoints));
+
+            bool resolveCondition = true;
+
+            foreach (long isolationPointId in isolationPoints)
+            {
+                if(TopologyModel.GetElementByGid(isolationPointId, out IOutageTopologyElement element))
+                {
+                    if(element.NoReclosing != element.IsActive)
+                    {
+                        resolveCondition = false;
+                        break;
+                    }
+                }
+            }
+
+            outageDbEntity.IsResolveConditionValidated = resolveCondition;
+
+            dbContext.ActiveOutageRepository.Update(outageDbEntity);
+
+            try
+            {
+                dbContext.Complete();
+                PublishOutage(Topic.ACTIVE_OUTAGE, outageMessageMapper.MapActiveOutage(outageDbEntity));
+            }
+            catch(Exception e)
+            {
+                string message = "OutageModel::ValidateResolveConditions => exception in Complete method.";
+                Logger.LogError(message, e);
+            }
+
+            return true;
         }
 
         public bool ResolveOutage(long outageId)
         {
-            throw new NotImplementedException();
+            ActiveOutage activeOutageDbEntity = null;
+
+            try
+            {
+                activeOutageDbEntity = dbContext.ActiveOutageRepository.Get(outageId);
+            }
+            catch (Exception e)
+            {
+                string message = "OutageModel::SendRepairCrew => exception in UnitOfWork.ActiveOutageRepository.Get()";
+                Logger.LogError(message, e);
+                throw e;
+            }
+
+            if (activeOutageDbEntity == null)
+            {
+                Logger.LogError($"Outage with id 0x{outageId:X16} is not found in database.");
+                return false;
+            }
+
+            if (activeOutageDbEntity.OutageState != ActiveOutageState.REPAIRED)
+            {
+                Logger.LogError($"Outage with id 0x{outageId:X16} is in state {activeOutageDbEntity.OutageState}, and thus repair crew can not be sent. (Expected state: {ActiveOutageState.REPAIRED})");
+                return false;
+            }
+
+            if(!activeOutageDbEntity.IsResolveConditionValidated)
+            {
+                //TODO: mozda i ovde odraditi proveru uslova?
+                Logger.LogWarn("ResolveOutage => resolve conditions not validated.");
+                return false;
+            }
+
+            ArchivedOutage createdArchivedOutage = new ArchivedOutage()
+            {
+                OutageId = activeOutageDbEntity.OutageId,
+                OutageElementGid = activeOutageDbEntity.OutageElementGid,
+                ReportTime = activeOutageDbEntity.ReportTime,
+                IsolatedTime = activeOutageDbEntity.IsolatedTime,
+                RepairedTime = activeOutageDbEntity.RepairedTime,
+                ArchiveTime = DateTime.UtcNow,
+                DefaultIsolationPoints = activeOutageDbEntity.DefaultIsolationPoints,
+                OptimumIsolationPoints = activeOutageDbEntity.OptimumIsolationPoints,
+                AffectedConsumers = activeOutageDbEntity.AffectedConsumers,
+            };
+
+            bool success; 
+            ArchivedOutage archivedOutageDbEntity = dbContext.ArchivedOutageRepository.Add(createdArchivedOutage);
+            dbContext.ActiveOutageRepository.Remove(activeOutageDbEntity);
+
+            try
+            {
+                dbContext.Complete();
+                Logger.LogDebug($"ArchivedOutage on element with gid: 0x{archivedOutageDbEntity.OutageElementGid:x16} is successfully stored in database.");
+                success = true;
+            }
+            catch (Exception e)
+            {
+                string message = "OutageModel::ResolveOutage method => exception on Complete()";
+                Logger.LogError(message, e);
+                Console.WriteLine($"{message}, Message: {e.Message})");
+
+                //TODO: da li je dobar handle?
+                dbContext.Dispose();
+                dbContext = new UnitOfWork();
+                success = false;
+            }
+
+            if (success && archivedOutageDbEntity != null) //TODO: ne svidja mi se ova konstrukcija...
+            {
+                try
+                {
+                    success = PublishOutage(Topic.ARCHIVED_OUTAGE, outageMessageMapper.MapArchivedOutage(archivedOutageDbEntity));
+
+                    if (success)
+                    {
+                        Logger.LogInfo($"ArchivedOutage on element with gid: 0x{archivedOutageDbEntity.OutageElementGid:x16} is successfully published");
+                    }
+                }
+                catch (Exception e) //TODO: Exception over proxy or enum...
+                {
+                    Logger.LogError("OutageModel::ResolveOutage => exception on PublishActiveOutage()", e);
+                    success = false;
+                }
+            }
+
+            return success;
         }
         #endregion
 
@@ -474,12 +623,28 @@ namespace OutageManagementService
                     throw new NullReferenceException(message);
                 }
 
-                TopologyModel = (OutageTopologyModel)omsTopologyProxy.GetOMSModel();
+                TopologyModel = omsTopologyProxy.GetOMSModel();
             }
         }
+
+        private void SubscribeToOMSTopologyPublications()
+        {
+            Logger.LogDebug("Subcribing on OMS Topology.");
+            subscriberProxy = proxyFactory.CreateProxy<SubscriberProxy, ISubscriber>(this, EndpointNames.SubscriberEndpoint);
+
+            if (subscriberProxy == null)
+            {
+                string message = "SubscribeToOMSTopologyPublications() => SubscriberProxy is null.";
+                Logger.LogError(message);
+                throw new NullReferenceException(message);
+            }
+
+            subscriberProxy.Subscribe(Topic.OMS_MODEL);
+        }
+
         private long GetNextBreaker(long breakerId)
         {
-            if (!topologyModel.OutageTopology.ContainsKey(breakerId))
+            if (!TopologyModel.OutageTopology.ContainsKey(breakerId))
             {
                 string message = $"Breaker with gid: {breakerId} is not in a topology model.";
                 Logger.LogError(message);
@@ -488,7 +653,7 @@ namespace OutageManagementService
 
             long nextBreakerId = -1;
 
-            foreach(long elementId in topologyModel.OutageTopology[breakerId].SecondEnd)
+            foreach(long elementId in TopologyModel.OutageTopology[breakerId].SecondEnd)
             {
                 if (modelResourcesDesc.GetModelCodeFromId(elementId) == ModelCode.ACLINESEGMENT)
                 {
@@ -512,12 +677,11 @@ namespace OutageManagementService
             return nextBreakerId;
         }
         
-
         private long GetRecloserForHeadBreaker(long headBreakerId)
         {
             long recolserId = -1;
 
-            if (!topologyModel.OutageTopology.ContainsKey(headBreakerId))
+            if (!TopologyModel.OutageTopology.ContainsKey(headBreakerId))
             {
                 string message = $"Head switch with gid: {headBreakerId} is not in a topology model.";
                 Logger.LogError(message);
@@ -532,14 +696,14 @@ namespace OutageManagementService
                     continue;
                 }
 
-                if (!topologyModel.OutageTopology.ContainsKey(currentBreakerId))
+                if (!TopologyModel.OutageTopology.ContainsKey(currentBreakerId))
                 {
                     string message = $"Head switch with gid: {currentBreakerId} is not in a topology model.";
                     Logger.LogError(message);
                     throw new Exception(message);
                 }
 
-                if (!topologyModel.OutageTopology[currentBreakerId].NoReclosing)
+                if (!TopologyModel.OutageTopology[currentBreakerId].NoReclosing)
                 {
                     recolserId = currentBreakerId;
                     break;
@@ -704,16 +868,16 @@ namespace OutageManagementService
                             outageToIsolate.OptimumIsolationPoints = $"{currentBreakerId}|{nextBreakerId}";
 
 
-                            if (!topologyModel.OutageTopology.ContainsKey(nextBreakerId))
+                            if (!TopologyModel.OutageTopology.ContainsKey(nextBreakerId))
                             {
                                 string message = $"Breaker (next breaker) with id: 0x{nextBreakerId:X16} is not in topology";
                                 Logger.LogError(message);
                                 throw new Exception(message);
                             }
 
-                            long outageElement = topologyModel.OutageTopology[nextBreakerId].FirstEnd;
+                            long outageElement = TopologyModel.OutageTopology[nextBreakerId].FirstEnd;
 
-                            if (!topologyModel.OutageTopology[currentBreakerId].SecondEnd.Contains(outageElement))
+                            if (!TopologyModel.OutageTopology[currentBreakerId].SecondEnd.Contains(outageElement))
                             {
                                 string message = $"Outage element with gid: 0x{outageElement:X16} is not on a second end of current breaker id";
                                 Logger.LogError(message);
@@ -937,9 +1101,9 @@ namespace OutageManagementService
                 {
                     visited.Add(currentNode);
 
-                    if (topologyModel.OutageTopology.ContainsKey(currentNode))
+                    if (TopologyModel.OutageTopology.ContainsKey(currentNode))
                     {
-                        IOutageTopologyElement topologyElement = topologyModel.OutageTopology[currentNode];
+                        IOutageTopologyElement topologyElement = TopologyModel.OutageTopology[currentNode];
 
                         if (topologyElement.SecondEnd.Count == 0 && topologyElement.DmsType == "ENERGYCONSUMER")
                         {
@@ -962,6 +1126,44 @@ namespace OutageManagementService
             }
 
             return affectedConsumers;
+        }
+
+        private List<long> ParseIsolationPointsFromCSV(string isolationPointsCSV)
+        {
+            List<long> isolationPoints = new List<long>();
+
+            foreach(string isolationPointString in isolationPointsCSV.Split('|'))
+            {
+                if(long.TryParse(isolationPointString, out long isolationPointId))
+                {
+                    isolationPoints.Add(isolationPointId);
+                }
+                else
+                {
+                    Logger.LogError("Parsing error in ParseIsolationPointsFromCSV.");
+                    isolationPoints.Clear();
+                    //throw?
+                }
+            }
+
+            return isolationPoints;
+        }
+
+        private string ParseIsolationPointsToCSV(List<long> isolationPoints)
+        {
+            StringBuilder isolationPointsCSV = new StringBuilder();
+
+            for (int i = 0; i < isolationPoints.Count; i++)
+            {
+                isolationPointsCSV.Append($"{isolationPoints[i]}");
+
+                if(i < isolationPoints.Count - 1)
+                {
+                    isolationPointsCSV.Append("|");
+                }
+            }
+
+            return isolationPointsCSV.ToString();
         }
         #endregion
 
@@ -1039,7 +1241,25 @@ namespace OutageManagementService
 
             return resourceDescriptions;
         }
+        #endregion
 
+        #region ISubscriberCallback
+        public string GetSubscriberName()
+        {
+            return "OUTAGE_MODEL_SUBSCRIBER";
+        }
+
+        public void Notify(IPublishableMessage message)
+        {
+            if(message is OMSModelMessage omsModelMessage)
+            {
+                TopologyModel = omsModelMessage.OutageTopologyModel; //TODO: Da li su subsciber callback pozivi sinhroni?
+            }
+            else
+            {
+                Logger.LogWarn("OutageModel::Notify => UNKNOWN message type. OMSModelMessage expected.");
+            }
+        }
         #endregion
     }
 }

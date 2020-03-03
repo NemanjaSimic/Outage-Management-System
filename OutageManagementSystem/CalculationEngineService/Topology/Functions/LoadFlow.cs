@@ -38,17 +38,25 @@ namespace Topology
                 {
                     nextElement = stack.Pop();
 
-                    if (!IsElementEnergized(nextElement))
+                    if (nextElement is Field field)
                     {
-                        DeEnergizeElementsAbove(nextElement);
+                        stack.Push(field.Members.First());
                     }
                     else
                     {
-                        foreach (var child in nextElement.SecondEnd)
+
+                        if (!IsElementEnergized(nextElement))
                         {
-                            if (!reclosers.Contains(child.Id))
+                            DeEnergizeElementsAbove(nextElement);
+                        }
+                        else
+                        {
+                            foreach (var child in nextElement.SecondEnd)
                             {
-                                stack.Push(child);
+                                if (!reclosers.Contains(child.Id))
+                                {
+                                    stack.Push(child);
+                                }
                             }
                         }
                     }
@@ -63,29 +71,16 @@ namespace Topology
         private bool IsElementEnergized(ITopologyElement element)
         {
             element.IsActive = true;
-            if (element is Field field)
+            foreach (var measurement in element.Measurements)
             {
-                field.IsActive = true;
-                foreach (var member in field.Members)
+                if ((DMSType)ModelCodeHelper.ExtractTypeFromGlobalId(measurement) == DMSType.DISCRETE)
                 {
-                    if (!IsElementEnergized(member))
-                    {
-                        field.IsActive = false;
-                    }
+                    // Value je true ako je prekidac otvoren, tada je element neaktivan
+                    element.IsActive = !Provider.Instance.MeasurementProvider.GetDiscreteValue(measurement);
+                    break;
                 }
             }
-            else
-            {
-                foreach (var measurement in element.Measurements)
-                {
-                    if ((DMSType)ModelCodeHelper.ExtractTypeFromGlobalId(measurement) == DMSType.DISCRETE)
-                    {
-                        // Value je true ako je prekidac otvoren, tada je element neaktivan
-                        element.IsActive = !Provider.Instance.MeasurementProvider.GetDiscreteValue(measurement);
-                        break;
-                    }
-                }
-            }
+
             return element.IsActive;
         }
         private void DeEnergizeElementsAbove(ITopologyElement element)
@@ -98,6 +93,15 @@ namespace Topology
             {
                 nextElement = stack.Pop();
                 nextElement.IsActive = false;
+
+                if (nextElement is Field field)
+                {
+                    foreach (var member in field.Members)
+                    {
+                        member.IsActive = false;
+                    }
+                }
+
                 foreach (var child in nextElement.SecondEnd)
                 {
                     if (!reclosers.Contains(child.Id))

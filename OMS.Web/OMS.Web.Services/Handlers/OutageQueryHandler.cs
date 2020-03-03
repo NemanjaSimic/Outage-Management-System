@@ -1,7 +1,6 @@
 ﻿namespace OMS.Web.Services.Handlers
 {
     using MediatR;
-    using OMS.Web.Common;
     using OMS.Web.Common.Mappers;
     using OMS.Web.Services.Queries;
     using OMS.Web.UI.Models.ViewModels;
@@ -15,21 +14,19 @@
     using System.Threading;
     using System.Threading.Tasks;
 
-    public class OutageQueryHandler : 
+    public class OutageQueryHandler :
         IRequestHandler<GetActiveOutagesQuery, IEnumerable<ActiveOutageViewModel>>,
         IRequestHandler<GetArchivedOutagesQuery, IEnumerable<ArchivedOutageViewModel>>
     {
         private readonly ILogger _logger;
         private readonly IOutageMapper _mapper;
-        //private readonly IOutageService _outageService;
-        ProxyFactory _proxyFactory;
+        IProxyFactory _proxyFactory;
 
-        public OutageQueryHandler(ILogger logger, IOutageMapper mapper)
+        public OutageQueryHandler(ILogger logger, IOutageMapper mapper, IProxyFactory factory)
         {
             _logger = logger;
             _mapper = mapper;
-
-            _proxyFactory = new ProxyFactory();
+            _proxyFactory = factory;
         }
 
         public Task<IEnumerable<ActiveOutageViewModel>> Handle(GetActiveOutagesQuery request, CancellationToken cancellationToken)

@@ -132,10 +132,10 @@ namespace OMS.OutageSimulator.UserControls
 
         private void EndOutageButton_Click(object sender, RoutedEventArgs e)
         {
-            ResolveOutage(SelectedOutege.OutageElement.GID);
+            StopOutageSimulation(SelectedOutege.OutageElement.GID);
         }
 
-        public bool ResolveOutage(long outageElementId)
+        public bool StopOutageSimulation(long outageElementId)
         {
             //TODO: END TASK HERE
 

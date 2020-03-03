@@ -25,7 +25,7 @@ namespace OMSTestClient
 
 				using (var proxy = new OutageSimulatorServiceProxy(EndpointNames.OutageSimulatorServiceEndpoint))
 				{
-					proxy.ResolvedOutage(0x0000000c00000029);
+					proxy.StopOutageSimulation(0x0000000c00000029);
 				}
 			}
 			catch (Exception ex)
