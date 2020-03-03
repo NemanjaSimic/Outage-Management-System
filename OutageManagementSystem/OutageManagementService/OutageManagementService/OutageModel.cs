@@ -399,7 +399,7 @@ namespace OutageManagementService
             Task task = Task.Run(() =>
             {
                 Task.Delay(10000).Wait();
-
+                
                 using(OutageSimulatorServiceProxy proxy = proxyFactory.CreateProxy<OutageSimulatorServiceProxy, IOutageSimulatorContract>(EndpointNames.OutageSimulatorServiceEndpoint))
                 {
                     if(proxy == null)
