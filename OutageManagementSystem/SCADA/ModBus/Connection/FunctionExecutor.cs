@@ -316,11 +316,11 @@ namespace Outage.SCADA.ModBus.Connection
                         ModbusClient = new ModbusClient(ConfigData.IpAddress.ToString(), ConfigData.TcpPort);
                     }
 
-                    Logger.LogDebug("Connected and waiting for command event.");
+                    //Logger.LogDebug("Connected and waiting for command event.");
 
                     this.commandEvent.WaitOne();
 
-                    Logger.LogDebug("Command event happened.");
+                    //Logger.LogDebug("Command event happened.");
 
                     if (!ModbusClient.Connected)
                     {
@@ -374,6 +374,8 @@ namespace Outage.SCADA.ModBus.Connection
             {
                 string message = "Exception on currentCommand.Execute().";
                 Logger.LogWarn(message, e);
+                ModbusClient.Disconnect();
+                return;
             }
 
             if (command is IReadAnalogModusFunction readAnalogCommand)
@@ -444,7 +446,7 @@ namespace Outage.SCADA.ModBus.Connection
                 }
                 else if (MeasurementsCache[gid] is AnalogModbusData analogCacheItem && analogCacheItem.Value != data[gid].Value)
                 {
-                    Logger.LogDebug($"Value changed. Old value: {analogCacheItem.Value}; new value: {data[gid].Value}");
+                    Logger.LogDebug($"Value changed on element with id: {analogCacheItem.MeasurementGid}. Old value: {analogCacheItem.Value}; new value: {data[gid].Value}");
                     MeasurementsCache[gid] = data[gid];
                     
 
@@ -495,7 +497,7 @@ namespace Outage.SCADA.ModBus.Connection
                 }
                 else if (MeasurementsCache[gid] is DiscreteModbusData discreteCacheItem && discreteCacheItem.Value != data[gid].Value)
                 {
-                    Logger.LogDebug($"Value changed. Old value: {discreteCacheItem.Value}; new value: {data[gid].Value}");
+                    Logger.LogDebug($"Value changed on element with id :{discreteCacheItem.MeasurementGid};. Old value: {discreteCacheItem.Value}; new value: {data[gid].Value}");
                     MeasurementsCache[gid] = data[gid];
 
                     if (!publicationData.ContainsKey(gid))
@@ -546,7 +548,7 @@ namespace Outage.SCADA.ModBus.Connection
                     }
                     else if(data is DiscreteModbusData discreteModbusData)
                     {
-                        sb.AppendLine($"Analog data line: [gid] 0x{gid:X16}, [value] {discreteModbusData.Value}, [alarm] {discreteModbusData.Alarm}");
+                        sb.AppendLine($"Discrete data line: [gid] 0x{gid:X16}, [value] {discreteModbusData.Value}, [alarm] {discreteModbusData.Alarm}");
                     }
                     else
                     {

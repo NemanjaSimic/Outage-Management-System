@@ -164,7 +164,7 @@ namespace Outage.SCADA.ModBus.Acquisitor
 
                         if (this.readCommandEnqueuer.EnqueueReadCommand(modbusFunction))
                         {
-                            Logger.LogDebug($"Modbus function enquided. Point type is {pointType}, quantity {quantity}.");
+                            //Logger.LogDebug($"Modbus function enquided. Point type is {pointType}, quantity {quantity}.");
                         }
                     }
 

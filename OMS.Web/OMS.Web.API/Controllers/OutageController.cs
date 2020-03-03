@@ -42,7 +42,7 @@ namespace OMS.Web.API.Controllers
             {
                 _ = await _mediator.Send(new IsolateOutageCommand(id));
             }
-            catch (Exception e)
+            catch (Exception)
             {
                 return InternalServerError();
             }
@@ -52,11 +52,11 @@ namespace OMS.Web.API.Controllers
 
         [HttpPost]
         [Route("api/outage/sendlocationisolationcrew/{id}")]
-        public async Task<IHttpActionResult> SendOutageLocationIsolationCrew([FromUri]long id   )
+        public async Task<IHttpActionResult> SendOutageLocationIsolationCrew([FromUri]long id)
         {
             try
             {
-                _ = await _mediator.Send(new SendOutageLocationIsolationCrewCommand(id));
+                await _mediator.Send(new SendOutageLocationIsolationCrewCommand(id));
             }
             catch (Exception)
             {
@@ -72,9 +72,9 @@ namespace OMS.Web.API.Controllers
         {
             try
             {
-                _ = await _mediator.Send(new SendOutageRepairCrewCommand(id));
+                await _mediator.Send(new SendOutageRepairCrewCommand(id));
             }
-            catch (Exception)
+            catch (Exception e)
             {
                 return InternalServerError();
             }
@@ -88,9 +88,9 @@ namespace OMS.Web.API.Controllers
         {
             try
             {
-                _ = await _mediator.Send(new ValidateResolveConditionsCommand(id));
+                await _mediator.Send(new ValidateResolveConditionsCommand(id));
             }
-            catch (Exception)
+            catch (Exception e)
             {
                 return InternalServerError();
             }
@@ -104,7 +104,7 @@ namespace OMS.Web.API.Controllers
         {
             try
             {
-                _ = await _mediator.Send(new ResolveOutageCommand(id));
+                await _mediator.Send(new ResolveOutageCommand(id));
             }
             catch (Exception)
             {

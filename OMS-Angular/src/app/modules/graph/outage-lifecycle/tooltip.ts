@@ -1,7 +1,9 @@
 import tippy from 'tippy.js';
 
 import {
-    generateCreatedOutageTemplate, generateRepairCrewOutageTemplate, generateIsolatedOutageTemplate
+    generateCreatedOutageTemplate,
+    generateRepairCrewOutageTemplate,
+    generateIsolatedOutageTemplate
 } from './contents';
 import { ActiveOutage, OutageLifeCycleState } from '@shared/models/outage.model';
 
@@ -43,20 +45,19 @@ export const addOutageTooltip = (cy, node, outage: ActiveOutage) => {
 }
 
 const generateTemplate = (outage: ActiveOutage) => {
+    console.log(outage);
+    
     if (outage.State == OutageLifeCycleState.Created)
         return generateCreatedOutageTemplate(outage);
 
     if (outage.State == OutageLifeCycleState.Isolated)
-        return outage.ReportedAt
-            ? generateRepairCrewOutageTemplate(outage)
-            : generateIsolatedOutageTemplate(outage)
+        return generateIsolatedOutageTemplate(outage);
+
+    if (outage.State == OutageLifeCycleState.Repaired)
+        return generateRepairCrewOutageTemplate(outage);
 }
 
-// ughh
-// @TODO:
-// - change to a map function
 const generateButton = (outage: ActiveOutage, node) => {
-
     if (outage.State == OutageLifeCycleState.Created) {
         const button = document.createElement('button');
         button.innerHTML = "Isolate";
@@ -67,49 +68,52 @@ const generateButton = (outage: ActiveOutage, node) => {
         return button;
     }
 
-    if (outage.State == OutageLifeCycleState.Isolated)
-        if (outage.ReportedAt) {
-            if (!outage.IsValidated) {
-                const resolveButton = document.createElement('button');
-                resolveButton.innerHTML = "Resolve";
-                resolveButton.disabled = true;
+    if (outage.State == OutageLifeCycleState.Isolated) {
+        const button = document.createElement('button');
+        button.innerHTML = "Send Repair Crew";
+        button.addEventListener('click', () => {
+            node.sendRepairCrewCommand(outage.Id);
+            commandedNodeIds.push(node.data('id'));
+        });
+        return button;
+    }
 
-                const validateButton = document.createElement('button');
-                validateButton.innerHTML = "Validate";
-                validateButton.addEventListener('click', () => {
-                    node.sendValidateOutageCommand(outage.Id);
-                    commandedNodeIds.push(node.data('id'));
-                });
+    if (outage.State == OutageLifeCycleState.Repaired) {
+        if (!outage.IsResolveConditionValidated) {
+            const resolveButton = document.createElement('button');
+            resolveButton.innerHTML = "Resolve";
+            resolveButton.disabled = true;
 
-                const buttonDiv = document.createElement('div');
-                buttonDiv.append(resolveButton);
-                buttonDiv.append(validateButton);
-                return buttonDiv;
-            } else {
-                const resolveButton = document.createElement('button');
-                resolveButton.innerHTML = "Resolve";
-                resolveButton.addEventListener('click', () => {
-                    node.sendResolveOutageCommand(outage.Id);
-                    commandedNodeIds.push(node.data('id'));
-                });
-
-                const validateButton = document.createElement('button');
-                validateButton.innerHTML = "Validate";
-                validateButton.disabled = true;
-
-                const buttonDiv = document.createElement('div');
-                buttonDiv.append(resolveButton);
-                buttonDiv.append(validateButton);
-                return buttonDiv;
-            }
-
-        } else {
-            const button = document.createElement('button');
-            button.innerHTML = "Send Repair Crew";
-            button.addEventListener('click', () => {
-                node.sendRepairCrewCommand(outage.Id);
+            const validateButton = document.createElement('button');
+            validateButton.innerHTML = "Validate";
+            validateButton.setAttribute('mat-stroked-button','');
+            validateButton.setAttribute('color', 'primary')
+            validateButton.addEventListener('click', () => {
+                node.sendValidateOutageCommand(outage.Id);
                 commandedNodeIds.push(node.data('id'));
             });
-            return button;
+
+            const buttonDiv = document.createElement('div');
+            buttonDiv.append(resolveButton);
+            buttonDiv.append(validateButton);
+            return buttonDiv;
+        } else {
+            const resolveButton = document.createElement('button');
+            resolveButton.innerHTML = "Resolve";
+            resolveButton.addEventListener('click', () => {
+                node.sendResolveOutageCommand(outage.Id);
+                commandedNodeIds.push(node.data('id'));
+            });
+
+            const validateButton = document.createElement('button');
+            validateButton.innerHTML = "Validate";
+            validateButton.disabled = true;
+
+            const buttonDiv = document.createElement('div');
+            buttonDiv.append(resolveButton);
+            buttonDiv.append(validateButton);
+            return buttonDiv;
         }
+
+    }
 }
