@@ -48,6 +48,10 @@ namespace OutageManagementService.Calling
                 }
             }
 
+            foreach (var item in this.outages)
+            {
+                this.outageModel.ReportPotentialOutage(item);
+            }
         }
         private bool IsSwitch(string dmsType)
         {
