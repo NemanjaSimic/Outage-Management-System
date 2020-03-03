@@ -80,7 +80,8 @@ namespace OutageManagementService.Outage
 
             try
             {
-                result = outageModel.IsolateOutage(outageId);
+                outageModel.IsolateOutage(outageId);
+                result = true;
             }
             catch (Exception e)
             {

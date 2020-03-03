@@ -20,7 +20,7 @@ namespace CECommon.Model
 			}
 			else
 			{
-				Logger.Instance.LogWarn($"Topology element with GID 0x{newElement.Id.ToString("16X")} is already added.");
+				Logger.Instance.LogWarn($"Topology element with GID 0x{newElement.Id.ToString("X16")} is already added.");
 			}
 		}
 		public bool GetElementByGid(long gid, out ITopologyElement topologyElement)
