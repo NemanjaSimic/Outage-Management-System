@@ -2934,6 +2934,7 @@
 		<ftn:IdentifiedObject.name>ACL_51</ftn:IdentifiedObject.name>
 	</cim:ACLineSegment>
 	<cim:ACLineSegment rdf:ID="ACL_52">
+		<cim:ConductingEquipment.BaseVoltage rdf:resource="#BV_2"/>
 		<cim:ConductingEquipment.isRemote>false</cim:ConductingEquipment.isRemote>
 		<cim:IdentifiedObject.description>ACLineSegment</cim:IdentifiedObject.description>
 		<cim:IdentifiedObject.mRID>ACL_52</cim:IdentifiedObject.mRID>
@@ -3226,6 +3227,7 @@
 	<cim:Breaker rdf:ID="BR_9">
 		<cim:Breaker.noReclosing>true</cim:Breaker.noReclosing>
 		<cim:ConductingEquipment.isRemote>false</cim:ConductingEquipment.isRemote>
+		<cim:ConductingEquipment.BaseVoltage rdf:resource="#BV_2"/>
 		<cim:IdentifiedObject.description> </cim:IdentifiedObject.description>
 		<cim:IdentifiedObject.mRID>BR_9</cim:IdentifiedObject.mRID>
 		<ftn:IdentifiedObject.name>BR_9</ftn:IdentifiedObject.name>
@@ -5022,7 +5024,7 @@
 		<cim:IdentifiedObject.description> </cim:IdentifiedObject.description>
 		<cim:IdentifiedObject.mRID>AN_1</cim:IdentifiedObject.mRID>
 		<ftn:IdentifiedObject.name>AN_1</ftn:IdentifiedObject.name>
-	</cim:Analog>
+	</cim:Analog> 
 	<cim:Analog rdf:ID="AN_2">
 		<cim:Analog.scalingFactor>1</cim:Analog.scalingFactor>
 		<cim:Analog.deviation>0</cim:Analog.deviation>
@@ -5656,6 +5658,7 @@
 		<cim:IdentifiedObject.mRID>AN_43</cim:IdentifiedObject.mRID>
 		<ftn:IdentifiedObject.name>AN_43</ftn:IdentifiedObject.name>
 	</cim:Analog>
+	
 	<!--END Analog-->
 	
 	
