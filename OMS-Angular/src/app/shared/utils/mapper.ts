@@ -72,7 +72,9 @@ const mapBreakerNode = (node) => {
       measurements: node.Measurements,
       nominalVoltage: node.NominalVoltage,
       deviceType: node.IsRemote ? "remote" : "local",
-      isClosed: "closed"//node.Measurements[0].Value != 0 ? "closed" : "open"
+      isClosed: 
+        (node.Measurements[0] != null && node.Measurements[0] != undefined) ? 
+          (node.Measurements[0].Value != 0 ? "closed" : "open") : "open"
   }
 }
 }
