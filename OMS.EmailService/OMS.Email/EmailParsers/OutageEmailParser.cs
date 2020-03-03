@@ -3,24 +3,33 @@
     using OMS.Email.Interfaces;
     using OMS.Email.Models;
     using System;
+    using System.Globalization;
 
     public class OutageEmailParser : IEmailParser
     {
         public OutageTracingModel Parse(OutageMailMessage message)
         {
-            string searchQuery = "gid:";
+            string searchQuery = "gid";
             int gidIndex = message.Body.ToLower().IndexOf(searchQuery);
 
             if (gidIndex < 0)
                 return BuildInvalidModel();
 
             long gid = 0;
-            int gidLength = 7;
+
             try
             {
                 // we should consider everything 
-                string gidText = message.Body.Substring(gidIndex + searchQuery.Length, gidLength + 1);
-                gid = Int64.Parse(gidText);
+                string gidText = message.Body.Split('[')[1].Split(']')[0];
+
+                if(gidText.ToLower().Contains("0x"))
+                {
+                    gid = long.Parse(gidText.ToLower().Split('x')[1], NumberStyles.HexNumber);
+                }
+                else
+                {
+                    gid = long.Parse(gidText);
+                }
             }
             catch (Exception)
             {
