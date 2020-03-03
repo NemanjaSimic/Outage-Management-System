@@ -6203,6 +6203,20 @@
 		<cim:IdentifiedObject.mRID>DS_21</cim:IdentifiedObject.mRID>
 		<ftn:IdentifiedObject.name>DS_21</ftn:IdentifiedObject.name>
 	</cim:Discrete>
+	
+	<cim:Discrete rdf:ID="DS_22">
+		<cim:Discrete.currentOpen>true</cim:Discrete.currentOpen>
+		<cim:Discrete.maxValue>1</cim:Discrete.maxValue>
+		<cim:Discrete.measurementType>SwitchStatus</cim:Discrete.measurementType>
+		<cim:Discrete.minValue>0</cim:Discrete.minValue>
+		<cim:Discrete.normalValue>1</cim:Discrete.normalValue>
+		<cim:Measurement.address>22</cim:Measurement.address>
+		<cim:Measurement.isInput>false</cim:Measurement.isInput>
+		<cim:Measurement.Terminal rdf:resource="#TM_307"/>
+		<cim:IdentifiedObject.description> </cim:IdentifiedObject.description>
+		<cim:IdentifiedObject.mRID>DS_22</cim:IdentifiedObject.mRID>
+		<ftn:IdentifiedObject.name>DS_22</ftn:IdentifiedObject.name>
+	</cim:Discrete>
 	<!--END Discrete-->
 <!--[END Package_Meas ]-->	
 </rdf:RDF>
