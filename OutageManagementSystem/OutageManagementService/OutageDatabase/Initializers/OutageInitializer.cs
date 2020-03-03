@@ -33,6 +33,7 @@ namespace OutageDatabase.Initializers
             dbContext.ArchivedOutageRepository.RemoveAll();
             dbContext.ConsumerRepository.RemoveAll();
 
+            
             ArchivedOutage archivedOutage;
 
             long archivedId = 1;
