@@ -47,7 +47,7 @@ namespace Topology
 
                         if (!IsElementEnergized(nextElement))
                         {
-                            DeEnergizeElementsAbove(nextElement);
+                            DeEnergizeElementsUnder(nextElement);
                         }
                         else
                         {
@@ -73,7 +73,8 @@ namespace Topology
             element.IsActive = true;
             foreach (var measurement in element.Measurements)
             {
-                if ((DMSType)ModelCodeHelper.ExtractTypeFromGlobalId(measurement) == DMSType.DISCRETE)
+                if ((DMSType)ModelCodeHelper.ExtractTypeFromGlobalId(measurement) == DMSType.DISCRETE
+                    || measurement < 10000)
                 {
                     // Value je true ako je prekidac otvoren, tada je element neaktivan
                     element.IsActive = !Provider.Instance.MeasurementProvider.GetDiscreteValue(measurement);
@@ -83,7 +84,7 @@ namespace Topology
 
             return element.IsActive;
         }
-        private void DeEnergizeElementsAbove(ITopologyElement element)
+        private void DeEnergizeElementsUnder(ITopologyElement element)
         {
             Stack<ITopologyElement> stack = new Stack<ITopologyElement>();
             stack.Push(element);
@@ -192,19 +193,66 @@ namespace Topology
                 nextElement = tuple.Item1;
                 sourceGid = tuple.Item2;
 
-                foreach (var child in nextElement.SecondEnd)
+                if (IsElementEnergized(nextElement))
                 {
-                    if (child.Id != sourceGid)
+                    if (!nextElement.DmsType.Equals(DMSType.ENERGYCONSUMER.ToString())
+                    && nextElement.FirstEnd.Id != sourceGid)
                     {
-                        stack.Push(new Tuple<ITopologyElement, long>(child, nextElement.Id));
+                        stack.Push(new Tuple<ITopologyElement, long>(nextElement.FirstEnd, nextElement.Id));
+                    }
+
+                    foreach (var child in nextElement.SecondEnd)
+                    {
+                        if (child.Id != sourceGid)
+                        {
+                            stack.Push(new Tuple<ITopologyElement, long>(child, nextElement.Id));
+                        }
+                    }
+                }
+                else
+                {
+                    if (nextElement.DmsType.Equals(DMSType.FUSE.ToString()))
+                    {
+                        DeEnergizeElementsUnder(nextElement);
+                    }
+                    else
+                    {
+                        foreach (var child in nextElement.SecondEnd)
+                        {
+                            if (child.Id != sourceGid)
+                            {
+                                stack.Push(new Tuple<ITopologyElement, long>(child, nextElement.Id));
+                            }
+                        }
+                    }
+                }     
+            }
+        }
+        private void DeEnergizeElementsFromRecloser(ITopologyElement element, long sourceElementGid)
+        {
+            Stack<ITopologyElement> stack = new Stack<ITopologyElement>();
+            stack.Push(element);
+            ITopologyElement nextElement;
+
+            while (stack.Count > 0)
+            {
+                nextElement = stack.Pop();
+                nextElement.IsActive = false;
+
+                if (nextElement is Field field)
+                {
+                    foreach (var member in field.Members)
+                    {
+                        member.IsActive = false;
                     }
                 }
 
-                if (IsElementEnergized(nextElement)
-                    && !nextElement.DmsType.Equals(DMSType.ENERGYCONSUMER.ToString())
-                    && nextElement.FirstEnd.Id != sourceGid)
+                foreach (var child in nextElement.SecondEnd)
                 {
-                    stack.Push(new Tuple<ITopologyElement, long>(nextElement.FirstEnd, nextElement.Id));
+                    if (!reclosers.Contains(child.Id) || child.Id != sourceElementGid)
+                    {
+                        stack.Push(child);
+                    }
                 }
             }
         }
