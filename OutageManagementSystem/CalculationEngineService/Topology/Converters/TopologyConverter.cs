@@ -123,6 +123,7 @@ namespace Topology
                 nextElementGid = stack.Pop();
                 if (topology.GetElementByGid(nextElementGid, out element))
                 {
+
                     secondEnd.Clear();
                     if (!reclosers.Contains(nextElementGid))
                     {
@@ -146,7 +147,7 @@ namespace Topology
                         }
                     }
 
-                    if (!outageTopologyModel.GetElementByGid(nextElement, out var _))
+                    if (!outageTopologyModel.GetElementByGid(element.Id, out var _))
                     {
                         outageTopologyModel.AddElement(
                             new OutageTopologyElement(element.Id)
@@ -166,7 +167,6 @@ namespace Topology
                 }
             }
             logger.LogDebug("Topology to OMSModel convert finished successfully.");
-
             return outageTopologyModel;
         }
     }

@@ -34,7 +34,7 @@ namespace OutageManagementService.Calling
                 this.outages.Add(currentGid);
                 this.outageModel.TopologyModel.GetElementByGid(currentGid, out IOutageTopologyElement topologyElement);
                 this.potentialOutages.Remove(currentGid);
-                while (topologyElement.DmsType != "ENERGYSOURCE" && !topologyElement.IsRemote)
+                while (topologyElement.DmsType != "ENERGYSOURCE" && !topologyElement.IsRemote && this.potentialOutages.Count > 0)
                 {
                     FoundOutage = false;
                     if (TraceDFS(visited, topologyElement, FoundOutage))
