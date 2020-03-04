@@ -20,6 +20,13 @@
         <th [class.dark-header]="true" mat-header-cell *matHeaderCellDef> Archived At </th>
         <td [class.table-data]="true" mat-cell *matCellDef="let archivedOutage"> {{ archivedOutage.ArchivedAt | date:'medium' }} </td>
       </ng-container>
+
+      <ng-container matColumnDef="actions">
+        <th [class.dark-header]="true" mat-header-cell *matHeaderCellDef> Actions </th>
+        <td [class.table-data]="true" mat-cell *matCellDef="let archivedOutage">
+          <button mat-raised-button (click)="showMoreDetails(archivedOutage)">More details</button>
+        </td>
+      </ng-container>
     
       <tr mat-header-row *matHeaderRowDef="columns"></tr>
       <tr mat-row *matRowDef="let row; columns: columns;"></tr>

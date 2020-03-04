@@ -99,6 +99,7 @@ export class GraphComponent implements OnInit, OnDestroy {
     this.getActiveOutages();
 
     this.legendItems = legendData.items;
+    this.drawGraph();
   }
 
   ngOnDestroy() {
