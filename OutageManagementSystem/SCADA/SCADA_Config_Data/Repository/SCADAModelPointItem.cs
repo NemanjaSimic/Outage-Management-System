@@ -20,14 +20,12 @@ namespace Outage.SCADA.SCADAData.Repository
         public string Name { get; set; }
         public PointType RegisterType { get; set; }
         public AlarmType Alarm { get; set; }
-
-        protected SCADAModelPointItem()
-        {
-            Alarm = AlarmType.NO_ALARM;
-        }
+        public bool Initialized { get; protected set; }
 
         protected SCADAModelPointItem(List<Property> props, ModelCode type)
         {
+            Alarm = AlarmType.NO_ALARM;
+
             foreach (var item in props)
             {
                 switch (item.Id)
@@ -76,7 +74,7 @@ namespace Outage.SCADA.SCADAData.Repository
             }
         }
 
-        public abstract bool SetAlarms();
+        protected abstract bool SetAlarms();
 
         #region IClonable
 

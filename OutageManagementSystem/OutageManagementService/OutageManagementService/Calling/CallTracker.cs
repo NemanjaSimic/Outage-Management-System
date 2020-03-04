@@ -78,6 +78,12 @@ namespace OutageManagementService.Calling
         {
             if (message is EmailToOutageMessage emailMessage)
             {
+                if(emailMessage.Gid == 0)
+                {
+                    Logger.LogError("Invalid email received.");
+                    return;
+                }
+
                 if (!resourcesDesc.GetModelCodeFromId(emailMessage.Gid).Equals(ModelCode.ENERGYCONSUMER))
                 {
                     Logger.LogWarn("Received GID is not id of energy consumer.");

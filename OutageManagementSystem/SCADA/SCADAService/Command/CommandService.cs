@@ -23,15 +23,15 @@ namespace Outage.SCADA.SCADAService.Command
 
         #region Static Members
 
-        protected static FunctionExecutor functionExecutor = null;
+        protected static IWriteCommandEnqueuer writeCommandEnqueuer = null;
 
-        public static FunctionExecutor FunctionExecutor
+        public static IWriteCommandEnqueuer WriteCommandEnqueuer
         {
             set
             {
-                if (functionExecutor == null)
+                if (writeCommandEnqueuer == null)
                 {
-                    functionExecutor = value;
+                    writeCommandEnqueuer = value;
                 }
             }
         }
@@ -51,10 +51,7 @@ namespace Outage.SCADA.SCADAService.Command
 
         #endregion
 
-
-
-
-        public bool SendAnalogCommand(long gid, float commandingValue)
+        public bool SendAnalogCommand(long gid, float commandingValue, CommandOriginType commandOriginType)
         {
             bool success;
 
@@ -81,7 +78,7 @@ namespace Outage.SCADA.SCADAService.Command
                 try
                 {
                     int modbusValue = analogPointItem.EguToRawValueConversion(commandingValue);
-                    success = SendCommand(pointItem, modbusValue);
+                    success = SendCommand(pointItem, modbusValue, commandOriginType);
                 }
                 catch (Exception e)
                 {
@@ -102,7 +99,7 @@ namespace Outage.SCADA.SCADAService.Command
             return success;
         }
 
-        public bool SendDiscreteCommand(long gid, ushort commandingValue)
+        public bool SendDiscreteCommand(long gid, ushort commandingValue, CommandOriginType commandOriginType)
         {
             bool success;
 
@@ -128,7 +125,7 @@ namespace Outage.SCADA.SCADAService.Command
             {
                 try
                 {
-                    success = SendCommand(pointItem, commandingValue);
+                    success = SendCommand(pointItem, commandingValue, commandOriginType);
                 }
                 catch (Exception e)
                 {
@@ -147,14 +144,14 @@ namespace Outage.SCADA.SCADAService.Command
             return success;
         }
 
-        private bool SendCommand(ISCADAModelPointItem pointItem, object commandingValue)
+        private bool SendCommand(ISCADAModelPointItem pointItem, object commandingValue, CommandOriginType commandOriginType)
         {
             bool success;
             ushort length = 6;
             ModbusWriteCommandParameters modbusWriteCommandParams;
             StringBuilder sb = new StringBuilder();
 
-            if(CommandService.functionExecutor == null)
+            if(CommandService.writeCommandEnqueuer == null)
             {
                 string message = $"SendCommand => Function Executor is null.";
                 Logger.LogError(message);
@@ -189,8 +186,8 @@ namespace Outage.SCADA.SCADAService.Command
                     throw new ArgumentException(message);
                 }
 
-                ModbusFunction modbusFunction = FunctionFactory.CreateModbusFunction(modbusWriteCommandParams);
-                success = CommandService.functionExecutor.EnqueueCommand(modbusFunction);
+                IWriteModbusFunction modbusFunction = FunctionFactory.CreateWriteModbusFunction(modbusWriteCommandParams, commandOriginType);
+                success = CommandService.writeCommandEnqueuer.EnqueueWriteCommand(modbusFunction);
 
                 if (success)
                 {

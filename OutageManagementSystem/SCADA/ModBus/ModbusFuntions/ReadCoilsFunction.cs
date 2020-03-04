@@ -1,7 +1,9 @@
 ﻿using EasyModbus;
+using Outage.Common;
 using Outage.Common.PubSub.SCADADataContract;
 using Outage.SCADA.ModBus.FunctionParameters;
 using Outage.SCADA.SCADACommon;
+using Outage.SCADA.SCADACommon.FunctionParameters;
 using Outage.SCADA.SCADAData.Repository;
 using System;
 using System.Collections.Generic;
@@ -13,12 +15,15 @@ namespace Outage.SCADA.ModBus.ModbusFuntions
     public class ReadCoilsFunction : ModbusFunction, IReadDiscreteModbusFunction
     {
         public SCADAModel SCADAModel { get; private set; }
+        public IModbusReadCommandParameters ModbusReadCommandParameters { get; private set; }
 
         public ReadCoilsFunction(ModbusCommandParameters commandParameters, SCADAModel scadaModel)
             : base(commandParameters)
         {
             CheckArguments(MethodBase.GetCurrentMethod(), typeof(ModbusReadCommandParameters));
             SCADAModel = scadaModel;
+            ModbusReadCommandParameters = commandParameters as IModbusReadCommandParameters;
+            Data = new Dictionary<long, DiscreteModbusData>();
         }
 
         #region IModBusFunction
@@ -44,13 +49,34 @@ namespace Outage.SCADA.ModBus.ModbusFuntions
                 throw new Exception(message);
             }
 
-            bool[] data = modbusClient.ReadCoils(startAddress - 1, quantity);
+            bool[] data = new bool[0];
+
+            try
+            {
+                if (modbusClient.Connected)
+                {
+                    data = modbusClient.ReadCoils(startAddress - 1, quantity);
+                }
+                else
+                {
+                    Logger.LogError("modbusClient is disconected ");
+                }
+            }
+            catch (Exception e)
+            {
+                Logger.LogError("Error on ReadCoils()", e);
+                throw e;
+            }
+
+
+
             Data = new Dictionary<long, DiscreteModbusData>(data.Length);
 
             var currentSCADAModel = SCADAModel.CurrentScadaModel;
             var currentAddressToGidMap = SCADAModel.CurrentAddressToGidMap;
+            var commandValuesCache = SCADAModel.CommandedValuesCache;
 
-            for (ushort i = 0; i < quantity; i++)
+            for (ushort i = 0; i < data.Length; i++)
             {
                 ushort address = (ushort)(startAddress + i);
                 ushort value = (ushort)(data[i] ? 1 : 0);
@@ -77,22 +103,29 @@ namespace Outage.SCADA.ModBus.ModbusFuntions
                     Logger.LogError(message);
                     throw new Exception(message);
                 }
-
-                pointItem.CurrentValue = value;
-
-                bool alarmChanged = pointItem.SetAlarms();
-
-                if (alarmChanged)
+                
+                if (pointItem.CurrentValue != value)
                 {
+                    pointItem.CurrentValue = value;
                     Logger.LogInfo($"Alarm for Point [Gid: 0x{pointItem.Gid:X16}, Address: {pointItem.Address}] set to {pointItem.Alarm}.");
                 }
 
-                DiscreteModbusData digitalData = new DiscreteModbusData(value, pointItem.Alarm);
+
+                CommandOriginType commandOrigin = CommandOriginType.OTHER_COMMAND;
+
+                if (commandValuesCache.ContainsKey(gid) && commandValuesCache[gid].Value == value)
+                {
+                    commandOrigin = commandValuesCache[gid].CommandOrigin;
+                    commandValuesCache.Remove(gid);
+                    Logger.LogDebug($"[ReadCoilsFunction] Command origin of command address: {pointItem.Address} is set to {commandOrigin}.");
+                }
+
+                DiscreteModbusData digitalData = new DiscreteModbusData(value, pointItem.Alarm, gid, commandOrigin);
                 Data.Add(gid, digitalData);
-                Logger.LogDebug($"ReadCoilsFunction execute => Current value: {value} from address: {address}, gid: 0x{gid:X16}.");
+                //Logger.LogDebug($"ReadCoilsFunction execute => Current value: {value} from address: {address}, gid: 0x{gid:X16}.");
             }
 
-            Logger.LogDebug($"ReadCoilsFunction executed SUCCESSFULLY. StartAddress: {startAddress}, Quantity: {quantity}");
+            //Logger.LogDebug($"ReadCoilsFunction executed SUCCESSFULLY. StartAddress: {startAddress}, Quantity: {quantity}");
         }
 
         #endregion IModBusFunction

@@ -1,14 +1,12 @@
 using MediatR;
-using OMS.Web.Adapter.Contracts;
-using OMS.Web.Adapter.Topology;
 using OMS.Web.API.Hubs;
-using OMS.Web.Common;
 using OMS.Web.Common.Exceptions;
 using OMS.Web.Common.Loggers;
 using OMS.Web.Common.Mappers;
 using OMS.Web.Services.Commands;
 using OMS.Web.Services.Queries;
 using Outage.Common;
+using Outage.Common.ServiceProxies;
 using System;
 using System.Collections.Generic;
 using System.Linq;
@@ -57,12 +55,13 @@ namespace OMS.Web.API
             container.RegisterType<IGraphMapper, GraphMapper>();
             container.RegisterType<IConsumerMapper, ConsumerMapper>();
             container.RegisterType<IOutageMapper, OutageMapper>();
+            container.RegisterType<IProxyFactory, ProxyFactory>();
             container.RegisterType<ILogger, FileLogger>(new ContainerControlledLifetimeManager());
 
             // We register our mediatr commands here (concrete, not abstract)
             container.RegisterMediator();
-            container.RegisterMediatorHandlers(Assembly.GetAssembly(typeof(TurnOffSwitchCommand)));
-            container.RegisterMediatorHandlers(Assembly.GetAssembly(typeof(TurnOnSwitchCommand)));
+            container.RegisterMediatorHandlers(Assembly.GetAssembly(typeof(OpenSwitchCommand)));
+            container.RegisterMediatorHandlers(Assembly.GetAssembly(typeof(CloseSwitchCommand)));
             container.RegisterMediatorHandlers(Assembly.GetAssembly(typeof(GetTopologyQuery)));
             container.RegisterMediatorHandlers(Assembly.GetAssembly(typeof(GetActiveOutagesQuery)));
             container.RegisterMediatorHandlers(Assembly.GetAssembly(typeof(GetArchivedOutagesQuery)));

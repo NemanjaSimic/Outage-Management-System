@@ -36,3 +36,9 @@
   border-left: 1px solid #373c42;
   padding-left: 10px;
 }
+
+#moreDetails-button {
+  color: white;
+  background-color: #4b4b4b;
+  border: 1px solid black;
+}

@@ -6,13 +6,13 @@ using Outage.Common;
 using Outage.Common.ServiceContracts.PubSub;
 using Outage.Common.ServiceProxies;
 using Outage.Common.ServiceProxies.PubSub;
-using SCADACommanding;
+using CalculationEngine.SCADAFunctions;
 using System;
 using System.Collections.Generic;
 using System.ServiceModel;
 using System.Text;
 using Topology;
-using TopologyBuilder;
+using CalculationEngineService.SwitchCommanding;
 
 namespace CalculationEngineService
 {
@@ -20,11 +20,11 @@ namespace CalculationEngineService
     {
         private ILogger logger;
         private ISubscriber proxy;
-        private IModelTopologyServis modelTopologyServis;
         private ITopologyConverter webTopologyBuilder;
         private IModelManager modelManager;
         private ITopologyBuilder topologyBuilder;
-        private ICacheProvider cacheProvider;
+        private IMeasurementProvider cacheProvider;
+        private ILoadFlow voltageFlow;
 
         private ProxyFactory proxyFactory;
         private SCADAResultHandler sCADAResultProvider;
@@ -44,14 +44,14 @@ namespace CalculationEngineService
             proxyFactory = new ProxyFactory();
 
             topologyBuilder = new GraphBuilder();
-            modelTopologyServis = new TopologyManager(topologyBuilder);
+            voltageFlow = new LoadFlow();
             webTopologyBuilder = new TopologyConverter();
 
             sCADAResultProvider = new SCADAResultHandler();
-            cacheProvider = new CacheProvider();
-            modelManager = new NMSManager();
+            cacheProvider = new MeasurementProvider();
+            modelManager = new ModelManager();
             modelProvider = new ModelProvider(modelManager);
-            topologyProvider = new TopologyProvider(modelTopologyServis);
+            topologyProvider = new TopologyProvider(topologyBuilder, voltageFlow);
             webTopologyModelProvider = new TopologyConverterProvider(webTopologyBuilder);
             topologyPublisher = new TopologyPublisher();
             InitializeHosts();
@@ -84,7 +84,8 @@ namespace CalculationEngineService
                 new ServiceHost(typeof(CEModelUpdateNotification)),
                 new ServiceHost(typeof(CETransactionActor)),
                 new ServiceHost(typeof(TopologyService)),
-                new ServiceHost(typeof(SCADACommandingService))
+                new ServiceHost(typeof(SwitchStatusCommandingService)),
+                new ServiceHost(typeof(MeasurementMapService))
             };
         }
 
@@ -153,7 +154,6 @@ namespace CalculationEngineService
         {
             Logger.LogDebug("Subcribing on SCADA measurements.");
             proxy = proxyFactory.CreateProxy<SubscriberProxy, ISubscriber>(new SCADASubscriber(), EndpointNames.SubscriberEndpoint);
-            //proxy = new SubscriberProxy(new SCADASubscriber(), EndpointNames.SubscriberEndpoint);
 
             if (proxy == null)
             {

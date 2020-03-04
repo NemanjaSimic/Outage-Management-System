@@ -14,13 +14,13 @@ namespace Outage.Common.ServiceProxies
         {
         }
 
-        public bool SendAnalogCommand(long gid, float commandingValue)
+        public bool SendAnalogCommand(long gid, float commandingValue, CommandOriginType commandOriginType)
         {
             bool success;
 
             try
             {
-                success = Channel.SendAnalogCommand(gid, commandingValue);
+                success = Channel.SendAnalogCommand(gid, commandingValue, commandOriginType);
             }
             catch (Exception e)
             {
@@ -32,13 +32,13 @@ namespace Outage.Common.ServiceProxies
             return success;
         }
 
-        public bool SendDiscreteCommand(long gid, ushort commandingValue)
+        public bool SendDiscreteCommand(long gid, ushort commandingValue, CommandOriginType commandOriginType)
         {
             bool success;
 
             try
             {
-                success = Channel.SendDiscreteCommand(gid, commandingValue);
+                success = Channel.SendDiscreteCommand(gid, commandingValue, commandOriginType);
             }
             catch (Exception e)
             {

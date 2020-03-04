@@ -28,7 +28,7 @@ namespace PubSubEngine
                 }
                 else
                 {
-                    Logger.LogDebug($"Failed to add subscriber [{subscriberName}] to list of subsribers.");
+                    Logger.LogDebug($"Failed to add subscriber [{subscriberName}] to list of subscribers.");
                 }
 
                 if (Publications.Instance.TryAddSubscriber(topic, subscriber, subscriberName))
@@ -38,7 +38,7 @@ namespace PubSubEngine
                 }
                 else
                 {
-                    Logger.LogWarn($"Failed to add subscriber [{subscriberName}] to map Topic -> subsriber. Topic: {topic}");
+                    Logger.LogWarn($"Failed to add subscriber [{subscriberName}] to map Topic -> subscriber. Topic: {topic}");
                 }
             }
             catch (Exception ex)

@@ -21,7 +21,7 @@ namespace Outage.Common
     public enum Topic
     {
         [EnumMember]
-        MEASUREMENT = 0,
+        MEASUREMENT = 1,
 
         [EnumMember]
         SWITCH_STATUS,
@@ -63,12 +63,59 @@ namespace Outage.Common
     }
 
     [DataContract]
+    public enum DiscreteCommandingType : ushort
+    {
+        [EnumMember]
+        CLOSE = 0x00,
+        
+        [EnumMember]
+        OPEN = 0x01,
+    }
+
+    [DataContract]
     public enum ElementType
     {
-        [DataMember]
+        
+        [EnumMember]
         Remote = 1,
 
-        [DataMember]
+        [EnumMember]
         Local
+    }
+    
+    [DataContract]
+    public enum CommandOriginType : short
+    {
+        [EnumMember]
+        USER_COMMAND = 0x1,
+
+        [EnumMember]
+        ISOLATING_ALGORITHM_COMMAND,
+
+        [EnumMember]
+        CE_COMMAND,
+
+        [EnumMember]
+        MODEL_UPDATE_COMMAND,
+
+        [EnumMember]
+        OUTAGE_SIMULATOR,
+
+        [EnumMember]
+        OTHER_COMMAND, //TODO: rethink of name, add others like CE ili tako nesto
+    }
+
+    //OMS
+    [DataContract]
+    public enum ActiveOutageState : short
+    {
+        [EnumMember]
+        CREATED = 1,
+        [EnumMember]
+        ISOLATED = 2,
+        [EnumMember]
+        REPAIRED = 3,
+        //[EnumMember]
+        //RESOLVED = 4,
     }
 }

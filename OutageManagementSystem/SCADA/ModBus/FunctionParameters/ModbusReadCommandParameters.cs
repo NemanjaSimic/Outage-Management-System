@@ -1,6 +1,8 @@
-﻿namespace Outage.SCADA.ModBus.FunctionParameters
+﻿using Outage.SCADA.SCADACommon.FunctionParameters;
+
+namespace Outage.SCADA.ModBus.FunctionParameters
 {
-    public class ModbusReadCommandParameters : ModbusCommandParameters
+    public class ModbusReadCommandParameters : ModbusCommandParameters, IModbusReadCommandParameters
     {
         private ushort startAddress;
         private ushort quantity;

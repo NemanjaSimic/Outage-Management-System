@@ -13,11 +13,11 @@ using System.Threading;
 
 namespace Outage.SCADA.SCADAData.Repository
 {
-    public class SCADAModel
+    public sealed class SCADAModel
     {
         private ILogger logger;
 
-        protected ILogger Logger
+        private ILogger Logger
         {
             get { return logger ?? (logger = LoggerWrapper.Instance); }
         }
@@ -32,21 +32,21 @@ namespace Outage.SCADA.SCADAData.Repository
         private Dictionary<PointType, Dictionary<ushort, long>> incomingAddressToGidMap;
         private Dictionary<long, ISCADAModelPointItem> currentScadaModel;
         private Dictionary<PointType, Dictionary<ushort, long>> currentAddressToGidMap;
-
+        private Dictionary<long, CommandValue> commandedValuesCache;
 
         #region Properties
 
-        protected Dictionary<DeltaOpType, List<long>> ModelChanges
+        private Dictionary<DeltaOpType, List<long>> ModelChanges
         {
             get { return modelChanges ?? (modelChanges = new Dictionary<DeltaOpType, List<long>>()); }
         }
 
-        protected Dictionary<long, ISCADAModelPointItem> IncomingScadaModel
+        private Dictionary<long, ISCADAModelPointItem> IncomingScadaModel
         {
             get { return incomingScadaModel ?? (incomingScadaModel = new Dictionary<long, ISCADAModelPointItem>()); }
         }
 
-        protected Dictionary<PointType, Dictionary<ushort, long>> IncomingAddressToGidMap
+        private Dictionary<PointType, Dictionary<ushort, long>> IncomingAddressToGidMap
         {
             get
             {
@@ -60,7 +60,6 @@ namespace Outage.SCADA.SCADAData.Repository
                 });
             }
         }
-
 
         public bool IsSCADAModelImported
         {
@@ -85,6 +84,11 @@ namespace Outage.SCADA.SCADAData.Repository
                     { PointType.HR_LONG,        new Dictionary<ushort, long>()  },
                 });
             }
+        }
+
+        public Dictionary<long, CommandValue> CommandedValuesCache
+        {
+            get { return commandedValuesCache ?? (commandedValuesCache = new Dictionary<long, CommandValue>()); }
         }
 
         public event ModelUpdateDelegate SignalIncomingModelConfirmation;
@@ -253,6 +257,7 @@ namespace Outage.SCADA.SCADAData.Repository
             incomingAddressToGidMap = null;
 
             modelChanges.Clear();
+            CommandedValuesCache.Clear();
 
             string message = $"Incoming SCADA model is confirmed.";
             Console.WriteLine(message);

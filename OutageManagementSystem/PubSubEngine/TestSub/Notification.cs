@@ -35,7 +35,8 @@ namespace TestSub
                 {
                     double currentValue = multipleAnalogValue.Data[gid].Value;
                     AlarmType alarm = multipleAnalogValue.Data[gid].Alarm;
-                    Console.WriteLine($"Analog => Gid: 0x{gid:X16}, Value: {currentValue}, Alarm: {alarm}");
+                    CommandOriginType commandOrigin = multipleAnalogValue.Data[gid].CommandOrigin;
+                    Console.WriteLine($"Analog => Gid: 0x{gid:X16} Value: {currentValue}, Alarm: {alarm}, Origin: {commandOrigin}");
                 }
             }
             else if (msg is MultipleDiscreteValueSCADAMessage multipleDiscreteValue)
@@ -44,12 +45,13 @@ namespace TestSub
                 {
                     ushort currentValue = multipleDiscreteValue.Data[gid].Value;
                     AlarmType alarm = multipleDiscreteValue.Data[gid].Alarm;
-                    Console.WriteLine($"Discrete => Gid: 0x{gid:X16}, Value: {currentValue}, Alarm: {alarm}");
+                    CommandOriginType commandOrigin = multipleDiscreteValue.Data[gid].CommandOrigin;
+                    Console.WriteLine($"Discrete => Gid: 0x{gid:X16}, Value: {currentValue}, Alarm: {alarm}, Origin: {commandOrigin}");
                 }
             }
-            else if (msg is ActiveOutage activeOutage)
+            else if (msg is ActiveOutageMessage activeOutage)
             {
-                Console.WriteLine($"Active outage id: {activeOutage.OutageId}, affected consumers:{activeOutage.AffectedConsumers}, affected element: 0x{activeOutage.ElementGid:x16}");
+                Console.WriteLine($"Active outage id: {activeOutage.OutageId}, affected consumers:{activeOutage.AffectedConsumers}, affected element: 0x{activeOutage.OutageElementGid:x16}");
             }
         }
 	}

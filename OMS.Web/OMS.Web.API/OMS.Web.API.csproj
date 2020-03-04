@@ -409,14 +409,6 @@
       <Project>{892cbe15-9ed7-4540-81fa-0eaaba592138}</Project>
       <Name>Common</Name>
     </ProjectReference>
-    <ProjectReference Include="..\OMS.Web.Adapter.Contracts\OMS.Web.Adapter.Contracts.csproj">
-      <Project>{0cad32c4-5c09-467f-b5dc-57c646bac2a2}</Project>
-      <Name>OMS.Web.Adapter.Contracts</Name>
-    </ProjectReference>
-    <ProjectReference Include="..\OMS.Web.Adapter\OMS.Web.Adapter.csproj">
-      <Project>{18d15695-17f8-4e5c-9f92-51ad600437b9}</Project>
-      <Name>OMS.Web.Adapter</Name>
-    </ProjectReference>
     <ProjectReference Include="..\OMS.Web.Common\OMS.Web.Common.csproj">
       <Project>{63ea1aa4-dc22-4552-8454-346f1da85082}</Project>
       <Name>OMS.Web.Common</Name>

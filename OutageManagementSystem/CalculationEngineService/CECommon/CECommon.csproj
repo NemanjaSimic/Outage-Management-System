@@ -21,7 +21,7 @@
     <DefineConstants>DEBUG;TRACE</DefineConstants>
     <ErrorReport>queue</ErrorReport>
     <WarningLevel>4</WarningLevel>
-    <PlatformTarget>x86</PlatformTarget>
+    <PlatformTarget>AnyCPU</PlatformTarget>
   </PropertyGroup>
   <PropertyGroup Condition=" '$(Configuration)|$(Platform)' == 'Release|AnyCPU' ">
     <DebugType>pdbonly</DebugType>
@@ -44,12 +44,13 @@
     <Reference Include="System.Xml" />
   </ItemGroup>
   <ItemGroup>
-    <Compile Include="Interfaces\ICacheProvider.cs" />
+    <Compile Include="Interfaces\IMeasurementProvider.cs" />
     <Compile Include="Interfaces\IGraphElement.cs" />
     <Compile Include="Interfaces\IMeasurement.cs" />
     <Compile Include="Interfaces\IModelManager.cs" />
     <Compile Include="Interfaces\IModelProvider.cs" />
     <Compile Include="Interfaces\IModelTopologyServis.cs" />
+    <Compile Include="Interfaces\ISCADACommanding.cs" />
     <Compile Include="Interfaces\ISCADAResultProvider.cs" />
     <Compile Include="Interfaces\ITopology.cs" />
     <Compile Include="Interfaces\ITopologyBuilder.cs" />
@@ -58,21 +59,15 @@
     <Compile Include="Interfaces\ITopologyConverter.cs" />
     <Compile Include="Enums.cs" />
     <Compile Include="Interfaces\ITopologyConverterProvider.cs" />
-    <Compile Include="Model\BaseVoltage.cs" />
-    <Compile Include="Model\Field.cs" />
-    <Compile Include="Model\Measurement.cs" />
-    <Compile Include="Model\TopologyModel.cs" />
+    <Compile Include="Interfaces\ILoadFlow.cs" />
+    <Compile Include="Models\Field.cs" />
+    <Compile Include="Models\Measurement.cs" />
+    <Compile Include="Models\TopologyModel.cs" />
     <Compile Include="Properties\AssemblyInfo.cs" />
-    <Compile Include="Providers\CacheProvider.cs" />
-    <Compile Include="Providers\ModelProvider.cs" />
     <Compile Include="Providers\Provider.cs" />
-    <Compile Include="Providers\SCADAResultHandler.cs" />
-    <Compile Include="Providers\TopologyProvider.cs" />
-    <Compile Include="Providers\TopologyConverterProvider.cs" />
-    <Compile Include="SmartCache.cs" />
     <Compile Include="TopologyConfiguration\Config.cs" />
     <Compile Include="TopologyConfiguration\ConfigurationParse.cs" />
-    <Compile Include="Model\TopologyElement.cs" />
+    <Compile Include="Models\TopologyElement.cs" />
   </ItemGroup>
   <ItemGroup>
     <ProjectReference Include="..\..\Common\Common.csproj">

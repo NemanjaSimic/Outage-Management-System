@@ -57,7 +57,7 @@
     <Compile Include="ModbusFuntions\ReadCoilsFunction.cs" />
     <Compile Include="ModbusFuntions\ReadDiscreteInputsFunction.cs" />
     <Compile Include="ModbusFuntions\ReadHoldingRegistersFunction.cs" />
-    <Compile Include="ModbusFuntions\ReadInputRegistersFunctions.cs" />
+    <Compile Include="ModbusFuntions\ReadInputRegistersFunction.cs" />
     <Compile Include="ModbusFuntions\WriteSingleCoilFunction.cs" />
     <Compile Include="ModbusFuntions\WriteSingleRegisterFunction.cs" />
     <Compile Include="ModbusSimulatorHandler.cs" />

@@ -51,7 +51,53 @@
     <Reference Include="System.Xml" />
   </ItemGroup>
   <ItemGroup>
-    <Compile Include="Configuration.cs" />
+    <Compile Include="Migrations\202002271531103_ResolvedTime to RepairedTime.cs" />
+    <Compile Include="Migrations\202002271531103_ResolvedTime to RepairedTime.designer.cs">
+      <DependentUpon>202002271531103_ResolvedTime to RepairedTime.cs</DependentUpon>
+    </Compile>
+    <Compile Include="Migrations\202002281444367_Property IsResolveConditionValidated.cs" />
+    <Compile Include="Migrations\202002281444367_Property IsResolveConditionValidated.designer.cs">
+      <DependentUpon>202002281444367_Property IsResolveConditionValidated.cs</DependentUpon>
+    </Compile>
+    <Compile Include="Repository\ActiveOutageRepository.cs" />
+    <Compile Include="Repository\ArchivedOutageRepository.cs" />
+    <Compile Include="Repository\ConsumerRepository.cs" />
+    <Compile Include="Repository\Repository.cs" />
+    <Compile Include="Repository\UnitOfWork.cs" />
+    <Compile Include="Initializers\OutageInitializer.cs" />
+    <Compile Include="Migrations\202002121057388_InitMigration.cs" />
+    <Compile Include="Migrations\202002121057388_InitMigration.designer.cs">
+      <DependentUpon>202002121057388_InitMigration.cs</DependentUpon>
+    </Compile>
+    <Compile Include="Migrations\202002130914535_common fields.cs" />
+    <Compile Include="Migrations\202002130914535_common fields.designer.cs">
+      <DependentUpon>202002130914535_common fields.cs</DependentUpon>
+    </Compile>
+    <Compile Include="Migrations\202002141544238_OutageModelChanges.cs" />
+    <Compile Include="Migrations\202002141544238_OutageModelChanges.Designer.cs">
+      <DependentUpon>202002141544238_OutageModelChanges.cs</DependentUpon>
+    </Compile>
+    <Compile Include="Migrations\202002180650507_fields_in_model.cs" />
+    <Compile Include="Migrations\202002180650507_fields_in_model.designer.cs">
+      <DependentUpon>202002180650507_fields_in_model.cs</DependentUpon>
+    </Compile>
+    <Compile Include="Migrations\202002181256469_Common fields and nullable properties.cs" />
+    <Compile Include="Migrations\202002181256469_Common fields and nullable properties.designer.cs">
+      <DependentUpon>202002181256469_Common fields and nullable properties.cs</DependentUpon>
+    </Compile>
+    <Compile Include="Migrations\202002210903165_List properties to string.cs" />
+    <Compile Include="Migrations\202002210903165_List properties to string.designer.cs">
+      <DependentUpon>202002210903165_List properties to string.cs</DependentUpon>
+    </Compile>
+    <Compile Include="Migrations\202002240038525_model refactor.cs" />
+    <Compile Include="Migrations\202002240038525_model refactor.designer.cs">
+      <DependentUpon>202002240038525_model refactor.cs</DependentUpon>
+    </Compile>
+    <Compile Include="Migrations\202002241003148_Move OutageState prop to ActiveOutage.cs" />
+    <Compile Include="Migrations\202002241003148_Move OutageState prop to ActiveOutage.designer.cs">
+      <DependentUpon>202002241003148_Move OutageState prop to ActiveOutage.cs</DependentUpon>
+    </Compile>
+    <Compile Include="Migrations\Configuration.cs" />
     <Compile Include="OutageContext.cs" />
     <Compile Include="Properties\AssemblyInfo.cs" />
   </ItemGroup>
@@ -64,6 +110,42 @@
       <Project>{892CBE15-9ED7-4540-81FA-0EAABA592138}</Project>
       <Name>Common</Name>
     </ProjectReference>
+    <ProjectReference Include="..\OMSCommon\OMSCommon.csproj">
+      <Project>{BC054AA3-2DD3-4657-B27B-6C2126803106}</Project>
+      <Name>OMSCommon</Name>
+    </ProjectReference>
+  </ItemGroup>
+  <ItemGroup>
+    <EmbeddedResource Include="Migrations\202002121057388_InitMigration.resx">
+      <DependentUpon>202002121057388_InitMigration.cs</DependentUpon>
+    </EmbeddedResource>
+    <EmbeddedResource Include="Migrations\202002130914535_common fields.resx">
+      <DependentUpon>202002130914535_common fields.cs</DependentUpon>
+    </EmbeddedResource>
+    <EmbeddedResource Include="Migrations\202002141544238_OutageModelChanges.resx">
+      <DependentUpon>202002141544238_OutageModelChanges.cs</DependentUpon>
+    </EmbeddedResource>
+    <EmbeddedResource Include="Migrations\202002180650507_fields_in_model.resx">
+      <DependentUpon>202002180650507_fields_in_model.cs</DependentUpon>
+    </EmbeddedResource>
+    <EmbeddedResource Include="Migrations\202002181256469_Common fields and nullable properties.resx">
+      <DependentUpon>202002181256469_Common fields and nullable properties.cs</DependentUpon>
+    </EmbeddedResource>
+    <EmbeddedResource Include="Migrations\202002210903165_List properties to string.resx">
+      <DependentUpon>202002210903165_List properties to string.cs</DependentUpon>
+    </EmbeddedResource>
+    <EmbeddedResource Include="Migrations\202002240038525_model refactor.resx">
+      <DependentUpon>202002240038525_model refactor.cs</DependentUpon>
+    </EmbeddedResource>
+    <EmbeddedResource Include="Migrations\202002241003148_Move OutageState prop to ActiveOutage.resx">
+      <DependentUpon>202002241003148_Move OutageState prop to ActiveOutage.cs</DependentUpon>
+    </EmbeddedResource>
+    <EmbeddedResource Include="Migrations\202002271531103_ResolvedTime to RepairedTime.resx">
+      <DependentUpon>202002271531103_ResolvedTime to RepairedTime.cs</DependentUpon>
+    </EmbeddedResource>
+    <EmbeddedResource Include="Migrations\202002281444367_Property IsResolveConditionValidated.resx">
+      <DependentUpon>202002281444367_Property IsResolveConditionValidated.cs</DependentUpon>
+    </EmbeddedResource>
   </ItemGroup>
   <Import Project="$(MSBuildToolsPath)\Microsoft.CSharp.targets" />
   <Target Name="EnsureNuGetPackageBuildImports" BeforeTargets="PrepareForBuild">

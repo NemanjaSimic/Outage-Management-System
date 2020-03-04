@@ -1,6 +1,6 @@
-﻿using Outage.Common;
+﻿using OMSCommon.OutageDatabaseModel;
+using Outage.Common;
 using Outage.Common.GDA;
-using Outage.Common.PubSub.OutageDataContract;
 using Outage.Common.ServiceContracts.GDA;
 using Outage.Common.ServiceContracts.PubSub;
 using Outage.Common.ServiceProxies;
@@ -11,11 +11,8 @@ using OutageManagementService.DistribuedTransaction;
 using OutageManagementService.Outage;
 using System;
 using System.Collections.Generic;
-using System.Linq;
 using System.ServiceModel;
 using System.Text;
-using System.Threading;
-using System.Threading.Tasks;
 
 namespace OutageManagementService
 {
@@ -42,11 +39,11 @@ namespace OutageManagementService
             proxyFactory = new ProxyFactory();
 
             //TODO: Initialize what is needed
-            //Delete database(TODO: restauration of data...)
+            //TODO: restauration of data...
             modelResourcesDesc = new ModelResourcesDesc();
             using (OutageContext db = new OutageContext())
             {
-                db.DeleteAllData();
+                //db.DeleteAllData();
                 InitializeEnergyConsumers(db);
             }
            
@@ -54,11 +51,11 @@ namespace OutageManagementService
             OutageService.outageModel = outageModel;
             OutageTransactionActor.OutageModel = outageModel;
             OutageModelUpdateNotification.OutageModel = outageModel;
+
             callTracker = new CallTracker("CallTrackerSubscriber", outageModel);
             SubscribeOnEmailService();
             
             InitializeHosts();
-
         }
 
         #region GDAHelper
@@ -155,20 +152,26 @@ namespace OutageManagementService
         {
             List<ResourceDescription> energyConsumers = GetExtentValues(ModelCode.ENERGYCONSUMER, modelResourcesDesc.GetAllPropertyIds(ModelCode.ENERGYCONSUMER));
 
-            int i = 0;
+            int i = 0; //TODO: delete, for first/last name placeholder
+
             foreach(ResourceDescription energyConsumer in energyConsumers)
             {
-                Consumer consumer = new Consumer();
-                consumer.ConsumerId = energyConsumer.GetProperty(ModelCode.IDOBJ_GID).AsLong();
-                consumer.ConsumerMRID = energyConsumer.GetProperty(ModelCode.IDOBJ_MRID).AsString();
-                consumer.FirstName = $"FirstName{i}";
-                consumer.LastName = $"LastName{i}";
+                Consumer consumer = new Consumer
+                {
+                    ConsumerId = energyConsumer.GetProperty(ModelCode.IDOBJ_GID).AsLong(),
+                    ConsumerMRID = energyConsumer.GetProperty(ModelCode.IDOBJ_MRID).AsString(),
+                    FirstName = $"FirstName{i}", //TODO: energyConsumer.GetProperty(ModelCode.ENERGYCONSUMER_FIRSTNAME).AsString(); 
+                    LastName = $"LastName{i}"   //TODO: energyConsumer.GetProperty(ModelCode.ENERGYCONSUMER_LASTNAME).AsString();
+                };
+
                 i++;
 
                 db.Consumers.Add(consumer);
+                Logger.LogDebug($"Add consumer: {consumer.ConsumerMRID}");
             }
 
             db.SaveChanges();
+            Logger.LogDebug("Init energy consumers: SaveChanges()");
         }
 
 
@@ -206,26 +209,6 @@ namespace OutageManagementService
                 new ServiceHost(typeof(OutageModelUpdateNotification)),
             };
         }
-
-        private void CloseHosts()
-        {
-            
-            if (hosts == null || hosts.Count == 0)
-            {
-                throw new Exception("Outage Management Service hosts can not be closed because they are not initialized.");
-            }
-
-            foreach (ServiceHost host in hosts)
-            {
-                host.Close();
-            }
-
-            string message = "Outage Management Service is gracefully closed.";
-            Logger.LogInfo(message);
-            Console.WriteLine("\n\n{0}", message);
-        }
-
-        
 
         private void StartHosts()
         {
@@ -268,6 +251,23 @@ namespace OutageManagementService
             message = "The Outage Management Service is started.";
             Console.WriteLine("\n{0}", message);
             Logger.LogInfo(message);
+        }
+        
+        private void CloseHosts()
+        {
+            if (hosts == null || hosts.Count == 0)
+            {
+                throw new Exception("Outage Management Service hosts can not be closed because they are not initialized.");
+            }
+
+            foreach (ServiceHost host in hosts)
+            {
+                host.Close();
+            }
+
+            string message = "Outage Management Service is gracefully closed.";
+            Logger.LogInfo(message);
+            Console.WriteLine("\n\n{0}", message);
         }
 
         #endregion

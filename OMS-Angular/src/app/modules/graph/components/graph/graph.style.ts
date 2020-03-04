@@ -33,20 +33,26 @@ export const style = cytoscape.stylesheet()
     .selector('node[type = "warning"]')
     .style({
         'shape': 'rectangle',
-        'background-color': '#2b2935',
+        'background-opacity': '0',
         'background-fit': 'cover',
         'background-image': 'assets/img/warning.png',
-        'height': '20px',
-        'width': '20px'
+        'height': '35px',
+        'width': '35px'
     })
     .selector('node[type = "analogMeasurement"]')
     .style({
         'shape': 'rectangle',
         'background-color': '#2b2935',
-        'background-fit': 'contain',
-        'background-image': 'assets/img/bulb.png',
-        'height': '20px',
-        'width': '20px',
+        'background-opacity': '0',
+        'border' : '3px',
+        'border-color' : "#40E609",
+        'color' : 'data(color)',
+        'background-fit': 'cover',
+        'content': 'data(content)',
+        'height': 'auto',
+        'width': 'auto',
+        'text-wrap': 'wrap',
+        'text-margin-y': '25px',
     })
     .selector('node[type = "outage-call"]')
     .style({
@@ -97,10 +103,34 @@ export const style = cytoscape.stylesheet()
         'height': '60px',
         'width': '60px'
     })
-    .selector('node[dmsType="BREAKER"]')
+    .selector('node[dmsType="BREAKER"][isRecloser = "no"]')
     .style({
         'background-fit': 'cover',
         'background-image': 'assets/img/breaker.png',
+        'background-opacity': '0',
+        'height': '60px',
+        'width': '60px'
+    })
+    .selector('node[dmsType="BREAKER"][isRecloser = "no"][isClosed = "closed"]')
+    .style({
+        'background-fit': 'cover',
+        'background-image': 'assets/img/breakerOff.png',
+        'background-opacity': '0',
+        'height': '60px',
+        'width': '60px'
+    })
+    .selector('node[dmsType="BREAKER"][isRecloser = "yes"][isClosed = "open"]')
+    .style({
+        'background-fit': 'cover',
+        'background-image': 'assets/img/recloser.png',
+        'background-opacity': '0',
+        'height': '60px',
+        'width': '60px'
+    })
+    .selector('node[dmsType="BREAKER"][isRecloser = "yes"][isClosed = "closed"]')
+    .style({
+        'background-fit': 'cover',
+        'background-image': 'assets/img/recloserOff.png',
         'background-opacity': '0',
         'height': '60px',
         'width': '60px'

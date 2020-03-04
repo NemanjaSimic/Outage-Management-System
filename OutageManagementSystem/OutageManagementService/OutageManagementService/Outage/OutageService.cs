@@ -5,10 +5,13 @@ using OutageDatabase;
 using System.Collections.Generic;
 using System.Linq;
 using System.Data.Entity;
+using System;
+using OMSCommon.OutageDatabaseModel;
+using OMSCommon.Mappers;
 
 namespace OutageManagementService.Outage
 {
-    public class OutageService : IOutageContract
+    public class OutageService : IOutageAccessContract, IReportPotentialOutageContract, IOutageLifecycleUICommandingContract
     {
         private ILogger logger;
        
@@ -18,36 +21,154 @@ namespace OutageManagementService.Outage
         }
 
         public static OutageModel outageModel;
-       
-       
 
-        public List<ActiveOutage> GetActiveOutages()
+        #region IOutageAccessContract
+        public IEnumerable<ActiveOutageMessage> GetActiveOutages()
         {
-            //TODO: Logic
-            List<ActiveOutage> activeOutages = null;
+            OutageMessageMapper mapper = new OutageMessageMapper();
+
+            List<ActiveOutageMessage> activeOutages = new List<ActiveOutageMessage>();
+
             using (OutageContext db = new OutageContext())
             {
-                activeOutages = db.ActiveOutages.Include(a => a.AffectedConsumers).ToList();
+                activeOutages.AddRange(mapper.MapActiveOutages(db.ActiveOutages.Include(a => a.AffectedConsumers)));
             }
 
             return activeOutages;
         }
 
-        public List<ArchivedOutage> GetArchivedOutages()
+        public IEnumerable<ArchivedOutageMessage> GetArchivedOutages()
         {
-            List<ArchivedOutage> archivedOutages = null;
+            OutageMessageMapper mapper = new OutageMessageMapper();
+
+            List<ArchivedOutageMessage> archivedOutages = new List<ArchivedOutageMessage>();
+
             using (OutageContext db = new OutageContext())
             {
-                archivedOutages = db.ArchivedOutages.ToList();
+                archivedOutages.AddRange(mapper.MapArchivedOutages(db.ArchivedOutages.Include(a => a.AffectedConsumers)));
             }
-
 
             return archivedOutages;
         }
+        #endregion
 
-        public bool ReportOutage(long elementGid)
+        #region IReportPotentialOutageContract
+        public bool ReportPotentialOutage(long elementGid)
         {
-            return outageModel.ReportPotentialOutage(elementGid); //TODO: enum (error, noAffectedConsumers, success,...)
+            bool result;
+
+            try
+            {
+                result = outageModel.ReportPotentialOutage(elementGid); //TODO: enum (error, noAffectedConsumers, success,...)
+            }
+            catch (Exception e)
+            {
+                result = false;
+                string message = "ReportPotentialOutage => exception caught";
+                Logger.LogError(message, e);
+                //todo throw;
+            }
+
+            return result;
         }
+        #endregion
+
+        #region IOutageLifecycleUICommandingContract
+        public bool IsolateOutage(long outageId)
+        {
+            bool result;
+
+            try
+            {
+                outageModel.IsolateOutage(outageId);
+                result = true;
+            }
+            catch (Exception e)
+            {
+                result = false;
+                string message = "IsolateOutage => exception caught";
+                Logger.LogError(message, e);
+                //todo: throw;
+            }
+
+            return result;
+        }
+
+        public bool SendRepairCrew(long outageId)
+        {
+            bool result;
+
+            try
+            {
+                result = outageModel.SendRepairCrew(outageId);
+            }
+            catch (Exception e)
+            {
+                result = false;
+                string message = "SendRepairCrew => exception caught";
+                Logger.LogError(message, e);
+                //todo throw;
+            }
+
+            return result;
+        }
+
+        public bool SendLocationIsolationCrew(long outageId)
+        {
+            bool result;
+
+            try
+            {
+                result = outageModel.SendLocationIsolationCrew(outageId);
+            }
+            catch (Exception e)
+            {
+                result = false;
+                string message = "SendLocationIsolationCrew => exception caught";
+                Logger.LogError(message, e);
+                //todo throw;
+            }
+
+            return result;
+        }
+
+        public bool ValidateResolveConditions(long outageId)
+        {
+            bool result;
+
+            try
+            {
+                result = outageModel.ValidateResolveConditions(outageId);
+            }
+            catch (Exception e)
+            {
+                result = false;
+                string message = "ValidateResolveConditions => exception caught";
+                Logger.LogError(message, e);
+                //todo throw;
+            }
+
+            return result;
+        }
+
+        public bool ResolveOutage(long outageId)
+        {
+            bool result;
+
+            try
+            {
+                result = outageModel.ResolveOutage(outageId);
+            }
+            catch (Exception e)
+            {
+                result = false;
+                string message = "ResolveOutage => exception caught";
+                Logger.LogError(message, e);
+                //todo throw;
+            }
+
+            return result;
+        }
+        #endregion
     }
 }

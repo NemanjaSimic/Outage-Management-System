@@ -14,6 +14,7 @@
                 DMSType = node.DMSType,
                 IsActive = node.IsActive,
                 IsRemote = node.IsRemote,
+                NoReclosing = node.NoReclosing,
                 Measurements = node.Measurements,
                 NominalVoltage = node.NominalVoltage,
                 FirstWinding = new NodeViewModel(),

@@ -1,0 +1,87 @@
+﻿<UserControl x:Class="OMS.OutageSimulator.UserControls.Overview"
+             xmlns="http://schemas.microsoft.com/winfx/2006/xaml/presentation"
+             xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml"
+             xmlns:mc="http://schemas.openxmlformats.org/markup-compatibility/2006" 
+             xmlns:d="http://schemas.microsoft.com/expression/blend/2008" 
+             xmlns:local="clr-namespace:OMS.OutageSimulator.UserControls"
+             mc:Ignorable="d" 
+             d:DesignHeight="620" d:DesignWidth="750">
+    <Grid>
+        <Grid.RowDefinitions>
+            <RowDefinition Height="10"/>
+            <RowDefinition Height="*"/>
+            <RowDefinition Height="10"/>
+        </Grid.RowDefinitions>
+        <Grid.ColumnDefinitions>
+            <ColumnDefinition Width="10"/>
+            <ColumnDefinition Width="300"/>
+            <ColumnDefinition Width="*"/>
+            <ColumnDefinition Width="10"/>
+        </Grid.ColumnDefinitions>
+        <StackPanel Grid.Row="1" Grid.Column="1">
+            <Label>Active outages</Label>
+            <DataGrid ItemsSource="{Binding ActiveOutages, UpdateSourceTrigger=PropertyChanged}" 
+                      SelectedItem="{Binding SelectedOutege, Mode=OneWayToSource}" 
+                      IsReadOnly="True" 
+                      SelectionMode="Single" 
+                      AutoGenerateColumns="False"
+                      MaxHeight="550"
+                      SelectionChanged="DataGrid_SelectionChanged">
+                <DataGrid.Columns>
+                    <DataGridTextColumn Binding="{Binding OutageElement.GID, StringFormat={}0x{0:X16}}" Header="Outage ID" Width="auto"/>
+                    <DataGridTextColumn Binding="{Binding OutageElement.Type}" Header="Type" Width="*"/>
+                </DataGrid.Columns>
+            </DataGrid>
+        </StackPanel>
+
+        <Grid Visibility="{Binding IsSelectedOutageGridVisible, UpdateSourceTrigger=PropertyChanged}" Grid.Row="1" Grid.Column="2">
+            <Grid.RowDefinitions>
+                <RowDefinition Height="10"/>
+                <RowDefinition Height="150"/>
+                <RowDefinition Height="20"/>
+                <RowDefinition Height="150"/>
+                <RowDefinition Height="20"/>
+                <RowDefinition Height="150"/>
+                <RowDefinition Height="*"/>
+                <RowDefinition Height="10"/>
+            </Grid.RowDefinitions>
+            <Grid.ColumnDefinitions>
+                <ColumnDefinition Width="80"/>
+                <ColumnDefinition Width="*"/>
+                <ColumnDefinition Width="30"/>
+            </Grid.ColumnDefinitions>
+            
+            <StackPanel Grid.Row="1" Grid.Column="1">
+                <Label>Optimum Isplation Points</Label>
+                <DataGrid ItemsSource="{Binding OptimumIsolationPoints, UpdateSourceTrigger=PropertyChanged}" 
+                      IsReadOnly="True" 
+                      SelectionMode="Single" 
+                      AutoGenerateColumns="False"
+                      MaxHeight="137">
+                    <DataGrid.Columns>
+                        <DataGridTextColumn Binding="{Binding GID, StringFormat={}0x{0:X16}}" Header="Global Identifiers" Width="auto"/>
+                        <DataGridTextColumn Binding="{Binding Type}" Header="Type" Width="*"/>
+                    </DataGrid.Columns>
+                </DataGrid>
+            </StackPanel>
+            <StackPanel Grid.Row="3" Grid.Column="1">
+                <Label>Default Isolation Points</Label>
+                <DataGrid ItemsSource="{Binding DefaultIsolationPoints, UpdateSourceTrigger=PropertyChanged}"  
+                      IsReadOnly="True" 
+                      SelectionMode="Single" 
+                      AutoGenerateColumns="False"
+                      MaxHeight="137">
+                    <DataGrid.Columns>
+                        <DataGridTextColumn Binding="{Binding GID, StringFormat={}0x{0:X16}}" Header="Global Identifiers" Width="auto"/>
+                        <DataGridTextColumn Binding="{Binding Type}" Header="Type" Width="*"/>
+                    </DataGrid.Columns>
+                </DataGrid>
+            </StackPanel>
+            <Button Grid.Row="5" Grid.Column="1" 
+                    Content="END OUTAGE" 
+                    Height="30" Width="200" 
+                    IsEnabled="{Binding IsEndOutageEnabled, UpdateSourceTrigger=PropertyChanged}"
+                    Click="EndOutageButton_Click" />
+        </Grid>
+    </Grid>
+</UserControl>

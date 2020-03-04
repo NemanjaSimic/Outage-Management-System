@@ -45,7 +45,7 @@ namespace Outage.SCADA.SCADAService
             CommandService.SCADAModel = scadaModel;
             IntegrityUpdateService.SCADAModel = scadaModel;
 
-            CommandService.FunctionExecutor = functionExecutor;
+            CommandService.WriteCommandEnqueuer = functionExecutor;
 
             scadaModel.ImportModel();
 

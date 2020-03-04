@@ -4,7 +4,8 @@
     using OMS.Web.Common.Extensions;
     using Outage.Common.UI;
     using System.Collections.Generic;
-    
+    using Outage.Common;
+
     public class GraphMapper : IGraphMapper
     {
         private const string PowerTransformerDmsTypeName = "POWERTRANSFORMER";
@@ -25,6 +26,7 @@
                     IsActive = keyValue.Value.IsActive,
                     DMSType = keyValue.Value.DMSType,
                     IsRemote = keyValue.Value.IsRemote,
+                    NoReclosing = keyValue.Value.NoReclosing,
                     NominalVoltage = keyValue.Value.NominalVoltage.ToString(),
                     Measurements = new List<MeasurementViewModel>()
                 };
@@ -35,7 +37,8 @@
                     {
                         Id = measurement.Gid.ToString(),
                         Type = measurement.Type,
-                        Value = measurement.Value
+                        Value = measurement.Value,
+                        AlarmType = AlarmType.NO_ALARM
                     });
                 }
 
@@ -55,7 +58,7 @@
                     {
                         SourceNodeId = keyValue.Key.ToString(),
                         TargetNodeId = targetNodeId.ToString(),
-                        IsActive = topologyModel.Nodes[keyValue.Key].IsActive
+                        IsActive = topologyModel.Nodes[keyValue.Key].IsActive || topologyModel.Nodes[targetNodeId].IsActive
                     };
 
                     graph.Relations.Add(graphRelation);

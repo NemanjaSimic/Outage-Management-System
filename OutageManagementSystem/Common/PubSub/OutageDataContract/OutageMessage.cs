@@ -1,98 +1,95 @@
 ﻿using System;
 using System.Collections.Generic;
-using System.ComponentModel.DataAnnotations;
-using System.ComponentModel.DataAnnotations.Schema;
-using System.Linq;
 using System.Runtime.Serialization;
-using System.Text;
-using System.Threading.Tasks;
 
 namespace Outage.Common.PubSub.OutageDataContract
 {
     [DataContract(IsReference = true)]
     public abstract class OutageMessage : IPublishableMessage
     {
-    }
-
-
-
-    [DataContract(IsReference = true)]
-    public class ActiveOutage : OutageMessage
-    {
-        [Key]
-        [DataMember]
-        [DatabaseGenerated(DatabaseGeneratedOption.Identity)]
-        public long OutageId { get; set; }
-
-        [DataMember]
-        public long ElementGid { get; set; }
-
         [DataMember]
         public DateTime ReportTime { get; set; }
+        [DataMember]
+        public DateTime? IsolatedTime { get; set; }
+        [DataMember]
+        public DateTime? RepairedTime { get; set; }
 
         [DataMember]
-        public List<Consumer> AffectedConsumers { get; set; }
+        public long OutageElementGid { get; set; }
+        [DataMember]
+        public IEnumerable<long> DefaultIsolationPoints { get; set; }
+        [DataMember]
+        public IEnumerable<long> OptimumIsolationPoints { get; set; }
 
-        public ActiveOutage()
+        [DataMember]
+        public IEnumerable<ConsumerMessage> AffectedConsumers { get; set; }
+
+        public OutageMessage()
         {
-            AffectedConsumers = new List<Consumer>();
+            DefaultIsolationPoints = new List<long>();
+            OptimumIsolationPoints = new List<long>();
+            AffectedConsumers = new List<ConsumerMessage>();
         }
     }
 
-    [DataContract]
-    public class ArchivedOutage : OutageMessage
+    [DataContract(IsReference = true)]
+    public class ActiveOutageMessage : OutageMessage
     {
-        [Key]
         [DataMember]
-        [DatabaseGenerated(DatabaseGeneratedOption.None)]
         public long OutageId { get; set; }
 
         [DataMember]
-        public long ElementGid { get; set; }
+        public ActiveOutageState OutageState { get; set; }
 
         [DataMember]
-        public DateTime ReportTime { get; set; }
+        public bool IsResolveConditionValidated { get; set; }
+
+        public ActiveOutageMessage() 
+            : base()
+        {
+        }
+    }
+
+    [DataContract(IsReference = true)]
+    public class ArchivedOutageMessage : OutageMessage
+    {
+        [DataMember]   
+        public long OutageId { get; set; }
 
         [DataMember]
         public DateTime ArchiveTime { get; set; }
 
-        [DataMember]
-        public List<Consumer> AffectedConsumers { get; set; }
-
-        public ArchivedOutage()
+        public ArchivedOutageMessage()
+            : base()
         {
-            AffectedConsumers = new List<Consumer>();
         }
     }
 
     [DataContract]
-    public class Consumer
+    public class ConsumerMessage
     {
-        [Key]
         [DataMember]
-        [DatabaseGenerated(DatabaseGeneratedOption.None)]
         public long ConsumerId { get; set; }
 
         [DataMember]
         public string ConsumerMRID { get; set; }
-
         [DataMember]
         public string FirstName { get; set; }
-
         [DataMember]
         public string LastName { get; set; }
 
         [DataMember]
-        public List<ArchivedOutage> ArchivedOutages { get; set; }
-
+        public IEnumerable<ArchivedOutageMessage> ArchivedOutages { get; set; }
         [DataMember]
-        public List<ActiveOutage> ActiveOutages { get; set; }
+        public IEnumerable<ActiveOutageMessage> ActiveOutages { get; set; }
 
-        public Consumer()
+        public ConsumerMessage()
         {
-            ArchivedOutages = new List<ArchivedOutage>();
-            ActiveOutages = new List<ActiveOutage>();
+            ConsumerMRID = string.Empty;
+            FirstName = string.Empty;
+            LastName = string.Empty;
+            ArchivedOutages = new List<ArchivedOutageMessage>();
+            ActiveOutages = new List<ActiveOutageMessage>();
         }
     }
-    
 }

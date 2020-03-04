@@ -4,8 +4,8 @@
 
     public enum SwitchCommandType
     {
-        TURN_OFF = 1,
-        TURN_ON = 0
+        OPEN = 1,
+        CLOSE = 0,
     }
 
     public class SwitchCommandBindingModel

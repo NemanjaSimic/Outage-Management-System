@@ -9,10 +9,7 @@ namespace Outage.SCADA.SCADAData.Repository
 {
     public class AnalogSCADAModelPointItem : SCADAModelPointItem, IAnalogSCADAModelPointItem
     {
-        public AnalogSCADAModelPointItem() 
-            : base()
-        {
-        }
+        private float currentEguValue;
 
         public AnalogSCADAModelPointItem(List<Property> props, ModelCode type, EnumDescs enumDescs)
             : base(props, type)
@@ -52,11 +49,22 @@ namespace Outage.SCADA.SCADAData.Repository
                     default:
                         break;
                 }
-            }                       
+            }
+
+            Initialized = true;
+            SetAlarms();
         }
 
         public float NormalValue { get; set; }
-        public float CurrentEguValue { get; set; }
+        public float CurrentEguValue
+        {
+            get { return currentEguValue; }
+            set
+            {
+                currentEguValue = value;
+                SetAlarms();
+            }
+        }
         public float EGU_Min { get; set; }
         public float EGU_Max { get; set; }
         public float ScalingFactor { get; set; }
@@ -87,12 +95,16 @@ namespace Outage.SCADA.SCADAData.Repository
             }
         }
 
-
-        public override bool SetAlarms()
+        protected override bool SetAlarms()
         {
+            if (!Initialized)
+            {
+                return false;
+            }
+
             bool alarmChanged = false;
-            ushort LowLimit;
-            ushort HighLimit;
+            float LowLimit;
+            float HighLimit;
             AlarmType currentAlarm = Alarm;
 
             if (AnalogType == AnalogMeasurementType.POWER)
@@ -104,6 +116,11 @@ namespace Outage.SCADA.SCADAData.Repository
             {
                 LowLimit = AlarmConfigData.Instance.LowVoltageLimit;
                 HighLimit = AlarmConfigData.Instance.HighVolageLimit;
+            }
+            else if(AnalogType == AnalogMeasurementType.CURRENT)
+            {
+                LowLimit = AlarmConfigData.Instance.LowCurrentLimit;
+                HighLimit = AlarmConfigData.Instance.HighCurrentLimit;
             }
             else
             {

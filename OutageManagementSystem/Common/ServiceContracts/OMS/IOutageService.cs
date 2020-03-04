@@ -1,5 +1,6 @@
 ﻿namespace Outage.Common.ServiceContracts.OMS
 {
     // service naming convention
-    public interface IOutageService : IOutageContract { }
+    //TODO: prosiriti i sa ostalim outage contract-ima? npr. IOutageLifecycleUICommandingContract
+    public interface IOutageService : IOutageAccessContract { }
 }

@@ -1,15 +1,9 @@
-﻿using System;
-using System.Collections.Generic;
-using System.Linq;
-using System.Text;
-using System.Threading.Tasks;
+﻿using System.Collections.Generic;
 
 namespace CECommon.Interfaces
 {
-    public interface IModelTopologyServis
+    public interface IModelTopologyService
     {
         List<ITopology> CreateTopology();
-        ITopology CalulateLoadFlow(long startingElementGid, ITopology topology);
-        List<ITopology> UpdateLoadFlow(List<long> startingSignalGid, List<ITopology> topologies);
     }
 }
