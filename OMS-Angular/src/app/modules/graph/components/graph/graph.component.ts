@@ -102,6 +102,11 @@ export class GraphComponent implements OnInit, OnDestroy {
     this.drawGraph();
   }
 
+  openMenu(event, message) : void {
+    console.log(event.clientX);
+    console.log(message);
+  }
+
   ngOnDestroy() {
     if (this.connectionSubscription)
       this.connectionSubscription.unsubscribe();

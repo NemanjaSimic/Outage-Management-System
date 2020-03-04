@@ -1,8 +1,5 @@
 <mat-sidenav-container class="container">
-  <mat-sidenav #sidenav 
-  mode="side" 
-  [(opened)]="opened"
-    (closed)="events.push('close!')">
+  <mat-sidenav #sidenav mode="side" [(opened)]="opened">
     <mat-nav-list>
       <mat-toolbar>
         <span>Outage Management System</span>
@@ -13,12 +10,15 @@
       <a mat-list-item routerLink="/active-browser" routerLinkActive="active" [routerLinkActiveOptions]="{exact: true}">
         Active Browser
       </a>
-      <a mat-list-item routerLink="/archived-browser" routerLinkActive="active" [routerLinkActiveOptions]="{exact: true}">
+      <a mat-list-item routerLink="/archived-browser" routerLinkActive="active"
+        [routerLinkActiveOptions]="{exact: true}">
         Archived Browser
       </a>
-      <mat-list-item> Other options </mat-list-item>
+      <a mat-list-item routerLink="/report" routerLinkActive="active"
+        [routerLinkActiveOptions]="{exact: true}">
+        Reporting
+      </a>
     </mat-nav-list>
-
   </mat-sidenav>
 
   <mat-sidenav-content>

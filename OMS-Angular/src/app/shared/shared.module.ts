@@ -18,13 +18,15 @@ import { MatDialogModule } from '@angular/material/dialog';
 import { SplashComponent } from './components/splash/splash.component';
 import { ActiveOutageModalComponent } from './components/active-outage-modal/active-outage-modal.component';
 import { ArchivedOutageModalComponent } from './components/archived-outage-modal/archived-outage-modal.component';
+import { RefreshMenuComponent } from './components/refresh-menu/refresh-menu.component';
 
 
 @NgModule({
   declarations: [
     SplashComponent,
     ActiveOutageModalComponent,
-    ArchivedOutageModalComponent
+    ArchivedOutageModalComponent,
+    RefreshMenuComponent
   ],
   imports: [
     CommonModule,

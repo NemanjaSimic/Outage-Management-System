@@ -7,7 +7,7 @@
 
 .sidemenu_buttons {
   position: absolute;
-  z-index: 99;
+  z-index: 1;
   top: 50%;
   padding-left: 10px ;
   transform: translateY(-50%);
