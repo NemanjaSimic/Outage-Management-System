@@ -11,17 +11,15 @@ namespace OMSCommon.OutageDatabaseModel
         public DateTime? RepairedTime { get; set; }
 
         public long OutageElementGid { get; set; }
-        //CSV, separator '|'
-        public string DefaultIsolationPoints { get; set; }
-        //CSV, separator '|'
-        public string OptimumIsolationPoints { get; set; }
 
+        public List<Equipment> DefaultIsolationPoints { get; set; }
+        public List<Equipment> OptimumIsolationPoints { get; set; }
         public List<Consumer> AffectedConsumers { get; set; }
 
         public Outage()
         {
-            DefaultIsolationPoints = string.Empty;
-            OptimumIsolationPoints = string.Empty;
+            DefaultIsolationPoints = new List<Equipment>();
+            OptimumIsolationPoints = new List<Equipment>();
             AffectedConsumers = new List<Consumer>();
         }
     }

@@ -26,9 +26,9 @@
                 IsolatedAt = outage.IsolatedTime,
                 RepairedAt = outage.RepairedTime,
                 ElementId = outage.OutageElementGid,
-                DefaultIsolationPoints = outage.DefaultIsolationPoints,
+                DefaultIsolationPoints = outage.DefaultIsolationPoints.Select(e => e.EquipmentId),
                 AffectedConsumers = _consumerMapper.MapConsumers(outage.AffectedConsumers),
-                OptimalIsolationPoints = outage.OptimumIsolationPoints,
+                OptimalIsolationPoints = outage.OptimumIsolationPoints.Select(e => e.EquipmentId),
                 IsResolveConditionValidated = outage.IsResolveConditionValidated,
             };
 
@@ -44,9 +44,9 @@
                 RepairedAt = outage.RepairedTime,
                 ArchivedAt = outage.ArchiveTime,
                 ElementId = outage.OutageElementGid,
-                DefaultIsolationPoints = outage.DefaultIsolationPoints,
+                DefaultIsolationPoints = outage.DefaultIsolationPoints.Select(e => e.EquipmentId),
                 AffectedConsumers = _consumerMapper.MapConsumers(outage.AffectedConsumers),
-                OptimalIsolationPoints = outage.OptimumIsolationPoints,
+                OptimalIsolationPoints = outage.OptimumIsolationPoints.Select(e => e.EquipmentId),
             };
 
         public IEnumerable<ArchivedOutageViewModel> MapArchivedOutages(IEnumerable<ArchivedOutageMessage> outages)

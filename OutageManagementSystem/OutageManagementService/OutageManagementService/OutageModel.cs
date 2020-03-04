@@ -237,14 +237,14 @@ namespace OutageManagementService
                 throw e;
             }
 
-            string defaultIsolationEndpoints = GetDefaultIsolationEndpointsString(gid, recloserId);
+            List<Equipment> defaultIsolationPoints = GetEquipmentEntity(new List<long> { gid, recloserId });
 
             ActiveOutage createdActiveOutage = new ActiveOutage
             {
                 AffectedConsumers = consumerDbEntities,
                 OutageState = ActiveOutageState.CREATED,
                 ReportTime = DateTime.UtcNow,
-                DefaultIsolationPoints = defaultIsolationEndpoints,
+                DefaultIsolationPoints = defaultIsolationPoints,
             };
 
             activeOutageDbEntity = dbContext.ActiveOutageRepository.Add(createdActiveOutage);
@@ -469,15 +469,15 @@ namespace OutageManagementService
                 return false;
             }
 
-            List<long> isolationPoints = new List<long>();
-            isolationPoints.AddRange(ParseIsolationPointsFromCSV(outageDbEntity.DefaultIsolationPoints));
-            isolationPoints.AddRange(ParseIsolationPointsFromCSV(outageDbEntity.OptimumIsolationPoints));
+            List<Equipment> isolationPoints = new List<Equipment>();
+            isolationPoints.AddRange(outageDbEntity.DefaultIsolationPoints);
+            isolationPoints.AddRange(outageDbEntity.OptimumIsolationPoints);
 
             bool resolveCondition = true;
 
-            foreach (long isolationPointId in isolationPoints)
+            foreach (Equipment isolationPoint in isolationPoints)
             {
-                if(TopologyModel.GetElementByGid(isolationPointId, out IOutageTopologyElement element))
+                if(TopologyModel.GetElementByGid(isolationPoint.EquipmentId, out IOutageTopologyElement element))
                 {
                     if(element.NoReclosing != element.IsActive)
                     {
@@ -646,7 +646,7 @@ namespace OutageManagementService
         {
             if (!TopologyModel.OutageTopology.ContainsKey(breakerId))
             {
-                string message = $"Breaker with gid: {breakerId} is not in a topology model.";
+                string message = $"Breaker with gid: 0x{breakerId:X16} is not in a topology model.";
                 Logger.LogError(message);
                 throw new Exception(message);
             }
@@ -690,7 +690,8 @@ namespace OutageManagementService
             long currentBreakerId = headBreakerId;
             while (currentBreakerId != 0)
             {
-                currentBreakerId = TopologyModel.OutageTopology[currentBreakerId].SecondEnd.Where(element => modelResourcesDesc.GetModelCodeFromId(element) == ModelCode.BREAKER).FirstOrDefault();
+                //currentBreakerId = TopologyModel.OutageTopology[currentBreakerId].SecondEnd.Where(element => modelResourcesDesc.GetModelCodeFromId(element) == ModelCode.BREAKER).FirstOrDefault();
+                currentBreakerId = GetNextBreaker(currentBreakerId);
                 if (currentBreakerId == 0)
                 {
                     continue;
@@ -698,7 +699,7 @@ namespace OutageManagementService
 
                 if (!TopologyModel.OutageTopology.ContainsKey(currentBreakerId))
                 {
-                    string message = $"Head switch with gid: {currentBreakerId} is not in a topology model.";
+                    string message = $"Switch with gid: 0X{currentBreakerId:X16} is not in a topology model.";
                     Logger.LogError(message);
                     throw new Exception(message);
                 }
@@ -730,6 +731,77 @@ namespace OutageManagementService
             }
 
             return affectedConsumers;
+        }
+
+        private List<Equipment> GetEquipmentEntity(List<long> equipmentIds)
+        {
+            List<long> equipementIdsNotFoundInDb = new List<long>();
+            List<Equipment> equipmentList = new List<Equipment>();
+
+            foreach (long equipmentId in equipmentIds)
+            {
+                Equipment equipmentDbEntity = dbContext.EquipmentRepository.Get(equipmentId);
+
+                if (equipmentDbEntity == null)
+                {
+                    equipementIdsNotFoundInDb.Add(equipmentId);
+                }
+                else
+                {
+                    equipmentList.Add(equipmentDbEntity);
+                }
+            }
+
+            equipmentList.AddRange(CreateEquipementEntitiesFromNmsData(equipementIdsNotFoundInDb));
+
+            return equipmentList;
+        }
+
+        private List<Equipment> CreateEquipementEntitiesFromNmsData(List<long> entityIds)
+        {
+            List<Equipment> equipements = new List<Equipment>();
+
+            List<ModelCode> propIds = new List<ModelCode>() { ModelCode.IDOBJ_MRID };
+
+            using(NetworkModelGDAProxy proxy = proxyFactory.CreateProxy<NetworkModelGDAProxy, INetworkModelGDAContract>(EndpointNames.NetworkModelGDAEndpoint))
+            {
+                if (proxy == null)
+                {
+                    string message = "OutageModel::CreateEquipementEntitiesFromNmsData => NetworkModelGDAProxy is null";
+                    Logger.LogError(message);
+                    throw new NullReferenceException();
+                }
+
+                foreach(long gid in entityIds)
+                {
+                    ResourceDescription rd = null;
+
+                    try
+                    {
+                        rd = proxy.GetValues(gid, propIds);
+                    }
+                    catch (Exception e)
+                    {
+                        //TODO: Kad prvi put ovde bude puklo, alarmirajte me. Dimitrije
+                        throw e;
+                    }
+
+                    if(rd == null)
+                    {
+                        continue;
+                    }
+                
+                    Equipment createdEquipement = new Equipment()
+                    {
+                        EquipmentId = rd.Id,
+                        EquipmentMRID = rd.Properties[0].AsString(),
+                    };
+
+                    equipements.Add(createdEquipement);
+                }
+            }
+
+            return equipements;
         }
 
         private bool PublishOutage(Topic topic, OutageMessage outageMessage)
@@ -766,7 +838,7 @@ namespace OutageManagementService
 
         private bool StartIsolationAlgorthm(ActiveOutage outageToIsolate)
         {
-            List<long> defaultIsolationPoints = GetElementIdsFromString(outageToIsolate.DefaultIsolationPoints);
+            List<long> defaultIsolationPoints = outageToIsolate.DefaultIsolationPoints.Select(point => point.EquipmentId).ToList();
 
             bool isIsolated;
             bool isFirstBreakerRecloser;
@@ -865,7 +937,7 @@ namespace OutageManagementService
                         long nextBreakerId = GetNextBreaker(currentBreakerId);
                         if (currentBreakerId != 0 && currentBreakerId != recloser)
                         {
-                            outageToIsolate.OptimumIsolationPoints = $"{currentBreakerId}|{nextBreakerId}";
+                            outageToIsolate.OptimumIsolationPoints = GetEquipmentEntity(new List<long> { currentBreakerId, nextBreakerId });
 
 
                             if (!TopologyModel.OutageTopology.ContainsKey(nextBreakerId))
@@ -1128,6 +1200,7 @@ namespace OutageManagementService
             return affectedConsumers;
         }
 
+        [Obsolete]
         private List<long> ParseIsolationPointsFromCSV(string isolationPointsCSV)
         {
             List<long> isolationPoints = new List<long>();
@@ -1149,6 +1222,7 @@ namespace OutageManagementService
             return isolationPoints;
         }
 
+        [Obsolete]
         private string ParseIsolationPointsToCSV(List<long> isolationPoints)
         {
             StringBuilder isolationPointsCSV = new StringBuilder();

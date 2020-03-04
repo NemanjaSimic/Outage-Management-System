@@ -59,9 +59,14 @@
     <Compile Include="Migrations\202002281444367_Property IsResolveConditionValidated.designer.cs">
       <DependentUpon>202002281444367_Property IsResolveConditionValidated.cs</DependentUpon>
     </Compile>
+    <Compile Include="Migrations\202003041419187_Add equipment entity.cs" />
+    <Compile Include="Migrations\202003041419187_Add equipment entity.designer.cs">
+      <DependentUpon>202003041419187_Add equipment entity.cs</DependentUpon>
+    </Compile>
     <Compile Include="Repository\ActiveOutageRepository.cs" />
     <Compile Include="Repository\ArchivedOutageRepository.cs" />
     <Compile Include="Repository\ConsumerRepository.cs" />
+    <Compile Include="Repository\EquipmentRepository.cs" />
     <Compile Include="Repository\Repository.cs" />
     <Compile Include="Repository\UnitOfWork.cs" />
     <Compile Include="Initializers\OutageInitializer.cs" />
@@ -145,6 +150,9 @@
     </EmbeddedResource>
     <EmbeddedResource Include="Migrations\202002281444367_Property IsResolveConditionValidated.resx">
       <DependentUpon>202002281444367_Property IsResolveConditionValidated.cs</DependentUpon>
+    </EmbeddedResource>
+    <EmbeddedResource Include="Migrations\202003041419187_Add equipment entity.resx">
+      <DependentUpon>202003041419187_Add equipment entity.cs</DependentUpon>
     </EmbeddedResource>
   </ItemGroup>
   <Import Project="$(MSBuildToolsPath)\Microsoft.CSharp.targets" />

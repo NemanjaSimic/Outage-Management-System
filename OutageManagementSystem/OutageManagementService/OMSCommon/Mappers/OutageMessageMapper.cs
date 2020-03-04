@@ -17,10 +17,12 @@ namespace OMSCommon.Mappers
         }
 
         private ConsumerMessageMapper consumerMapper;
+        private EquipmentMapper equipmentMapper;
 
         public OutageMessageMapper()
         {
             consumerMapper = new ConsumerMessageMapper(this);
+            equipmentMapper = new EquipmentMapper(this);
         }
 
         public ActiveOutageMessage MapActiveOutage(ActiveOutage outage)
@@ -33,19 +35,11 @@ namespace OMSCommon.Mappers
                 IsolatedTime = outage.IsolatedTime,
                 RepairedTime = outage.RepairedTime,
                 OutageElementGid = outage.OutageElementGid,
+                DefaultIsolationPoints = equipmentMapper.MapEquipments(outage.DefaultIsolationPoints),
+                OptimumIsolationPoints = equipmentMapper.MapEquipments(outage.OptimumIsolationPoints),
                 AffectedConsumers = consumerMapper.MapConsumers(outage.AffectedConsumers),
                 IsResolveConditionValidated = outage.IsResolveConditionValidated,
             };
-
-            if (TryParseIsolationPointsFromCSVFormat(outage.DefaultIsolationPoints, out List<long> defaultIsolationPoints))
-            {
-                activeOutageMessage.DefaultIsolationPoints = defaultIsolationPoints;
-            }
-
-            if (TryParseIsolationPointsFromCSVFormat(outage.OptimumIsolationPoints, out List<long> optimumIsolationPoints))
-            {
-                activeOutageMessage.OptimumIsolationPoints = optimumIsolationPoints;
-            }
 
             return activeOutageMessage;
         }
@@ -65,18 +59,10 @@ namespace OMSCommon.Mappers
                 RepairedTime = outage.RepairedTime,
                 ArchiveTime = outage.ArchiveTime,
                 OutageElementGid = outage.OutageElementGid,
+                DefaultIsolationPoints = equipmentMapper.MapEquipments(outage.DefaultIsolationPoints),
+                OptimumIsolationPoints = equipmentMapper.MapEquipments(outage.OptimumIsolationPoints),
                 AffectedConsumers = consumerMapper.MapConsumers(outage.AffectedConsumers)
             };
-
-            if(TryParseIsolationPointsFromCSVFormat(outage.DefaultIsolationPoints, out List<long> defaultIsolationPoints))
-            {
-                archivedOutageMessage.DefaultIsolationPoints = defaultIsolationPoints;
-            }
-
-            if (TryParseIsolationPointsFromCSVFormat(outage.OptimumIsolationPoints, out List<long> optimumIsolationPoints))
-            {
-                archivedOutageMessage.OptimumIsolationPoints = optimumIsolationPoints;
-            }
             
             return archivedOutageMessage;
         }
@@ -86,6 +72,8 @@ namespace OMSCommon.Mappers
             return outages.Select(o => MapArchivedOutage(o));
         }
 
+        #region Obsolete
+        [Obsolete]
         private IEnumerable<long> ParseIsolationPointsFromCSVFormat(string isolationPointsCSV)
         {
             if(isolationPointsCSV == null)
@@ -108,7 +96,7 @@ namespace OMSCommon.Mappers
 
             return isolationPoints;
         }
-
+        [Obsolete]
         private bool TryParseIsolationPointsFromCSVFormat(string isolationPointsCSV, out List<long> isolationPoints)
         {
             isolationPoints = new List<long>();
@@ -131,5 +119,6 @@ namespace OMSCommon.Mappers
 
             return true;
         }
+        #endregion
     }
 }

@@ -17,17 +17,17 @@ namespace Outage.Common.PubSub.OutageDataContract
         [DataMember]
         public long OutageElementGid { get; set; }
         [DataMember]
-        public IEnumerable<long> DefaultIsolationPoints { get; set; }
+        public IEnumerable<EquipmentMessage> DefaultIsolationPoints { get; set; }
         [DataMember]
-        public IEnumerable<long> OptimumIsolationPoints { get; set; }
+        public IEnumerable<EquipmentMessage> OptimumIsolationPoints { get; set; }
 
         [DataMember]
         public IEnumerable<ConsumerMessage> AffectedConsumers { get; set; }
 
         public OutageMessage()
         {
-            DefaultIsolationPoints = new List<long>();
-            OptimumIsolationPoints = new List<long>();
+            DefaultIsolationPoints = new List<EquipmentMessage>();
+            OptimumIsolationPoints = new List<EquipmentMessage>();
             AffectedConsumers = new List<ConsumerMessage>();
         }
     }
@@ -88,6 +88,27 @@ namespace Outage.Common.PubSub.OutageDataContract
             ConsumerMRID = string.Empty;
             FirstName = string.Empty;
             LastName = string.Empty;
+            ArchivedOutages = new List<ArchivedOutageMessage>();
+            ActiveOutages = new List<ActiveOutageMessage>();
+        }
+    }
+
+    [DataContract]
+    public class EquipmentMessage
+    {
+        [DataMember]
+        public long EquipmentId { get; set; }
+        [DataMember]
+        public string EquipmentMRID { get; set; }
+
+        [DataMember]
+        public IEnumerable<ArchivedOutageMessage> ArchivedOutages { get; set; }
+        [DataMember]
+        public IEnumerable<ActiveOutageMessage> ActiveOutages { get; set; }
+
+        public EquipmentMessage()
+        {
+            EquipmentMRID = string.Empty;
             ArchivedOutages = new List<ArchivedOutageMessage>();
             ActiveOutages = new List<ActiveOutageMessage>();
         }

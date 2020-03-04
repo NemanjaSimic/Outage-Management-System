@@ -43,10 +43,12 @@
   </ItemGroup>
   <ItemGroup>
     <Compile Include="Mappers\ConsumerMessageMapper.cs" />
+    <Compile Include="Mappers\EquipementMapper.cs" />
     <Compile Include="Mappers\OutageMessageMapper.cs" />
     <Compile Include="OutageDatabaseModel\ActiveOutage.cs" />
     <Compile Include="OutageDatabaseModel\ArchivedOutage.cs" />
     <Compile Include="OutageDatabaseModel\Consumer.cs" />
+    <Compile Include="OutageDatabaseModel\Equipement.cs" />
     <Compile Include="OutageDatabaseModel\Outage.cs" />
     <Compile Include="Properties\AssemblyInfo.cs" />
   </ItemGroup>

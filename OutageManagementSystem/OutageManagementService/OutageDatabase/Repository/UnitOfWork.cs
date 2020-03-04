@@ -11,6 +11,7 @@ namespace OutageDatabase.Repository
         public ActiveOutageRepository ActiveOutageRepository { get; set; }
         public ArchivedOutageRepository ArchivedOutageRepository { get; set; }
         public ConsumerRepository ConsumerRepository { get; set; }
+        public EquipmentRepository EquipmentRepository { get; set; }
 
         public UnitOfWork()
         {
@@ -19,6 +20,7 @@ namespace OutageDatabase.Repository
             ActiveOutageRepository = new ActiveOutageRepository(context);
             ArchivedOutageRepository = new ArchivedOutageRepository(context);
             ConsumerRepository = new ConsumerRepository(context);
+            EquipmentRepository = new EquipmentRepository(context);
         }
 
         public UnitOfWork(OutageContext context)
@@ -28,6 +30,7 @@ namespace OutageDatabase.Repository
             ActiveOutageRepository = new ActiveOutageRepository(context);
             ArchivedOutageRepository = new ArchivedOutageRepository(context);
             ConsumerRepository = new ConsumerRepository(context);
+            EquipmentRepository = new EquipmentRepository(context);
         }
 
         public int Complete()

@@ -49,8 +49,8 @@ namespace OutageDatabase.Initializers
                     IsolatedTime = DateTime.UtcNow,
                     RepairedTime = DateTime.UtcNow,
                     ArchiveTime = DateTime.UtcNow,
-                    DefaultIsolationPoints = string.Empty,
-                    OptimumIsolationPoints = string.Empty,
+                    DefaultIsolationPoints = new List<Equipment>(),
+                    OptimumIsolationPoints = new List<Equipment>(),
                     AffectedConsumers = new List<Consumer>(),
                 };
 
