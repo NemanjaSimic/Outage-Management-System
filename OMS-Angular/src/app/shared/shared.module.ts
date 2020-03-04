@@ -1,7 +1,8 @@
 import { NgModule } from '@angular/core';
 import { CommonModule } from '@angular/common';
-import { FormsModule } from '@angular/forms';
+import { FormsModule, ReactiveFormsModule } from '@angular/forms';
 import { BrowserAnimationsModule } from '@angular/platform-browser/animations';
+
 
 import { MatSidenavModule } from '@angular/material/sidenav';
 import { MatCheckboxModule } from '@angular/material/checkbox';
@@ -15,6 +16,9 @@ import { MatTableModule } from '@angular/material/table';
 import { MatSelectModule } from '@angular/material/select';
 import { MatDialogModule } from '@angular/material/dialog';
 import { MatMenuModule } from '@angular/material/menu';
+import { MatAutocompleteModule } from '@angular/material/autocomplete';
+import { MatDatepickerModule } from '@angular/material/datepicker';
+
 
 import { SplashComponent } from './components/splash/splash.component';
 import { ActiveOutageModalComponent } from './components/active-outage-modal/active-outage-modal.component';
@@ -32,6 +36,7 @@ import { RefreshMenuComponent } from './components/refresh-menu/refresh-menu.com
   imports: [
     CommonModule,
     FormsModule,
+    ReactiveFormsModule,
     MatSidenavModule,
     MatCheckboxModule,
     MatListModule,
@@ -45,10 +50,13 @@ import { RefreshMenuComponent } from './components/refresh-menu/refresh-menu.com
     MatTableModule,
     MatDialogModule,
     MatMenuModule,
+    MatAutocompleteModule,
+    MatDatepickerModule
   ],
   exports: [
     CommonModule,
     FormsModule,
+    ReactiveFormsModule,
     SplashComponent,
     MatSidenavModule,
     MatCheckboxModule,
@@ -62,7 +70,9 @@ import { RefreshMenuComponent } from './components/refresh-menu/refresh-menu.com
     MatSelectModule,
     MatTableModule,
     MatDialogModule,
-    MatMenuModule
+    MatMenuModule,
+    MatAutocompleteModule,
+    MatDatepickerModule
   ],
   entryComponents: [
     ActiveOutageModalComponent,

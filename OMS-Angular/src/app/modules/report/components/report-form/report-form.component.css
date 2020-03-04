@@ -3,8 +3,26 @@
   border: 1px solid black;
   border-radius: 15px;
   padding: 15px 30px;
+  color:white;
 }
 
-.report-type {
+.white-label {
+  color: white;
+}
+
+.custom-width {
+  width: 260px;
+}
+
+.form-field {
+  padding-right: 50px;
+  color: white;
+}
+
+input::placeholder {
+  color: white;
+}
+
+input {
   color: white;
 }

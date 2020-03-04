@@ -1,10 +1,38 @@
 <div class="report-form">
-  <mat-form-field>
-    <mat-label class="report-type"> Report Type </mat-label>
-    <mat-select>
+  <mat-form-field class="form-field white-label">
+    <mat-label class="white-label"> Report Type </mat-label>
+    <mat-select [(value)]="selectedReportType">
       <mat-option *ngFor="let reportType of reportTypes" [value]="reportType.value">
         {{ reportType.name }}
       </mat-option>
-    </mat-select> 
+    </mat-select>
   </mat-form-field>
+
+  <mat-form-field class="form-field custom-width">
+    <mat-label class="white-label">Scope</mat-label>
+    <input type="text" class="white-label" matInput [formControl]="selectedScopeControl" [matAutocomplete]="auto">
+    <mat-autocomplete #auto="matAutocomplete">
+      <mat-option *ngFor="let scope of filteredScopes | async" [value]="scope.name">
+        <span>{{ scope.name }}</span> |
+        <small>{{ scope.gid }}</small>
+      </mat-option>
+    </mat-autocomplete>
+  </mat-form-field>
+
+  <mat-form-field class="form-field">
+    <mat-label class="white-label">Choose a start date</mat-label>
+    <input matInput [matDatepicker]="startDatePicker" [formControl]="startDate">
+    <mat-datepicker-toggle matSuffix [for]="startDatePicker"></mat-datepicker-toggle>
+    <mat-datepicker #startDatePicker></mat-datepicker>
+  </mat-form-field>
+
+  <mat-form-field class="form-field">
+    <mat-label class="white-label">Choose a end date</mat-label>
+    <input matInput [matDatepicker]="endDatePicker" [formControl]="endDate">
+    <mat-datepicker-toggle matSuffix [for]="endDatePicker"></mat-datepicker-toggle>
+    <mat-datepicker #endDatePicker></mat-datepicker>
+  </mat-form-field>
+
+  <button mat-flat-button (click)="onSubmitHandler()">Generate report</button>
+
 </div>

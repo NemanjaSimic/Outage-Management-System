@@ -1,3 +1,10 @@
 .report {
   margin: 100px 60px;
+  font-family: 'PT Serif', serif;
+  color: white;
+}
+
+.report > .h1 {
+  font-size: 50px;
+  color: white;
 }
