@@ -17,6 +17,7 @@
         public bool IsActive { get; set; }
         public string NominalVoltage { get; set; }
         public bool IsRemote { get; set; }
+        public bool NoReclosing { get; set; }
 
         public List<MeasurementViewModel> Measurements { get; set; }
 
@@ -34,6 +35,7 @@
             && IsActive == other.IsActive
             && NominalVoltage == other.NominalVoltage
             && IsRemote == other.IsRemote
+            && NoReclosing == other.NoReclosing
             && Measurements.Equals(other.Measurements);   
     }
 }

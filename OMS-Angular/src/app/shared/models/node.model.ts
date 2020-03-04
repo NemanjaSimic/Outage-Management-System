@@ -10,6 +10,7 @@ export interface Node {
   NominalVoltage: string;
   IsRemote: Boolean;
   IsActive: Boolean;
+  NoReclosing: Boolean;
 }
 
 export interface IMeasurement {
