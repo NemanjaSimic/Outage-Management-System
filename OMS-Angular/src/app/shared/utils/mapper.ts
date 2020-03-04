@@ -74,7 +74,8 @@ const mapBreakerNode = (node) => {
       deviceType: node.IsRemote ? "remote" : "local",
       isClosed: 
         (node.Measurements[0] != null && node.Measurements[0] != undefined) ? 
-          (node.Measurements[0].Value != 0 ? "closed" : "open") : "open"
+          (node.Measurements[0].Value != 0 ? "closed" : "open") : "open",
+      isRecloser: node.NoReclosing ? "no" : "yes"
   }
 }
 }
