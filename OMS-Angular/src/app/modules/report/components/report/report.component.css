@@ -8,3 +8,13 @@
   font-size: 50px;
   color: white;
 }
+
+.chart-area {
+  text-align: center;
+  height: 600px;
+  margin: 125px 0px;
+}
+
+.chart-area > .chart {
+  display: inline-block;
+}

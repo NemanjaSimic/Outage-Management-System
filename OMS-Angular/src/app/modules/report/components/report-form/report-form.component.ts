@@ -1,4 +1,4 @@
-import { Component, OnInit } from '@angular/core';
+import { Component, OnInit, Output, EventEmitter } from '@angular/core';
 import { FormControl } from '@angular/forms';
 import { Observable } from 'rxjs';
 import { map, startWith } from 'rxjs/operators';
@@ -28,10 +28,11 @@ export class ReportFormComponent implements OnInit {
 
   public selectedReportType;
   public filteredScopes: Observable<any[]>;
-  public selectedScope = this.scopes[0].value;
   public selectedScopeControl = new FormControl();
   public startDate = new FormControl();
   public endDate = new FormControl();
+
+  @Output() generate = new EventEmitter<boolean>();
 
   constructor() { }
 
@@ -51,9 +52,11 @@ export class ReportFormComponent implements OnInit {
 
   onSubmitHandler(): void {
     console.log(this.selectedReportType);
-    console.log(this.selectedScope);
+    console.log(this.selectedScopeControl.value);
     console.log(this.startDate.value);
     console.log(this.endDate.value);
+  
+    this.generate.emit(true);
   }
 
 

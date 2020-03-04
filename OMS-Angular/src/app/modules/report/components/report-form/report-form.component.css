@@ -2,7 +2,8 @@
   background-color: #5c5c5c;
   border: 1px solid black;
   border-radius: 15px;
-  padding: 15px 30px;
+  padding: 15px 0px;
+  text-align: center;
   color:white;
 }
 
@@ -17,6 +18,11 @@
 .form-field {
   padding-right: 50px;
   color: white;
+}
+
+.generate-button {
+  position: relative;
+  left: 0px;
 }
 
 input::placeholder {

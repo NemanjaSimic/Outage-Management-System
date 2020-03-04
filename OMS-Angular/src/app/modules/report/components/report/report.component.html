@@ -3,6 +3,16 @@
     <i class="far fa-chart-bar"></i>
     Report
   </h1>
-  <app-report-form></app-report-form>
-  <app-report-chart></app-report-chart>
+  <app-report-form (generate)="onGenerateHandler($event)"></app-report-form>
+
+  <div class="chart-area">
+    <div *ngIf="hasChartData" class="chart">
+      <app-report-chart>        
+      </app-report-chart>
+    </div>
+    <div *ngIf="!hasChartData" >
+      <h1>No data to show.</h1>
+      <h1>Please generate a report.</h1>
+    </div>
+  </div>
 </div>
