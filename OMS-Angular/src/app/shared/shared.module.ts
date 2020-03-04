@@ -14,6 +14,7 @@ import { MatInputModule } from '@angular/material/input';
 import { MatTableModule } from '@angular/material/table';
 import { MatSelectModule } from '@angular/material/select';
 import { MatDialogModule } from '@angular/material/dialog';
+import { MatMenuModule } from '@angular/material/menu';
 
 import { SplashComponent } from './components/splash/splash.component';
 import { ActiveOutageModalComponent } from './components/active-outage-modal/active-outage-modal.component';
@@ -42,7 +43,8 @@ import { RefreshMenuComponent } from './components/refresh-menu/refresh-menu.com
     MatInputModule,
     MatSelectModule,
     MatTableModule,
-    MatDialogModule
+    MatDialogModule,
+    MatMenuModule,
   ],
   exports: [
     CommonModule,
@@ -59,7 +61,8 @@ import { RefreshMenuComponent } from './components/refresh-menu/refresh-menu.com
     MatInputModule,
     MatSelectModule,
     MatTableModule,
-    MatDialogModule
+    MatDialogModule,
+    MatMenuModule
   ],
   entryComponents: [
     ActiveOutageModalComponent,
