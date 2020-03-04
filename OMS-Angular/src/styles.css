@@ -1,11 +1,8 @@
-/* You can add global styles to this file, and also import other style files */
 body {
   overflow: hidden;
   background-color: #525463;
   color: white;
 }
-mat-dialog-container#modal-component {
-  border: 3px solid #262626;
-  border-radius: 11px;
-  background-color: #1a1a1a;
-}
+
+html, body { height: 100%; }
+body { margin: 0; font-family: Roboto, "Helvetica Neue", sans-serif; }

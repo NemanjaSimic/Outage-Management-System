@@ -90,7 +90,8 @@ namespace Topology
                             NominalVoltage = element.NominalVoltage,
                             Measurements = measurements,
                             IsActive = element.IsActive,
-                            IsRemote = element.IsRemote
+                            IsRemote = element.IsRemote,
+                            NoReclosing = element.NoReclosing
                         };
                         uIModel.AddNode(newUINode);
                     }

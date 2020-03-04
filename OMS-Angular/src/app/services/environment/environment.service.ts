@@ -7,4 +7,5 @@ import { environment } from '@env/environment';
 export class EnvironmentService {
   public serverUrl: string = environment.serverUrl;
   public apiUrl: string = environment.apiUrl; 
+  
 }
