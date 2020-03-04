@@ -1,0 +1,10 @@
+.report-form {
+  background-color: #5c5c5c;
+  border: 1px solid black;
+  border-radius: 15px;
+  padding: 15px 30px;
+}
+
+.report-type {
+  color: white;
+}

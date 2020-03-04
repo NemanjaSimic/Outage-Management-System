@@ -1,10 +1,5 @@
 import { Component, OnInit } from '@angular/core';
 
-interface Food {
-  value: string;
-  viewValue: string;
-}
-
 @Component({
   selector: 'app-report-form',
   templateUrl: './report-form.component.html',
@@ -12,16 +7,15 @@ interface Food {
 })
 export class ReportFormComponent implements OnInit {
   
-  foods: Food[] = [
-    {value: 'steak-0', viewValue: 'Steak'},
-    {value: 'pizza-1', viewValue: 'Pizza'},
-    {value: 'tacos-2', viewValue: 'Tacos'}
+  reportTypes: any[] = [
+    {value: '0', name: 'SAIFI'},
+    {value: '1', name: 'SAIDI'},
+    {value: '2', name: 'Total'}
   ];
 
   constructor() { }
 
   ngOnInit() {
-    console.log(this.foods);
   }
 
 }
