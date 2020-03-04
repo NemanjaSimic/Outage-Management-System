@@ -48,7 +48,6 @@ namespace OutageManagementService.Calling
                             this.outages.Add(currentGid);
                             previousGid = currentGid;
                         }
-                        long id = topologyElement.Id;
                         topologyElement = GetSwitch(topologyElement.FirstEnd);
                         if (topologyElement == null) break;
                         currentGid = topologyElement.Id;
@@ -58,7 +57,6 @@ namespace OutageManagementService.Calling
             catch (Exception ex)
             {
                 Console.WriteLine("Tracing algorithm failed with error: {0}", ex.Message);
-                throw;
             }
 
             foreach (var item in this.outages)
