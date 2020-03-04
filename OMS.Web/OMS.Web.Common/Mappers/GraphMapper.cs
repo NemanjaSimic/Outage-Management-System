@@ -26,6 +26,7 @@
                     IsActive = keyValue.Value.IsActive,
                     DMSType = keyValue.Value.DMSType,
                     IsRemote = keyValue.Value.IsRemote,
+                    NoReclosing = keyValue.Value.NoReclosing,
                     NominalVoltage = keyValue.Value.NominalVoltage.ToString(),
                     Measurements = new List<MeasurementViewModel>()
                 };
