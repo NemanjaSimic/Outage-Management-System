@@ -119,10 +119,18 @@ export const style = cytoscape.stylesheet()
         'height': '60px',
         'width': '60px'
     })
-    .selector('node[dmsType="BREAKER"][isRecloser = "yes"]')
+    .selector('node[dmsType="BREAKER"][isRecloser = "yes"][isClosed = "open"]')
     .style({
         'background-fit': 'cover',
         'background-image': 'assets/img/recloser.png',
+        'background-opacity': '0',
+        'height': '60px',
+        'width': '60px'
+    })
+    .selector('node[dmsType="BREAKER"][isRecloser = "yes"][isClosed = "closed"]')
+    .style({
+        'background-fit': 'cover',
+        'background-image': 'assets/img/recloserOff.png',
         'background-opacity': '0',
         'height': '60px',
         'width': '60px'
