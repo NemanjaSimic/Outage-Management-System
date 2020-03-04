@@ -1,8 +1,10 @@
 import { Component, OnInit, OnDestroy } from '@angular/core';
 
-import { ArchivedOutage } from '@shared/models/outage.model';
+import { ArchivedOutage, OutageLifeCycleState } from '@shared/models/outage.model';
 import { OutageService } from '@services/outage/outage.service';
 import { Subscription } from 'rxjs';
+import { MatDialog } from '@angular/material';
+import { ArchivedOutageModalComponent } from '@shared/components/archived-outage-modal/archived-outage-modal.component';
 
 @Component({
   selector: 'app-archived-browser',
@@ -10,24 +12,50 @@ import { Subscription } from 'rxjs';
   styleUrls: ['./archived-browser.component.css']
 })
 
-export class ArchivedBrowserComponent implements OnInit, OnDestroy {
-  private archivedOutagesSubscription: Subscription;
+export class ArchivedBrowserComponent implements OnInit {
+  public archivedOutagesSubscription: Subscription;
 
-  private archivedOutages: ArchivedOutage[] = [];
-  private columns: string[] = ["id", "elementId", "reportedAt", "archivedAt"];
+  public archivedOutages: ArchivedOutage[] = [];
+  public columns: string[] = ["id", "elementId", "reportedAt", "archivedAt", "actions"];
 
-  constructor(private outageService: OutageService) { }
+  constructor(private outageService: OutageService, private dialog: MatDialog) { }
 
   ngOnInit() {
-    this.archivedOutagesSubscription = this.outageService.getAllArchivedOutages().subscribe(
-      outages => this.archivedOutages = outages,
+
+    const outage: ArchivedOutage = {
+      AffectedConsumers: [],
+      ElementId: 123,
+      FixedAt: new Date(),
+      Id: 213,
+      IsResolveConditionValidated: true,
+      IsolatedAt: new Date(),
+      RepairedAt: new Date(),
+      ReportedAt: new Date(),
+      State: OutageLifeCycleState.Archived,
+      ArchivedAt: new Date()
+    }
+
+    this.archivedOutages.push(outage);
+    this.archivedOutages.push(outage);
+
+    this.getArchivedOutages();
+  }
+
+  private getArchivedOutages(): void {
+    this.outageService.getAllArchivedOutages().subscribe(
+      outages => this.archivedOutages = outages, 
       err => console.log(err)
     );
   }
 
-  ngOnDestroy() {
-    if(!this.archivedOutagesSubscription)
-      this.archivedOutagesSubscription.unsubscribe();
+  showMoreDetails(outage: ArchivedOutage) : void{
+    this.dialog.open(ArchivedOutageModalComponent, {
+       data: outage
+     });
+  }
+
+  public getOutageStateString(state: any) : string {
+    return OutageLifeCycleState[state];
   }
 
 }
