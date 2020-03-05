@@ -139,6 +139,7 @@ export class GraphComponent implements OnInit, OnDestroy {
       outages => {
         console.log(outages);
         this.activeOutages = outages;
+        this.addOutageTooltips();
       },
       err => console.log(err)
     );
