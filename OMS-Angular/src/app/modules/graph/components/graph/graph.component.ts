@@ -3,7 +3,7 @@ import { Subscription } from 'rxjs';
 import { OmsGraph } from '@shared/models/oms-graph.model';
 
 import { drawBackupEdge } from '@shared/utils/backup-edge';
-import { addGraphTooltip, addEdgeTooltip } from '@shared/utils/tooltip';
+import { addGraphTooltip, addEdgeTooltip, addAnalogMeasurementTooltip } from '@shared/utils/tooltip';
 import { drawWarningOnNode, drawWarningOnLine } from '@shared/utils/warning';
 import { drawCallWarning } from '@shared/utils/outage';
 import { addOutageTooltip } from '@modules/graph/outage-lifecycle/tooltip';
@@ -139,6 +139,7 @@ export class GraphComponent implements OnInit, OnDestroy {
       outages => {
         console.log(outages);
         this.activeOutages = outages;
+        this.addOutageTooltips();
       },
       err => console.log(err)
     );
@@ -250,7 +251,9 @@ export class GraphComponent implements OnInit, OnDestroy {
     this.cy.ready(() => {
       this.cy.nodes().forEach(node => {
         node.sendSwitchCommand = (command) => this.onSwitchCommandHandler(command);
-        addGraphTooltip(this.cy, node);
+        if(node.data('type') != "analogMeasurement"){
+          addGraphTooltip(this.cy, node);
+        }
         if (node.data('dmsType') == "ACLINESEGMENT") {
           const connectedEdges = node.connectedEdges();
           if (connectedEdges.length)
@@ -278,7 +281,7 @@ export class GraphComponent implements OnInit, OnDestroy {
             drawMeasurements(this.cy, node, measurementString, color, nodePosition * counter, meas.Id);
             counter++;
             let newNode = this.cy.$id(meas.Id);
-            // addAnalogMeasurementTooltip(this.cy, newNode, meas.AlarmType);
+            addAnalogMeasurementTooltip(this.cy, newNode, meas.AlarmType);
           });
         }
       })
