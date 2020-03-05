@@ -6,6 +6,7 @@ using System;
 using System.Collections.Generic;
 using System.Linq;
 using CalculationEngine.SCADAFunctions;
+using System.Threading;
 
 namespace Topology
 {
@@ -117,11 +118,11 @@ namespace Topology
         private void UpdateLoadFlowFromRecloser(List<ITopology> topologies)
         {
             List<ITopology> retTopologies = topologies;
-            foreach (var recloser in reclosers)
+            foreach (var recloserGid in reclosers)
             {
                 foreach (var topology in topologies)
                 {
-                    if (topology.TopologyElements.ContainsKey(recloser))
+                    if (topology.GetElementByGid(recloserGid, out ITopologyElement recloser))
                     {
                         CalculateLoadFlowFromRecloser(recloser, topology);
                         break;
@@ -129,57 +130,60 @@ namespace Topology
                 }
             }
         }
-        private ITopology CalculateLoadFlowFromRecloser(long recloserGid, ITopology topology)
+        private ITopology CalculateLoadFlowFromRecloser(ITopologyElement element, ITopology topology)
         {
-            if (topology.GetElementByGid(recloserGid, out ITopologyElement element))
+            long measurementGid = 0;
+
+            if (element.Measurements.Count == 1)
             {
-                long measurementGid = 0;
+                measurementGid = element.Measurements.First();
+            }
+            else
+            {
+                logger.LogWarn($"[CalculateLoadFlowFromRecloser] Recloser with GID 0x{element.Id.ToString("X16")} does not have proper measurements.");
+            }
 
-                if (element.Measurements.Count == 1)
+            if (element.FirstEnd != null && element.SecondEnd.Count == 1)
+            {
+                if (element.FirstEnd.IsActive && !element.SecondEnd.First().IsActive)
                 {
-                    measurementGid = element.Measurements.First();
-                }
-                else
-                {
-                    logger.LogWarn($"[CalculateLoadFlowFromRecloser] Recloser with GID 0x{recloserGid.ToString("X16")} does not have proper measurements.");
-                }
-
-                if (element.FirstEnd != null && element.SecondEnd.Count == 1)
-                {
-                    if (element.FirstEnd.IsActive && !element.SecondEnd.First().IsActive)
+                    if (IsElementEnergized(element))
                     {
-                        CalculateLoadFlowUpsideDown(element.SecondEnd.First(), recloserGid);
-                        element.IsActive = true;
-                        scadaCommanding.SendDiscreteCommand(measurementGid, 0, CommandOriginType.CE_COMMAND);
-                    }
-                    else if (!element.FirstEnd.IsActive && element.SecondEnd.First().IsActive)
-                    {
-                        CalculateLoadFlowUpsideDown(element.FirstEnd, recloserGid);
-                        element.IsActive = true;
-                        scadaCommanding.SendDiscreteCommand(measurementGid, 0, CommandOriginType.CE_COMMAND);
+                        CalculateLoadFlowUpsideDown(element.SecondEnd.First(), element.Id);
                     }
                     else
                     {
-                        //TODO: pitati asistente, da li da se prenese na Validate
-                        scadaCommanding.SendDiscreteCommand(measurementGid, 1, CommandOriginType.CE_COMMAND);
-                        element.IsActive = false;
+                        Thread thread = new Thread(() => CommandToRecloser(measurementGid, 0, CommandOriginType.CE_COMMAND, element));
+                        thread.Start();
                     }
+                }
+                else if (!element.FirstEnd.IsActive && element.SecondEnd.First().IsActive)
+                {
+                    if (IsElementEnergized(element))
+                    {
+                        CalculateLoadFlowUpsideDown(element.FirstEnd, element.Id);
+                    }
+                    else
+                    {
+                        Thread thread = new Thread(() => CommandToRecloser(measurementGid, 0, CommandOriginType.CE_COMMAND, element));
+                        thread.Start();
+                    }              
                 }
                 else
                 {
-                    logger.LogDebug($"[CalculateLoadFlowFromRecloser] Recloser with GID 0x{recloserGid.ToString("X16")} does not have both ends, or have more than one on one end.");
+                    //TODO: pitati asistente, da li da se prenese na Validate
+                    scadaCommanding.SendDiscreteCommand(measurementGid, 1, CommandOriginType.CE_COMMAND);
+                    element.IsActive = false;
                 }
             }
             else
             {
-                logger.LogDebug($"[CalculateLoadFlowFromRecloser] Recloser with GID 0x{recloserGid.ToString("X16")} does not exist in topology.");
+                logger.LogDebug($"[CalculateLoadFlowFromRecloser] Recloser with GID 0x{element.Id.ToString("X16")} does not have both ends, or have more than one on one end.");
             }
             return topology;
         }
         private void CalculateLoadFlowUpsideDown(ITopologyElement element, long sourceElementGid)
         {
-            element.IsActive = true;
-
             Stack<Tuple<ITopologyElement, long>> stack = new Stack<Tuple<ITopologyElement, long>>();
             stack.Push(new Tuple<ITopologyElement, long>(element, sourceElementGid));
             
@@ -227,34 +231,12 @@ namespace Topology
                     }
                 }     
             }
-        }
-        private void DeEnergizeElementsFromRecloser(ITopologyElement element, long sourceElementGid)
+        }     
+        private void CommandToRecloser(long measurementGid, int value, CommandOriginType originType, ITopologyElement recloser)
         {
-            Stack<ITopologyElement> stack = new Stack<ITopologyElement>();
-            stack.Push(element);
-            ITopologyElement nextElement;
-
-            while (stack.Count > 0)
-            {
-                nextElement = stack.Pop();
-                nextElement.IsActive = false;
-
-                if (nextElement is Field field)
-                {
-                    foreach (var member in field.Members)
-                    {
-                        member.IsActive = false;
-                    }
-                }
-
-                foreach (var child in nextElement.SecondEnd)
-                {
-                    if (!reclosers.Contains(child.Id) || child.Id != sourceElementGid)
-                    {
-                        stack.Push(child);
-                    }
-                }
-            }
+            Thread.Sleep(5000);
+            recloser.IsActive = true;
+            scadaCommanding.SendDiscreteCommand(measurementGid, value, originType);
         }
         #endregion
     }
