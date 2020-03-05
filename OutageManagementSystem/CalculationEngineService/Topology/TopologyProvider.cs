@@ -1,5 +1,6 @@
 ﻿using CECommon;
 using CECommon.Interfaces;
+using CECommon.Models;
 using CECommon.Providers;
 using Outage.Common;
 using System;
@@ -80,6 +81,26 @@ namespace Topology
                 }
             }
             return isRemote;
+        }
+        //Veruj developeru na rec da je recloser, umoran sam
+        public void ResetRecloser(long recloserGid)
+        {
+            try
+            {
+                foreach (var topology in Topology)
+                {
+                    if (topology.GetElementByGid(recloserGid, out ITopologyElement recloser))
+                    {
+                        ((Recloser)recloser).NumberOfTry = 0;
+                        break;
+                    }
+                }
+            }
+            catch (Exception)
+            {
+
+                throw;
+            }
         }
 
         #region Distributed Transaction

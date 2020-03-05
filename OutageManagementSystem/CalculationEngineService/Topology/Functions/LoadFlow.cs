@@ -7,6 +7,7 @@ using System.Collections.Generic;
 using System.Linq;
 using CalculationEngine.SCADAFunctions;
 using System.Threading;
+using CECommon.Models;
 
 namespace Topology
 {
@@ -235,8 +236,11 @@ namespace Topology
         private void CommandToRecloser(long measurementGid, int value, CommandOriginType originType, ITopologyElement recloser)
         {
             Thread.Sleep(5000);
-            recloser.IsActive = true;
-            scadaCommanding.SendDiscreteCommand(measurementGid, value, originType);
+            if (!((Recloser)recloser).IsReachedMaximumOfTries())
+            {
+                scadaCommanding.SendDiscreteCommand(measurementGid, value, originType);
+                ((Recloser)recloser).NumberOfTry++;
+            }
         }
         #endregion
     }

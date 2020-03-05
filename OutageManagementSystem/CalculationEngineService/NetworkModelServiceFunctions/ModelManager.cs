@@ -1,6 +1,7 @@
 ﻿using CECommon;
 using CECommon.Interfaces;
 using CECommon.Model;
+using CECommon.Models;
 using CECommon.Providers;
 using Outage.Common;
 using Outage.Common.GDA;
@@ -291,6 +292,10 @@ namespace NetworkModelServiceFunctions
 				if (rs.ContainsProperty(ModelCode.BREAKER_NORECLOSING))
 				{
 					topologyElement.NoReclosing = rs.GetProperty(ModelCode.BREAKER_NORECLOSING).AsBool();
+					if (!topologyElement.NoReclosing)
+					{
+						topologyElement = new Recloser(topologyElement);
+					}
 				}
 				else
 				{

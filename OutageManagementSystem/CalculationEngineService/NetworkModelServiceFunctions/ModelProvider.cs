@@ -1,4 +1,5 @@
 ﻿using CECommon.Interfaces;
+using CECommon.Models;
 using Outage.Common;
 using System;
 using System.Collections.Generic;
@@ -81,6 +82,10 @@ namespace CECommon.Providers
             {
                 return transactionEnergySources;
             }
+        }
+        public bool IsRecloser(long recloserGid)
+        {
+            return reclosers.Contains(recloserGid);
         }
 
         #region Distributed Transaction

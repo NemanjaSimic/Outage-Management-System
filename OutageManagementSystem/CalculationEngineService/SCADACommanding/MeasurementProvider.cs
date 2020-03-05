@@ -89,7 +89,7 @@ namespace CalculationEngine.SCADAFunctions
 				UpdateAnalogMeasurement(gid, (float)measurementData.Value, measurementData.CommandOrigin);
 			}
 		}
-		public bool UpdateDiscreteMeasurement(long measurementGid, int value, CommandOriginType commandOrigin)
+		private bool UpdateDiscreteMeasurement(long measurementGid, int value, CommandOriginType commandOrigin)
 		{
 			bool success = true;
 			if (discreteMeasurements.TryGetValue(measurementGid, out DiscreteMeasurement measurement))
@@ -128,6 +128,13 @@ namespace CalculationEngine.SCADAFunctions
 			{
 				logger.LogWarn($"Failed to update discrete measurement with GID 0x{measurementGid.ToString("X16")}. There is no such a measurement.");
 				success = false;
+			}
+
+			if (measurementToElementMap.TryGetValue(measurementGid, out long recloserGid) 
+				&& Provider.Instance.ModelProvider.IsRecloser(recloserGid)
+				&& commandOrigin != CommandOriginType.CE_COMMAND)
+			{
+				Provider.Instance.TopologyProvider.ResetRecloser(recloserGid);
 			}
 			return success;
 		}
@@ -180,7 +187,6 @@ namespace CalculationEngine.SCADAFunctions
 			}
 			return success;
 		}
-
 		public void AddMeasurementElementPair(long measurementId, long elementId)
 		{
 			if (measurementToElementMap.ContainsKey(measurementId))
