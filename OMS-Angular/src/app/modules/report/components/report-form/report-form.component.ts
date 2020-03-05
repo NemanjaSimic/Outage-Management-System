@@ -2,6 +2,7 @@ import { Component, OnInit, Output, EventEmitter } from '@angular/core';
 import { FormControl } from '@angular/forms';
 import { Observable } from 'rxjs';
 import { map, startWith } from 'rxjs/operators';
+import { SnackbarService } from '@services/notification/snackbar.service';
 
 @Component({
   selector: 'app-report-form',
@@ -34,7 +35,7 @@ export class ReportFormComponent implements OnInit {
 
   @Output() generate = new EventEmitter<boolean>();
 
-  constructor() { }
+  constructor(private snackBar: SnackbarService) { }
 
   ngOnInit() {
     this.filteredScopes = this.selectedScopeControl.valueChanges
@@ -57,6 +58,7 @@ export class ReportFormComponent implements OnInit {
     console.log(this.endDate.value);
   
     this.generate.emit(true);
+    this.snackBar.notify('Generating report');
   }
 
 
