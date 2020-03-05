@@ -29,11 +29,11 @@
                 RepairedAt = outage.RepairedTime,
                 ElementId = outage.OutageElementGid,
                 IsResolveConditionValidated = outage.IsResolveConditionValidated,
-                DefaultIsolationPoints = outage.DefaultIsolationPoints.Select(o => o.EquipmentId),
-                OptimalIsolationPoints = outage.OptimumIsolationPoints.Select(o => o.EquipmentId),
+                //DefaultIsolationPoints = outage.DefaultIsolationPoints.Select(o => o.EquipmentId),
+                //OptimalIsolationPoints = outage.OptimumIsolationPoints.Select(o => o.EquipmentId),
                 //TODO: uncomment when using EquipmentViewModel
-                //DefaultIsolationPoints = _equipmentMapper.MapEquipments(outage.DefaultIsolationPoints),
-                //OptimalIsolationPoints = _equipmentMapper.MapEquipments(outage.OptimumIsolationPoints),
+                DefaultIsolationPoints = _equipmentMapper.MapEquipments(outage.DefaultIsolationPoints),
+                OptimalIsolationPoints = _equipmentMapper.MapEquipments(outage.OptimumIsolationPoints),
                 AffectedConsumers = _consumerMapper.MapConsumers(outage.AffectedConsumers),
             };
 
@@ -49,11 +49,11 @@
                 RepairedAt = outage.RepairedTime,
                 ArchivedAt = outage.ArchivedTime,
                 ElementId = outage.OutageElementGid,
-                DefaultIsolationPoints = outage.DefaultIsolationPoints.Select(o => o.EquipmentId),
-                OptimalIsolationPoints = outage.OptimumIsolationPoints.Select(o => o.EquipmentId),
+                //DefaultIsolationPoints = outage.DefaultIsolationPoints.Select(o => o.EquipmentId),
+                //OptimalIsolationPoints = outage.OptimumIsolationPoints.Select(o => o.EquipmentId),
                 //TODO: uncomment when using EquipmentViewModel
-                //DefaultIsolationPoints = _equipmentMapper.MapEquipments(outage.DefaultIsolationPoints),
-                //OptimalIsolationPoints = _equipmentMapper.MapEquipments(outage.OptimumIsolationPoints),
+                DefaultIsolationPoints = _equipmentMapper.MapEquipments(outage.DefaultIsolationPoints),
+                OptimalIsolationPoints = _equipmentMapper.MapEquipments(outage.OptimumIsolationPoints),
                 AffectedConsumers = _consumerMapper.MapConsumers(outage.AffectedConsumers),
             };
 

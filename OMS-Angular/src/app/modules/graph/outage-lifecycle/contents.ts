@@ -11,7 +11,7 @@ const separator = ', ';
 export const generateCreatedOutageTemplate = (outage: ActiveOutage) => {
     return createdOutageTooltipContent
         .replace("[[id]]", outage.Id.toString())
-        .replace("[[defaultIsolationPoints]]", "0x" + (outage.DefaultIsolationPoints.map(point => point.toString(16))).join(separator))
+        .replace("[[defaultIsolationPoints]]", outage.DefaultIsolationPoints.map(point => `0x${point.Mrid} (${point.Id.toString(16)})`).join(separator))
         .replace("[[affectedConsumers]]", outage.AffectedConsumers.length.toString())
         // .replace("[[affectedConsumers]]", outage.AffectedConsumers.map(aff => aff.Id).join(separator))
         .replace("[[state]]", OutageLifeCycleState[outage.State])
@@ -21,9 +21,9 @@ export const generateCreatedOutageTemplate = (outage: ActiveOutage) => {
 export const generateIsolatedOutageTemplate = (outage: ActiveOutage) => {
     return isolatedOutageTooltipContent
         .replace("[[id]]", outage.Id.toString())
-        .replace("[[elementId]]", "0x" + outage.ElementId.toString(16))
-        .replace("[[defaultIsolationPoints]]", "0x" + (outage.DefaultIsolationPoints.map(point => point.toString(16))).join(separator))
-        .replace("[[optimalIsolationPoints]]", "0x" + (outage.OptimalIsolationPoints.map(point => point.toString(16))).join(separator))
+        .replace("[[elementId]]", `0x${outage.ElementId.toString(16)}`)
+        .replace("[[defaultIsolationPoints]]", outage.DefaultIsolationPoints.map(point => `0x${point.Mrid} (${point.Id.toString(16)})`).join(separator))
+        .replace("[[optimalIsolationPoints]]", outage.OptimalIsolationPoints.map(point => `0x${point.Mrid} (${point.Id.toString(16)})`).join(separator))
         .replace("[[affectedConsumers]]", outage.AffectedConsumers.length.toString())
         // .replace("[[affectedConsumers]]", outage.AffectedConsumers.map(aff => aff.Id).join(separator))
         .replace("[[state]]", OutageLifeCycleState[outage.State])
@@ -33,9 +33,9 @@ export const generateIsolatedOutageTemplate = (outage: ActiveOutage) => {
 export const generateRepairCrewOutageTemplate = (outage: ActiveOutage) => {
     return sendRepairCrewTooltipOutage
         .replace("[[id]]", outage.Id.toString())
-        .replace("[[elementId]]", "0x" + outage.ElementId.toString(16))
-        .replace("[[defaultIsolationPoints]]", "0x" + (outage.DefaultIsolationPoints.map(point => point.toString(16))).join(separator))
-        .replace("[[optimalIsolationPoints]]", "0x" + (outage.OptimalIsolationPoints.map(point => point.toString(16))).join(separator))
+        .replace("[[elementId]]", `0x${outage.ElementId.toString(16)}`)
+        .replace("[[defaultIsolationPoints]]", outage.DefaultIsolationPoints.map(point => `0x${point.Mrid} (${point.Id.toString(16)})`).join(separator))
+        .replace("[[optimalIsolationPoints]]", outage.OptimalIsolationPoints.map(point => `0x${point.Mrid} (${point.Id.toString(16)})`).join(separator))
         .replace("[[affectedConsumers]]", outage.AffectedConsumers.length.toString())
         // .replace("[[affectedConsumers]]", outage.AffectedConsumers.map(aff => aff.Id).join(separator))
         .replace("[[state]]", OutageLifeCycleState[outage.State])
