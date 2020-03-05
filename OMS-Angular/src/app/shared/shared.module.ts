@@ -18,7 +18,7 @@ import { MatDialogModule } from '@angular/material/dialog';
 import { MatMenuModule } from '@angular/material/menu';
 import { MatAutocompleteModule } from '@angular/material/autocomplete';
 import { MatDatepickerModule } from '@angular/material/datepicker';
-
+import { MatSnackBarModule } from '@angular/material/snack-bar';
 
 import { SplashComponent } from './components/splash/splash.component';
 import { ActiveOutageModalComponent } from './components/active-outage-modal/active-outage-modal.component';
@@ -51,7 +51,8 @@ import { RefreshMenuComponent } from './components/refresh-menu/refresh-menu.com
     MatDialogModule,
     MatMenuModule,
     MatAutocompleteModule,
-    MatDatepickerModule
+    MatDatepickerModule,
+    MatSnackBarModule
   ],
   exports: [
     CommonModule,
@@ -72,7 +73,8 @@ import { RefreshMenuComponent } from './components/refresh-menu/refresh-menu.com
     MatDialogModule,
     MatMenuModule,
     MatAutocompleteModule,
-    MatDatepickerModule
+    MatDatepickerModule,
+    MatSnackBarModule
   ],
   entryComponents: [
     ActiveOutageModalComponent,
