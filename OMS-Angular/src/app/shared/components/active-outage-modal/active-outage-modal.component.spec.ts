@@ -1,20 +1,20 @@
 import { async, ComponentFixture, TestBed } from '@angular/core/testing';
 
-import { ModalComponent } from './modal.component';
+import { ActiveOutageModalComponent } from './active-outage-modal.component';
 
-describe('ModalComponent', () => {
-  let component: ModalComponent;
-  let fixture: ComponentFixture<ModalComponent>;
+describe('ActiveOutageModalComponent', () => {
+  let component: ActiveOutageModalComponent;
+  let fixture: ComponentFixture<ActiveOutageModalComponent>;
 
   beforeEach(async(() => {
     TestBed.configureTestingModule({
-      declarations: [ ModalComponent ]
+      declarations: [ ActiveOutageModalComponent ]
     })
     .compileComponents();
   }));
 
   beforeEach(() => {
-    fixture = TestBed.createComponent(ModalComponent);
+    fixture = TestBed.createComponent(ActiveOutageModalComponent);
     component = fixture.componentInstance;
     fixture.detectChanges();
   });

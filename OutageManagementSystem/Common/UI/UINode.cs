@@ -25,6 +25,8 @@ namespace Outage.Common.UI
         public string DMSType { get; set; }
         [DataMember]
         public bool IsRemote { get; set; }
+        [DataMember]
+        public bool NoReclosing { get; set; }
         public UINode(){}
     }
 }
