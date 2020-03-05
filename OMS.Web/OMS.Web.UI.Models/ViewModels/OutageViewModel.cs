@@ -12,13 +12,16 @@
         public long ElementId { get; set; }
         public IEnumerable<long> DefaultIsolationPoints { get; set; }
         public IEnumerable<long> OptimalIsolationPoints { get; set; }
+        //TODO: uncomment when using EquipmentViewModel
+        //public IEnumerable<EquipmentViewModel> DefaultIsolationPoints { get; set; }
+        //public IEnumerable<EquipmentViewModel> OptimalIsolationPoints { get; set; }
         public IEnumerable<ConsumerViewModel> AffectedConsumers { get; set; }
 
         public OutageViewModel()
         {
-            AffectedConsumers = new List<ConsumerViewModel>();
             DefaultIsolationPoints = new List<long>();
             OptimalIsolationPoints = new List<long>();
+            AffectedConsumers = new List<ConsumerViewModel>();
         }
     }
 }

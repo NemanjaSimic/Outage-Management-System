@@ -11,10 +11,12 @@
     public class OutageMapper : IOutageMapper
     {
         private IConsumerMapper _consumerMapper;
+        private IEquipmentMapper _equipmentMapper;
 
-        public OutageMapper(IConsumerMapper consumerMapper)
+        public OutageMapper(IConsumerMapper consumerMapper, IEquipmentMapper equipmentMapper)
         {
             _consumerMapper = consumerMapper;
+            _equipmentMapper = equipmentMapper;
         }
 
         public ActiveOutageViewModel MapActiveOutage(ActiveOutageMessage outage)
@@ -26,10 +28,13 @@
                 IsolatedAt = outage.IsolatedTime,
                 RepairedAt = outage.RepairedTime,
                 ElementId = outage.OutageElementGid,
-                DefaultIsolationPoints = outage.DefaultIsolationPoints.Select(e => e.EquipmentId),
-                AffectedConsumers = _consumerMapper.MapConsumers(outage.AffectedConsumers),
-                OptimalIsolationPoints = outage.OptimumIsolationPoints.Select(e => e.EquipmentId),
                 IsResolveConditionValidated = outage.IsResolveConditionValidated,
+                DefaultIsolationPoints = outage.DefaultIsolationPoints.Select(o => o.EquipmentId),
+                OptimalIsolationPoints = outage.OptimumIsolationPoints.Select(o => o.EquipmentId),
+                //TODO: uncomment when using EquipmentViewModel
+                //DefaultIsolationPoints = _equipmentMapper.MapEquipments(outage.DefaultIsolationPoints),
+                //OptimalIsolationPoints = _equipmentMapper.MapEquipments(outage.OptimumIsolationPoints),
+                AffectedConsumers = _consumerMapper.MapConsumers(outage.AffectedConsumers),
             };
 
         public IEnumerable<ActiveOutageViewModel> MapActiveOutages(IEnumerable<ActiveOutageMessage> outages)
@@ -44,9 +49,12 @@
                 RepairedAt = outage.RepairedTime,
                 ArchivedAt = outage.ArchiveTime,
                 ElementId = outage.OutageElementGid,
-                DefaultIsolationPoints = outage.DefaultIsolationPoints.Select(e => e.EquipmentId),
+                DefaultIsolationPoints = outage.DefaultIsolationPoints.Select(o => o.EquipmentId),
+                OptimalIsolationPoints = outage.OptimumIsolationPoints.Select(o => o.EquipmentId),
+                //TODO: uncomment when using EquipmentViewModel
+                //DefaultIsolationPoints = _equipmentMapper.MapEquipments(outage.DefaultIsolationPoints),
+                //OptimalIsolationPoints = _equipmentMapper.MapEquipments(outage.OptimumIsolationPoints),
                 AffectedConsumers = _consumerMapper.MapConsumers(outage.AffectedConsumers),
-                OptimalIsolationPoints = outage.OptimumIsolationPoints.Select(e => e.EquipmentId),
             };
 
         public IEnumerable<ArchivedOutageViewModel> MapArchivedOutages(IEnumerable<ArchivedOutageMessage> outages)
