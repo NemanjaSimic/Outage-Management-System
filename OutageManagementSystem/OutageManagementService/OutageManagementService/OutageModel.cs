@@ -1177,7 +1177,7 @@ namespace OutageManagementService
                     {
                         IOutageTopologyElement topologyElement = TopologyModel.OutageTopology[currentNode];
 
-                        if (topologyElement.SecondEnd.Count == 0 && topologyElement.DmsType == "ENERGYCONSUMER")
+                        if (topologyElement.SecondEnd.Count == 0 && topologyElement.DmsType == "ENERGYCONSUMER" /*&& !topologyElement.IsActive*/)
                         {
                             affectedConsumers.Add(currentNode);
                         }

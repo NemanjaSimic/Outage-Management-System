@@ -32,6 +32,7 @@ namespace OutageDatabase.Initializers
             dbContext.ActiveOutageRepository.RemoveAll();
             dbContext.ArchivedOutageRepository.RemoveAll();
             dbContext.ConsumerRepository.RemoveAll();
+            dbContext.EquipmentRepository.RemoveAll();
 
             
             ArchivedOutage archivedOutage;

@@ -147,7 +147,7 @@ namespace Topology
                         }
                     }
 
-                    if (!outageTopologyModel.GetElementByGid(nextElement, out var _))
+                    if (!outageTopologyModel.GetElementByGid(element.Id, out var _))
                     {
                         outageTopologyModel.AddElement(
                             new OutageTopologyElement(element.Id)
