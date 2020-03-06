@@ -8,6 +8,7 @@ using System.Data.Entity;
 using System;
 using OMSCommon.OutageDatabaseModel;
 using OMSCommon.Mappers;
+using OutageDatabase.Repository;
 
 namespace OutageManagementService.Outage
 {
@@ -29,9 +30,9 @@ namespace OutageManagementService.Outage
 
             List<ActiveOutageMessage> activeOutages = new List<ActiveOutageMessage>();
 
-            using (OutageContext db = new OutageContext())
+            using (UnitOfWork db = new UnitOfWork())
             {
-                activeOutages.AddRange(mapper.MapActiveOutages(db.ActiveOutages.Include(a => a.AffectedConsumers)));
+                activeOutages.AddRange(mapper.MapOutageEntitiesToActive(db.OutageRepository.GetAllActive()));
             }
 
             return activeOutages;
@@ -43,9 +44,9 @@ namespace OutageManagementService.Outage
 
             List<ArchivedOutageMessage> archivedOutages = new List<ArchivedOutageMessage>();
 
-            using (OutageContext db = new OutageContext())
+            using (UnitOfWork db = new UnitOfWork())
             {
-                archivedOutages.AddRange(mapper.MapArchivedOutages(db.ArchivedOutages.Include(a => a.AffectedConsumers)));
+                archivedOutages.AddRange(mapper.MapOutageEntitiesToArchived(db.OutageRepository.GetAllArchived()));
             }
 
             return archivedOutages;

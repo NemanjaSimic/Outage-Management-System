@@ -7,13 +7,13 @@ namespace OutageDatabase.Migrations
     using System.Resources;
     
     [GeneratedCode("EntityFramework.Migrations", "6.4.0")]
-    public sealed partial class Addequipmententity : IMigrationMetadata
+    public sealed partial class MergeActiveOutageandArchivedOutageintoOutageEntity : IMigrationMetadata
     {
-        private readonly ResourceManager Resources = new ResourceManager(typeof(Addequipmententity));
+        private readonly ResourceManager Resources = new ResourceManager(typeof(MergeActiveOutageandArchivedOutageintoOutageEntity));
         
         string IMigrationMetadata.Id
         {
-            get { return "202003041419187_Add equipment entity"; }
+            get { return "202003061017231_Merge ActiveOutage and ArchivedOutage into OutageEntity"; }
         }
         
         string IMigrationMetadata.Source

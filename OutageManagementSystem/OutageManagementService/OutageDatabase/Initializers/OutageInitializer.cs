@@ -29,34 +29,62 @@ namespace OutageDatabase.Initializers
 
             UnitOfWork dbContext = new UnitOfWork(outageContext);
 
-            dbContext.ActiveOutageRepository.RemoveAll();
-            dbContext.ArchivedOutageRepository.RemoveAll();
+            dbContext.OutageRepository.RemoveAll();
             dbContext.ConsumerRepository.RemoveAll();
             dbContext.EquipmentRepository.RemoveAll();
 
-            
-            ArchivedOutage archivedOutage;
-
             long archivedId = 1;
-            archivedOutage = dbContext.ArchivedOutageRepository.Get(archivedId);
+            OutageEntity archivedOutage = dbContext.OutageRepository.Get(archivedId);
 
             if (archivedOutage == null)
             {
-                archivedOutage = new ArchivedOutage()
+                archivedOutage = new OutageEntity()
                 {
                     OutageId = archivedId,
-                    OutageElementGid = 0x0000000a00000007,
+                    OutageState = OutageState.ARCHIVED,
+                    OutageElementGid = 0x0000000C00000007,
+                    IsResolveConditionValidated = true,
                     ReportTime = DateTime.UtcNow,
                     IsolatedTime = DateTime.UtcNow,
                     RepairedTime = DateTime.UtcNow,
-                    ArchiveTime = DateTime.UtcNow,
+                    ArchivedTime = DateTime.UtcNow,
                     DefaultIsolationPoints = new List<Equipment>(),
                     OptimumIsolationPoints = new List<Equipment>(),
                     AffectedConsumers = new List<Consumer>(),
                 };
 
-                archivedOutage = dbContext.ArchivedOutageRepository.Add(archivedOutage);
+                archivedOutage = dbContext.OutageRepository.Add(archivedOutage);
             }
+
+            //long defaultIsolationId = 0x0000000a00000001;
+            //Equipment defaultIsolation = dbContext.EquipmentRepository.Get(defaultIsolationId);
+
+            //if (defaultIsolation == null)
+            //{
+            //    defaultIsolation = new Equipment()
+            //    {
+            //        EquipmentId = defaultIsolationId,
+            //        EquipmentMRID = "BR_NESTO",
+            //        OutagesAsDefaultIsolation = new List<OutageEntity>() { archivedOutage },
+            //    };
+
+            //    defaultIsolation = dbContext.EquipmentRepository.Add(defaultIsolation);
+            //}
+
+            //long optimumIsolationId = 0x0000000a00000002;
+            //Equipment optimumIsolation = dbContext.EquipmentRepository.Get(optimumIsolationId);
+
+            //if (optimumIsolation == null)
+            //{
+            //    optimumIsolation = new Equipment()
+            //    {
+            //        EquipmentId = defaultIsolationId,
+            //        EquipmentMRID = "BR_NESTO",
+            //        OutagesAsOptimumIsolation = new List<OutageEntity>() { archivedOutage },
+            //    };
+
+            //    optimumIsolation = dbContext.EquipmentRepository.Add(defaultIsolation);
+            //}
 
             try
             {

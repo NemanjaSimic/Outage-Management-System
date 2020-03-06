@@ -1,7 +1,6 @@
 ﻿using OMSCommon.OutageDatabaseModel;
 using OutageDatabase.Initializers;
 using System.Data.Entity;
-using System.Linq;
 
 namespace OutageDatabase
 {
@@ -12,9 +11,42 @@ namespace OutageDatabase
             Database.SetInitializer(new OutageInitializer());
         }
 
-        public DbSet<ActiveOutage> ActiveOutages { get; set; }
-        public DbSet<ArchivedOutage> ArchivedOutages { get; set; }
+        public DbSet<OutageEntity> OutageEntities { get; set; }
         public DbSet<Consumer> Consumers { get; set; }
-        public DbSet<Equipment> Equipment { get; set; }
+        public DbSet<Equipment> Equipments { get; set; }
+
+        protected override void OnModelCreating(DbModelBuilder modelBuilder)
+        {
+            modelBuilder.Entity<OutageEntity>().HasKey(o => o.OutageId).ToTable("OutageEntities");
+            modelBuilder.Entity<Consumer>().HasKey(c => c.ConsumerId).ToTable("Consumers");
+            modelBuilder.Entity<Equipment>().HasKey(e => e.EquipmentId).ToTable("Equipments");
+
+            modelBuilder.Entity<OutageEntity>().HasMany(o => o.AffectedConsumers)
+                                               .WithMany(c => c.Outages)
+                                               .Map(oc =>
+                                               {
+                                                   oc.MapLeftKey("OutageRefId");
+                                                   oc.MapRightKey("ConsumerRefId");
+                                                   oc.ToTable("OutageConsumers");
+                                               });
+
+            modelBuilder.Entity<OutageEntity>().HasMany(o => o.DefaultIsolationPoints)
+                                               .WithMany(e => e.OutagesAsDefaultIsolation)
+                                               .Map(oe =>
+                                               {
+                                                   oe.MapLeftKey("OutageRefId");
+                                                   oe.MapRightKey("DefaultEquipmentRefId");
+                                                   oe.ToTable("OutageDefaultEquipments");
+                                               });
+
+            modelBuilder.Entity<OutageEntity>().HasMany(o => o.OptimumIsolationPoints)
+                                               .WithMany(e => e.OutagesAsOptimumIsolation)
+                                               .Map(oe =>
+                                               {
+                                                   oe.MapLeftKey("OutageRefId");
+                                                   oe.MapRightKey("OptimumEquipmentRefId");
+                                                   oe.ToTable("OutageOptimumEquipments");
+                                               });
+        }
     }
 }

@@ -39,7 +39,7 @@ namespace Outage.Common.PubSub.OutageDataContract
         public long OutageId { get; set; }
 
         [DataMember]
-        public ActiveOutageState OutageState { get; set; }
+        public OutageState OutageState { get; set; }
 
         [DataMember]
         public bool IsResolveConditionValidated { get; set; }
@@ -57,7 +57,7 @@ namespace Outage.Common.PubSub.OutageDataContract
         public long OutageId { get; set; }
 
         [DataMember]
-        public DateTime ArchiveTime { get; set; }
+        public DateTime ArchivedTime { get; set; }
 
         public ArchivedOutageMessage()
             : base()

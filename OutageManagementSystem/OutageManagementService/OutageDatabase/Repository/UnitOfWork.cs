@@ -8,8 +8,7 @@ namespace OutageDatabase.Repository
     {
         private readonly OutageContext context;
 
-        public ActiveOutageRepository ActiveOutageRepository { get; set; }
-        public ArchivedOutageRepository ArchivedOutageRepository { get; set; }
+        public OutageRepository OutageRepository { get; set; }
         public ConsumerRepository ConsumerRepository { get; set; }
         public EquipmentRepository EquipmentRepository { get; set; }
 
@@ -17,8 +16,7 @@ namespace OutageDatabase.Repository
         {
             context = new OutageContext();
 
-            ActiveOutageRepository = new ActiveOutageRepository(context);
-            ArchivedOutageRepository = new ArchivedOutageRepository(context);
+            OutageRepository = new OutageRepository(context);
             ConsumerRepository = new ConsumerRepository(context);
             EquipmentRepository = new EquipmentRepository(context);
         }
@@ -27,8 +25,7 @@ namespace OutageDatabase.Repository
         {
             this.context = context;
 
-            ActiveOutageRepository = new ActiveOutageRepository(context);
-            ArchivedOutageRepository = new ArchivedOutageRepository(context);
+            OutageRepository = new OutageRepository(context);
             ConsumerRepository = new ConsumerRepository(context);
             EquipmentRepository = new EquipmentRepository(context);
         }

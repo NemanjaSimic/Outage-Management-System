@@ -15,16 +15,16 @@ namespace OutageDatabase.Repository
 
         public override Equipment Get(long id)
         {
-            return context.Set<Equipment>().Include(e => e.ActiveOutages)
-                                          .Include(e => e.ArchivedOutages)
-                                          .Where(e => e.EquipmentId == id)
-                                          .FirstOrDefault();
+            return context.Set<Equipment>().Include(e => e.OutagesAsDefaultIsolation)
+                                           .Include(e => e.OutagesAsOptimumIsolation)
+                                           .Where(e => e.EquipmentId == id)
+                                           .FirstOrDefault();
         }
 
         public override IEnumerable<Equipment> GetAll()
         {
-            return context.Set<Equipment>().Include(c => c.ActiveOutages)
-                                          .Include(c => c.ArchivedOutages);
+            return context.Set<Equipment>().Include(c => c.OutagesAsDefaultIsolation)
+                                           .Include(e => e.OutagesAsOptimumIsolation);
         }
     }
 }

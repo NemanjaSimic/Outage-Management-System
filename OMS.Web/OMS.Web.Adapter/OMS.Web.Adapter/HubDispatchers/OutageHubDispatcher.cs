@@ -51,7 +51,7 @@ namespace OMS.Web.Adapter.HubDispatchers
 
         public void NotifyArchiveOutageUpdate(ArchivedOutageMessage archivedOutage)
         {
-            Console.WriteLine($"Sending archived outage update to Outage Hub. ArchivedOutage[ID: {archivedOutage.OutageId}, ElementGid: {archivedOutage.OutageElementGid}, ArchivedAt: {archivedOutage.ArchiveTime}]");
+            Console.WriteLine($"Sending archived outage update to Outage Hub. ArchivedOutage[ID: {archivedOutage.OutageId}, ElementGid: {archivedOutage.OutageElementGid}, ArchivedAt: {archivedOutage.ArchivedTime}]");
             _proxy.Invoke<string>("NotifyArchiveOutageUpdate", _mapper.MapArchivedOutage(archivedOutage)).Wait();
         }
 

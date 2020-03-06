@@ -47,7 +47,7 @@
                 ReportedAt = outage.ReportTime,
                 IsolatedAt = outage.IsolatedTime,
                 RepairedAt = outage.RepairedTime,
-                ArchivedAt = outage.ArchiveTime,
+                ArchivedAt = outage.ArchivedTime,
                 ElementId = outage.OutageElementGid,
                 DefaultIsolationPoints = outage.DefaultIsolationPoints.Select(o => o.EquipmentId),
                 OptimalIsolationPoints = outage.OptimumIsolationPoints.Select(o => o.EquipmentId),
@@ -60,15 +60,15 @@
         public IEnumerable<ArchivedOutageViewModel> MapArchivedOutages(IEnumerable<ArchivedOutageMessage> outages)
             => outages.Select(o => MapArchivedOutage(o));
 
-        public ActiveOutageLifecycleState MapActiveOutageState(ActiveOutageState activeOutageState)
+        public ActiveOutageLifecycleState MapActiveOutageState(OutageState activeOutageState)
         {
             switch(activeOutageState)
             {
-                case ActiveOutageState.CREATED:
+                case OutageState.CREATED:
                     return ActiveOutageLifecycleState.Created;
-                case ActiveOutageState.ISOLATED:
+                case OutageState.ISOLATED:
                     return ActiveOutageLifecycleState.Isolated;
-                case ActiveOutageState.REPAIRED:
+                case OutageState.REPAIRED:
                     return ActiveOutageLifecycleState.Repaired;
                 default:
                     throw new ArgumentException("Unsupported enum type. ActiveOutageState required.");
