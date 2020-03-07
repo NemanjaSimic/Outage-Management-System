@@ -1,4 +1,5 @@
 import { Consumer } from './consumer.model';
+import { EquipmentViewModel } from './equipment.view-model';
 
 export interface Outage {
     Id: Number;
@@ -13,8 +14,10 @@ export interface Outage {
 }
 
 export interface ActiveOutage extends Outage {
-    DefaultIsolationPoints: Number[];
-    OptimalIsolationPoints: Number[];
+    // DefaultIsolationPoints: Number[];
+    // OptimalIsolationPoints: Number[];
+    DefaultIsolationPoints: EquipmentViewModel[];
+    OptimalIsolationPoints: EquipmentViewModel[];
 }
 
 export interface ArchivedOutage extends Outage {

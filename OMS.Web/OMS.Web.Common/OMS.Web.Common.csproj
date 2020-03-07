@@ -56,8 +56,10 @@
     <Compile Include="Extensions\TransformerNodeExtensions.cs" />
     <Compile Include="Loggers\FileLogger.cs" />
     <Compile Include="Mappers\ConsumerMapper.cs" />
+    <Compile Include="Mappers\EquipmentMapper.cs" />
     <Compile Include="Mappers\GraphMapper.cs" />
     <Compile Include="Mappers\IConsumerMapper.cs" />
+    <Compile Include="Mappers\IEquipmentMapper.cs" />
     <Compile Include="Mappers\IGraphMapper.cs" />
     <Compile Include="Mappers\IMapper.cs" />
     <Compile Include="Mappers\IOutageMapper.cs" />

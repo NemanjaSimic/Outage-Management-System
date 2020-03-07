@@ -107,7 +107,7 @@ namespace OMS.Web.Adapter
 
 
             //OUTAGE_SUBSCRIBER
-            OutageNotification outageNotification = new OutageNotification("OUTAGE_ADAPTER_SUBSCRIBER", new OutageMapper(new ConsumerMapper()));
+            OutageNotification outageNotification = new OutageNotification("OUTAGE_ADAPTER_SUBSCRIBER", new OutageMapper(new ConsumerMapper(), new EquipmentMapper()));
             SubscriberProxy outageSubscriberProxy = _proxyFactory.CreateProxy<SubscriberProxy, ISubscriber>(outageNotification, EndpointNames.SubscriberEndpoint);
 
             if (outageSubscriberProxy == null)

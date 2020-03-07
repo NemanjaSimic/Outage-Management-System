@@ -41,6 +41,7 @@
     <Compile Include="OutageLifecycleState.cs" />
     <Compile Include="ViewModels\ArchivedOutageViewModel.cs" />
     <Compile Include="ViewModels\ConsumerViewModel.cs" />
+    <Compile Include="ViewModels\EquipmentViewModel.cs" />
     <Compile Include="ViewModels\MeasurementViewModel.cs" />
     <Compile Include="ViewModels\NodeViewModel.cs" />
     <Compile Include="ViewModels\OmsGraphViewModel.cs" />

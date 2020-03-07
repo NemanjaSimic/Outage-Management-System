@@ -10,7 +10,7 @@
         //TODO:
         //private IOutageMapper _outageMapper;
 
-        //public ConsumerMapper()
+        //public ConsumerMapper(IOutageMapper outageMapper)
         //{
         //    //_outageMapper = outageMapper;
         //}
