@@ -1,7 +1,24 @@
 <h1 mat-dialog-title>Active Outage Details</h1>
 <div mat-dialog-content>
-  <p>ID: {{ outage.Id }}</p>
-  <p>ElementId: {{ outage.ElementId }}</p>
+  <p>ID:&nbsp;&nbsp;{{ outage.Id }}</p>
+  <p>ElementId:&nbsp;&nbsp;{{ ((+outage.ElementId).toString(16).toUpperCase()) == '0' ? '-' : '0x'+((+outage.ElementId).toString(16).toUpperCase()) }}</p>
+  <p>Default Isolation Points:<br/>
+    <ng-container *ngIf="outage.DefaultIsolationPoints.length != 0; else empty_array"> 
+    <div *ngFor="let point of getOutagePointsString(outage.DefaultIsolationPoints)">
+      &nbsp;&nbsp;{{ point }}
+    </div>
+    </ng-container>
+    <ng-template #empty_array><p> - </p></ng-template>
+  <p>Optimal Isolation Points:<br/></p>
+    <ng-container *ngIf="outage.OptimalIsolationPoints.length != 0; else empty_array">
+      <div *ngFor="let point of getOutagePointsString(outage.OptimalIsolationPoints)">
+        &nbsp;&nbsp;{{ point }}
+      </div>
+    </ng-container>
+    <ng-template #empty_array><p> - </p></ng-template>
+  <p>Affected Consumers:&nbsp;&nbsp;{{ outage.AffectedConsumers.length.toString() }}</p>
+  <p>State:&nbsp;&nbsp;{{ getOutageStateString(outage.State) }}</p>
+  <p>Reported at:<br/>{{ outage.ReportedAt | date:'medium' }}</p>
 </div>
 <div mat-dialog-actions>
   <button mat-raised-button (click)="onCloseClick()">Close</button>

@@ -9,7 +9,7 @@
     <ng-container matColumnDef="elementId">
       <th [class.dark-header]="true" mat-header-cell *matHeaderCellDef> Element ID </th>
       <td [class.table-data]="true" mat-cell *matCellDef="let activeOutage">
-       {{ ((+activeOutage.ElementId).toString(16).toUpperCase()) == '0' ? '-' : '0x'+((+activeOutage.ElementId).toString(16).toUpperCase())}} </td>
+       {{ ((+activeOutage.ElementId).toString(16).toUpperCase()) == '0' ? '-' : '0x'+((+activeOutage.ElementId).toString(16).toUpperCase()) }} </td>
     </ng-container>
 
     <ng-container matColumnDef="state">

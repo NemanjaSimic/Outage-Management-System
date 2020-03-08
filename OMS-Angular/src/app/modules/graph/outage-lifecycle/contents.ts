@@ -13,7 +13,6 @@ export const generateCreatedOutageTemplate = (outage: ActiveOutage) => {
         .replace("[[id]]", outage.Id.toString())
         .replace("[[defaultIsolationPoints]]", outage.DefaultIsolationPoints.map(point => `<br/>${point.Mrid} (0x${point.Id.toString(16).toUpperCase()})`).join(separator))
         .replace("[[affectedConsumers]]", outage.AffectedConsumers.length.toString())
-        // .replace("[[affectedConsumers]]", outage.AffectedConsumers.map(aff => aff.Id).join(separator))
         .replace("[[state]]", OutageLifeCycleState[outage.State])
         .replace("[[reportedAt]]", formatDate(outage.ReportedAt));
 }
@@ -25,7 +24,6 @@ export const generateIsolatedOutageTemplate = (outage: ActiveOutage) => {
         .replace("[[defaultIsolationPoints]]", outage.DefaultIsolationPoints.map(point => `<br/>${point.Mrid} (0x${point.Id.toString(16).toUpperCase()})`).join(separator))
         .replace("[[optimalIsolationPoints]]", outage.OptimalIsolationPoints.map(point => `<br/>${point.Mrid} (0x${point.Id.toString(16).toUpperCase()})`).join(separator))
         .replace("[[affectedConsumers]]", outage.AffectedConsumers.length.toString())
-        // .replace("[[affectedConsumers]]", outage.AffectedConsumers.map(aff => aff.Id).join(separator))
         .replace("[[state]]", OutageLifeCycleState[outage.State])
         .replace("[[reportedAt]]", formatDate(outage.ReportedAt));
 }
@@ -37,7 +35,6 @@ export const generateRepairCrewOutageTemplate = (outage: ActiveOutage) => {
         .replace("[[defaultIsolationPoints]]", outage.DefaultIsolationPoints.map(point => `<br/>${point.Mrid} (0x${point.Id.toString(16).toUpperCase()})`).join(separator))
         .replace("[[optimalIsolationPoints]]", outage.OptimalIsolationPoints.map(point => `<br/>${point.Mrid} (0x${point.Id.toString(16).toUpperCase()})`).join(separator))
         .replace("[[affectedConsumers]]", outage.AffectedConsumers.length.toString())
-        // .replace("[[affectedConsumers]]", outage.AffectedConsumers.map(aff => aff.Id).join(separator))
         .replace("[[state]]", OutageLifeCycleState[outage.State])
         .replace("[[reportedAt]]", formatDate(outage.ReportedAt))
         .replace("[[repairedAt]]", formatDate(outage.RepairedAt));
