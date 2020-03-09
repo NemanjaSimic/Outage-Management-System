@@ -2,6 +2,7 @@ import { Component, OnInit, Output, EventEmitter } from '@angular/core';
 import { FormControl } from '@angular/forms';
 import { Observable } from 'rxjs';
 import { map, startWith } from 'rxjs/operators';
+import { ReportOptions } from '@shared/models/report-options.model';
 
 @Component({
   selector: 'app-report-form',
@@ -32,7 +33,7 @@ export class ReportFormComponent implements OnInit {
   public startDate = new FormControl();
   public endDate = new FormControl();
 
-  @Output() generate = new EventEmitter<boolean>();
+  @Output() generate = new EventEmitter<ReportOptions>();
 
   constructor() { }
 
@@ -51,12 +52,14 @@ export class ReportFormComponent implements OnInit {
   }
 
   onSubmitHandler(): void {
-    console.log(this.selectedReportType);
-    console.log(this.selectedScopeControl.value);
-    console.log(this.startDate.value);
-    console.log(this.endDate.value);
-  
-    this.generate.emit(true);
+    const options: ReportOptions = {
+      Type: this.selectedReportType,
+      ElementId: this.selectedScopeControl.value,
+      StartDate: this.startDate.value,
+      EndDate: this.endDate.value
+    }
+
+    this.generate.emit(options);
   }
 
 
