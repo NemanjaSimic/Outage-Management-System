@@ -2,9 +2,9 @@
 {
     using System.Collections.Generic;
 
-    public class ReportViewModel
+    public class ReportViewModel : IViewModel
     {
-        public Dictionary<string, int> Data { get; set; }
-        public string Type { get; set; } // Yearly, Monthly
+        public IDictionary<string, int> Data { get; set; }
+        public string Type { get; set; }
     }
 }

@@ -51,6 +51,7 @@
     <Compile Include="ViewModels\OutageViewModel.cs" />
     <Compile Include="ViewModels\RelationViewModel.cs" />
     <Compile Include="Properties\AssemblyInfo.cs" />
+    <Compile Include="ViewModels\ReportViewModel.cs" />
     <Compile Include="ViewModels\TransformerNodeViewModel.cs" />
   </ItemGroup>
   <ItemGroup>
