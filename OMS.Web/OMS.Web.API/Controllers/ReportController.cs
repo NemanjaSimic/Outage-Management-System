@@ -1,7 +1,10 @@
 ﻿namespace OMS.Web.API.Controllers
 {
     using MediatR;
+    using OMS.Web.Services.Commands;
     using OMS.Web.UI.Models.BindingModels;
+    using OMS.Web.UI.Models.ViewModels;
+    using System.Threading.Tasks;
     using System.Web.Http;
 
     public class ReportController : ApiController
@@ -14,9 +17,10 @@
         }
 
         [HttpGet]
-        public IHttpActionResult Get([FromUri]ReportOptions options)
+        public async Task<IHttpActionResult> Get([FromUri]ReportOptions options)
         {
-            return Ok(options);
+            var report = await _mediator.Send<ReportViewModel>(new GenerateReportCommand(options));
+            return Ok(report);
         }
     }
 }
