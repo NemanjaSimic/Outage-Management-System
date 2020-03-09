@@ -1,8 +1,13 @@
 body {
   overflow: hidden;
-  background-color: #525463;
+  background-color: #2d2d2e;
   color: white;
 }
 
 html, body { height: 100%; }
 body { margin: 0; font-family: Roboto, "Helvetica Neue", sans-serif; }
+.ngx-charts, text { fill: #e0e0e0; }
+
+.white-text {
+  color: white;
+}

@@ -1,0 +1,34 @@
+.report-form {
+  background-color: #5c5c5c;
+  border: 1px solid black;
+  border-radius: 15px;
+  padding: 15px 0px;
+  text-align: center;
+  color:white;
+}
+
+.white-label {
+  color: white;
+}
+
+.custom-width {
+  width: 260px;
+}
+
+.form-field {
+  padding-right: 50px;
+  color: white;
+}
+
+.generate-button {
+  position: relative;
+  left: 0px;
+}
+
+input::placeholder {
+  color: white;
+}
+
+input {
+  color: white;
+}
