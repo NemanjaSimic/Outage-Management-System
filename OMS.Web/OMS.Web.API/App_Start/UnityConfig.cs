@@ -55,6 +55,7 @@ namespace OMS.Web.API
             container.RegisterType<IGraphMapper, GraphMapper>();
             container.RegisterType<IConsumerMapper, ConsumerMapper>();
             container.RegisterType<IOutageMapper, OutageMapper>();
+            container.RegisterType<IEquipmentMapper, EquipmentMapper>();
             container.RegisterType<IProxyFactory, ProxyFactory>();
             container.RegisterType<ILogger, FileLogger>(new ContainerControlledLifetimeManager());
 
