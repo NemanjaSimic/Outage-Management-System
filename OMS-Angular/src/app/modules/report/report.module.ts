@@ -3,6 +3,8 @@ import { SharedModule } from '@shared/shared.module';
 import { ReportComponent } from './components/report/report.component';
 import { ReportFormComponent } from './components/report-form/report-form.component';
 import { ReportChartComponent } from './components/report-chart/report-chart.component';
+import { NgxChartsModule } from '@swimlane/ngx-charts';
+
 
 @NgModule({
   declarations: [
@@ -11,7 +13,8 @@ import { ReportChartComponent } from './components/report-chart/report-chart.com
     ReportChartComponent
   ],
   imports: [
-    SharedModule
+    SharedModule,
+    NgxChartsModule
   ],
   exports: [
     ReportComponent

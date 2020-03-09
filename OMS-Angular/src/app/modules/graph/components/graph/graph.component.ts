@@ -344,7 +344,7 @@ export class GraphComponent implements OnInit, OnDestroy {
       
       if (activeOutage.State == OutageLifeCycleState.Created) {
         if (activeOutage.DefaultIsolationPoints.length)
-          outageElement = this.cy.nodes().filter(node => node.data('id') == activeOutage.DefaultIsolationPoints[0])[0];
+          outageElement = this.cy.nodes().filter(node => node.data('id') == activeOutage.DefaultIsolationPoints[0].Id)[0];
       }
 
       // @TODO:

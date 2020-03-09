@@ -1,6 +1,6 @@
 import { Component, OnInit, Inject } from '@angular/core';
 import { MatDialogRef, MAT_DIALOG_DATA } from '@angular/material';
-import { ActiveOutage } from '@shared/models/outage.model';
+import { ActiveOutage, OutageLifeCycleState } from '@shared/models/outage.model';
 
 @Component({
   selector: 'app-active-outage-modal',
@@ -19,5 +19,18 @@ export class ActiveOutageModalComponent implements OnInit {
 
   onCloseClick(): void {
     this.dialogRef.close();
+  }
+
+  public getOutageStateString(state: any) : string {
+    return OutageLifeCycleState[state];
+  }
+
+  public getOutagePointsString(points: any) : string[] {
+    return points.map(point => `${point.Mrid} (0x${point.Id.toString(16).toUpperCase()})`);
+  }
+
+  public getConsumersString(consumers: any) : string[] {
+    return consumers.map(consumer => 
+      `${consumer.Mrid} (0x${consumer.Id.toString(16).toUpperCase()}) - ${consumer.LastName} ${consumer.FirstName}`);
   }
 }

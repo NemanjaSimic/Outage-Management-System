@@ -14,16 +14,14 @@ namespace OMSCommon.OutageDatabaseModel
         public string FirstName { get; set; }
         public string LastName { get; set; }
 
-        public List<ArchivedOutage> ArchivedOutages { get; set; }
-        public List<ActiveOutage> ActiveOutages { get; set; }
+        public ICollection<OutageEntity> Outages { get; set; }
 
         public Consumer()
         {
             ConsumerMRID = string.Empty;
             FirstName = string.Empty;
             LastName = string.Empty;
-            ArchivedOutages = new List<ArchivedOutage>();
-            ActiveOutages = new List<ActiveOutage>();
+            Outages = new List<OutageEntity>();
         }
     }
 }

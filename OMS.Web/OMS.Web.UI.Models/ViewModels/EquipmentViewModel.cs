@@ -1,18 +1,20 @@
-﻿namespace OMS.Web.UI.Models.ViewModels
+﻿using System;
+using System.Collections.Generic;
+using System.Linq;
+using System.Text;
+using System.Threading.Tasks;
+
+namespace OMS.Web.UI.Models.ViewModels
 {
-    using System.Collections.Generic;   
-    
-    public class ConsumerViewModel
+    public class EquipmentViewModel
     {
         public long Id { get; set; }
         public string Mrid { get; set; }
-        public string FirstName { get; set; }
-        public string LastName { get; set; }
 
         public IEnumerable<ActiveOutageViewModel> ActiveOutages { get; set; }
         public IEnumerable<ArchivedOutageViewModel> ArchivedOutages { get; set; }
 
-        public ConsumerViewModel()
+        public EquipmentViewModel()
         {
             ActiveOutages = new List<ActiveOutageViewModel>();
             ArchivedOutages = new List<ArchivedOutageViewModel>();
