@@ -3,6 +3,7 @@ import { FormControl } from '@angular/forms';
 import { Observable } from 'rxjs';
 import { map, startWith } from 'rxjs/operators';
 import { SnackbarService } from '@services/notification/snackbar.service';
+import { ReportOptions } from '@shared/models/report-options.model';
 
 @Component({
   selector: 'app-report-form',
@@ -33,7 +34,7 @@ export class ReportFormComponent implements OnInit {
   public startDate = new FormControl();
   public endDate = new FormControl();
 
-  @Output() generate = new EventEmitter<boolean>();
+  @Output() generate = new EventEmitter<ReportOptions>();
 
   constructor(private snackBar: SnackbarService) { }
 
@@ -52,13 +53,14 @@ export class ReportFormComponent implements OnInit {
   }
 
   onSubmitHandler(): void {
-    console.log(this.selectedReportType);
-    console.log(this.selectedScopeControl.value);
-    console.log(this.startDate.value);
-    console.log(this.endDate.value);
-  
-    this.generate.emit(true);
-    this.snackBar.notify('Generating report');
+    const options: ReportOptions = {
+      Type: this.selectedReportType,
+      ElementId: this.selectedScopeControl.value,
+      StartDate: this.startDate.value,
+      EndDate: this.endDate.value
+    }
+
+    this.generate.emit(options);
   }
 
 
