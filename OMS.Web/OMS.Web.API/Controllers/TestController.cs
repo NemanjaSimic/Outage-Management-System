@@ -70,7 +70,8 @@
             ActiveOutageViewModel initialActiveOutage = new ActiveOutageViewModel
             {
                 Id = 111,
-                DefaultIsolationPoints = new List<long> { 6 },
+                //DefaultIsolationPoints = new List<long> { 6 },
+                DefaultIsolationPoints = new List<EquipmentViewModel>() { new EquipmentViewModel() { Id = 6, Mrid = "EL_6" } },
                 State = ActiveOutageLifecycleState.Created,
                 ReportedAt = DateTime.Now
             };
@@ -88,11 +89,15 @@
             ActiveOutageViewModel initialActiveOutage = new ActiveOutageViewModel
             {
                 Id = id,
-                DefaultIsolationPoints = new List<long> { 6 },
+                //DefaultIsolationPoints = new List<long> { 6 },
+                DefaultIsolationPoints = new List<EquipmentViewModel>() { new EquipmentViewModel() { Id = 6, Mrid = "EL_6" } },
                 ElementId = 12, // ACLINE segment
                 // breaker iznad i fuse ispod (stavio sam elemente okolo aclinesegmenta), ali front ce raditi sa bilo kojim vasim id-evima
                 // mada ovo nije ni bitno toliko za front ?
-                OptimalIsolationPoints = new List<long> { 6, 14 }, 
+                //OptimalIsolationPoints = new List<long> { 6, 14 }, 
+                OptimalIsolationPoints = new List<EquipmentViewModel>() { 
+                    new EquipmentViewModel() { Id = 6, Mrid = "EL_6" },
+                    new EquipmentViewModel() { Id = 14, Mrid = "EL_14" }},
                 State = ActiveOutageLifecycleState.Isolated,
                 ReportedAt = DateTime.Now // ovo se ne menja al test
             };
@@ -110,11 +115,15 @@
             ActiveOutageViewModel initialActiveOutage = new ActiveOutageViewModel
             {
                 Id = id,
-                DefaultIsolationPoints = new List<long> { 6 },
+                //DefaultIsolationPoints = new List<long> { 6 },
+                DefaultIsolationPoints = new List<EquipmentViewModel>() { new EquipmentViewModel() { Id = 6, Mrid = "EL_6" } },
                 ElementId = 12, // ACLINE segment
                 // breaker iznad i fuse ispod (stavio sam elemente okolo aclinesegmenta), ali front ce raditi sa bilo kojim vasim id-evima
                 // mada ovo nije ni bitno toliko za front ?
-                OptimalIsolationPoints = new List<long> { 6, 14 },
+                //OptimalIsolationPoints = new List<long> { 6, 14 },
+                OptimalIsolationPoints = new List<EquipmentViewModel>() { 
+                    new EquipmentViewModel() { Id = 6, Mrid = "EL_6" },
+                    new EquipmentViewModel() { Id = 14, Mrid = "EL_14" }},
                 State = ActiveOutageLifecycleState.Isolated,
                 ReportedAt = DateTime.Now, // ovo nije isto, al test je
                 RepairedAt = DateTime.Now
@@ -141,11 +150,15 @@
             ActiveOutageViewModel initialActiveOutage = new ActiveOutageViewModel
             {
                 Id = id,
-                DefaultIsolationPoints = new List<long> { 6 },
+                //DefaultIsolationPoints = new List<long> { 6 },
+                DefaultIsolationPoints = new List<EquipmentViewModel>() { new EquipmentViewModel() { Id = 6, Mrid = "EL_6" } },
                 ElementId = 12, // ACLINE segment
                 // breaker iznad i fuse ispod (stavio sam elemente okolo aclinesegmenta), ali front ce raditi sa bilo kojim vasim id-evima
                 // mada ovo nije ni bitno toliko za front ?
-                OptimalIsolationPoints = new List<long> { 6, 14 },
+                //OptimalIsolationPoints = new List<long> { 6, 14 },
+                OptimalIsolationPoints = new List<EquipmentViewModel>() { 
+                    new EquipmentViewModel() { Id = 6, Mrid = "EL_6" },
+                    new EquipmentViewModel() { Id = 14, Mrid = "EL_14" }},
                 State = ActiveOutageLifecycleState.Isolated,
                 ReportedAt = DateTime.Now, // ovo nije isto, al test je
                 RepairedAt = DateTime.Now,
