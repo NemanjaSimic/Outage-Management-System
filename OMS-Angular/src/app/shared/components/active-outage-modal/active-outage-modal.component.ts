@@ -28,4 +28,9 @@ export class ActiveOutageModalComponent implements OnInit {
   public getOutagePointsString(points: any) : string[] {
     return points.map(point => `${point.Mrid} (0x${point.Id.toString(16).toUpperCase()})`);
   }
+
+  public getConsumersString(consumers: any) : string[] {
+    return consumers.map(consumer => 
+      `${consumer.Mrid} (0x${consumer.Id.toString(16).toUpperCase()}) - ${consumer.LastName} ${consumer.FirstName}`);
+  }
 }
