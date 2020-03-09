@@ -106,8 +106,9 @@ namespace Topology
         #region Distributed Transaction
         public void CommitTransaction()
         {
-            Topology = TransactionTopology;
             transactionFlag = TransactionFlag.NoTransaction;
+            this.loadFlow.UpdateLoadFlow(TransactionTopology);
+            Topology = TransactionTopology;
             ProviderTopologyConnectionDelegate?.Invoke(Topology);
         }
         public bool PrepareForTransaction()
@@ -117,7 +118,6 @@ namespace Topology
             {
                 logger.LogDebug($"Topology provider preparing for transaction.");
                 TransactionTopology = CreateTopology();
-                this.loadFlow.UpdateLoadFlow(TransactionTopology);
                 transactionFlag = TransactionFlag.InTransaction;
             }
             catch (Exception ex)

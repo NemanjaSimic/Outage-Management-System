@@ -23,5 +23,8 @@ namespace CECommon.Interfaces
         void UpdateAnalogMeasurement(Dictionary<long, AnalogModbusData> data); //TODO: AnalogModbusData koji stigne sa SCADA prepakovati u lokali model na CE
         void UpdateDiscreteMeasurement(Dictionary<long, DiscreteModbusData> data); //TODO: DiscreteModbusData koji stigne sa SCADA prepakovati u lokali model na CE
         Dictionary<long, long> GetMeasurementToElementMap();
+        bool PrepareForTransaction();
+        void CommitTransaction();
+        void RollbackTransaction();
     }
 }
