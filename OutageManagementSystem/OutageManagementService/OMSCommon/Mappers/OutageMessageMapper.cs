@@ -17,75 +17,129 @@ namespace OMSCommon.Mappers
         }
 
         private ConsumerMessageMapper consumerMapper;
+        private EquipmentMapper equipmentMapper;
 
         public OutageMessageMapper()
         {
             consumerMapper = new ConsumerMessageMapper(this);
+            equipmentMapper = new EquipmentMapper(this);
         }
 
-        public ActiveOutageMessage MapActiveOutage(ActiveOutage outage)
+        public OutageMessage MapOutageEntity(OutageEntity outage)
         {
-            ActiveOutageMessage activeOutageMessage = new ActiveOutageMessage()
-            {
-                OutageId = outage.OutageId,
-                OutageState = outage.OutageState,
-                ReportTime = outage.ReportTime,
-                IsolatedTime = outage.IsolatedTime,
-                RepairedTime = outage.RepairedTime,
-                OutageElementGid = outage.OutageElementGid,
-                AffectedConsumers = consumerMapper.MapConsumers(outage.AffectedConsumers),
-                IsResolveConditionValidated = outage.IsResolveConditionValidated,
-            };
+            OutageMessage outageMessage;
 
-            if (TryParseIsolationPointsFromCSVFormat(outage.DefaultIsolationPoints, out List<long> defaultIsolationPoints))
+            if (outage.OutageState != OutageState.ARCHIVED)
             {
-                activeOutageMessage.DefaultIsolationPoints = defaultIsolationPoints;
+                outageMessage = new ActiveOutageMessage()
+                {
+                    OutageId = outage.OutageId,
+                    OutageState = outage.OutageState,
+                    ReportTime = outage.ReportTime,
+                    IsolatedTime = outage.IsolatedTime,
+                    RepairedTime = outage.RepairedTime,
+                    OutageElementGid = outage.OutageElementGid,
+                    DefaultIsolationPoints = equipmentMapper.MapEquipments(outage.DefaultIsolationPoints),
+                    OptimumIsolationPoints = equipmentMapper.MapEquipments(outage.OptimumIsolationPoints),
+                    AffectedConsumers = consumerMapper.MapConsumers(outage.AffectedConsumers),
+                    IsResolveConditionValidated = outage.IsResolveConditionValidated,
+                };
             }
-
-            if (TryParseIsolationPointsFromCSVFormat(outage.OptimumIsolationPoints, out List<long> optimumIsolationPoints))
+            else
             {
-                activeOutageMessage.OptimumIsolationPoints = optimumIsolationPoints;
-            }
-
-            return activeOutageMessage;
-        }
-
-        public IEnumerable<ActiveOutageMessage> MapActiveOutages(IEnumerable<ActiveOutage> outages)
-        {
-            return outages.Select(o => MapActiveOutage(o)).ToList();
-        }
-
-        public ArchivedOutageMessage MapArchivedOutage(ArchivedOutage outage)
-        {
-            ArchivedOutageMessage archivedOutageMessage = new ArchivedOutageMessage
-            {
-                OutageId = outage.OutageId,
-                ReportTime = outage.ReportTime,
-                IsolatedTime = outage.IsolatedTime,
-                RepairedTime = outage.RepairedTime,
-                ArchiveTime = outage.ArchiveTime,
-                OutageElementGid = outage.OutageElementGid,
-                AffectedConsumers = consumerMapper.MapConsumers(outage.AffectedConsumers)
-            };
-
-            if(TryParseIsolationPointsFromCSVFormat(outage.DefaultIsolationPoints, out List<long> defaultIsolationPoints))
-            {
-                archivedOutageMessage.DefaultIsolationPoints = defaultIsolationPoints;
-            }
-
-            if (TryParseIsolationPointsFromCSVFormat(outage.OptimumIsolationPoints, out List<long> optimumIsolationPoints))
-            {
-                archivedOutageMessage.OptimumIsolationPoints = optimumIsolationPoints;
+                outageMessage = new ArchivedOutageMessage
+                {
+                    OutageId = outage.OutageId,
+                    ReportTime = outage.ReportTime,
+                    IsolatedTime = outage.IsolatedTime,
+                    RepairedTime = outage.RepairedTime,
+                    ArchivedTime = outage.ArchivedTime ?? DateTime.UtcNow,
+                    OutageElementGid = outage.OutageElementGid,
+                    DefaultIsolationPoints = equipmentMapper.MapEquipments(outage.DefaultIsolationPoints),
+                    OptimumIsolationPoints = equipmentMapper.MapEquipments(outage.OptimumIsolationPoints),
+                    AffectedConsumers = consumerMapper.MapConsumers(outage.AffectedConsumers)
+                };
             }
             
-            return archivedOutageMessage;
+
+            return outageMessage;
         }
 
-        public IEnumerable<ArchivedOutageMessage> MapArchivedOutages(IEnumerable<ArchivedOutage> outages)
+        public ActiveOutageMessage MapOutageEntityToActive(OutageEntity outage)
         {
-            return outages.Select(o => MapArchivedOutage(o));
+            ActiveOutageMessage outageMessage;
+
+            if (outage.OutageState != OutageState.ARCHIVED)
+            {
+                outageMessage = new ActiveOutageMessage()
+                {
+                    OutageId = outage.OutageId,
+                    OutageState = outage.OutageState,
+                    ReportTime = outage.ReportTime,
+                    IsolatedTime = outage.IsolatedTime,
+                    RepairedTime = outage.RepairedTime,
+                    OutageElementGid = outage.OutageElementGid,
+                    DefaultIsolationPoints = equipmentMapper.MapEquipments(outage.DefaultIsolationPoints),
+                    OptimumIsolationPoints = equipmentMapper.MapEquipments(outage.OptimumIsolationPoints),
+                    AffectedConsumers = consumerMapper.MapConsumers(outage.AffectedConsumers),
+                    IsResolveConditionValidated = outage.IsResolveConditionValidated,
+                };
+            }
+            else
+            {
+                throw new ArgumentException($"MapOutageEntityToActive => Outage state: { OutageState.ARCHIVED}.");
+            }
+
+
+            return outageMessage;
         }
 
+        public ArchivedOutageMessage MapOutageEntityToArchived(OutageEntity outage)
+        {
+            ArchivedOutageMessage outageMessage;
+
+            if (outage.OutageState == OutageState.ARCHIVED)
+            {
+                outageMessage = new ArchivedOutageMessage
+                {
+                    OutageId = outage.OutageId,
+                    ReportTime = outage.ReportTime,
+                    IsolatedTime = outage.IsolatedTime,
+                    RepairedTime = outage.RepairedTime,
+                    ArchivedTime = outage.ArchivedTime ?? DateTime.UtcNow,
+                    OutageElementGid = outage.OutageElementGid,
+                    DefaultIsolationPoints = equipmentMapper.MapEquipments(outage.DefaultIsolationPoints),
+                    OptimumIsolationPoints = equipmentMapper.MapEquipments(outage.OptimumIsolationPoints),
+                    AffectedConsumers = consumerMapper.MapConsumers(outage.AffectedConsumers)
+                };
+            }
+            else
+            {
+                throw new ArgumentException($"MapOutageEntityToArchived => Outage state: {outage.OutageState}, but {OutageState.ARCHIVED} was expected.");
+            }
+
+
+            return outageMessage;
+        }
+
+
+        public IEnumerable<OutageMessage> MapOutageEntities(IEnumerable<OutageEntity> outages)
+        {
+            return outages.Select(o => MapOutageEntity(o)).ToList();
+        }
+
+        public IEnumerable<ActiveOutageMessage> MapOutageEntitiesToActive(IEnumerable<OutageEntity> outages)
+        {
+            return outages.Where(o => o.OutageState != OutageState.ARCHIVED).Select(o => MapOutageEntityToActive(o)).ToList();
+        }
+
+        public IEnumerable<ArchivedOutageMessage> MapOutageEntitiesToArchived(IEnumerable<OutageEntity> outages)
+        {
+            return outages.Where(o => o.OutageState == OutageState.ARCHIVED).Select(o => MapOutageEntityToArchived(o)).ToList();
+        }
+
+        #region Obsolete
+        [Obsolete]
         private IEnumerable<long> ParseIsolationPointsFromCSVFormat(string isolationPointsCSV)
         {
             if(isolationPointsCSV == null)
@@ -108,7 +162,7 @@ namespace OMSCommon.Mappers
 
             return isolationPoints;
         }
-
+        [Obsolete]
         private bool TryParseIsolationPointsFromCSVFormat(string isolationPointsCSV, out List<long> isolationPoints)
         {
             isolationPoints = new List<long>();
@@ -131,5 +185,6 @@ namespace OMSCommon.Mappers
 
             return true;
         }
+        #endregion
     }
 }

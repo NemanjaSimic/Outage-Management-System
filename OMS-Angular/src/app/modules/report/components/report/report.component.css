@@ -1,3 +1,20 @@
-/* .report {
-  margin-left: 60px;
-} */
+.report {
+  margin: 100px 60px;
+  font-family: 'PT Serif', serif;
+  color: white;
+}
+
+.report > .h1 {
+  font-size: 50px;
+  color: white;
+}
+
+.chart-area {
+  text-align: center;
+  height: 600px;
+  margin: 125px 0px;
+}
+
+.chart-area > .chart {
+  display: inline-block;
+}

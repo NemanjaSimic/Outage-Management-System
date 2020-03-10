@@ -11,10 +11,12 @@
     public class OutageMapper : IOutageMapper
     {
         private IConsumerMapper _consumerMapper;
+        private IEquipmentMapper _equipmentMapper;
 
-        public OutageMapper(IConsumerMapper consumerMapper)
+        public OutageMapper(IConsumerMapper consumerMapper, IEquipmentMapper equipmentMapper)
         {
             _consumerMapper = consumerMapper;
+            _equipmentMapper = equipmentMapper;
         }
 
         public ActiveOutageViewModel MapActiveOutage(ActiveOutageMessage outage)
@@ -26,10 +28,13 @@
                 IsolatedAt = outage.IsolatedTime,
                 RepairedAt = outage.RepairedTime,
                 ElementId = outage.OutageElementGid,
-                DefaultIsolationPoints = outage.DefaultIsolationPoints,
-                AffectedConsumers = _consumerMapper.MapConsumers(outage.AffectedConsumers),
-                OptimalIsolationPoints = outage.OptimumIsolationPoints,
                 IsResolveConditionValidated = outage.IsResolveConditionValidated,
+                //DefaultIsolationPoints = outage.DefaultIsolationPoints.Select(o => o.EquipmentId),
+                //OptimalIsolationPoints = outage.OptimumIsolationPoints.Select(o => o.EquipmentId),
+                //TODO: uncomment when using EquipmentViewModel
+                DefaultIsolationPoints = _equipmentMapper.MapEquipments(outage.DefaultIsolationPoints),
+                OptimalIsolationPoints = _equipmentMapper.MapEquipments(outage.OptimumIsolationPoints),
+                AffectedConsumers = _consumerMapper.MapConsumers(outage.AffectedConsumers),
             };
 
         public IEnumerable<ActiveOutageViewModel> MapActiveOutages(IEnumerable<ActiveOutageMessage> outages)
@@ -42,25 +47,28 @@
                 ReportedAt = outage.ReportTime,
                 IsolatedAt = outage.IsolatedTime,
                 RepairedAt = outage.RepairedTime,
-                ArchivedAt = outage.ArchiveTime,
+                ArchivedAt = outage.ArchivedTime,
                 ElementId = outage.OutageElementGid,
-                DefaultIsolationPoints = outage.DefaultIsolationPoints,
+                //DefaultIsolationPoints = outage.DefaultIsolationPoints.Select(o => o.EquipmentId),
+                //OptimalIsolationPoints = outage.OptimumIsolationPoints.Select(o => o.EquipmentId),
+                //TODO: uncomment when using EquipmentViewModel
+                DefaultIsolationPoints = _equipmentMapper.MapEquipments(outage.DefaultIsolationPoints),
+                OptimalIsolationPoints = _equipmentMapper.MapEquipments(outage.OptimumIsolationPoints),
                 AffectedConsumers = _consumerMapper.MapConsumers(outage.AffectedConsumers),
-                OptimalIsolationPoints = outage.OptimumIsolationPoints,
             };
 
         public IEnumerable<ArchivedOutageViewModel> MapArchivedOutages(IEnumerable<ArchivedOutageMessage> outages)
             => outages.Select(o => MapArchivedOutage(o));
 
-        public ActiveOutageLifecycleState MapActiveOutageState(ActiveOutageState activeOutageState)
+        public ActiveOutageLifecycleState MapActiveOutageState(OutageState activeOutageState)
         {
             switch(activeOutageState)
             {
-                case ActiveOutageState.CREATED:
+                case OutageState.CREATED:
                     return ActiveOutageLifecycleState.Created;
-                case ActiveOutageState.ISOLATED:
+                case OutageState.ISOLATED:
                     return ActiveOutageLifecycleState.Isolated;
-                case ActiveOutageState.REPAIRED:
+                case OutageState.REPAIRED:
                     return ActiveOutageLifecycleState.Repaired;
                 default:
                     throw new ArgumentException("Unsupported enum type. ActiveOutageState required.");
