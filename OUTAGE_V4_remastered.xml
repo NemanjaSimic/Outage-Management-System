@@ -476,7 +476,7 @@
 		<ftn:IdentifiedObject.name>TM_62</ftn:IdentifiedObject.name>
 	</cim:Terminal>
 	<cim:Terminal rdf:ID="TM_63">
-		<cim:Terminal.ConductingEquipment rdf:resource="#ACL_14"/>
+		<cim:Terminal.ConductingEquipment rdf:resource="#ACL_94"/>
 		<cim:Terminal.ConnectivityNode rdf:resource="#CN_29"/>
 		<cim:IdentifiedObject.description>Terminal63</cim:IdentifiedObject.description>
 		<cim:IdentifiedObject.mRID>TM_63</cim:IdentifiedObject.mRID>
@@ -485,7 +485,7 @@
 	<!--TODO: RECLOSER-->
 	<cim:Terminal rdf:ID="TM_64">
 		<cim:Terminal.ConductingEquipment rdf:resource="#ACL_R1"/>
-		<cim:Terminal.ConnectivityNode rdf:resource="#CN_29"/>
+		<cim:Terminal.ConnectivityNode rdf:resource="#CN_195"/>
 		<cim:IdentifiedObject.description>Terminal64</cim:IdentifiedObject.description>
 		<cim:IdentifiedObject.mRID>TM_64</cim:IdentifiedObject.mRID>
 		<ftn:IdentifiedObject.name>TM_64</ftn:IdentifiedObject.name>
@@ -506,28 +506,28 @@
 	</cim:Terminal>
 	<cim:Terminal rdf:ID="TM_67">
 		<cim:Terminal.ConductingEquipment rdf:resource="#ACL_16"/>
-		<cim:Terminal.ConnectivityNode rdf:resource="#CN_30"/>
+		<cim:Terminal.ConnectivityNode rdf:resource="#CN_178"/>
 		<cim:IdentifiedObject.description>Terminal67</cim:IdentifiedObject.description>
 		<cim:IdentifiedObject.mRID>TM_67</cim:IdentifiedObject.mRID>
 		<ftn:IdentifiedObject.name>TM_67</ftn:IdentifiedObject.name>
 	</cim:Terminal>
 	<cim:Terminal rdf:ID="TM_68">
 		<cim:Terminal.ConductingEquipment rdf:resource="#ACL_17"/>
-		<cim:Terminal.ConnectivityNode rdf:resource="#CN_30"/>
+		<cim:Terminal.ConnectivityNode rdf:resource="#CN_179"/>
 		<cim:IdentifiedObject.description>Terminal68</cim:IdentifiedObject.description>
 		<cim:IdentifiedObject.mRID>TM_68</cim:IdentifiedObject.mRID>
 		<ftn:IdentifiedObject.name>TM_68</ftn:IdentifiedObject.name>
 	</cim:Terminal>
 	<cim:Terminal rdf:ID="TM_69">
 		<cim:Terminal.ConductingEquipment rdf:resource="#ACL_18"/>
-		<cim:Terminal.ConnectivityNode rdf:resource="#CN_30"/>
+		<cim:Terminal.ConnectivityNode rdf:resource="#CN_180"/>
 		<cim:IdentifiedObject.description>Terminal69</cim:IdentifiedObject.description>
 		<cim:IdentifiedObject.mRID>TM_69</cim:IdentifiedObject.mRID>
 		<ftn:IdentifiedObject.name>TM_69</ftn:IdentifiedObject.name>
 	</cim:Terminal>
 	<cim:Terminal rdf:ID="TM_70">
 		<cim:Terminal.ConductingEquipment rdf:resource="#ACL_19"/>
-		<cim:Terminal.ConnectivityNode rdf:resource="#CN_30"/>
+		<cim:Terminal.ConnectivityNode rdf:resource="#CN_181"/>
 		<cim:IdentifiedObject.description>Terminal70</cim:IdentifiedObject.description>
 		<cim:IdentifiedObject.mRID>TM_70</cim:IdentifiedObject.mRID>
 		<ftn:IdentifiedObject.name>TM_70</ftn:IdentifiedObject.name>
@@ -681,7 +681,7 @@
 	</cim:Terminal>
 	<cim:Terminal rdf:ID="TM_92">
 		<cim:Terminal.ConductingEquipment rdf:resource="#ACL_20"/>
-		<cim:Terminal.ConnectivityNode rdf:resource="#CN_41"/>
+		<cim:Terminal.ConnectivityNode rdf:resource="#CN_182"/>
 		<cim:IdentifiedObject.description>Terminal92</cim:IdentifiedObject.description>
 		<cim:IdentifiedObject.mRID>TM_92</cim:IdentifiedObject.mRID>
 		<ftn:IdentifiedObject.name>TM_92</ftn:IdentifiedObject.name>
@@ -730,21 +730,21 @@
 	</cim:Terminal>
 	<cim:Terminal rdf:ID="TM_99">
 		<cim:Terminal.ConductingEquipment rdf:resource="#ACL_22"/>
-		<cim:Terminal.ConnectivityNode rdf:resource="#CN_44"/>
+		<cim:Terminal.ConnectivityNode rdf:resource="#CN_183"/>
 		<cim:IdentifiedObject.description>Terminal99</cim:IdentifiedObject.description>
 		<cim:IdentifiedObject.mRID>TM_99</cim:IdentifiedObject.mRID>
 		<ftn:IdentifiedObject.name>TM_99</ftn:IdentifiedObject.name>
 	</cim:Terminal>
 	<cim:Terminal rdf:ID="TM_100">
 		<cim:Terminal.ConductingEquipment rdf:resource="#ACL_23"/>
-		<cim:Terminal.ConnectivityNode rdf:resource="#CN_44"/>
+		<cim:Terminal.ConnectivityNode rdf:resource="#CN_184"/>
 		<cim:IdentifiedObject.description>Terminal100</cim:IdentifiedObject.description>
 		<cim:IdentifiedObject.mRID>TM_100</cim:IdentifiedObject.mRID>
 		<ftn:IdentifiedObject.name>TM_100</ftn:IdentifiedObject.name>
 	</cim:Terminal>
 	<cim:Terminal rdf:ID="TM_101">
 		<cim:Terminal.ConductingEquipment rdf:resource="#ACL_24"/>
-		<cim:Terminal.ConnectivityNode rdf:resource="#CN_44"/>
+		<cim:Terminal.ConnectivityNode rdf:resource="#CN_185"/>
 		<cim:IdentifiedObject.description>Terminal101</cim:IdentifiedObject.description>
 		<cim:IdentifiedObject.mRID>TM_101</cim:IdentifiedObject.mRID>
 		<ftn:IdentifiedObject.name>TM_101</ftn:IdentifiedObject.name>
@@ -877,14 +877,14 @@
 	</cim:Terminal>
 	<cim:Terminal rdf:ID="TM_120">
 		<cim:Terminal.ConductingEquipment rdf:resource="#ACL_26"/>
-		<cim:Terminal.ConnectivityNode rdf:resource="#CN_53"/>
+		<cim:Terminal.ConnectivityNode rdf:resource="#CN_186"/>
 		<cim:IdentifiedObject.description>Terminal120</cim:IdentifiedObject.description>
 		<cim:IdentifiedObject.mRID>TM_120</cim:IdentifiedObject.mRID>
 		<ftn:IdentifiedObject.name>TM_120</ftn:IdentifiedObject.name>
 	</cim:Terminal>
 	<cim:Terminal rdf:ID="TM_121">
 		<cim:Terminal.ConductingEquipment rdf:resource="#ACL_27"/>
-		<cim:Terminal.ConnectivityNode rdf:resource="#CN_53"/>
+		<cim:Terminal.ConnectivityNode rdf:resource="#CN_187"/>
 		<cim:IdentifiedObject.description>Terminal121</cim:IdentifiedObject.description>
 		<cim:IdentifiedObject.mRID>TM_121</cim:IdentifiedObject.mRID>
 		<ftn:IdentifiedObject.name>TM_121</ftn:IdentifiedObject.name>
@@ -989,7 +989,7 @@
 	</cim:Terminal>
 	<cim:Terminal rdf:ID="TM_136">
 		<cim:Terminal.ConductingEquipment rdf:resource="#ACL_29"/>
-		<cim:Terminal.ConnectivityNode rdf:resource="#CN_60"/>
+		<cim:Terminal.ConnectivityNode rdf:resource="#CN_188"/>
 		<cim:IdentifiedObject.description>Terminal136</cim:IdentifiedObject.description>
 		<cim:IdentifiedObject.mRID>TM_136</cim:IdentifiedObject.mRID>
 		<ftn:IdentifiedObject.name>TM_136</ftn:IdentifiedObject.name>
@@ -1130,7 +1130,7 @@
 	<!--TODO: RECLOSER-->
 	<cim:Terminal rdf:ID="TM_156">
 		<cim:Terminal.ConductingEquipment rdf:resource="#ACL_R2"/>
-		<cim:Terminal.ConnectivityNode rdf:resource="#CN_69"/>
+		<cim:Terminal.ConnectivityNode rdf:resource="#CN_197"/>
 		<cim:IdentifiedObject.description>Terminal156</cim:IdentifiedObject.description>
 		<cim:IdentifiedObject.mRID>TM_156</cim:IdentifiedObject.mRID>
 		<ftn:IdentifiedObject.name>TM_156</ftn:IdentifiedObject.name>
@@ -1151,21 +1151,21 @@
 	</cim:Terminal>
 	<cim:Terminal rdf:ID="TM_159">
 		<cim:Terminal.ConductingEquipment rdf:resource="#ACL_35"/>
-		<cim:Terminal.ConnectivityNode rdf:resource="#CN_70"/>
+		<cim:Terminal.ConnectivityNode rdf:resource="#CN_189"/>
 		<cim:IdentifiedObject.description>Terminal159</cim:IdentifiedObject.description>
 		<cim:IdentifiedObject.mRID>TM_159</cim:IdentifiedObject.mRID>
 		<ftn:IdentifiedObject.name>TM_159</ftn:IdentifiedObject.name>
 	</cim:Terminal>
 	<cim:Terminal rdf:ID="TM_160">
 		<cim:Terminal.ConductingEquipment rdf:resource="#ACL_36"/>
-		<cim:Terminal.ConnectivityNode rdf:resource="#CN_70"/>
+		<cim:Terminal.ConnectivityNode rdf:resource="#CN_190"/>
 		<cim:IdentifiedObject.description>Terminal160</cim:IdentifiedObject.description>
 		<cim:IdentifiedObject.mRID>TM_160</cim:IdentifiedObject.mRID>
 		<ftn:IdentifiedObject.name>TM_160</ftn:IdentifiedObject.name>
 	</cim:Terminal>
 	<cim:Terminal rdf:ID="TM_161">
 		<cim:Terminal.ConductingEquipment rdf:resource="#ACL_37"/>
-		<cim:Terminal.ConnectivityNode rdf:resource="#CN_70"/>
+		<cim:Terminal.ConnectivityNode rdf:resource="#CN_191"/>
 		<cim:IdentifiedObject.description>Terminal161</cim:IdentifiedObject.description>
 		<cim:IdentifiedObject.mRID>TM_161</cim:IdentifiedObject.mRID>
 		<ftn:IdentifiedObject.name>TM_161</ftn:IdentifiedObject.name>
@@ -1298,14 +1298,14 @@
 	</cim:Terminal>
 	<cim:Terminal rdf:ID="TM_180">
 		<cim:Terminal.ConductingEquipment rdf:resource="#ACL_39"/>
-		<cim:Terminal.ConnectivityNode rdf:resource="#CN_79"/>
+		<cim:Terminal.ConnectivityNode rdf:resource="#CN_192"/>
 		<cim:IdentifiedObject.description>Terminal180</cim:IdentifiedObject.description>
 		<cim:IdentifiedObject.mRID>TM_180</cim:IdentifiedObject.mRID>
 		<ftn:IdentifiedObject.name>TM_180</ftn:IdentifiedObject.name>
 	</cim:Terminal>
 	<cim:Terminal rdf:ID="TM_181">
 		<cim:Terminal.ConductingEquipment rdf:resource="#ACL_40"/>
-		<cim:Terminal.ConnectivityNode rdf:resource="#CN_79"/>
+		<cim:Terminal.ConnectivityNode rdf:resource="#CN_193"/>
 		<cim:IdentifiedObject.description>Terminal181</cim:IdentifiedObject.description>
 		<cim:IdentifiedObject.mRID>TM_181</cim:IdentifiedObject.mRID>
 		<ftn:IdentifiedObject.name>TM_181</ftn:IdentifiedObject.name>
@@ -2844,8 +2844,286 @@
 		<cim:IdentifiedObject.mRID>TM_400</cim:IdentifiedObject.mRID>
 		<ftn:IdentifiedObject.name>TM_400</ftn:IdentifiedObject.name>
 	</cim:Terminal>
-	
-	
+	<cim:Terminal rdf:ID="TM_401">
+		<cim:Terminal.ConductingEquipment rdf:resource="#ACL_78"/>
+		<cim:Terminal.ConnectivityNode rdf:resource="#CN_30"/>
+		<cim:IdentifiedObject.description>Terminal401</cim:IdentifiedObject.description>
+		<cim:IdentifiedObject.mRID>TM_401</cim:IdentifiedObject.mRID>
+		<ftn:IdentifiedObject.name>TM_401</ftn:IdentifiedObject.name>
+	</cim:Terminal>
+	<cim:Terminal rdf:ID="TM_402">
+		<cim:Terminal.ConductingEquipment rdf:resource="#ACL_78"/>
+		<cim:Terminal.ConnectivityNode rdf:resource="#CN_178"/>
+		<cim:IdentifiedObject.description>Terminal402</cim:IdentifiedObject.description>
+		<cim:IdentifiedObject.mRID>TM_402</cim:IdentifiedObject.mRID>
+		<ftn:IdentifiedObject.name>TM_402</ftn:IdentifiedObject.name>
+	</cim:Terminal>
+	<cim:Terminal rdf:ID="TM_403">
+		<cim:Terminal.ConductingEquipment rdf:resource="#ACL_79"/>
+		<cim:Terminal.ConnectivityNode rdf:resource="#CN_178"/>
+		<cim:IdentifiedObject.description>Terminal403</cim:IdentifiedObject.description>
+		<cim:IdentifiedObject.mRID>TM_403</cim:IdentifiedObject.mRID>
+		<ftn:IdentifiedObject.name>TM_403</ftn:IdentifiedObject.name>
+	</cim:Terminal>
+	<cim:Terminal rdf:ID="TM_404">
+		<cim:Terminal.ConductingEquipment rdf:resource="#ACL_79"/>
+		<cim:Terminal.ConnectivityNode rdf:resource="#CN_179"/>
+		<cim:IdentifiedObject.description>Terminal404</cim:IdentifiedObject.description>
+		<cim:IdentifiedObject.mRID>TM_404</cim:IdentifiedObject.mRID>
+		<ftn:IdentifiedObject.name>TM_404</ftn:IdentifiedObject.name>
+	</cim:Terminal>
+	<cim:Terminal rdf:ID="TM_405">
+		<cim:Terminal.ConductingEquipment rdf:resource="#ACL_80"/>
+		<cim:Terminal.ConnectivityNode rdf:resource="#CN_179"/>
+		<cim:IdentifiedObject.description>Terminal405</cim:IdentifiedObject.description>
+		<cim:IdentifiedObject.mRID>TM_405</cim:IdentifiedObject.mRID>
+		<ftn:IdentifiedObject.name>TM_405</ftn:IdentifiedObject.name>
+	</cim:Terminal>
+	<cim:Terminal rdf:ID="TM_406">
+		<cim:Terminal.ConductingEquipment rdf:resource="#ACL_80"/>
+		<cim:Terminal.ConnectivityNode rdf:resource="#CN_180"/>
+		<cim:IdentifiedObject.description>Terminal406</cim:IdentifiedObject.description>
+		<cim:IdentifiedObject.mRID>TM_406</cim:IdentifiedObject.mRID>
+		<ftn:IdentifiedObject.name>TM_406</ftn:IdentifiedObject.name>
+	</cim:Terminal>
+	<cim:Terminal rdf:ID="TM_407">
+		<cim:Terminal.ConductingEquipment rdf:resource="#ACL_81"/>
+		<cim:Terminal.ConnectivityNode rdf:resource="#CN_180"/>
+		<cim:IdentifiedObject.description>Terminal407</cim:IdentifiedObject.description>
+		<cim:IdentifiedObject.mRID>TM_407</cim:IdentifiedObject.mRID>
+		<ftn:IdentifiedObject.name>TM_407</ftn:IdentifiedObject.name>
+	</cim:Terminal>
+	<cim:Terminal rdf:ID="TM_408">
+		<cim:Terminal.ConductingEquipment rdf:resource="#ACL_81"/>
+		<cim:Terminal.ConnectivityNode rdf:resource="#CN_181"/>
+		<cim:IdentifiedObject.description>Terminal408</cim:IdentifiedObject.description>
+		<cim:IdentifiedObject.mRID>TM_408</cim:IdentifiedObject.mRID>
+		<ftn:IdentifiedObject.name>TM_408</ftn:IdentifiedObject.name>
+	</cim:Terminal>
+	<cim:Terminal rdf:ID="TM_409">
+		<cim:Terminal.ConductingEquipment rdf:resource="#ACL_82"/>
+		<cim:Terminal.ConnectivityNode rdf:resource="#CN_181"/>
+		<cim:IdentifiedObject.description>Terminal409</cim:IdentifiedObject.description>
+		<cim:IdentifiedObject.mRID>TM_409</cim:IdentifiedObject.mRID>
+		<ftn:IdentifiedObject.name>TM_409</ftn:IdentifiedObject.name>
+	</cim:Terminal>
+	<cim:Terminal rdf:ID="TM_410">
+		<cim:Terminal.ConductingEquipment rdf:resource="#ACL_82"/>
+		<cim:Terminal.ConnectivityNode rdf:resource="#CN_182"/>
+		<cim:IdentifiedObject.description>Terminal410</cim:IdentifiedObject.description>
+		<cim:IdentifiedObject.mRID>TM_410</cim:IdentifiedObject.mRID>
+		<ftn:IdentifiedObject.name>TM_410</ftn:IdentifiedObject.name>
+	</cim:Terminal>
+	<cim:Terminal rdf:ID="TM_411">
+		<cim:Terminal.ConductingEquipment rdf:resource="#ACL_83"/>
+		<cim:Terminal.ConnectivityNode rdf:resource="#CN_44"/>
+		<cim:IdentifiedObject.description>Terminal411</cim:IdentifiedObject.description>
+		<cim:IdentifiedObject.mRID>TM_411</cim:IdentifiedObject.mRID>
+		<ftn:IdentifiedObject.name>TM_411</ftn:IdentifiedObject.name>
+	</cim:Terminal>
+	<cim:Terminal rdf:ID="TM_412">
+		<cim:Terminal.ConductingEquipment rdf:resource="#ACL_83"/>
+		<cim:Terminal.ConnectivityNode rdf:resource="#CN_183"/>
+		<cim:IdentifiedObject.description>Terminal412</cim:IdentifiedObject.description>
+		<cim:IdentifiedObject.mRID>TM_412</cim:IdentifiedObject.mRID>
+		<ftn:IdentifiedObject.name>TM_412</ftn:IdentifiedObject.name>
+	</cim:Terminal>
+	<cim:Terminal rdf:ID="TM_413">
+		<cim:Terminal.ConductingEquipment rdf:resource="#ACL_84"/>
+		<cim:Terminal.ConnectivityNode rdf:resource="#CN_183"/>
+		<cim:IdentifiedObject.description>Terminal413</cim:IdentifiedObject.description>
+		<cim:IdentifiedObject.mRID>TM_413</cim:IdentifiedObject.mRID>
+		<ftn:IdentifiedObject.name>TM_413</ftn:IdentifiedObject.name>
+	</cim:Terminal>
+	<cim:Terminal rdf:ID="TM_414">
+		<cim:Terminal.ConductingEquipment rdf:resource="#ACL_84"/>
+		<cim:Terminal.ConnectivityNode rdf:resource="#CN_184"/>
+		<cim:IdentifiedObject.description>Terminal414</cim:IdentifiedObject.description>
+		<cim:IdentifiedObject.mRID>TM_414</cim:IdentifiedObject.mRID>
+		<ftn:IdentifiedObject.name>TM_414</ftn:IdentifiedObject.name>
+	</cim:Terminal>
+	<cim:Terminal rdf:ID="TM_415">
+		<cim:Terminal.ConductingEquipment rdf:resource="#ACL_85"/>
+		<cim:Terminal.ConnectivityNode rdf:resource="#CN_184"/>
+		<cim:IdentifiedObject.description>Terminal415</cim:IdentifiedObject.description>
+		<cim:IdentifiedObject.mRID>TM_415</cim:IdentifiedObject.mRID>
+		<ftn:IdentifiedObject.name>TM_415</ftn:IdentifiedObject.name>
+	</cim:Terminal>
+	<cim:Terminal rdf:ID="TM_416">
+		<cim:Terminal.ConductingEquipment rdf:resource="#ACL_85"/>
+		<cim:Terminal.ConnectivityNode rdf:resource="#CN_185"/>
+		<cim:IdentifiedObject.description>Terminal416</cim:IdentifiedObject.description>
+		<cim:IdentifiedObject.mRID>TM_416</cim:IdentifiedObject.mRID>
+		<ftn:IdentifiedObject.name>TM_416</ftn:IdentifiedObject.name>
+	</cim:Terminal>
+	<cim:Terminal rdf:ID="TM_417">
+		<cim:Terminal.ConductingEquipment rdf:resource="#ACL_86"/>
+		<cim:Terminal.ConnectivityNode rdf:resource="#CN_53"/>
+		<cim:IdentifiedObject.description>Terminal417</cim:IdentifiedObject.description>
+		<cim:IdentifiedObject.mRID>TM_417</cim:IdentifiedObject.mRID>
+		<ftn:IdentifiedObject.name>TM_417</ftn:IdentifiedObject.name>
+	</cim:Terminal>
+	<cim:Terminal rdf:ID="TM_418">
+		<cim:Terminal.ConductingEquipment rdf:resource="#ACL_86"/>
+		<cim:Terminal.ConnectivityNode rdf:resource="#CN_186"/>
+		<cim:IdentifiedObject.description>Terminal418</cim:IdentifiedObject.description>
+		<cim:IdentifiedObject.mRID>TM_418</cim:IdentifiedObject.mRID>
+		<ftn:IdentifiedObject.name>TM_418</ftn:IdentifiedObject.name>
+	</cim:Terminal>
+	<cim:Terminal rdf:ID="TM_419">
+		<cim:Terminal.ConductingEquipment rdf:resource="#ACL_87"/>
+		<cim:Terminal.ConnectivityNode rdf:resource="#CN_186"/>
+		<cim:IdentifiedObject.description>Terminal419</cim:IdentifiedObject.description>
+		<cim:IdentifiedObject.mRID>TM_419</cim:IdentifiedObject.mRID>
+		<ftn:IdentifiedObject.name>TM_419</ftn:IdentifiedObject.name>
+	</cim:Terminal>
+	<cim:Terminal rdf:ID="TM_420">
+		<cim:Terminal.ConductingEquipment rdf:resource="#ACL_87"/>
+		<cim:Terminal.ConnectivityNode rdf:resource="#CN_187"/>
+		<cim:IdentifiedObject.description>Terminal420</cim:IdentifiedObject.description>
+		<cim:IdentifiedObject.mRID>TM_420</cim:IdentifiedObject.mRID>
+		<ftn:IdentifiedObject.name>TM_420</ftn:IdentifiedObject.name>
+	</cim:Terminal>
+	<cim:Terminal rdf:ID="TM_421">
+		<cim:Terminal.ConductingEquipment rdf:resource="#ACL_88"/>
+		<cim:Terminal.ConnectivityNode rdf:resource="#CN_60"/>
+		<cim:IdentifiedObject.description>Terminal421</cim:IdentifiedObject.description>
+		<cim:IdentifiedObject.mRID>TM_421</cim:IdentifiedObject.mRID>
+		<ftn:IdentifiedObject.name>TM_421</ftn:IdentifiedObject.name>
+	</cim:Terminal>
+	<cim:Terminal rdf:ID="TM_422">
+		<cim:Terminal.ConductingEquipment rdf:resource="#ACL_88"/>
+		<cim:Terminal.ConnectivityNode rdf:resource="#CN_188"/>
+		<cim:IdentifiedObject.description>Terminal422</cim:IdentifiedObject.description>
+		<cim:IdentifiedObject.mRID>TM_422</cim:IdentifiedObject.mRID>
+		<ftn:IdentifiedObject.name>TM_422</ftn:IdentifiedObject.name>
+	</cim:Terminal>
+	<cim:Terminal rdf:ID="TM_423">
+		<cim:Terminal.ConductingEquipment rdf:resource="#ACL_89"/>
+		<cim:Terminal.ConnectivityNode rdf:resource="#CN_70"/>
+		<cim:IdentifiedObject.description>Terminal423</cim:IdentifiedObject.description>
+		<cim:IdentifiedObject.mRID>TM_423</cim:IdentifiedObject.mRID>
+		<ftn:IdentifiedObject.name>TM_423</ftn:IdentifiedObject.name>
+	</cim:Terminal>
+	<cim:Terminal rdf:ID="TM_424">
+		<cim:Terminal.ConductingEquipment rdf:resource="#ACL_89"/>
+		<cim:Terminal.ConnectivityNode rdf:resource="#CN_189"/>
+		<cim:IdentifiedObject.description>Terminal424</cim:IdentifiedObject.description>
+		<cim:IdentifiedObject.mRID>TM_424</cim:IdentifiedObject.mRID>
+		<ftn:IdentifiedObject.name>TM_424</ftn:IdentifiedObject.name>
+	</cim:Terminal>
+	<cim:Terminal rdf:ID="TM_425">
+		<cim:Terminal.ConductingEquipment rdf:resource="#ACL_90"/>
+		<cim:Terminal.ConnectivityNode rdf:resource="#CN_189"/>
+		<cim:IdentifiedObject.description>Terminal425</cim:IdentifiedObject.description>
+		<cim:IdentifiedObject.mRID>TM_425</cim:IdentifiedObject.mRID>
+		<ftn:IdentifiedObject.name>TM_425</ftn:IdentifiedObject.name>
+	</cim:Terminal>
+	<cim:Terminal rdf:ID="TM_426">
+		<cim:Terminal.ConductingEquipment rdf:resource="#ACL_90"/>
+		<cim:Terminal.ConnectivityNode rdf:resource="#CN_190"/>
+		<cim:IdentifiedObject.description>Terminal426</cim:IdentifiedObject.description>
+		<cim:IdentifiedObject.mRID>TM_426</cim:IdentifiedObject.mRID>
+		<ftn:IdentifiedObject.name>TM_426</ftn:IdentifiedObject.name>
+	</cim:Terminal>
+	<cim:Terminal rdf:ID="TM_427">
+		<cim:Terminal.ConductingEquipment rdf:resource="#ACL_91"/>
+		<cim:Terminal.ConnectivityNode rdf:resource="#CN_190"/>
+		<cim:IdentifiedObject.description>Terminal427</cim:IdentifiedObject.description>
+		<cim:IdentifiedObject.mRID>TM_427</cim:IdentifiedObject.mRID>
+		<ftn:IdentifiedObject.name>TM_427</ftn:IdentifiedObject.name>
+	</cim:Terminal>
+	<cim:Terminal rdf:ID="TM_428">
+		<cim:Terminal.ConductingEquipment rdf:resource="#ACL_91"/>
+		<cim:Terminal.ConnectivityNode rdf:resource="#CN_191"/>
+		<cim:IdentifiedObject.description>Terminal428</cim:IdentifiedObject.description>
+		<cim:IdentifiedObject.mRID>TM_428</cim:IdentifiedObject.mRID>
+		<ftn:IdentifiedObject.name>TM_428</ftn:IdentifiedObject.name>
+	</cim:Terminal>
+	<cim:Terminal rdf:ID="TM_429">
+		<cim:Terminal.ConductingEquipment rdf:resource="#ACL_92"/>
+		<cim:Terminal.ConnectivityNode rdf:resource="#CN_79"/>
+		<cim:IdentifiedObject.description>Terminal429</cim:IdentifiedObject.description>
+		<cim:IdentifiedObject.mRID>TM_429</cim:IdentifiedObject.mRID>
+		<ftn:IdentifiedObject.name>TM_429</ftn:IdentifiedObject.name>
+	</cim:Terminal>
+	<cim:Terminal rdf:ID="TM_430">
+		<cim:Terminal.ConductingEquipment rdf:resource="#ACL_92"/>
+		<cim:Terminal.ConnectivityNode rdf:resource="#CN_192"/>
+		<cim:IdentifiedObject.description>Terminal430</cim:IdentifiedObject.description>
+		<cim:IdentifiedObject.mRID>TM_430</cim:IdentifiedObject.mRID>
+		<ftn:IdentifiedObject.name>TM_430</ftn:IdentifiedObject.name>
+	</cim:Terminal>
+	<cim:Terminal rdf:ID="TM_431">
+		<cim:Terminal.ConductingEquipment rdf:resource="#ACL_93"/>
+		<cim:Terminal.ConnectivityNode rdf:resource="#CN_192"/>
+		<cim:IdentifiedObject.description>Terminal431</cim:IdentifiedObject.description>
+		<cim:IdentifiedObject.mRID>TM_431</cim:IdentifiedObject.mRID>
+		<ftn:IdentifiedObject.name>TM_431</ftn:IdentifiedObject.name>
+	</cim:Terminal>
+	<cim:Terminal rdf:ID="TM_432">
+		<cim:Terminal.ConductingEquipment rdf:resource="#ACL_93"/>
+		<cim:Terminal.ConnectivityNode rdf:resource="#CN_193"/>
+		<cim:IdentifiedObject.description>Terminal432</cim:IdentifiedObject.description>
+		<cim:IdentifiedObject.mRID>TM_432</cim:IdentifiedObject.mRID>
+		<ftn:IdentifiedObject.name>TM_432</ftn:IdentifiedObject.name>
+	</cim:Terminal>
+	<cim:Terminal rdf:ID="TM_433">
+		<cim:Terminal.ConductingEquipment rdf:resource="#ACL_14"/>
+		<cim:Terminal.ConnectivityNode rdf:resource="#CN_29"/>
+		<cim:IdentifiedObject.description>Terminal433</cim:IdentifiedObject.description>
+		<cim:IdentifiedObject.mRID>TM_433</cim:IdentifiedObject.mRID>
+		<ftn:IdentifiedObject.name>TM_433</ftn:IdentifiedObject.name>
+	</cim:Terminal>
+	<cim:Terminal rdf:ID="TM_434">
+		<cim:Terminal.ConductingEquipment rdf:resource="#ACL_94"/>
+		<cim:Terminal.ConnectivityNode rdf:resource="#CN_194"/>
+		<cim:IdentifiedObject.description>Terminal434</cim:IdentifiedObject.description>
+		<cim:IdentifiedObject.mRID>TM_434</cim:IdentifiedObject.mRID>
+		<ftn:IdentifiedObject.name>TM_434</ftn:IdentifiedObject.name>
+	</cim:Terminal>
+	<cim:Terminal rdf:ID="TM_435">
+		<cim:Terminal.ConductingEquipment rdf:resource="#BR_17"/>
+		<cim:Terminal.ConnectivityNode rdf:resource="#CN_194"/>
+		<cim:IdentifiedObject.description>Terminal435</cim:IdentifiedObject.description>
+		<cim:IdentifiedObject.mRID>TM_435</cim:IdentifiedObject.mRID>
+		<ftn:IdentifiedObject.name>TM_435</ftn:IdentifiedObject.name>
+	</cim:Terminal>
+	<cim:Terminal rdf:ID="TM_436">
+		<cim:Terminal.ConductingEquipment rdf:resource="#BR_17"/>
+		<cim:Terminal.ConnectivityNode rdf:resource="#CN_195"/>
+		<cim:IdentifiedObject.description>Terminal436</cim:IdentifiedObject.description>
+		<cim:IdentifiedObject.mRID>TM_436</cim:IdentifiedObject.mRID>
+		<ftn:IdentifiedObject.name>TM_436</ftn:IdentifiedObject.name>
+	</cim:Terminal>
+	<cim:Terminal rdf:ID="TM_437">
+		<cim:Terminal.ConductingEquipment rdf:resource="#ACL_95"/>
+		<cim:Terminal.ConnectivityNode rdf:resource="#CN_69"/>
+		<cim:IdentifiedObject.description>Terminal437</cim:IdentifiedObject.description>
+		<cim:IdentifiedObject.mRID>TM_437</cim:IdentifiedObject.mRID>
+		<ftn:IdentifiedObject.name>TM_437</ftn:IdentifiedObject.name>
+	</cim:Terminal>
+	<cim:Terminal rdf:ID="TM_438">
+		<cim:Terminal.ConductingEquipment rdf:resource="#ACL_95"/>
+		<cim:Terminal.ConnectivityNode rdf:resource="#CN_196"/>
+		<cim:IdentifiedObject.description>Terminal438</cim:IdentifiedObject.description>
+		<cim:IdentifiedObject.mRID>TM_438</cim:IdentifiedObject.mRID>
+		<ftn:IdentifiedObject.name>TM_438</ftn:IdentifiedObject.name>
+	</cim:Terminal>
+	<cim:Terminal rdf:ID="TM_439">
+		<cim:Terminal.ConductingEquipment rdf:resource="#BR_18"/>
+		<cim:Terminal.ConnectivityNode rdf:resource="#CN_196"/>
+		<cim:IdentifiedObject.description>Terminal439</cim:IdentifiedObject.description>
+		<cim:IdentifiedObject.mRID>TM_439</cim:IdentifiedObject.mRID>
+		<ftn:IdentifiedObject.name>TM_439</ftn:IdentifiedObject.name>
+	</cim:Terminal>
+	<cim:Terminal rdf:ID="TM_440">
+		<cim:Terminal.ConductingEquipment rdf:resource="#BR_18"/>
+		<cim:Terminal.ConnectivityNode rdf:resource="#CN_197"/>
+		<cim:IdentifiedObject.description>Terminal440</cim:IdentifiedObject.description>
+		<cim:IdentifiedObject.mRID>TM_440</cim:IdentifiedObject.mRID>
+		<ftn:IdentifiedObject.name>TM_440</ftn:IdentifiedObject.name>
+	</cim:Terminal>
 	<!--END Terminal-->
 <!--[END Package_Core ]-->
 	
@@ -3401,8 +3679,132 @@
 		<cim:IdentifiedObject.mRID>ACL_77</cim:IdentifiedObject.mRID>
 		<ftn:IdentifiedObject.name>ACL_77</ftn:IdentifiedObject.name>
 	</cim:ACLineSegment>
-	
-	
+	<cim:ACLineSegment rdf:ID="ACL_78">
+		<cim:ConductingEquipment.BaseVoltage rdf:resource="#BV_2"/>
+		<cim:ConductingEquipment.isRemote>true</cim:ConductingEquipment.isRemote>
+		<cim:IdentifiedObject.description>ACLineSegment</cim:IdentifiedObject.description>
+		<cim:IdentifiedObject.mRID>ACL_78</cim:IdentifiedObject.mRID>
+		<ftn:IdentifiedObject.name>ACL_78</ftn:IdentifiedObject.name>
+	</cim:ACLineSegment>
+	<cim:ACLineSegment rdf:ID="ACL_79">
+		<cim:ConductingEquipment.BaseVoltage rdf:resource="#BV_2"/>
+		<cim:ConductingEquipment.isRemote>true</cim:ConductingEquipment.isRemote>
+		<cim:IdentifiedObject.description>ACLineSegment</cim:IdentifiedObject.description>
+		<cim:IdentifiedObject.mRID>ACL_79</cim:IdentifiedObject.mRID>
+		<ftn:IdentifiedObject.name>ACL_79</ftn:IdentifiedObject.name>
+	</cim:ACLineSegment>
+	<cim:ACLineSegment rdf:ID="ACL_80">
+		<cim:ConductingEquipment.BaseVoltage rdf:resource="#BV_2"/>
+		<cim:ConductingEquipment.isRemote>true</cim:ConductingEquipment.isRemote>
+		<cim:IdentifiedObject.description>ACLineSegment</cim:IdentifiedObject.description>
+		<cim:IdentifiedObject.mRID>ACL_80</cim:IdentifiedObject.mRID>
+		<ftn:IdentifiedObject.name>ACL_80</ftn:IdentifiedObject.name>
+	</cim:ACLineSegment>
+	<cim:ACLineSegment rdf:ID="ACL_81">
+		<cim:ConductingEquipment.BaseVoltage rdf:resource="#BV_2"/>
+		<cim:ConductingEquipment.isRemote>true</cim:ConductingEquipment.isRemote>
+		<cim:IdentifiedObject.description>ACLineSegment</cim:IdentifiedObject.description>
+		<cim:IdentifiedObject.mRID>ACL_81</cim:IdentifiedObject.mRID>
+		<ftn:IdentifiedObject.name>ACL_81</ftn:IdentifiedObject.name>
+	</cim:ACLineSegment>
+	<cim:ACLineSegment rdf:ID="ACL_82">
+		<cim:ConductingEquipment.BaseVoltage rdf:resource="#BV_2"/>
+		<cim:ConductingEquipment.isRemote>true</cim:ConductingEquipment.isRemote>
+		<cim:IdentifiedObject.description>ACLineSegment</cim:IdentifiedObject.description>
+		<cim:IdentifiedObject.mRID>ACL_82</cim:IdentifiedObject.mRID>
+		<ftn:IdentifiedObject.name>ACL_82</ftn:IdentifiedObject.name>
+	</cim:ACLineSegment>
+	<cim:ACLineSegment rdf:ID="ACL_83">
+		<cim:ConductingEquipment.BaseVoltage rdf:resource="#BV_2"/>
+		<cim:ConductingEquipment.isRemote>true</cim:ConductingEquipment.isRemote>
+		<cim:IdentifiedObject.description>ACLineSegment</cim:IdentifiedObject.description>
+		<cim:IdentifiedObject.mRID>ACL_83</cim:IdentifiedObject.mRID>
+		<ftn:IdentifiedObject.name>ACL_83</ftn:IdentifiedObject.name>
+	</cim:ACLineSegment>
+	<cim:ACLineSegment rdf:ID="ACL_84">
+		<cim:ConductingEquipment.BaseVoltage rdf:resource="#BV_2"/>
+		<cim:ConductingEquipment.isRemote>true</cim:ConductingEquipment.isRemote>
+		<cim:IdentifiedObject.description>ACLineSegment</cim:IdentifiedObject.description>
+		<cim:IdentifiedObject.mRID>ACL_84</cim:IdentifiedObject.mRID>
+		<ftn:IdentifiedObject.name>ACL_84</ftn:IdentifiedObject.name>
+	</cim:ACLineSegment>
+	<cim:ACLineSegment rdf:ID="ACL_85">
+		<cim:ConductingEquipment.BaseVoltage rdf:resource="#BV_2"/>
+		<cim:ConductingEquipment.isRemote>true</cim:ConductingEquipment.isRemote>
+		<cim:IdentifiedObject.description>ACLineSegment</cim:IdentifiedObject.description>
+		<cim:IdentifiedObject.mRID>ACL_85</cim:IdentifiedObject.mRID>
+		<ftn:IdentifiedObject.name>ACL_85</ftn:IdentifiedObject.name>
+	</cim:ACLineSegment>
+	<cim:ACLineSegment rdf:ID="ACL_86">
+		<cim:ConductingEquipment.BaseVoltage rdf:resource="#BV_2"/>
+		<cim:ConductingEquipment.isRemote>true</cim:ConductingEquipment.isRemote>
+		<cim:IdentifiedObject.description>ACLineSegment</cim:IdentifiedObject.description>
+		<cim:IdentifiedObject.mRID>ACL_86</cim:IdentifiedObject.mRID>
+		<ftn:IdentifiedObject.name>ACL_86</ftn:IdentifiedObject.name>
+	</cim:ACLineSegment>
+	<cim:ACLineSegment rdf:ID="ACL_87">
+		<cim:ConductingEquipment.BaseVoltage rdf:resource="#BV_2"/>
+		<cim:ConductingEquipment.isRemote>true</cim:ConductingEquipment.isRemote>
+		<cim:IdentifiedObject.description>ACLineSegment</cim:IdentifiedObject.description>
+		<cim:IdentifiedObject.mRID>ACL_87</cim:IdentifiedObject.mRID>
+		<ftn:IdentifiedObject.name>ACL_87</ftn:IdentifiedObject.name>
+	</cim:ACLineSegment>
+	<cim:ACLineSegment rdf:ID="ACL_88">
+		<cim:ConductingEquipment.BaseVoltage rdf:resource="#BV_2"/>
+		<cim:ConductingEquipment.isRemote>true</cim:ConductingEquipment.isRemote>
+		<cim:IdentifiedObject.description>ACLineSegment</cim:IdentifiedObject.description>
+		<cim:IdentifiedObject.mRID>ACL_88</cim:IdentifiedObject.mRID>
+		<ftn:IdentifiedObject.name>ACL_88</ftn:IdentifiedObject.name>
+	</cim:ACLineSegment>
+	<cim:ACLineSegment rdf:ID="ACL_89">
+		<cim:ConductingEquipment.BaseVoltage rdf:resource="#BV_2"/>
+		<cim:ConductingEquipment.isRemote>true</cim:ConductingEquipment.isRemote>
+		<cim:IdentifiedObject.description>ACLineSegment</cim:IdentifiedObject.description>
+		<cim:IdentifiedObject.mRID>ACL_89</cim:IdentifiedObject.mRID>
+		<ftn:IdentifiedObject.name>ACL_89</ftn:IdentifiedObject.name>
+	</cim:ACLineSegment>
+	<cim:ACLineSegment rdf:ID="ACL_90">
+		<cim:ConductingEquipment.BaseVoltage rdf:resource="#BV_2"/>
+		<cim:ConductingEquipment.isRemote>true</cim:ConductingEquipment.isRemote>
+		<cim:IdentifiedObject.description>ACLineSegment</cim:IdentifiedObject.description>
+		<cim:IdentifiedObject.mRID>ACL_90</cim:IdentifiedObject.mRID>
+		<ftn:IdentifiedObject.name>ACL_90</ftn:IdentifiedObject.name>
+	</cim:ACLineSegment>
+	<cim:ACLineSegment rdf:ID="ACL_91">
+		<cim:ConductingEquipment.BaseVoltage rdf:resource="#BV_2"/>
+		<cim:ConductingEquipment.isRemote>true</cim:ConductingEquipment.isRemote>
+		<cim:IdentifiedObject.description>ACLineSegment</cim:IdentifiedObject.description>
+		<cim:IdentifiedObject.mRID>ACL_91</cim:IdentifiedObject.mRID>
+		<ftn:IdentifiedObject.name>ACL_91</ftn:IdentifiedObject.name>
+	</cim:ACLineSegment>
+	<cim:ACLineSegment rdf:ID="ACL_92">
+		<cim:ConductingEquipment.BaseVoltage rdf:resource="#BV_2"/>
+		<cim:ConductingEquipment.isRemote>true</cim:ConductingEquipment.isRemote>
+		<cim:IdentifiedObject.description>ACLineSegment</cim:IdentifiedObject.description>
+		<cim:IdentifiedObject.mRID>ACL_92</cim:IdentifiedObject.mRID>
+		<ftn:IdentifiedObject.name>ACL_92</ftn:IdentifiedObject.name>
+	</cim:ACLineSegment>
+	<cim:ACLineSegment rdf:ID="ACL_93">
+		<cim:ConductingEquipment.BaseVoltage rdf:resource="#BV_2"/>
+		<cim:ConductingEquipment.isRemote>true</cim:ConductingEquipment.isRemote>
+		<cim:IdentifiedObject.description>ACLineSegment</cim:IdentifiedObject.description>
+		<cim:IdentifiedObject.mRID>ACL_93</cim:IdentifiedObject.mRID>
+		<ftn:IdentifiedObject.name>ACL_93</ftn:IdentifiedObject.name>
+	</cim:ACLineSegment>
+	<cim:ACLineSegment rdf:ID="ACL_94">
+		<cim:ConductingEquipment.BaseVoltage rdf:resource="#BV_2"/>
+		<cim:ConductingEquipment.isRemote>true</cim:ConductingEquipment.isRemote>
+		<cim:IdentifiedObject.description>ACLineSegment</cim:IdentifiedObject.description>
+		<cim:IdentifiedObject.mRID>ACL_94</cim:IdentifiedObject.mRID>
+		<ftn:IdentifiedObject.name>ACL_94</ftn:IdentifiedObject.name>
+	</cim:ACLineSegment>
+	<cim:ACLineSegment rdf:ID="ACL_95">
+		<cim:ConductingEquipment.BaseVoltage rdf:resource="#BV_2"/>
+		<cim:ConductingEquipment.isRemote>true</cim:ConductingEquipment.isRemote>
+		<cim:IdentifiedObject.description>ACLineSegment</cim:IdentifiedObject.description>
+		<cim:IdentifiedObject.mRID>ACL_95</cim:IdentifiedObject.mRID>
+		<ftn:IdentifiedObject.name>ACL_95</ftn:IdentifiedObject.name>
+	</cim:ACLineSegment>
 	<cim:ACLineSegment rdf:ID="ACL_96">
 		<cim:ConductingEquipment.BaseVoltage rdf:resource="#BV_2"/>
 		<cim:ConductingEquipment.isRemote>false</cim:ConductingEquipment.isRemote>
@@ -3415,14 +3817,14 @@
 		<cim:ConductingEquipment.isRemote>false</cim:ConductingEquipment.isRemote>
 		<cim:IdentifiedObject.description>ACLineSegment</cim:IdentifiedObject.description>
 		<cim:IdentifiedObject.mRID>ACL_97</cim:IdentifiedObject.mRID>
-		<ftn:IdentifiedObject.name>ACL_97/ftn:IdentifiedObject.name>
+		<ftn:IdentifiedObject.name>ACL_97</ftn:IdentifiedObject.name>
 	</cim:ACLineSegment>
 	<cim:ACLineSegment rdf:ID="ACL_98">
 		<cim:ConductingEquipment.BaseVoltage rdf:resource="#BV_2"/>
 		<cim:ConductingEquipment.isRemote>false</cim:ConductingEquipment.isRemote>
 		<cim:IdentifiedObject.description>ACLineSegment</cim:IdentifiedObject.description>
 		<cim:IdentifiedObject.mRID>ACL_98</cim:IdentifiedObject.mRID>
-		<ftn:IdentifiedObject.name>ACL_968</ftn:IdentifiedObject.name>
+		<ftn:IdentifiedObject.name>ACL_98</ftn:IdentifiedObject.name>
 	</cim:ACLineSegment>
 	<cim:ACLineSegment rdf:ID="ACL_99">
 		<cim:ConductingEquipment.BaseVoltage rdf:resource="#BV_2"/>
@@ -3500,6 +3902,13 @@
 		<cim:IdentifiedObject.description>ACLineSegment</cim:IdentifiedObject.description>
 		<cim:IdentifiedObject.mRID>ACL_109</cim:IdentifiedObject.mRID>
 		<ftn:IdentifiedObject.name>ACL_109</ftn:IdentifiedObject.name>
+	</cim:ACLineSegment>
+	<cim:ACLineSegment rdf:ID="ACL_110">
+		<cim:ConductingEquipment.BaseVoltage rdf:resource="#BV_2"/>
+		<cim:ConductingEquipment.isRemote>false</cim:ConductingEquipment.isRemote>
+		<cim:IdentifiedObject.description>ACLineSegment</cim:IdentifiedObject.description>
+		<cim:IdentifiedObject.mRID>ACL_110</cim:IdentifiedObject.mRID>
+		<ftn:IdentifiedObject.name>ACL_110</ftn:IdentifiedObject.name>
 	</cim:ACLineSegment>
 	<cim:ACLineSegment rdf:ID="ACL_111">
 		<cim:ConductingEquipment.BaseVoltage rdf:resource="#BV_2"/>
@@ -3797,7 +4206,22 @@
 		<cim:IdentifiedObject.mRID>BR_16</cim:IdentifiedObject.mRID>
 		<ftn:IdentifiedObject.name>BR_16</ftn:IdentifiedObject.name>
 	</cim:Breaker>	
-	
+	<cim:Breaker rdf:ID="BR_17">
+		<cim:Breaker.noReclosing>true</cim:Breaker.noReclosing>
+		<cim:ConductingEquipment.isRemote>true</cim:ConductingEquipment.isRemote>
+		<cim:ConductingEquipment.BaseVoltage rdf:resource="#BV_2"/>
+		<cim:IdentifiedObject.description> </cim:IdentifiedObject.description>
+		<cim:IdentifiedObject.mRID>BR_17</cim:IdentifiedObject.mRID>
+		<ftn:IdentifiedObject.name>BR_17</ftn:IdentifiedObject.name>
+	</cim:Breaker>	
+	<cim:Breaker rdf:ID="BR_18">
+		<cim:Breaker.noReclosing>true</cim:Breaker.noReclosing>
+		<cim:ConductingEquipment.isRemote>true</cim:ConductingEquipment.isRemote>
+		<cim:ConductingEquipment.BaseVoltage rdf:resource="#BV_2"/>
+		<cim:IdentifiedObject.description> </cim:IdentifiedObject.description>
+		<cim:IdentifiedObject.mRID>BR_18</cim:IdentifiedObject.mRID>
+		<ftn:IdentifiedObject.name>BR_18</ftn:IdentifiedObject.name>
+	</cim:Breaker>	
 	<cim:Breaker rdf:ID="BR_19">
 		<cim:Breaker.noReclosing>true</cim:Breaker.noReclosing>
 		<cim:ConductingEquipment.isRemote>false</cim:ConductingEquipment.isRemote>
@@ -5667,6 +6091,106 @@
 		<cim:IdentifiedObject.description>ConnectivityNode177</cim:IdentifiedObject.description>
 		<cim:IdentifiedObject.mRID>CN_177</cim:IdentifiedObject.mRID>
 		<ftn:IdentifiedObject.name>CN_177</ftn:IdentifiedObject.name>
+	</cim:ConnectivityNode>
+	<cim:ConnectivityNode rdf:ID="CN_178">
+		<cim:IdentifiedObject.description>ConnectivityNode178</cim:IdentifiedObject.description>
+		<cim:IdentifiedObject.mRID>CN_178</cim:IdentifiedObject.mRID>
+		<ftn:IdentifiedObject.name>CN_178</ftn:IdentifiedObject.name>
+	</cim:ConnectivityNode>
+	<cim:ConnectivityNode rdf:ID="CN_179">
+		<cim:IdentifiedObject.description>ConnectivityNode179</cim:IdentifiedObject.description>
+		<cim:IdentifiedObject.mRID>CN_179</cim:IdentifiedObject.mRID>
+		<ftn:IdentifiedObject.name>CN_179</ftn:IdentifiedObject.name>
+	</cim:ConnectivityNode>
+	<cim:ConnectivityNode rdf:ID="CN_180">
+		<cim:IdentifiedObject.description>ConnectivityNode180</cim:IdentifiedObject.description>
+		<cim:IdentifiedObject.mRID>CN_180</cim:IdentifiedObject.mRID>
+		<ftn:IdentifiedObject.name>CN_180</ftn:IdentifiedObject.name>
+	</cim:ConnectivityNode>
+	<cim:ConnectivityNode rdf:ID="CN_181">
+		<cim:IdentifiedObject.description>ConnectivityNode181</cim:IdentifiedObject.description>
+		<cim:IdentifiedObject.mRID>CN_181</cim:IdentifiedObject.mRID>
+		<ftn:IdentifiedObject.name>CN_181</ftn:IdentifiedObject.name>
+	</cim:ConnectivityNode>
+	<cim:ConnectivityNode rdf:ID="CN_182">
+		<cim:IdentifiedObject.description>ConnectivityNode182</cim:IdentifiedObject.description>
+		<cim:IdentifiedObject.mRID>CN_182</cim:IdentifiedObject.mRID>
+		<ftn:IdentifiedObject.name>CN_182</ftn:IdentifiedObject.name>
+	</cim:ConnectivityNode>
+	<cim:ConnectivityNode rdf:ID="CN_183">
+		<cim:IdentifiedObject.description>ConnectivityNode183</cim:IdentifiedObject.description>
+		<cim:IdentifiedObject.mRID>CN_183</cim:IdentifiedObject.mRID>
+		<ftn:IdentifiedObject.name>CN_183</ftn:IdentifiedObject.name>
+	</cim:ConnectivityNode>
+	<cim:ConnectivityNode rdf:ID="CN_184">
+		<cim:IdentifiedObject.description>ConnectivityNode184</cim:IdentifiedObject.description>
+		<cim:IdentifiedObject.mRID>CN_184</cim:IdentifiedObject.mRID>
+		<ftn:IdentifiedObject.name>CN_184</ftn:IdentifiedObject.name>
+	</cim:ConnectivityNode>
+	<cim:ConnectivityNode rdf:ID="CN_185">
+		<cim:IdentifiedObject.description>ConnectivityNode185</cim:IdentifiedObject.description>
+		<cim:IdentifiedObject.mRID>CN_185</cim:IdentifiedObject.mRID>
+		<ftn:IdentifiedObject.name>CN_185</ftn:IdentifiedObject.name>
+	</cim:ConnectivityNode>
+	<cim:ConnectivityNode rdf:ID="CN_186">
+		<cim:IdentifiedObject.description>ConnectivityNode186</cim:IdentifiedObject.description>
+		<cim:IdentifiedObject.mRID>CN_186</cim:IdentifiedObject.mRID>
+		<ftn:IdentifiedObject.name>CN_186</ftn:IdentifiedObject.name>
+	</cim:ConnectivityNode>
+	<cim:ConnectivityNode rdf:ID="CN_187">
+		<cim:IdentifiedObject.description>ConnectivityNode187</cim:IdentifiedObject.description>
+		<cim:IdentifiedObject.mRID>CN_187</cim:IdentifiedObject.mRID>
+		<ftn:IdentifiedObject.name>CN_187</ftn:IdentifiedObject.name>
+	</cim:ConnectivityNode>
+	<cim:ConnectivityNode rdf:ID="CN_188">
+		<cim:IdentifiedObject.description>ConnectivityNode188</cim:IdentifiedObject.description>
+		<cim:IdentifiedObject.mRID>CN_188</cim:IdentifiedObject.mRID>
+		<ftn:IdentifiedObject.name>CN_188</ftn:IdentifiedObject.name>
+	</cim:ConnectivityNode>
+	<cim:ConnectivityNode rdf:ID="CN_189">
+		<cim:IdentifiedObject.description>ConnectivityNode189</cim:IdentifiedObject.description>
+		<cim:IdentifiedObject.mRID>CN_189</cim:IdentifiedObject.mRID>
+		<ftn:IdentifiedObject.name>CN_189</ftn:IdentifiedObject.name>
+	</cim:ConnectivityNode>
+	<cim:ConnectivityNode rdf:ID="CN_190">
+		<cim:IdentifiedObject.description>ConnectivityNode190</cim:IdentifiedObject.description>
+		<cim:IdentifiedObject.mRID>CN_190</cim:IdentifiedObject.mRID>
+		<ftn:IdentifiedObject.name>CN_190</ftn:IdentifiedObject.name>
+	</cim:ConnectivityNode>
+	<cim:ConnectivityNode rdf:ID="CN_191">
+		<cim:IdentifiedObject.description>ConnectivityNode191</cim:IdentifiedObject.description>
+		<cim:IdentifiedObject.mRID>CN_191</cim:IdentifiedObject.mRID>
+		<ftn:IdentifiedObject.name>CN_191</ftn:IdentifiedObject.name>
+	</cim:ConnectivityNode>
+	<cim:ConnectivityNode rdf:ID="CN_192">
+		<cim:IdentifiedObject.description>ConnectivityNode192</cim:IdentifiedObject.description>
+		<cim:IdentifiedObject.mRID>CN_192</cim:IdentifiedObject.mRID>
+		<ftn:IdentifiedObject.name>CN_192</ftn:IdentifiedObject.name>
+	</cim:ConnectivityNode>
+	<cim:ConnectivityNode rdf:ID="CN_193">
+		<cim:IdentifiedObject.description>ConnectivityNode193</cim:IdentifiedObject.description>
+		<cim:IdentifiedObject.mRID>CN_193</cim:IdentifiedObject.mRID>
+		<ftn:IdentifiedObject.name>CN_193</ftn:IdentifiedObject.name>
+	</cim:ConnectivityNode>
+	<cim:ConnectivityNode rdf:ID="CN_194">
+		<cim:IdentifiedObject.description>ConnectivityNode194</cim:IdentifiedObject.description>
+		<cim:IdentifiedObject.mRID>CN_194</cim:IdentifiedObject.mRID>
+		<ftn:IdentifiedObject.name>CN_194</ftn:IdentifiedObject.name>
+	</cim:ConnectivityNode>
+	<cim:ConnectivityNode rdf:ID="CN_195">
+		<cim:IdentifiedObject.description>ConnectivityNode195</cim:IdentifiedObject.description>
+		<cim:IdentifiedObject.mRID>CN_195</cim:IdentifiedObject.mRID>
+		<ftn:IdentifiedObject.name>CN_195</ftn:IdentifiedObject.name>
+	</cim:ConnectivityNode>
+	<cim:ConnectivityNode rdf:ID="CN_196">
+		<cim:IdentifiedObject.description>ConnectivityNode196</cim:IdentifiedObject.description>
+		<cim:IdentifiedObject.mRID>CN_196</cim:IdentifiedObject.mRID>
+		<ftn:IdentifiedObject.name>CN_196</ftn:IdentifiedObject.name>
+	</cim:ConnectivityNode>
+	<cim:ConnectivityNode rdf:ID="CN_197">
+		<cim:IdentifiedObject.description>ConnectivityNode197</cim:IdentifiedObject.description>
+		<cim:IdentifiedObject.mRID>CN_197</cim:IdentifiedObject.mRID>
+		<ftn:IdentifiedObject.name>CN_197</ftn:IdentifiedObject.name>
 	</cim:ConnectivityNode>
 	<!--suvisni-->
 	<!--
