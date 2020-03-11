@@ -26,7 +26,6 @@ namespace Outage.NetworkModelService
         {
             networkModel = new NetworkModel();
             GenericDataAccess.NetworkModel = networkModel;
-            ResourceIterator.NetworkModel = networkModel;
             NMSTransactionActor.NetworkModel = networkModel;
             InitializeHosts();
         }

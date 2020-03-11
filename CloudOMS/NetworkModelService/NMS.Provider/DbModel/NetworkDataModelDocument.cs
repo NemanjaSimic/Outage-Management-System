@@ -1,7 +1,7 @@
 ﻿using Outage.Common;
 using System.Collections.Generic;
 
-namespace CloudOMS.NetworkModelService.NMSProvider.DbModel
+namespace CloudOMS.NetworkModelService.NMS.Provider.DbModel
 {
     public class NetworkDataModelDocument
     {

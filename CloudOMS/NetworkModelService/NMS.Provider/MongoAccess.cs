@@ -1,4 +1,4 @@
-﻿using CloudOMS.NetworkModelService.NMSProvider.DbModel;
+﻿using CloudOMS.NetworkModelService.NMS.Provider.DbModel;
 using Microsoft.ServiceFabric.Data.Collections;
 using MongoDB.Bson;
 using MongoDB.Bson.Serialization;
@@ -13,7 +13,7 @@ using System.Linq;
 using System.Text;
 using System.Threading.Tasks;
 
-namespace CloudOMS.NetworkModelService.NMSProvider
+namespace CloudOMS.NetworkModelService.NMS.Provider
 {
     public class MongoAccess
     {

@@ -233,7 +233,7 @@ namespace Outage.NetworkModelService
                     class2PropertyIDs.Add(entityDmsType, properties);
                 }
 
-                ResourceIterator ri = new ResourceIterator(globalIds, class2PropertyIDs);
+                ResourceIterator ri = new ResourceIterator(this, globalIds, class2PropertyIDs);
 
                 Logger.LogInfo($"Getting extent values for entity type: {entityType} succedded.");
 
@@ -276,7 +276,7 @@ namespace Outage.NetworkModelService
                     }
                 }
 
-                ResourceIterator ri = new ResourceIterator(relatedGids, class2PropertyIDs);
+                ResourceIterator ri = new ResourceIterator(this, relatedGids, class2PropertyIDs);
 
                 Logger.LogInfo($"Getting related values for source: 0x{source:X16} succedded.");
 

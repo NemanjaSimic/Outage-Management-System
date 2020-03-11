@@ -2,7 +2,7 @@
 using Outage.DistributedTransactionActor;
 using System;
 
-namespace CloudOMS.NetworkModelService.NMSProvider.DistributedTransaction
+namespace CloudOMS.NetworkModelService.NMS.Provider.DistributedTransaction
 {
     public class NMSTransactionActor : TransactionActor
     { 

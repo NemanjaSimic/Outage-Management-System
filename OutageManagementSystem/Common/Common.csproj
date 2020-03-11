@@ -190,6 +190,7 @@
   </ItemGroup>
   <ItemGroup>
     <None Include="app.config" />
+    <Fakes Include="Fakes\Microsoft.ServiceFabric.Data.Interfaces.fakes" />
     <None Include="Log4NetConfig.config">
       <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
     </None>

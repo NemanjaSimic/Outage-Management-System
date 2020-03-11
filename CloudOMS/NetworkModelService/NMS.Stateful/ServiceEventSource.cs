@@ -7,9 +7,9 @@ using System.Text;
 using System.Threading.Tasks;
 using Microsoft.ServiceFabric.Services.Runtime;
 
-namespace CloudOMS.NetworkModelService
+namespace NMS.Stateful
 {
-    [EventSource(Name = "MyCompany-CloudOMS-NetworkModelService")]
+    [EventSource(Name = "MyCompany-CloudOMS-NMS.Stateful")]
     internal sealed class ServiceEventSource : EventSource
     {
         public static readonly ServiceEventSource Current = new ServiceEventSource();

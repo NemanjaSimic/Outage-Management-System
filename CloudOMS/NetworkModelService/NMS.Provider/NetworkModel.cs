@@ -1,4 +1,4 @@
-﻿using CloudOMS.NetworkModelService.NMSProvider.GDA;
+﻿using CloudOMS.NetworkModelService.NMS.Provider.GDA;
 using Microsoft.ServiceFabric.Data;
 using Microsoft.ServiceFabric.Data.Collections;
 using Outage.Common;
@@ -12,7 +12,7 @@ using System.Collections.Generic;
 using System.Text;
 using UpdateResult = Outage.Common.GDA.UpdateResult;
 
-namespace CloudOMS.NetworkModelService.NMSProvider
+namespace CloudOMS.NetworkModelService.NMS.Provider
 {
     public class NetworkModel
     {
@@ -23,6 +23,9 @@ namespace CloudOMS.NetworkModelService.NMSProvider
         {
             get { return logger ?? (logger = LoggerWrapper.Instance); }
         }
+
+        private readonly string networkModelKey = "networkModelKey";
+        private readonly string incomingNetworkModelKey = "incomingNetworkModelKey";
 
         private IReliableStateManager stateManager;
         private ProxyFactory proxyFactory;
@@ -67,14 +70,13 @@ namespace CloudOMS.NetworkModelService.NMSProvider
 
         #endregion
 
-
         /// <summary>
         /// Initializes a new instance of the Model class.
         /// </summary>
         public NetworkModel(IReliableStateManager stateManager)
         {
             this.stateManager = stateManager;
-            this.networkDataModel = stateManager.GetOrAddAsync<IReliableDictionary<ushort, Container>>("networkModel").Result;
+            this.networkDataModel = stateManager.GetOrAddAsync<IReliableDictionary<ushort, Container>>(networkModelKey).Result;
 
             this.mongoDb = new MongoAccess();
             this.proxyFactory = new ProxyFactory();
@@ -333,35 +335,22 @@ namespace CloudOMS.NetworkModelService.NMSProvider
         public UpdateResult ApplyDelta(Delta delta, bool isInitialization = false)
         {
             currentDelta = delta;
-
             UpdateResult updateResult = new UpdateResult();
 
             //shallow copy 
-            incomingNetworkDataModel = this.stateManager.GetOrAddAsync<IReliableDictionary<ushort, Container>>("incomingNetworkModel").Result;
-
-            IAsyncEnumerable<KeyValuePair<ushort, Container>> enumerableCurrentModel;
-
-            using (ITransaction tx = this.stateManager.CreateTransaction())
+            if(ReliableDictionaryHelper.TryCopyToReliableDictionary<ushort, Container>(networkModelKey, incomingNetworkModelKey, stateManager))
             {
-                enumerableCurrentModel = NetworkDataModel.CreateEnumerableAsync(tx).Result;
+                incomingNetworkDataModel = this.stateManager.GetOrAddAsync<IReliableDictionary<ushort, Container>>(incomingNetworkModelKey).Result;
+                Logger.LogDebug($"Incoming model [HashCode: 0x{incomingNetworkDataModel.GetHashCode():X16}] is shallow copy of Current model [HashCode: 0x{networkDataModel.GetHashCode():X16}].");
             }
-
-            IAsyncEnumerator<KeyValuePair<ushort, Container>> asyncEnumerator = enumerableCurrentModel.GetAsyncEnumerator();
-
-            while(!asyncEnumerator.MoveNextAsync(new System.Threading.CancellationToken()).Result)
+            else
             {
-                KeyValuePair<ushort, Container> kvp = asyncEnumerator.Current;
+                string message = "ApplyDelta => Failed to copy current to incoming network model";
+                Logger.LogError(message);
+                updateResult.Result = ResultType.Failed;
+                updateResult.Message = message;
+                return updateResult;
             }
-
-            List<KeyValuePair<ushort, Container>> list = new List<KeyValuePair<ushort, Container>>(enumerableCurrentModel);
-
-            foreach (var foo in enumerableCurrentModel)
-            {
-
-            }
-
-            incomingNetworkDataModel = new Dictionary<DMSType, Container>(NetworkDataModel);
-            Logger.LogDebug($"Incoming model [HashCode: 0x{incomingNetworkDataModel.GetHashCode():X16}] is shallow copy of Current model [HashCode: 0x{networkDataModel.GetHashCode():X16}].");
 
             try
             {
@@ -373,7 +362,6 @@ namespace CloudOMS.NetworkModelService.NMSProvider
                 if (!isInitialization)
                 {
                     delta.FixNegativeToPositiveIds(ref typesCounters, ref globalIdPairs);
-
                 }
 
                 updateResult.GlobalIdPairs = globalIdPairs;
@@ -481,7 +469,8 @@ namespace CloudOMS.NetworkModelService.NMSProvider
             {
                 Logger.LogDebug("Delta version is higher then network model version.");
 
-                networkDataModel = mongoDb.GetLatesNetworkModel(networkModelVersion);
+                var dbNetworkModel = mongoDb.GetLatesNetworkModel(networkModelVersion);
+                ReliableDictionaryHelper.TryCopyToReliableDictionary<ushort, Container>(dbNetworkModel, networkModelKey, stateManager);
 
                 List<Delta> deltas = mongoDb.GetAllDeltas(deltaVersion, networkModelVersion);
 
@@ -501,7 +490,8 @@ namespace CloudOMS.NetworkModelService.NMSProvider
             }
             else if (networkModelVersion > 0)
             {
-                networkDataModel = mongoDb.GetLatesNetworkModel(networkModelVersion);
+                var dbNetworkModel = mongoDb.GetLatesNetworkModel(networkModelVersion);
+                ReliableDictionaryHelper.TryCopyToReliableDictionary<ushort, Container>(dbNetworkModel, networkModelKey, stateManager);
             }
             else
             {
@@ -632,9 +622,14 @@ namespace CloudOMS.NetworkModelService.NMSProvider
             {
                 typesCounters[(short)type] = 0;
 
-                if (networkDataModel.ContainsKey(type))
+                using(ITransaction tx = stateManager.CreateTransaction())
                 {
-                    typesCounters[(short)type] = networkDataModel[type].Count;
+                    var result = networkDataModel.TryGetValueAsync(tx, (ushort)type).Result;
+                    
+                    if (result.HasValue)
+                    {
+                        typesCounters[(short)type] = result.Value.Count;
+                    }
                 }
             }
 
@@ -657,7 +652,7 @@ namespace CloudOMS.NetworkModelService.NMSProvider
             Logger.LogInfo($"Inserting entity with GID: 0x{globalId:X16}");
 
             // check if mapping for specified global id already exists			
-            if (this.EntityExistsInIncomingData(globalId))
+            if (TryGetEntityFormIncomingData(globalId, out _))
             {
                 string message = String.Format("Failed to insert entity because entity with specified GID: 0x{0:X16} already exists in network model.", globalId);
                 Logger.LogError(message);
@@ -673,15 +668,10 @@ namespace CloudOMS.NetworkModelService.NMSProvider
                 Container incomingContainer = null;
 
                 //get container from incoming model
-                if (incomingNetworkDataModel.ContainsKey(type))
+                if(TryGetContainerFromIncomingData(type, out incomingContainer))
                 {
-                    incomingContainer = incomingNetworkDataModel[type];
-
-                    //get container from current model
-                    if (networkDataModel.ContainsKey(type))
+                    if(TryGetContainer(type, out Container currentContainer))
                     {
-                        Container currentContainer = networkDataModel[type];
-
                         if (currentContainer.GetHashCode() == incomingContainer.GetHashCode())
                         {
                             incomingContainer = GetContainerShallowCopy(type, currentContainer);
@@ -691,11 +681,48 @@ namespace CloudOMS.NetworkModelService.NMSProvider
                 //create new container or make the shallow copy
                 else
                 {
-                    incomingContainer = new Container();
-                    incomingNetworkDataModel.Add(type, incomingContainer);
-                    Logger.LogDebug($"Container [{type}, HashCode: 0x{incomingContainer.GetHashCode():X16}] created and added to Incoming model.");
-
+                    using (ITransaction tx = stateManager.CreateTransaction())
+                    {
+                        incomingContainer = new Container();
+                        Logger.LogDebug($"Container [{type}, HashCode: 0x{incomingContainer.GetHashCode():X16}] created;");
+                    }
                 }
+
+                using (ITransaction tx = stateManager.CreateTransaction())
+                {
+                    if (incomingNetworkDataModel.TryAddAsync(tx, (ushort)type, incomingContainer).Result)
+                    {
+                        Logger.LogDebug($"Container [{type}, HashCode: 0x{incomingContainer.GetHashCode():X16}] created and added to Incoming model.");
+                    }
+                    else
+                    {
+                        throw new NotImplementedException();
+                    }
+                }
+
+                //if (incomingNetworkDataModel.ContainsKey(type))
+                //{
+                //    incomingContainer1 = incomingNetworkDataModel[type];
+
+                //    //get container from current model
+                //    if (networkDataModel.ContainsKey(type))
+                //    {
+                //        Container currentContainer = networkDataModel[type];
+
+                //        if (currentContainer.GetHashCode() == incomingContainer.GetHashCode())
+                //        {
+                //            incomingContainer = GetContainerShallowCopy(type, currentContainer);
+                //        }
+                //    }
+                //}
+                ////create new container or make the shallow copy
+                //else
+                //{
+                //    incomingContainer = new Container();
+                //    incomingNetworkDataModel.Add(type, incomingContainer);
+                //    Logger.LogDebug($"Container [{type}, HashCode: 0x{incomingContainer.GetHashCode():X16}] created and added to Incoming model.");
+
+                //}
 
                 // create entity and add it to container
                 IdentifiedObject io = incomingContainer.CreateEntity(globalId);

@@ -1,4 +1,4 @@
-﻿namespace CloudOMS.NetworkModelService.NMSProvider.DbModel
+﻿namespace CloudOMS.NetworkModelService.NMS.Provider.DbModel
 {
     public class ModelVersionDocument
     {

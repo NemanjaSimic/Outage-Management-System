@@ -2,21 +2,20 @@ using System;
 using System.Collections.Generic;
 using System.Diagnostics;
 using System.Fabric;
-using System.Linq;
 using System.Threading;
 using System.Threading.Tasks;
-using Microsoft.ServiceFabric.Data.Collections;
+using CloudOMS.NetworkModelService.NMS.Provider;
 using Microsoft.ServiceFabric.Services.Communication.Runtime;
 using Microsoft.ServiceFabric.Services.Runtime;
 
-namespace CloudOMS.NetworkModelService
+namespace NMS.Stateful
 {
     /// <summary>
     /// An instance of this class is created for each service replica by the Service Fabric runtime.
     /// </summary>
-    internal sealed class NetworkModelService : StatefulService
+    internal sealed class NMSStateful : StatefulService
     {
-        public NetworkModelService(StatefulServiceContext context)
+        public NMSStateful(StatefulServiceContext context)
             : base(context)
         { }
 
@@ -42,36 +41,7 @@ namespace CloudOMS.NetworkModelService
             // TODO: Replace the following sample code with your own logic 
             //       or remove this RunAsync override if it's not needed in your service.
 
-            var myDictionary = await this.StateManager.GetOrAddAsync<IReliableDictionary<string, long>>("myDictionary");
-
-            while(!cancellationToken.IsCancellationRequested)
-            {
-                try
-                {
-                    string message = "Starting Network Model Service...";
-                    Trace.WriteLine($"\n{message}\n", "Info");
-
-                    using (NMSProvider.NMSProvider nmsProvider = new NMSProvider.NMSProvider(this.StateManager))
-                    {
-                        nmsProvider.Start();
-
-                        message = "Press <Enter> to stop the service.";
-                        Trace.WriteLine($"\n{message}\n", "Info");
-                        Console.ReadLine();
-
-                        while(!cancellationToken.IsCancellationRequested)
-                        {
-                            //...
-                        }
-                    }
-                }
-                catch (Exception ex)
-                {
-                    Trace.WriteLine($"\n{ex.Message}\n", "Error");
-                    Trace.WriteLine("Network Model Service failed.", "Error");
-                    Trace.WriteLine($"\n{ex.StackTrace}\n", "Error");
-                }
-            }
+            //var myDictionary = await this.StateManager.GetOrAddAsync<IReliableDictionary<string, long>>("myDictionary");
 
             //while (true)
             //{
@@ -93,6 +63,32 @@ namespace CloudOMS.NetworkModelService
 
             //    await Task.Delay(TimeSpan.FromSeconds(1), cancellationToken);
             //}
+
+            while (!cancellationToken.IsCancellationRequested)
+            {
+                try
+                {
+                    string message = "Starting Network Model Service...";
+                    Trace.WriteLine($"\n{message}\n", "Info");
+
+                    using (NetworkModelService nms = new NetworkModelService(this.StateManager))
+                    {
+                        nms.Start();
+
+                        message = "Press <Enter> to stop the service.";
+                        Trace.WriteLine($"\n{message}\n", "Info");
+                        Console.ReadLine();
+
+                        while (!cancellationToken.IsCancellationRequested) ;
+                    }
+                }
+                catch (Exception ex)
+                {
+                    Trace.WriteLine($"\n{ex.Message}\n", "Error");
+                    Trace.WriteLine("Network Model Service failed.", "Error");
+                    Trace.WriteLine($"\n{ex.StackTrace}\n", "Error");
+                }
+            }
         }
     }
 }

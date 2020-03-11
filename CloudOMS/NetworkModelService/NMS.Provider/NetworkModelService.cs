@@ -1,5 +1,5 @@
-﻿using CloudOMS.NetworkModelService.NMSProvider.DistributedTransaction;
-using CloudOMS.NetworkModelService.NMSProvider.GDA;
+﻿using CloudOMS.NetworkModelService.NMS.Provider.DistributedTransaction;
+using CloudOMS.NetworkModelService.NMS.Provider.GDA;
 using Microsoft.ServiceFabric.Data;
 using Microsoft.ServiceFabric.Data.Collections;
 using Outage.Common;
@@ -8,9 +8,9 @@ using System.Collections.Generic;
 using System.ServiceModel;
 using System.Text;
 
-namespace CloudOMS.NetworkModelService.NMSProvider
+namespace CloudOMS.NetworkModelService.NMS.Provider
 {
-    public sealed class NMSProvider : IDisposable
+    public sealed class NetworkModelService : IDisposable
     {
         private ILogger logger;
 
@@ -22,7 +22,7 @@ namespace CloudOMS.NetworkModelService.NMSProvider
         private NetworkModel networkModel = null;
         private List<ServiceHost> hosts = null;
 
-        public NMSProvider(IReliableStateManager stateManager)
+        public NetworkModelService(IReliableStateManager stateManager)
         {
             networkModel = new NetworkModel(stateManager);
             GenericDataAccess.NetworkModel = networkModel;

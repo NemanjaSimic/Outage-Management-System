@@ -16,7 +16,7 @@ using System.Text;
 
 namespace OutageManagementService
 {
-    public class OutageManagementService : IDisposable
+    public sealed class OutageManagementService : IDisposable
     {
         #region Private Fields
 
@@ -134,8 +134,7 @@ namespace OutageManagementService
         private void SubscribeOnEmailService()
         {
             ProxyFactory proxyFactory = new ProxyFactory();
-            subscriberProxy = proxyFactory.CreateProxy<SubscriberProxy, ISubscriber>(callTracker, EndpointNames.SubscriberEndpoint);
-            //proxyFactory = new SubscriberProxy(callTracker, EndpointNames.SubscriberEndpoint);
+            this.subscriberProxy = proxyFactory.CreateProxy<SubscriberProxy, ISubscriber>(callTracker, EndpointNames.SubscriberEndpoint);
 
             if (subscriberProxy == null)
             {
@@ -145,7 +144,6 @@ namespace OutageManagementService
             }
 
             subscriberProxy.Subscribe(Topic.OUTAGE_EMAIL);
-
         }
 
         private void InitializeEnergyConsumers(OutageContext db)

@@ -1,7 +1,7 @@
 ﻿using System;
 using System.Configuration;
 
-namespace CloudOMS.NetworkModelService.NMSProvider
+namespace CloudOMS.NetworkModelService.NMS.Provider
 {
     public class Config
     {

@@ -7,8 +7,6 @@
     <ServerGarbageCollection>True</ServerGarbageCollection>
     <RuntimeIdentifier>win7-x64</RuntimeIdentifier>
     <TargetLatestRuntimePatch>False</TargetLatestRuntimePatch>
-    <AssemblyName>CloudOMS.NetworkModelService</AssemblyName>
-    <RootNamespace>CloudOMS.NetworkModelService</RootNamespace>
   </PropertyGroup>
 
   <ItemGroup>
@@ -16,7 +14,7 @@
   </ItemGroup>
 
   <ItemGroup>
-    <ProjectReference Include="..\NMSProvider\NMSProvider.csproj" />
+    <ProjectReference Include="..\NMS.Provider\NMS.Provider.csproj" />
   </ItemGroup>
 
 </Project>

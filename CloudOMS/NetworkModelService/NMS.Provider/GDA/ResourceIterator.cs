@@ -3,7 +3,7 @@ using Outage.Common.GDA;
 using System;
 using System.Collections.Generic;
 
-namespace CloudOMS.NetworkModelService.NMSProvider.GDA
+namespace CloudOMS.NetworkModelService.NMS.Provider.GDA
 {
     public class ResourceIterator
     {
