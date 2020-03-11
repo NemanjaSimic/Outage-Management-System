@@ -439,7 +439,105 @@ namespace OutageManagementService
 
         public bool SendLocationIsolationCrew(long outageId)
         {
-            throw new NotImplementedException();
+
+            long outageElementId = -1;
+            OutageEntity outageEntity = null;
+            List<OutageEntity> activeOutages = null;
+            try
+            {
+                outageEntity = dbContext.OutageRepository.Get(outageId);
+            }
+            catch (Exception ex)
+            {
+
+                Logger.LogError($"OutageModel::SendLocationIsolationCrew => exception in UnitOfWork.OutageRepository.Get()", ex);
+            }
+
+            try
+            {
+                activeOutages = dbContext.OutageRepository.GetAllActive().ToList();
+            }
+            catch (Exception ex)
+            {
+
+                Logger.LogError("OutageModel::SendLocationIsolationCrew => excpetion in UnitOfWork.OutageRepository.GetAllActive()", ex);
+                return false;
+            }
+            if(outageEntity == null)
+            {
+                Logger.LogError($"Outage with id 0x{outageId:X16} is not found in database.");
+                return false;
+            }
+
+
+            Task task = Task.Run(() =>
+            {
+                Task.Delay(5000).Wait();
+                using (OutageSimulatorServiceProxy proxy = proxyFactory.CreateProxy<OutageSimulatorServiceProxy, IOutageSimulatorContract>(EndpointNames.OutageSimulatorServiceEndpoint))
+                {
+                    if (proxy == null)
+                    {
+                        string message = "OutageModel::SendLocationIsolationCrew => OutageSimulatorProxy is null";
+                        Logger.LogError(message);
+                        throw new NullReferenceException(message);
+                    }
+                    //Da li je prijaveljen element OutageElement
+                    if (proxy.IsOutageElement(outageEntity.OutageElementGid))
+                    {
+                        outageElementId = outageEntity.OutageElementGid;
+                    }
+                    else
+                    {
+                        //Da li je mozda na ACL-novima ispod prijavljenog elementa
+                        if (topologyModel.GetElementByGid(outageEntity.OutageElementGid, out IOutageTopologyElement topologyElement))
+                        {
+                            try
+                            {
+                                for (int i = 0; i < topologyElement.SecondEnd.Count; i++)
+                                {
+                                    if (proxy.IsOutageElement(topologyElement.SecondEnd[i]))
+                                    {
+                                        if (outageElementId == -1)
+                                        {
+                                            outageElementId = topologyElement.SecondEnd[i];
+                                            outageEntity.OutageElementGid = outageElementId;
+                                        }
+                                        else
+                                        {
+                                            OutageEntity entity = new OutageEntity() { OutageElementGid = topologyElement.SecondEnd[i], ReportTime = DateTime.UtcNow };
+                                            dbContext.OutageRepository.Add(entity);
+                                        }
+                                    }
+                                }
+                            }
+                            catch (Exception ex)
+                            {
+                                Logger.LogError("OutageModel::SendLocationIsolationCrew => failed with error", ex);
+                                throw;
+                            }
+                            dbContext.Complete();
+                        }
+
+                    }
+
+                    topologyModel.GetElementByGidFirstEnd(outageEntity.OutageElementGid, out IOutageTopologyElement element);
+                    //Tragamo za ACL-om gore ka source-u
+                    do
+                    {
+                        if (proxy.IsOutageElement(outageEntity.OutageElementGid))
+                        {
+                            outageElementId = outageEntity.OutageElementGid;
+                            outageEntity.OutageElementGid = outageElementId;
+                            dbContext.Complete();
+                        }
+
+                    } while (outageElementId == -1 && !element.IsRemote && element.DmsType != "ENERGYSOURCE");
+                }
+            });
+            if (outageElementId == -1)
+                return false;
+            else
+                return true;
         }
 
         public bool ValidateResolveConditions(long outageId)
