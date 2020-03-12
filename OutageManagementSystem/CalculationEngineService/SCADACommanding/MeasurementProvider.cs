@@ -137,7 +137,8 @@ namespace CalculationEngine.SCADAFunctions
 
 			if (measurementToElementMap.TryGetValue(measurementGid, out long recloserGid) 
 				&& Provider.Instance.ModelProvider.IsRecloser(recloserGid)
-				&& commandOrigin != CommandOriginType.CE_COMMAND)
+				&& commandOrigin != CommandOriginType.CE_COMMAND
+				&& commandOrigin != CommandOriginType.OUTAGE_SIMULATOR)
 			{
 				Provider.Instance.TopologyProvider.ResetRecloser(recloserGid);
 			}
