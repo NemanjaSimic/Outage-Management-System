@@ -1,10 +1,11 @@
-﻿using System;
+﻿using Microsoft.ServiceFabric.Services.Remoting;
+using System;
 using System.ServiceModel;
 
 namespace Outage.Common.ServiceContracts.CalculationEngine
 {
     [ServiceContract]
-    public interface ISwitchStatusCommandingContract
+    public interface ISwitchStatusCommandingContract : IService
     {
         //TERMINOLOGY: using 'gid' because UI can send gid of either element (for noSCADA commanding) or measurement (for SCADA commanding)
 

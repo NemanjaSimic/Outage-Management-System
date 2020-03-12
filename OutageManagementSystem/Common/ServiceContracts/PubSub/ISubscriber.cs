@@ -1,4 +1,5 @@
-﻿using Outage.Common.OutageService.Model;
+﻿using Microsoft.ServiceFabric.Services.Remoting;
+using Outage.Common.OutageService.Model;
 using Outage.Common.PubSub;
 using Outage.Common.PubSub.CalculationEngineDataContract;
 using Outage.Common.PubSub.EmailDataContract;
@@ -10,13 +11,13 @@ using System.ServiceModel;
 namespace Outage.Common.ServiceContracts.PubSub
 {
     [ServiceContract(CallbackContract = typeof(ISubscriberCallback))]
-    public interface ISubscriber
+    public interface ISubscriber : IService
     {
         [OperationContract(IsOneWay = true)]
         void Subscribe(Topic topic);
     }
 
-    public interface ISubscriberCallback
+    public interface ISubscriberCallback : IService
     {
         [OperationContract]
         string GetSubscriberName();

@@ -6,7 +6,7 @@ using System.Linq;
 
 namespace CloudOMS.NetworkModelService.NMS.Provider
 {
-    public class Container //: ICloneable
+    public class Container : IEquatable<Container>
     {
         ILogger Logger = LoggerWrapper.Instance;
 
@@ -292,6 +292,14 @@ namespace CloudOMS.NetworkModelService.NMS.Provider
             };
 
             return clone;
+        }
+        #endregion
+
+
+        #region IEquitable
+        public bool Equals(Container other)
+        {
+            return this.GetHashCode() == other.GetHashCode();
         }
         #endregion
     }

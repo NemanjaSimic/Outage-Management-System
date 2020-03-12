@@ -1,6 +1,7 @@
 ﻿using Outage.Common.ServiceContracts.DistributedTransaction;
 using System;
 using System.ServiceModel;
+using System.Threading.Tasks;
 
 namespace Outage.Common.ServiceProxies.DistributedTransaction
 {
@@ -11,13 +12,13 @@ namespace Outage.Common.ServiceProxies.DistributedTransaction
         {
         }
 
-        public bool Prepare()
+        public async Task<bool> Prepare()
         {
             bool success;
 
             try
             {
-                success = Channel.Prepare();
+                success = await Channel.Prepare();
             }
             catch (Exception e)
             {
@@ -30,11 +31,11 @@ namespace Outage.Common.ServiceProxies.DistributedTransaction
             
         }
 
-        public void Commit()
+        public async Task Commit()
         {
             try
             {
-                Channel.Commit();
+                await Channel.Commit();
             }
             catch (Exception e)
             {
@@ -44,11 +45,11 @@ namespace Outage.Common.ServiceProxies.DistributedTransaction
             }         
         }
 
-        public void Rollback()
+        public async Task Rollback()
         {
             try
             {
-                Channel.Rollback();
+                await Channel.Rollback();
             }
             catch (Exception e)
             {

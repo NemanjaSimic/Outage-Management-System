@@ -8,30 +8,83 @@ namespace Outage.Common.ReliableCollectionHelpers
 {
     public static class ReliableDictionaryHelper
     {
-        public static Dictionary<TKey, TValue> CopyToDictionary<TKey, TValue>(IReliableDictionary<TKey, TValue> reliableDictionary, IReliableStateManager stateManager) where TKey : IComparable<TKey>,
-                                                                                                                                                                                     IEquatable<TKey>
+        public static bool TryCopyToDictionary<TKey, TValue>(string sourceKey, IReliableStateManager stateManager, out Dictionary<TKey, TValue> target) where TKey : IComparable<TKey>,
+                                                                                                                                                                     IEquatable<TKey>
         {
-            Dictionary<TKey, TValue> dictionary = new Dictionary<TKey, TValue>();
-            Microsoft.ServiceFabric.Data.IAsyncEnumerable<KeyValuePair<TKey, TValue>> asyncEnumerable;
+            target = null;
 
-            using (ITransaction tx = stateManager.CreateTransaction())
+            try
             {
-                asyncEnumerable = reliableDictionary.CreateEnumerableAsync(tx).Result;
+                var result = stateManager.TryGetAsync<IReliableDictionary<TKey, TValue>>(sourceKey).Result;
+
+                if (!result.HasValue)
+                {
+                    return false;
+                }
+
+                IReliableDictionary<TKey, TValue> source = result.Value;
+                target = new Dictionary<TKey, TValue>();
+
+                IAsyncEnumerable<KeyValuePair<TKey, TValue>> asyncEnumerable;
+
+                using (ITransaction tx = stateManager.CreateTransaction())
+                {
+                    asyncEnumerable = source.CreateEnumerableAsync(tx).Result;
+                }
+
+                var asyncEnumerator = asyncEnumerable.GetAsyncEnumerator();
+                var currentEntry = asyncEnumerator.Current;
+                target.Add(currentEntry.Key, currentEntry.Value);
+
+                CancellationTokenSource tokenSource = new CancellationTokenSource();
+
+                while (asyncEnumerator.MoveNextAsync(tokenSource.Token).Result)
+                {
+                    currentEntry = asyncEnumerator.Current;
+                    target.Add(currentEntry.Key, currentEntry.Value);
+                }
+            }
+            catch (Exception e)
+            {
+                throw e;
             }
             
-            var asyncEnumerator = asyncEnumerable.GetAsyncEnumerator();
-            var currentEntry = asyncEnumerator.Current;
-            dictionary.Add(currentEntry.Key, currentEntry.Value);
+            return true;
+        }
 
-            CancellationTokenSource tokenSource = new CancellationTokenSource();
-            
-            while (asyncEnumerator.MoveNextAsync(tokenSource.Token).Result)
+        public static bool TryCopyToDictionary<TKey, TValue>(IReliableDictionary<TKey, TValue> source, IReliableStateManager stateManager, out Dictionary<TKey, TValue> target) where TKey : IComparable<TKey>,
+                                                                                                                                                                                             IEquatable<TKey>
+        {
+            try
             {
-                currentEntry = asyncEnumerator.Current;
-                dictionary.Add(currentEntry.Key, currentEntry.Value);
-            }
+                target = new Dictionary<TKey, TValue>();
+                IAsyncEnumerable<KeyValuePair<TKey, TValue>> asyncEnumerable;
 
-            return dictionary;
+                using (ITransaction tx = stateManager.CreateTransaction())
+                {
+                    asyncEnumerable = source.CreateEnumerableAsync(tx).Result;
+                }
+
+                var asyncEnumerator = asyncEnumerable.GetAsyncEnumerator();
+                var currentEntry = asyncEnumerator.Current;
+                target.Add(currentEntry.Key, currentEntry.Value);
+
+                CancellationTokenSource tokenSource = new CancellationTokenSource();
+
+                while (asyncEnumerator.MoveNextAsync(tokenSource.Token).Result)
+                {
+                    currentEntry = asyncEnumerator.Current;
+                    target.Add(currentEntry.Key, currentEntry.Value);
+                }
+            }
+            catch (Exception e)
+            {
+
+                throw e;
+            }
+            
+
+            return true;
         }
 
         public static bool TryCopyToReliableDictionary<TKey, TValue>(Dictionary<TKey, TValue> source, string targetKey, IReliableStateManager stateManager) where TKey : IComparable<TKey>,

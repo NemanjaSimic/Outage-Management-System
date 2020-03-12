@@ -1,11 +1,24 @@
 ﻿using System;
 using System.Configuration;
+using System.Fabric;
 
 namespace CloudOMS.NetworkModelService.NMS.Provider
 {
     public class Config
     {
         private string dBConnectionString = string.Empty;
+        private StatelessServiceContext context;
+
+        public StatelessServiceContext Context 
+        {
+            get { return context; }
+
+            set
+            {
+                context = value;
+                Set();
+            }
+        }
 
         public string DbConnectionString
         {
@@ -15,7 +28,7 @@ namespace CloudOMS.NetworkModelService.NMS.Provider
 
         private Config()
         {
-            dBConnectionString = ConfigurationManager.ConnectionStrings["mongoConnectionString"].ConnectionString;
+            //dBConnectionString = ConfigurationManager.ConnectionStrings["mongoConnectionString"].ConnectionString;
         }
 
         #region Static members
@@ -36,6 +49,12 @@ namespace CloudOMS.NetworkModelService.NMS.Provider
         }
 
         #endregion Static members
+
+        private void Set()
+        {
+            var config = context.CodePackageActivationContext.GetConfigurationPackageObject("Config");
+            dBConnectionString = config.Settings.Sections["ConnectionStrings"].Parameters["mongoConnectionString"].Value;
+        }
 
         public string GetCompositeId(long valueWithSystemId)
         {

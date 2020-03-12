@@ -1,5 +1,6 @@
 ﻿using Outage.Common;
 using Outage.Common.ServiceContracts.DistributedTransaction;
+using System.Threading.Tasks;
 
 namespace Outage.DistributedTransactionActor
 {
@@ -7,14 +8,14 @@ namespace Outage.DistributedTransactionActor
     {
         protected ILogger Logger = LoggerWrapper.Instance;
 
-        public virtual bool Prepare()
+        public virtual async Task<bool> Prepare()
         {
             Logger.LogInfo("Prepare finished SUCCESSFULLY");
             return true;
         }
 
-        public abstract void Commit();
+        public abstract Task Commit();
 
-        public abstract void Rollback();
+        public abstract Task Rollback();
     }
 }

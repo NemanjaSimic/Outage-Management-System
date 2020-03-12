@@ -1,6 +1,4 @@
 ﻿using CloudOMS.NetworkModelService.NMS.Provider.GDA;
-using Microsoft.ServiceFabric.Data;
-using Microsoft.ServiceFabric.Data.Collections;
 using Outage.Common;
 using Outage.Common.GDA;
 using Outage.Common.ServiceContracts.DistributedTransaction;
@@ -24,60 +22,56 @@ namespace CloudOMS.NetworkModelService.NMS.Provider
             get { return logger ?? (logger = LoggerWrapper.Instance); }
         }
 
-        private readonly string networkModelKey = "networkModelKey";
-        private readonly string incomingNetworkModelKey = "incomingNetworkModelKey";
-
-        private IReliableStateManager stateManager;
-        private ProxyFactory proxyFactory;
-
         private MongoAccess mongoDb;
         private Delta currentDelta;
+
+        ProxyFactory proxyFactory;
 
         /// <summary>
         /// ModelResourceDesc class contains metadata of the model
         /// </summary>
         private ModelResourcesDesc resourcesDescs;
 
+        private bool isTransactionInProgress = false;
+
         /// <summary>
         /// Dictionary which contains all data: Key - DMSType, Value - Container
         /// </summary>
-        private IReliableDictionary<ushort, Container> networkDataModel;
+        private Dictionary<DMSType, Container> networkDataModel;
 
         /// <summary>
 		/// Dictionaru which contains all incoming data: Key - DMSType, Value - Container;
         /// Used while applying deltas.
 		/// </summary>
-        private IReliableDictionary<ushort, Container> incomingNetworkDataModel;
+        private Dictionary<DMSType, Container> incomingNetworkDataModel;
 
         /// <summary>
 		/// Dictionaru which contains all incoming data: Key - DMSType, Value - Container;
         /// Contains old network model during distributed transaction.
 		/// </summary>
-        private IReliableDictionary<ushort, Container> oldNetworkDataModel;
+        private Dictionary<DMSType, Container> oldNetworkDataModel;
         #endregion
 
         #region Properties
         /// <summary>
         /// Dictionary which contains all data: Key - DMSType, Value - Container
         /// </summary>
-        public IReliableDictionary<ushort, Container> NetworkDataModel
+        public Dictionary<DMSType, Container> NetworkDataModel
         {
             get
             {
-                return networkDataModel; 
+                return networkDataModel ?? (networkDataModel = new Dictionary<DMSType, Container>());
             }
         }
 
         #endregion
 
+
         /// <summary>
         /// Initializes a new instance of the Model class.
         /// </summary>
-        public NetworkModel(IReliableStateManager stateManager)
+        public NetworkModel()
         {
-            this.stateManager = stateManager;
-            this.networkDataModel = stateManager.GetOrAddAsync<IReliableDictionary<ushort, Container>>(networkModelKey).Result;
-
             this.mongoDb = new MongoAccess();
             this.proxyFactory = new ProxyFactory();
             this.resourcesDescs = new ModelResourcesDesc();
@@ -88,111 +82,67 @@ namespace CloudOMS.NetworkModelService.NMS.Provider
 
         #region Find
 
-        public bool TryGetEntity(long globalId, out IdentifiedObject io)
+        public bool EntityExists(long globalId)
         {
-            io = null;
-
             DMSType type = (DMSType)ModelCodeHelper.ExtractTypeFromGlobalId(globalId);
 
-            if (!TryGetContainer(type, out Container container))
+            if (networkDataModel.ContainsKey(type))
             {
-                return false;
+                Container container = networkDataModel[type];
+
+                if (container.EntityExists(globalId))
+                {
+                    return true;
+                }
             }
 
-            if (container.EntityExists(globalId))
+            return false;
+        }
+
+        private bool EntityExistsInIncomingData(long globalId)
+        {
+            DMSType type = (DMSType)ModelCodeHelper.ExtractTypeFromGlobalId(globalId);
+
+            if (incomingNetworkDataModel.ContainsKey(type))
             {
-                io = container.GetEntity(globalId);
-                return true;
+                Container container = incomingNetworkDataModel[type];
+                return container.EntityExists(globalId);
+            }
+
+            return false;
+        }
+
+        public IdentifiedObject GetEntity(long globalId)
+        {
+            if (EntityExists(globalId))
+            {
+                DMSType type = (DMSType)ModelCodeHelper.ExtractTypeFromGlobalId(globalId);
+                IdentifiedObject io = networkDataModel[type].GetEntity(globalId);
+
+                return io;
             }
             else
             {
                 string message = string.Format("Entity  (GID: 0x{0:X16}) does not exist.", globalId);
                 Logger.LogError(message);
-                return false;
+                throw new Exception(message);
             }
         }
 
-        public bool TryGetEntityFormIncomingData(long globalId, out IdentifiedObject io)
+        private IdentifiedObject GetEntityFromIncomingData(long globalId)
         {
-            io = null;
-
-            DMSType type = (DMSType)ModelCodeHelper.ExtractTypeFromGlobalId(globalId);
-            
-            if(!TryGetContainerFromIncomingData(type, out Container container))
+            if (EntityExistsInIncomingData(globalId))
             {
-                return false;
-            }
+                DMSType type = (DMSType)ModelCodeHelper.ExtractTypeFromGlobalId(globalId);
+                IdentifiedObject io = incomingNetworkDataModel[type].GetEntity(globalId);
 
-            if (container.EntityExists(globalId))
-            {
-                io = container.GetEntity(globalId);
-                return true;
+                return io;
             }
             else
             {
-                string message = string.Format("TryGetEntityFormIncomingData => Entity  (GID: 0x{0:X16}) does not exist.", globalId);
+                string message = string.Format("Entity  (GID: 0x{0:X16}) does not exist.", globalId);
                 Logger.LogError(message);
-                return false;
-            }
-        }
-
-        private bool TryGetContainer(DMSType type, out Container container)
-        {
-            container = null;
-            ConditionalValue<Container> result;
-
-            using (ITransaction tx = this.stateManager.CreateTransaction())
-            {
-                try
-                {
-                    result = NetworkDataModel.TryGetValueAsync(tx, (ushort)type).Result;
-                }
-                catch (Exception e)
-                {
-                    string message = $"TryGetContainer => Exception in IReliableDictionary.TryGetValueAsync()";
-                    Logger.LogError(message, e);
-                    return false;
-                }
-            }
-
-            if (result.HasValue)
-            {
-                container = result.Value;
-                return true;
-            }
-            else
-            {
-                return false;
-            }
-        }
-
-        private bool TryGetContainerFromIncomingData(DMSType type, out Container container)
-        {
-            container = null;
-            ConditionalValue<Container> result;
-
-            using (ITransaction tx = this.stateManager.CreateTransaction())
-            {
-                try
-                {
-                    result = incomingNetworkDataModel.TryGetValueAsync(tx, (ushort)type).Result;
-                }
-                catch (Exception e)
-                {
-                    string message = $"TryGetContainerFromIncomingData => Exception in IReliableDictionary.TryGetValueAsync()";
-                    Logger.LogError(message, e);
-                    return false;
-                }
-            }
-
-            if (result.HasValue)
-            {
-                container = result.Value;
-                return true;
-            }
-            else
-            {
-                return false;
+                throw new Exception(message);
             }
         }
 
@@ -209,16 +159,16 @@ namespace CloudOMS.NetworkModelService.NMS.Provider
         /// <returns>Resource description of the specified entity</returns>
         public ResourceDescription GetValues(long globalId, List<ModelCode> properties)
         {
+            if (!isTransactionInProgress)
+            {
+                InitializeNetworkModel();
+            }
+
             Logger.LogInfo($"Getting values for GID: 0x{globalId:X16}.");
 
             try
             {
-                if(!TryGetEntity(globalId, out IdentifiedObject io))
-                {
-                    string message = string.Format("Failed to get values for entity with GID: 0x{0:X16}. {1}", globalId);
-                    Logger.LogError(message);
-                    throw new Exception(message);
-                }
+                IdentifiedObject io = GetEntity(globalId);
 
                 ResourceDescription rd = new ResourceDescription(globalId);
 
@@ -231,7 +181,6 @@ namespace CloudOMS.NetworkModelService.NMS.Provider
                     io.GetProperty(property);
                     rd.AddProperty(property);
                 }
-
                 Logger.LogInfo($"Getting values for GID: 0x{globalId:X16} succedded.");
 
                 return rd;
@@ -240,7 +189,7 @@ namespace CloudOMS.NetworkModelService.NMS.Provider
             {
                 string message = string.Format("Failed to get values for entity with GID: 0x{0:X16}. {1}", globalId, ex.Message);
                 Logger.LogError(message, ex);
-                throw new Exception(message, ex);
+                throw new Exception(message);
             }
         }
 
@@ -252,6 +201,11 @@ namespace CloudOMS.NetworkModelService.NMS.Provider
         /// <returns>Resource iterator for the requested entities</returns>
         public ResourceIterator GetExtentValues(ModelCode entityType, List<ModelCode> properties)
         {
+            if (!isTransactionInProgress)
+            {
+                InitializeNetworkModel();
+            }
+
             Logger.LogInfo($"Getting extent values for entity type: {entityType}.");
 
             try
@@ -261,18 +215,14 @@ namespace CloudOMS.NetworkModelService.NMS.Provider
 
                 DMSType entityDmsType = ModelCodeHelper.GetTypeFromModelCode(entityType);
 
-
-                if (!TryGetContainer(entityDmsType, out Container container))
+                if (NetworkDataModel.ContainsKey(entityDmsType))
                 {
-                    string message = string.Format($"Failed to get container for type: {entityDmsType}");
-                    Logger.LogError(message);
-                    throw new Exception(message);
+                    Container container = NetworkDataModel[entityDmsType];
+                    globalIds = container.GetEntitiesGlobalIds();
+                    class2PropertyIDs.Add(entityDmsType, properties);
                 }
 
-                globalIds = container.GetEntitiesGlobalIds();
-                class2PropertyIDs.Add(entityDmsType, properties);
-
-                ResourceIterator ri = new ResourceIterator(globalIds, class2PropertyIDs);
+                ResourceIterator ri = new ResourceIterator(globalIds, class2PropertyIDs, this);
 
                 Logger.LogInfo($"Getting extent values for entity type: {entityType} succedded.");
 
@@ -297,6 +247,11 @@ namespace CloudOMS.NetworkModelService.NMS.Provider
         /// <returns>Resource iterator for the requested entities</returns>
         public ResourceIterator GetRelatedValues(long source, List<ModelCode> properties, Association association)
         {
+            if (!isTransactionInProgress)
+            {
+                InitializeNetworkModel();
+            }
+
             Logger.LogInfo($"Getting related values for source: 0x{source:X16}.");
 
             try
@@ -315,7 +270,7 @@ namespace CloudOMS.NetworkModelService.NMS.Provider
                     }
                 }
 
-                ResourceIterator ri = new ResourceIterator(relatedGids, class2PropertyIDs);
+                ResourceIterator ri = new ResourceIterator(relatedGids, class2PropertyIDs, this);
 
                 Logger.LogInfo($"Getting related values for source: 0x{source:X16} succedded.");
 
@@ -334,23 +289,15 @@ namespace CloudOMS.NetworkModelService.NMS.Provider
 
         public UpdateResult ApplyDelta(Delta delta, bool isInitialization = false)
         {
+            //InitializeNetworkModel();
+
             currentDelta = delta;
+
             UpdateResult updateResult = new UpdateResult();
 
             //shallow copy 
-            if(ReliableDictionaryHelper.TryCopyToReliableDictionary<ushort, Container>(networkModelKey, incomingNetworkModelKey, stateManager))
-            {
-                incomingNetworkDataModel = this.stateManager.GetOrAddAsync<IReliableDictionary<ushort, Container>>(incomingNetworkModelKey).Result;
-                Logger.LogDebug($"Incoming model [HashCode: 0x{incomingNetworkDataModel.GetHashCode():X16}] is shallow copy of Current model [HashCode: 0x{networkDataModel.GetHashCode():X16}].");
-            }
-            else
-            {
-                string message = "ApplyDelta => Failed to copy current to incoming network model";
-                Logger.LogError(message);
-                updateResult.Result = ResultType.Failed;
-                updateResult.Message = message;
-                return updateResult;
-            }
+            incomingNetworkDataModel = new Dictionary<DMSType, Container>(NetworkDataModel);
+            Logger.LogDebug($"Incoming model [HashCode: 0x{incomingNetworkDataModel.GetHashCode():X16}] is shallow copy of Current model [HashCode: 0x{networkDataModel.GetHashCode():X16}].");
 
             try
             {
@@ -362,6 +309,7 @@ namespace CloudOMS.NetworkModelService.NMS.Provider
                 if (!isInitialization)
                 {
                     delta.FixNegativeToPositiveIds(ref typesCounters, ref globalIdPairs);
+
                 }
 
                 updateResult.GlobalIdPairs = globalIdPairs;
@@ -438,6 +386,7 @@ namespace CloudOMS.NetworkModelService.NMS.Provider
         /// <returns></returns>
         public bool Commit(bool isInitialization = false)
         {
+            isTransactionInProgress = false;
             if (!isInitialization && currentDelta != null)
             {
                 mongoDb.SaveDelta(currentDelta);
@@ -451,6 +400,7 @@ namespace CloudOMS.NetworkModelService.NMS.Provider
 
         public bool Rollback()
         {
+            isTransactionInProgress = false;
             currentDelta = null;
             networkDataModel = oldNetworkDataModel;
             Logger.LogDebug($"Current model [HashCode: 0x{networkDataModel.GetHashCode():X16}] rollbacked to Old model [HashCode: 0x{oldNetworkDataModel.GetHashCode():X16}].");
@@ -461,7 +411,7 @@ namespace CloudOMS.NetworkModelService.NMS.Provider
         #region Private Members
         private void InitializeNetworkModel()
         {
-            long deltaVersion = 0,  networkModelVersion = 0;
+            long deltaVersion = 0, networkModelVersion = 0;
 
             mongoDb.GetVersions(ref networkModelVersion, ref deltaVersion);
 
@@ -469,9 +419,7 @@ namespace CloudOMS.NetworkModelService.NMS.Provider
             {
                 Logger.LogDebug("Delta version is higher then network model version.");
 
-                var dbNetworkModel = mongoDb.GetLatesNetworkModel(networkModelVersion);
-                ReliableDictionaryHelper.TryCopyToReliableDictionary<ushort, Container>(dbNetworkModel, networkModelKey, stateManager);
-
+                networkDataModel = mongoDb.GetLatesNetworkModel(networkModelVersion);
                 List<Delta> deltas = mongoDb.GetAllDeltas(deltaVersion, networkModelVersion);
 
                 foreach (Delta delta in deltas)
@@ -486,12 +434,11 @@ namespace CloudOMS.NetworkModelService.NMS.Provider
                     }
                 }
 
-                mongoDb.SaveNetworkModel(networkDataModel);
+                mongoDb.SaveNetworkModel(NetworkDataModel);
             }
             else if (networkModelVersion > 0)
             {
-                var dbNetworkModel = mongoDb.GetLatesNetworkModel(networkModelVersion);
-                ReliableDictionaryHelper.TryCopyToReliableDictionary<ushort, Container>(dbNetworkModel, networkModelKey, stateManager);
+                networkDataModel = mongoDb.GetLatesNetworkModel(networkModelVersion);
             }
             else
             {
@@ -501,6 +448,7 @@ namespace CloudOMS.NetworkModelService.NMS.Provider
 
         private void StartDistributedTransaction(Delta delta)
         {
+            isTransactionInProgress = true;
             using (TransactionCoordinatorProxy transactionCoordinatorProxy = proxyFactory.CreateProxy<TransactionCoordinatorProxy, ITransactionCoordinatorContract>(EndpointNames.TransactionCoordinatorEndpoint))
             {
                 if (transactionCoordinatorProxy == null)
@@ -622,14 +570,9 @@ namespace CloudOMS.NetworkModelService.NMS.Provider
             {
                 typesCounters[(short)type] = 0;
 
-                using(ITransaction tx = stateManager.CreateTransaction())
+                if (networkDataModel.ContainsKey(type))
                 {
-                    var result = networkDataModel.TryGetValueAsync(tx, (ushort)type).Result;
-                    
-                    if (result.HasValue)
-                    {
-                        typesCounters[(short)type] = result.Value.Count;
-                    }
+                    typesCounters[(short)type] = networkDataModel[type].Count;
                 }
             }
 
@@ -652,7 +595,7 @@ namespace CloudOMS.NetworkModelService.NMS.Provider
             Logger.LogInfo($"Inserting entity with GID: 0x{globalId:X16}");
 
             // check if mapping for specified global id already exists			
-            if (TryGetEntityFormIncomingData(globalId, out _))
+            if (this.EntityExistsInIncomingData(globalId))
             {
                 string message = String.Format("Failed to insert entity because entity with specified GID: 0x{0:X16} already exists in network model.", globalId);
                 Logger.LogError(message);
@@ -668,10 +611,15 @@ namespace CloudOMS.NetworkModelService.NMS.Provider
                 Container incomingContainer = null;
 
                 //get container from incoming model
-                if(TryGetContainerFromIncomingData(type, out incomingContainer))
+                if (incomingNetworkDataModel.ContainsKey(type))
                 {
-                    if(TryGetContainer(type, out Container currentContainer))
+                    incomingContainer = incomingNetworkDataModel[type];
+
+                    //get container from current model
+                    if (networkDataModel.ContainsKey(type))
                     {
+                        Container currentContainer = networkDataModel[type];
+
                         if (currentContainer.GetHashCode() == incomingContainer.GetHashCode())
                         {
                             incomingContainer = GetContainerShallowCopy(type, currentContainer);
@@ -681,48 +629,11 @@ namespace CloudOMS.NetworkModelService.NMS.Provider
                 //create new container or make the shallow copy
                 else
                 {
-                    using (ITransaction tx = stateManager.CreateTransaction())
-                    {
-                        incomingContainer = new Container();
-                        Logger.LogDebug($"Container [{type}, HashCode: 0x{incomingContainer.GetHashCode():X16}] created;");
-                    }
+                    incomingContainer = new Container();
+                    incomingNetworkDataModel.Add(type, incomingContainer);
+                    Logger.LogDebug($"Container [{type}, HashCode: 0x{incomingContainer.GetHashCode():X16}] created and added to Incoming model.");
+
                 }
-
-                using (ITransaction tx = stateManager.CreateTransaction())
-                {
-                    if (incomingNetworkDataModel.TryAddAsync(tx, (ushort)type, incomingContainer).Result)
-                    {
-                        Logger.LogDebug($"Container [{type}, HashCode: 0x{incomingContainer.GetHashCode():X16}] created and added to Incoming model.");
-                    }
-                    else
-                    {
-                        throw new NotImplementedException();
-                    }
-                }
-
-                //if (incomingNetworkDataModel.ContainsKey(type))
-                //{
-                //    incomingContainer1 = incomingNetworkDataModel[type];
-
-                //    //get container from current model
-                //    if (networkDataModel.ContainsKey(type))
-                //    {
-                //        Container currentContainer = networkDataModel[type];
-
-                //        if (currentContainer.GetHashCode() == incomingContainer.GetHashCode())
-                //        {
-                //            incomingContainer = GetContainerShallowCopy(type, currentContainer);
-                //        }
-                //    }
-                //}
-                ////create new container or make the shallow copy
-                //else
-                //{
-                //    incomingContainer = new Container();
-                //    incomingNetworkDataModel.Add(type, incomingContainer);
-                //    Logger.LogDebug($"Container [{type}, HashCode: 0x{incomingContainer.GetHashCode():X16}] created and added to Incoming model.");
-
-                //}
 
                 // create entity and add it to container
                 IdentifiedObject io = incomingContainer.CreateEntity(globalId);
@@ -1107,12 +1018,7 @@ namespace CloudOMS.NetworkModelService.NMS.Provider
                 association = new Association();
             }
 
-            if(!TryGetEntity(source, out IdentifiedObject io))
-            {
-                string message = string.Format("ApplyAssocioationOnSource => Failed to get values for entity with GID: 0x{0:X16}. {1}", source);
-                Logger.LogError(message);
-                throw new Exception(message);
-            }
+            IdentifiedObject io = GetEntity(source);
 
             if (!io.HasProperty(association.PropertyId))
             {

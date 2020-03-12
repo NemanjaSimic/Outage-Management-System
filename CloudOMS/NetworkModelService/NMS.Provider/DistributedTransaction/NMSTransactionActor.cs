@@ -1,22 +1,20 @@
 ﻿using Outage.Common;
 using Outage.DistributedTransactionActor;
 using System;
+using System.Threading.Tasks;
 
 namespace CloudOMS.NetworkModelService.NMS.Provider.DistributedTransaction
 {
     public class NMSTransactionActor : TransactionActor
     { 
-        protected static NetworkModel networkModel = null;
+        private readonly NetworkModel networkModel = null;
 
-        public static NetworkModel NetworkModel
+        public NMSTransactionActor(NetworkModel networkModel)
         {
-            set
-            {
-                networkModel = value;
-            }
+            this.networkModel = networkModel;
         }
 
-        public override bool Prepare()
+        public override async Task<bool> Prepare()
         {
             bool success = false;
 
@@ -42,7 +40,7 @@ namespace CloudOMS.NetworkModelService.NMS.Provider.DistributedTransaction
             return success;
         }
 
-        public override void Commit()
+        public override async Task Commit()
         {
             try
             {
@@ -54,9 +52,11 @@ namespace CloudOMS.NetworkModelService.NMS.Provider.DistributedTransaction
                 Logger.LogError($"Exception caught in Commit method on NMS Transaction actor. Exception: {ex.Message}", ex);
                 Logger.LogInfo("Commit on NMS Transaction actor UNSUCCESSFULLY finished.");
             }
+
+            
         }
 
-        public override void Rollback()
+        public override async Task Rollback()
         {
             try
             {
@@ -68,6 +68,7 @@ namespace CloudOMS.NetworkModelService.NMS.Provider.DistributedTransaction
                 Logger.LogError($"Exception caught in Rollback method on NMS Transaction actor. Exception: {ex.Message}", ex);
                 Logger.LogInfo("Rollback on NMS Transaction actor UNSUCCESSFULLY finished.");
             }
+
         }
     }
 }

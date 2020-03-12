@@ -1,4 +1,5 @@
-﻿using Outage.Common.Exceptions.SCADA;
+﻿using Microsoft.ServiceFabric.Services.Remoting;
+using Outage.Common.Exceptions.SCADA;
 using Outage.Common.PubSub.SCADADataContract;
 using System;
 using System.Collections.Generic;
@@ -7,7 +8,7 @@ using System.ServiceModel;
 namespace Outage.Common.ServiceContracts.SCADA
 {
     [ServiceContract]
-    public interface ISCADAIntegrityUpdateContract
+    public interface ISCADAIntegrityUpdateContract : IService
     {
         [OperationContract]
         [FaultContract(typeof(ArgumentException))]

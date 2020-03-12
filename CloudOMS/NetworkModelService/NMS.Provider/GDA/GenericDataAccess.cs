@@ -3,6 +3,7 @@ using Outage.Common.ServiceContracts.GDA;
 using Outage.Common.GDA;
 using System;
 using System.Collections.Generic;
+using System.Threading.Tasks;
 
 namespace CloudOMS.NetworkModelService.NMS.Provider.GDA
 {
@@ -18,26 +19,19 @@ namespace CloudOMS.NetworkModelService.NMS.Provider.GDA
         private static Dictionary<int, ResourceIterator> resourceIterators = new Dictionary<int, ResourceIterator>();
         private static int resourceItId = 0;
 
-        protected static NetworkModel networkModel = null;
+        private readonly NetworkModel networkModel;
 
-        public static NetworkModel NetworkModel
+        public GenericDataAccess(NetworkModel networkModel)
         {
-            set
-            {
-                networkModel = value;
-            }
+            this.networkModel = networkModel;
         }
 
-        public GenericDataAccess()
-        {
-        }
-
-        public UpdateResult ApplyUpdate(Delta delta)
+        public async Task<UpdateResult> ApplyUpdate(Delta delta)
         {
             return networkModel.ApplyDelta(delta);
         }
 
-        public ResourceDescription GetValues(long resourceId, List<ModelCode> propIds)
+        public async Task<ResourceDescription> GetValues(long resourceId, List<ModelCode> propIds)
         {
             try
             {
@@ -52,12 +46,12 @@ namespace CloudOMS.NetworkModelService.NMS.Provider.GDA
             }
         }
 
-        public int GetExtentValues(ModelCode entityType, List<ModelCode> propIds)
+        public async Task<int> GetExtentValues(ModelCode entityType, List<ModelCode> propIds)
         {
             try
             {
                 ResourceIterator ri = networkModel.GetExtentValues(entityType, propIds);
-                int retVal = AddIterator(ri);
+                int retVal = AddIterator(ri).Result;
 
                 return retVal;
             }
@@ -69,12 +63,12 @@ namespace CloudOMS.NetworkModelService.NMS.Provider.GDA
             }
         }
 
-        public int GetRelatedValues(long source, List<ModelCode> propIds, Association association)
+        public async Task<int> GetRelatedValues(long source, List<ModelCode> propIds, Association association)
         {
             try
             {
                 ResourceIterator ri = networkModel.GetRelatedValues(source, propIds, association);
-                int retVal = AddIterator(ri);
+                int retVal =  AddIterator(ri).Result;
 
                 return retVal;
             }
@@ -86,11 +80,11 @@ namespace CloudOMS.NetworkModelService.NMS.Provider.GDA
             }
         }
 
-        public List<ResourceDescription> IteratorNext(int n, int id)
+        public async Task<List<ResourceDescription>> IteratorNext(int n, int id)
         {
             try
             {
-                List<ResourceDescription> retVal = GetIterator(id).Next(n);
+                List<ResourceDescription> retVal = GetIterator(id).Result.Next(n);
 
                 return retVal;
             }
@@ -102,11 +96,11 @@ namespace CloudOMS.NetworkModelService.NMS.Provider.GDA
             }
         }
 
-        public bool IteratorRewind(int id)
+        public async Task<bool> IteratorRewind(int id)
         {
             try
             {
-                GetIterator(id).Rewind();
+                GetIterator(id).Result.Rewind();
 
                 return true;
             }
@@ -118,11 +112,11 @@ namespace CloudOMS.NetworkModelService.NMS.Provider.GDA
             }
         }
 
-        public int IteratorResourcesTotal(int id)
+        public async Task<int> IteratorResourcesTotal(int id)
         {
             try
             {
-                int retVal = GetIterator(id).ResourcesTotal();
+                int retVal = GetIterator(id).Result.ResourcesTotal();
                 return retVal;
             }
             catch (Exception ex)
@@ -133,11 +127,11 @@ namespace CloudOMS.NetworkModelService.NMS.Provider.GDA
             }
         }
 
-        public int IteratorResourcesLeft(int id)
+        public async Task<int> IteratorResourcesLeft(int id)
         {
             try
             {
-                int resourcesLeft = GetIterator(id).ResourcesLeft();
+                int resourcesLeft = GetIterator(id).Result.ResourcesLeft();
 
                 return resourcesLeft;
             }
@@ -149,11 +143,11 @@ namespace CloudOMS.NetworkModelService.NMS.Provider.GDA
             }
         }
 
-        public bool IteratorClose(int id)
+        public async Task<bool> IteratorClose(int id)
         {
             try
             {
-                bool retVal = RemoveIterator(id);
+                bool retVal = await RemoveIterator(id);
 
                 return retVal;
             }
@@ -165,7 +159,7 @@ namespace CloudOMS.NetworkModelService.NMS.Provider.GDA
             }
         }
 
-        private int AddIterator(ResourceIterator iterator)
+        private async Task<int> AddIterator(ResourceIterator iterator)
         {
             lock (resourceIterators)
             {
@@ -175,7 +169,7 @@ namespace CloudOMS.NetworkModelService.NMS.Provider.GDA
             }
         }
 
-        private ResourceIterator GetIterator(int iteratorId)
+        private async Task<ResourceIterator> GetIterator(int iteratorId)
         {
             lock (resourceIterators)
             {
@@ -190,7 +184,7 @@ namespace CloudOMS.NetworkModelService.NMS.Provider.GDA
             }
         }
 
-        private bool RemoveIterator(int iteratorId)
+        private async Task<bool> RemoveIterator(int iteratorId)
         {
             lock (resourceIterators)
             {
