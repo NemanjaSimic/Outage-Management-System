@@ -14,12 +14,16 @@ namespace OutageDatabase
         public DbSet<OutageEntity> OutageEntities { get; set; }
         public DbSet<Consumer> Consumers { get; set; }
         public DbSet<Equipment> Equipments { get; set; }
+        public DbSet<EquipmentHistorical> EquipmentsHistorical { get; set; }
+        public DbSet<ConsumerHistorical> ConsumersHistorical { get; set; }
 
         protected override void OnModelCreating(DbModelBuilder modelBuilder)
         {
             modelBuilder.Entity<OutageEntity>().HasKey(o => o.OutageId).ToTable("OutageEntities");
             modelBuilder.Entity<Consumer>().HasKey(c => c.ConsumerId).ToTable("Consumers");
             modelBuilder.Entity<Equipment>().HasKey(e => e.EquipmentId).ToTable("Equipments");
+            modelBuilder.Entity<EquipmentHistorical>().HasKey(eh => eh.Id).ToTable("EquipmentsHistorical");
+            modelBuilder.Entity<ConsumerHistorical>().HasKey(ch => ch.Id).ToTable("ConsumersHistorical");
 
             modelBuilder.Entity<OutageEntity>().HasMany(o => o.AffectedConsumers)
                                                .WithMany(c => c.Outages)

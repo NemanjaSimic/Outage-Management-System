@@ -18,11 +18,15 @@ namespace OMSCommon.Mappers
 
         private ConsumerMessageMapper consumerMapper;
         private EquipmentMapper equipmentMapper;
+        private ConsumerHistoricalMessageMapper consumerHistoricalMapper;
+        private EquipmentHistoricalMessageMapper equipmentHistoricalMapper;
 
         public OutageMessageMapper()
         {
             consumerMapper = new ConsumerMessageMapper(this);
             equipmentMapper = new EquipmentMapper(this);
+            consumerHistoricalMapper = new ConsumerHistoricalMessageMapper(this);
+            equipmentHistoricalMapper = new EquipmentHistoricalMessageMapper(this);
         }
 
         public OutageMessage MapOutageEntity(OutageEntity outage)

@@ -42,11 +42,15 @@
     <Reference Include="System.Xml" />
   </ItemGroup>
   <ItemGroup>
+    <Compile Include="Mappers\ConsumerHistoricalMessageMapper.cs" />
     <Compile Include="Mappers\ConsumerMessageMapper.cs" />
     <Compile Include="Mappers\EquipementMapper.cs" />
+    <Compile Include="Mappers\EquipmentHistoricalMessageMapper.cs" />
     <Compile Include="Mappers\OutageMessageMapper.cs" />
     <Compile Include="OutageDatabaseModel\Consumer.cs" />
+    <Compile Include="OutageDatabaseModel\ConsumerHistorical.cs" />
     <Compile Include="OutageDatabaseModel\Equipement.cs" />
+    <Compile Include="OutageDatabaseModel\EquipmentHistorical.cs" />
     <Compile Include="OutageDatabaseModel\OutageEntity.cs" />
     <Compile Include="Properties\AssemblyInfo.cs" />
   </ItemGroup>

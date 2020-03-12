@@ -63,6 +63,8 @@
     <Compile Include="Migrations\202003061017231_Merge ActiveOutage and ArchivedOutage into OutageEntity.designer.cs">
       <DependentUpon>202003061017231_Merge ActiveOutage and ArchivedOutage into OutageEntity.cs</DependentUpon>
     </Compile>
+    <Compile Include="Repository\ConsumerHistoricalRepository.cs" />
+    <Compile Include="Repository\EquipmentHistoricalRepository.cs" />
     <Compile Include="Repository\OutageRepository.cs" />
     <Compile Include="Repository\ConsumerRepository.cs" />
     <Compile Include="Repository\EquipmentRepository.cs" />
