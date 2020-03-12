@@ -1,14 +1,10 @@
-﻿using System;
-using System.Collections.Generic;
-using System.Linq;
+﻿using Microsoft.ServiceFabric.Services.Remoting;
 using System.ServiceModel;
-using System.Text;
-using System.Threading.Tasks;
 
 namespace Outage.Common.ServiceContracts.OMS
 {
     [ServiceContract]
-    public interface ICallingContract
+    public interface ICallingContract : IService
     {
         [OperationContract]
         void ReportMalfunction(long consumerGid);

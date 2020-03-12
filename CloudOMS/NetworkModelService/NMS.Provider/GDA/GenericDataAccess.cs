@@ -18,18 +18,11 @@ namespace CloudOMS.NetworkModelService.NMS.Provider.GDA
         private static Dictionary<int, ResourceIterator> resourceIterators = new Dictionary<int, ResourceIterator>();
         private static int resourceItId = 0;
 
-        protected static NetworkModel networkModel = null;
+        private readonly NetworkModel networkModel;
 
-        public static NetworkModel NetworkModel
+        public GenericDataAccess(NetworkModel networkModel)
         {
-            set
-            {
-                networkModel = value;
-            }
-        }
-
-        public GenericDataAccess()
-        {
+            this.networkModel = networkModel;
         }
 
         public UpdateResult ApplyUpdate(Delta delta)

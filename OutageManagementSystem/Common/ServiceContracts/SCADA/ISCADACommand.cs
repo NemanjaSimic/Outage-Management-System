@@ -1,4 +1,5 @@
-﻿using Outage.Common.Exceptions.SCADA;
+﻿using Microsoft.ServiceFabric.Services.Remoting;
+using Outage.Common.Exceptions.SCADA;
 using System;
 using System.Collections.Generic;
 using System.Linq;
@@ -9,7 +10,7 @@ using System.Threading.Tasks;
 namespace Outage.Common.ServiceContracts.SCADA
 {
     [ServiceContract]
-    public interface ISCADACommand
+    public interface ISCADACommand : IService
     {
         [OperationContract]
         [FaultContract(typeof(ArgumentException))]

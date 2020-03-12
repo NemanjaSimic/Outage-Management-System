@@ -32,7 +32,7 @@
     <Content Include="packages.config" />
   </ItemGroup>
   <ItemGroup>
-    <ProjectReference Include="..\NetworkModelService\NMS.Stateful\NMS.Stateful.csproj" />
+    <ProjectReference Include="..\NetworkModelService\NMS.Stateless\NMS.Stateless.csproj" />
   </ItemGroup>
   <Import Project="$(MSBuildToolsPath)\Microsoft.Common.targets" />
   <PropertyGroup>

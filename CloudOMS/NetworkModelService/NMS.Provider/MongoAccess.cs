@@ -99,11 +99,8 @@ namespace CloudOMS.NetworkModelService.NMS.Provider
             }
         }
 
-        public void SaveNetworkModel(IReliableDictionary<ushort, Container> networkDataModel)
+        public void SaveNetworkModel(Dictionary<DMSType, Container> networkDataModel)
         {
-            //TODO: prepakuj u Dictionary<DMSType, Container> networkDataModel
-
-
             long networkModelVersion = 0, deltaVersion = 0;
 
             GetVersions(ref networkModelVersion, ref deltaVersion);

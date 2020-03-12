@@ -1,9 +1,10 @@
-﻿using System.ServiceModel;
+﻿using Microsoft.ServiceFabric.Services.Remoting;
+using System.ServiceModel;
 
 namespace Outage.Common.ServiceContracts.DistributedTransaction
 {
     [ServiceContract]
-    public interface ITransactionActorContract
+    public interface ITransactionActorContract : IService
     {
         [OperationContract]
         bool Prepare();

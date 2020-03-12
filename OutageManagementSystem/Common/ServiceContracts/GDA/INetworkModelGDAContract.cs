@@ -1,11 +1,12 @@
 ﻿using System.Collections.Generic;
 using System.ServiceModel;
+using Microsoft.ServiceFabric.Services.Remoting;
 using Outage.Common.GDA;
 
 namespace Outage.Common.ServiceContracts.GDA
 {
 	[ServiceContract]
-	public interface INetworkModelGDAContract
+	public interface INetworkModelGDAContract : IService
 	{
 		/// <summary>
 		/// Updates model by appluing reosoreces sent in delta

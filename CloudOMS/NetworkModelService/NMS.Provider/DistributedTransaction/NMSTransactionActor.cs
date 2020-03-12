@@ -6,14 +6,11 @@ namespace CloudOMS.NetworkModelService.NMS.Provider.DistributedTransaction
 {
     public class NMSTransactionActor : TransactionActor
     { 
-        protected static NetworkModel networkModel = null;
+        private readonly NetworkModel networkModel = null;
 
-        public static NetworkModel NetworkModel
+        public NMSTransactionActor(NetworkModel networkModel)
         {
-            set
-            {
-                networkModel = value;
-            }
+            this.networkModel = networkModel;
         }
 
         public override bool Prepare()

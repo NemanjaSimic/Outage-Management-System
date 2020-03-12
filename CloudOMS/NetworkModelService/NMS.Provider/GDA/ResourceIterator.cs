@@ -14,7 +14,7 @@ namespace CloudOMS.NetworkModelService.NMS.Provider.GDA
             get { return logger ?? (logger = LoggerWrapper.Instance); }
         }
 
-        private static NetworkModel networkModel = null;
+        private readonly NetworkModel networkModel = null;
 
         private List<long> globalDs = new List<long>();
         private Dictionary<DMSType, List<ModelCode>> class2PropertyIDs = new Dictionary<DMSType, List<ModelCode>>();
@@ -22,19 +22,16 @@ namespace CloudOMS.NetworkModelService.NMS.Provider.GDA
         private int lastReadIndex = 0; // index of the last read resource description
         private int maxReturnNo = 5000;
 
-        public static NetworkModel NetworkModel
+        public ResourceIterator(NetworkModel networkModel)
         {
-            set { ResourceIterator.networkModel = value; }
+            this.networkModel = networkModel;
         }
 
-        public ResourceIterator()
-        {
-        }
-
-        public ResourceIterator(List<long> globalIDs, Dictionary<DMSType, List<ModelCode>> class2PropertyIDs)
+        public ResourceIterator(List<long> globalIDs, Dictionary<DMSType, List<ModelCode>> class2PropertyIDs, NetworkModel networkModel)
         {
             this.globalDs = globalIDs;
             this.class2PropertyIDs = class2PropertyIDs;
+            this.networkModel = networkModel;
         }
 
         public int ResourcesLeft()

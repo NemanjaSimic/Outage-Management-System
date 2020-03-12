@@ -4,7 +4,6 @@ using MongoDB.Bson.Serialization.Serializers;
 using MongoDB.Driver;
 using Outage.Common;
 using Outage.Common.GDA;
-using Outage.Common.ServiceContracts;
 using Outage.Common.ServiceContracts.DistributedTransaction;
 using Outage.Common.ServiceProxies;
 using Outage.Common.ServiceProxies.DistributedTransaction;
@@ -13,13 +12,8 @@ using Outage.DBModel.NetworkModelService;
 using Outage.NetworkModelService.GDA;
 using System;
 using System.Collections.Generic;
-using System.IO;
 using System.Linq;
-using System.ServiceModel;
 using System.Text;
-using System.Threading;
-using System.Threading.Tasks;
-using System.Xml;
 
 namespace Outage.NetworkModelService
 {

@@ -7,9 +7,12 @@
     <ServerGarbageCollection>True</ServerGarbageCollection>
     <RuntimeIdentifier>win7-x64</RuntimeIdentifier>
     <TargetLatestRuntimePatch>False</TargetLatestRuntimePatch>
+    <RootNamespace>CloudOMS.NMS.Stateful</RootNamespace>
+    <AssemblyName>CloudOMS.NMS.Stateful</AssemblyName>
   </PropertyGroup>
 
   <ItemGroup>
+    <PackageReference Include="Microsoft.ServiceFabric" Version="7.0.470" />
     <PackageReference Include="Microsoft.ServiceFabric.Services" Version="4.0.470" />
   </ItemGroup>
 

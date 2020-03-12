@@ -1,10 +1,11 @@
 ﻿using CloudOMS.NetworkModelService.NMS.Provider.DistributedTransaction;
 using CloudOMS.NetworkModelService.NMS.Provider.GDA;
-using Microsoft.ServiceFabric.Data;
-using Microsoft.ServiceFabric.Data.Collections;
+using Microsoft.ServiceFabric.Services.Communication.Runtime;
+using Microsoft.ServiceFabric.Services.Remoting.V1.FabricTransport.Runtime;
 using Outage.Common;
 using System;
 using System.Collections.Generic;
+using System.Fabric;
 using System.ServiceModel;
 using System.Text;
 
@@ -20,106 +21,39 @@ namespace CloudOMS.NetworkModelService.NMS.Provider
         }
 
         private NetworkModel networkModel = null;
-        private List<ServiceHost> hosts = null;
+        public List<ServiceInstanceListener> Listeners { get; private set; }
 
-        public NetworkModelService(IReliableStateManager stateManager)
+        public NetworkModelService(StatelessServiceContext context)
         {
-            networkModel = new NetworkModel(stateManager);
-            GenericDataAccess.NetworkModel = networkModel;
-            ResourceIterator.NetworkModel = networkModel;
-            NMSTransactionActor.NetworkModel = networkModel;
-            InitializeHosts();
-        }
-
-        public void Start()
-        {
-            try
-            {
-                StartHosts();
-            }
-            catch (Exception e)
-            {
-                Logger.LogError("Exception in Start()", e);
-                Console.WriteLine(e.Message);
-            }
+            networkModel = new NetworkModel();
+            InitializeListeners(networkModel, context);
         }
 
         public void Dispose()
         {
-            CloseHosts();
+            CloseListeners();
             GC.SuppressFinalize(this);
         }
 
-        private void InitializeHosts()
+        private void InitializeListeners(NetworkModel networkModel, StatelessServiceContext contex)
         {
-            hosts = new List<ServiceHost>
+            Listeners = new List<ServiceInstanceListener>()
             {
-                new ServiceHost(typeof(GenericDataAccess)),
-                new ServiceHost(typeof(NMSTransactionActor))
+                new ServiceInstanceListener(c => new FabricTransportServiceRemotingListener(contex, new GenericDataAccess(networkModel)), EndpointNames.NetworkModelGDAEndpoint),
+                new ServiceInstanceListener(c => new FabricTransportServiceRemotingListener(contex, new NMSTransactionActor(networkModel)), EndpointNames.NetworkModelTransactionActorEndpoint),
             };
         }
 
-        private void StartHosts()
-        {
-            if (hosts == null || hosts.Count == 0)
-            {
-                throw new Exception("Network Model Service hosts can not be opend because they are not initialized.");
-            }
-
-            string message;
-            StringBuilder sb = new StringBuilder();
-
-            foreach (ServiceHost host in hosts)
-            {
-                host.Open();
-
-                message = string.Format("The WCF service {0} is ready.", host.Description.Name);
-                Console.WriteLine(message);
-                sb.AppendLine(message);
-
-                message = "Endpoints:";
-                Console.WriteLine(message);
-                sb.AppendLine(message);
-
-                foreach (Uri uri in host.BaseAddresses)
-                {
-                    Console.WriteLine(uri);
-                    sb.AppendLine(uri.ToString());
-                }
-
-                Console.WriteLine("\n");
-                sb.AppendLine();
-            }
-
-            Logger.LogInfo(sb.ToString());
-
-            message = $"Database connection string: {Config.Instance.DbConnectionString}";
-            Console.WriteLine(message);
-            Logger.LogInfo(message);
-
-            message = "Trace level: LEVEL NOT SPECIFIED.";
-            Console.WriteLine(message);
-            Logger.LogWarn(message);
-
-
-            message = "Network Model Service is started.";
-            Console.WriteLine("\n{0}", message);
-            Logger.LogInfo(message);
-        }
-
-        private void CloseHosts()
+        private void CloseListeners()
         {
             networkModel.SaveNetworkModel();
 
-            if (hosts == null || hosts.Count == 0)
+            if (Listeners == null || Listeners.Count == 0)
             {
                 throw new Exception("Network Model Services can not be closed because it is not initialized.");
             }
 
-            foreach (ServiceHost host in hosts)
-            {
-                host.Close();
-            }
+            Listeners.Clear();
 
             string message = "The Network Model Service is gracefully closed.";
             Logger.LogInfo(message);

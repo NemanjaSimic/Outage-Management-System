@@ -34,6 +34,9 @@
     <Reference Include="EasyModbus, Version=5.5.0.0, Culture=neutral, processorArchitecture=MSIL">
       <HintPath>..\..\packages\EasyModbusTCP.5.5.0\lib\EasyModbus.dll</HintPath>
     </Reference>
+    <Reference Include="Microsoft.ServiceFabric.Services.Remoting">
+      <HintPath>..\..\bin64\Microsoft.ServiceFabric.Services.Remoting.dll</HintPath>
+    </Reference>
     <Reference Include="System" />
     <Reference Include="System.Core" />
     <Reference Include="System.ServiceModel" />
@@ -73,6 +76,9 @@
       <Project>{c37f054d-37d9-46c0-881c-1ee3c8c77633}</Project>
       <Name>SCADAData</Name>
     </ProjectReference>
+  </ItemGroup>
+  <ItemGroup>
+    <None Include="app.config" />
   </ItemGroup>
   <Import Project="$(MSBuildToolsPath)\Microsoft.CSharp.targets" />
 </Project>
