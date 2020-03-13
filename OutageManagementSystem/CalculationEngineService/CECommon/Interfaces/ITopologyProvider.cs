@@ -13,5 +13,6 @@ namespace CECommon.Interfaces
         bool PrepareForTransaction();
         void RollbackTransaction();
         bool IsElementRemote(long elementGid);
+        void ResetRecloser(long recloserGid);
     }
 }

@@ -36,6 +36,10 @@ namespace CECommon.Model
         public AnalogMeasurementType SignalType { get; set;}
         public override string GetMeasurementType() => SignalType.ToString();
         public override float GetCurrentVaule() => CurrentValue;
+    }
 
+    public class ArtificalDiscreteMeasurement : DiscreteMeasurement
+    {
+       
     }
 }
