@@ -284,7 +284,6 @@ namespace OutageManagementService
                     success = false;
                 }
             }
-
             return success;
         }
 
@@ -293,7 +292,6 @@ namespace OutageManagementService
         public void IsolateOutage(long outageId)
         {
             //bool success = false;
-         
             OutageEntity outageToIsolate = dbContext.OutageRepository.Get(outageId);
 
             if (outageToIsolate != null)
@@ -443,6 +441,7 @@ namespace OutageManagementService
             long outageElementId = -1;
             OutageEntity outageEntity = null;
             List<OutageEntity> activeOutages = null;
+            long reportedGid = 0;
             try
             {
                 outageEntity = dbContext.OutageRepository.Get(outageId);
@@ -469,12 +468,14 @@ namespace OutageManagementService
                 return false;
             }
 
-
+            reportedGid = outageEntity.DefaultIsolationPoints.First().EquipmentId;
             Task task = Task.Run(() =>
             {
                 Task.Delay(5000).Wait();
                 using (OutageSimulatorServiceProxy proxy = proxyFactory.CreateProxy<OutageSimulatorServiceProxy, IOutageSimulatorContract>(EndpointNames.OutageSimulatorServiceEndpoint))
                 {
+                    IOutageTopologyElement topologyElement = null;
+
                     if (proxy == null)
                     {
                         string message = "OutageModel::SendLocationIsolationCrew => OutageSimulatorProxy is null";
@@ -482,14 +483,14 @@ namespace OutageManagementService
                         throw new NullReferenceException(message);
                     }
                     //Da li je prijaveljen element OutageElement
-                    if (proxy.IsOutageElement(outageEntity.OutageElementGid))
+                    if (proxy.IsOutageElement(reportedGid))
                     {
-                        outageElementId = outageEntity.OutageElementGid;
+                        outageElementId = reportedGid;
                     }
                     else
                     {
                         //Da li je mozda na ACL-novima ispod prijavljenog elementa
-                        if (topologyModel.GetElementByGid(outageEntity.OutageElementGid, out IOutageTopologyElement topologyElement))
+                        if (topologyModel.GetElementByGid(reportedGid,out topologyElement))
                         {
                             try
                             {
@@ -515,25 +516,53 @@ namespace OutageManagementService
                                 Logger.LogError("OutageModel::SendLocationIsolationCrew => failed with error", ex);
                                 throw;
                             }
-                            dbContext.Complete();
                         }
-
                     }
-
-                    topologyModel.GetElementByGidFirstEnd(outageEntity.OutageElementGid, out IOutageTopologyElement element);
                     //Tragamo za ACL-om gore ka source-u
-                    do
+                    while (outageElementId == -1 && !topologyElement.IsRemote && topologyElement.DmsType != "ENERGYSOURCE") 
                     {
-                        if (proxy.IsOutageElement(outageEntity.OutageElementGid))
+                        if (proxy.IsOutageElement(reportedGid))
                         {
                             outageElementId = outageEntity.OutageElementGid;
                             outageEntity.OutageElementGid = outageElementId;
-                            dbContext.Complete();
                         }
 
-                    } while (outageElementId == -1 && !element.IsRemote && element.DmsType != "ENERGYSOURCE");
+                    }
+                    long UpBreaker;
+                    topologyModel.GetElementByGidFirstEnd(outageEntity.OutageElementGid, out  topologyElement);
+                    while (topologyElement.DmsType != "BREAKER")
+                    {
+                        topologyModel.GetElementByGidFirstEnd(topologyElement.Id, out topologyElement);
+                    }
+                    UpBreaker = topologyElement.Id;
+                    long nextBreaker = GetNextBreaker(outageEntity.OutageElementGid);
+
+                    if (!TopologyModel.OutageTopology.ContainsKey(nextBreaker))
+                    {
+                        string message = $"Breaker (next breaker) with id: 0x{nextBreaker:X16} is not in topology";
+                        Logger.LogError(message);
+                        throw new Exception(message);
+                    }
+
+                    long outageElement = TopologyModel.OutageTopology[nextBreaker].FirstEnd;
+
+                    if (!TopologyModel.OutageTopology[UpBreaker].SecondEnd.Contains(outageElement))
+                    {
+                        string message = $"Outage element with gid: 0x{outageElement:X16} is not on a second end of current breaker id";
+                        Logger.LogError(message);
+                        throw new Exception(message);
+                    }
+                    outageEntity.OptimumIsolationPoints = GetEquipmentEntity(new List<long>() { UpBreaker, nextBreaker });
+                    outageEntity.IsolatedTime = DateTime.UtcNow;
+                    outageEntity.OutageState = OutageState.ISOLATED;
+              
+                    PublishOutage(Topic.ACTIVE_OUTAGE, outageMessageMapper.MapOutageEntity(outageEntity));
+                    dbContext.OutageRepository.Update(outageEntity);
+                    dbContext.Complete();
+
                 }
-            });
+              });
+            outageEntity = null;
             if (outageElementId == -1)
                 return false;
             else
