@@ -61,10 +61,17 @@ const generateButton = (outage: ActiveOutage, node) => {
     if (outage.State == OutageLifeCycleState.Created) {
         const button = document.createElement('button');
         button.innerHTML = "Isolate";
+        if(node.IsRemote == true){
         button.addEventListener('click', () => {
             node.sendIsolateOutageCommand(outage.Id);
             commandedNodeIds.push(node.data('id'));
         });
+        }else{
+            button.addEventListener('click', () => {
+                node.sendSendLocationIsolationCrew(outage.Id);
+                commandedNodeIds.push(node.data('id'));
+            });    
+        }
         return button;
     }
 

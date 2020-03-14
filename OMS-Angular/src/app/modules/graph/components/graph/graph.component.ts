@@ -362,11 +362,17 @@ export class GraphComponent implements OnInit, OnDestroy {
         outageNode.sendRepairCrewCommand = (id) => this.onSendCrewOutageCommand(id);
         outageNode.sendValidateOutageCommand = (id) => this.onValidateOutageCommand(id);
         outageNode.sendResolveOutageCommand = (id) => this.onResolveOutageCommand(id);
+        outageNode.sendSendLocationIsolationCrew = (id) => this.onSendLocationIsolationCrewCommand(id);
         addOutageTooltip(this.cy, outageNode, activeOutage);
       }
     }
   }
-
+  public onSendLocationIsolationCrewCommand(id: Number):void{
+    this.outageService.sendLocationIsolationCrewCommand(id).subscribe(
+      status => console.log(status),
+      err => console.log(err)
+    );
+  }
   public onIsolateOutageCommand(id: Number): void {
     this.outageService.sendIsolateOutageCommand(id).subscribe(
       status => console.log(status),

@@ -54,7 +54,7 @@ namespace OutageManagementService
 
             callTracker = new CallTracker("CallTrackerSubscriber", outageModel);
             SubscribeOnEmailService();
-            
+            outageModel.ReportPotentialOutage(42949672965);
             InitializeHosts();
         }
 

@@ -471,6 +471,8 @@ namespace OutageManagementService
             reportedGid = outageEntity.DefaultIsolationPoints.First().EquipmentId;
             Task task = Task.Run(() =>
             {
+                outageEntity = dbContext.OutageRepository.Get(outageId);
+                activeOutages = dbContext.OutageRepository.GetAllActive().ToList();
                 Task.Delay(5000).Wait();
                 using (OutageSimulatorServiceProxy proxy = proxyFactory.CreateProxy<OutageSimulatorServiceProxy, IOutageSimulatorContract>(EndpointNames.OutageSimulatorServiceEndpoint))
                 {
@@ -562,6 +564,7 @@ namespace OutageManagementService
 
                 }
               });
+            Task.WaitAll();
             outageEntity = null;
             if (outageElementId == -1)
                 return false;
