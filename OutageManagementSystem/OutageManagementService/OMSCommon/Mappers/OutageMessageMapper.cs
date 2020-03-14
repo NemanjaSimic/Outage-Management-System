@@ -18,15 +18,11 @@ namespace OMSCommon.Mappers
 
         private ConsumerMessageMapper consumerMapper;
         private EquipmentMapper equipmentMapper;
-        private ConsumerHistoricalMessageMapper consumerHistoricalMapper;
-        private EquipmentHistoricalMessageMapper equipmentHistoricalMapper;
 
         public OutageMessageMapper()
         {
             consumerMapper = new ConsumerMessageMapper(this);
             equipmentMapper = new EquipmentMapper(this);
-            consumerHistoricalMapper = new ConsumerHistoricalMessageMapper(this);
-            equipmentHistoricalMapper = new EquipmentHistoricalMessageMapper(this);
         }
 
         public OutageMessage MapOutageEntity(OutageEntity outage)
@@ -126,6 +122,40 @@ namespace OMSCommon.Mappers
             return outageMessage;
         }
 
+        public List<ConsumerHistorical> MapOutageToConsumerHistorical(List<Consumer> affectedConsumers, long outageId, DatabaseOperation databaseOperation)
+        {
+            List<ConsumerHistorical> retVal = new List<ConsumerHistorical>(affectedConsumers.Count);
+            foreach (Consumer consumer in affectedConsumers)
+            {
+                retVal.Add(
+                    new ConsumerHistorical()
+                    {
+                        ConsumerId = consumer.ConsumerId,
+                        OutageId = outageId,
+                        OperationTime = DateTime.Now,
+                        DatabaseOperation = databaseOperation
+                    }
+                );
+            }
+            return retVal;
+        }
+
+        public List<EquipmentHistorical> MapOutageToEquipmentHistorical(List<Equipment> affectedEquipment, long outageId, DatabaseOperation databaseOperation)
+        {
+            List<EquipmentHistorical> retVal = new List<EquipmentHistorical>(affectedEquipment.Count);
+            foreach (Equipment equipment in affectedEquipment)
+            {
+                retVal.Add(new EquipmentHistorical
+                {
+                    EquipmentId = equipment.EquipmentId,
+                    OutageId = outageId,
+                    OperationTime = DateTime.Now,
+                    DatabaseOperation = databaseOperation
+                });
+            }
+
+            return retVal;
+        }
 
         public IEnumerable<OutageMessage> MapOutageEntities(IEnumerable<OutageEntity> outages)
         {
