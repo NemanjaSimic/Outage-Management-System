@@ -56,7 +56,7 @@ export const addGraphTooltip = (cy, node) => {
 const createNodeTooltipContent = (node) => {
   const div = document.createElement('div');
   div.innerHTML = graphTooltipBody
-    .replace("[[id]]", (+node.data('id')).toString(16))
+    .replace("[[id]]", "0x" + (+node.data('id')).toString(16).toUpperCase())
     .replace("[[type]]", node.data('dmsType'))
     .replace("[[name]]", node.data('name'))
     .replace("[[mrid]]", node.data('mrid'))
@@ -110,7 +110,7 @@ export const addEdgeTooltip = (cy, node, edge) => {
     content: () => {
       const div = document.createElement('div');
       div.innerHTML = graphTooltipBody
-        .replace("[[id]]", (+node.data('id')).toString(16))
+        .replace("[[id]]", "0x" + (+node.data('id')).toString(16).toUpperCase())
         .replace("[[type]]", node.data('dmsType'))
         .replace("[[name]]", node.data('name'))
         .replace("[[mrid]]", node.data('mrid'))

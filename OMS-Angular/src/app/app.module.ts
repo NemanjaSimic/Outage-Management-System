@@ -5,6 +5,7 @@ import { SharedModule } from '@shared/shared.module';
 import { ServicesModule } from '@services/services.module';
 import { MatSidenavModule } from '@angular/material/sidenav';
 import { GraphModule } from './modules/graph/graph.module';
+import { MatMomentDateModule } from '@angular/material-moment-adapter';
 
 import { AppComponent } from './app.component';
 import { ActiveBrowserComponent } from './modules/active-browser/active-browser.component';
@@ -21,7 +22,8 @@ import { ArchivedBrowserComponent } from './modules/archived-browser/archived-br
     SharedModule,
     ServicesModule,
     GraphModule,
-    MatSidenavModule    
+    MatSidenavModule,
+    MatMomentDateModule 
   ],
   providers: [
     ServicesModule

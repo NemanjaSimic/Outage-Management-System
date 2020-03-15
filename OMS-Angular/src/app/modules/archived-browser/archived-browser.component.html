@@ -8,7 +8,8 @@
     
       <ng-container matColumnDef="elementId">
         <th [class.dark-header]="true" mat-header-cell *matHeaderCellDef> Element ID </th>
-        <td [class.table-data]="true" mat-cell *matCellDef="let archivedOutage"> {{ archivedOutage.ElementId }} </td>
+        <td [class.table-data]="true" mat-cell *matCellDef="let archivedOutage"> 
+          0x{{ (+archivedOutage.ElementId).toString(16).toUpperCase() }} </td>
       </ng-container>
     
       <ng-container matColumnDef="reportedAt">
