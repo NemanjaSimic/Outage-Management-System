@@ -49,41 +49,11 @@ namespace NMS.Stateless
 
             long iterations = 0;
 
-            //while (true)
-            //{
-            //    cancellationToken.ThrowIfCancellationRequested();
-
-            //    ServiceEventSource.Current.ServiceMessage(this.Context, "Working-{0}", ++iterations);
-
-            //    await Task.Delay(TimeSpan.FromSeconds(1), cancellationToken);
-            //}
-
             while (!cancellationToken.IsCancellationRequested)
             {
                 cancellationToken.ThrowIfCancellationRequested();
 
-                //try
-                //{
-                //    string message = "Starting Network Model Service...";
-                //    Trace.WriteLine($"\n{message}\n", "Info");
-
-                //    using (NetworkModelService nms = new NetworkModelService())
-                //    {
-                //        nms.Start();
-
-                //        message = "Press <Enter> to stop the service.";
-                //        Trace.WriteLine($"\n{message}\n", "Info");
-                //        Console.ReadLine();
-
-                //        while (!cancellationToken.IsCancellationRequested);
-                //    }
-                //}
-                //catch (Exception ex)
-                //{
-                //    Trace.WriteLine($"\n{ex.Message}\n", "Error");
-                //    Trace.WriteLine("Network Model Service failed.", "Error");
-                //    Trace.WriteLine($"\n{ex.StackTrace}\n", "Error");
-                //}
+                
             }
         }
     }
