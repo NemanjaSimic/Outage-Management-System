@@ -249,10 +249,10 @@ namespace OutageManagementService
 
             activeOutageDbEntity = dbContext.OutageRepository.Add(createdActiveOutage);
 
-            List<ConsumerHistorical> consumers = outageMessageMapper.MapOutageToConsumerHistorical(consumerDbEntities, gid, DatabaseOperation.INSERT);
+            List<ConsumerHistorical> consumers = outageMessageMapper.MapOutageToConsumerHistorical(consumerDbEntities, createdActiveOutage.OutageId, DatabaseOperation.INSERT);
             dbContext.ConsumerHistoricalRepository.AddRange(consumers);
 
-            List<EquipmentHistorical> equipment = outageMessageMapper.MapOutageToEquipmentHistorical(defaultIsolationPoints, gid, DatabaseOperation.INSERT);
+            List<EquipmentHistorical> equipment = outageMessageMapper.MapOutageToEquipmentHistorical(defaultIsolationPoints, createdActiveOutage.OutageId, DatabaseOperation.INSERT);
             dbContext.EquipmentHistoricalRepository.AddRange(equipment);
 
             try
@@ -265,7 +265,7 @@ namespace OutageManagementService
             {
                 string message = "OutageModel::ReportPotentialOutage method => exception on Complete()";
                 Logger.LogError(message, e);
-                Console.WriteLine($"{message}, Message: {e.Message})");
+                Console.WriteLine($"{message}, Message: {e.Message}, Inner Message: {e.InnerException.Message})");
 
                 //TODO: da li je dobar handle?
                 dbContext.Dispose();
@@ -420,6 +420,8 @@ namespace OutageManagementService
                         outageDbEntity.OutageState = OutageState.REPAIRED;
                         outageDbEntity.RepairedTime = DateTime.UtcNow;
                         dbContext.OutageRepository.Update(outageDbEntity);
+
+
 
                         try
                         {
@@ -980,8 +982,7 @@ namespace OutageManagementService
                             outageToIsolate.OutageState = OutageState.ISOLATED;
 
                             //outage isolated => affected consumers are energized
-                            List<long> affectedConsumers = GetAffectedConsumers(outageToIsolate.OutageId);
-                            List<Consumer> consumerDbEntities = GetAffectedConsumersFromDatabase(affectedConsumers);
+                            List<Consumer> consumerDbEntities = outageToIsolate.AffectedConsumers.ToList();
                             List<ConsumerHistorical> consumers = outageMessageMapper.MapOutageToConsumerHistorical(consumerDbEntities, outageToIsolate.OutageId, DatabaseOperation.DELETE);
                             dbContext.ConsumerHistoricalRepository.AddRange(consumers);
 

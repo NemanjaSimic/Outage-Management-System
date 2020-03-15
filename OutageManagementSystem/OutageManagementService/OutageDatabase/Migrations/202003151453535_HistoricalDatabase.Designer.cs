@@ -7,13 +7,13 @@ namespace OutageDatabase.Migrations
     using System.Resources;
     
     [GeneratedCode("EntityFramework.Migrations", "6.4.0")]
-    public sealed partial class HistoricalDatabases : IMigrationMetadata
+    public sealed partial class HistoricalDatabase : IMigrationMetadata
     {
-        private readonly ResourceManager Resources = new ResourceManager(typeof(HistoricalDatabases));
+        private readonly ResourceManager Resources = new ResourceManager(typeof(HistoricalDatabase));
         
         string IMigrationMetadata.Id
         {
-            get { return "202003122120323_HistoricalDatabases"; }
+            get { return "202003151453535_HistoricalDatabase"; }
         }
         
         string IMigrationMetadata.Source

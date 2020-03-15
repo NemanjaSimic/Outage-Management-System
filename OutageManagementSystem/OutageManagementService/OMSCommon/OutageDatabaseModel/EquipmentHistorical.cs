@@ -12,7 +12,7 @@ namespace OMSCommon.OutageDatabaseModel
     public class EquipmentHistorical
     {
         [Key]
-        [DatabaseGenerated(DatabaseGeneratedOption.None)]
+        [DatabaseGenerated(DatabaseGeneratedOption.Identity)]
         public long Id { get; set; }
         public long EquipmentId { get; set; }
         public long? OutageId { get; set; }

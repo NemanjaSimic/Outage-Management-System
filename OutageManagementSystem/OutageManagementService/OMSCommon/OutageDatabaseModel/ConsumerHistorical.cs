@@ -12,7 +12,7 @@ namespace OMSCommon.OutageDatabaseModel
     public class ConsumerHistorical
     {
         [Key]
-        [DatabaseGenerated(DatabaseGeneratedOption.None)]
+        [DatabaseGenerated(DatabaseGeneratedOption.Identity)]
         public long Id { get; set; }
         public long ConsumerId { get; set; }
         public long? OutageId { get; set; }

@@ -63,9 +63,9 @@
     <Compile Include="Migrations\202003061017231_Merge ActiveOutage and ArchivedOutage into OutageEntity.designer.cs">
       <DependentUpon>202003061017231_Merge ActiveOutage and ArchivedOutage into OutageEntity.cs</DependentUpon>
     </Compile>
-    <Compile Include="Migrations\202003122120323_HistoricalDatabases.cs" />
-    <Compile Include="Migrations\202003122120323_HistoricalDatabases.designer.cs">
-      <DependentUpon>202003122120323_HistoricalDatabases.cs</DependentUpon>
+    <Compile Include="Migrations\202003151453535_HistoricalDatabase.cs" />
+    <Compile Include="Migrations\202003151453535_HistoricalDatabase.designer.cs">
+      <DependentUpon>202003151453535_HistoricalDatabase.cs</DependentUpon>
     </Compile>
     <Compile Include="Repository\ConsumerHistoricalRepository.cs" />
     <Compile Include="Repository\EquipmentHistoricalRepository.cs" />
@@ -159,8 +159,8 @@
     <EmbeddedResource Include="Migrations\202003061017231_Merge ActiveOutage and ArchivedOutage into OutageEntity.resx">
       <DependentUpon>202003061017231_Merge ActiveOutage and ArchivedOutage into OutageEntity.cs</DependentUpon>
     </EmbeddedResource>
-    <EmbeddedResource Include="Migrations\202003122120323_HistoricalDatabases.resx">
-      <DependentUpon>202003122120323_HistoricalDatabases.cs</DependentUpon>
+    <EmbeddedResource Include="Migrations\202003151453535_HistoricalDatabase.resx">
+      <DependentUpon>202003151453535_HistoricalDatabase.cs</DependentUpon>
     </EmbeddedResource>
   </ItemGroup>
   <Import Project="$(MSBuildToolsPath)\Microsoft.CSharp.targets" />

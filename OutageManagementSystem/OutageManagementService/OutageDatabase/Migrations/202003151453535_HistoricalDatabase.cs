@@ -3,7 +3,7 @@
     using System;
     using System.Data.Entity.Migrations;
     
-    public partial class HistoricalDatabases : DbMigration
+    public partial class HistoricalDatabase : DbMigration
     {
         public override void Up()
         {
@@ -11,7 +11,7 @@
                 "dbo.ConsumersHistorical",
                 c => new
                     {
-                        Id = c.Long(nullable: false),
+                        Id = c.Long(nullable: false, identity: true),
                         ConsumerId = c.Long(nullable: false),
                         OutageId = c.Long(),
                         OperationTime = c.DateTime(nullable: false),
@@ -23,7 +23,7 @@
                 "dbo.EquipmentsHistorical",
                 c => new
                     {
-                        Id = c.Long(nullable: false),
+                        Id = c.Long(nullable: false, identity: true),
                         EquipmentId = c.Long(nullable: false),
                         OutageId = c.Long(),
                         OperationTime = c.DateTime(nullable: false),
