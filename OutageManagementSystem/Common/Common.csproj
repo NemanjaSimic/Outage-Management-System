@@ -107,6 +107,9 @@
     <Compile Include="OutageService\Interface\IOutageTopologyModel.cs" />
     <Compile Include="OutageService\Model\OutageTopologyElement.cs" />
     <Compile Include="OutageService\Model\OutageTopologyModel.cs" />
+    <Compile Include="OutageService\OutageReport.cs" />
+    <Compile Include="OutageService\ReportOptions.cs" />
+    <Compile Include="OutageService\ReportType.cs" />
     <Compile Include="PubSub\CalculationEngineDataContract\CalculationEngineMessage.cs" />
     <Compile Include="PubSub\CalculationEngineDataContract\CalculationEnginePublication.cs" />
     <Compile Include="PubSub\EmailDataContract\EmailServiceMessage.cs" />
@@ -128,6 +131,7 @@
     <Compile Include="ServiceContracts\OMS\ICallingContract.cs" />
     <Compile Include="ServiceContracts\OMS\IOutageAccessContract.cs" />
     <Compile Include="ServiceContracts\OMS\IOutageLifecycleUICommandingContract.cs" />
+    <Compile Include="ServiceContracts\OMS\IReportingContract.cs" />
     <Compile Include="ServiceContracts\OMS\IReportPotentialOutageContract.cs" />
     <Compile Include="ServiceContracts\OMS\IOutageService.cs" />
     <Compile Include="ServiceContracts\OMS\IOutageSimulatorContract.cs" />
