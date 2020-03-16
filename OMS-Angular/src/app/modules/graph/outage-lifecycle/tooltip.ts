@@ -91,6 +91,7 @@ const generateButton = (outage: ActiveOutage, node) => {
             validateButton.addEventListener('click', () => {
                 node.sendValidateOutageCommand(outage.Id);
                 commandedNodeIds.push(node.data('id'));
+                validateButton.disabled = true;
             });
 
             const buttonDiv = document.createElement('div');
