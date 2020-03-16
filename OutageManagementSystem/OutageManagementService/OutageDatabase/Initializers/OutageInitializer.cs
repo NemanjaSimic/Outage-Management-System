@@ -32,6 +32,8 @@ namespace OutageDatabase.Initializers
             dbContext.OutageRepository.RemoveAll();
             dbContext.ConsumerRepository.RemoveAll();
             dbContext.EquipmentRepository.RemoveAll();
+            dbContext.ConsumerHistoricalRepository.RemoveAll();
+            dbContext.EquipmentHistoricalRepository.RemoveAll();
 
             long archivedId = 1;
             OutageEntity archivedOutage = dbContext.OutageRepository.Get(archivedId);

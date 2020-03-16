@@ -113,4 +113,34 @@ namespace Outage.Common.PubSub.OutageDataContract
             ActiveOutages = new List<ActiveOutageMessage>();
         }
     }
+
+    //[DataContract]
+    //public class ConsumerHistoricalMessage
+    //{
+    //    [DataMember]
+    //    public long Id { get; set; }
+    //    [DataMember]
+    //    public long ConsumerId { get; set; }
+    //    [DataMember]
+    //    public long? OutageId { get; set; }
+    //    [DataMember]
+    //    public DateTime OperationTime { get; set; }
+    //    [DataMember]
+    //    public DatabaseOperation DatabaseOperation { get; set; }
+    //}
+
+    //[DataContract]
+    //public class EquipmentHistoricalMessage
+    //{
+    //    [DataMember]
+    //    public long Id { get; set; }
+    //    [DataMember]
+    //    public long EquipmentId { get; set; }
+    //    [DataMember]
+    //    public long? OutageId { get; set; }
+    //    [DataMember]
+    //    public DateTime OperationTime { get; set; }
+    //    [DataMember]
+    //    public DatabaseOperation DatabaseOperation { get; set; }
+    //}
 }
