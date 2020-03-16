@@ -14,8 +14,6 @@ export interface Outage {
 }
 
 export interface ActiveOutage extends Outage {
-    // DefaultIsolationPoints: Number[];
-    // OptimalIsolationPoints: Number[];
     DefaultIsolationPoints: EquipmentViewModel[];
     OptimalIsolationPoints: EquipmentViewModel[];
 }
