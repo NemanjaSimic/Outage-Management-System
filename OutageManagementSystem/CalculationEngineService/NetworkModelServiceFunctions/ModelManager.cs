@@ -1,6 +1,7 @@
 ﻿using CECommon;
 using CECommon.Interfaces;
 using CECommon.Model;
+using CECommon.Models;
 using CECommon.Providers;
 using Outage.Common;
 using Outage.Common.GDA;
@@ -57,6 +58,7 @@ namespace NetworkModelServiceFunctions
 
 		#region Fields
 		ILogger logger = LoggerWrapper.Instance;
+		private static long noScadaGuid = 1;
 		private readonly ModelResourcesDesc modelResourcesDesc;
 		private readonly NetworkModelGDA networkModelGDA;
 		private Dictionary<long, IMeasurement> Measurements { get; set; }
@@ -86,9 +88,9 @@ namespace NetworkModelServiceFunctions
 
 		#region Functions
 		public bool TryGetAllModelEntities(
-			out Dictionary<long, ITopologyElement> topologyElements, 
-			out Dictionary<long, List<long>> elementConnections, 
-			out HashSet<long> reclosers, 
+			out Dictionary<long, ITopologyElement> topologyElements,
+			out Dictionary<long, List<long>> elementConnections,
+			out HashSet<long> reclosers,
 			out List<long> energySources)
 		{
 			TopologyElements.Clear();
@@ -118,11 +120,19 @@ namespace NetworkModelServiceFunctions
 						}
 					}
 				});
-				
+
 				foreach (var measurement in Measurements.Values)
 				{
 					PutMeasurementsInElements(measurement);
 					Provider.Instance.MeasurementProvider.AddMeasurementElementPair(measurement.Id, measurement.ElementId);
+				}
+
+				foreach (var element in TopologyElements.Values)
+				{
+					if (element.Measurements.Count == 0)
+					{
+						CreateNoScadaMeasurement(element);
+					}
 				}
 
 				topologyElements = TopologyElements;
@@ -175,7 +185,7 @@ namespace NetworkModelServiceFunctions
 					}
 					catch (Exception)
 					{
-							logger.LogWarn($"{message} Failed to find appropriate element for mesuremnt with GID {measurement.Id.ToString("X")}. There is no conducting equipment connected to common terminal.");
+						logger.LogWarn($"{message} Failed to find appropriate element for mesuremnt with GID {measurement.Id.ToString("X")}. There is no conducting equipment connected to common terminal.");
 					}
 				}
 				else
@@ -187,7 +197,6 @@ namespace NetworkModelServiceFunctions
 			{
 				logger.LogWarn($"{message} Measurement with GID 0x{measurement.Id.ToString("X16")} does not exist in mesurement to terminal map.");
 			}
-
 		}
 		private void TransformToTopologyElement(ResourceDescription modelEntity)
 		{
@@ -283,6 +292,10 @@ namespace NetworkModelServiceFunctions
 				if (rs.ContainsProperty(ModelCode.BREAKER_NORECLOSING))
 				{
 					topologyElement.NoReclosing = rs.GetProperty(ModelCode.BREAKER_NORECLOSING).AsBool();
+					if (!topologyElement.NoReclosing)
+					{
+						topologyElement = new Recloser(topologyElement);
+					}
 				}
 				else
 				{
@@ -303,7 +316,7 @@ namespace NetworkModelServiceFunctions
 				}
 				else
 				{
-					topologyElement.NominalVoltage = 0;	
+					topologyElement.NominalVoltage = 0;
 				}
 
 				if (rs.ContainsProperty(ModelCode.BREAKER_NORECLOSING) && !rs.GetProperty(ModelCode.BREAKER_NORECLOSING).AsBool())
@@ -314,7 +327,7 @@ namespace NetworkModelServiceFunctions
 			catch (Exception ex)
 			{
 				logger.LogError($"{errorMessage} Could not get all properties.Excepiton message: {ex.Message}");
-			}		
+			}
 			return topologyElement;
 		}
 		private AnalogMeasurement GetPopulatedAnalogMeasurement(ResourceDescription rs)
@@ -392,8 +405,39 @@ namespace NetworkModelServiceFunctions
 			return measurement;
 		}
 		private DMSType GetDMSTypeOfTopologyElement(long gid)
-		{	
+		{
 			return (DMSType)ModelCodeHelper.ExtractTypeFromGlobalId(gid);
+		}
+		private ArtificalDiscreteMeasurement GetNoScadaDiscreteMeasurement()
+		{
+			ArtificalDiscreteMeasurement discreteMeasurement = new ArtificalDiscreteMeasurement()
+			{
+				Id = noScadaGuid++,
+				Address = "",
+				isInput = false,
+				CurrentOpen = false,
+				MaxValue = 1,
+				MinValue = 0,
+				NormalValue = 0,
+				MeasurementType = DiscreteMeasurementType.SWITCH_STATUS
+			};
+			return discreteMeasurement;
+		}
+		private void CreateNoScadaMeasurement(ITopologyElement element)
+		{
+			DMSType dMSType = GetDMSTypeOfTopologyElement(element.Id);
+
+			if (dMSType == DMSType.LOADBREAKSWITCH
+				|| dMSType == DMSType.BREAKER
+				|| dMSType == DMSType.FUSE
+				|| dMSType == DMSType.DISCONNECTOR)
+			{
+				ArtificalDiscreteMeasurement measurement = GetNoScadaDiscreteMeasurement();
+				element.Measurements.Add(measurement.Id);
+				measurement.ElementId = element.Id;
+				Provider.Instance.MeasurementProvider.AddDiscreteMeasurement(measurement);
+				Provider.Instance.MeasurementProvider.AddMeasurementElementPair(measurement.Id, element.Id);
+			}
 		}
         #endregion
     }

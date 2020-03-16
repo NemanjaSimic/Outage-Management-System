@@ -1,10 +1,12 @@
 ﻿using CECommon.Interfaces;
+using CECommon.Model;
 using CECommon.Providers;
 using Outage.Common;
 using Outage.Common.PubSub.SCADADataContract;
 using Outage.Common.ServiceContracts.SCADA;
 using Outage.Common.ServiceProxies;
 using System;
+using System.Collections.Generic;
 
 namespace CalculationEngine.SCADAFunctions
 {
@@ -22,7 +24,7 @@ namespace CalculationEngine.SCADAFunctions
         {
             try
             {
-                if (Provider.Instance.TopologyProvider.IsElementRemote(Provider.Instance.MeasurementProvider.GetElementGidForMeasurement(measurementGid)))
+                if (Provider.Instance.MeasurementProvider.TryGetDiscreteMeasurement(measurementGid, out DiscreteMeasurement measurement) && !(measurement is ArtificalDiscreteMeasurement))
                 {
                     ProxyFactory proxyFactory = new ProxyFactory();
 
@@ -41,9 +43,14 @@ namespace CalculationEngine.SCADAFunctions
                 else
                 {
                     //TOOD: DiscreteModbusData prilikom prijema sa skade prepakovati u model podataka koji ce se cuvati na CE, u prilogy AlarmType.NO_ALARM, nije validna stvar, navodi se da se 
-                    DiscreteModbusData data = new DiscreteModbusData((ushort)value, AlarmType.NO_ALARM, measurementGid, commandOrigin);
+                    //DiscreteModbusData data = new DiscreteModbusData((ushort)value, AlarmType.NO_ALARM, measurementGid, commandOrigin);
+                    Dictionary<long, DiscreteModbusData> data = new Dictionary<long, DiscreteModbusData>(1)
+                    {
+                        { measurementGid, new DiscreteModbusData((ushort)value, AlarmType.NO_ALARM, measurementGid, commandOrigin) } 
+				    };
+                    Provider.Instance.MeasurementProvider.UpdateDiscreteMeasurement(data);
+                    //Provider.Instance.MeasurementProvider.UpdateDiscreteMeasurement(data.MeasurementGid, data.Value, data.CommandOrigin);
 
-                    Provider.Instance.MeasurementProvider.UpdateDiscreteMeasurement(data.MeasurementGid, data.Value, data.CommandOrigin);
                 }
             }
             catch (Exception ex)

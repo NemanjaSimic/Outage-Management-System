@@ -62,6 +62,7 @@
     <Compile Include="Interfaces\ILoadFlow.cs" />
     <Compile Include="Models\Field.cs" />
     <Compile Include="Models\Measurement.cs" />
+    <Compile Include="Models\Recloser.cs" />
     <Compile Include="Models\TopologyModel.cs" />
     <Compile Include="Properties\AssemblyInfo.cs" />
     <Compile Include="Providers\Provider.cs" />

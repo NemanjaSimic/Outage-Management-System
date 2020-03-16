@@ -1,13 +1,6 @@
 ﻿using CECommon.Providers;
-using NetworkModelServiceFunctions;
 using Outage.Common.GDA;
-using System;
 using System.Collections.Generic;
-using System.Linq;
-using System.Text;
-using System.Threading.Tasks;
-using Topology;
-using Logger = Outage.Common.LoggerWrapper;
 
 namespace CalculationEngineService
 {
@@ -47,7 +40,7 @@ namespace CalculationEngineService
         {
             bool success;
 
-            if(Provider.Instance.ModelProvider.PrepareForTransaction() && Provider.Instance.TopologyProvider.PrepareForTransaction())
+            if(Provider.Instance.ModelProvider.PrepareForTransaction())
             {
                 success = true;
             }
@@ -62,13 +55,11 @@ namespace CalculationEngineService
         public void CommitTransaction()
         {
             Provider.Instance.ModelProvider.CommitTransaction();
-            Provider.Instance.TopologyProvider.CommitTransaction();
         }
 
         public void RollbackTransaction()
         {
             Provider.Instance.ModelProvider.RollbackTransaction();
-            Provider.Instance.TopologyProvider.RollbackTransaction();
         }
     }
 }

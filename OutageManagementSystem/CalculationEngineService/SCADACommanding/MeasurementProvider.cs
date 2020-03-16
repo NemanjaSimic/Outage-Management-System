@@ -19,6 +19,12 @@ namespace CalculationEngine.SCADAFunctions
 		private Dictionary<long, DiscreteMeasurement> discreteMeasurements;
 		private Dictionary<long, List<long>> elementToMeasurementMap;
 		private Dictionary<long, long> measurementToElementMap;
+
+		private Dictionary<long, AnalogMeasurement> tempAnalogMeasurements;
+		private Dictionary<long, DiscreteMeasurement> tempDiscreteMeasurements;
+		private Dictionary<long, List<long>> tempElementToMeasurementMap;
+		private Dictionary<long, long> tempMeasurementToElementMap;
+
 		private ProxyFactory proxyFactory;
 		private readonly HashSet<CommandOriginType> ignorableOriginTypes;
         #endregion
@@ -34,7 +40,6 @@ namespace CalculationEngine.SCADAFunctions
 			proxyFactory = new ProxyFactory();
 			Provider.Instance.MeasurementProvider = this;
 		}
-
 		public DiscreteMeasurementDelegate DiscreteMeasurementDelegate { get; set; }
 		public void AddAnalogMeasurement(AnalogMeasurement analogMeasurement)
 		{
@@ -89,7 +94,7 @@ namespace CalculationEngine.SCADAFunctions
 				UpdateAnalogMeasurement(gid, (float)measurementData.Value, measurementData.CommandOrigin);
 			}
 		}
-		public bool UpdateDiscreteMeasurement(long measurementGid, int value, CommandOriginType commandOrigin)
+		private bool UpdateDiscreteMeasurement(long measurementGid, int value, CommandOriginType commandOrigin)
 		{
 			bool success = true;
 			if (discreteMeasurements.TryGetValue(measurementGid, out DiscreteMeasurement measurement))
@@ -128,6 +133,14 @@ namespace CalculationEngine.SCADAFunctions
 			{
 				logger.LogWarn($"Failed to update discrete measurement with GID 0x{measurementGid.ToString("X16")}. There is no such a measurement.");
 				success = false;
+			}
+
+			if (measurementToElementMap.TryGetValue(measurementGid, out long recloserGid) 
+				&& Provider.Instance.ModelProvider.IsRecloser(recloserGid)
+				&& commandOrigin != CommandOriginType.CE_COMMAND
+				&& commandOrigin != CommandOriginType.OUTAGE_SIMULATOR)
+			{
+				Provider.Instance.TopologyProvider.ResetRecloser(recloserGid);
 			}
 			return success;
 		}
@@ -180,7 +193,6 @@ namespace CalculationEngine.SCADAFunctions
 			}
 			return success;
 		}
-
 		public void AddMeasurementElementPair(long measurementId, long elementId)
 		{
 			if (measurementToElementMap.ContainsKey(measurementId))
@@ -221,6 +233,46 @@ namespace CalculationEngine.SCADAFunctions
 		public Dictionary<long, long> GetMeasurementToElementMap()
 		{
 			return measurementToElementMap;
+		}
+        #endregion
+
+        #region Transaction Manager
+		public bool PrepareForTransaction()
+		{
+			bool success = true;
+			try
+			{
+				tempAnalogMeasurements = new Dictionary<long, AnalogMeasurement>(analogMeasurements);
+				tempDiscreteMeasurements = new Dictionary<long, DiscreteMeasurement>(discreteMeasurements);
+				tempElementToMeasurementMap = new Dictionary<long, List<long>>(elementToMeasurementMap);
+				tempMeasurementToElementMap = new Dictionary<long, long>(measurementToElementMap);
+
+				elementToMeasurementMap = new Dictionary<long, List<long>>();
+				measurementToElementMap = new Dictionary<long, long>();
+				analogMeasurements = new Dictionary<long, AnalogMeasurement>();
+				discreteMeasurements = new Dictionary<long, DiscreteMeasurement>();
+			}
+			catch (Exception)
+			{
+				success = false;
+			}
+			return success;
+		}
+
+		public void CommitTransaction()
+		{
+			tempAnalogMeasurements = null;
+			tempDiscreteMeasurements = null;
+			tempElementToMeasurementMap = null;
+			tempMeasurementToElementMap = null;
+		}
+
+		public void RollbackTransaction()
+		{
+			elementToMeasurementMap = tempElementToMeasurementMap;
+			measurementToElementMap = tempMeasurementToElementMap;
+			analogMeasurements = tempAnalogMeasurements;
+			discreteMeasurements = tempDiscreteMeasurements;
 		}
 		#endregion
 	}
