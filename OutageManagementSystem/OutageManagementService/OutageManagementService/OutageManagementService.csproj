@@ -62,7 +62,9 @@
     <Compile Include="OutageManagementService.cs" />
     <Compile Include="Outage\OutageService.cs" />
     <Compile Include="Properties\AssemblyInfo.cs" />
-    <Compile Include="Report\Queries\OutageIdSpecification.cs" />
+    <Compile Include="Report\Queries\HistoricalConsumerIdQuery.cs" />
+    <Compile Include="Report\Queries\HistoricalConsumerSpecification.cs" />
+    <Compile Include="Report\Queries\OutageIdQuery.cs" />
     <Compile Include="Report\Queries\OutageSpecification.cs" />
     <Compile Include="Report\Queries\Specification.cs" />
     <Compile Include="Report\ReportingService.cs" />
