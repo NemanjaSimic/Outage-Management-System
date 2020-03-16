@@ -1,10 +1,5 @@
 ﻿using Outage.Common;
 using Outage.Common.GDA;
-using System;
-using System.Collections.Generic;
-using System.Linq;
-using System.Text;
-using System.Threading.Tasks;
 
 namespace Outage.DataModel
 {
@@ -39,12 +34,12 @@ namespace Outage.DataModel
 
         public override bool HasProperty(ModelCode property)
         {
-            switch (property) //in case we add new props
+            switch (property)
             {
-                //case ModelCode.EQUIPMENT_AGGREGATE:
-                //case ModelCode.EQUIPMENT_NORMALLYINSERVICE:
-
-                //	return true;
+                case ModelCode.ENERGYCONSUMER_LASTNAME:
+                    return true;
+                case ModelCode.ENERGYCONSUMER_FIRSTNAME:
+                    return true;
                 default:
                     return base.HasProperty(property);
             }
