@@ -9,6 +9,8 @@ using System;
 using OMSCommon.OutageDatabaseModel;
 using OMSCommon.Mappers;
 using OutageDatabase.Repository;
+using Outage.Common.OutageService;
+using OutageManagementService.Report;
 
 namespace OutageManagementService.Outage
 {
@@ -171,5 +173,19 @@ namespace OutageManagementService.Outage
             return result;
         }
         #endregion
+
+        public OutageReport GenerateReport(ReportOptions options)
+        {
+            try
+            {
+                var reportService = new ReportingService();
+                var report = reportService.GenerateReport(options);
+                return report;
+            }
+            catch (Exception e)
+            {
+                throw;
+            }
+        }
     }
 }

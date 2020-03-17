@@ -1,11 +1,10 @@
-﻿namespace Outage.Common.OutageService
+﻿using System.Collections.Generic;
+
+namespace Outage.Common.OutageService
 {
     public class OutageReport
     {
-        // @TODO:
-        // - dogovoriti se kakve ce povratne vrednosti da budu
-        
-        // @NOTE: 
-        // - postoji vec na API-u kako bi trebalo da izgledaju podaci za report 
+        public IDictionary<string, int> Data { get; set; }
+        public string Type { get; set; }
     }
 }

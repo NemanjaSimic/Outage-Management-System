@@ -12,7 +12,7 @@
             => _id = id;
 
         public override Expression<Func<OutageEntity, bool>> IsSatisfiedBy()
-            => x => x.OutageId == _id;
+            => x => x.OutageElementGid == _id;
         
     }
 }

@@ -294,8 +294,6 @@ namespace OutageManagementService
             return success;
         }
 
-        
-
         public void IsolateOutage(long outageId)
         {
             //bool success = false;

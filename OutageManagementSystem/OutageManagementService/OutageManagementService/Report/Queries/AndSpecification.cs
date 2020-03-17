@@ -9,12 +9,8 @@
         private IList<Specification<T>> _specifications;
 
         public AndSpecification(IList<Specification<T>> specifications)
-        {
-            if (specifications.Count < 2)
-                throw new ArgumentException("Specification list must contain at least two items.");
+            => _specifications = specifications;
 
-            _specifications = specifications;
-        }
 
         /// <summary>
         /// Builds an expression tree for checking multiple ISpecifications
