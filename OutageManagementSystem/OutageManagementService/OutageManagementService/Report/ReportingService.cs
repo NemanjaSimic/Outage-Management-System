@@ -7,6 +7,9 @@ namespace OutageManagementService.Report
     {
         public OutageReport GenerateReport(ReportOptions options)
         {
+            // @TODO:
+            // - proveriti koji je report type i generisati odredjeni report
+
             throw new System.NotImplementedException();
         }
     }
