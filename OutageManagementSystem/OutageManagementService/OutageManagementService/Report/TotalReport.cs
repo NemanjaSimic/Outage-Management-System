@@ -1,4 +1,5 @@
 ﻿using Outage.Common.OutageService;
+using System;
 
 namespace OutageManagementService.Report
 {
@@ -8,6 +9,8 @@ namespace OutageManagementService.Report
         {
             // @TODO:
             // - proveri options i dobavi sve outage-e i generisi report
+
+            throw new NotImplementedException();
         }
     }
 }

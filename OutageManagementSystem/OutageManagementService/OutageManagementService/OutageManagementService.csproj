@@ -68,6 +68,9 @@
     <Compile Include="Report\Queries\OutageSpecification.cs" />
     <Compile Include="Report\Queries\Specification.cs" />
     <Compile Include="Report\ReportingService.cs" />
+    <Compile Include="Report\SaidiReport.cs" />
+    <Compile Include="Report\SaifiReport.cs" />
+    <Compile Include="Report\TotalReport.cs" />
     <Compile Include="ScadaSubscriber\ScadaNotification.cs" />
   </ItemGroup>
   <ItemGroup>

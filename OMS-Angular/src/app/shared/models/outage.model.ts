@@ -14,8 +14,6 @@ export interface Outage {
 }
 
 export interface ActiveOutage extends Outage {
-    // DefaultIsolationPoints: Number[];
-    // OptimalIsolationPoints: Number[];
     DefaultIsolationPoints: EquipmentViewModel[];
     OptimalIsolationPoints: EquipmentViewModel[];
 }
@@ -25,8 +23,9 @@ export interface ArchivedOutage extends Outage {
 }
 
 export enum OutageLifeCycleState {
-    Created,
-    Isolated,
-    Repaired,
-    Archived
+    Unknown = 0,
+    Created = 1,
+    Isolated = 2,
+    Repaired = 3,
+    Archived = 4
 }

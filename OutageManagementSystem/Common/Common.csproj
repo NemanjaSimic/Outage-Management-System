@@ -105,6 +105,7 @@
     <Compile Include="Exceptions\SCADA\InternalSCADAServiceException.cs" />
     <Compile Include="OutageService\Interface\IOutageTopologyElement.cs" />
     <Compile Include="OutageService\Interface\IOutageTopologyModel.cs" />
+    <Compile Include="OutageService\IReport.cs" />
     <Compile Include="OutageService\Model\OutageTopologyElement.cs" />
     <Compile Include="OutageService\Model\OutageTopologyModel.cs" />
     <Compile Include="OutageService\OutageReport.cs" />
