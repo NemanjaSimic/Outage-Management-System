@@ -3,11 +3,7 @@
   <Parameters>
     <Parameter Name="NMS_Stateless_InstanceCount" DefaultValue="-1" />
     <Parameter Name="NMS_GDA_Port" DefaultValue="10007" />
-    <Parameter Name="NMS_GDA_Protocol" DefaultValue="tcp" />
-    <Parameter Name="NMS_GDA_Type" DefaultValue="Input" />
     <Parameter Name="NMS_TActor_Port" DefaultValue="10007" />
-    <Parameter Name="NMS_TActor_Protocol" DefaultValue="tcp" />
-    <Parameter Name="NMS_TActor_Type" DefaultValue="Input" />
   </Parameters>
   <!-- Import the ServiceManifest from the ServicePackage. The ServiceManifestName and ServiceManifestVersion 
        should match the Name and Version attributes of the ServiceManifest element defined in the 
@@ -17,8 +13,18 @@
     <ConfigOverrides />
     <ResourceOverrides>
       <Endpoints>
-        <Endpoint Name="NetworkModelGDAEndpoint" Port="[NMS_GDA_Port]" Protocol="[NMS_GDA_Protocol]" Type="[NMS_GDA_Type]" />
-        <Endpoint Name="NetworkModelServiceTransactionActorEndpoint" Port="[NMS_TActor_Port]" Protocol="[NMS_TActor_Protocol]" Type="[NMS_TActor_Type]" />
+        <!--
+        Name
+        Protocol => Https, Http, Tcp, Udp
+        EndpointType => Input, Internal
+        Certificate
+        Port
+        UriScheme => file, ftp, https, net.pipe, net.tcp, telnet
+        PathSuffix
+        CodePackageName
+        IpAddressOrFqdn-->
+        <Endpoint Name="NetworkModelGDAEndpoint" Port="[NMS_GDA_Port]" Protocol="Tcp" Type="Input" UriScheme="net.tcp" PathSuffix="NetworkModelService/GDA/" />
+        <Endpoint Name="NetworkModelServiceTransactionActorEndpoint" Port="[NMS_TActor_Port]" Protocol="Tcp" Type="Input" UriScheme="net.tcp" PathSuffix="NetworkModelService/TransactionActor/" />
       </Endpoints>
     </ResourceOverrides>
   </ServiceManifestImport>

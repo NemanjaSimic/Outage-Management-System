@@ -8,6 +8,7 @@ using Outage.Common.ServiceContracts.GDA;
 using System;
 using System.Collections.Generic;
 using System.ServiceModel;
+using System.Fabric.Description;
 
 namespace OMS.Cloud.NMS.Provider
 {
@@ -46,12 +47,14 @@ namespace OMS.Cloud.NMS.Provider
                 //NetworkModelGDAEndpoint
                 new ServiceInstanceListener(context =>
                 {
-                    var host = context.NodeContext.IPAddressOrFQDN;
-                    var endpointConfig = context.CodePackageActivationContext.GetEndpoint(EndpointNames.NetworkModelGDAEndpoint);
+                    EndpointResourceDescription endpointConfig = context.CodePackageActivationContext.GetEndpoint(EndpointNames.NetworkModelGDAEndpoint);
+                    //string host = context.NodeContext.IPAddressOrFQDN; //DESKTOP-LO0FHM9
+                    string host = "localhost";
                     int port = endpointConfig.Port;
-                    string schema = endpointConfig.Protocol.ToString();
-                    //string uri = $"net.tcp://{host}:{port}/{EndpointNames.NetworkModelGDAEndpoint}/";
-                    string uri = $"net.tcp://localhost:10007/NetworkModelService/GDA/";
+                    string schema = endpointConfig.UriScheme;
+                    string sufix = endpointConfig.PathSuffix;
+                    string uri = $"{schema}://{host}:{port}/{sufix}";
+                    //string uri = $"net.tcp://localhost:10007/NetworkModelService/GDA/";
 
                     //WcfCommunicationListener<INetworkModelGDAContract> listener = new WcfCommunicationListener<INetworkModelGDAContract>(context, new GenericDataAccess(networkModel));
                     WcfCommunicationListener<INetworkModelGDAContract> listener = new WcfCommunicationListener<INetworkModelGDAContract>(context,
@@ -65,12 +68,14 @@ namespace OMS.Cloud.NMS.Provider
                 //NetworkModelTransactionActorEndpoint
                 new ServiceInstanceListener(context =>
                 {
-                    var host = context.NodeContext.IPAddressOrFQDN;
-                    var endpointConfig = context.CodePackageActivationContext.GetEndpoint(EndpointNames.NetworkModelTransactionActorEndpoint);
+                    EndpointResourceDescription endpointConfig = context.CodePackageActivationContext.GetEndpoint(EndpointNames.NetworkModelTransactionActorEndpoint);
+                    //string host = context.NodeContext.IPAddressOrFQDN; //DESKTOP-LO0FHM9
+                    string host = "localhost";
                     int port = endpointConfig.Port;
-                    string schema = endpointConfig.Protocol.ToString();
-                    //string uri = $"net.tcp://{host}:{port}/{EndpointNames.NetworkModelTransactionActorEndpoint}/";
-                    string uri = $"net.tcp://localhost:10007/NetworkModelService/TransactionActor/";
+                    string schema = endpointConfig.UriScheme;
+                    string sufix = endpointConfig.PathSuffix;
+                    string uri = $"{schema}://{host}:{port}/{sufix}";
+                    //string uri = $"net.tcp://localhost:10007/NetworkModelService/TransactionActor/";
 
                     //WcfCommunicationListener<ITransactionActorContract> listener = new WcfCommunicationListener<ITransactionActorContract>(context, new NMSTransactionActor(networkModel));
                     WcfCommunicationListener<ITransactionActorContract> listener = new WcfCommunicationListener<ITransactionActorContract>(context,
