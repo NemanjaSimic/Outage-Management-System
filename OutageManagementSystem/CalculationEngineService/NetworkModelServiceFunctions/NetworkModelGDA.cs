@@ -37,7 +37,7 @@ namespace NetworkModelServiceFunctions
 
 				try
 				{
-					iteratorId = gdaQueryProxy.GetExtentValues(entityType, propIds);
+					iteratorId = gdaQueryProxy.GetExtentValues(entityType, propIds).Result;
 				}
 				catch (Exception e)
 				{
@@ -64,7 +64,7 @@ namespace NetworkModelServiceFunctions
 
 				try
 				{
-					iteratorId = gdaQueryProxy.GetRelatedValues(source, propIds, association);
+					iteratorId = gdaQueryProxy.GetRelatedValues(source, propIds, association).Result;
 				}
 				catch (Exception e)
 				{
@@ -91,7 +91,7 @@ namespace NetworkModelServiceFunctions
 
 				try
 				{
-					resource = gdaQueryProxy.GetValues(resourceId, propIds);
+					resource = gdaQueryProxy.GetValues(resourceId, propIds).Result;
 				}
 				catch (Exception e)
 				{
@@ -120,18 +120,18 @@ namespace NetworkModelServiceFunctions
 
 				try
 				{
-					resourcesLeft = gdaQueryProxy.IteratorResourcesTotal(iteratorId);
+					resourcesLeft = gdaQueryProxy.IteratorResourcesTotal(iteratorId).Result;
 					resourceDescriptions = new List<ResourceDescription>(resourcesLeft);
 
 					while (resourcesLeft > 0)
 					{
-						List<ResourceDescription> rds = gdaQueryProxy.IteratorNext(numberOfResources, iteratorId);
+						List<ResourceDescription> rds = gdaQueryProxy.IteratorNext(numberOfResources, iteratorId).Result;
 						resourceDescriptions.AddRange(rds);
 
-						resourcesLeft = gdaQueryProxy.IteratorResourcesLeft(iteratorId);
+						resourcesLeft = gdaQueryProxy.IteratorResourcesLeft(iteratorId).Result;
 					}
 
-					gdaQueryProxy.IteratorClose(iteratorId);
+					gdaQueryProxy.IteratorClose(iteratorId).Wait();
 				}
 				catch (Exception e)
 				{

@@ -206,12 +206,12 @@ namespace Outage.DataImporter.CIMAdapter.Importer
 
 				try
 				{
-					iteratorId = gdaQueryProxy.GetExtentValues(modelCodeType, mrIdProp);
-					resourcesLeft = gdaQueryProxy.IteratorResourcesLeft(iteratorId);
+					iteratorId = gdaQueryProxy.GetExtentValues(modelCodeType, mrIdProp).Result;
+					resourcesLeft = gdaQueryProxy.IteratorResourcesLeft(iteratorId).Result;
 
 					while (resourcesLeft > 0)
 					{
-						List<ResourceDescription> gdaResult = gdaQueryProxy.IteratorNext(numberOfResources, iteratorId);
+						List<ResourceDescription> gdaResult = gdaQueryProxy.IteratorNext(numberOfResources, iteratorId).Result;
 
 						foreach (ResourceDescription rd in gdaResult)
 						{
@@ -232,10 +232,10 @@ namespace Outage.DataImporter.CIMAdapter.Importer
 							}
 						}
 
-						resourcesLeft = gdaQueryProxy.IteratorResourcesLeft(iteratorId);
+						resourcesLeft = gdaQueryProxy.IteratorResourcesLeft(iteratorId).Result;
 					}
 
-					gdaQueryProxy.IteratorClose(iteratorId);
+					gdaQueryProxy.IteratorClose(iteratorId).Wait();
 
 					message = "Getting nms data from server successfully finished.";
 					Logger.LogInfo(message);

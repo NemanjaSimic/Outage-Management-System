@@ -3,11 +3,9 @@ using Outage.Common.ServiceContracts.GDA;
 using Outage.Common.GDA;
 using System;
 using System.Collections.Generic;
-using System.Linq;
-using System.Text;
 using System.Threading.Tasks;
 
-namespace Outage.NetworkModelService.GDA
+namespace OMS.Cloud.NMS.Provider.GDA
 {
     public class GenericDataAccess : INetworkModelGDAContract
     {
@@ -21,18 +19,11 @@ namespace Outage.NetworkModelService.GDA
         private static Dictionary<int, ResourceIterator> resourceIterators = new Dictionary<int, ResourceIterator>();
         private static int resourceItId = 0;
 
-        protected static NetworkModel networkModel = null;
+        private readonly NetworkModel networkModel;
 
-        public static NetworkModel NetworkModel
+        public GenericDataAccess(NetworkModel networkModel)
         {
-            set
-            {
-                networkModel = value;
-            }
-        }
-
-        public GenericDataAccess()
-        {
+            this.networkModel = networkModel;
         }
 
         public async Task<UpdateResult> ApplyUpdate(Delta delta)
@@ -60,7 +51,7 @@ namespace Outage.NetworkModelService.GDA
             try
             {
                 ResourceIterator ri = networkModel.GetExtentValues(entityType, propIds);
-                int retVal = AddIterator(ri);
+                int retVal = AddIterator(ri).Result;
 
                 return retVal;
             }
@@ -77,7 +68,7 @@ namespace Outage.NetworkModelService.GDA
             try
             {
                 ResourceIterator ri = networkModel.GetRelatedValues(source, propIds, association);
-                int retVal = AddIterator(ri);
+                int retVal =  AddIterator(ri).Result;
 
                 return retVal;
             }
@@ -93,7 +84,7 @@ namespace Outage.NetworkModelService.GDA
         {
             try
             {
-                List<ResourceDescription> retVal = GetIterator(id).Next(n);
+                List<ResourceDescription> retVal = GetIterator(id).Result.Next(n);
 
                 return retVal;
             }
@@ -109,7 +100,7 @@ namespace Outage.NetworkModelService.GDA
         {
             try
             {
-                GetIterator(id).Rewind();
+                GetIterator(id).Result.Rewind();
 
                 return true;
             }
@@ -125,7 +116,7 @@ namespace Outage.NetworkModelService.GDA
         {
             try
             {
-                int retVal = GetIterator(id).ResourcesTotal();
+                int retVal = GetIterator(id).Result.ResourcesTotal();
                 return retVal;
             }
             catch (Exception ex)
@@ -140,7 +131,7 @@ namespace Outage.NetworkModelService.GDA
         {
             try
             {
-                int resourcesLeft = GetIterator(id).ResourcesLeft();
+                int resourcesLeft = GetIterator(id).Result.ResourcesLeft();
 
                 return resourcesLeft;
             }
@@ -156,7 +147,7 @@ namespace Outage.NetworkModelService.GDA
         {
             try
             {
-                bool retVal = RemoveIterator(id);
+                bool retVal = await RemoveIterator(id);
 
                 return retVal;
             }
@@ -168,7 +159,7 @@ namespace Outage.NetworkModelService.GDA
             }
         }
 
-        private int AddIterator(ResourceIterator iterator)
+        private async Task<int> AddIterator(ResourceIterator iterator)
         {
             lock (resourceIterators)
             {
@@ -178,7 +169,7 @@ namespace Outage.NetworkModelService.GDA
             }
         }
 
-        private ResourceIterator GetIterator(int iteratorId)
+        private async Task<ResourceIterator> GetIterator(int iteratorId)
         {
             lock (resourceIterators)
             {
@@ -193,7 +184,7 @@ namespace Outage.NetworkModelService.GDA
             }
         }
 
-        private bool RemoveIterator(int iteratorId)
+        private async Task<bool> RemoveIterator(int iteratorId)
         {
             lock (resourceIterators)
             {

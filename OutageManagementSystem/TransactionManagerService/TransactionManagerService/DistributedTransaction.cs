@@ -142,7 +142,7 @@ namespace Outage.TransactionManagerService
 
                     }
                         
-                    success = transactionActorProxy.Prepare();
+                    success = transactionActorProxy.Prepare().Result;
                 }
 
                 if (success)

@@ -3,18 +3,15 @@ using Outage.DistributedTransactionActor;
 using System;
 using System.Threading.Tasks;
 
-namespace Outage.NetworkModelService.DistributedTransaction
+namespace OMS.Cloud.NMS.Provider.DistributedTransaction
 {
     public class NMSTransactionActor : TransactionActor
     { 
-        protected static NetworkModel networkModel = null;
+        private readonly NetworkModel networkModel = null;
 
-        public static NetworkModel NetworkModel
+        public NMSTransactionActor(NetworkModel networkModel)
         {
-            set
-            {
-                networkModel = value;
-            }
+            this.networkModel = networkModel;
         }
 
         public override async Task<bool> Prepare()

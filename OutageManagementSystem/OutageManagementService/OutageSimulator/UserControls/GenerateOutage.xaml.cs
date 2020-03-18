@@ -239,12 +239,12 @@ namespace OMS.OutageSimulator.UserControls
 
                     try
                     {
-                        iteratorId = gdaProxy.GetExtentValues(dmsTypesModelCode, propIds);
-                        resourcesLeft = gdaProxy.IteratorResourcesLeft(iteratorId);
+                        iteratorId = gdaProxy.GetExtentValues(dmsTypesModelCode, propIds).Result;
+                        resourcesLeft = gdaProxy.IteratorResourcesLeft(iteratorId).Result;
 
                         while (resourcesLeft > 0)
                         {
-                            List<ResourceDescription> gdaResult = gdaProxy.IteratorNext(numberOfResources, iteratorId);
+                            List<ResourceDescription> gdaResult = gdaProxy.IteratorNext(numberOfResources, iteratorId).Result;
 
                             foreach (ResourceDescription rd in gdaResult)
                             {
@@ -257,10 +257,10 @@ namespace OMS.OutageSimulator.UserControls
                                 GlobalIdentifiers.Add(globalIdentifier);
                             }
 
-                            resourcesLeft = gdaProxy.IteratorResourcesLeft(iteratorId);
+                            resourcesLeft = gdaProxy.IteratorResourcesLeft(iteratorId).Result;
                         }
 
-                        gdaProxy.IteratorClose(iteratorId);
+                        gdaProxy.IteratorClose(iteratorId).Wait();
                     }
                     catch (Exception e)
                     {

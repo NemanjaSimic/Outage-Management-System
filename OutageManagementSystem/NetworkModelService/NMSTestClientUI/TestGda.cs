@@ -11,11 +11,11 @@ using Outage.Common.ServiceProxies;
 
 namespace TelventDMS.Services.NetworkModelService.TestClient.TestsUI
 {
-	public class TestGda : IDisposable
+	public sealed class TestGda : IDisposable
 	{
 		private ILogger logger;
 
-		protected ILogger Logger
+		private ILogger Logger
 		{
 			get { return logger ?? (logger = LoggerWrapper.Instance); }
 		}
@@ -48,7 +48,7 @@ namespace TelventDMS.Services.NetworkModelService.TestClient.TestsUI
 						throw new NullReferenceException(errMsg);
 					}
 					
-					rd = gdaQueryProxy.GetValues(globalId, properties);
+					rd = gdaQueryProxy.GetValues(globalId, properties).Result;
 					message = "Getting values method successfully finished.";
 					Logger.LogInfo(message);
 				}
@@ -84,12 +84,12 @@ namespace TelventDMS.Services.NetworkModelService.TestClient.TestsUI
 						throw new NullReferenceException(errMsg);
 					}
 
-					iteratorId = gdaQueryProxy.GetExtentValues(modelCodeType, properties);
-					resourcesLeft = gdaQueryProxy.IteratorResourcesLeft(iteratorId);
+					iteratorId = gdaQueryProxy.GetExtentValues(modelCodeType, properties).Result;
+					resourcesLeft = gdaQueryProxy.IteratorResourcesLeft(iteratorId).Result;
 
 					while (resourcesLeft > 0)
 					{
-						List<ResourceDescription> rds = gdaQueryProxy.IteratorNext(numberOfResources, iteratorId);
+						List<ResourceDescription> rds = gdaQueryProxy.IteratorNext(numberOfResources, iteratorId).Result;
 
 						for (int i = 0; i < rds.Count; i++)
 						{
@@ -125,10 +125,10 @@ namespace TelventDMS.Services.NetworkModelService.TestClient.TestsUI
 							}
 							ids.Add(rds[i].Id);
 						}
-						resourcesLeft = gdaQueryProxy.IteratorResourcesLeft(iteratorId);
+						resourcesLeft = gdaQueryProxy.IteratorResourcesLeft(iteratorId).Result;
 					}
 
-					gdaQueryProxy.IteratorClose(iteratorId);
+					gdaQueryProxy.IteratorClose(iteratorId).Wait();
 
 					message = "Getting extent values method successfully finished.";
 					Logger.LogInfo(message);
@@ -170,12 +170,12 @@ namespace TelventDMS.Services.NetworkModelService.TestClient.TestsUI
 						throw new NullReferenceException(errMsg);
 					}
 
-					iteratorId = gdaQueryProxy.GetRelatedValues(sourceGlobalId, properties, association);
-					resourcesLeft = gdaQueryProxy.IteratorResourcesLeft(iteratorId);
+					iteratorId = gdaQueryProxy.GetRelatedValues(sourceGlobalId, properties, association).Result;
+					resourcesLeft = gdaQueryProxy.IteratorResourcesLeft(iteratorId).Result;
 
 					while (resourcesLeft > 0)
 					{
-						List<ResourceDescription> rds = gdaQueryProxy.IteratorNext(numberOfResources, iteratorId);
+						List<ResourceDescription> rds = gdaQueryProxy.IteratorNext(numberOfResources, iteratorId).Result;
 
 						for (int i = 0; i < rds.Count; i++)
 						{
@@ -211,9 +211,9 @@ namespace TelventDMS.Services.NetworkModelService.TestClient.TestsUI
 							}
 							resultIds.Add(rds[i].Id);
 						}
-						resourcesLeft = gdaQueryProxy.IteratorResourcesLeft(iteratorId);
+						resourcesLeft = gdaQueryProxy.IteratorResourcesLeft(iteratorId).Result;
 					}
-					gdaQueryProxy.IteratorClose(iteratorId);
+					gdaQueryProxy.IteratorClose(iteratorId).Wait();
 
 					message = "Getting related values method successfully finished.";
 					Logger.LogInfo(message);
