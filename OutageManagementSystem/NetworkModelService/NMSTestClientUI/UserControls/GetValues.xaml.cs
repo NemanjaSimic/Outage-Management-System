@@ -38,6 +38,7 @@ namespace NMSTestClientUI.UserControls
             catch (Exception ex)
             {
                 MessageBox.Show(ex.Message, "GetValues", MessageBoxButton.OK, MessageBoxImage.Error);
+                return;
             }
 
             foreach (DMSType dmsType in Enum.GetValues(typeof(DMSType)))
@@ -48,7 +49,7 @@ namespace NMSTestClientUI.UserControls
                 }
 
                 ModelCode dmsTypesModelCode = modelResourcesDesc.GetModelCodeFromType(dmsType);
-                tgda.GetExtentValues(dmsTypesModelCode, new List<ModelCode> { ModelCode.IDOBJ_GID }, null).ForEach(g => GlobalIdentifiers.Add(new GlobalIdentifierViewModel()
+                tgda.GetExtentValues(dmsTypesModelCode, new List<ModelCode> { ModelCode.IDOBJ_GID }, null).Result.ForEach(g => GlobalIdentifiers.Add(new GlobalIdentifierViewModel()
                 {
                     GID = g,
                     Type = dmsTypesModelCode.ToString(),
@@ -164,7 +165,7 @@ namespace NMSTestClientUI.UserControls
             ResourceDescription rd = null;
             try
             {
-                rd = tgda.GetValues(SelectedGID.GID, selectedProperties);
+                rd = tgda.GetValues(SelectedGID.GID, selectedProperties).Result;
             }
             catch (Exception ex)
             {
@@ -220,7 +221,7 @@ namespace NMSTestClientUI.UserControls
                 }
 
                 ModelCode dmsTypesModelCode = modelResourcesDesc.GetModelCodeFromType(dmsType);
-                tgda.GetExtentValues(dmsTypesModelCode, new List<ModelCode> { ModelCode.IDOBJ_GID }, null).ForEach(g => GlobalIdentifiers.Add(new GlobalIdentifierViewModel()
+                tgda.GetExtentValues(dmsTypesModelCode, new List<ModelCode> { ModelCode.IDOBJ_GID }, null).Result.ForEach(g => GlobalIdentifiers.Add(new GlobalIdentifierViewModel()
                 {
                     GID = g,
                     Type = dmsTypesModelCode.ToString(),

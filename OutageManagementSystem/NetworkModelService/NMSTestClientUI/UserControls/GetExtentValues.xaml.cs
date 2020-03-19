@@ -46,6 +46,7 @@ namespace NMSTestClientUI.UserControls
             catch (Exception ex)
             {
                 MessageBox.Show(ex.Message, "GetExtentValues", MessageBoxButton.OK, MessageBoxImage.Error);
+                return;
             }
 
             foreach (DMSType dmsType in Enum.GetValues(typeof(DMSType)))

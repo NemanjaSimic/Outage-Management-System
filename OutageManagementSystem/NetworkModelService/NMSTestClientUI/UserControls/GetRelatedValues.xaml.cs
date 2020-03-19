@@ -53,6 +53,7 @@ namespace NMSTestClientUI.UserControls
             catch (Exception ex)
             {
                 MessageBox.Show(ex.Message, "GetRelatedValues", MessageBoxButton.OK, MessageBoxImage.Error);
+                return;
             }
 
             foreach(DMSType dmsType in Enum.GetValues(typeof(DMSType)))
@@ -63,7 +64,7 @@ namespace NMSTestClientUI.UserControls
                 }
 
                 ModelCode dmsTypesModelCode = modelResourcesDesc.GetModelCodeFromType(dmsType);
-                tgda.GetExtentValues(dmsTypesModelCode, new List<ModelCode> { ModelCode.IDOBJ_GID }, null).ForEach(g => GlobalIdentifiersRelated.Add(new GlobalIdentifierViewModel()
+                tgda.GetExtentValues(dmsTypesModelCode, new List<ModelCode> { ModelCode.IDOBJ_GID }, null).Result.ForEach(g => GlobalIdentifiersRelated.Add(new GlobalIdentifierViewModel()
                 {
                     GID = g,
                     Type = dmsTypesModelCode.ToString(),
@@ -295,7 +296,7 @@ namespace NMSTestClientUI.UserControls
 
             ////////////////////////////////////////////
             List<long> gidReferences = new List<long>();
-            ResourceDescription rd = tgda.GetValues(SelectedGID.GID, new List<ModelCode>() { SelectedProperty.Property });
+            ResourceDescription rd = tgda.GetValues(SelectedGID.GID, new List<ModelCode>() { SelectedProperty.Property }).Result;
             if (rd != null)
             {
                 Property prop = rd.GetProperty(SelectedProperty.Property);
@@ -329,7 +330,7 @@ namespace NMSTestClientUI.UserControls
                 if (SelectedDmsType != null)
                 {
                     Association association = new Association(SelectedProperty.Property, modelResourcesDesc.GetModelCodeFromType(SelectedDmsType.DmsType));
-                    List<long> gids = tgda.GetRelatedValues(SelectedGID.GID, selectedProperties, association, sb);
+                    List<long> gids = tgda.GetRelatedValues(SelectedGID.GID, selectedProperties, association, sb).Result;
                 }
                 else
                 {
@@ -369,7 +370,7 @@ namespace NMSTestClientUI.UserControls
                     /////////////////////////////////////////////////////////////
 
                     Association association = new Association(SelectedProperty.Property, 0x0000000000000000);
-                    List<long> gids = tgda.GetRelatedValues(SelectedGID.GID, selectedProperties, association, sb);
+                    List<long> gids = tgda.GetRelatedValues(SelectedGID.GID, selectedProperties, association, sb).Result;
                 }
             }
             catch (Exception ex)
@@ -393,7 +394,7 @@ namespace NMSTestClientUI.UserControls
                 }
 
                 ModelCode dmsTypesModelCode = modelResourcesDesc.GetModelCodeFromType(dmsType);
-                tgda.GetExtentValues(dmsTypesModelCode, new List<ModelCode> { ModelCode.IDOBJ_GID }, null).ForEach(g => GlobalIdentifiersRelated.Add(new GlobalIdentifierViewModel()
+                tgda.GetExtentValues(dmsTypesModelCode, new List<ModelCode> { ModelCode.IDOBJ_GID }, null).Result.ForEach(g => GlobalIdentifiersRelated.Add(new GlobalIdentifierViewModel()
                 {
                     GID = g,
                     Type = dmsTypesModelCode.ToString(),
