@@ -1,7 +1,7 @@
 ﻿using Outage.Common;
 using Outage.Common.GDA;
 
-namespace Outage.DataModel.Outage
+namespace Outage.DataModel
 {
     public class SynchronousMachine : ConductingEquipment
     {

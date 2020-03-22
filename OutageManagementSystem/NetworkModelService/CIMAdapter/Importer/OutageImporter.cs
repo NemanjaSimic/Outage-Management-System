@@ -165,10 +165,10 @@ namespace Outage.DataImporter.CIMAdapter.Importer
 			ImportLoadBreakSwitches();
 			ImportACLineSegments();
 			ImportConnectivityNodes();
+			ImportSynchronousMachines();
 			ImportTerminals();
 			ImportDiscretes();
 			ImportAnalogs();
-			ImportSynchronousMachines();
 
 			CorrectNegativeReferences();
 			CreateAndInsertDeleteOperations();

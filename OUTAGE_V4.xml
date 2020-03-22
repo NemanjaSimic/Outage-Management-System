@@ -2564,6 +2564,20 @@
 		<cim:IdentifiedObject.mRID>TM_360</cim:IdentifiedObject.mRID>
 		<ftn:IdentifiedObject.name>TM_360</ftn:IdentifiedObject.name>
 	</cim:Terminal>
+	<cim:Terminal rdf:ID="TM_361">
+		<cim:Terminal.ConductingEquipment rdf:resource="#EC_6"/>
+		<cim:Terminal.ConnectivityNode rdf:resource="#CN_158"/>
+		<cim:IdentifiedObject.description>Terminal361</cim:IdentifiedObject.description>
+		<cim:IdentifiedObject.mRID>TM_361</cim:IdentifiedObject.mRID>
+		<ftn:IdentifiedObject.name>TM_361</ftn:IdentifiedObject.name>
+	</cim:Terminal>
+	<cim:Terminal rdf:ID="TM_362">
+		<cim:Terminal.ConductingEquipment rdf:resource="#SM_1"/>
+		<cim:Terminal.ConnectivityNode rdf:resource="#CN_158"/>
+		<cim:IdentifiedObject.description>Terminal362</cim:IdentifiedObject.description>
+		<cim:IdentifiedObject.mRID>TM_362</cim:IdentifiedObject.mRID>
+		<ftn:IdentifiedObject.name>TM_362</ftn:IdentifiedObject.name>
+	</cim:Terminal>
 	
 	<!--END Terminal-->
 <!--[END Package_Core ]-->
@@ -2581,6 +2595,15 @@
 		<ftn:IdentifiedObject.name>ACL_</ftn:IdentifiedObject.name>
 	</cim:ACLineSegment>
 	-->
+	<cim:SynchronousMachine rdf:ID="SM_1">
+		<cim:ConductingEquipment.BaseVoltage rdf:resource="#BV_2"/>
+		<cim:ConductingEquipment.isRemote>true</cim:ConductingEquipment.isRemote>
+		<cim:IdentifiedObject.description>SynchronousMachine1</cim:IdentifiedObject.description>
+		<cim:IdentifiedObject.mRID>SM_1</cim:IdentifiedObject.mRID>
+		<ftn:IdentifiedObject.name>SM_1</ftn:IdentifiedObject.name>
+		<cim:SynchronousMachine.capacity>5</cim:SynchronousMachine.capacity>
+		<cim:SynchronousMachine.currentRegime>0</cim:SynchronousMachine.currentRegime>
+	</cim:SynchronousMachine>
 	<cim:ACLineSegment rdf:ID="ACL_1">
 		<cim:ConductingEquipment.BaseVoltage rdf:resource="#BV_1"/>
 		<cim:ConductingEquipment.isRemote>true</cim:ConductingEquipment.isRemote>
@@ -5148,6 +5171,11 @@
 		<cim:IdentifiedObject.mRID>CN_157</cim:IdentifiedObject.mRID>
 		<ftn:IdentifiedObject.name>CN_157</ftn:IdentifiedObject.name>
 	</cim:ConnectivityNode>
+	<cim:ConnectivityNode rdf:ID="CN_158">
+		<cim:IdentifiedObject.description>ConnectivityNode158</cim:IdentifiedObject.description>
+		<cim:IdentifiedObject.mRID>CN_158</cim:IdentifiedObject.mRID>
+		<ftn:IdentifiedObject.name>CN_158</ftn:IdentifiedObject.name>
+	</cim:ConnectivityNode>
 	<!--suvisni-->
 	<!--
 	<cim:ConnectivityNode rdf:ID="CN_89">
@@ -5914,7 +5942,7 @@
 		<cim:Analog.deviation>0</cim:Analog.deviation>
 		<cim:Analog.currentValue>0</cim:Analog.currentValue>
 		<cim:Analog.maxValue>30</cim:Analog.maxValue>
-		<cim:Analog.measurementType>Current</cim:Analog.measurementType>
+		<cim:Analog.measurementType>FeederCurrent</cim:Analog.measurementType>
 		<cim:Analog.minValue>0</cim:Analog.minValue>
 		<cim:Analog.normalValue>20</cim:Analog.normalValue>
 		<cim:Measurement.address>44</cim:Measurement.address>
@@ -5929,7 +5957,7 @@
 		<cim:Analog.deviation>0</cim:Analog.deviation>
 		<cim:Analog.currentValue>0</cim:Analog.currentValue>
 		<cim:Analog.maxValue>30</cim:Analog.maxValue>
-		<cim:Analog.measurementType>Current</cim:Analog.measurementType>
+		<cim:Analog.measurementType>FeederCurrent</cim:Analog.measurementType>
 		<cim:Analog.minValue>0</cim:Analog.minValue>
 		<cim:Analog.normalValue>20</cim:Analog.normalValue>
 		<cim:Measurement.address>45</cim:Measurement.address>

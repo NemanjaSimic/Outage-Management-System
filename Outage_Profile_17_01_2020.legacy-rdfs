@@ -373,6 +373,10 @@ When the sensor location is needed both Measurement-PSR and Measurement-Terminal
 	<rdfs:label>Current</rdfs:label>
 	<rdf:type rdf:resource="#AnalogMeasurementType"/>
   </rdf:Description>
+  <rdf:Description rdf:about="#AnalogMeasurementType.FeederCurrent">
+	<rdfs:label>FeederCurrent</rdfs:label>
+	<rdf:type rdf:resource="#AnalogMeasurementType"/>
+  </rdf:Description>
   <rdf:Description rdf:about="#AnalogMeasurementType.Power">
 	<rdfs:label>Power</rdfs:label>
 	<rdf:type rdf:resource="#AnalogMeasurementType"/>

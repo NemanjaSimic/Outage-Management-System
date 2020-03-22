@@ -27,6 +27,10 @@
         {
             "icon": "assets/img/consumer.png",
             "label": "Energy Consumer"
+        },
+        {
+            "icon": "assets/img/plant.png",
+            "label": "Distribuited Generator"
         }
     ]
 }

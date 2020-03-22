@@ -396,6 +396,8 @@ namespace Outage.DataImporter.CIMAdapter.Importer
             {
                 case Outage.AnalogMeasurementType.Current:
                     return Outage.Common.AnalogMeasurementType.CURRENT;
+                case Outage.AnalogMeasurementType.FeederCurrent:
+                    return Outage.Common.AnalogMeasurementType.FEEDER_CURRENT;
                 case Outage.AnalogMeasurementType.Voltage:
                     return Outage.Common.AnalogMeasurementType.VOLTAGE;
                 case Outage.AnalogMeasurementType.Power:
