@@ -36,7 +36,7 @@ namespace Outage.Common
 		public ResourcePropertiesDesc(ModelCode resourceId)
 		{
 			this.resourceId = resourceId;
-			this.resourceName = resourceId.ToString();			
+			this.resourceName = resourceId.ToString();
 		}
 
 		public ResourcePropertiesDesc(ModelCode resourceId, string resourceName)
@@ -900,7 +900,8 @@ namespace Outage.Common
             typeIdsInInsertOrder.Add(ModelCode.TERMINAL);
             typeIdsInInsertOrder.Add(ModelCode.DISCRETE);
             typeIdsInInsertOrder.Add(ModelCode.ANALOG);
-        }
+            typeIdsInInsertOrder.Add(ModelCode.SYNCHRONOUSMACHINE);
+		}
 
         private void InitializeNotSettablePropertyIds()
         { 

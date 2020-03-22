@@ -51,7 +51,7 @@ namespace Topology
                         }
                     }
                     List<UIMeasurement> measurements = new List<UIMeasurement>();
-                    foreach (var meausrementGid in element.Measurements)
+                    foreach (var meausrementGid in element.Measurements.Keys)
                     {
                         if (Provider.Instance.MeasurementProvider.TryGetDiscreteMeasurement(meausrementGid, out DiscreteMeasurement discreteMeasurement))
                         {

@@ -23,7 +23,8 @@ namespace Topology
         #endregion
 
         public ITopology CreateGraphTopology(long firstElementGid)
-        { 
+        {
+            long currentFider = 0;
             elements = Provider.Instance.ModelProvider.GetElementModels();
             connections = Provider.Instance.ModelProvider.GetConnections();
             reclosers = Provider.Instance.ModelProvider.GetReclosers();
@@ -87,7 +88,21 @@ namespace Topology
                     {
                         logger.LogError($"[GraphBuilder] Element with GID 0x{element.ToString("X16")} does not exist in collection of elements.");
                     }
-                }         
+                }
+
+                if (currentElement.Mrid.Equals("ACL_5"))
+                {
+                    currentFider = currentElement.Id;
+                }
+                else if (currentElement.Mrid.Equals("ACL_6"))
+                {
+                    currentFider = currentElement.Id;
+                }
+                else
+                {
+                    currentElement.Fider = currentFider;
+                }
+
                 topology.AddElement(currentElement);
             }
 

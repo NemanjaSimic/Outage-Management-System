@@ -16,15 +16,41 @@ namespace Topology
         readonly ILogger logger = LoggerWrapper.Instance;
         private readonly ISCADACommanding scadaCommanding = new SCADACommanding();
         private HashSet<long> reclosers;
+        private Dictionary<long, ITopologyElement> fiders;
+        private Dictionary<long, float> loadOfFiders;
+
 
         public void UpdateLoadFlow(List<ITopology> topologies)
         {
+            loadOfFiders = new Dictionary<long, float>();
+            fiders = new Dictionary<long, ITopologyElement>();
             reclosers = Provider.Instance.ModelProvider.GetReclosers();
             foreach (var topology in topologies)
             {
                 CalculateLoadFlow(topology);
             }
             UpdateLoadFlowFromRecloser(topologies);
+
+            foreach (var loadFider in loadOfFiders)
+            {
+                if (fiders.TryGetValue(loadFider.Key, out ITopologyElement fider))
+                {
+                    long signalGid = 0;
+                    foreach (var measurement in fider.Measurements)
+                    {
+                        if (measurement.Value.Equals(AnalogMeasurementType.CURRENT.ToString()))
+                        {
+                            signalGid = measurement.Key;
+                        }
+                    }
+
+                    if (signalGid != 0)
+                    {
+                        scadaCommanding.SendAnalogCommand(signalGid, loadFider.Value, CommandOriginType.CE_COMMAND);
+                        Provider.Instance.MeasurementProvider.UpdateAnalogMeasurement(signalGid, loadFider.Value, CommandOriginType.CE_COMMAND);
+                    }
+                }
+            }
         }
         private void CalculateLoadFlow(ITopology topology)
         {
@@ -35,6 +61,7 @@ namespace Topology
                 Stack<ITopologyElement> stack = new Stack<ITopologyElement>();
                 stack.Push(firsElement);
                 ITopologyElement nextElement;
+                long currentFider = 0;
 
                 while (stack.Count > 0)
                 {
@@ -47,12 +74,39 @@ namespace Topology
                     else
                     {
 
-                        if (!IsElementEnergized(nextElement))
+                        if (nextElement.Mrid.Equals("ACL_5"))
+                        {
+                            currentFider = nextElement.Id;
+                            if (!fiders.ContainsKey(currentFider))
+                            {
+                                fiders.Add(currentFider, nextElement);
+                            }
+                        }
+                        else if (nextElement.Mrid.Equals("ACL_6"))
+                        {
+                            currentFider = nextElement.Id;
+                            if (!fiders.ContainsKey(currentFider))
+                            {
+                                fiders.Add(currentFider, nextElement);
+                            }
+                        }
+
+                        if (!IsElementEnergized(nextElement, out float load))
                         {
                             DeEnergizeElementsUnder(nextElement);
                         }
                         else
                         {
+
+                            if (loadOfFiders.ContainsKey(currentFider))
+                            {
+                                loadOfFiders[currentFider] += load;
+                            }
+                            else
+                            {
+                                loadOfFiders.Add(currentFider, load);
+                            }
+
                             foreach (var child in nextElement.SecondEnd)
                             {
                                 if (!reclosers.Contains(child.Id))
@@ -70,10 +124,10 @@ namespace Topology
             }
             logger.LogDebug("Calulate load flow successfully finished.");
         }
-        private bool IsElementEnergized(ITopologyElement element)
+        private bool IsElementEnergized(ITopologyElement element, out float load)
         {
             element.IsActive = true;
-            foreach (var measurement in element.Measurements)
+            foreach (var measurement in element.Measurements.Keys)
             {
                 if ((DMSType)ModelCodeHelper.ExtractTypeFromGlobalId(measurement) == DMSType.DISCRETE
                     || measurement < 10000)
@@ -82,6 +136,15 @@ namespace Topology
                     element.IsActive = !Provider.Instance.MeasurementProvider.GetDiscreteValue(measurement);
                     break;
                 }
+            }
+
+            if (element.DmsType.Equals(DMSType.ENERGYCONSUMER.ToString()))
+            {
+                load = 2;
+            }
+            else
+            {
+                load = 0;
             }
 
             return element.IsActive;
@@ -131,59 +194,60 @@ namespace Topology
                 }
             }
         }
-        private ITopology CalculateLoadFlowFromRecloser(ITopologyElement element, ITopology topology)
+        private ITopology CalculateLoadFlowFromRecloser(ITopologyElement recloser, ITopology topology)
         {
             long measurementGid = 0;
 
-            if (element.Measurements.Count == 1)
+            if (recloser.Measurements.Count == 1)
             {
-                measurementGid = element.Measurements.First();
+                //dogovor je da prekidaci imaju samo discrete measurement
+                measurementGid = recloser.Measurements.First().Key;
             }
             else
             {
-                logger.LogWarn($"[CalculateLoadFlowFromRecloser] Recloser with GID 0x{element.Id.ToString("X16")} does not have proper measurements.");
+                logger.LogWarn($"[CalculateLoadFlowFromRecloser] Recloser with GID 0x{recloser.Id.ToString("X16")} does not have proper measurements.");
             }
 
-            if (element.FirstEnd != null && element.SecondEnd.Count == 1)
+            if (recloser.FirstEnd != null && recloser.SecondEnd.Count == 1)
             {
-                if (element.FirstEnd.IsActive && !element.SecondEnd.First().IsActive)
+                if (recloser.FirstEnd.IsActive && !recloser.SecondEnd.First().IsActive)
                 {
-                    if (IsElementEnergized(element))
+                    if (IsElementEnergized(recloser, out float load))
                     {
-                        CalculateLoadFlowUpsideDown(element.SecondEnd.First(), element.Id);
+                        CalculateLoadFlowUpsideDown(recloser.SecondEnd.First(), recloser.Id, recloser.FirstEnd.Fider);
                     }
                     else
                     {
-                        Thread thread = new Thread(() => CommandToRecloser(measurementGid, 0, CommandOriginType.CE_COMMAND, element));
+                        Thread thread = new Thread(() => CommandToRecloser(measurementGid, 0, CommandOriginType.CE_COMMAND, recloser));
                         thread.Start();
                     }
                 }
-                else if (!element.FirstEnd.IsActive && element.SecondEnd.First().IsActive)
+                else if (!recloser.FirstEnd.IsActive && recloser.SecondEnd.First().IsActive)
                 {
-                    if (IsElementEnergized(element))
+                    if (IsElementEnergized(recloser, out float load))
                     {
-                        CalculateLoadFlowUpsideDown(element.FirstEnd, element.Id);
+                        CalculateLoadFlowUpsideDown(recloser.FirstEnd, recloser.Id, recloser.SecondEnd.First().Fider);
                     }
                     else
                     {
-                        Thread thread = new Thread(() => CommandToRecloser(measurementGid, 0, CommandOriginType.CE_COMMAND, element));
+                        Thread thread = new Thread(() => CommandToRecloser(measurementGid, 0, CommandOriginType.CE_COMMAND, recloser));
                         thread.Start();
-                    }              
+                    }
                 }
                 else
                 {
                     //TODO: pitati asistente, da li da se prenese na Validate
                     scadaCommanding.SendDiscreteCommand(measurementGid, 1, CommandOriginType.CE_COMMAND);
-                    element.IsActive = false;
+                    recloser.IsActive = false;
                 }
             }
             else
             {
-                logger.LogDebug($"[CalculateLoadFlowFromRecloser] Recloser with GID 0x{element.Id.ToString("X16")} does not have both ends, or have more than one on one end.");
+                logger.LogDebug($"[CalculateLoadFlowFromRecloser] Recloser with GID 0x{recloser.Id.ToString("X16")} does not have both ends, or have more than one on one end.");
             }
             return topology;
         }
-        private void CalculateLoadFlowUpsideDown(ITopologyElement element, long sourceElementGid)
+        private void CalculateLoadFlowUpsideDown(ITopologyElement element, long sourceElementGid, long fider)
         {
             Stack<Tuple<ITopologyElement, long>> stack = new Stack<Tuple<ITopologyElement, long>>();
             stack.Push(new Tuple<ITopologyElement, long>(element, sourceElementGid));
@@ -198,7 +262,7 @@ namespace Topology
                 nextElement = tuple.Item1;
                 sourceGid = tuple.Item2;
 
-                if (IsElementEnergized(nextElement))
+                if (IsElementEnergized(nextElement, out float load))
                 {
                     if (!nextElement.DmsType.Equals(DMSType.ENERGYCONSUMER.ToString())
                     && nextElement.FirstEnd.Id != sourceGid)
@@ -212,6 +276,15 @@ namespace Topology
                         {
                             stack.Push(new Tuple<ITopologyElement, long>(child, nextElement.Id));
                         }
+                    }
+
+                    if (loadOfFiders.ContainsKey(fider))
+                    {
+                        loadOfFiders[fider] += load;
+                    }
+                    else
+                    {
+                        loadOfFiders.Add(fider, load);
                     }
                 }
                 else

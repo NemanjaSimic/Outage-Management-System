@@ -16,17 +16,18 @@ namespace CECommon
 		public ITopologyElement FirstEnd { get; set; }
 		public List<ITopologyElement> SecondEnd { get; set; }
 		public string DmsType { get; set; }
-		public List<long> Measurements { get; set; }
+		public Dictionary<long, string> Measurements { get; set; }
 		public bool IsRemote { get; set; }
 		public bool IsActive { get; set; }
 		public bool NoReclosing { get; set; }
+		public long Fider { get; set; }
 
 		#endregion
 		public TopologyElement(long gid)
 		{
 			Id = gid;
 			SecondEnd = new List<ITopologyElement>();
-			Measurements = new List<long>();
+			Measurements = new Dictionary<long, string>();
 		}
 	}
 }

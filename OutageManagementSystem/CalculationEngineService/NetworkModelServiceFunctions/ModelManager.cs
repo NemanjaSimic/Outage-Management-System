@@ -175,7 +175,7 @@ namespace NetworkModelServiceFunctions
 
 						if (TopologyElements.ContainsKey(elementId))
 						{
-							TopologyElements[elementId].Measurements.Add(measurement.Id);
+							TopologyElements[elementId].Measurements.Add(measurement.Id, measurement.GetMeasurementType());
 							measurement.ElementId = elementId;
 						}
 						else
@@ -323,6 +323,21 @@ namespace NetworkModelServiceFunctions
 				{
 					Reclosers.Add(topologyElement.Id);
 				}
+
+				if (type == DMSType.SYNCHRONOUSMACHINE)
+				{
+					topologyElement = new SynchronousMachine(topologyElement);
+
+					if (rs.ContainsProperty(ModelCode.SYNCHRONOUSMACHINE_CAPACITY))
+					{
+						((SynchronousMachine)topologyElement).Capacity = rs.GetProperty(ModelCode.SYNCHRONOUSMACHINE_CAPACITY).AsFloat();
+					}
+
+					if (rs.ContainsProperty(ModelCode.SYNCHRONOUSMACHINE_CURRENTREGIME))
+					{
+						((SynchronousMachine)topologyElement).CurrentRegime = rs.GetProperty(ModelCode.SYNCHRONOUSMACHINE_CURRENTREGIME).AsFloat();
+					}
+				}
 			}
 			catch (Exception ex)
 			{
@@ -433,7 +448,7 @@ namespace NetworkModelServiceFunctions
 				|| dMSType == DMSType.DISCONNECTOR)
 			{
 				ArtificalDiscreteMeasurement measurement = GetNoScadaDiscreteMeasurement();
-				element.Measurements.Add(measurement.Id);
+				element.Measurements.Add(measurement.Id, "SWITCH_STATUS");
 				measurement.ElementId = element.Id;
 				Provider.Instance.MeasurementProvider.AddDiscreteMeasurement(measurement);
 				Provider.Instance.MeasurementProvider.AddMeasurementElementPair(measurement.Id, element.Id);
