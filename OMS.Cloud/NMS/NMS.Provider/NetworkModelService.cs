@@ -7,9 +7,10 @@ using Outage.Common.ServiceContracts.DistributedTransaction;
 using Outage.Common.ServiceContracts.GDA;
 using System;
 using System.Collections.Generic;
-using System.ServiceModel;
-using System.Fabric.Description;
+using NetTcpBinding = System.ServiceModel.NetTcpBinding;
+using SecurityMode = System.ServiceModel.SecurityMode;
 using Microsoft.ServiceFabric.Services.Communication.Wcf;
+using System.ServiceModel.Channels;
 
 namespace OMS.Cloud.NMS.Provider
 {
@@ -46,21 +47,47 @@ namespace OMS.Cloud.NMS.Provider
             return new List<ServiceInstanceListener>()
             {
                 //NetworkModelGDAEndpoint
-                new ServiceInstanceListener(context => 
-                    new WcfCommunicationListener<INetworkModelGDAContract>(context, 
+                new ServiceInstanceListener(context =>
+                {
+                    return new WcfCommunicationListener<INetworkModelGDAContract>(context,
                                                                            new GenericDataAccess(networkModel),
-                                                                           WcfUtility.CreateTcpListenerBinding(),
-                                                                           EndpointNames.NetworkModelGDAEndpoint),
-                    EndpointNames.NetworkModelGDAEndpoint),
+                                                                           CreateBinding(),
+                                                                           EndpointNames.NetworkModelGDAEndpoint);
+                }, EndpointNames.NetworkModelGDAEndpoint),
 
                 //NetworkModelTransactionActorEndpoint
                 new ServiceInstanceListener(context =>
-                    new WcfCommunicationListener<ITransactionActorContract>(context, 
-                                                                            new NMSTransactionActor(networkModel),
-                                                                            WcfUtility.CreateTcpListenerBinding(),
-                                                                            EndpointNames.NetworkModelTransactionActorEndpoint),
-                    EndpointNames.NetworkModelTransactionActorEndpoint),
+                {
+                    return new WcfCommunicationListener<ITransactionActorContract>(context,
+                                                                           new NMSTransactionActor(networkModel),
+                                                                           CreateBinding(),
+                                                                           EndpointNames.NetworkModelTransactionActorEndpoint);
+                }, EndpointNames.NetworkModelTransactionActorEndpoint),
             };
+        }
+
+        private NetTcpBinding CreateBinding()
+        {
+            //NetTcpBinding binding = new NetTcpBinding(SecurityMode.None)
+            //{
+            //    SendTimeout = TimeSpan.MaxValue,
+            //    ReceiveTimeout = TimeSpan.MaxValue,
+            //    OpenTimeout = TimeSpan.FromMinutes(1),
+            //    CloseTimeout = TimeSpan.FromMinutes(1),
+            //    MaxConnections = int.MaxValue,
+            //    MaxReceivedMessageSize = 1024 * 1024 * 1024,
+            //};
+
+            //binding.MaxBufferSize = (int)binding.MaxReceivedMessageSize;
+            //binding.MaxBufferPoolSize = Environment.ProcessorCount * binding.MaxReceivedMessageSize;
+
+            var binding = WcfUtility.CreateTcpListenerBinding();
+            binding.SendTimeout = TimeSpan.MaxValue;
+            binding.ReceiveTimeout = TimeSpan.MaxValue;
+            binding.OpenTimeout = TimeSpan.FromMinutes(1);
+            binding.CloseTimeout = TimeSpan.FromMinutes(1);
+
+            return (NetTcpBinding)binding;
         }
 
         private void CloseListeners()

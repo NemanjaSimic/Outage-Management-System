@@ -4,8 +4,12 @@ using System.Fabric;
 using System.Threading;
 using System.Threading.Tasks;
 using Microsoft.ServiceFabric.Services.Communication.Runtime;
+using Microsoft.ServiceFabric.Services.Remoting.Runtime;
 using Microsoft.ServiceFabric.Services.Runtime;
 using OMS.Cloud.NMS.Provider;
+using Outage.Common;
+using Outage.Common.GDA;
+using Outage.Common.ServiceContracts.GDA;
 
 namespace OMS.Cloud.NMS.Stateless
 {

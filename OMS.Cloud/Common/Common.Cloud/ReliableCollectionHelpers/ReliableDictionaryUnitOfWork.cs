@@ -1,6 +1,6 @@
 ﻿using Microsoft.ServiceFabric.Data;
 using Microsoft.ServiceFabric.Data.Collections;
-using Outage.Common.ReliableCollectionHelpers;
+using OMS.Common.Cloud.ReliableCollectionHelpers;
 using System;
 using System.Collections;
 using System.Collections.Generic;
@@ -8,7 +8,7 @@ using System.Linq;
 using System.Text;
 using System.Threading.Tasks;
 
-namespace Cloud.Common.ReliableCollectionHelpers
+namespace OMS.Common.Cloud.ReliableCollectionHelpers
 {
     enum OperatinType
     {

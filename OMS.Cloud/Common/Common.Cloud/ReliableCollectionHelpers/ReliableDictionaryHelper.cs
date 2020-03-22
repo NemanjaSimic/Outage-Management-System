@@ -4,7 +4,7 @@ using System.Collections.Generic;
 using System;
 using System.Threading;
 
-namespace Outage.Common.ReliableCollectionHelpers
+namespace OMS.Common.Cloud.ReliableCollectionHelpers
 {
     public static class ReliableDictionaryHelper
     {
