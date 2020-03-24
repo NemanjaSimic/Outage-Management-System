@@ -183,6 +183,7 @@
     <Compile Include="GDA\Property.cs" />
     <Compile Include="GDA\ResourceDescription.cs" />
     <Compile Include="GDA\PropertyValue.cs" />
+    <Compile Include="ServiceProxies\WcfServiceFabricCommunicationClient.cs" />
     <Compile Include="UI\UIMeasurement.cs" />
     <Compile Include="UI\UIModel.cs" />
     <Compile Include="UI\UINode.cs" />

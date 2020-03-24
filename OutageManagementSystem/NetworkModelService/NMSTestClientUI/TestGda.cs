@@ -6,6 +6,8 @@ using FTN.Services.NetworkModelService.TestClientUI;
 using OMS.Common.Cloud.WcfServiceFabricClients.NMS;
 using Outage.Common;
 using Outage.Common.GDA;
+using Outage.Common.ServiceContracts.GDA;
+using Outage.Common.ServiceProxies;
 
 namespace TelventDMS.Services.NetworkModelService.TestClient.TestsUI
 {
@@ -19,12 +21,12 @@ namespace TelventDMS.Services.NetworkModelService.TestClient.TestsUI
 		}
 
 		private readonly ModelResourcesDesc modelResourcesDesc;
-		private readonly NetworkModelGdaClient nmsClient;
+		private readonly WcfServiceFabricCommunicationClient<INetworkModelGDAContract> wcfClient;
 
 		public TestGda()
 		{
 			modelResourcesDesc = new ModelResourcesDesc();
-			nmsClient = NetworkModelGdaClient.CreateClient();
+			wcfClient = WcfServiceFabricCommunicationClient<INetworkModelGDAContract>.GetClient(new Uri("fabric:/OMS_Cloud/NMS_Stateless"));
 		}
 
 		#region GDAQueryService
@@ -38,16 +40,19 @@ namespace TelventDMS.Services.NetworkModelService.TestClient.TestsUI
 
 			try
 			{
-				if (nmsClient == null)
+				//using (NetworkModelGDAProxy gdaQueryProxy = proxyFactory.CreateProxy<NetworkModelGDAProxy, INetworkModelGDAContract>(EndpointNames.NetworkModelGDAEndpoint))
+				//{
+				if (wcfClient == null)
 				{
-					string errMsg = "NetworkModelGdaClient is null.";
+					string errMsg = "NetworkModelGDAProxy is null.";
 					Logger.LogWarn(errMsg);
 					throw new NullReferenceException(errMsg);
 				}
 
-				rd = nmsClient.GetValues(globalId, properties).Result;
+				rd = await wcfClient.InvokeWithRetryAsync(x => x.Channel.GetValues(globalId, properties));/*GetValues(globalId, properties).Result;*/
 				message = "Getting values method successfully finished.";
 				Logger.LogInfo(message);
+				//}
 			}
 			catch (Exception e)
 			{
@@ -71,66 +76,65 @@ namespace TelventDMS.Services.NetworkModelService.TestClient.TestsUI
 
 			try
 			{
-				if (nmsClient == null)
+				//using (NetworkModelGDAProxy gdaQueryProxy = proxyFactory.CreateProxy<NetworkModelGDAProxy, INetworkModelGDAContract>(EndpointNames.NetworkModelGDAEndpoint))
+				//{
+				if (wcfClient == null)
 				{
-					string errMsg = "NetworkModelGdaClient is null.";
+					string errMsg = "NetworkModelGDAProxy is null.";
 					Logger.LogWarn(errMsg);
 					throw new NullReferenceException(errMsg);
 				}
 
 
-				iteratorId = nmsClient.GetExtentValues(modelCodeType, properties).Result;
-				resourcesLeft = nmsClient.IteratorResourcesLeft(iteratorId).Result;
+				iteratorId = await wcfClient.InvokeWithRetryAsync(x => x.Channel.GetExtentValues(modelCodeType, properties));
+				resourcesLeft = await wcfClient.InvokeWithRetryAsync(x => x.Channel.IteratorResourcesLeft(iteratorId));
 
 				while (resourcesLeft > 0)
 				{
-					List<ResourceDescription> rds = nmsClient.IteratorNext(numberOfResources, iteratorId).Result;
+					List<ResourceDescription> rds = await wcfClient.InvokeWithRetryAsync(x => x.Channel.IteratorNext(numberOfResources, iteratorId));
 
 					for (int i = 0; i < rds.Count; i++)
 					{
-						if (rds[i] == null)
+						if (rds[i] != null)
 						{
-							continue;
-						}
+							tempSb.Append($"Entity with gid: 0x{rds[i].Id:X16}" + Environment.NewLine);
 
-						tempSb.Append($"Entity with gid: 0x{rds[i].Id:X16}" + Environment.NewLine);
-
-						foreach (Property property in rds[i].Properties)
-						{
-							switch (property.Type)
+							foreach (Property property in rds[i].Properties)
 							{
-								case PropertyType.Int64:
-									StringAppender.AppendLong(tempSb, property);
-									break;
-								case PropertyType.Float:
-									StringAppender.AppendFloat(tempSb, property);
-									break;
-								case PropertyType.String:
-									StringAppender.AppendString(tempSb, property);
-									break;
-								case PropertyType.Reference:
-									StringAppender.AppendReference(tempSb, property);
-									break;
-								case PropertyType.ReferenceVector:
-									StringAppender.AppendReferenceVector(tempSb, property);
-									break;
+								switch (property.Type)
+								{
+									case PropertyType.Int64:
+										StringAppender.AppendLong(tempSb, property);
+										break;
+									case PropertyType.Float:
+										StringAppender.AppendFloat(tempSb, property);
+										break;
+									case PropertyType.String:
+										StringAppender.AppendString(tempSb, property);
+										break;
+									case PropertyType.Reference:
+										StringAppender.AppendReference(tempSb, property);
+										break;
+									case PropertyType.ReferenceVector:
+										StringAppender.AppendReferenceVector(tempSb, property);
+										break;
 
-								default:
-									tempSb.Append($"{property.Id}: {property.PropertyValue.LongValue}{Environment.NewLine}");
-									break;
+									default:
+										tempSb.Append($"{property.Id}: {property.PropertyValue.LongValue}{Environment.NewLine}");
+										break;
+								}
 							}
 						}
-
 						ids.Add(rds[i].Id);
 					}
-
-					resourcesLeft = nmsClient.IteratorResourcesLeft(iteratorId).Result;
+					resourcesLeft = await wcfClient.InvokeWithRetryAsync(x => x.Channel.IteratorResourcesLeft(iteratorId));
 				}
 
-				nmsClient.IteratorClose(iteratorId).Wait();
+				await wcfClient.InvokeWithRetryAsync(x => x.Channel.IteratorClose(iteratorId));
 
 				message = "Getting extent values method successfully finished.";
 				Logger.LogInfo(message);
+				//}
 			}
 			catch (Exception e)
 			{
@@ -159,65 +163,63 @@ namespace TelventDMS.Services.NetworkModelService.TestClient.TestsUI
 
 			try
 			{
-				if (nmsClient == null)
+				//using (NetworkModelGDAProxy gdaQueryProxy = proxyFactory.CreateProxy<NetworkModelGDAProxy, INetworkModelGDAContract>(EndpointNames.NetworkModelGDAEndpoint))
+				//{
+				if (wcfClient == null)
 				{
-					string errMsg = "NetworkModelGdaClient is null.";
+					string errMsg = "NetworkModelGDAProxy is null.";
 					Logger.LogWarn(errMsg);
 					throw new NullReferenceException(errMsg);
 				}
 
-				iteratorId = nmsClient.GetRelatedValues(sourceGlobalId, properties, association).Result;
-				resourcesLeft = nmsClient.IteratorResourcesLeft(iteratorId).Result;
+				iteratorId = await wcfClient.InvokeWithRetryAsync(x => x.Channel.GetRelatedValues(sourceGlobalId, properties, association));
+				resourcesLeft = await wcfClient.InvokeWithRetryAsync(x => x.Channel.IteratorResourcesLeft(iteratorId));
 
 				while (resourcesLeft > 0)
 				{
-					List<ResourceDescription> rds = nmsClient.IteratorNext(numberOfResources, iteratorId).Result;
+					List<ResourceDescription> rds = await wcfClient.InvokeWithRetryAsync(x => x.Channel.IteratorNext(numberOfResources, iteratorId));
 
 					for (int i = 0; i < rds.Count; i++)
 					{
-						if (rds[i] == null)
+						if (rds[i] != null)
 						{
-							continue;
-						}
+							tempSb.Append($"Entity with gid: 0x{rds[i].Id:X16}" + Environment.NewLine);
 
-						tempSb.Append($"Entity with gid: 0x{rds[i].Id:X16}" + Environment.NewLine);
-
-						foreach (Property property in rds[i].Properties)
-						{
-							switch (property.Type)
+							foreach (Property property in rds[i].Properties)
 							{
-								case PropertyType.Int64:
-									StringAppender.AppendLong(tempSb, property);
-									break;
-								case PropertyType.Float:
-									StringAppender.AppendFloat(tempSb, property);
-									break;
-								case PropertyType.String:
-									StringAppender.AppendString(tempSb, property);
-									break;
-								case PropertyType.Reference:
-									StringAppender.AppendReference(tempSb, property);
-									break;
-								case PropertyType.ReferenceVector:
-									StringAppender.AppendReferenceVector(tempSb, property);
-									break;
+								switch (property.Type)
+								{
+									case PropertyType.Int64:
+										StringAppender.AppendLong(tempSb, property);
+										break;
+									case PropertyType.Float:
+										StringAppender.AppendFloat(tempSb, property);
+										break;
+									case PropertyType.String:
+										StringAppender.AppendString(tempSb, property);
+										break;
+									case PropertyType.Reference:
+										StringAppender.AppendReference(tempSb, property);
+										break;
+									case PropertyType.ReferenceVector:
+										StringAppender.AppendReferenceVector(tempSb, property);
+										break;
 
-								default:
-									tempSb.Append($"{property.Id}: {property.PropertyValue.LongValue}{Environment.NewLine}");
-									break;
+									default:
+										tempSb.Append($"{property.Id}: {property.PropertyValue.LongValue}{Environment.NewLine}");
+										break;
+								}
 							}
 						}
-
 						resultIds.Add(rds[i].Id);
 					}
-
-					resourcesLeft = nmsClient.IteratorResourcesLeft(iteratorId).Result;
+					resourcesLeft = await wcfClient.InvokeWithRetryAsync(x => x.Channel.IteratorResourcesLeft(iteratorId));
 				}
-
-				nmsClient.IteratorClose(iteratorId).Wait();
+				await wcfClient.InvokeWithRetryAsync(x => x.Channel.IteratorClose(iteratorId));
 
 				message = "Getting related values method successfully finished.";
 				Logger.LogInfo(message);
+				//}
 			}
 			catch (Exception e)
 			{

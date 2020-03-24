@@ -25,7 +25,7 @@
                     <controls:GetValues/>
                 </Grid>
             </TabItem>
-            <TabItem Header="Get Extent Values">
+            <!--<TabItem Header="Get Extent Values">
                 <Grid>
                     <controls:GetExtentValues/>
                 </Grid>
@@ -34,7 +34,7 @@
                 <Grid>
                     <controls:GetRelatedValues/>
                 </Grid>
-            </TabItem>
+            </TabItem>-->
         </TabControl>
     </Grid>
 </Window>

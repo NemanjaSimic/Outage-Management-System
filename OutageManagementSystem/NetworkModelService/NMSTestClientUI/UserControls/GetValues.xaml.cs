@@ -5,8 +5,10 @@ using System;
 using System.Collections.Generic;
 using System.Collections.ObjectModel;
 using System.Text;
+using System.Threading.Tasks;
 using System.Windows;
 using System.Windows.Controls;
+using System.Windows.Threading;
 using TelventDMS.Services.NetworkModelService.TestClient.TestsUI;
 
 namespace NMSTestClientUI.UserControls
@@ -41,6 +43,13 @@ namespace NMSTestClientUI.UserControls
                 return;
             }
 
+            //Dispatcher.Invoke(Initialize, DispatcherPriority.Normal);
+            Task.Run(Initialize);
+            //Initialize().RunSynchronously();
+        }
+
+        private async Task Initialize()
+        {
             foreach (DMSType dmsType in Enum.GetValues(typeof(DMSType)))
             {
                 if (dmsType == DMSType.MASK_TYPE)
@@ -49,11 +58,33 @@ namespace NMSTestClientUI.UserControls
                 }
 
                 ModelCode dmsTypesModelCode = modelResourcesDesc.GetModelCodeFromType(dmsType);
-                tgda.GetExtentValues(dmsTypesModelCode, new List<ModelCode> { ModelCode.IDOBJ_GID }, null).Result.ForEach(g => GlobalIdentifiers.Add(new GlobalIdentifierViewModel()
+                List<long> gids = await tgda.GetExtentValues(dmsTypesModelCode, new List<ModelCode>() { ModelCode.IDOBJ_GID }, null);
+
+                foreach(long gid in gids)
                 {
-                    GID = g,
-                    Type = dmsTypesModelCode.ToString(),
-                }));
+                    Dispatcher.Invoke(() =>
+                    {
+                        GlobalIdentifiers.Add(new GlobalIdentifierViewModel()
+                        {
+                            GID = gid,
+                            Type = dmsTypesModelCode.ToString(),
+                        });
+                    });
+
+                    //GlobalIdentifiers.Add(new GlobalIdentifierViewModel()
+                    //{
+                    //    GID = gid,
+                    //    Type = dmsTypesModelCode.ToString(),
+                    //});
+
+                } 
+
+
+                //tgda.GetExtentValues(dmsTypesModelCode, new List<ModelCode> { ModelCode.IDOBJ_GID }, null).Result.ForEach(g => GlobalIdentifiers.Add(new GlobalIdentifierViewModel()
+                //{
+                //    GID = g,
+                //    Type = dmsTypesModelCode.ToString(),
+                //}));
             }
 
             SelectedGID = null;
@@ -134,7 +165,7 @@ namespace NMSTestClientUI.UserControls
             }
         }
 
-        private void ButtonGetValues_Click(object sender, RoutedEventArgs e)
+        private async void ButtonGetValues_Click(object sender, RoutedEventArgs e)
         {
             if(SelectedGID == null)
             {
@@ -165,7 +196,7 @@ namespace NMSTestClientUI.UserControls
             ResourceDescription rd = null;
             try
             {
-                rd = tgda.GetValues(SelectedGID.GID, selectedProperties).Result;
+                rd = await tgda.GetValues(SelectedGID.GID, selectedProperties);
             }
             catch (Exception ex)
             {
@@ -209,7 +240,7 @@ namespace NMSTestClientUI.UserControls
             }
         }
 
-        private void ButtonRefreshGids_Click(object sender, RoutedEventArgs e)
+        private async void ButtonRefreshGids_Click(object sender, RoutedEventArgs e)
         {
             GlobalIdentifiers.Clear();
 
@@ -221,11 +252,20 @@ namespace NMSTestClientUI.UserControls
                 }
 
                 ModelCode dmsTypesModelCode = modelResourcesDesc.GetModelCodeFromType(dmsType);
-                tgda.GetExtentValues(dmsTypesModelCode, new List<ModelCode> { ModelCode.IDOBJ_GID }, null).Result.ForEach(g => GlobalIdentifiers.Add(new GlobalIdentifierViewModel()
+                List<long> gids = await tgda.GetExtentValues(dmsTypesModelCode, new List<ModelCode> { ModelCode.IDOBJ_GID }, null);//Result.ForEach(g => GlobalIdentifiers.Add(new GlobalIdentifierViewModel()
+                
+                foreach (long gid in gids)
                 {
-                    GID = g,
-                    Type = dmsTypesModelCode.ToString(),
-                }));
+                    Dispatcher.Invoke(() =>
+                    {
+                        GlobalIdentifiers.Add(new GlobalIdentifierViewModel()
+                        {
+                            GID = gid,
+                            Type = dmsTypesModelCode.ToString(),
+                        });
+                    });
+                    
+                }   
             }
 
             SelectedGID = null;
