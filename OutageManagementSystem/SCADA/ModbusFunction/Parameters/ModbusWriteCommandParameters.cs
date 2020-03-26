@@ -1,6 +1,6 @@
 ﻿using Outage.SCADA.SCADACommon.FunctionParameters;
 
-namespace Outage.SCADA.ModBus.FunctionParameters
+namespace Outage.SCADA.ModbusFunctions.Parameters
 {
     public class ModbusWriteCommandParameters : ModbusCommandParameters, IModbusWriteCommandParameters
     {

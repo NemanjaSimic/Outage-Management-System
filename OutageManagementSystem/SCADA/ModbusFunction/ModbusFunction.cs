@@ -1,12 +1,12 @@
 ﻿using EasyModbus;
 using Outage.Common;
-using Outage.SCADA.ModBus.FunctionParameters;
+using Outage.SCADA.ModbusFunctions.Parameters;
 using Outage.SCADA.SCADACommon;
 using System;
 using System.Collections.Generic;
 using System.Reflection;
 
-namespace Outage.SCADA.ModBus.ModbusFuntions
+namespace Outage.SCADA.ModbusFunctions
 {
     public abstract class ModbusFunction : IModbusFunction
     {

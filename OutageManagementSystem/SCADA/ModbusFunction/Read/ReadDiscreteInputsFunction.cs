@@ -1,7 +1,7 @@
 ﻿using EasyModbus;
 using Outage.Common;
 using Outage.Common.PubSub.SCADADataContract;
-using Outage.SCADA.ModBus.FunctionParameters;
+using Outage.SCADA.ModbusFunctions.Parameters;
 using Outage.SCADA.SCADACommon;
 using Outage.SCADA.SCADACommon.FunctionParameters;
 using Outage.SCADA.SCADAData.Repository;
@@ -10,14 +10,14 @@ using System.Collections.Generic;
 using System.Net;
 using System.Reflection;
 
-namespace Outage.SCADA.ModBus.ModbusFuntions
+namespace Outage.SCADA.ModbusFunctions.Read
 {
-    public class ReadCoilsFunction : ModbusFunction, IReadDiscreteModbusFunction
+    public class ReadDiscreteInputsFunction : ModbusFunction, IReadDiscreteModbusFunction
     {
         public SCADAModel SCADAModel { get; private set; }
         public IModbusReadCommandParameters ModbusReadCommandParameters { get; private set; }
 
-        public ReadCoilsFunction(ModbusCommandParameters commandParameters, SCADAModel scadaModel)
+        public ReadDiscreteInputsFunction(ModbusCommandParameters commandParameters, SCADAModel scadaModel)
             : base(commandParameters)
         {
             CheckArguments(MethodBase.GetCurrentMethod(), typeof(ModbusReadCommandParameters));
@@ -35,7 +35,7 @@ namespace Outage.SCADA.ModBus.ModbusFuntions
             ushort startAddress = mdb_read_comm_pars.StartAddress;
             ushort quantity = mdb_read_comm_pars.Quantity;
 
-            if (quantity <= 0)
+            if(quantity <= 0)
             {
                 string message = $"Reading Quantity: {quantity} does not make sense.";
                 Logger.LogError(message);
@@ -55,7 +55,7 @@ namespace Outage.SCADA.ModBus.ModbusFuntions
             {
                 if (modbusClient.Connected)
                 {
-                    data = modbusClient.ReadCoils(startAddress - 1, quantity);
+                    data = modbusClient.ReadDiscreteInputs(startAddress - 1, quantity);
                 }
                 else
                 {
@@ -64,11 +64,9 @@ namespace Outage.SCADA.ModBus.ModbusFuntions
             }
             catch (Exception e)
             {
-                Logger.LogError("Error on ReadCoils()", e);
+                Logger.LogError("Error on ReadDiscreteInputs()", e);
                 throw e;
             }
-
-
 
             Data = new Dictionary<long, DiscreteModbusData>(data.Length);
 
@@ -82,18 +80,18 @@ namespace Outage.SCADA.ModBus.ModbusFuntions
                 ushort value = (ushort)(data[i] ? 1 : 0);
 
                 //for commands enqueued during model update
-                if (!currentAddressToGidMap[PointType.DIGITAL_OUTPUT].ContainsKey(address))
+                if (!currentAddressToGidMap[PointType.DIGITAL_INPUT].ContainsKey(address))
                 {
-                    Logger.LogWarn($"ReadCoilsFunction execute => trying to read value on address {address}, Point type: {PointType.DIGITAL_OUTPUT}, which is not in the current SCADA Model.");
+                    Logger.LogWarn($"ReadDiscreteInputsFunction execute => trying to read value on address {address}, Point type: {PointType.DIGITAL_INPUT}, which is not in the current SCADA Model.");
                     continue;
                 }
 
-                long gid = currentAddressToGidMap[PointType.DIGITAL_OUTPUT][address];
+                long gid = currentAddressToGidMap[PointType.DIGITAL_INPUT][address];
 
                 //for commands enqueued during model update
                 if (!currentSCADAModel.ContainsKey(gid))
                 {
-                    Logger.LogWarn($"ReadCoilsFunction execute => trying to read value for measurement with gid: 0x{gid:X16}, which is not in the current SCADA Model.");
+                    Logger.LogWarn($"ReadDiscreteInputsFunction execute => trying to read value for measurement with gid: 0x{gid:X16}, which is not in the current SCADA Model.");
                     continue;
                 }
 
@@ -103,13 +101,12 @@ namespace Outage.SCADA.ModBus.ModbusFuntions
                     Logger.LogError(message);
                     throw new Exception(message);
                 }
-                
-                if (pointItem.CurrentValue != value)
+
+                if(pointItem.CurrentValue != value)
                 {
                     pointItem.CurrentValue = value;
-                    Logger.LogInfo($"Alarm for Point [Gid: 0x{pointItem.Gid:X16}, Address: {pointItem.Address}] set to {pointItem.Alarm}.");
+                    Logger.LogInfo($"Alarm for Point [Gid: 0x{pointItem.Gid:X16}, Point type: {PointType.DIGITAL_INPUT}, Address: {pointItem.Address}] set to {pointItem.Alarm}.");
                 }
-
 
                 CommandOriginType commandOrigin = CommandOriginType.OTHER_COMMAND;
 
@@ -117,22 +114,22 @@ namespace Outage.SCADA.ModBus.ModbusFuntions
                 {
                     commandOrigin = commandValuesCache[gid].CommandOrigin;
                     commandValuesCache.Remove(gid);
-                    Logger.LogDebug($"[ReadCoilsFunction] Command origin of command address: {pointItem.Address} is set to {commandOrigin}.");
+                    Logger.LogDebug($"[ReadDiscreteInputsFunction] Command origin of command address: {pointItem.Address} is set to {commandOrigin}.");
                 }
 
                 DiscreteModbusData digitalData = new DiscreteModbusData(value, pointItem.Alarm, gid, commandOrigin);
                 Data.Add(gid, digitalData);
-                //Logger.LogDebug($"ReadCoilsFunction execute => Current value: {value} from address: {address}, gid: 0x{gid:X16}.");
+                //Logger.LogDebug($"ReadDiscreteInputsFunction execute => Current value: {value} from address: {address}, point type: {PointType.DIGITAL_INPUT}, gid: 0x{gid:X16}.");
             }
 
-            //Logger.LogDebug($"ReadCoilsFunction executed SUCCESSFULLY. StartAddress: {startAddress}, Quantity: {quantity}");
+            //Logger.LogDebug($"ReadDiscreteInputsFunction executed SUCCESSFULLY. StartAddress: {startAddress}, Quantity: {quantity}");
         }
 
         #endregion IModBusFunction
 
         #region Obsolete
 
-        /// <inheritdoc/>
+        /// <inheritdoc />
         [Obsolete]
         public override byte[] PackRequest()
         {
@@ -157,18 +154,18 @@ namespace Outage.SCADA.ModBus.ModbusFuntions
             ModbusReadCommandParameters mdb_read_comm_pars = this.CommandParameters as ModbusReadCommandParameters;
             Dictionary<Tuple<PointType, ushort>, ushort> returnResponse = new Dictionary<Tuple<PointType, ushort>, ushort>();
 
-            if (response[7] == (byte)ModbusFunctionCode.READ_COILS)
+            if (response[7] == (byte)ModbusFunctionCode.READ_DISCRETE_INPUTS)
             {
-                int numberOfBytes = response[8];
+                int n = response[8];
 
-                for (ushort i = 0; i < numberOfBytes; i++)   //petlja za bajtove
+                for (ushort i = 0; i < n; i++)
                 {
-                    for (ushort j = 0; j < 8; j++)          //petlja za svaki bit u bajtu
+                    for (ushort j = 0; j < 8; j++)
                     {
                         ushort value = (response[9 + i] & (byte)Math.Pow(2, j)) != 0 ? (byte)1 : (byte)0;
 
                         returnResponse.Add
-                        (new Tuple<PointType, ushort>(PointType.DIGITAL_OUTPUT, (ushort)(mdb_read_comm_pars.StartAddress + i * 8 + j)), value);
+                        (new Tuple<PointType, ushort>(PointType.DIGITAL_INPUT, (ushort)(mdb_read_comm_pars.StartAddress + i * 8 + j)), value);
                     }
                 }
             }

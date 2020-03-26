@@ -1,6 +1,6 @@
 ﻿using EasyModbus;
 using Outage.Common;
-using Outage.SCADA.ModBus.FunctionParameters;
+using Outage.SCADA.ModbusFunctions.Parameters;
 using Outage.SCADA.SCADACommon;
 using Outage.SCADA.SCADACommon.FunctionParameters;
 using System;
@@ -8,14 +8,14 @@ using System.Collections.Generic;
 using System.Net;
 using System.Reflection;
 
-namespace Outage.SCADA.ModBus.ModbusFuntions
+namespace Outage.SCADA.ModbusFunctions.Write
 {
-    public class WriteSingleCoilFunction : ModbusFunction, IWriteModbusFunction
+    public class WriteSingleRegisterFunction : ModbusFunction, IWriteModbusFunction
     {
         public CommandOriginType CommandOrigin { get; private set; }
         public IModbusWriteCommandParameters ModbusWriteCommandParameters { get; private set; }
 
-        public WriteSingleCoilFunction(ModbusCommandParameters commandParameters, CommandOriginType commandOrigin)
+        public WriteSingleRegisterFunction(ModbusCommandParameters commandParameters, CommandOriginType commandOrigin)
             : base(commandParameters)
         {
             CheckArguments(MethodBase.GetCurrentMethod(), typeof(ModbusWriteCommandParameters));
@@ -23,41 +23,15 @@ namespace Outage.SCADA.ModBus.ModbusFuntions
             ModbusWriteCommandParameters = commandParameters as IModbusWriteCommandParameters;
         }
 
-
         #region IModBusFunction
 
         public override void Execute(ModbusClient modbusClient)
         {
-
             ModbusWriteCommandParameters mdb_write_comm_pars = this.CommandParameters as ModbusWriteCommandParameters;
-            ushort outputAddress = mdb_write_comm_pars.OutputAddress;
-            int value = mdb_write_comm_pars.Value;
-
-            if (outputAddress >= ushort.MaxValue || outputAddress == ushort.MinValue)
-            {
-                string message = $"Address is out of bound. Output address: {outputAddress}.";
-                Logger.LogError(message);
-                throw new Exception(message);
-            }
-
-            bool commandingValue;
-            if (value == 0)
-            {
-                commandingValue = false;
-            }
-            else if (value == 1)
-            {
-                commandingValue = true;
-            }
-            else
-            {
-                throw new ArgumentException("Non-boolean value in write single coil command parameter.");
-            }
-
 
             //TODO: Check does current scada model has the requested address, maybe let anyway
-            modbusClient.WriteSingleCoil(outputAddress - 1, commandingValue);
-            Logger.LogInfo($"WriteSingleCoilFunction executed SUCCESSFULLY. OutputAddress: {outputAddress}, Value: {commandingValue}");
+            modbusClient.WriteSingleRegister(mdb_write_comm_pars.OutputAddress - 1, mdb_write_comm_pars.Value);
+            Logger.LogInfo($"WriteSingleRegisterFunction executed SUCCESSFULLY. OutputAddress: {mdb_write_comm_pars.OutputAddress}, Value: {mdb_write_comm_pars.Value}");
         }
 
         #endregion IModBusFunction
@@ -89,7 +63,7 @@ namespace Outage.SCADA.ModBus.ModbusFuntions
             ModbusWriteCommandParameters mdb_write_comm_pars = this.CommandParameters as ModbusWriteCommandParameters;
             Dictionary<Tuple<PointType, ushort>, ushort> returnResponse = new Dictionary<Tuple<PointType, ushort>, ushort>();
 
-            if (response[7] == (byte)ModbusFunctionCode.WRITE_SINGLE_COIL)
+            if (response[7] == (byte)ModbusFunctionCode.WRITE_SINGLE_REGISTER)
             {
                 byte[] array = new byte[2];
 
@@ -103,7 +77,7 @@ namespace Outage.SCADA.ModBus.ModbusFuntions
 
                 ushort value = BitConverter.ToUInt16(array, 0);
 
-                returnResponse.Add(new Tuple<PointType, ushort>(PointType.DIGITAL_OUTPUT, out_a), value);
+                returnResponse.Add(new Tuple<PointType, ushort>(PointType.ANALOG_OUTPUT, out_a), value);
             }
 
             return returnResponse;

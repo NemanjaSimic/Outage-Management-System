@@ -7,8 +7,8 @@
     <ProjectGuid>{6E88F6B5-11CB-485A-9BDF-C622FF837022}</ProjectGuid>
     <OutputType>Library</OutputType>
     <AppDesignerFolder>Properties</AppDesignerFolder>
-    <RootNamespace>Outage.SCADA.ModBus</RootNamespace>
-    <AssemblyName>ModBus</AssemblyName>
+    <RootNamespace>Outage.SCADA.Modbus</RootNamespace>
+    <AssemblyName>Outage.SCADA.Modbus</AssemblyName>
     <TargetFrameworkVersion>v4.8</TargetFrameworkVersion>
     <FileAlignment>512</FileAlignment>
     <Deterministic>true</Deterministic>
@@ -60,19 +60,8 @@
     <Reference Include="System.Xml" />
   </ItemGroup>
   <ItemGroup>
-    <Compile Include="Acquisitor\Acquisition.cs" />
-    <Compile Include="Connection\FunctionExecutor.cs" />
-    <Compile Include="FunctionFactory.cs" />
-    <Compile Include="FunctionParameters\ModbusCommandParameters.cs" />
-    <Compile Include="FunctionParameters\ModbusReadCommandParameters.cs" />
-    <Compile Include="FunctionParameters\ModbusWriteCommandParameters.cs" />
-    <Compile Include="ModbusFuntions\ModbusFunction.cs" />
-    <Compile Include="ModbusFuntions\ReadCoilsFunction.cs" />
-    <Compile Include="ModbusFuntions\ReadDiscreteInputsFunction.cs" />
-    <Compile Include="ModbusFuntions\ReadHoldingRegistersFunction.cs" />
-    <Compile Include="ModbusFuntions\ReadInputRegistersFunction.cs" />
-    <Compile Include="ModbusFuntions\WriteSingleCoilFunction.cs" />
-    <Compile Include="ModbusFuntions\WriteSingleRegisterFunction.cs" />
+    <Compile Include="Acquisition.cs" />
+    <Compile Include="FunctionExecutor.cs" />
     <Compile Include="ModbusSimulatorHandler.cs" />
     <Compile Include="Properties\AssemblyInfo.cs" />
   </ItemGroup>
@@ -80,6 +69,10 @@
     <ProjectReference Include="..\..\Common\Common.csproj">
       <Project>{892CBE15-9ED7-4540-81FA-0EAABA592138}</Project>
       <Name>Common</Name>
+    </ProjectReference>
+    <ProjectReference Include="..\ModbusFunction\ModbusFunctions.csproj">
+      <Project>{3A07C9C5-D4C1-4DB2-9E8B-755759FED39C}</Project>
+      <Name>ModbusFunctions</Name>
     </ProjectReference>
     <ProjectReference Include="..\SCADACommon\SCADACommon.csproj">
       <Project>{7D87AA2B-ED19-47EA-B403-4EDC6B830D4A}</Project>

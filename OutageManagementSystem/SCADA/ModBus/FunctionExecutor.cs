@@ -10,14 +10,13 @@ using System.Collections.Generic;
 using System.Threading;
 using Outage.Common.PubSub.SCADADataContract;
 using EasyModbus.Exceptions;
-using Outage.SCADA.ModBus.FunctionParameters;
-using System.ServiceModel;
-using Outage.Common.Exceptions.SCADA;
 using Outage.Common.ServiceProxies;
 using Outage.Common.ServiceContracts.PubSub;
 using System.Text;
+using Outage.SCADA.ModbusFunctions.Parameters;
+using Outage.SCADA.ModbusFunctions;
 
-namespace Outage.SCADA.ModBus.Connection
+namespace Outage.SCADA.Modbus
 {
 
     public class FunctionExecutor : IReadCommandEnqueuer, IWriteCommandEnqueuer, IModelUpdateCommandEnqueuer

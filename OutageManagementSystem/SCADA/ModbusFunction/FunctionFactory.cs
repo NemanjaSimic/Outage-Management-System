@@ -1,17 +1,18 @@
 ﻿using Outage.Common;
-using Outage.SCADA.ModBus.FunctionParameters;
-using Outage.SCADA.ModBus.ModbusFuntions;
+using Outage.SCADA.ModbusFunctions.Parameters;
+using Outage.SCADA.ModbusFunctions.Read;
+using Outage.SCADA.ModbusFunctions.Write;
 using Outage.SCADA.SCADACommon;
 using Outage.SCADA.SCADAData.Repository;
 using System;
 
-namespace Outage.SCADA.ModBus
+namespace Outage.SCADA.ModbusFunctions
 {
-    public class FunctionFactory
+    public static class FunctionFactory
     {
         #region Static Members
 
-        protected static SCADAModel scadaModel = null;
+        private static SCADAModel scadaModel = null;
 
         public static SCADAModel SCADAModel
         {

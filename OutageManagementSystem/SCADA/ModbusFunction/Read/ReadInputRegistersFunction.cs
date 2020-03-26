@@ -1,7 +1,7 @@
 ﻿using EasyModbus;
 using Outage.Common;
 using Outage.Common.PubSub.SCADADataContract;
-using Outage.SCADA.ModBus.FunctionParameters;
+using Outage.SCADA.ModbusFunctions.Parameters;
 using Outage.SCADA.SCADACommon;
 using Outage.SCADA.SCADACommon.FunctionParameters;
 using Outage.SCADA.SCADAData.Repository;
@@ -10,7 +10,7 @@ using System.Collections.Generic;
 using System.Net;
 using System.Reflection;
 
-namespace Outage.SCADA.ModBus.ModbusFuntions
+namespace Outage.SCADA.ModbusFunctions.Read
 {
     public class ReadInputRegistersFunction : ModbusFunction, IReadAnalogModusFunction
     {

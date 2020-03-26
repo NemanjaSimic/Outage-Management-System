@@ -1,7 +1,6 @@
 ﻿using Outage.Common;
-using Outage.SCADA.ModBus.Connection;
-using Outage.SCADA.ModBus.FunctionParameters;
-using Outage.SCADA.ModBus.ModbusFuntions;
+using Outage.SCADA.ModbusFunctions;
+using Outage.SCADA.ModbusFunctions.Parameters;
 using Outage.SCADA.SCADACommon;
 using Outage.SCADA.SCADAData.Configuration;
 using Outage.SCADA.SCADAData.Repository;
@@ -9,7 +8,7 @@ using System;
 using System.Collections.Generic;
 using System.Threading;
 
-namespace Outage.SCADA.ModBus.Acquisitor
+namespace Outage.SCADA.Modbus
 {
     public class Acquisition
     {

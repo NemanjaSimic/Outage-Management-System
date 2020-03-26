@@ -4,11 +4,11 @@
   <PropertyGroup>
     <Configuration Condition=" '$(Configuration)' == '' ">Debug</Configuration>
     <Platform Condition=" '$(Platform)' == '' ">AnyCPU</Platform>
-    <ProjectGuid>{DF3A5248-7638-41C8-998A-53112F1ACFA2}</ProjectGuid>
+    <ProjectGuid>{3A07C9C5-D4C1-4DB2-9E8B-755759FED39C}</ProjectGuid>
     <OutputType>Library</OutputType>
     <AppDesignerFolder>Properties</AppDesignerFolder>
-    <RootNamespace>Outage.SCADA.SCADAService</RootNamespace>
-    <AssemblyName>SCADAService</AssemblyName>
+    <RootNamespace>Outage.SCADA.ModbusFunctions</RootNamespace>
+    <AssemblyName>Outage.SCADA.ModbusFunctions</AssemblyName>
     <TargetFrameworkVersion>v4.8</TargetFrameworkVersion>
     <FileAlignment>512</FileAlignment>
     <Deterministic>true</Deterministic>
@@ -34,12 +34,8 @@
     <Reference Include="EasyModbus, Version=5.5.0.0, Culture=neutral, processorArchitecture=MSIL">
       <HintPath>..\..\packages\EasyModbusTCP.5.5.0\lib\EasyModbus.dll</HintPath>
     </Reference>
-    <Reference Include="Microsoft.ServiceFabric.Services.Remoting">
-      <HintPath>..\..\bin64\Microsoft.ServiceFabric.Services.Remoting.dll</HintPath>
-    </Reference>
     <Reference Include="System" />
     <Reference Include="System.Core" />
-    <Reference Include="System.ServiceModel" />
     <Reference Include="System.Xml.Linq" />
     <Reference Include="System.Data.DataSetExtensions" />
     <Reference Include="Microsoft.CSharp" />
@@ -48,11 +44,17 @@
     <Reference Include="System.Xml" />
   </ItemGroup>
   <ItemGroup>
-    <Compile Include="Command\CommandService.cs" />
-    <Compile Include="DistributedTransaction\SCADAModelUpdateNotification.cs" />
-    <Compile Include="DistributedTransaction\SCADATransactionActor.cs" />
-    <Compile Include="IntegrityUpdate\IntegrityUpdateService.cs" />
-    <Compile Include="SCADAService.cs" />
+    <Compile Include="FunctionFactory.cs" />
+    <Compile Include="Parameters\ModbusCommandParameters.cs" />
+    <Compile Include="Parameters\ModbusReadCommandParameters.cs" />
+    <Compile Include="Parameters\ModbusWriteCommandParameters.cs" />
+    <Compile Include="ModbusFunction.cs" />
+    <Compile Include="Read\ReadCoilsFunction.cs" />
+    <Compile Include="Read\ReadDiscreteInputsFunction.cs" />
+    <Compile Include="Read\ReadHoldingRegistersFunction.cs" />
+    <Compile Include="Read\ReadInputRegistersFunction.cs" />
+    <Compile Include="Write\WriteSingleCoilFunction.cs" />
+    <Compile Include="Write\WriteSingleRegisterFunction.cs" />
     <Compile Include="Properties\AssemblyInfo.cs" />
   </ItemGroup>
   <ItemGroup>
@@ -60,29 +62,17 @@
       <Project>{892CBE15-9ED7-4540-81FA-0EAABA592138}</Project>
       <Name>Common</Name>
     </ProjectReference>
-    <ProjectReference Include="..\..\TransactionManagerService\DistributedTransactionActor\DistributedTransactionActor.csproj">
-      <Project>{D2B436C8-C9AF-4FE2-B881-B8D28228637B}</Project>
-      <Name>DistributedTransactionActor</Name>
-    </ProjectReference>
-    <ProjectReference Include="..\ModbusFunction\ModbusFunctions.csproj">
-      <Project>{3A07C9C5-D4C1-4DB2-9E8B-755759FED39C}</Project>
-      <Name>ModbusFunctions</Name>
-    </ProjectReference>
-    <ProjectReference Include="..\ModBus\Modbus.csproj">
-      <Project>{6e88f6b5-11cb-485a-9bdf-c622ff837022}</Project>
-      <Name>Modbus</Name>
-    </ProjectReference>
     <ProjectReference Include="..\SCADACommon\SCADACommon.csproj">
-      <Project>{7d87aa2b-ed19-47ea-b403-4edc6b830d4a}</Project>
+      <Project>{7D87AA2B-ED19-47EA-B403-4EDC6B830D4A}</Project>
       <Name>SCADACommon</Name>
     </ProjectReference>
     <ProjectReference Include="..\SCADA_Config_Data\SCADAData.csproj">
-      <Project>{c37f054d-37d9-46c0-881c-1ee3c8c77633}</Project>
+      <Project>{C37F054D-37D9-46C0-881C-1EE3C8C77633}</Project>
       <Name>SCADAData</Name>
     </ProjectReference>
   </ItemGroup>
   <ItemGroup>
-    <None Include="app.config" />
+    <None Include="packages.config" />
   </ItemGroup>
   <Import Project="$(MSBuildToolsPath)\Microsoft.CSharp.targets" />
 </Project>
