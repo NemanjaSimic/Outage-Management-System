@@ -26,7 +26,7 @@ namespace OutageManagementService.DistribuedTransaction
         }
         #endregion
 
-        public override bool Prepare()
+        public override async Task<bool> Prepare()
         {
             bool success = false;
 
@@ -53,7 +53,7 @@ namespace OutageManagementService.DistribuedTransaction
             return success;
         }
 
-        public override void Commit()
+        public override async Task Commit()
         {
             try
             {
@@ -67,7 +67,7 @@ namespace OutageManagementService.DistribuedTransaction
             }
         }
 
-        public override void Rollback()
+        public override async Task Rollback()
         {
             try
             {

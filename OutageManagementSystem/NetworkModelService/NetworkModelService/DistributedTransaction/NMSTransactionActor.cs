@@ -1,6 +1,7 @@
 ﻿using Outage.Common;
 using Outage.DistributedTransactionActor;
 using System;
+using System.Threading.Tasks;
 
 namespace Outage.NetworkModelService.DistributedTransaction
 {
@@ -16,7 +17,7 @@ namespace Outage.NetworkModelService.DistributedTransaction
             }
         }
 
-        public override bool Prepare()
+        public override async Task<bool> Prepare()
         {
             bool success = false;
 
@@ -42,7 +43,7 @@ namespace Outage.NetworkModelService.DistributedTransaction
             return success;
         }
 
-        public override void Commit()
+        public override async Task Commit()
         {
             try
             {
@@ -56,7 +57,7 @@ namespace Outage.NetworkModelService.DistributedTransaction
             }
         }
 
-        public override void Rollback()
+        public override async Task Rollback()
         {
             try
             {

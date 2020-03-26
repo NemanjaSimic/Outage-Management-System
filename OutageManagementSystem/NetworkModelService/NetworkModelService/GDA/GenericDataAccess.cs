@@ -35,12 +35,12 @@ namespace Outage.NetworkModelService.GDA
         {
         }
 
-        public UpdateResult ApplyUpdate(Delta delta)
+        public async Task<UpdateResult> ApplyUpdate(Delta delta)
         {
             return networkModel.ApplyDelta(delta);
         }
 
-        public ResourceDescription GetValues(long resourceId, List<ModelCode> propIds)
+        public async Task<ResourceDescription> GetValues(long resourceId, List<ModelCode> propIds)
         {
             try
             {
@@ -55,7 +55,7 @@ namespace Outage.NetworkModelService.GDA
             }
         }
 
-        public int GetExtentValues(ModelCode entityType, List<ModelCode> propIds)
+        public async Task<int> GetExtentValues(ModelCode entityType, List<ModelCode> propIds)
         {
             try
             {
@@ -72,7 +72,7 @@ namespace Outage.NetworkModelService.GDA
             }
         }
 
-        public int GetRelatedValues(long source, List<ModelCode> propIds, Association association)
+        public async Task<int> GetRelatedValues(long source, List<ModelCode> propIds, Association association)
         {
             try
             {
@@ -89,7 +89,7 @@ namespace Outage.NetworkModelService.GDA
             }
         }
 
-        public List<ResourceDescription> IteratorNext(int n, int id)
+        public async Task<List<ResourceDescription>> IteratorNext(int n, int id)
         {
             try
             {
@@ -105,7 +105,7 @@ namespace Outage.NetworkModelService.GDA
             }
         }
 
-        public bool IteratorRewind(int id)
+        public async Task<bool> IteratorRewind(int id)
         {
             try
             {
@@ -121,7 +121,7 @@ namespace Outage.NetworkModelService.GDA
             }
         }
 
-        public int IteratorResourcesTotal(int id)
+        public async Task<int> IteratorResourcesTotal(int id)
         {
             try
             {
@@ -136,7 +136,7 @@ namespace Outage.NetworkModelService.GDA
             }
         }
 
-        public int IteratorResourcesLeft(int id)
+        public async Task<int> IteratorResourcesLeft(int id)
         {
             try
             {
@@ -152,7 +152,7 @@ namespace Outage.NetworkModelService.GDA
             }
         }
 
-        public bool IteratorClose(int id)
+        public async Task<bool> IteratorClose(int id)
         {
             try
             {

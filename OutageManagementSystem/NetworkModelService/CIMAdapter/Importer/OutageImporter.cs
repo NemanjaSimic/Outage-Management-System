@@ -1,12 +1,12 @@
 ﻿using CIM.Model;
+using OMS.Common.Cloud.WcfServiceFabricClients.NMS;
 using Outage.Common;
 using Outage.Common.GDA;
 using Outage.Common.ServiceContracts.GDA;
 using Outage.Common.ServiceProxies;
 using System;
 using System.Collections.Generic;
-using System.ServiceModel;
-using System.Threading;
+using System.Threading.Tasks;
 
 namespace Outage.DataImporter.CIMAdapter.Importer
 {
@@ -107,7 +107,7 @@ namespace Outage.DataImporter.CIMAdapter.Importer
 			report = null;
 		}
 
-		public TransformAndLoadReport CreateNMSDelta(ConcreteModel cimConcreteModel, ProxyFactory proxyFactory, ModelResourcesDesc resourcesDesc)
+		public async Task<TransformAndLoadReport> CreateNMSDelta(ConcreteModel cimConcreteModel, ModelResourcesDesc resourcesDesc)
 		{
 			Logger.LogInfo("Importing Outage Elements...");
 			report = new TransformAndLoadReport();
@@ -121,7 +121,7 @@ namespace Outage.DataImporter.CIMAdapter.Importer
 			{
 				try
 				{
-					ConvertModelAndPopulateDelta(proxyFactory, resourcesDesc);
+					await ConvertModelAndPopulateDelta(resourcesDesc);
 				}
 				catch (Exception ex)
 				{
@@ -136,22 +136,11 @@ namespace Outage.DataImporter.CIMAdapter.Importer
 			return report;
 		}
 
-		private void ConvertModelAndPopulateDelta(ProxyFactory proxyFactory, ModelResourcesDesc resourcesDesc)
+		private async Task ConvertModelAndPopulateDelta(ModelResourcesDesc resourcesDesc)
 		{
 			Logger.LogInfo("Loading elements and creating delta...");
 
-
-			using (NetworkModelGDAProxy gdaQueryProxy = proxyFactory.CreateProxy<NetworkModelGDAProxy, INetworkModelGDAContract>(EndpointNames.NetworkModelGDAEndpoint))
-			{
-				if (gdaQueryProxy == null)
-				{
-					string message = "ProcessIterator() => NetworkModelGDAProxy is null.";
-					Logger.LogError(message);
-					throw new NullReferenceException(message);
-				}
-
-				PopulateNmsDataFromServer(gdaQueryProxy, resourcesDesc);
-			}
+			await PopulateNmsDataFromServer(resourcesDesc);
 
 			//// import all concrete model types (DMSType enum)
 			ImportBaseVoltages();
@@ -174,11 +163,20 @@ namespace Outage.DataImporter.CIMAdapter.Importer
 			Logger.LogInfo("Loading elements and creating delta completed.");
 		}
 
-		private bool PopulateNmsDataFromServer(NetworkModelGDAProxy gdaQueryProxy, ModelResourcesDesc resourcesDesc)
+		private async Task<bool> PopulateNmsDataFromServer(ModelResourcesDesc resourcesDesc)
 		{
 			bool success = false;
 			string message = "Getting nms data from server started.";
 			Logger.LogInfo(message);
+
+			NetworkModelGdaClient nmsGdaClient = NetworkModelGdaClient.CreateClient();
+
+			if (nmsGdaClient == null)
+			{
+				string errMessage = "PopulateNmsDataFromServer() => NetworkModelGdaClient is null.";
+				Logger.LogError(errMessage);
+				throw new NullReferenceException(errMessage);
+			}
 
 			HashSet<ModelCode> requiredEntityTypes = new HashSet<ModelCode>();
 
@@ -198,6 +196,7 @@ namespace Outage.DataImporter.CIMAdapter.Importer
 			}
 
 			List<ModelCode> mrIdProp = new List<ModelCode>() { ModelCode.IDOBJ_MRID };
+
 			foreach (ModelCode modelCodeType in requiredEntityTypes)
 			{
 				int iteratorId = 0;
@@ -206,12 +205,12 @@ namespace Outage.DataImporter.CIMAdapter.Importer
 
 				try
 				{
-					iteratorId = gdaQueryProxy.GetExtentValues(modelCodeType, mrIdProp);
-					resourcesLeft = gdaQueryProxy.IteratorResourcesLeft(iteratorId);
+					iteratorId = await nmsGdaClient.GetExtentValues(modelCodeType, mrIdProp);
+					resourcesLeft = await nmsGdaClient.IteratorResourcesLeft(iteratorId);
 
 					while (resourcesLeft > 0)
 					{
-						List<ResourceDescription> gdaResult = gdaQueryProxy.IteratorNext(numberOfResources, iteratorId);
+						List<ResourceDescription> gdaResult = await nmsGdaClient.IteratorNext(numberOfResources, iteratorId);
 
 						foreach (ResourceDescription rd in gdaResult)
 						{
@@ -232,10 +231,10 @@ namespace Outage.DataImporter.CIMAdapter.Importer
 							}
 						}
 
-						resourcesLeft = gdaQueryProxy.IteratorResourcesLeft(iteratorId);
+						resourcesLeft = await nmsGdaClient.IteratorResourcesLeft(iteratorId);
 					}
 
-					gdaQueryProxy.IteratorClose(iteratorId);
+					await nmsGdaClient.IteratorClose(iteratorId);
 
 					message = "Getting nms data from server successfully finished.";
 					Logger.LogInfo(message);

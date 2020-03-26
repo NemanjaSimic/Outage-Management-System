@@ -1,17 +1,19 @@
-﻿using System.ServiceModel;
+﻿using Microsoft.ServiceFabric.Services.Remoting;
+using System.ServiceModel;
+using System.Threading.Tasks;
 
 namespace Outage.Common.ServiceContracts.DistributedTransaction
 {
     [ServiceContract]
-    public interface ITransactionActorContract
+    public interface ITransactionActorContract : IService
     {
         [OperationContract]
-        bool Prepare();
+        Task<bool> Prepare();
         
         [OperationContract]
-        void Commit();
+        Task Commit();
         
         [OperationContract]
-        void Rollback();
+        Task Rollback();
     }
 }

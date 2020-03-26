@@ -4,7 +4,7 @@ using Outage.SCADA.SCADAData.Configuration;
 using System;
 using System.Diagnostics;
 
-namespace Outage.SCADA.ModBus
+namespace Outage.SCADA.Modbus
 {
     public static class ModbusSimulatorHandler
     {

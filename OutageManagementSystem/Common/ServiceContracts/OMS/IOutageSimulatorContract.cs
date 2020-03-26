@@ -1,9 +1,10 @@
-﻿using System.ServiceModel;
+﻿using Microsoft.ServiceFabric.Services.Remoting;
+using System.ServiceModel;
 
 namespace Outage.Common.ServiceContracts.OMS
 {
     [ServiceContract]
-    public interface IOutageSimulatorContract
+    public interface IOutageSimulatorContract : IService
     {
         [OperationContract]
         bool StopOutageSimulation(long outageElementId);

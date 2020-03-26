@@ -1,6 +1,7 @@
 ﻿using Outage.DistributedTransactionActor;
 using Outage.SCADA.SCADAData.Repository;
 using System;
+using System.Threading.Tasks;
 
 namespace Outage.SCADA.SCADAService.DistributedTransaction
 {
@@ -23,14 +24,14 @@ namespace Outage.SCADA.SCADAService.DistributedTransaction
 
         #endregion
 
-        public override bool Prepare()
+        public override async Task<bool> Prepare()
         {
             bool success = false;
 
             try
             {
                 success = true;
-                success = SCADATransactionActor.scadaModel.Prepare();
+                success = await SCADATransactionActor.scadaModel.Prepare();
             }
             catch (Exception ex)
             {
@@ -50,7 +51,7 @@ namespace Outage.SCADA.SCADAService.DistributedTransaction
             return success;
         }
 
-        public override void Commit()
+        public override async Task Commit()
         {
             try
             {
@@ -64,7 +65,7 @@ namespace Outage.SCADA.SCADAService.DistributedTransaction
             }
         }
 
-        public override void Rollback()
+        public override async Task Rollback()
         {
             try
             {

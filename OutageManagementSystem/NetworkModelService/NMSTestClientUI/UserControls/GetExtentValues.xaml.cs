@@ -3,18 +3,10 @@ using Outage.Common;
 using System;
 using System.Collections.Generic;
 using System.Collections.ObjectModel;
-using System.Linq;
 using System.Text;
 using System.Threading.Tasks;
 using System.Windows;
 using System.Windows.Controls;
-using System.Windows.Data;
-using System.Windows.Documents;
-using System.Windows.Input;
-using System.Windows.Media;
-using System.Windows.Media.Imaging;
-using System.Windows.Navigation;
-using System.Windows.Shapes;
 using TelventDMS.Services.NetworkModelService.TestClient.TestsUI;
 
 namespace NMSTestClientUI.UserControls
@@ -24,7 +16,7 @@ namespace NMSTestClientUI.UserControls
     /// </summary>
     public partial class GetExtentValues : UserControl
     {
-        private TestGda tgda;
+        private readonly TestGda tgda;
         private ModelResourcesDesc modelResourcesDesc = new ModelResourcesDesc();
         private Dictionary<ModelCode, string> propertiesDesc = new Dictionary<ModelCode, string>();
 
@@ -37,6 +29,7 @@ namespace NMSTestClientUI.UserControls
             InitializeComponent();
             DataContext = this;
 
+            SelectedType = null;
             ClassTypes = new ObservableCollection<ClassTypeViewModel>();
 
             try
@@ -46,6 +39,7 @@ namespace NMSTestClientUI.UserControls
             catch (Exception ex)
             {
                 MessageBox.Show(ex.Message, "GetExtentValues", MessageBoxButton.OK, MessageBoxImage.Error);
+                return;
             }
 
             foreach (DMSType dmsType in Enum.GetValues(typeof(DMSType)))
@@ -58,8 +52,6 @@ namespace NMSTestClientUI.UserControls
                 ModelCode dmsTypesModelCode = modelResourcesDesc.GetModelCodeFromType(dmsType);
                 ClassTypes.Add(new ClassTypeViewModel() { ClassType = dmsTypesModelCode });
             }
-
-            SelectedType = null;
         }
 
         private void DataGrid_SelectionChanged(object sender, SelectionChangedEventArgs e)
@@ -137,12 +129,14 @@ namespace NMSTestClientUI.UserControls
             }
         }
 
-        private void ButtonGetExtentValues_Click(object sender, RoutedEventArgs e)
+        private async void ButtonGetExtentValues_Click(object sender, RoutedEventArgs e)
         {
             if (SelectedType == null)
             {
                 return;
             }
+
+            GetExtentValuesButton.IsEnabled = false;
 
             List<ModelCode> selectedProperties = new List<ModelCode>();
 
@@ -170,7 +164,7 @@ namespace NMSTestClientUI.UserControls
 
             try
             {
-                tgda.GetExtentValues(SelectedType.ClassType, selectedProperties, sb);
+                await tgda.GetExtentValues(SelectedType.ClassType, selectedProperties, sb);
             }
             catch (Exception ex)
             {
@@ -179,10 +173,13 @@ namespace NMSTestClientUI.UserControls
 
             ExtentValues.Document.Blocks.Clear();
             ExtentValues.AppendText(sb.ToString());
+            GetExtentValuesButton.IsEnabled = true;
         }
 
         private void ButtonRefreshTypes_Click(object sender, RoutedEventArgs e)
         {
+            RefreshButton.IsEnabled = false;
+
             ClassTypes.Clear();
 
             foreach (DMSType dmsType in Enum.GetValues(typeof(DMSType)))
@@ -197,6 +194,7 @@ namespace NMSTestClientUI.UserControls
             }
 
             SelectedType = null;
+            RefreshButton.IsEnabled = true;
         }
     }
 }

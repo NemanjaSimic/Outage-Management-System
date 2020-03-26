@@ -5,11 +5,12 @@ using Outage.Common.PubSub.CalculationEngineDataContract;
 using Outage.Common.PubSub.EmailDataContract;
 using Outage.Common.PubSub.OutageDataContract;
 using Outage.Common.OutageService.Model;
+using Microsoft.ServiceFabric.Services.Remoting;
 
 namespace Outage.Common.ServiceContracts.PubSub
 {
     [ServiceContract]
-    public interface IPublisher
+    public interface IPublisher : IService
     {
         [OperationContract]
         [ServiceKnownType(typeof(Publication))]

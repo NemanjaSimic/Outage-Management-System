@@ -1,4 +1,5 @@
-﻿using Outage.Common.UI;
+﻿using Microsoft.ServiceFabric.Services.Remoting;
+using Outage.Common.UI;
 using System.ServiceModel;
 
 namespace Outage.Common.ServiceContracts
@@ -6,7 +7,7 @@ namespace Outage.Common.ServiceContracts
     [ServiceContract]
     [ServiceKnownType(typeof(UIMeasurement))]
     [ServiceKnownType(typeof(UINode))]
-    public interface ITopologyServiceContract
+    public interface ITopologyServiceContract : IService
     {
         [OperationContract]
         UIModel GetTopology();

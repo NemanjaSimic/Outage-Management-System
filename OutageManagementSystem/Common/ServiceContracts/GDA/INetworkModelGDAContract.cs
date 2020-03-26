@@ -1,11 +1,13 @@
 ﻿using System.Collections.Generic;
 using System.ServiceModel;
+using System.Threading.Tasks;
+using Microsoft.ServiceFabric.Services.Remoting;
 using Outage.Common.GDA;
 
 namespace Outage.Common.ServiceContracts.GDA
 {
 	[ServiceContract]
-	public interface INetworkModelGDAContract
+	public interface INetworkModelGDAContract : IService
 	{
 		/// <summary>
 		/// Updates model by appluing reosoreces sent in delta
@@ -13,7 +15,7 @@ namespace Outage.Common.ServiceContracts.GDA
 		/// <param name="delta">Object which contains model changes</param>		
 		/// <returns>Result of model changes</returns>
 		[OperationContract]
-		UpdateResult ApplyUpdate(Delta delta);
+		Task<UpdateResult> ApplyUpdate(Delta delta);
 
 		/// <summary>
 		/// Gets resource description for resource specified by id.
@@ -22,7 +24,7 @@ namespace Outage.Common.ServiceContracts.GDA
 		/// <param name="propIds">List of requested properties</param>		
 		/// <returns>Resource description of the specified entity</returns>
 		[OperationContract]
-		ResourceDescription GetValues(long resourceId, List<ModelCode> propIds);
+		Task<ResourceDescription> GetValues(long resourceId, List<ModelCode> propIds);
 
 		/// <summary>
 		/// Gets id of the resource iterator that holds descriptions for all entities of the specified type.
@@ -31,7 +33,7 @@ namespace Outage.Common.ServiceContracts.GDA
 		/// <param name="propIds">List of requested property codes</param>
 		/// <returns>Id of resource iterator for the requested entities</returns>
 		[OperationContract]
-		int GetExtentValues(ModelCode entityType, List<ModelCode> propIds);
+		Task<int> GetExtentValues(ModelCode entityType, List<ModelCode> propIds);
 
 		/// <summary>
 		/// Gets id of the resource iterator that holds descriptions for all entities related to specified source.
@@ -41,7 +43,7 @@ namespace Outage.Common.ServiceContracts.GDA
 		/// <param name="association">Relation between source and entities that should be returned</param>		
 		/// <returns>Id of the resource iterator for the requested entities</returns>
 		[OperationContract]
-		int GetRelatedValues(long source, List<ModelCode> propIds, Association association);
+		Task<int> GetRelatedValues(long source, List<ModelCode> propIds, Association association);
 
 		/// <summary>
 		/// Gets list of next n resource descriptions from the iterator.
@@ -50,7 +52,7 @@ namespace Outage.Common.ServiceContracts.GDA
 		/// <param name="id">Id of the resource iterator</param>
 		/// <returns>List of resource descriptions</returns>
 		[OperationContract]
-		List<ResourceDescription> IteratorNext(int n, int id);
+		Task<List<ResourceDescription>> IteratorNext(int n, int id);
 
 		/// <summary>
 		/// Resets current position in resource iterator to the iterator's beginning
@@ -58,7 +60,7 @@ namespace Outage.Common.ServiceContracts.GDA
 		/// <param name="id">Id of the resource iterator</param>
 		/// <returns>TRUE if current position in iterator is successfully reseted</returns>
 		[OperationContract]
-		bool IteratorRewind(int id);
+		Task<bool> IteratorRewind(int id);
 
 		/// <summary>
 		/// Gets the total number of the resource descriptions in resource iterator.
@@ -66,7 +68,7 @@ namespace Outage.Common.ServiceContracts.GDA
 		/// <param name="id">Id of the resource iterator</param>
 		/// <returns>Total number of resources in resource iterator</returns>
 		[OperationContract]
-		int IteratorResourcesTotal(int id);
+		Task<int> IteratorResourcesTotal(int id);
 
 		/// <summary>
 		/// Gets the number of resource descriptions left from current position in iterator to iterator's end
@@ -74,7 +76,7 @@ namespace Outage.Common.ServiceContracts.GDA
 		/// <param name="id">Id of the resource iterator</param>
 		/// <returns>Number of resource iterator left to return in next calls</returns>
 		[OperationContract]
-		int IteratorResourcesLeft(int id);
+		Task<int> IteratorResourcesLeft(int id);
 
 		/// <summary>
 		/// Closes the iterator.
@@ -82,6 +84,6 @@ namespace Outage.Common.ServiceContracts.GDA
 		/// <param name="id">Id of the resource iterator</param>
 		/// <returns>TRUE if iterator is successfully closed</returns>
 		[OperationContract]
-		bool IteratorClose(int id);
+		Task<bool> IteratorClose(int id);
 	}
 }

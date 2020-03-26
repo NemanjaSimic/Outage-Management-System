@@ -780,7 +780,7 @@ namespace OutageManagementService
 
                     try
                     {
-                        rd = proxy.GetValues(gid, propIds);
+                        rd = proxy.GetValues(gid, propIds).Result;
                     }
                     catch (Exception e)
                     {
@@ -1137,7 +1137,7 @@ namespace OutageManagementService
             {
                 using (NetworkModelGDAProxy gda = proxyFactory.CreateProxy<NetworkModelGDAProxy, INetworkModelGDAContract>(EndpointNames.NetworkModelGDAEndpoint))
                 {
-                    ResourceDescription resourceDescription = gda.GetValues(elementId, new List<ModelCode>() { ModelCode.BREAKER_NORECLOSING });
+                    ResourceDescription resourceDescription = gda.GetValues(elementId, new List<ModelCode>() { ModelCode.BREAKER_NORECLOSING }).Result;
 
                     Property property = resourceDescription.GetProperty(ModelCode.BREAKER_NORECLOSING);
 
@@ -1259,7 +1259,7 @@ namespace OutageManagementService
 
                 try
                 {
-                    iteratorId = gdaQueryProxy.GetExtentValues(entityType, propIds);
+                    iteratorId = gdaQueryProxy.GetExtentValues(entityType, propIds).Result;
                 }
                 catch (Exception e)
                 {
@@ -1290,19 +1290,19 @@ namespace OutageManagementService
 
                 try
                 {
-                    resourcesLeft = gdaQueryProxy.IteratorResourcesTotal(iteratorId);
+                    resourcesLeft = gdaQueryProxy.IteratorResourcesTotal(iteratorId).Result;
                     resourceDescriptions = new Dictionary<long, ResourceDescription>(resourcesLeft);
 
                     while (resourcesLeft > 0)
                     {
-                        List<ResourceDescription> resources = gdaQueryProxy.IteratorNext(numberOfResources, iteratorId);
+                        List<ResourceDescription> resources = gdaQueryProxy.IteratorNext(numberOfResources, iteratorId).Result;
                         
                         foreach (ResourceDescription resource in resources)
                         {
                             resourceDescriptions.Add(resource.Id, resource);
                         }
 
-                        resourcesLeft = gdaQueryProxy.IteratorResourcesLeft(iteratorId);
+                        resourcesLeft = gdaQueryProxy.IteratorResourcesLeft(iteratorId).Result;
                     }
 
                     gdaQueryProxy.IteratorClose(iteratorId);
