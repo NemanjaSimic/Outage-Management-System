@@ -4,23 +4,19 @@ using System.Fabric;
 using System.Threading;
 using System.Threading.Tasks;
 using Microsoft.ServiceFabric.Services.Communication.Runtime;
-using Microsoft.ServiceFabric.Services.Remoting.Runtime;
 using Microsoft.ServiceFabric.Services.Runtime;
-using OMS.Cloud.NMS.Provider;
-using Outage.Common;
-using Outage.Common.GDA;
-using Outage.Common.ServiceContracts.GDA;
+using OMS.Cloud.NMS.GdaProvider;
 
-namespace OMS.Cloud.NMS.Stateless
+namespace OMS.Cloud.NMS.GdaService
 {
     /// <summary>
     /// An instance of this class is created for each service instance by the Service Fabric runtime.
     /// </summary>
-    internal sealed class Stateless : StatelessService
+    internal sealed class GdaService : StatelessService
     {
         private readonly NetworkModelService nms;
 
-        public Stateless(StatelessServiceContext context)
+        public GdaService(StatelessServiceContext context)
             : base(context)
         {
             Config.GetInstance(context);

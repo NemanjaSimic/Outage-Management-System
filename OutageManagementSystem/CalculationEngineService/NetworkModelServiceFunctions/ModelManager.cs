@@ -104,14 +104,14 @@ namespace NetworkModelServiceFunctions
 			try
 			{
 				logger.LogInfo("Getting all network model elements and converting them...");
-				GetBaseVoltages();
+				GetBaseVoltages().Wait();
 				Parallel.For(0, ConcreteModels.Count, (i) =>
 				{
 					var model = ConcreteModels.ElementAt(i);
 					if (model != ModelCode.BASEVOLTAGE)
 					{
 						List<ModelCode> properties = modelResourcesDesc.GetAllPropertyIds(model);
-						var elements = networkModelGDA.GetExtentValues(model, properties);
+						var elements = networkModelGDA.GetExtentValues(model, properties).Result;
 						foreach (var element in elements)
 						{
 							TransformToTopologyElement(element);
@@ -141,10 +141,10 @@ namespace NetworkModelServiceFunctions
 			}
 			return success;
 		}
-		private void GetBaseVoltages()
+		private async Task GetBaseVoltages()
 		{
 			List<ModelCode> properties = modelResourcesDesc.GetAllPropertyIds(ModelCode.BASEVOLTAGE);
-			var elements = networkModelGDA.GetExtentValues(ModelCode.BASEVOLTAGE, properties);
+			var elements = await networkModelGDA.GetExtentValues(ModelCode.BASEVOLTAGE, properties);
 			foreach (var element in elements)
 			{
 				TransformToTopologyElement(element);

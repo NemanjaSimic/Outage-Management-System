@@ -4,6 +4,7 @@ using Outage.Common.ServiceContracts.GDA;
 using Outage.Common.ServiceProxies;
 using System;
 using System.Collections.Generic;
+using System.Threading.Tasks;
 
 namespace NetworkModelServiceFunctions
 {
@@ -22,7 +23,7 @@ namespace NetworkModelServiceFunctions
 			proxyFactory = new ProxyFactory();
 		}
 
-		public List<ResourceDescription> GetExtentValues(ModelCode entityType, List<ModelCode> propIds)
+		public async Task<List<ResourceDescription>> GetExtentValues(ModelCode entityType, List<ModelCode> propIds)
 		{
 			int iteratorId;
 
@@ -37,7 +38,7 @@ namespace NetworkModelServiceFunctions
 
 				try
 				{
-					iteratorId = gdaQueryProxy.GetExtentValues(entityType, propIds).Result;
+					iteratorId = await gdaQueryProxy.GetExtentValues(entityType, propIds);
 				}
 				catch (Exception e)
 				{
@@ -47,9 +48,9 @@ namespace NetworkModelServiceFunctions
 				}
 			}
 
-			return ProcessIterator(iteratorId);
+			return await ProcessIterator(iteratorId);
 		}
-		public List<ResourceDescription> GetRelatedValues(long source, List<ModelCode> propIds, Association association)
+		public async Task<List<ResourceDescription>> GetRelatedValues(long source, List<ModelCode> propIds, Association association)
 		{
 			int iteratorId;
 
@@ -64,7 +65,7 @@ namespace NetworkModelServiceFunctions
 
 				try
 				{
-					iteratorId = gdaQueryProxy.GetRelatedValues(source, propIds, association).Result;
+					iteratorId = await gdaQueryProxy.GetRelatedValues(source, propIds, association);
 				}
 				catch (Exception e)
 				{
@@ -74,9 +75,9 @@ namespace NetworkModelServiceFunctions
 				}
 			}
 
-			return ProcessIterator(iteratorId);
+			return await ProcessIterator(iteratorId);
 		}
-		public ResourceDescription GetValues(long resourceId, List<ModelCode> propIds)
+		public async Task<ResourceDescription> GetValues(long resourceId, List<ModelCode> propIds)
 		{
 			ResourceDescription resource;
 
@@ -91,7 +92,7 @@ namespace NetworkModelServiceFunctions
 
 				try
 				{
-					resource = gdaQueryProxy.GetValues(resourceId, propIds).Result;
+					resource = await gdaQueryProxy.GetValues(resourceId, propIds);
 				}
 				catch (Exception e)
 				{
@@ -103,7 +104,7 @@ namespace NetworkModelServiceFunctions
 
 			return resource;
 		}
-		private List<ResourceDescription> ProcessIterator(int iteratorId)
+		private async Task<List<ResourceDescription>> ProcessIterator(int iteratorId)
 		{
 			int resourcesLeft;
 			int numberOfResources = 10000;
@@ -120,18 +121,18 @@ namespace NetworkModelServiceFunctions
 
 				try
 				{
-					resourcesLeft = gdaQueryProxy.IteratorResourcesTotal(iteratorId).Result;
+					resourcesLeft = await gdaQueryProxy.IteratorResourcesTotal(iteratorId);
 					resourceDescriptions = new List<ResourceDescription>(resourcesLeft);
 
 					while (resourcesLeft > 0)
 					{
-						List<ResourceDescription> rds = gdaQueryProxy.IteratorNext(numberOfResources, iteratorId).Result;
+						List<ResourceDescription> rds = await gdaQueryProxy.IteratorNext(numberOfResources, iteratorId);
 						resourceDescriptions.AddRange(rds);
 
-						resourcesLeft = gdaQueryProxy.IteratorResourcesLeft(iteratorId).Result;
+						resourcesLeft = await gdaQueryProxy.IteratorResourcesLeft(iteratorId);
 					}
 
-					gdaQueryProxy.IteratorClose(iteratorId).Wait();
+					await gdaQueryProxy.IteratorClose(iteratorId);
 				}
 				catch (Exception e)
 				{

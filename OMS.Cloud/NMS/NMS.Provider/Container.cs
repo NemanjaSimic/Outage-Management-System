@@ -4,7 +4,7 @@ using System;
 using System.Collections.Generic;
 using System.Linq;
 
-namespace OMS.Cloud.NMS.Provider
+namespace OMS.Cloud.NMS.GdaProvider
 {
     public class Container : IEquatable<Container>
     {

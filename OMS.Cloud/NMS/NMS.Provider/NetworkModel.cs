@@ -1,4 +1,4 @@
-﻿using OMS.Cloud.NMS.Provider.GDA;
+﻿using OMS.Cloud.NMS.GdaProvider.GDA;
 using Outage.Common;
 using Outage.Common.GDA;
 using Outage.Common.ServiceContracts.DistributedTransaction;
@@ -10,7 +10,7 @@ using System.Collections.Generic;
 using System.Text;
 using UpdateResult = Outage.Common.GDA.UpdateResult;
 
-namespace OMS.Cloud.NMS.Provider
+namespace OMS.Cloud.NMS.GdaProvider
 {
     public class NetworkModel
     {
@@ -342,7 +342,8 @@ namespace OMS.Cloud.NMS.Provider
                 }
                 else
                 {
-                    StartDistributedTransaction(delta);
+                    Commit();
+                    //StartDistributedTransaction(delta);
                 }
             }
             catch (Exception ex)

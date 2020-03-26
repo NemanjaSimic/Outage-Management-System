@@ -3,7 +3,7 @@ using Outage.DistributedTransactionActor;
 using System;
 using System.Threading.Tasks;
 
-namespace OMS.Cloud.NMS.Provider.DistributedTransaction
+namespace OMS.Cloud.NMS.GdaProvider.DistributedTransaction
 {
     public class NMSTransactionActor : TransactionActor
     { 

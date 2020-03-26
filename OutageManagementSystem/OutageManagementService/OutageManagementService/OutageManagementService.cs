@@ -13,6 +13,7 @@ using System;
 using System.Collections.Generic;
 using System.ServiceModel;
 using System.Text;
+using System.Threading.Tasks;
 
 namespace OutageManagementService
 {
@@ -41,12 +42,9 @@ namespace OutageManagementService
             //TODO: Initialize what is needed
             //TODO: restauration of data...
             modelResourcesDesc = new ModelResourcesDesc();
-            using (OutageContext db = new OutageContext())
-            {
-                //db.DeleteAllData();
-                InitializeEnergyConsumers(db);
-            }
-           
+            
+            Task.Run(InitializeEnergyConsumers);
+
             outageModel = new OutageModel();
             OutageService.outageModel = outageModel;
             OutageTransactionActor.OutageModel = outageModel;
@@ -59,7 +57,7 @@ namespace OutageManagementService
         }
 
         #region GDAHelper
-        public List<ResourceDescription> GetExtentValues(ModelCode entityType, List<ModelCode> propIds)
+        public async Task<List<ResourceDescription>> GetExtentValues(ModelCode entityType, List<ModelCode> propIds)
         {
             int iteratorId;
 
@@ -84,10 +82,10 @@ namespace OutageManagementService
                 }
             }
 
-            return ProcessIterator(iteratorId);
+            return await ProcessIterator(iteratorId);
         }
 
-        private List<ResourceDescription> ProcessIterator(int iteratorId)
+        private async Task<List<ResourceDescription>> ProcessIterator(int iteratorId)
         {
             //TODO: mozda vec ovde napakovati dictionary<long, rd> ?
             int resourcesLeft;
@@ -116,7 +114,7 @@ namespace OutageManagementService
                         resourcesLeft = gdaQueryProxy.IteratorResourcesLeft(iteratorId).Result;
                     }
 
-                    gdaQueryProxy.IteratorClose(iteratorId).Wait();
+                    await gdaQueryProxy.IteratorClose(iteratorId);
                 }
                 catch (Exception e)
                 {
@@ -146,30 +144,34 @@ namespace OutageManagementService
             subscriberProxy.Subscribe(Topic.OUTAGE_EMAIL);
         }
 
-        private void InitializeEnergyConsumers(OutageContext db)
+        private async Task InitializeEnergyConsumers()
         {
-            List<ResourceDescription> energyConsumers = GetExtentValues(ModelCode.ENERGYCONSUMER, modelResourcesDesc.GetAllPropertyIds(ModelCode.ENERGYCONSUMER));
-
-            int i = 0; //TODO: delete, for first/last name placeholder
-
-            foreach(ResourceDescription energyConsumer in energyConsumers)
+            using (OutageContext db = new OutageContext())
             {
-                Consumer consumer = new Consumer
+                List<ResourceDescription> energyConsumers = await GetExtentValues(ModelCode.ENERGYCONSUMER, modelResourcesDesc.GetAllPropertyIds(ModelCode.ENERGYCONSUMER));
+
+                int i = 0; //TODO: delete, for first/last name placeholder
+
+                foreach(ResourceDescription energyConsumer in energyConsumers)
                 {
-                    ConsumerId = energyConsumer.GetProperty(ModelCode.IDOBJ_GID).AsLong(),
-                    ConsumerMRID = energyConsumer.GetProperty(ModelCode.IDOBJ_MRID).AsString(),
-                    FirstName = $"FirstName{i}", //TODO: energyConsumer.GetProperty(ModelCode.ENERGYCONSUMER_FIRSTNAME).AsString(); 
-                    LastName = $"LastName{i}"   //TODO: energyConsumer.GetProperty(ModelCode.ENERGYCONSUMER_LASTNAME).AsString();
-                };
+                    Consumer consumer = new Consumer
+                    {
+                        ConsumerId = energyConsumer.GetProperty(ModelCode.IDOBJ_GID).AsLong(),
+                        ConsumerMRID = energyConsumer.GetProperty(ModelCode.IDOBJ_MRID).AsString(),
+                        FirstName = $"FirstName{i}", //TODO: energyConsumer.GetProperty(ModelCode.ENERGYCONSUMER_FIRSTNAME).AsString(); 
+                        LastName = $"LastName{i}"   //TODO: energyConsumer.GetProperty(ModelCode.ENERGYCONSUMER_LASTNAME).AsString();
+                    };
 
-                i++;
+                    i++;
 
-                db.Consumers.Add(consumer);
-                Logger.LogDebug($"Add consumer: {consumer.ConsumerMRID}");
+                    db.Consumers.Add(consumer);
+                    Logger.LogDebug($"Add consumer: {consumer.ConsumerMRID}");
+                }
+
+                db.SaveChanges();
+                Logger.LogDebug("Init energy consumers: SaveChanges()");
             }
 
-            db.SaveChanges();
-            Logger.LogDebug("Init energy consumers: SaveChanges()");
         }
 
 

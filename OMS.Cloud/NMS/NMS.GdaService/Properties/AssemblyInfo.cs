@@ -5,11 +5,11 @@ using System.Runtime.InteropServices;
 // General Information about an assembly is controlled through the following 
 // set of attributes. Change these attribute values to modify the information
 // associated with an assembly.
-[assembly: AssemblyTitle("OMS.Cloud.NMS.Stateless")]
+[assembly: AssemblyTitle("OMS.Cloud.NMS.GdaService")]
 [assembly: AssemblyDescription("")]
 [assembly: AssemblyConfiguration("")]
 [assembly: AssemblyCompany("")]
-[assembly: AssemblyProduct("OMS.Cloud.NMS.Stateless")]
+[assembly: AssemblyProduct("OMS.Cloud.NMS.GdaService")]
 [assembly: AssemblyCopyright("Copyright ©  2020")]
 [assembly: AssemblyTrademark("")]
 [assembly: AssemblyCulture("")]
@@ -20,7 +20,7 @@ using System.Runtime.InteropServices;
 [assembly: ComVisible(false)]
 
 // The following GUID is for the ID of the typelib if this project is exposed to COM
-[assembly: Guid("11be4757-a86a-4687-abb9-c791ad6b2900")]
+[assembly: Guid("c5e8cd96-c1a3-4d6f-a782-76e7d8eb4b12")]
 
 // Version information for an assembly consists of the following four values:
 //

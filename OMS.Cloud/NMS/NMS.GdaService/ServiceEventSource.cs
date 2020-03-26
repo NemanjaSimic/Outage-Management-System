@@ -7,9 +7,9 @@ using System.Text;
 using System.Threading.Tasks;
 using Microsoft.ServiceFabric.Services.Runtime;
 
-namespace OMS.Cloud.NMS.Stateless
+namespace OMS.Cloud.NMS.GdaService
 {
-    [EventSource(Name = "MyCompany-OMS.Cloud-NMS.Stateless")]
+    [EventSource(Name = "MyCompany-OMS.Cloud-NMS.GdaService")]
     internal sealed class ServiceEventSource : EventSource
     {
         public static readonly ServiceEventSource Current = new ServiceEventSource();

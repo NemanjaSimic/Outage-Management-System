@@ -7,8 +7,8 @@
     <ProjectGuid>{DC569D7F-23C2-4DB6-A49E-03459F3D38CF}</ProjectGuid>
     <OutputType>Library</OutputType>
     <AppDesignerFolder>Properties</AppDesignerFolder>
-    <RootNamespace>OMS.Cloud.NMS.Provider</RootNamespace>
-    <AssemblyName>OMS.Cloud.NMS.Provider</AssemblyName>
+    <RootNamespace>OMS.Cloud.NMS.GdaProvider</RootNamespace>
+    <AssemblyName>OMS.Cloud.NMS.GdaProvider</AssemblyName>
     <TargetFrameworkVersion>v4.8</TargetFrameworkVersion>
     <FileAlignment>512</FileAlignment>
     <Deterministic>true</Deterministic>

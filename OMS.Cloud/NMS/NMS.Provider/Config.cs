@@ -2,7 +2,7 @@
 using System.Configuration;
 using System.Fabric;
 
-namespace OMS.Cloud.NMS.Provider
+namespace OMS.Cloud.NMS.GdaProvider
 {
     public class Config
     {

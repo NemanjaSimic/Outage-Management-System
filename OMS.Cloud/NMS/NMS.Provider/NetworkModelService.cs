@@ -1,5 +1,5 @@
-﻿using OMS.Cloud.NMS.Provider.DistributedTransaction;
-using OMS.Cloud.NMS.Provider.GDA;
+﻿using OMS.Cloud.NMS.GdaProvider.DistributedTransaction;
+using OMS.Cloud.NMS.GdaProvider.GDA;
 using Microsoft.ServiceFabric.Services.Communication.Runtime;
 using Microsoft.ServiceFabric.Services.Communication.Wcf.Runtime;
 using Outage.Common;
@@ -12,7 +12,7 @@ using SecurityMode = System.ServiceModel.SecurityMode;
 using Microsoft.ServiceFabric.Services.Communication.Wcf;
 using System.ServiceModel.Channels;
 
-namespace OMS.Cloud.NMS.Provider
+namespace OMS.Cloud.NMS.GdaProvider
 {
     public sealed class NetworkModelService : IDisposable
     {

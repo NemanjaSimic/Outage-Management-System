@@ -1,4 +1,4 @@
-﻿namespace OMS.Cloud.NMS.Provider.DbModel
+﻿namespace OMS.Cloud.NMS.GdaProvider.DbModel
 {
     public class ModelVersionDocument
     {

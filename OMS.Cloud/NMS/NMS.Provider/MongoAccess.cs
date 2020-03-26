@@ -1,4 +1,4 @@
-﻿using OMS.Cloud.NMS.Provider.DbModel;
+﻿using OMS.Cloud.NMS.GdaProvider.DbModel;
 using Microsoft.ServiceFabric.Data.Collections;
 using MongoDB.Bson;
 using MongoDB.Bson.Serialization;
@@ -13,7 +13,7 @@ using System.Linq;
 using System.Text;
 using System.Threading.Tasks;
 
-namespace OMS.Cloud.NMS.Provider
+namespace OMS.Cloud.NMS.GdaProvider
 {
     public class MongoAccess
     {

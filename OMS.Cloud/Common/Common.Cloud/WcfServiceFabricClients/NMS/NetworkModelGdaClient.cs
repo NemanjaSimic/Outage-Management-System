@@ -6,28 +6,32 @@ using Outage.Common.GDA;
 using Outage.Common.ServiceContracts.GDA;
 using System;
 using System.Collections.Generic;
+using System.Configuration;
 using System.Fabric;
 using System.ServiceModel;
-using System.ServiceModel.Channels;
 using System.Threading.Tasks;
 
 namespace OMS.Common.Cloud.WcfServiceFabricClients.NMS
 {
     public class NetworkModelGdaClient : WcfSeviceFabricClientBase<INetworkModelGDAContract>, INetworkModelGDAContract
     {
-        private static readonly Uri nmsServiceName = new Uri("fabric:/OMS_Cloud/NMS_Stateless"); 
-
         public NetworkModelGdaClient(WcfCommunicationClientFactory<INetworkModelGDAContract> clientFactory, Uri serviceName) 
             : base(clientFactory, serviceName)
         {
         }
 
-        public static NetworkModelGdaClient CreateClient()
+        public static NetworkModelGdaClient CreateClient(Uri nmsServiceName = null)
         {
+            if (nmsServiceName == null && ConfigurationManager.AppSettings[MicroserviceNames.NmsGdaService] is string nmsGdaServiceName)
+            {
+                nmsServiceName = new Uri(nmsGdaServiceName);
+            }
+
             var partitionResolver = new ServicePartitionResolver(() => new FabricClient());
+            //var partitionResolver = ServicePartitionResolver.GetDefault();
             var factory = new WcfCommunicationClientFactory<INetworkModelGDAContract>(CreateBinding(), null, partitionResolver);
             
-            return new NetworkModelGdaClient(factory, nmsServiceName); ;
+            return new NetworkModelGdaClient(factory, nmsServiceName);
         }
 
         private static NetTcpBinding CreateBinding()

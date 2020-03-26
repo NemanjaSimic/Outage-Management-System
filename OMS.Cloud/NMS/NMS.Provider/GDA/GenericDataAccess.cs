@@ -5,7 +5,7 @@ using System;
 using System.Collections.Generic;
 using System.Threading.Tasks;
 
-namespace OMS.Cloud.NMS.Provider.GDA
+namespace OMS.Cloud.NMS.GdaProvider.GDA
 {
     public class GenericDataAccess : INetworkModelGDAContract
     {

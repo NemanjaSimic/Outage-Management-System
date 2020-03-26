@@ -1,15 +1,11 @@
-﻿using EasyModbus;
-using Outage.Common;
+﻿using Outage.Common;
 using Outage.Common.GDA;
 using Outage.Common.ServiceContracts.GDA;
 using Outage.Common.ServiceProxies;
 using Outage.SCADA.SCADACommon;
-using Outage.SCADA.SCADAData.Configuration;
 using System;
 using System.Collections.Generic;
-using System.Linq;
-using System.ServiceModel;
-using System.Threading;
+using System.Threading.Tasks;
 
 namespace Outage.SCADA.SCADAData.Repository
 {
@@ -117,7 +113,7 @@ namespace Outage.SCADA.SCADAData.Repository
 
         #region ITransactionActorContract
 
-        public bool Prepare()
+        public async Task<bool> Prepare()
         {
             bool success;
 
@@ -141,7 +137,7 @@ namespace Outage.SCADA.SCADAData.Repository
                 }
 
                 //IMPORT ALL measurements from NMS and create PointItems for them
-                CreatePointItemsFromNetworkModelMeasurements(out Dictionary<long, ISCADAModelPointItem> incomingPointItems);
+                Dictionary<long, ISCADAModelPointItem> incomingPointItems = await CreatePointItemsFromNetworkModelMeasurements();
 
                 //ORDER IS IMPORTANT due to IncomingAddressToGidMap validity: DELETE => UPDATE => INSERT
 
@@ -281,12 +277,12 @@ namespace Outage.SCADA.SCADAData.Repository
 
         #region ImportScadaModel
 
-        public bool ImportModel()
+        public async Task<bool> ImportModel()
         {
             string message = "Importing analog measurements started...";
             Logger.LogInfo(message);
             Console.WriteLine(message);
-            bool analogImportSuccess = ImportAnalog();
+            bool analogImportSuccess = await ImportAnalog();
 
             message = $"Importing analog measurements finished. ['success' value: {analogImportSuccess}]";
             Logger.LogInfo(message);
@@ -295,7 +291,7 @@ namespace Outage.SCADA.SCADAData.Repository
             message = "Importing discrete measurements started...";
             Logger.LogInfo(message);
             Console.WriteLine(message);
-            bool discreteImportSuccess = ImportDiscrete();
+            bool discreteImportSuccess = await ImportDiscrete();
 
             message = $"Importing discrete measurements finished. ['success' value: {discreteImportSuccess}]";
             Logger.LogInfo(message);
@@ -311,7 +307,7 @@ namespace Outage.SCADA.SCADAData.Repository
             return isSCADAModelImported;
         }
 
-        private bool ImportAnalog()
+        private async Task<bool> ImportAnalog()
         {
             bool success;
             int numberOfResources = 1000;
@@ -328,12 +324,12 @@ namespace Outage.SCADA.SCADAData.Repository
 
                 try
                 {
-                    int iteratorId = gdaProxy.GetExtentValues(ModelCode.ANALOG, props).Result;
-                    int resourcesLeft = gdaProxy.IteratorResourcesLeft(iteratorId).Result;
+                    int iteratorId = await gdaProxy.GetExtentValues(ModelCode.ANALOG, props);
+                    int resourcesLeft = await gdaProxy.IteratorResourcesLeft(iteratorId);
 
                     while (resourcesLeft > 0)
                     {
-                        List<ResourceDescription> rds = gdaProxy.IteratorNext(numberOfResources, iteratorId).Result;
+                        List<ResourceDescription> rds = await gdaProxy.IteratorNext(numberOfResources, iteratorId);
                         for (int i = 0; i < rds.Count; i++)
                         {
                             if (rds[i] != null)
@@ -347,7 +343,7 @@ namespace Outage.SCADA.SCADAData.Repository
                                 Logger.LogDebug($"ANALOG measurement added to SCADA model [Gid: {gid}, Address: {pointItem.Address}]");
                             }
                         }
-                        resourcesLeft = gdaProxy.IteratorResourcesLeft(iteratorId).Result;
+                        resourcesLeft = await gdaProxy.IteratorResourcesLeft(iteratorId);
                     }
 
                     success = true;
@@ -365,7 +361,7 @@ namespace Outage.SCADA.SCADAData.Repository
             return success;
         }
 
-        private bool ImportDiscrete()
+        private async Task<bool> ImportDiscrete()
         {
             bool success;
             int numberOfResources = 1000;
@@ -382,12 +378,12 @@ namespace Outage.SCADA.SCADAData.Repository
 
                 try
                 {
-                    int iteratorId = gdaProxy.GetExtentValues(ModelCode.DISCRETE, props).Result;
-                    int resourcesLeft = gdaProxy.IteratorResourcesLeft(iteratorId).Result;
+                    int iteratorId = await gdaProxy.GetExtentValues(ModelCode.DISCRETE, props);
+                    int resourcesLeft = await gdaProxy.IteratorResourcesLeft(iteratorId);
 
                     while (resourcesLeft > 0)
                     {
-                        List<ResourceDescription> rds = gdaProxy.IteratorNext(numberOfResources, iteratorId).Result;
+                        List<ResourceDescription> rds = await gdaProxy.IteratorNext(numberOfResources, iteratorId);
                         for (int i = 0; i < rds.Count; i++)
                         {
                             if (rds[i] != null)
@@ -400,7 +396,7 @@ namespace Outage.SCADA.SCADAData.Repository
                                 Logger.LogDebug($"DISCRETE measurement added to SCADA model [Gid: {gid}, Address: {pointItem.Address}]");
                             }
                         }
-                        resourcesLeft = gdaProxy.IteratorResourcesLeft(iteratorId).Result;
+                        resourcesLeft = await gdaProxy.IteratorResourcesLeft(iteratorId);
                     }
 
                     success = true;
@@ -420,9 +416,9 @@ namespace Outage.SCADA.SCADAData.Repository
 
         #endregion ImportScadaModel
 
-        private void CreatePointItemsFromNetworkModelMeasurements(out Dictionary<long, ISCADAModelPointItem> pointItems)
+        private async Task<Dictionary<long, ISCADAModelPointItem>> CreatePointItemsFromNetworkModelMeasurements()
         {
-            pointItems = new Dictionary<long, ISCADAModelPointItem>();
+            Dictionary<long, ISCADAModelPointItem>  pointItems = new Dictionary<long, ISCADAModelPointItem>();
 
             using (NetworkModelGDAProxy gdaProxy = proxyFactory.CreateProxy<NetworkModelGDAProxy, INetworkModelGDAContract>(EndpointNames.NetworkModelGDAEndpoint))
             {
@@ -467,12 +463,12 @@ namespace Outage.SCADA.SCADAData.Repository
 
                     try
                     {
-                        iteratorId = gdaProxy.GetExtentValues(type, props).Result;
-                        resourcesLeft = gdaProxy.IteratorResourcesLeft(iteratorId).Result;
+                        iteratorId = await gdaProxy.GetExtentValues(type, props);
+                        resourcesLeft = await gdaProxy.IteratorResourcesLeft(iteratorId);
 
                         while (resourcesLeft > 0)
                         {
-                            List<ResourceDescription> resources = gdaProxy.IteratorNext(numberOfResources, iteratorId).Result;
+                            List<ResourceDescription> resources = await gdaProxy.IteratorNext(numberOfResources, iteratorId);
 
                             foreach (ResourceDescription rd in resources)
                             {
@@ -493,10 +489,10 @@ namespace Outage.SCADA.SCADAData.Repository
                                 }
                             }
 
-                            resourcesLeft = gdaProxy.IteratorResourcesLeft(iteratorId).Result;
+                            resourcesLeft = await gdaProxy.IteratorResourcesLeft(iteratorId);
                         }
 
-                        gdaProxy.IteratorClose(iteratorId);
+                        await gdaProxy.IteratorClose(iteratorId);
                     }
                     catch (Exception ex)
                     {
@@ -506,6 +502,8 @@ namespace Outage.SCADA.SCADAData.Repository
                     }
                 }
             }
+
+            return pointItems;
         }
 
         private ISCADAModelPointItem CreatePointItemFromResource(ResourceDescription resource)

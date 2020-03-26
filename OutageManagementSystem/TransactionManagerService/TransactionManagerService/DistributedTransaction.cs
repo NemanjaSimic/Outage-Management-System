@@ -4,6 +4,7 @@ using Outage.Common.ServiceProxies;
 using Outage.Common.ServiceProxies.DistributedTransaction;
 using System;
 using System.Collections.Generic;
+using System.Threading.Tasks;
 
 namespace Outage.TransactionManagerService
 {
@@ -65,13 +66,13 @@ namespace Outage.TransactionManagerService
             //TODO: start timer...
         }
 
-        public void FinishDistributedUpdate(bool success)
+        public async void FinishDistributedUpdate(bool success)
         {
             try
             {
                 if (success)
                 {
-                    if (InvokePreparationOnActors())
+                    if (await InvokePreparationOnActors())
                     {
                         InvokeCommitOnActors();
                     }
@@ -116,7 +117,7 @@ namespace Outage.TransactionManagerService
 
         #region Private Members
 
-        private bool InvokePreparationOnActors()
+        private async Task<bool> InvokePreparationOnActors()
         {
             bool success = false;
 
@@ -142,7 +143,7 @@ namespace Outage.TransactionManagerService
 
                     }
                         
-                    success = transactionActorProxy.Prepare().Result;
+                    success = await transactionActorProxy.Prepare();
                 }
 
                 if (success)

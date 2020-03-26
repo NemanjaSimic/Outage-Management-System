@@ -31,7 +31,7 @@ namespace Outage.SCADA.SCADAService.DistributedTransaction
             try
             {
                 success = true;
-                success = SCADATransactionActor.scadaModel.Prepare();
+                success = await SCADATransactionActor.scadaModel.Prepare();
             }
             catch (Exception ex)
             {
