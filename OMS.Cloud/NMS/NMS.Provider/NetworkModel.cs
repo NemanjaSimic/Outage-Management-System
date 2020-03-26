@@ -343,6 +343,7 @@ namespace OMS.Cloud.NMS.GdaProvider
                 else
                 {
                     Commit();
+                    //TODO: kad budemo podigli transakcioni....
                     //StartDistributedTransaction(delta);
                 }
             }

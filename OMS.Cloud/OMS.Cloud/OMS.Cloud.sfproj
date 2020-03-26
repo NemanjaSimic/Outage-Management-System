@@ -33,6 +33,9 @@
   </ItemGroup>
   <ItemGroup>
     <ProjectReference Include="..\NMS\NMS.GdaService\NMS.GdaService.csproj" />
+    <ProjectReference Include="..\SCADA\SCADA.AcquisitionService\SCADA.AcquisitionService.csproj" />
+    <ProjectReference Include="..\SCADA\SCADA.CommandingService\SCADA.CommandingService.csproj" />
+    <ProjectReference Include="..\SCADA\SCADA.FunctionExecutorService\SCADA.FunctionExecutorService.csproj" />
   </ItemGroup>
   <Import Project="$(MSBuildToolsPath)\Microsoft.Common.targets" />
   <PropertyGroup>
