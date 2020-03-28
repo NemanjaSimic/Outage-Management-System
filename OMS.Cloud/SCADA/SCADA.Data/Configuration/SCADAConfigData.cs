@@ -1,8 +1,8 @@
 ﻿using Outage.Common;
-using OMS.Cloud.SCADA.Common;
 using System;
 using System.Configuration;
 using System.Net;
+using OMS.Common.SCADA;
 
 namespace OMS.Cloud.SCADA.Data.Configuration
 {

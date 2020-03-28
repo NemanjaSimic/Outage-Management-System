@@ -1,4 +1,4 @@
-﻿using OMS.Cloud.SCADA.Common.FunctionParameters;
+﻿using OMS.Common.SCADA.FunctionParameters;
 
 namespace OMS.Cloud.SCADA.ModbusFunctions.Parameters
 {
@@ -10,7 +10,7 @@ namespace OMS.Cloud.SCADA.ModbusFunctions.Parameters
         private byte unitId;
         private byte functionCode;
 
-        public ModbusCommandParameters(ushort length, byte functionCode)
+        protected ModbusCommandParameters(ushort length, byte functionCode)
         {
             ProtocolId = 0;
             Length = length;

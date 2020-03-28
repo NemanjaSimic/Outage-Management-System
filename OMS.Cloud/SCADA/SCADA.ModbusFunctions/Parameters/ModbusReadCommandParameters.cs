@@ -1,4 +1,4 @@
-﻿using OMS.Cloud.SCADA.Common.FunctionParameters;
+﻿using OMS.Common.SCADA.FunctionParameters;
 
 namespace OMS.Cloud.SCADA.ModbusFunctions.Parameters
 {

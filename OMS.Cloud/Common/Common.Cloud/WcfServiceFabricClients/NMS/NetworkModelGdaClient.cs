@@ -1,9 +1,9 @@
 ﻿using Microsoft.ServiceFabric.Services.Client;
 using Microsoft.ServiceFabric.Services.Communication.Wcf;
 using Microsoft.ServiceFabric.Services.Communication.Wcf.Client;
+using OMS.Common.NmsContracts;
+using OMS.Common.NmsContracts.GDA;
 using Outage.Common;
-using Outage.Common.GDA;
-using Outage.Common.ServiceContracts.GDA;
 using System;
 using System.Collections.Generic;
 using System.Configuration;
@@ -58,6 +58,7 @@ namespace OMS.Common.Cloud.WcfServiceFabricClients.NMS
             return (NetTcpBinding)binding;
         }
 
+        #region INetworkModelGDAContract
         public Task<UpdateResult> ApplyUpdate(Delta delta)
         {
             return InvokeWithRetryAsync(client => client.Channel.ApplyUpdate(delta));
@@ -102,5 +103,6 @@ namespace OMS.Common.Cloud.WcfServiceFabricClients.NMS
         {
             return InvokeWithRetryAsync(client => client.Channel.IteratorRewind(id));
         }
+        #endregion
     }
 }

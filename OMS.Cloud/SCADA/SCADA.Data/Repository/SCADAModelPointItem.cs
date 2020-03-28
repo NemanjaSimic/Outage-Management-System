@@ -1,8 +1,8 @@
 ﻿using Outage.Common;
 using Outage.Common.GDA;
-using OMS.Cloud.SCADA.Common;
 using System;
 using System.Collections.Generic;
+using OMS.Common.SCADA;
 
 namespace OMS.Cloud.SCADA.Data.Repository
 {

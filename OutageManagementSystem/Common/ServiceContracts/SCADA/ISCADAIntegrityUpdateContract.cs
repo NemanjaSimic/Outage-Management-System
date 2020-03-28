@@ -8,6 +8,7 @@ using System.ServiceModel;
 namespace Outage.Common.ServiceContracts.SCADA
 {
     [ServiceContract]
+    [Obsolete("Use OMS.Common.ScadaContracts")]
     public interface ISCADAIntegrityUpdateContract : IService
     {
         [OperationContract]
@@ -18,6 +19,7 @@ namespace Outage.Common.ServiceContracts.SCADA
         [ServiceKnownType(typeof(MultipleAnalogValueSCADAMessage))]
         [ServiceKnownType(typeof(SingleDiscreteValueSCADAMessage))]
         [ServiceKnownType(typeof(MultipleDiscreteValueSCADAMessage))]
+        [Obsolete("Use OMS.Common.ScadaContracts")]
         Dictionary<Topic, SCADAPublication> GetIntegrityUpdate();
 
         [OperationContract]
@@ -28,6 +30,7 @@ namespace Outage.Common.ServiceContracts.SCADA
         [ServiceKnownType(typeof(MultipleAnalogValueSCADAMessage))]
         [ServiceKnownType(typeof(SingleDiscreteValueSCADAMessage))]
         [ServiceKnownType(typeof(MultipleDiscreteValueSCADAMessage))]
+        [Obsolete("Use OMS.Common.ScadaContracts")]
         SCADAPublication GetIntegrityUpdateForSpecificTopic(Topic topic);
     }
 }

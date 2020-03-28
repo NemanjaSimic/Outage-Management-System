@@ -1,9 +1,11 @@
 ﻿using System.Collections.Generic;
 using System.Text;
 using System.Runtime.Serialization;
+using System;
 
 namespace Outage.Common.GDA
 {
+	[Obsolete("Use Common.NmsContracts alternative")]
 	public enum ResultType : byte
 	{
 		Succeeded = 0,	
@@ -11,6 +13,7 @@ namespace Outage.Common.GDA
 	}
 
 	[DataContract]
+	[Obsolete("Use Common.NmsContracts alternative")]
 	public class UpdateResult
 	{
 		private Dictionary<long, long> globalIdPairs;

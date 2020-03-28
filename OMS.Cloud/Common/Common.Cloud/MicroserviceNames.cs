@@ -10,5 +10,9 @@ namespace OMS.Common.Cloud
     {
         //NMS
         public static readonly string NmsGdaService = "NmsGdaService";
+
+        //SCADA
+        public static readonly string ScadaCommandingService = "ScadaCommandingService";
+        public static readonly string ScadaModelProviderService = "ScadaModelProviderService";
     }
 }

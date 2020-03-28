@@ -1,7 +1,7 @@
-﻿using OMS.Cloud.SCADA.Common;
-using OMS.Cloud.SCADA.Data.Repository;
+﻿using OMS.Cloud.SCADA.Data.Repository;
 using OMS.Cloud.SCADA.ModbusFunctions;
 using OMS.Cloud.SCADA.ModbusFunctions.Parameters;
+using OMS.Common.SCADA;
 using Outage.Common;
 using Outage.Common.Exceptions.SCADA;
 using System;

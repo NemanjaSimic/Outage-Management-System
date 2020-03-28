@@ -1,12 +1,12 @@
 ﻿using EasyModbus;
 using Outage.Common;
 using OMS.Cloud.SCADA.ModbusFunctions.Parameters;
-using OMS.Cloud.SCADA.Common;
-using OMS.Cloud.SCADA.Common.FunctionParameters;
 using System;
 using System.Collections.Generic;
 using System.Net;
 using System.Reflection;
+using OMS.Common.SCADA;
+using OMS.Common.SCADA.FunctionParameters;
 
 namespace OMS.Cloud.SCADA.ModbusFunctions.Write
 {

@@ -4,13 +4,14 @@ using System.Runtime.Serialization;
 namespace Outage.Common.GDA
 {
 	[DataContract]
-	
+	[Obsolete("Use Common.NmsContracts alternative")]
 	public class Association
 	{
 		private bool inverse;
 		private ModelCode propertyId;
 		private ModelCode type;
 
+		[Obsolete("Use Common.NmsContracts alternative")]
 		public Association()
 		{
 			this.inverse = false;
@@ -18,6 +19,7 @@ namespace Outage.Common.GDA
 			this.type = 0;
 		}
 
+		[Obsolete("Use Common.NmsContracts alternative")]
 		public Association(ModelCode property)
 		{
 			this.inverse = false;
@@ -25,6 +27,7 @@ namespace Outage.Common.GDA
 			this.type = 0;
 		}
 
+		[Obsolete("Use Common.NmsContracts alternative")]
 		public Association(ModelCode property, bool inverse)
 		{
 			this.inverse = inverse;

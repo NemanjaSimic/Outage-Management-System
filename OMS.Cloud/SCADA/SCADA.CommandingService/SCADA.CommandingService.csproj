@@ -98,9 +98,9 @@
       <Project>{892CBE15-9ED7-4540-81FA-0EAABA592138}</Project>
       <Name>Common</Name>
     </ProjectReference>
-    <ProjectReference Include="..\SCADA.Common\SCADA.Common.csproj">
-      <Project>{D66F634C-495C-46E4-A6AF-B730A95EB29D}</Project>
-      <Name>SCADA.Common</Name>
+    <ProjectReference Include="..\..\Common\Common.SCADA\Common.SCADA.csproj">
+      <Project>{6A84DB56-920C-4FC1-9CB0-9C29D0FC1586}</Project>
+      <Name>Common.SCADA</Name>
     </ProjectReference>
     <ProjectReference Include="..\SCADA.Data\SCADA.Data.csproj">
       <Project>{25E726AA-10F3-400B-AE6E-0F423EC51FF8}</Project>

@@ -2,10 +2,10 @@
 using Outage.Common.GDA;
 using Outage.Common.ServiceContracts.GDA;
 using Outage.Common.ServiceProxies;
-using OMS.Cloud.SCADA.Common;
 using System;
 using System.Collections.Generic;
 using System.Threading.Tasks;
+using OMS.Common.SCADA;
 
 namespace OMS.Cloud.SCADA.Data.Repository
 {

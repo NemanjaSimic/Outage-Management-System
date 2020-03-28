@@ -2,9 +2,9 @@
 using OMS.Cloud.SCADA.ModbusFunctions.Parameters;
 using OMS.Cloud.SCADA.ModbusFunctions.Read;
 using OMS.Cloud.SCADA.ModbusFunctions.Write;
-using OMS.Cloud.SCADA.Common;
 using OMS.Cloud.SCADA.Data.Repository;
 using System;
+using OMS.Common.SCADA;
 
 namespace OMS.Cloud.SCADA.ModbusFunctions
 {
