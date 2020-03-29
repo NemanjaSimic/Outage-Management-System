@@ -1,4 +1,5 @@
 ﻿using EasyModbus;
+using EasyModbus.Exceptions;
 using Microsoft.WindowsAzure.Storage.Queue;
 using OMS.Cloud.SCADA.Data.Repository;
 using OMS.Common.Cloud.AzureStorageHelpers;
@@ -49,51 +50,52 @@ namespace OMS.Cloud.SCADA.FunctionExecutorService
 
         public void Start()
         {
-            try
-            {
-                if (ModbusClient == null)
-                {
-                    ModbusClient = new ModbusClient(ConfigData.IpAddress.ToString(), ConfigData.TcpPort);
-                }
+            //todo
+            //try
+            //{
+            //    if (ModbusClient == null)
+            //    {
+            //        ModbusClient = new ModbusClient(ConfigData.IpAddress.ToString(), ConfigData.TcpPort);
+            //    }
 
-                //Logger.LogDebug("Connected and waiting for command event.");
+            //    //Logger.LogDebug("Connected and waiting for command event.");
 
-                this.commandEvent.WaitOne();
+            //    this.commandEvent.WaitOne();
 
-                //Logger.LogDebug("Command event happened.");
+            //    //Logger.LogDebug("Command event happened.");
 
-                if (!ModbusClient.Connected)
-                {
-                    ConnectToModbusClient();
-                }
+            //    if (!ModbusClient.Connected)
+            //    {
+            //        ConnectToModbusClient();
+            //    }
 
-                //HIGH PRIORITY COMMANDS - model update commands
-                while (modelUpdateQueue.TryDequeue(out IWriteModbusFunction currentCommand))
-                {
-                    ExecuteCommand(currentCommand);
-                }
+            //    //HIGH PRIORITY COMMANDS - model update commands
+            //    while (modelUpdateQueue.TryDequeue(out IWriteModbusFunction currentCommand))
+            //    {
+            //        ExecuteCommand(currentCommand);
+            //    }
 
-                this.modelUpdateQueueEmptyEvent.Set();
+            //    this.modelUpdateQueueEmptyEvent.Set();
 
-                //WRITE COMMANDS
-                while (writeCommandQueue.TryDequeue(out IWriteModbusFunction currentCommand))
-                {
-                    ExecuteCommand(currentCommand);
-                }
+            //    //WRITE COMMANDS
+            //    while (writeCommandQueue.TryDequeue(out IWriteModbusFunction currentCommand))
+            //    {
+            //        ExecuteCommand(currentCommand);
+            //    }
 
-                this.writeCommandQueueEmptyEvent.Set();
+            //    this.writeCommandQueueEmptyEvent.Set();
 
-                //READ COMMANDS - acquisition
-                while (readCommandQueue.TryDequeue(out IReadModbusFunction currentCommand))
-                {
-                    ExecuteCommand(currentCommand);
-                }
-            }
-            catch (Exception ex)
-            {
-                string message = "Exception caught in FunctionExecutorThread.";
-                Logger.LogError(message, ex);
-            }
+            //    //READ COMMANDS - acquisition
+            //    while (readCommandQueue.TryDequeue(out IReadModbusFunction currentCommand))
+            //    {
+            //        ExecuteCommand(currentCommand);
+            //    }
+            //}
+            //catch (Exception ex)
+            //{
+            //    string message = "Exception caught in FunctionExecutorThread.";
+            //    Logger.LogError(message, ex);
+            //}
         }
 
         private void ConnectToModbusClient()
@@ -159,15 +161,15 @@ namespace OMS.Cloud.SCADA.FunctionExecutorService
 
             if (command is IReadAnalogModusFunction readAnalogCommand)
             {
-                MakeAnalogEntryToMeasurementCache(readAnalogCommand.Data, true);
+                //todo: MakeAnalogEntryToMeasurementCache(readAnalogCommand.Data, true);
             }
             else if (command is IReadDiscreteModbusFunction readDiscreteCommand)
             {
-                MakeDiscreteEntryToMeasurementCache(readDiscreteCommand.Data, true);
+                //todo: MakeDiscreteEntryToMeasurementCache(readDiscreteCommand.Data, true);
             }
             else if (command is IWriteModbusFunction writeModbusCommand)
             {
-                CommandValue commandValue = new CommandValue()
+                CommandDescription commandValue = new CommandDescription()
                 {
                     Address = writeModbusCommand.ModbusWriteCommandParameters.OutputAddress,
                     Value = writeModbusCommand.ModbusWriteCommandParameters.Value,

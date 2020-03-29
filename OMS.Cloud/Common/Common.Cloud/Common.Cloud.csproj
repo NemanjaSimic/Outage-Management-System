@@ -44,17 +44,20 @@
     <Reference Include="System.Xml" />
   </ItemGroup>
   <ItemGroup>
+    <Compile Include="AzureStorageHelpers\CloudQueueHelper.cs" />
     <Compile Include="MicroserviceNames.cs" />
     <Compile Include="Properties\AssemblyInfo.cs" />
     <Compile Include="ReliableCollectionHelpers\ReliableDictionaryHelper.cs" />
     <Compile Include="ReliableCollectionHelpers\ReliableDictionaryUnitOfWork.cs" />
     <Compile Include="Serialization.cs" />
     <Compile Include="WcfServiceFabricClients\CE\Placeholder.cs" />
+    <Compile Include="WcfServiceFabricClients\HttpBindingHelper.cs" />
     <Compile Include="WcfServiceFabricClients\NMS\NetworkModelGdaClient.cs" />
     <Compile Include="WcfServiceFabricClients\OMS\Placeholder.cs" />
     <Compile Include="WcfServiceFabricClients\SCADA\ScadaCommandingClient.cs" />
     <Compile Include="WcfServiceFabricClients\SCADA\ScadaIntegrityUpdateClient.cs" />
     <Compile Include="WcfServiceFabricClients\SCADA\ScadaModelAccessClient.cs" />
+    <Compile Include="WcfServiceFabricClients\TcpBindingHelper.cs" />
     <Compile Include="WcfServiceFabricClients\WcfSeviceFabricClientBase.cs" />
   </ItemGroup>
   <ItemGroup>
@@ -105,6 +108,9 @@
     </PackageReference>
     <PackageReference Include="Microsoft.ServiceFabric.Services.Wcf">
       <Version>4.0.470</Version>
+    </PackageReference>
+    <PackageReference Include="WindowsAzure.Storage">
+      <Version>9.3.3</Version>
     </PackageReference>
   </ItemGroup>
   <Import Project="$(MSBuildToolsPath)\Microsoft.CSharp.targets" />

@@ -11,6 +11,7 @@ using NetTcpBinding = System.ServiceModel.NetTcpBinding;
 using SecurityMode = System.ServiceModel.SecurityMode;
 using Microsoft.ServiceFabric.Services.Communication.Wcf;
 using System.ServiceModel.Channels;
+using OMS.Common.Cloud.WcfServiceFabricClients;
 
 namespace OMS.Cloud.NMS.GdaProvider
 {
@@ -51,7 +52,7 @@ namespace OMS.Cloud.NMS.GdaProvider
                 {
                     return new WcfCommunicationListener<INetworkModelGDAContract>(context,
                                                                            new GenericDataAccess(networkModel),
-                                                                           CreateBinding(),
+                                                                           TcpBindingHelper.CreateListenerBinding(),
                                                                            EndpointNames.NetworkModelGDAEndpoint);
                 }, EndpointNames.NetworkModelGDAEndpoint),
 
@@ -60,38 +61,15 @@ namespace OMS.Cloud.NMS.GdaProvider
                 {
                     return new WcfCommunicationListener<ITransactionActorContract>(context,
                                                                            new NMSTransactionActor(networkModel),
-                                                                           CreateBinding(),
+                                                                           TcpBindingHelper.CreateListenerBinding(),
                                                                            EndpointNames.NetworkModelTransactionActorEndpoint);
                 }, EndpointNames.NetworkModelTransactionActorEndpoint),
             };
         }
 
-        private NetTcpBinding CreateBinding()
-        {
-            //NetTcpBinding binding = new NetTcpBinding(SecurityMode.None)
-            //{
-            //    SendTimeout = TimeSpan.MaxValue,
-            //    ReceiveTimeout = TimeSpan.MaxValue,
-            //    OpenTimeout = TimeSpan.FromMinutes(1),
-            //    CloseTimeout = TimeSpan.FromMinutes(1),
-            //    MaxConnections = int.MaxValue,
-            //    MaxReceivedMessageSize = 1024 * 1024 * 1024,
-            //};
-
-            //binding.MaxBufferSize = (int)binding.MaxReceivedMessageSize;
-            //binding.MaxBufferPoolSize = Environment.ProcessorCount * binding.MaxReceivedMessageSize;
-
-            var binding = WcfUtility.CreateTcpListenerBinding();
-            binding.SendTimeout = TimeSpan.MaxValue;
-            binding.ReceiveTimeout = TimeSpan.MaxValue;
-            binding.OpenTimeout = TimeSpan.FromMinutes(1);
-            binding.CloseTimeout = TimeSpan.FromMinutes(1);
-
-            return (NetTcpBinding)binding;
-        }
-
         private void CloseListeners()
         {
+            //TODO: diskutabilno da li nam je potrebno...
             networkModel.SaveNetworkModel();
 
             if (Listeners == null || Listeners.Count == 0)

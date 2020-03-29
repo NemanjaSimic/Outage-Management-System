@@ -44,14 +44,14 @@
     <Reference Include="System.Xml" />
   </ItemGroup>
   <ItemGroup>
-    <Compile Include="CommandValue.cs" />
+    <Compile Include="CommandDescription.cs" />
     <Compile Include="Enums.cs" />
     <Compile Include="FunctionParameters\IModbusCommandParameters.cs" />
     <Compile Include="FunctionParameters\IModbusReadCommandParameters.cs" />
     <Compile Include="FunctionParameters\IModbusWriteCommandParameters.cs" />
-    <Compile Include="ICommandEnqueuer.cs" />
     <Compile Include="IModBusFunction.cs" />
     <Compile Include="ISCADAConfigData.cs" />
+    <Compile Include="IScadaModel.cs" />
     <Compile Include="ISCADAModelPointItem.cs" />
     <Compile Include="ModelUpdateDelegate.cs" />
     <Compile Include="Properties\AssemblyInfo.cs" />

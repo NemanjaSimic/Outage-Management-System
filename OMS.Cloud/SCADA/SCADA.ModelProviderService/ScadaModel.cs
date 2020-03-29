@@ -1,15 +1,17 @@
-﻿using Outage.Common;
-using Outage.Common.ServiceContracts.GDA;
-using Outage.Common.ServiceProxies;
+﻿using Microsoft.ServiceFabric.Data.Collections;
+using OMS.Cloud.SCADA.Data.Repository;
+using OMS.Common.Cloud.WcfServiceFabricClients.NMS;
+using OMS.Common.NmsContracts.GDA;
+using OMS.Common.SCADA;
+using Outage.Common;
+using Outage.Common.ServiceContracts.DistributedTransaction;
 using System;
 using System.Collections.Generic;
 using System.Threading.Tasks;
-using OMS.Common.SCADA;
-using OMS.Common.NmsContracts.GDA;
 
-namespace OMS.Cloud.SCADA.Data.Repository
+namespace OMS.Cloud.SCADA.ModelProviderService
 {
-    public sealed class SCADAModel
+    internal sealed class ScadaModel : IScadaModel, IModelUpdateNotificationContract, ITransactionActorContract
     {
         private ILogger logger;
 
@@ -18,17 +20,22 @@ namespace OMS.Cloud.SCADA.Data.Repository
             get { return logger ?? (logger = LoggerWrapper.Instance); }
         }
 
-        private EnumDescs enumDescs;
-        private ModelResourcesDesc modelResourceDesc;
-        private ProxyFactory proxyFactory;
+        private readonly EnumDescs enumDescs;
+        private readonly ModelResourcesDesc modelResourceDesc;
 
         private bool isSCADAModelImported;
+        private NetworkModelGdaClient nmsGdaClient;
+
         private Dictionary<DeltaOpType, List<long>> modelChanges;
         private Dictionary<long, ISCADAModelPointItem> incomingScadaModel;
         private Dictionary<PointType, Dictionary<ushort, long>> incomingAddressToGidMap;
+
         private Dictionary<long, ISCADAModelPointItem> currentScadaModel;
         private Dictionary<PointType, Dictionary<ushort, long>> currentAddressToGidMap;
-        private Dictionary<long, CommandDescription> commandedValuesCache;
+        private Dictionary<long, CommandDescription> commandDescriptionCache;
+        //private IReliableDictionary<long, ISCADAModelPointItem> currentScadaModel;
+        //private IReliableDictionary<PointType, Dictionary<ushort, long>> currentAddressToGidMap;
+        //private IReliableDictionary<long, CommandDescription> commandDescriptionCache;
 
         #region Properties
 
@@ -82,24 +89,168 @@ namespace OMS.Cloud.SCADA.Data.Repository
             }
         }
 
-        public Dictionary<long, CommandDescription> CommandedValuesCache
+        public Dictionary<long, CommandDescription> CommandDescriptionCache
         {
-            get { return commandedValuesCache ?? (commandedValuesCache = new Dictionary<long, CommandDescription>()); }
+            get { return commandDescriptionCache ?? (commandDescriptionCache = new Dictionary<long, CommandDescription>()); }
         }
 
         public event ModelUpdateDelegate SignalIncomingModelConfirmation;
 
         #endregion Properties
 
-        public SCADAModel(ModelResourcesDesc modelResourceDesc, EnumDescs enumDescs)
+        public ScadaModel(ModelResourcesDesc modelResourceDesc, EnumDescs enumDescs)
         {
             this.modelResourceDesc = modelResourceDesc;
             this.enumDescs = enumDescs;
-            this.proxyFactory = new ProxyFactory();
+
+            this.nmsGdaClient = NetworkModelGdaClient.CreateClient();
 
             currentScadaModel = new Dictionary<long, ISCADAModelPointItem>();
             incomingScadaModel = new Dictionary<long, ISCADAModelPointItem>();
         }
+
+        #region ImportScadaModel
+
+        public async Task<bool> ImportModel()
+        {
+            string message = "Importing analog measurements started...";
+            Logger.LogInfo(message);
+            Console.WriteLine(message);
+            bool analogImportSuccess = await ImportAnalog();
+
+            message = $"Importing analog measurements finished. ['success' value: {analogImportSuccess}]";
+            Logger.LogInfo(message);
+            Console.WriteLine(message);
+
+            message = "Importing discrete measurements started...";
+            Logger.LogInfo(message);
+            Console.WriteLine(message);
+            bool discreteImportSuccess = await ImportDiscrete();
+
+            message = $"Importing discrete measurements finished. ['success' value: {discreteImportSuccess}]";
+            Logger.LogInfo(message);
+            Console.WriteLine(message);
+
+            isSCADAModelImported = analogImportSuccess && discreteImportSuccess;
+
+            if (isSCADAModelImported && SignalIncomingModelConfirmation != null)
+            {
+                SignalIncomingModelConfirmation.Invoke(new List<long>(CurrentScadaModel.Keys));
+            }
+
+            return isSCADAModelImported;
+        }
+
+        private async Task<bool> ImportAnalog()
+        {
+            bool success;
+            int numberOfResources = 1000;
+            List<ModelCode> props = modelResourceDesc.GetAllPropertyIds(ModelCode.ANALOG);
+
+            if (this.nmsGdaClient == null)
+            {
+                success = false;
+                string errMsg = "From ImportAnalog() method: NetworkModelGdaClient is null.";
+                Logger.LogWarn(errMsg);
+
+                this.nmsGdaClient = NetworkModelGdaClient.CreateClient();
+            }
+
+            try
+            {
+                int iteratorId = await nmsGdaClient.GetExtentValues(ModelCode.ANALOG, props);
+                int resourcesLeft = await nmsGdaClient.IteratorResourcesLeft(iteratorId);
+
+                while (resourcesLeft > 0)
+                {
+                    List<ResourceDescription> rds = await nmsGdaClient.IteratorNext(numberOfResources, iteratorId);
+
+                    for (int i = 0; i < rds.Count; i++)
+                    {
+                        if (rds[i] != null)
+                        {
+                            long gid = rds[i].Id;
+                            ModelCode type = modelResourceDesc.GetModelCodeFromId(gid);
+                            ISCADAModelPointItem pointItem = new AnalogSCADAModelPointItem(rds[i].Properties, ModelCode.ANALOG, enumDescs);
+                            CurrentScadaModel.Add(rds[i].Id, pointItem);
+                            CurrentAddressToGidMap[pointItem.RegisterType].Add(pointItem.Address, rds[i].Id);
+
+                            Logger.LogDebug($"ANALOG measurement added to SCADA model [Gid: {gid}, Address: {pointItem.Address}]");
+                        }
+                    }
+
+                    resourcesLeft = await nmsGdaClient.IteratorResourcesLeft(iteratorId);
+                }
+
+                success = true;
+            }
+            catch (Exception ex)
+            {
+
+                success = false;
+                string errorMessage = $"ImportAnalog failed with error: {ex.Message}";
+                Console.WriteLine(errorMessage);
+                Logger.LogError(errorMessage, ex);
+            }
+
+            return success;
+        }
+
+        private async Task<bool> ImportDiscrete()
+        {
+            bool success;
+            int numberOfResources = 1000;
+            List<ModelCode> props = modelResourceDesc.GetAllPropertyIds(ModelCode.DISCRETE);
+
+            if (this.nmsGdaClient == null)
+            {
+                success = false;
+                string errMsg = "From ImportDiscrete() method: NetworkModelGdaClient is null.";
+                Logger.LogWarn(errMsg);
+
+                this.nmsGdaClient = NetworkModelGdaClient.CreateClient();
+            }
+
+            try
+            {
+                int iteratorId = await nmsGdaClient.GetExtentValues(ModelCode.DISCRETE, props);
+                int resourcesLeft = await nmsGdaClient.IteratorResourcesLeft(iteratorId);
+
+                while (resourcesLeft > 0)
+                {
+                    List<ResourceDescription> rds = await nmsGdaClient.IteratorNext(numberOfResources, iteratorId);
+
+                    for (int i = 0; i < rds.Count; i++)
+                    {
+                        if (rds[i] != null)
+                        {
+                            long gid = rds[i].Id;
+                            ModelCode type = modelResourceDesc.GetModelCodeFromId(gid);
+                            ISCADAModelPointItem pointItem = new DiscreteSCADAModelPointItem(rds[i].Properties, ModelCode.DISCRETE, enumDescs);
+                            CurrentScadaModel.Add(gid, pointItem);
+                            CurrentAddressToGidMap[pointItem.RegisterType].Add(pointItem.Address, gid);
+                            Logger.LogDebug($"DISCRETE measurement added to SCADA model [Gid: {gid}, Address: {pointItem.Address}]");
+                        }
+                    }
+
+                    resourcesLeft = await nmsGdaClient.IteratorResourcesLeft(iteratorId);
+                }
+
+                success = true;
+            }
+            catch (Exception ex)
+            {
+
+                success = false;
+                string errorMessage = $"ImportDiscrete failed with error: {ex.Message}";
+                Console.WriteLine(errorMessage);
+                Logger.LogError(errorMessage, ex);
+            }
+
+            return success;
+        }
+
+        #endregion ImportScadaModel
 
         #region IModelUpdateNotificationContract
 
@@ -253,7 +404,7 @@ namespace OMS.Cloud.SCADA.Data.Repository
             incomingAddressToGidMap = null;
 
             modelChanges.Clear();
-            CommandedValuesCache.Clear();
+            CommandDescriptionCache.Clear();
 
             string message = $"Incoming SCADA model is confirmed.";
             Console.WriteLine(message);
@@ -275,231 +426,87 @@ namespace OMS.Cloud.SCADA.Data.Repository
 
         #endregion ITransactionActorContract
 
-        #region ImportScadaModel
-
-        public async Task<bool> ImportModel()
-        {
-            string message = "Importing analog measurements started...";
-            Logger.LogInfo(message);
-            Console.WriteLine(message);
-            bool analogImportSuccess = await ImportAnalog();
-
-            message = $"Importing analog measurements finished. ['success' value: {analogImportSuccess}]";
-            Logger.LogInfo(message);
-            Console.WriteLine(message);
-
-            message = "Importing discrete measurements started...";
-            Logger.LogInfo(message);
-            Console.WriteLine(message);
-            bool discreteImportSuccess = await ImportDiscrete();
-
-            message = $"Importing discrete measurements finished. ['success' value: {discreteImportSuccess}]";
-            Logger.LogInfo(message);
-            Console.WriteLine(message);
-
-            isSCADAModelImported = analogImportSuccess && discreteImportSuccess;
-
-            if (isSCADAModelImported && SignalIncomingModelConfirmation != null)
-            {
-                SignalIncomingModelConfirmation.Invoke(new List<long>(CurrentScadaModel.Keys));
-            }
-
-            return isSCADAModelImported;
-        }
-
-        private async Task<bool> ImportAnalog()
-        {
-            bool success;
-            int numberOfResources = 1000;
-            List<ModelCode> props = modelResourceDesc.GetAllPropertyIds(ModelCode.ANALOG);
-
-            using (NetworkModelGDAProxy gdaProxy = proxyFactory.CreateProxy<NetworkModelGDAProxy, INetworkModelGDAContract>(EndpointNames.NetworkModelGDAEndpoint))
-            {
-                if (gdaProxy == null)
-                {
-                    success = false;
-                    string errMsg = "From ImportAnalog() method: NetworkModelGDAProxy is null.";
-                    Logger.LogWarn(errMsg);
-                }
-
-                try
-                {
-                    int iteratorId = await gdaProxy.GetExtentValues(ModelCode.ANALOG, props);
-                    int resourcesLeft = await gdaProxy.IteratorResourcesLeft(iteratorId);
-
-                    while (resourcesLeft > 0)
-                    {
-                        List<ResourceDescription> rds = null;// await gdaProxy.IteratorNext(numberOfResources, iteratorId);
-                        for (int i = 0; i < rds.Count; i++)
-                        {
-                            if (rds[i] != null)
-                            {
-                                long gid = rds[i].Id;
-                                ModelCode type = modelResourceDesc.GetModelCodeFromId(gid);
-                                ISCADAModelPointItem pointItem = new AnalogSCADAModelPointItem(rds[i].Properties, ModelCode.ANALOG, enumDescs);
-                                CurrentScadaModel.Add(rds[i].Id, pointItem);
-                                CurrentAddressToGidMap[pointItem.RegisterType].Add(pointItem.Address, rds[i].Id);
-
-                                Logger.LogDebug($"ANALOG measurement added to SCADA model [Gid: {gid}, Address: {pointItem.Address}]");
-                            }
-                        }
-                        resourcesLeft = await gdaProxy.IteratorResourcesLeft(iteratorId);
-                    }
-
-                    success = true;
-                }
-                catch (Exception ex)
-                {
-
-                    success = false;
-                    string errorMessage = $"ImportAnalog failed with error: {ex.Message}";
-                    Console.WriteLine(errorMessage);
-                    Logger.LogError(errorMessage, ex);
-                }
-            }
-
-            return success;
-        }
-
-        private async Task<bool> ImportDiscrete()
-        {
-            bool success;
-            int numberOfResources = 1000;
-            List<ModelCode> props = modelResourceDesc.GetAllPropertyIds(ModelCode.DISCRETE);
-
-            using (NetworkModelGDAProxy gdaProxy = proxyFactory.CreateProxy<NetworkModelGDAProxy, INetworkModelGDAContract>(EndpointNames.NetworkModelGDAEndpoint))
-            {
-                if (gdaProxy == null)
-                {
-                    success = false;
-                    string errMsg = "From ImportDiscrete() method: NetworkModelGDAProxy is null.";
-                    Logger.LogWarn(errMsg);
-                }
-
-                try
-                {
-                    int iteratorId = await gdaProxy.GetExtentValues(ModelCode.DISCRETE, props);
-                    int resourcesLeft = await gdaProxy.IteratorResourcesLeft(iteratorId);
-
-                    while (resourcesLeft > 0)
-                    {
-                        List<ResourceDescription> rds = null;// await gdaProxy.IteratorNext(numberOfResources, iteratorId);
-                        for (int i = 0; i < rds.Count; i++)
-                        {
-                            if (rds[i] != null)
-                            {
-                                long gid = rds[i].Id;
-                                ModelCode type = modelResourceDesc.GetModelCodeFromId(gid);
-                                ISCADAModelPointItem pointItem = new DiscreteSCADAModelPointItem(rds[i].Properties, ModelCode.DISCRETE, enumDescs);
-                                CurrentScadaModel.Add(gid, pointItem);
-                                CurrentAddressToGidMap[pointItem.RegisterType].Add(pointItem.Address, gid);
-                                Logger.LogDebug($"DISCRETE measurement added to SCADA model [Gid: {gid}, Address: {pointItem.Address}]");
-                            }
-                        }
-                        resourcesLeft = await gdaProxy.IteratorResourcesLeft(iteratorId);
-                    }
-
-                    success = true;
-                }
-                catch (Exception ex)
-                {
-
-                    success = false;
-                    string errorMessage = $"ImportDiscrete failed with error: {ex.Message}";
-                    Console.WriteLine(errorMessage);
-                    Logger.LogError(errorMessage, ex);
-                }
-            }
-
-            return success;
-        }
-
-        #endregion ImportScadaModel
-
         private async Task<Dictionary<long, ISCADAModelPointItem>> CreatePointItemsFromNetworkModelMeasurements()
         {
             Dictionary<long, ISCADAModelPointItem> pointItems = new Dictionary<long, ISCADAModelPointItem>();
 
-            using (NetworkModelGDAProxy gdaProxy = proxyFactory.CreateProxy<NetworkModelGDAProxy, INetworkModelGDAContract>(EndpointNames.NetworkModelGDAEndpoint))
+            if (this.nmsGdaClient == null)
             {
-                if (gdaProxy == null)
+                string message = "From method CreatePointItemsFromNetworkModelMeasurements(): NetworkModelGdaClient is null.";
+                Logger.LogWarn(message);
+
+                this.nmsGdaClient = NetworkModelGdaClient.CreateClient();
+            }
+
+            int iteratorId;
+            int resourcesLeft;
+            int numberOfResources = 10000;
+
+            List<ModelCode> props;
+
+            //TOOD: change service contract IModelUpdateNotificationContract to receive types of all changed elements from NMS 
+            HashSet<ModelCode> changedTypes = new HashSet<ModelCode>();
+
+            foreach (List<long> gids in ModelChanges.Values)
+            {
+                foreach (long gid in gids)
                 {
-                    string message = "From method CreatePointItemsFromNetworkModelMeasurements(): NetworkModelGDAProxy is null.";
-                    Logger.LogWarn(message);
-                    throw new NullReferenceException(message);
-                }
+                    ModelCode type = modelResourceDesc.GetModelCodeFromId(gid);
 
-                //ModelCode type;
-
-                int iteratorId;
-                int resourcesLeft;
-                int numberOfResources = 10000;
-
-                List<ModelCode> props;
-
-                //TOOD: change service contract IModelUpdateNotificationContract to receive types of all changed elements from NMS 
-                HashSet<ModelCode> changedTypes = new HashSet<ModelCode>();
-                foreach (List<long> gids in ModelChanges.Values)
-                {
-                    foreach (long gid in gids)
+                    if (!changedTypes.Contains(type))
                     {
-                        ModelCode type = modelResourceDesc.GetModelCodeFromId(gid);
-
-                        if (!changedTypes.Contains(type))
-                        {
-                            changedTypes.Add(type);
-                        }
+                        changedTypes.Add(type);
                     }
                 }
+            }
 
-                foreach (ModelCode type in changedTypes)
+            foreach (ModelCode type in changedTypes)
+            {
+                if (type != ModelCode.ANALOG && type != ModelCode.DISCRETE)
                 {
-                    if (type != ModelCode.ANALOG && type != ModelCode.DISCRETE)
+                    continue;
+                }
+
+                props = modelResourceDesc.GetAllPropertyIds(type);
+
+                try
+                {
+                    iteratorId = await nmsGdaClient.GetExtentValues(type, props);
+                    resourcesLeft = await nmsGdaClient.IteratorResourcesLeft(iteratorId);
+
+                    while (resourcesLeft > 0)
                     {
-                        continue;
-                    }
+                        List<ResourceDescription> resources = await nmsGdaClient.IteratorNext(numberOfResources, iteratorId);
 
-                    props = modelResourceDesc.GetAllPropertyIds(type);
-
-                    try
-                    {
-                        iteratorId = await gdaProxy.GetExtentValues(type, props);
-                        resourcesLeft = await gdaProxy.IteratorResourcesLeft(iteratorId);
-
-                        while (resourcesLeft > 0)
+                        foreach (ResourceDescription rd in resources)
                         {
-                            List<ResourceDescription> resources = null; //await gdaProxy.IteratorNext(numberOfResources, iteratorId);
-
-                            foreach (ResourceDescription rd in resources)
+                            if (pointItems.ContainsKey(rd.Id))
                             {
-                                if (pointItems.ContainsKey(rd.Id))
-                                {
-                                    string message = $"Trying to create point item for resource that already exists in model. Gid: 0x{rd.Id:X16}";
-                                    Logger.LogError(message);
-                                    throw new ArgumentException(message);
-                                }
-
-                                ISCADAModelPointItem point;
-
-                                //change service contract IModelUpdateNotificationContract => change List<long> to Hashset<long> 
-                                if (ModelChanges[DeltaOpType.Update].Contains(rd.Id) || ModelChanges[DeltaOpType.Insert].Contains(rd.Id))
-                                {
-                                    point = CreatePointItemFromResource(rd);
-                                    pointItems.Add(rd.Id, point);
-                                }
+                                string message = $"Trying to create point item for resource that already exists in model. Gid: 0x{rd.Id:X16}";
+                                Logger.LogError(message);
+                                throw new ArgumentException(message);
                             }
 
-                            resourcesLeft = await gdaProxy.IteratorResourcesLeft(iteratorId);
+                            ISCADAModelPointItem point;
+
+                            //change service contract IModelUpdateNotificationContract => change List<long> to Hashset<long> 
+                            if (ModelChanges[DeltaOpType.Update].Contains(rd.Id) || ModelChanges[DeltaOpType.Insert].Contains(rd.Id))
+                            {
+                                point = CreatePointItemFromResource(rd);
+                                pointItems.Add(rd.Id, point);
+                            }
                         }
 
-                        await gdaProxy.IteratorClose(iteratorId);
+                        resourcesLeft = await nmsGdaClient.IteratorResourcesLeft(iteratorId);
                     }
-                    catch (Exception ex)
-                    {
-                        string errorMessage = $"CreatePointItemsFromNetworkModelMeasurements failed with error: {ex.Message}";
-                        Console.WriteLine(errorMessage);
-                        Logger.LogError(errorMessage, ex);
-                    }
+
+                    await nmsGdaClient.IteratorClose(iteratorId);
+                }
+                catch (Exception ex)
+                {
+                    string errorMessage = $"CreatePointItemsFromNetworkModelMeasurements failed with error: {ex.Message}";
+                    Console.WriteLine(errorMessage);
+                    Logger.LogError(errorMessage, ex);
                 }
             }
 
@@ -530,6 +537,5 @@ namespace OMS.Cloud.SCADA.Data.Repository
 
             return pointItem;
         }
-
     }
 }

@@ -1,12 +1,17 @@
 ﻿using System;
 using System.Collections.Generic;
 using System.Fabric;
-using System.Linq;
 using System.Threading;
 using System.Threading.Tasks;
 using Microsoft.ServiceFabric.Data.Collections;
 using Microsoft.ServiceFabric.Services.Communication.Runtime;
+using Microsoft.ServiceFabric.Services.Communication.Wcf.Runtime;
 using Microsoft.ServiceFabric.Services.Runtime;
+using OMS.Cloud.SCADA.ModelProviderService.ContractProviders;
+using OMS.Common.Cloud.WcfServiceFabricClients;
+using OMS.Common.ScadaContracts;
+using Outage.Common;
+using Outage.Common.ServiceContracts.DistributedTransaction;
 
 namespace OMS.Cloud.SCADA.ModelProviderService
 {
@@ -17,7 +22,8 @@ namespace OMS.Cloud.SCADA.ModelProviderService
     {
         public ModelProviderService(StatefulServiceContext context)
             : base(context)
-        { }
+        {
+        }
 
         /// <summary>
         /// Optional override to create listeners (e.g., HTTP, Service Remoting, WCF, etc.) for this service replica to handle client or user requests.
@@ -28,7 +34,35 @@ namespace OMS.Cloud.SCADA.ModelProviderService
         /// <returns>A collection of listeners.</returns>
         protected override IEnumerable<ServiceReplicaListener> CreateServiceReplicaListeners()
         {
-            return new ServiceReplicaListener[0];
+            return new List<ServiceReplicaListener>()
+            {
+                //SCADAIntegrityUpdateEndpoint
+                new ServiceReplicaListener(context =>
+                {
+                    return new WcfCommunicationListener<IScadaIntegrityUpdateContract>(context,
+                                                                           new IntegrityUpdateProvider(),
+                                                                           TcpBindingHelper.CreateListenerBinding(),
+                                                                           EndpointNames.SCADAIntegrityUpdateEndpoint);
+                }, EndpointNames.SCADAIntegrityUpdateEndpoint),
+
+                //SCADAModelAccessEndpoint
+                new ServiceReplicaListener(context =>
+                {
+                    return new WcfCommunicationListener<IScadaModelAccessContract>(context,
+                                                                           new ModelAccessProvider(),
+                                                                           TcpBindingHelper.CreateListenerBinding(),
+                                                                           EndpointNames.SCADAModelAccessEndpoint);
+                }, EndpointNames.SCADAModelAccessEndpoint),
+
+                //ScadaModelTransactionActorEndpoint
+                new ServiceInstanceListener(context =>
+                {
+                    return new WcfCommunicationListener<ITransactionActorContract>(context,
+                                                                           new NMSTransactionActor(),
+                                                                           TcpBindingHelper.CreateListenerBinding(),
+                                                                           EndpointNames.SCADATransactionActorEndpoint);
+                }, EndpointNames.SCADATransactionActorEndpoint),
+            };
         }
 
         /// <summary>
@@ -63,6 +97,12 @@ namespace OMS.Cloud.SCADA.ModelProviderService
 
                 await Task.Delay(TimeSpan.FromSeconds(1), cancellationToken);
             }
+        }
+
+        private async Task InitializeReliableCollections()
+        {
+            var myDictionary = await this.StateManager.GetOrAddAsync<IReliableDictionary<string, long>>("ScadaModel");
+            var myDictionary = await this.StateManager.GetOrAddAsync<IReliableDictionary<string, long>>("ScadaConfig");
         }
     }
 }

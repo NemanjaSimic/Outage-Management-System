@@ -2,7 +2,7 @@
 
 namespace OMS.Common.SCADA
 {
-    public class CommandValue
+    public class CommandDescription
     {
         public ushort Address { get; set; }
         public int Value { get; set; }

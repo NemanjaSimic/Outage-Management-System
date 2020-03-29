@@ -10,19 +10,20 @@ namespace OMS.Cloud.SCADA.Data.Configuration
     {
         private ILogger logger;
 
-        protected ILogger Logger
+        private ILogger Logger
         {
             get { return logger ?? (logger = LoggerWrapper.Instance); }
         }
 
 
-        public ushort TcpPort { get; protected set; }
-        public IPAddress IpAddress { get; protected set; }
-        public byte UnitAddress { get; protected set; }
-        public ushort Interval { get; protected set; }
+        public ushort TcpPort { get; private set; }
+        public IPAddress IpAddress { get; private set; }
+        public byte UnitAddress { get; private set; }
+        public ushort AcquisitionInterval { get; private set; }
+        public ushort FunctionExecutionInterval { get; private set; }
 
-        public string ModbusSimulatorExeName { get; protected set; } = string.Empty;
-        public string ModbusSimulatorExePath { get; protected set; } = string.Empty;
+        public string ModbusSimulatorExeName { get; private set; } = string.Empty;
+        public string ModbusSimulatorExePath { get; private set; } = string.Empty;
 
         #region Instance
 
@@ -40,7 +41,6 @@ namespace OMS.Cloud.SCADA.Data.Configuration
                 return _instance;
             }
         }
-
         #endregion Instance
 
         private SCADAConfigData()
@@ -92,16 +92,29 @@ namespace OMS.Cloud.SCADA.Data.Configuration
                 }
             }
 
-            if (ConfigurationManager.AppSettings["Interval"] is string intervalSetting)
+            if (ConfigurationManager.AppSettings["AcquisitionInterval"] is string acquisitionIntervalSetting)
             {
-                if (ushort.TryParse(intervalSetting, out ushort interval))
+                if (ushort.TryParse(acquisitionIntervalSetting, out ushort interval))
                 {
-                    Interval = interval;
+                    AcquisitionInterval = interval;
                 }
                 else
                 {
-                    Interval = 10000;
-                    Logger.LogWarn("Interval in SCADA configuration is either not defined or not valid.");
+                    AcquisitionInterval = 10000;
+                    Logger.LogWarn("AcquisitionInterval in SCADA configuration is either not defined or not valid.");
+                }
+            }
+
+            if (ConfigurationManager.AppSettings["FunctionExecutionInterval"] is string functionExecutionIntervalSetting)
+            {
+                if (ushort.TryParse(functionExecutionIntervalSetting, out ushort interval))
+                {
+                    FunctionExecutionInterval = interval;
+                }
+                else
+                {
+                    FunctionExecutionInterval = 10000;
+                    Logger.LogWarn("FunctionExecutionInterval in SCADA configuration is either not defined or not valid.");
                 }
             }
 

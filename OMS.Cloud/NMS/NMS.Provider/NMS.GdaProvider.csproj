@@ -84,6 +84,10 @@
       <Project>{9C8B510F-C2C6-4F56-ABAC-FAE49C676F7E}</Project>
       <Name>Cloud.Common</Name>
     </ProjectReference>
+    <ProjectReference Include="..\..\Common\Common.Cloud\Common.Cloud.csproj">
+      <Project>{FBEE1369-0F6C-41E6-8C62-8C1C5CDBB602}</Project>
+      <Name>Common.Cloud</Name>
+    </ProjectReference>
   </ItemGroup>
   <ItemGroup>
     <None Include="app.config" />

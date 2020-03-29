@@ -1,9 +1,9 @@
 ﻿using Outage.Common;
-using Outage.Common.GDA;
 using OMS.Cloud.SCADA.Data.Configuration;
 using System;
 using System.Collections.Generic;
 using OMS.Common.SCADA;
+using OMS.Common.NmsContracts.GDA;
 
 namespace OMS.Cloud.SCADA.Data.Repository
 {
