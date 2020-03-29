@@ -75,6 +75,10 @@
       <Project>{FBEE1369-0F6C-41E6-8C62-8C1C5CDBB602}</Project>
       <Name>Common.Cloud</Name>
     </ProjectReference>
+    <ProjectReference Include="..\..\..\OMS.Cloud\Common\Contracts\Common.NmsContracts\Common.NmsContracts.csproj">
+      <Project>{235804A8-9C8F-40EC-8786-5DAB24733977}</Project>
+      <Name>Common.NmsContracts</Name>
+    </ProjectReference>
     <ProjectReference Include="..\CIMParser\CIMParser.csproj">
       <Project>{3C03A41C-BE4C-40A8-97D5-5DBAC0C34102}</Project>
       <Name>CIMParser</Name>
