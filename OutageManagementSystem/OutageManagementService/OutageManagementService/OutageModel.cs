@@ -249,17 +249,21 @@ namespace OutageManagementService
 
             activeOutageDbEntity = dbContext.OutageRepository.Add(createdActiveOutage);
 
-            List<ConsumerHistorical> consumers = outageMessageMapper.MapOutageToConsumerHistorical(consumerDbEntities, createdActiveOutage.OutageId, DatabaseOperation.INSERT);
-            dbContext.ConsumerHistoricalRepository.AddRange(consumers);
-
-            List<EquipmentHistorical> equipment = outageMessageMapper.MapOutageToEquipmentHistorical(defaultIsolationPoints, createdActiveOutage.OutageId, DatabaseOperation.INSERT);
-            dbContext.EquipmentHistoricalRepository.AddRange(equipment);
-
             try
             {
                 dbContext.Complete();
                 Logger.LogDebug($"Outage on element with gid: 0x{activeOutageDbEntity.OutageElementGid:x16} is successfully stored in database.");
                 success = true;
+
+                //outage created -> affected consumers are deenergized
+                List<ConsumerHistorical> consumers = outageMessageMapper.MapOutageToConsumerHistorical(consumerDbEntities, activeOutageDbEntity.OutageId, DatabaseOperation.INSERT);
+                dbContext.ConsumerHistoricalRepository.AddRange(consumers);
+
+                //outage created -> default isolation points are opened
+                List<EquipmentHistorical> equipment = outageMessageMapper.MapOutageToEquipmentHistorical(defaultIsolationPoints, activeOutageDbEntity.OutageId, DatabaseOperation.INSERT);
+                dbContext.EquipmentHistoricalRepository.AddRange(equipment);
+
+                dbContext.Complete();
             }
             catch (Exception e)
             {
@@ -307,13 +311,28 @@ namespace OutageManagementService
                     //try
                     //{
                     //    success = StartIsolationAlgorthm(outageToIsolate);
-
-
                         Task.Run(() => StartIsolationAlgorthm(outageToIsolate))
                             .ContinueWith(task =>
                             {
                                 if (task.Result) 
                                 {
+                                    //TODO: Get from CE new affected consumers and replace with outageToIsolate.AffectedConsumers for historical database
+                                    //outage isolated => some of the affected consumers are energized
+                                    List<long> consumerIds = GetAffectedConsumers(outageToIsolate.OutageElementGid);
+                                    List<Consumer> consumerDbEntities = GetAffectedConsumersFromDatabase(consumerIds);
+                                    List<ConsumerHistorical> consumers = outageMessageMapper.MapOutageToConsumerHistorical(consumerDbEntities, outageToIsolate.OutageId, DatabaseOperation.DELETE);
+                                    dbContext.ConsumerHistoricalRepository.AddRange(consumers);
+
+                                    //outage isolated => optimum isolation points are opened
+                                    List<Equipment> optimumIsolationEquipment = outageToIsolate.OptimumIsolationPoints.ToList();
+                                    List<EquipmentHistorical> optimumEquipmentDbEntities = outageMessageMapper.MapOutageToEquipmentHistorical(optimumIsolationEquipment, outageToIsolate.OutageId, DatabaseOperation.INSERT);
+                                    dbContext.EquipmentHistoricalRepository.AddRange(optimumEquipmentDbEntities);
+
+                                    //outage isolated => default isolation points are closed
+                                    List<Equipment> defaultIsolationEquipment = outageToIsolate.DefaultIsolationPoints.ToList();
+                                    List<EquipmentHistorical> defaultEquipmentDbEntities = outageMessageMapper.MapOutageToEquipmentHistorical(defaultIsolationEquipment, outageToIsolate.OutageId, DatabaseOperation.DELETE);
+                                    dbContext.EquipmentHistoricalRepository.AddRange(defaultEquipmentDbEntities);
+
                                     dbContext.Complete();
                                 }
                             }, TaskContinuationOptions.OnlyOnRanToCompletion)
@@ -497,6 +516,10 @@ namespace OutageManagementService
 
             dbContext.OutageRepository.Update(outageDbEntity);
 
+            //outage validated -> optimum isolation points are closed
+            List<EquipmentHistorical> equipment = outageMessageMapper.MapOutageToEquipmentHistorical(outageDbEntity.OptimumIsolationPoints.ToList(), outageDbEntity.OutageId, DatabaseOperation.DELETE);
+            dbContext.EquipmentHistoricalRepository.AddRange(equipment);
+
             try
             {
                 dbContext.Complete();
@@ -563,11 +586,6 @@ namespace OutageManagementService
             bool success;
             OutageEntity archivedOutageDbEntity = dbContext.OutageRepository.Add(createdArchivedOutage);
             dbContext.OutageRepository.Remove(activeOutageDbEntity);
-
-            //outage archived -> optimum isolation points closed
-            List<Equipment> equipment = activeOutageDbEntity.OptimumIsolationPoints.ToList();
-            List<EquipmentHistorical> equipmentDbEntity = outageMessageMapper.MapOutageToEquipmentHistorical(equipment, activeOutageDbEntity.OutageId, DatabaseOperation.DELETE);
-            dbContext.EquipmentHistoricalRepository.AddRange(equipmentDbEntity);
 
             try
             {
@@ -979,21 +997,6 @@ namespace OutageManagementService
                             outageToIsolate.OutageElementGid = outageElement;
                             outageToIsolate.OutageState = OutageState.ISOLATED;
 
-                            //outage isolated => affected consumers are energized
-                            List<Consumer> consumerDbEntities = outageToIsolate.AffectedConsumers.ToList();
-                            List<ConsumerHistorical> consumers = outageMessageMapper.MapOutageToConsumerHistorical(consumerDbEntities, outageToIsolate.OutageId, DatabaseOperation.DELETE);
-                            dbContext.ConsumerHistoricalRepository.AddRange(consumers);
-
-                            //outage isolated => optimum isolation points are opened
-                            List<Equipment> optimumIsolationEquipment = GetEquipmentEntity(optimumIsolationPoints.ToList());
-                            List<EquipmentHistorical> optimumEquipmentDbEntities = outageMessageMapper.MapOutageToEquipmentHistorical(optimumIsolationEquipment, outageToIsolate.OutageId, DatabaseOperation.INSERT);
-                            dbContext.EquipmentHistoricalRepository.AddRange(optimumEquipmentDbEntities);
-
-                            //outage isolated => default isolation points are closed
-                            List<Equipment> defaultIsolationEquipment = GetEquipmentEntity(defaultIsolationPoints);
-                            List<EquipmentHistorical> defaultEquipmentDbEntities = outageMessageMapper.MapOutageToEquipmentHistorical(defaultIsolationEquipment, outageToIsolate.OutageId, DatabaseOperation.DELETE);
-                            dbContext.EquipmentHistoricalRepository.AddRange(defaultEquipmentDbEntities);
-
                             Logger.LogInfo($"Isolation of outage with id {outageToIsolate.OutageId}. Optimum isolation points: 0x{currentBreakerId:X16} and 0x{nextBreakerId:X16}, and outage element id is 0x{outageElement:X16}");
                             isIsolated = true;
                         }
@@ -1185,11 +1188,11 @@ namespace OutageManagementService
             return isRecloser;
         }
 
-        private List<long> GetAffectedConsumers(long potentialOutageGid)
+        private List<long> GetAffectedConsumers(long outageElementGid)
         {
             List<long> affectedConsumers = new List<long>();
             Stack<long> nodesToBeVisited = new Stack<long>();
-            nodesToBeVisited.Push(potentialOutageGid);
+            nodesToBeVisited.Push(outageElementGid);
             HashSet<long> visited = new HashSet<long>();
 
 
@@ -1205,7 +1208,7 @@ namespace OutageManagementService
                     {
                         IOutageTopologyElement topologyElement = TopologyModel.OutageTopology[currentNode];
 
-                        if (topologyElement.SecondEnd.Count == 0 && topologyElement.DmsType == "ENERGYCONSUMER" /*&& !topologyElement.IsActive*/)
+                        if (topologyElement.SecondEnd.Count == 0 && topologyElement.DmsType == "ENERGYCONSUMER" && /*!topologyElement.IsActive*/)
                         {
                             affectedConsumers.Add(currentNode);
                         }
