@@ -2,7 +2,6 @@ import { Component, OnInit, NgZone, OnDestroy } from '@angular/core';
 import { Subscription } from 'rxjs';
 import { OmsGraph } from '@shared/models/oms-graph.model';
 
-import { drawBackupEdge } from '@shared/utils/backup-edge';
 import { addGraphTooltip, addEdgeTooltip, addAnalogMeasurementTooltip } from '@shared/utils/tooltip';
 import { drawWarningOnNode, drawWarningOnLine } from '@shared/utils/warning';
 import { drawCallWarning } from '@shared/utils/outage';
@@ -238,14 +237,6 @@ export class GraphComponent implements OnInit, OnDestroy {
     this.addOutageTooltips();
     modifyNodeDistance(this.cy.nodes().filter(x => x.data('dmsType') == "ENERGYCONSUMER"));
   };
-
-  public drawBackupEdges(): void {
-    this.cy.ready(() => {
-      this.graphData.backup_edges.forEach(line => {
-        drawBackupEdge(this.cy, line);
-      });
-    });
-  }
 
   public addTooltips(): void {
     this.cy.ready(() => {
