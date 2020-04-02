@@ -26,7 +26,6 @@ using System.Text;
 using System.Threading.Tasks;
 using System.Timers;
 using AutoResetEvent = System.Threading.AutoResetEvent;
-using OMSCommon.OutageDatabaseModel;
 
 namespace OutageManagementService
 {
@@ -316,7 +315,6 @@ namespace OutageManagementService
                             {
                                 if (task.Result) 
                                 {
-                                    //TODO: Get from CE new affected consumers and replace with outageToIsolate.AffectedConsumers for historical database
                                     //outage isolated => some of the affected consumers are energized
                                     List<long> consumerIds = GetAffectedConsumers(outageToIsolate.OutageElementGid);
                                     List<Consumer> consumerDbEntities = GetAffectedConsumersFromDatabase(consumerIds);
@@ -437,8 +435,6 @@ namespace OutageManagementService
                         outageDbEntity.OutageState = OutageState.REPAIRED;
                         outageDbEntity.RepairedTime = DateTime.UtcNow;
                         dbContext.OutageRepository.Update(outageDbEntity);
-
-
 
                         try
                         {
@@ -1208,7 +1204,7 @@ namespace OutageManagementService
                     {
                         IOutageTopologyElement topologyElement = TopologyModel.OutageTopology[currentNode];
 
-                        if (topologyElement.SecondEnd.Count == 0 && topologyElement.DmsType == "ENERGYCONSUMER" && /*!topologyElement.IsActive*/)
+                        if (topologyElement.SecondEnd.Count == 0 && topologyElement.DmsType == "ENERGYCONSUMER" /*&& !topologyElement.IsActive*/)
                         {
                             affectedConsumers.Add(currentNode);
                         }
