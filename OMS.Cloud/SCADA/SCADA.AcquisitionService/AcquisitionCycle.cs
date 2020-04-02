@@ -3,12 +3,14 @@ using Microsoft.WindowsAzure.Storage.Queue;
 using OMS.Cloud.SCADA.ModbusFunctions;
 using OMS.Cloud.SCADA.ModbusFunctions.Parameters;
 using OMS.Common.Cloud;
+using OMS.Common.Cloud.AzureStorageHelpers;
 using OMS.Common.Cloud.WcfServiceFabricClients.SCADA;
 using OMS.Common.SCADA;
 using Outage.Common;
 using System;
 using System.Collections.Generic;
 using System.Configuration;
+using System.Threading.Tasks;
 
 namespace OMS.Cloud.SCADA.AcquisitionService
 {
@@ -27,17 +29,17 @@ namespace OMS.Cloud.SCADA.AcquisitionService
         public AcquisitionCycle()
         {
             this.scadaModelClient = ScadaModelAccessClient.CreateClient();
-            TryGetQueue("readcommandqueue", out this.readCommandQueue);
+            CloudQueueHelper.TryGetQueue("readcommandqueue", out this.readCommandQueue);
         }
 
-        public async void Start()
+        public async Task Start()
         {
             if (this.readCommandQueue == null)
             {
                 string message = $"Read command queue is null.";
                 Logger.LogWarn(message);
 
-                if(!TryGetQueue("readcommandqueue", out this.readCommandQueue))
+                if(!CloudQueueHelper.TryGetQueue("readcommandqueue", out this.readCommandQueue))
                 {
                     return;
                 }

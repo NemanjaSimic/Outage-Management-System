@@ -61,6 +61,11 @@ namespace OMS.Common.Cloud.WcfServiceFabricClients.SCADA
         {
             throw new System.NotImplementedException();
         }
+
+        public ISCADAConfigData GetScadaConfigData()
+        {
+            throw new NotImplementedException();
+        }
         #endregion
     }
 }

@@ -15,11 +15,11 @@ namespace Outage.Common.ServiceContracts.SCADA
         [OperationContract]
         [FaultContract(typeof(ArgumentException))]
         [FaultContract(typeof(InternalSCADAServiceException))]
-        bool SendAnalogCommand(long gid, float commandingValue, CommandOriginType commandOriginType);
+        Task SendAnalogCommand(long gid, float commandingValue, CommandOriginType commandOriginType);
 
         [OperationContract]
         [FaultContract(typeof(ArgumentException))]
         [FaultContract(typeof(InternalSCADAServiceException))]
-        bool SendDiscreteCommand(long gid, ushort commandingValue, CommandOriginType commandOriginType);
+        Task SendDiscreteCommand(long gid, ushort commandingValue, CommandOriginType commandOriginType);
     }
 }

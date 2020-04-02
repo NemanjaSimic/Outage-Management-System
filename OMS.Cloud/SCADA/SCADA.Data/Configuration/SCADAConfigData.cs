@@ -20,6 +20,8 @@ namespace OMS.Cloud.SCADA.Data.Configuration
         public IPAddress IpAddress { get; protected set; }
         public byte UnitAddress { get; protected set; }
         public ushort Interval { get; protected set; }
+        public ushort AcquisitionInterval { get; protected set; }
+        public ushort FunctionExecutionInterval { get; protected set; }
 
         public string ModbusSimulatorExeName { get; protected set; } = string.Empty;
         public string ModbusSimulatorExePath { get; protected set; } = string.Empty;
@@ -40,6 +42,7 @@ namespace OMS.Cloud.SCADA.Data.Configuration
                 return _instance;
             }
         }
+
 
         #endregion Instance
 

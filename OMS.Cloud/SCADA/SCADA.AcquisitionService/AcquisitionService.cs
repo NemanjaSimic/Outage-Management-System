@@ -48,7 +48,7 @@ namespace OMS.Cloud.SCADA.AcquisitionService
 
                 try
                 {
-                    acquisitionCycle.Start();
+                    await acquisitionCycle.Start();
                 }
                 catch (Exception e)
                 {
