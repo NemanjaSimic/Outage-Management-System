@@ -3,15 +3,11 @@ using OMS.Cloud.NMS.GdaProvider.GDA;
 using Microsoft.ServiceFabric.Services.Communication.Runtime;
 using Microsoft.ServiceFabric.Services.Communication.Wcf.Runtime;
 using Outage.Common;
-using Outage.Common.ServiceContracts.DistributedTransaction;
 using Outage.Common.ServiceContracts.GDA;
 using System;
 using System.Collections.Generic;
-using NetTcpBinding = System.ServiceModel.NetTcpBinding;
-using SecurityMode = System.ServiceModel.SecurityMode;
-using Microsoft.ServiceFabric.Services.Communication.Wcf;
-using System.ServiceModel.Channels;
 using OMS.Common.Cloud.WcfServiceFabricClients;
+using OMS.Common.DistributedTransactionContracts;
 
 namespace OMS.Cloud.NMS.GdaProvider
 {

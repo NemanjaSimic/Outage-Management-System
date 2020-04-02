@@ -20,12 +20,12 @@ namespace OMS.Cloud.SCADA.AcquisitionService
             get { return logger ?? (logger = LoggerWrapper.Instance); }
         }
 
-        private ScadaModelAccessClient scadaModelClient;
+        private ScadaModelReadAccessClient scadaModelClient;
         private CloudQueue readCommandQueue;
 
         public AcquisitionCycle()
         {
-            this.scadaModelClient = ScadaModelAccessClient.CreateClient();
+            this.scadaModelClient = ScadaModelReadAccessClient.CreateClient();
             CloudQueueHelper.TryGetQueue("readcommandqueue", out this.readCommandQueue);
         }
 
@@ -44,10 +44,10 @@ namespace OMS.Cloud.SCADA.AcquisitionService
 
             if (this.scadaModelClient == null)
             {
-                this.scadaModelClient = ScadaModelAccessClient.CreateClient();
+                this.scadaModelClient = ScadaModelReadAccessClient.CreateClient();
             }
 
-            Dictionary<PointType, Dictionary<ushort, long>> addressToGidMap = scadaModelClient.GetAddressToGidMapping();
+            Dictionary<PointType, Dictionary<ushort, long>> addressToGidMap = scadaModelClient.GetAddressToGidMap();
 
             foreach (var kvp in addressToGidMap)
             {

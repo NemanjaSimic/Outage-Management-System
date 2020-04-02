@@ -116,21 +116,24 @@ namespace Outage.SCADA.Modbus
         {
             bool success;
 
-            if(!(modbusFunction is IReadAnalogModusFunction || modbusFunction is IReadDiscreteModbusFunction))
+            if (!(modbusFunction is IReadAnalogModusFunction || modbusFunction is IReadDiscreteModbusFunction))
             {
                 string message = "EnqueueReadCommand => trying to enqueue modbus function that implements neither IReadDiscreteModbusFunction nor IReadDiscreteModbusFunction interface.";
                 Logger.LogError(message);
                 throw new ArgumentException(message);
             }
 
-            if(!modelUpdateQueue.IsEmpty)
+            while (!modelUpdateQueue.IsEmpty || !writeCommandQueue.IsEmpty)
             {
-                this.modelUpdateQueueEmptyEvent.WaitOne();
-            }
+                if (!modelUpdateQueue.IsEmpty)
+                {
+                    this.modelUpdateQueueEmptyEvent.WaitOne();
+                }
 
-            if(!writeCommandQueue.IsEmpty)
-            {
-                this.writeCommandQueueEmptyEvent.WaitOne();
+                if (!writeCommandQueue.IsEmpty)
+                {
+                    this.writeCommandQueueEmptyEvent.WaitOne();
+                }
             }
 
             try

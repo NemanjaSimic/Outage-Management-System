@@ -14,5 +14,9 @@ namespace OMS.Common.Cloud
         //SCADA
         public static readonly string ScadaCommandingService = "ScadaCommandingService";
         public static readonly string ScadaModelProviderService = "ScadaModelProviderService";
+
+        //TMS
+        public static readonly string TransactionManagerService = "TransactionManagerService";
+        public static readonly string TransactionActorService = "TransactionActorService";
     }
 }

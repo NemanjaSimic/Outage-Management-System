@@ -20,18 +20,18 @@ namespace OMS.Cloud.SCADA.CommandingService
 
         #region Static Members
 
-        protected static IWriteCommandEnqueuer writeCommandEnqueuer = null;
+        //protected static IWriteCommandEnqueuer writeCommandEnqueuer = null;
 
-        public static IWriteCommandEnqueuer WriteCommandEnqueuer
-        {
-            set
-            {
-                if (writeCommandEnqueuer == null)
-                {
-                    writeCommandEnqueuer = value;
-                }
-            }
-        }
+        //public static IWriteCommandEnqueuer WriteCommandEnqueuer
+        //{
+        //    set
+        //    {
+        //        if (writeCommandEnqueuer == null)
+        //        {
+        //            writeCommandEnqueuer = value;
+        //        }
+        //    }
+        //}
 
         protected static SCADAModel scadaModel = null;
 
@@ -148,12 +148,12 @@ namespace OMS.Cloud.SCADA.CommandingService
             ModbusWriteCommandParameters modbusWriteCommandParams;
             StringBuilder sb = new StringBuilder();
 
-            if (CommandingProvider.writeCommandEnqueuer == null)
-            {
-                string message = $"SendCommand => Function Executor is null.";
-                Logger.LogError(message);
-                throw new InternalSCADAServiceException(message);
-            }
+            //if (CommandingProvider.writeCommandEnqueuer == null)
+            //{
+            //    string message = $"SendCommand => Function Executor is null.";
+            //    Logger.LogError(message);
+            //    throw new InternalSCADAServiceException(message);
+            //}
 
             try
             {
@@ -184,16 +184,16 @@ namespace OMS.Cloud.SCADA.CommandingService
                 }
 
                 IWriteModbusFunction modbusFunction = FunctionFactory.CreateWriteModbusFunction(modbusWriteCommandParams, commandOriginType);
-                success = CommandingProvider.writeCommandEnqueuer.EnqueueWriteCommand(modbusFunction);
+                //success = CommandingProvider.writeCommandEnqueuer.EnqueueWriteCommand(modbusFunction);
 
-                if (success)
-                {
-                    sb.AppendLine("Command SUCCESSFULLY enqueued.");
-                }
-                else
-                {
-                    sb.AppendLine("Command enqueuing FAILED.");
-                }
+                //if (success)
+                //{
+                //    sb.AppendLine("Command SUCCESSFULLY enqueued.");
+                //}
+                //else
+                //{
+                //    sb.AppendLine("Command enqueuing FAILED.");
+                //}
 
                 Logger.LogInfo(sb.ToString());
             }
@@ -204,7 +204,7 @@ namespace OMS.Cloud.SCADA.CommandingService
                 throw new InternalSCADAServiceException(message, e);
             }
 
-            return success;
+            return true;// success;
         }
     }
 }

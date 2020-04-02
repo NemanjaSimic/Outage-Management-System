@@ -1,18 +1,17 @@
-﻿using Outage.DistributedTransactionActor;
+﻿using OMS.Cloud.TMS.DistributedTransactionActor;
+using OMS.Common.DistributedTransactionContracts;
 using System;
-using System.Collections.Generic;
-using System.Linq;
 using System.Threading.Tasks;
 
 namespace OMS.Cloud.SCADA.ModelProviderService.DistributedTransaction
 {
     internal class ScadaTransactionActor : TransactionActor
     {
-        private readonly ScadaModel scadaModel;
+        private readonly ITransactionActorContract scadaTransactionActor;
 
-        public ScadaTransactionActor(ScadaModel scadaModel)
+        public ScadaTransactionActor(ITransactionActorContract scadaTransactionActor)
         {
-            this.scadaModel = scadaModel;
+            this.scadaTransactionActor = scadaTransactionActor;
         }
 
         public override async Task<bool> Prepare()
@@ -21,7 +20,7 @@ namespace OMS.Cloud.SCADA.ModelProviderService.DistributedTransaction
 
             try
             {
-                success = await this.scadaModel.Prepare();
+                success = await this.scadaTransactionActor.Prepare();
             }
             catch (Exception ex)
             {
@@ -45,7 +44,7 @@ namespace OMS.Cloud.SCADA.ModelProviderService.DistributedTransaction
         {
             try
             {
-                this.scadaModel.Commit();
+                await this.scadaTransactionActor.Commit();
                 Logger.LogInfo("Commit on SCADA Transaction actor SUCCESSFULLY finished.");
             }
             catch (Exception ex)
@@ -59,7 +58,7 @@ namespace OMS.Cloud.SCADA.ModelProviderService.DistributedTransaction
         {
             try
             {
-                this.scadaModel.Rollback();
+                await this.scadaTransactionActor.Rollback();
                 Logger.LogInfo("Rollback on SCADA Transaction actor SUCCESSFULLY finished.");
             }
             catch (Exception ex)

@@ -47,6 +47,7 @@
     <Compile Include="AzureStorageHelpers\CloudQueueHelper.cs" />
     <Compile Include="MicroserviceNames.cs" />
     <Compile Include="Properties\AssemblyInfo.cs" />
+    <Compile Include="ReliableCollectionHelpers\ReliableDictionaryAccess.cs" />
     <Compile Include="ReliableCollectionHelpers\ReliableDictionaryHelper.cs" />
     <Compile Include="ReliableCollectionHelpers\ReliableDictionaryUnitOfWork.cs" />
     <Compile Include="Serialization.cs" />
@@ -56,8 +57,13 @@
     <Compile Include="WcfServiceFabricClients\OMS\Placeholder.cs" />
     <Compile Include="WcfServiceFabricClients\SCADA\ScadaCommandingClient.cs" />
     <Compile Include="WcfServiceFabricClients\SCADA\ScadaIntegrityUpdateClient.cs" />
-    <Compile Include="WcfServiceFabricClients\SCADA\ScadaModelAccessClient.cs" />
+    <Compile Include="WcfServiceFabricClients\SCADA\ScadaModelReadAccessClient.cs" />
+    <Compile Include="WcfServiceFabricClients\SCADA\ScadaModelUpdateAccessClient.cs" />
     <Compile Include="WcfServiceFabricClients\TcpBindingHelper.cs" />
+    <Compile Include="WcfServiceFabricClients\TMS\ModelUpdateNotificationClient.cs" />
+    <Compile Include="WcfServiceFabricClients\TMS\TransactionActorClient.cs" />
+    <Compile Include="WcfServiceFabricClients\TMS\TransactionCoordinatorClient.cs" />
+    <Compile Include="WcfServiceFabricClients\TMS\TransactionEnlistmentClient.cs" />
     <Compile Include="WcfServiceFabricClients\WcfSeviceFabricClientBase.cs" />
   </ItemGroup>
   <ItemGroup>
@@ -71,6 +77,10 @@
     <ProjectReference Include="..\Common.SCADA\Common.SCADA.csproj">
       <Project>{6A84DB56-920C-4FC1-9CB0-9C29D0FC1586}</Project>
       <Name>Common.SCADA</Name>
+    </ProjectReference>
+    <ProjectReference Include="..\Contracts\Common.DistributedTransactionContracts\Common.DistributedTransactionContracts.csproj">
+      <Project>{A07D94C2-40EF-48DB-B828-7E53E7F5A372}</Project>
+      <Name>Common.DistributedTransactionContracts</Name>
     </ProjectReference>
     <ProjectReference Include="..\Contracts\Common.NmsContracts\Common.NmsContracts.csproj">
       <Project>{235804A8-9C8F-40EC-8786-5DAB24733977}</Project>

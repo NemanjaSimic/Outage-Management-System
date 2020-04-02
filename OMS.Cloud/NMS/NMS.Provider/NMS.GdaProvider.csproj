@@ -76,17 +76,17 @@
       <Project>{274dcaf7-5fdd-46a0-97e2-91dbca365381}</Project>
       <Name>DataModel</Name>
     </ProjectReference>
-    <ProjectReference Include="..\..\..\OutageManagementSystem\TransactionManagerService\DistributedTransactionActor\DistributedTransactionActor.csproj">
-      <Project>{d2b436c8-c9af-4fe2-b881-b8d28228637b}</Project>
-      <Name>DistributedTransactionActor</Name>
-    </ProjectReference>
-    <ProjectReference Include="..\..\Cloud.Common\Cloud.Common.csproj">
-      <Project>{9C8B510F-C2C6-4F56-ABAC-FAE49C676F7E}</Project>
-      <Name>Cloud.Common</Name>
-    </ProjectReference>
     <ProjectReference Include="..\..\Common\Common.Cloud\Common.Cloud.csproj">
       <Project>{FBEE1369-0F6C-41E6-8C62-8C1C5CDBB602}</Project>
       <Name>Common.Cloud</Name>
+    </ProjectReference>
+    <ProjectReference Include="..\..\Common\Contracts\Common.DistributedTransactionContracts\Common.DistributedTransactionContracts.csproj">
+      <Project>{A07D94C2-40EF-48DB-B828-7E53E7F5A372}</Project>
+      <Name>Common.DistributedTransactionContracts</Name>
+    </ProjectReference>
+    <ProjectReference Include="..\..\TMS\DistributedTransactionActor\DistributedTransactionActor.csproj">
+      <Project>{A6D3A531-D547-4620-8D4C-2E79D9AAE9D6}</Project>
+      <Name>DistributedTransactionActor</Name>
     </ProjectReference>
   </ItemGroup>
   <ItemGroup>

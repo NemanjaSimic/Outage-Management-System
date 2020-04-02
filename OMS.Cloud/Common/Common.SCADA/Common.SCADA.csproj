@@ -55,6 +55,7 @@
     <Compile Include="ISCADAModelPointItem.cs" />
     <Compile Include="ModelUpdateDelegate.cs" />
     <Compile Include="Properties\AssemblyInfo.cs" />
+    <Compile Include="ReliableDictionaryNames.cs" />
   </ItemGroup>
   <ItemGroup>
     <ProjectReference Include="..\..\..\OutageManagementSystem\Common\Common.csproj">

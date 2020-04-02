@@ -1,5 +1,4 @@
-﻿using Outage.Common;
-using Outage.DistributedTransactionActor;
+﻿using OMS.Cloud.TMS.DistributedTransactionActor;
 using System;
 using System.Threading.Tasks;
 

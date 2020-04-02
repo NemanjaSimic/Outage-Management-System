@@ -39,9 +39,6 @@
     <IsServiceFabricServiceProject>true</IsServiceFabricServiceProject>
   </PropertyGroup>
   <ItemGroup>
-    <Reference Include="DistributedTransactionActor">
-      <HintPath>..\..\..\OutageManagementSystem\TransactionManagerService\DistributedTransactionActor\bin\Debug\DistributedTransactionActor.dll</HintPath>
-    </Reference>
     <Reference Include="Microsoft.ServiceFabric.Data, Version=7.0.0.0, Culture=neutral, PublicKeyToken=31bf3856ad364e35, processorArchitecture=AMD64">
       <HintPath>..\..\packages\Microsoft.ServiceFabric.Data.4.0.470\lib\net472\Microsoft.ServiceFabric.Data.dll</HintPath>
     </Reference>
@@ -97,7 +94,9 @@
   </ItemGroup>
   <ItemGroup>
     <Compile Include="ContractProviders\IntegrityUpdateProvider.cs" />
-    <Compile Include="ContractProviders\ModelAccessProvider.cs" />
+    <Compile Include="ContractProviders\ModelReadAccessProvider.cs" />
+    <Compile Include="ContractProviders\ModelUpdateAccessProvider.cs" />
+    <Compile Include="DistributedTransaction\ScadaModelUpdateNotification.cs" />
     <Compile Include="DistributedTransaction\ScadaTransactionActor.cs" />
     <Compile Include="Properties\AssemblyInfo.cs" />
     <Compile Include="ModelProviderService.cs" />
@@ -124,6 +123,10 @@
       <Project>{6A84DB56-920C-4FC1-9CB0-9C29D0FC1586}</Project>
       <Name>Common.SCADA</Name>
     </ProjectReference>
+    <ProjectReference Include="..\..\Common\Contracts\Common.DistributedTransactionContracts\Common.DistributedTransactionContracts.csproj">
+      <Project>{A07D94C2-40EF-48DB-B828-7E53E7F5A372}</Project>
+      <Name>Common.DistributedTransactionContracts</Name>
+    </ProjectReference>
     <ProjectReference Include="..\..\Common\Contracts\Common.NmsContracts\Common.NmsContracts.csproj">
       <Project>{235804A8-9C8F-40EC-8786-5DAB24733977}</Project>
       <Name>Common.NmsContracts</Name>
@@ -131,6 +134,10 @@
     <ProjectReference Include="..\..\Common\Contracts\Common.ScadaContracts\Common.ScadaContracts.csproj">
       <Project>{5F25D9C5-9A93-49E7-92F7-58E399AEF928}</Project>
       <Name>Common.ScadaContracts</Name>
+    </ProjectReference>
+    <ProjectReference Include="..\..\TMS\DistributedTransactionActor\DistributedTransactionActor.csproj">
+      <Project>{A6D3A531-D547-4620-8D4C-2E79D9AAE9D6}</Project>
+      <Name>DistributedTransactionActor</Name>
     </ProjectReference>
     <ProjectReference Include="..\SCADA.Data\SCADA.Data.csproj">
       <Project>{25E726AA-10F3-400B-AE6E-0F423EC51FF8}</Project>
