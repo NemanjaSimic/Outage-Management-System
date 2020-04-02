@@ -3,6 +3,7 @@ using Outage.Common;
 using Outage.Common.Exceptions.SCADA;
 using System;
 using System.ServiceModel;
+using System.Threading.Tasks;
 
 namespace OMS.Common.ScadaContracts
 {

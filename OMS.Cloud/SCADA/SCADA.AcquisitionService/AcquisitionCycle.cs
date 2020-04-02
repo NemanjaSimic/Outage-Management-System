@@ -2,13 +2,12 @@
 using OMS.Cloud.SCADA.ModbusFunctions;
 using OMS.Cloud.SCADA.ModbusFunctions.Parameters;
 using OMS.Common.Cloud;
-using OMS.Common.Cloud.AzureStorageHelpers;
 using OMS.Common.Cloud.WcfServiceFabricClients.SCADA;
 using OMS.Common.SCADA;
 using Outage.Common;
 using System;
+using OMS.Common.Cloud.AzureStorageHelpers;
 using System.Collections.Generic;
-using System.Configuration;
 using System.Threading.Tasks;
 
 namespace OMS.Cloud.SCADA.AcquisitionService
