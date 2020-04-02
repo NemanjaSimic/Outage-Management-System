@@ -5,6 +5,8 @@ using Outage.Common;
 using System;
 using System.Configuration;
 using System.Fabric;
+using System.ServiceModel;
+using System.Threading.Tasks;
 
 namespace OMS.Common.Cloud.WcfServiceFabricClients.SCADA
 {
@@ -31,14 +33,14 @@ namespace OMS.Common.Cloud.WcfServiceFabricClients.SCADA
         }
 
         #region IScadaCommandingContract
-        public bool SendAnalogCommand(long gid, float commandingValue, CommandOriginType commandOriginType)
+        public Task<bool> SendAnalogCommand(long gid, float commandingValue, CommandOriginType commandOriginType)
         {
-            throw new System.NotImplementedException();
+            return InvokeWithRetryAsync(client => client.Channel.SendAnalogCommand(gid, commandingValue, commandOriginType));
         }
 
-        public bool SendDiscreteCommand(long gid, ushort commandingValue, CommandOriginType commandOriginType)
+        public Task<bool> SendDiscreteCommand(long gid, ushort commandingValue, CommandOriginType commandOriginType)
         {
-            throw new System.NotImplementedException();
+            return InvokeWithRetryAsync(client => client.Channel.SendDiscreteCommand(gid, commandingValue, commandOriginType));
         }
         #endregion
     }

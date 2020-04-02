@@ -6,10 +6,16 @@ using Outage.Common;
 using Outage.Common.Exceptions.SCADA;
 using System;
 using System.Text;
+using Outage.Common.ServiceContracts.SCADA;
+using System.Threading.Tasks;
+using System.Collections.Generic;
+using Microsoft.WindowsAzure.Storage.Queue;
+using OMS.Common.Cloud.AzureStorageHelpers;
+using OMS.Common.Cloud;
 
 namespace OMS.Cloud.SCADA.CommandingService
 {
-    public class CommandingProvider
+    public class CommandingProvider : IScadaCommandingContract
     {
         private ILogger logger;
 
@@ -18,48 +24,45 @@ namespace OMS.Cloud.SCADA.CommandingService
             get { return logger ?? (logger = LoggerWrapper.Instance); }
         }
 
-        #region Static Members
+     
+        protected CloudQueue writeCommandEnqueuer = null;
 
-        //protected static IWriteCommandEnqueuer writeCommandEnqueuer = null;
-
-        //public static IWriteCommandEnqueuer WriteCommandEnqueuer
-        //{
-        //    set
-        //    {
-        //        if (writeCommandEnqueuer == null)
-        //        {
-        //            writeCommandEnqueuer = value;
-        //        }
-        //    }
-        //}
-
-        protected static SCADAModel scadaModel = null;
-
-        public static SCADAModel SCADAModel
+        public CloudQueue WriteCommandEnqueuer
         {
             set
             {
-                if (scadaModel == null)
+                if (writeCommandEnqueuer == null)
                 {
-                    scadaModel = value;
+                    writeCommandEnqueuer = value;
                 }
             }
         }
 
-        #endregion
-
-        public bool SendAnalogCommand(long gid, float commandingValue, CommandOriginType commandOriginType)
+        public CommandingProvider()
         {
-            bool success;
+            if (!CloudQueueHelper.TryGetQueue("writecommandqueue", out writeCommandEnqueuer))
+            {
+                string message = "There is no queue available.";
+                Logger.LogError(message);
+                throw new Exception(message);
+            }
+        }
 
-            if (CommandingProvider.scadaModel == null)
+
+        public async Task SendAnalogCommand(long gid, float commandingValue, CommandOriginType commandOriginType)
+        {
+
+
+            Dictionary<long, ISCADAModelPointItem> currentScadaModel = new Dictionary<long, ISCADAModelPointItem>(); //TODO: get from scada access client
+
+            if (currentScadaModel == null)
             {
                 string message = $"SendAnalogCommand => SCADA model is null.";
                 Logger.LogError(message);
                 throw new InternalSCADAServiceException(message);
             }
 
-            var currentScadaModel = CommandingProvider.scadaModel.CurrentScadaModel;
+            
 
             if (!currentScadaModel.ContainsKey(gid))
             {
@@ -75,7 +78,7 @@ namespace OMS.Cloud.SCADA.CommandingService
                 try
                 {
                     int modbusValue = analogPointItem.EguToRawValueConversion(commandingValue);
-                    success = SendCommand(pointItem, modbusValue, commandOriginType);
+                    await SendCommand(pointItem, modbusValue, commandOriginType);
                 }
                 catch (Exception e)
                 {
@@ -92,22 +95,18 @@ namespace OMS.Cloud.SCADA.CommandingService
             }
 
 
-
-            return success;
         }
 
-        public bool SendDiscreteCommand(long gid, ushort commandingValue, CommandOriginType commandOriginType)
+        public async Task SendDiscreteCommand(long gid, ushort commandingValue, CommandOriginType commandOriginType)
         {
-            bool success;
 
-            if (CommandingProvider.scadaModel == null)
+            Dictionary<long, ISCADAModelPointItem> currentScadaModel = new Dictionary<long, ISCADAModelPointItem>(); //TODO: get from scada access client
+            if (currentScadaModel == null)
             {
                 string message = $"SendDiscreteCommand => SCADA model is null.";
                 Logger.LogError(message);
                 throw new InternalSCADAServiceException(message);
             }
-
-            var currentScadaModel = CommandingProvider.scadaModel.CurrentScadaModel;
 
             if (!currentScadaModel.ContainsKey(gid))
             {
@@ -122,7 +121,7 @@ namespace OMS.Cloud.SCADA.CommandingService
             {
                 try
                 {
-                    success = SendCommand(pointItem, commandingValue, commandOriginType);
+                    await SendCommand(pointItem, commandingValue, commandOriginType);
                 }
                 catch (Exception e)
                 {
@@ -138,22 +137,22 @@ namespace OMS.Cloud.SCADA.CommandingService
                 throw new ArgumentException(message);
             }
 
-            return success;
+            
         }
 
-        private bool SendCommand(ISCADAModelPointItem pointItem, object commandingValue, CommandOriginType commandOriginType)
+        private async Task SendCommand(ISCADAModelPointItem pointItem, object commandingValue, CommandOriginType commandOriginType)
         {
-            bool success;
+            
             ushort length = 6;
             ModbusWriteCommandParameters modbusWriteCommandParams;
             StringBuilder sb = new StringBuilder();
 
-            //if (CommandingProvider.writeCommandEnqueuer == null)
-            //{
-            //    string message = $"SendCommand => Function Executor is null.";
-            //    Logger.LogError(message);
-            //    throw new InternalSCADAServiceException(message);
-            //}
+            if (writeCommandEnqueuer == null)
+            {
+                string message = $"SendCommand => Function Executor is null.";
+                Logger.LogError(message);
+                throw new InternalSCADAServiceException(message);
+            }
 
             try
             {
@@ -184,16 +183,9 @@ namespace OMS.Cloud.SCADA.CommandingService
                 }
 
                 IWriteModbusFunction modbusFunction = FunctionFactory.CreateWriteModbusFunction(modbusWriteCommandParams, commandOriginType);
-                //success = CommandingProvider.writeCommandEnqueuer.EnqueueWriteCommand(modbusFunction);
+                await writeCommandEnqueuer.AddMessageAsync(new CloudQueueMessage(Serialization.ObjectToByteArray(modbusFunction)));
 
-                //if (success)
-                //{
-                //    sb.AppendLine("Command SUCCESSFULLY enqueued.");
-                //}
-                //else
-                //{
-                //    sb.AppendLine("Command enqueuing FAILED.");
-                //}
+                sb.AppendLine("Command SUCCESSFULLY enqueued.");
 
                 Logger.LogInfo(sb.ToString());
             }
@@ -204,7 +196,6 @@ namespace OMS.Cloud.SCADA.CommandingService
                 throw new InternalSCADAServiceException(message, e);
             }
 
-            return true;// success;
         }
     }
 }

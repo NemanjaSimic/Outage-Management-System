@@ -72,7 +72,7 @@ namespace OMS.Cloud.SCADA.ModbusFunctions.Read
 
             var currentSCADAModel = SCADAModel.CurrentScadaModel;
             var currentAddressToGidMap = SCADAModel.CurrentAddressToGidMap;
-            var commandValuesCache = SCADAModel.CommandedValuesCache;
+            var commandValuesCache = SCADAModel.CommandedValuesCache; //TODO: dobaviti od provider-a
 
             for (ushort i = 0; i < data.Length; i++)
             {
@@ -104,7 +104,7 @@ namespace OMS.Cloud.SCADA.ModbusFunctions.Read
 
                 if(pointItem.CurrentValue != value)
                 {
-                    pointItem.CurrentValue = value;
+                    pointItem.CurrentValue = value; //TODO: Update na provideru
                     Logger.LogInfo($"Alarm for Point [Gid: 0x{pointItem.Gid:X16}, Point type: {PointType.DIGITAL_INPUT}, Address: {pointItem.Address}] set to {pointItem.Alarm}.");
                 }
 
@@ -113,7 +113,7 @@ namespace OMS.Cloud.SCADA.ModbusFunctions.Read
                 if (commandValuesCache.ContainsKey(gid) && commandValuesCache[gid].Value == value)
                 {
                     commandOrigin = commandValuesCache[gid].CommandOrigin;
-                    commandValuesCache.Remove(gid);
+                    commandValuesCache.Remove(gid); //TODO: Update provider-a
                     Logger.LogDebug($"[ReadDiscreteInputsFunction] Command origin of command address: {pointItem.Address} is set to {commandOrigin}.");
                 }
 

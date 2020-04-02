@@ -2,6 +2,7 @@
 using EasyModbus.Exceptions;
 using Microsoft.WindowsAzure.Storage.Queue;
 using OMS.Cloud.SCADA.Data.Repository;
+using OMS.Common.Cloud;
 using OMS.Common.Cloud.AzureStorageHelpers;
 using OMS.Common.SCADA;
 using Outage.Common;
@@ -26,7 +27,7 @@ namespace OMS.Cloud.SCADA.FunctionExecutorService
         private CloudQueue modelUpdateCommandQueue;
 
         public ISCADAConfigData ConfigData { get; private set; }
-        public SCADAModel SCADAModel { get; private set; }
+        //public SCADAModel SCADAModel { get; private set; }
         public ModbusClient ModbusClient { get; private set; }
 
         private Dictionary<long, IModbusData> measurementsCache;
@@ -50,52 +51,65 @@ namespace OMS.Cloud.SCADA.FunctionExecutorService
 
         public void Start()
         {
-            //todo
-            //try
-            //{
-            //    if (ModbusClient == null)
-            //    {
-            //        ModbusClient = new ModbusClient(ConfigData.IpAddress.ToString(), ConfigData.TcpPort);
-            //    }
+            try
+            {
+                if (ModbusClient == null)
+                {
+                    ModbusClient = new ModbusClient(ConfigData.IpAddress.ToString(), ConfigData.TcpPort);
+                }
+                
+                //Logger.LogDebug("Connected and waiting for command event.");
 
-            //    //Logger.LogDebug("Connected and waiting for command event.");
+                //this.commandEvent.WaitOne();
 
-            //    this.commandEvent.WaitOne();
+                //Logger.LogDebug("Command event happened.");
 
-            //    //Logger.LogDebug("Command event happened.");
+                if (!ModbusClient.Connected)
+                {
+                    ConnectToModbusClient();
+                }
+                
 
-            //    if (!ModbusClient.Connected)
-            //    {
-            //        ConnectToModbusClient();
-            //    }
+                
+                while (modelUpdateCommandQueue.PeekMessage() != null)
+                {
+                    CloudQueueMessage message = modelUpdateCommandQueue.GetMessage();
+                    IWriteModbusFunction currentCommand = (IWriteModbusFunction)(Serialization.ByteArrayToObject(message.AsBytes));
+                    modelUpdateCommandQueue.DeleteMessage(message);
+                    ExecuteCommand(currentCommand);
+                }
+                
+                //HIGH PRIORITY COMMANDS - model update commands
 
-            //    //HIGH PRIORITY COMMANDS - model update commands
-            //    while (modelUpdateQueue.TryDequeue(out IWriteModbusFunction currentCommand))
-            //    {
-            //        ExecuteCommand(currentCommand);
-            //    }
+                //this.modelUpdateQueueEmptyEvent.Set();
 
-            //    this.modelUpdateQueueEmptyEvent.Set();
+                //WRITE COMMANDS
 
-            //    //WRITE COMMANDS
-            //    while (writeCommandQueue.TryDequeue(out IWriteModbusFunction currentCommand))
-            //    {
-            //        ExecuteCommand(currentCommand);
-            //    }
+                while (writeCommandQueue.PeekMessage() != null)
+                {
+                    CloudQueueMessage message = writeCommandQueue.GetMessage();
+                    IWriteModbusFunction currentCommand = (IWriteModbusFunction)(Serialization.ByteArrayToObject(message.AsBytes));
+                    modelUpdateCommandQueue.DeleteMessage(message);
+                    ExecuteCommand(currentCommand);
+                }
 
-            //    this.writeCommandQueueEmptyEvent.Set();
 
-            //    //READ COMMANDS - acquisition
-            //    while (readCommandQueue.TryDequeue(out IReadModbusFunction currentCommand))
-            //    {
-            //        ExecuteCommand(currentCommand);
-            //    }
-            //}
-            //catch (Exception ex)
-            //{
-            //    string message = "Exception caught in FunctionExecutorThread.";
-            //    Logger.LogError(message, ex);
-            //}
+                //this.writeCommandQueueEmptyEvent.Set();
+
+                //READ COMMANDS - acquisition
+                while (readCommandQueue.PeekMessage() != null)
+                {
+                    CloudQueueMessage message = readCommandQueue.GetMessage();
+                    IWriteModbusFunction currentCommand = (IWriteModbusFunction)(Serialization.ByteArrayToObject(message.AsBytes));
+                    modelUpdateCommandQueue.DeleteMessage(message);
+                    ExecuteCommand(currentCommand);
+                }
+            }
+            catch (Exception ex)
+            {
+                string message = "Exception caught in FunctionExecutorThread.";
+                Logger.LogError(message, ex);
+            }
         }
 
         private void ConnectToModbusClient()
@@ -190,13 +204,117 @@ namespace OMS.Cloud.SCADA.FunctionExecutorService
                         return;
                 }
 
+                SCADAModel SCADAModel = null; //TODO: dobaviti od providera
                 if (SCADAModel.CurrentAddressToGidMap[pointType].ContainsKey(commandValue.Address))
                 {
                     long gid = SCADAModel.CurrentAddressToGidMap[pointType][commandValue.Address];
 
                     SCADAModel.CommandedValuesCache[gid] = commandValue;
+                    //TODO: update na provideru
                 }
             }
         }
+
+        private void MakeAnalogEntryToMeasurementCache(Dictionary<long, AnalogModbusData> data, bool permissionToPublishData)
+        {
+            Dictionary<long, AnalogModbusData> publicationData = new Dictionary<long, AnalogModbusData>();
+
+            if (data == null)
+            {
+                string message = $"WriteToMeasurementsCache() => readAnalogCommand.Data is null.";
+                Logger.LogError(message);
+                throw new NullReferenceException(message);
+            }
+
+            foreach (long gid in data.Keys)
+            {
+                if (!MeasurementsCache.ContainsKey(gid))
+                {
+                    MeasurementsCache.Add(gid, data[gid]);
+
+                    if (!publicationData.ContainsKey(gid))
+                    {
+                        publicationData.Add(gid, data[gid]);
+                    }
+                    else
+                    {
+                        publicationData[gid] = data[gid];
+                    }
+                }
+                else if (MeasurementsCache[gid] is AnalogModbusData analogCacheItem && analogCacheItem.Value != data[gid].Value)
+                {
+                    Logger.LogDebug($"Value changed on element with id: {analogCacheItem.MeasurementGid}. Old value: {analogCacheItem.Value}; new value: {data[gid].Value}");
+                    MeasurementsCache[gid] = data[gid];
+
+
+                    if (!publicationData.ContainsKey(gid))
+                    {
+                        publicationData.Add(gid, MeasurementsCache[gid] as AnalogModbusData);
+                    }
+                    else
+                    {
+                        publicationData[gid] = MeasurementsCache[gid] as AnalogModbusData;
+                    }
+                }
+            }
+
+            //if data is empty that means that there are no new values in the current acquisition cycle
+            if (permissionToPublishData && publicationData.Count > 0)
+            {
+                SCADAMessage scadaMessage = new MultipleAnalogValueSCADAMessage(publicationData);
+                //PublishScadaData(Topic.MEASUREMENT, scadaMessage);
+            }
+        }
+
+        private void MakeDiscreteEntryToMeasurementCache(Dictionary<long, DiscreteModbusData> data, bool permissionToPublishData)
+        {
+            Dictionary<long, DiscreteModbusData> publicationData = new Dictionary<long, DiscreteModbusData>();
+
+            if (data == null)
+            {
+                string message = $"WriteToMeasurementsCache() => readAnalogCommand.Data is null.";
+                Logger.LogError(message);
+                throw new NullReferenceException(message);
+            }
+
+            foreach (long gid in data.Keys)
+            {
+                if (!MeasurementsCache.ContainsKey(gid))
+                {
+                    MeasurementsCache.Add(gid, data[gid]);
+
+                    if (!publicationData.ContainsKey(gid))
+                    {
+                        publicationData.Add(gid, data[gid]);
+                    }
+                    else
+                    {
+                        publicationData[gid] = data[gid];
+                    }
+                }
+                else if (MeasurementsCache[gid] is DiscreteModbusData discreteCacheItem && discreteCacheItem.Value != data[gid].Value)
+                {
+                    Logger.LogDebug($"Value changed on element with id :{discreteCacheItem.MeasurementGid};. Old value: {discreteCacheItem.Value}; new value: {data[gid].Value}");
+                    MeasurementsCache[gid] = data[gid];
+
+                    if (!publicationData.ContainsKey(gid))
+                    {
+                        publicationData.Add(gid, MeasurementsCache[gid] as DiscreteModbusData);
+                    }
+                    else
+                    {
+                        publicationData[gid] = MeasurementsCache[gid] as DiscreteModbusData;
+                    }
+                }
+            }
+
+            //if data is empty that means that there are no new values in the current acquisition cycle
+            if (permissionToPublishData && publicationData.Count > 0)
+            {
+                SCADAMessage scadaMessage = new MultipleDiscreteValueSCADAMessage(publicationData);
+                //PublishScadaData(Topic.SWITCH_STATUS, scadaMessage);
+            }
+        }
+
     }
 }

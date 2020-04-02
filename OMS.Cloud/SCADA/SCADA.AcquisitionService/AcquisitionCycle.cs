@@ -8,6 +8,8 @@ using OMS.Common.SCADA;
 using Outage.Common;
 using System;
 using System.Collections.Generic;
+using System.Configuration;
+using System.Threading.Tasks;
 
 namespace OMS.Cloud.SCADA.AcquisitionService
 {
@@ -29,7 +31,7 @@ namespace OMS.Cloud.SCADA.AcquisitionService
             CloudQueueHelper.TryGetQueue("readcommandqueue", out this.readCommandQueue);
         }
 
-        public async void Start()
+        public async Task Start()
         {
             if (this.readCommandQueue == null)
             {

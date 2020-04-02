@@ -2,10 +2,15 @@
 using System.Collections.Generic;
 using System.Fabric;
 using System.Linq;
+using System.ServiceModel;
 using System.Threading;
 using System.Threading.Tasks;
 using Microsoft.ServiceFabric.Services.Communication.Runtime;
+using Microsoft.ServiceFabric.Services.Communication.Wcf;
+using Microsoft.ServiceFabric.Services.Communication.Wcf.Runtime;
 using Microsoft.ServiceFabric.Services.Runtime;
+using Outage.Common;
+using Outage.Common.ServiceContracts.SCADA;
 
 namespace OMS.Cloud.SCADA.CommandingService
 {
@@ -24,7 +29,40 @@ namespace OMS.Cloud.SCADA.CommandingService
         /// <returns>A collection of listeners.</returns>
         protected override IEnumerable<ServiceInstanceListener> CreateServiceInstanceListeners()
         {
-            return new ServiceInstanceListener[0];
+            return new List<ServiceInstanceListener>()
+            {
+                new ServiceInstanceListener(context =>
+                {
+                    return new WcfCommunicationListener<IScadaCommandingContract>(context,
+                                                                              new CommandingProvider(),
+                                                                              CreateBinding(),
+                                                                              EndpointNames.SCADACommandService);
+                }, EndpointNames.SCADACommandService)
+            };
+        }
+
+        private NetTcpBinding CreateBinding()
+        {
+            //NetTcpBinding binding = new NetTcpBinding(SecurityMode.None)
+            //{
+            //    SendTimeout = TimeSpan.MaxValue,
+            //    ReceiveTimeout = TimeSpan.MaxValue,
+            //    OpenTimeout = TimeSpan.FromMinutes(1),
+            //    CloseTimeout = TimeSpan.FromMinutes(1),
+            //    MaxConnections = int.MaxValue,
+            //    MaxReceivedMessageSize = 1024 * 1024 * 1024,
+            //};
+
+            //binding.MaxBufferSize = (int)binding.MaxReceivedMessageSize;
+            //binding.MaxBufferPoolSize = Environment.ProcessorCount * binding.MaxReceivedMessageSize;
+
+            var binding = WcfUtility.CreateTcpListenerBinding();
+            binding.SendTimeout = TimeSpan.MaxValue;
+            binding.ReceiveTimeout = TimeSpan.MaxValue;
+            binding.OpenTimeout = TimeSpan.FromMinutes(1);
+            binding.CloseTimeout = TimeSpan.FromMinutes(1);
+
+            return (NetTcpBinding)binding;
         }
 
         /// <summary>
