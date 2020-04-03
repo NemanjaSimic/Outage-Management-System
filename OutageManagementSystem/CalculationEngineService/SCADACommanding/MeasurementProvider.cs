@@ -57,7 +57,7 @@ namespace CalculationEngine.SCADAFunctions
 		}
 		public float GetAnalogValue(long measurementGid)
 		{
-			float value = 0;
+			float value = -1;
 			if (analogMeasurements.ContainsKey(measurementGid))
 			{
 				value = analogMeasurements[measurementGid].CurrentValue;
@@ -74,11 +74,12 @@ namespace CalculationEngine.SCADAFunctions
 			}
 			return isOpen;
 		}
-		public void UpdateAnalogMeasurement(long measurementGid, float value, CommandOriginType commandOrigin)
+		private void UpdateAnalogMeasurement(long measurementGid, float value, CommandOriginType commandOrigin, AlarmType alarmType)
 		{
 			if (analogMeasurements.TryGetValue(measurementGid, out AnalogMeasurement measurement))
 			{
 				measurement.CurrentValue = value;
+				measurement.Alarm = alarmType;
 			}
 			else
 			{
@@ -91,8 +92,9 @@ namespace CalculationEngine.SCADAFunctions
 			{
 				AnalogModbusData measurementData = data[gid];
 
-				UpdateAnalogMeasurement(gid, (float)measurementData.Value, measurementData.CommandOrigin);
+				UpdateAnalogMeasurement(gid, (float)measurementData.Value, measurementData.CommandOrigin, measurementData.Alarm);
 			}
+			//DiscreteMeasurementDelegate?.Invoke();
 		}
 		private bool UpdateDiscreteMeasurement(long measurementGid, int value, CommandOriginType commandOrigin)
 		{
@@ -156,7 +158,7 @@ namespace CalculationEngine.SCADAFunctions
 					signalGids.Add(gid);
 				}
 			}
-			DiscreteMeasurementDelegate?.Invoke(signalGids);
+			DiscreteMeasurementDelegate?.Invoke();
 		}
 		public long GetElementGidForMeasurement(long measurementGid)
 		{

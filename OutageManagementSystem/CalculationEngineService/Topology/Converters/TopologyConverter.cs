@@ -59,7 +59,7 @@ namespace Topology
                             {
                                 Gid = discreteMeasurement.Id,
                                 Type = discreteMeasurement.GetMeasurementType(),
-                                Value = discreteMeasurement.GetCurrentVaule()
+                                Value = discreteMeasurement.GetCurrentValue()
                             });
                         }
                         else if (Provider.Instance.MeasurementProvider.TryGetAnalogMeasurement(meausrementGid, out AnalogMeasurement analogMeasurement))
@@ -68,7 +68,7 @@ namespace Topology
                             {
                                 Gid = analogMeasurement.Id,
                                 Type = analogMeasurement.GetMeasurementType(),
-                                Value = analogMeasurement.GetCurrentVaule()
+                                Value = analogMeasurement.GetCurrentValue()
                             });
                         }
                         else

@@ -24,7 +24,7 @@ namespace Topology
 
         public ITopology CreateGraphTopology(long firstElementGid)
         {
-            long currentFider = 0;
+            ITopologyElement currentFider = null;
             elements = Provider.Instance.ModelProvider.GetElementModels();
             connections = Provider.Instance.ModelProvider.GetConnections();
             reclosers = Provider.Instance.ModelProvider.GetReclosers();
@@ -92,15 +92,15 @@ namespace Topology
 
                 if (currentElement.Mrid.Equals("ACL_5"))
                 {
-                    currentFider = currentElement.Id;
+                    currentFider = currentElement;
                 }
                 else if (currentElement.Mrid.Equals("ACL_6"))
                 {
-                    currentFider = currentElement.Id;
+                    currentFider = currentElement;
                 }
                 else
                 {
-                    currentElement.Fider = currentFider;
+                    currentElement.Feeder = currentFider;
                 }
 
                 topology.AddElement(currentElement);

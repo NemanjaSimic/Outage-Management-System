@@ -354,7 +354,7 @@ namespace NetworkModelServiceFunctions
 			{
 				measurement.Id = rs.Id;
 				measurement.Address = rs.GetProperty(ModelCode.MEASUREMENT_ADDRESS).AsString();
-				measurement.isInput = rs.GetProperty(ModelCode.MEASUREMENT_ISINPUT).AsBool();
+				measurement.IsInput = rs.GetProperty(ModelCode.MEASUREMENT_ISINPUT).AsBool();
 				measurement.CurrentValue = rs.GetProperty(ModelCode.ANALOG_CURRENTVALUE).AsFloat();
 				measurement.MaxValue = rs.GetProperty(ModelCode.ANALOG_MAXVALUE).AsFloat();
 				measurement.MinValue = rs.GetProperty(ModelCode.ANALOG_MINVALUE).AsFloat();
@@ -392,7 +392,7 @@ namespace NetworkModelServiceFunctions
 			{
 				measurement.Id = rs.Id;
 				measurement.Address = rs.GetProperty(ModelCode.MEASUREMENT_ADDRESS).AsString();
-				measurement.isInput = rs.GetProperty(ModelCode.MEASUREMENT_ISINPUT).AsBool();
+				measurement.IsInput = rs.GetProperty(ModelCode.MEASUREMENT_ISINPUT).AsBool();
 				measurement.CurrentOpen = rs.GetProperty(ModelCode.DISCRETE_CURRENTOPEN).AsBool();
 				measurement.MaxValue = rs.GetProperty(ModelCode.DISCRETE_MAXVALUE).AsInt();
 				measurement.MinValue = rs.GetProperty(ModelCode.DISCRETE_MINVALUE).AsInt();
@@ -431,7 +431,7 @@ namespace NetworkModelServiceFunctions
 			{
 				Id = noScadaGuid++,
 				Address = "",
-				isInput = false,
+				IsInput = false,
 				CurrentOpen = false,
 				MaxValue = 1,
 				MinValue = 0,

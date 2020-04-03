@@ -20,7 +20,7 @@ namespace CECommon
 		public bool IsRemote { get; set; }
 		public bool IsActive { get; set; }
 		public bool NoReclosing { get; set; }
-		public long Fider { get; set; }
+		public ITopologyElement Feeder { get; set; }
 
 		#endregion
 		public TopologyElement(long gid)

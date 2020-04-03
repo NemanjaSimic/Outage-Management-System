@@ -16,6 +16,6 @@ namespace CECommon.Interfaces
         float NominalVoltage { get; set; }
         Dictionary<long, string> Measurements { get; set; }
         bool NoReclosing { get; set; }
-        long Fider { get; set; }
+        ITopologyElement Feeder { get; set; }
     }
 }
