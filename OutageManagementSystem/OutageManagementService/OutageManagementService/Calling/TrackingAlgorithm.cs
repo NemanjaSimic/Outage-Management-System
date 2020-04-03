@@ -27,25 +27,36 @@ namespace OutageManagementService.Calling
             long currentGid, previousGid;
 
             currentGid = this.potentialOutages[0];
-            while (this.potentialOutages.Count > 0)
+            try
             {
-                currentGid = this.potentialOutages[0];
-                previousGid = currentGid;
-                this.outages.Add(currentGid);
-                this.outageModel.TopologyModel.GetElementByGid(currentGid, out IOutageTopologyElement topologyElement);
-                this.potentialOutages.Remove(currentGid);
-                while (topologyElement.DmsType != "ENERGYSOURCE" && !topologyElement.IsRemote)
+
+
+
+                while (this.potentialOutages.Count > 0)
                 {
-                    FoundOutage = false;
-                    if (TraceDFS(visited, topologyElement, FoundOutage))
+                    currentGid = this.potentialOutages[0];
+                    previousGid = currentGid;
+                    this.outages.Add(currentGid);
+                    this.outageModel.TopologyModel.GetElementByGid(currentGid, out IOutageTopologyElement topologyElement);
+                    this.potentialOutages.Remove(currentGid);
+                    while (topologyElement.DmsType != "ENERGYSOURCE" && !topologyElement.IsRemote && this.potentialOutages.Count > 0)
                     {
-                        this.outages.Remove(previousGid);
-                        this.outages.Add(currentGid);
-                        previousGid = currentGid;
+                        FoundOutage = false;
+                        if (TraceDFS(visited, topologyElement, FoundOutage))
+                        {
+                            this.outages.Remove(previousGid);
+                            this.outages.Add(currentGid);
+                            previousGid = currentGid;
+                        }
+                        topologyElement = GetSwitch(topologyElement.FirstEnd);
+                        if (topologyElement == null) break;
+                        currentGid = topologyElement.Id;
                     }
-                    topologyElement = GetSwitch(topologyElement.FirstEnd);
-                    currentGid = topologyElement.Id;
                 }
+            }
+            catch (Exception ex)
+            {
+                Console.WriteLine("Tracing algorithm failed with error: {0}", ex.Message);
             }
 
             foreach (var item in this.outages)
