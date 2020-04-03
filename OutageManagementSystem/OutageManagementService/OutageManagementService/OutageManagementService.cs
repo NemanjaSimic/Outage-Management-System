@@ -1,6 +1,7 @@
 ﻿using OMSCommon.OutageDatabaseModel;
 using Outage.Common;
 using Outage.Common.GDA;
+using Outage.Common.PubSub.EmailDataContract;
 using Outage.Common.ServiceContracts.GDA;
 using Outage.Common.ServiceContracts.PubSub;
 using Outage.Common.ServiceProxies;
@@ -56,6 +57,7 @@ namespace OutageManagementService
             SubscribeOnEmailService();
             
             InitializeHosts();
+          
         }
 
         #region GDAHelper
