@@ -1,6 +1,7 @@
 ﻿using OMSCommon.OutageDatabaseModel;
 using Outage.Common;
 using Outage.Common.GDA;
+using Outage.Common.PubSub.EmailDataContract;
 using Outage.Common.ServiceContracts.GDA;
 using Outage.Common.ServiceContracts.PubSub;
 using Outage.Common.ServiceProxies;
@@ -74,6 +75,7 @@ namespace OutageManagementService
             callTracker = new CallTracker("CallTrackerSubscriber", outageModel);
             SubscribeOnEmailService();
             InitializeHosts();
+          
         }
 
         #region GDAHelper
