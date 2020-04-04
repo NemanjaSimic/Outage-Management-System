@@ -1,10 +1,15 @@
-﻿using OMS.Cloud.SCADA.Data.Repository;
+﻿using Common.SCADA;
+using Microsoft.ServiceFabric.Data;
+using OMS.Cloud.SCADA.Data.Repository;
+using OMS.Common.Cloud.ReliableCollectionHelpers;
+using OMS.Common.SCADA;
 using OMS.Common.ScadaContracts;
 using Outage.Common;
 using Outage.Common.Exceptions.SCADA;
 using Outage.Common.PubSub.SCADADataContract;
 using System;
 using System.Collections.Generic;
+using System.Threading.Tasks;
 
 namespace OMS.Cloud.SCADA.ModelProviderService.ContractProviders
 {
@@ -16,41 +21,54 @@ namespace OMS.Cloud.SCADA.ModelProviderService.ContractProviders
             get { return logger ?? (logger = LoggerWrapper.Instance); }
         }
 
-        #region IScadaIntegrityUpdateContract
-        public Dictionary<Topic, SCADAPublication> GetIntegrityUpdate()
+        private readonly ReliableDictionaryAccess<long, ISCADAModelPointItem> gidToPointItemMap;
+        private readonly ReliableDictionaryAccess<long, CommandDescription> commandDescriptionCache;
+
+        public IntegrityUpdateProvider(IReliableStateManager stateManager)
         {
-            if (scadaModel == null)
+            this.gidToPointItemMap = new ReliableDictionaryAccess<long, ISCADAModelPointItem>(stateManager, ReliableDictionaryNames.GidToPointItemMap);
+            this.commandDescriptionCache = new ReliableDictionaryAccess<long, CommandDescription>(stateManager, ReliableDictionaryNames.CommandDescriptionCache);
+        }
+
+        #region IScadaIntegrityUpdateContract
+        public async Task<Dictionary<Topic, SCADAPublication>> GetIntegrityUpdate()
+        {
+            if (this.gidToPointItemMap == null)
             {
-                string message = $"GetIntegrityUpdate => SCADA model is null.";
+                string message = $"GetIntegrityUpdate => gidToPointItemMap is null.";
                 Logger.LogError(message);
                 throw new InternalSCADAServiceException(message);
             }
 
-            var currentScadaModel = scadaModel.CurrentScadaModel;
-            var commandValuesCache = scadaModel.CommandedValuesCache;
+            if (this.commandDescriptionCache == null)
+            {
+                string message = $"GetIntegrityUpdate => commandDescriptionCache is null.";
+                Logger.LogError(message);
+                throw new InternalSCADAServiceException(message);
+            }
 
             Dictionary<long, AnalogModbusData> analogModbusData = new Dictionary<long, AnalogModbusData>();
             Dictionary<long, DiscreteModbusData> discreteModbusData = new Dictionary<long, DiscreteModbusData>();
 
-            foreach (long gid in currentScadaModel.Keys)
+            foreach (long gid in this.gidToPointItemMap.Keys)
             {
                 CommandOriginType commandOrigin = CommandOriginType.OTHER_COMMAND;
 
-                if (currentScadaModel[gid] is AnalogSCADAModelPointItem analogPointItem)
+                if (this.gidToPointItemMap[gid] is AnalogSCADAModelPointItem analogPointItem)
                 {
-                    if (commandValuesCache.ContainsKey(gid) && commandValuesCache[gid].Value == analogPointItem.CurrentRawValue)
+                    if (this.commandDescriptionCache.ContainsKey(gid) && this.commandDescriptionCache[gid].Value == analogPointItem.CurrentRawValue)
                     {
-                        commandOrigin = commandValuesCache[gid].CommandOrigin;
+                        commandOrigin = this.commandDescriptionCache[gid].CommandOrigin;
                     }
 
                     AnalogModbusData analogValue = new AnalogModbusData(analogPointItem.CurrentEguValue, analogPointItem.Alarm, gid, commandOrigin);
                     analogModbusData.Add(gid, analogValue);
                 }
-                else if (currentScadaModel[gid] is DiscreteSCADAModelPointItem discretePointItem)
+                else if (this.gidToPointItemMap[gid] is DiscreteSCADAModelPointItem discretePointItem)
                 {
-                    if (commandValuesCache.ContainsKey(gid) && commandValuesCache[gid].Value == discretePointItem.CurrentValue)
+                    if (this.commandDescriptionCache.ContainsKey(gid) && this.commandDescriptionCache[gid].Value == discretePointItem.CurrentValue)
                     {
-                        commandOrigin = commandValuesCache[gid].CommandOrigin;
+                        commandOrigin = this.commandDescriptionCache[gid].CommandOrigin;
                     }
 
                     DiscreteModbusData discreteValue = new DiscreteModbusData(discretePointItem.CurrentValue, discretePointItem.Alarm, gid, commandOrigin);
@@ -73,48 +91,52 @@ namespace OMS.Cloud.SCADA.ModelProviderService.ContractProviders
             return scadaPublications;
         }
 
-        public SCADAPublication GetIntegrityUpdateForSpecificTopic(Topic topic)
+        public async Task<SCADAPublication> GetIntegrityUpdateForSpecificTopic(Topic topic)
         {
-            if (scadaModel == null)
+            if (this.gidToPointItemMap == null)
             {
-                string message = $"GetIntegrityUpdate => SCADA model is null.";
+                string message = $"GetIntegrityUpdate => gidToPointItemMap is null.";
                 Logger.LogError(message);
                 throw new InternalSCADAServiceException(message);
             }
 
-            SCADAPublication scadaPublication;
-
-            var currentScadaModel = scadaModel.CurrentScadaModel;
-            var commandValuesCache = scadaModel.CommandedValuesCache;
+            if (this.commandDescriptionCache == null)
+            {
+                string message = $"GetIntegrityUpdate => commandDescriptionCache is null.";
+                Logger.LogError(message);
+                throw new InternalSCADAServiceException(message);
+            }
 
             Dictionary<long, AnalogModbusData> analogModbusData = new Dictionary<long, AnalogModbusData>();
             Dictionary<long, DiscreteModbusData> discreteModbusData = new Dictionary<long, DiscreteModbusData>();
 
-            foreach (long gid in currentScadaModel.Keys)
+            foreach (long gid in this.gidToPointItemMap.Keys)
             {
                 CommandOriginType commandOrigin = CommandOriginType.OTHER_COMMAND;
 
-                if (topic == Topic.MEASUREMENT && currentScadaModel[gid] is AnalogSCADAModelPointItem analogPointItem)
+                if (topic == Topic.MEASUREMENT && this.gidToPointItemMap[gid] is AnalogSCADAModelPointItem analogPointItem)
                 {
-                    if (commandValuesCache.ContainsKey(gid) && commandValuesCache[gid].Value == analogPointItem.CurrentRawValue)
+                    if (this.commandDescriptionCache.ContainsKey(gid) && this.commandDescriptionCache[gid].Value == analogPointItem.CurrentRawValue)
                     {
-                        commandOrigin = commandValuesCache[gid].CommandOrigin;
+                        commandOrigin = this.commandDescriptionCache[gid].CommandOrigin;
                     }
 
                     AnalogModbusData analogValue = new AnalogModbusData(analogPointItem.CurrentEguValue, analogPointItem.Alarm, gid, commandOrigin);
                     analogModbusData.Add(gid, analogValue);
                 }
-                else if (topic == Topic.SWITCH_STATUS && currentScadaModel[gid] is DiscreteSCADAModelPointItem discretePointItem)
+                else if (topic == Topic.SWITCH_STATUS && this.gidToPointItemMap[gid] is DiscreteSCADAModelPointItem discretePointItem)
                 {
-                    if (commandValuesCache.ContainsKey(gid) && commandValuesCache[gid].Value == discretePointItem.CurrentValue)
+                    if (this.commandDescriptionCache.ContainsKey(gid) && this.commandDescriptionCache[gid].Value == discretePointItem.CurrentValue)
                     {
-                        commandOrigin = commandValuesCache[gid].CommandOrigin;
+                        commandOrigin = this.commandDescriptionCache[gid].CommandOrigin;
                     }
 
                     DiscreteModbusData discreteValue = new DiscreteModbusData(discretePointItem.CurrentValue, discretePointItem.Alarm, gid, commandOrigin);
                     discreteModbusData.Add(gid, discreteValue);
                 }
             }
+
+            SCADAPublication scadaPublication;
 
             if (topic == Topic.MEASUREMENT)
             {

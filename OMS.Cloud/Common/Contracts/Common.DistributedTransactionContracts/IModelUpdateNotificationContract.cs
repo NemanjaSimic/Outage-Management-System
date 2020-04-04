@@ -2,6 +2,7 @@
 using OMS.Common.NmsContracts.GDA;
 using System.Collections.Generic;
 using System.ServiceModel;
+using System.Threading.Tasks;
 
 namespace OMS.Common.DistributedTransactionContracts
 {
@@ -9,6 +10,6 @@ namespace OMS.Common.DistributedTransactionContracts
     public interface IModelUpdateNotificationContract : IService
     {
         [OperationContract]
-        bool NotifyAboutUpdate(Dictionary<DeltaOpType, List<long>> modelChanges);
+        Task<bool> NotifyAboutUpdate(Dictionary<DeltaOpType, List<long>> modelChanges);
     }
 }

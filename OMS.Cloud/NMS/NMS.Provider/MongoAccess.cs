@@ -1,17 +1,14 @@
 ﻿using OMS.Cloud.NMS.GdaProvider.DbModel;
-using Microsoft.ServiceFabric.Data.Collections;
 using MongoDB.Bson;
 using MongoDB.Bson.Serialization;
 using MongoDB.Bson.Serialization.Serializers;
 using MongoDB.Driver;
 using Outage.Common;
-using Outage.Common.GDA;
-using Outage.DataModel;
 using System;
 using System.Collections.Generic;
 using System.Linq;
-using System.Text;
-using System.Threading.Tasks;
+using OMS.Cloud.NMS.DataModel;
+using OMS.Common.NmsContracts.GDA;
 
 namespace OMS.Cloud.NMS.GdaProvider
 {

@@ -1,5 +1,5 @@
-﻿using Outage.Common;
-using Outage.DataModel;
+﻿using OMS.Cloud.NMS.DataModel;
+using Outage.Common;
 using System;
 using System.Collections.Generic;
 using System.Linq;

@@ -1,14 +1,12 @@
 ﻿using Microsoft.ServiceFabric.Services.Client;
-using Microsoft.ServiceFabric.Services.Communication.Wcf;
 using Microsoft.ServiceFabric.Services.Communication.Wcf.Client;
+using OMS.Common.NmsContracts;
+using OMS.Common.NmsContracts.GDA;
 using Outage.Common;
-using Outage.Common.GDA;
-using Outage.Common.ServiceContracts.GDA;
 using System;
 using System.Collections.Generic;
 using System.Configuration;
 using System.Fabric;
-using System.ServiceModel;
 using System.Threading.Tasks;
 
 namespace OMS.Common.Cloud.WcfServiceFabricClients.NMS

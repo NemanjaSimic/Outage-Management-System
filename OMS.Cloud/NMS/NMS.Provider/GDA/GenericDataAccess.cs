@@ -1,6 +1,6 @@
-﻿using Outage.Common;
-using Outage.Common.ServiceContracts.GDA;
-using Outage.Common.GDA;
+﻿using OMS.Common.NmsContracts;
+using OMS.Common.NmsContracts.GDA;
+using Outage.Common;
 using System;
 using System.Collections.Generic;
 using System.Threading.Tasks;
@@ -51,8 +51,7 @@ namespace OMS.Cloud.NMS.GdaProvider.GDA
             try
             {
                 ResourceIterator ri = networkModel.GetExtentValues(entityType, propIds);
-                int retVal = AddIterator(ri).Result;
-
+                int retVal = AddIterator(ri);
                 return retVal;
             }
             catch (Exception ex)
@@ -68,8 +67,7 @@ namespace OMS.Cloud.NMS.GdaProvider.GDA
             try
             {
                 ResourceIterator ri = networkModel.GetRelatedValues(source, propIds, association);
-                int retVal =  AddIterator(ri).Result;
-
+                int retVal =  AddIterator(ri);
                 return retVal;
             }
             catch (Exception ex)
@@ -84,9 +82,8 @@ namespace OMS.Cloud.NMS.GdaProvider.GDA
         {
             try
             {
-                List<ResourceDescription> retVal = GetIterator(id).Result.Next(n);
-
-                return retVal;
+                ResourceIterator iterator = GetIterator(id);
+                return iterator.Next(n);
             }
             catch (Exception ex)
             {
@@ -100,8 +97,8 @@ namespace OMS.Cloud.NMS.GdaProvider.GDA
         {
             try
             {
-                GetIterator(id).Result.Rewind();
-
+                ResourceIterator iterator = GetIterator(id);
+                iterator.Rewind();
                 return true;
             }
             catch (Exception ex)
@@ -116,8 +113,8 @@ namespace OMS.Cloud.NMS.GdaProvider.GDA
         {
             try
             {
-                int retVal = GetIterator(id).Result.ResourcesTotal();
-                return retVal;
+                ResourceIterator iterator = GetIterator(id);
+                return iterator.ResourcesTotal();
             }
             catch (Exception ex)
             {
@@ -131,9 +128,8 @@ namespace OMS.Cloud.NMS.GdaProvider.GDA
         {
             try
             {
-                int resourcesLeft = GetIterator(id).Result.ResourcesLeft();
-
-                return resourcesLeft;
+                ResourceIterator iterator = GetIterator(id);
+                return iterator.ResourcesLeft();
             }
             catch (Exception ex)
             {
@@ -147,8 +143,7 @@ namespace OMS.Cloud.NMS.GdaProvider.GDA
         {
             try
             {
-                bool retVal = await RemoveIterator(id);
-
+                bool retVal = RemoveIterator(id);
                 return retVal;
             }
             catch (Exception ex)
@@ -159,7 +154,7 @@ namespace OMS.Cloud.NMS.GdaProvider.GDA
             }
         }
 
-        private async Task<int> AddIterator(ResourceIterator iterator)
+        private int AddIterator(ResourceIterator iterator)
         {
             lock (resourceIterators)
             {
@@ -169,7 +164,7 @@ namespace OMS.Cloud.NMS.GdaProvider.GDA
             }
         }
 
-        private async Task<ResourceIterator> GetIterator(int iteratorId)
+        private ResourceIterator GetIterator(int iteratorId)
         {
             lock (resourceIterators)
             {
@@ -184,7 +179,7 @@ namespace OMS.Cloud.NMS.GdaProvider.GDA
             }
         }
 
-        private async Task<bool> RemoveIterator(int iteratorId)
+        private bool RemoveIterator(int iteratorId)
         {
             lock (resourceIterators)
             {

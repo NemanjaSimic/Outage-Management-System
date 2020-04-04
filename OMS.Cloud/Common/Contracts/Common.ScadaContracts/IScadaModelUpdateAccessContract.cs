@@ -2,6 +2,7 @@
 using Outage.Common.PubSub.SCADADataContract;
 using System.Collections.Generic;
 using System.ServiceModel;
+using System.Threading.Tasks;
 
 namespace OMS.Common.ScadaContracts
 {
@@ -9,9 +10,9 @@ namespace OMS.Common.ScadaContracts
     public interface IScadaModelUpdateAccessContract : IService
     {
         [OperationContract]
-        void MakeAnalogEntryToMeasurementCache(Dictionary<long, AnalogModbusData> data, bool permissionToPublishData);
+        Task MakeAnalogEntryToMeasurementCache(Dictionary<long, AnalogModbusData> data, bool permissionToPublishData);
 
         [OperationContract]
-        void MakeDiscreteEntryToMeasurementCache(Dictionary<long, DiscreteModbusData> data, bool permissionToPublishData);
+        Task MakeDiscreteEntryToMeasurementCache(Dictionary<long, DiscreteModbusData> data, bool permissionToPublishData);
     }
 }

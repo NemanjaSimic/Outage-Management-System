@@ -33,12 +33,12 @@ namespace OMS.Common.Cloud.WcfServiceFabricClients.SCADA
         }
 
         #region IScadaCommandingContract
-        public Task<bool> SendAnalogCommand(long gid, float commandingValue, CommandOriginType commandOriginType)
+        public Task SendAnalogCommand(long gid, float commandingValue, CommandOriginType commandOriginType)
         {
             return InvokeWithRetryAsync(client => client.Channel.SendAnalogCommand(gid, commandingValue, commandOriginType));
         }
 
-        public Task<bool> SendDiscreteCommand(long gid, ushort commandingValue, CommandOriginType commandOriginType)
+        public Task SendDiscreteCommand(long gid, ushort commandingValue, CommandOriginType commandOriginType)
         {
             return InvokeWithRetryAsync(client => client.Channel.SendDiscreteCommand(gid, commandingValue, commandOriginType));
         }

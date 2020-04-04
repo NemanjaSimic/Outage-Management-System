@@ -3,6 +3,7 @@ using OMS.Common.DistributedTransactionContracts;
 using OMS.Common.NmsContracts.GDA;
 using Outage.Common;
 using System.Collections.Generic;
+using System.Threading.Tasks;
 
 namespace OMS.Cloud.TMS.DistributedTransactionActor
 {
@@ -22,6 +23,6 @@ namespace OMS.Cloud.TMS.DistributedTransactionActor
             transactionEnlistmentClient = TransactionEnlistmentClient.CreateClient();
         }
 
-        public abstract bool NotifyAboutUpdate(Dictionary<DeltaOpType, List<long>> modelChanges);
+        public abstract Task<bool> NotifyAboutUpdate(Dictionary<DeltaOpType, List<long>> modelChanges);
     }
 }

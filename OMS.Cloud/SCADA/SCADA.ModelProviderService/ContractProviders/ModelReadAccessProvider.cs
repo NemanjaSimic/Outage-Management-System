@@ -1,40 +1,71 @@
-﻿using OMS.Common.SCADA;
+﻿using Common.SCADA;
+using Microsoft.ServiceFabric.Data;
+using OMS.Cloud.SCADA.Data.Configuration;
+using OMS.Common.Cloud.ReliableCollectionHelpers;
+using OMS.Common.SCADA;
 using OMS.Common.ScadaContracts;
 using System;
 using System.Collections.Generic;
+using System.Threading.Tasks;
 
 namespace OMS.Cloud.SCADA.ModelProviderService.ContractProviders
 {
     internal class ModelReadAccessProvider : IScadaModelReadAccessContract
     {
-        public Dictionary<PointType, Dictionary<ushort, long>> GetAddressToGidMap()
+        private ISCADAConfigData configData;
+        private readonly ReliableDictionaryAccess<long, ISCADAModelPointItem> gidToPointItemMap;
+        private readonly ReliableDictionaryAccess<ushort, Dictionary<ushort, long>> addressToGidMap;
+        private readonly ReliableDictionaryAccess<long, CommandDescription> commandDescriptionCache;
+
+        public ModelReadAccessProvider(IReliableStateManager stateManager)
+        {
+            this.configData = SCADAConfigData.Instance;
+
+            this.gidToPointItemMap = new ReliableDictionaryAccess<long, ISCADAModelPointItem>(stateManager, ReliableDictionaryNames.GidToPointItemMap);
+            this.addressToGidMap = new ReliableDictionaryAccess<ushort, Dictionary<ushort, long>>(stateManager, ReliableDictionaryNames.AddressToGidMap);
+            this.commandDescriptionCache = new ReliableDictionaryAccess<long, CommandDescription>(stateManager, ReliableDictionaryNames.CommandDescriptionCache);
+        }
+
+        public async Task<bool> GetIsScadaModelImportedIndicator()
         {
             throw new NotImplementedException();
         }
 
-        public Dictionary<PointType, Dictionary<ushort, ISCADAModelPointItem>> GetAddressToPointItemMap()
+        public async Task<ISCADAConfigData> GetScadaConfigData()
         {
-            throw new NotImplementedException();
+            return this.configData;
         }
 
-        public Dictionary<long, CommandDescription> GetCommandDescriptionCache()
+        public async Task<Dictionary<long, ISCADAModelPointItem>> GetGidToPointItemMap()
         {
-            throw new NotImplementedException();
+            return this.gidToPointItemMap.GetDataCopy();
         }
 
-        public Dictionary<long, ISCADAModelPointItem> GetGidToPointItemMap()
+        public async Task<Dictionary<ushort, Dictionary<ushort, ISCADAModelPointItem>>> GetAddressToPointItemMap()
         {
-            throw new NotImplementedException();
+            Dictionary<long, ISCADAModelPointItem> gidToPointItemMap = await GetGidToPointItemMap();
+            Dictionary<ushort, Dictionary<ushort, long>> addressToGidMap = await GetAddressToGidMap();
+            Dictionary<ushort, Dictionary<ushort, ISCADAModelPointItem>> addressToPointItemMap = new Dictionary<ushort, Dictionary<ushort, ISCADAModelPointItem>>(addressToGidMap.Count);
+
+            foreach(ushort key in addressToGidMap.Keys)
+            {
+                foreach(ushort address in addressToGidMap[key].Keys)
+                {
+                    addressToPointItemMap[key][address] = gidToPointItemMap[addressToGidMap[key][address]];
+                }
+            }
+
+            return addressToPointItemMap;
         }
 
-        public bool GetIsScadaModelImportedIndicator()
+        public async Task<Dictionary<ushort, Dictionary<ushort, long>>> GetAddressToGidMap()
         {
-            throw new NotImplementedException();
+            return this.addressToGidMap.GetDataCopy();
         }
 
-        public ISCADAConfigData GetScadaConfigData()
+        public async Task<Dictionary<long, CommandDescription>> GetCommandDescriptionCache()
         {
-            throw new NotImplementedException();
-        }
+            return this.commandDescriptionCache.GetDataCopy();
+        }        
     }
 }

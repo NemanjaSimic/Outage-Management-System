@@ -2,6 +2,7 @@
 using OMS.Common.SCADA;
 using System.Collections.Generic;
 using System.ServiceModel;
+using System.Threading.Tasks;
 
 namespace OMS.Common.ScadaContracts
 {
@@ -9,21 +10,21 @@ namespace OMS.Common.ScadaContracts
     public interface IScadaModelReadAccessContract : IService
     {
         [OperationContract]
-        bool GetIsScadaModelImportedIndicator();
+        Task<bool> GetIsScadaModelImportedIndicator();
 
         [OperationContract]
-        ISCADAConfigData GetScadaConfigData();
+        Task<ISCADAConfigData> GetScadaConfigData();
 
         [OperationContract]
-        Dictionary<long, ISCADAModelPointItem> GetGidToPointItemMap();
+        Task<Dictionary<long, ISCADAModelPointItem>> GetGidToPointItemMap();
 
         [OperationContract]
-        Dictionary<PointType, Dictionary<ushort, long>> GetAddressToGidMap();
+        Task<Dictionary<ushort, Dictionary<ushort, long>>> GetAddressToGidMap();
 
         [OperationContract]
-        Dictionary<PointType, Dictionary<ushort, ISCADAModelPointItem>> GetAddressToPointItemMap();
+        Task<Dictionary<ushort, Dictionary<ushort, ISCADAModelPointItem>>> GetAddressToPointItemMap();
 
         [OperationContract]
-        Dictionary<long, CommandDescription> GetCommandDescriptionCache();
+        Task<Dictionary<long, CommandDescription>> GetCommandDescriptionCache();
     }
 }

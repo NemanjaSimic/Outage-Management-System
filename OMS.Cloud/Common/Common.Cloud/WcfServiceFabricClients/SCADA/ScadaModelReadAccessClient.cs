@@ -6,6 +6,7 @@ using System;
 using System.Collections.Generic;
 using System.Configuration;
 using System.Fabric;
+using System.Threading.Tasks;
 
 namespace OMS.Common.Cloud.WcfServiceFabricClients.SCADA
 {
@@ -31,34 +32,34 @@ namespace OMS.Common.Cloud.WcfServiceFabricClients.SCADA
         }
 
         #region IScadaModelAccessContract
-        public Dictionary<PointType, Dictionary<ushort, long>> GetAddressToGidMap()
+        public Task<Dictionary<ushort, Dictionary<ushort, long>>> GetAddressToGidMap()
         {
-            throw new NotImplementedException();
+            return InvokeWithRetryAsync(client => client.Channel.GetAddressToGidMap());
         }
 
-        public Dictionary<PointType, Dictionary<ushort, ISCADAModelPointItem>> GetAddressToPointItemMap()
+        public Task<Dictionary<ushort, Dictionary<ushort, ISCADAModelPointItem>>> GetAddressToPointItemMap()
         {
-            throw new NotImplementedException();
+            return InvokeWithRetryAsync(client => client.Channel.GetAddressToPointItemMap());
         }
 
-        public Dictionary<long, CommandDescription> GetCommandDescriptionCache()
+        public Task<Dictionary<long, CommandDescription>> GetCommandDescriptionCache()
         {
-            throw new NotImplementedException();
+            return InvokeWithRetryAsync(client => client.Channel.GetCommandDescriptionCache());
         }
 
-        public Dictionary<long, ISCADAModelPointItem> GetGidToPointItemMap()
+        public Task<Dictionary<long, ISCADAModelPointItem>> GetGidToPointItemMap()
         {
-            throw new NotImplementedException();
+            return InvokeWithRetryAsync(client => client.Channel.GetGidToPointItemMap());
         }
 
-        public bool GetIsScadaModelImportedIndicator()
+        public Task<bool> GetIsScadaModelImportedIndicator()
         {
-            throw new NotImplementedException();
+            return InvokeWithRetryAsync(client => client.Channel.GetIsScadaModelImportedIndicator());
         }
 
-        public ISCADAConfigData GetScadaConfigData()
+        public Task<ISCADAConfigData> GetScadaConfigData()
         {
-            throw new NotImplementedException();
+            return InvokeWithRetryAsync(client => client.Channel.GetScadaConfigData());
         }
         #endregion
     }

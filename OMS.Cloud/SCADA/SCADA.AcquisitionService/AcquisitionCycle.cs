@@ -48,7 +48,7 @@ namespace OMS.Cloud.SCADA.AcquisitionService
                 this.scadaModelClient = ScadaModelReadAccessClient.CreateClient();
             }
 
-            Dictionary<PointType, Dictionary<ushort, long>> addressToGidMap = scadaModelClient.GetAddressToGidMap();
+            Dictionary<ushort, Dictionary<ushort, long>> addressToGidMap = await scadaModelClient.GetAddressToGidMap();
 
             foreach (var kvp in addressToGidMap)
             {
@@ -60,10 +60,10 @@ namespace OMS.Cloud.SCADA.AcquisitionService
             }
         }
 
-        private bool TryCreateModbusFunction(KeyValuePair<PointType, Dictionary<ushort, long>> addressToGidMapKvp, out IReadModbusFunction modbusFunction)
+        private bool TryCreateModbusFunction(KeyValuePair<ushort, Dictionary<ushort, long>> addressToGidMapKvp, out IReadModbusFunction modbusFunction)
         {
             modbusFunction = null;
-            PointType pointType = addressToGidMapKvp.Key;
+            PointType pointType = (PointType)addressToGidMapKvp.Key;
             Dictionary<ushort, long> addressToGidMap = addressToGidMapKvp.Value;
             ModbusFunctionCode functionCode;
 

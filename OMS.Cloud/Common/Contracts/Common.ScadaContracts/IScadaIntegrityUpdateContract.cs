@@ -5,6 +5,7 @@ using Outage.Common.PubSub.SCADADataContract;
 using System;
 using System.Collections.Generic;
 using System.ServiceModel;
+using System.Threading.Tasks;
 
 namespace OMS.Common.ScadaContracts
 {
@@ -19,7 +20,7 @@ namespace OMS.Common.ScadaContracts
         [ServiceKnownType(typeof(MultipleAnalogValueSCADAMessage))]
         [ServiceKnownType(typeof(SingleDiscreteValueSCADAMessage))]
         [ServiceKnownType(typeof(MultipleDiscreteValueSCADAMessage))]
-        Dictionary<Topic, SCADAPublication> GetIntegrityUpdate();
+        Task<Dictionary<Topic, SCADAPublication>> GetIntegrityUpdate();
 
         [OperationContract]
         [FaultContract(typeof(ArgumentException))]
@@ -29,6 +30,6 @@ namespace OMS.Common.ScadaContracts
         [ServiceKnownType(typeof(MultipleAnalogValueSCADAMessage))]
         [ServiceKnownType(typeof(SingleDiscreteValueSCADAMessage))]
         [ServiceKnownType(typeof(MultipleDiscreteValueSCADAMessage))]
-        SCADAPublication GetIntegrityUpdateForSpecificTopic(Topic topic);
+        Task<SCADAPublication> GetIntegrityUpdateForSpecificTopic(Topic topic);
     }
 }

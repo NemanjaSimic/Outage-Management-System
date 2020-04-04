@@ -26,7 +26,7 @@ namespace OMS.Cloud.SCADA.ModelProviderService
         public ModelProviderService(StatefulServiceContext context)
             : base(context)
         {
-            scadaModel = new ScadaModel(new ModelResourcesDesc(), new EnumDescs());
+            scadaModel = new ScadaModel(this.StateManager, new ModelResourcesDesc(), new EnumDescs());
         }
 
         /// <summary>
@@ -44,7 +44,7 @@ namespace OMS.Cloud.SCADA.ModelProviderService
                 new ServiceReplicaListener(context =>
                 {
                     return new WcfCommunicationListener<IScadaIntegrityUpdateContract>(context,
-                                                                           new IntegrityUpdateProvider(),
+                                                                           new IntegrityUpdateProvider(this.StateManager),
                                                                            TcpBindingHelper.CreateListenerBinding(),
                                                                            EndpointNames.SCADAIntegrityUpdateEndpoint);
                 }, EndpointNames.SCADAIntegrityUpdateEndpoint),
@@ -53,7 +53,7 @@ namespace OMS.Cloud.SCADA.ModelProviderService
                 new ServiceReplicaListener(context =>
                 {
                     return new WcfCommunicationListener<IScadaModelReadAccessContract>(context,
-                                                                           new ModelReadAccessProvider(),
+                                                                           new ModelReadAccessProvider(this.StateManager),
                                                                            TcpBindingHelper.CreateListenerBinding(),
                                                                            EndpointNames.ScadaModelReadAccessEndpoint);
                 }, EndpointNames.ScadaModelReadAccessEndpoint),
@@ -62,7 +62,7 @@ namespace OMS.Cloud.SCADA.ModelProviderService
                 new ServiceReplicaListener(context =>
                 {
                     return new WcfCommunicationListener<IScadaModelUpdateAccessContract>(context,
-                                                                           new ModelUpdateAccessProvider(),
+                                                                           new ModelUpdateAccessProvider(this.StateManager),
                                                                            TcpBindingHelper.CreateListenerBinding(),
                                                                            EndpointNames.ScadaModelUpdateAccessEndpoint);
                 }, EndpointNames.ScadaModelUpdateAccessEndpoint),

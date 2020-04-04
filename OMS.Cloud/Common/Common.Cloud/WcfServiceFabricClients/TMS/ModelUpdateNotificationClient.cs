@@ -6,6 +6,7 @@ using System;
 using System.Collections.Generic;
 using System.Configuration;
 using System.Fabric;
+using System.Threading.Tasks;
 
 namespace OMS.Common.Cloud.WcfServiceFabricClients.TMS
 {
@@ -31,9 +32,9 @@ namespace OMS.Common.Cloud.WcfServiceFabricClients.TMS
         }
 
         #region IModelUpdateNotificationContract
-        public bool NotifyAboutUpdate(Dictionary<DeltaOpType, List<long>> modelChanges)
+        public Task<bool> NotifyAboutUpdate(Dictionary<DeltaOpType, List<long>> modelChanges)
         {
-            throw new NotImplementedException();
+            return InvokeWithRetryAsync(client => client.Channel.NotifyAboutUpdate(modelChanges));
         }
         #endregion
     }

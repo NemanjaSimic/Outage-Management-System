@@ -3,6 +3,7 @@ using OMS.Common.Cloud.WcfServiceFabricClients.TMS;
 using OMS.Common.DistributedTransactionContracts;
 using OMS.Common.NmsContracts.GDA;
 using System.Collections.Generic;
+using System.Threading.Tasks;
 
 namespace OMS.Cloud.SCADA.ModelProviderService.DistributedTransaction
 {
@@ -16,9 +17,11 @@ namespace OMS.Cloud.SCADA.ModelProviderService.DistributedTransaction
             this.modelUpdateNotification = modelUpdateNotification;
         }
 
-        public override bool NotifyAboutUpdate(Dictionary<DeltaOpType, List<long>> modelChanges)
+        public override async Task<bool> NotifyAboutUpdate(Dictionary<DeltaOpType, List<long>> modelChanges)
         {
-            if(!this.modelUpdateNotification.NotifyAboutUpdate(modelChanges))
+            bool result = await this.modelUpdateNotification.NotifyAboutUpdate(modelChanges);
+            
+            if (!result)
             {
                 return false;
             }

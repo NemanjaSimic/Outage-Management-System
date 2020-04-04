@@ -3,6 +3,7 @@ using Microsoft.ServiceFabric.Data.Collections;
 using System.Collections.Generic;
 using System;
 using System.Threading;
+using System.Threading.Tasks;
 
 namespace OMS.Common.Cloud.ReliableCollectionHelpers
 {

@@ -32,17 +32,17 @@ namespace OMS.Common.Cloud.WcfServiceFabricClients.TMS
         #region ITransactionActorContract
         public Task<bool> Prepare()
         {
-            throw new NotImplementedException();
+            return InvokeWithRetryAsync(client => client.Channel.Prepare());
         }
 
         public Task Commit()
         {
-            throw new NotImplementedException();
+            return InvokeWithRetryAsync(client => client.Channel.Commit());
         }
 
         public Task Rollback()
         {
-            throw new NotImplementedException();
+            return InvokeWithRetryAsync(client => client.Channel.Rollback());
         }
         #endregion
     }

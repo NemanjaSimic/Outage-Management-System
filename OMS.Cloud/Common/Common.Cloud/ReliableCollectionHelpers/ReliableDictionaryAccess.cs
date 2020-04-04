@@ -21,10 +21,17 @@ namespace OMS.Common.Cloud.ReliableCollectionHelpers
         private readonly string reliableDictionaryName;
         
         private IReliableDictionary<TKey, TValue> reliableDictionary;
+       
         private IDictionary<TKey, TValue> localDictionary;
         private IDictionary<TKey, TValue> LocalDictionary
         {
             get { return localDictionary ?? (localDictionary = new Dictionary<TKey, TValue>()); }
+        }
+        
+        private IDictionary<TKey, TValue> enumerableDictionary;
+        private IDictionary<TKey, TValue> EnumerableDictionary
+        {
+            get { return enumerableDictionary ?? (enumerableDictionary = new Dictionary<TKey, TValue>()); }
         }
 
         public ReliableDictionaryAccess(IReliableStateManager stateManager, string reliableDictioanryName)
@@ -56,6 +63,11 @@ namespace OMS.Common.Cloud.ReliableCollectionHelpers
                 this.reliableDictionary.DictionaryChanged += this.OnDictionaryChangedHandler;
                 await tx.CommitAsync();
             }
+        }
+
+        public Dictionary<TKey, TValue> GetDataCopy()
+        {
+            return new Dictionary<TKey, TValue>(LocalDictionary);
         }
 
         #region NotificationHandlers
@@ -577,8 +589,8 @@ namespace OMS.Common.Cloud.ReliableCollectionHelpers
 
         public IEnumerator<KeyValuePair<TKey, TValue>> GetEnumerator()
         {
-            //TODO: diskutabilno -> ako se odrzava lokalna projekcija IReliableDictionary-ja, moze doci do promene reliable kolekcije u toku iteriranja kroz lokalnu kolekciju 
-            return LocalDictionary.GetEnumerator();
+            enumerableDictionary = new Dictionary<TKey, TValue>(LocalDictionary);
+            return EnumerableDictionary.GetEnumerator();
         }
 
         public async Task<bool> Remove(TKey key)
@@ -618,7 +630,8 @@ namespace OMS.Common.Cloud.ReliableCollectionHelpers
         #region IEnumerable
         IEnumerator IEnumerable.GetEnumerator()
         {
-            throw new NotImplementedException();
+            enumerableDictionary = new Dictionary<TKey, TValue>(LocalDictionary);
+            return EnumerableDictionary.GetEnumerator();
         }
         #endregion IEnumerable
 

@@ -7,6 +7,7 @@ using System;
 using System.Collections.Generic;
 using System.Configuration;
 using System.Fabric;
+using System.Threading.Tasks;
 
 namespace OMS.Common.Cloud.WcfServiceFabricClients.SCADA
 {
@@ -32,14 +33,14 @@ namespace OMS.Common.Cloud.WcfServiceFabricClients.SCADA
         }
 
         #region IScadaIntegrityUpdateContract
-        public Dictionary<Topic, SCADAPublication> GetIntegrityUpdate()
+        public Task<Dictionary<Topic, SCADAPublication>> GetIntegrityUpdate()
         {
-            throw new NotImplementedException();
+            return InvokeWithRetryAsync(client => client.Channel.GetIntegrityUpdate());
         }
 
-        public SCADAPublication GetIntegrityUpdateForSpecificTopic(Topic topic)
+        public Task<SCADAPublication> GetIntegrityUpdateForSpecificTopic(Topic topic)
         {
-            throw new NotImplementedException();
+            return InvokeWithRetryAsync(client => client.Channel.GetIntegrityUpdateForSpecificTopic(topic));
         }
         #endregion
     }

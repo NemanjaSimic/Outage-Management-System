@@ -6,12 +6,12 @@ using Outage.Common;
 using Outage.Common.Exceptions.SCADA;
 using System;
 using System.Text;
-using Outage.Common.ServiceContracts.SCADA;
 using System.Threading.Tasks;
 using System.Collections.Generic;
 using Microsoft.WindowsAzure.Storage.Queue;
 using OMS.Common.Cloud.AzureStorageHelpers;
 using OMS.Common.Cloud;
+using OMS.Common.ScadaContracts;
 
 namespace OMS.Cloud.SCADA.CommandingService
 {

@@ -6,6 +6,7 @@ using System;
 using System.Collections.Generic;
 using System.Configuration;
 using System.Fabric;
+using System.Threading.Tasks;
 
 namespace OMS.Common.Cloud.WcfServiceFabricClients.SCADA
 {
@@ -31,14 +32,14 @@ namespace OMS.Common.Cloud.WcfServiceFabricClients.SCADA
         }
 
         #region IScadaModelUpdateAccessContract
-        public void MakeAnalogEntryToMeasurementCache(Dictionary<long, AnalogModbusData> data, bool permissionToPublishData)
+        public Task MakeAnalogEntryToMeasurementCache(Dictionary<long, AnalogModbusData> data, bool permissionToPublishData)
         {
-            throw new NotImplementedException();
+            return InvokeWithRetryAsync(client => client.Channel.MakeAnalogEntryToMeasurementCache(data, permissionToPublishData));
         }
-
-        public void MakeDiscreteEntryToMeasurementCache(Dictionary<long, DiscreteModbusData> data, bool permissionToPublishData)
+        
+        public Task MakeDiscreteEntryToMeasurementCache(Dictionary<long, DiscreteModbusData> data, bool permissionToPublishData)
         {
-            throw new NotImplementedException();
+            return InvokeWithRetryAsync(client => client.Channel.MakeDiscreteEntryToMeasurementCache(data, permissionToPublishData));
         }
         #endregion
     }

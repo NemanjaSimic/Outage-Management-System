@@ -1,14 +1,13 @@
-﻿using OMS.Cloud.NMS.GdaProvider.GDA;
-using Outage.Common;
-using Outage.Common.GDA;
-using Outage.Common.ServiceContracts.DistributedTransaction;
-using Outage.Common.ServiceProxies;
-using Outage.Common.ServiceProxies.DistributedTransaction;
-using Outage.DataModel;
+﻿ using OMS.Cloud.NMS.DataModel;
+using OMS.Cloud.NMS.GdaProvider.GDA;
+using OMS.Common.Cloud.WcfServiceFabricClients.TMS;
+using OMS.Common.NmsContracts.GDA;
+using Outage.Common; 
 using System;
 using System.Collections.Generic;
 using System.Text;
-using UpdateResult = Outage.Common.GDA.UpdateResult;
+using System.Threading.Tasks;
+using UpdateResult = OMS.Common.NmsContracts.GDA.UpdateResult;
 
 namespace OMS.Cloud.NMS.GdaProvider
 {
@@ -24,8 +23,6 @@ namespace OMS.Cloud.NMS.GdaProvider
 
         private MongoAccess mongoDb;
         private Delta currentDelta;
-
-        ProxyFactory proxyFactory;
 
         /// <summary>
         /// ModelResourceDesc class contains metadata of the model
@@ -73,7 +70,6 @@ namespace OMS.Cloud.NMS.GdaProvider
         public NetworkModel()
         {
             this.mongoDb = new MongoAccess();
-            this.proxyFactory = new ProxyFactory();
             this.resourcesDescs = new ModelResourcesDesc();
 
             InitializeNetworkModel();
@@ -448,21 +444,21 @@ namespace OMS.Cloud.NMS.GdaProvider
             }
         }
 
-        private void StartDistributedTransaction(Delta delta)
+        private async Task StartDistributedTransaction(Delta delta)
         {
             isTransactionInProgress = true;
-            using (TransactionCoordinatorProxy transactionCoordinatorProxy = proxyFactory.CreateProxy<TransactionCoordinatorProxy, ITransactionCoordinatorContract>(EndpointNames.TransactionCoordinatorEndpoint))
-            {
-                if (transactionCoordinatorProxy == null)
-                {
-                    Logger.LogWarn("TransactionCoordinatorProxy is not initialized. This can be due to TransactionCoordinator not being stared.");
-                    Commit(false);
-                    return;
-                }
+            
+            TransactionCoordinatorClient transactionCoordinatorClient = TransactionCoordinatorClient.CreateClient();
 
-                transactionCoordinatorProxy.StartDistributedUpdate();
-                Logger.LogDebug("StartDistributedUpdate() invoked on Transaction Coordinator.");
+            if (transactionCoordinatorClient == null)
+            {
+                Logger.LogWarn("TransactionCoordinatorClient is not initialized. This can be due to TransactionCoordinator not being stared.");
+                Commit(false);
+                return;
             }
+
+            await transactionCoordinatorClient.StartDistributedUpdate();
+            Logger.LogDebug("StartDistributedUpdate() invoked on Transaction Coordinator.");
 
             Dictionary<DeltaOpType, List<long>> modelChanges = new Dictionary<DeltaOpType, List<long>>()
             {
@@ -488,80 +484,77 @@ namespace OMS.Cloud.NMS.GdaProvider
 
             bool success = false;
 
-            using (ModelUpdateNotificationProxy scadaModelUpdateNotifierProxy = proxyFactory.CreateProxy<ModelUpdateNotificationProxy, IModelUpdateNotificationContract>(EndpointNames.SCADAModelUpdateNotifierEndpoint))
+            //TODO: specify actor name...
+            ModelUpdateNotificationClient scadaModelUpdateNotifierClient = ModelUpdateNotificationClient.CreateClient();
+
+            if (scadaModelUpdateNotifierClient == null)
             {
-                if (scadaModelUpdateNotifierProxy == null)
+                string message = "ModelUpdateNotificationProxy for SCADA is null.";
+                Logger.LogWarn(message);
+                throw new NullReferenceException(message);
+            }
+
+            success = await scadaModelUpdateNotifierClient.NotifyAboutUpdate(modelChanges);
+            Logger.LogDebug("NotifyAboutUpdate() method invoked on SCADA Transaction actor.");
+            
+
+            if (success)
+            {
+                //TODO: specify actor name...
+                ModelUpdateNotificationClient calculationEngineUpdateNotifierClient = ModelUpdateNotificationClient.CreateClient();
+
+                if (calculationEngineUpdateNotifierClient == null)
                 {
-                    string message = "ModelUpdateNotificationProxy for SCADA is null.";
+                    string message = "ModelUpdateNotificationProxy for CalculationEngine is null.";
                     Logger.LogWarn(message);
                     throw new NullReferenceException(message);
                 }
 
-                success = scadaModelUpdateNotifierProxy.NotifyAboutUpdate(modelChanges);
-                Logger.LogDebug("NotifyAboutUpdate() method invoked on SCADA Transaction actor.");
-            }
+                success = await calculationEngineUpdateNotifierClient.NotifyAboutUpdate(modelChanges);
+                Logger.LogDebug("NotifyAboutUpdate() method invoked on CE Transaction actor.");
 
-            if (success)
-            {
-                using (ModelUpdateNotificationProxy calculationEngineModelUpdateNotifierProxy = proxyFactory.CreateProxy<ModelUpdateNotificationProxy, IModelUpdateNotificationContract>(EndpointNames.CalculationEngineModelUpdateNotifierEndpoint))
+                if (success)
                 {
-                    if (calculationEngineModelUpdateNotifierProxy == null)
+                    //TODO: specify actor name...
+                    ModelUpdateNotificationClient outageModelUpdateNotifierClient = ModelUpdateNotificationClient.CreateClient();
+
+                    if (outageModelUpdateNotifierClient == null)
                     {
-                        string message = "ModelUpdateNotificationProxy for CalculationEngine is null.";
+                        string message = "ModelUpdateNotificationProxy for Outage is null.";
                         Logger.LogWarn(message);
                         throw new NullReferenceException(message);
                     }
 
-                    success = calculationEngineModelUpdateNotifierProxy.NotifyAboutUpdate(modelChanges);
-                    Logger.LogDebug("NotifyAboutUpdate() method invoked on CE Transaction actor.");
-                }
-
-                if (success)
-                {
-                    using (ModelUpdateNotificationProxy outageModelUpdateNotifierProxy = proxyFactory.CreateProxy<ModelUpdateNotificationProxy, IModelUpdateNotificationContract>(EndpointNames.OutageModelUpdateNotifierEndpoint))
-                    {
-                        if (outageModelUpdateNotifierProxy == null)
-                        {
-                            string message = "ModelUpdateNotificationProxy for Outage is null.";
-                            Logger.LogWarn(message);
-                            throw new NullReferenceException(message);
-                        }
-
-                        success = outageModelUpdateNotifierProxy.NotifyAboutUpdate(modelChanges);
-                        Logger.LogDebug("NotifyAboutUpdate() method invoked on Outage Transaction actor. ");
-                    }
+                    success = await outageModelUpdateNotifierClient.NotifyAboutUpdate(modelChanges);
+                    Logger.LogDebug("NotifyAboutUpdate() method invoked on Outage Transaction actor. ");
 
                     if (success)
                     {
-                        using (TransactionEnlistmentProxy transactionEnlistmentProxy = proxyFactory.CreateProxy<TransactionEnlistmentProxy, ITransactionEnlistmentContract>(EndpointNames.TransactionEnlistmentEndpoint))
-                        {
-                            if (transactionEnlistmentProxy == null)
-                            {
-                                string message = "TransactionEnlistmentProxy is null.";
-                                Logger.LogWarn(message);
-                                throw new NullReferenceException(message);    
-                            }
+                        //TODO: specify actor name...
+                        TransactionEnlistmentClient transactionEnlistmentClient = TransactionEnlistmentClient.CreateClient();
 
-                            success = transactionEnlistmentProxy.Enlist(ServiceNames.NetworkModelService);
-                            Logger.LogDebug("Enlist() method invoked on Transaction Coordinator.");
+                        if (transactionEnlistmentClient == null)
+                        {
+                            string message = "TransactionEnlistmentProxy is null.";
+                            Logger.LogWarn(message);
+                            throw new NullReferenceException(message);    
                         }
 
+                        success = transactionEnlistmentClient.Enlist(ServiceNames.NetworkModelService);
+                        Logger.LogDebug("Enlist() method invoked on Transaction Coordinator.");
                     }
                 }
             }
 
-            using (TransactionCoordinatorProxy transactionCoordinatorProxy = proxyFactory.CreateProxy<TransactionCoordinatorProxy, ITransactionCoordinatorContract>(EndpointNames.TransactionCoordinatorEndpoint))
+            if (transactionCoordinatorClient == null)
             {
-                if (transactionCoordinatorProxy == null)
-                {
-                    string message = "TransactionCoordinatorProxy is null.";
-                    Logger.LogWarn(message);
-                    throw new NullReferenceException(message);
-                }
-                
-                transactionCoordinatorProxy.FinishDistributedUpdate(success);
-                Logger.LogDebug($"FinishDistributedUpdate() invoked on Transaction Coordinator with parameter 'success' value: {success}.");
+                string message = "TransactionCoordinatorClient is null.";
+                Logger.LogWarn(message);
+                throw new NullReferenceException(message);
             }
+
+            await transactionCoordinatorClient.FinishDistributedUpdate(success);
+            Logger.LogDebug($"FinishDistributedUpdate() invoked on Transaction Coordinator with parameter 'success' value: {success}.");
         }
 
         private Dictionary<short, int> GetCounters()

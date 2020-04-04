@@ -1,5 +1,6 @@
 ﻿using Microsoft.ServiceFabric.Services.Remoting;
 using System.ServiceModel;
+using System.Threading.Tasks;
 
 namespace OMS.Common.DistributedTransactionContracts
 {
@@ -7,9 +8,9 @@ namespace OMS.Common.DistributedTransactionContracts
     public interface ITransactionCoordinatorContract : IService
     {
         [OperationContract]
-        void StartDistributedUpdate();
+        Task StartDistributedUpdate();
 
         [OperationContract]
-        void FinishDistributedUpdate(bool success);
+        Task FinishDistributedUpdate(bool success);
     }
 }

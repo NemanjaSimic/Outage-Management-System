@@ -16,7 +16,7 @@ namespace OMS.Cloud.SCADA.ModelProviderService
     internal sealed class ScadaModel : IModelUpdateNotificationContract, ITransactionActorContract
     {
         private ILogger logger;
-        private ILogger Logger;
+        private ILogger Logger { get { return logger ?? (logger = LoggerWrapper.Instance); } }
 
         private readonly EnumDescs enumDescs;
         private readonly ModelResourcesDesc modelResourceDesc;
@@ -239,7 +239,7 @@ namespace OMS.Cloud.SCADA.ModelProviderService
         #endregion ImportScadaModel
 
         #region IModelUpdateNotificationContract
-        public bool NotifyAboutUpdate(Dictionary<DeltaOpType, List<long>> modelChanges)
+        public async Task<bool> NotifyAboutUpdate(Dictionary<DeltaOpType, List<long>> modelChanges)
         {
             this.modelChanges = modelChanges;
             return true;

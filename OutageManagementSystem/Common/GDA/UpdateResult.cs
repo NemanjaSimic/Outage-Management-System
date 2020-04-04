@@ -28,6 +28,7 @@ namespace Outage.Common.GDA
 		}
 
 		[DataMember]
+		[Obsolete("Use Common.NmsContracts alternative")]
 		public Dictionary<long, long> GlobalIdPairs
 		{
 			get { return globalIdPairs; }
@@ -35,6 +36,7 @@ namespace Outage.Common.GDA
 		}
 
 		[DataMember]
+		[Obsolete("Use Common.NmsContracts alternative")]
 		public string Message
 		{
 			get { return message; }
@@ -42,13 +44,15 @@ namespace Outage.Common.GDA
 		}
 
 		[DataMember]
+		[Obsolete("Use Common.NmsContracts alternative")]
 		public ResultType Result
 		{
 			get { return result; }
 			set { result = value; }
 		}
 
-        public override string ToString()
+		[Obsolete("Use Common.NmsContracts alternative")]
+		public override string ToString()
         {
             StringBuilder sb = new StringBuilder();
 

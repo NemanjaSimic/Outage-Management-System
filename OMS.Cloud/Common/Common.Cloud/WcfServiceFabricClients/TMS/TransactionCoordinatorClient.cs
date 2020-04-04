@@ -4,6 +4,7 @@ using OMS.Common.DistributedTransactionContracts;
 using System;
 using System.Configuration;
 using System.Fabric;
+using System.Threading.Tasks;
 
 namespace OMS.Common.Cloud.WcfServiceFabricClients.TMS
 {
@@ -29,14 +30,14 @@ namespace OMS.Common.Cloud.WcfServiceFabricClients.TMS
         }
 
         #region ITransactionCoordinatorContract
-        public void FinishDistributedUpdate(bool success)
+        public Task FinishDistributedUpdate(bool success)
         {
-            throw new NotImplementedException();
+            return InvokeWithRetryAsync(client => client.Channel.FinishDistributedUpdate(success));
         }
 
-        public void StartDistributedUpdate()
+        public Task StartDistributedUpdate()
         {
-            throw new NotImplementedException();
+            return InvokeWithRetryAsync(client => client.Channel.StartDistributedUpdate());
         }
         #endregion
     }
