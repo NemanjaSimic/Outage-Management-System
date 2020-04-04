@@ -1,4 +1,5 @@
 ﻿using Outage.Common.OutageService.Interface;
+using OutageManagementService.LifeCycleServices;
 using System;
 using System.Collections.Concurrent;
 using System.Collections.Generic;
@@ -11,11 +12,13 @@ namespace OutageManagementService.Calling
     public class TrackingAlgorithm
     {
         private OutageModel outageModel;
+        private ReportOutageService reportOutageService;
         private List<long> potentialOutages;
         private List<long> outages;
         public TrackingAlgorithm(OutageModel outageModel)
         {
             this.outageModel = outageModel;
+            this.reportOutageService = new ReportOutageService(outageModel);
         }
 
         public void Start(ConcurrentQueue<long> calls)
@@ -50,7 +53,7 @@ namespace OutageManagementService.Calling
 
             foreach (var item in this.outages)
             {
-                this.outageModel.ReportPotentialOutage(item);
+                reportOutageService.ReportPotentialOutage(item);
             }
         }
         private bool IsSwitch(string dmsType)

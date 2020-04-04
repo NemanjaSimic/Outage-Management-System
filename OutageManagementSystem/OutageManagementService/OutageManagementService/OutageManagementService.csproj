@@ -57,6 +57,12 @@
     <Compile Include="Calling\TrackingAlgorithm.cs" />
     <Compile Include="DistribuedTransaction\OutageModelUpdateNotification.cs" />
     <Compile Include="DistribuedTransaction\OutageTransactionActor.cs" />
+    <Compile Include="LifeCycleServices\IsolateOutageService.cs" />
+    <Compile Include="LifeCycleServices\ReportOutageService.cs" />
+    <Compile Include="LifeCycleServices\ResolveOutageService.cs" />
+    <Compile Include="LifeCycleServices\SendLocationIsolationCrewService.cs" />
+    <Compile Include="LifeCycleServices\SendRepairCrewService.cs" />
+    <Compile Include="LifeCycleServices\ValidateResolveConditionsService.cs" />
     <Compile Include="OutageIsolationAlgorithm\OutageIsolationAlgorithmParameters.cs" />
     <Compile Include="OutageModel.cs" />
     <Compile Include="OutageManagementService.cs" />
@@ -90,6 +96,7 @@
     <None Include="App.config" />
     <None Include="packages.config" />
   </ItemGroup>
+  <ItemGroup />
   <Import Project="$(MSBuildToolsPath)\Microsoft.CSharp.targets" />
   <Target Name="EnsureNuGetPackageBuildImports" BeforeTargets="PrepareForBuild">
     <PropertyGroup>

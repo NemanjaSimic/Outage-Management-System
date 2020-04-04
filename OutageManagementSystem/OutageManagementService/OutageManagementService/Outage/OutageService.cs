@@ -9,6 +9,7 @@ using System;
 using OMSCommon.OutageDatabaseModel;
 using OMSCommon.Mappers;
 using OutageDatabase.Repository;
+using OutageManagementService.LifeCycleServices;
 
 namespace OutageManagementService.Outage
 {
@@ -21,8 +22,12 @@ namespace OutageManagementService.Outage
             get { return logger ?? (logger = LoggerWrapper.Instance); }
         }
 
-        public static OutageModel outageModel;
-
+        public static ReportOutageService reportOutageService;
+        public static IsolateOutageService isolateOutageService;
+        public static ResolveOutageService resolveOutageService;
+        public static ValidateResolveConditionsService validateResolveConditionsService;
+        public static SendRepairCrewService sendRepairCrewService;
+        public static SendLocationIsolationCrewService sendLocationIsolationCrewService;
         #region IOutageAccessContract
         public IEnumerable<ActiveOutageMessage> GetActiveOutages()
         {
@@ -60,7 +65,7 @@ namespace OutageManagementService.Outage
 
             try
             {
-                result = outageModel.ReportPotentialOutage(elementGid); //TODO: enum (error, noAffectedConsumers, success,...)
+                result = reportOutageService.ReportPotentialOutage(elementGid); //TODO: enum (error, noAffectedConsumers, success,...)
             }
             catch (Exception e)
             {
@@ -81,7 +86,7 @@ namespace OutageManagementService.Outage
 
             try
             {
-                outageModel.IsolateOutage(outageId);
+                isolateOutageService.IsolateOutage(outageId);
                 result = true;
             }
             catch (Exception e)
@@ -101,7 +106,7 @@ namespace OutageManagementService.Outage
 
             try
             {
-                result = outageModel.SendRepairCrew(outageId);
+                result = sendRepairCrewService.SendRepairCrew(outageId);
             }
             catch (Exception e)
             {
@@ -120,7 +125,7 @@ namespace OutageManagementService.Outage
 
             try
             {
-                result = outageModel.SendLocationIsolationCrew(outageId);
+                result = sendLocationIsolationCrewService.SendLocationIsolationCrew(outageId);
             }
             catch (Exception e)
             {
@@ -139,7 +144,7 @@ namespace OutageManagementService.Outage
 
             try
             {
-                result = outageModel.ValidateResolveConditions(outageId);
+                result = validateResolveConditionsService.ValidateResolveConditions(outageId);
             }
             catch (Exception e)
             {
@@ -158,7 +163,7 @@ namespace OutageManagementService.Outage
 
             try
             {
-                result = outageModel.ResolveOutage(outageId);
+                result = resolveOutageService.ResolveOutage(outageId);
             }
             catch (Exception e)
             {

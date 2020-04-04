@@ -8,6 +8,7 @@ using Outage.Common.ServiceProxies.PubSub;
 using OutageDatabase;
 using OutageManagementService.Calling;
 using OutageManagementService.DistribuedTransaction;
+using OutageManagementService.LifeCycleServices;
 using OutageManagementService.Outage;
 using System;
 using System.Collections.Generic;
@@ -23,6 +24,12 @@ namespace OutageManagementService
         private ILogger logger;
         private List<ServiceHost> hosts = null;
         private OutageModel outageModel;
+        private ReportOutageService reportOutageService;
+        private IsolateOutageService isolateOutageService;
+        private ResolveOutageService resolveOutageService;
+        private ValidateResolveConditionsService validateResolveConditionsService;
+        private SendRepairCrewService sendRepairCrewService;
+        private SendLocationIsolationCrewService sendLocationIsolationCrewService;
         private SubscriberProxy subscriberProxy;
         private CallTracker callTracker;
         private ModelResourcesDesc modelResourcesDesc;
@@ -48,13 +55,24 @@ namespace OutageManagementService
             }
            
             outageModel = new OutageModel();
-            OutageService.outageModel = outageModel;
+            reportOutageService = new ReportOutageService(outageModel);
+            isolateOutageService = new IsolateOutageService(outageModel);
+            resolveOutageService = new ResolveOutageService(outageModel);
+            validateResolveConditionsService = new ValidateResolveConditionsService(outageModel);
+            sendRepairCrewService = new SendRepairCrewService(outageModel);
+            sendLocationIsolationCrewService = new SendLocationIsolationCrewService(outageModel);
+            OutageService.reportOutageService = reportOutageService;
+            OutageService.isolateOutageService = isolateOutageService;
+            OutageService.resolveOutageService = resolveOutageService;
+            OutageService.validateResolveConditionsService = validateResolveConditionsService;
+            OutageService.sendLocationIsolationCrewService = sendLocationIsolationCrewService;
+            OutageService.sendRepairCrewService = sendRepairCrewService;
             OutageTransactionActor.OutageModel = outageModel;
             OutageModelUpdateNotification.OutageModel = outageModel;
+  
 
             callTracker = new CallTracker("CallTrackerSubscriber", outageModel);
             SubscribeOnEmailService();
-            outageModel.ReportPotentialOutage(42949672965);
             InitializeHosts();
         }
 
