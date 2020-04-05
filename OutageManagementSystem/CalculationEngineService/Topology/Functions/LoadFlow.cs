@@ -121,6 +121,14 @@ namespace Topology
                                                     : ((SynchronousMachine)element).Capacity;
 
                         scadaCommanding.SendAnalogCommand(powerMeasurement.Id, newSMPower, CommandOriginType.CE_COMMAND);
+
+                        Dictionary<long, AnalogModbusData> data = new Dictionary<long, AnalogModbusData>(1)
+                        {
+                            { powerMeasurement.Id, new AnalogModbusData(newSMPower, AlarmType.NO_ALARM, powerMeasurement.Id, CommandOriginType.CE_COMMAND)}
+                        };
+
+                        Provider.Instance.MeasurementProvider.UpdateAnalogMeasurement(data);
+
                         loadOfFeeders[element.Feeder.Id] -= newSMPower / voltageMeasurement.GetCurrentValue();
                     }
                     else
@@ -129,26 +137,6 @@ namespace Topology
                     }
                 }
 
-                //foreach (var meas in element.Feeder.Measurements)
-                //{
-                //    if (meas.Value.Equals(AnalogMeasurementType.FEEDER_CURRENT.ToString()))
-                //    {
-                //        if (!Provider.Instance.MeasurementProvider.TryGetAnalogMeasurement(meas.Key, out feederCurrentmeasurement))
-                //        {
-                //            logger.LogError($"[Load flow] FEEDER_CURRENT with GID 0x{meas.Key:X16} does not exist in measurement provider.");
-                //        }
-                //        break;
-                //    }
-                //}
-
-                //if (feederCurrentmeasurement != null)
-                //{
-                //    float feederCurrent = feederCurrentmeasurement.GetCurrentValue();
-                //}
-                //else
-                //{
-                //    logger.LogError($"[Load flow] Feeder, which synchronous machine with GID 0x{element.Id:X16} belongs to, does not have FEEDER_CURRENT measurement.");
-                //}
             }
             else
             {
@@ -225,13 +213,8 @@ namespace Topology
         private bool IsElementEnergized(ITopologyElement element, out float load)
         {
             load = 0;
+            bool pastState = element.IsActive;
             element.IsActive = true;
-            float power = 0;
-            float voltage = 0;
-            float current = 0;
-            AnalogMeasurement currentMeasurement = null;
-            AnalogMeasurement voltageMeasurement = null;
-            AnalogMeasurement powerMeasurement = null;
 
             foreach (var measurement in element.Measurements)
             {
@@ -242,37 +225,42 @@ namespace Topology
                     element.IsActive = !Provider.Instance.MeasurementProvider.GetDiscreteValue(measurement.Key);
                     break;
                 }
-
-                if (measurement.Value.Equals(AnalogMeasurementType.POWER.ToString())
-                    && Provider.Instance.MeasurementProvider.TryGetAnalogMeasurement(measurement.Key, out powerMeasurement))
-                {
-                    power = powerMeasurement.GetCurrentValue();
-                }
-                else if (measurement.Value.Equals(AnalogMeasurementType.VOLTAGE.ToString())
-                    && Provider.Instance.MeasurementProvider.TryGetAnalogMeasurement(measurement.Key, out voltageMeasurement))
-                {
-                    voltage = voltageMeasurement.GetCurrentValue();
-
-                }
-                else if (measurement.Value.Equals(AnalogMeasurementType.CURRENT.ToString())
-                    && Provider.Instance.MeasurementProvider.TryGetAnalogMeasurement(measurement.Key, out currentMeasurement))
-                {
-                    current = currentMeasurement.GetCurrentValue();
-                }
             }
 
             if (element.IsActive)
             {
+                if (!pastState)
+                {
+                    TurnOnAllMeasurement(element.Measurements);
+                }
+                var analogMeasurements = GetMeasurements(element.Measurements);
+
                 if (element.DmsType.Equals(DMSType.SYNCHRONOUSMACHINE.ToString()))
                 {
                     syncMachines.Add(element.Id, element);
-
                 }
-                else if (power != 0 && voltage != 0)
+                else
                 {
-                    load = (float)Math.Round(power / voltage);
+                    float power = 0;
+                    float voltage = 0;
+                    foreach (var analogMeasurement in analogMeasurements)
+                    {
+                        if (analogMeasurement.GetMeasurementType().Equals(AnalogMeasurementType.POWER.ToString()))
+                        {
+                            power = analogMeasurement.GetCurrentValue();
+                        }
+                        else if (analogMeasurement.GetMeasurementType().Equals(AnalogMeasurementType.VOLTAGE.ToString()))
+                        {
+                            voltage = analogMeasurement.GetCurrentValue();
+                        }
+                    }
+
+                    if (power != 0 && voltage != 0)
+                    {
+                        load = (float)Math.Round(power / voltage);
+                    }
                 }
- 
+                
             }
 
             return element.IsActive;
@@ -287,14 +275,16 @@ namespace Topology
             {
                 nextElement = stack.Pop();
                 nextElement.IsActive = false;
-
                 if (nextElement is Field field)
                 {
                     foreach (var member in field.Members)
                     {
+                        TurnOffAllMeasurement(member.Measurements);
                         member.IsActive = false;
                     }
                 }
+
+                TurnOffAllMeasurement(nextElement.Measurements);
 
                 foreach (var child in nextElement.SecondEnd)
                 {
@@ -444,5 +434,70 @@ namespace Topology
             }
         }
         #endregion
+
+        public List<AnalogMeasurement> GetMeasurements(Dictionary<long, string> measurements)
+        {
+            List<AnalogMeasurement> analogMeasurements = new List<AnalogMeasurement>();
+
+            foreach (var measurement in measurements)
+            {
+                if (measurement.Value.Equals(AnalogMeasurementType.POWER.ToString())
+                    && Provider.Instance.MeasurementProvider.TryGetAnalogMeasurement(measurement.Key, out AnalogMeasurement power))
+                {
+                    analogMeasurements.Add(power);
+                }
+                else if (measurement.Value.Equals(AnalogMeasurementType.VOLTAGE.ToString())
+                    && Provider.Instance.MeasurementProvider.TryGetAnalogMeasurement(measurement.Key, out AnalogMeasurement voltage))
+                {
+                    analogMeasurements.Add(voltage);
+                }
+                else if (measurement.Value.Equals(AnalogMeasurementType.CURRENT.ToString())
+                    && Provider.Instance.MeasurementProvider.TryGetAnalogMeasurement(measurement.Key, out AnalogMeasurement current))
+                {
+                    analogMeasurements.Add(current);
+                }
+                else if (measurement.Value.Equals(AnalogMeasurementType.FEEDER_CURRENT.ToString())
+                  && Provider.Instance.MeasurementProvider.TryGetAnalogMeasurement(measurement.Key, out AnalogMeasurement feederCurrent))
+                {
+                    analogMeasurements.Add(feederCurrent);
+                }
+            }
+
+            return analogMeasurements;
+        }
+
+        private void TurnOffAllMeasurement(Dictionary<long, string> measurements)
+        {
+            List<AnalogMeasurement> analogMeasurements = GetMeasurements(measurements);
+
+            foreach (var meas in analogMeasurements)
+            {
+                scadaCommanding.SendAnalogCommand(meas.Id, 0, CommandOriginType.CE_COMMAND);
+
+                Dictionary<long, AnalogModbusData> data = new Dictionary<long, AnalogModbusData>(1)
+                {
+                            { meas.Id, new AnalogModbusData(0, AlarmType.NO_ALARM, meas.Id, CommandOriginType.CE_COMMAND)}
+                };
+
+                Provider.Instance.MeasurementProvider.UpdateAnalogMeasurement(data);
+            }
+        }
+
+        private void TurnOnAllMeasurement(Dictionary<long, string> measurements)
+        {
+            List<AnalogMeasurement> analogMeasurements = GetMeasurements(measurements);
+
+            foreach (var meas in analogMeasurements)
+            {
+                scadaCommanding.SendAnalogCommand(meas.Id, 0, CommandOriginType.CE_COMMAND);
+
+                Dictionary<long, AnalogModbusData> data = new Dictionary<long, AnalogModbusData>(1)
+                {
+                            { meas.Id, new AnalogModbusData(meas.NormalValue, AlarmType.NO_ALARM, meas.Id, CommandOriginType.CE_COMMAND)}
+                };
+
+                Provider.Instance.MeasurementProvider.UpdateAnalogMeasurement(data);
+            }
+        }
     }
 }

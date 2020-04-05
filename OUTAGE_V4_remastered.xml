@@ -36,6 +36,15 @@
 		<cim:SynchronousMachine.capacity>1100</cim:SynchronousMachine.capacity>
 		<cim:SynchronousMachine.currentRegime>0</cim:SynchronousMachine.currentRegime>
 	</cim:SynchronousMachine>
+	<cim:SynchronousMachine rdf:ID="SM_2">
+		<cim:ConductingEquipment.BaseVoltage rdf:resource="#BV_2"/>
+		<cim:ConductingEquipment.isRemote>true</cim:ConductingEquipment.isRemote>
+		<cim:IdentifiedObject.description>SynchronousMachine2</cim:IdentifiedObject.description>
+		<cim:IdentifiedObject.mRID>SM_2</cim:IdentifiedObject.mRID>
+		<ftn:IdentifiedObject.name>SM_2</ftn:IdentifiedObject.name>
+		<cim:SynchronousMachine.capacity>1100</cim:SynchronousMachine.capacity>
+		<cim:SynchronousMachine.currentRegime>0</cim:SynchronousMachine.currentRegime>
+	</cim:SynchronousMachine>
 	
 	<!--Terminal-->
 	<!--
@@ -3153,6 +3162,27 @@
 		<cim:IdentifiedObject.mRID>TM_443</cim:IdentifiedObject.mRID>
 		<ftn:IdentifiedObject.name>TM_443</ftn:IdentifiedObject.name>
 	</cim:Terminal>
+	<cim:Terminal rdf:ID="TM_444">
+		<cim:Terminal.ConductingEquipment rdf:resource="#ACL_115"/>
+		<cim:Terminal.ConnectivityNode rdf:resource="#CN_193"/>
+		<cim:IdentifiedObject.description>Terminal444</cim:IdentifiedObject.description>
+		<cim:IdentifiedObject.mRID>TM_444</cim:IdentifiedObject.mRID>
+		<ftn:IdentifiedObject.name>TM_444</ftn:IdentifiedObject.name>
+	</cim:Terminal>
+	<cim:Terminal rdf:ID="TM_445">
+		<cim:Terminal.ConductingEquipment rdf:resource="#ACL_115"/>
+		<cim:Terminal.ConnectivityNode rdf:resource="#CN_199"/>
+		<cim:IdentifiedObject.description>Terminal445</cim:IdentifiedObject.description>
+		<cim:IdentifiedObject.mRID>TM_445</cim:IdentifiedObject.mRID>
+		<ftn:IdentifiedObject.name>TM_445</ftn:IdentifiedObject.name>
+	</cim:Terminal>
+	<cim:Terminal rdf:ID="TM_446">
+		<cim:Terminal.ConductingEquipment rdf:resource="#SM_2"/>
+		<cim:Terminal.ConnectivityNode rdf:resource="#CN_199"/>
+		<cim:IdentifiedObject.description>Terminal445</cim:IdentifiedObject.description>
+		<cim:IdentifiedObject.mRID>TM_446</cim:IdentifiedObject.mRID>
+		<ftn:IdentifiedObject.name>TM_446</ftn:IdentifiedObject.name>
+	</cim:Terminal>
 	<!--END Terminal-->
 <!--[END Package_Core ]-->
 	
@@ -3966,6 +3996,13 @@
 		<cim:IdentifiedObject.description>ACLineSegment</cim:IdentifiedObject.description>
 		<cim:IdentifiedObject.mRID>ACL_114</cim:IdentifiedObject.mRID>
 		<ftn:IdentifiedObject.name>ACL_114</ftn:IdentifiedObject.name>
+	</cim:ACLineSegment>
+	<cim:ACLineSegment rdf:ID="ACL_115">
+		<cim:ConductingEquipment.BaseVoltage rdf:resource="#BV_2"/>
+		<cim:ConductingEquipment.isRemote>false</cim:ConductingEquipment.isRemote>
+		<cim:IdentifiedObject.description>ACLineSegment</cim:IdentifiedObject.description>
+		<cim:IdentifiedObject.mRID>ACL_115</cim:IdentifiedObject.mRID>
+		<ftn:IdentifiedObject.name>ACL_115</ftn:IdentifiedObject.name>
 	</cim:ACLineSegment>
 	<!--Suvisni-->
 	<!--
@@ -6233,6 +6270,11 @@
 		<cim:IdentifiedObject.mRID>CN_198</cim:IdentifiedObject.mRID>
 		<ftn:IdentifiedObject.name>CN_198</ftn:IdentifiedObject.name>
 	</cim:ConnectivityNode>
+	<cim:ConnectivityNode rdf:ID="CN_199">
+		<cim:IdentifiedObject.description>ConnectivityNode199</cim:IdentifiedObject.description>
+		<cim:IdentifiedObject.mRID>CN_199</cim:IdentifiedObject.mRID>
+		<ftn:IdentifiedObject.name>CN_199</ftn:IdentifiedObject.name>
+	</cim:ConnectivityNode>
 	<!--suvisni-->
 	<!--
 	<cim:ConnectivityNode rdf:ID="CN_89">
@@ -7744,6 +7786,36 @@
 		<cim:IdentifiedObject.description> </cim:IdentifiedObject.description>
 		<cim:IdentifiedObject.mRID>AN_96</cim:IdentifiedObject.mRID>
 		<ftn:IdentifiedObject.name>AN_96</ftn:IdentifiedObject.name>
+	</cim:Analog>
+	<cim:Analog rdf:ID="AN_97">
+		<cim:Analog.scalingFactor>1</cim:Analog.scalingFactor>
+		<cim:Analog.deviation>0</cim:Analog.deviation>
+		<cim:Analog.currentValue>220</cim:Analog.currentValue>
+		<cim:Analog.maxValue>2000</cim:Analog.maxValue>
+		<cim:Analog.measurementType>Voltage</cim:Analog.measurementType>
+		<cim:Analog.minValue>0</cim:Analog.minValue>
+		<cim:Analog.normalValue>220</cim:Analog.normalValue>
+		<cim:Measurement.address>97</cim:Measurement.address>
+		<cim:Measurement.isInput>false</cim:Measurement.isInput>
+		<cim:Measurement.Terminal rdf:resource="#TM_446"/>
+		<cim:IdentifiedObject.description> </cim:IdentifiedObject.description>
+		<cim:IdentifiedObject.mRID>AN_97</cim:IdentifiedObject.mRID>
+		<ftn:IdentifiedObject.name>AN_97</ftn:IdentifiedObject.name>
+	</cim:Analog>
+	<cim:Analog rdf:ID="AN_98">
+		<cim:Analog.scalingFactor>1</cim:Analog.scalingFactor>
+		<cim:Analog.deviation>0</cim:Analog.deviation>
+		<cim:Analog.currentValue>0</cim:Analog.currentValue>
+		<cim:Analog.maxValue>10000</cim:Analog.maxValue>
+		<cim:Analog.measurementType>Power</cim:Analog.measurementType>
+		<cim:Analog.minValue>0</cim:Analog.minValue>
+		<cim:Analog.normalValue>440</cim:Analog.normalValue>
+		<cim:Measurement.address>98</cim:Measurement.address>
+		<cim:Measurement.isInput>false</cim:Measurement.isInput>
+		<cim:Measurement.Terminal rdf:resource="#TM_446"/>
+		<cim:IdentifiedObject.description> </cim:IdentifiedObject.description>
+		<cim:IdentifiedObject.mRID>AN_98</cim:IdentifiedObject.mRID>
+		<ftn:IdentifiedObject.name>AN_98</ftn:IdentifiedObject.name>
 	</cim:Analog>
 	<!--END Analog-->
 	
