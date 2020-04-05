@@ -70,6 +70,10 @@
       <Project>{6A84DB56-920C-4FC1-9CB0-9C29D0FC1586}</Project>
       <Name>Common.SCADA</Name>
     </ProjectReference>
+    <ProjectReference Include="..\..\Common\Contracts\Common.ScadaContracts\Common.ScadaContracts.csproj">
+      <Project>{5F25D9C5-9A93-49E7-92F7-58E399AEF928}</Project>
+      <Name>Common.ScadaContracts</Name>
+    </ProjectReference>
     <ProjectReference Include="..\SCADA.Data\SCADA.Data.csproj">
       <Project>{25E726AA-10F3-400B-AE6E-0F423EC51FF8}</Project>
       <Name>SCADA.Data</Name>

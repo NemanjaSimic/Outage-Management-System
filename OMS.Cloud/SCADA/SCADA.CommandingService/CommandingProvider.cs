@@ -12,6 +12,7 @@ using System.Collections.Generic;
 using Microsoft.WindowsAzure.Storage.Queue;
 using OMS.Common.Cloud.AzureStorageHelpers;
 using OMS.Common.Cloud;
+using OMS.Common.ScadaContracts;
 
 namespace OMS.Cloud.SCADA.CommandingService
 {

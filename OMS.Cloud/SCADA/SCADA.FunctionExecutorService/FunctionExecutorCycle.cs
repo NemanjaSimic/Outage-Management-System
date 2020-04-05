@@ -5,15 +5,17 @@ using OMS.Cloud.SCADA.Data.Repository;
 using OMS.Common.Cloud;
 using OMS.Common.Cloud.AzureStorageHelpers;
 using OMS.Common.SCADA;
+using OMS.Common.ScadaContracts;
 using Outage.Common;
 using Outage.Common.PubSub.SCADADataContract;
 using System;
 using System.Collections.Generic;
 using System.Threading;
+using System.Threading.Tasks;
 
 namespace OMS.Cloud.SCADA.FunctionExecutorService
 {
-    internal class FunctionExecutorCycle
+    internal class FunctionExecutorCycle : IReadCommandEnqueuer, IWriteCommandEnqueuer, IModelUpdateCommandEnqueuer
     {
         private ILogger logger;
 
@@ -48,6 +50,113 @@ namespace OMS.Cloud.SCADA.FunctionExecutorService
             CloudQueueHelper.TryGetQueue("writecommandqueue", out this.writeCommandQueue);
             CloudQueueHelper.TryGetQueue("mucommandqueue", out this.modelUpdateCommandQueue);
         }
+
+        #region Command Enqueuers
+
+        public async Task<bool> EnqueueReadCommand(IReadModbusFunction modbusFunction)
+        {
+            bool success;
+
+            if (!(modbusFunction is IReadAnalogModusFunction || modbusFunction is IReadDiscreteModbusFunction))
+            {
+                string message = "EnqueueReadCommand => trying to enqueue modbus function that implements neither IReadDiscreteModbusFunction nor IReadDiscreteModbusFunction interface.";
+                Logger.LogError(message);
+                throw new ArgumentException(message);
+            }
+
+            while (modelUpdateCommandQueue.PeekMessage() != null || writeCommandQueue.PeekMessage() != null)
+            {
+                while (modelUpdateCommandQueue.PeekMessage() != null)
+                {
+                    await Task.Delay(1000);
+                }
+
+                while (writeCommandQueue.PeekMessage() == null)
+                {
+                    await Task.Delay(1000);
+                }
+            }
+
+            try
+            {
+                await this.readCommandQueue.AddMessageAsync(new CloudQueueMessage(Serialization.ObjectToByteArray(modbusFunction)));
+                //this.commandEvent.Set();
+                success = true;
+            }
+            catch (Exception e)
+            {
+                success = false;
+                string message = "Exception caught in EnqueueCommand() method.";
+                Logger.LogError(message, e);
+            }
+
+            return success;
+        }
+
+        public async Task<bool> EnqueueWriteCommand(IWriteModbusFunction modbusFunction)
+        {
+            bool success;
+
+            while (modelUpdateCommandQueue.PeekMessage() != null)
+            {
+                await Task.Delay(1000);
+            }
+
+            try
+            {
+                await this.writeCommandQueue.AddMessageAsync(new CloudQueueMessage(Serialization.ObjectToByteArray(modbusFunction)));
+                this.readCommandQueue.Clear();
+                //this.commandEvent.Set();
+                success = true;
+            }
+            catch (Exception e)
+            {
+                success = false;
+                string message = "Exception caught in EnqueueCommand() method.";
+                Logger.LogError(message, e);
+            }
+
+            return success;
+        }
+
+        public async Task<bool> EnqueueModelUpdateCommands(List<IWriteModbusFunction> modbusFunctions)
+        {
+            bool success;
+            ushort length = 6;
+
+            Dictionary<long, AnalogModbusData> analogData = new Dictionary<long, AnalogModbusData>();
+            Dictionary<long, DiscreteModbusData> discreteData = new Dictionary<long, DiscreteModbusData>();
+            MeasurementsCache.Clear();
+
+            try
+            {
+                //Dictionary<long, ISCADAModelPointItem> currentScadaModel = new Dictionary<long, ISCADAModelPointItem>(); //TODO: Preuzeti od providera
+
+                Task[] addTasks = new Task[modbusFunctions.Count];
+                for(int i = 0; i < modbusFunctions.Count; i++) 
+                {
+                    addTasks[i] = this.modelUpdateCommandQueue.AddMessageAsync(new CloudQueueMessage(Serialization.ObjectToByteArray(modbusFunctions[i])));
+                }
+
+                Task.WaitAll(addTasks);
+
+
+                success = true;
+                this.writeCommandQueue.Clear();
+                this.readCommandQueue.Clear();
+                //this.commandEvent.Set();
+            }
+            catch (Exception e)
+            {
+                success = false;
+                string message = "Exception caught in EnqueueModelUpdateCommands() method.";
+                Logger.LogError(message, e);
+            }
+
+            return success;
+        }
+
+        #endregion
 
         public void Start()
         {
@@ -175,11 +284,11 @@ namespace OMS.Cloud.SCADA.FunctionExecutorService
 
             if (command is IReadAnalogModusFunction readAnalogCommand)
             {
-                //todo: MakeAnalogEntryToMeasurementCache(readAnalogCommand.Data, true);
+                //todo: MakeAnalogEntryToMeasurementCache(readAnalogCommand.Data, true); POZIV KA PROVIDER
             }
             else if (command is IReadDiscreteModbusFunction readDiscreteCommand)
             {
-                //todo: MakeDiscreteEntryToMeasurementCache(readDiscreteCommand.Data, true);
+                //todo: MakeDiscreteEntryToMeasurementCache(readDiscreteCommand.Data, true); POZIV KA PROVIDER
             }
             else if (command is IWriteModbusFunction writeModbusCommand)
             {
@@ -215,106 +324,8 @@ namespace OMS.Cloud.SCADA.FunctionExecutorService
             }
         }
 
-        private void MakeAnalogEntryToMeasurementCache(Dictionary<long, AnalogModbusData> data, bool permissionToPublishData)
-        {
-            Dictionary<long, AnalogModbusData> publicationData = new Dictionary<long, AnalogModbusData>();
+       
 
-            if (data == null)
-            {
-                string message = $"WriteToMeasurementsCache() => readAnalogCommand.Data is null.";
-                Logger.LogError(message);
-                throw new NullReferenceException(message);
-            }
-
-            foreach (long gid in data.Keys)
-            {
-                if (!MeasurementsCache.ContainsKey(gid))
-                {
-                    MeasurementsCache.Add(gid, data[gid]);
-
-                    if (!publicationData.ContainsKey(gid))
-                    {
-                        publicationData.Add(gid, data[gid]);
-                    }
-                    else
-                    {
-                        publicationData[gid] = data[gid];
-                    }
-                }
-                else if (MeasurementsCache[gid] is AnalogModbusData analogCacheItem && analogCacheItem.Value != data[gid].Value)
-                {
-                    Logger.LogDebug($"Value changed on element with id: {analogCacheItem.MeasurementGid}. Old value: {analogCacheItem.Value}; new value: {data[gid].Value}");
-                    MeasurementsCache[gid] = data[gid];
-
-
-                    if (!publicationData.ContainsKey(gid))
-                    {
-                        publicationData.Add(gid, MeasurementsCache[gid] as AnalogModbusData);
-                    }
-                    else
-                    {
-                        publicationData[gid] = MeasurementsCache[gid] as AnalogModbusData;
-                    }
-                }
-            }
-
-            //if data is empty that means that there are no new values in the current acquisition cycle
-            if (permissionToPublishData && publicationData.Count > 0)
-            {
-                SCADAMessage scadaMessage = new MultipleAnalogValueSCADAMessage(publicationData);
-                //PublishScadaData(Topic.MEASUREMENT, scadaMessage);
-            }
-        }
-
-        private void MakeDiscreteEntryToMeasurementCache(Dictionary<long, DiscreteModbusData> data, bool permissionToPublishData)
-        {
-            Dictionary<long, DiscreteModbusData> publicationData = new Dictionary<long, DiscreteModbusData>();
-
-            if (data == null)
-            {
-                string message = $"WriteToMeasurementsCache() => readAnalogCommand.Data is null.";
-                Logger.LogError(message);
-                throw new NullReferenceException(message);
-            }
-
-            foreach (long gid in data.Keys)
-            {
-                if (!MeasurementsCache.ContainsKey(gid))
-                {
-                    MeasurementsCache.Add(gid, data[gid]);
-
-                    if (!publicationData.ContainsKey(gid))
-                    {
-                        publicationData.Add(gid, data[gid]);
-                    }
-                    else
-                    {
-                        publicationData[gid] = data[gid];
-                    }
-                }
-                else if (MeasurementsCache[gid] is DiscreteModbusData discreteCacheItem && discreteCacheItem.Value != data[gid].Value)
-                {
-                    Logger.LogDebug($"Value changed on element with id :{discreteCacheItem.MeasurementGid};. Old value: {discreteCacheItem.Value}; new value: {data[gid].Value}");
-                    MeasurementsCache[gid] = data[gid];
-
-                    if (!publicationData.ContainsKey(gid))
-                    {
-                        publicationData.Add(gid, MeasurementsCache[gid] as DiscreteModbusData);
-                    }
-                    else
-                    {
-                        publicationData[gid] = MeasurementsCache[gid] as DiscreteModbusData;
-                    }
-                }
-            }
-
-            //if data is empty that means that there are no new values in the current acquisition cycle
-            if (permissionToPublishData && publicationData.Count > 0)
-            {
-                SCADAMessage scadaMessage = new MultipleDiscreteValueSCADAMessage(publicationData);
-                //PublishScadaData(Topic.SWITCH_STATUS, scadaMessage);
-            }
-        }
-
+       
     }
 }
