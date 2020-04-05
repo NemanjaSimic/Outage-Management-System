@@ -489,7 +489,7 @@ namespace Topology
 
             foreach (var meas in analogMeasurements)
             {
-                scadaCommanding.SendAnalogCommand(meas.Id, 0, CommandOriginType.CE_COMMAND);
+                scadaCommanding.SendAnalogCommand(meas.Id, meas.NormalValue, CommandOriginType.CE_COMMAND);
 
                 Dictionary<long, AnalogModbusData> data = new Dictionary<long, AnalogModbusData>(1)
                 {
