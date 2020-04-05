@@ -1,6 +1,7 @@
 ﻿using CECommon;
 using CECommon.Interfaces;
 using CECommon.Model;
+using CECommon.Models;
 using CECommon.Providers;
 using NetworkModelServiceFunctions;
 using Outage.Common;
@@ -90,11 +91,7 @@ namespace Topology
                     }
                 }
 
-                if (currentElement.Mrid.Equals("ACL_5"))
-                {
-                    currentFider = currentElement;
-                }
-                else if (currentElement.Mrid.Equals("ACL_6"))
+                if (currentElement is Feeder)
                 {
                     currentFider = currentElement;
                 }

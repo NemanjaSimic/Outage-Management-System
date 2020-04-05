@@ -9,6 +9,7 @@ using CalculationEngine.SCADAFunctions;
 using System.Threading;
 using CECommon.Models;
 using CECommon.Model;
+using Outage.Common.PubSub.SCADADataContract;
 
 namespace Topology
 {
@@ -54,7 +55,14 @@ namespace Topology
                     if (signalGid != 0)
                     {
                         scadaCommanding.SendAnalogCommand(signalGid, loadFider.Value, CommandOriginType.CE_COMMAND);
-                       // Provider.Instance.MeasurementProvider.UpdateAnalogMeasurement(signalGid, loadFider.Value, CommandOriginType.CE_COMMAND);
+                        AlarmType alarmType = (loadFider.Value >= 36) ? AlarmType.HIGH_ALARM : AlarmType.NO_ALARM;
+
+                        Dictionary<long, AnalogModbusData> data = new Dictionary<long, AnalogModbusData>(1)
+                        {
+                            { signalGid, new AnalogModbusData(loadFider.Value, alarmType, signalGid, CommandOriginType.CE_COMMAND)}
+                        };
+
+                        Provider.Instance.MeasurementProvider.UpdateAnalogMeasurement(data);
                     }
                     else
                     {
@@ -65,8 +73,8 @@ namespace Topology
         }
         private void SyncMachine(ITopologyElement element)
         {
-            AnalogMeasurement feederCurrentmeasurement = null;
-            AnalogMeasurement measurement = null;
+            AnalogMeasurement powerMeasurement = null;
+            AnalogMeasurement voltageMeasurement = null;
 
             if (element.Feeder != null)
             {
@@ -88,17 +96,32 @@ namespace Topology
 
                     foreach (var meas in element.Measurements)
                     {
-                        if (!(meas.Value.Equals(AnalogMeasurementType.CURRENT.ToString())
-                            && Provider.Instance.MeasurementProvider.TryGetAnalogMeasurement(meas.Key, out measurement)))
+                        if (meas.Value.Equals(AnalogMeasurementType.POWER.ToString()))
                         {
-
+                            if (!Provider.Instance.MeasurementProvider.TryGetAnalogMeasurement(meas.Key, out powerMeasurement))
+                            {
+                                logger.LogError($"[Load flow] Synchronous machine with GID 0x{element.Id:X16} does not have POWER measurement.");
+                            }
+                        }
+                        
+                        if (meas.Value.Equals(AnalogMeasurementType.VOLTAGE.ToString()))
+                        {
+                            if (!Provider.Instance.MeasurementProvider.TryGetAnalogMeasurement(meas.Key, out voltageMeasurement))
+                            {
+                                logger.LogError($"[Load flow] Synchronous machine with GID 0x{element.Id:X16} does not have VOLTAGE measurement.");
+                            }
                         }
                     }
 
-                    if (measurement != null)
+                    if (powerMeasurement != null && voltageMeasurement != null)
                     {
-                        scadaCommanding.SendAnalogCommand(measurement.Id, machineCurrentChange, CommandOriginType.CE_COMMAND);
-                        loadOfFeeders[element.Feeder.Id] -= machineCurrentChange;
+                        float newNeededPower = machineCurrentChange * voltageMeasurement.GetCurrentValue();
+                        float newSMPower = (((SynchronousMachine)element).Capacity >= newNeededPower)
+                                                    ? newNeededPower
+                                                    : ((SynchronousMachine)element).Capacity;
+
+                        scadaCommanding.SendAnalogCommand(powerMeasurement.Id, newSMPower, CommandOriginType.CE_COMMAND);
+                        loadOfFeeders[element.Feeder.Id] -= newSMPower / voltageMeasurement.GetCurrentValue();
                     }
                     else
                     {
@@ -106,30 +129,26 @@ namespace Topology
                     }
                 }
 
-                foreach (var meas in element.Feeder.Measurements)
-                {
-                    if (meas.Value.Equals(AnalogMeasurementType.FEEDER_CURRENT.ToString()))
-                    {
-                        if (!Provider.Instance.MeasurementProvider.TryGetAnalogMeasurement(meas.Key, out feederCurrentmeasurement))
-                        {
-                            logger.LogError($"[Load flow] FEEDER_CURRENT with GID 0x{meas.Key:X16} does not exist in measurement provider.");
-                        }
-                        break;
-                    }
-                }
+                //foreach (var meas in element.Feeder.Measurements)
+                //{
+                //    if (meas.Value.Equals(AnalogMeasurementType.FEEDER_CURRENT.ToString()))
+                //    {
+                //        if (!Provider.Instance.MeasurementProvider.TryGetAnalogMeasurement(meas.Key, out feederCurrentmeasurement))
+                //        {
+                //            logger.LogError($"[Load flow] FEEDER_CURRENT with GID 0x{meas.Key:X16} does not exist in measurement provider.");
+                //        }
+                //        break;
+                //    }
+                //}
 
-                if (feederCurrentmeasurement != null)
-                {
-                    float feederCurrent = feederCurrentmeasurement.GetCurrentValue();
-                    
-
-                   
-
-                }
-                else
-                {
-                    logger.LogError($"[Load flow] Feeder, which synchronous machine with GID 0x{element.Id:X16} belongs to, does not have FEEDER_CURRENT measurement.");
-                }
+                //if (feederCurrentmeasurement != null)
+                //{
+                //    float feederCurrent = feederCurrentmeasurement.GetCurrentValue();
+                //}
+                //else
+                //{
+                //    logger.LogError($"[Load flow] Feeder, which synchronous machine with GID 0x{element.Id:X16} belongs to, does not have FEEDER_CURRENT measurement.");
+                //}
             }
             else
             {
@@ -160,7 +179,7 @@ namespace Topology
                     else
                     {
 
-                        if (nextElement.Mrid.Equals("ACL_5"))
+                        if (nextElement is Feeder)
                         {
                             currentFider = nextElement.Id;
                             if (!feeders.ContainsKey(currentFider))
@@ -168,14 +187,7 @@ namespace Topology
                                 feeders.Add(currentFider, nextElement);
                             }
                         }
-                        else if (nextElement.Mrid.Equals("ACL_6"))
-                        {
-                            currentFider = nextElement.Id;
-                            if (!feeders.ContainsKey(currentFider))
-                            {
-                                feeders.Add(currentFider, nextElement);
-                            }
-                        }
+                      
 
                         if (!IsElementEnergized(nextElement, out float load))
                         {
@@ -253,60 +265,6 @@ namespace Topology
             {
                 if (element.DmsType.Equals(DMSType.SYNCHRONOUSMACHINE.ToString()))
                 {
-                    //AnalogMeasurement feederCurrentmeasurement = null;
-
-                    //if (element.Feeder != null)
-                    //{
-                    //    foreach (var meas in element.Feeder.Measurements)
-                    //    {
-                    //        if (meas.Value.Equals(AnalogMeasurementType.FEEDER_CURRENT.ToString()))
-                    //        {
-                    //            if (!Provider.Instance.MeasurementProvider.TryGetAnalogMeasurement(meas.Key, out feederCurrentmeasurement))
-                    //            {
-                    //                logger.LogError($"[Load flow] FEEDER_CURRENT with GID 0x{meas.Key:X16} does not exist in measurement provider.");
-                    //            }
-                    //            break;
-                    //        }
-                    //    }
-                    //}
-                    //else
-                    //{
-                    //    logger.LogWarn($"[Load flow] Synchronous machine with GID 0x{element.Id:X16} does not belond to any feeder.");
-                    //}
-
-                    //if (feederCurrentmeasurement != null)
-                    //{
-                    //    float machineCurrentChange;
-                    //    float feederCurrent = feederCurrentmeasurement.GetCurrentValue();
-                    //    if (feederCurrent > 36)
-                    //    {
-                    //        float improvementFactor = feederCurrent - 36;
-
-                    //        machineCurrentChange = (((SynchronousMachine)element).Capacity >= improvementFactor) 
-                    //                                    ? improvementFactor 
-                    //                                    : ((SynchronousMachine)element).Capacity;
-                    //    }
-                    //    else
-                    //    {
-                    //        machineCurrentChange = 0;
-                    //    }
-
-                    //    if (currentMeasurement != null)
-                    //    {
-                    //        scadaCommanding.SendAnalogCommand(currentMeasurement.Id, machineCurrentChange, CommandOriginType.CE_COMMAND);
-                    //        load -= machineCurrentChange;
-                    //    }
-                    //    else
-                    //    {
-                    //        logger.LogError($"[Load flow] Synchronous machine with GID 0x{element.Id:X16} does not have CURRENT measurement.");
-                    //    }
-
-                    //}
-                    //else
-                    //{
-                    //    logger.LogError($"[Load flow] Feeder, which synchronous machine with GID 0x{element.Id:X16} belongs to, does not have FEEDER_CURRENT measurement.");
-                    //}
-
                     syncMachines.Add(element.Id, element);
 
                 }
@@ -478,7 +436,7 @@ namespace Topology
         }     
         private void CommandToRecloser(long measurementGid, int value, CommandOriginType originType, ITopologyElement recloser)
         {
-            Thread.Sleep(5000);
+            Thread.Sleep(10000);
             if (!((Recloser)recloser).IsReachedMaximumOfTries())
             {
                 scadaCommanding.SendDiscreteCommand(measurementGid, value, originType);

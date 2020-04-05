@@ -175,10 +175,16 @@ namespace NetworkModelServiceFunctions
 							e => GetDMSTypeOfTopologyElement(e) != DMSType.CONNECTIVITYNODE
 							&& GetDMSTypeOfTopologyElement(e) != DMSType.ANALOG);
 
-						if (TopologyElements.ContainsKey(elementId))
+						if (TopologyElements.TryGetValue(elementId, out ITopologyElement element))
 						{
-							TopologyElements[elementId].Measurements.Add(measurement.Id, measurement.GetMeasurementType());
+							element.Measurements.Add(measurement.Id, measurement.GetMeasurementType());
 							measurement.ElementId = elementId;
+
+							if (measurement.GetMeasurementType().Equals(AnalogMeasurementType.FEEDER_CURRENT.ToString()))
+							{
+								//element = new Feeder(element);
+								TopologyElements[elementId] = new Feeder(element);
+							}
 						}
 						else
 						{
