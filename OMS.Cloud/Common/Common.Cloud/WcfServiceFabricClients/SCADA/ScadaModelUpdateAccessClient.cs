@@ -19,16 +19,16 @@ namespace OMS.Common.Cloud.WcfServiceFabricClients.SCADA
 
         public static ScadaModelUpdateAccessClient CreateClient(Uri serviceUri = null)
         {
-            if (serviceUri == null && ConfigurationManager.AppSettings[MicroserviceNames.ScadaModelProviderService] is string scadaModelProviderServiceName)
+            ClientFactory factory = new ClientFactory();
+
+            if (serviceUri == null)
             {
-                serviceUri = new Uri(scadaModelProviderServiceName);
+                return factory.CreateClient<ScadaModelUpdateAccessClient, IScadaModelUpdateAccessContract>(MicroserviceNames.ScadaModelProviderService);
             }
-
-            var partitionResolver = new ServicePartitionResolver(() => new FabricClient());
-            //var partitionResolver = ServicePartitionResolver.GetDefault();
-            var factory = new WcfCommunicationClientFactory<IScadaModelUpdateAccessContract>(TcpBindingHelper.CreateClientBinding(), null, partitionResolver);
-
-            return new ScadaModelUpdateAccessClient(factory, serviceUri);
+            else
+            {
+                return factory.CreateClient<ScadaModelUpdateAccessClient, IScadaModelUpdateAccessContract>(serviceUri);
+            }
         }
 
         #region IScadaModelUpdateAccessContract

@@ -51,6 +51,7 @@
     <Compile Include="ReliableCollectionHelpers\ReliableDictionaryHelper.cs" />
     <Compile Include="Serialization.cs" />
     <Compile Include="WcfServiceFabricClients\CE\Placeholder.cs" />
+    <Compile Include="WcfServiceFabricClients\ClientFactory.cs" />
     <Compile Include="WcfServiceFabricClients\HttpBindingHelper.cs" />
     <Compile Include="WcfServiceFabricClients\NMS\NetworkModelGdaClient.cs" />
     <Compile Include="WcfServiceFabricClients\OMS\Placeholder.cs" />

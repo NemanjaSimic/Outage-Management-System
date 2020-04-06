@@ -48,11 +48,8 @@ namespace OMS.Cloud.SCADA.CommandingService
             }
         }
 
-
         public async Task SendAnalogCommand(long gid, float commandingValue, CommandOriginType commandOriginType)
         {
-
-
             Dictionary<long, ISCADAModelPointItem> currentScadaModel = new Dictionary<long, ISCADAModelPointItem>(); //TODO: get from scada access client
 
             if (currentScadaModel == null)

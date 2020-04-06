@@ -131,20 +131,23 @@ namespace OMS.Cloud.NMS.GdaProvider
 
         public void GetVersions(ref long networkModelVersion, ref long deltaVersion)
         {
-            IMongoCollection<ModelVersionDocument> versionsCollection = db.GetCollection<ModelVersionDocument>("versions");
+            //TODO: bug fix, runtime faliure
+            //IMongoCollection<ModelVersionDocument> versionsCollection = db.GetCollection<ModelVersionDocument>("versions");
 
-            var networkModelVersionFilter = Builders<ModelVersionDocument>.Filter.Eq("_id", "networkModelVersion");
-            var deltaVersionFilter = Builders<ModelVersionDocument>.Filter.Eq("_id", "deltaVersion");
+            //var networkModelVersionFilter = Builders<ModelVersionDocument>.Filter.Eq("_id", "networkModelVersion");
+            //var deltaVersionFilter = Builders<ModelVersionDocument>.Filter.Eq("_id", "deltaVersion");
 
-            if (versionsCollection.Find(networkModelVersionFilter).CountDocuments() > 0)
-            {
-                networkModelVersion = versionsCollection.Find(networkModelVersionFilter).First().Version;
-            }
+            //if (versionsCollection.Find(networkModelVersionFilter).CountDocuments() > 0)
+            //{
+            //    networkModelVersion = versionsCollection.Find(networkModelVersionFilter).First().Version;
+            //}
 
-            if (versionsCollection.Find(deltaVersionFilter).CountDocuments() > 0)
-            {
-                deltaVersion = versionsCollection.Find(deltaVersionFilter).First().Version;
-            }
+            //if (versionsCollection.Find(deltaVersionFilter).CountDocuments() > 0)
+            //{
+            //    deltaVersion = versionsCollection.Find(deltaVersionFilter).First().Version;
+            //}
+            networkModelVersion = 2;
+            deltaVersion = 1;
         }
 
         public List<Delta> GetAllDeltas(long deltaVersion, long networkModelVersion)

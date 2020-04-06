@@ -20,16 +20,16 @@ namespace OMS.Common.Cloud.WcfServiceFabricClients.NMS
 
         public static NetworkModelGdaClient CreateClient(Uri serviceUri = null)
         {
-            if (serviceUri == null && ConfigurationManager.AppSettings[MicroserviceNames.NmsGdaService] is string nmsGdaServiceName)
-            {
-                serviceUri = new Uri(nmsGdaServiceName);
-            }
+            ClientFactory factory = new ClientFactory();
 
-            var partitionResolver = new ServicePartitionResolver(() => new FabricClient());
-            //var partitionResolver = ServicePartitionResolver.GetDefault();
-            var factory = new WcfCommunicationClientFactory<INetworkModelGDAContract>(TcpBindingHelper.CreateClientBinding(), null, partitionResolver);
-            
-            return new NetworkModelGdaClient(factory, serviceUri);
+            if (serviceUri == null)
+            {
+                return factory.CreateClient<NetworkModelGdaClient, INetworkModelGDAContract>(MicroserviceNames.NmsGdaService);
+            }
+            else
+            {
+                return factory.CreateClient<NetworkModelGdaClient, INetworkModelGDAContract>(serviceUri);
+            }
         }
 
         #region INetworkModelGDAContract

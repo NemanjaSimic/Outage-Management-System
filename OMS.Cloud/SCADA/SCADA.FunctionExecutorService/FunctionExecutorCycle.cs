@@ -4,6 +4,7 @@ using Microsoft.WindowsAzure.Storage.Queue;
 using OMS.Cloud.SCADA.Data.Repository;
 using OMS.Common.Cloud;
 using OMS.Common.Cloud.AzureStorageHelpers;
+using OMS.Common.Cloud.WcfServiceFabricClients.SCADA;
 using OMS.Common.SCADA;
 using OMS.Common.ScadaContracts;
 using Outage.Common;
@@ -18,33 +19,21 @@ namespace OMS.Cloud.SCADA.FunctionExecutorService
     internal class FunctionExecutorCycle : IReadCommandEnqueuer, IWriteCommandEnqueuer, IModelUpdateCommandEnqueuer
     {
         private ILogger logger;
-
-        protected ILogger Logger
+        private ILogger Logger
         {
             get { return logger ?? (logger = LoggerWrapper.Instance); }
         }
 
-        private CloudQueue readCommandQueue;
-        private CloudQueue writeCommandQueue;
-        private CloudQueue modelUpdateCommandQueue;
+        private readonly CloudQueue readCommandQueue;
+        private readonly CloudQueue writeCommandQueue;
+        private readonly CloudQueue modelUpdateCommandQueue;
 
-        public ISCADAConfigData ConfigData { get; private set; }
-        //public SCADAModel SCADAModel { get; private set; }
-        public ModbusClient ModbusClient { get; private set; }
-
-        private Dictionary<long, IModbusData> measurementsCache;
-        public Dictionary<long, IModbusData> MeasurementsCache
-        {
-            get { return measurementsCache ?? (measurementsCache = new Dictionary<long, IModbusData>()); }
-        }
-
+        private ISCADAConfigData configData;
+        private ModbusClient modbusClient;
+        
         public FunctionExecutorCycle()
         {
-            //SCADAModel = scadaModel;
-            //SCADAModel.SignalIncomingModelConfirmation += EnqueueModelUpdateCommands;
-
-            //ConfigData = SCADAConfigData.Instance;
-            ModbusClient = new ModbusClient(ConfigData.IpAddress.ToString(), ConfigData.TcpPort);
+            InitializeModbusClient();
 
             CloudQueueHelper.TryGetQueue("readcommandqueue", out this.readCommandQueue);
             CloudQueueHelper.TryGetQueue("writecommandqueue", out this.writeCommandQueue);
@@ -52,7 +41,6 @@ namespace OMS.Cloud.SCADA.FunctionExecutorService
         }
 
         #region Command Enqueuers
-
         public async Task<bool> EnqueueReadCommand(IReadModbusFunction modbusFunction)
         {
             bool success;
@@ -122,11 +110,10 @@ namespace OMS.Cloud.SCADA.FunctionExecutorService
         public async Task<bool> EnqueueModelUpdateCommands(List<IWriteModbusFunction> modbusFunctions)
         {
             bool success;
-            ushort length = 6;
 
             Dictionary<long, AnalogModbusData> analogData = new Dictionary<long, AnalogModbusData>();
             Dictionary<long, DiscreteModbusData> discreteData = new Dictionary<long, DiscreteModbusData>();
-            MeasurementsCache.Clear();
+            //MeasurementsCache.Clear();
 
             try
             {
@@ -162,9 +149,9 @@ namespace OMS.Cloud.SCADA.FunctionExecutorService
         {
             try
             {
-                if (ModbusClient == null)
+                if (modbusClient == null)
                 {
-                    ModbusClient = new ModbusClient(ConfigData.IpAddress.ToString(), ConfigData.TcpPort);
+                    InitializeModbusClient();
                 }
                 
                 //Logger.LogDebug("Connected and waiting for command event.");
@@ -173,12 +160,10 @@ namespace OMS.Cloud.SCADA.FunctionExecutorService
 
                 //Logger.LogDebug("Command event happened.");
 
-                if (!ModbusClient.Connected)
+                if (!modbusClient.Connected)
                 {
                     ConnectToModbusClient();
                 }
-                
-
                 
                 while (modelUpdateCommandQueue.PeekMessage() != null)
                 {
@@ -221,6 +206,13 @@ namespace OMS.Cloud.SCADA.FunctionExecutorService
             }
         }
 
+        private async void InitializeModbusClient()
+        {
+            ScadaModelReadAccessClient modelReadAccess = ScadaModelReadAccessClient.CreateClient();
+            this.configData = await modelReadAccess.GetScadaConfigData();
+            this.modbusClient = new ModbusClient(configData.IpAddress.ToString(), configData.TcpPort);
+        }
+
         private void ConnectToModbusClient()
         {
             int numberOfTries = 0;
@@ -230,18 +222,18 @@ namespace OMS.Cloud.SCADA.FunctionExecutorService
             Console.WriteLine(message);
             Logger.LogInfo(message);
 
-            while (!ModbusClient.Connected)
+            while (!modbusClient.Connected)
             {
                 try
                 {
-                    ModbusClient.Connect();
+                    modbusClient.Connect();
                 }
                 catch (ConnectionException ce)
                 {
                     Logger.LogWarn("ConnectionException on ModbusClient.Connect().", ce);
                 }
 
-                if (!ModbusClient.Connected)
+                if (!modbusClient.Connected)
                 {
                     numberOfTries++;
                     Logger.LogDebug($"Connecting try number: {numberOfTries}.");
@@ -253,7 +245,7 @@ namespace OMS.Cloud.SCADA.FunctionExecutorService
 
                     Thread.Sleep(sleepInterval);
                 }
-                else if (!ModbusClient.Connected && numberOfTries == int.MaxValue)
+                else if (!modbusClient.Connected && numberOfTries == int.MaxValue)
                 {
                     string timeoutMessage = "Failed to connect to Modbus client by exceeding the maximum number of connection retries.";
                     Logger.LogError(timeoutMessage);
@@ -272,13 +264,13 @@ namespace OMS.Cloud.SCADA.FunctionExecutorService
         {
             try
             {
-                command.Execute(ModbusClient);
+                command.Execute(modbusClient);
             }
             catch (Exception e)
             {
                 string message = "Exception on currentCommand.Execute().";
                 Logger.LogWarn(message, e);
-                ModbusClient.Disconnect();
+                modbusClient.Disconnect();
                 return;
             }
 
@@ -323,9 +315,5 @@ namespace OMS.Cloud.SCADA.FunctionExecutorService
                 }
             }
         }
-
-       
-
-       
     }
 }

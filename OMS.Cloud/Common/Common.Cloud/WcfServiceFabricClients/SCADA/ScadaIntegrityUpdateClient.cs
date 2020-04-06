@@ -20,16 +20,16 @@ namespace OMS.Common.Cloud.WcfServiceFabricClients.SCADA
 
         public static ScadaIntegrityUpdateClient CreateClient(Uri serviceUri = null)
         {
-            if (serviceUri == null && ConfigurationManager.AppSettings[MicroserviceNames.ScadaModelProviderService] is string scadaModelProviderServiceName)
+            ClientFactory factory = new ClientFactory();
+
+            if (serviceUri == null)
             {
-                serviceUri = new Uri(scadaModelProviderServiceName);
+                return factory.CreateClient<ScadaIntegrityUpdateClient, IScadaIntegrityUpdateContract>(MicroserviceNames.ScadaModelProviderService);
             }
-
-            var partitionResolver = new ServicePartitionResolver(() => new FabricClient());
-            //var partitionResolver = ServicePartitionResolver.GetDefault();
-            var factory = new WcfCommunicationClientFactory<IScadaIntegrityUpdateContract>(TcpBindingHelper.CreateClientBinding(), null, partitionResolver);
-
-            return new ScadaIntegrityUpdateClient(factory, serviceUri);
+            else
+            {
+                return factory.CreateClient<ScadaIntegrityUpdateClient, IScadaIntegrityUpdateContract>(serviceUri);
+            }
         }
 
         #region IScadaIntegrityUpdateContract

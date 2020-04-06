@@ -16,16 +16,16 @@ namespace OMS.Common.Cloud.WcfServiceFabricClients.TMS
 
         public static TransactionEnlistmentClient CreateClient(Uri serviceUri = null)
         {
-            if (serviceUri == null && ConfigurationManager.AppSettings[MicroserviceNames.TransactionManagerService] is string transactionManagerServiceName)
+            ClientFactory factory = new ClientFactory();
+
+            if (serviceUri == null)
             {
-                serviceUri = new Uri(transactionManagerServiceName);
+                return factory.CreateClient<TransactionEnlistmentClient, ITransactionEnlistmentContract>(MicroserviceNames.TransactionManagerService);
             }
-
-            var partitionResolver = new ServicePartitionResolver(() => new FabricClient());
-            //var partitionResolver = ServicePartitionResolver.GetDefault();
-            var factory = new WcfCommunicationClientFactory<ITransactionEnlistmentContract>(TcpBindingHelper.CreateClientBinding(), null, partitionResolver);
-
-            return new TransactionEnlistmentClient(factory, serviceUri);
+            else
+            {
+                return factory.CreateClient<TransactionEnlistmentClient, ITransactionEnlistmentContract>(serviceUri);
+            }
         }
 
         #region ITransactionEnlistmentContract

@@ -1,14 +1,15 @@
-﻿using OMS.Common.SCADA;
-using System;
+﻿using Microsoft.ServiceFabric.Services.Remoting;
+using OMS.Common.SCADA;
 using System.Collections.Generic;
-using System.Linq;
-using System.Text;
+using System.ServiceModel;
 using System.Threading.Tasks;
 
 namespace OMS.Common.ScadaContracts
 {
-    public interface IModelUpdateCommandEnqueuer
+    [ServiceContract]
+    public interface IModelUpdateCommandEnqueuer : IService
     {
+        [OperationContract]
         Task<bool> EnqueueModelUpdateCommands(List<IWriteModbusFunction> modbusFunctions);
     }
 }

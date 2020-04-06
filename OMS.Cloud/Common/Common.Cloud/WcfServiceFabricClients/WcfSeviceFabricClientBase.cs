@@ -5,7 +5,7 @@ using System;
 
 namespace OMS.Common.Cloud.WcfServiceFabricClients
 {
-    public abstract class WcfSeviceFabricClientBase<T> : ServicePartitionClient<WcfCommunicationClient<T>> where T : class, IService
+    public class WcfSeviceFabricClientBase<T> : ServicePartitionClient<WcfCommunicationClient<T>> where T : class, IService
     {
         public WcfSeviceFabricClientBase(WcfCommunicationClientFactory<T> clientFactory, Uri serviceName)
             : base(clientFactory, serviceName)

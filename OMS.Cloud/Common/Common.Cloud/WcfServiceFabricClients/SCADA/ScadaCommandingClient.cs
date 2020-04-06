@@ -20,16 +20,16 @@ namespace OMS.Common.Cloud.WcfServiceFabricClients.SCADA
 
         public static ScadaCommandingClient CreateClient(Uri serviceUri = null)
         {
-            if (serviceUri == null && ConfigurationManager.AppSettings[MicroserviceNames.ScadaCommandingService] is string scadaCommandingServiceName)
+            ClientFactory factory = new ClientFactory();
+
+            if (serviceUri == null)
             {
-                serviceUri = new Uri(scadaCommandingServiceName);
+                return factory.CreateClient<ScadaCommandingClient, IScadaCommandingContract>(MicroserviceNames.ScadaCommandingService);
             }
-
-            var partitionResolver = new ServicePartitionResolver(() => new FabricClient());
-            //var partitionResolver = ServicePartitionResolver.GetDefault();
-            var factory = new WcfCommunicationClientFactory<IScadaCommandingContract>(TcpBindingHelper.CreateClientBinding(), null, partitionResolver);
-
-            return new ScadaCommandingClient(factory, serviceUri);
+            else
+            {
+                return factory.CreateClient<ScadaCommandingClient, IScadaCommandingContract>(serviceUri);
+            }
         }
 
         #region IScadaCommandingContract

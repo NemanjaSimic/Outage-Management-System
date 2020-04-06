@@ -19,16 +19,16 @@ namespace OMS.Common.Cloud.WcfServiceFabricClients.TMS
 
         public static ModelUpdateNotificationClient CreateClient(Uri serviceUri = null)
         {
-            if (serviceUri == null && ConfigurationManager.AppSettings[MicroserviceNames.TransactionActorService] is string transactionActorServiceName)
+            ClientFactory factory = new ClientFactory();
+
+            if (serviceUri == null)
             {
-                serviceUri = new Uri(transactionActorServiceName);
+                return factory.CreateClient<ModelUpdateNotificationClient, IModelUpdateNotificationContract>(MicroserviceNames.TransactionActorService);
             }
-
-            var partitionResolver = new ServicePartitionResolver(() => new FabricClient());
-            //var partitionResolver = ServicePartitionResolver.GetDefault();
-            var factory = new WcfCommunicationClientFactory<IModelUpdateNotificationContract>(TcpBindingHelper.CreateClientBinding(), null, partitionResolver);
-
-            return new ModelUpdateNotificationClient(factory, serviceUri);
+            else
+            {
+                return factory.CreateClient<ModelUpdateNotificationClient, IModelUpdateNotificationContract>(serviceUri);
+            }
         }
 
         #region IModelUpdateNotificationContract
