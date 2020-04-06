@@ -19,7 +19,6 @@
         public Configuration()
         {
             AutomaticMigrationsEnabled = false;
-            
         }
     }
 }
