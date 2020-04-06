@@ -13,6 +13,9 @@
         public static readonly string SCADAIntegrityUpdateEndpoint = "SCADAIntegrityUpdateEndpoint";
         public static readonly string ScadaModelReadAccessEndpoint = "ScadaModelReadAccessEndpoint";
         public static readonly string ScadaModelUpdateAccessEndpoint = "ScadaModelUpdateAccessEndpoint";
+        public static readonly string ScadaReadCommandEnqueuerEndpoint = "ScadaReadCommandEnqueuerEndpoint";
+        public static readonly string ScadaWriteCommandEnqueuerEndpoint = "ScadaWriteCommandEnqueuerEndpoint";
+        public static readonly string ScadaModelUpdateCommandEnqueueurEndpoint = "ScadaModelUpdateCommandEnqueueurEndpoint";
 
         //NMS - 2
         public static readonly string NetworkModelGDAEndpoint = "NetworkModelGDAEndpoint";

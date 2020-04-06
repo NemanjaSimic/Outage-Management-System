@@ -6,7 +6,11 @@ using System.Linq;
 using System.Threading;
 using System.Threading.Tasks;
 using Microsoft.ServiceFabric.Services.Communication.Runtime;
+using Microsoft.ServiceFabric.Services.Communication.Wcf.Runtime;
 using Microsoft.ServiceFabric.Services.Runtime;
+using OMS.Common.Cloud.WcfServiceFabricClients;
+using OMS.Common.ScadaContracts;
+using Outage.Common;
 
 namespace OMS.Cloud.SCADA.FunctionExecutorService
 {
@@ -15,9 +19,12 @@ namespace OMS.Cloud.SCADA.FunctionExecutorService
     /// </summary>
     internal sealed class FunctionExecutorService : StatelessService
     {
+        public FunctionExecutorCycle FunctionExecutorCycle { get; set; }
         public FunctionExecutorService(StatelessServiceContext context)
             : base(context)
-        { }
+        {
+            FunctionExecutorCycle = new FunctionExecutorCycle();
+        }
 
         /// <summary>
         /// Optional override to create listeners (e.g., TCP, HTTP) for this service replica to handle client or user requests.
@@ -25,7 +32,31 @@ namespace OMS.Cloud.SCADA.FunctionExecutorService
         /// <returns>A collection of listeners.</returns>
         protected override IEnumerable<ServiceInstanceListener> CreateServiceInstanceListeners()
         {
-            return new ServiceInstanceListener[0];
+            return new List<ServiceInstanceListener>()
+            {
+                new ServiceInstanceListener(context =>
+                {
+                    return new WcfCommunicationListener<IReadCommandEnqueuer>(context,
+                                                                            FunctionExecutorCycle,
+                                                                            TcpBindingHelper.CreateListenerBinding(),
+                                                                            EndpointNames.ScadaReadCommandEnqueuerEndpoint);
+                }, EndpointNames.ScadaReadCommandEnqueuerEndpoint),
+                new ServiceInstanceListener(context =>
+                {
+                    return new WcfCommunicationListener<IWriteCommandEnqueuer>(context,
+                                                                            FunctionExecutorCycle,
+                                                                            TcpBindingHelper.CreateListenerBinding(),
+                                                                            EndpointNames.ScadaWriteCommandEnqueuerEndpoint);
+                }, EndpointNames.ScadaWriteCommandEnqueuerEndpoint),
+                new ServiceInstanceListener(context =>
+                {
+                    return new WcfCommunicationListener<IModelUpdateCommandEnqueuer>(context,
+                                                                                    FunctionExecutorCycle,
+                                                                                    TcpBindingHelper.CreateListenerBinding(),
+                                                                                    EndpointNames.ScadaModelUpdateCommandEnqueueurEndpoint);
+                }, EndpointNames.ScadaModelUpdateCommandEnqueueurEndpoint)
+                
+            };
         }
 
         /// <summary>
