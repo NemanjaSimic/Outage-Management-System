@@ -9,7 +9,7 @@
         private IList<Specification<T>> _specifications;
 
         public AndSpecification(IList<Specification<T>> specifications)
-            => _specifications = specifications;
+            => _specifications = specifications.Count >= 2 ? specifications : throw new ArgumentException($"{nameof(specifications)} length cannot be less than 2");
 
 
         /// <summary>

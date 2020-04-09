@@ -16,11 +16,7 @@ namespace OutageDatabase.Repository
 
         public override OutageEntity Get(long id)
         {
-            return context.Set<OutageEntity>().Include(o => o.AffectedConsumers)
-                                              .Include(o => o.DefaultIsolationPoints)
-                                              .Include(o => o.OptimumIsolationPoints)
-                                              .Where(o => o.OutageId == id)
-                                              .FirstOrDefault();
+            return context.Set<OutageEntity>().Where(o => o.OutageId == id).FirstOrDefault();
         }
 
         public IEnumerable<OutageEntity> GetAllActive()

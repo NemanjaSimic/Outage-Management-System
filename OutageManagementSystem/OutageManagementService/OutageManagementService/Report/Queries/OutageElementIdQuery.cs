@@ -4,11 +4,11 @@
     using System;
     using System.Linq.Expressions;
 
-    public class OutageIdQuery : OutageSpecification
+    public class OutageElementIdQuery : OutageSpecification
     {
         private readonly long _id;
 
-        public OutageIdQuery(long id)
+        public OutageElementIdQuery(long id)
             => _id = id;
 
         public override Expression<Func<OutageEntity, bool>> IsSatisfiedBy()

@@ -3,14 +3,14 @@ using Outage.Common.OutageService;
 using OutageDatabase;
 using OutageDatabase.Repository;
 using OutageManagementService.Report.Queries;
+using System;
 using System.Collections.Generic;
+using System.Linq;
 
 namespace OutageManagementService.Report
 {
     public class TotalReport : IReport
     {
-        // posto ne postoji nijedan interface za repozitorijume
-        // nema ni DI
         private readonly OutageContext _context;
         private readonly OutageRepository _outageRepository;
         private readonly ConsumerHistoricalRepository _consumerHistoricalRepository;
@@ -27,21 +27,44 @@ namespace OutageManagementService.Report
             List<Specification<OutageEntity>> specs = new List<Specification<OutageEntity>>();
 
             if (options.ElementId.HasValue)
-                specs.Add(new OutageIdQuery(options.ElementId.Value));
+                specs.Add(new OutageElementIdQuery(options.ElementId.Value));
 
             if (options.StartDate.HasValue)
                 specs.Add(new OutageStartDateQuery(options.StartDate.Value));
-            
+
             if (options.EndDate.HasValue)
-                specs.Add(new OutageStartDateQuery(options.EndDate.Value));
+                specs.Add(new OutageEndDateQuery(options.EndDate.Value));
 
-            AndSpecification<OutageEntity> andQuery = new AndSpecification<OutageEntity>(specs);
-            
-            // ovde treba da vrati ID 9, koji ja imam u bazi, ali nece da pronadje ovako
-            // kad odradim GetAll, vrati mi sve i medju njima je bas taj sa ID 9
-            var outages = _outageRepository.Get(9);
+            IEnumerable<OutageEntity> outages;
 
-            return new OutageReport { };
+            if (specs.Count > 1)
+            {
+                AndSpecification<OutageEntity> andQuery = new AndSpecification<OutageEntity>(specs);
+                outages = _outageRepository.Find(andQuery.IsSatisfiedBy()).ToList();
+            }
+            else if (specs.Count == 1)
+            {
+                outages = _outageRepository.Find(specs[0].IsSatisfiedBy()).ToList();
+            }
+            else
+            {
+                // TODO: sta radimo u ovom slucaju?
+                throw new Exception($"{nameof(specs)} cannot be empty?");
+            }
+
+            var type = DateHelpers.GetType(options.StartDate, options.EndDate);
+
+            var outageReportGrouping = outages.GroupBy(o => type == "Monthly" ? o.ReportTime.Month : o.ReportTime.Year).Select(o => o).ToList();
+
+            var reportData = new Dictionary<string, int>();
+            foreach (var outage in outageReportGrouping)
+                reportData.Add(type == "Monthly" ? DateHelpers.Months[outage.Key] : outage.Key.ToString(), outage.Count());
+
+            return new OutageReport
+            {
+                Type = type,
+                Data = reportData
+            };
         }
     }
 }

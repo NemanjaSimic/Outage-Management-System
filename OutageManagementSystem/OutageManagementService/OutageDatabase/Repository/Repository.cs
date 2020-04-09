@@ -27,7 +27,7 @@ namespace OutageDatabase.Repository
 
         public IEnumerable<TEntity> Find(Expression<Func<TEntity, bool>> predicate)
         {
-            return context.Set<TEntity>().Where(predicate);
+            return context.Set<TEntity>().Where(predicate).AsNoTracking();
         }
 
         public virtual TEntity Get(TPKey id)
