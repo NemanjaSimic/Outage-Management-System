@@ -45,18 +45,10 @@ namespace OMS.Web.Services.Handlers
 
                         var report = outageProxy.GenerateReport(options);
 
-                        // Data examples
                         return new ReportViewModel
                         {
-                            Data = new Dictionary<string, int>
-                            {
-                                { "January", 2154 },
-                                { "February", 1538 },
-                                { "March", 1234 },
-                                { "April", 756 },
-                                { "May", 2621 }
-                            },
-                            Type = "Monthly"
+                            Data = report.Data,
+                            Type = report.Type
                         };
                     }
                     catch (Exception ex)

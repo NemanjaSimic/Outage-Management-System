@@ -12,6 +12,6 @@
             => _startDate = startDate;
 
         public override Expression<Func<OutageEntity, bool>> IsSatisfiedBy()
-            => x => x.ReportTime.Date >= _startDate.Date;
+            => x => x.ReportTime >= _startDate;
     }
 }
