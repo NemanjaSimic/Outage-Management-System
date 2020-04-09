@@ -5,6 +5,7 @@ using System;
 using System.Collections;
 using System.Collections.Concurrent;
 using System.Collections.Generic;
+using System.Fabric;
 using System.Threading;
 using System.Threading.Tasks;
 
@@ -17,6 +18,7 @@ namespace OMS.Common.Cloud.ReliableCollectionHelpers
     {
         public event EventHandler<NotifyDictionaryChangedEventArgs<TKey, TValue>> DictionaryChanged;
         
+        private readonly ReliableStateManagerHelper reliableStateManagerHelper;
         private readonly IReliableStateManager stateManager;
         private readonly string reliableDictionaryName;
         
@@ -38,6 +40,7 @@ namespace OMS.Common.Cloud.ReliableCollectionHelpers
         {
             this.stateManager = stateManager;
             this.reliableDictionaryName = reliableDictioanryName;
+            this.reliableStateManagerHelper = new ReliableStateManagerHelper();
 
             InitializeReliableDictionary(reliableDictioanryName);
         }
@@ -56,9 +59,9 @@ namespace OMS.Common.Cloud.ReliableCollectionHelpers
                 reliableDictioanryName = this.reliableDictionaryName;
             }
 
-            using (ITransaction tx = stateManager.CreateTransaction())
+            using (ITransaction tx = this.stateManager.CreateTransaction())
             {
-                this.reliableDictionary = await this.stateManager.GetOrAddAsync<IReliableDictionary<TKey, TValue>>(tx, reliableDictioanryName);
+                this.reliableDictionary = await reliableStateManagerHelper.GetOrAddAsync<IReliableDictionary<TKey, TValue>>(stateManager, tx, reliableDictioanryName);
                 this.reliableDictionary.RebuildNotificationAsyncCallback = this.OnDictionaryRebuildNotificationHandlerAsync;
                 this.reliableDictionary.DictionaryChanged += this.OnDictionaryChangedHandler;
                 await tx.CommitAsync();

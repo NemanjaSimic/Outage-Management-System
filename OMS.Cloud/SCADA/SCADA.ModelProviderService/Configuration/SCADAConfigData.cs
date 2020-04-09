@@ -4,9 +4,9 @@ using System.Configuration;
 using System.Net;
 using OMS.Common.SCADA;
 
-namespace OMS.Cloud.SCADA.Data.Configuration
+namespace OMS.Cloud.SCADA.ModelProviderService.Configuration
 {
-    public class SCADAConfigData : ISCADAConfigData
+    internal class SCADAConfigData : ISCADAConfigData
     {
         private ILogger logger;
 

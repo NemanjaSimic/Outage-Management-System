@@ -1,6 +1,6 @@
 ﻿using Common.SCADA;
 using Microsoft.ServiceFabric.Data;
-using OMS.Cloud.SCADA.Data.Configuration;
+using OMS.Cloud.SCADA.ModelProviderService.Configuration;
 using OMS.Common.Cloud.ReliableCollectionHelpers;
 using OMS.Common.SCADA;
 using OMS.Common.ScadaContracts;
@@ -12,18 +12,49 @@ namespace OMS.Cloud.SCADA.ModelProviderService.ContractProviders
 {
     internal class ModelReadAccessProvider : IScadaModelReadAccessContract
     {
+        private readonly IReliableStateManager stateManager;
+
+        #region Private Properties
         private ISCADAConfigData configData;
-        private readonly ReliableDictionaryAccess<long, ISCADAModelPointItem> gidToPointItemMap;
-        private readonly ReliableDictionaryAccess<ushort, Dictionary<ushort, long>> addressToGidMap;
-        private readonly ReliableDictionaryAccess<long, CommandDescription> commandDescriptionCache;
+        private ISCADAConfigData ConfigData
+        {
+            get
+            {
+                return configData ?? (configData = SCADAConfigData.Instance);
+            }
+        }
+
+        private ReliableDictionaryAccess<long, ISCADAModelPointItem> gidToPointItemMap;
+        private ReliableDictionaryAccess<long, ISCADAModelPointItem> GidToPointItemMap
+        {
+            get
+            {
+                return gidToPointItemMap ?? (gidToPointItemMap = new ReliableDictionaryAccess<long, ISCADAModelPointItem>(stateManager, ReliableDictionaryNames.GidToPointItemMap));
+            }
+        }
+
+        private ReliableDictionaryAccess<ushort, Dictionary<ushort, long>> addressToGidMap;
+        private ReliableDictionaryAccess<ushort, Dictionary<ushort, long>> AddressToGidMap
+        {
+            get
+            {
+                return addressToGidMap ?? (addressToGidMap = new ReliableDictionaryAccess<ushort, Dictionary<ushort, long>>(stateManager, ReliableDictionaryNames.AddressToGidMap));
+            }
+        }
+
+        private ReliableDictionaryAccess<long, CommandDescription> commandDescriptionCache;
+        private ReliableDictionaryAccess<long, CommandDescription> CommandDescriptionCache
+        {
+            get
+            {
+                return commandDescriptionCache ?? (commandDescriptionCache = new ReliableDictionaryAccess<long, CommandDescription>(stateManager, ReliableDictionaryNames.CommandDescriptionCache));
+            }
+        }
+        #endregion Properties
 
         public ModelReadAccessProvider(IReliableStateManager stateManager)
         {
-            this.configData = SCADAConfigData.Instance;
-
-            this.gidToPointItemMap = new ReliableDictionaryAccess<long, ISCADAModelPointItem>(stateManager, ReliableDictionaryNames.GidToPointItemMap);
-            this.addressToGidMap = new ReliableDictionaryAccess<ushort, Dictionary<ushort, long>>(stateManager, ReliableDictionaryNames.AddressToGidMap);
-            this.commandDescriptionCache = new ReliableDictionaryAccess<long, CommandDescription>(stateManager, ReliableDictionaryNames.CommandDescriptionCache);
+            this.stateManager = stateManager;
         }
 
         public async Task<bool> GetIsScadaModelImportedIndicator()
@@ -38,7 +69,7 @@ namespace OMS.Cloud.SCADA.ModelProviderService.ContractProviders
 
         public async Task<Dictionary<long, ISCADAModelPointItem>> GetGidToPointItemMap()
         {
-            return this.gidToPointItemMap.GetDataCopy();
+            return GidToPointItemMap.GetDataCopy();
         }
 
         public async Task<Dictionary<ushort, Dictionary<ushort, ISCADAModelPointItem>>> GetAddressToPointItemMap()
@@ -60,12 +91,12 @@ namespace OMS.Cloud.SCADA.ModelProviderService.ContractProviders
 
         public async Task<Dictionary<ushort, Dictionary<ushort, long>>> GetAddressToGidMap()
         {
-            return this.addressToGidMap.GetDataCopy();
+            return AddressToGidMap.GetDataCopy();
         }
 
         public async Task<Dictionary<long, CommandDescription>> GetCommandDescriptionCache()
         {
-            return this.commandDescriptionCache.GetDataCopy();
+            return CommandDescriptionCache.GetDataCopy();
         }        
     }
 }

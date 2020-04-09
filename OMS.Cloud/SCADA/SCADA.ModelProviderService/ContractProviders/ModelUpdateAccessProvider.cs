@@ -13,17 +13,26 @@ namespace OMS.Cloud.SCADA.ModelProviderService.ContractProviders
 {
     internal class ModelUpdateAccessProvider : IScadaModelUpdateAccessContract
     {
+        private readonly IReliableStateManager stateManager;
+        
         private ILogger logger;
         private ILogger Logger
         {
             get { return logger ?? (logger = LoggerWrapper.Instance); }
         }
 
-        private readonly ReliableDictionaryAccess<long, IModbusData> measurementsCache;
+        private ReliableDictionaryAccess<long, IModbusData> measurementsCache;
+        private ReliableDictionaryAccess<long, IModbusData> MeasurementsCache
+        {
+            get
+            {
+                return measurementsCache ?? (measurementsCache = new ReliableDictionaryAccess<long, IModbusData>(this.stateManager, ReliableDictionaryNames.MeasurementsCache));
+            }
+        }
 
         public ModelUpdateAccessProvider(IReliableStateManager stateManager)
         {
-            this.measurementsCache = new ReliableDictionaryAccess<long, IModbusData>(stateManager, ReliableDictionaryNames.MeasurementsCache);
+            this.stateManager = stateManager;
         }
 
         public async Task MakeAnalogEntryToMeasurementCache(Dictionary<long, AnalogModbusData> data, bool permissionToPublishData)
@@ -37,7 +46,7 @@ namespace OMS.Cloud.SCADA.ModelProviderService.ContractProviders
                 throw new NullReferenceException(message);
             }
 
-            if (this.measurementsCache == null)
+            if (MeasurementsCache == null)
             {
                 string message = $"GetIntegrityUpdate => gidToPointItemMap is null.";
                 Logger.LogError(message);
@@ -46,17 +55,17 @@ namespace OMS.Cloud.SCADA.ModelProviderService.ContractProviders
 
             foreach (long gid in data.Keys)
             {
-                if (!this.measurementsCache.ContainsKey(gid))
+                if (!MeasurementsCache.ContainsKey(gid))
                 {
-                    this.measurementsCache.Add(gid, data[gid]);
+                    MeasurementsCache.Add(gid, data[gid]);
                     publicationData[gid] = data[gid];
                 }
-                else if (this.measurementsCache[gid] is AnalogModbusData analogCacheItem && analogCacheItem.Value != data[gid].Value)
+                else if (MeasurementsCache[gid] is AnalogModbusData analogCacheItem && analogCacheItem.Value != data[gid].Value)
                 {
                     Logger.LogDebug($"Value changed on element with id: {analogCacheItem.MeasurementGid}. Old value: {analogCacheItem.Value}; new value: {data[gid].Value}");
 
-                    this.measurementsCache[gid] = data[gid];
-                    publicationData[gid] = this.measurementsCache[gid] as AnalogModbusData;
+                    MeasurementsCache[gid] = data[gid];
+                    publicationData[gid] = MeasurementsCache[gid] as AnalogModbusData;
                 }
             }
 
@@ -79,7 +88,7 @@ namespace OMS.Cloud.SCADA.ModelProviderService.ContractProviders
                 throw new NullReferenceException(message);
             }
 
-            if (this.measurementsCache == null)
+            if (MeasurementsCache == null)
             {
                 string message = $"GetIntegrityUpdate => gidToPointItemMap is null.";
                 Logger.LogError(message);
@@ -88,17 +97,17 @@ namespace OMS.Cloud.SCADA.ModelProviderService.ContractProviders
 
             foreach (long gid in data.Keys)
             {
-                if (!this.measurementsCache.ContainsKey(gid))
+                if (!MeasurementsCache.ContainsKey(gid))
                 {
-                    this.measurementsCache.Add(gid, data[gid]);
+                    MeasurementsCache.Add(gid, data[gid]);
                     publicationData[gid] = data[gid];
                 }
-                else if (this.measurementsCache[gid] is DiscreteModbusData discreteCacheItem && discreteCacheItem.Value != data[gid].Value)
+                else if (MeasurementsCache[gid] is DiscreteModbusData discreteCacheItem && discreteCacheItem.Value != data[gid].Value)
                 {
                     Logger.LogDebug($"Value changed on element with id :{discreteCacheItem.MeasurementGid};. Old value: {discreteCacheItem.Value}; new value: {data[gid].Value}");
 
-                    this.measurementsCache[gid] = data[gid];
-                    publicationData[gid] = this.measurementsCache[gid] as DiscreteModbusData;
+                    MeasurementsCache[gid] = data[gid];
+                    publicationData[gid] = MeasurementsCache[gid] as DiscreteModbusData;
                 }
             }
 

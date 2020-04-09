@@ -5,9 +5,9 @@ using System.Linq;
 using System.Text;
 using System.Threading.Tasks;
 
-namespace OMS.Cloud.SCADA.Data.Configuration
+namespace OMS.Cloud.SCADA.ModelProviderService.Configuration
 {
-    public class AlarmConfigData
+	internal class AlarmConfigData
     {
 
 		public float LowPowerLimit { get; set; }

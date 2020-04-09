@@ -1,5 +1,4 @@
 ﻿using Outage.Common;
-using OMS.Cloud.SCADA.Data.Configuration;
 using System;
 using System.Collections.Generic;
 using OMS.Common.SCADA;
@@ -107,77 +106,78 @@ namespace OMS.Cloud.SCADA.Data.Repository
             float HighLimit;
             AlarmType currentAlarm = Alarm;
 
-            if (AnalogType == AnalogMeasurementType.POWER)
-            {
-                LowLimit = AlarmConfigData.Instance.LowPowerLimit;
-                HighLimit = AlarmConfigData.Instance.HighPowerLimit;
-            }
-            else if(AnalogType == AnalogMeasurementType.VOLTAGE)
-            {
-                LowLimit = AlarmConfigData.Instance.LowVoltageLimit;
-                HighLimit = AlarmConfigData.Instance.HighVolageLimit;
-            }
-            else if(AnalogType == AnalogMeasurementType.CURRENT)
-            {
-                LowLimit = AlarmConfigData.Instance.LowCurrentLimit;
-                HighLimit = AlarmConfigData.Instance.HighCurrentLimit;
-            }
-            else
-            {
-                throw new Exception($"Analog measurement is of type: {AnalogType} which is not supported for alarming.");
-            }
+            //TODO: gde sa ovim?
+            //if (AnalogType == AnalogMeasurementType.POWER)
+            //{
+            //    LowLimit = AlarmConfigData.Instance.LowPowerLimit;
+            //    HighLimit = AlarmConfigData.Instance.HighPowerLimit;
+            //}
+            //else if(AnalogType == AnalogMeasurementType.VOLTAGE)
+            //{
+            //    LowLimit = AlarmConfigData.Instance.LowVoltageLimit;
+            //    HighLimit = AlarmConfigData.Instance.HighVolageLimit;
+            //}
+            //else if(AnalogType == AnalogMeasurementType.CURRENT)
+            //{
+            //    LowLimit = AlarmConfigData.Instance.LowCurrentLimit;
+            //    HighLimit = AlarmConfigData.Instance.HighCurrentLimit;
+            //}
+            //else
+            //{
+            //    throw new Exception($"Analog measurement is of type: {AnalogType} which is not supported for alarming.");
+            //}
 
-            //ALARMS FOR ANALOG VALUES
-            if (RegisterType == PointType.ANALOG_INPUT || RegisterType == PointType.ANALOG_OUTPUT)
-            {
-                //VALUE IS INVALID
-                if (CurrentRawValue < MinRawValue || CurrentRawValue > MaxRawValue)
-                {
-                    Alarm = AlarmType.ABNORMAL_VALUE;
-                    if (currentAlarm != Alarm)
-                    {
-                        alarmChanged = true;
-                    }
+            ////ALARMS FOR ANALOG VALUES
+            //if (RegisterType == PointType.ANALOG_INPUT || RegisterType == PointType.ANALOG_OUTPUT)
+            //{
+            //    //VALUE IS INVALID
+            //    if (CurrentRawValue < MinRawValue || CurrentRawValue > MaxRawValue)
+            //    {
+            //        Alarm = AlarmType.ABNORMAL_VALUE;
+            //        if (currentAlarm != Alarm)
+            //        {
+            //            alarmChanged = true;
+            //        }
 
-                    //TODO: maybe throw new Exception("Invalid value");
-                }
-                else if(CurrentEguValue < EGU_Min || CurrentEguValue > EGU_Max)
-                {
-                    Alarm = AlarmType.REASONABILITY_FAILURE;
-                    if (currentAlarm != Alarm)
-                    {
-                        alarmChanged = true;
-                    }
-                }
-                else if (CurrentEguValue > EGU_Min && CurrentEguValue < LowLimit)
-                {
-                    Alarm = AlarmType.LOW_ALARM;
-                    if (currentAlarm != Alarm)
-                    {
-                        alarmChanged = true;
-                    }
-                }
-                else if (CurrentEguValue < EGU_Max && CurrentEguValue > HighLimit)
-                {
-                    Alarm = AlarmType.HIGH_ALARM;
-                    if (currentAlarm != Alarm)
-                    {
-                        alarmChanged = true;
-                    }
-                }
-                else
-                {
-                    Alarm = AlarmType.NO_ALARM;
-                    if (currentAlarm != Alarm)
-                    {
-                        alarmChanged = true;
-                    }
-                }
-            }
-            else
-            {
-                throw new Exception($"PointItem [Gid: 0x{Gid:X16}, Address: {Address}] RegisterType value is invalid. Value: {RegisterType}");
-            }
+            //        //TODO: maybe throw new Exception("Invalid value");
+            //    }
+            //    else if(CurrentEguValue < EGU_Min || CurrentEguValue > EGU_Max)
+            //    {
+            //        Alarm = AlarmType.REASONABILITY_FAILURE;
+            //        if (currentAlarm != Alarm)
+            //        {
+            //            alarmChanged = true;
+            //        }
+            //    }
+            //    else if (CurrentEguValue > EGU_Min && CurrentEguValue < LowLimit)
+            //    {
+            //        Alarm = AlarmType.LOW_ALARM;
+            //        if (currentAlarm != Alarm)
+            //        {
+            //            alarmChanged = true;
+            //        }
+            //    }
+            //    else if (CurrentEguValue < EGU_Max && CurrentEguValue > HighLimit)
+            //    {
+            //        Alarm = AlarmType.HIGH_ALARM;
+            //        if (currentAlarm != Alarm)
+            //        {
+            //            alarmChanged = true;
+            //        }
+            //    }
+            //    else
+            //    {
+            //        Alarm = AlarmType.NO_ALARM;
+            //        if (currentAlarm != Alarm)
+            //        {
+            //            alarmChanged = true;
+            //        }
+            //    }
+            //}
+            //else
+            //{
+            //    throw new Exception($"PointItem [Gid: 0x{Gid:X16}, Address: {Address}] RegisterType value is invalid. Value: {RegisterType}");
+            //}
 
             return alarmChanged;
         }

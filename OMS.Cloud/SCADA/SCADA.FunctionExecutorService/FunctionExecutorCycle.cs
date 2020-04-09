@@ -16,7 +16,7 @@ using System.Threading.Tasks;
 
 namespace OMS.Cloud.SCADA.FunctionExecutorService
 {
-    internal class FunctionExecutorCycle : IReadCommandEnqueuer, IWriteCommandEnqueuer, IModelUpdateCommandEnqueuer
+    internal class FunctionExecutorCycle
     {
         private ILogger logger;
         private ILogger Logger
@@ -40,118 +40,13 @@ namespace OMS.Cloud.SCADA.FunctionExecutorService
             CloudQueueHelper.TryGetQueue("mucommandqueue", out this.modelUpdateCommandQueue);
         }
 
-        #region Command Enqueuers
-        public async Task<bool> EnqueueReadCommand(IReadModbusFunction modbusFunction)
-        {
-            bool success;
-
-            if (!(modbusFunction is IReadAnalogModusFunction || modbusFunction is IReadDiscreteModbusFunction))
-            {
-                string message = "EnqueueReadCommand => trying to enqueue modbus function that implements neither IReadDiscreteModbusFunction nor IReadDiscreteModbusFunction interface.";
-                Logger.LogError(message);
-                throw new ArgumentException(message);
-            }
-
-            while (modelUpdateCommandQueue.PeekMessage() != null || writeCommandQueue.PeekMessage() != null)
-            {
-                while (modelUpdateCommandQueue.PeekMessage() != null)
-                {
-                    await Task.Delay(1000);
-                }
-
-                while (writeCommandQueue.PeekMessage() == null)
-                {
-                    await Task.Delay(1000);
-                }
-            }
-
-            try
-            {
-                await this.readCommandQueue.AddMessageAsync(new CloudQueueMessage(Serialization.ObjectToByteArray(modbusFunction)));
-                //this.commandEvent.Set();
-                success = true;
-            }
-            catch (Exception e)
-            {
-                success = false;
-                string message = "Exception caught in EnqueueCommand() method.";
-                Logger.LogError(message, e);
-            }
-
-            return success;
-        }
-
-        public async Task<bool> EnqueueWriteCommand(IWriteModbusFunction modbusFunction)
-        {
-            bool success;
-
-            while (modelUpdateCommandQueue.PeekMessage() != null)
-            {
-                await Task.Delay(1000);
-            }
-
-            try
-            {
-                await this.writeCommandQueue.AddMessageAsync(new CloudQueueMessage(Serialization.ObjectToByteArray(modbusFunction)));
-                this.readCommandQueue.Clear();
-                //this.commandEvent.Set();
-                success = true;
-            }
-            catch (Exception e)
-            {
-                success = false;
-                string message = "Exception caught in EnqueueCommand() method.";
-                Logger.LogError(message, e);
-            }
-
-            return success;
-        }
-
-        public async Task<bool> EnqueueModelUpdateCommands(List<IWriteModbusFunction> modbusFunctions)
-        {
-            bool success;
-
-            Dictionary<long, AnalogModbusData> analogData = new Dictionary<long, AnalogModbusData>();
-            Dictionary<long, DiscreteModbusData> discreteData = new Dictionary<long, DiscreteModbusData>();
-            //MeasurementsCache.Clear();
-
-            try
-            {
-                //Dictionary<long, ISCADAModelPointItem> currentScadaModel = new Dictionary<long, ISCADAModelPointItem>(); //TODO: Preuzeti od providera
-
-                Task[] addTasks = new Task[modbusFunctions.Count];
-                for(int i = 0; i < modbusFunctions.Count; i++) 
-                {
-                    addTasks[i] = this.modelUpdateCommandQueue.AddMessageAsync(new CloudQueueMessage(Serialization.ObjectToByteArray(modbusFunctions[i])));
-                }
-
-                Task.WaitAll(addTasks);
-
-
-                success = true;
-                this.writeCommandQueue.Clear();
-                this.readCommandQueue.Clear();
-                //this.commandEvent.Set();
-            }
-            catch (Exception e)
-            {
-                success = false;
-                string message = "Exception caught in EnqueueModelUpdateCommands() method.";
-                Logger.LogError(message, e);
-            }
-
-            return success;
-        }
-
-        #endregion
-
-        public void Start()
+        public async void Start()
         {
             try
             {
                 if (modbusClient == null)
                 {
-                    InitializeModbusClient();
+                    await InitializeModbusClient();
                 }
                 
                 //Logger.LogDebug("Connected and waiting for command event.");
@@ -206,7 +101,7 @@ namespace OMS.Cloud.SCADA.FunctionExecutorService
             }
         }
 
-        private async void InitializeModbusClient()
+        private async Task InitializeModbusClient()
         {
             ScadaModelReadAccessClient modelReadAccess = ScadaModelReadAccessClient.CreateClient();
             this.configData = await modelReadAccess.GetScadaConfigData();

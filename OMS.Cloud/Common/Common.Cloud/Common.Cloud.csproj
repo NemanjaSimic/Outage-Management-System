@@ -49,6 +49,7 @@
     <Compile Include="Properties\AssemblyInfo.cs" />
     <Compile Include="ReliableCollectionHelpers\ReliableDictionaryAccess.cs" />
     <Compile Include="ReliableCollectionHelpers\ReliableDictionaryHelper.cs" />
+    <Compile Include="ReliableStateManagerHelper.cs" />
     <Compile Include="Serialization.cs" />
     <Compile Include="WcfServiceFabricClients\CE\Placeholder.cs" />
     <Compile Include="WcfServiceFabricClients\ClientFactory.cs" />
