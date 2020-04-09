@@ -1,4 +1,5 @@
-﻿using System;
+﻿using LinqKit;
+using System;
 using System.Collections.Generic;
 using System.Data.Entity;
 using System.Linq;
@@ -27,7 +28,9 @@ namespace OutageDatabase.Repository
 
         public IEnumerable<TEntity> Find(Expression<Func<TEntity, bool>> predicate)
         {
-            return context.Set<TEntity>().Where(predicate).AsNoTracking();
+            return context.Set<TEntity>()
+                .AsExpandable()
+                .Where(predicate);
         }
 
         public virtual TEntity Get(TPKey id)
