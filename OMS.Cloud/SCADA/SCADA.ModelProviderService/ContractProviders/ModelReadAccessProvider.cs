@@ -64,7 +64,7 @@ namespace OMS.Cloud.SCADA.ModelProviderService.ContractProviders
 
         public async Task<ISCADAConfigData> GetScadaConfigData()
         {
-            return this.configData;
+            return ConfigData;
         }
 
         public async Task<Dictionary<long, ISCADAModelPointItem>> GetGidToPointItemMap()
