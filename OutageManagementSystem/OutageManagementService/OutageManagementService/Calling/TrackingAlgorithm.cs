@@ -1,4 +1,5 @@
-﻿using Outage.Common.OutageService.Interface;
+﻿using Outage.Common;
+using Outage.Common.OutageService.Interface;
 using System;
 using System.Collections.Concurrent;
 using System.Collections.Generic;
@@ -50,7 +51,7 @@ namespace OutageManagementService.Calling
 
             foreach (var item in this.outages)
             {
-                this.outageModel.ReportPotentialOutage(item);
+                this.outageModel.ReportPotentialOutage(item, CommandOriginType.OTHER_COMMAND);
             }
         }
         private bool IsSwitch(string dmsType)

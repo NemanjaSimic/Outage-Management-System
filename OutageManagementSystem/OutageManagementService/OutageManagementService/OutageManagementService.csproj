@@ -55,6 +55,7 @@
   <ItemGroup>
     <Compile Include="Calling\CallTracker.cs" />
     <Compile Include="Calling\TrackingAlgorithm.cs" />
+    <Compile Include="DBManager\HistoryDBManager.cs" />
     <Compile Include="DistribuedTransaction\OutageModelUpdateNotification.cs" />
     <Compile Include="DistribuedTransaction\OutageTransactionActor.cs" />
     <Compile Include="OutageIsolationAlgorithm\OutageIsolationAlgorithmParameters.cs" />

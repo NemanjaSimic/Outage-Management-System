@@ -11,6 +11,7 @@ using OMSCommon.Mappers;
 using OutageDatabase.Repository;
 using Outage.Common.OutageService;
 using OutageManagementService.Report;
+using Outage.Common.OutageService.Interface;
 
 namespace OutageManagementService.Outage
 {
@@ -24,7 +25,7 @@ namespace OutageManagementService.Outage
         }
 
         public static OutageModel outageModel;
-
+        public static SwitchClosed SwitchClosed { get; set; }
         #region IOutageAccessContract
         public IEnumerable<ActiveOutageMessage> GetActiveOutages()
         {
@@ -56,13 +57,13 @@ namespace OutageManagementService.Outage
         #endregion
 
         #region IReportPotentialOutageContract
-        public bool ReportPotentialOutage(long elementGid)
+        public bool ReportPotentialOutage(long elementGid, CommandOriginType commandOriginType)
         {
             bool result;
 
             try
             {
-                result = outageModel.ReportPotentialOutage(elementGid); //TODO: enum (error, noAffectedConsumers, success,...)
+                result = outageModel.ReportPotentialOutage(elementGid, commandOriginType); //TODO: enum (error, noAffectedConsumers, success,...)
             }
             catch (Exception e)
             {
@@ -186,6 +187,11 @@ namespace OutageManagementService.Outage
             {
                 throw;
             }
+        }
+
+        public void OnSwitchClose(long elementGid)
+        {
+            SwitchClosed?.Invoke(elementGid);
         }
     }
 }

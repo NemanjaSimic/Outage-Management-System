@@ -21,6 +21,7 @@ using OutageManagementService.ScadaSubscriber;
 using System;
 using System.Collections.Concurrent;
 using System.Collections.Generic;
+using System.Dynamic;
 using System.Linq;
 using System.Text;
 using System.Threading.Tasks;
@@ -38,6 +39,9 @@ namespace OutageManagementService
     {
         private IOutageTopologyModel topologyModel;
 
+        public SwitchOpened SwitchOpened { get; set; }
+        public ConsumersBlackedOut ConsumersBlackedOut { get; set; }
+        public ConsumersEnergized ConsumersEnergized { get; set; }
         public IOutageTopologyModel TopologyModel
         {
             get
@@ -68,7 +72,12 @@ namespace OutageManagementService
         private HashSet<long> commandedElements;
         private HashSet<long> optimumIsolationPoints;
         private Dictionary<DeltaOpType, List<long>> modelChanges;
-        
+
+        private HashSet<long> currentAffectedConsumers;
+        private HashSet<long> currentOpenedSwitches;
+
+        private Dictionary<long, Dictionary<long, List<long>>> recloserOutageMap;
+
         public List<long> CalledOutages;
         public ConcurrentQueue<long> EmailMsg;
 
@@ -77,8 +86,11 @@ namespace OutageManagementService
             proxyFactory = new ProxyFactory();
             commandedElements = new HashSet<long>();
             optimumIsolationPoints = new HashSet<long>();
+            currentAffectedConsumers = new HashSet<long>();
+            currentOpenedSwitches = new HashSet<long>();
             outageMessageMapper = new OutageMessageMapper();
             modelResourcesDesc = new ModelResourcesDesc();
+            recloserOutageMap = new Dictionary<long, Dictionary<long, List<long>>>();
 
             dbContext = new UnitOfWork();
 
@@ -188,112 +200,151 @@ namespace OutageManagementService
         #endregion
 
         #region IOutageLifecycleContract
-        public bool ReportPotentialOutage(long gid)
+        public bool ReportPotentialOutage(long gid, CommandOriginType commandOriginType)
         {
             bool success = false;
-            Logger.LogDebug($"Reporting outage for gid: 0x{gid:X16}");
-
-            if (commandedElements.Contains(gid) || optimumIsolationPoints.Contains(gid))
-            {
-                return false;
-            }
-
             List<long> affectedConsumersIds = new List<long>();
-
-
             affectedConsumersIds = GetAffectedConsumers(gid);
 
-            if (affectedConsumersIds.Count == 0)
+            if (commandOriginType != CommandOriginType.USER_COMMAND && 
+                commandOriginType != CommandOriginType.ISOLATING_ALGORITHM_COMMAND)
             {
-                Logger.LogInfo("There is no affected consumers => outage report is not valid.");
-                return false;
-            }
+                Logger.LogDebug($"Reporting outage for gid: 0x{gid:X16}");
 
-            OutageEntity activeOutageDbEntity = null;
+                if (commandedElements.Contains(gid) || optimumIsolationPoints.Contains(gid))
+                {
+                    SwitchOpened?.Invoke(gid, -1);
+                    ConsumersBlackedOut?.Invoke(affectedConsumersIds, -1);
+                    return false;
+                }    
 
-            if (dbContext.OutageRepository.Find(o => o.OutageElementGid == gid && o.OutageState != OutageState.ARCHIVED).FirstOrDefault() != null)
-            {
-                Logger.LogWarn($"Malfunction on element with gid: 0x{gid:x16} has already been reported.");
-                return false;
-            }
+                if (affectedConsumersIds.Count == 0)
+                {
+                    bool isSwitchInvoked = false;
+                    if (recloserOutageMap.TryGetValue(gid, out Dictionary<long, List<long>> outageAffectedPair))
+                    {
+                        foreach (var pair in outageAffectedPair)
+                        {
+                            ConsumersBlackedOut?.Invoke(pair.Value, pair.Key);
+                            SwitchOpened?.Invoke(gid, pair.Key);
+                            isSwitchInvoked = true;
+                        }
+                    }
 
-            List<Consumer> consumerDbEntities = GetAffectedConsumersFromDatabase(affectedConsumersIds);
+                    if (!isSwitchInvoked)
+                    {
+                        SwitchOpened?.Invoke(gid, -1);
+                    }
 
-            if (consumerDbEntities.Count != affectedConsumersIds.Count)
-            {
-                Logger.LogWarn("Some of affected consumers are not present in database");
-                return false;
-            }
+                    Logger.LogInfo("There is no affected consumers => outage report is not valid.");
+                    return false;
+                }
 
-            long recloserId;
+                OutageEntity activeOutageDbEntity = null;
 
-            try
-            {
-                recloserId = GetRecloserForHeadBreaker(gid);
-            }
-            catch (Exception e)
-            {
-                throw e;
-            }
+                if (dbContext.OutageRepository.Find(o => o.OutageElementGid == gid && o.OutageState != OutageState.ARCHIVED).FirstOrDefault() != null)
+                {
+                    Logger.LogWarn($"Malfunction on element with gid: 0x{gid:x16} has already been reported.");
+                    return false;
+                }
 
-            List<Equipment> defaultIsolationPoints = GetEquipmentEntity(new List<long> { gid, recloserId });
+                List<Consumer> consumerDbEntities = GetAffectedConsumersFromDatabase(affectedConsumersIds);
 
-            OutageEntity createdActiveOutage = new OutageEntity
-            {
-                AffectedConsumers = consumerDbEntities,
-                OutageState = OutageState.CREATED,
-                ReportTime = DateTime.UtcNow,
-                DefaultIsolationPoints = defaultIsolationPoints,
-            };
+                if (consumerDbEntities.Count != affectedConsumersIds.Count)
+                {
+                    Logger.LogWarn("Some of affected consumers are not present in database");
+                    return false;
+                }
 
-            activeOutageDbEntity = dbContext.OutageRepository.Add(createdActiveOutage);
+                long recloserId;
 
-            try
-            {
-                dbContext.Complete();
-                Logger.LogDebug($"Outage on element with gid: 0x{activeOutageDbEntity.OutageElementGid:x16} is successfully stored in database.");
-                success = true;
-
-                //outage created -> affected consumers are deenergized
-                List<ConsumerHistorical> consumers = outageMessageMapper.MapOutageToConsumerHistorical(consumerDbEntities, activeOutageDbEntity.OutageId, DatabaseOperation.INSERT);
-                dbContext.ConsumerHistoricalRepository.AddRange(consumers);
-
-                //outage created -> default isolation points are opened
-                List<EquipmentHistorical> equipment = outageMessageMapper.MapOutageToEquipmentHistorical(defaultIsolationPoints, activeOutageDbEntity.OutageId, DatabaseOperation.INSERT);
-                dbContext.EquipmentHistoricalRepository.AddRange(equipment);
-
-                dbContext.Complete();
-            }
-            catch (Exception e)
-            {
-                string message = "OutageModel::ReportPotentialOutage method => exception on Complete()";
-                Logger.LogError(message, e);
-                Console.WriteLine($"{message}, Message: {e.Message}, Inner Message: {e.InnerException.Message})");
-
-                //TODO: da li je dobar handle?
-                dbContext.Dispose();
-                dbContext = new UnitOfWork();
-                success = false;
-            }
-
-            if (success && activeOutageDbEntity != null)
-            {
                 try
                 {
-                    success = PublishOutage(Topic.ACTIVE_OUTAGE, outageMessageMapper.MapOutageEntity(activeOutageDbEntity));
-                    
-                    if(success)
-                    {
-                        Logger.LogInfo($"Outage on element with gid: 0x{activeOutageDbEntity.OutageElementGid:x16} is successfully published");
-                    }
+                    recloserId = GetRecloserForHeadBreaker(gid);
                 }
-                catch (Exception e) //TODO: Exception over proxy or enum...
+                catch (Exception e)
                 {
-                    Logger.LogError("OutageModel::ReportPotentialOutage => exception on PublishActiveOutage()", e);
+                    throw e;
+                }
+
+                List<Equipment> defaultIsolationPoints = GetEquipmentEntity(new List<long> { gid, recloserId });
+
+                OutageEntity createdActiveOutage = new OutageEntity
+                {
+                    AffectedConsumers = consumerDbEntities,
+                    OutageState = OutageState.CREATED,
+                    ReportTime = DateTime.UtcNow,
+                    DefaultIsolationPoints = defaultIsolationPoints,
+                };
+
+                activeOutageDbEntity = dbContext.OutageRepository.Add(createdActiveOutage);
+
+                try
+                {
+                    dbContext.Complete();
+                    Logger.LogDebug($"Outage on element with gid: 0x{activeOutageDbEntity.OutageElementGid:x16} is successfully stored in database.");
+                    success = true;
+
+                    if (recloserOutageMap.TryGetValue(recloserId, out Dictionary<long, List<long>> outageAffectedPair))
+                    {
+                        if (outageAffectedPair.TryGetValue(createdActiveOutage.OutageId, out List<long> affected))
+                        {
+                            affected = new List<long>(affectedConsumersIds);
+                        }
+                        else
+                        {
+                            outageAffectedPair.Add(createdActiveOutage.OutageId, affectedConsumersIds);
+                        }
+                    }else
+                    {
+                        Dictionary<long, List<long>> dict = new Dictionary<long, List<long>>() 
+                        { 
+                            { createdActiveOutage.OutageId, affectedConsumersIds } 
+                        };
+
+                        recloserOutageMap.Add(recloserId, dict);
+                    }
+
+                    SwitchOpened?.Invoke(gid, createdActiveOutage.OutageId);
+                    ConsumersBlackedOut?.Invoke(affectedConsumersIds, createdActiveOutage.OutageId);
+                }
+                catch (Exception e)
+                {
+                    string message = "OutageModel::ReportPotentialOutage method => exception on Complete()";
+                    Logger.LogError(message, e);
+                    Console.WriteLine($"{message}, Message: {e.Message}, Inner Message: {e.InnerException.Message})");
+
+                    //TODO: da li je dobar handle?
+                    dbContext.Dispose();
+                    dbContext = new UnitOfWork();
                     success = false;
                 }
-            }
 
+                if (success && activeOutageDbEntity != null)
+                {
+                    try
+                    {
+                        success = PublishOutage(Topic.ACTIVE_OUTAGE, outageMessageMapper.MapOutageEntity(activeOutageDbEntity));
+
+                        if (success)
+                        {
+                            Logger.LogInfo($"Outage on element with gid: 0x{activeOutageDbEntity.OutageElementGid:x16} is successfully published");
+                        }
+                    }
+                    catch (Exception e) //TODO: Exception over proxy or enum...
+                    {
+                        Logger.LogError("OutageModel::ReportPotentialOutage => exception on PublishActiveOutage()", e);
+                        success = false;
+                    }
+                }
+            }
+            else
+            {
+                //USER COMANDA - korisnik rucno otvara neki breaker -> nije outage ali korisnici potencijalno ostaju bez napajanja
+                SwitchOpened?.Invoke(gid, -1);
+                ConsumersBlackedOut?.Invoke(affectedConsumersIds, -1);
+            }
+            
             return success;
         }
 
@@ -307,30 +358,11 @@ namespace OutageManagementService
             {
                 if (outageToIsolate.OutageState == OutageState.CREATED)
                 {
-                    //try
-                    //{
-                    //    success = StartIsolationAlgorthm(outageToIsolate);
                         Task.Run(() => StartIsolationAlgorthm(outageToIsolate))
                             .ContinueWith(task =>
                             {
                                 if (task.Result) 
                                 {
-                                    //outage isolated => some of the affected consumers are energized
-                                    List<long> consumerIds = GetAffectedConsumers(outageToIsolate.OutageElementGid);
-                                    List<Consumer> consumerDbEntities = GetAffectedConsumersFromDatabase(consumerIds);
-                                    List<ConsumerHistorical> consumers = outageMessageMapper.MapOutageToConsumerHistorical(consumerDbEntities, outageToIsolate.OutageId, DatabaseOperation.DELETE);
-                                    dbContext.ConsumerHistoricalRepository.AddRange(consumers);
-
-                                    //outage isolated => optimum isolation points are opened
-                                    List<Equipment> optimumIsolationEquipment = outageToIsolate.OptimumIsolationPoints.ToList();
-                                    List<EquipmentHistorical> optimumEquipmentDbEntities = outageMessageMapper.MapOutageToEquipmentHistorical(optimumIsolationEquipment, outageToIsolate.OutageId, DatabaseOperation.INSERT);
-                                    dbContext.EquipmentHistoricalRepository.AddRange(optimumEquipmentDbEntities);
-
-                                    //outage isolated => default isolation points are closed
-                                    List<Equipment> defaultIsolationEquipment = outageToIsolate.DefaultIsolationPoints.ToList();
-                                    List<EquipmentHistorical> defaultEquipmentDbEntities = outageMessageMapper.MapOutageToEquipmentHistorical(defaultIsolationEquipment, outageToIsolate.OutageId, DatabaseOperation.DELETE);
-                                    dbContext.EquipmentHistoricalRepository.AddRange(defaultEquipmentDbEntities);
-
                                     dbContext.Complete();
                                 }
                             }, TaskContinuationOptions.OnlyOnRanToCompletion)
@@ -347,32 +379,6 @@ namespace OutageManagementService
                                     Logger.LogError("Error occured while trying to publish outage.", e);
                                 }
                             }, TaskContinuationOptions.OnlyOnRanToCompletion);
-                    //}
-                    //catch (Exception e)
-                    //{
-                    //    success = false;
-                    //    Logger.LogError("Exception on StartIsolationAlgorthm() method.", e);
-                    //}
-
-                    //if (success)
-                    //{
-                    //    dbContext.Complete();
-                    //}
-
-                    //if (success)
-                    //{
-                    //    try
-                    //    {
-                    //        PublishOutage(Topic.ACTIVE_OUTAGE, outageMessageMapper.MapActiveOutage(outageToIsolate));
-                    //        Logger.LogInfo($"Outage with id: 0x{outageToIsolate.OutageId:x16} is successfully published");
-                    //        success = true;
-                    //    }
-                    //    catch (Exception e) //TODO: Exception over proxy or enum...
-                    //    {
-                    //        Logger.LogError("Error occured while trying to publish outage.", e);
-                    //        throw e;
-                    //    }
-                    //}
                 }
                 else
                 {
@@ -387,8 +393,6 @@ namespace OutageManagementService
 
             //return success;
         }
-
-        
 
         public bool SendRepairCrew(long outageId)
         {
@@ -509,17 +513,20 @@ namespace OutageManagementService
             }
 
             outageDbEntity.IsResolveConditionValidated = resolveCondition;
-
             dbContext.OutageRepository.Update(outageDbEntity);
-
-            //outage validated -> optimum isolation points are closed
-            List<EquipmentHistorical> equipment = outageMessageMapper.MapOutageToEquipmentHistorical(outageDbEntity.OptimumIsolationPoints.ToList(), outageDbEntity.OutageId, DatabaseOperation.DELETE);
-            dbContext.EquipmentHistoricalRepository.AddRange(equipment);
 
             try
             {
                 dbContext.Complete();
                 PublishOutage(Topic.ACTIVE_OUTAGE, outageMessageMapper.MapOutageEntity(outageDbEntity));
+
+                foreach (var pair in recloserOutageMap.Values)
+                {
+                    if (pair.ContainsKey(outageDbEntity.OutageId))
+                    {
+                        pair.Remove(outageDbEntity.OutageId);
+                    }
+                }
             }
             catch(Exception e)
             {
@@ -582,6 +589,31 @@ namespace OutageManagementService
             bool success;
             OutageEntity archivedOutageDbEntity = dbContext.OutageRepository.Add(createdArchivedOutage);
             dbContext.OutageRepository.Remove(activeOutageDbEntity);
+
+            //outage resolved - the rest of the affected consumers are energized
+            //List<long> allAffectedConsumers = new List<long>(archivedOutageDbEntity.AffectedConsumers.Count);
+            //foreach(var consumer in archivedOutageDbEntity.AffectedConsumers)
+            //{
+            //    allAffectedConsumers.Add(consumer.ConsumerId);
+            //}
+            //foreach (var consumer in allAffectedConsumers)
+            //{
+            //    foreach (var currentAffected in currentAffectedConsumers)
+            //    {
+            //        if(consumer == currentAffected)
+            //        {
+            //            ConsumerHistorical dbConsumer = new ConsumerHistorical()
+            //            {
+            //                OutageId = archivedOutageDbEntity.OutageId,
+            //                ConsumerId = consumer,
+            //                OperationTime = DateTime.Now,
+            //                DatabaseOperation = DatabaseOperation.DELETE
+            //            };
+            //            dbContext.ConsumerHistoricalRepository.Remove(dbConsumer);
+            //        }
+            //    }
+            //}
+            //currentAffectedConsumers.ExceptWith(allAffectedConsumers);
 
             try
             {
@@ -1355,10 +1387,33 @@ namespace OutageManagementService
             if(message is OMSModelMessage omsModelMessage)
             {
                 TopologyModel = omsModelMessage.OutageTopologyModel; //TODO: Da li su subsciber callback pozivi sinhroni?
+                HashSet<long> energizedConsumers = new HashSet<long>();
+                foreach (var element in TopologyModel.OutageTopology.Values)
+                {
+                    if (element.DmsType.Equals(DMSType.ENERGYCONSUMER.ToString()))
+                    {
+                        if (element.IsActive)
+                        {
+                            energizedConsumers.Add(element.Id);
+                        }
+                    }
+                }
+                ConsumersEnergized?.Invoke(energizedConsumers);
             }
             else
             {
                 Logger.LogWarn("OutageModel::Notify => UNKNOWN message type. OMSModelMessage expected.");
+            }
+        }
+
+        public void CheckForClosedBreakers(IOutageTopologyModel outageTopologyModel)
+        {
+            foreach (var element in outageTopologyModel.OutageTopology)
+            {
+                if(element.Value.DmsType == "BREAKER")
+                {
+                    //TODO: dobiti od CE info da li su breakere Opened ili ne
+                }
             }
         }
         #endregion

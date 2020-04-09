@@ -39,7 +39,8 @@ namespace OutageManagementService.Report
             
             // ovde treba da vrati ID 9, koji ja imam u bazi, ali nece da pronadje ovako
             // kad odradim GetAll, vrati mi sve i medju njima je bas taj sa ID 9
-            var outages = _outageRepository.Get(9);
+            var outages = _outageRepository.Get(3);
+            
 
             return new OutageReport { };
         }

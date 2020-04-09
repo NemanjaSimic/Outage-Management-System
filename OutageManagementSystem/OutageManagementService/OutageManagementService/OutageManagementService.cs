@@ -8,6 +8,7 @@ using Outage.Common.ServiceProxies.PubSub;
 using OutageDatabase;
 using OutageDatabase.Repository;
 using OutageManagementService.Calling;
+using OutageManagementService.DBManager;
 using OutageManagementService.DistribuedTransaction;
 using OutageManagementService.Outage;
 using System;
@@ -50,8 +51,15 @@ namespace OutageManagementService
 				//db.DeleteAllData();
 				InitializeEnergyConsumers(db);
 			}
-		   
+
 			outageModel = new OutageModel();
+			HistoryDBManager historyDBManager = new HistoryDBManager();
+
+			outageModel.ConsumersBlackedOut += historyDBManager.OnConsumersBlackedOut;
+			outageModel.ConsumersEnergized += historyDBManager.OnConsumersEnergized;
+			outageModel.SwitchOpened += historyDBManager.OnSwitchOpened;
+			OutageService.SwitchClosed += historyDBManager.OnSwitchClosed;
+
 			OutageService.outageModel = outageModel;
 			OutageTransactionActor.OutageModel = outageModel;
 			OutageModelUpdateNotification.OutageModel = outageModel;

@@ -35,7 +35,7 @@ namespace CalculationEngine.SCADAFunctions
 			measurementToElementMap = new Dictionary<long, long>();
 			analogMeasurements = new Dictionary<long, AnalogMeasurement>();
 			discreteMeasurements = new Dictionary<long, DiscreteMeasurement>();
-			ignorableOriginTypes = new HashSet<CommandOriginType>() { CommandOriginType.USER_COMMAND, CommandOriginType.ISOLATING_ALGORITHM_COMMAND };
+			ignorableOriginTypes = new HashSet<CommandOriginType>() { /*CommandOriginType.USER_COMMAND,*/ CommandOriginType.ISOLATING_ALGORITHM_COMMAND };
 
 			proxyFactory = new ProxyFactory();
 			Provider.Instance.MeasurementProvider = this;
@@ -105,29 +105,35 @@ namespace CalculationEngine.SCADAFunctions
 				}
 				else
 				{
-					if (!measurement.CurrentOpen && !ignorableOriginTypes.Contains(commandOrigin))
-					{
-						using (ReportPotentialOutageProxy reportPotentialOutageProxy = proxyFactory.CreateProxy<ReportPotentialOutageProxy, IReportPotentialOutageContract>(EndpointNames.ReportPotentialOutageEndpoint))
-						{
-							if (reportPotentialOutageProxy == null)
-							{
-								string message = "UpdateDiscreteMeasurement => ReportPotentialOutageProxy is null.";
-								logger.LogError(message);
-								throw new NullReferenceException(message);
-							}
-
-							try
-							{
-								reportPotentialOutageProxy.ReportPotentialOutage(measurement.ElementId);
-							}
-							catch (Exception e)
-							{
-								logger.LogError("Failed to report potential outage.", e);
-							}
-						}
-					}
 					measurement.CurrentOpen = true;
 				}
+
+				using (ReportPotentialOutageProxy reportPotentialOutageProxy = proxyFactory.CreateProxy<ReportPotentialOutageProxy, IReportPotentialOutageContract>(EndpointNames.ReportPotentialOutageEndpoint))
+				{
+					if (reportPotentialOutageProxy == null)
+					{
+						string message = "UpdateDiscreteMeasurement => ReportPotentialOutageProxy is null.";
+						logger.LogError(message);
+						throw new NullReferenceException(message);
+					}
+
+					try
+					{
+						if (measurement.CurrentOpen)
+						{
+							reportPotentialOutageProxy.ReportPotentialOutage(measurement.ElementId, commandOrigin);
+						}
+						else
+						{
+							reportPotentialOutageProxy.OnSwitchClose(measurement.ElementId);
+						}
+					}
+					catch (Exception e)
+					{
+						logger.LogError("Failed to report potential outage.", e);
+					}
+				}
+
 			}
 			else
 			{
