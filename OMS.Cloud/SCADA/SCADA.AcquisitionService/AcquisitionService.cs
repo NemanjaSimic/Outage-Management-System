@@ -33,31 +33,31 @@ namespace OMS.Cloud.SCADA.AcquisitionService
         /// <param name="cancellationToken">Canceled when Service Fabric needs to shut down this service instance.</param>
         protected override async Task RunAsync(CancellationToken cancellationToken)
         {
-            //AcquisitionCycle acquisitionCycle = new AcquisitionCycle();
+            AcquisitionCycle acquisitionCycle = new AcquisitionCycle();
 
-            //// TODO: Replace the following sample code with your own logic 
-            ////       or remove this RunAsync override if it's not needed in your service.
+            // TODO: Replace the following sample code with your own logic 
+            //       or remove this RunAsync override if it's not needed in your service.
 
-            //long iterations = 0;
+            long iterations = 0;
 
-            //while (true)
-            //{
-            //    cancellationToken.ThrowIfCancellationRequested();
+            while (true)
+            {
+                cancellationToken.ThrowIfCancellationRequested();
 
-            //    ServiceEventSource.Current.ServiceMessage(this.Context, "Working-{0}", ++iterations);
+                ServiceEventSource.Current.ServiceMessage(this.Context, "Working-{0}", ++iterations);
 
-            //    try
-            //    {
-            //        await acquisitionCycle.Start();
-            //    }
-            //    catch (Exception e)
-            //    {
-            //        Trace.TraceError(e.Message, "Error");
-            //    }
+                try
+                {
+                    await acquisitionCycle.Start();
+                }
+                catch (Exception e)
+                {
+                    Trace.TraceError(e.Message, "Error");
+                }
 
-            //    //TODO: configure cycle....
-            //    await Task.Delay(TimeSpan.FromSeconds(1), cancellationToken);
-            //}
+                //TODO: configure cycle....
+                await Task.Delay(TimeSpan.FromSeconds(1), cancellationToken);
+            }
         }
     }
 }
