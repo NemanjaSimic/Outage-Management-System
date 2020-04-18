@@ -40,7 +40,7 @@
          The attribute ServiceTypeName below must match the name defined in the imported ServiceManifest.xml file. -->
     <Service Name="SCADA.ModelProviderService" ServicePackageActivationMode="ExclusiveProcess">
       <StatefulService ServiceTypeName="OMS.Cloud.SCADA.ModelProviderServiceType" TargetReplicaSetSize="[OMS.Cloud.SCADA.ModelProviderService_TargetReplicaSetSize]" MinReplicaSetSize="[OMS.Cloud.SCADA.ModelProviderService_MinReplicaSetSize]">
-        <UniformInt64Partition PartitionCount="[OMS.Cloud.SCADA.ModelProviderService_PartitionCount]" LowKey="-9223372036854775808" HighKey="9223372036854775807" />
+        <UniformInt64Partition PartitionCount="[OMS.Cloud.SCADA.ModelProviderService_PartitionCount]" LowKey="0" HighKey="1" />
       </StatefulService>
     </Service>
     <Service Name="SCADA.FunctionExecutorService" ServicePackageActivationMode="ExclusiveProcess">

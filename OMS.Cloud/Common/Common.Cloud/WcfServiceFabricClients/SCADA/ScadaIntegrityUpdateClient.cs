@@ -5,30 +5,29 @@ using Outage.Common;
 using Outage.Common.PubSub.SCADADataContract;
 using System;
 using System.Collections.Generic;
-using System.Configuration;
-using System.Fabric;
 using System.Threading.Tasks;
 
 namespace OMS.Common.Cloud.WcfServiceFabricClients.SCADA
 {
     class ScadaIntegrityUpdateClient : WcfSeviceFabricClientBase<IScadaIntegrityUpdateContract>, IScadaIntegrityUpdateContract
     {
-        public ScadaIntegrityUpdateClient(WcfCommunicationClientFactory<IScadaIntegrityUpdateContract> clientFactory, Uri serviceUri)
-            : base(clientFactory, serviceUri)
+        public ScadaIntegrityUpdateClient(WcfCommunicationClientFactory<IScadaIntegrityUpdateContract> clientFactory, Uri serviceUri, ServicePartitionKey servicePartition)
+            : base(clientFactory, serviceUri, servicePartition)
         {
         }
 
         public static ScadaIntegrityUpdateClient CreateClient(Uri serviceUri = null)
         {
             ClientFactory factory = new ClientFactory();
+            ServicePartitionKey servicePartition = new ServicePartitionKey(0);
 
             if (serviceUri == null)
             {
-                return factory.CreateClient<ScadaIntegrityUpdateClient, IScadaIntegrityUpdateContract>(MicroserviceNames.ScadaModelProviderService);
+                return factory.CreateClient<ScadaIntegrityUpdateClient, IScadaIntegrityUpdateContract>(MicroserviceNames.ScadaModelProviderService, servicePartition);
             }
             else
             {
-                return factory.CreateClient<ScadaIntegrityUpdateClient, IScadaIntegrityUpdateContract>(serviceUri);
+                return factory.CreateClient<ScadaIntegrityUpdateClient, IScadaIntegrityUpdateContract>(serviceUri, servicePartition);
             }
         }
 

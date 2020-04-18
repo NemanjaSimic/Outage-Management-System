@@ -8,50 +8,47 @@ namespace OMS.Common.Cloud.WcfServiceFabricClients
     {
         public static NetTcpBinding CreateListenerBinding()
         {
-            //NetTcpBinding binding = new NetTcpBinding(SecurityMode.None)
-            //{
-            //    SendTimeout = TimeSpan.MaxValue,
-            //    ReceiveTimeout = TimeSpan.MaxValue,
-            //    OpenTimeout = TimeSpan.FromMinutes(1),
-            //    CloseTimeout = TimeSpan.FromMinutes(1),
-            //    MaxConnections = int.MaxValue,
-            //    MaxReceivedMessageSize = 1024 * 1024 * 1024,
-            //};
-
+            //NetTcpBinding binding = (NetTcpBinding)WcfUtility.CreateTcpListenerBinding();
+            //binding.SendTimeout = TimeSpan.MaxValue;
+            //binding.ReceiveTimeout = TimeSpan.MaxValue;
+            //binding.OpenTimeout = TimeSpan.FromMinutes(1);
+            //binding.CloseTimeout = TimeSpan.FromMinutes(1);
             //binding.MaxBufferSize = (int)binding.MaxReceivedMessageSize;
             //binding.MaxBufferPoolSize = Environment.ProcessorCount * binding.MaxReceivedMessageSize;
 
-            var binding = WcfUtility.CreateTcpListenerBinding();
-            binding.SendTimeout = TimeSpan.MaxValue;
-            binding.ReceiveTimeout = TimeSpan.MaxValue;
-            binding.OpenTimeout = TimeSpan.FromMinutes(1);
-            binding.CloseTimeout = TimeSpan.FromMinutes(1);
-
-            return (NetTcpBinding)binding;
+            return CreateBinding();
         }
 
         public static NetTcpBinding CreateClientBinding()
         {
-            //NetTcpBinding binding = new NetTcpBinding(SecurityMode.None)
-            //{
-            //    SendTimeout = TimeSpan.MaxValue,
-            //    ReceiveTimeout = TimeSpan.MaxValue,
-            //    OpenTimeout = TimeSpan.FromMinutes(1),
-            //    CloseTimeout = TimeSpan.FromMinutes(1),
-            //    MaxConnections = int.MaxValue,
-            //    MaxReceivedMessageSize = 1024 * 1024 * 1024,
-            //};
-
+            //NetTcpBinding binding = (NetTcpBinding)WcfUtility.CreateTcpClientBinding();
+            //binding.SendTimeout = TimeSpan.MaxValue;
+            //binding.ReceiveTimeout = TimeSpan.MaxValue;
+            //binding.OpenTimeout = TimeSpan.FromMinutes(1);
+            //binding.CloseTimeout = TimeSpan.FromMinutes(1);
             //binding.MaxBufferSize = (int)binding.MaxReceivedMessageSize;
             //binding.MaxBufferPoolSize = Environment.ProcessorCount * binding.MaxReceivedMessageSize;
 
-            var binding = WcfUtility.CreateTcpClientBinding();
-            binding.SendTimeout = TimeSpan.MaxValue;
-            binding.ReceiveTimeout = TimeSpan.MaxValue;
-            binding.OpenTimeout = TimeSpan.FromMinutes(1);
-            binding.CloseTimeout = TimeSpan.FromMinutes(1);
-
-            return (NetTcpBinding)binding;
+            return CreateBinding();
         }
+
+        private static NetTcpBinding CreateBinding()
+        {
+            NetTcpBinding binding = new NetTcpBinding(SecurityMode.None)
+            {
+                SendTimeout = TimeSpan.MaxValue,
+                ReceiveTimeout = TimeSpan.MaxValue,
+                OpenTimeout = TimeSpan.FromMinutes(1),
+                CloseTimeout = TimeSpan.FromMinutes(1),
+                MaxConnections = int.MaxValue,
+                MaxReceivedMessageSize = 1024 * 1024 * 1024,
+            };
+
+            binding.MaxBufferSize = (int)binding.MaxReceivedMessageSize;
+            binding.MaxBufferPoolSize = Environment.ProcessorCount * binding.MaxReceivedMessageSize;
+
+            return binding;
+        }
+
     }
 }

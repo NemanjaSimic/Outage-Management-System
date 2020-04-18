@@ -4,16 +4,14 @@ using OMS.Common.DistributedTransactionContracts;
 using OMS.Common.NmsContracts.GDA;
 using System;
 using System.Collections.Generic;
-using System.Configuration;
-using System.Fabric;
 using System.Threading.Tasks;
 
 namespace OMS.Common.Cloud.WcfServiceFabricClients.TMS
 {
     public class ModelUpdateNotificationClient : WcfSeviceFabricClientBase<IModelUpdateNotificationContract>, IModelUpdateNotificationContract
     {
-        public ModelUpdateNotificationClient(WcfCommunicationClientFactory<IModelUpdateNotificationContract> clientFactory, Uri serviceUri)
-            : base(clientFactory, serviceUri)
+        public ModelUpdateNotificationClient(WcfCommunicationClientFactory<IModelUpdateNotificationContract> clientFactory, Uri serviceUri, ServicePartitionKey servicePartition)
+            : base(clientFactory, serviceUri, servicePartition)
         {
         }
 

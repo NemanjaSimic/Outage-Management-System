@@ -9,19 +9,18 @@ using System.Net;
 using System.Reflection;
 using OMS.Common.SCADA;
 using OMS.Common.SCADA.FunctionParameters;
+using OMS.Common.Cloud.WcfServiceFabricClients.SCADA;
 
 namespace OMS.Cloud.SCADA.ModbusFunctions.Read
 {
     public class ReadInputRegistersFunction : ModbusFunction, IReadAnalogModusFunction
     {
-        public SCADAModel SCADAModel { get; private set; }
         public IModbusReadCommandParameters ModbusReadCommandParameters { get; private set; }
 
-        public ReadInputRegistersFunction(ModbusCommandParameters commandParameters, SCADAModel scadaModel)
+        public ReadInputRegistersFunction(ModbusCommandParameters commandParameters)
             : base(commandParameters)
         {
             CheckArguments(MethodBase.GetCurrentMethod(), typeof(ModbusReadCommandParameters));
-            SCADAModel = scadaModel;
             ModbusReadCommandParameters = commandParameters as IModbusReadCommandParameters;
             Data = new Dictionary<long, AnalogModbusData>();
         }
@@ -30,7 +29,7 @@ namespace OMS.Cloud.SCADA.ModbusFunctions.Read
 
         public Dictionary<long, AnalogModbusData> Data { get; protected set; }
 
-        public override void Execute(ModbusClient modbusClient)
+        public async override void Execute(ModbusClient modbusClient)
         {
             ModbusReadCommandParameters mdb_read_comm_pars = this.CommandParameters as ModbusReadCommandParameters;
             ushort startAddress = mdb_read_comm_pars.StartAddress;
@@ -72,9 +71,10 @@ namespace OMS.Cloud.SCADA.ModbusFunctions.Read
 
             Data = new Dictionary<long, AnalogModbusData>(data.Length);
 
-            var currentAddressToGidMap = SCADAModel.CurrentAddressToGidMap;
-            var currentSCADAModel = SCADAModel.CurrentScadaModel;
-            var commandValuesCache = SCADAModel.CommandedValuesCache; //TODO: dobaviti sa provider-a
+            ScadaModelReadAccessClient modelReadAccessClient = ScadaModelReadAccessClient.CreateClient();
+            var currentSCADAModel = await modelReadAccessClient.GetGidToPointItemMap();
+            var currentAddressToGidMap = await modelReadAccessClient.GetAddressToGidMap();
+            var commandValuesCache = await modelReadAccessClient.GetCommandDescriptionCache();
 
             for (ushort i = 0; i < data.Length; i++)
             {
@@ -82,13 +82,13 @@ namespace OMS.Cloud.SCADA.ModbusFunctions.Read
                 int rawValue = data[i];
 
                 //for commands enqueued during model update
-                if (!currentAddressToGidMap[PointType.ANALOG_INPUT].ContainsKey(address))
+                if (!currentAddressToGidMap[(ushort)PointType.ANALOG_INPUT].ContainsKey(address))
                 {
                     Logger.LogWarn($"ReadInputRegistersFunction execute => trying to read value on address {address}, Point type: {PointType.ANALOG_INPUT}, which is not in the current SCADA Model.");
                     continue;
                 }
 
-                long gid = currentAddressToGidMap[PointType.ANALOG_INPUT][address];
+                long gid = currentAddressToGidMap[(ushort)PointType.ANALOG_INPUT][address];
 
                 //for commands enqueued during model update
                 if (!currentSCADAModel.ContainsKey(gid))

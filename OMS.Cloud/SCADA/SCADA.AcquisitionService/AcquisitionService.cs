@@ -44,11 +44,11 @@ namespace OMS.Cloud.SCADA.AcquisitionService
             {
                 cancellationToken.ThrowIfCancellationRequested();
 
-                ServiceEventSource.Current.ServiceMessage(this.Context, "Working-{0}", ++iterations);
-
                 try
                 {
+                    //TODO: uncoment
                     await acquisitionCycle.Start();
+                    ServiceEventSource.Current.ServiceMessage(this.Context, "AcquisitionService::AcquisitionCycle.Start() Working-{0}", ++iterations);
                 }
                 catch (Exception e)
                 {

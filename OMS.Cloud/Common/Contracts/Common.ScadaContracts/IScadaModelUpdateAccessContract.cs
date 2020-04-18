@@ -1,4 +1,5 @@
 ﻿using Microsoft.ServiceFabric.Services.Remoting;
+using OMS.Common.SCADA;
 using Outage.Common.PubSub.SCADADataContract;
 using System.Collections.Generic;
 using System.ServiceModel;
@@ -14,5 +15,8 @@ namespace OMS.Common.ScadaContracts
 
         [OperationContract]
         Task MakeDiscreteEntryToMeasurementCache(Dictionary<long, DiscreteModbusData> data, bool permissionToPublishData);
+
+        [OperationContract]
+        Task UpdateCommandDescription(long gid, CommandDescription commandDescription);
     }
 }

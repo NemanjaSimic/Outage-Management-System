@@ -22,7 +22,7 @@ namespace OMS.Cloud.SCADA.ModelProviderService
         private readonly ModelResourcesDesc modelResourceDesc;
         private readonly IReliableStateManager stateManager;
 
-        private NetworkModelGdaClient nmsGdaClient;
+        //private NetworkModelGdaClient nmsGdaClient;
 
         #region Private Properties
         private Dictionary<DeltaOpType, List<long>> modelChanges;
@@ -93,7 +93,7 @@ namespace OMS.Cloud.SCADA.ModelProviderService
             this.modelResourceDesc = modelResourceDesc;
             this.enumDescs = enumDescs;
 
-            this.nmsGdaClient = NetworkModelGdaClient.CreateClient();
+            //this.nmsGdaClient = NetworkModelGdaClient.CreateClient();
         }
 
         #region ImportScadaModel
@@ -134,14 +134,16 @@ namespace OMS.Cloud.SCADA.ModelProviderService
             int numberOfResources = 1000;
             List<ModelCode> props = modelResourceDesc.GetAllPropertyIds(ModelCode.ANALOG);
 
-            if (this.nmsGdaClient == null)
-            {
-                success = false;
-                string errMsg = "From ImportAnalog() method: NetworkModelGdaClient is null.";
-                Logger.LogWarn(errMsg);
+            //if (this.nmsGdaClient == null)
+            //{
+            //    success = false;
+            //    string errMsg = "From ImportAnalog() method: NetworkModelGdaClient is null.";
+            //    Logger.LogWarn(errMsg);
 
-                this.nmsGdaClient = NetworkModelGdaClient.CreateClient();
-            }
+            //    this.nmsGdaClient = NetworkModelGdaClient.CreateClient();
+            //}
+
+            NetworkModelGdaClient nmsGdaClient = NetworkModelGdaClient.CreateClient();
 
             try
             {
@@ -189,14 +191,16 @@ namespace OMS.Cloud.SCADA.ModelProviderService
             int numberOfResources = 1000;
             List<ModelCode> props = modelResourceDesc.GetAllPropertyIds(ModelCode.DISCRETE);
 
-            if (this.nmsGdaClient == null)
-            {
-                success = false;
-                string errMsg = "From ImportDiscrete() method: NetworkModelGdaClient is null.";
-                Logger.LogWarn(errMsg);
+            //if (this.nmsGdaClient == null)
+            //{
+            //    success = false;
+            //    string errMsg = "From ImportDiscrete() method: NetworkModelGdaClient is null.";
+            //    Logger.LogWarn(errMsg);
 
-                this.nmsGdaClient = NetworkModelGdaClient.CreateClient();
-            }
+            //    this.nmsGdaClient = NetworkModelGdaClient.CreateClient();
+            //}
+
+            NetworkModelGdaClient nmsGdaClient = NetworkModelGdaClient.CreateClient();
 
             try
             {
@@ -420,13 +424,15 @@ namespace OMS.Cloud.SCADA.ModelProviderService
         {
             Dictionary<long, ISCADAModelPointItem> pointItems = new Dictionary<long, ISCADAModelPointItem>();
 
-            if (this.nmsGdaClient == null)
-            {
-                string message = "From method CreatePointItemsFromNetworkModelMeasurements(): NetworkModelGdaClient is null.";
-                Logger.LogWarn(message);
+            //if (this.nmsGdaClient == null)
+            //{
+            //    string message = "From method CreatePointItemsFromNetworkModelMeasurements(): NetworkModelGdaClient is null.";
+            //    Logger.LogWarn(message);
 
-                this.nmsGdaClient = NetworkModelGdaClient.CreateClient();
-            }
+            //    this.nmsGdaClient = NetworkModelGdaClient.CreateClient();
+            //}
+
+            NetworkModelGdaClient nmsGdaClient = NetworkModelGdaClient.CreateClient();
 
             int iteratorId;
             int resourcesLeft;

@@ -8,8 +8,8 @@ namespace OMS.Common.Cloud.WcfServiceFabricClients
 {
     public class WcfSeviceFabricClientBase<T> : ServicePartitionClient<WcfCommunicationClient<T>> where T : class, IService
     {
-        public WcfSeviceFabricClientBase(WcfCommunicationClientFactory<T> clientFactory, Uri serviceName)
-            : base(clientFactory, serviceName, new ServicePartitionKey(1))
+        public WcfSeviceFabricClientBase(WcfCommunicationClientFactory<T> clientFactory, Uri serviceName, ServicePartitionKey servicePartition)
+            : base(clientFactory, serviceName, servicePartition)
         {
         }
     }

@@ -33,14 +33,13 @@ namespace OMS.Cloud.SCADA.FunctionExecutorService
         
         public FunctionExecutorCycle()
         {
-            InitializeModbusClient();
-
+            //InitializeModbusClient();
             CloudQueueHelper.TryGetQueue("readcommandqueue", out this.readCommandQueue);
             CloudQueueHelper.TryGetQueue("writecommandqueue", out this.writeCommandQueue);
             CloudQueueHelper.TryGetQueue("mucommandqueue", out this.modelUpdateCommandQueue);
         }
 
-        public async void Start()
+        public async Task Start()
         {
             try
             {
@@ -65,7 +64,7 @@ namespace OMS.Cloud.SCADA.FunctionExecutorService
                     CloudQueueMessage message = modelUpdateCommandQueue.GetMessage();
                     IWriteModbusFunction currentCommand = (IWriteModbusFunction)(Serialization.ByteArrayToObject(message.AsBytes));
                     modelUpdateCommandQueue.DeleteMessage(message);
-                    ExecuteCommand(currentCommand);
+                    await ExecuteCommand(currentCommand);
                 }
                 
                 //HIGH PRIORITY COMMANDS - model update commands
@@ -79,7 +78,7 @@ namespace OMS.Cloud.SCADA.FunctionExecutorService
                     CloudQueueMessage message = writeCommandQueue.GetMessage();
                     IWriteModbusFunction currentCommand = (IWriteModbusFunction)(Serialization.ByteArrayToObject(message.AsBytes));
                     modelUpdateCommandQueue.DeleteMessage(message);
-                    ExecuteCommand(currentCommand);
+                    await ExecuteCommand(currentCommand);
                 }
 
 
@@ -91,7 +90,7 @@ namespace OMS.Cloud.SCADA.FunctionExecutorService
                     CloudQueueMessage message = readCommandQueue.GetMessage();
                     IWriteModbusFunction currentCommand = (IWriteModbusFunction)(Serialization.ByteArrayToObject(message.AsBytes));
                     modelUpdateCommandQueue.DeleteMessage(message);
-                    ExecuteCommand(currentCommand);
+                    await ExecuteCommand(currentCommand);
                 }
             }
             catch (Exception ex)
@@ -103,8 +102,8 @@ namespace OMS.Cloud.SCADA.FunctionExecutorService
 
         private async Task InitializeModbusClient()
         {
-            ScadaModelReadAccessClient modelReadAccess = ScadaModelReadAccessClient.CreateClient();
-            this.configData = await modelReadAccess.GetScadaConfigData();
+            ScadaModelReadAccessClient modelReadAccessClient = ScadaModelReadAccessClient.CreateClient();
+            this.configData = await modelReadAccessClient.GetScadaConfigData();
             this.modbusClient = new ModbusClient(configData.IpAddress.ToString(), configData.TcpPort);
         }
 
@@ -155,7 +154,7 @@ namespace OMS.Cloud.SCADA.FunctionExecutorService
             }
         }
 
-        private void ExecuteCommand(IModbusFunction command)
+        private async Task ExecuteCommand(IModbusFunction command)
         {
             try
             {
@@ -171,11 +170,13 @@ namespace OMS.Cloud.SCADA.FunctionExecutorService
 
             if (command is IReadAnalogModusFunction readAnalogCommand)
             {
-                //todo: MakeAnalogEntryToMeasurementCache(readAnalogCommand.Data, true); POZIV KA PROVIDER
+                ScadaModelUpdateAccessClient modelUpdateAccessClient = ScadaModelUpdateAccessClient.CreateClient();
+                await modelUpdateAccessClient.MakeAnalogEntryToMeasurementCache(readAnalogCommand.Data, true);
             }
             else if (command is IReadDiscreteModbusFunction readDiscreteCommand)
             {
-                //todo: MakeDiscreteEntryToMeasurementCache(readDiscreteCommand.Data, true); POZIV KA PROVIDER
+                ScadaModelUpdateAccessClient modelUpdateAccessClient = ScadaModelUpdateAccessClient.CreateClient();
+                await modelUpdateAccessClient.MakeDiscreteEntryToMeasurementCache(readDiscreteCommand.Data, true);
             }
             else if (command is IWriteModbusFunction writeModbusCommand)
             {
@@ -200,13 +201,17 @@ namespace OMS.Cloud.SCADA.FunctionExecutorService
                         return;
                 }
 
-                SCADAModel SCADAModel = null; //TODO: dobaviti od providera
-                if (SCADAModel.CurrentAddressToGidMap[pointType].ContainsKey(commandValue.Address))
-                {
-                    long gid = SCADAModel.CurrentAddressToGidMap[pointType][commandValue.Address];
+                ScadaModelReadAccessClient modelReadAccessClient = ScadaModelReadAccessClient.CreateClient();
+                var currentAddressToGidMap = await modelReadAccessClient.GetAddressToGidMap();
+                var commandedValuesCache = await modelReadAccessClient.GetCommandDescriptionCache();
 
-                    SCADAModel.CommandedValuesCache[gid] = commandValue;
-                    //TODO: update na provideru
+                if (currentAddressToGidMap[(ushort)pointType].ContainsKey(commandValue.Address))
+                {
+                    long gid = currentAddressToGidMap[(ushort)pointType][commandValue.Address];
+
+                    //commandedValuesCache[gid] = commandValue;
+                    ScadaModelUpdateAccessClient modelUpdateAccessClient = ScadaModelUpdateAccessClient.CreateClient();
+                    await modelUpdateAccessClient.UpdateCommandDescription(gid, commandValue);
                 }
             }
         }

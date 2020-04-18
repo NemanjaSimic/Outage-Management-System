@@ -4,8 +4,15 @@ using System.Fabric;
 using System.Threading;
 using System.Threading.Tasks;
 using Microsoft.ServiceFabric.Services.Communication.Runtime;
+using Microsoft.ServiceFabric.Services.Communication.Wcf.Runtime;
 using Microsoft.ServiceFabric.Services.Runtime;
 using OMS.Cloud.NMS.GdaProvider;
+using OMS.Cloud.NMS.GdaProvider.DistributedTransaction;
+using OMS.Cloud.NMS.GdaProvider.GDA;
+using OMS.Common.Cloud.WcfServiceFabricClients;
+using OMS.Common.DistributedTransactionContracts;
+using OMS.Common.NmsContracts;
+using Outage.Common;
 
 namespace OMS.Cloud.NMS.GdaService
 {
@@ -14,13 +21,13 @@ namespace OMS.Cloud.NMS.GdaService
     /// </summary>
     internal sealed class GdaService : StatelessService
     {
-        private readonly NetworkModelService nms;
+        private readonly NetworkModel networkModel;
 
         public GdaService(StatelessServiceContext context)
             : base(context)
         {
             Config.GetInstance(context);
-            nms = new NetworkModelService();
+            networkModel = new NetworkModel();
         }
 
         /// <summary>
@@ -29,28 +36,26 @@ namespace OMS.Cloud.NMS.GdaService
         /// <returns>A collection of listeners.</returns>
         protected override IEnumerable<ServiceInstanceListener> CreateServiceInstanceListeners()
         {
-            return nms.Listeners;
-        }
-
-        /// <summary>
-        /// This is the main entry point for your service instance.
-        /// </summary>
-        /// <param name="cancellationToken">Canceled when Service Fabric needs to shut down this service instance.</param>
-        protected override async Task RunAsync(CancellationToken cancellationToken)
-        {
-            // TODO: Replace the following sample code with your own logic 
-            //       or remove this RunAsync override if it's not needed in your service.
-
-            long iterations = 0;
-
-            while (true)
+            return new List<ServiceInstanceListener>()
             {
-                cancellationToken.ThrowIfCancellationRequested();
+                //NetworkModelGDAEndpoint
+                new ServiceInstanceListener(context =>
+                {
+                    return new WcfCommunicationListener<INetworkModelGDAContract>(context,
+                                                                           new GenericDataAccess(networkModel),
+                                                                           TcpBindingHelper.CreateListenerBinding(),
+                                                                           EndpointNames.NetworkModelGDAEndpoint);
+                }, EndpointNames.NetworkModelGDAEndpoint),
 
-                ServiceEventSource.Current.ServiceMessage(this.Context, "Working-{0}", ++iterations);
-
-                await Task.Delay(TimeSpan.FromSeconds(1), cancellationToken);
-            }
+                //NetworkModelTransactionActorEndpoint
+                new ServiceInstanceListener(context =>
+                {
+                    return new WcfCommunicationListener<ITransactionActorContract>(context,
+                                                                           new NMSTransactionActor(networkModel),
+                                                                           TcpBindingHelper.CreateListenerBinding(),
+                                                                           EndpointNames.NetworkModelTransactionActorEndpoint);
+                }, EndpointNames.NetworkModelTransactionActorEndpoint),
+            };
         }
     }
 }

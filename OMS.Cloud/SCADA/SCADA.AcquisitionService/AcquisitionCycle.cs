@@ -14,19 +14,19 @@ namespace OMS.Cloud.SCADA.AcquisitionService
 {
     internal class AcquisitionCycle
     {
+        private readonly FunctionFactory functionFactory;
+        
         private ILogger logger;
-
-        protected ILogger Logger
+        private  ILogger Logger
         {
             get { return logger ?? (logger = LoggerWrapper.Instance); }
         }
 
-        private ScadaModelReadAccessClient scadaModelClient;
         private CloudQueue readCommandQueue;
 
         public AcquisitionCycle()
         {
-            this.scadaModelClient = ScadaModelReadAccessClient.CreateClient();
+            this.functionFactory = new FunctionFactory();
             CloudQueueHelper.TryGetQueue("readcommandqueue", out this.readCommandQueue);
         }
 
@@ -43,11 +43,7 @@ namespace OMS.Cloud.SCADA.AcquisitionService
                 }
             }
 
-            if (this.scadaModelClient == null)
-            {
-                this.scadaModelClient = ScadaModelReadAccessClient.CreateClient();
-            }
-
+            ScadaModelReadAccessClient scadaModelClient = ScadaModelReadAccessClient.CreateClient();
             Dictionary<ushort, Dictionary<ushort, long>> addressToGidMap = await scadaModelClient.GetAddressToGidMap();
 
             foreach (var kvp in addressToGidMap)
@@ -88,7 +84,7 @@ namespace OMS.Cloud.SCADA.AcquisitionService
             }
 
             ModbusReadCommandParameters mdb_read = new ModbusReadCommandParameters(length, (byte)functionCode, startAddress, quantity);
-            modbusFunction = FunctionFactory.CreateReadModbusFunction(mdb_read);
+            modbusFunction = functionFactory.CreateReadModbusFunction(mdb_read);
             return true;
         }
     
@@ -111,6 +107,5 @@ namespace OMS.Cloud.SCADA.AcquisitionService
 
             throw new ArgumentException("MapPointTypeToModbusFunctionCode");
         }
-
     }
 }

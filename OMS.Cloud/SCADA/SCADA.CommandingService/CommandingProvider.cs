@@ -17,30 +17,21 @@ namespace OMS.Cloud.SCADA.CommandingService
 {
     public class CommandingProvider : IScadaCommandingContract
     {
-        private ILogger logger;
+        private readonly FunctionFactory functionFactory;
 
-        protected ILogger Logger
+        private ILogger logger;
+        private ILogger Logger
         {
             get { return logger ?? (logger = LoggerWrapper.Instance); }
         }
 
-     
-        protected CloudQueue writeCommandEnqueuer = null;
-
-        public CloudQueue WriteCommandEnqueuer
-        {
-            set
-            {
-                if (writeCommandEnqueuer == null)
-                {
-                    writeCommandEnqueuer = value;
-                }
-            }
-        }
+        private CloudQueue writeCommandQueue;
 
         public CommandingProvider()
         {
-            if (!CloudQueueHelper.TryGetQueue("writecommandqueue", out writeCommandEnqueuer))
+            this.functionFactory = new FunctionFactory();
+
+            if (!CloudQueueHelper.TryGetQueue("writecommandqueue", out writeCommandQueue))
             {
                 string message = "There is no queue available.";
                 Logger.LogError(message);
@@ -58,8 +49,6 @@ namespace OMS.Cloud.SCADA.CommandingService
                 Logger.LogError(message);
                 throw new InternalSCADAServiceException(message);
             }
-
-            
 
             if (!currentScadaModel.ContainsKey(gid))
             {
@@ -90,8 +79,6 @@ namespace OMS.Cloud.SCADA.CommandingService
                 Logger.LogError(message);
                 throw new ArgumentException(message);
             }
-
-
         }
 
         public async Task SendDiscreteCommand(long gid, ushort commandingValue, CommandOriginType commandOriginType)
@@ -144,7 +131,7 @@ namespace OMS.Cloud.SCADA.CommandingService
             ModbusWriteCommandParameters modbusWriteCommandParams;
             StringBuilder sb = new StringBuilder();
 
-            if (writeCommandEnqueuer == null)
+            if (writeCommandQueue == null)
             {
                 string message = $"SendCommand => Function Executor is null.";
                 Logger.LogError(message);
@@ -179,8 +166,8 @@ namespace OMS.Cloud.SCADA.CommandingService
                     throw new ArgumentException(message);
                 }
 
-                IWriteModbusFunction modbusFunction = FunctionFactory.CreateWriteModbusFunction(modbusWriteCommandParams, commandOriginType);
-                await writeCommandEnqueuer.AddMessageAsync(new CloudQueueMessage(Serialization.ObjectToByteArray(modbusFunction)));
+                IWriteModbusFunction modbusFunction = functionFactory.CreateWriteModbusFunction(modbusWriteCommandParams, commandOriginType);
+                await writeCommandQueue.AddMessageAsync(new CloudQueueMessage(Serialization.ObjectToByteArray(modbusFunction)));
 
                 sb.AppendLine("Command SUCCESSFULLY enqueued.");
 
@@ -192,7 +179,6 @@ namespace OMS.Cloud.SCADA.CommandingService
                 Logger.LogError(message, e);
                 throw new InternalSCADAServiceException(message, e);
             }
-
         }
     }
 }

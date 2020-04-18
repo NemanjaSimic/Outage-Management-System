@@ -2,16 +2,14 @@
 using Microsoft.ServiceFabric.Services.Communication.Wcf.Client;
 using OMS.Common.DistributedTransactionContracts;
 using System;
-using System.Configuration;
-using System.Fabric;
 using System.Threading.Tasks;
 
 namespace OMS.Common.Cloud.WcfServiceFabricClients.TMS
 {
     public class TransactionCoordinatorClient : WcfSeviceFabricClientBase<ITransactionCoordinatorContract>, ITransactionCoordinatorContract
     {
-        public TransactionCoordinatorClient(WcfCommunicationClientFactory<ITransactionCoordinatorContract> clientFactory, Uri serviceUri)
-            : base(clientFactory, serviceUri)
+        public TransactionCoordinatorClient(WcfCommunicationClientFactory<ITransactionCoordinatorContract> clientFactory, Uri serviceUri, ServicePartitionKey servicePartition)
+            : base(clientFactory, serviceUri, servicePartition)
         {
         }
 

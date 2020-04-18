@@ -2,15 +2,13 @@
 using Microsoft.ServiceFabric.Services.Communication.Wcf.Client;
 using OMS.Common.DistributedTransactionContracts;
 using System;
-using System.Configuration;
-using System.Fabric;
 
 namespace OMS.Common.Cloud.WcfServiceFabricClients.TMS
 {
     public class TransactionEnlistmentClient : WcfSeviceFabricClientBase<ITransactionEnlistmentContract>, ITransactionEnlistmentContract
     {
-        public TransactionEnlistmentClient(WcfCommunicationClientFactory<ITransactionEnlistmentContract> clientFactory, Uri serviceUri)
-           : base(clientFactory, serviceUri)
+        public TransactionEnlistmentClient(WcfCommunicationClientFactory<ITransactionEnlistmentContract> clientFactory, Uri serviceUri, ServicePartitionKey servicePartition)
+           : base(clientFactory, serviceUri, servicePartition)
         {
         }
 

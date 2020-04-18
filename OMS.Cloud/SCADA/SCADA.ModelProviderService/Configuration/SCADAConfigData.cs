@@ -3,6 +3,7 @@ using System;
 using System.Configuration;
 using System.Net;
 using OMS.Common.SCADA;
+using System.Diagnostics;
 
 namespace OMS.Cloud.SCADA.ModelProviderService.Configuration
 {
@@ -46,6 +47,7 @@ namespace OMS.Cloud.SCADA.ModelProviderService.Configuration
         private SCADAConfigData()
         {
             ImportAppSettings();
+            Trace.TraceInformation("SCADAConfigData: ImportAppSettings done.");
         }
 
         private void ImportAppSettings()

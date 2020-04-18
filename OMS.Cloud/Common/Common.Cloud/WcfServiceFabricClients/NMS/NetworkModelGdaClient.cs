@@ -5,16 +5,14 @@ using OMS.Common.NmsContracts.GDA;
 using Outage.Common;
 using System;
 using System.Collections.Generic;
-using System.Configuration;
-using System.Fabric;
 using System.Threading.Tasks;
 
 namespace OMS.Common.Cloud.WcfServiceFabricClients.NMS
 {
     public class NetworkModelGdaClient : WcfSeviceFabricClientBase<INetworkModelGDAContract>, INetworkModelGDAContract
     {
-        public NetworkModelGdaClient(WcfCommunicationClientFactory<INetworkModelGDAContract> clientFactory, Uri serviceUri) 
-            : base(clientFactory, serviceUri)
+        public NetworkModelGdaClient(WcfCommunicationClientFactory<INetworkModelGDAContract> clientFactory, Uri serviceUri, ServicePartitionKey servicePartition) 
+            : base(clientFactory, serviceUri, servicePartition)
         {
         }
 

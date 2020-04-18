@@ -1,6 +1,7 @@
 ﻿using Common.SCADA;
 using Microsoft.ServiceFabric.Data;
 using OMS.Common.Cloud.ReliableCollectionHelpers;
+using OMS.Common.SCADA;
 using OMS.Common.ScadaContracts;
 using Outage.Common;
 using Outage.Common.Exceptions.SCADA;
@@ -27,6 +28,15 @@ namespace OMS.Cloud.SCADA.ModelProviderService.ContractProviders
             get
             {
                 return measurementsCache ?? (measurementsCache = new ReliableDictionaryAccess<long, IModbusData>(this.stateManager, ReliableDictionaryNames.MeasurementsCache));
+            }
+        }
+
+        private ReliableDictionaryAccess<long, CommandDescription> commandDescriptionCache;
+        private ReliableDictionaryAccess<long, CommandDescription> CommandDescriptionCache
+        {
+            get
+            {
+                return commandDescriptionCache ?? (commandDescriptionCache = new ReliableDictionaryAccess<long, CommandDescription>(this.stateManager, ReliableDictionaryNames.CommandDescriptionCache));
             }
         }
 
@@ -117,6 +127,12 @@ namespace OMS.Cloud.SCADA.ModelProviderService.ContractProviders
                 SCADAMessage scadaMessage = new MultipleDiscreteValueSCADAMessage(publicationData);
                 //TODO: PublishScadaData(Topic.SWITCH_STATUS, scadaMessage);
             }
+        }
+
+        public Task UpdateCommandDescription(long gid, CommandDescription commandDescription)
+        {
+            CommandDescriptionCache[gid] = commandDescription;
+            return null; //TODO: ispratiti kako ce se ovo odraziti
         }
 
         //TODO: publish...

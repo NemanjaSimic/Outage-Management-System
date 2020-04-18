@@ -2,7 +2,6 @@
 using System.Collections.Generic;
 using System.Diagnostics;
 using System.Fabric;
-using System.Linq;
 using System.Threading;
 using System.Threading.Tasks;
 using Microsoft.ServiceFabric.Services.Communication.Runtime;
@@ -66,7 +65,7 @@ namespace OMS.Cloud.SCADA.FunctionExecutorService
         /// <param name="cancellationToken">Canceled when Service Fabric needs to shut down this service instance.</param>
         protected override async Task RunAsync(CancellationToken cancellationToken)
         {
-            FunctionExecutorCycle functionExecutor = new FunctionExecutorCycle();
+            FunctionExecutorCycle functionExecutorCycle = new FunctionExecutorCycle();
 
             // TODO: Replace the following sample code with your own logic 
             //       or remove this RunAsync override if it's not needed in your service.
@@ -77,11 +76,10 @@ namespace OMS.Cloud.SCADA.FunctionExecutorService
             {
                 cancellationToken.ThrowIfCancellationRequested();
 
-                ServiceEventSource.Current.ServiceMessage(this.Context, "Working-{0}", ++iterations);
-
                 try
                 {
-                    functionExecutor.Start();
+                    await functionExecutorCycle.Start();
+                    ServiceEventSource.Current.ServiceMessage(this.Context, "FunctionExecutorService::FunctionExecutorCycle.Start() Working-{0}", ++iterations);
                 }
                 catch (Exception e)
                 {

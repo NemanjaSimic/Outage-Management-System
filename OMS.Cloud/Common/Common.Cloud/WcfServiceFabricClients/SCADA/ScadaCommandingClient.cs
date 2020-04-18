@@ -3,9 +3,6 @@ using Microsoft.ServiceFabric.Services.Communication.Wcf.Client;
 using OMS.Common.ScadaContracts;
 using Outage.Common;
 using System;
-using System.Configuration;
-using System.Fabric;
-using System.ServiceModel;
 using System.Threading.Tasks;
 
 namespace OMS.Common.Cloud.WcfServiceFabricClients.SCADA
@@ -13,8 +10,8 @@ namespace OMS.Common.Cloud.WcfServiceFabricClients.SCADA
 
     public class ScadaCommandingClient : WcfSeviceFabricClientBase<IScadaCommandingContract>, IScadaCommandingContract
     {
-        public ScadaCommandingClient(WcfCommunicationClientFactory<IScadaCommandingContract> clientFactory, Uri serviceUri)
-            : base(clientFactory, serviceUri)
+        public ScadaCommandingClient(WcfCommunicationClientFactory<IScadaCommandingContract> clientFactory, Uri serviceUri, ServicePartitionKey servicePartition)
+            : base(clientFactory, serviceUri, servicePartition)
         {
         }
 

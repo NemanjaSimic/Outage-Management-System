@@ -2,60 +2,32 @@
 using OMS.Cloud.SCADA.ModbusFunctions.Parameters;
 using OMS.Cloud.SCADA.ModbusFunctions.Read;
 using OMS.Cloud.SCADA.ModbusFunctions.Write;
-using OMS.Cloud.SCADA.Data.Repository;
-using System;
 using OMS.Common.SCADA;
 
 namespace OMS.Cloud.SCADA.ModbusFunctions
 {
-    public static class FunctionFactory
+    public class FunctionFactory
     {
-        #region Static Members
-
-        private static SCADAModel scadaModel = null;
-
-        public static SCADAModel SCADAModel
-        {
-            set
-            {
-                if (scadaModel == null)
-                {
-                    scadaModel = value;
-                }
-            }
-        }
-
-        #endregion
-
-
-        public static IReadModbusFunction CreateReadModbusFunction(ModbusReadCommandParameters commandParameters)
+        public IReadModbusFunction CreateReadModbusFunction(ModbusReadCommandParameters commandParameters)
         {
             IReadModbusFunction modbusFunction;
-
-            if(FunctionFactory.scadaModel == null)
-            {
-                string message = $"CreateReadModbusFunction => SCADA model is null.";
-                LoggerWrapper.Instance.LogError(message);
-                //TODO: InternalSCADAServiceException
-                throw new Exception(message);
-            }
 
             switch ((ModbusFunctionCode)commandParameters.FunctionCode)
             {
                 case ModbusFunctionCode.READ_COILS:
-                    modbusFunction = new ReadCoilsFunction(commandParameters, FunctionFactory.scadaModel);
+                    modbusFunction = new ReadCoilsFunction(commandParameters);
                     break;
 
                 case ModbusFunctionCode.READ_DISCRETE_INPUTS:
-                    modbusFunction = new ReadDiscreteInputsFunction(commandParameters, FunctionFactory.scadaModel);
+                    modbusFunction = new ReadDiscreteInputsFunction(commandParameters);
                     break;
 
                 case ModbusFunctionCode.READ_INPUT_REGISTERS:
-                    modbusFunction = new ReadInputRegistersFunction(commandParameters, FunctionFactory.scadaModel);
+                    modbusFunction = new ReadInputRegistersFunction(commandParameters);
                     break;
 
                 case ModbusFunctionCode.READ_HOLDING_REGISTERS:
-                    modbusFunction = new ReadHoldingRegistersFunction(commandParameters, FunctionFactory.scadaModel);
+                    modbusFunction = new ReadHoldingRegistersFunction(commandParameters);
                     break;
 
                 default:
@@ -68,17 +40,9 @@ namespace OMS.Cloud.SCADA.ModbusFunctions
             return modbusFunction;
         }
 
-        public static IWriteModbusFunction CreateWriteModbusFunction(ModbusWriteCommandParameters commandParameters, CommandOriginType commandOrigin)
+        public IWriteModbusFunction CreateWriteModbusFunction(ModbusWriteCommandParameters commandParameters, CommandOriginType commandOrigin)
         {
             IWriteModbusFunction modbusFunction;
-
-            if (FunctionFactory.scadaModel == null)
-            {
-                string message = $"CreateWriteModbusFunction => SCADA model is null.";
-                LoggerWrapper.Instance.LogError(message);
-                //TODO: InternalSCADAServiceException
-                throw new Exception(message);
-            }
 
             switch ((ModbusFunctionCode)commandParameters.FunctionCode)
             {

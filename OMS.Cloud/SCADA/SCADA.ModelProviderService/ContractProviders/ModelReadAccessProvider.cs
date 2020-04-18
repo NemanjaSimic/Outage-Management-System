@@ -55,6 +55,7 @@ namespace OMS.Cloud.SCADA.ModelProviderService.ContractProviders
         public ModelReadAccessProvider(IReliableStateManager stateManager)
         {
             this.stateManager = stateManager;
+            this.configData = SCADAConfigData.Instance;
         }
 
         public async Task<bool> GetIsScadaModelImportedIndicator()

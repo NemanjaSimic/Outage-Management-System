@@ -4,30 +4,29 @@ using OMS.Common.SCADA;
 using OMS.Common.ScadaContracts;
 using System;
 using System.Collections.Generic;
-using System.Configuration;
-using System.Fabric;
 using System.Threading.Tasks;
 
 namespace OMS.Common.Cloud.WcfServiceFabricClients.SCADA
 {
     public class ScadaModelReadAccessClient : WcfSeviceFabricClientBase<IScadaModelReadAccessContract>, IScadaModelReadAccessContract
     {
-        public ScadaModelReadAccessClient(WcfCommunicationClientFactory<IScadaModelReadAccessContract> clientFactory, Uri serviceUri)
-            : base(clientFactory, serviceUri)
+        public ScadaModelReadAccessClient(WcfCommunicationClientFactory<IScadaModelReadAccessContract> clientFactory, Uri serviceUri, ServicePartitionKey servicePartition)
+            : base(clientFactory, serviceUri, servicePartition)
         {
         }
 
         public static ScadaModelReadAccessClient CreateClient(Uri serviceUri = null)
         {
             ClientFactory factory = new ClientFactory();
+            ServicePartitionKey servicePartition = new ServicePartitionKey(0);
 
             if (serviceUri == null)
             {
-                return factory.CreateClient<ScadaModelReadAccessClient, IScadaModelReadAccessContract>(MicroserviceNames.ScadaModelProviderService);
+                return factory.CreateClient<ScadaModelReadAccessClient, IScadaModelReadAccessContract>(MicroserviceNames.ScadaModelProviderService, servicePartition);
             }
             else
             {
-                return factory.CreateClient<ScadaModelReadAccessClient, IScadaModelReadAccessContract>(serviceUri);
+                return factory.CreateClient<ScadaModelReadAccessClient, IScadaModelReadAccessContract>(serviceUri, servicePartition);
             }
         }
 
