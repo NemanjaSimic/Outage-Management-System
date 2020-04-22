@@ -89,6 +89,7 @@
     <Reference Include="System.Xml" />
   </ItemGroup>
   <ItemGroup>
+    <Compile Include="Data\ScadaConfigData.cs" />
     <Compile Include="IModelUpdateCommandEnqueuer.cs" />
     <Compile Include="IReadCommandEnqueuer.cs" />
     <Compile Include="IScadaCommandingContract.cs" />

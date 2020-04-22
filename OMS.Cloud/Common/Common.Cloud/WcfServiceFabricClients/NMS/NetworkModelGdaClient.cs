@@ -19,14 +19,15 @@ namespace OMS.Common.Cloud.WcfServiceFabricClients.NMS
         public static NetworkModelGdaClient CreateClient(Uri serviceUri = null)
         {
             ClientFactory factory = new ClientFactory();
+            ServicePartitionKey servicePartition = ServicePartitionKey.Singleton;
 
             if (serviceUri == null)
             {
-                return factory.CreateClient<NetworkModelGdaClient, INetworkModelGDAContract>(MicroserviceNames.NmsGdaService);
+                return factory.CreateClient<NetworkModelGdaClient, INetworkModelGDAContract>(MicroserviceNames.NmsGdaService, servicePartition);
             }
             else
             {
-                return factory.CreateClient<NetworkModelGdaClient, INetworkModelGDAContract>(serviceUri);
+                return factory.CreateClient<NetworkModelGdaClient, INetworkModelGDAContract>(serviceUri, servicePartition);
             }
         }
 

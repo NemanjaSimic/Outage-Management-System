@@ -1,5 +1,6 @@
 ﻿using Microsoft.ServiceFabric.Services.Remoting;
 using OMS.Common.SCADA;
+using OMS.Common.ScadaContracts.Data;
 using System.Collections.Generic;
 using System.ServiceModel;
 using System.Threading.Tasks;
@@ -13,7 +14,8 @@ namespace OMS.Common.ScadaContracts
         Task<bool> GetIsScadaModelImportedIndicator();
 
         [OperationContract]
-        Task<ISCADAConfigData> GetScadaConfigData();
+        //[ServiceKnownType(typeof(ScadaConfigData))]
+        Task<ScadaConfigData> GetScadaConfigData();
 
         [OperationContract]
         Task<Dictionary<long, ISCADAModelPointItem>> GetGidToPointItemMap();

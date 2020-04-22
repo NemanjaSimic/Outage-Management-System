@@ -2,7 +2,7 @@
 
 namespace OMS.Common.SCADA
 {
-    public interface ISCADAConfigData
+    public interface IScadaConfigData
     {
         ushort TcpPort { get; }
         IPAddress IpAddress { get; }

@@ -28,7 +28,7 @@ namespace OMS.Cloud.SCADA.FunctionExecutorService
         private readonly CloudQueue writeCommandQueue;
         private readonly CloudQueue modelUpdateCommandQueue;
 
-        private ISCADAConfigData configData;
+        private IScadaConfigData configData;
         private ModbusClient modbusClient;
         
         public FunctionExecutorCycle()

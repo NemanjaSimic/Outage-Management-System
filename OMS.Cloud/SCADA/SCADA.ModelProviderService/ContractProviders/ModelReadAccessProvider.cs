@@ -4,6 +4,7 @@ using OMS.Cloud.SCADA.ModelProviderService.Configuration;
 using OMS.Common.Cloud.ReliableCollectionHelpers;
 using OMS.Common.SCADA;
 using OMS.Common.ScadaContracts;
+using OMS.Common.ScadaContracts.Data;
 using System;
 using System.Collections.Generic;
 using System.Threading.Tasks;
@@ -15,12 +16,12 @@ namespace OMS.Cloud.SCADA.ModelProviderService.ContractProviders
         private readonly IReliableStateManager stateManager;
 
         #region Private Properties
-        private ISCADAConfigData configData;
-        private ISCADAConfigData ConfigData
+        private ScadaConfigData configData;
+        private ScadaConfigData ConfigData
         {
             get
             {
-                return configData ?? (configData = SCADAConfigData.Instance);
+                return configData ?? (configData = new ScadaConfigData());
             }
         }
 
@@ -55,7 +56,7 @@ namespace OMS.Cloud.SCADA.ModelProviderService.ContractProviders
         public ModelReadAccessProvider(IReliableStateManager stateManager)
         {
             this.stateManager = stateManager;
-            this.configData = SCADAConfigData.Instance;
+            ScadaConfigDataHelper.ImportAppSettings(ConfigData);
         }
 
         public async Task<bool> GetIsScadaModelImportedIndicator()
@@ -63,7 +64,7 @@ namespace OMS.Cloud.SCADA.ModelProviderService.ContractProviders
             throw new NotImplementedException();
         }
 
-        public async Task<ISCADAConfigData> GetScadaConfigData()
+        public async Task<ScadaConfigData> GetScadaConfigData()
         {
             return ConfigData;
         }

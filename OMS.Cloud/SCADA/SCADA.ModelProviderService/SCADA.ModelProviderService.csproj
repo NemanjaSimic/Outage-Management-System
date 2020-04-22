@@ -116,7 +116,7 @@
   </ItemGroup>
   <ItemGroup>
     <Compile Include="Configuration\AlarmConfigData.cs" />
-    <Compile Include="Configuration\SCADAConfigData.cs" />
+    <Compile Include="Configuration\ScadaConfigDataHelper.cs" />
     <Compile Include="ContractProviders\IntegrityUpdateProvider.cs" />
     <Compile Include="ContractProviders\ModelReadAccessProvider.cs" />
     <Compile Include="ContractProviders\ModelUpdateAccessProvider.cs" />

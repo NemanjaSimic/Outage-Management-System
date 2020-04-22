@@ -2,6 +2,7 @@
 using Microsoft.ServiceFabric.Services.Communication.Wcf.Client;
 using OMS.Common.SCADA;
 using OMS.Common.ScadaContracts;
+using OMS.Common.ScadaContracts.Data;
 using System;
 using System.Collections.Generic;
 using System.Threading.Tasks;
@@ -56,7 +57,7 @@ namespace OMS.Common.Cloud.WcfServiceFabricClients.SCADA
             return InvokeWithRetryAsync(client => client.Channel.GetIsScadaModelImportedIndicator());
         }
 
-        public Task<ISCADAConfigData> GetScadaConfigData()
+        public Task<ScadaConfigData> GetScadaConfigData()
         {
             return InvokeWithRetryAsync(client => client.Channel.GetScadaConfigData());
         }

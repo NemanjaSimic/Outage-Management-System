@@ -16,6 +16,7 @@ namespace OMS.Common.Cloud.WcfServiceFabricClients
             //binding.MaxBufferSize = (int)binding.MaxReceivedMessageSize;
             //binding.MaxBufferPoolSize = Environment.ProcessorCount * binding.MaxReceivedMessageSize;
 
+            //return binding;
             return CreateBinding();
         }
 
@@ -29,11 +30,14 @@ namespace OMS.Common.Cloud.WcfServiceFabricClients
             //binding.MaxBufferSize = (int)binding.MaxReceivedMessageSize;
             //binding.MaxBufferPoolSize = Environment.ProcessorCount * binding.MaxReceivedMessageSize;
 
+            //return binding;
             return CreateBinding();
         }
 
         private static NetTcpBinding CreateBinding()
         {
+            int maxReceivedMessageSize = 1024 * 1024 * 1024;
+
             NetTcpBinding binding = new NetTcpBinding(SecurityMode.None)
             {
                 SendTimeout = TimeSpan.MaxValue,
@@ -41,11 +45,10 @@ namespace OMS.Common.Cloud.WcfServiceFabricClients
                 OpenTimeout = TimeSpan.FromMinutes(1),
                 CloseTimeout = TimeSpan.FromMinutes(1),
                 MaxConnections = int.MaxValue,
-                MaxReceivedMessageSize = 1024 * 1024 * 1024,
+                MaxReceivedMessageSize = maxReceivedMessageSize,
+                MaxBufferSize = maxReceivedMessageSize,
+                MaxBufferPoolSize = Environment.ProcessorCount * maxReceivedMessageSize,
             };
-
-            binding.MaxBufferSize = (int)binding.MaxReceivedMessageSize;
-            binding.MaxBufferPoolSize = Environment.ProcessorCount * binding.MaxReceivedMessageSize;
 
             return binding;
         }
