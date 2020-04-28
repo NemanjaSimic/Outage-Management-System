@@ -1,35 +1,20 @@
 ﻿<?xml version="1.0" encoding="utf-8"?>
 <ApplicationManifest xmlns:xsd="http://www.w3.org/2001/XMLSchema" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" ApplicationTypeName="OMS.CloudType" ApplicationTypeVersion="1.0.0" xmlns="http://schemas.microsoft.com/2011/01/fabric">
   <Parameters>
-    <Parameter Name="OMS.Cloud.SCADA.ModelProviderService_MinReplicaSetSize" DefaultValue="3" />
-    <Parameter Name="OMS.Cloud.SCADA.ModelProviderService_PartitionCount" DefaultValue="1" />
-    <Parameter Name="OMS.Cloud.SCADA.ModelProviderService_TargetReplicaSetSize" DefaultValue="3" />
-    <Parameter Name="OMS.Cloud.SCADA.FunctionExecutorService_InstanceCount" DefaultValue="-1" />
-    <Parameter Name="OMS.Cloud.SCADA.CommandingService_InstanceCount" DefaultValue="-1" />
-    <Parameter Name="OMS.Cloud.SCADA.AcquisitionService_InstanceCount" DefaultValue="-1" />
-    <Parameter Name="OMS.Cloud.NMS.GdaService_InstanceCount" DefaultValue="-1" />
+    <Parameter Name="SCADA.FunctionExecutorService_InstanceCount" DefaultValue="-1" />
+    <Parameter Name="SCADA.ModelProviderService_MinReplicaSetSize" DefaultValue="3" />
+    <Parameter Name="SCADA.ModelProviderService_PartitionCount" DefaultValue="1" />
+    <Parameter Name="SCADA.ModelProviderService_TargetReplicaSetSize" DefaultValue="3" />
   </Parameters>
   <!-- Import the ServiceManifest from the ServicePackage. The ServiceManifestName and ServiceManifestVersion 
        should match the Name and Version attributes of the ServiceManifest element defined in the 
        ServiceManifest.xml file. -->
   <ServiceManifestImport>
-    <ServiceManifestRef ServiceManifestName="OMS.Cloud.SCADA.ModelProviderServicePkg" ServiceManifestVersion="1.0.0" />
+    <ServiceManifestRef ServiceManifestName="SCADA.FunctionExecutorServicePkg" ServiceManifestVersion="1.0.0" />
     <ConfigOverrides />
   </ServiceManifestImport>
   <ServiceManifestImport>
-    <ServiceManifestRef ServiceManifestName="OMS.Cloud.SCADA.FunctionExecutorServicePkg" ServiceManifestVersion="1.0.0" />
-    <ConfigOverrides />
-  </ServiceManifestImport>
-  <ServiceManifestImport>
-    <ServiceManifestRef ServiceManifestName="OMS.Cloud.SCADA.CommandingServicePkg" ServiceManifestVersion="1.0.0" />
-    <ConfigOverrides />
-  </ServiceManifestImport>
-  <ServiceManifestImport>
-    <ServiceManifestRef ServiceManifestName="OMS.Cloud.SCADA.AcquisitionServicePkg" ServiceManifestVersion="1.0.0" />
-    <ConfigOverrides />
-  </ServiceManifestImport>
-  <ServiceManifestImport>
-    <ServiceManifestRef ServiceManifestName="OMS.Cloud.NMS.GdaServicePkg" ServiceManifestVersion="1.0.0" />
+    <ServiceManifestRef ServiceManifestName="SCADA.ModelProviderServicePkg" ServiceManifestVersion="1.0.0" />
     <ConfigOverrides />
   </ServiceManifestImport>
   <DefaultServices>
@@ -38,30 +23,15 @@
          ServiceFabric PowerShell module.
          
          The attribute ServiceTypeName below must match the name defined in the imported ServiceManifest.xml file. -->
-    <Service Name="SCADA.ModelProviderService" ServicePackageActivationMode="ExclusiveProcess">
-      <StatefulService ServiceTypeName="OMS.Cloud.SCADA.ModelProviderServiceType" TargetReplicaSetSize="[OMS.Cloud.SCADA.ModelProviderService_TargetReplicaSetSize]" MinReplicaSetSize="[OMS.Cloud.SCADA.ModelProviderService_MinReplicaSetSize]">
-        <UniformInt64Partition PartitionCount="[OMS.Cloud.SCADA.ModelProviderService_PartitionCount]" LowKey="-9223372036854775808" HighKey="9223372036854775807" />
-      </StatefulService>
-    </Service>
     <Service Name="SCADA.FunctionExecutorService" ServicePackageActivationMode="ExclusiveProcess">
-      <StatelessService ServiceTypeName="OMS.Cloud.SCADA.FunctionExecutorServiceType" InstanceCount="[OMS.Cloud.SCADA.FunctionExecutorService_InstanceCount]">
+      <StatelessService ServiceTypeName="SCADA.FunctionExecutorServiceType" InstanceCount="[SCADA.FunctionExecutorService_InstanceCount]">
         <SingletonPartition />
       </StatelessService>
     </Service>
-    <Service Name="SCADA.CommandingService" ServicePackageActivationMode="ExclusiveProcess">
-      <StatelessService ServiceTypeName="OMS.Cloud.SCADA.CommandingServiceType" InstanceCount="[OMS.Cloud.SCADA.CommandingService_InstanceCount]">
-        <SingletonPartition />
-      </StatelessService>
-    </Service>
-    <Service Name="SCADA.AcquisitionService" ServicePackageActivationMode="ExclusiveProcess">
-      <StatelessService ServiceTypeName="OMS.Cloud.SCADA.AcquisitionServiceType" InstanceCount="[OMS.Cloud.SCADA.AcquisitionService_InstanceCount]">
-        <SingletonPartition />
-      </StatelessService>
-    </Service>
-    <Service Name="NMS.GdaService" ServicePackageActivationMode="ExclusiveProcess">
-      <StatelessService ServiceTypeName="OMS.Cloud.NMS.GdaServiceType" InstanceCount="[OMS.Cloud.NMS.GdaService_InstanceCount]">
-        <SingletonPartition />
-      </StatelessService>
+    <Service Name="SCADA.ModelProviderService" ServicePackageActivationMode="ExclusiveProcess">
+      <StatefulService ServiceTypeName="SCADA.ModelProviderServiceType" TargetReplicaSetSize="[SCADA.ModelProviderService_TargetReplicaSetSize]" MinReplicaSetSize="[SCADA.ModelProviderService_MinReplicaSetSize]">
+        <UniformInt64Partition PartitionCount="[SCADA.ModelProviderService_PartitionCount]" LowKey="-9223372036854775808" HighKey="9223372036854775807" />
+      </StatefulService>
     </Service>
   </DefaultServices>
 </ApplicationManifest>

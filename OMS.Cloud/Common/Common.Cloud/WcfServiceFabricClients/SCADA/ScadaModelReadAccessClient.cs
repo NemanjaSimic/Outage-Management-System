@@ -1,8 +1,7 @@
 ﻿using Microsoft.ServiceFabric.Services.Client;
 using Microsoft.ServiceFabric.Services.Communication.Wcf.Client;
-using OMS.Common.SCADA;
 using OMS.Common.ScadaContracts;
-using OMS.Common.ScadaContracts.Data;
+using OMS.Common.ScadaContracts.DataContracts;
 using System;
 using System.Collections.Generic;
 using System.Threading.Tasks;
@@ -34,27 +33,32 @@ namespace OMS.Common.Cloud.WcfServiceFabricClients.SCADA
         #region IScadaModelAccessContract
         public Task<Dictionary<ushort, Dictionary<ushort, long>>> GetAddressToGidMap()
         {
-            return InvokeWithRetryAsync(client => client.Channel.GetAddressToGidMap());
+            throw new NotImplementedException();
+            // return InvokeWithRetryAsync(client => client.Channel.GetAddressToGidMap());
         }
 
-        public Task<Dictionary<ushort, Dictionary<ushort, ISCADAModelPointItem>>> GetAddressToPointItemMap()
+        public Task<Dictionary<ushort, Dictionary<ushort, IScadaModelPointItem>>> GetAddressToPointItemMap()
         {
-            return InvokeWithRetryAsync(client => client.Channel.GetAddressToPointItemMap());
+            throw new NotImplementedException();
+            //return InvokeWithRetryAsync(client => client.Channel.GetAddressToPointItemMap());
         }
 
         public Task<Dictionary<long, CommandDescription>> GetCommandDescriptionCache()
         {
-            return InvokeWithRetryAsync(client => client.Channel.GetCommandDescriptionCache());
+            throw new NotImplementedException();
+            //return InvokeWithRetryAsync(client => client.Channel.GetCommandDescriptionCache());
         }
 
-        public Task<Dictionary<long, ISCADAModelPointItem>> GetGidToPointItemMap()
+        public Task<Dictionary<long, IScadaModelPointItem>> GetGidToPointItemMap()
         {
-            return InvokeWithRetryAsync(client => client.Channel.GetGidToPointItemMap());
+            throw new NotImplementedException();
+            //return InvokeWithRetryAsync(client => client.Channel.GetGidToPointItemMap());
         }
 
         public Task<bool> GetIsScadaModelImportedIndicator()
         {
-            return InvokeWithRetryAsync(client => client.Channel.GetIsScadaModelImportedIndicator());
+            throw new NotImplementedException();
+            ///return InvokeWithRetryAsync(client => client.Channel.GetIsScadaModelImportedIndicator());
         }
 
         public Task<ScadaConfigData> GetScadaConfigData()

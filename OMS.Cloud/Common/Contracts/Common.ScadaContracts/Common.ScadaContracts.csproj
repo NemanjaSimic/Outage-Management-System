@@ -89,14 +89,20 @@
     <Reference Include="System.Xml" />
   </ItemGroup>
   <ItemGroup>
-    <Compile Include="Data\ScadaConfigData.cs" />
-    <Compile Include="IModelUpdateCommandEnqueuer.cs" />
-    <Compile Include="IReadCommandEnqueuer.cs" />
-    <Compile Include="IScadaCommandingContract.cs" />
-    <Compile Include="IScadaIntegrityUpdateContract.cs" />
-    <Compile Include="IScadaModelReadAccessContract.cs" />
-    <Compile Include="IScadaModelUpdateAccessContract.cs" />
-    <Compile Include="IWriteCommandEnqueuer.cs" />
+    <Compile Include="DataContracts\AnalogPointItem.cs" />
+    <Compile Include="DataContracts\CommandDescription.cs" />
+    <Compile Include="DataContracts\DiscretePointItem.cs" />
+    <Compile Include="DataContracts\IScadaModelPointItem.cs" />
+    <Compile Include="DataContracts\ISetAlarmStrategy.cs" />
+    <Compile Include="DataContracts\ScadaConfigData.cs" />
+    <Compile Include="FunctionExecutior\IModelUpdateCommandEnqueuer.cs" />
+    <Compile Include="FunctionExecutior\IReadCommandEnqueuer.cs" />
+    <Compile Include="Commanding\IScadaCommandingContract.cs" />
+    <Compile Include="DataContracts\ScadaModelPointItem.cs" />
+    <Compile Include="ModelProvider\IScadaIntegrityUpdateContract.cs" />
+    <Compile Include="ModelProvider\IScadaModelReadAccessContract.cs" />
+    <Compile Include="ModelProvider\IScadaModelUpdateAccessContract.cs" />
+    <Compile Include="FunctionExecutior\IWriteCommandEnqueuer.cs" />
     <Compile Include="Properties\AssemblyInfo.cs" />
   </ItemGroup>
   <ItemGroup>

@@ -37,6 +37,7 @@
     </Reference>
     <Reference Include="System" />
     <Reference Include="System.Core" />
+    <Reference Include="System.Runtime.Serialization" />
     <Reference Include="System.Xml.Linq" />
     <Reference Include="System.Data.DataSetExtensions" />
     <Reference Include="Microsoft.CSharp" />
@@ -45,15 +46,11 @@
     <Reference Include="System.Xml" />
   </ItemGroup>
   <ItemGroup>
-    <Compile Include="CommandDescription.cs" />
     <Compile Include="Enums.cs" />
     <Compile Include="FunctionParameters\IModbusCommandParameters.cs" />
     <Compile Include="FunctionParameters\IModbusReadCommandParameters.cs" />
     <Compile Include="FunctionParameters\IModbusWriteCommandParameters.cs" />
     <Compile Include="IModBusFunction.cs" />
-    <Compile Include="ISCADAConfigData.cs" />
-    <Compile Include="IScadaModel.cs" />
-    <Compile Include="ISCADAModelPointItem.cs" />
     <Compile Include="ModelUpdateDelegate.cs" />
     <Compile Include="Properties\AssemblyInfo.cs" />
     <Compile Include="ReliableDictionaryNames.cs" />

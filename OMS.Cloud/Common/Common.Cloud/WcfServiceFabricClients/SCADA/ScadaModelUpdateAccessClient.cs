@@ -2,6 +2,7 @@
 using Microsoft.ServiceFabric.Services.Communication.Wcf.Client;
 using OMS.Common.SCADA;
 using OMS.Common.ScadaContracts;
+using OMS.Common.ScadaContracts.DataContracts;
 using Outage.Common.PubSub.SCADADataContract;
 using System;
 using System.Collections.Generic;

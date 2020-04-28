@@ -1,12 +1,9 @@
 ﻿<?xml version="1.0" encoding="utf-8"?>
 <Application xmlns:xsd="http://www.w3.org/2001/XMLSchema" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" Name="fabric:/OMS.Cloud" xmlns="http://schemas.microsoft.com/2011/01/fabric">
   <Parameters>
-    <Parameter Name="OMS.Cloud.SCADA.ModelProviderService_PartitionCount" Value="1" />
-    <Parameter Name="OMS.Cloud.SCADA.ModelProviderService_MinReplicaSetSize" Value="1" />
-    <Parameter Name="OMS.Cloud.SCADA.ModelProviderService_TargetReplicaSetSize" Value="1" />
-    <Parameter Name="OMS.Cloud.SCADA.FunctionExecutorService_InstanceCount" Value="1" />
-    <Parameter Name="OMS.Cloud.SCADA.CommandingService_InstanceCount" Value="1" />
-    <Parameter Name="OMS.Cloud.SCADA.AcquisitionService_InstanceCount" Value="1" />
-    <Parameter Name="OMS.Cloud.NMS.GdaService_InstanceCount" Value="1" />
+    <Parameter Name="SCADA.FunctionExecutorService_InstanceCount" Value="1" />
+    <Parameter Name="SCADA.ModelProviderService_PartitionCount" Value="1" />
+    <Parameter Name="SCADA.ModelProviderService_MinReplicaSetSize" Value="1" />
+    <Parameter Name="SCADA.ModelProviderService_TargetReplicaSetSize" Value="1" />
   </Parameters>
 </Application>
