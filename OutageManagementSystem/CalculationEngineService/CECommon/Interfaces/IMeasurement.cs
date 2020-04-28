@@ -4,10 +4,10 @@
     {
         long Id { get; set; }
         string Address { get; set; }
-        bool isInput { get; set; }
+        bool IsInput { get; set; }
         long ElementId { get; set; }
 
         string GetMeasurementType();
-        float GetCurrentVaule();
+        float GetCurrentValue();
     }
 }
