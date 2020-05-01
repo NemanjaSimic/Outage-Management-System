@@ -25,18 +25,23 @@ namespace SCADA.FunctionExecutorImplementation
         private readonly CloudQueue writeCommandQueue;
         private readonly CloudQueue modelUpdateCommandQueue;
 
+        private ScadaModelReadAccessClient modelReadAccessClient;
+        private ScadaModelUpdateAccessClient modelUpdateAccessClient;
+
         private ScadaConfigData configData;
         private ModbusClient modbusClient;
 
         public FunctionExecutorCycle()
         {
-            //InitializeModbusClient();
             CloudQueueHelper.TryGetQueue("readcommandqueue", out this.readCommandQueue);
             CloudQueueHelper.TryGetQueue("writecommandqueue", out this.writeCommandQueue);
             CloudQueueHelper.TryGetQueue("mucommandqueue", out this.modelUpdateCommandQueue);
+
+            this.modelReadAccessClient = ScadaModelReadAccessClient.CreateClient();
+            this.modelUpdateAccessClient = ScadaModelUpdateAccessClient.CreateClient();
         }
 
-        public async Task Start()
+        public async Task Start(bool isRetry = false)
         {
             try
             {
@@ -44,12 +49,6 @@ namespace SCADA.FunctionExecutorImplementation
                 {
                     await InitializeModbusClient();
                 }
-
-                //Logger.LogDebug("Connected and waiting for command event.");
-
-                //this.commandEvent.WaitOne();
-
-                //Logger.LogDebug("Command event happened.");
 
                 if (!modbusClient.Connected)
                 {
@@ -64,12 +63,6 @@ namespace SCADA.FunctionExecutorImplementation
                     await ExecuteCommand(currentCommand);
                 }
 
-                //HIGH PRIORITY COMMANDS - model update commands
-
-                //this.modelUpdateQueueEmptyEvent.Set();
-
-                //WRITE COMMANDS
-
                 while (writeCommandQueue.PeekMessage() != null)
                 {
                     CloudQueueMessage message = writeCommandQueue.GetMessage();
@@ -78,10 +71,6 @@ namespace SCADA.FunctionExecutorImplementation
                     await ExecuteCommand(currentCommand);
                 }
 
-
-                //this.writeCommandQueueEmptyEvent.Set();
-
-                //READ COMMANDS - acquisition
                 while (readCommandQueue.PeekMessage() != null)
                 {
                     CloudQueueMessage message = readCommandQueue.GetMessage();
@@ -92,24 +81,37 @@ namespace SCADA.FunctionExecutorImplementation
             }
             catch (Exception ex)
             {
-                string message = "Exception caught in Start().";
-                Logger.LogError(message, ex);
+                if (!isRetry)
+                {
+                    this.modelReadAccessClient = ScadaModelReadAccessClient.CreateClient();
+                    this.modelUpdateAccessClient = ScadaModelUpdateAccessClient.CreateClient();
+                    await Start(true);
+                }
+                else
+                {
+                    string message = "Exception caught in FunctionExecutorCycle.Start method.";
+                    Logger.LogError(message, ex);
+                    throw ex;
+                }
             }
         }
 
         private async Task InitializeModbusClient()
         {
-            ScadaModelReadAccessClient modelReadAccessClient = ScadaModelReadAccessClient.CreateClient();
-            
             try
             {
-                this.configData = await modelReadAccessClient.GetScadaConfigData();
+                this.configData = await this.modelReadAccessClient.GetScadaConfigData();
                 this.modbusClient = new ModbusClient(configData.IpAddress.ToString(), configData.TcpPort);
             }
             catch (Exception e)
             {
                 string message = "Exception caught in InitializeModbusClient().";
                 Logger.LogError(message, e);
+            }
+
+            if (modbusClient == null)
+            {
+                throw new Exception("InitializeModbusClient failed: ModbusClient is null");
             }
         }
 
@@ -176,13 +178,11 @@ namespace SCADA.FunctionExecutorImplementation
 
             if (command is IReadAnalogModusFunction readAnalogCommand)
             {
-                ScadaModelUpdateAccessClient modelUpdateAccessClient = ScadaModelUpdateAccessClient.CreateClient();
-                await modelUpdateAccessClient.MakeAnalogEntryToMeasurementCache(readAnalogCommand.Data, true);
+                await this.modelUpdateAccessClient.MakeAnalogEntryToMeasurementCache(readAnalogCommand.Data, true);
             }
             else if (command is IReadDiscreteModbusFunction readDiscreteCommand)
             {
-                ScadaModelUpdateAccessClient modelUpdateAccessClient = ScadaModelUpdateAccessClient.CreateClient();
-                await modelUpdateAccessClient.MakeDiscreteEntryToMeasurementCache(readDiscreteCommand.Data, true);
+                await this.modelUpdateAccessClient.MakeDiscreteEntryToMeasurementCache(readDiscreteCommand.Data, true);
             }
             else if (command is IWriteModbusFunction writeModbusCommand)
             {
@@ -207,17 +207,13 @@ namespace SCADA.FunctionExecutorImplementation
                         return;
                 }
 
-                ScadaModelReadAccessClient modelReadAccessClient = ScadaModelReadAccessClient.CreateClient();
-                var currentAddressToGidMap = await modelReadAccessClient.GetAddressToGidMap();
-                var commandedValuesCache = await modelReadAccessClient.GetCommandDescriptionCache();
+                var currentAddressToGidMap = await this.modelReadAccessClient.GetAddressToGidMap();
+                var commandedValuesCache = await this.modelReadAccessClient.GetCommandDescriptionCache();
 
                 if (currentAddressToGidMap[(ushort)pointType].ContainsKey(commandValue.Address))
                 {
                     long gid = currentAddressToGidMap[(ushort)pointType][commandValue.Address];
-
-                    //commandedValuesCache[gid] = commandValue;
-                    ScadaModelUpdateAccessClient modelUpdateAccessClient = ScadaModelUpdateAccessClient.CreateClient();
-                    await modelUpdateAccessClient.UpdateCommandDescription(gid, commandValue);
+                    await this.modelUpdateAccessClient.UpdateCommandDescription(gid, commandValue);
                 }
             }
         }

@@ -57,6 +57,9 @@
     <Compile Include="WcfServiceFabricClients\HttpBindingHelper.cs" />
     <Compile Include="WcfServiceFabricClients\NMS\NetworkModelGdaClient.cs" />
     <Compile Include="WcfServiceFabricClients\OMS\Placeholder.cs" />
+    <Compile Include="WcfServiceFabricClients\SCADA\ModelUpdateCommandEnqueuerClient.cs" />
+    <Compile Include="WcfServiceFabricClients\SCADA\WriteCommandEnqueuerClient.cs" />
+    <Compile Include="WcfServiceFabricClients\SCADA\ReadCommandEnqueuerClient.cs" />
     <Compile Include="WcfServiceFabricClients\SCADA\ScadaCommandingClient.cs" />
     <Compile Include="WcfServiceFabricClients\SCADA\ScadaIntegrityUpdateClient.cs" />
     <Compile Include="WcfServiceFabricClients\SCADA\ScadaModelReadAccessClient.cs" />

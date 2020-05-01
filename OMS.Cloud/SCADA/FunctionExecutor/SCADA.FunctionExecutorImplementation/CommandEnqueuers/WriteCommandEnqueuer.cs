@@ -42,7 +42,6 @@ namespace SCADA.FunctionExecutorImplementation.CommandEnqueuers
             {
                 await this.writeCommandQueue.AddMessageAsync(new CloudQueueMessage(Serialization.ObjectToByteArray(modbusFunction)));
                 this.readCommandQueue.Clear();
-                //this.commandEvent.Set();
                 success = true;
             }
             catch (Exception e)

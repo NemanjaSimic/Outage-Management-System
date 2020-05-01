@@ -3,14 +3,10 @@ using System.Collections.Generic;
 using System.Fabric;
 using System.Threading;
 using System.Threading.Tasks;
-using Microsoft.ServiceFabric.Services.Client;
-using Microsoft.ServiceFabric.Services.Communication.Client;
 using Microsoft.ServiceFabric.Services.Communication.Runtime;
 using Microsoft.ServiceFabric.Services.Communication.Wcf;
-using Microsoft.ServiceFabric.Services.Communication.Wcf.Client;
 using Microsoft.ServiceFabric.Services.Communication.Wcf.Runtime;
 using Microsoft.ServiceFabric.Services.Runtime;
-using OMS.Common.Cloud.WcfServiceFabricClients.SCADA;
 using OMS.Common.ScadaContracts;
 using Outage.Common;
 using SCADA.FunctionExecutorImplementation;
@@ -74,24 +70,19 @@ namespace SCADA.FunctionExecutorService
         {
             FunctionExecutorCycle functionExecutorCycle = new FunctionExecutorCycle();
 
-            // TODO: Replace the following sample code with your own logic 
-            //       or remove this RunAsync override if it's not needed in your service.
-
-            long iterations = 0;
-
             while (true)
             {
                 cancellationToken.ThrowIfCancellationRequested();
 
                 try
                 {
-                    await functionExecutorCycle.Start();
+                    await functionExecutorCycle.Start(); 
+                    ServiceEventSource.Current.ServiceMessage(this.Context, $"[FunctionExecutorService] FunctionExecutorCycle executed.");
                 }
                 catch (Exception e)
                 {
                     ServiceEventSource.Current.ServiceMessage(this.Context, $"[FunctionExecutorService] Error: {e.Message}]");
                 }
-                
                 
                 await Task.Delay(TimeSpan.FromSeconds(1), cancellationToken);
             }

@@ -62,9 +62,13 @@ namespace OMS.Common.Cloud.ReliableCollectionHelpers
             using (ITransaction tx = this.stateManager.CreateTransaction())
             {
                 this.reliableDictionary = await reliableStateManagerHelper.GetOrAddAsync<IReliableDictionary<TKey, TValue>>(stateManager, tx, reliableDictioanryName);
-                this.reliableDictionary.RebuildNotificationAsyncCallback = this.OnDictionaryRebuildNotificationHandlerAsync;
-                this.reliableDictionary.DictionaryChanged += this.OnDictionaryChangedHandler;
                 await tx.CommitAsync();
+
+                //this.reliableDictionary = await reliableStateManagerHelper.GetOrAddAsync<IReliableDictionary<TKey, TValue>>(stateManager, tx, reliableDictioanryName);
+                //this.reliableDictionary.RebuildNotificationAsyncCallback = this.OnDictionaryRebuildNotificationHandlerAsync;
+                //this.reliableDictionary.DictionaryChanged += this.OnDictionaryChangedHandler;
+
+                //await tx.CommitAsync();
             }
         }
 

@@ -35,14 +35,8 @@ namespace SCADA.FunctionExecutorImplementation.CommandEnqueuers
         {
             bool success;
 
-            Dictionary<long, AnalogModbusData> analogData = new Dictionary<long, AnalogModbusData>();
-            Dictionary<long, DiscreteModbusData> discreteData = new Dictionary<long, DiscreteModbusData>();
-            //MeasurementsCache.Clear();
-
             try
             {
-                //Dictionary<long, ISCADAModelPointItem> currentScadaModel = new Dictionary<long, ISCADAModelPointItem>(); //TODO: Preuzeti od providera
-
                 Task[] addTasks = new Task[modbusFunctions.Count];
                 for (int i = 0; i < modbusFunctions.Count; i++)
                 {
@@ -54,7 +48,6 @@ namespace SCADA.FunctionExecutorImplementation.CommandEnqueuers
                 success = true;
                 this.writeCommandQueue.Clear();
                 this.readCommandQueue.Clear();
-                //this.commandEvent.Set();
             }
             catch (Exception e)
             {

@@ -32,6 +32,8 @@
     <Content Include="packages.config" />
   </ItemGroup>
   <ItemGroup>
+    <ProjectReference Include="..\SCADA\Acquisition\SCADA.AcquisitionService\SCADA.AcquisitionService.csproj" />
+    <ProjectReference Include="..\SCADA\Commanding\SCADA.CommandingService\SCADA.CommandingService.csproj" />
     <ProjectReference Include="..\SCADA\FunctionExecutor\SCADA.FunctionExecutorService\SCADA.FunctionExecutorService.csproj" />
     <ProjectReference Include="..\SCADA\ModelProvider\SCADA.ModelProviderService\SCADA.ModelProviderService.csproj" />
   </ItemGroup>

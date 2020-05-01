@@ -27,7 +27,7 @@ namespace SCADA.ModelProviderImplementation
         private readonly AnalogAlarmStrategy analogAlarmStrategy;
         private readonly DiscreteAlarmStrategy discreteAlarmStrategy;
 
-        //private NetworkModelGdaClient nmsGdaClient;
+        private NetworkModelGdaClient nmsGdaClient;
 
         #region Private Properties
         private Dictionary<DeltaOpType, List<long>> modelChanges;
@@ -101,11 +101,44 @@ namespace SCADA.ModelProviderImplementation
             this.analogAlarmStrategy = new AnalogAlarmStrategy();
             this.discreteAlarmStrategy = new DiscreteAlarmStrategy();
 
-            //this.nmsGdaClient = NetworkModelGdaClient.CreateClient();
+            this.nmsGdaClient = NetworkModelGdaClient.CreateClient();
+
+            InitializeScadaModel();
+        }
+
+        private async void InitializeScadaModel(bool isRetry = false)
+        {
+            try
+            {
+                if(!await ImportModel())
+                {
+                    this.nmsGdaClient = NetworkModelGdaClient.CreateClient();
+                    if (!await ImportModel(true))
+                    {
+                        string message = "ScadaModel: failed to ImportModel.";
+                        Logger.LogError(message);
+                        throw new Exception(message);
+                    }
+                }
+            }
+            catch (Exception e)
+            {
+                if (!isRetry)
+                {
+                    this.nmsGdaClient = NetworkModelGdaClient.CreateClient();
+                    InitializeScadaModel(true);
+                }
+                else
+                {
+                    string message = "Exception caught in InitializeScadaModel method.";
+                    Logger.LogError(message, e);
+                    throw e;
+                }
+            }
         }
 
         #region ImportScadaModel
-        public async Task<bool> ImportModel()
+        public async Task<bool> ImportModel(bool isRetry = false)
         {
             string message = "Importing analog measurements started...";
             Logger.LogInfo(message);
@@ -142,25 +175,14 @@ namespace SCADA.ModelProviderImplementation
             int numberOfResources = 1000;
             List<ModelCode> props = modelResourceDesc.GetAllPropertyIds(ModelCode.ANALOG);
 
-            //if (this.nmsGdaClient == null)
-            //{
-            //    success = false;
-            //    string errMsg = "From ImportAnalog() method: NetworkModelGdaClient is null.";
-            //    Logger.LogWarn(errMsg);
-
-            //    this.nmsGdaClient = NetworkModelGdaClient.CreateClient();
-            //}
-
-            NetworkModelGdaClient nmsGdaClient = NetworkModelGdaClient.CreateClient();
-
             try
             {
-                int iteratorId = await nmsGdaClient.GetExtentValues(ModelCode.ANALOG, props);
-                int resourcesLeft = await nmsGdaClient.IteratorResourcesLeft(iteratorId);
+                int iteratorId = await this.nmsGdaClient.GetExtentValues(ModelCode.ANALOG, props);
+                int resourcesLeft = await this.nmsGdaClient.IteratorResourcesLeft(iteratorId);
 
                 while (resourcesLeft > 0)
                 {
-                    List<ResourceDescription> rds = await nmsGdaClient.IteratorNext(numberOfResources, iteratorId);
+                    List<ResourceDescription> rds = await this.nmsGdaClient.IteratorNext(numberOfResources, iteratorId);
 
                     for (int i = 0; i < rds.Count; i++)
                     {
@@ -178,7 +200,7 @@ namespace SCADA.ModelProviderImplementation
                         }
                     }
 
-                    resourcesLeft = await nmsGdaClient.IteratorResourcesLeft(iteratorId);
+                    resourcesLeft = await this.nmsGdaClient.IteratorResourcesLeft(iteratorId);
                 }
 
                 success = true;
@@ -201,25 +223,14 @@ namespace SCADA.ModelProviderImplementation
             int numberOfResources = 1000;
             List<ModelCode> props = modelResourceDesc.GetAllPropertyIds(ModelCode.DISCRETE);
 
-            //if (this.nmsGdaClient == null)
-            //{
-            //    success = false;
-            //    string errMsg = "From ImportDiscrete() method: NetworkModelGdaClient is null.";
-            //    Logger.LogWarn(errMsg);
-
-            //    this.nmsGdaClient = NetworkModelGdaClient.CreateClient();
-            //}
-
-            NetworkModelGdaClient nmsGdaClient = NetworkModelGdaClient.CreateClient();
-
             try
             {
-                int iteratorId = await nmsGdaClient.GetExtentValues(ModelCode.DISCRETE, props);
-                int resourcesLeft = await nmsGdaClient.IteratorResourcesLeft(iteratorId);
+                int iteratorId = await this.nmsGdaClient.GetExtentValues(ModelCode.DISCRETE, props);
+                int resourcesLeft = await this.nmsGdaClient.IteratorResourcesLeft(iteratorId);
 
                 while (resourcesLeft > 0)
                 {
-                    List<ResourceDescription> rds = await nmsGdaClient.IteratorNext(numberOfResources, iteratorId);
+                    List<ResourceDescription> rds = await this.nmsGdaClient.IteratorNext(numberOfResources, iteratorId);
 
                     for (int i = 0; i < rds.Count; i++)
                     {
@@ -236,14 +247,13 @@ namespace SCADA.ModelProviderImplementation
                         }
                     }
 
-                    resourcesLeft = await nmsGdaClient.IteratorResourcesLeft(iteratorId);
+                    resourcesLeft = await this.nmsGdaClient.IteratorResourcesLeft(iteratorId);
                 }
 
                 success = true;
             }
             catch (Exception ex)
             {
-
                 success = false;
                 string errorMessage = $"ImportDiscrete failed with error: {ex.Message}";
                 Console.WriteLine(errorMessage);
@@ -436,16 +446,6 @@ namespace SCADA.ModelProviderImplementation
         {
             Dictionary<long, IScadaModelPointItem> pointItems = new Dictionary<long, IScadaModelPointItem>();
 
-            //if (this.nmsGdaClient == null)
-            //{
-            //    string message = "From method CreatePointItemsFromNetworkModelMeasurements(): NetworkModelGdaClient is null.";
-            //    Logger.LogWarn(message);
-
-            //    this.nmsGdaClient = NetworkModelGdaClient.CreateClient();
-            //}
-
-            NetworkModelGdaClient nmsGdaClient = NetworkModelGdaClient.CreateClient();
-
             int iteratorId;
             int resourcesLeft;
             int numberOfResources = 10000;
@@ -479,12 +479,12 @@ namespace SCADA.ModelProviderImplementation
 
                 try
                 {
-                    iteratorId = await nmsGdaClient.GetExtentValues(type, props);
-                    resourcesLeft = await nmsGdaClient.IteratorResourcesLeft(iteratorId);
+                    iteratorId = await this.nmsGdaClient.GetExtentValues(type, props);
+                    resourcesLeft = await this.nmsGdaClient.IteratorResourcesLeft(iteratorId);
 
                     while (resourcesLeft > 0)
                     {
-                        List<ResourceDescription> resources = await nmsGdaClient.IteratorNext(numberOfResources, iteratorId);
+                        List<ResourceDescription> resources = await this.nmsGdaClient.IteratorNext(numberOfResources, iteratorId);
 
                         foreach (ResourceDescription rd in resources)
                         {
@@ -505,10 +505,10 @@ namespace SCADA.ModelProviderImplementation
                             }
                         }
 
-                        resourcesLeft = await nmsGdaClient.IteratorResourcesLeft(iteratorId);
+                        resourcesLeft = await this.nmsGdaClient.IteratorResourcesLeft(iteratorId);
                     }
 
-                    await nmsGdaClient.IteratorClose(iteratorId);
+                    await this.nmsGdaClient.IteratorClose(iteratorId);
                 }
                 catch (Exception ex)
                 {
