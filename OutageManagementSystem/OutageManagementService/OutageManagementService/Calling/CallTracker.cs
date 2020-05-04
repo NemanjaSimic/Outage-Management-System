@@ -45,6 +45,7 @@ namespace OutageManagementService.Calling
             try
             {
                 timeInterval = Int32.Parse(ConfigurationManager.AppSettings["TimerInterval"]);
+                Logger.LogInfo($"TIme interval is set to: {timeInterval}.");
                 
             }
             catch(Exception e)
@@ -56,6 +57,7 @@ namespace OutageManagementService.Calling
             try
             {
                 expectedCalls = Int32.Parse(ConfigurationManager.AppSettings["ExpectedCalls"]);
+                Logger.LogInfo($"Expected calls is set to: {expectedCalls}.");
             }
             catch (Exception e)
             {

@@ -32,8 +32,9 @@
     <WarningLevel>4</WarningLevel>
   </PropertyGroup>
   <ItemGroup>
-    <Reference Include="OutageCIMProfile_NetworkModelService">
-      <HintPath>..\bin64\DLL\OutageCIMProfile_NetworkModelService.dll</HintPath>
+    <Reference Include="OutageCIMProfile_NetworkModelService, Version=1.0.0.0, Culture=neutral, processorArchitecture=MSIL">
+      <SpecificVersion>False</SpecificVersion>
+      <HintPath>..\bin64\OutageCIMProfile_NetworkModelService.dll</HintPath>
     </Reference>
     <Reference Include="System" />
     <Reference Include="System.Core" />
