@@ -36,9 +36,11 @@
     <Reference Include="System.ComponentModel.DataAnnotations" />
   </ItemGroup>
   <ItemGroup>
+    <Compile Include="BindingModels\ReportOptions.cs" />
     <Compile Include="BindingModels\SwitchCommandBindingModel.cs" />
     <Compile Include="IViewModel.cs" />
     <Compile Include="OutageLifecycleState.cs" />
+    <Compile Include="ReportType.cs" />
     <Compile Include="ViewModels\ArchivedOutageViewModel.cs" />
     <Compile Include="ViewModels\ConsumerViewModel.cs" />
     <Compile Include="ViewModels\EquipmentViewModel.cs" />
@@ -49,6 +51,7 @@
     <Compile Include="ViewModels\OutageViewModel.cs" />
     <Compile Include="ViewModels\RelationViewModel.cs" />
     <Compile Include="Properties\AssemblyInfo.cs" />
+    <Compile Include="ViewModels\ReportViewModel.cs" />
     <Compile Include="ViewModels\TransformerNodeViewModel.cs" />
   </ItemGroup>
   <ItemGroup>

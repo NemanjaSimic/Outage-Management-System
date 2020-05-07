@@ -7,12 +7,15 @@ using Outage.Common.ServiceContracts.PubSub;
 using Outage.Common.ServiceProxies;
 using Outage.Common.ServiceProxies.PubSub;
 using OutageDatabase;
+using OutageDatabase.Repository;
 using OutageManagementService.Calling;
+using OutageManagementService.DBManager;
 using OutageManagementService.DistribuedTransaction;
 using OutageManagementService.LifeCycleServices;
 using OutageManagementService.Outage;
 using System;
 using System.Collections.Generic;
+using System.Linq;
 using System.ServiceModel;
 using System.Text;
 
@@ -54,7 +57,7 @@ namespace OutageManagementService
                 //db.DeleteAllData();
                 InitializeEnergyConsumers(db);
             }
-           
+
             outageModel = new OutageModel();
             reportOutageService = new ReportOutageService(outageModel);
             isolateOutageService = new IsolateOutageService(outageModel);
@@ -70,12 +73,11 @@ namespace OutageManagementService
             OutageService.sendRepairCrewService = sendRepairCrewService;
             OutageTransactionActor.OutageModel = outageModel;
             OutageModelUpdateNotification.OutageModel = outageModel;
-  
 
             callTracker = new CallTracker("CallTrackerSubscriber", outageModel);
             SubscribeOnEmailService();
             InitializeHosts();
-          
+
         }
 
         #region GDAHelper
@@ -180,7 +182,7 @@ namespace OutageManagementService
                 {
                     ConsumerId = energyConsumer.GetProperty(ModelCode.IDOBJ_GID).AsLong(),
                     ConsumerMRID = energyConsumer.GetProperty(ModelCode.IDOBJ_MRID).AsString(),
-                    FirstName = $"FirstName{i}", //TODO: energyConsumer.GetProperty(ModelCode.ENERGYCONSUMER_FIRSTNAME).AsString(); 
+                    FirstName = $"FirstName{i}", //TODO: energyConsumer.GetProperty(ModelCode.ENERGYCONSUMER_FIRSTNAME).AsString();
                     LastName = $"LastName{i}"   //TODO: energyConsumer.GetProperty(ModelCode.ENERGYCONSUMER_LASTNAME).AsString();
                 };
 
@@ -272,7 +274,7 @@ namespace OutageManagementService
             Console.WriteLine("\n{0}", message);
             Logger.LogInfo(message);
         }
-        
+
         private void CloseHosts()
         {
             if (hosts == null || hosts.Count == 0)

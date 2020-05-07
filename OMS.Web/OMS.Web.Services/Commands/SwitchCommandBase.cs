@@ -10,20 +10,17 @@
 
         public long Gid
         {
-            get { return _gid; }
-
-            protected set { _gid = value; }
+            get => _gid;
+            protected set => _gid = value;
         }
 
         public SwitchCommandType Command
         {
-            get { return _command; }
-            protected set { _command = value; }
+            get => _command;
+            protected set => _command = value;
         }
 
         public SwitchCommandBase(long gid)
-        {
-            _gid = gid;
-        }
+           => _gid = gid;
     }
 }

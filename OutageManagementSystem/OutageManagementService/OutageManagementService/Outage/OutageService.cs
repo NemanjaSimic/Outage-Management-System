@@ -10,24 +10,31 @@ using OMSCommon.OutageDatabaseModel;
 using OMSCommon.Mappers;
 using OutageDatabase.Repository;
 using OutageManagementService.LifeCycleServices;
+using Outage.Common.OutageService;
+using OutageManagementService.Report;
+using Outage.Common.OutageService.Interface;
 
 namespace OutageManagementService.Outage
 {
     public class OutageService : IOutageAccessContract, IReportPotentialOutageContract, IOutageLifecycleUICommandingContract
     {
         private ILogger logger;
-       
+
         protected ILogger Logger
         {
             get { return logger ?? (logger = LoggerWrapper.Instance); }
         }
 
+
+        public static OutageModel outageModel;
+        public static SwitchClosed SwitchClosed { get; set; }
         public static ReportOutageService reportOutageService;
         public static IsolateOutageService isolateOutageService;
         public static ResolveOutageService resolveOutageService;
         public static ValidateResolveConditionsService validateResolveConditionsService;
         public static SendRepairCrewService sendRepairCrewService;
         public static SendLocationIsolationCrewService sendLocationIsolationCrewService;
+
         #region IOutageAccessContract
         public IEnumerable<ActiveOutageMessage> GetActiveOutages()
         {
@@ -59,13 +66,17 @@ namespace OutageManagementService.Outage
         #endregion
 
         #region IReportPotentialOutageContract
-        public bool ReportPotentialOutage(long elementGid)
+        public bool ReportPotentialOutage(long elementGid, CommandOriginType commandOriginType)
         {
             bool result;
 
             try
             {
+
                 result = reportOutageService.ReportPotentialOutage(elementGid); //TODO: enum (error, noAffectedConsumers, success,...)
+
+                //result = outageModel.ReportPotentialOutage(elementGid, commandOriginType); //TODO: enum (error, noAffectedConsumers, success,...)
+
             }
             catch (Exception e)
             {
@@ -176,5 +187,24 @@ namespace OutageManagementService.Outage
             return result;
         }
         #endregion
+
+        public OutageReport GenerateReport(ReportOptions options)
+        {
+            try
+            {
+                var reportService = new ReportingService();
+                var report = reportService.GenerateReport(options);
+                return report;
+            }
+            catch (Exception e)
+            {
+                throw;
+            }
+        }
+
+        public void OnSwitchClose(long elementGid)
+        {
+            SwitchClosed?.Invoke(elementGid);
+        }
     }
 }

@@ -21,6 +21,7 @@ using OutageManagementService.ScadaSubscriber;
 using System;
 using System.Collections.Concurrent;
 using System.Collections.Generic;
+using System.Dynamic;
 using System.Linq;
 using System.Text;
 using System.Threading.Tasks;
@@ -40,6 +41,9 @@ namespace OutageManagementService
     {
         private IOutageTopologyModel topologyModel;
 
+        public SwitchOpened SwitchOpened { get; set; }
+        public ConsumersBlackedOut ConsumersBlackedOut { get; set; }
+        public ConsumersEnergized ConsumersEnergized { get; set; }
         public IOutageTopologyModel TopologyModel
         {
             get
@@ -64,12 +68,14 @@ namespace OutageManagementService
         public ModelResourcesDesc modelResourcesDesc;
         public UnitOfWork dbContext { get; private set; }
         private UnitOfWork transactionDbContext;
-        private SubscriberProxy subscriberProxy; 
+        private SubscriberProxy subscriberProxy;
 
         public HashSet<long> commandedElements;
         public HashSet<long> optimumIsolationPoints;
         private Dictionary<DeltaOpType, List<long>> modelChanges;
-        
+
+        private Dictionary<long, Dictionary<long, List<long>>> recloserOutageMap;
+
         public List<long> CalledOutages;
         public ConcurrentQueue<long> EmailMsg;
 
@@ -80,6 +86,7 @@ namespace OutageManagementService
             optimumIsolationPoints = new HashSet<long>();
             outageMessageMapper = new OutageMessageMapper();
             modelResourcesDesc = new ModelResourcesDesc();
+            recloserOutageMap = new Dictionary<long, Dictionary<long, List<long>>>();
 
             dbContext = new UnitOfWork();
 
@@ -188,19 +195,6 @@ namespace OutageManagementService
         }
         #endregion
 
-        #region IOutageLifecycleContract
-       
-        
-
-       
-
-      
-
-        
-
-       
-        #endregion
-
         #region Private Methods
         private string GetDefaultIsolationEndpointsString(long gid, long recloserId)
         {
@@ -281,7 +275,7 @@ namespace OutageManagementService
 
             return nextBreakerId;
         }
-        
+
         public long GetRecloserForHeadBreaker(long headBreakerId)
         {
             long recolserId = -1;
@@ -316,7 +310,7 @@ namespace OutageManagementService
                 }
             }
 
-            return recolserId; 
+            return recolserId;
         }
 
         public List<Consumer> GetAffectedConsumersFromDatabase(List<long> affectedConsumersIds)
@@ -395,7 +389,7 @@ namespace OutageManagementService
                     {
                         continue;
                     }
-                
+
                     Equipment createdEquipement = new Equipment()
                     {
                         EquipmentId = rd.Id,
@@ -559,7 +553,7 @@ namespace OutageManagementService
                     while (resourcesLeft > 0)
                     {
                         List<ResourceDescription> resources = gdaQueryProxy.IteratorNext(numberOfResources, iteratorId);
-                        
+
                         foreach (ResourceDescription resource in resources)
                         {
                             resourceDescriptions.Add(resource.Id, resource);
@@ -593,10 +587,33 @@ namespace OutageManagementService
             if(message is OMSModelMessage omsModelMessage)
             {
                 TopologyModel = omsModelMessage.OutageTopologyModel; //TODO: Da li su subsciber callback pozivi sinhroni?
+                HashSet<long> energizedConsumers = new HashSet<long>();
+                foreach (var element in TopologyModel.OutageTopology.Values)
+                {
+                    if (element.DmsType.Equals(DMSType.ENERGYCONSUMER.ToString()))
+                    {
+                        if (element.IsActive)
+                        {
+                            energizedConsumers.Add(element.Id);
+                        }
+                    }
+                }
+                ConsumersEnergized?.Invoke(energizedConsumers);
             }
             else
             {
                 Logger.LogWarn("OutageModel::Notify => UNKNOWN message type. OMSModelMessage expected.");
+            }
+        }
+
+        public void CheckForClosedBreakers(IOutageTopologyModel outageTopologyModel)
+        {
+            foreach (var element in outageTopologyModel.OutageTopology)
+            {
+                if(element.Value.DmsType == "BREAKER")
+                {
+                    //TODO: dobiti od CE info da li su breakere Opened ili ne
+                }
             }
         }
         #endregion
