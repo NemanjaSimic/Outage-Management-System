@@ -54,7 +54,7 @@ namespace OutageManagementService.DBManager
             }
         }
 
-        public void OnConsumersBlackedOut(List<long> consumers, long outageId)
+        public void OnConsumersBlackedOut(List<long> consumers, long? outageId)
         {
             List<ConsumerHistorical> consumerHistoricals = new List<ConsumerHistorical>();
             try
@@ -82,7 +82,7 @@ namespace OutageManagementService.DBManager
             }
         }
 
-        public void OnSwitchOpened(long elementGid, long outageId)
+        public void OnSwitchOpened(long elementGid, long? outageId)
         {
             try
             {

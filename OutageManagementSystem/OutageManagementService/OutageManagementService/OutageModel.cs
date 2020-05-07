@@ -73,9 +73,6 @@ namespace OutageManagementService
         private HashSet<long> optimumIsolationPoints;
         private Dictionary<DeltaOpType, List<long>> modelChanges;
 
-        private HashSet<long> currentAffectedConsumers;
-        private HashSet<long> currentOpenedSwitches;
-
         private Dictionary<long, Dictionary<long, List<long>>> recloserOutageMap;
 
         public List<long> CalledOutages;
@@ -86,8 +83,6 @@ namespace OutageManagementService
             proxyFactory = new ProxyFactory();
             commandedElements = new HashSet<long>();
             optimumIsolationPoints = new HashSet<long>();
-            currentAffectedConsumers = new HashSet<long>();
-            currentOpenedSwitches = new HashSet<long>();
             outageMessageMapper = new OutageMessageMapper();
             modelResourcesDesc = new ModelResourcesDesc();
             recloserOutageMap = new Dictionary<long, Dictionary<long, List<long>>>();
@@ -213,8 +208,8 @@ namespace OutageManagementService
 
                 if (commandedElements.Contains(gid) || optimumIsolationPoints.Contains(gid))
                 {
-                    SwitchOpened?.Invoke(gid, -1);
-                    ConsumersBlackedOut?.Invoke(affectedConsumersIds, -1);
+                    SwitchOpened?.Invoke(gid, null);
+                    ConsumersBlackedOut?.Invoke(affectedConsumersIds, null);
                     return false;
                 }    
 
@@ -233,7 +228,7 @@ namespace OutageManagementService
 
                     if (!isSwitchInvoked)
                     {
-                        SwitchOpened?.Invoke(gid, -1);
+                        SwitchOpened?.Invoke(gid, null);
                     }
 
                     Logger.LogInfo("There is no affected consumers => outage report is not valid.");
@@ -341,8 +336,8 @@ namespace OutageManagementService
             else
             {
                 //USER COMANDA - korisnik rucno otvara neki breaker -> nije outage ali korisnici potencijalno ostaju bez napajanja
-                SwitchOpened?.Invoke(gid, -1);
-                ConsumersBlackedOut?.Invoke(affectedConsumersIds, -1);
+                SwitchOpened?.Invoke(gid, null);
+                ConsumersBlackedOut?.Invoke(affectedConsumersIds, null);
             }
             
             return success;
@@ -1232,11 +1227,10 @@ namespace OutageManagementService
                 {
                     visited.Add(currentNode);
 
-                    if (TopologyModel.OutageTopology.ContainsKey(currentNode))
+                    if (TopologyModel.OutageTopology.TryGetValue(currentNode, out IOutageTopologyElement topologyElement))
                     {
-                        IOutageTopologyElement topologyElement = TopologyModel.OutageTopology[currentNode];
 
-                        if (topologyElement.SecondEnd.Count == 0 && topologyElement.DmsType == "ENERGYCONSUMER" /*&& !topologyElement.IsActive*/)
+                        if (topologyElement.DmsType == "ENERGYCONSUMER" && !topologyElement.IsActive)
                         {
                             affectedConsumers.Add(currentNode);
                         }

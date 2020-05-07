@@ -3,8 +3,8 @@
 namespace Outage.Common.OutageService.Interface
 {
     public delegate void SwitchClosed(long elementGid);
-    public delegate void ConsumersBlackedOut(List<long> consumers, long outageId);
-    public delegate void SwitchOpened(long elementId, long outageId);
+    public delegate void ConsumersBlackedOut(List<long> consumers, long? outageId);
+    public delegate void SwitchOpened(long elementId, long? outageId);
     public delegate void ConsumersEnergized(HashSet<long> consumers);
     public interface IOutageTopologyModel
     {
