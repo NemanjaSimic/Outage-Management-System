@@ -3,32 +3,22 @@ using OMSCommon.OutageDatabaseModel;
 using Outage.Common;
 using Outage.Common.GDA;
 using Outage.Common.OutageService.Interface;
-using Outage.Common.OutageService.Model;
 using Outage.Common.PubSub;
 using Outage.Common.PubSub.CalculationEngineDataContract;
 using Outage.Common.PubSub.OutageDataContract;
 using Outage.Common.ServiceContracts.CalculationEngine;
 using Outage.Common.ServiceContracts.GDA;
-using Outage.Common.ServiceContracts.OMS;
 using Outage.Common.ServiceContracts.PubSub;
-using Outage.Common.ServiceContracts.SCADA;
 using Outage.Common.ServiceProxies;
 using Outage.Common.ServiceProxies.CalcualtionEngine;
-using Outage.Common.ServiceProxies.Outage;
 using Outage.Common.ServiceProxies.PubSub;
 using OutageDatabase.Repository;
-using OutageManagementService.ScadaSubscriber;
+using OutageManagementService.Outage;
 using System;
 using System.Collections.Concurrent;
 using System.Collections.Generic;
-using System.Dynamic;
 using System.Linq;
 using System.Text;
-using System.Threading.Tasks;
-using System.Timers;
-using AutoResetEvent = System.Threading.AutoResetEvent;
-using OMSCommon.OutageDatabaseModel;
-using OutageManagementService.LifeCycleServices;
 
 namespace OutageManagementService
 {
@@ -78,6 +68,7 @@ namespace OutageManagementService
 
         public List<long> CalledOutages;
         public ConcurrentQueue<long> EmailMsg;
+        public Queue<Tuple<long, CommandOriginType>> PotentialOutage { get; set; }
 
         public OutageModel()
         {
@@ -87,6 +78,7 @@ namespace OutageManagementService
             outageMessageMapper = new OutageMessageMapper();
             modelResourcesDesc = new ModelResourcesDesc();
             recloserOutageMap = new Dictionary<long, Dictionary<long, List<long>>>();
+            PotentialOutage = new Queue<Tuple<long, CommandOriginType>>();
 
             dbContext = new UnitOfWork();
 
@@ -601,6 +593,14 @@ namespace OutageManagementService
                 }
 
                 ConsumersEnergized?.Invoke(energizedConsumers);
+                //foreach pair in queue
+                //while queue.COunt > 0
+                //queue.Dequee
+                while (PotentialOutage.Count > 0)
+                {
+                    var tuple = PotentialOutage.Dequeue();
+                    OutageService.reportOutageService.ReportPotentialOutage(tuple.Item1, tuple.Item2); //TODO: enum (error, noAffectedConsumers, success,...)
+                }
             }
             else
             {

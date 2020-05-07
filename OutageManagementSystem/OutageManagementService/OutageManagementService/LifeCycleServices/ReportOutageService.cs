@@ -97,9 +97,9 @@ namespace OutageManagementService.LifeCycleServices
                 {
                     recloserId = outageModel.GetRecloserForHeadBreaker(gid);
                 }
-                catch (Exception e)
+                catch (Exception)
                 {
-                    throw e;
+                    return false;
                 }
 
                 List<Equipment> defaultIsolationPoints = outageModel.GetEquipmentEntity(new List<long> { gid, recloserId });
@@ -188,8 +188,28 @@ namespace OutageManagementService.LifeCycleServices
         {
             List<long> affectedConsumers = new List<long>();
             Stack<long> nodesToBeVisited = new Stack<long>();
-            nodesToBeVisited.Push(potentialOutageGid);
             HashSet<long> visited = new HashSet<long>();
+            long startingSwitch = potentialOutageGid;
+
+            if (outageModel.TopologyModel.OutageTopology.TryGetValue(potentialOutageGid, out IOutageTopologyElement firstElement)
+                && outageModel.TopologyModel.OutageTopology.TryGetValue(firstElement.FirstEnd, out IOutageTopologyElement currentElementAbove))
+            {
+                while (!currentElementAbove.DmsType.Equals("ENERGYSOURCE"))
+                {
+                    if (currentElementAbove.IsOpen)
+                    {
+                        startingSwitch = currentElementAbove.Id;
+                        break;
+                    }
+
+                    if(!outageModel.TopologyModel.OutageTopology.TryGetValue(currentElementAbove.FirstEnd, out currentElementAbove))
+                    {
+                        break;
+                    }
+                }
+            }
+
+            nodesToBeVisited.Push(startingSwitch);
 
             while (nodesToBeVisited.Count > 0)
             {
@@ -201,7 +221,7 @@ namespace OutageManagementService.LifeCycleServices
 
                     if (outageModel.TopologyModel.OutageTopology.TryGetValue(currentNode, out IOutageTopologyElement topologyElement))
                     {
-                        if (topologyElement.SecondEnd.Count == 0 && topologyElement.DmsType == "ENERGYCONSUMER" /*&& !topologyElement.IsActive*/)
+                        if (topologyElement.DmsType == "ENERGYCONSUMER" && !topologyElement.IsActive)
                         {
                             affectedConsumers.Add(currentNode);
                         }

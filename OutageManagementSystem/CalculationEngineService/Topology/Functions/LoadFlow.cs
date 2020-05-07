@@ -237,7 +237,10 @@ namespace Topology
 
                 if (element.DmsType.Equals(DMSType.SYNCHRONOUSMACHINE.ToString()))
                 {
-                    syncMachines.Add(element.Id, element);
+                    if (syncMachines.ContainsKey(element.Id))
+                    {
+                        syncMachines.Add(element.Id, element);
+                    }
                 }
                 else
                 {

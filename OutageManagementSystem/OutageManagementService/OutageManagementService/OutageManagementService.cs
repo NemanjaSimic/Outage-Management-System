@@ -78,6 +78,7 @@ namespace OutageManagementService
             OutageService.validateResolveConditionsService = validateResolveConditionsService;
             OutageService.sendLocationIsolationCrewService = sendLocationIsolationCrewService;
             OutageService.sendRepairCrewService = sendRepairCrewService;
+            OutageService.outageModel = outageModel;
             OutageTransactionActor.OutageModel = outageModel;
             OutageModelUpdateNotification.OutageModel = outageModel;
 

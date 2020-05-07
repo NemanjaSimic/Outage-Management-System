@@ -118,6 +118,7 @@ namespace Topology
             long nextElement = 0;
             long nextElementGid = 0;
             ITopologyElement element;
+            bool isOpen;
 
             while (stack.Count > 0)
             {
@@ -148,6 +149,16 @@ namespace Topology
                         }
                     }
 
+                    isOpen = false;
+
+                    foreach (var meausrementGid in element.Measurements.Keys)
+                    {
+                        if (Provider.Instance.MeasurementProvider.TryGetDiscreteMeasurement(meausrementGid, out DiscreteMeasurement discreteMeasurement))
+                        {
+                            isOpen = discreteMeasurement.CurrentOpen;
+                        }
+                    }
+
                     if (!outageTopologyModel.GetElementByGid(element.Id, out var _))
                     {
                         outageTopologyModel.AddElement(
@@ -159,6 +170,7 @@ namespace Topology
                                 IsActive = element.IsActive,
                                 SecondEnd = new List<long>(secondEnd),
                                 NoReclosing = element.NoReclosing,
+                                IsOpen = isOpen
                             });
                     }
                 }
