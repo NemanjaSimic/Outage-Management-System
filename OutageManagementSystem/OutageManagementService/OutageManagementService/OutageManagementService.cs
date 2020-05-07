@@ -55,10 +55,17 @@ namespace OutageManagementService
             using (OutageContext db = new OutageContext())
             {
                 //db.DeleteAllData();
-                InitializeEnergyConsumers(db);
+                //InitializeEnergyConsumers(db);
             }
 
             outageModel = new OutageModel();
+            HistoryDBManager historyDBManager = new HistoryDBManager();
+
+            outageModel.ConsumersBlackedOut += historyDBManager.OnConsumersBlackedOut;
+            outageModel.ConsumersEnergized += historyDBManager.OnConsumersEnergized;
+            outageModel.SwitchOpened += historyDBManager.OnSwitchOpened;
+            OutageService.SwitchClosed += historyDBManager.OnSwitchClosed;
+
             reportOutageService = new ReportOutageService(outageModel);
             isolateOutageService = new IsolateOutageService(outageModel);
             resolveOutageService = new ResolveOutageService(outageModel);

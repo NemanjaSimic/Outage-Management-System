@@ -1,4 +1,5 @@
-﻿using Outage.Common.OutageService.Interface;
+﻿using Outage.Common;
+using Outage.Common.OutageService.Interface;
 using OutageManagementService.LifeCycleServices;
 using System;
 using System.Collections.Concurrent;
@@ -33,8 +34,6 @@ namespace OutageManagementService.Calling
             try
             {
 
-
-
                 while (this.potentialOutages.Count > 0)
                 {
                     currentGid = this.potentialOutages[0];
@@ -64,7 +63,7 @@ namespace OutageManagementService.Calling
 
             foreach (var item in this.outages)
             {
-                reportOutageService.ReportPotentialOutage(item);
+                reportOutageService.ReportPotentialOutage(item, CommandOriginType.ISOLATING_ALGORITHM_COMMAND );
             }
         }
         private bool IsSwitch(string dmsType)

@@ -588,6 +588,7 @@ namespace OutageManagementService
             {
                 TopologyModel = omsModelMessage.OutageTopologyModel; //TODO: Da li su subsciber callback pozivi sinhroni?
                 HashSet<long> energizedConsumers = new HashSet<long>();
+
                 foreach (var element in TopologyModel.OutageTopology.Values)
                 {
                     if (element.DmsType.Equals(DMSType.ENERGYCONSUMER.ToString()))
@@ -598,6 +599,7 @@ namespace OutageManagementService
                         }
                     }
                 }
+
                 ConsumersEnergized?.Invoke(energizedConsumers);
             }
             else

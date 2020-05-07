@@ -72,11 +72,7 @@ namespace OutageManagementService.Outage
 
             try
             {
-
-                result = reportOutageService.ReportPotentialOutage(elementGid); //TODO: enum (error, noAffectedConsumers, success,...)
-
-                //result = outageModel.ReportPotentialOutage(elementGid, commandOriginType); //TODO: enum (error, noAffectedConsumers, success,...)
-
+                result = reportOutageService.ReportPotentialOutage(elementGid, commandOriginType); //TODO: enum (error, noAffectedConsumers, success,...)
             }
             catch (Exception e)
             {
