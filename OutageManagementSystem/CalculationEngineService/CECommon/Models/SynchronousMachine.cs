@@ -2,11 +2,10 @@
 
 namespace CECommon.Models
 {
-    public class Recloser : TopologyElement
-    {
-        private readonly int maxNumberOfTries = 3;
-        public Recloser(ITopologyElement element) : base(element.Id)
-        {
+    public class SynchronousMachine : TopologyElement
+	{
+		public SynchronousMachine(ITopologyElement element) : base (element.Id)
+		{
             Id = element.Id;
             Description = element.Description;
             Mrid = element.Mrid;
@@ -18,15 +17,9 @@ namespace CECommon.Models
             Measurements = element.Measurements;
             IsRemote = element.IsRemote;
             IsActive = element.IsActive;
-            NoReclosing = element.NoReclosing;
-            NumberOfTry = 0;
-        }
-        public int NumberOfTry { get; set; }
-        public bool IsReachedMaximumOfTries()
-        {
-            return (NumberOfTry >= maxNumberOfTries);
         }
 
-
+        public float Capacity { get; set; }
+        public float CurrentRegime { get; set; }
     }
 }

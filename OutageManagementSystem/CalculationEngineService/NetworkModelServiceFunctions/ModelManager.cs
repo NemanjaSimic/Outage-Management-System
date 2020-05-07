@@ -28,6 +28,7 @@ namespace NetworkModelServiceFunctions
 				{ DMSType.BREAKER, new List<ModelCode>(){ ModelCode.CONDUCTINGEQUIPMENT_TERMINALS, ModelCode.CONDUCTINGEQUIPMENT_BASEVOLTAGE } },
 				{ DMSType.LOADBREAKSWITCH, new List<ModelCode>(){ ModelCode.CONDUCTINGEQUIPMENT_TERMINALS, ModelCode.CONDUCTINGEQUIPMENT_BASEVOLTAGE } },
 				{ DMSType.ACLINESEGMENT, new List<ModelCode>(){ ModelCode.CONDUCTINGEQUIPMENT_TERMINALS, ModelCode.CONDUCTINGEQUIPMENT_BASEVOLTAGE } },
+				{ DMSType.SYNCHRONOUSMACHINE, new List<ModelCode>(){ ModelCode.CONDUCTINGEQUIPMENT_TERMINALS, ModelCode.CONDUCTINGEQUIPMENT_BASEVOLTAGE } },
 				{ DMSType.ANALOG, new List<ModelCode>(){ ModelCode.MEASUREMENT_TERMINAL } },
 				{ DMSType.DISCRETE, new List<ModelCode>(){ ModelCode.MEASUREMENT_TERMINAL } },
 				{ DMSType.BASEVOLTAGE, new List<ModelCode>(){ ModelCode.BASEVOLTAGE_CONDUCTINGEQUIPMENTS } }
@@ -51,6 +52,7 @@ namespace NetworkModelServiceFunctions
 			ModelCode.BREAKER,
 			ModelCode.LOADBREAKSWITCH,
 			ModelCode.ACLINESEGMENT,
+			ModelCode.SYNCHRONOUSMACHINE,
 			ModelCode.ANALOG,
 			ModelCode.DISCRETE
 		};
@@ -173,10 +175,16 @@ namespace NetworkModelServiceFunctions
 							e => GetDMSTypeOfTopologyElement(e) != DMSType.CONNECTIVITYNODE
 							&& GetDMSTypeOfTopologyElement(e) != DMSType.ANALOG);
 
-						if (TopologyElements.ContainsKey(elementId))
+						if (TopologyElements.TryGetValue(elementId, out ITopologyElement element))
 						{
-							TopologyElements[elementId].Measurements.Add(measurement.Id);
+							element.Measurements.Add(measurement.Id, measurement.GetMeasurementType());
 							measurement.ElementId = elementId;
+
+							if (measurement.GetMeasurementType().Equals(AnalogMeasurementType.FEEDER_CURRENT.ToString()))
+							{
+								//element = new Feeder(element);
+								TopologyElements[elementId] = new Feeder(element);
+							}
 						}
 						else
 						{
@@ -323,6 +331,21 @@ namespace NetworkModelServiceFunctions
 				{
 					Reclosers.Add(topologyElement.Id);
 				}
+
+				if (type == DMSType.SYNCHRONOUSMACHINE)
+				{
+					topologyElement = new SynchronousMachine(topologyElement);
+
+					if (rs.ContainsProperty(ModelCode.SYNCHRONOUSMACHINE_CAPACITY))
+					{
+						((SynchronousMachine)topologyElement).Capacity = rs.GetProperty(ModelCode.SYNCHRONOUSMACHINE_CAPACITY).AsFloat();
+					}
+
+					if (rs.ContainsProperty(ModelCode.SYNCHRONOUSMACHINE_CURRENTREGIME))
+					{
+						((SynchronousMachine)topologyElement).CurrentRegime = rs.GetProperty(ModelCode.SYNCHRONOUSMACHINE_CURRENTREGIME).AsFloat();
+					}
+				}
 			}
 			catch (Exception ex)
 			{
@@ -337,7 +360,7 @@ namespace NetworkModelServiceFunctions
 			{
 				measurement.Id = rs.Id;
 				measurement.Address = rs.GetProperty(ModelCode.MEASUREMENT_ADDRESS).AsString();
-				measurement.isInput = rs.GetProperty(ModelCode.MEASUREMENT_ISINPUT).AsBool();
+				measurement.IsInput = rs.GetProperty(ModelCode.MEASUREMENT_ISINPUT).AsBool();
 				measurement.CurrentValue = rs.GetProperty(ModelCode.ANALOG_CURRENTVALUE).AsFloat();
 				measurement.MaxValue = rs.GetProperty(ModelCode.ANALOG_MAXVALUE).AsFloat();
 				measurement.MinValue = rs.GetProperty(ModelCode.ANALOG_MINVALUE).AsFloat();
@@ -375,7 +398,7 @@ namespace NetworkModelServiceFunctions
 			{
 				measurement.Id = rs.Id;
 				measurement.Address = rs.GetProperty(ModelCode.MEASUREMENT_ADDRESS).AsString();
-				measurement.isInput = rs.GetProperty(ModelCode.MEASUREMENT_ISINPUT).AsBool();
+				measurement.IsInput = rs.GetProperty(ModelCode.MEASUREMENT_ISINPUT).AsBool();
 				measurement.CurrentOpen = rs.GetProperty(ModelCode.DISCRETE_CURRENTOPEN).AsBool();
 				measurement.MaxValue = rs.GetProperty(ModelCode.DISCRETE_MAXVALUE).AsInt();
 				measurement.MinValue = rs.GetProperty(ModelCode.DISCRETE_MINVALUE).AsInt();
@@ -414,7 +437,7 @@ namespace NetworkModelServiceFunctions
 			{
 				Id = noScadaGuid++,
 				Address = "",
-				isInput = false,
+				IsInput = false,
 				CurrentOpen = false,
 				MaxValue = 1,
 				MinValue = 0,
@@ -433,7 +456,7 @@ namespace NetworkModelServiceFunctions
 				|| dMSType == DMSType.DISCONNECTOR)
 			{
 				ArtificalDiscreteMeasurement measurement = GetNoScadaDiscreteMeasurement();
-				element.Measurements.Add(measurement.Id);
+				element.Measurements.Add(measurement.Id, "SWITCH_STATUS");
 				measurement.ElementId = element.Id;
 				Provider.Instance.MeasurementProvider.AddDiscreteMeasurement(measurement);
 				Provider.Instance.MeasurementProvider.AddMeasurementElementPair(measurement.Id, element.Id);

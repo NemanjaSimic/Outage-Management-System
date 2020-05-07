@@ -16,8 +16,26 @@ namespace CalculationEngine.SCADAFunctions
 
         public void SendAnalogCommand(long measurementGid, float commandingValue, CommandOriginType commandOrigin)
         {
-            //Imamo li analog komandu ????
-            throw new NotImplementedException("CalculationEngine.SCADAFunctions.SendAnalogCommand");
+            try
+            {
+                ProxyFactory proxyFactory = new ProxyFactory();
+                using (SCADACommandProxy proxy = proxyFactory.CreateProxy<SCADACommandProxy, ISCADACommand>(EndpointNames.SCADACommandService))
+                {
+                    if (proxy == null)
+                    {
+                        string message = "SendDiscreteCommand => SCADACommandProxy is null.";
+                        logger.LogError(message);
+                        throw new NullReferenceException(message);
+                    }
+
+                    proxy.SendAnalogCommand(measurementGid, commandingValue, commandOrigin);
+                }
+            }
+            catch (Exception)
+            {
+
+                throw;
+            }
         }
 
         public void SendDiscreteCommand(long measurementGid, int value, CommandOriginType commandOrigin)

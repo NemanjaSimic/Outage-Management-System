@@ -52,7 +52,7 @@ namespace Topology
         private List<ITopology> TransactionTopology { get; set; }
         public ProviderTopologyDelegate ProviderTopologyDelegate { get; set; }
         public ProviderTopologyConnectionDelegate ProviderTopologyConnectionDelegate{get; set;}
-        public void DiscreteMeasurementDelegate(List<long> elementGids)
+        public void DiscreteMeasurementDelegate()
         {
             loadFlow.UpdateLoadFlow(Topology);
             ProviderTopologyDelegate?.Invoke(Topology);

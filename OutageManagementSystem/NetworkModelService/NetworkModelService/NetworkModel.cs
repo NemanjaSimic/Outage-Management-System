@@ -1103,6 +1103,7 @@ namespace Outage.NetworkModelService
             BsonClassMap.RegisterClassMap<ACLineSegment>();
             BsonClassMap.RegisterClassMap<Discrete>();
             BsonClassMap.RegisterClassMap<Analog>();
+            BsonClassMap.RegisterClassMap<SynchronousMachine>();
         }
 
         private void SaveDelta(Delta delta)

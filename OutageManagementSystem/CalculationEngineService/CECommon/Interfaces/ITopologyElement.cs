@@ -14,7 +14,8 @@ namespace CECommon.Interfaces
         bool IsRemote { get; set; }
         bool IsActive { get; set; }
         float NominalVoltage { get; set; }
-        List<long> Measurements { get; set; }
+        Dictionary<long, string> Measurements { get; set; }
         bool NoReclosing { get; set; }
+        ITopologyElement Feeder { get; set; }
     }
 }

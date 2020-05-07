@@ -7,7 +7,8 @@ namespace Outage.Common
     {
         VOLTAGE = 1,
         CURRENT = 2,
-        POWER   = 3,
+        FEEDER_CURRENT = 3,
+        POWER   = 4,
     }
 
     public enum DiscreteMeasurementType : short
