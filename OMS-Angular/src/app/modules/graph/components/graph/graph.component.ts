@@ -36,6 +36,7 @@ import cyConfig from './graph.config';
 import popper from 'cytoscape-popper';
 import * as cytoscape from 'cytoscape';
 import * as legendData from './legend.json';
+import { SnackbarService } from '@services/notification/snackbar.service';
 
 cytoscape.use(dagre);
 cytoscape.use(popper);
@@ -80,6 +81,7 @@ export class GraphComponent implements OnInit, OnDestroy {
     private outageNotificationService: OutageNotificationService,
     private commandService: CommandService,
     private outageService: OutageService,
+    private snackBar: SnackbarService,
     private ngZone: NgZone
   ) {
     this.connectionSubscription = Subscription.EMPTY;
@@ -363,34 +365,34 @@ export class GraphComponent implements OnInit, OnDestroy {
   }
   public onSendLocationIsolationCrewCommand(id: Number):void{
     this.outageService.sendLocationIsolationCrewCommand(id).subscribe(
-      status => console.log(status),
+      status => this.snackBar.notify(`Sent location isolation crew command for element: ${id}`),
       err => console.log(err)
     );
   }
   public onIsolateOutageCommand(id: Number): void {
     this.outageService.sendIsolateOutageCommand(id).subscribe(
-      status => console.log(status),
+      status => this.snackBar.notify(`Sent isolation command for element: ${id}`),
       err => console.log(err)
     );
   }
 
   public onSendCrewOutageCommand(id: Number): void {
     this.outageService.sendOutageRepairCrew(id).subscribe(
-      status => console.log(status),
+      status => this.snackBar.notify(`Sent outage repair command for element: ${id}`),
       err => console.log(err)
     );
   }
 
   public onValidateOutageCommand(id: Number): void {
     this.outageService.sendValidateOutageCommand(id).subscribe(
-      status => console.log(status),
+      status => this.snackBar.notify(`Sent outage validation command for element: ${id}`),
       err => console.log(err)
     );
   }
 
   public onResolveOutageCommand(id: Number): void {
     this.outageService.sendResolveOutageCommand(id).subscribe(
-      status => console.log(status),
+      status => this.snackBar.notify(`Sent resolve outage command for element: ${id}`),
       err => console.log(err)
     );
 
