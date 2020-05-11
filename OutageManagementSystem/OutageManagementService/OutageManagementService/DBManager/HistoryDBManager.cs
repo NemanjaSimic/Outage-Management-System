@@ -38,9 +38,8 @@ namespace OutageManagementService.DBManager
                     {
                         dbContext.EquipmentHistoricalRepository.Add(new EquipmentHistorical() { EquipmentId = elementGid, OperationTime = DateTime.Now, DatabaseOperation = DatabaseOperation.DELETE });
                         openedSwitches.Remove(elementGid);
+                        dbContext.Complete();
                     }
-
-                    dbContext.Complete();
                 }
             }
             catch (Exception e)
@@ -83,16 +82,14 @@ namespace OutageManagementService.DBManager
         {
             try
             {
-                if (!openedSwitches.Contains(elementGid))
-                {
-
-                    dbContext.EquipmentHistoricalRepository.Add(new EquipmentHistorical() { OutageId = outageId, EquipmentId = elementGid, OperationTime = DateTime.Now, DatabaseOperation = DatabaseOperation.INSERT });
-                    openedSwitches.Add(elementGid);
-                }
-
                 lock (syncObject)
                 {
-                    dbContext.Complete();
+                    if (!openedSwitches.Contains(elementGid))
+                    {
+                        dbContext.EquipmentHistoricalRepository.Add(new EquipmentHistorical() { OutageId = outageId, EquipmentId = elementGid, OperationTime = DateTime.Now, DatabaseOperation = DatabaseOperation.INSERT });
+                        openedSwitches.Add(elementGid);
+                        dbContext.Complete();
+                    }
                 }
             }
             catch (Exception e)

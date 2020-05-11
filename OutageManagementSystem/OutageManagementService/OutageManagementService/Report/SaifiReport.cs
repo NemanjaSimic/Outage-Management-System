@@ -25,6 +25,7 @@ namespace OutageManagementService.Report
 
         public OutageReport Generate(ReportOptions options)
         {
+            bool isScope = false;
             List<Specification<ConsumerHistorical>> specs = new List<Specification<ConsumerHistorical>>();
 
             if (options.StartDate.HasValue)
@@ -33,6 +34,12 @@ namespace OutageManagementService.Report
             if (options.EndDate.HasValue)
                 specs.Add(new HistoricalConsumerEndDateQuery(options.EndDate.Value));
 
+            if (options.ElementId != null)
+            { 
+                specs.Add(new HistoricalConsumerElementIdQuery((long)options.ElementId));
+                isScope = true;
+            }
+
             specs.Add(new HistoricalConsumerOperationQuery(DatabaseOperation.DELETE));
 
             IEnumerable<ConsumerHistorical> outages;
@@ -40,11 +47,11 @@ namespace OutageManagementService.Report
             if (specs.Count > 1)
             {
                 AndSpecification<ConsumerHistorical> andQuery = new AndSpecification<ConsumerHistorical>(specs);
-                outages = _outageRepository.Find(andQuery.IsSatisfiedBy()).ToList();
+                outages = _outageRepository.Find(andQuery.IsSatisfiedBy).ToList();
             }
             else if (specs.Count == 1)
             {
-                outages = _outageRepository.Find(specs[0].IsSatisfiedBy()).ToList();
+                outages = _outageRepository.Find(specs[0].IsSatisfiedBy).ToList();
             }
             else
             {
@@ -55,7 +62,11 @@ namespace OutageManagementService.Report
             var outageReportGrouping = outages.GroupBy(o => type == "Monthly" ? o.OperationTime.Month : o.OperationTime.Year).Select(o => o).ToList();
 
             var numOfConsumers = 1;
-            numOfConsumers = _consumerRepository.GetAll().Count();
+
+            if (!isScope)
+            {
+                numOfConsumers = _consumerRepository.GetAll().Count();
+            }
 
             var reportData = new Dictionary<string, float>();
             foreach (var outage in outageReportGrouping)

@@ -224,6 +224,10 @@ namespace OutageManagementService.LifeCycleServices
                         if (topologyElement.DmsType == "ENERGYCONSUMER" && !topologyElement.IsActive)
                         {
                             affectedConsumers.Add(currentNode);
+                        }else if(topologyElement.DmsType == "ENERGYCONSUMER" && !topologyElement.IsRemote)
+                        {
+                            affectedConsumers.Add(currentNode);
+
                         }
 
                         foreach (long adjNode in topologyElement.SecondEnd)

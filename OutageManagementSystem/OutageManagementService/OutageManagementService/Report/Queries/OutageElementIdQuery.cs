@@ -11,8 +11,7 @@
         public OutageElementIdQuery(long id)
             => _id = id;
 
-        public override Expression<Func<OutageEntity, bool>> IsSatisfiedBy()
-            => x => x.OutageElementGid == _id;
-        
+        public override Expression<Func<OutageEntity, bool>> IsSatisfiedBy => x => x.OutageElementGid == _id;
+
     }
 }

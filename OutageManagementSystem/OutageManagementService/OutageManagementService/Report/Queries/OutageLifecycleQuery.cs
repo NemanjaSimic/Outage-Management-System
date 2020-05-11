@@ -12,7 +12,6 @@
         public OutageLifecycleQuery(OutageState state)
             => _state = state;
 
-        public override Expression<Func<OutageEntity, bool>> IsSatisfiedBy()
-            => x => x.OutageState == _state;
-    }
+		public override Expression<Func<OutageEntity, bool>> IsSatisfiedBy => x => x.OutageState == _state;
+	}
 }

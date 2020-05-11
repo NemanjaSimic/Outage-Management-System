@@ -74,14 +74,14 @@ namespace OutageManagementService.LifeCycleServices
                 IsolatedTime = activeOutageDbEntity.IsolatedTime,
                 RepairedTime = activeOutageDbEntity.RepairedTime,
                 ArchivedTime = DateTime.UtcNow,
-                DefaultIsolationPoints = activeOutageDbEntity.DefaultIsolationPoints,
-                OptimumIsolationPoints = activeOutageDbEntity.OptimumIsolationPoints,
-                AffectedConsumers = activeOutageDbEntity.AffectedConsumers,
+                DefaultIsolationPoints =  new List<Equipment>(activeOutageDbEntity.DefaultIsolationPoints),
+                OptimumIsolationPoints = new List<Equipment>(activeOutageDbEntity.OptimumIsolationPoints),
+                AffectedConsumers = new List<Consumer>(activeOutageDbEntity.AffectedConsumers),
             };
 
             bool success;
-            OutageEntity archivedOutageDbEntity = dbContext.OutageRepository.Add(createdArchivedOutage);
             dbContext.OutageRepository.Remove(activeOutageDbEntity);
+            OutageEntity archivedOutageDbEntity = dbContext.OutageRepository.Add(createdArchivedOutage);
 
             try
             {

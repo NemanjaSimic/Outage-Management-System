@@ -12,7 +12,6 @@
         public HistoricalConsumerOperationQuery(DatabaseOperation operation)
             => _operation = operation;
 
-        public override Expression<Func<ConsumerHistorical, bool>> IsSatisfiedBy()
-            => x => x.DatabaseOperation == _operation;
-    }
+		public override Expression<Func<ConsumerHistorical, bool>> IsSatisfiedBy => x => x.DatabaseOperation == _operation;
+	}
 }
