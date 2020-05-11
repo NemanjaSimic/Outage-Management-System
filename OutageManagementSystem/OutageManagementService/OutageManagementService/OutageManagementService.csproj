@@ -71,11 +71,14 @@
     <Compile Include="Properties\AssemblyInfo.cs" />
     <Compile Include="Report\DateHelpers.cs" />
     <Compile Include="Report\Queries\AndSpecification.cs" />
+    <Compile Include="Report\Queries\HistoricalConsumerEndDateQuery.cs" />
+    <Compile Include="Report\Queries\HistoricalConsumerStartDateQuery .cs" />
     <Compile Include="Report\Queries\HistoricalConsumerIdQuery.cs" />
     <Compile Include="Report\Queries\HistoricalConsumerOperationQuery.cs" />
     <Compile Include="Report\Queries\HistoricalConsumerSpecification.cs" />
     <Compile Include="Report\Queries\OutageEndDateQuery.cs" />
     <Compile Include="Report\Queries\OutageElementIdQuery.cs" />
+    <Compile Include="Report\Queries\OutageLifecycleQuery.cs" />
     <Compile Include="Report\Queries\OutageSpecification.cs" />
     <Compile Include="Report\Queries\OutageStartDateQuery.cs" />
     <Compile Include="Report\Queries\Specification.cs" />

@@ -13,13 +13,11 @@ namespace OutageManagementService.Report
     {
         private readonly OutageContext _context;
         private readonly OutageRepository _outageRepository;
-        private readonly ConsumerHistoricalRepository _consumerHistoricalRepository;
 
         public TotalReport()
         {
             _context = new OutageContext();
             _outageRepository = new OutageRepository(_context);
-            _consumerHistoricalRepository = new ConsumerHistoricalRepository(_context);
         }
 
         public OutageReport Generate(ReportOptions options)
@@ -47,16 +45,15 @@ namespace OutageManagementService.Report
                 outages = _outageRepository.Find(specs[0].IsSatisfiedBy()).ToList();
             }
             else
-            {
-                // TODO: sta radimo u ovom slucaju?
-                throw new Exception($"{nameof(specs)} cannot be empty?");
+            {                
+                outages = _outageRepository.GetAll().ToList();
             }
 
             var type = DateHelpers.GetType(options.StartDate, options.EndDate);
 
             var outageReportGrouping = outages.GroupBy(o => type == "Monthly" ? o.ReportTime.Month : o.ReportTime.Year).Select(o => o).ToList();
 
-            var reportData = new Dictionary<string, int>();
+            var reportData = new Dictionary<string, float>();
             foreach (var outage in outageReportGrouping)
                 reportData.Add(type == "Monthly" ? DateHelpers.Months[outage.Key] : outage.Key.ToString(), outage.Count());
 

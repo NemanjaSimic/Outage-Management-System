@@ -128,7 +128,10 @@ export class GraphComponent implements OnInit, OnDestroy {
 
   public getTopology(): void {
     this.topologySubscription = this.graphService.getTopology().subscribe(
-      graph => this.onNotification(graph),
+      graph => {
+        console.log(graph);
+        this.onNotification(graph)
+      },
       error => console.log(error)
     );
   }

@@ -3,6 +3,7 @@ import { FormControl } from '@angular/forms';
 import { Observable } from 'rxjs';
 import { map, startWith } from 'rxjs/operators';
 import { ReportOptions } from '@shared/models/report-options.model';
+import { GraphService } from '@services/notification/graph.service';
 
 @Component({
   selector: 'app-report-form',
@@ -20,11 +21,7 @@ export class ReportFormComponent implements OnInit {
   ];
 
   scopes: any[] = [
-    { value: '0', name: 'All network elements', gid: 'No GID' },
-    { value: '1', name: 'BR_01', gid: '0x00000B00001' },
-    { value: '2', name: 'BR_02', gid: '0x00000B00002' },
-    { value: '3', name: 'BR_03', gid: '0x00000B00003' },
-    { value: '4', name: 'BR_04', gid: '0x00000B00004' },
+    { value: '0', name: 'All network elements', gid: 'No GID' }
   ];
 
   public selectedReportType;
@@ -35,15 +32,23 @@ export class ReportFormComponent implements OnInit {
 
   @Output() generate = new EventEmitter<ReportOptions>();
 
-  constructor() { }
+  constructor(private graphService: GraphService) { }
 
   ngOnInit() {
-    this.filteredScopes = this.selectedScopeControl.valueChanges
-      .pipe(
-        startWith(''),
-        map(value => typeof value === 'string' ? value : value.name),
-        map(name => name ? this.filterScopes(name) : this.scopes.slice())
-      );
+    this.graphService.getTopology().subscribe((graph) => {
+      graph.Nodes.forEach(node => this.scopes.push({
+        value: node.Mrid,
+        name: node.Name,
+        gid: node.Id
+      }))
+
+      this.filteredScopes = this.selectedScopeControl.valueChanges
+        .pipe(
+          startWith(''),
+          map(value => typeof value === 'string' ? value : value.name),
+          map(name => name ? this.filterScopes(name) : this.scopes.slice())
+        );
+    });
   }
 
   filterScopes(name): any[] {
@@ -54,7 +59,7 @@ export class ReportFormComponent implements OnInit {
   onSubmitHandler(): void {
     const options: ReportOptions = {
       Type: this.selectedReportType,
-      ElementId: this.selectedScopeControl.value,
+      ElementId: +this.selectedScopeControl.value,
       StartDate: this.startDate.value,
       EndDate: this.endDate.value
     }
