@@ -5,6 +5,6 @@
 
     public abstract class Specification<T> where T : class
     {
-        public abstract Expression<Func<T, bool>> IsSatisfiedBy();
-    }
+		public abstract Expression<Func<T, bool>> IsSatisfiedBy { get; }
+	}
 }

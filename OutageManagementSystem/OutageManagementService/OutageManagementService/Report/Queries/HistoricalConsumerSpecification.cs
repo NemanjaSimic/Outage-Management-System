@@ -6,6 +6,6 @@
 
     public abstract class HistoricalConsumerSpecification : Specification<ConsumerHistorical>
     {
-        public abstract override Expression<Func<ConsumerHistorical, bool>> IsSatisfiedBy();
+        public abstract override Expression<Func<ConsumerHistorical, bool>> IsSatisfiedBy { get; }
     }
 }

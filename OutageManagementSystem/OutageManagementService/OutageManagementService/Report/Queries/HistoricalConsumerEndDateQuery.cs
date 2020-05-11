@@ -11,7 +11,6 @@
         public HistoricalConsumerEndDateQuery(DateTime date)
             => _date = date;
 
-        public override Expression<Func<ConsumerHistorical, bool>> IsSatisfiedBy()
-            => x => x.OperationTime <= _date;
-    }
+		public override Expression<Func<ConsumerHistorical, bool>> IsSatisfiedBy => x => x.OperationTime <= _date;
+	}
 }

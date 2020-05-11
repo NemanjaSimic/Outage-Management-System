@@ -38,11 +38,11 @@ namespace OutageManagementService.Report
             if (specs.Count > 1)
             {
                 AndSpecification<OutageEntity> andQuery = new AndSpecification<OutageEntity>(specs);
-                outages = _outageRepository.Find(andQuery.IsSatisfiedBy()).ToList();
+                outages = _outageRepository.Find(andQuery.IsSatisfiedBy).ToList();
             }
             else if (specs.Count == 1)
             {
-                outages = _outageRepository.Find(specs[0].IsSatisfiedBy()).ToList();
+                outages = _outageRepository.Find(specs[0].IsSatisfiedBy).ToList();
             }
             else
             {                

@@ -11,7 +11,6 @@
         public HistoricalConsumerIdQuery(long id)
             => _id = id;
 
-        public override Expression<Func<ConsumerHistorical, bool>> IsSatisfiedBy()
-            => x => x.ConsumerId == _id;
-    }
+		public override Expression<Func<ConsumerHistorical, bool>> IsSatisfiedBy => x => x.ConsumerId == _id;
+	}
 }

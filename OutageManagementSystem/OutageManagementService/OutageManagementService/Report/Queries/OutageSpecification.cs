@@ -6,6 +6,6 @@
 
     public abstract class OutageSpecification : Specification<OutageEntity>
     {
-        public abstract override Expression<Func<OutageEntity, bool>> IsSatisfiedBy();
-    }
+		public abstract override Expression<Func<OutageEntity, bool>> IsSatisfiedBy { get; }
+	}
 }
