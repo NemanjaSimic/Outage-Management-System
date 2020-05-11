@@ -19,24 +19,24 @@ namespace Topology
         private readonly ISCADACommanding scadaCommanding = new SCADACommanding();
         private HashSet<long> reclosers;
         private Dictionary<long, ITopologyElement> feeders;
-        private Dictionary<long, float> loadOfFeeders;
+        //private Dictionary<long, float> loadOfFeeders;
         private Dictionary<long, ITopologyElement> syncMachines;
 
         public void UpdateLoadFlow(List<ITopology> topologies)
         {
-            loadOfFeeders = new Dictionary<long, float>();
+            Dictionary<long, float> loadOfFeeders = new Dictionary<long, float>();
             feeders = new Dictionary<long, ITopologyElement>();
             syncMachines = new Dictionary<long, ITopologyElement>();
             reclosers = Provider.Instance.ModelProvider.GetReclosers();
             foreach (var topology in topologies)
             {
-                CalculateLoadFlow(topology);
+                CalculateLoadFlow(topology, loadOfFeeders);
             }
-            UpdateLoadFlowFromRecloser(topologies);
+            UpdateLoadFlowFromRecloser(topologies, loadOfFeeders);
 
             foreach (var syncMachine in syncMachines.Values)
             {
-                SyncMachine(syncMachine);
+                SyncMachine(syncMachine, loadOfFeeders);
             }
 
             foreach (var loadFider in loadOfFeeders)
@@ -71,7 +71,7 @@ namespace Topology
                 }
             }
         }
-        private void SyncMachine(ITopologyElement element)
+        private void SyncMachine(ITopologyElement element, Dictionary<long, float> loadOfFeeders)
         {
             AnalogMeasurement powerMeasurement = null;
             AnalogMeasurement voltageMeasurement = null;
@@ -145,7 +145,7 @@ namespace Topology
 
             
         }
-        private void CalculateLoadFlow(ITopology topology)
+        private void CalculateLoadFlow(ITopology topology, Dictionary<long, float> loadOfFeeders)
         {
             logger.LogDebug("Calulate load flow started.");
 
@@ -237,7 +237,7 @@ namespace Topology
 
                 if (element.DmsType.Equals(DMSType.SYNCHRONOUSMACHINE.ToString()))
                 {
-                    if (syncMachines.ContainsKey(element.Id))
+                    if (!syncMachines.ContainsKey(element.Id))
                     {
                         syncMachines.Add(element.Id, element);
                     }
@@ -300,7 +300,7 @@ namespace Topology
         }
 
         #region RecloserLogic
-        private void UpdateLoadFlowFromRecloser(List<ITopology> topologies)
+        private void UpdateLoadFlowFromRecloser(List<ITopology> topologies, Dictionary<long, float> loadOfFeeders)
         {
             List<ITopology> retTopologies = topologies;
             foreach (var recloserGid in reclosers)
@@ -309,13 +309,13 @@ namespace Topology
                 {
                     if (topology.GetElementByGid(recloserGid, out ITopologyElement recloser))
                     {
-                        CalculateLoadFlowFromRecloser(recloser, topology);
+                        CalculateLoadFlowFromRecloser(recloser, topology, loadOfFeeders);
                         break;
                     }
                 }
             }
         }
-        private ITopology CalculateLoadFlowFromRecloser(ITopologyElement recloser, ITopology topology)
+        private ITopology CalculateLoadFlowFromRecloser(ITopologyElement recloser, ITopology topology, Dictionary<long, float> loadOfFeeders)
         {
             long measurementGid = 0;
 
@@ -335,7 +335,7 @@ namespace Topology
                 {
                     if (IsElementEnergized(recloser, out float load))
                     {
-                        CalculateLoadFlowUpsideDown(recloser.SecondEnd.First(), recloser.Id, recloser.FirstEnd.Feeder);
+                        CalculateLoadFlowUpsideDown(recloser.SecondEnd.First(), recloser.Id, recloser.FirstEnd.Feeder, loadOfFeeders);
                     }
                     else
                     {
@@ -347,7 +347,7 @@ namespace Topology
                 {
                     if (IsElementEnergized(recloser, out float load))
                     {
-                        CalculateLoadFlowUpsideDown(recloser.FirstEnd, recloser.Id, recloser.SecondEnd.First().Feeder);
+                        CalculateLoadFlowUpsideDown(recloser.FirstEnd, recloser.Id, recloser.SecondEnd.First().Feeder, loadOfFeeders);
                     }
                     else
                     {
@@ -368,7 +368,7 @@ namespace Topology
             }
             return topology;
         }
-        private void CalculateLoadFlowUpsideDown(ITopologyElement element, long sourceElementGid, ITopologyElement feeder)
+        private void CalculateLoadFlowUpsideDown(ITopologyElement element, long sourceElementGid, ITopologyElement feeder, Dictionary<long, float> loadOfFeeders)
         {
             Stack<Tuple<ITopologyElement, long>> stack = new Stack<Tuple<ITopologyElement, long>>();
             stack.Push(new Tuple<ITopologyElement, long>(element, sourceElementGid));
