@@ -52,10 +52,10 @@ namespace OutageManagementService
             //TODO: Initialize what is needed
             //TODO: restauration of data...
             modelResourcesDesc = new ModelResourcesDesc();
-            using (OutageContext db = new OutageContext())
+            using (UnitOfWork db = new UnitOfWork())
             {
                 //db.DeleteAllData();
-                //InitializeEnergyConsumers(db);
+                InitializeEnergyConsumers(db);
             }
 
             outageModel = new OutageModel();
@@ -175,10 +175,11 @@ namespace OutageManagementService
             }
 
             subscriberProxy.Subscribe(Topic.OUTAGE_EMAIL);
+            Logger.LogDebug("Successfully subscribed to Email Service messages.");
 
         }
 
-        private void InitializeEnergyConsumers(OutageContext db)
+        private void InitializeEnergyConsumers(UnitOfWork db)
         {
             List<ResourceDescription> energyConsumers = GetExtentValues(ModelCode.ENERGYCONSUMER, modelResourcesDesc.GetAllPropertyIds(ModelCode.ENERGYCONSUMER));
 
@@ -196,11 +197,11 @@ namespace OutageManagementService
 
                 i++;
 
-                db.Consumers.Add(consumer);
+                db.ConsumerRepository.Add(consumer);
                 Logger.LogDebug($"Add consumer: {consumer.ConsumerMRID}");
             }
 
-            db.SaveChanges();
+            db.Complete();
             Logger.LogDebug("Init energy consumers: SaveChanges()");
         }
 
