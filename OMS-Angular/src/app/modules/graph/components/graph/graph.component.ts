@@ -365,34 +365,34 @@ export class GraphComponent implements OnInit, OnDestroy {
   }
   public onSendLocationIsolationCrewCommand(id: Number):void{
     this.outageService.sendLocationIsolationCrewCommand(id).subscribe(
-      status => this.snackBar.notify(`Sent location isolation crew command for element: ${id}`),
+      status => this.snackBar.notify(`Crew has isolated outage with ID ${id} successfully.`),
       err => console.log(err)
     );
   }
   public onIsolateOutageCommand(id: Number): void {
     this.outageService.sendIsolateOutageCommand(id).subscribe(
-      status => this.snackBar.notify(`Sent isolation command for element: ${id}`),
+      status => this.snackBar.notify(`Outage with ID ${id} has been successfully validated.`),
       err => console.log(err)
     );
   }
 
   public onSendCrewOutageCommand(id: Number): void {
     this.outageService.sendOutageRepairCrew(id).subscribe(
-      status => this.snackBar.notify(`Sent outage repair command for element: ${id}`),
+      status => this.snackBar.notify(`Crew has repaired outage with ID ${id} successfully.`),
       err => console.log(err)
     );
   }
 
   public onValidateOutageCommand(id: Number): void {
     this.outageService.sendValidateOutageCommand(id).subscribe(
-      status => this.snackBar.notify(`Sent outage validation command for element: ${id}`),
+      status => this.snackBar.notify(`Outage with ID ${id} has been successfully validated.`),
       err => console.log(err)
     );
   }
 
   public onResolveOutageCommand(id: Number): void {
     this.outageService.sendResolveOutageCommand(id).subscribe(
-      status => this.snackBar.notify(`Sent resolve outage command for element: ${id}`),
+      status => this.snackBar.notify(`Outage with ID ${id} has been successfully resolved.`),
       err => console.log(err)
     );
 

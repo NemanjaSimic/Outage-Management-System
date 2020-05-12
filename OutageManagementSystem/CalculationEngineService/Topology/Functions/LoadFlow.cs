@@ -399,13 +399,16 @@ namespace Topology
                         }
                     }
 
-                    if (loadOfFeeders.ContainsKey(feeder.Id))
+                    if (feeder != null)
                     {
-                        loadOfFeeders[feeder.Id] += load;
-                    }
-                    else
-                    {
-                        loadOfFeeders.Add(feeder.Id, load);
+                        if (loadOfFeeders.ContainsKey(feeder.Id))
+                        {
+                            loadOfFeeders[feeder.Id] += load;
+                        }
+                        else
+                        {
+                            loadOfFeeders.Add(feeder.Id, load);
+                        }
                     }
                 }
                 else
