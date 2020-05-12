@@ -144,12 +144,12 @@ namespace OutageManagementService.LifeCycleServices
                 //Tragamo za ACL-om gore ka source-u
                 while (outageElementId == -1 && !topologyElement.IsRemote && topologyElement.DmsType != "ENERGYSOURCE")
                 {
-                    if (proxy.IsOutageElement(reportedGid))
+                    if (proxy.IsOutageElement(topologyElement.Id))
                     {
-                        outageElementId = outageEntity.OutageElementGid;
+                        outageElementId = topologyElement.Id;
                         outageEntity.OutageElementGid = outageElementId;
                     }
-
+                    outageModel.TopologyModel.GetElementByGid(topologyElement.FirstEnd, out topologyElement);
                 }
                 if(outageElementId == -1)
                 {
