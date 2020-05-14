@@ -19,7 +19,7 @@ namespace OutageDatabase.Initializers
         public override void InitializeDatabase(OutageContext context)
         {
             LoggerWrapper.Instance.LogDebug("InitializeDatabase called.");
-            base.InitializeDatabase(context);
+            //base.InitializeDatabase(context);
             //Seed(context);
         }
     }

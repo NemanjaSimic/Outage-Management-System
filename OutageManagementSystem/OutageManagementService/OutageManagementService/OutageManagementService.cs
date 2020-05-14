@@ -55,7 +55,7 @@ namespace OutageManagementService
             using (UnitOfWork db = new UnitOfWork())
             {
                 //db.DeleteAllData();
-                InitializeEnergyConsumers(db);
+                //InitializeEnergyConsumers(db);
             }
 
             outageModel = new OutageModel();
