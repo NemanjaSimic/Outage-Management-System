@@ -329,6 +329,17 @@ export class GraphComponent implements OnInit, OnDestroy {
 
   public onActiveOutageNotification(outage: ActiveOutage): void {
     console.log(outage);
+    let message;
+    if (outage.State == OutageLifeCycleState.Removed)
+    {
+      message = `Outage with gid ${outage.Id} has been removed.`;
+    }
+    else if(outage.State == OutageLifeCycleState.Isolated)
+    {
+      message = `Outage with ID ${outage.Id} has been successfully isolated.`;
+    }
+    // mozda ovde prebaciti sve poruke za snackBar
+    this.snackBar.notify(message);
     this.activeOutages = this.activeOutages.filter(o => o.Id !== outage.Id);
     this.activeOutages.push(outage);
     this.drawGraph(); // da bi resetovao tooltip-ove, ako je velika mreza, optimizovacemo
@@ -365,13 +376,18 @@ export class GraphComponent implements OnInit, OnDestroy {
   }
   public onSendLocationIsolationCrewCommand(id: Number):void{
     this.outageService.sendLocationIsolationCrewCommand(id).subscribe(
-      status => this.snackBar.notify(`Crew has isolated outage with ID ${id} successfully.`),
+      status =>
+      {
+        console.log("Status of send location and isolation crew is: ");
+        console.log(status);
+        // this.snackBar.notify(`Crew has isolated outage with ID ${id} successfully.`);
+      },
       err => console.log(err)
     );
   }
   public onIsolateOutageCommand(id: Number): void {
     this.outageService.sendIsolateOutageCommand(id).subscribe(
-      status => this.snackBar.notify(`Outage with ID ${id} has been successfully validated.`),
+      status => console.log(status),//this.snackBar.notify(`Outage with ID ${id} has been successfully isolated.`),
       err => console.log(err)
     );
   }

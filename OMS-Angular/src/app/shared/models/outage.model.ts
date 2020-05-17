@@ -27,5 +27,6 @@ export enum OutageLifeCycleState {
     Created = 1,
     Isolated = 2,
     Repaired = 3,
-    Archived = 4
+    Archived = 4,
+    Removed = 5
 }

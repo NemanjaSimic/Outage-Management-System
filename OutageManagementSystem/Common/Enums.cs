@@ -121,6 +121,8 @@ namespace Outage.Common
         REPAIRED = 3,
         [EnumMember]
         ARCHIVED = 4,
+        [EnumMember]
+        REMOVED = 5,
     }
 
     [DataContract]

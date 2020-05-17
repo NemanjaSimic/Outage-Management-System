@@ -153,6 +153,8 @@ namespace OutageManagementService.LifeCycleServices
                 }
                 if(outageElementId == -1)
                 {
+                    outageEntity.OutageState = OutageState.REMOVED;
+                    dbContext.OutageRepository.Remove(outageEntity);
                     Logger.LogError("End of feeder no outage detected.");
                     return false;
                 }
