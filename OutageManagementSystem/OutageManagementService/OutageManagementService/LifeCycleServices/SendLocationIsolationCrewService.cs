@@ -2,8 +2,11 @@
 using OMSCommon.OutageDatabaseModel;
 using Outage.Common;
 using Outage.Common.OutageService.Interface;
+using Outage.Common.ServiceContracts.CalculationEngine;
 using Outage.Common.ServiceContracts.OMS;
 using Outage.Common.ServiceProxies;
+using Outage.Common.ServiceProxies.CalcualtionEngine;
+using Outage.Common.ServiceProxies.Commanding;
 using Outage.Common.ServiceProxies.Outage;
 using OutageDatabase.Repository;
 using System;
@@ -186,12 +189,62 @@ namespace OutageManagementService.LifeCycleServices
                 outageEntity.OutageState = OutageState.ISOLATED;
 
                 dbContext.OutageRepository.Update(outageEntity);
-             
+                SendSCADACommand(UpBreaker, DiscreteCommandingType.OPEN);
+                SendSCADACommand(nextBreaker, DiscreteCommandingType.OPEN);
 
             }
        
             return true;
         }
+        private void SendSCADACommand(long currentBreakerId, DiscreteCommandingType discreteCommandingType)
+        {
+            long measrement = -1;
+            using (MeasurementMapProxy measurementMapProxy = proxyFactory.CreateProxy<MeasurementMapProxy, IMeasurementMapContract>(EndpointNames.MeasurementMapEndpoint))
+            {
+                List<long> measuremnts = new List<long>();
+                try
+                {
+                    measuremnts = measurementMapProxy.GetMeasurementsOfElement(currentBreakerId);
 
+                }
+                catch (Exception e)
+                {
+                    //Logger.LogError("Error on GetMeasurementsForElement() method", e);
+                    throw e;
+                }
+
+                if (measuremnts.Count > 0)
+                {
+                    measrement = measuremnts[0];
+                }
+
+            }
+
+            if (measrement != -1)
+            {
+                if (discreteCommandingType == DiscreteCommandingType.OPEN && !outageModel.commandedElements.Contains(currentBreakerId))
+                {
+                    //TODO: add at list
+                    outageModel.commandedElements.Add(currentBreakerId);
+                }
+
+
+                using (SwitchStatusCommandingProxy scadaCommandProxy = proxyFactory.CreateProxy<SwitchStatusCommandingProxy, ISwitchStatusCommandingContract>(EndpointNames.SwitchStatusCommandingEndpoint))
+                {
+                    try
+                    {
+                        scadaCommandProxy.SendOpenCommand(measrement);
+                    }
+                    catch (Exception e)
+                    {
+                        if (discreteCommandingType == DiscreteCommandingType.OPEN && outageModel.commandedElements.Contains(currentBreakerId))
+                        {
+                            outageModel.commandedElements.Remove(currentBreakerId);
+                        }
+                        throw e;
+                    }
+                }
+            }
+        }
     }
 }
