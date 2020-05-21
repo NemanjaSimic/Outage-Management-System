@@ -196,9 +196,13 @@ namespace OutageManagementService
                 };
 
                 i++;
+                if (db.ConsumerRepository.Get(consumer.ConsumerId) == null)
+                {
+                    db.ConsumerRepository.Add(consumer);
+                    Logger.LogDebug($"Add consumer: {consumer.ConsumerMRID}");
+                }
 
-                db.ConsumerRepository.Add(consumer);
-                Logger.LogDebug($"Add consumer: {consumer.ConsumerMRID}");
+                
             }
 
             db.Complete();
