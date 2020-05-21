@@ -35,6 +35,10 @@
            file under the ConfigPackage. --><!--
       <Endpoint Name="ReplicatorEndpoint" />-->
       <Endpoint Name="ScadaModelReadAccessEndpoint" Protocol="tcp" Type="Input"/>
+      <Endpoint Name="ScadaModelUpdateAccessEndpoint" Protocol="tcp" Type="Input"/>
+      <Endpoint Name="SCADAIntegrityUpdateEndpoint" Protocol="tcp" Type="Input"/>
+      <!--<Endpoint Name="SCADAModelUpdateNotifierEndpoint" Protocol="tcp" Type="Input"/>
+      <Endpoint Name="SCADATransactionActorEndpoint" Protocol="tcp" Type="Input"/>-->
     </Endpoints>
   </Resources>
 </ServiceManifest>

@@ -47,10 +47,10 @@
   </ItemGroup>
   <ItemGroup>
     <Compile Include="Enums.cs" />
-    <Compile Include="FunctionParameters\IModbusCommandParameters.cs" />
-    <Compile Include="FunctionParameters\IModbusReadCommandParameters.cs" />
-    <Compile Include="FunctionParameters\IModbusWriteCommandParameters.cs" />
-    <Compile Include="IModBusFunction.cs" />
+    <Compile Include="IAlarmConfigData.cs" />
+    <Compile Include="IExecuteModbusFunctionResult.cs" />
+    <Compile Include="IModbusFunction.cs" />
+    <Compile Include="IScadaConfigData.cs" />
     <Compile Include="ModelUpdateDelegate.cs" />
     <Compile Include="Properties\AssemblyInfo.cs" />
     <Compile Include="ReliableDictionaryNames.cs" />

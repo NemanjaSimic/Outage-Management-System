@@ -1,10 +1,4 @@
-﻿using System;
-using System.Collections.Generic;
-using System.Linq;
-using System.Text;
-using System.Threading.Tasks;
-
-namespace Common.SCADA
+﻿namespace Common.SCADA
 {
     public static class ReliableDictionaryNames
     {
@@ -12,5 +6,6 @@ namespace Common.SCADA
         public static readonly string AddressToGidMap = "AddressToGidMap";
         public static readonly string CommandDescriptionCache = "CommandDescriptionCache";
         public static readonly string MeasurementsCache = "MeasurementsCache";
+        public static readonly string InfoCache = "InfoCache";
     }
 }

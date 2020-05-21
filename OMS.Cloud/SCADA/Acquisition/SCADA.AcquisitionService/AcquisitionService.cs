@@ -3,8 +3,10 @@ using System.Collections.Generic;
 using System.Fabric;
 using System.Threading;
 using System.Threading.Tasks;
+using Common.SCADA;
 using Microsoft.ServiceFabric.Services.Communication.Runtime;
 using Microsoft.ServiceFabric.Services.Runtime;
+using OMS.Common.Cloud.WcfServiceFabricClients.SCADA;
 using SCADA.AcquisitionImplementation;
 
 namespace SCADA.AcquisitionService
@@ -34,6 +36,8 @@ namespace SCADA.AcquisitionService
         protected override async Task RunAsync(CancellationToken cancellationToken)
         {
             AcquisitionCycle acquisitionCycle = new AcquisitionCycle();
+            ScadaModelReadAccessClient readAccessClient = ScadaModelReadAccessClient.CreateClient();
+            IScadaConfigData configData = await readAccessClient.GetScadaConfigData();
 
             while (true)
             {
@@ -49,7 +53,7 @@ namespace SCADA.AcquisitionService
                     ServiceEventSource.Current.ServiceMessage(this.Context, $"[AcquisitionService] Error: {e.Message}]");
                 }
 
-                await Task.Delay(TimeSpan.FromSeconds(1), cancellationToken);
+                await Task.Delay(TimeSpan.FromMilliseconds(configData.AcquisitionInterval), cancellationToken);
             }
         }
     }

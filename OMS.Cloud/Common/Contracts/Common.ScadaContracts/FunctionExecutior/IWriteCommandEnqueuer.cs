@@ -1,18 +1,18 @@
 ﻿using Microsoft.ServiceFabric.Services.Remoting;
 using OMS.Common.SCADA;
-using System;
-using System.Collections.Generic;
-using System.Linq;
+using OMS.Common.ScadaContracts.DataContracts.ModbusFunctions;
 using System.ServiceModel;
-using System.Text;
 using System.Threading.Tasks;
 
-namespace OMS.Common.ScadaContracts
+namespace OMS.Common.ScadaContracts.FunctionExecutior
 {
     [ServiceContract]
     public interface IWriteCommandEnqueuer : IService
     {
         [OperationContract]
+        [ServiceKnownType(typeof(ReadFunction))]
+        [ServiceKnownType(typeof(WriteSingleFunction))]
+        [ServiceKnownType(typeof(WriteMultipleFunction))]
         Task<bool> EnqueueWriteCommand(IWriteModbusFunction modbusFunction);
     }
 }

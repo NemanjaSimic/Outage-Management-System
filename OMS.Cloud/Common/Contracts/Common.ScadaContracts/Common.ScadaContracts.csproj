@@ -32,6 +32,9 @@
     <WarningLevel>4</WarningLevel>
   </PropertyGroup>
   <ItemGroup>
+    <Reference Include="EasyModbus, Version=5.5.0.0, Culture=neutral, processorArchitecture=MSIL">
+      <HintPath>..\..\..\packages\EasyModbusTCP.5.5.0\lib\EasyModbus.dll</HintPath>
+    </Reference>
     <Reference Include="Microsoft.ServiceFabric.Data, Version=7.0.0.0, Culture=neutral, PublicKeyToken=31bf3856ad364e35, processorArchitecture=AMD64">
       <HintPath>..\..\..\packages\Microsoft.ServiceFabric.Data.4.0.470\lib\net472\Microsoft.ServiceFabric.Data.dll</HintPath>
     </Reference>
@@ -89,16 +92,21 @@
     <Reference Include="System.Xml" />
   </ItemGroup>
   <ItemGroup>
-    <Compile Include="DataContracts\AnalogPointItem.cs" />
+    <Compile Include="DataContracts\AlarmConfigData.cs" />
+    <Compile Include="DataContracts\ModbusFunctions\ModbusFunction.cs" />
+    <Compile Include="DataContracts\ModbusFunctions\ReadFunction.cs" />
+    <Compile Include="DataContracts\ModbusFunctions\WriteSingleFunction.cs" />
+    <Compile Include="DataContracts\ModbusFunctions\WriteMultipleFunction.cs" />
+    <Compile Include="DataContracts\ScadaModelPointItems\AnalogPointItem.cs" />
     <Compile Include="DataContracts\CommandDescription.cs" />
-    <Compile Include="DataContracts\DiscretePointItem.cs" />
-    <Compile Include="DataContracts\IScadaModelPointItem.cs" />
-    <Compile Include="DataContracts\ISetAlarmStrategy.cs" />
+    <Compile Include="DataContracts\ScadaModelPointItems\DiscretePointItem.cs" />
+    <Compile Include="DataContracts\ScadaModelPointItems\IScadaModelPointItem.cs" />
+    <Compile Include="DataContracts\ScadaModelPointItems\ISetAlarmStrategy.cs" />
     <Compile Include="DataContracts\ScadaConfigData.cs" />
     <Compile Include="FunctionExecutior\IModelUpdateCommandEnqueuer.cs" />
     <Compile Include="FunctionExecutior\IReadCommandEnqueuer.cs" />
     <Compile Include="Commanding\IScadaCommandingContract.cs" />
-    <Compile Include="DataContracts\ScadaModelPointItem.cs" />
+    <Compile Include="DataContracts\ScadaModelPointItems\ScadaModelPointItem.cs" />
     <Compile Include="ModelProvider\IScadaIntegrityUpdateContract.cs" />
     <Compile Include="ModelProvider\IScadaModelReadAccessContract.cs" />
     <Compile Include="ModelProvider\IScadaModelUpdateAccessContract.cs" />
@@ -119,5 +127,6 @@
     <None Include="app.config" />
     <None Include="packages.config" />
   </ItemGroup>
+  <ItemGroup />
   <Import Project="$(MSBuildToolsPath)\Microsoft.CSharp.targets" />
 </Project>

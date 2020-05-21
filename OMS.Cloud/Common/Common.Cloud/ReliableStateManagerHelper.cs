@@ -1,9 +1,6 @@
 ﻿using Microsoft.ServiceFabric.Data;
 using System;
-using System.Collections.Generic;
 using System.Fabric;
-using System.Linq;
-using System.Text;
 using System.Threading.Tasks;
 
 namespace OMS.Common.Cloud
@@ -12,7 +9,7 @@ namespace OMS.Common.Cloud
     {
         private readonly int maxTryCount = 30;
 
-        public async Task<T> GetOrAddAsync<T>(IReliableStateManager stateManager, ITransaction tx, string name) where T : IReliableState
+        public async Task<T> GetOrAddAsync<T>(IReliableStateManager stateManager, ITransaction tx, string name) where T : IReliableState 
         {
             int tryCount = 0;
 
@@ -24,7 +21,7 @@ namespace OMS.Common.Cloud
                 }
                 catch (FabricNotReadableException fnre)
                 {
-                    if(++tryCount < maxTryCount)
+                    if (++tryCount < maxTryCount)
                     {
                         await Task.Delay(1000);
                         //TOOD: log
@@ -32,12 +29,13 @@ namespace OMS.Common.Cloud
                     }
                     else
                     {
-                        throw fnre;
+                        string message = $"FabricNotReadableException re-throwen after {maxTryCount} retries. See the inner exception for more details.";
+                        throw new Exception(message, fnre);
                     }
                 }
-                catch (Exception)
+                catch (Exception e)
                 {
-                    throw;
+                    throw e;
                 }
             }
         }
@@ -65,9 +63,9 @@ namespace OMS.Common.Cloud
                         throw fnre;
                     }
                 }
-                catch (Exception)
+                catch (Exception e)
                 {
-                    throw;
+                    throw e;
                 }
             }
         }

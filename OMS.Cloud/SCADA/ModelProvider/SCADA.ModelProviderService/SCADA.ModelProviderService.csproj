@@ -109,9 +109,9 @@
       <Project>{892CBE15-9ED7-4540-81FA-0EAABA592138}</Project>
       <Name>Common</Name>
     </ProjectReference>
-    <ProjectReference Include="..\..\..\Common\Common.Cloud\Common.Cloud.csproj">
-      <Project>{FBEE1369-0F6C-41E6-8C62-8C1C5CDBB602}</Project>
-      <Name>Common.Cloud</Name>
+    <ProjectReference Include="..\..\..\Common\Common.SCADA\Common.SCADA.csproj">
+      <Project>{6A84DB56-920C-4FC1-9CB0-9C29D0FC1586}</Project>
+      <Name>Common.SCADA</Name>
     </ProjectReference>
     <ProjectReference Include="..\..\..\Common\Contracts\Common.ScadaContracts\Common.ScadaContracts.csproj">
       <Project>{5F25D9C5-9A93-49E7-92F7-58E399AEF928}</Project>

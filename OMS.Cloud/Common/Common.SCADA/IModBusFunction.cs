@@ -1,34 +1,32 @@
-﻿using EasyModbus;
-using OMS.Common.SCADA.FunctionParameters;
-using Outage.Common;
-using Outage.Common.PubSub.SCADADataContract;
-using System.Collections.Generic;
+﻿using Outage.Common;
 
 namespace OMS.Common.SCADA
 {
     public interface IModbusFunction
     {
-        void Execute(ModbusClient modbusClient);
+        ModbusFunctionCode FunctionCode { get; }
     }
 
     public interface IWriteModbusFunction : IModbusFunction
     {
         CommandOriginType CommandOrigin { get; }
-        IModbusWriteCommandParameters ModbusWriteCommandParameters { get; }
+    }
+
+    public interface IWriteSingleFunction : IWriteModbusFunction
+    {
+        ushort OutputAddress { get; }
+        int CommandValue { get; }
+    }
+
+    public interface IWriteMultipleFunction : IWriteModbusFunction
+    {
+        ushort StartAddress { get; }
+        int[] CommandValues { get; }
     }
 
     public interface IReadModbusFunction : IModbusFunction
     {
-        IModbusReadCommandParameters ModbusReadCommandParameters { get; }
-    }
-
-    public interface IReadAnalogModusFunction : IReadModbusFunction
-    {
-        Dictionary<long, AnalogModbusData> Data { get; }
-    }
-
-    public interface IReadDiscreteModbusFunction : IReadModbusFunction
-    {
-        Dictionary<long, DiscreteModbusData> Data { get; }
+        ushort StartAddress { get; }
+        ushort Quantity { get; }
     }
 }

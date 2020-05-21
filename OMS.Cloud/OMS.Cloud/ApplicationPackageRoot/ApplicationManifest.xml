@@ -1,6 +1,8 @@
 ﻿<?xml version="1.0" encoding="utf-8"?>
 <ApplicationManifest xmlns:xsd="http://www.w3.org/2001/XMLSchema" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" ApplicationTypeName="OMS.CloudType" ApplicationTypeVersion="1.0.0" xmlns="http://schemas.microsoft.com/2011/01/fabric">
   <Parameters>
+    <Parameter Name="TestService_InstanceCount" DefaultValue="-1" />
+    <Parameter Name="NMS.GdaService_InstanceCount" DefaultValue="-1" />
     <Parameter Name="SCADA.CommandingService_InstanceCount" DefaultValue="-1" />
     <Parameter Name="SCADA.AcquisitionService_InstanceCount" DefaultValue="-1" />
     <Parameter Name="SCADA.FunctionExecutorService_InstanceCount" DefaultValue="-1" />
@@ -11,6 +13,14 @@
   <!-- Import the ServiceManifest from the ServicePackage. The ServiceManifestName and ServiceManifestVersion 
        should match the Name and Version attributes of the ServiceManifest element defined in the 
        ServiceManifest.xml file. -->
+  <ServiceManifestImport>
+    <ServiceManifestRef ServiceManifestName="TestServicePkg" ServiceManifestVersion="1.0.0" />
+    <ConfigOverrides />
+  </ServiceManifestImport>
+  <ServiceManifestImport>
+    <ServiceManifestRef ServiceManifestName="NMS.GdaServicePkg" ServiceManifestVersion="1.0.0" />
+    <ConfigOverrides />
+  </ServiceManifestImport>
   <ServiceManifestImport>
     <ServiceManifestRef ServiceManifestName="SCADA.CommandingServicePkg" ServiceManifestVersion="1.0.0" />
     <ConfigOverrides />
@@ -33,6 +43,16 @@
          ServiceFabric PowerShell module.
          
          The attribute ServiceTypeName below must match the name defined in the imported ServiceManifest.xml file. -->
+    <Service Name="TestService" ServicePackageActivationMode="ExclusiveProcess">
+      <StatelessService ServiceTypeName="TestServiceType" InstanceCount="[TestService_InstanceCount]">
+        <SingletonPartition />
+      </StatelessService>
+    </Service>
+    <Service Name="NMS.GdaService" ServicePackageActivationMode="ExclusiveProcess">
+      <StatelessService ServiceTypeName="NMS.GdaServiceType" InstanceCount="[NMS.GdaService_InstanceCount]">
+        <SingletonPartition />
+      </StatelessService>
+    </Service>
     <Service Name="SCADA.CommandingService" ServicePackageActivationMode="ExclusiveProcess">
       <StatelessService ServiceTypeName="SCADA.CommandingServiceType" InstanceCount="[SCADA.CommandingService_InstanceCount]">
         <SingletonPartition />

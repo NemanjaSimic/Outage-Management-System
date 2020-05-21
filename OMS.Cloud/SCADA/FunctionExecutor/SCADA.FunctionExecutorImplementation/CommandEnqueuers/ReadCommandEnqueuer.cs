@@ -2,7 +2,7 @@
 using OMS.Common.Cloud;
 using OMS.Common.Cloud.AzureStorageHelpers;
 using OMS.Common.SCADA;
-using OMS.Common.ScadaContracts;
+using OMS.Common.ScadaContracts.FunctionExecutior;
 using Outage.Common;
 using System;
 using System.Threading.Tasks;
@@ -33,9 +33,9 @@ namespace SCADA.FunctionExecutorImplementation.CommandEnqueuers
         {
             bool success;
 
-            if (!(modbusFunction is IReadAnalogModusFunction || modbusFunction is IReadDiscreteModbusFunction))
+            if (!(modbusFunction is IReadModbusFunction))
             {
-                string message = "EnqueueReadCommand => trying to enqueue modbus function that implements neither IReadDiscreteModbusFunction nor IReadDiscreteModbusFunction interface.";
+                string message = "EnqueueReadCommand => trying to enqueue modbus function that does not implement IReadModbusFunction interface.";
                 Logger.LogError(message);
                 throw new ArgumentException(message);
             }

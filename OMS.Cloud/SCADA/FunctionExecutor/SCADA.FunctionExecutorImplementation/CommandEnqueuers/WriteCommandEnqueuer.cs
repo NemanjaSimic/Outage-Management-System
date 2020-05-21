@@ -2,7 +2,7 @@
 using OMS.Common.Cloud;
 using OMS.Common.Cloud.AzureStorageHelpers;
 using OMS.Common.SCADA;
-using OMS.Common.ScadaContracts;
+using OMS.Common.ScadaContracts.FunctionExecutior;
 using Outage.Common;
 using System;
 using System.Threading.Tasks;

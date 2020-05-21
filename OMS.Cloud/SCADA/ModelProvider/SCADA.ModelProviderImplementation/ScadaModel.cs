@@ -1,21 +1,25 @@
 ﻿using Common.SCADA;
 using Microsoft.ServiceFabric.Data;
+using Microsoft.ServiceFabric.Data.Notifications;
 using OMS.Common.Cloud.ReliableCollectionHelpers;
 using OMS.Common.Cloud.WcfServiceFabricClients.NMS;
 using OMS.Common.DistributedTransactionContracts;
 using OMS.Common.NmsContracts.GDA;
 using OMS.Common.SCADA;
 using OMS.Common.ScadaContracts.DataContracts;
+using OMS.Common.ScadaContracts.DataContracts.ScadaModelPointItems;
 using Outage.Common;
-using SCADA.ModelProviderImplementation.AlarmStrategies;
+using Outage.Common.Exceptions.SCADA;
 using SCADA.ModelProviderImplementation.Data;
+using SCADA.ModelProviderImplementation.Helpers;
 using System;
 using System.Collections.Generic;
+using System.Diagnostics;
 using System.Threading.Tasks;
 
 namespace SCADA.ModelProviderImplementation
 {
-    internal sealed class ScadaModel : IModelUpdateNotificationContract, ITransactionActorContract
+    public sealed class ScadaModel : IModelUpdateNotificationContract, ITransactionActorContract
     {
         private ILogger logger;
         private ILogger Logger { get { return logger ?? (logger = LoggerWrapper.Instance); } }
@@ -24,12 +28,21 @@ namespace SCADA.ModelProviderImplementation
         private readonly ModelResourcesDesc modelResourceDesc;
         private readonly IReliableStateManager stateManager;
         private readonly ScadaModelPointItemHelper pointItemHelper;
-        private readonly AnalogAlarmStrategy analogAlarmStrategy;
-        private readonly DiscreteAlarmStrategy discreteAlarmStrategy;
+
+        private bool isModelImported;
+        private bool isGidToPointItemMapInitialized;
+        private bool isAddressToGidMapInitialized;
+        private bool isCommandDescriptionCacheInitialized;
+        private bool isInfoCacheInitialized;
 
         private NetworkModelGdaClient nmsGdaClient;
 
         #region Private Properties
+        private bool ReliableDictionariesInitialized
+        {
+            get {   return isGidToPointItemMapInitialized && isAddressToGidMapInitialized && isCommandDescriptionCacheInitialized && isInfoCacheInitialized; }
+        }
+
         private Dictionary<DeltaOpType, List<long>> modelChanges;
         private Dictionary<DeltaOpType, List<long>> ModelChanges
         {
@@ -60,13 +73,10 @@ namespace SCADA.ModelProviderImplementation
         #endregion Private Properties
 
         #region Public Properties
-        //TODO: do we need this?
-        public bool IsSCADAModelImported { get; private set; }
-
-        private ReliableDictionaryAccess<long, IScadaModelPointItem> currentScadaModel;
-        public ReliableDictionaryAccess<long, IScadaModelPointItem> CurrentScadaModel
+        private ReliableDictionaryAccess<long, IScadaModelPointItem> currentGidToPointItemMap;
+        public ReliableDictionaryAccess<long, IScadaModelPointItem> CurrentGidToPointItemMap
         {
-            get { return currentScadaModel ?? (currentScadaModel = new ReliableDictionaryAccess<long, IScadaModelPointItem>(stateManager, ReliableDictionaryNames.GidToPointItemMap)); }
+            get { return currentGidToPointItemMap ?? (currentGidToPointItemMap = ReliableDictionaryAccess<long, IScadaModelPointItem>.Create(stateManager, ReliableDictionaryNames.GidToPointItemMap).Result); }
         }
 
         private ReliableDictionaryAccess<short, Dictionary<ushort, long>> currentAddressToGidMap;
@@ -74,21 +84,33 @@ namespace SCADA.ModelProviderImplementation
         {
             get
             {
-                return currentAddressToGidMap ?? (currentAddressToGidMap = new ReliableDictionaryAccess<short, Dictionary<ushort, long>>(stateManager, ReliableDictionaryNames.AddressToGidMap)
+                if(currentAddressToGidMap == null)
                 {
-                    { (short)PointType.ANALOG_INPUT,   new Dictionary<ushort, long>()  },
-                    { (short)PointType.ANALOG_OUTPUT,  new Dictionary<ushort, long>()  },
-                    { (short)PointType.DIGITAL_INPUT,  new Dictionary<ushort, long>()  },
-                    { (short)PointType.DIGITAL_OUTPUT, new Dictionary<ushort, long>()  },
-                    { (short)PointType.HR_LONG,        new Dictionary<ushort, long>()  },
-                });
+                    currentAddressToGidMap = ReliableDictionaryAccess<short, Dictionary<ushort, long>>.Create(stateManager, ReliableDictionaryNames.AddressToGidMap).Result;
+                    currentAddressToGidMap.Add((short)PointType.ANALOG_INPUT, new Dictionary<ushort, long>());
+                    currentAddressToGidMap.Add((short)PointType.ANALOG_OUTPUT, new Dictionary<ushort, long>());
+                    currentAddressToGidMap.Add((short)PointType.DIGITAL_INPUT, new Dictionary<ushort, long>());
+                    currentAddressToGidMap.Add((short)PointType.DIGITAL_OUTPUT, new Dictionary<ushort, long>());
+                    currentAddressToGidMap.Add((short)PointType.HR_LONG, new Dictionary<ushort, long>());
+                }
+
+                return currentAddressToGidMap;
             }
         }
 
         private ReliableDictionaryAccess<long, CommandDescription> commandDescriptionCache;
         public ReliableDictionaryAccess<long, CommandDescription> CommandDescriptionCache
         {
-            get { return commandDescriptionCache ?? (commandDescriptionCache = new ReliableDictionaryAccess<long, CommandDescription>(stateManager, ReliableDictionaryNames.CommandDescriptionCache)); }
+            get { return commandDescriptionCache ?? (commandDescriptionCache = ReliableDictionaryAccess<long, CommandDescription>.Create(stateManager, ReliableDictionaryNames.CommandDescriptionCache).Result); }
+        }
+
+        private ReliableDictionaryAccess<string, bool> infoCache;
+        public ReliableDictionaryAccess<string, bool> InfoCache
+        {
+            get
+            {
+                return infoCache ?? (infoCache = ReliableDictionaryAccess<string, bool>.Create(stateManager, ReliableDictionaryNames.InfoCache).Result);
+            }
         }
         #endregion Public Properties
 
@@ -98,19 +120,70 @@ namespace SCADA.ModelProviderImplementation
             this.modelResourceDesc = modelResourceDesc;
             this.enumDescs = enumDescs;
             this.pointItemHelper = new ScadaModelPointItemHelper();
-            this.analogAlarmStrategy = new AnalogAlarmStrategy();
-            this.discreteAlarmStrategy = new DiscreteAlarmStrategy();
 
             this.nmsGdaClient = NetworkModelGdaClient.CreateClient();
 
-            InitializeScadaModel();
+            this.isGidToPointItemMapInitialized = false;
+            this.isAddressToGidMapInitialized = false;
+            this.isCommandDescriptionCacheInitialized = false;
+            this.isInfoCacheInitialized = false;
+            stateManager.StateManagerChanged += this.OnStateManagerChangedHandler;
         }
 
-        private async void InitializeScadaModel(bool isRetry = false)
+        private async void OnStateManagerChangedHandler(object sender, NotifyStateManagerChangedEventArgs e)
         {
+            if(e.Action == NotifyStateManagerChangedAction.Add)
+            {
+                var operation = e as NotifyStateManagerSingleEntityChangedEventArgs;
+                string reliableStateName = operation.ReliableState.Name.AbsolutePath;
+
+                if (reliableStateName == ReliableDictionaryNames.GidToPointItemMap)
+                {
+                    //_ = CurrentGidToPointItemMap;
+                    currentGidToPointItemMap = await ReliableDictionaryAccess<long, IScadaModelPointItem>.Create(stateManager, ReliableDictionaryNames.GidToPointItemMap);
+                    this.isGidToPointItemMapInitialized = true;
+                }
+                else if(reliableStateName == ReliableDictionaryNames.AddressToGidMap)
+                {
+                    //_ = CurrentAddressToGidMap;
+                    currentAddressToGidMap = await ReliableDictionaryAccess<short, Dictionary<ushort, long>>.Create(stateManager, ReliableDictionaryNames.AddressToGidMap);
+                    await currentAddressToGidMap.Add((short)PointType.ANALOG_INPUT, new Dictionary<ushort, long>());
+                    await currentAddressToGidMap.Add((short)PointType.ANALOG_OUTPUT, new Dictionary<ushort, long>());
+                    await currentAddressToGidMap.Add((short)PointType.DIGITAL_INPUT, new Dictionary<ushort, long>());
+                    await currentAddressToGidMap.Add((short)PointType.DIGITAL_OUTPUT, new Dictionary<ushort, long>());
+                    await currentAddressToGidMap.Add((short)PointType.HR_LONG, new Dictionary<ushort, long>());
+                    this.isAddressToGidMapInitialized = true;
+                }
+                else if(reliableStateName == ReliableDictionaryNames.CommandDescriptionCache)
+                {
+                    //_ = CommandDescriptionCache;
+                    commandDescriptionCache = await ReliableDictionaryAccess<long, CommandDescription>.Create(stateManager, ReliableDictionaryNames.CommandDescriptionCache);
+                    this.isCommandDescriptionCacheInitialized = true;
+                }
+                else if (reliableStateName == ReliableDictionaryNames.InfoCache)
+                {
+                    //_ = InfoCache;
+                    infoCache = await ReliableDictionaryAccess<string, bool>.Create(stateManager, ReliableDictionaryNames.InfoCache);
+                    isInfoCacheInitialized = true;
+                }
+            }
+            //else if(e.Action == UPDATE, what if?)
+        }
+
+        public async Task InitializeScadaModel(bool isRetry = false)
+        {
+            while (!ReliableDictionariesInitialized)
+            {
+                //TODO: something smarter
+                await Task.Delay(1000);
+            }
+
             try
             {
-                if(!await ImportModel())
+                isModelImported = await ImportModel();
+                InfoCache["IsScadaModelImported"] = isModelImported;
+
+                if (!isModelImported)
                 {
                     this.nmsGdaClient = NetworkModelGdaClient.CreateClient();
                     if (!await ImportModel(true))
@@ -125,8 +198,9 @@ namespace SCADA.ModelProviderImplementation
             {
                 if (!isRetry)
                 {
+                    await Task.Delay(2000);
                     this.nmsGdaClient = NetworkModelGdaClient.CreateClient();
-                    InitializeScadaModel(true);
+                    await InitializeScadaModel(true);
                 }
                 else
                 {
@@ -140,25 +214,30 @@ namespace SCADA.ModelProviderImplementation
         #region ImportScadaModel
         public async Task<bool> ImportModel(bool isRetry = false)
         {
+            bool success;
+
+            await CurrentGidToPointItemMap.Clear();
+            await CurrentAddressToGidMap.Clear();
+
             string message = "Importing analog measurements started...";
             Logger.LogInfo(message);
-            Console.WriteLine(message);
+            Trace.WriteLine(message);
             bool analogImportSuccess = await ImportAnalog();
 
             message = $"Importing analog measurements finished. ['success' value: {analogImportSuccess}]";
             Logger.LogInfo(message);
-            Console.WriteLine(message);
+            Trace.WriteLine(message);
 
             message = "Importing discrete measurements started...";
             Logger.LogInfo(message);
-            Console.WriteLine(message);
+            Trace.WriteLine(message);
             bool discreteImportSuccess = await ImportDiscrete();
 
             message = $"Importing discrete measurements finished. ['success' value: {discreteImportSuccess}]";
             Logger.LogInfo(message);
             Console.WriteLine(message);
 
-            IsSCADAModelImported = analogImportSuccess && discreteImportSuccess;
+            success = analogImportSuccess && discreteImportSuccess;
 
             //TODO: model confirmation => modbus MU commands
             //if (isSCADAModelImported && SignalIncomingModelConfirmation != null)
@@ -166,7 +245,7 @@ namespace SCADA.ModelProviderImplementation
             //    SignalIncomingModelConfirmation.Invoke(new List<long>(CurrentScadaModel.Keys));
             //}
 
-            return IsSCADAModelImported;
+            return success;
         }
 
         private async Task<bool> ImportAnalog()
@@ -191,11 +270,31 @@ namespace SCADA.ModelProviderImplementation
                             long gid = rds[i].Id;
                             ModelCode type = modelResourceDesc.GetModelCodeFromId(gid);
 
-                            IScadaModelPointItem pointItem = new AnalogPointItem(this.analogAlarmStrategy);
+                            ScadaModelPointItem pointItem = new AnalogPointItem(AlarmConfigDataHelper.GetAlarmConfigData());
                             pointItemHelper.InitializeAnalogPointItem(pointItem as AnalogPointItem, rds[i].Properties, ModelCode.ANALOG, enumDescs);
-                            CurrentScadaModel.Add(rds[i].Id, pointItem);
-                            CurrentAddressToGidMap[(short)pointItem.RegisterType].Add(pointItem.Address, rds[i].Id);
+                            
+                            if(CurrentGidToPointItemMap.ContainsKey(gid))
+                            {
+                                string message = $"SCADA model is invalid => Gid: {gid} belongs to more than one entity.";
+                                Logger.LogError(message);
+                                throw new InternalSCADAServiceException(message);
+                            }
 
+                            await CurrentGidToPointItemMap.Add(gid, pointItem);
+
+                            if (!CurrentAddressToGidMap.ContainsKey((short)pointItem.RegisterType))
+                            {
+                                await CurrentAddressToGidMap.Add((short)pointItem.RegisterType, new Dictionary<ushort, long>());
+                            }
+
+                            if(CurrentAddressToGidMap[(short)pointItem.RegisterType].ContainsKey(pointItem.Address))
+                            {
+                                string message = $"SCADA model is invalid => Address: {pointItem.Address} (RegType: {pointItem.RegisterType}) belongs to more than one entity.";
+                                Logger.LogError(message);
+                                throw new InternalSCADAServiceException(message);
+                            }
+
+                            CurrentAddressToGidMap[(short)pointItem.RegisterType].Add(pointItem.Address, rds[i].Id);
                             Logger.LogDebug($"ANALOG measurement added to SCADA model [Gid: {gid}, Address: {pointItem.Address}]");
                         }
                     }
@@ -207,10 +306,12 @@ namespace SCADA.ModelProviderImplementation
             }
             catch (Exception ex)
             {
+                await CurrentGidToPointItemMap.Clear();
+                await CurrentAddressToGidMap.Clear();
 
                 success = false;
                 string errorMessage = $"ImportAnalog failed with error: {ex.Message}";
-                Console.WriteLine(errorMessage);
+                Trace.WriteLine(errorMessage);
                 Logger.LogError(errorMessage, ex);
             }
 
@@ -239,9 +340,30 @@ namespace SCADA.ModelProviderImplementation
                             long gid = rds[i].Id;
                             ModelCode type = modelResourceDesc.GetModelCodeFromId(gid);
 
-                            IScadaModelPointItem pointItem = new DiscretePointItem(this.discreteAlarmStrategy);
+                            ScadaModelPointItem pointItem = new DiscretePointItem(AlarmConfigDataHelper.GetAlarmConfigData());
                             pointItemHelper.InitializeDiscretePointItem(pointItem as DiscretePointItem, rds[i].Properties, ModelCode.DISCRETE, enumDescs);
-                            CurrentScadaModel.Add(gid, pointItem);
+
+                            if (CurrentGidToPointItemMap.ContainsKey(gid))
+                            {
+                                string message = $"SCADA model is invalid => Gid: {gid} belongs to more than one entity.";
+                                Logger.LogError(message);
+                                throw new InternalSCADAServiceException(message);
+                            }
+
+                            await CurrentGidToPointItemMap.Add(gid, pointItem);
+
+                            if (!CurrentAddressToGidMap.ContainsKey((short)pointItem.RegisterType))
+                            {
+                                await CurrentAddressToGidMap.Add((short)pointItem.RegisterType, new Dictionary<ushort, long>());
+                            }
+
+                            if (CurrentAddressToGidMap[(short)pointItem.RegisterType].ContainsKey(pointItem.Address))
+                            {
+                                string message = $"SCADA model is invalid => Address: {pointItem.Address} (RegType: {pointItem.RegisterType}) belongs to more than one entity.";
+                                Logger.LogError(message);
+                                throw new InternalSCADAServiceException(message);
+                            }
+
                             CurrentAddressToGidMap[(short)pointItem.RegisterType].Add(pointItem.Address, gid);
                             Logger.LogDebug($"DISCRETE measurement added to SCADA model [Gid: {gid}, Address: {pointItem.Address}]");
                         }
@@ -281,12 +403,12 @@ namespace SCADA.ModelProviderImplementation
             {
                 //INIT INCOMING SCADA MODEL with current model values
                 //can not go with just 'incomingScadaModel = new Dictionary<long, ISCADAModelPointItem>(CurrentScadaModel)' because IncomingAddressToGidMap must also be initialized
-                incomingScadaModel = new Dictionary<long, IScadaModelPointItem>(CurrentScadaModel.Count);
+                incomingScadaModel = new Dictionary<long, IScadaModelPointItem>(CurrentGidToPointItemMap.Count);
 
-                foreach (long gid in CurrentScadaModel.Keys)
+                foreach (long gid in CurrentGidToPointItemMap.Keys)
                 {
                     ModelCode type = modelResourceDesc.GetModelCodeFromId(gid);
-                    IScadaModelPointItem pointItem = CurrentScadaModel[gid].Clone();
+                    IScadaModelPointItem pointItem = CurrentGidToPointItemMap[gid].Clone();
 
                     IncomingScadaModel.Add(gid, pointItem);
 
@@ -404,26 +526,23 @@ namespace SCADA.ModelProviderImplementation
             return success;
         }
 
-        public Task Commit()
+        public async Task Commit()
         {
-            return Task.Run(() =>
-            {
-                //todo: currentScadaModel  = IncomingScadaModel;
-                incomingScadaModel = null;
+            //todo: currentScadaModel  = IncomingScadaModel;
+            incomingScadaModel = null;
 
-                //todo: currentAddressToGidMap = IncomingAddressToGidMap;
-                incomingAddressToGidMap = null;
+            //todo: currentAddressToGidMap = IncomingAddressToGidMap;
+            incomingAddressToGidMap = null;
 
-                modelChanges.Clear();
-                CommandDescriptionCache.Clear();
+            modelChanges.Clear();
+            await CommandDescriptionCache.Clear();
 
-                string message = $"Incoming SCADA model is confirmed.";
-                Console.WriteLine(message);
-                Logger.LogInfo(message);
+            string message = $"Incoming SCADA model is confirmed.";
+            Console.WriteLine(message);
+            Logger.LogInfo(message);
 
-                //TODO: model confirmation => modbus MU commands
-                //SignalIncomingModelConfirmation.Invoke(new List<long>(CurrentScadaModel.Keys));
-            });
+            //TODO: model confirmation => modbus MU commands
+            //SignalIncomingModelConfirmation.Invoke(new List<long>(CurrentScadaModel.Keys));
         }
 
         public Task Rollback()
@@ -530,12 +649,12 @@ namespace SCADA.ModelProviderImplementation
 
             if (type == ModelCode.ANALOG)
             {
-                pointItem = new AnalogPointItem(this.analogAlarmStrategy);
+                pointItem = new AnalogPointItem(AlarmConfigDataHelper.GetAlarmConfigData());
                 pointItemHelper.InitializeAnalogPointItem(pointItem as AnalogPointItem, resource.Properties, type, enumDescs);
             }
             else if (type == ModelCode.DISCRETE)
             {
-                pointItem = new DiscretePointItem(this.discreteAlarmStrategy);
+                pointItem = new DiscretePointItem(AlarmConfigDataHelper.GetAlarmConfigData());
                 pointItemHelper.InitializeDiscretePointItem(pointItem as DiscretePointItem, resource.Properties, type, enumDescs);
             }
             else

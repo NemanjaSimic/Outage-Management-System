@@ -1,8 +1,9 @@
 ﻿using Microsoft.ServiceFabric.Services.Client;
 using Microsoft.ServiceFabric.Services.Communication.Wcf.Client;
-using OMS.Common.ScadaContracts;
+using OMS.Common.ScadaContracts.Commanding;
 using Outage.Common;
 using System;
+using System.Collections.Generic;
 using System.Threading.Tasks;
 
 namespace OMS.Common.Cloud.WcfServiceFabricClients.SCADA
@@ -31,14 +32,24 @@ namespace OMS.Common.Cloud.WcfServiceFabricClients.SCADA
         }
 
         #region IScadaCommandingContract
-        public Task SendAnalogCommand(long gid, float commandingValue, CommandOriginType commandOriginType)
+        public Task SendSingleAnalogCommand(long gid, float commandingValue, CommandOriginType commandOriginType)
         {
-            return InvokeWithRetryAsync(client => client.Channel.SendAnalogCommand(gid, commandingValue, commandOriginType));
+            return InvokeWithRetryAsync(client => client.Channel.SendSingleAnalogCommand(gid, commandingValue, commandOriginType));
         }
 
-        public Task SendDiscreteCommand(long gid, ushort commandingValue, CommandOriginType commandOriginType)
+        public Task SendMultipleAnalogCommand(Dictionary<long, float> commandingValues, CommandOriginType commandOriginType)
         {
-            return InvokeWithRetryAsync(client => client.Channel.SendDiscreteCommand(gid, commandingValue, commandOriginType));
+            return InvokeWithRetryAsync(client => client.Channel.SendMultipleAnalogCommand(commandingValues, commandOriginType));
+        }
+
+        public Task SendSingleDiscreteCommand(long gid, ushort commandingValue, CommandOriginType commandOriginType)
+        {
+            return InvokeWithRetryAsync(client => client.Channel.SendSingleDiscreteCommand(gid, commandingValue, commandOriginType));
+        }
+
+        public Task SendMultipleDiscreteCommand(Dictionary<long, ushort> commandingValues, CommandOriginType commandOriginType)
+        {
+            return InvokeWithRetryAsync(client => client.Channel.SendMultipleDiscreteCommand(commandingValues, commandOriginType));
         }
         #endregion
     }

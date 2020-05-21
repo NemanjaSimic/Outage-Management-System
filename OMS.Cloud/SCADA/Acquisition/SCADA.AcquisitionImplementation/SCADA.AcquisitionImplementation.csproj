@@ -21,6 +21,7 @@
     <DefineConstants>DEBUG;TRACE</DefineConstants>
     <ErrorReport>prompt</ErrorReport>
     <WarningLevel>4</WarningLevel>
+    <PlatformTarget>x64</PlatformTarget>
   </PropertyGroup>
   <PropertyGroup Condition=" '$(Configuration)|$(Platform)' == 'Release|AnyCPU' ">
     <DebugType>pdbonly</DebugType>
@@ -95,9 +96,9 @@
       <Project>{6A84DB56-920C-4FC1-9CB0-9C29D0FC1586}</Project>
       <Name>Common.SCADA</Name>
     </ProjectReference>
-    <ProjectReference Include="..\..\FunctionExecutor\SCADA.ModbusFunctions\SCADA.ModbusFunctions.csproj">
-      <Project>{C28AD7E4-881E-45AB-987F-5834A0D3CAAB}</Project>
-      <Name>SCADA.ModbusFunctions</Name>
+    <ProjectReference Include="..\..\..\Common\Contracts\Common.ScadaContracts\Common.ScadaContracts.csproj">
+      <Project>{5F25D9C5-9A93-49E7-92F7-58E399AEF928}</Project>
+      <Name>Common.ScadaContracts</Name>
     </ProjectReference>
   </ItemGroup>
   <ItemGroup>

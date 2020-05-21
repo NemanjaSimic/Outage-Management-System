@@ -5,6 +5,7 @@ using OMS.Common.SCADA;
 using OMS.Common.NmsContracts.GDA;
 using System.Runtime.Serialization;
 using OMS.Common.ScadaContracts.DataContracts;
+using OMS.Common.ScadaContracts.DataContracts.ScadaModelPointItems;
 
 namespace SCADA.ModelProviderImplementation.Data
 {

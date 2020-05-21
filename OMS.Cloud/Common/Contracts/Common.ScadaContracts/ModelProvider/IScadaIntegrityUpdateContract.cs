@@ -7,7 +7,7 @@ using System.Collections.Generic;
 using System.ServiceModel;
 using System.Threading.Tasks;
 
-namespace OMS.Common.ScadaContracts
+namespace OMS.Common.ScadaContracts.ModelProvider
 {
     [ServiceContract]
     public interface IScadaIntegrityUpdateContract : IService

@@ -1,7 +1,9 @@
-﻿using Microsoft.ServiceFabric.Services.Client;
+﻿using Common.SCADA;
+using Microsoft.ServiceFabric.Services.Client;
 using Microsoft.ServiceFabric.Services.Communication.Wcf.Client;
-using OMS.Common.ScadaContracts;
 using OMS.Common.ScadaContracts.DataContracts;
+using OMS.Common.ScadaContracts.DataContracts.ScadaModelPointItems;
+using OMS.Common.ScadaContracts.ModelProvider;
 using System;
 using System.Collections.Generic;
 using System.Threading.Tasks;
@@ -31,12 +33,12 @@ namespace OMS.Common.Cloud.WcfServiceFabricClients.SCADA
         }
 
         #region IScadaModelAccessContract
-        public Task<Dictionary<ushort, Dictionary<ushort, long>>> GetAddressToGidMap()
+        public Task<Dictionary<short, Dictionary<ushort, long>>> GetAddressToGidMap()
         {
             return InvokeWithRetryAsync(client => client.Channel.GetAddressToGidMap());
         }
 
-        public Task<Dictionary<ushort, Dictionary<ushort, IScadaModelPointItem>>> GetAddressToPointItemMap()
+        public Task<Dictionary<short, Dictionary<ushort, IScadaModelPointItem>>> GetAddressToPointItemMap()
         {
             return InvokeWithRetryAsync(client => client.Channel.GetAddressToPointItemMap());
         }
@@ -56,7 +58,7 @@ namespace OMS.Common.Cloud.WcfServiceFabricClients.SCADA
             return InvokeWithRetryAsync(client => client.Channel.GetIsScadaModelImportedIndicator());
         }
 
-        public Task<ScadaConfigData> GetScadaConfigData()
+        public Task<IScadaConfigData> GetScadaConfigData()
         {
             return InvokeWithRetryAsync(client => client.Channel.GetScadaConfigData());
         }

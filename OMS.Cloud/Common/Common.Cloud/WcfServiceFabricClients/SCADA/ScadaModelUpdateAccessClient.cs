@@ -1,8 +1,7 @@
 ﻿using Microsoft.ServiceFabric.Services.Client;
 using Microsoft.ServiceFabric.Services.Communication.Wcf.Client;
-using OMS.Common.SCADA;
-using OMS.Common.ScadaContracts;
 using OMS.Common.ScadaContracts.DataContracts;
+using OMS.Common.ScadaContracts.ModelProvider;
 using Outage.Common.PubSub.SCADADataContract;
 using System;
 using System.Collections.Generic;
@@ -37,7 +36,7 @@ namespace OMS.Common.Cloud.WcfServiceFabricClients.SCADA
         {
             return InvokeWithRetryAsync(client => client.Channel.MakeAnalogEntryToMeasurementCache(data, permissionToPublishData));
         }
-        
+
         public Task MakeDiscreteEntryToMeasurementCache(Dictionary<long, DiscreteModbusData> data, bool permissionToPublishData)
         {
             return InvokeWithRetryAsync(client => client.Channel.MakeDiscreteEntryToMeasurementCache(data, permissionToPublishData));
@@ -47,6 +46,21 @@ namespace OMS.Common.Cloud.WcfServiceFabricClients.SCADA
         {
             return InvokeWithRetryAsync(client => client.Channel.UpdateCommandDescription(gid, commandDescription));
         }
+
+        //public Task MakeAnalogEntryToMeasurementCache()
+        //{
+        //    return InvokeWithRetryAsync(client => client.Channel.MakeAnalogEntryToMeasurementCache());
+        //}
+
+        //public Task MakeDiscreteEntryToMeasurementCache()
+        //{
+        //    return InvokeWithRetryAsync(client => client.Channel.MakeDiscreteEntryToMeasurementCache());
+        //}
+
+        //public Task UpdateCommandDescription()
+        //{
+        //    return InvokeWithRetryAsync(client => client.Channel.UpdateCommandDescription());
+        //}
         #endregion
     }
 }

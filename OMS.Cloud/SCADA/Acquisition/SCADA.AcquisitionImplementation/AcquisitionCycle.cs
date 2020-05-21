@@ -1,8 +1,7 @@
 ﻿using OMS.Common.Cloud.WcfServiceFabricClients.SCADA;
 using OMS.Common.SCADA;
+using OMS.Common.ScadaContracts.DataContracts.ModbusFunctions;
 using Outage.Common;
-using SCADA.ModbusFunctions;
-using SCADA.ModbusFunctions.Parameters;
 using System;
 using System.Collections.Generic;
 using System.Threading.Tasks;
@@ -11,7 +10,6 @@ namespace SCADA.AcquisitionImplementation
 {
     public class AcquisitionCycle
     {
-        private readonly FunctionFactory functionFactory;
         private ReadCommandEnqueuerClient commandEnqueuerClient;
         private ScadaModelReadAccessClient readAccessClient;
 
@@ -25,21 +23,20 @@ namespace SCADA.AcquisitionImplementation
         {
             this.commandEnqueuerClient = ReadCommandEnqueuerClient.CreateClient();
             this.readAccessClient = ScadaModelReadAccessClient.CreateClient();
-            this.functionFactory = new FunctionFactory();
         }
 
         public async Task Start(bool isRetry = false)
         {
             try
             {
-                Dictionary<ushort, Dictionary<ushort, long>> addressToGidMap = await this.readAccessClient.GetAddressToGidMap();
+                Dictionary<short, Dictionary<ushort, long>> addressToGidMap = await this.readAccessClient.GetAddressToGidMap();
 
                 foreach (var kvp in addressToGidMap)
                 {
                     if (TryCreateModbusFunction(kvp, out IReadModbusFunction modbusFunction))
                     {
                         await commandEnqueuerClient.EnqueueReadCommand(modbusFunction);
-                        Logger.LogDebug($"Modbus function enquided. Point type is {kvp.Key}, quantity {modbusFunction.ModbusReadCommandParameters.Quantity}.");
+                        //Logger.LogDebug($"Modbus function enquided. Point type is {kvp.Key}, quantity {modbusFunction.Quantity}.");
                     }
                 }
             }
@@ -60,7 +57,7 @@ namespace SCADA.AcquisitionImplementation
             }
         }
 
-        private bool TryCreateModbusFunction(KeyValuePair<ushort, Dictionary<ushort, long>> addressToGidMapKvp, out IReadModbusFunction modbusFunction)
+        private bool TryCreateModbusFunction(KeyValuePair<short, Dictionary<ushort, long>> addressToGidMapKvp, out IReadModbusFunction modbusFunction)
         {
             modbusFunction = null;
             PointType pointType = (PointType)addressToGidMapKvp.Key;
@@ -78,7 +75,6 @@ namespace SCADA.AcquisitionImplementation
                 return false;
             }
 
-            ushort length = 6;  //expected by protocol
             ushort startAddress = 1;
             ushort quantity = (ushort)addressToGidMap.Count;
 
@@ -87,8 +83,7 @@ namespace SCADA.AcquisitionImplementation
                 return false;
             }
 
-            ModbusReadCommandParameters mdb_read = new ModbusReadCommandParameters(length, (byte)functionCode, startAddress, quantity);
-            modbusFunction = functionFactory.CreateReadModbusFunction(mdb_read);
+            modbusFunction = new ReadFunction(functionCode, startAddress, quantity);
             return true;
         }
 

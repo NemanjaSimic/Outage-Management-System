@@ -2,10 +2,11 @@
 using Outage.Common;
 using Outage.Common.Exceptions.SCADA;
 using System;
+using System.Collections.Generic;
 using System.ServiceModel;
 using System.Threading.Tasks;
 
-namespace OMS.Common.ScadaContracts
+namespace OMS.Common.ScadaContracts.Commanding
 {
     [ServiceContract]
     public interface IScadaCommandingContract : IService
@@ -13,11 +14,21 @@ namespace OMS.Common.ScadaContracts
         [OperationContract]
         [FaultContract(typeof(ArgumentException))]
         [FaultContract(typeof(InternalSCADAServiceException))]
-        Task SendAnalogCommand(long gid, float commandingValue, CommandOriginType commandOriginType);
+        Task SendSingleAnalogCommand(long gid, float commandingValue, CommandOriginType commandOriginType);
 
         [OperationContract]
         [FaultContract(typeof(ArgumentException))]
         [FaultContract(typeof(InternalSCADAServiceException))]
-        Task SendDiscreteCommand(long gid, ushort commandingValue, CommandOriginType commandOriginType);
+        Task SendMultipleAnalogCommand(Dictionary<long, float> commandingValues, CommandOriginType commandOriginType);
+
+        [OperationContract]
+        [FaultContract(typeof(ArgumentException))]
+        [FaultContract(typeof(InternalSCADAServiceException))]
+        Task SendSingleDiscreteCommand(long gid, ushort commandingValue, CommandOriginType commandOriginType);
+
+        [OperationContract]
+        [FaultContract(typeof(ArgumentException))]
+        [FaultContract(typeof(InternalSCADAServiceException))]
+        Task SendMultipleDiscreteCommand(Dictionary<long, ushort> commandingValues, CommandOriginType commandOriginType);
     }
 }

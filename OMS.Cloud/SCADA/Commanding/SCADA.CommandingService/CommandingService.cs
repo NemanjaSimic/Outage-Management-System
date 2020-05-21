@@ -5,6 +5,7 @@ using Microsoft.ServiceFabric.Services.Communication.Wcf;
 using Microsoft.ServiceFabric.Services.Communication.Wcf.Runtime;
 using Microsoft.ServiceFabric.Services.Runtime;
 using OMS.Common.ScadaContracts;
+using OMS.Common.ScadaContracts.Commanding;
 using Outage.Common;
 using SCADA.CommandingImplementation;
 

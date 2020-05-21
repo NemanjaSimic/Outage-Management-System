@@ -3,11 +3,13 @@ using System.Collections.Generic;
 using System.Fabric;
 using System.Threading;
 using System.Threading.Tasks;
+using Common.SCADA;
 using Microsoft.ServiceFabric.Services.Communication.Runtime;
 using Microsoft.ServiceFabric.Services.Communication.Wcf;
 using Microsoft.ServiceFabric.Services.Communication.Wcf.Runtime;
 using Microsoft.ServiceFabric.Services.Runtime;
-using OMS.Common.ScadaContracts;
+using OMS.Common.Cloud.WcfServiceFabricClients.SCADA;
+using OMS.Common.ScadaContracts.FunctionExecutior;
 using Outage.Common;
 using SCADA.FunctionExecutorImplementation;
 using SCADA.FunctionExecutorImplementation.CommandEnqueuers;
@@ -19,9 +21,17 @@ namespace SCADA.FunctionExecutorService
     /// </summary>
     internal sealed class FunctionExecutorService : StatelessService
     {
+        private readonly ReadCommandEnqueuer readCommandEnqueuer;
+        private readonly WriteCommandEnqueuer writeCommandEnqueuer;
+        private readonly ModelUpdateCommandEnqueuer modelUpdateCommandEnqueuer;
+
         public FunctionExecutorService(StatelessServiceContext context)
             : base(context)
-        { }
+        {
+            this.readCommandEnqueuer = new ReadCommandEnqueuer();
+            this.writeCommandEnqueuer = new WriteCommandEnqueuer();
+            this.modelUpdateCommandEnqueuer = new ModelUpdateCommandEnqueuer();
+        }
 
         /// <summary>
         /// Optional override to create listeners (e.g., TCP, HTTP) for this service replica to handle client or user requests.
@@ -36,7 +46,7 @@ namespace SCADA.FunctionExecutorService
                 new ServiceInstanceListener(context =>
                 {
                     return new WcfCommunicationListener<IReadCommandEnqueuer>(context,
-                                                                              new ReadCommandEnqueuer(),
+                                                                              this.readCommandEnqueuer,
                                                                               WcfUtility.CreateTcpListenerBinding(),
                                                                               EndpointNames.ScadaReadCommandEnqueuerEndpoint);
                 }, EndpointNames.ScadaReadCommandEnqueuerEndpoint),
@@ -45,7 +55,7 @@ namespace SCADA.FunctionExecutorService
                 new ServiceInstanceListener(context =>
                 {
                     return new WcfCommunicationListener<IWriteCommandEnqueuer>(context,
-                                                                               new WriteCommandEnqueuer(),
+                                                                               this.writeCommandEnqueuer,
                                                                                WcfUtility.CreateTcpListenerBinding(),
                                                                                EndpointNames.ScadaWriteCommandEnqueuerEndpoint);
                 }, EndpointNames.ScadaWriteCommandEnqueuerEndpoint),
@@ -54,7 +64,7 @@ namespace SCADA.FunctionExecutorService
                 new ServiceInstanceListener(context =>
                 {
                     return new WcfCommunicationListener<IModelUpdateCommandEnqueuer>(context,
-                                                                                     new ModelUpdateCommandEnqueuer(),
+                                                                                     this.modelUpdateCommandEnqueuer,
                                                                                      WcfUtility.CreateTcpListenerBinding(),
                                                                                      EndpointNames.ScadaModelUpdateCommandEnqueueurEndpoint);
                 }, EndpointNames.ScadaModelUpdateCommandEnqueueurEndpoint)
@@ -69,6 +79,8 @@ namespace SCADA.FunctionExecutorService
         protected override async Task RunAsync(CancellationToken cancellationToken)
         {
             FunctionExecutorCycle functionExecutorCycle = new FunctionExecutorCycle();
+            ScadaModelReadAccessClient readAccessClient = ScadaModelReadAccessClient.CreateClient();
+            IScadaConfigData configData = await readAccessClient.GetScadaConfigData();
 
             while (true)
             {
@@ -76,15 +88,15 @@ namespace SCADA.FunctionExecutorService
 
                 try
                 {
-                    await functionExecutorCycle.Start(); 
+                    await functionExecutorCycle.Start();
                     ServiceEventSource.Current.ServiceMessage(this.Context, $"[FunctionExecutorService] FunctionExecutorCycle executed.");
                 }
                 catch (Exception e)
                 {
                     ServiceEventSource.Current.ServiceMessage(this.Context, $"[FunctionExecutorService] Error: {e.Message}]");
                 }
-                
-                await Task.Delay(TimeSpan.FromSeconds(1), cancellationToken);
+
+                await Task.Delay(TimeSpan.FromMilliseconds(configData.FunctionExecutionInterval), cancellationToken);
             }
         }
     }

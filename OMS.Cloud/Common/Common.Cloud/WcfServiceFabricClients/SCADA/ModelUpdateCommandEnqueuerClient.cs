@@ -1,7 +1,7 @@
 ﻿using Microsoft.ServiceFabric.Services.Client;
 using Microsoft.ServiceFabric.Services.Communication.Wcf.Client;
 using OMS.Common.SCADA;
-using OMS.Common.ScadaContracts;
+using OMS.Common.ScadaContracts.FunctionExecutior;
 using System;
 using System.Collections.Generic;
 using System.Threading.Tasks;

@@ -1,11 +1,21 @@
-﻿using System.Collections.Generic;
+﻿using System;
+using System.Collections.Generic;
 using System.Fabric;
+using System.Threading;
+using System.Threading.Tasks;
+using Common.SCADA;
+using Microsoft.ServiceFabric.Data;
+using Microsoft.ServiceFabric.Data.Collections;
 using Microsoft.ServiceFabric.Services.Communication.Runtime;
 using Microsoft.ServiceFabric.Services.Communication.Wcf;
 using Microsoft.ServiceFabric.Services.Communication.Wcf.Runtime;
 using Microsoft.ServiceFabric.Services.Runtime;
-using OMS.Common.ScadaContracts;
+using OMS.Common.ScadaContracts.DataContracts;
+using OMS.Common.ScadaContracts.DataContracts.ScadaModelPointItems;
+using OMS.Common.ScadaContracts.ModelProvider;
 using Outage.Common;
+using Outage.Common.PubSub.SCADADataContract;
+using SCADA.ModelProviderImplementation;
 using SCADA.ModelProviderImplementation.ContractProviders;
 
 namespace SCADA.ModelProviderService
@@ -15,9 +25,20 @@ namespace SCADA.ModelProviderService
     /// </summary>
     internal sealed class ModelProviderService : StatefulService
     {
+        private readonly ScadaModel scadaModel;
+        private readonly ModelReadAccessProvider modelReadAccessProvider;
+        private readonly ModelUpdateAccessProvider modelUpdateAccessProvider;
+        private readonly IntegrityUpdateProvider integrityUpdateProvider;
+
         public ModelProviderService(StatefulServiceContext context)
             : base(context)
-        { }
+        {
+            //DONE THIS WAY BECAUSE: there is a mechanism that tracks the initialization process of reliable collections, which is set in constructors of these classes
+            this.scadaModel = new ScadaModel(this.StateManager, new ModelResourcesDesc(), new EnumDescs());
+            this.modelReadAccessProvider = new ModelReadAccessProvider(this.StateManager);
+            this.modelUpdateAccessProvider = new ModelUpdateAccessProvider(this.StateManager);
+            this.integrityUpdateProvider = new IntegrityUpdateProvider(this.StateManager);
+        }
 
         /// <summary>
         /// Optional override to create listeners (e.g., HTTP, Service Remoting, WCF, etc.) for this service replica to handle client or user requests.
@@ -35,7 +56,7 @@ namespace SCADA.ModelProviderService
                 new ServiceReplicaListener(context =>
                 {
                     return new WcfCommunicationListener<IScadaModelReadAccessContract>(context,
-                                                                            new ModelReadAccessProvider(this.StateManager),
+                                                                            this.modelReadAccessProvider,
                                                                             WcfUtility.CreateTcpListenerBinding(),
                                                                             EndpointNames.ScadaModelReadAccessEndpoint);
                 }, EndpointNames.ScadaModelReadAccessEndpoint),
@@ -44,7 +65,7 @@ namespace SCADA.ModelProviderService
                 new ServiceReplicaListener(context =>
                 {
                     return new WcfCommunicationListener<IScadaModelUpdateAccessContract>(context,
-                                                                            new ModelUpdateAccessProvider(this.StateManager),
+                                                                            this.modelUpdateAccessProvider,
                                                                             WcfUtility.CreateTcpListenerBinding(),
                                                                             EndpointNames.ScadaModelUpdateAccessEndpoint);
                 }, EndpointNames.ScadaModelUpdateAccessEndpoint),
@@ -53,11 +74,145 @@ namespace SCADA.ModelProviderService
                 new ServiceReplicaListener(context =>
                 {
                     return new WcfCommunicationListener<IScadaIntegrityUpdateContract>(context,
-                                                                           new IntegrityUpdateProvider(this.StateManager),
+                                                                           this.integrityUpdateProvider,
                                                                            WcfUtility.CreateTcpListenerBinding(),
                                                                            EndpointNames.SCADAIntegrityUpdateEndpoint);
                 }, EndpointNames.SCADAIntegrityUpdateEndpoint),
+
+                ////SCADAModelUpdateNotifierEndpoint
+                //new ServiceReplicaListener(context =>
+                //{
+                //    return new WcfCommunicationListener<IModelUpdateNotificationContract>(context,
+                //                                                            new ScadaModelUpdateNotification(scadaModel),
+                //                                                            WcfUtility.CreateTcpListenerBinding(),
+                //                                                            EndpointNames.SCADAModelUpdateNotifierEndpoint);
+                //}, EndpointNames.SCADAModelUpdateNotifierEndpoint),
+
+                ////SCADATransactionActorEndpoint
+                //new ServiceReplicaListener(context =>
+                //{
+                //    return new WcfCommunicationListener<ITransactionActorContract>(context,
+                //                                                            new ScadaTransactionActor(scadaModel),
+                //                                                            WcfUtility.CreateTcpListenerBinding(),
+                //                                                            EndpointNames.SCADATransactionActorEndpoint);
+                //}, EndpointNames.SCADATransactionActorEndpoint),
             };
+        }
+
+        protected async override Task RunAsync(CancellationToken cancellationToken)
+        {
+            cancellationToken.ThrowIfCancellationRequested();
+
+            try
+            {
+                InitializeReliableCollections();
+                ServiceEventSource.Current.ServiceMessage(this.Context, $"[ModelProviderService] ReliableDictionaries initialized.");
+            }
+            catch (Exception e)
+            {
+                ServiceEventSource.Current.ServiceMessage(this.Context, $"[ModelProviderService] Error: {e.Message}");
+            }
+
+            await scadaModel.InitializeScadaModel();
+        }
+
+        private void InitializeReliableCollections()
+        {
+            Task[] tasks = new Task[]
+            {
+                Task.Run(async() =>
+                {
+                    using (ITransaction tx = this.StateManager.CreateTransaction())
+                    {
+                        var result = await StateManager.TryGetAsync<IReliableDictionary<long, IScadaModelPointItem>>(ReliableDictionaryNames.GidToPointItemMap);
+                        if(result.HasValue)
+                        {
+                            var gidToPointItemMap = result.Value;
+                            await gidToPointItemMap.ClearAsync();
+                            await tx.CommitAsync();
+                        }
+                        else
+                        {
+                            await StateManager.GetOrAddAsync<IReliableDictionary<long, IScadaModelPointItem>>(tx, ReliableDictionaryNames.GidToPointItemMap);
+                            await tx.CommitAsync();
+                        }
+                    }
+                }),
+                Task.Run(async() =>
+                {
+                    using (ITransaction tx = this.StateManager.CreateTransaction())
+                    {
+                        var result = await StateManager.TryGetAsync<IReliableDictionary<short, Dictionary<ushort, long>>>(ReliableDictionaryNames.AddressToGidMap);
+                        if(result.HasValue)
+                        {
+                            var addressToGidMap = result.Value;
+                            await addressToGidMap.ClearAsync();
+                            await tx.CommitAsync();
+                        }
+                        else
+                        {
+                            await StateManager.GetOrAddAsync<IReliableDictionary<short, Dictionary<ushort, long>>>(tx, ReliableDictionaryNames.AddressToGidMap);
+                            await tx.CommitAsync();
+                        }
+                    }
+                }),
+                Task.Run(async() =>
+                {
+                    using (ITransaction tx = this.StateManager.CreateTransaction())
+                    {
+                        var result = await StateManager.TryGetAsync<IReliableDictionary<long, CommandDescription>>(ReliableDictionaryNames.CommandDescriptionCache);
+                        if(result.HasValue)
+                        {
+                            var commandDescriptionCache = result.Value;
+                            await commandDescriptionCache.ClearAsync();
+                            await tx.CommitAsync();
+                        }
+                        else
+                        {
+                            await StateManager.GetOrAddAsync<IReliableDictionary<long, CommandDescription>>(tx, ReliableDictionaryNames.CommandDescriptionCache);
+                            await tx.CommitAsync();
+                        }
+                    }
+                }),
+                Task.Run(async() =>
+                {
+                    using (ITransaction tx = this.StateManager.CreateTransaction())
+                    {
+                        var result = await StateManager.TryGetAsync<IReliableDictionary<long, ModbusData>>(ReliableDictionaryNames.MeasurementsCache);
+                        if(result.HasValue)
+                        {
+                            var measurementsCache = result.Value;
+                            await measurementsCache.ClearAsync();
+                            await tx.CommitAsync();
+                        }
+                        else
+                        {
+                            await StateManager.GetOrAddAsync<IReliableDictionary<long, ModbusData>>(tx, ReliableDictionaryNames.MeasurementsCache);
+                            await tx.CommitAsync();
+                        }
+                    }
+                }),
+                Task.Run(async() =>
+                {
+                    using (ITransaction tx = this.StateManager.CreateTransaction())
+                    {
+                        var result = await StateManager.TryGetAsync<IReliableDictionary<string, bool>>(ReliableDictionaryNames.InfoCache);
+                        if(result.HasValue)
+                        {
+                            var measurementsCache = result.Value;
+                            await measurementsCache.ClearAsync();
+                            await tx.CommitAsync();
+                        }
+                        else
+                        {
+                            await StateManager.GetOrAddAsync<IReliableDictionary<string, bool>>(tx, ReliableDictionaryNames.InfoCache);
+                            await tx.CommitAsync();
+                        }
+                    }
+                }),
+            };
+
+            Task.WaitAll(tasks);
         }
     }
 }

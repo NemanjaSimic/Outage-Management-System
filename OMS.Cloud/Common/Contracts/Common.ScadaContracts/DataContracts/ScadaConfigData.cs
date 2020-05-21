@@ -1,10 +1,11 @@
-﻿using System.Net;
+﻿using Common.SCADA;
+using System.Net;
 using System.Runtime.Serialization;
 
 namespace OMS.Common.ScadaContracts.DataContracts
 {
     [DataContract]
-    public class ScadaConfigData
+    public class ScadaConfigData : IScadaConfigData
     {
         [DataMember]
         public ushort TcpPort { get; set; }

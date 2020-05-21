@@ -7,6 +7,8 @@ namespace OMS.Common.ScadaContracts.DataContracts
     public class CommandDescription
     {
         [DataMember]
+        public long Gid { get; set; }
+        [DataMember]
         public ushort Address { get; set; }
         [DataMember]
         public int Value { get; set; }

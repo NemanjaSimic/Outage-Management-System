@@ -5,7 +5,7 @@ using System.Collections.Generic;
 using System.ServiceModel;
 using System.Threading.Tasks;
 
-namespace OMS.Common.ScadaContracts
+namespace OMS.Common.ScadaContracts.ModelProvider
 {
     [ServiceContract]
     public interface IScadaModelUpdateAccessContract : IService
@@ -18,5 +18,14 @@ namespace OMS.Common.ScadaContracts
 
         [OperationContract]
         Task UpdateCommandDescription(long gid, CommandDescription commandDescription);
+
+        //[OperationContract]
+        //Task MakeAnalogEntryToMeasurementCache();
+
+        //[OperationContract]
+        //Task MakeDiscreteEntryToMeasurementCache();
+
+        //[OperationContract]
+        //Task UpdateCommandDescription();
     }
 }

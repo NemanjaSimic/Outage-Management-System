@@ -1,9 +1,10 @@
 ﻿using Common.SCADA;
 using Microsoft.ServiceFabric.Data;
+using Microsoft.ServiceFabric.Data.Notifications;
 using OMS.Common.Cloud.ReliableCollectionHelpers;
-using OMS.Common.SCADA;
-using OMS.Common.ScadaContracts;
 using OMS.Common.ScadaContracts.DataContracts;
+using OMS.Common.ScadaContracts.DataContracts.ScadaModelPointItems;
+using OMS.Common.ScadaContracts.ModelProvider;
 using Outage.Common;
 using Outage.Common.Exceptions.SCADA;
 using Outage.Common.PubSub.SCADADataContract;
@@ -16,6 +17,15 @@ namespace SCADA.ModelProviderImplementation.ContractProviders
     public class IntegrityUpdateProvider : IScadaIntegrityUpdateContract
     {
         private readonly IReliableStateManager stateManager;
+        private bool isGidToPointItemMapInitialized;
+        private bool isCommandDescriptionCacheInitialized;
+        private bool isInfoCacheInitialized;
+
+        #region Private Properties
+        private bool ReliableDictionariesInitialized
+        {
+            get { return isGidToPointItemMapInitialized && isCommandDescriptionCacheInitialized && isInfoCacheInitialized; }
+        }
 
         private ILogger logger;
         private ILogger Logger
@@ -28,7 +38,7 @@ namespace SCADA.ModelProviderImplementation.ContractProviders
         {
             get
             {
-                return gidToPointItemMap ?? (gidToPointItemMap = new ReliableDictionaryAccess<long, IScadaModelPointItem>(stateManager, ReliableDictionaryNames.GidToPointItemMap));
+                return gidToPointItemMap ?? (gidToPointItemMap = ReliableDictionaryAccess<long, IScadaModelPointItem>.Create(stateManager, ReliableDictionaryNames.GidToPointItemMap).Result);
             }
         }
 
@@ -37,18 +47,85 @@ namespace SCADA.ModelProviderImplementation.ContractProviders
         {
             get
             {
-                return commandDescriptionCache ?? (commandDescriptionCache = new ReliableDictionaryAccess<long, CommandDescription>(stateManager, ReliableDictionaryNames.CommandDescriptionCache));
+                return commandDescriptionCache ?? (commandDescriptionCache = ReliableDictionaryAccess<long, CommandDescription>.Create(stateManager, ReliableDictionaryNames.CommandDescriptionCache).Result);
             }
         }
+
+        private ReliableDictionaryAccess<string, bool> infoCache;
+        private ReliableDictionaryAccess<string, bool> InfoCache
+        {
+            get
+            {
+                return infoCache ?? (infoCache = ReliableDictionaryAccess<string, bool>.Create(stateManager, ReliableDictionaryNames.InfoCache).Result);
+            }
+        }
+        #endregion Private Properties
 
         public IntegrityUpdateProvider(IReliableStateManager stateManager)
         {
             this.stateManager = stateManager;
+
+            this.isGidToPointItemMapInitialized = false;
+            this.isCommandDescriptionCacheInitialized = false;
+            this.isInfoCacheInitialized = false;
+
+            stateManager.StateManagerChanged += this.OnStateManagerChangedHandler;
+        }
+
+        private async void OnStateManagerChangedHandler(object sender, NotifyStateManagerChangedEventArgs e)
+        {
+            if (e.Action == NotifyStateManagerChangedAction.Add)
+            {
+                var operation = e as NotifyStateManagerSingleEntityChangedEventArgs;
+                string reliableStateName = operation.ReliableState.Name.AbsolutePath;
+
+                if (reliableStateName == ReliableDictionaryNames.GidToPointItemMap)
+                {
+                    //_ = GidToPointItemMap;
+                    gidToPointItemMap = await ReliableDictionaryAccess<long, IScadaModelPointItem>.Create(stateManager, ReliableDictionaryNames.GidToPointItemMap);
+                    this.isGidToPointItemMapInitialized = true;
+                }
+                else if (reliableStateName == ReliableDictionaryNames.CommandDescriptionCache)
+                {
+                    //_ = CommandDescriptionCache;
+                    commandDescriptionCache = await ReliableDictionaryAccess<long, CommandDescription>.Create(stateManager, ReliableDictionaryNames.CommandDescriptionCache);
+                    this.isCommandDescriptionCacheInitialized = true;
+                }
+                else if (reliableStateName == ReliableDictionaryNames.InfoCache)
+                {
+                    //_ = InfoCache;
+                    infoCache = await ReliableDictionaryAccess<string, bool>.Create(stateManager, ReliableDictionaryNames.InfoCache);
+                    isInfoCacheInitialized = true;
+                }
+            }
+        }
+
+        private async Task<bool> GetIsScadaModelImportedIndicator()
+        {
+            while (!ReliableDictionariesInitialized)
+            {
+                //TODO: something smarter
+                await Task.Delay(1000);
+            }
+
+            string key = "IsScadaModelImported";
+            if (!InfoCache.ContainsKey(key))
+            {
+                InfoCache[key] = false;
+            }
+
+            return InfoCache[key];
         }
 
         #region IScadaIntegrityUpdateContract
         public async Task<Dictionary<Topic, SCADAPublication>> GetIntegrityUpdate()
         {
+            while (!ReliableDictionariesInitialized || !(await GetIsScadaModelImportedIndicator()))
+            {
+                //TODO: something smarter
+                await Task.Delay(1000);
+            }
+
             if (GidToPointItemMap == null)
             {
                 string message = $"GetIntegrityUpdate => GidToPointItemMap is null.";
@@ -109,6 +186,12 @@ namespace SCADA.ModelProviderImplementation.ContractProviders
 
         public async Task<SCADAPublication> GetIntegrityUpdateForSpecificTopic(Topic topic)
         {
+            while (!ReliableDictionariesInitialized || !(await GetIsScadaModelImportedIndicator()))
+            {
+                //TODO: something smarter
+                await Task.Delay(1000);
+            }
+
             if (GidToPointItemMap == null)
             {
                 string message = $"GetIntegrityUpdate => GidToPointItemMap is null.";

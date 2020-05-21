@@ -113,7 +113,7 @@
       <Project>{5F25D9C5-9A93-49E7-92F7-58E399AEF928}</Project>
       <Name>Common.ScadaContracts</Name>
     </ProjectReference>
-    <ProjectReference Include="..\..\..\SCADA.CommandingImplementation\SCADA.CommandingImplementation.csproj">
+    <ProjectReference Include="..\SCADA.CommandingImplementation\SCADA.CommandingImplementation.csproj">
       <Project>{06A9FD17-9E70-4CBF-AD4B-9AD68BB2CBF4}</Project>
       <Name>SCADA.CommandingImplementation</Name>
     </ProjectReference>

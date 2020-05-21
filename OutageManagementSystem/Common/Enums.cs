@@ -3,15 +3,21 @@
 namespace Outage.Common
 {
     //NMS
+    [DataContract]
     public enum AnalogMeasurementType : short
     {
+        [EnumMember]
         VOLTAGE = 1,
+        [EnumMember]
         CURRENT = 2,
+        [EnumMember]
         POWER   = 3,
     }
 
+    [DataContract]
     public enum DiscreteMeasurementType : short
     {
+        [EnumMember]
         SWITCH_STATUS   = 1,
     }
 
@@ -22,10 +28,8 @@ namespace Outage.Common
     {
         [EnumMember]
         MEASUREMENT = 1,
-
         [EnumMember]
         SWITCH_STATUS,
-
         [EnumMember]
         TOPOLOGY,
 
@@ -111,10 +115,13 @@ namespace Outage.Common
     {
         [EnumMember]
         CREATED = 1,
+
         [EnumMember]
         ISOLATED = 2,
+
         [EnumMember]
         REPAIRED = 3,
+
         [EnumMember]
         ARCHIVED = 4,
     }

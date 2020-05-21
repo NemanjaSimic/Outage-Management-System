@@ -1,20 +1,37 @@
-﻿using OMS.Common.ScadaContracts.DataContracts;
+﻿using Common.SCADA;
+using OMS.Common.ScadaContracts.DataContracts;
 using Outage.Common;
 using System;
-using System.Collections.Generic;
 using System.Configuration;
-using System.Linq;
 using System.Net;
-using System.Text;
-using System.Threading.Tasks;
 
 namespace SCADA.ModelProviderImplementation.Helpers
 {
     internal static class ScadaConfigDataHelper
     {
-        public static void ImportAppSettings(ScadaConfigData data)
+        private static readonly object lockSync = new object();
+        private static IScadaConfigData scadaConfigData;
+
+        public static IScadaConfigData GetScadaConfigData()
+        {
+            if (scadaConfigData == null)
+            {
+                lock (lockSync)
+                {
+                    if (scadaConfigData == null)
+                    {
+                        scadaConfigData = ImportAppSettings();
+                    }
+                }
+            }
+
+            return scadaConfigData;
+        }
+
+        private static IScadaConfigData ImportAppSettings()
         {
             ILogger logger = LoggerWrapper.Instance;
+            ScadaConfigData data = new ScadaConfigData();
 
             if (ConfigurationManager.AppSettings["TcpPort"] is string tcpPortSetting)
             {
@@ -93,6 +110,8 @@ namespace SCADA.ModelProviderImplementation.Helpers
                     data.ModbusSimulatorExePath = Environment.CurrentDirectory.Replace(@"\SCADAServiceHost\bin\Debug", $@"{mdbSimExePath}\{data.ModbusSimulatorExeName}");
                 }
             }
+
+            return data;
         }
     }
 }
