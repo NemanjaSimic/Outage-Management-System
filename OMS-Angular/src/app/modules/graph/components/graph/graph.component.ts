@@ -338,8 +338,23 @@ export class GraphComponent implements OnInit, OnDestroy {
     {
       message = `Outage with ID ${outage.Id} has been successfully isolated.`;
     }
-    // mozda ovde prebaciti sve poruke za snackBar
-    this.snackBar.notify(message);
+    else if(outage.State == OutageLifeCycleState.Repaired)
+    {
+      message = `Crew has repaired outage with ID ${outage.Id} successfully.`;
+    }
+    else if(outage.State == OutageLifeCycleState.Created)
+    {
+      message = `Outage with ID ${outage.Id} is successfully created.`;
+    }
+    else if(outage.State == OutageLifeCycleState.Archived)
+    {
+      message = `Outage with ID ${outage.Id} is successfully archived.`;
+    }
+    
+    if (message)
+    {
+        this.snackBar.notify(message);
+    }
     this.activeOutages = this.activeOutages.filter(o => o.Id !== outage.Id);
     this.activeOutages.push(outage);
     this.drawGraph(); // da bi resetovao tooltip-ove, ako je velika mreza, optimizovacemo
@@ -394,21 +409,21 @@ export class GraphComponent implements OnInit, OnDestroy {
 
   public onSendCrewOutageCommand(id: Number): void {
     this.outageService.sendOutageRepairCrew(id).subscribe(
-      status => this.snackBar.notify(`Crew has repaired outage with ID ${id} successfully.`),
+      status => console.log(status),//this.snackBar.notify(`Crew has repaired outage with ID ${id} successfully.`),
       err => console.log(err)
     );
   }
 
   public onValidateOutageCommand(id: Number): void {
     this.outageService.sendValidateOutageCommand(id).subscribe(
-      status => this.snackBar.notify(`Outage with ID ${id} has been successfully validated.`),
+      status => console.log(status),//this.snackBar.notify(`Outage with ID ${id} has been successfully validated.`),
       err => console.log(err)
     );
   }
 
   public onResolveOutageCommand(id: Number): void {
     this.outageService.sendResolveOutageCommand(id).subscribe(
-      status => this.snackBar.notify(`Outage with ID ${id} has been successfully resolved.`),
+      status => console.log(status),//this.snackBar.notify(`Outage with ID ${id} has been successfully resolved.`),
       err => console.log(err)
     );
 
