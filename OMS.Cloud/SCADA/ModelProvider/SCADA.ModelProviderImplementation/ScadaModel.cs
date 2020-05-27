@@ -3,6 +3,7 @@ using Microsoft.ServiceFabric.Data;
 using Microsoft.ServiceFabric.Data.Notifications;
 using OMS.Common.Cloud.ReliableCollectionHelpers;
 using OMS.Common.Cloud.WcfServiceFabricClients.NMS;
+using OMS.Common.Cloud.WcfServiceFabricClients.SCADA;
 using OMS.Common.DistributedTransactionContracts;
 using OMS.Common.NmsContracts.GDA;
 using OMS.Common.SCADA;
@@ -36,6 +37,7 @@ namespace SCADA.ModelProviderImplementation
         private bool isInfoCacheInitialized;
 
         private NetworkModelGdaClient nmsGdaClient;
+        private ScadaCommandingClient scadaCommandingClient;
 
         #region Private Properties
         private bool ReliableDictionariesInitialized
@@ -122,11 +124,13 @@ namespace SCADA.ModelProviderImplementation
             this.pointItemHelper = new ScadaModelPointItemHelper();
 
             this.nmsGdaClient = NetworkModelGdaClient.CreateClient();
+            this.scadaCommandingClient = ScadaCommandingClient.CreateClient();
 
             this.isGidToPointItemMapInitialized = false;
             this.isAddressToGidMapInitialized = false;
             this.isCommandDescriptionCacheInitialized = false;
             this.isInfoCacheInitialized = false;
+
             stateManager.StateManagerChanged += this.OnStateManagerChangedHandler;
         }
 
@@ -185,14 +189,11 @@ namespace SCADA.ModelProviderImplementation
 
                 if (!isModelImported)
                 {
-                    this.nmsGdaClient = NetworkModelGdaClient.CreateClient();
-                    if (!await ImportModel(true))
-                    {
-                        string message = "ScadaModel: failed to ImportModel.";
-                        Logger.LogError(message);
-                        throw new Exception(message);
-                    }
+                    //TODO: neka ozbiljnija retry logiga
+                    throw new Exception("InitializeScadaModel: failed to import model");
                 }
+
+                await SendModelUpdateCommands();
             }
             catch (Exception e)
             {
@@ -200,6 +201,7 @@ namespace SCADA.ModelProviderImplementation
                 {
                     await Task.Delay(2000);
                     this.nmsGdaClient = NetworkModelGdaClient.CreateClient();
+                    this.scadaCommandingClient = ScadaCommandingClient.CreateClient();
                     await InitializeScadaModel(true);
                 }
                 else
@@ -238,12 +240,6 @@ namespace SCADA.ModelProviderImplementation
             Console.WriteLine(message);
 
             success = analogImportSuccess && discreteImportSuccess;
-
-            //TODO: model confirmation => modbus MU commands
-            //if (isSCADAModelImported && SignalIncomingModelConfirmation != null)
-            //{
-            //    SignalIncomingModelConfirmation.Invoke(new List<long>(CurrentScadaModel.Keys));
-            //}
 
             return success;
         }
@@ -561,6 +557,27 @@ namespace SCADA.ModelProviderImplementation
         #endregion ITransactionActorContract
 
         #region Private Methods
+        private async Task SendModelUpdateCommands()
+        {
+            var analogCommandingValues = new Dictionary<long, float>(CurrentAddressToGidMap[(short)PointType.ANALOG_OUTPUT].Count);
+            var discreteCommandingValues = new Dictionary<long, ushort>(CurrentAddressToGidMap[(short)PointType.DIGITAL_OUTPUT].Count);
+
+            foreach (long gid in CurrentAddressToGidMap[(short)PointType.ANALOG_OUTPUT].Values)
+            {
+                var analogPointItem = CurrentGidToPointItemMap[gid] as IAnalogPointItem;
+                analogCommandingValues.Add(gid, analogPointItem.CurrentEguValue);
+            }
+
+            foreach (long gid in CurrentAddressToGidMap[(short)PointType.DIGITAL_OUTPUT].Values)
+            {
+                var discretePointItem = CurrentGidToPointItemMap[gid] as IDiscretePointItem;
+                discreteCommandingValues.Add(gid, discretePointItem.CurrentValue);
+            }
+
+            await this.scadaCommandingClient.SendMultipleAnalogCommand(analogCommandingValues, CommandOriginType.MODEL_UPDATE_COMMAND);
+            await this.scadaCommandingClient.SendMultipleDiscreteCommand(discreteCommandingValues, CommandOriginType.MODEL_UPDATE_COMMAND);
+        }
+
         private async Task<Dictionary<long, IScadaModelPointItem>> CreatePointItemsFromNetworkModelMeasurements()
         {
             Dictionary<long, IScadaModelPointItem> pointItems = new Dictionary<long, IScadaModelPointItem>();

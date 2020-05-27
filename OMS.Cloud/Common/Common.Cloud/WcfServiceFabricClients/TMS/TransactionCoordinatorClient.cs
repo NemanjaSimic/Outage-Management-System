@@ -8,8 +8,11 @@ namespace OMS.Common.Cloud.WcfServiceFabricClients.TMS
 {
     public class TransactionCoordinatorClient : WcfSeviceFabricClientBase<ITransactionCoordinatorContract>, ITransactionCoordinatorContract
     {
+        private static readonly string microserviceName = MicroserviceNames.TransactionManagerService;
+        private static readonly string listenerName = "";
+
         public TransactionCoordinatorClient(WcfCommunicationClientFactory<ITransactionCoordinatorContract> clientFactory, Uri serviceUri, ServicePartitionKey servicePartition)
-            : base(clientFactory, serviceUri, servicePartition)
+            : base(clientFactory, serviceUri, servicePartition, listenerName)
         {
         }
 
@@ -19,7 +22,7 @@ namespace OMS.Common.Cloud.WcfServiceFabricClients.TMS
 
             if (serviceUri == null)
             {
-                return factory.CreateClient<TransactionCoordinatorClient, ITransactionCoordinatorContract>(MicroserviceNames.TransactionManagerService);
+                return factory.CreateClient<TransactionCoordinatorClient, ITransactionCoordinatorContract>(microserviceName);
             }
             else
             {

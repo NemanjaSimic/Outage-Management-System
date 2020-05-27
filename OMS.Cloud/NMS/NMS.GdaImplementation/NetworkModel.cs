@@ -438,6 +438,10 @@ namespace NMS.GdaImplementation
             {
                 networkDataModel = mongoDb.GetLatesNetworkModel(networkModelVersion);
             }
+            else if(deltaVersion==0 && networkModelVersion==0)
+            {
+                return;
+            }
             else
             {
                 throw new NotImplementedException("InitializeNetworkModel => else path...");
@@ -1073,12 +1077,5 @@ namespace NMS.GdaImplementation
             return incomingEntity;
         }
         #endregion
-
-        #region MongoDB
-        public void SaveNetworkModel()
-        {
-            mongoDb.SaveNetworkModel(NetworkDataModel);
-        }
-        #endregion MongoDB
     }
 }

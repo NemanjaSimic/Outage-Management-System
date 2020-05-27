@@ -7,8 +7,11 @@ namespace OMS.Common.Cloud.WcfServiceFabricClients.TMS
 {
     public class TransactionEnlistmentClient : WcfSeviceFabricClientBase<ITransactionEnlistmentContract>, ITransactionEnlistmentContract
     {
+        private static readonly string microserviceName = MicroserviceNames.TransactionManagerService;
+        private static readonly string listenerName = "";
+
         public TransactionEnlistmentClient(WcfCommunicationClientFactory<ITransactionEnlistmentContract> clientFactory, Uri serviceUri, ServicePartitionKey servicePartition)
-           : base(clientFactory, serviceUri, servicePartition)
+           : base(clientFactory, serviceUri, servicePartition, listenerName)
         {
         }
 
@@ -18,7 +21,7 @@ namespace OMS.Common.Cloud.WcfServiceFabricClients.TMS
 
             if (serviceUri == null)
             {
-                return factory.CreateClient<TransactionEnlistmentClient, ITransactionEnlistmentContract>(MicroserviceNames.TransactionManagerService);
+                return factory.CreateClient<TransactionEnlistmentClient, ITransactionEnlistmentContract>(microserviceName);
             }
             else
             {

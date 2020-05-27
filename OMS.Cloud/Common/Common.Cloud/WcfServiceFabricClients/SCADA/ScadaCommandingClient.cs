@@ -11,8 +11,11 @@ namespace OMS.Common.Cloud.WcfServiceFabricClients.SCADA
 
     public class ScadaCommandingClient : WcfSeviceFabricClientBase<IScadaCommandingContract>, IScadaCommandingContract
     {
+        private static readonly string microserviceName = MicroserviceNames.ScadaCommandingService;
+        private static readonly string listenerName = EndpointNames.SCADACommandService;
+
         public ScadaCommandingClient(WcfCommunicationClientFactory<IScadaCommandingContract> clientFactory, Uri serviceUri, ServicePartitionKey servicePartition)
-            : base(clientFactory, serviceUri, servicePartition)
+            : base(clientFactory, serviceUri, servicePartition, listenerName)
         {
         }
 
@@ -23,7 +26,7 @@ namespace OMS.Common.Cloud.WcfServiceFabricClients.SCADA
 
             if (serviceUri == null)
             {
-                return factory.CreateClient<ScadaCommandingClient, IScadaCommandingContract>(MicroserviceNames.ScadaCommandingService, servicePartition);
+                return factory.CreateClient<ScadaCommandingClient, IScadaCommandingContract>(microserviceName, servicePartition);
             }
             else
             {

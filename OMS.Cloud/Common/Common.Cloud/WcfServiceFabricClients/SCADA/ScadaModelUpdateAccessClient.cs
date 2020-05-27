@@ -2,6 +2,7 @@
 using Microsoft.ServiceFabric.Services.Communication.Wcf.Client;
 using OMS.Common.ScadaContracts.DataContracts;
 using OMS.Common.ScadaContracts.ModelProvider;
+using Outage.Common;
 using Outage.Common.PubSub.SCADADataContract;
 using System;
 using System.Collections.Generic;
@@ -11,8 +12,11 @@ namespace OMS.Common.Cloud.WcfServiceFabricClients.SCADA
 {
     public class ScadaModelUpdateAccessClient : WcfSeviceFabricClientBase<IScadaModelUpdateAccessContract>, IScadaModelUpdateAccessContract
     {
+        private static readonly string microserviceName = MicroserviceNames.ScadaModelProviderService;
+        private static readonly string listenerName = EndpointNames.ScadaModelUpdateAccessEndpoint;
+
         public ScadaModelUpdateAccessClient(WcfCommunicationClientFactory<IScadaModelUpdateAccessContract> clientFactory, Uri serviceUri, ServicePartitionKey servicePartition)
-            : base(clientFactory, serviceUri, servicePartition)
+            : base(clientFactory, serviceUri, servicePartition, listenerName)
         {
         }
 
@@ -23,7 +27,7 @@ namespace OMS.Common.Cloud.WcfServiceFabricClients.SCADA
 
             if (serviceUri == null)
             {
-                return factory.CreateClient<ScadaModelUpdateAccessClient, IScadaModelUpdateAccessContract>(MicroserviceNames.ScadaModelProviderService, servicePartition);
+                return factory.CreateClient<ScadaModelUpdateAccessClient, IScadaModelUpdateAccessContract>(microserviceName, servicePartition);
             }
             else
             {

@@ -10,8 +10,11 @@ namespace OMS.Common.Cloud.WcfServiceFabricClients.TMS
 {
     public class ModelUpdateNotificationClient : WcfSeviceFabricClientBase<IModelUpdateNotificationContract>, IModelUpdateNotificationContract
     {
+        private static readonly string microserviceName = MicroserviceNames.TransactionActorService;
+        private static readonly string listenerName = "";
+
         public ModelUpdateNotificationClient(WcfCommunicationClientFactory<IModelUpdateNotificationContract> clientFactory, Uri serviceUri, ServicePartitionKey servicePartition)
-            : base(clientFactory, serviceUri, servicePartition)
+            : base(clientFactory, serviceUri, servicePartition, listenerName)
         {
         }
 
@@ -21,7 +24,7 @@ namespace OMS.Common.Cloud.WcfServiceFabricClients.TMS
 
             if (serviceUri == null)
             {
-                return factory.CreateClient<ModelUpdateNotificationClient, IModelUpdateNotificationContract>(MicroserviceNames.TransactionActorService);
+                return factory.CreateClient<ModelUpdateNotificationClient, IModelUpdateNotificationContract>(microserviceName);
             }
             else
             {

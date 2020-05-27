@@ -84,11 +84,13 @@ namespace SCADA.CommandingImplementation
                 throw new InternalSCADAServiceException(message);
             }
 
+            int analogOutputCount = addressToGidMap[(short)PointType.ANALOG_OUTPUT].Count;
             int[] multipleCommandingValues = new int[addressToGidMap[(short)PointType.ANALOG_OUTPUT].Count];
 
-            int analogOutputCount = addressToGidMap[(short)PointType.ANALOG_OUTPUT].Count;
-            for (ushort address = 1; address <= (short)PointType.ANALOG_OUTPUT; address++)
-            {
+            //for (ushort address = 1; address <= analogOutputCount; address++)
+            //{
+            foreach(ushort address in addressToGidMap[(short)PointType.ANALOG_OUTPUT].Keys)
+            { 
                 long gid = addressToGidMap[(short)PointType.ANALOG_OUTPUT][address];
 
                 if (!gidToPointItemMap.ContainsKey(gid))
@@ -116,7 +118,14 @@ namespace SCADA.CommandingImplementation
                         commandingValue = analogPointItem.CurrentRawValue;
                     }
 
-                    multipleCommandingValues[address - 1] = commandingValue;
+                    if(address <= analogOutputCount)
+                    {
+                        multipleCommandingValues[address - 1] = commandingValue;
+                    }
+                    else
+                    {
+                        throw new Exception("PointItem addresses of ANALOG entities are not successive. This can happen due to cim/xml being invalid.");
+                    }
                 }
             }
 
@@ -187,10 +196,11 @@ namespace SCADA.CommandingImplementation
                 throw new InternalSCADAServiceException(message);
             }
 
+            int digitalOutputCount = addressToGidMap[(short)PointType.DIGITAL_OUTPUT].Count;
             int[] multipleCommandingValues = new int[addressToGidMap[(short)PointType.DIGITAL_OUTPUT].Count];
 
-            int digitalOutputCount = addressToGidMap[(short)PointType.DIGITAL_OUTPUT].Count;
-            for (ushort address = 1; address <= digitalOutputCount; address++)
+            //for (ushort address = 1; address <= digitalOutputCount; address++)
+            foreach (ushort address in addressToGidMap[(short)PointType.DIGITAL_OUTPUT].Keys)
             {
                 long gid = addressToGidMap[(short)PointType.DIGITAL_OUTPUT][address];
 
@@ -219,7 +229,14 @@ namespace SCADA.CommandingImplementation
                         commandingValue = discretePointItem.CurrentValue;
                     }
 
-                    multipleCommandingValues[address - 1] = commandingValue;
+                    if (address <= digitalOutputCount)
+                    {
+                        multipleCommandingValues[address - 1] = commandingValue;
+                    }
+                    else
+                    {
+                        throw new Exception("PointItem addresses of DISCRETE entities are not successive. This can happen due to cim/xml being invalid.");
+                    }
                 }
             }
 

@@ -11,8 +11,11 @@ namespace OMS.Common.Cloud.WcfServiceFabricClients.NMS
 {
     public class NetworkModelGdaClient : WcfSeviceFabricClientBase<INetworkModelGDAContract>, INetworkModelGDAContract
     {
+        private static readonly string microserviceName = MicroserviceNames.NmsGdaService;
+        private static readonly string listenerName = EndpointNames.NetworkModelGDAEndpoint;
+
         public NetworkModelGdaClient(WcfCommunicationClientFactory<INetworkModelGDAContract> clientFactory, Uri serviceUri, ServicePartitionKey servicePartition) 
-            : base(clientFactory, serviceUri, servicePartition)
+            : base(clientFactory, serviceUri, servicePartition, listenerName)
         {
         }
 
@@ -23,7 +26,7 @@ namespace OMS.Common.Cloud.WcfServiceFabricClients.NMS
 
             if (serviceUri == null)
             {
-                return factory.CreateClient<NetworkModelGdaClient, INetworkModelGDAContract>(MicroserviceNames.NmsGdaService, servicePartition);
+                return factory.CreateClient<NetworkModelGdaClient, INetworkModelGDAContract>(microserviceName, servicePartition);
             }
             else
             {

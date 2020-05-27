@@ -1,12 +1,11 @@
 ﻿using Microsoft.ServiceFabric.Services.Client;
+using Microsoft.ServiceFabric.Services.Communication.Client;
 using Microsoft.ServiceFabric.Services.Communication.Wcf;
 using Microsoft.ServiceFabric.Services.Communication.Wcf.Client;
 using Microsoft.ServiceFabric.Services.Remoting;
 using System;
 using System.Collections.Generic;
 using System.Configuration;
-using System.Fabric;
-using System.Threading;
 
 namespace OMS.Common.Cloud.WcfServiceFabricClients
 {
@@ -36,8 +35,8 @@ namespace OMS.Common.Cloud.WcfServiceFabricClients
             var partitionResolver = ServicePartitionResolver.GetDefault();
             var wcfClientFactory = new WcfCommunicationClientFactory<TContract>(clientBinding: binding,
                                                                                 servicePartitionResolver: partitionResolver);
+
             return (TClient)Activator.CreateInstance(typeof(TClient), new object[] { wcfClientFactory, serviceUri, servicePartition });
-            //return (TClient)Activator.CreateInstance(typeof(TClient), new object[] { wcfClientFactory, serviceUri, servicePartition, TargetReplicaSelector.Default, null, null });
         }
     }
 }

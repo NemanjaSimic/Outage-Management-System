@@ -2,6 +2,7 @@
 using System.Collections.Generic;
 using System.Fabric;
 using System.Linq;
+using System.ServiceModel;
 using System.Threading;
 using System.Threading.Tasks;
 using Microsoft.ServiceFabric.Services.Communication.Runtime;
@@ -11,6 +12,7 @@ using OMS.Common.Cloud.WcfServiceFabricClients.SCADA;
 using OMS.Common.NmsContracts.GDA;
 using OMS.Common.SCADA;
 using OMS.Common.ScadaContracts.DataContracts;
+using OMS.Common.ScadaContracts.ModelProvider;
 using Outage.Common;
 using Outage.Common.PubSub.SCADADataContract;
 
@@ -64,12 +66,36 @@ namespace TestService
             //await TestReadCommandEnqueuerClient();
             //await TestWriteCommandEnqueuerClient();
             //await TestModelUpdateCommandEnqueuerClient();
-            
+
             //await TestScadaModelReadAccessClient();
             //await TestScadaModelUpdateAccessClient();
             //await TestScadaIntegrityUpdateClient();
             //await TestScadaCommandingClient();
             //await TestNetworkModelGdaClient();
+
+            //try
+            //{
+            //    Type type1 = typeof(IScadaModelReadAccessContract);
+            //    Type type2 = typeof(IScadaModelUpdateAccessContract);
+
+            //    ServiceContractAttribute atr1 =  (ServiceContractAttribute)Attribute.GetCustomAttribute(type1, typeof(ServiceContractAttribute));
+            //    ServiceContractAttribute atr2 = (ServiceContractAttribute)Attribute.GetCustomAttribute(type2, typeof(ServiceContractAttribute));
+
+            //    Attribute[] atr1s = Attribute.GetCustomAttributes(type1);
+            //    Attribute[] atr2s = Attribute.GetCustomAttributes(type2);
+
+            //    OperationContractAttribute op1 = (OperationContractAttribute)Attribute.GetCustomAttribute(type1.GetMethod("GetAddressToGidMap"), typeof(OperationContractAttribute));
+            //    OperationContractAttribute op2 = (OperationContractAttribute)Attribute.GetCustomAttribute(type1.GetMethod("GetAddressToPointItemMap"), typeof(OperationContractAttribute));
+            //    OperationContractAttribute op3 = (OperationContractAttribute)Attribute.GetCustomAttribute(type1.GetMethod("GetCommandDescriptionCache"), typeof(OperationContractAttribute));
+            //    OperationContractAttribute op4 = (OperationContractAttribute)Attribute.GetCustomAttribute(type1.GetMethod("GetGidToPointItemMap"), typeof(OperationContractAttribute));
+                                                 
+            //    OperationContractAttribute op5 = (OperationContractAttribute)Attribute.GetCustomAttribute(type2.GetMethod("MakeAnalogEntryToMeasurementCache"), typeof(OperationContractAttribute));
+            //    OperationContractAttribute op6 = (OperationContractAttribute)Attribute.GetCustomAttribute(type2.GetMethod("MakeDiscreteEntryToMeasurementCache"), typeof(OperationContractAttribute));
+            //    OperationContractAttribute op7 = (OperationContractAttribute)Attribute.GetCustomAttribute(type2.GetMethod("UpdateCommandDescription"), typeof(OperationContractAttribute));
+            //}
+            //catch (Exception e)
+            //{
+            //}
         }
 
         private async Task TestReadCommandEnqueuerClient()

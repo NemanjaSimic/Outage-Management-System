@@ -11,8 +11,11 @@ namespace OMS.Common.Cloud.WcfServiceFabricClients.SCADA
 {
     public class ScadaIntegrityUpdateClient : WcfSeviceFabricClientBase<IScadaIntegrityUpdateContract>, IScadaIntegrityUpdateContract
     {
+        private static readonly string microserviceName = MicroserviceNames.ScadaModelProviderService;
+        private static readonly string listenerName = EndpointNames.SCADAIntegrityUpdateEndpoint;
+
         public ScadaIntegrityUpdateClient(WcfCommunicationClientFactory<IScadaIntegrityUpdateContract> clientFactory, Uri serviceUri, ServicePartitionKey servicePartition)
-            : base(clientFactory, serviceUri, servicePartition)
+            : base(clientFactory, serviceUri, servicePartition, listenerName)
         {
         }
 
@@ -23,7 +26,7 @@ namespace OMS.Common.Cloud.WcfServiceFabricClients.SCADA
 
             if (serviceUri == null)
             {
-                return factory.CreateClient<ScadaIntegrityUpdateClient, IScadaIntegrityUpdateContract>(MicroserviceNames.ScadaModelProviderService, servicePartition);
+                return factory.CreateClient<ScadaIntegrityUpdateClient, IScadaIntegrityUpdateContract>(microserviceName, servicePartition);
             }
             else
             {
