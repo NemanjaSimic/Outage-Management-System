@@ -33,7 +33,6 @@ namespace SCADA.FunctionExecutorImplementation
 
         private ScadaModelReadAccessClient modelReadAccessClient;
         private ScadaModelUpdateAccessClient modelUpdateAccessClient;
-        //private NewScadaModelUpdateAccessClient newScadaModelUpdateAccessClient;
 
         private IScadaConfigData configData;
         private ModbusClient modbusClient;
@@ -41,12 +40,16 @@ namespace SCADA.FunctionExecutorImplementation
         public FunctionExecutorCycle()
         {
             CloudQueueHelper.TryGetQueue("readcommandqueue", out this.readCommandQueue);
+            this.readCommandQueue.ClearAsync();
+
             CloudQueueHelper.TryGetQueue("writecommandqueue", out this.writeCommandQueue);
+            this.writeCommandQueue.ClearAsync();
+
             CloudQueueHelper.TryGetQueue("mucommandqueue", out this.modelUpdateCommandQueue);
+            this.modelUpdateCommandQueue.ClearAsync();
 
             this.modelReadAccessClient = ScadaModelReadAccessClient.CreateClient();
             this.modelUpdateAccessClient = ScadaModelUpdateAccessClient.CreateClient();
-            //this.newScadaModelUpdateAccessClient = NewScadaModelUpdateAccessClient.CreateClient();
         }
 
         public async Task Start(bool isRetry = false)
@@ -66,25 +69,34 @@ namespace SCADA.FunctionExecutorImplementation
                 while (modelUpdateCommandQueue.PeekMessage() != null)
                 {
                     CloudQueueMessage message = modelUpdateCommandQueue.GetMessage();
-                    IModbusFunction currentCommand = (IModbusFunction)(Serialization.ByteArrayToObject(message.AsBytes));
-                    modelUpdateCommandQueue.DeleteMessage(message);
-                    await ExecuteCommand(currentCommand);
+                    if(message!=null)
+                    {
+                        IModbusFunction currentCommand = (IModbusFunction)(Serialization.ByteArrayToObject(message.AsBytes));
+                        modelUpdateCommandQueue.DeleteMessage(message);
+                        await ExecuteCommand(currentCommand);
+                    }
                 }
 
                 while (writeCommandQueue.PeekMessage() != null)
                 {
                     CloudQueueMessage message = writeCommandQueue.GetMessage();
-                    IModbusFunction currentCommand = (IModbusFunction)(Serialization.ByteArrayToObject(message.AsBytes));
-                    writeCommandQueue.DeleteMessage(message);
-                    await ExecuteCommand(currentCommand);
+                    if(message!=null)
+                    {
+                        IModbusFunction currentCommand = (IModbusFunction)(Serialization.ByteArrayToObject(message.AsBytes));
+                        writeCommandQueue.DeleteMessage(message);
+                        await ExecuteCommand(currentCommand);
+                    }
                 }
 
                 while (readCommandQueue.PeekMessage() != null)
                 {
                     CloudQueueMessage message = readCommandQueue.GetMessage();
-                    IModbusFunction currentCommand = (IModbusFunction)(Serialization.ByteArrayToObject(message.AsBytes));
-                    readCommandQueue.DeleteMessage(message);
-                    await ExecuteCommand(currentCommand);
+                    if (message != null)
+                    {
+                        IModbusFunction currentCommand = (IModbusFunction)(Serialization.ByteArrayToObject(message.AsBytes));
+                        readCommandQueue.DeleteMessage(message);
+                        await ExecuteCommand(currentCommand);
+                    }
                 }
             }
             catch (Exception ex)

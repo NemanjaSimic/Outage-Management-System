@@ -9,6 +9,8 @@ using System.Linq;
 using OMS.Common.NmsContracts.GDA;
 using NMS.DataModel;
 using NMS.GdaImplementation.DbModel;
+using System.Threading;
+using System.Threading.Tasks;
 
 namespace NMS.GdaImplementation
 {
@@ -134,25 +136,34 @@ namespace NMS.GdaImplementation
             }
         }
 
-        public void GetVersions(ref long networkModelVersion, ref long deltaVersion)
+        public void GetVersions(ref long networkModelVersion, ref long deltaVersion, bool isRetry=false)
         {
-            //TODO: bug fix, runtime faliure
-            IMongoCollection<ModelVersionDocument> versionsCollection = db.GetCollection<ModelVersionDocument>("versions");
-
-            var networkModelVersionFilter = Builders<ModelVersionDocument>.Filter.Eq("_id", "networkModelVersion");
-            var deltaVersionFilter = Builders<ModelVersionDocument>.Filter.Eq("_id", "deltaVersion");
-
-            if (versionsCollection.Find(networkModelVersionFilter).CountDocuments() > 0)
+            try
             {
-                networkModelVersion = versionsCollection.Find(networkModelVersionFilter).First().Version;
-            }
+                //TODO: bug fix, runtime faliure
+                IMongoCollection<ModelVersionDocument> versionsCollection = db.GetCollection<ModelVersionDocument>("versions");
 
-            if (versionsCollection.Find(deltaVersionFilter).CountDocuments() > 0)
-            {
-                deltaVersion = versionsCollection.Find(deltaVersionFilter).First().Version;
+                var networkModelVersionFilter = Builders<ModelVersionDocument>.Filter.Eq("_id", "networkModelVersion");
+                var deltaVersionFilter = Builders<ModelVersionDocument>.Filter.Eq("_id", "deltaVersion");
+
+                if (versionsCollection.Find(networkModelVersionFilter).CountDocuments() > 0)
+                {
+                    networkModelVersion = versionsCollection.Find(networkModelVersionFilter).First().Version;
+                }
+
+                if (versionsCollection.Find(deltaVersionFilter).CountDocuments() > 0)
+                {
+                    deltaVersion = versionsCollection.Find(deltaVersionFilter).First().Version;
+                }
             }
-            //networkModelVersion = 2;
-            //deltaVersion = 1;
+            catch (TimeoutException toe)
+            {
+                if(!isRetry)
+                {
+                    Task.Delay(60000).Wait();
+                    GetVersions(ref networkModelVersion, ref deltaVersion, true);
+                }
+            }
         }
 
         public List<Delta> GetAllDeltas(long deltaVersion, long networkModelVersion)

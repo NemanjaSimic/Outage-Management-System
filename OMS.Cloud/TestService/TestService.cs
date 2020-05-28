@@ -63,6 +63,12 @@ namespace TestService
         /// <param name="cancellationToken">Canceled when Service Fabric needs to shut down this service instance.</param>
         protected override async Task RunAsync(CancellationToken cancellationToken)
         {
+            //while(true)
+            //{
+            //    await TestScadaCommandingClient();
+            //    await Task.Delay(2000);
+            //}
+
             //await TestReadCommandEnqueuerClient();
             //await TestWriteCommandEnqueuerClient();
             //await TestModelUpdateCommandEnqueuerClient();
@@ -109,7 +115,6 @@ namespace TestService
             }
         }
 
-        //mismatch
         private async Task TestWriteCommandEnqueuerClient()
         {
             try
@@ -121,7 +126,6 @@ namespace TestService
             }
         }
 
-        //mismatch
         private async Task TestModelUpdateCommandEnqueuerClient()
         {
             try
@@ -130,7 +134,7 @@ namespace TestService
             }
             catch (Exception e)
             {
-            } 
+            }
         }
 
         private async Task TestScadaModelReadAccessClient()
@@ -233,9 +237,17 @@ namespace TestService
 
         private async Task TestScadaCommandingClient()
         {
+            try
+            {
+                await this.scadaCommandingClient.SendSingleAnalogCommand(0x0000000E00000001, 666, CommandOriginType.OTHER_COMMAND);
+            }
+            catch (Exception e)
+            {
+            }
+
             //try
             //{
-            //    await this.scadaCommandingClient.SendSingleAnalogCommand(0, 0, CommandOriginType.OTHER_COMMAND);
+            //    await this.scadaCommandingClient.SendMultipleAnalogCommand(new Dictionary<long, float>(), CommandOriginType.OTHER_COMMAND);
             //}
             //catch (Exception e)
             //{
@@ -243,27 +255,19 @@ namespace TestService
 
             try
             {
-                await this.scadaCommandingClient.SendMultipleAnalogCommand(new Dictionary<long, float>(), CommandOriginType.OTHER_COMMAND);
+                await this.scadaCommandingClient.SendSingleDiscreteCommand(0x0000000D00000001, 1, CommandOriginType.OTHER_COMMAND);
             }
             catch (Exception e)
             {
             }
 
-            try
-            {
-                await this.scadaCommandingClient.SendSingleDiscreteCommand(0, 0, CommandOriginType.OTHER_COMMAND);
-            }
-            catch (Exception e)
-            {
-            }
-
-            try
-            {
-                await this.scadaCommandingClient.SendMultipleDiscreteCommand(new Dictionary<long, ushort>(), CommandOriginType.OTHER_COMMAND);
-            }
-            catch (Exception e)
-            {
-            }
+            //try
+            //{
+            //    await this.scadaCommandingClient.SendMultipleDiscreteCommand(new Dictionary<long, ushort>(), CommandOriginType.OTHER_COMMAND);
+            //}
+            //catch (Exception e)
+            //{
+            //}
         }
 
         private async Task TestNetworkModelGdaClient()
