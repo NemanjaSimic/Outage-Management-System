@@ -1,5 +1,5 @@
-﻿using Outage.Common;
-using Outage.Common.GDA;
+﻿using OMS.Common.NmsContracts.GDA;
+using Outage.Common;
 
 namespace Outage.DataImporter.CIMAdapter.Importer
 {

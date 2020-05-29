@@ -4,10 +4,8 @@ using System.Text;
 using System.Threading.Tasks;
 using FTN.Services.NetworkModelService.TestClientUI;
 using OMS.Common.Cloud.WcfServiceFabricClients.NMS;
+using OMS.Common.NmsContracts.GDA;
 using Outage.Common;
-using Outage.Common.GDA;
-using Outage.Common.ServiceContracts.GDA;
-using Outage.Common.ServiceProxies;
 
 namespace TelventDMS.Services.NetworkModelService.TestClient.TestsUI
 {

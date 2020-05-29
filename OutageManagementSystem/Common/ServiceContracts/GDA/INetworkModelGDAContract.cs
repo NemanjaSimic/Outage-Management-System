@@ -1,4 +1,5 @@
-﻿using System.Collections.Generic;
+﻿using System;
+using System.Collections.Generic;
 using System.ServiceModel;
 using System.Threading.Tasks;
 using Microsoft.ServiceFabric.Services.Remoting;
@@ -7,6 +8,7 @@ using Outage.Common.GDA;
 namespace Outage.Common.ServiceContracts.GDA
 {
 	[ServiceContract]
+	[Obsolete]
 	public interface INetworkModelGDAContract : IService
 	{
 		/// <summary>
@@ -15,6 +17,7 @@ namespace Outage.Common.ServiceContracts.GDA
 		/// <param name="delta">Object which contains model changes</param>		
 		/// <returns>Result of model changes</returns>
 		[OperationContract]
+		[Obsolete]
 		Task<UpdateResult> ApplyUpdate(Delta delta);
 
 		/// <summary>
@@ -24,6 +27,7 @@ namespace Outage.Common.ServiceContracts.GDA
 		/// <param name="propIds">List of requested properties</param>		
 		/// <returns>Resource description of the specified entity</returns>
 		[OperationContract]
+		[Obsolete]
 		Task<ResourceDescription> GetValues(long resourceId, List<ModelCode> propIds);
 
 		/// <summary>
@@ -33,6 +37,7 @@ namespace Outage.Common.ServiceContracts.GDA
 		/// <param name="propIds">List of requested property codes</param>
 		/// <returns>Id of resource iterator for the requested entities</returns>
 		[OperationContract]
+		[Obsolete]
 		Task<int> GetExtentValues(ModelCode entityType, List<ModelCode> propIds);
 
 		/// <summary>
@@ -43,6 +48,7 @@ namespace Outage.Common.ServiceContracts.GDA
 		/// <param name="association">Relation between source and entities that should be returned</param>		
 		/// <returns>Id of the resource iterator for the requested entities</returns>
 		[OperationContract]
+		[Obsolete]
 		Task<int> GetRelatedValues(long source, List<ModelCode> propIds, Association association);
 
 		/// <summary>
@@ -52,6 +58,7 @@ namespace Outage.Common.ServiceContracts.GDA
 		/// <param name="id">Id of the resource iterator</param>
 		/// <returns>List of resource descriptions</returns>
 		[OperationContract]
+		[Obsolete]
 		Task<List<ResourceDescription>> IteratorNext(int n, int id);
 
 		/// <summary>
@@ -60,6 +67,7 @@ namespace Outage.Common.ServiceContracts.GDA
 		/// <param name="id">Id of the resource iterator</param>
 		/// <returns>TRUE if current position in iterator is successfully reseted</returns>
 		[OperationContract]
+		[Obsolete]
 		Task<bool> IteratorRewind(int id);
 
 		/// <summary>
@@ -68,6 +76,7 @@ namespace Outage.Common.ServiceContracts.GDA
 		/// <param name="id">Id of the resource iterator</param>
 		/// <returns>Total number of resources in resource iterator</returns>
 		[OperationContract]
+		[Obsolete]
 		Task<int> IteratorResourcesTotal(int id);
 
 		/// <summary>
@@ -76,6 +85,7 @@ namespace Outage.Common.ServiceContracts.GDA
 		/// <param name="id">Id of the resource iterator</param>
 		/// <returns>Number of resource iterator left to return in next calls</returns>
 		[OperationContract]
+		[Obsolete]
 		Task<int> IteratorResourcesLeft(int id);
 
 		/// <summary>
@@ -84,6 +94,7 @@ namespace Outage.Common.ServiceContracts.GDA
 		/// <param name="id">Id of the resource iterator</param>
 		/// <returns>TRUE if iterator is successfully closed</returns>
 		[OperationContract]
+		[Obsolete]
 		Task<bool> IteratorClose(int id);
 	}
 }

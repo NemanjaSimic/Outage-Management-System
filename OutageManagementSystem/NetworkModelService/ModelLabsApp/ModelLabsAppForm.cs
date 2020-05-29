@@ -4,11 +4,11 @@ using System.Text;
 using System.Windows.Forms;
 using System.Xml;
 using Outage.Common;
-using Outage.Common.GDA;
 using Outage.DataImporter.CIMAdapter;
 using Outage.DataImporter.CIMAdapter.Manager;
 using System.Windows.Threading;
 using System.Threading.Tasks;
+using OMS.Common.NmsContracts.GDA;
 
 namespace Outage.DataImporter.ModelLabsApp
 {

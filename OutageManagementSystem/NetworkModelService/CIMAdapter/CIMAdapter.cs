@@ -2,7 +2,6 @@
 using CIMParser;
 using Outage.DataImporter.CIMAdapter.Importer;
 using Outage.DataImporter.CIMAdapter.Manager;
-using Outage.Common.GDA;
 using System;
 using System.IO;
 using System.Reflection;
@@ -11,6 +10,7 @@ using Outage.Common;
 using OMS.Common.Cloud.WcfServiceFabricClients.NMS;
 using System.Threading.Tasks;
 using System.Text;
+using OMS.Common.NmsContracts.GDA;
 
 namespace Outage.DataImporter.CIMAdapter
 {

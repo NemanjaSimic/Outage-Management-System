@@ -1,10 +1,8 @@
-﻿using Outage.Common;
-using Outage.Common.GDA;
+﻿using OMS.Common.NmsContracts.GDA;
+using Outage.Common;
 using System;
 using System.Collections.Generic;
-using System.Linq;
 using System.Text;
-using System.Threading.Tasks;
 
 namespace FTN.Services.NetworkModelService.TestClientUI
 {

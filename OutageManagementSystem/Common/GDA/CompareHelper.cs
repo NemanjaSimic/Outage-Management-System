@@ -3,8 +3,10 @@ using System.Collections.Generic;
 
 namespace Outage.Common.GDA
 {
+	[Obsolete("Use Common.NmsContracts alternative")]
 	public class CompareHelper
 	{
+		[Obsolete("Use Common.NmsContracts alternative")]
 		public static bool CompareLists(List<long> xList, List<long> yList, bool compareReferences = true)
 		{
 			if (Object.ReferenceEquals(xList, null) && Object.ReferenceEquals(yList, null))

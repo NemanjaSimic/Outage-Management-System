@@ -7,6 +7,7 @@ namespace Outage.Common.GDA
 	/// <summary>
 	/// An enumeration that defines property types
 	/// </summary>	
+	[Obsolete("Use Common.NmsContracts alternative")]
 	public enum PropertyType : short
 	{
 		Empty = 0,
@@ -42,7 +43,8 @@ namespace Outage.Common.GDA
 	/// A class that describes property of generic model resource
 	/// </summary>
 	//[Serializable]
-	[DataContract]	
+	[DataContract]
+	[Obsolete("Use Common.NmsContracts alternative")]
 	public class Property : IComparable
 	{
 		private ILogger logger;

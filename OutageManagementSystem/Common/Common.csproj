@@ -54,7 +54,7 @@
     <Prefer32Bit>false</Prefer32Bit>
   </PropertyGroup>
   <PropertyGroup Condition=" '$(Configuration)|$(Platform)' == 'Debug|x64' ">
-    <PlatformTarget>AnyCPU</PlatformTarget>
+    <PlatformTarget>x64</PlatformTarget>
     <OutputPath>..\bin64\</OutputPath>
     <CodeAnalysisRuleSet>AllRules.ruleset</CodeAnalysisRuleSet>
     <DefineConstants>TRACE;DEBUG</DefineConstants>
@@ -183,7 +183,6 @@
     <Compile Include="GDA\Property.cs" />
     <Compile Include="GDA\ResourceDescription.cs" />
     <Compile Include="GDA\PropertyValue.cs" />
-    <Compile Include="ServiceProxies\WcfServiceFabricCommunicationClient.cs" />
     <Compile Include="UI\UIMeasurement.cs" />
     <Compile Include="UI\UIModel.cs" />
     <Compile Include="UI\UINode.cs" />
@@ -194,6 +193,7 @@
     <None Include="Log4NetConfig.config">
       <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
     </None>
+    <None Include="Properties\packages.config" />
     <None Include="Properties\Settings.settings">
       <Generator>SettingsSingleFileGenerator</Generator>
       <LastGenOutput>Settings.Designer.cs</LastGenOutput>

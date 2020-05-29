@@ -10,7 +10,8 @@ namespace Outage.Common.GDA
 	/// A class that describes generic model resource
 	/// </summary>
 	//[Serializable]
-	[DataContract]	
+	[DataContract]
+	[Obsolete("Use Common.NmsContracts alternative")]
 	public class ResourceDescription
 	{
 		private long id;

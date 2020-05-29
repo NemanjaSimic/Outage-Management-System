@@ -7,7 +7,7 @@ using System.Runtime.Serialization.Formatters.Binary;
 
 namespace Outage.Common.GDA
 {
-
+	[Obsolete("Use Common.NmsContracts alternative")]
 	public enum DeltaOpType : byte 
 	{ 
 		Insert = 0, 
@@ -15,7 +15,8 @@ namespace Outage.Common.GDA
 		Delete = 2 
 	}
 
-	[DataContract]	
+	[DataContract]
+	[Obsolete("Use Common.NmsContracts alternative")]
 	public class Delta
 	{
         private ILogger logger;

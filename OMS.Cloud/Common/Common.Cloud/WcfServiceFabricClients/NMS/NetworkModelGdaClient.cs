@@ -1,63 +1,40 @@
 ﻿using Microsoft.ServiceFabric.Services.Client;
-using Microsoft.ServiceFabric.Services.Communication.Wcf;
 using Microsoft.ServiceFabric.Services.Communication.Wcf.Client;
+using OMS.Common.NmsContracts;
+using OMS.Common.NmsContracts.GDA;
 using Outage.Common;
-using Outage.Common.GDA;
-using Outage.Common.ServiceContracts.GDA;
 using System;
 using System.Collections.Generic;
-using System.Configuration;
-using System.Fabric;
-using System.ServiceModel;
 using System.Threading.Tasks;
 
 namespace OMS.Common.Cloud.WcfServiceFabricClients.NMS
 {
     public class NetworkModelGdaClient : WcfSeviceFabricClientBase<INetworkModelGDAContract>, INetworkModelGDAContract
     {
-        public NetworkModelGdaClient(WcfCommunicationClientFactory<INetworkModelGDAContract> clientFactory, Uri serviceName) 
-            : base(clientFactory, serviceName)
+        private static readonly string microserviceName = MicroserviceNames.NmsGdaService;
+        private static readonly string listenerName = EndpointNames.NetworkModelGDAEndpoint;
+
+        public NetworkModelGdaClient(WcfCommunicationClientFactory<INetworkModelGDAContract> clientFactory, Uri serviceUri, ServicePartitionKey servicePartition) 
+            : base(clientFactory, serviceUri, servicePartition, listenerName)
         {
         }
 
-        public static NetworkModelGdaClient CreateClient(Uri nmsServiceName = null)
+        public static NetworkModelGdaClient CreateClient(Uri serviceUri = null)
         {
-            if (nmsServiceName == null && ConfigurationManager.AppSettings[MicroserviceNames.NmsGdaService] is string nmsGdaServiceName)
+            ClientFactory factory = new ClientFactory();
+            ServicePartitionKey servicePartition = ServicePartitionKey.Singleton;
+
+            if (serviceUri == null)
             {
-                nmsServiceName = new Uri(nmsGdaServiceName);
+                return factory.CreateClient<NetworkModelGdaClient, INetworkModelGDAContract>(microserviceName, servicePartition);
             }
-
-            var partitionResolver = new ServicePartitionResolver(() => new FabricClient());
-            //var partitionResolver = ServicePartitionResolver.GetDefault();
-            var factory = new WcfCommunicationClientFactory<INetworkModelGDAContract>(CreateBinding(), null, partitionResolver);
-            
-            return new NetworkModelGdaClient(factory, nmsServiceName);
+            else
+            {
+                return factory.CreateClient<NetworkModelGdaClient, INetworkModelGDAContract>(serviceUri, servicePartition);
+            }
         }
 
-        private static NetTcpBinding CreateBinding()
-        {
-            //NetTcpBinding binding = new NetTcpBinding(SecurityMode.None)
-            //{
-            //    SendTimeout = TimeSpan.MaxValue,
-            //    ReceiveTimeout = TimeSpan.MaxValue,
-            //    OpenTimeout = TimeSpan.FromMinutes(1),
-            //    CloseTimeout = TimeSpan.FromMinutes(1),
-            //    MaxConnections = int.MaxValue,
-            //    MaxReceivedMessageSize = 1024 * 1024 * 1024,
-            //};
-
-            //binding.MaxBufferSize = (int)binding.MaxReceivedMessageSize;
-            //binding.MaxBufferPoolSize = Environment.ProcessorCount * binding.MaxReceivedMessageSize;
-
-            var binding = WcfUtility.CreateTcpClientBinding();
-            binding.SendTimeout = TimeSpan.MaxValue;
-            binding.ReceiveTimeout = TimeSpan.MaxValue;
-            binding.OpenTimeout = TimeSpan.FromMinutes(1);
-            binding.CloseTimeout = TimeSpan.FromMinutes(1);
-
-            return (NetTcpBinding)binding;
-        }
-
+        #region INetworkModelGDAContract
         public Task<UpdateResult> ApplyUpdate(Delta delta)
         {
             return InvokeWithRetryAsync(client => client.Channel.ApplyUpdate(delta));
@@ -102,5 +79,6 @@ namespace OMS.Common.Cloud.WcfServiceFabricClients.NMS
         {
             return InvokeWithRetryAsync(client => client.Channel.IteratorRewind(id));
         }
+        #endregion
     }
 }

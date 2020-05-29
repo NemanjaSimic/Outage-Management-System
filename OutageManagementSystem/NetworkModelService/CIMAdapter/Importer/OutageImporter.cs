@@ -1,9 +1,7 @@
 ﻿using CIM.Model;
 using OMS.Common.Cloud.WcfServiceFabricClients.NMS;
+using OMS.Common.NmsContracts.GDA;
 using Outage.Common;
-using Outage.Common.GDA;
-using Outage.Common.ServiceContracts.GDA;
-using Outage.Common.ServiceProxies;
 using System;
 using System.Collections.Generic;
 using System.Threading.Tasks;

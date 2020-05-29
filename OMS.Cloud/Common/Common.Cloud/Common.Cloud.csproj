@@ -21,6 +21,7 @@
     <DefineConstants>DEBUG;TRACE</DefineConstants>
     <ErrorReport>prompt</ErrorReport>
     <WarningLevel>4</WarningLevel>
+    <PlatformTarget>x64</PlatformTarget>
   </PropertyGroup>
   <PropertyGroup Condition=" '$(Configuration)|$(Platform)' == 'Release|AnyCPU' ">
     <DebugType>pdbonly</DebugType>
@@ -44,14 +45,29 @@
     <Reference Include="System.Xml" />
   </ItemGroup>
   <ItemGroup>
+    <Compile Include="AzureStorageHelpers\CloudQueueHelper.cs" />
+    <Compile Include="AzureStorageHelpers\CloudTableHelper.cs" />
     <Compile Include="MicroserviceNames.cs" />
     <Compile Include="Properties\AssemblyInfo.cs" />
+    <Compile Include="ReliableCollectionHelpers\ReliableDictionaryAccess.cs" />
     <Compile Include="ReliableCollectionHelpers\ReliableDictionaryHelper.cs" />
-    <Compile Include="ReliableCollectionHelpers\ReliableDictionaryUnitOfWork.cs" />
+    <Compile Include="ReliableStateManagerHelper.cs" />
+    <Compile Include="Serialization.cs" />
     <Compile Include="WcfServiceFabricClients\CE\Placeholder.cs" />
+    <Compile Include="WcfServiceFabricClients\ClientFactory.cs" />
     <Compile Include="WcfServiceFabricClients\NMS\NetworkModelGdaClient.cs" />
     <Compile Include="WcfServiceFabricClients\OMS\Placeholder.cs" />
-    <Compile Include="WcfServiceFabricClients\SCADA\Placeholder.cs" />
+    <Compile Include="WcfServiceFabricClients\SCADA\ModelUpdateCommandEnqueuerClient.cs" />
+    <Compile Include="WcfServiceFabricClients\SCADA\WriteCommandEnqueuerClient.cs" />
+    <Compile Include="WcfServiceFabricClients\SCADA\ReadCommandEnqueuerClient.cs" />
+    <Compile Include="WcfServiceFabricClients\SCADA\ScadaCommandingClient.cs" />
+    <Compile Include="WcfServiceFabricClients\SCADA\ScadaIntegrityUpdateClient.cs" />
+    <Compile Include="WcfServiceFabricClients\SCADA\ScadaModelReadAccessClient.cs" />
+    <Compile Include="WcfServiceFabricClients\SCADA\ScadaModelUpdateAccessClient.cs" />
+    <Compile Include="WcfServiceFabricClients\TMS\ModelUpdateNotificationClient.cs" />
+    <Compile Include="WcfServiceFabricClients\TMS\TransactionActorClient.cs" />
+    <Compile Include="WcfServiceFabricClients\TMS\TransactionCoordinatorClient.cs" />
+    <Compile Include="WcfServiceFabricClients\TMS\TransactionEnlistmentClient.cs" />
     <Compile Include="WcfServiceFabricClients\WcfSeviceFabricClientBase.cs" />
   </ItemGroup>
   <ItemGroup>
@@ -61,6 +77,22 @@
     <ProjectReference Include="..\..\..\OutageManagementSystem\Common\Common.csproj">
       <Project>{892CBE15-9ED7-4540-81FA-0EAABA592138}</Project>
       <Name>Common</Name>
+    </ProjectReference>
+    <ProjectReference Include="..\Common.SCADA\Common.SCADA.csproj">
+      <Project>{6A84DB56-920C-4FC1-9CB0-9C29D0FC1586}</Project>
+      <Name>Common.SCADA</Name>
+    </ProjectReference>
+    <ProjectReference Include="..\Contracts\Common.DistributedTransactionContracts\Common.DistributedTransactionContracts.csproj">
+      <Project>{A07D94C2-40EF-48DB-B828-7E53E7F5A372}</Project>
+      <Name>Common.DistributedTransactionContracts</Name>
+    </ProjectReference>
+    <ProjectReference Include="..\Contracts\Common.NmsContracts\Common.NmsContracts.csproj">
+      <Project>{235804A8-9C8F-40EC-8786-5DAB24733977}</Project>
+      <Name>Common.NmsContracts</Name>
+    </ProjectReference>
+    <ProjectReference Include="..\Contracts\Common.ScadaContracts\Common.ScadaContracts.csproj">
+      <Project>{5F25D9C5-9A93-49E7-92F7-58E399AEF928}</Project>
+      <Name>Common.ScadaContracts</Name>
     </ProjectReference>
   </ItemGroup>
   <ItemGroup>
@@ -91,6 +123,10 @@
     <PackageReference Include="Microsoft.ServiceFabric.Services.Wcf">
       <Version>4.0.470</Version>
     </PackageReference>
+    <PackageReference Include="WindowsAzure.Storage">
+      <Version>9.3.3</Version>
+    </PackageReference>
   </ItemGroup>
+  <ItemGroup />
   <Import Project="$(MSBuildToolsPath)\Microsoft.CSharp.targets" />
 </Project>
