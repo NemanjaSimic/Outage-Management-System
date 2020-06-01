@@ -39,7 +39,7 @@
       <HintPath>..\..\packages\Microsoft.ServiceFabric.Services.Remoting.4.0.470\lib\net472\Microsoft.ServiceFabric.Services.Remoting.dll</HintPath>
     </Reference>
     <Reference Include="OutageCIMProfile_NetworkModelService">
-      <HintPath>..\bin64\DLL\OutageCIMProfile_NetworkModelService.dll</HintPath>
+      <HintPath>..\OutageCIMProfile_NetworkModelService.dll</HintPath>
     </Reference>
     <Reference Include="System" />
     <Reference Include="System.Core" />
@@ -71,11 +71,11 @@
     <Compile Include="TransformAndLoadReport.cs" />
   </ItemGroup>
   <ItemGroup>
-    <ProjectReference Include="..\..\..\OMS.Cloud\Common\Common.Cloud\Common.Cloud.csproj">
+    <ProjectReference Include="..\..\..\Common\Common.Cloud\Common.Cloud.csproj">
       <Project>{FBEE1369-0F6C-41E6-8C62-8C1C5CDBB602}</Project>
       <Name>Common.Cloud</Name>
     </ProjectReference>
-    <ProjectReference Include="..\..\..\OMS.Cloud\Common\Contracts\Common.NmsContracts\Common.NmsContracts.csproj">
+    <ProjectReference Include="..\..\..\Common\Contracts\Common.NmsContracts\Common.NmsContracts.csproj">
       <Project>{235804A8-9C8F-40EC-8786-5DAB24733977}</Project>
       <Name>Common.NmsContracts</Name>
     </ProjectReference>
@@ -83,7 +83,7 @@
       <Project>{3C03A41C-BE4C-40A8-97D5-5DBAC0C34102}</Project>
       <Name>CIMParser</Name>
     </ProjectReference>
-    <ProjectReference Include="..\..\Common\Common.csproj">
+    <ProjectReference Include="..\..\..\..\OutageManagementSystem\Common\Common.csproj">
       <Project>{892CBE15-9ED7-4540-81FA-0EAABA592138}</Project>
       <Name>Common</Name>
     </ProjectReference>

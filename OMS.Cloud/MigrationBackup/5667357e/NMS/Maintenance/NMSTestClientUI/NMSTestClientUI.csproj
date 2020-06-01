@@ -171,6 +171,7 @@
       <Generator>ResXFileCodeGenerator</Generator>
       <LastGenOutput>Resources.Designer.cs</LastGenOutput>
     </EmbeddedResource>
+    <None Include="packages.config" />
     <None Include="Properties\Settings.settings">
       <Generator>SettingsSingleFileGenerator</Generator>
       <LastGenOutput>Settings.Designer.cs</LastGenOutput>
@@ -182,60 +183,25 @@
     </None>
   </ItemGroup>
   <ItemGroup>
-    <ProjectReference Include="..\..\..\Common\Common.Cloud\Common.Cloud.csproj">
+    <ProjectReference Include="..\..\..\OMS.Cloud\Common\Common.Cloud\Common.Cloud.csproj">
       <Project>{FBEE1369-0F6C-41E6-8C62-8C1C5CDBB602}</Project>
       <Name>Common.Cloud</Name>
     </ProjectReference>
-    <ProjectReference Include="..\..\..\Common\Contracts\Common.NmsContracts\Common.NmsContracts.csproj">
+    <ProjectReference Include="..\..\..\OMS.Cloud\Common\Contracts\Common.NmsContracts\Common.NmsContracts.csproj">
       <Project>{235804A8-9C8F-40EC-8786-5DAB24733977}</Project>
       <Name>Common.NmsContracts</Name>
     </ProjectReference>
-    <ProjectReference Include="..\..\..\..\OutageManagementSystem\Common\Common.csproj">
+    <ProjectReference Include="..\..\Common\Common.csproj">
       <Project>{892CBE15-9ED7-4540-81FA-0EAABA592138}</Project>
       <Name>Common</Name>
     </ProjectReference>
   </ItemGroup>
-  <ItemGroup>
-    <PackageReference Include="log4net">
-      <Version>2.0.8</Version>
-    </PackageReference>
-    <PackageReference Include="Microsoft.ServiceFabric">
-      <Version>7.0.470</Version>
-    </PackageReference>
-    <PackageReference Include="Microsoft.ServiceFabric.Actors">
-      <Version>4.0.470</Version>
-    </PackageReference>
-    <PackageReference Include="Microsoft.ServiceFabric.Data">
-      <Version>4.0.470</Version>
-    </PackageReference>
-    <PackageReference Include="Microsoft.ServiceFabric.Data.Extensions">
-      <Version>4.0.470</Version>
-    </PackageReference>
-    <PackageReference Include="Microsoft.ServiceFabric.Data.Interfaces">
-      <Version>4.0.470</Version>
-    </PackageReference>
-    <PackageReference Include="Microsoft.ServiceFabric.Diagnostics.Internal">
-      <Version>4.0.470</Version>
-    </PackageReference>
-    <PackageReference Include="Microsoft.ServiceFabric.FabricTransport.Internal">
-      <Version>4.0.470</Version>
-    </PackageReference>
-    <PackageReference Include="Microsoft.ServiceFabric.Services">
-      <Version>4.0.470</Version>
-    </PackageReference>
-    <PackageReference Include="Microsoft.ServiceFabric.Services.Remoting">
-      <Version>4.0.470</Version>
-    </PackageReference>
-    <PackageReference Include="Microsoft.ServiceFabric.Services.Wcf">
-      <Version>4.0.470</Version>
-    </PackageReference>
-  </ItemGroup>
   <Import Project="$(MSBuildToolsPath)\Microsoft.CSharp.targets" />
-  <!-- <Import Project="..\..\packages\Microsoft.ServiceFabric.Actors.4.0.470\build\net45\Microsoft.ServiceFabric.Actors.targets" Condition="Exists('..\..\packages\Microsoft.ServiceFabric.Actors.4.0.470\build\net45\Microsoft.ServiceFabric.Actors.targets')" /> -->
-  <!-- <Target Name="EnsureNuGetPackageBuildImports" BeforeTargets="PrepareForBuild"> -->
-    <!-- <PropertyGroup> -->
-      <!-- <ErrorText>This project references NuGet package(s) that are missing on this computer. Use NuGet Package Restore to download them.  For more information, see http://go.microsoft.com/fwlink/?LinkID=322105. The missing file is {0}.</ErrorText> -->
-    <!-- </PropertyGroup> -->
-    <!-- <Error Condition="!Exists('..\..\packages\Microsoft.ServiceFabric.Actors.4.0.470\build\net45\Microsoft.ServiceFabric.Actors.targets')" Text="$([System.String]::Format('$(ErrorText)', '..\..\packages\Microsoft.ServiceFabric.Actors.4.0.470\build\net45\Microsoft.ServiceFabric.Actors.targets'))" /> -->
-  <!-- </Target> -->
+  <Import Project="..\..\packages\Microsoft.ServiceFabric.Actors.4.0.470\build\net45\Microsoft.ServiceFabric.Actors.targets" Condition="Exists('..\..\packages\Microsoft.ServiceFabric.Actors.4.0.470\build\net45\Microsoft.ServiceFabric.Actors.targets')" />
+  <Target Name="EnsureNuGetPackageBuildImports" BeforeTargets="PrepareForBuild">
+    <PropertyGroup>
+      <ErrorText>This project references NuGet package(s) that are missing on this computer. Use NuGet Package Restore to download them.  For more information, see http://go.microsoft.com/fwlink/?LinkID=322105. The missing file is {0}.</ErrorText>
+    </PropertyGroup>
+    <Error Condition="!Exists('..\..\packages\Microsoft.ServiceFabric.Actors.4.0.470\build\net45\Microsoft.ServiceFabric.Actors.targets')" Text="$([System.String]::Format('$(ErrorText)', '..\..\packages\Microsoft.ServiceFabric.Actors.4.0.470\build\net45\Microsoft.ServiceFabric.Actors.targets'))" />
+  </Target>
 </Project>

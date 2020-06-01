@@ -192,7 +192,7 @@ namespace NMS.GdaImplementation
         #region GDA Contract
         public async Task<UpdateResult> ApplyDelta(Delta delta, bool isInitialization = false)
         {
-            while (!isNetworkModelInitialized)
+            while (!isNetworkModelInitialized && !isInitialization)
             {
                 await Task.Delay(1000);
             }
