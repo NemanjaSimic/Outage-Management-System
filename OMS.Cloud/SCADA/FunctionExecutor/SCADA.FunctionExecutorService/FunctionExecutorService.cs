@@ -21,16 +21,34 @@ namespace SCADA.FunctionExecutorService
     /// </summary>
     internal sealed class FunctionExecutorService : StatelessService
     {
-        private readonly ReadCommandEnqueuer readCommandEnqueuer;
-        private readonly WriteCommandEnqueuer writeCommandEnqueuer;
-        private readonly ModelUpdateCommandEnqueuer modelUpdateCommandEnqueuer;
+        private ReadCommandEnqueuer readCommandEnqueuer;
+        private WriteCommandEnqueuer writeCommandEnqueuer;
+        private ModelUpdateCommandEnqueuer modelUpdateCommandEnqueuer;
 
         public FunctionExecutorService(StatelessServiceContext context)
             : base(context)
         {
-            this.readCommandEnqueuer = new ReadCommandEnqueuer();
-            this.writeCommandEnqueuer = new WriteCommandEnqueuer();
-            this.modelUpdateCommandEnqueuer = new ModelUpdateCommandEnqueuer();
+            try
+            {
+                this.readCommandEnqueuer = new ReadCommandEnqueuer();
+                this.writeCommandEnqueuer = new WriteCommandEnqueuer();
+                this.modelUpdateCommandEnqueuer = new ModelUpdateCommandEnqueuer();
+                ServiceEventSource.Current.ServiceMessage(this.Context, $"[FunctionExecutorService] Contract providers initialized.");
+            }
+            catch (Exception e)
+            {
+                ServiceEventSource.Current.ServiceMessage(this.Context, $"[FunctionExecutorService] Error: {e.Message}");
+            }
+        }
+
+        protected async override Task OnOpenAsync(CancellationToken cancellationToken)
+        {
+            cancellationToken.ThrowIfCancellationRequested();
+
+            ////FOR DEBUGING IN AZURE DEPLOYMENT (time to atach to process)
+            //await Task.Delay(60000);
+
+            await base.OnOpenAsync(cancellationToken);
         }
 
         /// <summary>
@@ -78,9 +96,26 @@ namespace SCADA.FunctionExecutorService
         /// <param name="cancellationToken">Canceled when Service Fabric needs to shut down this service instance.</param>
         protected override async Task RunAsync(CancellationToken cancellationToken)
         {
-            FunctionExecutorCycle functionExecutorCycle = new FunctionExecutorCycle();
-            ScadaModelReadAccessClient readAccessClient = ScadaModelReadAccessClient.CreateClient();
-            IScadaConfigData configData = await readAccessClient.GetScadaConfigData();
+            cancellationToken.ThrowIfCancellationRequested();
+
+            FunctionExecutorCycle functionExecutorCycle;
+            IScadaConfigData configData;
+
+            //FOR DEBUGING IN AZURE DEPLOYMENT (time to atach to process)
+            Task.Delay(60000).Wait();
+
+            try
+            {
+                functionExecutorCycle = new FunctionExecutorCycle();
+                ScadaModelReadAccessClient readAccessClient = ScadaModelReadAccessClient.CreateClient();
+                configData = await readAccessClient.GetScadaConfigData();
+                ServiceEventSource.Current.ServiceMessage(this.Context, $"[FunctionExecutorService] FunctionExecutorCycle initialized.");
+            }
+            catch (Exception e)
+            {
+                ServiceEventSource.Current.ServiceMessage(this.Context, $"[FunctionExecutorService] Error: {e.Message}");
+                throw e;
+            }
 
             while (true)
             {
@@ -93,7 +128,7 @@ namespace SCADA.FunctionExecutorService
                 }
                 catch (Exception e)
                 {
-                    ServiceEventSource.Current.ServiceMessage(this.Context, $"[FunctionExecutorService] Error: {e.Message}]");
+                    ServiceEventSource.Current.ServiceMessage(this.Context, $"[FunctionExecutorService] Error: {e.Message}");
                 }
 
                 await Task.Delay(TimeSpan.FromMilliseconds(configData.FunctionExecutionInterval), cancellationToken);

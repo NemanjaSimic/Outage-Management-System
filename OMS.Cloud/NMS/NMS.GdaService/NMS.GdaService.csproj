@@ -105,15 +105,15 @@
     <None Include="packages.config" />
   </ItemGroup>
   <ItemGroup>
-    <ProjectReference Include="..\..\..\..\OutageManagementSystem\Common\Common.csproj">
+    <ProjectReference Include="..\..\..\OutageManagementSystem\Common\Common.csproj">
       <Project>{892CBE15-9ED7-4540-81FA-0EAABA592138}</Project>
       <Name>Common</Name>
     </ProjectReference>
-    <ProjectReference Include="..\..\..\Common\Contracts\Common.NmsContracts\Common.NmsContracts.csproj">
+    <ProjectReference Include="..\..\Common\Contracts\Common.NmsContracts\Common.NmsContracts.csproj">
       <Project>{235804A8-9C8F-40EC-8786-5DAB24733977}</Project>
       <Name>Common.NmsContracts</Name>
     </ProjectReference>
-    <ProjectReference Include="..\..\..\NMS\NMS.GdaImplementation\NMS.GdaImplementation.csproj">
+    <ProjectReference Include="..\NMS.GdaImplementation\NMS.GdaImplementation.csproj">
       <Project>{BA3D0EA9-5697-412C-B9A3-B71E988709CE}</Project>
       <Name>NMS.GdaImplementation</Name>
     </ProjectReference>

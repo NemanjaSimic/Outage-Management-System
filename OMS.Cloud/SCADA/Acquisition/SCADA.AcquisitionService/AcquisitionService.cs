@@ -20,6 +20,16 @@ namespace SCADA.AcquisitionService
             : base(context)
         { }
 
+        protected async override Task OnOpenAsync(CancellationToken cancellationToken)
+        {
+            cancellationToken.ThrowIfCancellationRequested();
+
+            ////FOR DEBUGING IN AZURE DEPLOYMENT (time to atach to process)
+            //await Task.Delay(60000);
+
+            await base.OnOpenAsync(cancellationToken);
+        }
+
         /// <summary>
         /// Optional override to create listeners (e.g., TCP, HTTP) for this service replica to handle client or user requests.
         /// </summary>
@@ -35,9 +45,26 @@ namespace SCADA.AcquisitionService
         /// <param name="cancellationToken">Canceled when Service Fabric needs to shut down this service instance.</param>
         protected override async Task RunAsync(CancellationToken cancellationToken)
         {
-            AcquisitionCycle acquisitionCycle = new AcquisitionCycle();
-            ScadaModelReadAccessClient readAccessClient = ScadaModelReadAccessClient.CreateClient();
-            IScadaConfigData configData = await readAccessClient.GetScadaConfigData();
+            AcquisitionCycle acquisitionCycle;
+            IScadaConfigData configData;
+
+            cancellationToken.ThrowIfCancellationRequested();
+
+            //FOR DEBUGING IN AZURE DEPLOYMENT (time to atach to process)
+            Task.Delay(60000).Wait();
+
+            try
+            {
+                acquisitionCycle = new AcquisitionCycle();
+                ScadaModelReadAccessClient readAccessClient = ScadaModelReadAccessClient.CreateClient();
+                configData = await readAccessClient.GetScadaConfigData();
+                ServiceEventSource.Current.ServiceMessage(this.Context, $"[AcquisitionService] AcquisitionCycle initialized.");
+            }
+            catch (Exception e)
+            {
+                ServiceEventSource.Current.ServiceMessage(this.Context, $"[AcquisitionService] Error: {e.Message}");
+                throw e;
+            }
 
             while (true)
             {
@@ -50,7 +77,7 @@ namespace SCADA.AcquisitionService
                 }
                 catch (Exception e)
                 {
-                    ServiceEventSource.Current.ServiceMessage(this.Context, $"[AcquisitionService] Error: {e.Message}]");
+                    ServiceEventSource.Current.ServiceMessage(this.Context, $"[AcquisitionService] Error: {e.Message}");
                 }
 
                 await Task.Delay(TimeSpan.FromMilliseconds(configData.AcquisitionInterval), cancellationToken);

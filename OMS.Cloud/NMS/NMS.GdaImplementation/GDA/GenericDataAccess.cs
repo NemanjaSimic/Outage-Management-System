@@ -28,14 +28,14 @@ namespace NMS.GdaImplementation.GDA
 
         public async Task<UpdateResult> ApplyUpdate(Delta delta)
         {
-            return networkModel.ApplyDelta(delta);
+            return await networkModel.ApplyDelta(delta);
         }
 
         public async Task<ResourceDescription> GetValues(long resourceId, List<ModelCode> propIds)
         {
             try
             {
-                ResourceDescription retVal = networkModel.GetValues(resourceId, propIds);
+                ResourceDescription retVal = await networkModel.GetValues(resourceId, propIds);
                 return retVal;
             }
             catch (Exception ex)
@@ -50,7 +50,7 @@ namespace NMS.GdaImplementation.GDA
         {
             try
             {
-                ResourceIterator ri = networkModel.GetExtentValues(entityType, propIds);
+                ResourceIterator ri = await networkModel.GetExtentValues(entityType, propIds);
                 int retVal = AddIterator(ri);
                 return retVal;
             }
@@ -66,7 +66,7 @@ namespace NMS.GdaImplementation.GDA
         {
             try
             {
-                ResourceIterator ri = networkModel.GetRelatedValues(source, propIds, association);
+                ResourceIterator ri = await networkModel.GetRelatedValues(source, propIds, association);
                 int retVal =  AddIterator(ri);
                 return retVal;
             }
@@ -83,7 +83,7 @@ namespace NMS.GdaImplementation.GDA
             try
             {
                 ResourceIterator iterator = GetIterator(id);
-                return iterator.Next(n);
+                return await iterator.Next(n);
             }
             catch (Exception ex)
             {

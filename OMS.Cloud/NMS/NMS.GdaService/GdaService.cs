@@ -1,5 +1,8 @@
-﻿using System.Collections.Generic;
+﻿using System;
+using System.Collections.Generic;
 using System.Fabric;
+using System.Threading;
+using System.Threading.Tasks;
 using Microsoft.ServiceFabric.Services.Communication.Runtime;
 using Microsoft.ServiceFabric.Services.Communication.Wcf;
 using Microsoft.ServiceFabric.Services.Communication.Wcf.Runtime;
@@ -16,13 +19,32 @@ namespace NMS.GdaService
     /// </summary>
     internal sealed class GdaService : StatelessService
     {
-        private readonly NetworkModel networkModel;
+        private NetworkModel networkModel;
 
         public GdaService(StatelessServiceContext context)
             : base(context)
         {
-            _ = Config.GetInstance(context);
-            this.networkModel = new NetworkModel();
+            try
+            {
+                _ = Config.GetInstance(Context);
+                ServiceEventSource.Current.ServiceMessage(this.Context, $"[GdaService] Configuration initialized.");
+                
+                this.networkModel = new NetworkModel();
+            }
+            catch (Exception e)
+            {
+                ServiceEventSource.Current.ServiceMessage(this.Context, $"[GdaService] Error: {e.Message}");
+            }
+        }
+
+        protected async override Task OnOpenAsync(CancellationToken cancellationToken)
+        {
+            cancellationToken.ThrowIfCancellationRequested();
+
+            ////FOR DEBUGING IN AZURE DEPLOYMENT (time to atach to process)
+            //await Task.Delay(60000);
+
+            await base.OnOpenAsync(cancellationToken);
         }
 
         /// <summary>
@@ -52,6 +74,24 @@ namespace NMS.GdaService
                 //                                                           EndpointNames.NetworkModelTransactionActorEndpoint);
                 //}, EndpointNames.NetworkModelTransactionActorEndpoint),
             };
+        }
+
+        protected async override Task RunAsync(CancellationToken cancellationToken)
+        {
+            cancellationToken.ThrowIfCancellationRequested();
+
+            //FOR DEBUGING IN AZURE DEPLOYMENT (time to atach to process)
+            Task.Delay(60000).Wait();
+
+            try
+            {
+                await this.networkModel.InitializeNetworkModel();
+                ServiceEventSource.Current.ServiceMessage(this.Context, $"[GdaService] NetworkModel initialized.");
+            }
+            catch (Exception e)
+            {
+                ServiceEventSource.Current.ServiceMessage(this.Context, $"[GdaService] Error: {e.Message}");
+            }
         }
     }
 }

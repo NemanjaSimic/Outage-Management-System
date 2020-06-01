@@ -25,19 +25,37 @@ namespace SCADA.ModelProviderService
     /// </summary>
     internal sealed class ModelProviderService : StatefulService
     {
-        private readonly ScadaModel scadaModel;
-        private readonly ModelReadAccessProvider modelReadAccessProvider;
-        private readonly ModelUpdateAccessProvider modelUpdateAccessProvider;
-        private readonly IntegrityUpdateProvider integrityUpdateProvider;
+        private ScadaModel scadaModel;
+        private ModelReadAccessProvider modelReadAccessProvider;
+        private ModelUpdateAccessProvider modelUpdateAccessProvider;
+        private IntegrityUpdateProvider integrityUpdateProvider;
 
         public ModelProviderService(StatefulServiceContext context)
             : base(context)
         {
-            //DONE THIS WAY BECAUSE: there is a mechanism that tracks the initialization process of reliable collections, which is set in constructors of these classes
-            this.scadaModel = new ScadaModel(this.StateManager, new ModelResourcesDesc(), new EnumDescs());
-            this.modelReadAccessProvider = new ModelReadAccessProvider(this.StateManager);
-            this.modelUpdateAccessProvider = new ModelUpdateAccessProvider(this.StateManager);
-            this.integrityUpdateProvider = new IntegrityUpdateProvider(this.StateManager);
+            try
+            {
+                //DONE THIS WAY (in this order) BECAUSE: there is a mechanism that tracks the initialization process of reliable collections, which is set in constructors of these classes
+                this.scadaModel = new ScadaModel(this.StateManager, new ModelResourcesDesc(), new EnumDescs());
+                this.modelReadAccessProvider = new ModelReadAccessProvider(this.StateManager);
+                this.modelUpdateAccessProvider = new ModelUpdateAccessProvider(this.StateManager);
+                this.integrityUpdateProvider = new IntegrityUpdateProvider(this.StateManager);
+                ServiceEventSource.Current.ServiceMessage(this.Context, $"[ModelProviderService] Contract providers initialized.");
+            }
+            catch (Exception e)
+            {
+                ServiceEventSource.Current.ServiceMessage(this.Context, $"[ModelProviderService] Error: {e.Message}");
+            }
+        }
+
+        protected async override Task OnOpenAsync(ReplicaOpenMode openMode, CancellationToken cancellationToken)
+        {
+            cancellationToken.ThrowIfCancellationRequested();
+
+            ////FOR DEBUGING IN AZURE DEPLOYMENT (time to atach to process)
+            //await Task.Delay(60000);
+
+            await base.OnOpenAsync(openMode, cancellationToken);
         }
 
         /// <summary>
@@ -103,17 +121,21 @@ namespace SCADA.ModelProviderService
         {
             cancellationToken.ThrowIfCancellationRequested();
 
+            //FOR DEBUGING IN AZURE DEPLOYMENT (time to atach to process)
+            Task.Delay(60000).Wait();
+
             try
             {
                 InitializeReliableCollections();
                 ServiceEventSource.Current.ServiceMessage(this.Context, $"[ModelProviderService] ReliableDictionaries initialized.");
+
+                await scadaModel.InitializeScadaModel();
+                ServiceEventSource.Current.ServiceMessage(this.Context, $"[ModelProviderService] ScadaModel initialized.");
             }
             catch (Exception e)
             {
                 ServiceEventSource.Current.ServiceMessage(this.Context, $"[ModelProviderService] Error: {e.Message}");
             }
-
-            await scadaModel.InitializeScadaModel();
         }
 
         private void InitializeReliableCollections()
