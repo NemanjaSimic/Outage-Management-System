@@ -15,7 +15,7 @@
 	</cim:BaseVoltage>
 	-->
 	<cim:BaseVoltage rdf:ID="BV_1">
-		<cim:BaseVoltage.nominalVoltage>1100</cim:BaseVoltage.nominalVoltage>
+		<cim:BaseVoltage.nominalVoltage>20000</cim:BaseVoltage.nominalVoltage>
 		<cim:IdentifiedObject.description>BaseVoltage1</cim:IdentifiedObject.description>
 		<cim:IdentifiedObject.mRID>BV_1</cim:IdentifiedObject.mRID>
 		<ftn:IdentifiedObject.name>BV_1</ftn:IdentifiedObject.name>
@@ -3200,805 +3200,805 @@
 	</cim:ACLineSegment>
 	-->
 	<cim:ACLineSegment rdf:ID="ACL_1">
-		<cim:ConductingEquipment.BaseVoltage rdf:resource="#BV_1"/>
+		<!-- <cim:ConductingEquipment.BaseVoltage rdf:resource="#BV_1"/> -->
 		<cim:ConductingEquipment.isRemote>true</cim:ConductingEquipment.isRemote>
 		<cim:IdentifiedObject.description>ACLineSegment1</cim:IdentifiedObject.description>
 		<cim:IdentifiedObject.mRID>ACL_1</cim:IdentifiedObject.mRID>
 		<ftn:IdentifiedObject.name>ACL_1</ftn:IdentifiedObject.name>
 	</cim:ACLineSegment>
 	<cim:ACLineSegment rdf:ID="ACL_2">
-		<cim:ConductingEquipment.BaseVoltage rdf:resource="#BV_1"/>
+		<!-- <cim:ConductingEquipment.BaseVoltage rdf:resource="#BV_1"/> -->
 		<cim:ConductingEquipment.isRemote>true</cim:ConductingEquipment.isRemote>
 		<cim:IdentifiedObject.description>ACLineSegment2</cim:IdentifiedObject.description>
 		<cim:IdentifiedObject.mRID>ACL_2</cim:IdentifiedObject.mRID>
 		<ftn:IdentifiedObject.name>ACL_2</ftn:IdentifiedObject.name>
 	</cim:ACLineSegment>
 	<cim:ACLineSegment rdf:ID="ACL_3">
-		<cim:ConductingEquipment.BaseVoltage rdf:resource="#BV_1"/>
+		<!-- <cim:ConductingEquipment.BaseVoltage rdf:resource="#BV_1"/> -->
 		<cim:ConductingEquipment.isRemote>true</cim:ConductingEquipment.isRemote>
 		<cim:IdentifiedObject.description>ACLineSegment3</cim:IdentifiedObject.description>
 		<cim:IdentifiedObject.mRID>ACL_3</cim:IdentifiedObject.mRID>
 		<ftn:IdentifiedObject.name>ACL_3</ftn:IdentifiedObject.name>
 	</cim:ACLineSegment>
 	<cim:ACLineSegment rdf:ID="ACL_4">
-		<cim:ConductingEquipment.BaseVoltage rdf:resource="#BV_2"/>
+		<!-- <cim:ConductingEquipment.BaseVoltage rdf:resource="#BV_2"/> -->
 		<cim:ConductingEquipment.isRemote>true</cim:ConductingEquipment.isRemote>
 		<cim:IdentifiedObject.description>ACLineSegment</cim:IdentifiedObject.description>
 		<cim:IdentifiedObject.mRID>ACL_4</cim:IdentifiedObject.mRID>
 		<ftn:IdentifiedObject.name>ACL_4</ftn:IdentifiedObject.name>
 	</cim:ACLineSegment>
 	<cim:ACLineSegment rdf:ID="ACL_5">
-		<cim:ConductingEquipment.BaseVoltage rdf:resource="#BV_2"/>
+		<cim:ConductingEquipment.BaseVoltage rdf:resource="#BV_1"/>
 		<cim:ConductingEquipment.isRemote>true</cim:ConductingEquipment.isRemote>
 		<cim:IdentifiedObject.description>ACLineSegment</cim:IdentifiedObject.description>
 		<cim:IdentifiedObject.mRID>ACL_5</cim:IdentifiedObject.mRID>
 		<ftn:IdentifiedObject.name>ACL_5</ftn:IdentifiedObject.name>
 	</cim:ACLineSegment>
 	<cim:ACLineSegment rdf:ID="ACL_6">
-		<cim:ConductingEquipment.BaseVoltage rdf:resource="#BV_2"/>
+		<cim:ConductingEquipment.BaseVoltage rdf:resource="#BV_1"/>
 		<cim:ConductingEquipment.isRemote>true</cim:ConductingEquipment.isRemote>
 		<cim:IdentifiedObject.description>ACLineSegment</cim:IdentifiedObject.description>
 		<cim:IdentifiedObject.mRID>ACL_6</cim:IdentifiedObject.mRID>
 		<ftn:IdentifiedObject.name>ACL_6</ftn:IdentifiedObject.name>
 	</cim:ACLineSegment>
 	<cim:ACLineSegment rdf:ID="ACL_7">
-		<cim:ConductingEquipment.BaseVoltage rdf:resource="#BV_2"/>
+		<!-- <cim:ConductingEquipment.BaseVoltage rdf:resource="#BV_2"/> -->
 		<cim:ConductingEquipment.isRemote>true</cim:ConductingEquipment.isRemote>
 		<cim:IdentifiedObject.description>ACLineSegment</cim:IdentifiedObject.description>
 		<cim:IdentifiedObject.mRID>ACL_7</cim:IdentifiedObject.mRID>
 		<ftn:IdentifiedObject.name>ACL_7</ftn:IdentifiedObject.name>
 	</cim:ACLineSegment>
 	<cim:ACLineSegment rdf:ID="ACL_8">
-		<cim:ConductingEquipment.BaseVoltage rdf:resource="#BV_2"/>
+		<!-- <cim:ConductingEquipment.BaseVoltage rdf:resource="#BV_2"/> -->
 		<cim:ConductingEquipment.isRemote>true</cim:ConductingEquipment.isRemote>
 		<cim:IdentifiedObject.description>ACLineSegment</cim:IdentifiedObject.description>
 		<cim:IdentifiedObject.mRID>ACL_8</cim:IdentifiedObject.mRID>
 		<ftn:IdentifiedObject.name>ACL_8</ftn:IdentifiedObject.name>
 	</cim:ACLineSegment>
 	<cim:ACLineSegment rdf:ID="ACL_9">
-		<cim:ConductingEquipment.BaseVoltage rdf:resource="#BV_2"/>
+		<!-- <cim:ConductingEquipment.BaseVoltage rdf:resource="#BV_2"/> -->
 		<cim:ConductingEquipment.isRemote>true</cim:ConductingEquipment.isRemote>
 		<cim:IdentifiedObject.description>ACLineSegment</cim:IdentifiedObject.description>
 		<cim:IdentifiedObject.mRID>ACL_9</cim:IdentifiedObject.mRID>
 		<ftn:IdentifiedObject.name>ACL_9</ftn:IdentifiedObject.name>
 	</cim:ACLineSegment>
 	<cim:ACLineSegment rdf:ID="ACL_10">
-		<cim:ConductingEquipment.BaseVoltage rdf:resource="#BV_2"/>
+		<!-- <cim:ConductingEquipment.BaseVoltage rdf:resource="#BV_2"/> -->
 		<cim:ConductingEquipment.isRemote>true</cim:ConductingEquipment.isRemote>
 		<cim:IdentifiedObject.description>ACLineSegment</cim:IdentifiedObject.description>
 		<cim:IdentifiedObject.mRID>ACL_10</cim:IdentifiedObject.mRID>
 		<ftn:IdentifiedObject.name>ACL_10</ftn:IdentifiedObject.name>
 	</cim:ACLineSegment>
 	<cim:ACLineSegment rdf:ID="ACL_11">
-		<cim:ConductingEquipment.BaseVoltage rdf:resource="#BV_2"/>
+		<!-- <cim:ConductingEquipment.BaseVoltage rdf:resource="#BV_2"/> -->
 		<cim:ConductingEquipment.isRemote>true</cim:ConductingEquipment.isRemote>
 		<cim:IdentifiedObject.description>ACLineSegment</cim:IdentifiedObject.description>
 		<cim:IdentifiedObject.mRID>ACL_11</cim:IdentifiedObject.mRID>
 		<ftn:IdentifiedObject.name>ACL_11</ftn:IdentifiedObject.name>
 	</cim:ACLineSegment>
 	<cim:ACLineSegment rdf:ID="ACL_12">
-		<cim:ConductingEquipment.BaseVoltage rdf:resource="#BV_2"/>
+		<!-- <cim:ConductingEquipment.BaseVoltage rdf:resource="#BV_2"/> -->
 		<cim:ConductingEquipment.isRemote>true</cim:ConductingEquipment.isRemote>
 		<cim:IdentifiedObject.description>ACLineSegment</cim:IdentifiedObject.description>
 		<cim:IdentifiedObject.mRID>ACL_12</cim:IdentifiedObject.mRID>
 		<ftn:IdentifiedObject.name>ACL_12</ftn:IdentifiedObject.name>
 	</cim:ACLineSegment>
 	<cim:ACLineSegment rdf:ID="ACL_13">
-		<cim:ConductingEquipment.BaseVoltage rdf:resource="#BV_2"/>
+		<!-- <cim:ConductingEquipment.BaseVoltage rdf:resource="#BV_2"/> -->
 		<cim:ConductingEquipment.isRemote>true</cim:ConductingEquipment.isRemote>
 		<cim:IdentifiedObject.description>ACLineSegment</cim:IdentifiedObject.description>
 		<cim:IdentifiedObject.mRID>ACL_13</cim:IdentifiedObject.mRID>
 		<ftn:IdentifiedObject.name>ACL_13</ftn:IdentifiedObject.name>
 	</cim:ACLineSegment>
 	<cim:ACLineSegment rdf:ID="ACL_14">
-		<cim:ConductingEquipment.BaseVoltage rdf:resource="#BV_2"/>
+		<!-- <cim:ConductingEquipment.BaseVoltage rdf:resource="#BV_2"/> -->
 		<cim:ConductingEquipment.isRemote>true</cim:ConductingEquipment.isRemote>
 		<cim:IdentifiedObject.description>ACLineSegment</cim:IdentifiedObject.description>
 		<cim:IdentifiedObject.mRID>ACL_14</cim:IdentifiedObject.mRID>
 		<ftn:IdentifiedObject.name>ACL_14</ftn:IdentifiedObject.name>
 	</cim:ACLineSegment>
 	<cim:ACLineSegment rdf:ID="ACL_15">
-		<cim:ConductingEquipment.BaseVoltage rdf:resource="#BV_2"/>
+		<!-- <cim:ConductingEquipment.BaseVoltage rdf:resource="#BV_2"/> -->
 		<cim:ConductingEquipment.isRemote>true</cim:ConductingEquipment.isRemote>
 		<cim:IdentifiedObject.description>ACLineSegment</cim:IdentifiedObject.description>
 		<cim:IdentifiedObject.mRID>ACL_15</cim:IdentifiedObject.mRID>
 		<ftn:IdentifiedObject.name>ACL_15</ftn:IdentifiedObject.name>
 	</cim:ACLineSegment>
 	<cim:ACLineSegment rdf:ID="ACL_16">
-		<cim:ConductingEquipment.BaseVoltage rdf:resource="#BV_2"/>
+		<!-- <cim:ConductingEquipment.BaseVoltage rdf:resource="#BV_2"/> -->
 		<cim:ConductingEquipment.isRemote>true</cim:ConductingEquipment.isRemote>
 		<cim:IdentifiedObject.description>ACLineSegment</cim:IdentifiedObject.description>
 		<cim:IdentifiedObject.mRID>ACL_16</cim:IdentifiedObject.mRID>
 		<ftn:IdentifiedObject.name>ACL_16</ftn:IdentifiedObject.name>
 	</cim:ACLineSegment>
 	<cim:ACLineSegment rdf:ID="ACL_17">
-		<cim:ConductingEquipment.BaseVoltage rdf:resource="#BV_2"/>
+		<!-- <cim:ConductingEquipment.BaseVoltage rdf:resource="#BV_2"/> -->
 		<cim:ConductingEquipment.isRemote>true</cim:ConductingEquipment.isRemote>
 		<cim:IdentifiedObject.description>ACLineSegment</cim:IdentifiedObject.description>
 		<cim:IdentifiedObject.mRID>ACL_17</cim:IdentifiedObject.mRID>
 		<ftn:IdentifiedObject.name>ACL_17</ftn:IdentifiedObject.name>
 	</cim:ACLineSegment>
 	<cim:ACLineSegment rdf:ID="ACL_18">
-		<cim:ConductingEquipment.BaseVoltage rdf:resource="#BV_2"/>
+		<!-- <cim:ConductingEquipment.BaseVoltage rdf:resource="#BV_2"/> -->
 		<cim:ConductingEquipment.isRemote>true</cim:ConductingEquipment.isRemote>
 		<cim:IdentifiedObject.description>ACLineSegment</cim:IdentifiedObject.description>
 		<cim:IdentifiedObject.mRID>ACL_18</cim:IdentifiedObject.mRID>
 		<ftn:IdentifiedObject.name>ACL_18</ftn:IdentifiedObject.name>
 	</cim:ACLineSegment>
 	<cim:ACLineSegment rdf:ID="ACL_19">
-		<cim:ConductingEquipment.BaseVoltage rdf:resource="#BV_2"/>
+		<!-- <cim:ConductingEquipment.BaseVoltage rdf:resource="#BV_2"/> -->
 		<cim:ConductingEquipment.isRemote>true</cim:ConductingEquipment.isRemote>
 		<cim:IdentifiedObject.description>ACLineSegment</cim:IdentifiedObject.description>
 		<cim:IdentifiedObject.mRID>ACL_19</cim:IdentifiedObject.mRID>
 		<ftn:IdentifiedObject.name>ACL_19</ftn:IdentifiedObject.name>
 	</cim:ACLineSegment>
 	<cim:ACLineSegment rdf:ID="ACL_20">
-		<cim:ConductingEquipment.BaseVoltage rdf:resource="#BV_2"/>
+		<!-- <cim:ConductingEquipment.BaseVoltage rdf:resource="#BV_2"/> -->
 		<cim:ConductingEquipment.isRemote>true</cim:ConductingEquipment.isRemote>
 		<cim:IdentifiedObject.description>ACLineSegment</cim:IdentifiedObject.description>
 		<cim:IdentifiedObject.mRID>ACL_20</cim:IdentifiedObject.mRID>
 		<ftn:IdentifiedObject.name>ACL_20</ftn:IdentifiedObject.name>
 	</cim:ACLineSegment>
 	<cim:ACLineSegment rdf:ID="ACL_21">
-		<cim:ConductingEquipment.BaseVoltage rdf:resource="#BV_2"/>
+		<!-- <cim:ConductingEquipment.BaseVoltage rdf:resource="#BV_2"/> -->
 		<cim:ConductingEquipment.isRemote>true</cim:ConductingEquipment.isRemote>
 		<cim:IdentifiedObject.description>ACLineSegment</cim:IdentifiedObject.description>
 		<cim:IdentifiedObject.mRID>ACL_21</cim:IdentifiedObject.mRID>
 		<ftn:IdentifiedObject.name>ACL_21</ftn:IdentifiedObject.name>
 	</cim:ACLineSegment>
 	<cim:ACLineSegment rdf:ID="ACL_22">
-		<cim:ConductingEquipment.BaseVoltage rdf:resource="#BV_2"/>
+		<!-- <cim:ConductingEquipment.BaseVoltage rdf:resource="#BV_2"/> -->
 		<cim:ConductingEquipment.isRemote>true</cim:ConductingEquipment.isRemote>
 		<cim:IdentifiedObject.description>ACLineSegment</cim:IdentifiedObject.description>
 		<cim:IdentifiedObject.mRID>ACL_22</cim:IdentifiedObject.mRID>
 		<ftn:IdentifiedObject.name>ACL_22</ftn:IdentifiedObject.name>
 	</cim:ACLineSegment>
 	<cim:ACLineSegment rdf:ID="ACL_23">
-		<cim:ConductingEquipment.BaseVoltage rdf:resource="#BV_2"/>
+		<!-- <cim:ConductingEquipment.BaseVoltage rdf:resource="#BV_2"/> -->
 		<cim:ConductingEquipment.isRemote>true</cim:ConductingEquipment.isRemote>
 		<cim:IdentifiedObject.description>ACLineSegment</cim:IdentifiedObject.description>
 		<cim:IdentifiedObject.mRID>ACL_23</cim:IdentifiedObject.mRID>
 		<ftn:IdentifiedObject.name>ACL_23</ftn:IdentifiedObject.name>
 	</cim:ACLineSegment>
 	<cim:ACLineSegment rdf:ID="ACL_24">
-		<cim:ConductingEquipment.BaseVoltage rdf:resource="#BV_2"/>
+		<!-- <cim:ConductingEquipment.BaseVoltage rdf:resource="#BV_2"/> -->
 		<cim:ConductingEquipment.isRemote>true</cim:ConductingEquipment.isRemote>
 		<cim:IdentifiedObject.description>ACLineSegment</cim:IdentifiedObject.description>
 		<cim:IdentifiedObject.mRID>ACL_24</cim:IdentifiedObject.mRID>
 		<ftn:IdentifiedObject.name>ACL_24</ftn:IdentifiedObject.name>
 	</cim:ACLineSegment>
 	<cim:ACLineSegment rdf:ID="ACL_25">
-		<cim:ConductingEquipment.BaseVoltage rdf:resource="#BV_2"/>
+		<!-- <cim:ConductingEquipment.BaseVoltage rdf:resource="#BV_2"/> -->
 		<cim:ConductingEquipment.isRemote>true</cim:ConductingEquipment.isRemote>
 		<cim:IdentifiedObject.description>ACLineSegment</cim:IdentifiedObject.description>
 		<cim:IdentifiedObject.mRID>ACL_25</cim:IdentifiedObject.mRID>
 		<ftn:IdentifiedObject.name>ACL_25</ftn:IdentifiedObject.name>
 	</cim:ACLineSegment>
 	<cim:ACLineSegment rdf:ID="ACL_26">
-		<cim:ConductingEquipment.BaseVoltage rdf:resource="#BV_2"/>
+		<!-- <cim:ConductingEquipment.BaseVoltage rdf:resource="#BV_2"/> -->
 		<cim:ConductingEquipment.isRemote>true</cim:ConductingEquipment.isRemote>
 		<cim:IdentifiedObject.description>ACLineSegment</cim:IdentifiedObject.description>
 		<cim:IdentifiedObject.mRID>ACL_26</cim:IdentifiedObject.mRID>
 		<ftn:IdentifiedObject.name>ACL_26</ftn:IdentifiedObject.name>
 	</cim:ACLineSegment>
 	<cim:ACLineSegment rdf:ID="ACL_27">
-		<cim:ConductingEquipment.BaseVoltage rdf:resource="#BV_2"/>
+		<!-- <cim:ConductingEquipment.BaseVoltage rdf:resource="#BV_2"/> -->
 		<cim:ConductingEquipment.isRemote>true</cim:ConductingEquipment.isRemote>
 		<cim:IdentifiedObject.description>ACLineSegment</cim:IdentifiedObject.description>
 		<cim:IdentifiedObject.mRID>ACL_27</cim:IdentifiedObject.mRID>
 		<ftn:IdentifiedObject.name>ACL_27</ftn:IdentifiedObject.name>
 	</cim:ACLineSegment>
 	<cim:ACLineSegment rdf:ID="ACL_28">
-		<cim:ConductingEquipment.BaseVoltage rdf:resource="#BV_2"/>
+		<!-- <cim:ConductingEquipment.BaseVoltage rdf:resource="#BV_2"/> -->
 		<cim:ConductingEquipment.isRemote>true</cim:ConductingEquipment.isRemote>
 		<cim:IdentifiedObject.description>ACLineSegment</cim:IdentifiedObject.description>
 		<cim:IdentifiedObject.mRID>ACL_28</cim:IdentifiedObject.mRID>
 		<ftn:IdentifiedObject.name>ACL_28</ftn:IdentifiedObject.name>
 	</cim:ACLineSegment>
 	<cim:ACLineSegment rdf:ID="ACL_29">
-		<cim:ConductingEquipment.BaseVoltage rdf:resource="#BV_2"/>
+		<!-- <cim:ConductingEquipment.BaseVoltage rdf:resource="#BV_2"/> -->
 		<cim:ConductingEquipment.isRemote>true</cim:ConductingEquipment.isRemote>
 		<cim:IdentifiedObject.description>ACLineSegment</cim:IdentifiedObject.description>
 		<cim:IdentifiedObject.mRID>ACL_29</cim:IdentifiedObject.mRID>
 		<ftn:IdentifiedObject.name>ACL_29</ftn:IdentifiedObject.name>
 	</cim:ACLineSegment>
 	<cim:ACLineSegment rdf:ID="ACL_30">
-		<cim:ConductingEquipment.BaseVoltage rdf:resource="#BV_2"/>
+		<!-- <cim:ConductingEquipment.BaseVoltage rdf:resource="#BV_2"/> -->
 		<cim:ConductingEquipment.isRemote>true</cim:ConductingEquipment.isRemote>
 		<cim:IdentifiedObject.description>ACLineSegment</cim:IdentifiedObject.description>
 		<cim:IdentifiedObject.mRID>ACL_30</cim:IdentifiedObject.mRID>
 		<ftn:IdentifiedObject.name>ACL_30</ftn:IdentifiedObject.name>
 	</cim:ACLineSegment>
 	<cim:ACLineSegment rdf:ID="ACL_31">
-		<cim:ConductingEquipment.BaseVoltage rdf:resource="#BV_2"/>
+		<!-- <cim:ConductingEquipment.BaseVoltage rdf:resource="#BV_2"/> -->
 		<cim:ConductingEquipment.isRemote>true</cim:ConductingEquipment.isRemote>
 		<cim:IdentifiedObject.description>ACLineSegment</cim:IdentifiedObject.description>
 		<cim:IdentifiedObject.mRID>ACL_31</cim:IdentifiedObject.mRID>
 		<ftn:IdentifiedObject.name>ACL_31</ftn:IdentifiedObject.name>
 	</cim:ACLineSegment>
 	<cim:ACLineSegment rdf:ID="ACL_32">
-		<cim:ConductingEquipment.BaseVoltage rdf:resource="#BV_2"/>
+		<!-- <cim:ConductingEquipment.BaseVoltage rdf:resource="#BV_2"/> -->
 		<cim:ConductingEquipment.isRemote>true</cim:ConductingEquipment.isRemote>
 		<cim:IdentifiedObject.description>ACLineSegment</cim:IdentifiedObject.description>
 		<cim:IdentifiedObject.mRID>ACL_32</cim:IdentifiedObject.mRID>
 		<ftn:IdentifiedObject.name>ACL_32</ftn:IdentifiedObject.name>
 	</cim:ACLineSegment>
 	<cim:ACLineSegment rdf:ID="ACL_33">
-		<cim:ConductingEquipment.BaseVoltage rdf:resource="#BV_2"/>
+		<!-- <cim:ConductingEquipment.BaseVoltage rdf:resource="#BV_2"/> -->
 		<cim:ConductingEquipment.isRemote>true</cim:ConductingEquipment.isRemote>
 		<cim:IdentifiedObject.description>ACLineSegment</cim:IdentifiedObject.description>
 		<cim:IdentifiedObject.mRID>ACL_33</cim:IdentifiedObject.mRID>
 		<ftn:IdentifiedObject.name>ACL_33</ftn:IdentifiedObject.name>
 	</cim:ACLineSegment>
 	<cim:ACLineSegment rdf:ID="ACL_34">
-		<cim:ConductingEquipment.BaseVoltage rdf:resource="#BV_2"/>
+		<!-- <cim:ConductingEquipment.BaseVoltage rdf:resource="#BV_2"/> -->
 		<cim:ConductingEquipment.isRemote>true</cim:ConductingEquipment.isRemote>
 		<cim:IdentifiedObject.description>ACLineSegment</cim:IdentifiedObject.description>
 		<cim:IdentifiedObject.mRID>ACL_34</cim:IdentifiedObject.mRID>
 		<ftn:IdentifiedObject.name>ACL_34</ftn:IdentifiedObject.name>
 	</cim:ACLineSegment>
 	<cim:ACLineSegment rdf:ID="ACL_35">
-		<cim:ConductingEquipment.BaseVoltage rdf:resource="#BV_2"/>
+		<!-- <cim:ConductingEquipment.BaseVoltage rdf:resource="#BV_2"/> -->
 		<cim:ConductingEquipment.isRemote>true</cim:ConductingEquipment.isRemote>
 		<cim:IdentifiedObject.description>ACLineSegment</cim:IdentifiedObject.description>
 		<cim:IdentifiedObject.mRID>ACL_35</cim:IdentifiedObject.mRID>
 		<ftn:IdentifiedObject.name>ACL_35</ftn:IdentifiedObject.name>
 	</cim:ACLineSegment>
 	<cim:ACLineSegment rdf:ID="ACL_36">
-		<cim:ConductingEquipment.BaseVoltage rdf:resource="#BV_2"/>
+		<!-- <cim:ConductingEquipment.BaseVoltage rdf:resource="#BV_2"/> -->
 		<cim:ConductingEquipment.isRemote>true</cim:ConductingEquipment.isRemote>
 		<cim:IdentifiedObject.description>ACLineSegment</cim:IdentifiedObject.description>
 		<cim:IdentifiedObject.mRID>ACL_36</cim:IdentifiedObject.mRID>
 		<ftn:IdentifiedObject.name>ACL_36</ftn:IdentifiedObject.name>
 	</cim:ACLineSegment>
 	<cim:ACLineSegment rdf:ID="ACL_37">
-		<cim:ConductingEquipment.BaseVoltage rdf:resource="#BV_2"/>
+		<!-- <cim:ConductingEquipment.BaseVoltage rdf:resource="#BV_2"/> -->
 		<cim:ConductingEquipment.isRemote>true</cim:ConductingEquipment.isRemote>
 		<cim:IdentifiedObject.description>ACLineSegment</cim:IdentifiedObject.description>
 		<cim:IdentifiedObject.mRID>ACL_37</cim:IdentifiedObject.mRID>
 		<ftn:IdentifiedObject.name>ACL_37</ftn:IdentifiedObject.name>
 	</cim:ACLineSegment>
 	<cim:ACLineSegment rdf:ID="ACL_38">
-		<cim:ConductingEquipment.BaseVoltage rdf:resource="#BV_2"/>
+		<!-- <cim:ConductingEquipment.BaseVoltage rdf:resource="#BV_2"/> -->
 		<cim:ConductingEquipment.isRemote>true</cim:ConductingEquipment.isRemote>
 		<cim:IdentifiedObject.description>ACLineSegment</cim:IdentifiedObject.description>
 		<cim:IdentifiedObject.mRID>ACL_38</cim:IdentifiedObject.mRID>
 		<ftn:IdentifiedObject.name>ACL_38</ftn:IdentifiedObject.name>
 	</cim:ACLineSegment>
 	<cim:ACLineSegment rdf:ID="ACL_39">
-		<cim:ConductingEquipment.BaseVoltage rdf:resource="#BV_2"/>
+		<!-- <cim:ConductingEquipment.BaseVoltage rdf:resource="#BV_2"/> -->
 		<cim:ConductingEquipment.isRemote>true</cim:ConductingEquipment.isRemote>
 		<cim:IdentifiedObject.description>ACLineSegment</cim:IdentifiedObject.description>
 		<cim:IdentifiedObject.mRID>ACL_39</cim:IdentifiedObject.mRID>
 		<ftn:IdentifiedObject.name>ACL_39</ftn:IdentifiedObject.name>
 	</cim:ACLineSegment>
 	<cim:ACLineSegment rdf:ID="ACL_40">
-		<cim:ConductingEquipment.BaseVoltage rdf:resource="#BV_2"/>
+		<!-- <cim:ConductingEquipment.BaseVoltage rdf:resource="#BV_2"/> -->
 		<cim:ConductingEquipment.isRemote>true</cim:ConductingEquipment.isRemote>
 		<cim:IdentifiedObject.description>ACLineSegment</cim:IdentifiedObject.description>
 		<cim:IdentifiedObject.mRID>ACL_40</cim:IdentifiedObject.mRID>
 		<ftn:IdentifiedObject.name>ACL_40</ftn:IdentifiedObject.name>
 	</cim:ACLineSegment>
 	<cim:ACLineSegment rdf:ID="ACL_41">
-		<cim:ConductingEquipment.BaseVoltage rdf:resource="#BV_2"/>
+		<!-- <cim:ConductingEquipment.BaseVoltage rdf:resource="#BV_2"/> -->
 		<cim:ConductingEquipment.isRemote>true</cim:ConductingEquipment.isRemote>
 		<cim:IdentifiedObject.description>ACLineSegment</cim:IdentifiedObject.description>
 		<cim:IdentifiedObject.mRID>ACL_41</cim:IdentifiedObject.mRID>
 		<ftn:IdentifiedObject.name>ACL_41</ftn:IdentifiedObject.name>
 	</cim:ACLineSegment>
 	<cim:ACLineSegment rdf:ID="ACL_42">
-		<cim:ConductingEquipment.BaseVoltage rdf:resource="#BV_2"/>
+		<!-- <cim:ConductingEquipment.BaseVoltage rdf:resource="#BV_2"/> -->
 		<cim:ConductingEquipment.isRemote>false</cim:ConductingEquipment.isRemote>
 		<cim:IdentifiedObject.description>ACLineSegment</cim:IdentifiedObject.description>
 		<cim:IdentifiedObject.mRID>ACL_42</cim:IdentifiedObject.mRID>
 		<ftn:IdentifiedObject.name>ACL_42</ftn:IdentifiedObject.name>
 	</cim:ACLineSegment>
 	<cim:ACLineSegment rdf:ID="ACL_43">
-		<cim:ConductingEquipment.BaseVoltage rdf:resource="#BV_2"/>
+		<!-- <cim:ConductingEquipment.BaseVoltage rdf:resource="#BV_2"/> -->
 		<cim:ConductingEquipment.isRemote>false</cim:ConductingEquipment.isRemote>
 		<cim:IdentifiedObject.description>ACLineSegment</cim:IdentifiedObject.description>
 		<cim:IdentifiedObject.mRID>ACL_43</cim:IdentifiedObject.mRID>
 		<ftn:IdentifiedObject.name>ACL_43</ftn:IdentifiedObject.name>
 	</cim:ACLineSegment>
 	<cim:ACLineSegment rdf:ID="ACL_44">
-		<cim:ConductingEquipment.BaseVoltage rdf:resource="#BV_2"/>
+		<!-- <cim:ConductingEquipment.BaseVoltage rdf:resource="#BV_2"/> -->
 		<cim:ConductingEquipment.isRemote>false</cim:ConductingEquipment.isRemote>
 		<cim:IdentifiedObject.description>ACLineSegment</cim:IdentifiedObject.description>
 		<cim:IdentifiedObject.mRID>ACL_44</cim:IdentifiedObject.mRID>
 		<ftn:IdentifiedObject.name>ACL_44</ftn:IdentifiedObject.name>
 	</cim:ACLineSegment>
 	<cim:ACLineSegment rdf:ID="ACL_45">
-		<cim:ConductingEquipment.BaseVoltage rdf:resource="#BV_2"/>
+		<!-- <cim:ConductingEquipment.BaseVoltage rdf:resource="#BV_2"/> -->
 		<cim:ConductingEquipment.isRemote>false</cim:ConductingEquipment.isRemote>
 		<cim:IdentifiedObject.description>ACLineSegment</cim:IdentifiedObject.description>
 		<cim:IdentifiedObject.mRID>ACL_45</cim:IdentifiedObject.mRID>
 		<ftn:IdentifiedObject.name>ACL_45</ftn:IdentifiedObject.name>
 	</cim:ACLineSegment>
 	<cim:ACLineSegment rdf:ID="ACL_46">
-		<cim:ConductingEquipment.BaseVoltage rdf:resource="#BV_2"/>
+		<!-- <cim:ConductingEquipment.BaseVoltage rdf:resource="#BV_2"/> -->
 		<cim:ConductingEquipment.isRemote>false</cim:ConductingEquipment.isRemote>
 		<cim:IdentifiedObject.description>ACLineSegment</cim:IdentifiedObject.description>
 		<cim:IdentifiedObject.mRID>ACL_46</cim:IdentifiedObject.mRID>
 		<ftn:IdentifiedObject.name>ACL_46</ftn:IdentifiedObject.name>
 	</cim:ACLineSegment>
 	<cim:ACLineSegment rdf:ID="ACL_47">
-		<cim:ConductingEquipment.BaseVoltage rdf:resource="#BV_2"/>
+		<!-- <cim:ConductingEquipment.BaseVoltage rdf:resource="#BV_2"/> -->
 		<cim:ConductingEquipment.isRemote>false</cim:ConductingEquipment.isRemote>
 		<cim:IdentifiedObject.description>ACLineSegment</cim:IdentifiedObject.description>
 		<cim:IdentifiedObject.mRID>ACL_47</cim:IdentifiedObject.mRID>
 		<ftn:IdentifiedObject.name>ACL_47</ftn:IdentifiedObject.name>
 	</cim:ACLineSegment>
 	<cim:ACLineSegment rdf:ID="ACL_48">
-		<cim:ConductingEquipment.BaseVoltage rdf:resource="#BV_2"/>
+		<!-- <cim:ConductingEquipment.BaseVoltage rdf:resource="#BV_2"/> -->
 		<cim:ConductingEquipment.isRemote>false</cim:ConductingEquipment.isRemote>
 		<cim:IdentifiedObject.description>ACLineSegment</cim:IdentifiedObject.description>
 		<cim:IdentifiedObject.mRID>ACL_48</cim:IdentifiedObject.mRID>
 		<ftn:IdentifiedObject.name>ACL_48</ftn:IdentifiedObject.name>
 	</cim:ACLineSegment>
 	<cim:ACLineSegment rdf:ID="ACL_49">
-		<cim:ConductingEquipment.BaseVoltage rdf:resource="#BV_2"/>
+		<!-- <cim:ConductingEquipment.BaseVoltage rdf:resource="#BV_2"/> -->
 		<cim:ConductingEquipment.isRemote>false</cim:ConductingEquipment.isRemote>
 		<cim:IdentifiedObject.description>ACLineSegment</cim:IdentifiedObject.description>
 		<cim:IdentifiedObject.mRID>ACL_49</cim:IdentifiedObject.mRID>
 		<ftn:IdentifiedObject.name>ACL_49</ftn:IdentifiedObject.name>
 	</cim:ACLineSegment>
 	<cim:ACLineSegment rdf:ID="ACL_50">
-		<cim:ConductingEquipment.BaseVoltage rdf:resource="#BV_2"/>
+		<!-- <cim:ConductingEquipment.BaseVoltage rdf:resource="#BV_2"/> -->
 		<cim:ConductingEquipment.isRemote>false</cim:ConductingEquipment.isRemote>
 		<cim:IdentifiedObject.description>ACLineSegment</cim:IdentifiedObject.description>
 		<cim:IdentifiedObject.mRID>ACL_50</cim:IdentifiedObject.mRID>
 		<ftn:IdentifiedObject.name>ACL_50</ftn:IdentifiedObject.name>
 	</cim:ACLineSegment>
 	<cim:ACLineSegment rdf:ID="ACL_51">
-		<cim:ConductingEquipment.BaseVoltage rdf:resource="#BV_2"/>
+		<!-- <cim:ConductingEquipment.BaseVoltage rdf:resource="#BV_2"/> -->
 		<cim:ConductingEquipment.isRemote>false</cim:ConductingEquipment.isRemote>
 		<cim:IdentifiedObject.description>ACLineSegment</cim:IdentifiedObject.description>
 		<cim:IdentifiedObject.mRID>ACL_51</cim:IdentifiedObject.mRID>
 		<ftn:IdentifiedObject.name>ACL_51</ftn:IdentifiedObject.name>
 	</cim:ACLineSegment>
 	<cim:ACLineSegment rdf:ID="ACL_52">
-		<cim:ConductingEquipment.BaseVoltage rdf:resource="#BV_2"/>
+		<!-- <cim:ConductingEquipment.BaseVoltage rdf:resource="#BV_2"/> -->
 		<cim:ConductingEquipment.isRemote>false</cim:ConductingEquipment.isRemote>
 		<cim:IdentifiedObject.description>ACLineSegment</cim:IdentifiedObject.description>
 		<cim:IdentifiedObject.mRID>ACL_52</cim:IdentifiedObject.mRID>
 		<ftn:IdentifiedObject.name>ACL_52</ftn:IdentifiedObject.name>
 	</cim:ACLineSegment>
 	<cim:ACLineSegment rdf:ID="ACL_53">
-		<cim:ConductingEquipment.BaseVoltage rdf:resource="#BV_2"/>
+		<!-- <cim:ConductingEquipment.BaseVoltage rdf:resource="#BV_2"/> -->
 		<cim:ConductingEquipment.isRemote>false</cim:ConductingEquipment.isRemote>
 		<cim:IdentifiedObject.description>ACLineSegment</cim:IdentifiedObject.description>
 		<cim:IdentifiedObject.mRID>ACL_53</cim:IdentifiedObject.mRID>
 		<ftn:IdentifiedObject.name>ACL_53</ftn:IdentifiedObject.name>
 	</cim:ACLineSegment>
 	<cim:ACLineSegment rdf:ID="ACL_54">
-		<cim:ConductingEquipment.BaseVoltage rdf:resource="#BV_2"/>
+		<!-- <cim:ConductingEquipment.BaseVoltage rdf:resource="#BV_2"/> -->
 		<cim:ConductingEquipment.isRemote>false</cim:ConductingEquipment.isRemote>
 		<cim:IdentifiedObject.description>ACLineSegment</cim:IdentifiedObject.description>
 		<cim:IdentifiedObject.mRID>ACL_54</cim:IdentifiedObject.mRID>
 		<ftn:IdentifiedObject.name>ACL_54</ftn:IdentifiedObject.name>
 	</cim:ACLineSegment>
 	<cim:ACLineSegment rdf:ID="ACL_55">
-		<cim:ConductingEquipment.BaseVoltage rdf:resource="#BV_2"/>
+		<!-- <cim:ConductingEquipment.BaseVoltage rdf:resource="#BV_2"/> -->
 		<cim:ConductingEquipment.isRemote>false</cim:ConductingEquipment.isRemote>
 		<cim:IdentifiedObject.description>ACLineSegment</cim:IdentifiedObject.description>
 		<cim:IdentifiedObject.mRID>ACL_55</cim:IdentifiedObject.mRID>
 		<ftn:IdentifiedObject.name>ACL_55</ftn:IdentifiedObject.name>
 	</cim:ACLineSegment>
 	<cim:ACLineSegment rdf:ID="ACL_56">
-		<cim:ConductingEquipment.BaseVoltage rdf:resource="#BV_2"/>
+		<!-- <cim:ConductingEquipment.BaseVoltage rdf:resource="#BV_2"/> -->
 		<cim:ConductingEquipment.isRemote>false</cim:ConductingEquipment.isRemote>
 		<cim:IdentifiedObject.description>ACLineSegment</cim:IdentifiedObject.description>
 		<cim:IdentifiedObject.mRID>ACL_56</cim:IdentifiedObject.mRID>
 		<ftn:IdentifiedObject.name>ACL_56</ftn:IdentifiedObject.name>
 	</cim:ACLineSegment>
 	<cim:ACLineSegment rdf:ID="ACL_57">
-		<cim:ConductingEquipment.BaseVoltage rdf:resource="#BV_2"/>
+		<!-- <cim:ConductingEquipment.BaseVoltage rdf:resource="#BV_2"/> -->
 		<cim:ConductingEquipment.isRemote>false</cim:ConductingEquipment.isRemote>
 		<cim:IdentifiedObject.description>ACLineSegment</cim:IdentifiedObject.description>
 		<cim:IdentifiedObject.mRID>ACL_57</cim:IdentifiedObject.mRID>
 		<ftn:IdentifiedObject.name>ACL_57</ftn:IdentifiedObject.name>
 	</cim:ACLineSegment>
 	<cim:ACLineSegment rdf:ID="ACL_58">
-		<cim:ConductingEquipment.BaseVoltage rdf:resource="#BV_2"/>
+		<!-- <cim:ConductingEquipment.BaseVoltage rdf:resource="#BV_2"/> -->
 		<cim:ConductingEquipment.isRemote>false</cim:ConductingEquipment.isRemote>
 		<cim:IdentifiedObject.description>ACLineSegment</cim:IdentifiedObject.description>
 		<cim:IdentifiedObject.mRID>ACL_58</cim:IdentifiedObject.mRID>
 		<ftn:IdentifiedObject.name>ACL_58</ftn:IdentifiedObject.name>
 	</cim:ACLineSegment>
 	<cim:ACLineSegment rdf:ID="ACL_59">
-		<cim:ConductingEquipment.BaseVoltage rdf:resource="#BV_2"/>
+		<!-- <cim:ConductingEquipment.BaseVoltage rdf:resource="#BV_2"/> -->
 		<cim:ConductingEquipment.isRemote>false</cim:ConductingEquipment.isRemote>
 		<cim:IdentifiedObject.description>ACLineSegment</cim:IdentifiedObject.description>
 		<cim:IdentifiedObject.mRID>ACL_59</cim:IdentifiedObject.mRID>
 		<ftn:IdentifiedObject.name>ACL_59</ftn:IdentifiedObject.name>
 	</cim:ACLineSegment>
 	<cim:ACLineSegment rdf:ID="ACL_60">
-		<cim:ConductingEquipment.BaseVoltage rdf:resource="#BV_2"/>
+		<!-- <cim:ConductingEquipment.BaseVoltage rdf:resource="#BV_2"/> -->
 		<cim:ConductingEquipment.isRemote>false</cim:ConductingEquipment.isRemote>
 		<cim:IdentifiedObject.description>ACLineSegment</cim:IdentifiedObject.description>
 		<cim:IdentifiedObject.mRID>ACL_60</cim:IdentifiedObject.mRID>
 		<ftn:IdentifiedObject.name>ACL_60</ftn:IdentifiedObject.name>
 	</cim:ACLineSegment>
 	<cim:ACLineSegment rdf:ID="ACL_61">
-		<cim:ConductingEquipment.BaseVoltage rdf:resource="#BV_2"/>
+		<!-- <cim:ConductingEquipment.BaseVoltage rdf:resource="#BV_2"/> -->
 		<cim:ConductingEquipment.isRemote>false</cim:ConductingEquipment.isRemote>
 		<cim:IdentifiedObject.description>ACLineSegment</cim:IdentifiedObject.description>
 		<cim:IdentifiedObject.mRID>ACL_61</cim:IdentifiedObject.mRID>
 		<ftn:IdentifiedObject.name>ACL_61</ftn:IdentifiedObject.name>
 	</cim:ACLineSegment>
 		<cim:ACLineSegment rdf:ID="ACL_62">
-		<cim:ConductingEquipment.BaseVoltage rdf:resource="#BV_2"/>
+		<!-- <cim:ConductingEquipment.BaseVoltage rdf:resource="#BV_2"/> -->
 		<cim:ConductingEquipment.isRemote>false</cim:ConductingEquipment.isRemote>
 		<cim:IdentifiedObject.description>ACLineSegment</cim:IdentifiedObject.description>
 		<cim:IdentifiedObject.mRID>ACL_62</cim:IdentifiedObject.mRID>
 		<ftn:IdentifiedObject.name>ACL_62</ftn:IdentifiedObject.name>
 	</cim:ACLineSegment>
 		<cim:ACLineSegment rdf:ID="ACL_63">
-		<cim:ConductingEquipment.BaseVoltage rdf:resource="#BV_2"/>
+		<!-- <cim:ConductingEquipment.BaseVoltage rdf:resource="#BV_2"/> -->
 		<cim:ConductingEquipment.isRemote>false</cim:ConductingEquipment.isRemote>
 		<cim:IdentifiedObject.description>ACLineSegment</cim:IdentifiedObject.description>
 		<cim:IdentifiedObject.mRID>ACL_63</cim:IdentifiedObject.mRID>
 		<ftn:IdentifiedObject.name>ACL_63</ftn:IdentifiedObject.name>
 	</cim:ACLineSegment>
 		<cim:ACLineSegment rdf:ID="ACL_64">
-		<cim:ConductingEquipment.BaseVoltage rdf:resource="#BV_2"/>
+		<!-- <cim:ConductingEquipment.BaseVoltage rdf:resource="#BV_2"/> -->
 		<cim:ConductingEquipment.isRemote>false</cim:ConductingEquipment.isRemote>
 		<cim:IdentifiedObject.description>ACLineSegment</cim:IdentifiedObject.description>
 		<cim:IdentifiedObject.mRID>ACL_64</cim:IdentifiedObject.mRID>
 		<ftn:IdentifiedObject.name>ACL_64</ftn:IdentifiedObject.name>
 	</cim:ACLineSegment>
 		<cim:ACLineSegment rdf:ID="ACL_65">
-		<cim:ConductingEquipment.BaseVoltage rdf:resource="#BV_2"/>
+		<!-- <cim:ConductingEquipment.BaseVoltage rdf:resource="#BV_2"/> -->
 		<cim:ConductingEquipment.isRemote>false</cim:ConductingEquipment.isRemote>
 		<cim:IdentifiedObject.description>ACLineSegment</cim:IdentifiedObject.description>
 		<cim:IdentifiedObject.mRID>ACL_65</cim:IdentifiedObject.mRID>
 		<ftn:IdentifiedObject.name>ACL_65</ftn:IdentifiedObject.name>
 	</cim:ACLineSegment>
 		<cim:ACLineSegment rdf:ID="ACL_66">
-		<cim:ConductingEquipment.BaseVoltage rdf:resource="#BV_2"/>
+		<!-- <cim:ConductingEquipment.BaseVoltage rdf:resource="#BV_2"/> -->
 		<cim:ConductingEquipment.isRemote>false</cim:ConductingEquipment.isRemote>
 		<cim:IdentifiedObject.description>ACLineSegment</cim:IdentifiedObject.description>
 		<cim:IdentifiedObject.mRID>ACL_66</cim:IdentifiedObject.mRID>
 		<ftn:IdentifiedObject.name>ACL_66</ftn:IdentifiedObject.name>
 	</cim:ACLineSegment>
 		<cim:ACLineSegment rdf:ID="ACL_67">
-		<cim:ConductingEquipment.BaseVoltage rdf:resource="#BV_2"/>
+		<!-- <cim:ConductingEquipment.BaseVoltage rdf:resource="#BV_2"/> -->
 		<cim:ConductingEquipment.isRemote>false</cim:ConductingEquipment.isRemote>
 		<cim:IdentifiedObject.description>ACLineSegment</cim:IdentifiedObject.description>
 		<cim:IdentifiedObject.mRID>ACL_67</cim:IdentifiedObject.mRID>
 		<ftn:IdentifiedObject.name>ACL_67</ftn:IdentifiedObject.name>
 	</cim:ACLineSegment>
 		<cim:ACLineSegment rdf:ID="ACL_68">
-		<cim:ConductingEquipment.BaseVoltage rdf:resource="#BV_2"/>
+		<!-- <cim:ConductingEquipment.BaseVoltage rdf:resource="#BV_2"/> -->
 		<cim:ConductingEquipment.isRemote>false</cim:ConductingEquipment.isRemote>
 		<cim:IdentifiedObject.description>ACLineSegment</cim:IdentifiedObject.description>
 		<cim:IdentifiedObject.mRID>ACL_68</cim:IdentifiedObject.mRID>
 		<ftn:IdentifiedObject.name>ACL_68</ftn:IdentifiedObject.name>
 	</cim:ACLineSegment>
 		<cim:ACLineSegment rdf:ID="ACL_69">
-		<cim:ConductingEquipment.BaseVoltage rdf:resource="#BV_2"/>
+		<!-- <cim:ConductingEquipment.BaseVoltage rdf:resource="#BV_2"/> -->
 		<cim:ConductingEquipment.isRemote>false</cim:ConductingEquipment.isRemote>
 		<cim:IdentifiedObject.description>ACLineSegment</cim:IdentifiedObject.description>
 		<cim:IdentifiedObject.mRID>ACL_69</cim:IdentifiedObject.mRID>
 		<ftn:IdentifiedObject.name>ACL_69</ftn:IdentifiedObject.name>
 	</cim:ACLineSegment>
 		<cim:ACLineSegment rdf:ID="ACL_70">
-		<cim:ConductingEquipment.BaseVoltage rdf:resource="#BV_2"/>
+		<!-- <cim:ConductingEquipment.BaseVoltage rdf:resource="#BV_2"/> -->
 		<cim:ConductingEquipment.isRemote>false</cim:ConductingEquipment.isRemote>
 		<cim:IdentifiedObject.description>ACLineSegment</cim:IdentifiedObject.description>
 		<cim:IdentifiedObject.mRID>ACL_70</cim:IdentifiedObject.mRID>
 		<ftn:IdentifiedObject.name>ACL_70</ftn:IdentifiedObject.name>
 	</cim:ACLineSegment>
 	<cim:ACLineSegment rdf:ID="ACL_71">
-		<cim:ConductingEquipment.BaseVoltage rdf:resource="#BV_2"/>
+		<!-- <cim:ConductingEquipment.BaseVoltage rdf:resource="#BV_2"/> -->
 		<cim:ConductingEquipment.isRemote>false</cim:ConductingEquipment.isRemote>
 		<cim:IdentifiedObject.description>ACLineSegment</cim:IdentifiedObject.description>
 		<cim:IdentifiedObject.mRID>ACL_71</cim:IdentifiedObject.mRID>
 		<ftn:IdentifiedObject.name>ACL_71</ftn:IdentifiedObject.name>
 	</cim:ACLineSegment>
 		<cim:ACLineSegment rdf:ID="ACL_72">
-		<cim:ConductingEquipment.BaseVoltage rdf:resource="#BV_2"/>
+		<!-- <cim:ConductingEquipment.BaseVoltage rdf:resource="#BV_2"/> -->
 		<cim:ConductingEquipment.isRemote>false</cim:ConductingEquipment.isRemote>
 		<cim:IdentifiedObject.description>ACLineSegment</cim:IdentifiedObject.description>
 		<cim:IdentifiedObject.mRID>ACL_72</cim:IdentifiedObject.mRID>
 		<ftn:IdentifiedObject.name>ACL_72</ftn:IdentifiedObject.name>
 	</cim:ACLineSegment>
 		<cim:ACLineSegment rdf:ID="ACL_73">
-		<cim:ConductingEquipment.BaseVoltage rdf:resource="#BV_2"/>
+		<!-- <cim:ConductingEquipment.BaseVoltage rdf:resource="#BV_2"/> -->
 		<cim:ConductingEquipment.isRemote>false</cim:ConductingEquipment.isRemote>
 		<cim:IdentifiedObject.description>ACLineSegment</cim:IdentifiedObject.description>
 		<cim:IdentifiedObject.mRID>ACL_73</cim:IdentifiedObject.mRID>
 		<ftn:IdentifiedObject.name>ACL_73</ftn:IdentifiedObject.name>
 	</cim:ACLineSegment>
 		<cim:ACLineSegment rdf:ID="ACL_74">
-		<cim:ConductingEquipment.BaseVoltage rdf:resource="#BV_2"/>
+		<!-- <cim:ConductingEquipment.BaseVoltage rdf:resource="#BV_2"/> -->
 		<cim:ConductingEquipment.isRemote>false</cim:ConductingEquipment.isRemote>
 		<cim:IdentifiedObject.description>ACLineSegment</cim:IdentifiedObject.description>
 		<cim:IdentifiedObject.mRID>ACL_74</cim:IdentifiedObject.mRID>
 		<ftn:IdentifiedObject.name>ACL_74</ftn:IdentifiedObject.name>
 	</cim:ACLineSegment>
 		<cim:ACLineSegment rdf:ID="ACL_75">
-		<cim:ConductingEquipment.BaseVoltage rdf:resource="#BV_2"/>
+		<!-- <cim:ConductingEquipment.BaseVoltage rdf:resource="#BV_2"/> -->
 		<cim:ConductingEquipment.isRemote>false</cim:ConductingEquipment.isRemote>
 		<cim:IdentifiedObject.description>ACLineSegment</cim:IdentifiedObject.description>
 		<cim:IdentifiedObject.mRID>ACL_75</cim:IdentifiedObject.mRID>
 		<ftn:IdentifiedObject.name>ACL_75</ftn:IdentifiedObject.name>
 	</cim:ACLineSegment>
 		<cim:ACLineSegment rdf:ID="ACL_76">
-		<cim:ConductingEquipment.BaseVoltage rdf:resource="#BV_2"/>
+		<!-- <cim:ConductingEquipment.BaseVoltage rdf:resource="#BV_2"/> -->
 		<cim:ConductingEquipment.isRemote>false</cim:ConductingEquipment.isRemote>
 		<cim:IdentifiedObject.description>ACLineSegment</cim:IdentifiedObject.description>
 		<cim:IdentifiedObject.mRID>ACL_76</cim:IdentifiedObject.mRID>
 		<ftn:IdentifiedObject.name>ACL_76</ftn:IdentifiedObject.name>
 	</cim:ACLineSegment>
 		<cim:ACLineSegment rdf:ID="ACL_77">
-		<cim:ConductingEquipment.BaseVoltage rdf:resource="#BV_2"/>
+		<!-- <cim:ConductingEquipment.BaseVoltage rdf:resource="#BV_2"/> -->
 		<cim:ConductingEquipment.isRemote>false</cim:ConductingEquipment.isRemote>
 		<cim:IdentifiedObject.description>ACLineSegment</cim:IdentifiedObject.description>
 		<cim:IdentifiedObject.mRID>ACL_77</cim:IdentifiedObject.mRID>
 		<ftn:IdentifiedObject.name>ACL_77</ftn:IdentifiedObject.name>
 	</cim:ACLineSegment>
 	<cim:ACLineSegment rdf:ID="ACL_78">
-		<cim:ConductingEquipment.BaseVoltage rdf:resource="#BV_2"/>
+		<!-- <cim:ConductingEquipment.BaseVoltage rdf:resource="#BV_2"/> -->
 		<cim:ConductingEquipment.isRemote>true</cim:ConductingEquipment.isRemote>
 		<cim:IdentifiedObject.description>ACLineSegment</cim:IdentifiedObject.description>
 		<cim:IdentifiedObject.mRID>ACL_78</cim:IdentifiedObject.mRID>
 		<ftn:IdentifiedObject.name>ACL_78</ftn:IdentifiedObject.name>
 	</cim:ACLineSegment>
 	<cim:ACLineSegment rdf:ID="ACL_79">
-		<cim:ConductingEquipment.BaseVoltage rdf:resource="#BV_2"/>
+		<!-- <cim:ConductingEquipment.BaseVoltage rdf:resource="#BV_2"/> -->
 		<cim:ConductingEquipment.isRemote>true</cim:ConductingEquipment.isRemote>
 		<cim:IdentifiedObject.description>ACLineSegment</cim:IdentifiedObject.description>
 		<cim:IdentifiedObject.mRID>ACL_79</cim:IdentifiedObject.mRID>
 		<ftn:IdentifiedObject.name>ACL_79</ftn:IdentifiedObject.name>
 	</cim:ACLineSegment>
 	<cim:ACLineSegment rdf:ID="ACL_80">
-		<cim:ConductingEquipment.BaseVoltage rdf:resource="#BV_2"/>
+		<!-- <cim:ConductingEquipment.BaseVoltage rdf:resource="#BV_2"/> -->
 		<cim:ConductingEquipment.isRemote>true</cim:ConductingEquipment.isRemote>
 		<cim:IdentifiedObject.description>ACLineSegment</cim:IdentifiedObject.description>
 		<cim:IdentifiedObject.mRID>ACL_80</cim:IdentifiedObject.mRID>
 		<ftn:IdentifiedObject.name>ACL_80</ftn:IdentifiedObject.name>
 	</cim:ACLineSegment>
 	<cim:ACLineSegment rdf:ID="ACL_81">
-		<cim:ConductingEquipment.BaseVoltage rdf:resource="#BV_2"/>
+		<!-- <cim:ConductingEquipment.BaseVoltage rdf:resource="#BV_2"/> -->
 		<cim:ConductingEquipment.isRemote>true</cim:ConductingEquipment.isRemote>
 		<cim:IdentifiedObject.description>ACLineSegment</cim:IdentifiedObject.description>
 		<cim:IdentifiedObject.mRID>ACL_81</cim:IdentifiedObject.mRID>
 		<ftn:IdentifiedObject.name>ACL_81</ftn:IdentifiedObject.name>
 	</cim:ACLineSegment>
 	<cim:ACLineSegment rdf:ID="ACL_82">
-		<cim:ConductingEquipment.BaseVoltage rdf:resource="#BV_2"/>
+		<!-- <cim:ConductingEquipment.BaseVoltage rdf:resource="#BV_2"/> -->
 		<cim:ConductingEquipment.isRemote>true</cim:ConductingEquipment.isRemote>
 		<cim:IdentifiedObject.description>ACLineSegment</cim:IdentifiedObject.description>
 		<cim:IdentifiedObject.mRID>ACL_82</cim:IdentifiedObject.mRID>
 		<ftn:IdentifiedObject.name>ACL_82</ftn:IdentifiedObject.name>
 	</cim:ACLineSegment>
 	<cim:ACLineSegment rdf:ID="ACL_83">
-		<cim:ConductingEquipment.BaseVoltage rdf:resource="#BV_2"/>
+		<!-- <cim:ConductingEquipment.BaseVoltage rdf:resource="#BV_2"/> -->
 		<cim:ConductingEquipment.isRemote>true</cim:ConductingEquipment.isRemote>
 		<cim:IdentifiedObject.description>ACLineSegment</cim:IdentifiedObject.description>
 		<cim:IdentifiedObject.mRID>ACL_83</cim:IdentifiedObject.mRID>
 		<ftn:IdentifiedObject.name>ACL_83</ftn:IdentifiedObject.name>
 	</cim:ACLineSegment>
 	<cim:ACLineSegment rdf:ID="ACL_84">
-		<cim:ConductingEquipment.BaseVoltage rdf:resource="#BV_2"/>
+		<!-- <cim:ConductingEquipment.BaseVoltage rdf:resource="#BV_2"/> -->
 		<cim:ConductingEquipment.isRemote>true</cim:ConductingEquipment.isRemote>
 		<cim:IdentifiedObject.description>ACLineSegment</cim:IdentifiedObject.description>
 		<cim:IdentifiedObject.mRID>ACL_84</cim:IdentifiedObject.mRID>
 		<ftn:IdentifiedObject.name>ACL_84</ftn:IdentifiedObject.name>
 	</cim:ACLineSegment>
 	<cim:ACLineSegment rdf:ID="ACL_85">
-		<cim:ConductingEquipment.BaseVoltage rdf:resource="#BV_2"/>
+		<!-- <cim:ConductingEquipment.BaseVoltage rdf:resource="#BV_2"/> -->
 		<cim:ConductingEquipment.isRemote>true</cim:ConductingEquipment.isRemote>
 		<cim:IdentifiedObject.description>ACLineSegment</cim:IdentifiedObject.description>
 		<cim:IdentifiedObject.mRID>ACL_85</cim:IdentifiedObject.mRID>
 		<ftn:IdentifiedObject.name>ACL_85</ftn:IdentifiedObject.name>
 	</cim:ACLineSegment>
 	<cim:ACLineSegment rdf:ID="ACL_86">
-		<cim:ConductingEquipment.BaseVoltage rdf:resource="#BV_2"/>
+		<!-- <cim:ConductingEquipment.BaseVoltage rdf:resource="#BV_2"/> -->
 		<cim:ConductingEquipment.isRemote>true</cim:ConductingEquipment.isRemote>
 		<cim:IdentifiedObject.description>ACLineSegment</cim:IdentifiedObject.description>
 		<cim:IdentifiedObject.mRID>ACL_86</cim:IdentifiedObject.mRID>
 		<ftn:IdentifiedObject.name>ACL_86</ftn:IdentifiedObject.name>
 	</cim:ACLineSegment>
 	<cim:ACLineSegment rdf:ID="ACL_87">
-		<cim:ConductingEquipment.BaseVoltage rdf:resource="#BV_2"/>
+		<!-- <cim:ConductingEquipment.BaseVoltage rdf:resource="#BV_2"/> -->
 		<cim:ConductingEquipment.isRemote>true</cim:ConductingEquipment.isRemote>
 		<cim:IdentifiedObject.description>ACLineSegment</cim:IdentifiedObject.description>
 		<cim:IdentifiedObject.mRID>ACL_87</cim:IdentifiedObject.mRID>
 		<ftn:IdentifiedObject.name>ACL_87</ftn:IdentifiedObject.name>
 	</cim:ACLineSegment>
 	<cim:ACLineSegment rdf:ID="ACL_88">
-		<cim:ConductingEquipment.BaseVoltage rdf:resource="#BV_2"/>
+		<!-- <cim:ConductingEquipment.BaseVoltage rdf:resource="#BV_2"/> -->
 		<cim:ConductingEquipment.isRemote>true</cim:ConductingEquipment.isRemote>
 		<cim:IdentifiedObject.description>ACLineSegment</cim:IdentifiedObject.description>
 		<cim:IdentifiedObject.mRID>ACL_88</cim:IdentifiedObject.mRID>
 		<ftn:IdentifiedObject.name>ACL_88</ftn:IdentifiedObject.name>
 	</cim:ACLineSegment>
 	<cim:ACLineSegment rdf:ID="ACL_89">
-		<cim:ConductingEquipment.BaseVoltage rdf:resource="#BV_2"/>
+		<!-- <cim:ConductingEquipment.BaseVoltage rdf:resource="#BV_2"/> -->
 		<cim:ConductingEquipment.isRemote>true</cim:ConductingEquipment.isRemote>
 		<cim:IdentifiedObject.description>ACLineSegment</cim:IdentifiedObject.description>
 		<cim:IdentifiedObject.mRID>ACL_89</cim:IdentifiedObject.mRID>
 		<ftn:IdentifiedObject.name>ACL_89</ftn:IdentifiedObject.name>
 	</cim:ACLineSegment>
 	<cim:ACLineSegment rdf:ID="ACL_90">
-		<cim:ConductingEquipment.BaseVoltage rdf:resource="#BV_2"/>
+		<!-- <cim:ConductingEquipment.BaseVoltage rdf:resource="#BV_2"/> -->
 		<cim:ConductingEquipment.isRemote>true</cim:ConductingEquipment.isRemote>
 		<cim:IdentifiedObject.description>ACLineSegment</cim:IdentifiedObject.description>
 		<cim:IdentifiedObject.mRID>ACL_90</cim:IdentifiedObject.mRID>
 		<ftn:IdentifiedObject.name>ACL_90</ftn:IdentifiedObject.name>
 	</cim:ACLineSegment>
 	<cim:ACLineSegment rdf:ID="ACL_91">
-		<cim:ConductingEquipment.BaseVoltage rdf:resource="#BV_2"/>
+		<!-- <cim:ConductingEquipment.BaseVoltage rdf:resource="#BV_2"/> -->
 		<cim:ConductingEquipment.isRemote>true</cim:ConductingEquipment.isRemote>
 		<cim:IdentifiedObject.description>ACLineSegment</cim:IdentifiedObject.description>
 		<cim:IdentifiedObject.mRID>ACL_91</cim:IdentifiedObject.mRID>
 		<ftn:IdentifiedObject.name>ACL_91</ftn:IdentifiedObject.name>
 	</cim:ACLineSegment>
 	<cim:ACLineSegment rdf:ID="ACL_92">
-		<cim:ConductingEquipment.BaseVoltage rdf:resource="#BV_2"/>
+		<!-- <cim:ConductingEquipment.BaseVoltage rdf:resource="#BV_2"/> -->
 		<cim:ConductingEquipment.isRemote>true</cim:ConductingEquipment.isRemote>
 		<cim:IdentifiedObject.description>ACLineSegment</cim:IdentifiedObject.description>
 		<cim:IdentifiedObject.mRID>ACL_92</cim:IdentifiedObject.mRID>
 		<ftn:IdentifiedObject.name>ACL_92</ftn:IdentifiedObject.name>
 	</cim:ACLineSegment>
 	<cim:ACLineSegment rdf:ID="ACL_93">
-		<cim:ConductingEquipment.BaseVoltage rdf:resource="#BV_2"/>
+		<!-- <cim:ConductingEquipment.BaseVoltage rdf:resource="#BV_2"/> -->
 		<cim:ConductingEquipment.isRemote>true</cim:ConductingEquipment.isRemote>
 		<cim:IdentifiedObject.description>ACLineSegment</cim:IdentifiedObject.description>
 		<cim:IdentifiedObject.mRID>ACL_93</cim:IdentifiedObject.mRID>
 		<ftn:IdentifiedObject.name>ACL_93</ftn:IdentifiedObject.name>
 	</cim:ACLineSegment>
 	<cim:ACLineSegment rdf:ID="ACL_94">
-		<cim:ConductingEquipment.BaseVoltage rdf:resource="#BV_2"/>
+		<!-- <cim:ConductingEquipment.BaseVoltage rdf:resource="#BV_2"/> -->
 		<cim:ConductingEquipment.isRemote>true</cim:ConductingEquipment.isRemote>
 		<cim:IdentifiedObject.description>ACLineSegment</cim:IdentifiedObject.description>
 		<cim:IdentifiedObject.mRID>ACL_94</cim:IdentifiedObject.mRID>
 		<ftn:IdentifiedObject.name>ACL_94</ftn:IdentifiedObject.name>
 	</cim:ACLineSegment>
 	<cim:ACLineSegment rdf:ID="ACL_95">
-		<cim:ConductingEquipment.BaseVoltage rdf:resource="#BV_2"/>
+		<!-- <cim:ConductingEquipment.BaseVoltage rdf:resource="#BV_2"/> -->
 		<cim:ConductingEquipment.isRemote>true</cim:ConductingEquipment.isRemote>
 		<cim:IdentifiedObject.description>ACLineSegment</cim:IdentifiedObject.description>
 		<cim:IdentifiedObject.mRID>ACL_95</cim:IdentifiedObject.mRID>
 		<ftn:IdentifiedObject.name>ACL_95</ftn:IdentifiedObject.name>
 	</cim:ACLineSegment>
 	<cim:ACLineSegment rdf:ID="ACL_96">
-		<cim:ConductingEquipment.BaseVoltage rdf:resource="#BV_2"/>
+		<!-- <cim:ConductingEquipment.BaseVoltage rdf:resource="#BV_2"/> -->
 		<cim:ConductingEquipment.isRemote>false</cim:ConductingEquipment.isRemote>
 		<cim:IdentifiedObject.description>ACLineSegment</cim:IdentifiedObject.description>
 		<cim:IdentifiedObject.mRID>ACL_96</cim:IdentifiedObject.mRID>
 		<ftn:IdentifiedObject.name>ACL_96</ftn:IdentifiedObject.name>
 	</cim:ACLineSegment>
 	<cim:ACLineSegment rdf:ID="ACL_97">
-		<cim:ConductingEquipment.BaseVoltage rdf:resource="#BV_2"/>
+		<!-- <cim:ConductingEquipment.BaseVoltage rdf:resource="#BV_2"/> -->
 		<cim:ConductingEquipment.isRemote>false</cim:ConductingEquipment.isRemote>
 		<cim:IdentifiedObject.description>ACLineSegment</cim:IdentifiedObject.description>
 		<cim:IdentifiedObject.mRID>ACL_97</cim:IdentifiedObject.mRID>
 		<ftn:IdentifiedObject.name>ACL_97</ftn:IdentifiedObject.name>
 	</cim:ACLineSegment>
 	<cim:ACLineSegment rdf:ID="ACL_98">
-		<cim:ConductingEquipment.BaseVoltage rdf:resource="#BV_2"/>
+		<!-- <cim:ConductingEquipment.BaseVoltage rdf:resource="#BV_2"/> -->
 		<cim:ConductingEquipment.isRemote>false</cim:ConductingEquipment.isRemote>
 		<cim:IdentifiedObject.description>ACLineSegment</cim:IdentifiedObject.description>
 		<cim:IdentifiedObject.mRID>ACL_98</cim:IdentifiedObject.mRID>
 		<ftn:IdentifiedObject.name>ACL_98</ftn:IdentifiedObject.name>
 	</cim:ACLineSegment>
 	<cim:ACLineSegment rdf:ID="ACL_99">
-		<cim:ConductingEquipment.BaseVoltage rdf:resource="#BV_2"/>
+		<!-- <cim:ConductingEquipment.BaseVoltage rdf:resource="#BV_2"/> -->
 		<cim:ConductingEquipment.isRemote>false</cim:ConductingEquipment.isRemote>
 		<cim:IdentifiedObject.description>ACLineSegment</cim:IdentifiedObject.description>
 		<cim:IdentifiedObject.mRID>ACL_99</cim:IdentifiedObject.mRID>
 		<ftn:IdentifiedObject.name>ACL_99</ftn:IdentifiedObject.name>
 	</cim:ACLineSegment>
 	<cim:ACLineSegment rdf:ID="ACL_100">
-		<cim:ConductingEquipment.BaseVoltage rdf:resource="#BV_2"/>
+		<!-- <cim:ConductingEquipment.BaseVoltage rdf:resource="#BV_2"/> -->
 		<cim:ConductingEquipment.isRemote>false</cim:ConductingEquipment.isRemote>
 		<cim:IdentifiedObject.description>ACLineSegment</cim:IdentifiedObject.description>
 		<cim:IdentifiedObject.mRID>ACL_100</cim:IdentifiedObject.mRID>
 		<ftn:IdentifiedObject.name>ACL_100</ftn:IdentifiedObject.name>
 	</cim:ACLineSegment>
 	<cim:ACLineSegment rdf:ID="ACL_101">
-		<cim:ConductingEquipment.BaseVoltage rdf:resource="#BV_2"/>
+		<!-- <cim:ConductingEquipment.BaseVoltage rdf:resource="#BV_2"/> -->
 		<cim:ConductingEquipment.isRemote>false</cim:ConductingEquipment.isRemote>
 		<cim:IdentifiedObject.description>ACLineSegment</cim:IdentifiedObject.description>
 		<cim:IdentifiedObject.mRID>ACL_101</cim:IdentifiedObject.mRID>
 		<ftn:IdentifiedObject.name>ACL_101</ftn:IdentifiedObject.name>
 	</cim:ACLineSegment>
 	<cim:ACLineSegment rdf:ID="ACL_102">
-		<cim:ConductingEquipment.BaseVoltage rdf:resource="#BV_2"/>
+		<!-- <cim:ConductingEquipment.BaseVoltage rdf:resource="#BV_2"/> -->
 		<cim:ConductingEquipment.isRemote>false</cim:ConductingEquipment.isRemote>
 		<cim:IdentifiedObject.description>ACLineSegment</cim:IdentifiedObject.description>
 		<cim:IdentifiedObject.mRID>ACL_102</cim:IdentifiedObject.mRID>
 		<ftn:IdentifiedObject.name>ACL_102</ftn:IdentifiedObject.name>
 	</cim:ACLineSegment>
 	<cim:ACLineSegment rdf:ID="ACL_103">
-		<cim:ConductingEquipment.BaseVoltage rdf:resource="#BV_2"/>
+		<!-- <cim:ConductingEquipment.BaseVoltage rdf:resource="#BV_2"/> -->
 		<cim:ConductingEquipment.isRemote>false</cim:ConductingEquipment.isRemote>
 		<cim:IdentifiedObject.description>ACLineSegment</cim:IdentifiedObject.description>
 		<cim:IdentifiedObject.mRID>ACL_103</cim:IdentifiedObject.mRID>
 		<ftn:IdentifiedObject.name>ACL_103</ftn:IdentifiedObject.name>
 	</cim:ACLineSegment>
 	<cim:ACLineSegment rdf:ID="ACL_104">
-		<cim:ConductingEquipment.BaseVoltage rdf:resource="#BV_2"/>
+		<!-- <cim:ConductingEquipment.BaseVoltage rdf:resource="#BV_2"/> -->
 		<cim:ConductingEquipment.isRemote>false</cim:ConductingEquipment.isRemote>
 		<cim:IdentifiedObject.description>ACLineSegment</cim:IdentifiedObject.description>
 		<cim:IdentifiedObject.mRID>ACL_104</cim:IdentifiedObject.mRID>
 		<ftn:IdentifiedObject.name>ACL_104</ftn:IdentifiedObject.name>
 	</cim:ACLineSegment>
 	<cim:ACLineSegment rdf:ID="ACL_105">
-		<cim:ConductingEquipment.BaseVoltage rdf:resource="#BV_2"/>
+		<!-- <cim:ConductingEquipment.BaseVoltage rdf:resource="#BV_2"/> -->
 		<cim:ConductingEquipment.isRemote>false</cim:ConductingEquipment.isRemote>
 		<cim:IdentifiedObject.description>ACLineSegment</cim:IdentifiedObject.description>
 		<cim:IdentifiedObject.mRID>ACL_105</cim:IdentifiedObject.mRID>
 		<ftn:IdentifiedObject.name>ACL_105</ftn:IdentifiedObject.name>
 	</cim:ACLineSegment>
 	<cim:ACLineSegment rdf:ID="ACL_106">
-		<cim:ConductingEquipment.BaseVoltage rdf:resource="#BV_2"/>
+		<!-- <cim:ConductingEquipment.BaseVoltage rdf:resource="#BV_2"/> -->
 		<cim:ConductingEquipment.isRemote>false</cim:ConductingEquipment.isRemote>
 		<cim:IdentifiedObject.description>ACLineSegment</cim:IdentifiedObject.description>
 		<cim:IdentifiedObject.mRID>ACL_106</cim:IdentifiedObject.mRID>
 		<ftn:IdentifiedObject.name>ACL_106</ftn:IdentifiedObject.name>
 	</cim:ACLineSegment>
 	<cim:ACLineSegment rdf:ID="ACL_107">
-		<cim:ConductingEquipment.BaseVoltage rdf:resource="#BV_2"/>
+		<!-- <cim:ConductingEquipment.BaseVoltage rdf:resource="#BV_2"/> -->
 		<cim:ConductingEquipment.isRemote>false</cim:ConductingEquipment.isRemote>
 		<cim:IdentifiedObject.description>ACLineSegment</cim:IdentifiedObject.description>
 		<cim:IdentifiedObject.mRID>ACL_107</cim:IdentifiedObject.mRID>
 		<ftn:IdentifiedObject.name>ACL_107</ftn:IdentifiedObject.name>
 	</cim:ACLineSegment>
 	<cim:ACLineSegment rdf:ID="ACL_108">
-		<cim:ConductingEquipment.BaseVoltage rdf:resource="#BV_2"/>
+		<!-- <cim:ConductingEquipment.BaseVoltage rdf:resource="#BV_2"/> -->
 		<cim:ConductingEquipment.isRemote>false</cim:ConductingEquipment.isRemote>
 		<cim:IdentifiedObject.description>ACLineSegment</cim:IdentifiedObject.description>
 		<cim:IdentifiedObject.mRID>ACL_108</cim:IdentifiedObject.mRID>
 		<ftn:IdentifiedObject.name>ACL_108</ftn:IdentifiedObject.name>
 	</cim:ACLineSegment>
 	<cim:ACLineSegment rdf:ID="ACL_109">
-		<cim:ConductingEquipment.BaseVoltage rdf:resource="#BV_2"/>
+		<!-- <cim:ConductingEquipment.BaseVoltage rdf:resource="#BV_2"/> -->
 		<cim:ConductingEquipment.isRemote>false</cim:ConductingEquipment.isRemote>
 		<cim:IdentifiedObject.description>ACLineSegment</cim:IdentifiedObject.description>
 		<cim:IdentifiedObject.mRID>ACL_109</cim:IdentifiedObject.mRID>
 		<ftn:IdentifiedObject.name>ACL_109</ftn:IdentifiedObject.name>
 	</cim:ACLineSegment>
 	<cim:ACLineSegment rdf:ID="ACL_110">
-		<cim:ConductingEquipment.BaseVoltage rdf:resource="#BV_2"/>
+		<!-- <cim:ConductingEquipment.BaseVoltage rdf:resource="#BV_2"/> -->
 		<cim:ConductingEquipment.isRemote>false</cim:ConductingEquipment.isRemote>
 		<cim:IdentifiedObject.description>ACLineSegment</cim:IdentifiedObject.description>
 		<cim:IdentifiedObject.mRID>ACL_110</cim:IdentifiedObject.mRID>
 		<ftn:IdentifiedObject.name>ACL_110</ftn:IdentifiedObject.name>
 	</cim:ACLineSegment>
 	<cim:ACLineSegment rdf:ID="ACL_111">
-		<cim:ConductingEquipment.BaseVoltage rdf:resource="#BV_2"/>
+		<!-- <cim:ConductingEquipment.BaseVoltage rdf:resource="#BV_2"/> -->
 		<cim:ConductingEquipment.isRemote>false</cim:ConductingEquipment.isRemote>
 		<cim:IdentifiedObject.description>ACLineSegment</cim:IdentifiedObject.description>
 		<cim:IdentifiedObject.mRID>ACL_111</cim:IdentifiedObject.mRID>
 		<ftn:IdentifiedObject.name>ACL_111</ftn:IdentifiedObject.name>
 	</cim:ACLineSegment>
 	<cim:ACLineSegment rdf:ID="ACL_112">
-		<cim:ConductingEquipment.BaseVoltage rdf:resource="#BV_2"/>
+		<!-- <cim:ConductingEquipment.BaseVoltage rdf:resource="#BV_2"/> -->
 		<cim:ConductingEquipment.isRemote>false</cim:ConductingEquipment.isRemote>
 		<cim:IdentifiedObject.description>ACLineSegment</cim:IdentifiedObject.description>
 		<cim:IdentifiedObject.mRID>ACL_112</cim:IdentifiedObject.mRID>
 		<ftn:IdentifiedObject.name>ACL_112</ftn:IdentifiedObject.name>
 	</cim:ACLineSegment>
 	<cim:ACLineSegment rdf:ID="ACL_113">
-		<cim:ConductingEquipment.BaseVoltage rdf:resource="#BV_2"/>
+		<!-- <cim:ConductingEquipment.BaseVoltage rdf:resource="#BV_2"/> -->
 		<cim:ConductingEquipment.isRemote>false</cim:ConductingEquipment.isRemote>
 		<cim:IdentifiedObject.description>ACLineSegment</cim:IdentifiedObject.description>
 		<cim:IdentifiedObject.mRID>ACL_113</cim:IdentifiedObject.mRID>
 		<ftn:IdentifiedObject.name>ACL_113</ftn:IdentifiedObject.name>
 	</cim:ACLineSegment>
 	<cim:ACLineSegment rdf:ID="ACL_114">
-		<cim:ConductingEquipment.BaseVoltage rdf:resource="#BV_2"/>
+		<!-- <cim:ConductingEquipment.BaseVoltage rdf:resource="#BV_2"/> -->
 		<cim:ConductingEquipment.isRemote>false</cim:ConductingEquipment.isRemote>
 		<cim:IdentifiedObject.description>ACLineSegment</cim:IdentifiedObject.description>
 		<cim:IdentifiedObject.mRID>ACL_114</cim:IdentifiedObject.mRID>
 		<ftn:IdentifiedObject.name>ACL_114</ftn:IdentifiedObject.name>
 	</cim:ACLineSegment>
 	<cim:ACLineSegment rdf:ID="ACL_115">
-		<cim:ConductingEquipment.BaseVoltage rdf:resource="#BV_2"/>
+		<!-- <cim:ConductingEquipment.BaseVoltage rdf:resource="#BV_2"/> -->
 		<cim:ConductingEquipment.isRemote>false</cim:ConductingEquipment.isRemote>
 		<cim:IdentifiedObject.description>ACLineSegment</cim:IdentifiedObject.description>
 		<cim:IdentifiedObject.mRID>ACL_115</cim:IdentifiedObject.mRID>
@@ -6391,7 +6391,7 @@
 	</cim:Analog>
 	-->
 	
-	<cim:Analog rdf:ID="AN_1">
+<!-- 	<cim:Analog rdf:ID="AN_1">
 		<cim:Analog.scalingFactor>1</cim:Analog.scalingFactor>
 		<cim:Analog.deviation>0</cim:Analog.deviation>
 		<cim:Analog.currentValue>1100</cim:Analog.currentValue>
@@ -6405,8 +6405,8 @@
 		<cim:IdentifiedObject.description> </cim:IdentifiedObject.description>
 		<cim:IdentifiedObject.mRID>AN_1</cim:IdentifiedObject.mRID>
 		<ftn:IdentifiedObject.name>AN_1</ftn:IdentifiedObject.name>
-	</cim:Analog>
-	<cim:Analog rdf:ID="AN_2">
+	</cim:Analog> -->
+<!-- 	<cim:Analog rdf:ID="AN_2">
 		<cim:Analog.scalingFactor>1</cim:Analog.scalingFactor>
 		<cim:Analog.deviation>0</cim:Analog.deviation>
 		<cim:Analog.currentValue>1100</cim:Analog.currentValue>
@@ -6420,8 +6420,8 @@
 		<cim:IdentifiedObject.description> </cim:IdentifiedObject.description>
 		<cim:IdentifiedObject.mRID>AN_2</cim:IdentifiedObject.mRID>
 		<ftn:IdentifiedObject.name>AN_2</ftn:IdentifiedObject.name>
-	</cim:Analog>
-	<cim:Analog rdf:ID="AN_3">
+	</cim:Analog> -->
+<!-- 	<cim:Analog rdf:ID="AN_3">
 		<cim:Analog.scalingFactor>1</cim:Analog.scalingFactor>
 		<cim:Analog.deviation>0</cim:Analog.deviation>
 		<cim:Analog.currentValue>1100</cim:Analog.currentValue>
@@ -6435,8 +6435,8 @@
 		<cim:IdentifiedObject.description> </cim:IdentifiedObject.description>
 		<cim:IdentifiedObject.mRID>AN_3</cim:IdentifiedObject.mRID>
 		<ftn:IdentifiedObject.name>AN_3</ftn:IdentifiedObject.name>
-	</cim:Analog>
-	<cim:Analog rdf:ID="AN_4">
+	</cim:Analog> -->
+<!-- 	<cim:Analog rdf:ID="AN_4">
 		<cim:Analog.scalingFactor>1</cim:Analog.scalingFactor>
 		<cim:Analog.deviation>0</cim:Analog.deviation>
 		<cim:Analog.currentValue>1100</cim:Analog.currentValue>
@@ -6450,8 +6450,8 @@
 		<cim:IdentifiedObject.description> </cim:IdentifiedObject.description>
 		<cim:IdentifiedObject.mRID>AN_4</cim:IdentifiedObject.mRID>
 		<ftn:IdentifiedObject.name>AN_4</ftn:IdentifiedObject.name>
-	</cim:Analog>
-	<cim:Analog rdf:ID="AN_5">
+	</cim:Analog> -->
+<!-- 	<cim:Analog rdf:ID="AN_5">
 		<cim:Analog.scalingFactor>1</cim:Analog.scalingFactor>
 		<cim:Analog.deviation>0</cim:Analog.deviation>
 		<cim:Analog.currentValue>220</cim:Analog.currentValue>
@@ -6465,15 +6465,15 @@
 		<cim:IdentifiedObject.description> </cim:IdentifiedObject.description>
 		<cim:IdentifiedObject.mRID>AN_5</cim:IdentifiedObject.mRID>
 		<ftn:IdentifiedObject.name>AN_5</ftn:IdentifiedObject.name>
-	</cim:Analog>
+	</cim:Analog> -->
 	<cim:Analog rdf:ID="AN_6">
 		<cim:Analog.scalingFactor>1</cim:Analog.scalingFactor>
 		<cim:Analog.deviation>0</cim:Analog.deviation>
-		<cim:Analog.currentValue>220</cim:Analog.currentValue>
-		<cim:Analog.maxValue>2000</cim:Analog.maxValue>
+		<cim:Analog.currentValue>20000</cim:Analog.currentValue>
+		<cim:Analog.maxValue>30000</cim:Analog.maxValue>
 		<cim:Analog.measurementType>Voltage</cim:Analog.measurementType>
 		<cim:Analog.minValue>0</cim:Analog.minValue>
-		<cim:Analog.normalValue>220</cim:Analog.normalValue>
+		<cim:Analog.normalValue>20000</cim:Analog.normalValue>
 		<cim:Measurement.address>6</cim:Measurement.address>
 		<cim:Measurement.isInput>false</cim:Measurement.isInput>
 		<cim:Measurement.Terminal rdf:resource="#TM_41"/>
@@ -6484,11 +6484,11 @@
 	<cim:Analog rdf:ID="AN_7">
 		<cim:Analog.scalingFactor>1</cim:Analog.scalingFactor>
 		<cim:Analog.deviation>0</cim:Analog.deviation>
-		<cim:Analog.currentValue>220</cim:Analog.currentValue>
-		<cim:Analog.maxValue>2000</cim:Analog.maxValue>
+		<cim:Analog.currentValue>20000</cim:Analog.currentValue>
+		<cim:Analog.maxValue>30000</cim:Analog.maxValue>
 		<cim:Analog.measurementType>Voltage</cim:Analog.measurementType>
 		<cim:Analog.minValue>0</cim:Analog.minValue>
-		<cim:Analog.normalValue>220</cim:Analog.normalValue>
+		<cim:Analog.normalValue>20000</cim:Analog.normalValue>
 		<cim:Measurement.address>7</cim:Measurement.address>
 		<cim:Measurement.isInput>false</cim:Measurement.isInput>
 		<cim:Measurement.Terminal rdf:resource="#TM_40"/>
@@ -6496,7 +6496,7 @@
 		<cim:IdentifiedObject.mRID>AN_7</cim:IdentifiedObject.mRID>
 		<ftn:IdentifiedObject.name>AN_7</ftn:IdentifiedObject.name>
 	</cim:Analog>
-	<cim:Analog rdf:ID="AN_8">
+<!-- 	<cim:Analog rdf:ID="AN_8">
 		<cim:Analog.scalingFactor>1</cim:Analog.scalingFactor>
 		<cim:Analog.deviation>0</cim:Analog.deviation>
 		<cim:Analog.currentValue>220</cim:Analog.currentValue>
@@ -6510,8 +6510,8 @@
 		<cim:IdentifiedObject.description> </cim:IdentifiedObject.description>
 		<cim:IdentifiedObject.mRID>AN_8</cim:IdentifiedObject.mRID>
 		<ftn:IdentifiedObject.name>AN_8</ftn:IdentifiedObject.name>
-	</cim:Analog>
-	<cim:Analog rdf:ID="AN_9">
+	</cim:Analog> -->
+<!-- 	<cim:Analog rdf:ID="AN_9">
 		<cim:Analog.scalingFactor>1</cim:Analog.scalingFactor>
 		<cim:Analog.deviation>0</cim:Analog.deviation>
 		<cim:Analog.currentValue>220</cim:Analog.currentValue>
@@ -6525,8 +6525,8 @@
 		<cim:IdentifiedObject.description> </cim:IdentifiedObject.description>
 		<cim:IdentifiedObject.mRID>AN_9</cim:IdentifiedObject.mRID>
 		<ftn:IdentifiedObject.name>AN_9</ftn:IdentifiedObject.name>
-	</cim:Analog>
-	<cim:Analog rdf:ID="AN_10">
+	</cim:Analog> -->
+<!-- 	<cim:Analog rdf:ID="AN_10">
 		<cim:Analog.scalingFactor>1</cim:Analog.scalingFactor>
 		<cim:Analog.deviation>0</cim:Analog.deviation>
 		<cim:Analog.currentValue>220</cim:Analog.currentValue>
@@ -6540,8 +6540,8 @@
 		<cim:IdentifiedObject.description> </cim:IdentifiedObject.description>
 		<cim:IdentifiedObject.mRID>AN_10</cim:IdentifiedObject.mRID>
 		<ftn:IdentifiedObject.name>AN_10</ftn:IdentifiedObject.name>
-	</cim:Analog>
-	<cim:Analog rdf:ID="AN_11">
+	</cim:Analog> -->
+<!-- 	<cim:Analog rdf:ID="AN_11">
 		<cim:Analog.scalingFactor>1</cim:Analog.scalingFactor>
 		<cim:Analog.deviation>0</cim:Analog.deviation>
 		<cim:Analog.currentValue>220</cim:Analog.currentValue>
@@ -6555,8 +6555,8 @@
 		<cim:IdentifiedObject.description> </cim:IdentifiedObject.description>
 		<cim:IdentifiedObject.mRID>AN_11</cim:IdentifiedObject.mRID>
 		<ftn:IdentifiedObject.name>AN_11</ftn:IdentifiedObject.name>
-	</cim:Analog>
-	<cim:Analog rdf:ID="AN_12">
+	</cim:Analog> -->
+<!-- 	<cim:Analog rdf:ID="AN_12">
 		<cim:Analog.scalingFactor>1</cim:Analog.scalingFactor>
 		<cim:Analog.deviation>0</cim:Analog.deviation>
 		<cim:Analog.currentValue>220</cim:Analog.currentValue>
@@ -6570,8 +6570,8 @@
 		<cim:IdentifiedObject.description> </cim:IdentifiedObject.description>
 		<cim:IdentifiedObject.mRID>AN_12</cim:IdentifiedObject.mRID>
 		<ftn:IdentifiedObject.name>AN_12</ftn:IdentifiedObject.name>
-	</cim:Analog>
-	<cim:Analog rdf:ID="AN_13">
+	</cim:Analog> -->
+<!-- 	<cim:Analog rdf:ID="AN_13">
 		<cim:Analog.scalingFactor>1</cim:Analog.scalingFactor>
 		<cim:Analog.deviation>0</cim:Analog.deviation>
 		<cim:Analog.currentValue>220</cim:Analog.currentValue>
@@ -6585,8 +6585,8 @@
 		<cim:IdentifiedObject.description> </cim:IdentifiedObject.description>
 		<cim:IdentifiedObject.mRID>AN_13</cim:IdentifiedObject.mRID>
 		<ftn:IdentifiedObject.name>AN_13</ftn:IdentifiedObject.name>
-	</cim:Analog>
-	<cim:Analog rdf:ID="AN_14">
+	</cim:Analog> -->
+<!-- 	<cim:Analog rdf:ID="AN_14">
 		<cim:Analog.scalingFactor>1</cim:Analog.scalingFactor>
 		<cim:Analog.deviation>0</cim:Analog.deviation>
 		<cim:Analog.currentValue>220</cim:Analog.currentValue>
@@ -6600,8 +6600,8 @@
 		<cim:IdentifiedObject.description> </cim:IdentifiedObject.description>
 		<cim:IdentifiedObject.mRID>AN_14</cim:IdentifiedObject.mRID>
 		<ftn:IdentifiedObject.name>AN_14</ftn:IdentifiedObject.name>
-	</cim:Analog>
-	<cim:Analog rdf:ID="AN_15">
+	</cim:Analog> -->
+<!-- 	<cim:Analog rdf:ID="AN_15">
 		<cim:Analog.scalingFactor>1</cim:Analog.scalingFactor>
 		<cim:Analog.deviation>0</cim:Analog.deviation>
 		<cim:Analog.currentValue>220</cim:Analog.currentValue>
@@ -6615,8 +6615,8 @@
 		<cim:IdentifiedObject.description> </cim:IdentifiedObject.description>
 		<cim:IdentifiedObject.mRID>AN_15</cim:IdentifiedObject.mRID>
 		<ftn:IdentifiedObject.name>AN_15</ftn:IdentifiedObject.name>
-	</cim:Analog>
-	<cim:Analog rdf:ID="AN_16">
+	</cim:Analog> -->
+<!-- 	<cim:Analog rdf:ID="AN_16">
 		<cim:Analog.scalingFactor>1</cim:Analog.scalingFactor>
 		<cim:Analog.deviation>0</cim:Analog.deviation>
 		<cim:Analog.currentValue>220</cim:Analog.currentValue>
@@ -6630,8 +6630,8 @@
 		<cim:IdentifiedObject.description> </cim:IdentifiedObject.description>
 		<cim:IdentifiedObject.mRID>AN_16</cim:IdentifiedObject.mRID>
 		<ftn:IdentifiedObject.name>AN_16</ftn:IdentifiedObject.name>
-	</cim:Analog>
-	<cim:Analog rdf:ID="AN_17">
+	</cim:Analog> -->
+<!-- 	<cim:Analog rdf:ID="AN_17">
 		<cim:Analog.scalingFactor>1</cim:Analog.scalingFactor>
 		<cim:Analog.deviation>0</cim:Analog.deviation>
 		<cim:Analog.currentValue>220</cim:Analog.currentValue>
@@ -6645,8 +6645,8 @@
 		<cim:IdentifiedObject.description> </cim:IdentifiedObject.description>
 		<cim:IdentifiedObject.mRID>AN_17</cim:IdentifiedObject.mRID>
 		<ftn:IdentifiedObject.name>AN_17</ftn:IdentifiedObject.name>
-	</cim:Analog>
-	<cim:Analog rdf:ID="AN_18">
+	</cim:Analog> -->
+<!-- 	<cim:Analog rdf:ID="AN_18">
 		<cim:Analog.scalingFactor>1</cim:Analog.scalingFactor>
 		<cim:Analog.deviation>0</cim:Analog.deviation>
 		<cim:Analog.currentValue>220</cim:Analog.currentValue>
@@ -6660,8 +6660,8 @@
 		<cim:IdentifiedObject.description> </cim:IdentifiedObject.description>
 		<cim:IdentifiedObject.mRID>AN_18</cim:IdentifiedObject.mRID>
 		<ftn:IdentifiedObject.name>AN_18</ftn:IdentifiedObject.name>
-	</cim:Analog>
-	<cim:Analog rdf:ID="AN_19">
+	</cim:Analog> -->
+<!-- 	<cim:Analog rdf:ID="AN_19">
 		<cim:Analog.scalingFactor>1</cim:Analog.scalingFactor>
 		<cim:Analog.deviation>0</cim:Analog.deviation>
 		<cim:Analog.currentValue>220</cim:Analog.currentValue>
@@ -6675,8 +6675,8 @@
 		<cim:IdentifiedObject.description> </cim:IdentifiedObject.description>
 		<cim:IdentifiedObject.mRID>AN_19</cim:IdentifiedObject.mRID>
 		<ftn:IdentifiedObject.name>AN_19</ftn:IdentifiedObject.name>
-	</cim:Analog>
-	<cim:Analog rdf:ID="AN_20">
+	</cim:Analog> -->
+<!-- 	<cim:Analog rdf:ID="AN_20">
 		<cim:Analog.scalingFactor>1</cim:Analog.scalingFactor>
 		<cim:Analog.deviation>0</cim:Analog.deviation>
 		<cim:Analog.currentValue>220</cim:Analog.currentValue>
@@ -6690,8 +6690,8 @@
 		<cim:IdentifiedObject.description> </cim:IdentifiedObject.description>
 		<cim:IdentifiedObject.mRID>AN_20</cim:IdentifiedObject.mRID>
 		<ftn:IdentifiedObject.name>AN_20</ftn:IdentifiedObject.name>
-	</cim:Analog>
-	<cim:Analog rdf:ID="AN_21">
+	</cim:Analog> -->
+<!-- 	<cim:Analog rdf:ID="AN_21">
 		<cim:Analog.scalingFactor>1</cim:Analog.scalingFactor>
 		<cim:Analog.deviation>0</cim:Analog.deviation>
 		<cim:Analog.currentValue>220</cim:Analog.currentValue>
@@ -6705,8 +6705,8 @@
 		<cim:IdentifiedObject.description> </cim:IdentifiedObject.description>
 		<cim:IdentifiedObject.mRID>AN_21</cim:IdentifiedObject.mRID>
 		<ftn:IdentifiedObject.name>AN_21</ftn:IdentifiedObject.name>
-	</cim:Analog>
-	<cim:Analog rdf:ID="AN_22">
+	</cim:Analog> -->
+<!-- 	<cim:Analog rdf:ID="AN_22">
 		<cim:Analog.scalingFactor>1</cim:Analog.scalingFactor>
 		<cim:Analog.deviation>0</cim:Analog.deviation>
 		<cim:Analog.currentValue>220</cim:Analog.currentValue>
@@ -6720,8 +6720,8 @@
 		<cim:IdentifiedObject.description> </cim:IdentifiedObject.description>
 		<cim:IdentifiedObject.mRID>AN_22</cim:IdentifiedObject.mRID>
 		<ftn:IdentifiedObject.name>AN_22</ftn:IdentifiedObject.name>
-	</cim:Analog>
-	<cim:Analog rdf:ID="AN_23">
+	</cim:Analog> -->
+<!-- 	<cim:Analog rdf:ID="AN_23">
 		<cim:Analog.scalingFactor>1</cim:Analog.scalingFactor>
 		<cim:Analog.deviation>0</cim:Analog.deviation>
 		<cim:Analog.currentValue>220</cim:Analog.currentValue>
@@ -6735,8 +6735,8 @@
 		<cim:IdentifiedObject.description> </cim:IdentifiedObject.description>
 		<cim:IdentifiedObject.mRID>AN_23</cim:IdentifiedObject.mRID>
 		<ftn:IdentifiedObject.name>AN_23</ftn:IdentifiedObject.name>
-	</cim:Analog>
-	<cim:Analog rdf:ID="AN_24">
+	</cim:Analog> -->
+<!-- 	<cim:Analog rdf:ID="AN_24">
 		<cim:Analog.scalingFactor>1</cim:Analog.scalingFactor>
 		<cim:Analog.deviation>0</cim:Analog.deviation>
 		<cim:Analog.currentValue>220</cim:Analog.currentValue>
@@ -6750,8 +6750,8 @@
 		<cim:IdentifiedObject.description> </cim:IdentifiedObject.description>
 		<cim:IdentifiedObject.mRID>AN_24</cim:IdentifiedObject.mRID>
 		<ftn:IdentifiedObject.name>AN_24</ftn:IdentifiedObject.name>
-	</cim:Analog>
-	<cim:Analog rdf:ID="AN_25">
+	</cim:Analog> -->
+<!-- 	<cim:Analog rdf:ID="AN_25">
 		<cim:Analog.scalingFactor>1</cim:Analog.scalingFactor>
 		<cim:Analog.deviation>0</cim:Analog.deviation>
 		<cim:Analog.currentValue>220</cim:Analog.currentValue>
@@ -6765,8 +6765,8 @@
 		<cim:IdentifiedObject.description> </cim:IdentifiedObject.description>
 		<cim:IdentifiedObject.mRID>AN_25</cim:IdentifiedObject.mRID>
 		<ftn:IdentifiedObject.name>AN_25</ftn:IdentifiedObject.name>
-	</cim:Analog>
-	<cim:Analog rdf:ID="AN_26">
+	</cim:Analog> -->
+<!-- 	<cim:Analog rdf:ID="AN_26">
 		<cim:Analog.scalingFactor>1</cim:Analog.scalingFactor>
 		<cim:Analog.deviation>0</cim:Analog.deviation>
 		<cim:Analog.currentValue>220</cim:Analog.currentValue>
@@ -6780,8 +6780,8 @@
 		<cim:IdentifiedObject.description> </cim:IdentifiedObject.description>
 		<cim:IdentifiedObject.mRID>AN_26</cim:IdentifiedObject.mRID>
 		<ftn:IdentifiedObject.name>AN_26</ftn:IdentifiedObject.name>
-	</cim:Analog>
-	<cim:Analog rdf:ID="AN_27">
+	</cim:Analog> -->
+<!-- 	<cim:Analog rdf:ID="AN_27">
 		<cim:Analog.scalingFactor>1</cim:Analog.scalingFactor>
 		<cim:Analog.deviation>0</cim:Analog.deviation>
 		<cim:Analog.currentValue>220</cim:Analog.currentValue>
@@ -6795,8 +6795,8 @@
 		<cim:IdentifiedObject.description> </cim:IdentifiedObject.description>
 		<cim:IdentifiedObject.mRID>AN_27</cim:IdentifiedObject.mRID>
 		<ftn:IdentifiedObject.name>AN_27</ftn:IdentifiedObject.name>
-	</cim:Analog>
-	<cim:Analog rdf:ID="AN_28">
+	</cim:Analog> -->
+<!-- 	<cim:Analog rdf:ID="AN_28">
 		<cim:Analog.scalingFactor>1</cim:Analog.scalingFactor>
 		<cim:Analog.deviation>0</cim:Analog.deviation>
 		<cim:Analog.currentValue>220</cim:Analog.currentValue>
@@ -6810,8 +6810,8 @@
 		<cim:IdentifiedObject.description> </cim:IdentifiedObject.description>
 		<cim:IdentifiedObject.mRID>AN_28</cim:IdentifiedObject.mRID>
 		<ftn:IdentifiedObject.name>AN_28</ftn:IdentifiedObject.name>
-	</cim:Analog>
-	<cim:Analog rdf:ID="AN_29">
+	</cim:Analog> -->
+<!-- 	<cim:Analog rdf:ID="AN_29">
 		<cim:Analog.scalingFactor>1</cim:Analog.scalingFactor>
 		<cim:Analog.deviation>0</cim:Analog.deviation>
 		<cim:Analog.currentValue>220</cim:Analog.currentValue>
@@ -6825,8 +6825,8 @@
 		<cim:IdentifiedObject.description> </cim:IdentifiedObject.description>
 		<cim:IdentifiedObject.mRID>AN_29</cim:IdentifiedObject.mRID>
 		<ftn:IdentifiedObject.name>AN_29</ftn:IdentifiedObject.name>
-	</cim:Analog>
-	<cim:Analog rdf:ID="AN_30">
+	</cim:Analog> -->
+<!-- 	<cim:Analog rdf:ID="AN_30">
 		<cim:Analog.scalingFactor>1</cim:Analog.scalingFactor>
 		<cim:Analog.deviation>0</cim:Analog.deviation>
 		<cim:Analog.currentValue>220</cim:Analog.currentValue>
@@ -6840,8 +6840,8 @@
 		<cim:IdentifiedObject.description> </cim:IdentifiedObject.description>
 		<cim:IdentifiedObject.mRID>AN_30</cim:IdentifiedObject.mRID>
 		<ftn:IdentifiedObject.name>AN_30</ftn:IdentifiedObject.name>
-	</cim:Analog>
-	<cim:Analog rdf:ID="AN_31">
+	</cim:Analog> -->
+<!-- 	<cim:Analog rdf:ID="AN_31">
 		<cim:Analog.scalingFactor>1</cim:Analog.scalingFactor>
 		<cim:Analog.deviation>0</cim:Analog.deviation>
 		<cim:Analog.currentValue>220</cim:Analog.currentValue>
@@ -6855,8 +6855,8 @@
 		<cim:IdentifiedObject.description> </cim:IdentifiedObject.description>
 		<cim:IdentifiedObject.mRID>AN_31</cim:IdentifiedObject.mRID>
 		<ftn:IdentifiedObject.name>AN_31</ftn:IdentifiedObject.name>
-	</cim:Analog>
-	<cim:Analog rdf:ID="AN_32">
+	</cim:Analog> -->
+<!-- 	<cim:Analog rdf:ID="AN_32">
 		<cim:Analog.scalingFactor>1</cim:Analog.scalingFactor>
 		<cim:Analog.deviation>0</cim:Analog.deviation>
 		<cim:Analog.currentValue>220</cim:Analog.currentValue>
@@ -6870,8 +6870,8 @@
 		<cim:IdentifiedObject.description> </cim:IdentifiedObject.description>
 		<cim:IdentifiedObject.mRID>AN_32</cim:IdentifiedObject.mRID>
 		<ftn:IdentifiedObject.name>AN_32</ftn:IdentifiedObject.name>
-	</cim:Analog>
-	<cim:Analog rdf:ID="AN_33">
+	</cim:Analog> -->
+<!-- 	<cim:Analog rdf:ID="AN_33">
 		<cim:Analog.scalingFactor>1</cim:Analog.scalingFactor>
 		<cim:Analog.deviation>0</cim:Analog.deviation>
 		<cim:Analog.currentValue>220</cim:Analog.currentValue>
@@ -6885,8 +6885,8 @@
 		<cim:IdentifiedObject.description> </cim:IdentifiedObject.description>
 		<cim:IdentifiedObject.mRID>AN_33</cim:IdentifiedObject.mRID>
 		<ftn:IdentifiedObject.name>AN_33</ftn:IdentifiedObject.name>
-	</cim:Analog>
-	<cim:Analog rdf:ID="AN_34">
+	</cim:Analog> -->
+<!-- 	<cim:Analog rdf:ID="AN_34">
 		<cim:Analog.scalingFactor>1</cim:Analog.scalingFactor>
 		<cim:Analog.deviation>0</cim:Analog.deviation>
 		<cim:Analog.currentValue>220</cim:Analog.currentValue>
@@ -6900,8 +6900,8 @@
 		<cim:IdentifiedObject.description> </cim:IdentifiedObject.description>
 		<cim:IdentifiedObject.mRID>AN_34</cim:IdentifiedObject.mRID>
 		<ftn:IdentifiedObject.name>AN_34</ftn:IdentifiedObject.name>
-	</cim:Analog>
-	<cim:Analog rdf:ID="AN_35">
+	</cim:Analog> -->
+<!-- 	<cim:Analog rdf:ID="AN_35">
 		<cim:Analog.scalingFactor>1</cim:Analog.scalingFactor>
 		<cim:Analog.deviation>0</cim:Analog.deviation>
 		<cim:Analog.currentValue>220</cim:Analog.currentValue>
@@ -6915,8 +6915,8 @@
 		<cim:IdentifiedObject.description> </cim:IdentifiedObject.description>
 		<cim:IdentifiedObject.mRID>AN_35</cim:IdentifiedObject.mRID>
 		<ftn:IdentifiedObject.name>AN_35</ftn:IdentifiedObject.name>
-	</cim:Analog>
-	<cim:Analog rdf:ID="AN_36">
+	</cim:Analog> -->
+<!-- 	<cim:Analog rdf:ID="AN_36">
 		<cim:Analog.scalingFactor>1</cim:Analog.scalingFactor>
 		<cim:Analog.deviation>0</cim:Analog.deviation>
 		<cim:Analog.currentValue>220</cim:Analog.currentValue>
@@ -6930,8 +6930,8 @@
 		<cim:IdentifiedObject.description> </cim:IdentifiedObject.description>
 		<cim:IdentifiedObject.mRID>AN_36</cim:IdentifiedObject.mRID>
 		<ftn:IdentifiedObject.name>AN_36</ftn:IdentifiedObject.name>
-	</cim:Analog>
-	<cim:Analog rdf:ID="AN_37">
+	</cim:Analog> -->
+<!-- 	<cim:Analog rdf:ID="AN_37">
 		<cim:Analog.scalingFactor>1</cim:Analog.scalingFactor>
 		<cim:Analog.deviation>0</cim:Analog.deviation>
 		<cim:Analog.currentValue>220</cim:Analog.currentValue>
@@ -6945,8 +6945,8 @@
 		<cim:IdentifiedObject.description> </cim:IdentifiedObject.description>
 		<cim:IdentifiedObject.mRID>AN_37</cim:IdentifiedObject.mRID>
 		<ftn:IdentifiedObject.name>AN_37</ftn:IdentifiedObject.name>
-	</cim:Analog>
-	<cim:Analog rdf:ID="AN_38">
+	</cim:Analog> -->
+<!-- 	<cim:Analog rdf:ID="AN_38">
 		<cim:Analog.scalingFactor>1</cim:Analog.scalingFactor>
 		<cim:Analog.deviation>0</cim:Analog.deviation>
 		<cim:Analog.currentValue>220</cim:Analog.currentValue>
@@ -6960,8 +6960,8 @@
 		<cim:IdentifiedObject.description> </cim:IdentifiedObject.description>
 		<cim:IdentifiedObject.mRID>AN_38</cim:IdentifiedObject.mRID>
 		<ftn:IdentifiedObject.name>AN_38</ftn:IdentifiedObject.name>
-	</cim:Analog>
-	<cim:Analog rdf:ID="AN_39">
+	</cim:Analog> -->
+<!-- 	<cim:Analog rdf:ID="AN_39">
 		<cim:Analog.scalingFactor>1</cim:Analog.scalingFactor>
 		<cim:Analog.deviation>0</cim:Analog.deviation>
 		<cim:Analog.currentValue>220</cim:Analog.currentValue>
@@ -6975,8 +6975,8 @@
 		<cim:IdentifiedObject.description> </cim:IdentifiedObject.description>
 		<cim:IdentifiedObject.mRID>AN_39</cim:IdentifiedObject.mRID>
 		<ftn:IdentifiedObject.name>AN_39</ftn:IdentifiedObject.name>
-	</cim:Analog>
-	<cim:Analog rdf:ID="AN_40">
+	</cim:Analog> -->
+<!-- 	<cim:Analog rdf:ID="AN_40">
 		<cim:Analog.scalingFactor>1</cim:Analog.scalingFactor>
 		<cim:Analog.deviation>0</cim:Analog.deviation>
 		<cim:Analog.currentValue>220</cim:Analog.currentValue>
@@ -6990,8 +6990,8 @@
 		<cim:IdentifiedObject.description> </cim:IdentifiedObject.description>
 		<cim:IdentifiedObject.mRID>AN_40</cim:IdentifiedObject.mRID>
 		<ftn:IdentifiedObject.name>AN_40</ftn:IdentifiedObject.name>
-	</cim:Analog>
-	<cim:Analog rdf:ID="AN_41">
+	</cim:Analog> -->
+<!-- 	<cim:Analog rdf:ID="AN_41">
 		<cim:Analog.scalingFactor>1</cim:Analog.scalingFactor>
 		<cim:Analog.deviation>0</cim:Analog.deviation>
 		<cim:Analog.currentValue>220</cim:Analog.currentValue>
@@ -7005,8 +7005,8 @@
 		<cim:IdentifiedObject.description> </cim:IdentifiedObject.description>
 		<cim:IdentifiedObject.mRID>AN_41</cim:IdentifiedObject.mRID>
 		<ftn:IdentifiedObject.name>AN_41</ftn:IdentifiedObject.name>
-	</cim:Analog>
-	<cim:Analog rdf:ID="AN_42">
+	</cim:Analog> -->
+<!-- 	<cim:Analog rdf:ID="AN_42">
 		<cim:Analog.scalingFactor>1</cim:Analog.scalingFactor>
 		<cim:Analog.deviation>0</cim:Analog.deviation>
 		<cim:Analog.currentValue>9</cim:Analog.currentValue>
@@ -7020,8 +7020,8 @@
 		<cim:IdentifiedObject.description> </cim:IdentifiedObject.description>
 		<cim:IdentifiedObject.mRID>AN_42</cim:IdentifiedObject.mRID>
 		<ftn:IdentifiedObject.name>AN_42</ftn:IdentifiedObject.name>
-	</cim:Analog>
-	<cim:Analog rdf:ID="AN_43">
+	</cim:Analog> -->
+<!-- 	<cim:Analog rdf:ID="AN_43">
 		<cim:Analog.scalingFactor>1</cim:Analog.scalingFactor>
 		<cim:Analog.deviation>0</cim:Analog.deviation>
 		<cim:Analog.currentValue>10000</cim:Analog.currentValue>
@@ -7035,7 +7035,7 @@
 		<cim:IdentifiedObject.description> </cim:IdentifiedObject.description>
 		<cim:IdentifiedObject.mRID>AN_43</cim:IdentifiedObject.mRID>
 		<ftn:IdentifiedObject.name>AN_43</ftn:IdentifiedObject.name>
-	</cim:Analog>
+	</cim:Analog> -->
 	<!-- Measurements of consumers -->
 	<cim:Analog rdf:ID="AN_47">
 		<cim:Analog.scalingFactor>1</cim:Analog.scalingFactor>
@@ -7055,11 +7055,11 @@
 	<cim:Analog rdf:ID="AN_48">
 		<cim:Analog.scalingFactor>1</cim:Analog.scalingFactor>
 		<cim:Analog.deviation>0</cim:Analog.deviation>
-		<cim:Analog.currentValue>440</cim:Analog.currentValue>
+		<cim:Analog.currentValue>1440</cim:Analog.currentValue>
 		<cim:Analog.maxValue>10000</cim:Analog.maxValue>
 		<cim:Analog.measurementType>Power</cim:Analog.measurementType>
 		<cim:Analog.minValue>0</cim:Analog.minValue>
-		<cim:Analog.normalValue>440</cim:Analog.normalValue>
+		<cim:Analog.normalValue>1440</cim:Analog.normalValue>
 		<cim:Measurement.address>48</cim:Measurement.address>
 		<cim:Measurement.isInput>false</cim:Measurement.isInput>
 		<cim:Measurement.Terminal rdf:resource="#TM_74"/>
@@ -7085,11 +7085,11 @@
 	<cim:Analog rdf:ID="AN_50">
 		<cim:Analog.scalingFactor>1</cim:Analog.scalingFactor>
 		<cim:Analog.deviation>0</cim:Analog.deviation>
-		<cim:Analog.currentValue>440</cim:Analog.currentValue>
+		<cim:Analog.currentValue>1840</cim:Analog.currentValue>
 		<cim:Analog.maxValue>10000</cim:Analog.maxValue>
 		<cim:Analog.measurementType>Power</cim:Analog.measurementType>
 		<cim:Analog.minValue>0</cim:Analog.minValue>
-		<cim:Analog.normalValue>440</cim:Analog.normalValue>
+		<cim:Analog.normalValue>1840</cim:Analog.normalValue>
 		<cim:Measurement.address>50</cim:Measurement.address>
 		<cim:Measurement.isInput>false</cim:Measurement.isInput>
 		<cim:Measurement.Terminal rdf:resource="#TM_78"/>
@@ -7145,11 +7145,11 @@
 	<cim:Analog rdf:ID="AN_54">
 		<cim:Analog.scalingFactor>1</cim:Analog.scalingFactor>
 		<cim:Analog.deviation>0</cim:Analog.deviation>
-		<cim:Analog.currentValue>440</cim:Analog.currentValue>
+		<cim:Analog.currentValue>2050</cim:Analog.currentValue>
 		<cim:Analog.maxValue>10000</cim:Analog.maxValue>
 		<cim:Analog.measurementType>Power</cim:Analog.measurementType>
 		<cim:Analog.minValue>0</cim:Analog.minValue>
-		<cim:Analog.normalValue>440</cim:Analog.normalValue>
+		<cim:Analog.normalValue>2050</cim:Analog.normalValue>
 		<cim:Measurement.address>54</cim:Measurement.address>
 		<cim:Measurement.isInput>false</cim:Measurement.isInput>
 		<cim:Measurement.Terminal rdf:resource="#TM_82"/>
@@ -7175,11 +7175,11 @@
 	<cim:Analog rdf:ID="AN_56">
 		<cim:Analog.scalingFactor>1</cim:Analog.scalingFactor>
 		<cim:Analog.deviation>0</cim:Analog.deviation>
-		<cim:Analog.currentValue>440</cim:Analog.currentValue>
+		<cim:Analog.currentValue>2300</cim:Analog.currentValue>
 		<cim:Analog.maxValue>10000</cim:Analog.maxValue>
 		<cim:Analog.measurementType>Power</cim:Analog.measurementType>
 		<cim:Analog.minValue>0</cim:Analog.minValue>
-		<cim:Analog.normalValue>440</cim:Analog.normalValue>
+		<cim:Analog.normalValue>2300</cim:Analog.normalValue>
 		<cim:Measurement.address>56</cim:Measurement.address>
 		<cim:Measurement.isInput>false</cim:Measurement.isInput>
 		<cim:Measurement.Terminal rdf:resource="#TM_86"/>
@@ -7205,11 +7205,11 @@
 	<cim:Analog rdf:ID="AN_58">
 		<cim:Analog.scalingFactor>1</cim:Analog.scalingFactor>
 		<cim:Analog.deviation>0</cim:Analog.deviation>
-		<cim:Analog.currentValue>440</cim:Analog.currentValue>
+		<cim:Analog.currentValue>1990</cim:Analog.currentValue>
 		<cim:Analog.maxValue>10000</cim:Analog.maxValue>
 		<cim:Analog.measurementType>Power</cim:Analog.measurementType>
 		<cim:Analog.minValue>0</cim:Analog.minValue>
-		<cim:Analog.normalValue>440</cim:Analog.normalValue>
+		<cim:Analog.normalValue>1990</cim:Analog.normalValue>
 		<cim:Measurement.address>58</cim:Measurement.address>
 		<cim:Measurement.isInput>false</cim:Measurement.isInput>
 		<cim:Measurement.Terminal rdf:resource="#TM_90"/>
@@ -7235,11 +7235,11 @@
 	<cim:Analog rdf:ID="AN_60">
 		<cim:Analog.scalingFactor>1</cim:Analog.scalingFactor>
 		<cim:Analog.deviation>0</cim:Analog.deviation>
-		<cim:Analog.currentValue>440</cim:Analog.currentValue>
+		<cim:Analog.currentValue>2150</cim:Analog.currentValue>
 		<cim:Analog.maxValue>10000</cim:Analog.maxValue>
 		<cim:Analog.measurementType>Power</cim:Analog.measurementType>
 		<cim:Analog.minValue>0</cim:Analog.minValue>
-		<cim:Analog.normalValue>440</cim:Analog.normalValue>
+		<cim:Analog.normalValue>2150</cim:Analog.normalValue>
 		<cim:Measurement.address>60</cim:Measurement.address>
 		<cim:Measurement.isInput>false</cim:Measurement.isInput>
 		<cim:Measurement.Terminal rdf:resource="#TM_96"/>
@@ -7265,11 +7265,11 @@
 	<cim:Analog rdf:ID="AN_62">
 		<cim:Analog.scalingFactor>1</cim:Analog.scalingFactor>
 		<cim:Analog.deviation>0</cim:Analog.deviation>
-		<cim:Analog.currentValue>440</cim:Analog.currentValue>
+		<cim:Analog.currentValue>2700</cim:Analog.currentValue>
 		<cim:Analog.maxValue>10000</cim:Analog.maxValue>
 		<cim:Analog.measurementType>Power</cim:Analog.measurementType>
 		<cim:Analog.minValue>0</cim:Analog.minValue>
-		<cim:Analog.normalValue>440</cim:Analog.normalValue>
+		<cim:Analog.normalValue>2700</cim:Analog.normalValue>
 		<cim:Measurement.address>62</cim:Measurement.address>
 		<cim:Measurement.isInput>false</cim:Measurement.isInput>
 		<cim:Measurement.Terminal rdf:resource="#TM_105"/>
@@ -7295,11 +7295,11 @@
 	<cim:Analog rdf:ID="AN_64">
 		<cim:Analog.scalingFactor>1</cim:Analog.scalingFactor>
 		<cim:Analog.deviation>0</cim:Analog.deviation>
-		<cim:Analog.currentValue>440</cim:Analog.currentValue>
+		<cim:Analog.currentValue>1850</cim:Analog.currentValue>
 		<cim:Analog.maxValue>10000</cim:Analog.maxValue>
 		<cim:Analog.measurementType>Power</cim:Analog.measurementType>
 		<cim:Analog.minValue>0</cim:Analog.minValue>
-		<cim:Analog.normalValue>440</cim:Analog.normalValue>
+		<cim:Analog.normalValue>1850</cim:Analog.normalValue>
 		<cim:Measurement.address>64</cim:Measurement.address>
 		<cim:Measurement.isInput>false</cim:Measurement.isInput>
 		<cim:Measurement.Terminal rdf:resource="#TM_109"/>
@@ -7325,11 +7325,11 @@
 	<cim:Analog rdf:ID="AN_66">
 		<cim:Analog.scalingFactor>1</cim:Analog.scalingFactor>
 		<cim:Analog.deviation>0</cim:Analog.deviation>
-		<cim:Analog.currentValue>440</cim:Analog.currentValue>
+		<cim:Analog.currentValue>1780</cim:Analog.currentValue>
 		<cim:Analog.maxValue>10000</cim:Analog.maxValue>
 		<cim:Analog.measurementType>Power</cim:Analog.measurementType>
 		<cim:Analog.minValue>0</cim:Analog.minValue>
-		<cim:Analog.normalValue>440</cim:Analog.normalValue>
+		<cim:Analog.normalValue>1780</cim:Analog.normalValue>
 		<cim:Measurement.address>66</cim:Measurement.address>
 		<cim:Measurement.isInput>false</cim:Measurement.isInput>
 		<cim:Measurement.Terminal rdf:resource="#TM_113"/>
@@ -7355,11 +7355,11 @@
 	<cim:Analog rdf:ID="AN_68">
 		<cim:Analog.scalingFactor>1</cim:Analog.scalingFactor>
 		<cim:Analog.deviation>0</cim:Analog.deviation>
-		<cim:Analog.currentValue>440</cim:Analog.currentValue>
+		<cim:Analog.currentValue>2150</cim:Analog.currentValue>
 		<cim:Analog.maxValue>10000</cim:Analog.maxValue>
 		<cim:Analog.measurementType>Power</cim:Analog.measurementType>
 		<cim:Analog.minValue>0</cim:Analog.minValue>
-		<cim:Analog.normalValue>440</cim:Analog.normalValue>
+		<cim:Analog.normalValue>2150</cim:Analog.normalValue>
 		<cim:Measurement.address>68</cim:Measurement.address>
 		<cim:Measurement.isInput>false</cim:Measurement.isInput>
 		<cim:Measurement.Terminal rdf:resource="#TM_117"/>
@@ -7385,11 +7385,11 @@
 	<cim:Analog rdf:ID="AN_70">
 		<cim:Analog.scalingFactor>1</cim:Analog.scalingFactor>
 		<cim:Analog.deviation>0</cim:Analog.deviation>
-		<cim:Analog.currentValue>440</cim:Analog.currentValue>
+		<cim:Analog.currentValue>3400</cim:Analog.currentValue>
 		<cim:Analog.maxValue>10000</cim:Analog.maxValue>
 		<cim:Analog.measurementType>Power</cim:Analog.measurementType>
 		<cim:Analog.minValue>0</cim:Analog.minValue>
-		<cim:Analog.normalValue>440</cim:Analog.normalValue>
+		<cim:Analog.normalValue>3400</cim:Analog.normalValue>
 		<cim:Measurement.address>70</cim:Measurement.address>
 		<cim:Measurement.isInput>false</cim:Measurement.isInput>
 		<cim:Measurement.Terminal rdf:resource="#TM_125"/>
@@ -7415,11 +7415,11 @@
 	<cim:Analog rdf:ID="AN_72">
 		<cim:Analog.scalingFactor>1</cim:Analog.scalingFactor>
 		<cim:Analog.deviation>0</cim:Analog.deviation>
-		<cim:Analog.currentValue>440</cim:Analog.currentValue>
+		<cim:Analog.currentValue>1890</cim:Analog.currentValue>
 		<cim:Analog.maxValue>10000</cim:Analog.maxValue>
 		<cim:Analog.measurementType>Power</cim:Analog.measurementType>
 		<cim:Analog.minValue>0</cim:Analog.minValue>
-		<cim:Analog.normalValue>440</cim:Analog.normalValue>
+		<cim:Analog.normalValue>1890</cim:Analog.normalValue>
 		<cim:Measurement.address>72</cim:Measurement.address>
 		<cim:Measurement.isInput>false</cim:Measurement.isInput>
 		<cim:Measurement.Terminal rdf:resource="#TM_129"/>
@@ -7445,11 +7445,11 @@
 	<cim:Analog rdf:ID="AN_74">
 		<cim:Analog.scalingFactor>1</cim:Analog.scalingFactor>
 		<cim:Analog.deviation>0</cim:Analog.deviation>
-		<cim:Analog.currentValue>440</cim:Analog.currentValue>
+		<cim:Analog.currentValue>2050</cim:Analog.currentValue>
 		<cim:Analog.maxValue>10000</cim:Analog.maxValue>
 		<cim:Analog.measurementType>Power</cim:Analog.measurementType>
 		<cim:Analog.minValue>0</cim:Analog.minValue>
-		<cim:Analog.normalValue>440</cim:Analog.normalValue>
+		<cim:Analog.normalValue>2050</cim:Analog.normalValue>
 		<cim:Measurement.address>74</cim:Measurement.address>
 		<cim:Measurement.isInput>false</cim:Measurement.isInput>
 		<cim:Measurement.Terminal rdf:resource="#TM_133"/>
@@ -7475,11 +7475,11 @@
 	<cim:Analog rdf:ID="AN_76">
 		<cim:Analog.scalingFactor>1</cim:Analog.scalingFactor>
 		<cim:Analog.deviation>0</cim:Analog.deviation>
-		<cim:Analog.currentValue>440</cim:Analog.currentValue>
+		<cim:Analog.currentValue>2350</cim:Analog.currentValue>
 		<cim:Analog.maxValue>10000</cim:Analog.maxValue>
 		<cim:Analog.measurementType>Power</cim:Analog.measurementType>
 		<cim:Analog.minValue>0</cim:Analog.minValue>
-		<cim:Analog.normalValue>440</cim:Analog.normalValue>
+		<cim:Analog.normalValue>2350</cim:Analog.normalValue>
 		<cim:Measurement.address>76</cim:Measurement.address>
 		<cim:Measurement.isInput>false</cim:Measurement.isInput>
 		<cim:Measurement.Terminal rdf:resource="#TM_140"/>
@@ -7505,11 +7505,11 @@
 	<cim:Analog rdf:ID="AN_78">
 		<cim:Analog.scalingFactor>1</cim:Analog.scalingFactor>
 		<cim:Analog.deviation>0</cim:Analog.deviation>
-		<cim:Analog.currentValue>440</cim:Analog.currentValue>
+		<cim:Analog.currentValue>1700</cim:Analog.currentValue>
 		<cim:Analog.maxValue>10000</cim:Analog.maxValue>
 		<cim:Analog.measurementType>Power</cim:Analog.measurementType>
 		<cim:Analog.minValue>0</cim:Analog.minValue>
-		<cim:Analog.normalValue>440</cim:Analog.normalValue>
+		<cim:Analog.normalValue>1700</cim:Analog.normalValue>
 		<cim:Measurement.address>78</cim:Measurement.address>
 		<cim:Measurement.isInput>false</cim:Measurement.isInput>
 		<cim:Measurement.Terminal rdf:resource="#TM_144"/>
@@ -7535,11 +7535,11 @@
 	<cim:Analog rdf:ID="AN_80">
 		<cim:Analog.scalingFactor>1</cim:Analog.scalingFactor>
 		<cim:Analog.deviation>0</cim:Analog.deviation>
-		<cim:Analog.currentValue>440</cim:Analog.currentValue>
+		<cim:Analog.currentValue>2000</cim:Analog.currentValue>
 		<cim:Analog.maxValue>10000</cim:Analog.maxValue>
 		<cim:Analog.measurementType>Power</cim:Analog.measurementType>
 		<cim:Analog.minValue>0</cim:Analog.minValue>
-		<cim:Analog.normalValue>440</cim:Analog.normalValue>
+		<cim:Analog.normalValue>2000</cim:Analog.normalValue>
 		<cim:Measurement.address>80</cim:Measurement.address>
 		<cim:Measurement.isInput>false</cim:Measurement.isInput>
 		<cim:Measurement.Terminal rdf:resource="#TM_165"/>
@@ -7565,11 +7565,11 @@
 	<cim:Analog rdf:ID="AN_82">
 		<cim:Analog.scalingFactor>1</cim:Analog.scalingFactor>
 		<cim:Analog.deviation>0</cim:Analog.deviation>
-		<cim:Analog.currentValue>440</cim:Analog.currentValue>
+		<cim:Analog.currentValue>1950</cim:Analog.currentValue>
 		<cim:Analog.maxValue>10000</cim:Analog.maxValue>
 		<cim:Analog.measurementType>Power</cim:Analog.measurementType>
 		<cim:Analog.minValue>0</cim:Analog.minValue>
-		<cim:Analog.normalValue>440</cim:Analog.normalValue>
+		<cim:Analog.normalValue>1950</cim:Analog.normalValue>
 		<cim:Measurement.address>82</cim:Measurement.address>
 		<cim:Measurement.isInput>false</cim:Measurement.isInput>
 		<cim:Measurement.Terminal rdf:resource="#TM_169"/>
@@ -7595,11 +7595,11 @@
 	<cim:Analog rdf:ID="AN_84">
 		<cim:Analog.scalingFactor>1</cim:Analog.scalingFactor>
 		<cim:Analog.deviation>0</cim:Analog.deviation>
-		<cim:Analog.currentValue>440</cim:Analog.currentValue>
+		<cim:Analog.currentValue>2100</cim:Analog.currentValue>
 		<cim:Analog.maxValue>10000</cim:Analog.maxValue>
 		<cim:Analog.measurementType>Power</cim:Analog.measurementType>
 		<cim:Analog.minValue>0</cim:Analog.minValue>
-		<cim:Analog.normalValue>440</cim:Analog.normalValue>
+		<cim:Analog.normalValue>2100</cim:Analog.normalValue>
 		<cim:Measurement.address>84</cim:Measurement.address>
 		<cim:Measurement.isInput>false</cim:Measurement.isInput>
 		<cim:Measurement.Terminal rdf:resource="#TM_173"/>
@@ -7625,11 +7625,11 @@
 	<cim:Analog rdf:ID="AN_86">
 		<cim:Analog.scalingFactor>1</cim:Analog.scalingFactor>
 		<cim:Analog.deviation>0</cim:Analog.deviation>
-		<cim:Analog.currentValue>440</cim:Analog.currentValue>
+		<cim:Analog.currentValue>2400</cim:Analog.currentValue>
 		<cim:Analog.maxValue>10000</cim:Analog.maxValue>
 		<cim:Analog.measurementType>Power</cim:Analog.measurementType>
 		<cim:Analog.minValue>0</cim:Analog.minValue>
-		<cim:Analog.normalValue>440</cim:Analog.normalValue>
+		<cim:Analog.normalValue>2400</cim:Analog.normalValue>
 		<cim:Measurement.address>86</cim:Measurement.address>
 		<cim:Measurement.isInput>false</cim:Measurement.isInput>
 		<cim:Measurement.Terminal rdf:resource="#TM_177"/>
@@ -7655,11 +7655,11 @@
 	<cim:Analog rdf:ID="AN_88">
 		<cim:Analog.scalingFactor>1</cim:Analog.scalingFactor>
 		<cim:Analog.deviation>0</cim:Analog.deviation>
-		<cim:Analog.currentValue>440</cim:Analog.currentValue>
+		<cim:Analog.currentValue>2000</cim:Analog.currentValue>
 		<cim:Analog.maxValue>10000</cim:Analog.maxValue>
 		<cim:Analog.measurementType>Power</cim:Analog.measurementType>
 		<cim:Analog.minValue>0</cim:Analog.minValue>
-		<cim:Analog.normalValue>440</cim:Analog.normalValue>
+		<cim:Analog.normalValue>2000</cim:Analog.normalValue>
 		<cim:Measurement.address>88</cim:Measurement.address>
 		<cim:Measurement.isInput>false</cim:Measurement.isInput>
 		<cim:Measurement.Terminal rdf:resource="#TM_185"/>
@@ -7685,11 +7685,11 @@
 	<cim:Analog rdf:ID="AN_90">
 		<cim:Analog.scalingFactor>1</cim:Analog.scalingFactor>
 		<cim:Analog.deviation>0</cim:Analog.deviation>
-		<cim:Analog.currentValue>440</cim:Analog.currentValue>
+		<cim:Analog.currentValue>2600</cim:Analog.currentValue>
 		<cim:Analog.maxValue>10000</cim:Analog.maxValue>
 		<cim:Analog.measurementType>Power</cim:Analog.measurementType>
 		<cim:Analog.minValue>0</cim:Analog.minValue>
-		<cim:Analog.normalValue>440</cim:Analog.normalValue>
+		<cim:Analog.normalValue>2600</cim:Analog.normalValue>
 		<cim:Measurement.address>90</cim:Measurement.address>
 		<cim:Measurement.isInput>false</cim:Measurement.isInput>
 		<cim:Measurement.Terminal rdf:resource="#TM_189"/>
@@ -7715,11 +7715,11 @@
 	<cim:Analog rdf:ID="AN_92">
 		<cim:Analog.scalingFactor>1</cim:Analog.scalingFactor>
 		<cim:Analog.deviation>0</cim:Analog.deviation>
-		<cim:Analog.currentValue>440</cim:Analog.currentValue>
+		<cim:Analog.currentValue>1850</cim:Analog.currentValue>
 		<cim:Analog.maxValue>10000</cim:Analog.maxValue>
 		<cim:Analog.measurementType>Power</cim:Analog.measurementType>
 		<cim:Analog.minValue>0</cim:Analog.minValue>
-		<cim:Analog.normalValue>440</cim:Analog.normalValue>
+		<cim:Analog.normalValue>1850</cim:Analog.normalValue>
 		<cim:Measurement.address>92</cim:Measurement.address>
 		<cim:Measurement.isInput>false</cim:Measurement.isInput>
 		<cim:Measurement.Terminal rdf:resource="#TM_193"/>
