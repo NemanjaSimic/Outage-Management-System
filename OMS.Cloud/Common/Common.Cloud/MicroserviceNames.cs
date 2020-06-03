@@ -13,5 +13,8 @@
         //TMS
         public static readonly string TransactionManagerService = "TransactionManagerService";
         public static readonly string TransactionActorService = "TransactionActorService";
+
+        //PUB_SUB
+        public static readonly string PubSubService = "PubSubService";
     }
 }

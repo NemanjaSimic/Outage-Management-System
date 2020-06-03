@@ -57,6 +57,9 @@
     <Compile Include="WcfServiceFabricClients\ClientFactory.cs" />
     <Compile Include="WcfServiceFabricClients\NMS\NetworkModelGdaClient.cs" />
     <Compile Include="WcfServiceFabricClients\OMS\Placeholder.cs" />
+    <Compile Include="WcfServiceFabricClients\PubSub\NotifySubscriberClient.cs" />
+    <Compile Include="WcfServiceFabricClients\PubSub\PublisherClient.cs" />
+    <Compile Include="WcfServiceFabricClients\PubSub\RegisterSubscriberClient.cs" />
     <Compile Include="WcfServiceFabricClients\SCADA\ModelUpdateCommandEnqueuerClient.cs" />
     <Compile Include="WcfServiceFabricClients\SCADA\WriteCommandEnqueuerClient.cs" />
     <Compile Include="WcfServiceFabricClients\SCADA\ReadCommandEnqueuerClient.cs" />
@@ -78,6 +81,10 @@
       <Project>{892CBE15-9ED7-4540-81FA-0EAABA592138}</Project>
       <Name>Common</Name>
     </ProjectReference>
+    <ProjectReference Include="..\Common.PubSub\Common.PubSub.csproj">
+      <Project>{5B775779-A5AE-4F94-90EC-59973FA80D4D}</Project>
+      <Name>Common.PubSub</Name>
+    </ProjectReference>
     <ProjectReference Include="..\Common.SCADA\Common.SCADA.csproj">
       <Project>{6A84DB56-920C-4FC1-9CB0-9C29D0FC1586}</Project>
       <Name>Common.SCADA</Name>
@@ -89,6 +96,10 @@
     <ProjectReference Include="..\Contracts\Common.NmsContracts\Common.NmsContracts.csproj">
       <Project>{235804A8-9C8F-40EC-8786-5DAB24733977}</Project>
       <Name>Common.NmsContracts</Name>
+    </ProjectReference>
+    <ProjectReference Include="..\Contracts\Common.PubSubContracts\Common.PubSubContracts.csproj">
+      <Project>{AA75150D-EE56-49C0-9431-751F83CCC0CD}</Project>
+      <Name>Common.PubSubContracts</Name>
     </ProjectReference>
     <ProjectReference Include="..\Contracts\Common.ScadaContracts\Common.ScadaContracts.csproj">
       <Project>{5F25D9C5-9A93-49E7-92F7-58E399AEF928}</Project>

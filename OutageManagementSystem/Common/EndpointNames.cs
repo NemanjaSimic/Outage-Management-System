@@ -32,6 +32,7 @@
         //PUBSUB - 4
         public static readonly string PublisherEndpoint = "PublisherEndpoint";
         public static readonly string SubscriberEndpoint = "SubscriberEndpoint";
+        public static readonly string NotifySubscriberEndpoint = "NotifySubscriberEndpoint";
 
         //OMS - 5
         public static readonly string CallingEndpoint = "CallingEndpoint";

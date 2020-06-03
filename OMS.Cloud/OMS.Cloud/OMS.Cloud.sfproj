@@ -33,6 +33,7 @@
   </ItemGroup>
   <ItemGroup>
     <ProjectReference Include="..\NMS\NMS.GdaService\NMS.GdaService.csproj" />
+    <ProjectReference Include="..\PUB_SUB\PubSubService\PubSubService.csproj" />
     <ProjectReference Include="..\SCADA\Acquisition\SCADA.AcquisitionService\SCADA.AcquisitionService.csproj" />
     <ProjectReference Include="..\SCADA\Commanding\SCADA.CommandingService\SCADA.CommandingService.csproj" />
     <ProjectReference Include="..\SCADA\FunctionExecutor\SCADA.FunctionExecutorService\SCADA.FunctionExecutorService.csproj" />

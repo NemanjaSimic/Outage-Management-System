@@ -3,12 +3,12 @@ using System.Collections.Generic;
 using System.Fabric;
 using System.Threading;
 using System.Threading.Tasks;
-using Common.SCADA;
 using Microsoft.ServiceFabric.Services.Communication.Runtime;
 using Microsoft.ServiceFabric.Services.Communication.Wcf;
 using Microsoft.ServiceFabric.Services.Communication.Wcf.Runtime;
 using Microsoft.ServiceFabric.Services.Runtime;
 using OMS.Common.Cloud.WcfServiceFabricClients.SCADA;
+using OMS.Common.SCADA;
 using OMS.Common.ScadaContracts.FunctionExecutior;
 using Outage.Common;
 using SCADA.FunctionExecutorImplementation;
@@ -39,16 +39,6 @@ namespace SCADA.FunctionExecutorService
             {
                 ServiceEventSource.Current.ServiceMessage(this.Context, $"[FunctionExecutorService] Error: {e.Message}");
             }
-        }
-
-        protected async override Task OnOpenAsync(CancellationToken cancellationToken)
-        {
-            cancellationToken.ThrowIfCancellationRequested();
-
-            ////FOR DEBUGING IN AZURE DEPLOYMENT (time to atach to process)
-            //await Task.Delay(60000);
-
-            await base.OnOpenAsync(cancellationToken);
         }
 
         /// <summary>
@@ -100,9 +90,6 @@ namespace SCADA.FunctionExecutorService
 
             FunctionExecutorCycle functionExecutorCycle;
             IScadaConfigData configData;
-
-            //FOR DEBUGING IN AZURE DEPLOYMENT (time to atach to process)
-            Task.Delay(60000).Wait();
 
             try
             {

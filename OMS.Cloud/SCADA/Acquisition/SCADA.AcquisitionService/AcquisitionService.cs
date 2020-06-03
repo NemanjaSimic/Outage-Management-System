@@ -3,10 +3,10 @@ using System.Collections.Generic;
 using System.Fabric;
 using System.Threading;
 using System.Threading.Tasks;
-using Common.SCADA;
 using Microsoft.ServiceFabric.Services.Communication.Runtime;
 using Microsoft.ServiceFabric.Services.Runtime;
 using OMS.Common.Cloud.WcfServiceFabricClients.SCADA;
+using OMS.Common.SCADA;
 using SCADA.AcquisitionImplementation;
 
 namespace SCADA.AcquisitionService
@@ -19,16 +19,6 @@ namespace SCADA.AcquisitionService
         public AcquisitionService(StatelessServiceContext context)
             : base(context)
         { }
-
-        protected async override Task OnOpenAsync(CancellationToken cancellationToken)
-        {
-            cancellationToken.ThrowIfCancellationRequested();
-
-            ////FOR DEBUGING IN AZURE DEPLOYMENT (time to atach to process)
-            //await Task.Delay(60000);
-
-            await base.OnOpenAsync(cancellationToken);
-        }
 
         /// <summary>
         /// Optional override to create listeners (e.g., TCP, HTTP) for this service replica to handle client or user requests.
@@ -49,9 +39,6 @@ namespace SCADA.AcquisitionService
             IScadaConfigData configData;
 
             cancellationToken.ThrowIfCancellationRequested();
-
-            //FOR DEBUGING IN AZURE DEPLOYMENT (time to atach to process)
-            Task.Delay(60000).Wait();
 
             try
             {

@@ -1,5 +1,4 @@
-﻿using Common.SCADA;
-using OMS.Common.SCADA;
+﻿using OMS.Common.SCADA;
 using Outage.Common;
 using System;
 using System.Runtime.Serialization;

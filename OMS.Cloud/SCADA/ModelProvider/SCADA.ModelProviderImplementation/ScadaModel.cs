@@ -1,5 +1,4 @@
-﻿using Common.SCADA;
-using Microsoft.ServiceFabric.Data;
+﻿using Microsoft.ServiceFabric.Data;
 using Microsoft.ServiceFabric.Data.Notifications;
 using OMS.Common.Cloud.ReliableCollectionHelpers;
 using OMS.Common.Cloud.WcfServiceFabricClients.NMS;

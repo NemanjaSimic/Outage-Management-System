@@ -1,4 +1,4 @@
-﻿using Common.SCADA;
+﻿using OMS.Common.SCADA;
 using OMS.Common.ScadaContracts.DataContracts;
 using Outage.Common;
 using System;

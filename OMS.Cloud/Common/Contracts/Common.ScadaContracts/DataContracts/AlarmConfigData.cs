@@ -1,4 +1,4 @@
-﻿using Common.SCADA;
+﻿using OMS.Common.SCADA;
 using System.Runtime.Serialization;
 
 namespace OMS.Common.ScadaContracts.DataContracts

@@ -1,4 +1,4 @@
-﻿namespace Common.SCADA
+﻿namespace OMS.Common.SCADA
 {
     public static class ReliableDictionaryNames
     {

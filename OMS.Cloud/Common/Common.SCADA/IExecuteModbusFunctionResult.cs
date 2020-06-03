@@ -1,7 +1,7 @@
 ﻿using Outage.Common.PubSub.SCADADataContract;
 using System.Collections.Generic;
 
-namespace Common.SCADA
+namespace OMS.Common.SCADA
 {
     public interface IExecuteModbusFunctionResult
     {

@@ -7,8 +7,8 @@
     <ProjectGuid>{E07DFE6A-8C18-460A-8DD4-47A3320223D7}</ProjectGuid>
     <OutputType>Library</OutputType>
     <AppDesignerFolder>Properties</AppDesignerFolder>
-    <RootNamespace>Common.NMS</RootNamespace>
-    <AssemblyName>Common.NMS</AssemblyName>
+    <RootNamespace>OMS.Common.NMS</RootNamespace>
+    <AssemblyName>OMS.Common.NMS</AssemblyName>
     <TargetFrameworkVersion>v4.8</TargetFrameworkVersion>
     <FileAlignment>512</FileAlignment>
     <Deterministic>true</Deterministic>

@@ -14,9 +14,6 @@ namespace NMS.GdaService
         /// </summary>
         private static void Main()
         {
-            ////FOR DEBUGING IN AZURE DEPLOYMENT (time to atach to process)
-            //Task.Delay(60000).Wait();
-
             try
             {
                 // The ServiceManifest.XML file defines one or more service type names.

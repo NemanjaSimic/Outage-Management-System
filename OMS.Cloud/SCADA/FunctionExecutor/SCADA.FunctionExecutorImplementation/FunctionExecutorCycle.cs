@@ -1,5 +1,4 @@
-﻿using Common.SCADA;
-using EasyModbus;
+﻿using EasyModbus;
 using EasyModbus.Exceptions;
 using Microsoft.WindowsAzure.Storage.Queue;
 using OMS.Common.Cloud;

@@ -1,6 +1,6 @@
 ﻿using System.Net;
 
-namespace Common.SCADA
+namespace OMS.Common.SCADA
 {
     public interface IScadaConfigData
     {

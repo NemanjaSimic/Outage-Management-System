@@ -80,9 +80,6 @@ namespace NMS.GdaService
         {
             cancellationToken.ThrowIfCancellationRequested();
 
-            //FOR DEBUGING IN AZURE DEPLOYMENT (time to atach to process)
-            Task.Delay(60000).Wait();
-
             try
             {
                 await this.networkModel.InitializeNetworkModel();

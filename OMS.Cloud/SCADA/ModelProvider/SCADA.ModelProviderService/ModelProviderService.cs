@@ -3,13 +3,13 @@ using System.Collections.Generic;
 using System.Fabric;
 using System.Threading;
 using System.Threading.Tasks;
-using Common.SCADA;
 using Microsoft.ServiceFabric.Data;
 using Microsoft.ServiceFabric.Data.Collections;
 using Microsoft.ServiceFabric.Services.Communication.Runtime;
 using Microsoft.ServiceFabric.Services.Communication.Wcf;
 using Microsoft.ServiceFabric.Services.Communication.Wcf.Runtime;
 using Microsoft.ServiceFabric.Services.Runtime;
+using OMS.Common.SCADA;
 using OMS.Common.ScadaContracts.DataContracts;
 using OMS.Common.ScadaContracts.DataContracts.ScadaModelPointItems;
 using OMS.Common.ScadaContracts.ModelProvider;
@@ -46,16 +46,6 @@ namespace SCADA.ModelProviderService
             {
                 ServiceEventSource.Current.ServiceMessage(this.Context, $"[ModelProviderService] Error: {e.Message}");
             }
-        }
-
-        protected async override Task OnOpenAsync(ReplicaOpenMode openMode, CancellationToken cancellationToken)
-        {
-            cancellationToken.ThrowIfCancellationRequested();
-
-            ////FOR DEBUGING IN AZURE DEPLOYMENT (time to atach to process)
-            //await Task.Delay(60000);
-
-            await base.OnOpenAsync(openMode, cancellationToken);
         }
 
         /// <summary>
@@ -120,9 +110,6 @@ namespace SCADA.ModelProviderService
         protected async override Task RunAsync(CancellationToken cancellationToken)
         {
             cancellationToken.ThrowIfCancellationRequested();
-
-            //FOR DEBUGING IN AZURE DEPLOYMENT (time to atach to process)
-            Task.Delay(60000).Wait();
 
             try
             {
