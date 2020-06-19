@@ -34,7 +34,7 @@ namespace OMS.Common.Cloud.ReliableCollectionHelpers
         {
             Dictionary<TKey, TValue> target = new Dictionary<TKey, TValue>();
 
-            IAsyncEnumerable<KeyValuePair<TKey, TValue>> asyncEnumerable;
+            Microsoft.ServiceFabric.Data.IAsyncEnumerable<KeyValuePair<TKey, TValue>> asyncEnumerable;
 
             using (ITransaction tx = stateManager.CreateTransaction())
             {

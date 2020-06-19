@@ -1,16 +1,17 @@
-﻿using Common.SCADA;
-using EasyModbus;
+﻿using EasyModbus;
 using EasyModbus.Exceptions;
 using Microsoft.WindowsAzure.Storage.Queue;
 using OMS.Common.Cloud;
 using OMS.Common.Cloud.AzureStorageHelpers;
-using OMS.Common.Cloud.WcfServiceFabricClients.SCADA;
+using OMS.Common.Cloud.Exceptions.SCADA;
+using OMS.Common.Cloud.Logger;
+using OMS.Common.Cloud.ReliableCollectionHelpers;
+using OMS.Common.PubSubContracts.DataContracts.SCADA;
 using OMS.Common.SCADA;
 using OMS.Common.ScadaContracts.DataContracts;
 using OMS.Common.ScadaContracts.DataContracts.ScadaModelPointItems;
-using Outage.Common;
-using Outage.Common.Exceptions.SCADA;
-using Outage.Common.PubSub.SCADADataContract;
+using OMS.Common.ScadaContracts.ModelProvider;
+using OMS.Common.WcfClient.SCADA;
 using System;
 using System.Collections.Generic;
 using System.Diagnostics;
@@ -21,10 +22,10 @@ namespace SCADA.FunctionExecutorImplementation
 {
     public class FunctionExecutorCycle
     {
-        private ILogger logger;
-        private ILogger Logger
+        private ICloudLogger logger;
+        private ICloudLogger Logger
         {
-            get { return logger ?? (logger = LoggerWrapper.Instance); }
+            get { return logger ?? (logger = CloudLoggerFactory.GetLogger()); }
         }
 
         private readonly CloudQueue readCommandQueue;
@@ -32,7 +33,8 @@ namespace SCADA.FunctionExecutorImplementation
         private readonly CloudQueue modelUpdateCommandQueue;
 
         private ScadaModelReadAccessClient modelReadAccessClient;
-        private ScadaModelUpdateAccessClient modelUpdateAccessClient;
+        //private ScadaModelUpdateAccessClient modelUpdateAccessClient;
+        private IScadaModelUpdateAccessContract modelUpdateAccessClient;
 
         private IScadaConfigData configData;
         private ModbusClient modbusClient;
@@ -146,7 +148,7 @@ namespace SCADA.FunctionExecutorImplementation
 
             string message = $"Connecting to modbus client...";
             Trace.WriteLine(message);
-            Logger.LogInfo(message);
+            Logger.LogInformation(message);
 
             while (!modbusClient.Connected)
             {
@@ -156,7 +158,7 @@ namespace SCADA.FunctionExecutorImplementation
                 }
                 catch (ConnectionException ce)
                 {
-                    Logger.LogWarn("ConnectionException on ModbusClient.Connect().", ce);
+                    Logger.LogWarning("ConnectionException on ModbusClient.Connect().", ce);
                 }
 
                 if (!modbusClient.Connected)
@@ -181,7 +183,7 @@ namespace SCADA.FunctionExecutorImplementation
                 {
                     message = $"Successfully connected to modbus client.";
                     Trace.WriteLine(message);
-                    Logger.LogInfo(message);
+                    Logger.LogInformation(message);
                 }
             }
         }
@@ -277,7 +279,7 @@ namespace SCADA.FunctionExecutorImplementation
                 //for commands enqueued during model update
                 if (!currentAddressToGidMap[(short)pointType].ContainsKey(address))
                 {
-                    Logger.LogWarn($"ExecuteDiscreteReadCommand => trying to read value on address {address}, Point type: {pointType}, which is not in the current SCADA Model.");
+                    Logger.LogWarning($"ExecuteDiscreteReadCommand => trying to read value on address {address}, Point type: {pointType}, which is not in the current SCADA Model.");
                     continue;
                 }
 
@@ -286,7 +288,7 @@ namespace SCADA.FunctionExecutorImplementation
                 //for commands enqueued during model update
                 if (!currentSCADAModel.ContainsKey(gid))
                 {
-                    Logger.LogWarn($"ExecuteDiscreteReadCommand => trying to read value for measurement with gid: 0x{gid:X16}, which is not in the current SCADA Model.");
+                    Logger.LogWarning($"ExecuteDiscreteReadCommand => trying to read value for measurement with gid: 0x{gid:X16}, which is not in the current SCADA Model.");
                     continue;
                 }
 
@@ -299,8 +301,9 @@ namespace SCADA.FunctionExecutorImplementation
 
                 if (pointItem.CurrentValue != value)
                 {
-                    pointItem.CurrentValue = value;//TODO: Update na provideru
-                    Logger.LogInfo($"Alarm for Point [Gid: 0x{pointItem.Gid:X16}, Address: {pointItem.Address}] set to {pointItem.Alarm}.");
+                    //pointItem.CurrentValue = value;
+                    pointItem = (IDiscretePointItem)(await modelUpdateAccessClient.UpdatePointItemRawValue(pointItem.Gid, value));
+                    Logger.LogInformation($"Alarm for Point [Gid: 0x{pointItem.Gid:X16}, Address: {pointItem.Address}] set to {pointItem.Alarm}.");
                 }
 
                 CommandOriginType commandOrigin = CommandOriginType.OTHER_COMMAND;
@@ -308,7 +311,8 @@ namespace SCADA.FunctionExecutorImplementation
                 if (commandValuesCache.ContainsKey(gid) && commandValuesCache[gid].Value == value)
                 {
                     commandOrigin = commandValuesCache[gid].CommandOrigin;
-                    commandValuesCache.Remove(gid); //TODO: Update na provider-u
+                    //commandValuesCache.Remove(gid);
+                    await modelUpdateAccessClient.RemoveCommandDescription(gid);
                     Logger.LogDebug($"[ExecuteDiscreteReadCommand] Command origin of command address: {pointItem.Address} is set to {commandOrigin}.");
                 }
 
@@ -317,8 +321,6 @@ namespace SCADA.FunctionExecutorImplementation
             }
             
             await this.modelUpdateAccessClient.MakeDiscreteEntryToMeasurementCache(measurementCache, true);
-            //await this.modelUpdateAccessClient.MakeDiscreteEntryToMeasurementCache();
-            //await this.newScadaModelUpdateAccessClient.MakeDiscreteEntryToMeasurementCache(measurementCache, true);
         }
 
         private async Task ExecuteAnalogReadCommand(ModbusFunctionCode functionCode, ushort startAddress, ushort quantity)
@@ -345,9 +347,9 @@ namespace SCADA.FunctionExecutorImplementation
             var measurementCache = new Dictionary<long, AnalogModbusData>(data.Length);
 
             ScadaModelReadAccessClient modelReadAccessClient = ScadaModelReadAccessClient.CreateClient();
-            var currentSCADAModel = await modelReadAccessClient.GetGidToPointItemMap();
-            var currentAddressToGidMap = await modelReadAccessClient.GetAddressToGidMap();
-            var commandValuesCache = await modelReadAccessClient.GetCommandDescriptionCache();
+            var gidToPointItemMap = await modelReadAccessClient.GetGidToPointItemMap();
+            var addressToGidMap = await modelReadAccessClient.GetAddressToGidMap();
+            var commandDescriptionCache = await modelReadAccessClient.GetCommandDescriptionCache();
 
             for (ushort i = 0; i < data.Length; i++)
             {
@@ -355,42 +357,43 @@ namespace SCADA.FunctionExecutorImplementation
                 int rawValue = data[i];
 
                 //for commands enqueued during model update
-                if (!currentAddressToGidMap[(short)pointType].ContainsKey(address))
+                if (!addressToGidMap[(short)pointType].ContainsKey(address))
                 {
-                    Logger.LogWarn($"ExecuteAnalogReadCommand => trying to read value on address {address}, Point type: {pointType}, which is not in the current SCADA Model.");
+                    Logger.LogWarning($"ExecuteAnalogReadCommand => trying to read value on address {address}, Point type: {pointType}, which is not in the current SCADA Model.");
                     continue;
                 }
 
-                long gid = currentAddressToGidMap[(short)pointType][address];
+                long gid = addressToGidMap[(short)pointType][address];
 
                 //for commands enqueued during model update
-                if (!currentSCADAModel.ContainsKey(gid))
+                if (!gidToPointItemMap.ContainsKey(gid))
                 {
-                    Logger.LogWarn($"ExecuteAnalogReadCommand => trying to read value for measurement with gid: 0x{gid:X16}, which is not in the current SCADA Model.");
+                    Logger.LogWarning($"ExecuteAnalogReadCommand => trying to read value for measurement with gid: 0x{gid:X16}, which is not in the current SCADA Model.");
                     continue;
                 }
 
-                if (!(currentSCADAModel[gid] is IAnalogPointItem pointItem))
+                if (!(gidToPointItemMap[gid] is IAnalogPointItem pointItem))
                 {
                     string message = $"PointItem [Gid: 0x{gid:X16}] does not implement {typeof(IAnalogPointItem)}.";
                     Logger.LogError(message);
                     throw new Exception(message);
                 }
 
-
-                float eguValue = pointItem.RawToEguValueConversion(rawValue);
-                if (pointItem.CurrentEguValue != eguValue)
+                //float eguValue = pointItem.RawToEguValueConversion(rawValue);
+                if (pointItem.CurrentRawValue != rawValue)
                 {
-                    pointItem.CurrentEguValue = eguValue; //TODO: Update na provideru
-                    Logger.LogInfo($"Alarm for Point [Gid: 0x{pointItem.Gid:X16}, Address: {pointItem.Address}] set to {pointItem.Alarm}.");
+                    //pointItem.CurrentEguValue = eguValue;
+                    pointItem = (IAnalogPointItem)(await modelUpdateAccessClient.UpdatePointItemRawValue(pointItem.Gid, rawValue));
+                    Logger.LogInformation($"Alarm for Point [Gid: 0x{pointItem.Gid:X16}, Address: {pointItem.Address}] set to {pointItem.Alarm}.");
                 }
 
                 CommandOriginType commandOrigin = CommandOriginType.OTHER_COMMAND;
 
-                if (commandValuesCache.ContainsKey(gid) && commandValuesCache[gid].Value == pointItem.CurrentRawValue)
+                if (commandDescriptionCache.ContainsKey(gid) && commandDescriptionCache[gid].Value == pointItem.CurrentRawValue)
                 {
-                    commandOrigin = commandValuesCache[gid].CommandOrigin;
-                    commandValuesCache.Remove(gid); //TODO: Update na provider-u
+                    commandOrigin = commandDescriptionCache[gid].CommandOrigin;
+                    //commandValuesCache.Remove(gid);
+                    await modelUpdateAccessClient.RemoveCommandDescription(gid);
                     Logger.LogDebug($"[ExecuteAnalogReadCommand] Command origin of command address: {pointItem.Address} is set to {commandOrigin}.");
                 }
 
@@ -399,8 +402,6 @@ namespace SCADA.FunctionExecutorImplementation
             }
             
             await this.modelUpdateAccessClient.MakeAnalogEntryToMeasurementCache(measurementCache, true);
-            //await this.modelUpdateAccessClient.MakeAnalogEntryToMeasurementCache();
-            //await this.newScadaModelUpdateAccessClient.MakeAnalogEntryToMeasurementCache(measurementCache, true);
         }
         #endregion Execute Read
 
@@ -437,13 +438,13 @@ namespace SCADA.FunctionExecutorImplementation
                 }
 
                 modbusClient.WriteSingleCoil(outputAddress - 1, booleanCommand);
-                Logger.LogInfo($"ExecuteWriteSingleCommand [Discrete] executed SUCCESSFULLY. OutputAddress: {outputAddress}, Value: {booleanCommand}");
+                Logger.LogInformation($"ExecuteWriteSingleCommand [Discrete] executed SUCCESSFULLY. OutputAddress: {outputAddress}, Value: {booleanCommand}");
             }
             else if (writeCommand.FunctionCode == ModbusFunctionCode.WRITE_SINGLE_REGISTER)
             {
                 pointType = PointType.ANALOG_OUTPUT;
                 modbusClient.WriteSingleRegister(outputAddress - 1, commandValue);
-                Logger.LogInfo($"ExecuteWriteSingleCommand [Analog] executed SUCCESSFULLY. OutputAddress: {outputAddress}, Value: {commandValue}");
+                Logger.LogInformation($"ExecuteWriteSingleCommand [Analog] executed SUCCESSFULLY. OutputAddress: {outputAddress}, Value: {commandValue}");
             }
             else
             {
@@ -465,9 +466,7 @@ namespace SCADA.FunctionExecutorImplementation
                     CommandOrigin = writeCommand.CommandOrigin,
                 };
 
-                await this.modelUpdateAccessClient.UpdateCommandDescription(gid, commandDescription);
-                //await this.modelUpdateAccessClient.UpdateCommandDescription();
-                //await this.newScadaModelUpdateAccessClient.UpdateCommandDescription(gid, commandDescription);
+                await this.modelUpdateAccessClient.AddOrUpdateCommandDescription(gid, commandDescription);
             }
         }
 
@@ -546,14 +545,12 @@ namespace SCADA.FunctionExecutorImplementation
             }
 
             modbusClient.WriteMultipleCoils(startAddress - 1, booleanCommands);
-            Logger.LogInfo($"ExecuteWriteMultipleDiscreteCommand executed SUCCESSFULLY. StartAddress: {startAddress}, Quantity: {quantity}");
+            Logger.LogInformation($"ExecuteWriteMultipleDiscreteCommand executed SUCCESSFULLY. StartAddress: {startAddress}, Quantity: {quantity}");
 
             foreach (CommandDescription description in commandDescriptions.Values)
             {
                 //TODO: parallelization
-                await this.modelUpdateAccessClient.UpdateCommandDescription(description.Gid, description);
-                //await this.modelUpdateAccessClient.UpdateCommandDescription();
-                //await this.newScadaModelUpdateAccessClient.UpdateCommandDescription(description.Gid, description);
+                await this.modelUpdateAccessClient.AddOrUpdateCommandDescription(description.Gid, description);
             }
         }
 
@@ -584,14 +581,12 @@ namespace SCADA.FunctionExecutorImplementation
             }
 
             modbusClient.WriteMultipleRegisters(startAddress - 1, commandValues);
-            Logger.LogInfo($"ExecuteWriteMultipleAnalogCommand executed SUCCESSFULLY. StartAddress: {startAddress}, Quantity: {quantity}");
+            Logger.LogInformation($"ExecuteWriteMultipleAnalogCommand executed SUCCESSFULLY. StartAddress: {startAddress}, Quantity: {quantity}");
 
             foreach (CommandDescription description in commandDescriptions.Values)
             {
                 //TODO: parallelization
-                await this.modelUpdateAccessClient.UpdateCommandDescription(description.Gid, description);
-                //await this.modelUpdateAccessClient.UpdateCommandDescription();
-                //await this.newScadaModelUpdateAccessClient.UpdateCommandDescription(description.Gid, description);
+                await this.modelUpdateAccessClient.AddOrUpdateCommandDescription(description.Gid, description);
             }
         }
         #endregion Execute Write

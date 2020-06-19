@@ -1,5 +1,6 @@
 ﻿using Microsoft.ServiceFabric.Services.Remoting;
 using System.ServiceModel;
+using System.Threading.Tasks;
 
 namespace OMS.Common.DistributedTransactionContracts
 {
@@ -7,6 +8,6 @@ namespace OMS.Common.DistributedTransactionContracts
     public interface ITransactionEnlistmentContract : IService
     {
         [OperationContract]
-        bool Enlist(string actorName);
+        Task<bool> Enlist(string actorName);
     }
 }

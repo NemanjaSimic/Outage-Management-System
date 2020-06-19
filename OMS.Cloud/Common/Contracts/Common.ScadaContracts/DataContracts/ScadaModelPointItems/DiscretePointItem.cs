@@ -1,8 +1,7 @@
-﻿using Outage.Common;
-using System;
+﻿using System;
 using OMS.Common.SCADA;
 using System.Runtime.Serialization;
-using Common.SCADA;
+using OMS.Common.Cloud;
 
 namespace OMS.Common.ScadaContracts.DataContracts.ScadaModelPointItems
 {

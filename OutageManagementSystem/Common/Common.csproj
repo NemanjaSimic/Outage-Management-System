@@ -238,6 +238,9 @@
     <PackageReference Include="Microsoft.AspNet.SignalR.Client">
       <Version>2.4.1</Version>
     </PackageReference>
+    <PackageReference Include="Microsoft.Extensions.Logging">
+      <Version>3.1.5</Version>
+    </PackageReference>
     <PackageReference Include="Microsoft.Owin">
       <Version>4.1.0</Version>
     </PackageReference>

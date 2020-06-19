@@ -2,25 +2,26 @@
 using MongoDB.Bson.Serialization;
 using MongoDB.Bson.Serialization.Serializers;
 using MongoDB.Driver;
-using Outage.Common;
+
 using System;
 using System.Collections.Generic;
 using System.Linq;
 using OMS.Common.NmsContracts.GDA;
 using NMS.DataModel;
 using NMS.GdaImplementation.DbModel;
-using System.Threading;
 using System.Threading.Tasks;
+using OMS.Common.Cloud.Logger;
+using OMS.Common.Cloud;
 
 namespace NMS.GdaImplementation
 {
     public class MongoAccess
     {
-        private ILogger logger;
+        private ICloudLogger logger;
 
-        protected ILogger Logger
+        private ICloudLogger Logger
         {
-            get { return logger ?? (logger = LoggerWrapper.Instance); }
+            get { return logger ?? (logger = CloudLoggerFactory.GetLogger()); }
         }
 
         private IMongoDatabase db;
@@ -100,8 +101,9 @@ namespace NMS.GdaImplementation
             try
             {
                 var counterCollection = db.GetCollection<ModelVersionDocument>("versions");
-                counterCollection.ReplaceOne(new BsonDocument("_id", "deltaVersion"), new ModelVersionDocument { Id = "deltaVersion", Version = delta.Id }, new UpdateOptions { IsUpsert = true });
-                
+                //counterCollection.ReplaceOne(new BsonDocument("_id", "deltaVersion"), new ModelVersionDocument { Id = "deltaVersion", Version = delta.Id }, new UpdateOptions { IsUpsert = true });
+                counterCollection.ReplaceOne(new BsonDocument("_id", "deltaVersion"), new ModelVersionDocument { Id = "deltaVersion", Version = delta.Id }, new ReplaceOptions { IsUpsert = true });
+
                 var deltaCollection = db.GetCollection<Delta>("deltas");
                 deltaCollection.InsertOne(delta);
             }
@@ -128,7 +130,8 @@ namespace NMS.GdaImplementation
                 networkModelCollection.InsertOne(new NetworkDataModelDocument { Id = deltaVersion + 1, NetworkModel = networkDataModel });
 
                 IMongoCollection<ModelVersionDocument> versionsCollection = db.GetCollection<ModelVersionDocument>("versions");
-                versionsCollection.ReplaceOne(new BsonDocument("_id", "networkModelVersion"), new ModelVersionDocument { Id = "networkModelVersion", Version = deltaVersion + 1 }, new UpdateOptions { IsUpsert = true });
+                //versionsCollection.ReplaceOne(new BsonDocument("_id", "networkModelVersion"), new ModelVersionDocument { Id = "networkModelVersion", Version = deltaVersion + 1 }, new UpdateOptions { IsUpsert = true });
+                versionsCollection.ReplaceOne(new BsonDocument("_id", "networkModelVersion"), new ModelVersionDocument { Id = "networkModelVersion", Version = deltaVersion + 1 }, new ReplaceOptions { IsUpsert = true });
             }
             else
             {

@@ -72,7 +72,7 @@ namespace OutageManagementService
 
                 try
                 {
-                    iteratorId = gdaQueryProxy.GetExtentValues(entityType, propIds).Result;
+                    iteratorId = gdaQueryProxy.GetExtentValues(entityType, propIds);
                 }
                 catch (Exception e)
                 {
@@ -103,18 +103,18 @@ namespace OutageManagementService
 
                 try
                 {
-                    resourcesLeft = gdaQueryProxy.IteratorResourcesTotal(iteratorId).Result;
+                    resourcesLeft = gdaQueryProxy.IteratorResourcesTotal(iteratorId);
                     resourceDescriptions = new List<ResourceDescription>(resourcesLeft);
 
                     while (resourcesLeft > 0)
                     {
-                        List<ResourceDescription> rds = gdaQueryProxy.IteratorNext(numberOfResources, iteratorId).Result;
+                        List<ResourceDescription> rds = gdaQueryProxy.IteratorNext(numberOfResources, iteratorId);
                         resourceDescriptions.AddRange(rds);
 
-                        resourcesLeft = gdaQueryProxy.IteratorResourcesLeft(iteratorId).Result;
+                        resourcesLeft = gdaQueryProxy.IteratorResourcesLeft(iteratorId);
                     }
 
-                    await gdaQueryProxy.IteratorClose(iteratorId);
+                    gdaQueryProxy.IteratorClose(iteratorId);
                 }
                 catch (Exception e)
                 {

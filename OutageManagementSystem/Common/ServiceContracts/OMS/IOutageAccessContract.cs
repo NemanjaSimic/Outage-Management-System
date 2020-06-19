@@ -6,7 +6,7 @@ using System.ServiceModel;
 namespace Outage.Common.ServiceContracts.OMS
 {
     [ServiceContract]
-    public interface IOutageAccessContract : IService
+    public interface IOutageAccessContract
     {
         [OperationContract]
         IEnumerable<ActiveOutageMessage> GetActiveOutages();

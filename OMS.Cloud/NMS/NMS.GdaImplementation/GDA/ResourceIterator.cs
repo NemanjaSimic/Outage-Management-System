@@ -1,17 +1,21 @@
-﻿using OMS.Common.NmsContracts.GDA;
-using Outage.Common;
+﻿using OMS.Common.Cloud;
+using OMS.Common.Cloud.Logger;
+using OMS.Common.NmsContracts;
+using OMS.Common.NmsContracts.GDA;
+
 using System;
 using System.Collections.Generic;
+using System.Threading.Tasks;
 
 namespace NMS.GdaImplementation.GDA
 {
     public class ResourceIterator
     {
-        private ILogger logger;
+        private ICloudLogger logger;
 
-        protected ILogger Logger
+        private ICloudLogger Logger
         {
-            get { return logger ?? (logger = LoggerWrapper.Instance); }
+            get { return logger ?? (logger = CloudLoggerFactory.GetLogger()); }
         }
 
         private readonly NetworkModel networkModel = null;
@@ -44,7 +48,7 @@ namespace NMS.GdaImplementation.GDA
             return globalDs.Count;
         }
 
-        public List<ResourceDescription> Next(int n)
+        public async Task<List<ResourceDescription>> Next(int n)
         {
             try
             {
@@ -71,7 +75,7 @@ namespace NMS.GdaImplementation.GDA
                     lastReadIndex += n;
                 }
 
-                List<ResourceDescription> result = CollectData(resultIDs);
+                List<ResourceDescription> result = await CollectData(resultIDs);
 
                 return result;
             }
@@ -83,7 +87,7 @@ namespace NMS.GdaImplementation.GDA
             }
         }
 
-        public List<ResourceDescription> GetRange(int index, int n)
+        public async Task<List<ResourceDescription>> GetRange(int index, int n)
         {
             try
             {
@@ -94,7 +98,7 @@ namespace NMS.GdaImplementation.GDA
 
                 List<long> resultIDs = globalDs.GetRange(index, n);
 
-                List<ResourceDescription> result = CollectData(resultIDs);
+                List<ResourceDescription> result = await CollectData(resultIDs);
 
                 return result;
             }
@@ -111,7 +115,7 @@ namespace NMS.GdaImplementation.GDA
             lastReadIndex = 0;
         }
 
-        private List<ResourceDescription> CollectData(List<long> resultIDs)
+        private async Task<List<ResourceDescription>> CollectData(List<long> resultIDs)
         {
             try
             {
@@ -121,7 +125,7 @@ namespace NMS.GdaImplementation.GDA
                 foreach (long globalId in resultIDs)
                 {
                     propertyIds = class2PropertyIDs[(DMSType)ModelCodeHelper.ExtractTypeFromGlobalId(globalId)];
-                    result.Add(networkModel.GetValues(globalId, propertyIds));
+                    result.Add(await networkModel.GetValues(globalId, propertyIds));
                 }
 
                 return result;

@@ -86,6 +86,9 @@
     <Prefer32Bit>false</Prefer32Bit>
   </PropertyGroup>
   <ItemGroup>
+    <Reference Include="CIMAdapter">
+      <HintPath>..\bin\CIMAdapter.dll</HintPath>
+    </Reference>
     <Reference Include="System" />
     <Reference Include="System.Core" />
     <Reference Include="System.ServiceModel" />
@@ -97,7 +100,6 @@
     <Reference Include="System.Drawing" />
     <Reference Include="System.Windows.Forms" />
     <Reference Include="System.Xml" />
-    <Reference Include="WindowsBase" />
   </ItemGroup>
   <ItemGroup>
     <Compile Include="ModelLabsAppForm.cs">
@@ -136,17 +138,9 @@
     </Compile>
   </ItemGroup>
   <ItemGroup>
-    <ProjectReference Include="..\..\..\OMS.Cloud\Common\Contracts\Common.NmsContracts\Common.NmsContracts.csproj">
-      <Project>{235804A8-9C8F-40EC-8786-5DAB24733977}</Project>
-      <Name>Common.NmsContracts</Name>
-    </ProjectReference>
     <ProjectReference Include="..\..\Common\Common.csproj">
       <Project>{892CBE15-9ED7-4540-81FA-0EAABA592138}</Project>
       <Name>Common</Name>
-    </ProjectReference>
-    <ProjectReference Include="..\CIMAdapter\CIMAdapter.csproj">
-      <Project>{35679A04-DB61-4430-AD3F-65C2C2A53391}</Project>
-      <Name>CIMAdapter</Name>
     </ProjectReference>
   </ItemGroup>
   <ItemGroup>

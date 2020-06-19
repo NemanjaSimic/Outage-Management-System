@@ -1,4 +1,4 @@
-﻿using Outage.Common;
+﻿using OMS.Common.Cloud;
 using System.Runtime.Serialization;
 
 namespace OMS.Common.ScadaContracts.DataContracts

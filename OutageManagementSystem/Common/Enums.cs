@@ -8,8 +8,10 @@ namespace Outage.Common
     {
         [EnumMember]
         VOLTAGE = 1,
+
         [EnumMember]
         CURRENT = 2,
+        
         [EnumMember]
         POWER   = 3,
     }
@@ -24,26 +26,38 @@ namespace Outage.Common
 
     //PUB_SUB
     [DataContract]
-    public enum Topic
+    public enum Topic : short
     {
         [EnumMember]
-        MEASUREMENT = 1,
+        MEASUREMENT         = 1,
+        
         [EnumMember]
-        SWITCH_STATUS,
+        SWITCH_STATUS       = 2,
+        
         [EnumMember]
-        TOPOLOGY,
+        TOPOLOGY            = 3,
+        
+        [EnumMember]
+        OUTAGE_EMAIL        = 4,
+        
+        [EnumMember]
+        ACTIVE_OUTAGE       = 5,
+        
+        [EnumMember]
+        ARCHIVED_OUTAGE     = 6,
+        
+        [EnumMember]
+        OMS_MODEL           = 7,
+    }
+
+    [DataContract]
+    public enum ServiceType
+    {
+        [EnumMember]
+        STATEFUL_SERVICE    = 1,
 
         [EnumMember]
-        OUTAGE_EMAIL,
-
-        [EnumMember]
-        ACTIVE_OUTAGE,
-
-        [EnumMember]
-        ARCHIVED_OUTAGE,
-
-        [EnumMember]
-        OMS_MODEL
+        STATELESS_SERVICE   = 2,
     }
 
     //SCADA

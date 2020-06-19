@@ -1,4 +1,5 @@
-﻿using System;
+﻿using Microsoft.Extensions.Logging;
+using System;
 using System.Collections.Generic;
 using System.Runtime.Serialization;
 
@@ -44,12 +45,11 @@ namespace Outage.Common.GDA
 	/// </summary>
 	//[Serializable]
 	[DataContract]
-	[Obsolete("Use Common.NmsContracts alternative")]
 	public class Property : IComparable
 	{
 		private ILogger logger;
 
-        protected ILogger Logger
+		private ILogger Logger
         {
             get { return logger ?? (logger = LoggerWrapper.Instance); }
         }

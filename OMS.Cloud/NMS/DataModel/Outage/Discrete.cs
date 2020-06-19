@@ -1,4 +1,4 @@
-﻿using Outage.Common;
+﻿using OMS.Common.Cloud;
 using OMS.Common.NmsContracts.GDA;
 
 namespace NMS.DataModel

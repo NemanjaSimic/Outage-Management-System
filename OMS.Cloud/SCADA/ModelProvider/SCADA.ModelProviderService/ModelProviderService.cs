@@ -3,18 +3,21 @@ using System.Collections.Generic;
 using System.Fabric;
 using System.Threading;
 using System.Threading.Tasks;
-using Common.SCADA;
 using Microsoft.ServiceFabric.Data;
 using Microsoft.ServiceFabric.Data.Collections;
 using Microsoft.ServiceFabric.Services.Communication.Runtime;
 using Microsoft.ServiceFabric.Services.Communication.Wcf;
 using Microsoft.ServiceFabric.Services.Communication.Wcf.Runtime;
 using Microsoft.ServiceFabric.Services.Runtime;
+using OMS.Common.Cloud.Logger;
+using OMS.Common.Cloud.Names;
+using OMS.Common.NmsContracts;
+using OMS.Common.PubSubContracts.DataContracts.SCADA;
+using OMS.Common.SCADA;
 using OMS.Common.ScadaContracts.DataContracts;
 using OMS.Common.ScadaContracts.DataContracts.ScadaModelPointItems;
 using OMS.Common.ScadaContracts.ModelProvider;
-using Outage.Common;
-using Outage.Common.PubSub.SCADADataContract;
+
 using SCADA.ModelProviderImplementation;
 using SCADA.ModelProviderImplementation.ContractProviders;
 
@@ -25,6 +28,8 @@ namespace SCADA.ModelProviderService
     /// </summary>
     internal sealed class ModelProviderService : StatefulService
     {
+        private readonly ICloudLogger logger;
+
         private readonly ScadaModel scadaModel;
         private readonly ModelReadAccessProvider modelReadAccessProvider;
         private readonly ModelUpdateAccessProvider modelUpdateAccessProvider;
@@ -33,11 +38,25 @@ namespace SCADA.ModelProviderService
         public ModelProviderService(StatefulServiceContext context)
             : base(context)
         {
-            //DONE THIS WAY BECAUSE: there is a mechanism that tracks the initialization process of reliable collections, which is set in constructors of these classes
-            this.scadaModel = new ScadaModel(this.StateManager, new ModelResourcesDesc(), new EnumDescs());
-            this.modelReadAccessProvider = new ModelReadAccessProvider(this.StateManager);
-            this.modelUpdateAccessProvider = new ModelUpdateAccessProvider(this.StateManager);
-            this.integrityUpdateProvider = new IntegrityUpdateProvider(this.StateManager);
+            logger = CloudLoggerFactory.GetLogger();
+
+            try
+            {
+                //DONE THIS WAY (in this order) BECAUSE: there is a mechanism that tracks the initialization process of reliable collections, which is set in constructors of these classes
+                this.scadaModel = new ScadaModel(this.StateManager, new ModelResourcesDesc(), new EnumDescs());
+                this.modelReadAccessProvider = new ModelReadAccessProvider(this.StateManager);
+                this.modelUpdateAccessProvider = new ModelUpdateAccessProvider(this.StateManager);
+                this.integrityUpdateProvider = new IntegrityUpdateProvider(this.StateManager);
+ 
+                string message = "Contract providers initialized.";
+                logger.LogInformation(message);
+                ServiceEventSource.Current.ServiceMessage(this.Context, $"[ModelProviderService | Information] {message}");
+            }
+            catch (Exception e)
+            {
+                logger.LogError(e.Message, e);
+                ServiceEventSource.Current.ServiceMessage(this.Context, $"[ModelProviderService | Error] {e.Message}");
+            }
         }
 
         /// <summary>
@@ -76,8 +95,8 @@ namespace SCADA.ModelProviderService
                     return new WcfCommunicationListener<IScadaIntegrityUpdateContract>(context,
                                                                            this.integrityUpdateProvider,
                                                                            WcfUtility.CreateTcpListenerBinding(),
-                                                                           EndpointNames.SCADAIntegrityUpdateEndpoint);
-                }, EndpointNames.SCADAIntegrityUpdateEndpoint),
+                                                                           EndpointNames.ScadaIntegrityUpdateEndpoint);
+                }, EndpointNames.ScadaIntegrityUpdateEndpoint),
 
                 ////SCADAModelUpdateNotifierEndpoint
                 //new ServiceReplicaListener(context =>
@@ -106,14 +125,20 @@ namespace SCADA.ModelProviderService
             try
             {
                 InitializeReliableCollections();
-                ServiceEventSource.Current.ServiceMessage(this.Context, $"[ModelProviderService] ReliableDictionaries initialized.");
+                string message = "ReliableDictionaries initialized.";
+                logger.LogInformation(message);
+                ServiceEventSource.Current.ServiceMessage(this.Context, $"[ModelProviderService | Information] {message}");
+
+                await scadaModel.InitializeScadaModel();
+                message = "ScadaModel initialized.";
+                logger.LogInformation(message);
+                ServiceEventSource.Current.ServiceMessage(this.Context, $"[ModelProviderService | Information] {message}");
             }
             catch (Exception e)
             {
-                ServiceEventSource.Current.ServiceMessage(this.Context, $"[ModelProviderService] Error: {e.Message}");
+                logger.LogInformation(e.Message, e);
+                ServiceEventSource.Current.ServiceMessage(this.Context, $"[ModelProviderService | Error] {e.Message}");
             }
-
-            await scadaModel.InitializeScadaModel();
         }
 
         private void InitializeReliableCollections()

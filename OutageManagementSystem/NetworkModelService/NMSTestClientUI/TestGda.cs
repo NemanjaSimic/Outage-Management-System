@@ -1,33 +1,36 @@
 ﻿using System;
 using System.Collections.Generic;
+using System.ServiceModel;
 using System.Text;
-using System.Threading.Tasks;
+using System.Threading;
 using FTN.Services.NetworkModelService.TestClientUI;
-using OMS.Common.Cloud.WcfServiceFabricClients.NMS;
-using OMS.Common.NmsContracts.GDA;
 using Outage.Common;
+using Outage.Common.GDA;
+using Outage.Common.ServiceContracts.GDA;
+using Outage.Common.ServiceProxies;
 
 namespace TelventDMS.Services.NetworkModelService.TestClient.TestsUI
 {
-	public sealed class TestGda : IDisposable
+	public class TestGda : IDisposable
 	{
 		private ILogger logger;
 
-		private ILogger Logger
+		protected ILogger Logger
 		{
 			get { return logger ?? (logger = LoggerWrapper.Instance); }
 		}
 
-		//private readonly NetworkModelGdaClient nmsClient;
+		private ModelResourcesDesc modelResourcesDesc = new ModelResourcesDesc();
+		private ProxyFactory proxyFactory;
 
 		public TestGda()
 		{
-			//nmsClient = NetworkModelGdaClient.CreateClient();
+			proxyFactory = new ProxyFactory();
 		}
 
 		#region GDAQueryService
 
-		public async Task<ResourceDescription> GetValues(long globalId, List<ModelCode> properties)
+		public ResourceDescription GetValues(long globalId, List<ModelCode> properties)
 		{
 			string message = "Getting values method started.";
 			Logger.LogInfo(message);
@@ -36,18 +39,19 @@ namespace TelventDMS.Services.NetworkModelService.TestClient.TestsUI
 
 			try
 			{
-				NetworkModelGdaClient nmsClient = NetworkModelGdaClient.CreateClient();
-
-				if (nmsClient == null)
+				using (NetworkModelGDAProxy gdaQueryProxy = proxyFactory.CreateProxy<NetworkModelGDAProxy, INetworkModelGDAContract>(EndpointNames.NetworkModelGDAEndpoint))
 				{
-					string errMsg = "NetworkModelGdaClient is null.";
-					Logger.LogWarn(errMsg);
-					throw new NullReferenceException(errMsg);
+					if (gdaQueryProxy == null)
+					{
+						string errMsg = "NetworkModelGDAProxy is null.";
+						Logger.LogWarn(errMsg);
+						throw new NullReferenceException(errMsg);
+					}
+					
+					rd = gdaQueryProxy.GetValues(globalId, properties);
+					message = "Getting values method successfully finished.";
+					Logger.LogInfo(message);
 				}
-
-				rd = await nmsClient.GetValues(globalId, properties);
-				message = "Getting values method successfully finished.";
-				Logger.LogInfo(message);
 			}
 			catch (Exception e)
 			{
@@ -58,7 +62,7 @@ namespace TelventDMS.Services.NetworkModelService.TestClient.TestsUI
 			return rd;
 		}
 
-		public async Task<List<long>> GetExtentValues(ModelCode modelCodeType, List<ModelCode> properties, StringBuilder sb)
+		public List<long> GetExtentValues(ModelCode modelCodeType, List<ModelCode> properties, StringBuilder sb)
 		{
 			string message = "Getting extent values method started.";
 			Logger.LogInfo(message);
@@ -71,67 +75,64 @@ namespace TelventDMS.Services.NetworkModelService.TestClient.TestsUI
 
 			try
 			{
-				NetworkModelGdaClient nmsClient = NetworkModelGdaClient.CreateClient();
-
-				if (nmsClient == null)
+				using (NetworkModelGDAProxy gdaQueryProxy = proxyFactory.CreateProxy<NetworkModelGDAProxy, INetworkModelGDAContract>(EndpointNames.NetworkModelGDAEndpoint))
 				{
-					string errMsg = "NetworkModelGdaClient is null.";
-					Logger.LogWarn(errMsg);
-					throw new NullReferenceException(errMsg);
-				}
-
-				iteratorId = await nmsClient.GetExtentValues(modelCodeType, properties);
-				resourcesLeft = await nmsClient.IteratorResourcesLeft(iteratorId);
-
-				while (resourcesLeft > 0)
-				{
-					List<ResourceDescription> rds = await nmsClient.IteratorNext(numberOfResources, iteratorId);
-
-					for (int i = 0; i < rds.Count; i++)
+					if (gdaQueryProxy == null)
 					{
-						if (rds[i] == null)
-						{
-							continue;
-						}
-
-						tempSb.Append($"Entity with gid: 0x{rds[i].Id:X16}" + Environment.NewLine);
-
-						foreach (Property property in rds[i].Properties)
-						{
-							switch (property.Type)
-							{
-								case PropertyType.Int64:
-									StringAppender.AppendLong(tempSb, property);
-									break;
-								case PropertyType.Float:
-									StringAppender.AppendFloat(tempSb, property);
-									break;
-								case PropertyType.String:
-									StringAppender.AppendString(tempSb, property);
-									break;
-								case PropertyType.Reference:
-									StringAppender.AppendReference(tempSb, property);
-									break;
-								case PropertyType.ReferenceVector:
-									StringAppender.AppendReferenceVector(tempSb, property);
-									break;
-
-								default:
-									tempSb.Append($"{property.Id}: {property.PropertyValue.LongValue}{Environment.NewLine}");
-									break;
-							}
-						}
-
-						ids.Add(rds[i].Id);
+						string errMsg = "NetworkModelGDAProxy is null.";
+						Logger.LogWarn(errMsg);
+						throw new NullReferenceException(errMsg);
 					}
 
-					resourcesLeft = await nmsClient.IteratorResourcesLeft(iteratorId);
+					iteratorId = gdaQueryProxy.GetExtentValues(modelCodeType, properties);
+					resourcesLeft = gdaQueryProxy.IteratorResourcesLeft(iteratorId);
+
+					while (resourcesLeft > 0)
+					{
+						List<ResourceDescription> rds = gdaQueryProxy.IteratorNext(numberOfResources, iteratorId);
+
+						for (int i = 0; i < rds.Count; i++)
+						{
+							if (rds[i] != null)
+							{
+								tempSb.Append($"Entity with gid: 0x{rds[i].Id:X16}" + Environment.NewLine);
+
+								foreach (Property property in rds[i].Properties)
+								{
+									switch (property.Type)
+									{
+										case PropertyType.Int64:
+											StringAppender.AppendLong(tempSb, property);
+											break;
+										case PropertyType.Float:
+											StringAppender.AppendFloat(tempSb, property);
+											break;
+										case PropertyType.String:
+											StringAppender.AppendString(tempSb, property);
+											break;
+										case PropertyType.Reference:
+											StringAppender.AppendReference(tempSb, property);
+											break;
+										case PropertyType.ReferenceVector:
+											StringAppender.AppendReferenceVector(tempSb, property);
+											break;
+
+										default:
+											tempSb.Append($"{property.Id}: {property.PropertyValue.LongValue}{Environment.NewLine}");
+											break;
+									}
+								}
+							}
+							ids.Add(rds[i].Id);
+						}
+						resourcesLeft = gdaQueryProxy.IteratorResourcesLeft(iteratorId);
+					}
+
+					gdaQueryProxy.IteratorClose(iteratorId);
+
+					message = "Getting extent values method successfully finished.";
+					Logger.LogInfo(message);
 				}
-
-				await nmsClient.IteratorClose(iteratorId);
-
-				message = "Getting extent values method successfully finished.";
-				Logger.LogInfo(message);
 			}
 			catch (Exception e)
 			{
@@ -147,7 +148,7 @@ namespace TelventDMS.Services.NetworkModelService.TestClient.TestsUI
 			return ids;
 		}
 
-		public async Task<List<long>> GetRelatedValues(long sourceGlobalId, List<ModelCode> properties, Association association, StringBuilder sb)
+		public List<long> GetRelatedValues(long sourceGlobalId, List<ModelCode> properties, Association association, StringBuilder sb)
 		{
 			string message = "Getting related values method started.";
 			Logger.LogInfo(message);
@@ -160,67 +161,63 @@ namespace TelventDMS.Services.NetworkModelService.TestClient.TestsUI
 
 			try
 			{
-				NetworkModelGdaClient nmsClient = NetworkModelGdaClient.CreateClient();
-
-				if (nmsClient == null)
+				using (NetworkModelGDAProxy gdaQueryProxy = proxyFactory.CreateProxy<NetworkModelGDAProxy, INetworkModelGDAContract>(EndpointNames.NetworkModelGDAEndpoint))
 				{
-					string errMsg = "NetworkModelGdaClient is null.";
-					Logger.LogWarn(errMsg);
-					throw new NullReferenceException(errMsg);
-				}
-
-				iteratorId = await nmsClient.GetRelatedValues(sourceGlobalId, properties, association);
-				resourcesLeft = await nmsClient.IteratorResourcesLeft(iteratorId);
-
-				while (resourcesLeft > 0)
-				{
-					List<ResourceDescription> rds = await nmsClient.IteratorNext(numberOfResources, iteratorId);
-
-					for (int i = 0; i < rds.Count; i++)
+					if (gdaQueryProxy == null)
 					{
-						if (rds[i] == null)
-						{
-							continue;
-						}
-
-						tempSb.Append($"Entity with gid: 0x{rds[i].Id:X16}" + Environment.NewLine);
-
-						foreach (Property property in rds[i].Properties)
-						{
-							switch (property.Type)
-							{
-								case PropertyType.Int64:
-									StringAppender.AppendLong(tempSb, property);
-									break;
-								case PropertyType.Float:
-									StringAppender.AppendFloat(tempSb, property);
-									break;
-								case PropertyType.String:
-									StringAppender.AppendString(tempSb, property);
-									break;
-								case PropertyType.Reference:
-									StringAppender.AppendReference(tempSb, property);
-									break;
-								case PropertyType.ReferenceVector:
-									StringAppender.AppendReferenceVector(tempSb, property);
-									break;
-
-								default:
-									tempSb.Append($"{property.Id}: {property.PropertyValue.LongValue}{Environment.NewLine}");
-									break;
-							}
-						}
-
-						resultIds.Add(rds[i].Id);
+						string errMsg = "NetworkModelGDAProxy is null.";
+						Logger.LogWarn(errMsg);
+						throw new NullReferenceException(errMsg);
 					}
 
-					resourcesLeft = await nmsClient.IteratorResourcesLeft(iteratorId);
+					iteratorId = gdaQueryProxy.GetRelatedValues(sourceGlobalId, properties, association);
+					resourcesLeft = gdaQueryProxy.IteratorResourcesLeft(iteratorId);
+
+					while (resourcesLeft > 0)
+					{
+						List<ResourceDescription> rds = gdaQueryProxy.IteratorNext(numberOfResources, iteratorId);
+
+						for (int i = 0; i < rds.Count; i++)
+						{
+							if (rds[i] != null)
+							{
+								tempSb.Append($"Entity with gid: 0x{rds[i].Id:X16}" + Environment.NewLine);
+
+								foreach (Property property in rds[i].Properties)
+								{
+									switch (property.Type)
+									{
+										case PropertyType.Int64:
+											StringAppender.AppendLong(tempSb, property);
+											break;
+										case PropertyType.Float:
+											StringAppender.AppendFloat(tempSb, property);
+											break;
+										case PropertyType.String:
+											StringAppender.AppendString(tempSb, property);
+											break;
+										case PropertyType.Reference:
+											StringAppender.AppendReference(tempSb, property);
+											break;
+										case PropertyType.ReferenceVector:
+											StringAppender.AppendReferenceVector(tempSb, property);
+											break;
+
+										default:
+											tempSb.Append($"{property.Id}: {property.PropertyValue.LongValue}{Environment.NewLine}");
+											break;
+									}
+								}
+							}
+							resultIds.Add(rds[i].Id);
+						}
+						resourcesLeft = gdaQueryProxy.IteratorResourcesLeft(iteratorId);
+					}
+					gdaQueryProxy.IteratorClose(iteratorId);
+
+					message = "Getting related values method successfully finished.";
+					Logger.LogInfo(message);
 				}
-
-				await nmsClient.IteratorClose(iteratorId);
-
-				message = "Getting related values method successfully finished.";
-				Logger.LogInfo(message);
 			}
 			catch (Exception e)
 			{

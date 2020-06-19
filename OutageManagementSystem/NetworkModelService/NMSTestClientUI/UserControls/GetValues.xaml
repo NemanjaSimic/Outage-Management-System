@@ -28,11 +28,11 @@
         </DataGrid>
         <StackPanel Name="Properties" Margin="10,0,10,0"  Grid.Row="1" Grid.Column="2"/>
         <RichTextBox Margin="0,0,1,0" Name="Values" IsReadOnly="True" Grid.Row="1" Grid.Column="3"/>
-        <Button x:Name="GetValuesButton" Click="ButtonGetValues_Click" HorizontalAlignment="Right" Margin="0,0,50,0"  Content="Get Values" Grid.Column="3" Grid.Row="2" Width="200" Height="40"/>
+        <Button Click="ButtonGetValues_Click" HorizontalAlignment="Right" Margin="0,0,50,0"  Content="Get Values" Grid.Column="3" Grid.Row="2" Width="200" Height="40"/>
         <StatusBar Grid.Column="2" Grid.Row="2" Background="Transparent" HorizontalAlignment="Center">
             <Button Click="CheckAllBtn_Click" Name="CheckAllBtn" Content="Check All" Width="100" Height="40"/>
             <Button Click="UncheckAllBtn_Click" Name="UncheckAllBtn" Content="Uncheck All" IsEnabled="False" Grid.Column="3" Grid.Row="4"  Width="100" Height="40"/>
         </StatusBar>
-        <Button x:Name="RefreshButton" Click="ButtonRefreshGids_Click" HorizontalAlignment="Center" Margin="0,0,1,0"  Content="Refresh GIDs" Grid.Column="1" Grid.Row="2" Width="200" Height="40"/>
+        <Button Click="ButtonRefreshGids_Click" HorizontalAlignment="Center" Margin="0,0,1,0"  Content="Refresh GIDs" Grid.Column="1" Grid.Row="2" Width="200" Height="40"/>
     </Grid>
 </UserControl>

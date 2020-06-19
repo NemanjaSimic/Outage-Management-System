@@ -1,6 +1,7 @@
-﻿using Outage.Common;
-using System.Collections.Generic;
+﻿using System.Collections.Generic;
 using OMS.Common.NmsContracts.GDA;
+using Microsoft.Extensions.Logging;
+using OMS.Common.Cloud;
 
 namespace NMS.DataModel
 {
@@ -168,7 +169,7 @@ namespace NMS.DataModel
                     else
                     {
                         string message = $"Entity (GID: 0x{this.GlobalId:X16}) doesn't contain reference 0x{globalId:X16}.";
-                        Logger.LogWarn(message);
+                        Logger.LogWarning(message);
                     }
                     break;
 

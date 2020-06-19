@@ -11,7 +11,6 @@ namespace Outage.Common.GDA
 	/// </summary>
 	//[Serializable]
 	[DataContract]
-	[Obsolete("Use Common.NmsContracts alternative")]
 	public class ResourceDescription
 	{
 		private long id;

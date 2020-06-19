@@ -5,7 +5,7 @@ using System.ServiceModel;
 namespace Outage.Common.ServiceContracts.CalculationEngine
 {
     [ServiceContract]
-    interface ICECommand : IService
+    interface ICECommand
     {
         [OperationContract]
         bool SendAnalogCommand(long gid, float commandingValue);

@@ -7,7 +7,7 @@
     <ProjectGuid>{6A84DB56-920C-4FC1-9CB0-9C29D0FC1586}</ProjectGuid>
     <OutputType>Library</OutputType>
     <AppDesignerFolder>Properties</AppDesignerFolder>
-    <RootNamespace>Common.SCADA</RootNamespace>
+    <RootNamespace>OMS.Common.SCADA</RootNamespace>
     <AssemblyName>OMS.Common.SCADA</AssemblyName>
     <TargetFrameworkVersion>v4.8</TargetFrameworkVersion>
     <FileAlignment>512</FileAlignment>
@@ -56,9 +56,13 @@
     <Compile Include="ReliableDictionaryNames.cs" />
   </ItemGroup>
   <ItemGroup>
-    <ProjectReference Include="..\..\..\OutageManagementSystem\Common\Common.csproj">
-      <Project>{892CBE15-9ED7-4540-81FA-0EAABA592138}</Project>
-      <Name>Common</Name>
+    <ProjectReference Include="..\Common.Cloud\Common.Cloud.csproj">
+      <Project>{FBEE1369-0F6C-41E6-8C62-8C1C5CDBB602}</Project>
+      <Name>Common.Cloud</Name>
+    </ProjectReference>
+    <ProjectReference Include="..\Contracts\Common.PubSubContracts\Common.PubSubContracts.csproj">
+      <Project>{AA75150D-EE56-49C0-9431-751F83CCC0CD}</Project>
+      <Name>Common.PubSubContracts</Name>
     </ProjectReference>
   </ItemGroup>
   <ItemGroup>

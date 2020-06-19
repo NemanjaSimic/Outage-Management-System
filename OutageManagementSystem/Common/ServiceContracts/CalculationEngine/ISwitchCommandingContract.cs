@@ -5,7 +5,7 @@ using System.ServiceModel;
 namespace Outage.Common.ServiceContracts.CalculationEngine
 {
     [ServiceContract]
-    public interface ISwitchStatusCommandingContract : IService
+    public interface ISwitchStatusCommandingContract
     {
         //TERMINOLOGY: using 'gid' because UI can send gid of either element (for noSCADA commanding) or measurement (for SCADA commanding)
 

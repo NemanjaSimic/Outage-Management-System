@@ -1,6 +1,7 @@
 ﻿using Microsoft.ServiceFabric.Services.Remoting;
+using OMS.Common.PubSubContracts.DataContracts.SCADA;
 using OMS.Common.ScadaContracts.DataContracts;
-using Outage.Common.PubSub.SCADADataContract;
+using OMS.Common.ScadaContracts.DataContracts.ScadaModelPointItems;
 using System.Collections.Generic;
 using System.ServiceModel;
 using System.Threading.Tasks;
@@ -17,15 +18,15 @@ namespace OMS.Common.ScadaContracts.ModelProvider
         Task MakeDiscreteEntryToMeasurementCache(Dictionary<long, DiscreteModbusData> data, bool permissionToPublishData);
 
         [OperationContract]
-        Task UpdateCommandDescription(long gid, CommandDescription commandDescription);
+        [ServiceKnownType(typeof(AnalogPointItem))]
+        [ServiceKnownType(typeof(DiscretePointItem))]
+        [ServiceKnownType(typeof(AlarmConfigData))]
+        Task<IScadaModelPointItem> UpdatePointItemRawValue(long gid, int rawValue);
 
-        //[OperationContract]
-        //Task MakeAnalogEntryToMeasurementCache();
+        [OperationContract]
+        Task AddOrUpdateCommandDescription(long gid, CommandDescription commandDescription);
 
-        //[OperationContract]
-        //Task MakeDiscreteEntryToMeasurementCache();
-
-        //[OperationContract]
-        //Task UpdateCommandDescription();
+        [OperationContract]
+        Task<bool> RemoveCommandDescription(long gid);
     }
 }

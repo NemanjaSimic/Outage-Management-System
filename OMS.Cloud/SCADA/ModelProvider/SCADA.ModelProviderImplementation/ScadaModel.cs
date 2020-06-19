@@ -1,16 +1,17 @@
-﻿using Common.SCADA;
-using Microsoft.ServiceFabric.Data;
+﻿using Microsoft.ServiceFabric.Data;
 using Microsoft.ServiceFabric.Data.Notifications;
+using OMS.Common.Cloud;
+using OMS.Common.Cloud.Exceptions.SCADA;
+using OMS.Common.Cloud.Logger;
 using OMS.Common.Cloud.ReliableCollectionHelpers;
-using OMS.Common.Cloud.WcfServiceFabricClients.NMS;
-using OMS.Common.Cloud.WcfServiceFabricClients.SCADA;
 using OMS.Common.DistributedTransactionContracts;
+using OMS.Common.NmsContracts;
 using OMS.Common.NmsContracts.GDA;
 using OMS.Common.SCADA;
 using OMS.Common.ScadaContracts.DataContracts;
 using OMS.Common.ScadaContracts.DataContracts.ScadaModelPointItems;
-using Outage.Common;
-using Outage.Common.Exceptions.SCADA;
+using OMS.Common.WcfClient.NMS;
+using OMS.Common.WcfClient.SCADA;
 using SCADA.ModelProviderImplementation.Data;
 using SCADA.ModelProviderImplementation.Helpers;
 using System;
@@ -22,8 +23,11 @@ namespace SCADA.ModelProviderImplementation
 {
     public sealed class ScadaModel : IModelUpdateNotificationContract, ITransactionActorContract
     {
-        private ILogger logger;
-        private ILogger Logger { get { return logger ?? (logger = LoggerWrapper.Instance); } }
+        private ICloudLogger logger;
+        private ICloudLogger Logger 
+        {
+            get { return logger ?? (logger = CloudLoggerFactory.GetLogger()); } 
+        }
 
         private readonly EnumDescs enumDescs;
         private readonly ModelResourcesDesc modelResourceDesc;
@@ -89,11 +93,11 @@ namespace SCADA.ModelProviderImplementation
                 if(currentAddressToGidMap == null)
                 {
                     currentAddressToGidMap = ReliableDictionaryAccess<short, Dictionary<ushort, long>>.Create(stateManager, ReliableDictionaryNames.AddressToGidMap).Result;
-                    currentAddressToGidMap.Add((short)PointType.ANALOG_INPUT, new Dictionary<ushort, long>());
-                    currentAddressToGidMap.Add((short)PointType.ANALOG_OUTPUT, new Dictionary<ushort, long>());
-                    currentAddressToGidMap.Add((short)PointType.DIGITAL_INPUT, new Dictionary<ushort, long>());
-                    currentAddressToGidMap.Add((short)PointType.DIGITAL_OUTPUT, new Dictionary<ushort, long>());
-                    currentAddressToGidMap.Add((short)PointType.HR_LONG, new Dictionary<ushort, long>());
+                    currentAddressToGidMap.SetAsync((short)PointType.ANALOG_INPUT, new Dictionary<ushort, long>());
+                    currentAddressToGidMap.SetAsync((short)PointType.ANALOG_OUTPUT, new Dictionary<ushort, long>());
+                    currentAddressToGidMap.SetAsync((short)PointType.DIGITAL_INPUT, new Dictionary<ushort, long>());
+                    currentAddressToGidMap.SetAsync((short)PointType.DIGITAL_OUTPUT, new Dictionary<ushort, long>());
+                    currentAddressToGidMap.SetAsync((short)PointType.HR_LONG, new Dictionary<ushort, long>());
                 }
 
                 return currentAddressToGidMap;
@@ -151,11 +155,11 @@ namespace SCADA.ModelProviderImplementation
                 {
                     //_ = CurrentAddressToGidMap;
                     currentAddressToGidMap = await ReliableDictionaryAccess<short, Dictionary<ushort, long>>.Create(stateManager, ReliableDictionaryNames.AddressToGidMap);
-                    await currentAddressToGidMap.Add((short)PointType.ANALOG_INPUT, new Dictionary<ushort, long>());
-                    await currentAddressToGidMap.Add((short)PointType.ANALOG_OUTPUT, new Dictionary<ushort, long>());
-                    await currentAddressToGidMap.Add((short)PointType.DIGITAL_INPUT, new Dictionary<ushort, long>());
-                    await currentAddressToGidMap.Add((short)PointType.DIGITAL_OUTPUT, new Dictionary<ushort, long>());
-                    await currentAddressToGidMap.Add((short)PointType.HR_LONG, new Dictionary<ushort, long>());
+                    await currentAddressToGidMap.SetAsync((short)PointType.ANALOG_INPUT, new Dictionary<ushort, long>());
+                    await currentAddressToGidMap.SetAsync((short)PointType.ANALOG_OUTPUT, new Dictionary<ushort, long>());
+                    await currentAddressToGidMap.SetAsync((short)PointType.DIGITAL_INPUT, new Dictionary<ushort, long>());
+                    await currentAddressToGidMap.SetAsync((short)PointType.DIGITAL_OUTPUT, new Dictionary<ushort, long>());
+                    await currentAddressToGidMap.SetAsync((short)PointType.HR_LONG, new Dictionary<ushort, long>());
                     this.isAddressToGidMapInitialized = true;
                 }
                 else if(reliableStateName == ReliableDictionaryNames.CommandDescriptionCache)
@@ -218,28 +222,40 @@ namespace SCADA.ModelProviderImplementation
         {
             bool success;
 
-            await CurrentGidToPointItemMap.Clear();
-            await CurrentAddressToGidMap.Clear();
+            await CurrentGidToPointItemMap.ClearAsync();
+            foreach(var dictionary in CurrentAddressToGidMap.Values)
+            {
+                dictionary.Clear();
+            }
 
             string message = "Importing analog measurements started...";
-            Logger.LogInfo(message);
+            Logger.LogInformation(message);
             Trace.WriteLine(message);
             bool analogImportSuccess = await ImportAnalog();
 
             message = $"Importing analog measurements finished. ['success' value: {analogImportSuccess}]";
-            Logger.LogInfo(message);
+            Logger.LogInformation(message);
             Trace.WriteLine(message);
 
             message = "Importing discrete measurements started...";
-            Logger.LogInfo(message);
+            Logger.LogInformation(message);
             Trace.WriteLine(message);
             bool discreteImportSuccess = await ImportDiscrete();
 
             message = $"Importing discrete measurements finished. ['success' value: {discreteImportSuccess}]";
-            Logger.LogInfo(message);
+            Logger.LogInformation(message);
             Console.WriteLine(message);
 
             success = analogImportSuccess && discreteImportSuccess;
+
+            if(!success)
+            {
+                await CurrentGidToPointItemMap.ClearAsync();
+                foreach (var dictionary in CurrentAddressToGidMap.Values)
+                {
+                    dictionary.Clear();
+                }
+            }
 
             return success;
         }
@@ -261,38 +277,41 @@ namespace SCADA.ModelProviderImplementation
 
                     for (int i = 0; i < rds.Count; i++)
                     {
-                        if (rds[i] != null)
+                        if (rds[i] == null)
                         {
-                            long gid = rds[i].Id;
-                            ModelCode type = modelResourceDesc.GetModelCodeFromId(gid);
-
-                            ScadaModelPointItem pointItem = new AnalogPointItem(AlarmConfigDataHelper.GetAlarmConfigData());
-                            pointItemHelper.InitializeAnalogPointItem(pointItem as AnalogPointItem, rds[i].Properties, ModelCode.ANALOG, enumDescs);
-                            
-                            if(CurrentGidToPointItemMap.ContainsKey(gid))
-                            {
-                                string message = $"SCADA model is invalid => Gid: {gid} belongs to more than one entity.";
-                                Logger.LogError(message);
-                                throw new InternalSCADAServiceException(message);
-                            }
-
-                            await CurrentGidToPointItemMap.Add(gid, pointItem);
-
-                            if (!CurrentAddressToGidMap.ContainsKey((short)pointItem.RegisterType))
-                            {
-                                await CurrentAddressToGidMap.Add((short)pointItem.RegisterType, new Dictionary<ushort, long>());
-                            }
-
-                            if(CurrentAddressToGidMap[(short)pointItem.RegisterType].ContainsKey(pointItem.Address))
-                            {
-                                string message = $"SCADA model is invalid => Address: {pointItem.Address} (RegType: {pointItem.RegisterType}) belongs to more than one entity.";
-                                Logger.LogError(message);
-                                throw new InternalSCADAServiceException(message);
-                            }
-
-                            CurrentAddressToGidMap[(short)pointItem.RegisterType].Add(pointItem.Address, rds[i].Id);
-                            Logger.LogDebug($"ANALOG measurement added to SCADA model [Gid: {gid}, Address: {pointItem.Address}]");
+                            continue;
                         }
+
+                        long gid = rds[i].Id;
+                        ModelCode type = modelResourceDesc.GetModelCodeFromId(gid);
+
+                        ScadaModelPointItem pointItem = new AnalogPointItem(AlarmConfigDataHelper.GetAlarmConfigData());
+                        pointItemHelper.InitializeAnalogPointItem(pointItem as AnalogPointItem, rds[i].Properties, ModelCode.ANALOG, enumDescs);
+                            
+                        if(CurrentGidToPointItemMap.ContainsKey(gid))
+                        {
+                            string message = $"SCADA model is invalid => Gid: {gid} belongs to more than one entity.";
+                            Logger.LogError(message);
+                            throw new InternalSCADAServiceException(message);
+                        }
+
+                        await CurrentGidToPointItemMap.SetAsync(gid, pointItem);
+
+                        short registerType = (short)pointItem.RegisterType;
+                        if (!CurrentAddressToGidMap.ContainsKey(registerType))
+                        {
+                            await CurrentAddressToGidMap.SetAsync(registerType, new Dictionary<ushort, long>());
+                        }
+
+                        if(CurrentAddressToGidMap[registerType].ContainsKey(pointItem.Address))
+                        {
+                            string message = $"SCADA model is invalid => Address: {pointItem.Address} (RegType: {registerType}) belongs to more than one entity.";
+                            Logger.LogError(message);
+                            throw new InternalSCADAServiceException(message);
+                        }
+
+                        CurrentAddressToGidMap[registerType].Add(pointItem.Address, rds[i].Id);
+                        Logger.LogDebug($"ANALOG measurement added to SCADA model [Gid: {gid}, Address: {pointItem.Address}]");
                     }
 
                     resourcesLeft = await this.nmsGdaClient.IteratorResourcesLeft(iteratorId);
@@ -302,9 +321,6 @@ namespace SCADA.ModelProviderImplementation
             }
             catch (Exception ex)
             {
-                await CurrentGidToPointItemMap.Clear();
-                await CurrentAddressToGidMap.Clear();
-
                 success = false;
                 string errorMessage = $"ImportAnalog failed with error: {ex.Message}";
                 Trace.WriteLine(errorMessage);
@@ -331,38 +347,41 @@ namespace SCADA.ModelProviderImplementation
 
                     for (int i = 0; i < rds.Count; i++)
                     {
-                        if (rds[i] != null)
+                        if (rds[i] == null)
                         {
-                            long gid = rds[i].Id;
-                            ModelCode type = modelResourceDesc.GetModelCodeFromId(gid);
-
-                            ScadaModelPointItem pointItem = new DiscretePointItem(AlarmConfigDataHelper.GetAlarmConfigData());
-                            pointItemHelper.InitializeDiscretePointItem(pointItem as DiscretePointItem, rds[i].Properties, ModelCode.DISCRETE, enumDescs);
-
-                            if (CurrentGidToPointItemMap.ContainsKey(gid))
-                            {
-                                string message = $"SCADA model is invalid => Gid: {gid} belongs to more than one entity.";
-                                Logger.LogError(message);
-                                throw new InternalSCADAServiceException(message);
-                            }
-
-                            await CurrentGidToPointItemMap.Add(gid, pointItem);
-
-                            if (!CurrentAddressToGidMap.ContainsKey((short)pointItem.RegisterType))
-                            {
-                                await CurrentAddressToGidMap.Add((short)pointItem.RegisterType, new Dictionary<ushort, long>());
-                            }
-
-                            if (CurrentAddressToGidMap[(short)pointItem.RegisterType].ContainsKey(pointItem.Address))
-                            {
-                                string message = $"SCADA model is invalid => Address: {pointItem.Address} (RegType: {pointItem.RegisterType}) belongs to more than one entity.";
-                                Logger.LogError(message);
-                                throw new InternalSCADAServiceException(message);
-                            }
-
-                            CurrentAddressToGidMap[(short)pointItem.RegisterType].Add(pointItem.Address, gid);
-                            Logger.LogDebug($"DISCRETE measurement added to SCADA model [Gid: {gid}, Address: {pointItem.Address}]");
+                            continue;
                         }
+                        
+                        long gid = rds[i].Id;
+                        ModelCode type = modelResourceDesc.GetModelCodeFromId(gid);
+
+                        ScadaModelPointItem pointItem = new DiscretePointItem(AlarmConfigDataHelper.GetAlarmConfigData());
+                        pointItemHelper.InitializeDiscretePointItem(pointItem as DiscretePointItem, rds[i].Properties, ModelCode.DISCRETE, enumDescs);
+
+                        if (CurrentGidToPointItemMap.ContainsKey(gid))
+                        {
+                            string message = $"SCADA model is invalid => Gid: {gid} belongs to more than one entity.";
+                            Logger.LogError(message);
+                            throw new InternalSCADAServiceException(message);
+                        }
+
+                        await CurrentGidToPointItemMap.SetAsync(gid, pointItem);
+
+                        short registerType = (short)pointItem.RegisterType;
+                        if (!CurrentAddressToGidMap.ContainsKey(registerType))
+                        {
+                            await CurrentAddressToGidMap.SetAsync(registerType, new Dictionary<ushort, long>());
+                        }
+
+                        if (CurrentAddressToGidMap[registerType].ContainsKey(pointItem.Address))
+                        {
+                            string message = $"SCADA model is invalid => Address: {pointItem.Address} (RegType: {registerType}) belongs to more than one entity.";
+                            Logger.LogError(message);
+                            throw new InternalSCADAServiceException(message);
+                        }
+
+                        CurrentAddressToGidMap[registerType].Add(pointItem.Address, gid);
+                        Logger.LogDebug($"DISCRETE measurement added to SCADA model [Gid: {gid}, Address: {pointItem.Address}]");
                     }
 
                     resourcesLeft = await this.nmsGdaClient.IteratorResourcesLeft(iteratorId);
@@ -531,11 +550,11 @@ namespace SCADA.ModelProviderImplementation
             incomingAddressToGidMap = null;
 
             modelChanges.Clear();
-            await CommandDescriptionCache.Clear();
+            await CommandDescriptionCache.ClearAsync();
 
             string message = $"Incoming SCADA model is confirmed.";
             Console.WriteLine(message);
-            Logger.LogInfo(message);
+            Logger.LogInformation(message);
 
             //TODO: model confirmation => modbus MU commands
             //SignalIncomingModelConfirmation.Invoke(new List<long>(CurrentScadaModel.Keys));
@@ -551,7 +570,7 @@ namespace SCADA.ModelProviderImplementation
 
                 string message = $"Incoming SCADA model is rejected.";
                 Console.WriteLine(message);
-                Logger.LogInfo(message);
+                Logger.LogInformation(message);
             });
         }
         #endregion ITransactionActorContract
@@ -677,7 +696,7 @@ namespace SCADA.ModelProviderImplementation
             else
             {
                 string errMessage = $"ResourceDescription type is neither analog nor digital. Type: {type}.";
-                Logger.LogWarn(errMessage);
+                Logger.LogWarning(errMessage);
                 pointItem = null;
             }
 

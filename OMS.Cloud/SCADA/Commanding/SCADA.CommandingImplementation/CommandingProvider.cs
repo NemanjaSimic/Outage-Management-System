@@ -1,13 +1,14 @@
 ﻿using OMS.Common.SCADA;
-using Outage.Common;
-using Outage.Common.Exceptions.SCADA;
 using System;
 using System.Threading.Tasks;
 using System.Collections.Generic;
-using OMS.Common.Cloud.WcfServiceFabricClients.SCADA;
 using OMS.Common.ScadaContracts.DataContracts.ModbusFunctions;
 using OMS.Common.ScadaContracts.DataContracts.ScadaModelPointItems;
 using OMS.Common.ScadaContracts.Commanding;
+using OMS.Common.WcfClient.SCADA;
+using OMS.Common.Cloud.Logger;
+using OMS.Common.Cloud;
+using OMS.Common.Cloud.Exceptions.SCADA;
 
 namespace SCADA.CommandingImplementation
 {
@@ -16,10 +17,10 @@ namespace SCADA.CommandingImplementation
         private WriteCommandEnqueuerClient commandEnqueuerClient;
         private ScadaModelReadAccessClient scadaModelReadAccessClient;
 
-        private ILogger logger;
-        private ILogger Logger
+        private ICloudLogger logger;
+        private ICloudLogger Logger
         {
-            get { return logger ?? (logger = LoggerWrapper.Instance); }
+            get { return logger ?? (logger = CloudLoggerFactory.GetLogger()); }
         }
 
         public CommandingProvider()
@@ -75,7 +76,7 @@ namespace SCADA.CommandingImplementation
         {
             ushort startAddress = 1; //EasyModbus spec
             Dictionary<long, IScadaModelPointItem> gidToPointItemMap = await this.scadaModelReadAccessClient.GetGidToPointItemMap();
-            Dictionary<short, Dictionary<ushort, long>> addressToGidMap = await this.scadaModelReadAccessClient.GetAddressToGidMap(); //TODO: CHECK DO WE HAVE ADDRESS 0?
+            Dictionary<short, Dictionary<ushort, long>> addressToGidMap = await this.scadaModelReadAccessClient.GetAddressToGidMap();
 
             if (gidToPointItemMap == null)
             {
@@ -187,7 +188,7 @@ namespace SCADA.CommandingImplementation
         {
             ushort startAddress = 1; //EasyModbus spec
             Dictionary<long, IScadaModelPointItem> gidToPointItemMap = await this.scadaModelReadAccessClient.GetGidToPointItemMap();
-            Dictionary<short, Dictionary<ushort, long>> addressToGidMap = await this.scadaModelReadAccessClient.GetAddressToGidMap(); //TODO: CHECK DO WE HAVE ADDRESS 0?
+            Dictionary<short, Dictionary<ushort, long>> addressToGidMap = await this.scadaModelReadAccessClient.GetAddressToGidMap();
 
             if (gidToPointItemMap == null)
             {
@@ -278,7 +279,7 @@ namespace SCADA.CommandingImplementation
                 await this.commandEnqueuerClient.EnqueueWriteCommand(modbusFunction);
 
                 string message = $"Command SUCCESSFULLY enqueued. Function code: {modbusFunction.FunctionCode}, Origin: {modbusFunction.CommandOrigin}";
-                Logger.LogInfo(message);
+                Logger.LogInformation(message);
             }
             catch (Exception e)
             {
@@ -306,7 +307,7 @@ namespace SCADA.CommandingImplementation
                 await this.commandEnqueuerClient.EnqueueWriteCommand(modbusFunction);
 
                 string message = $"Command SUCCESSFULLY enqueued. Function code: {modbusFunction.FunctionCode}, Origin: {modbusFunction.CommandOrigin}";
-                Logger.LogInfo(message);
+                Logger.LogInformation(message);
             }
             catch (Exception e)
             {

@@ -10,7 +10,7 @@ using Microsoft.ServiceFabric.Services.Remoting;
 namespace Outage.Common.ServiceContracts.PubSub
 {
     [ServiceContract]
-    public interface IPublisher : IService
+    public interface IPublisher
     {
         [OperationContract]
         [ServiceKnownType(typeof(Publication))]

@@ -1,9 +1,10 @@
 ﻿using Microsoft.WindowsAzure.Storage.Queue;
 using OMS.Common.Cloud;
 using OMS.Common.Cloud.AzureStorageHelpers;
+using OMS.Common.Cloud.Logger;
+using OMS.Common.Cloud.ReliableCollectionHelpers;
 using OMS.Common.SCADA;
 using OMS.Common.ScadaContracts.FunctionExecutior;
-using Outage.Common;
 using System;
 using System.Collections.Generic;
 using System.Threading.Tasks;
@@ -12,10 +13,10 @@ namespace SCADA.FunctionExecutorImplementation.CommandEnqueuers
 {
     public class ModelUpdateCommandEnqueuer : IModelUpdateCommandEnqueuer
     {
-        private ILogger logger;
-        private ILogger Logger
+        private ICloudLogger logger;
+        private ICloudLogger Logger
         {
-            get { return logger ?? (logger = LoggerWrapper.Instance); }
+            get { return logger ?? (logger = CloudLoggerFactory.GetLogger()); }
         }
 
         private readonly CloudQueue readCommandQueue;

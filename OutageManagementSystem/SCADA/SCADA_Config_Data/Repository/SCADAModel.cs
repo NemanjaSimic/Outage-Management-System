@@ -324,12 +324,12 @@ namespace Outage.SCADA.SCADAData.Repository
 
                 try
                 {
-                    int iteratorId = await gdaProxy.GetExtentValues(ModelCode.ANALOG, props);
-                    int resourcesLeft = await gdaProxy.IteratorResourcesLeft(iteratorId);
+                    int iteratorId = gdaProxy.GetExtentValues(ModelCode.ANALOG, props);
+                    int resourcesLeft = gdaProxy.IteratorResourcesLeft(iteratorId);
 
                     while (resourcesLeft > 0)
                     {
-                        List<ResourceDescription> rds = await gdaProxy.IteratorNext(numberOfResources, iteratorId);
+                        List<ResourceDescription> rds = gdaProxy.IteratorNext(numberOfResources, iteratorId);
                         for (int i = 0; i < rds.Count; i++)
                         {
                             if (rds[i] != null)
@@ -343,7 +343,7 @@ namespace Outage.SCADA.SCADAData.Repository
                                 Logger.LogDebug($"ANALOG measurement added to SCADA model [Gid: {gid}, Address: {pointItem.Address}]");
                             }
                         }
-                        resourcesLeft = await gdaProxy.IteratorResourcesLeft(iteratorId);
+                        resourcesLeft = gdaProxy.IteratorResourcesLeft(iteratorId);
                     }
 
                     success = true;
@@ -378,12 +378,12 @@ namespace Outage.SCADA.SCADAData.Repository
 
                 try
                 {
-                    int iteratorId = await gdaProxy.GetExtentValues(ModelCode.DISCRETE, props);
-                    int resourcesLeft = await gdaProxy.IteratorResourcesLeft(iteratorId);
+                    int iteratorId = gdaProxy.GetExtentValues(ModelCode.DISCRETE, props);
+                    int resourcesLeft = gdaProxy.IteratorResourcesLeft(iteratorId);
 
                     while (resourcesLeft > 0)
                     {
-                        List<ResourceDescription> rds = await gdaProxy.IteratorNext(numberOfResources, iteratorId);
+                        List<ResourceDescription> rds = gdaProxy.IteratorNext(numberOfResources, iteratorId);
                         for (int i = 0; i < rds.Count; i++)
                         {
                             if (rds[i] != null)
@@ -396,7 +396,7 @@ namespace Outage.SCADA.SCADAData.Repository
                                 Logger.LogDebug($"DISCRETE measurement added to SCADA model [Gid: {gid}, Address: {pointItem.Address}]");
                             }
                         }
-                        resourcesLeft = await gdaProxy.IteratorResourcesLeft(iteratorId);
+                        resourcesLeft = gdaProxy.IteratorResourcesLeft(iteratorId);
                     }
 
                     success = true;
@@ -463,12 +463,12 @@ namespace Outage.SCADA.SCADAData.Repository
 
                     try
                     {
-                        iteratorId = await gdaProxy.GetExtentValues(type, props);
-                        resourcesLeft = await gdaProxy.IteratorResourcesLeft(iteratorId);
+                        iteratorId = gdaProxy.GetExtentValues(type, props);
+                        resourcesLeft = gdaProxy.IteratorResourcesLeft(iteratorId);
 
                         while (resourcesLeft > 0)
                         {
-                            List<ResourceDescription> resources = await gdaProxy.IteratorNext(numberOfResources, iteratorId);
+                            List<ResourceDescription> resources = gdaProxy.IteratorNext(numberOfResources, iteratorId);
 
                             foreach (ResourceDescription rd in resources)
                             {
@@ -489,10 +489,10 @@ namespace Outage.SCADA.SCADAData.Repository
                                 }
                             }
 
-                            resourcesLeft = await gdaProxy.IteratorResourcesLeft(iteratorId);
+                            resourcesLeft = gdaProxy.IteratorResourcesLeft(iteratorId);
                         }
 
-                        await gdaProxy.IteratorClose(iteratorId);
+                        gdaProxy.IteratorClose(iteratorId);
                     }
                     catch (Exception ex)
                     {

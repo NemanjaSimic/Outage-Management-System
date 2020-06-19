@@ -2,8 +2,8 @@
 using System.ServiceModel;
 using System.Threading.Tasks;
 using Microsoft.ServiceFabric.Services.Remoting;
+using OMS.Common.Cloud;
 using OMS.Common.NmsContracts.GDA;
-using Outage.Common;
 
 namespace OMS.Common.NmsContracts
 {

@@ -4,11 +4,10 @@ using System.Text;
 using System.Windows.Forms;
 using System.Xml;
 using Outage.Common;
+using Outage.Common.GDA;
 using Outage.DataImporter.CIMAdapter;
 using Outage.DataImporter.CIMAdapter.Manager;
-using System.Windows.Threading;
-using System.Threading.Tasks;
-using OMS.Common.NmsContracts.GDA;
+using Outage.DataImporter.CIMAdapter.Importer;
 
 namespace Outage.DataImporter.ModelLabsApp
 {
@@ -21,18 +20,13 @@ namespace Outage.DataImporter.ModelLabsApp
             get { return logger ?? (logger = LoggerWrapper.Instance); }
         }
 
-		private readonly EnumDescs enumDescs;
-        private readonly CIMAdapterClass adapter;
-
-        private ConditionalValue<Delta> nmsDeltaResult;
+        private CIMAdapterClass adapter = new CIMAdapterClass();
+        private Delta nmsDelta = null;
+		private EnumDescs enumDescs = null;
 
         public ModelLabsAppForm()
 		{
 			enumDescs = new EnumDescs();
-			adapter = new CIMAdapterClass();
-
-			nmsDeltaResult = new ConditionalValue<Delta>(false, null);
-
 			InitializeComponent();
 			InitGUIElements();
 		}
@@ -68,7 +62,7 @@ namespace Outage.DataImporter.ModelLabsApp
             }
 		}
 
-		private async Task ConvertCIMXMLToDMSNetworkModelDelta()
+		private void ConvertCIMXMLToDMSNetworkModelDelta(EnumDescs enumDescs)
 		{
 			////SEND CIM/XML to ADAPTER
 			try
@@ -80,24 +74,22 @@ namespace Outage.DataImporter.ModelLabsApp
                     return;
                 }
 
-				StringBuilder logBuilder = new StringBuilder();
-				nmsDeltaResult = new ConditionalValue<Delta>(false, null);
-
+				string log;
+				nmsDelta = null;
 				using (FileStream fs = File.Open(textBoxCIMFile.Text, FileMode.Open))
 				{
-					nmsDeltaResult = await adapter.CreateDelta(fs, (SupportedProfiles)(comboBoxProfile.SelectedItem), logBuilder);
-
-                    Logger.LogInfo(logBuilder.ToString());
-					richTextBoxReport.Text = logBuilder.ToString();
+					nmsDelta = adapter.CreateDelta(fs, (SupportedProfiles)(comboBoxProfile.SelectedItem), out log);
+                    Logger.LogInfo(log);
+					richTextBoxReport.Text = log;
 				}
 
-				if (nmsDeltaResult.HasValue)
+				if (nmsDelta != null)
 				{
 					//// export delta to file
 					using (XmlTextWriter xmlWriter = new XmlTextWriter(".\\deltaExport.xml", Encoding.UTF8))
 					{
 						xmlWriter.Formatting = Formatting.Indented;
-						nmsDeltaResult.Value.ExportToXml(xmlWriter, enumDescs);
+						nmsDelta.ExportToXml(xmlWriter, enumDescs);
 						xmlWriter.Flush();
 					}
 				}
@@ -108,33 +100,33 @@ namespace Outage.DataImporter.ModelLabsApp
                 Logger.LogError("An error occurred.", e);
             }
 
-			buttonApplyDelta.Enabled = nmsDeltaResult.HasValue;
+			buttonApplyDelta.Enabled = (nmsDelta != null);
             textBoxCIMFile.Text = string.Empty;
 		}
 
-		private async Task ApplyDMSNetworkModelDelta()
+		private void ApplyDMSNetworkModelDelta()
 		{
 			//// APPLY Delta
-            if (!nmsDeltaResult.HasValue)
-			{
-				MessageBox.Show("No data is imported into delta object.", "Info", MessageBoxButtons.OK, MessageBoxIcon.Information);
-				Logger.LogInfo("No data is imported into delta object.");
-				return;
-			}
-
-			try
+            if (nmsDelta != null)
             {
-                string log = await adapter.ApplyUpdates(nmsDeltaResult.Value);
-
-                richTextBoxReport.AppendText(log);
-				nmsDeltaResult = new ConditionalValue<Delta>(false, null);
-                buttonApplyDelta.Enabled = false;
+                try
+                {
+                    string log = adapter.ApplyUpdates(nmsDelta);
+                    richTextBoxReport.AppendText(log);
+                    nmsDelta = null;
+                    buttonApplyDelta.Enabled = (nmsDelta != null);
+                }
+                catch (Exception e)
+                {
+                    MessageBox.Show(string.Format("An error occurred.\n\n{0}", e.Message), "Error", MessageBoxButtons.OK, MessageBoxIcon.Error);
+                    Logger.LogError("An error occurred.", e);
+                }
             }
-            catch (Exception e)
+            else
             {
-                MessageBox.Show(string.Format("An error occurred.\n\n{0}", e.Message), "Error", MessageBoxButtons.OK, MessageBoxIcon.Error);
-                Logger.LogError("An error occurred.", e);
-            }            
+                MessageBox.Show("No data is imported into delta object.", "Info", MessageBoxButtons.OK, MessageBoxIcon.Information);
+                Logger.LogInfo("No data is imported into delta object.");
+            }
 		}
 
 		
@@ -150,15 +142,13 @@ namespace Outage.DataImporter.ModelLabsApp
 
 		private void buttonConvertCIMOnClick(object sender, EventArgs e)
 		{
-			this.buttonConvertCIM.Enabled = false;
-			Dispatcher.CurrentDispatcher.Invoke(ConvertCIMXMLToDMSNetworkModelDelta);
+			ConvertCIMXMLToDMSNetworkModelDelta(enumDescs);
 		}
 
         private void buttonApplyDeltaOnClick(object sender, EventArgs e)
         {
-			this.buttonApplyDelta.Enabled = false;
-			Dispatcher.CurrentDispatcher.Invoke(ApplyDMSNetworkModelDelta);
-		}
+            ApplyDMSNetworkModelDelta();
+        }
 
         private void buttonExitOnClick(object sender, EventArgs e)
 		{

@@ -9,7 +9,7 @@ namespace Outage.Common.ServiceContracts.SCADA
 {
     [ServiceContract]
     [Obsolete("Use OMS.Common.ScadaContracts")]
-    public interface ISCADAIntegrityUpdateContract : IService
+    public interface ISCADAIntegrityUpdateContract
     {
         [OperationContract]
         [FaultContract(typeof(ArgumentException))]

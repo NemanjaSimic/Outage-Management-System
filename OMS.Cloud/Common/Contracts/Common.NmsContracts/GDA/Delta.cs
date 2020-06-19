@@ -4,12 +4,14 @@ using System.IO;
 using System.Runtime.Serialization;
 using System.Xml;
 using System.Runtime.Serialization.Formatters.Binary;
-using Outage.Common;
+using OMS.Common.Cloud.Logger;
+using OMS.Common.Cloud.Exceptions.NMS;
+using OMS.Common.Cloud;
 
 namespace OMS.Common.NmsContracts.GDA
 {
 
-	public enum DeltaOpType : byte 
+    public enum DeltaOpType : byte 
 	{ 
 		Insert = 0, 
 		Update = 1, 
@@ -19,11 +21,11 @@ namespace OMS.Common.NmsContracts.GDA
 	[DataContract]	
 	public class Delta
 	{
-        private ILogger logger;
+        private ICloudLogger logger;
 
-        protected ILogger Logger
+        private ICloudLogger Logger
         {
-            get { return logger ?? (logger = LoggerWrapper.Instance); }
+            get { return logger ?? (logger = CloudLoggerFactory.GetLogger()); }
         } 
 
 		private long id;

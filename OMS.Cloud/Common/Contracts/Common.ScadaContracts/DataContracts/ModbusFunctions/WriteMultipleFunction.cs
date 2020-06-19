@@ -1,7 +1,7 @@
-﻿using Outage.Common;
-using OMS.Common.SCADA;
+﻿using OMS.Common.SCADA;
 using System.Runtime.Serialization;
 using System;
+using OMS.Common.Cloud;
 
 namespace OMS.Common.ScadaContracts.DataContracts.ModbusFunctions
 {

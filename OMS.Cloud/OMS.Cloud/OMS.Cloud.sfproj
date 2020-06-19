@@ -32,11 +32,12 @@
     <Content Include="packages.config" />
   </ItemGroup>
   <ItemGroup>
+    <ProjectReference Include="..\NMS\NMS.GdaService\NMS.GdaService.csproj" />
+    <ProjectReference Include="..\PUB_SUB\PubSubService\PubSubService.csproj" />
     <ProjectReference Include="..\SCADA\Acquisition\SCADA.AcquisitionService\SCADA.AcquisitionService.csproj" />
     <ProjectReference Include="..\SCADA\Commanding\SCADA.CommandingService\SCADA.CommandingService.csproj" />
     <ProjectReference Include="..\SCADA\FunctionExecutor\SCADA.FunctionExecutorService\SCADA.FunctionExecutorService.csproj" />
     <ProjectReference Include="..\SCADA\ModelProvider\SCADA.ModelProviderService\SCADA.ModelProviderService.csproj" />
-    <ProjectReference Include="..\SCADA\NMS\NMS.GdaService\NMS.GdaService.csproj" />
     <ProjectReference Include="..\TestService\TestService.csproj" />
   </ItemGroup>
   <Import Project="$(MSBuildToolsPath)\Microsoft.Common.targets" />

@@ -1,13 +1,14 @@
-﻿using Common.SCADA;
-using Microsoft.ServiceFabric.Data;
+﻿using Microsoft.ServiceFabric.Data;
 using Microsoft.ServiceFabric.Data.Notifications;
+using OMS.Common.Cloud;
+using OMS.Common.Cloud.Exceptions.SCADA;
+using OMS.Common.Cloud.Logger;
 using OMS.Common.Cloud.ReliableCollectionHelpers;
+using OMS.Common.PubSubContracts.DataContracts.SCADA;
+using OMS.Common.SCADA;
 using OMS.Common.ScadaContracts.DataContracts;
 using OMS.Common.ScadaContracts.DataContracts.ScadaModelPointItems;
 using OMS.Common.ScadaContracts.ModelProvider;
-using Outage.Common;
-using Outage.Common.Exceptions.SCADA;
-using Outage.Common.PubSub.SCADADataContract;
 using System;
 using System.Collections.Generic;
 using System.Threading.Tasks;
@@ -27,10 +28,10 @@ namespace SCADA.ModelProviderImplementation.ContractProviders
             get { return isGidToPointItemMapInitialized && isCommandDescriptionCacheInitialized && isInfoCacheInitialized; }
         }
 
-        private ILogger logger;
-        private ILogger Logger
+        private ICloudLogger logger;
+        private ICloudLogger Logger
         {
-            get { return logger ?? (logger = LoggerWrapper.Instance); }
+            get { return logger ?? (logger = CloudLoggerFactory.GetLogger()); }
         }
 
         private ReliableDictionaryAccess<long, IScadaModelPointItem> gidToPointItemMap;
@@ -118,7 +119,7 @@ namespace SCADA.ModelProviderImplementation.ContractProviders
         }
 
         #region IScadaIntegrityUpdateContract
-        public async Task<Dictionary<Topic, SCADAPublication>> GetIntegrityUpdate()
+        public async Task<Dictionary<Topic, ScadaPublication>> GetIntegrityUpdate()
         {
             while (!ReliableDictionariesInitialized || !(await GetIsScadaModelImportedIndicator()))
             {
@@ -170,12 +171,12 @@ namespace SCADA.ModelProviderImplementation.ContractProviders
             }
 
             MultipleAnalogValueSCADAMessage analogValuesMessage = new MultipleAnalogValueSCADAMessage(analogModbusData);
-            SCADAPublication measurementPublication = new SCADAPublication(Topic.MEASUREMENT, analogValuesMessage);
+            ScadaPublication measurementPublication = new ScadaPublication(Topic.MEASUREMENT, analogValuesMessage);
 
             MultipleDiscreteValueSCADAMessage discreteValuesMessage = new MultipleDiscreteValueSCADAMessage(discreteModbusData);
-            SCADAPublication switchStatusPublication = new SCADAPublication(Topic.SWITCH_STATUS, discreteValuesMessage);
+            ScadaPublication switchStatusPublication = new ScadaPublication(Topic.SWITCH_STATUS, discreteValuesMessage);
 
-            Dictionary<Topic, SCADAPublication> scadaPublications = new Dictionary<Topic, SCADAPublication>
+            Dictionary<Topic, ScadaPublication> scadaPublications = new Dictionary<Topic, ScadaPublication>
             {
                 { Topic.MEASUREMENT, measurementPublication },
                 { Topic.SWITCH_STATUS, switchStatusPublication },
@@ -184,7 +185,7 @@ namespace SCADA.ModelProviderImplementation.ContractProviders
             return scadaPublications;
         }
 
-        public async Task<SCADAPublication> GetIntegrityUpdateForSpecificTopic(Topic topic)
+        public async Task<ScadaPublication> GetIntegrityUpdateForSpecificTopic(Topic topic)
         {
             while (!ReliableDictionariesInitialized || !(await GetIsScadaModelImportedIndicator()))
             {
@@ -235,18 +236,18 @@ namespace SCADA.ModelProviderImplementation.ContractProviders
                 }
             }
 
-            SCADAPublication scadaPublication;
+            ScadaPublication scadaPublication;
 
             if (topic == Topic.MEASUREMENT)
             {
                 MultipleAnalogValueSCADAMessage analogValuesMessage = new MultipleAnalogValueSCADAMessage(analogModbusData);
-                scadaPublication = new SCADAPublication(Topic.MEASUREMENT, analogValuesMessage);
+                scadaPublication = new ScadaPublication(Topic.MEASUREMENT, analogValuesMessage);
 
             }
             else if (topic == Topic.SWITCH_STATUS)
             {
                 MultipleDiscreteValueSCADAMessage discreteValuesMessage = new MultipleDiscreteValueSCADAMessage(discreteModbusData);
-                scadaPublication = new SCADAPublication(Topic.SWITCH_STATUS, discreteValuesMessage);
+                scadaPublication = new ScadaPublication(Topic.SWITCH_STATUS, discreteValuesMessage);
             }
             else
             {

@@ -1,26 +1,24 @@
 ﻿using System;
 using System.Collections.Generic;
-using System.ServiceModel;
-using System.Threading.Tasks;
 using Outage.Common.GDA;
 using Outage.Common.ServiceContracts.GDA;
 
 namespace Outage.Common.ServiceProxies
 {
-	public class NetworkModelGDAProxy : BaseProxy<INetworkModelGDAContract>, INetworkModelGDAContract
+    public class NetworkModelGDAProxy : BaseProxy<INetworkModelGDAContract>, INetworkModelGDAContract
 	{
 		public NetworkModelGDAProxy(string endpointName)
 			: base(endpointName)
 		{
 		}
 
-		public async Task<UpdateResult> ApplyUpdate(Delta delta)
+		public UpdateResult ApplyUpdate(Delta delta)
 		{
             UpdateResult result;
 
             try
             {
-                result = await Channel.ApplyUpdate(delta);
+                result = Channel.ApplyUpdate(delta);
             }
             catch (Exception e)
             {
@@ -32,13 +30,13 @@ namespace Outage.Common.ServiceProxies
             return result;
 		}
 
-		public async Task<ResourceDescription> GetValues(long resourceId, List<ModelCode> propIds)
+		public ResourceDescription GetValues(long resourceId, List<ModelCode> propIds)
 		{
             ResourceDescription resource;
 
             try
             {
-                resource = await Channel.GetValues(resourceId, propIds);
+                resource = Channel.GetValues(resourceId, propIds);
             }
             catch (Exception e)
             {
@@ -50,13 +48,13 @@ namespace Outage.Common.ServiceProxies
             return resource;
 		}
 
-		public async Task<int> GetExtentValues(ModelCode entityType, List<ModelCode> propIds)
+		public int GetExtentValues(ModelCode entityType, List<ModelCode> propIds)
 		{
             int result;
 
             try
             {
-                result = await Channel.GetExtentValues(entityType, propIds);
+                result = Channel.GetExtentValues(entityType, propIds);
             }
             catch (Exception e)
             {
@@ -68,13 +66,13 @@ namespace Outage.Common.ServiceProxies
             return result;
 		}	
 
-		public async Task<int> GetRelatedValues(long source, List<ModelCode> propIds, Association association)
+		public int GetRelatedValues(long source, List<ModelCode> propIds, Association association)
 		{
             int result;
 
             try
             {
-                result = await Channel.GetRelatedValues(source, propIds, association);
+                result = Channel.GetRelatedValues(source, propIds, association);
             }
             catch (Exception e)
             {
@@ -87,13 +85,13 @@ namespace Outage.Common.ServiceProxies
 		}
 
 		
-		public async Task<bool> IteratorClose(int id)
+		public bool IteratorClose(int id)
 		{
             bool success;
 
             try
             {
-                success = await Channel.IteratorClose(id);
+                success = Channel.IteratorClose(id);
             }
             catch (Exception e)
             {
@@ -105,13 +103,13 @@ namespace Outage.Common.ServiceProxies
             return success;
 		}
 
-		public async Task<List<ResourceDescription>> IteratorNext(int n, int id)
+		public List<ResourceDescription> IteratorNext(int n, int id)
 		{
             List<ResourceDescription> result;
 
             try
             {
-                result = await Channel.IteratorNext(n, id);
+                result = Channel.IteratorNext(n, id);
             }
             catch (Exception e)
             {
@@ -123,13 +121,13 @@ namespace Outage.Common.ServiceProxies
             return result;
 		}
 
-		public async Task<int> IteratorResourcesLeft(int id)
+		public int IteratorResourcesLeft(int id)
 		{
             int result;
 
             try
             {
-                result = await Channel.IteratorResourcesLeft(id);
+                result = Channel.IteratorResourcesLeft(id);
             }
             catch (Exception e)
             {
@@ -141,13 +139,13 @@ namespace Outage.Common.ServiceProxies
             return result;
 		}
 
-		public async Task<int> IteratorResourcesTotal(int id)
+		public int IteratorResourcesTotal(int id)
 		{
             int result;
 
             try
             {
-                result = await Channel.IteratorResourcesTotal(id);
+                result = Channel.IteratorResourcesTotal(id);
             }
             catch (Exception e)
             {
@@ -159,13 +157,13 @@ namespace Outage.Common.ServiceProxies
             return result;
 		}
 
-		public async Task<bool> IteratorRewind(int id)
+		public bool IteratorRewind(int id)
 		{
             bool success;
 
             try
             {
-                success = await Channel.IteratorRewind(id);
+                success = Channel.IteratorRewind(id);
             }
             catch (Exception e)
             {

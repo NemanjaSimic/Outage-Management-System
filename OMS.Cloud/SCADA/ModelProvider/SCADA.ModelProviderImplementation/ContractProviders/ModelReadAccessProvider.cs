@@ -1,7 +1,7 @@
-﻿using Common.SCADA;
-using Microsoft.ServiceFabric.Data;
+﻿using Microsoft.ServiceFabric.Data;
 using Microsoft.ServiceFabric.Data.Notifications;
 using OMS.Common.Cloud.ReliableCollectionHelpers;
+using OMS.Common.SCADA;
 using OMS.Common.ScadaContracts.DataContracts;
 using OMS.Common.ScadaContracts.DataContracts.ScadaModelPointItems;
 using OMS.Common.ScadaContracts.ModelProvider;
@@ -145,15 +145,15 @@ namespace SCADA.ModelProviderImplementation.ContractProviders
                 await Task.Delay(1000);
             }
 
-            Dictionary<long, IScadaModelPointItem> copy = GidToPointItemMap.GetDataCopy();
-            Dictionary<long, IScadaModelPointItem> result = new Dictionary<long, IScadaModelPointItem>(copy.Count);
+            //Dictionary<long, IScadaModelPointItem> copy = GidToPointItemMap.GetDataCopy();
+            //Dictionary<long, IScadaModelPointItem> result = new Dictionary<long, IScadaModelPointItem>(copy.Count);
 
-            foreach(var element in copy)
-            {
-                result.Add(element.Key, element.Value);
-            }
+            //foreach(var element in copy)
+            //{
+            //    result.Add(element.Key, element.Value);
+            //}
 
-            return result;
+            return GidToPointItemMap.GetDataCopy();
         }
 
         public async Task<Dictionary<short, Dictionary<ushort, IScadaModelPointItem>>> GetAddressToPointItemMap()

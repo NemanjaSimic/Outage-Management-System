@@ -1,8 +1,11 @@
 ﻿using NMS.DataModel;
 using NMS.GdaImplementation.GDA;
-using OMS.Common.Cloud.WcfServiceFabricClients.TMS;
+using OMS.Common.Cloud;
+using OMS.Common.Cloud.Logger;
+using OMS.Common.Cloud.Names;
+using OMS.Common.NmsContracts;
 using OMS.Common.NmsContracts.GDA;
-using Outage.Common; 
+using OMS.Common.WcfClient.TMS;
 using System;
 using System.Collections.Generic;
 using System.Text;
@@ -14,11 +17,11 @@ namespace NMS.GdaImplementation
     public class NetworkModel
     {
         #region Fields
-        private ILogger logger;
+        private ICloudLogger logger;
 
-        protected ILogger Logger
+        private ICloudLogger Logger
         {
-            get { return logger ?? (logger = LoggerWrapper.Instance); }
+            get { return logger ?? (logger = CloudLoggerFactory.GetLogger()); }
         }
 
         private MongoAccess mongoDb;
@@ -29,6 +32,7 @@ namespace NMS.GdaImplementation
         /// </summary>
         private ModelResourcesDesc resourcesDescs;
 
+        private bool isNetworkModelInitialized = false;
         private bool isTransactionInProgress = false;
 
         /// <summary>
@@ -63,7 +67,6 @@ namespace NMS.GdaImplementation
 
         #endregion
 
-
         /// <summary>
         /// Initializes a new instance of the Model class.
         /// </summary>
@@ -71,10 +74,55 @@ namespace NMS.GdaImplementation
         {
             this.mongoDb = new MongoAccess();
             this.resourcesDescs = new ModelResourcesDesc();
-
-            InitializeNetworkModel();
+            
+            this.isNetworkModelInitialized = false;
+            //InitializeNetworkModel();
         }
 
+        public async Task InitializeNetworkModel()
+        {
+            this.isNetworkModelInitialized = false;
+
+            long deltaVersion = 0, networkModelVersion = 0;
+            mongoDb.GetVersions(ref networkModelVersion, ref deltaVersion);
+
+            if (deltaVersion > networkModelVersion)
+            {
+                Logger.LogDebug("Delta version is higher then network model version.");
+
+                networkDataModel = mongoDb.GetLatesNetworkModel(networkModelVersion);
+                List<Delta> deltas = mongoDb.GetAllDeltas(deltaVersion, networkModelVersion);
+
+                foreach (Delta delta in deltas)
+                {
+                    try
+                    {
+                        await ApplyDelta(delta, true);
+                    }
+                    catch (Exception ex)
+                    {
+                        Logger.LogError($"Error while applying delta (id: {delta.Id}) durning service initialization. {ex.Message}", ex);
+                    }
+                }
+
+                mongoDb.SaveNetworkModel(NetworkDataModel);
+                this.isNetworkModelInitialized = true;
+            }
+            else if (networkModelVersion > 0)
+            {
+                networkDataModel = mongoDb.GetLatesNetworkModel(networkModelVersion);
+                this.isNetworkModelInitialized = true;
+            }
+            else if (deltaVersion == 0 && networkModelVersion == 0)
+            {
+                this.isNetworkModelInitialized = true;
+                return;
+            }
+            else
+            {
+                throw new NotImplementedException("InitializeNetworkModel => else path...");
+            }
+        }
 
         #region Find
 
@@ -144,148 +192,13 @@ namespace NMS.GdaImplementation
 
         #endregion Find
 
-
-        #region GDA query
-
-        /// <summary>
-        /// Gets resource description for entity requested by globalId.
-        /// </summary>
-        /// <param name="globalId">Id of the entity</param>
-        /// <param name="properties">List of requested properties</param>		
-        /// <returns>Resource description of the specified entity</returns>
-        public ResourceDescription GetValues(long globalId, List<ModelCode> properties)
+        #region GDA Contract
+        public async Task<UpdateResult> ApplyDelta(Delta delta, bool isInitialization = false)
         {
-            if (!isTransactionInProgress)
+            while (!isNetworkModelInitialized && !isInitialization)
             {
-                InitializeNetworkModel();
+                await Task.Delay(1000);
             }
-
-            Logger.LogInfo($"Getting values for GID: 0x{globalId:X16}.");
-
-            try
-            {
-                IdentifiedObject io = GetEntity(globalId);
-
-                ResourceDescription rd = new ResourceDescription(globalId);
-
-                Property property = null;
-
-                // insert specified properties
-                foreach (ModelCode propId in properties)
-                {
-                    property = new Property(propId);
-                    io.GetProperty(property);
-                    rd.AddProperty(property);
-                }
-                Logger.LogInfo($"Getting values for GID: 0x{globalId:X16} succedded.");
-
-                return rd;
-            }
-            catch (Exception ex)
-            {
-                string message = string.Format("Failed to get values for entity with GID: 0x{0:X16}. {1}", globalId, ex.Message);
-                Logger.LogError(message, ex);
-                throw new Exception(message);
-            }
-        }
-
-        /// <summary>
-        /// Gets resource iterator that holds descriptions for all entities of the specified type.
-        /// </summary>		
-        /// <param name="type">Type of entity that is requested</param>
-        /// <param name="properties">List of requested properties</param>		
-        /// <returns>Resource iterator for the requested entities</returns>
-        public ResourceIterator GetExtentValues(ModelCode entityType, List<ModelCode> properties)
-        {
-            if (!isTransactionInProgress)
-            {
-                InitializeNetworkModel();
-            }
-
-            Logger.LogInfo($"Getting extent values for entity type: {entityType}.");
-
-            try
-            {
-                List<long> globalIds = new List<long>();
-                Dictionary<DMSType, List<ModelCode>> class2PropertyIDs = new Dictionary<DMSType, List<ModelCode>>();
-
-                DMSType entityDmsType = ModelCodeHelper.GetTypeFromModelCode(entityType);
-
-                if (NetworkDataModel.ContainsKey(entityDmsType))
-                {
-                    Container container = NetworkDataModel[entityDmsType];
-                    globalIds = container.GetEntitiesGlobalIds();
-                    class2PropertyIDs.Add(entityDmsType, properties);
-                }
-
-                ResourceIterator ri = new ResourceIterator(globalIds, class2PropertyIDs, this);
-
-                Logger.LogInfo($"Getting extent values for entity type: {entityType} succedded.");
-
-                return ri;
-            }
-            catch (Exception ex)
-            {
-                string message = string.Format("Failed to get extent values for entity type: {0}. {1}", entityType, ex.Message);
-                Logger.LogError(message, ex);
-                throw new Exception(message);
-            }
-        }
-
-        /// <summary>
-        /// Gets resource iterator that holds descriptions for all entities related to specified source.
-        /// </summary>
-        /// <param name="contextId">Context Id</param>
-        /// <param name="properties">List of requested properties</param>
-        /// <param name="association">Relation between source and entities that should be returned</param>
-        /// <param name="source">Id of entity that is start for association search</param>
-        /// <param name="typeOfQuery">Query type choice(global or local)</param>
-        /// <returns>Resource iterator for the requested entities</returns>
-        public ResourceIterator GetRelatedValues(long source, List<ModelCode> properties, Association association)
-        {
-            if (!isTransactionInProgress)
-            {
-                InitializeNetworkModel();
-            }
-
-            Logger.LogInfo($"Getting related values for source: 0x{source:X16}.");
-
-            try
-            {
-                List<long> relatedGids = ApplyAssocioationOnSource(source, association);
-
-                Dictionary<DMSType, List<ModelCode>> class2PropertyIDs = new Dictionary<DMSType, List<ModelCode>>();
-
-                foreach (long relatedGid in relatedGids)
-                {
-                    DMSType entityDmsType = (DMSType)ModelCodeHelper.ExtractTypeFromGlobalId(relatedGid);
-
-                    if (!class2PropertyIDs.ContainsKey(entityDmsType))
-                    {
-                        class2PropertyIDs.Add(entityDmsType, properties);
-                    }
-                }
-
-                ResourceIterator ri = new ResourceIterator(relatedGids, class2PropertyIDs, this);
-
-                Logger.LogInfo($"Getting related values for source: 0x{source:X16} succedded.");
-
-                return ri;
-            }
-            catch (Exception ex)
-            {
-                string message = String.Format("Failed to get related values for source GID: 0x{0:X16}. {1}.", source, ex.Message);
-                Logger.LogError(message, ex);
-                throw new Exception(message);
-            }
-        }
-
-        #endregion GDA query	
-
-
-        public UpdateResult ApplyDelta(Delta delta, bool isInitialization = false)
-        {
-            //InitializeNetworkModel();
 
             currentDelta = delta;
 
@@ -297,7 +210,7 @@ namespace NMS.GdaImplementation
 
             try
             {
-                Logger.LogInfo("Applying delta to network model.");
+                Logger.LogInformation("Applying delta to network model.");
 
                 Dictionary<short, int> typesCounters = GetCounters();
                 Dictionary<long, long> globalIdPairs = new Dictionary<long, long>();
@@ -362,7 +275,7 @@ namespace NMS.GdaImplementation
                 if (updateResult.Result == ResultType.Succeeded)
                 {
                     string message = "Applying delta to network model successfully finished.";
-                    Logger.LogInfo(message);
+                    Logger.LogInformation(message);
                     updateResult.Message = message;
                 }
             }
@@ -370,6 +283,155 @@ namespace NMS.GdaImplementation
             return updateResult;
         }
 
+        /// <summary>
+        /// Gets resource description for entity requested by globalId.
+        /// </summary>
+        /// <param name="globalId">Id of the entity</param>
+        /// <param name="properties">List of requested properties</param>		
+        /// <returns>Resource description of the specified entity</returns>
+        public async Task<ResourceDescription> GetValues(long globalId, List<ModelCode> properties)
+        {
+            while (!isNetworkModelInitialized)
+            {
+                await Task.Delay(1000);
+            }
+
+            if (!isTransactionInProgress)
+            {
+                await InitializeNetworkModel();
+            }
+
+            Logger.LogDebug($"Getting values for GID: 0x{globalId:X16}.");
+
+            try
+            {
+                IdentifiedObject io = GetEntity(globalId);
+
+                ResourceDescription rd = new ResourceDescription(globalId);
+
+                Property property = null;
+
+                // insert specified properties
+                foreach (ModelCode propId in properties)
+                {
+                    property = new Property(propId);
+                    io.GetProperty(property);
+                    rd.AddProperty(property);
+                }
+
+                Logger.LogDebug($"Getting values for GID: 0x{globalId:X16} succedded.");
+
+                return rd;
+            }
+            catch (Exception ex)
+            {
+                string message = string.Format("Failed to get values for entity with GID: 0x{0:X16}. {1}", globalId, ex.Message);
+                Logger.LogError(message, ex);
+                throw new Exception(message);
+            }
+        }
+
+        /// <summary>
+        /// Gets resource iterator that holds descriptions for all entities of the specified type.
+        /// </summary>		
+        /// <param name="type">Type of entity that is requested</param>
+        /// <param name="properties">List of requested properties</param>		
+        /// <returns>Resource iterator for the requested entities</returns>
+        public async Task<ResourceIterator> GetExtentValues(ModelCode entityType, List<ModelCode> properties)
+        {
+            while (!isNetworkModelInitialized)
+            {
+                await Task.Delay(1000);
+            }
+
+            if (!isTransactionInProgress)
+            {
+                await InitializeNetworkModel();
+            }
+
+            Logger.LogDebug($"Getting extent values for entity type: {entityType}.");
+
+            try
+            {
+                List<long> globalIds = new List<long>();
+                Dictionary<DMSType, List<ModelCode>> class2PropertyIDs = new Dictionary<DMSType, List<ModelCode>>();
+
+                DMSType entityDmsType = ModelCodeHelper.GetTypeFromModelCode(entityType);
+
+                if (NetworkDataModel.ContainsKey(entityDmsType))
+                {
+                    Container container = NetworkDataModel[entityDmsType];
+                    globalIds = container.GetEntitiesGlobalIds();
+                    class2PropertyIDs.Add(entityDmsType, properties);
+                }
+
+                ResourceIterator ri = new ResourceIterator(globalIds, class2PropertyIDs, this);
+
+                Logger.LogDebug($"Getting extent values for entity type: {entityType} succedded.");
+
+                return ri;
+            }
+            catch (Exception ex)
+            {
+                string message = string.Format("Failed to get extent values for entity type: {0}. {1}", entityType, ex.Message);
+                Logger.LogError(message, ex);
+                throw new Exception(message);
+            }
+        }
+
+        /// <summary>
+        /// Gets resource iterator that holds descriptions for all entities related to specified source.
+        /// </summary>
+        /// <param name="contextId">Context Id</param>
+        /// <param name="properties">List of requested properties</param>
+        /// <param name="association">Relation between source and entities that should be returned</param>
+        /// <param name="source">Id of entity that is start for association search</param>
+        /// <param name="typeOfQuery">Query type choice(global or local)</param>
+        /// <returns>Resource iterator for the requested entities</returns>
+        public async Task<ResourceIterator> GetRelatedValues(long source, List<ModelCode> properties, Association association)
+        {
+            while (!isNetworkModelInitialized)
+            {
+                await Task.Delay(1000);
+            }
+
+            if (!isTransactionInProgress)
+            {
+                await InitializeNetworkModel();
+            }
+
+            Logger.LogDebug($"Getting related values for source: 0x{source:X16}.");
+
+            try
+            {
+                List<long> relatedGids = ApplyAssocioationOnSource(source, association);
+
+                Dictionary<DMSType, List<ModelCode>> class2PropertyIDs = new Dictionary<DMSType, List<ModelCode>>();
+
+                foreach (long relatedGid in relatedGids)
+                {
+                    DMSType entityDmsType = (DMSType)ModelCodeHelper.ExtractTypeFromGlobalId(relatedGid);
+
+                    if (!class2PropertyIDs.ContainsKey(entityDmsType))
+                    {
+                        class2PropertyIDs.Add(entityDmsType, properties);
+                    }
+                }
+
+                ResourceIterator ri = new ResourceIterator(relatedGids, class2PropertyIDs, this);
+
+                Logger.LogDebug($"Getting related values for source: 0x{source:X16} succedded.");
+
+                return ri;
+            }
+            catch (Exception ex)
+            {
+                string message = String.Format("Failed to get related values for source GID: 0x{0:X16}. {1}.", source, ex.Message);
+                Logger.LogError(message, ex);
+                throw new Exception(message);
+            }
+        }
+        #endregion GDA query	
 
         #region ITransactionActorContract
         public bool Prepare()
@@ -407,47 +469,6 @@ namespace NMS.GdaImplementation
         #endregion
 
         #region Private Members
-        private void InitializeNetworkModel()
-        {
-            long deltaVersion = 0, networkModelVersion = 0;
-
-            mongoDb.GetVersions(ref networkModelVersion, ref deltaVersion);
-
-            if (deltaVersion > networkModelVersion)
-            {
-                Logger.LogDebug("Delta version is higher then network model version.");
-
-                networkDataModel = mongoDb.GetLatesNetworkModel(networkModelVersion);
-                List<Delta> deltas = mongoDb.GetAllDeltas(deltaVersion, networkModelVersion);
-
-                foreach (Delta delta in deltas)
-                {
-                    try
-                    {
-                        ApplyDelta(delta, true);
-                    }
-                    catch (Exception ex)
-                    {
-                        Logger.LogError($"Error while applying delta (id: {delta.Id}) durning service initialization. {ex.Message}", ex);
-                    }
-                }
-
-                mongoDb.SaveNetworkModel(NetworkDataModel);
-            }
-            else if (networkModelVersion > 0)
-            {
-                networkDataModel = mongoDb.GetLatesNetworkModel(networkModelVersion);
-            }
-            else if(deltaVersion==0 && networkModelVersion==0)
-            {
-                return;
-            }
-            else
-            {
-                throw new NotImplementedException("InitializeNetworkModel => else path...");
-            }
-        }
-
         private async Task StartDistributedTransaction(Delta delta)
         {
             isTransactionInProgress = true;
@@ -456,7 +477,7 @@ namespace NMS.GdaImplementation
 
             if (transactionCoordinatorClient == null)
             {
-                Logger.LogWarn("TransactionCoordinatorClient is not initialized. This can be due to TransactionCoordinator not being stared.");
+                Logger.LogWarning("TransactionCoordinatorClient is not initialized. This can be due to TransactionCoordinator not being stared.");
                 Commit(false);
                 return;
             }
@@ -494,7 +515,7 @@ namespace NMS.GdaImplementation
             if (scadaModelUpdateNotifierClient == null)
             {
                 string message = "ModelUpdateNotificationProxy for SCADA is null.";
-                Logger.LogWarn(message);
+                Logger.LogWarning(message);
                 throw new NullReferenceException(message);
             }
 
@@ -510,7 +531,7 @@ namespace NMS.GdaImplementation
                 if (calculationEngineUpdateNotifierClient == null)
                 {
                     string message = "ModelUpdateNotificationProxy for CalculationEngine is null.";
-                    Logger.LogWarn(message);
+                    Logger.LogWarning(message);
                     throw new NullReferenceException(message);
                 }
 
@@ -525,7 +546,7 @@ namespace NMS.GdaImplementation
                     if (outageModelUpdateNotifierClient == null)
                     {
                         string message = "ModelUpdateNotificationProxy for Outage is null.";
-                        Logger.LogWarn(message);
+                        Logger.LogWarning(message);
                         throw new NullReferenceException(message);
                     }
 
@@ -540,11 +561,11 @@ namespace NMS.GdaImplementation
                         if (transactionEnlistmentClient == null)
                         {
                             string message = "TransactionEnlistmentProxy is null.";
-                            Logger.LogWarn(message);
+                            Logger.LogWarning(message);
                             throw new NullReferenceException(message);    
                         }
 
-                        success = transactionEnlistmentClient.Enlist(ServiceNames.NetworkModelService);
+                        success = await transactionEnlistmentClient.Enlist(MicroserviceNames.NmsGdaService);
                         Logger.LogDebug("Enlist() method invoked on Transaction Coordinator.");
                     }
                 }
@@ -553,7 +574,7 @@ namespace NMS.GdaImplementation
             if (transactionCoordinatorClient == null)
             {
                 string message = "TransactionCoordinatorClient is null.";
-                Logger.LogWarn(message);
+                Logger.LogWarning(message);
                 throw new NullReferenceException(message);
             }
 
@@ -586,12 +607,12 @@ namespace NMS.GdaImplementation
         {
             if (rd == null)
             {
-                Logger.LogInfo("Insert entity is not done because update operation is empty.");
+                Logger.LogInformation("Insert entity is not done because update operation is empty.");
                 return;
             }
 
             long globalId = rd.Id;
-            Logger.LogInfo($"Inserting entity with GID: 0x{globalId:X16}");
+            Logger.LogInformation($"Inserting entity with GID: 0x{globalId:X16}");
 
             // check if mapping for specified global id already exists			
             if (this.EntityExistsInIncomingData(globalId))
@@ -697,7 +718,7 @@ namespace NMS.GdaImplementation
                     }
                 }
 
-                Logger.LogInfo($"Inserting entity with GID: 0x{globalId:X16} successfully finished.");
+                Logger.LogInformation($"Inserting entity with GID: 0x{globalId:X16} successfully finished.");
             }
             catch (Exception ex)
             {
@@ -715,14 +736,14 @@ namespace NMS.GdaImplementation
         {
             if (rd == null || rd.Properties == null && rd.Properties.Count == 0)
             {
-                Logger.LogInfo("Update entity is not done because update operation is empty.");
+                Logger.LogInformation("Update entity is not done because update operation is empty.");
                 return;
             }
 
             try
             {
                 long globalId = rd.Id;
-                Logger.LogInfo($"Updating entity with GID: 0x{globalId:X16}.");
+                Logger.LogInformation($"Updating entity with GID: 0x{globalId:X16}.");
 
                 if (!this.EntityExistsInIncomingData(globalId))
                 {
@@ -851,7 +872,7 @@ namespace NMS.GdaImplementation
                     }
                 }
 
-                Logger.LogInfo($"Updating entity with GID: 0x{globalId:X16} successfully finished.");
+                Logger.LogInformation($"Updating entity with GID: 0x{globalId:X16} successfully finished.");
             }
             catch (Exception ex)
             {
@@ -869,14 +890,14 @@ namespace NMS.GdaImplementation
         {
             if (rd == null)
             {
-                Logger.LogInfo("Delete entity is not done because update operation is empty.");
+                Logger.LogInformation("Delete entity is not done because update operation is empty.");
                 return;
             }
 
             try
             {
                 long globalId = rd.Id;
-                Logger.LogInfo($"Deleting entity with GID: 0x{globalId:X16}");
+                Logger.LogInformation($"Deleting entity with GID: 0x{globalId:X16}");
 
                 // check if entity exists
                 if (!this.EntityExistsInIncomingData(globalId))
@@ -991,7 +1012,7 @@ namespace NMS.GdaImplementation
 
                 // remove entity form netowrk model
                 incomingContainer.RemoveEntity(globalId);
-                Logger.LogInfo($"Deleting entity with GID: 0x{globalId:X16} successfully finished.");
+                Logger.LogInformation($"Deleting entity with GID: 0x{globalId:X16} successfully finished.");
             }
             catch (Exception ex)
             {

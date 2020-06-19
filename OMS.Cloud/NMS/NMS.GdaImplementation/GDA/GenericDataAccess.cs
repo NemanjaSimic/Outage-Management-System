@@ -1,6 +1,7 @@
-﻿using OMS.Common.NmsContracts;
+﻿using OMS.Common.Cloud;
+using OMS.Common.Cloud.Logger;
+using OMS.Common.NmsContracts;
 using OMS.Common.NmsContracts.GDA;
-using Outage.Common;
 using System;
 using System.Collections.Generic;
 using System.Threading.Tasks;
@@ -9,11 +10,11 @@ namespace NMS.GdaImplementation.GDA
 {
     public class GenericDataAccess : INetworkModelGDAContract
     {
-        private ILogger logger;
+        private ICloudLogger logger;
 
-        protected ILogger Logger
+        private ICloudLogger Logger
         {
-            get { return logger ?? (logger = LoggerWrapper.Instance); }
+            get { return logger ?? (logger = CloudLoggerFactory.GetLogger()); }
         }
 
         private static Dictionary<int, ResourceIterator> resourceIterators = new Dictionary<int, ResourceIterator>();
@@ -28,14 +29,14 @@ namespace NMS.GdaImplementation.GDA
 
         public async Task<UpdateResult> ApplyUpdate(Delta delta)
         {
-            return networkModel.ApplyDelta(delta);
+            return await networkModel.ApplyDelta(delta);
         }
 
         public async Task<ResourceDescription> GetValues(long resourceId, List<ModelCode> propIds)
         {
             try
             {
-                ResourceDescription retVal = networkModel.GetValues(resourceId, propIds);
+                ResourceDescription retVal = await networkModel.GetValues(resourceId, propIds);
                 return retVal;
             }
             catch (Exception ex)
@@ -50,7 +51,7 @@ namespace NMS.GdaImplementation.GDA
         {
             try
             {
-                ResourceIterator ri = networkModel.GetExtentValues(entityType, propIds);
+                ResourceIterator ri = await networkModel.GetExtentValues(entityType, propIds);
                 int retVal = AddIterator(ri);
                 return retVal;
             }
@@ -66,7 +67,7 @@ namespace NMS.GdaImplementation.GDA
         {
             try
             {
-                ResourceIterator ri = networkModel.GetRelatedValues(source, propIds, association);
+                ResourceIterator ri = await networkModel.GetRelatedValues(source, propIds, association);
                 int retVal =  AddIterator(ri);
                 return retVal;
             }
@@ -83,7 +84,7 @@ namespace NMS.GdaImplementation.GDA
             try
             {
                 ResourceIterator iterator = GetIterator(id);
-                return iterator.Next(n);
+                return await iterator.Next(n);
             }
             catch (Exception ex)
             {

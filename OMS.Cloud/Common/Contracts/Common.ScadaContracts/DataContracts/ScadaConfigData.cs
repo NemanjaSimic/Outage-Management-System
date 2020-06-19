@@ -1,4 +1,4 @@
-﻿using Common.SCADA;
+﻿using OMS.Common.SCADA;
 using System.Net;
 using System.Runtime.Serialization;
 
