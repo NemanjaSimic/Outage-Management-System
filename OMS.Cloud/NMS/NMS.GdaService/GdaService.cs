@@ -9,8 +9,10 @@ using Microsoft.ServiceFabric.Services.Communication.Wcf.Runtime;
 using Microsoft.ServiceFabric.Services.Runtime;
 using NMS.GdaImplementation;
 using NMS.GdaImplementation.GDA;
+using OMS.Common.Cloud.Logger;
+using OMS.Common.Cloud.Names;
 using OMS.Common.NmsContracts;
-using Outage.Common;
+
 
 namespace NMS.GdaService
 {
@@ -19,32 +21,32 @@ namespace NMS.GdaService
     /// </summary>
     internal sealed class GdaService : StatelessService
     {
-        private NetworkModel networkModel;
+        private readonly ICloudLogger logger;
+
+        private readonly NetworkModel networkModel;
 
         public GdaService(StatelessServiceContext context)
             : base(context)
         {
+            logger = CloudLoggerFactory.GetLogger();
+
             try
             {
-                _ = Config.GetInstance(Context);
-                ServiceEventSource.Current.ServiceMessage(this.Context, $"[GdaService] Configuration initialized.");
-                
+                _ = Config.GetInstance(this.Context);
+                string message = "Configuration initialized.";
+                logger.LogInformation(message);
+                ServiceEventSource.Current.ServiceMessage(this.Context, $"[GdaService | Information] {message}");
+
                 this.networkModel = new NetworkModel();
+                message = "NetworkModel created.";
+                logger.LogInformation(message);
+                ServiceEventSource.Current.ServiceMessage(this.Context, $"[GdaService | Information] {message}");
             }
             catch (Exception e)
             {
-                ServiceEventSource.Current.ServiceMessage(this.Context, $"[GdaService] Error: {e.Message}");
+                logger.LogError(e.Message, e);
+                ServiceEventSource.Current.ServiceMessage(this.Context, $"[GdaService | Error] {e.Message}");
             }
-        }
-
-        protected async override Task OnOpenAsync(CancellationToken cancellationToken)
-        {
-            cancellationToken.ThrowIfCancellationRequested();
-
-            ////FOR DEBUGING IN AZURE DEPLOYMENT (time to atach to process)
-            //await Task.Delay(60000);
-
-            await base.OnOpenAsync(cancellationToken);
         }
 
         /// <summary>
@@ -83,11 +85,14 @@ namespace NMS.GdaService
             try
             {
                 await this.networkModel.InitializeNetworkModel();
-                ServiceEventSource.Current.ServiceMessage(this.Context, $"[GdaService] NetworkModel initialized.");
+                string message = $"NetworkModel initialized.";
+                logger.LogInformation(message);
+                ServiceEventSource.Current.ServiceMessage(this.Context, $"[GdaService | Information] {message}");
             }
             catch (Exception e)
             {
-                ServiceEventSource.Current.ServiceMessage(this.Context, $"[GdaService] Error: {e.Message}");
+                logger.LogError(e.Message, e);
+                ServiceEventSource.Current.ServiceMessage(this.Context, $"[GdaService | Error] {e.Message}");
             }
         }
     }

@@ -1,26 +1,32 @@
-﻿using OMS.Common.Cloud.WcfServiceFabricClients.SCADA;
+﻿using OMS.Common.Cloud.Logger;
 using OMS.Common.SCADA;
 using OMS.Common.ScadaContracts.DataContracts.ModbusFunctions;
-using Outage.Common;
+using OMS.Common.WcfClient.SCADA;
 using System;
 using System.Collections.Generic;
+using System.Fabric;
 using System.Threading.Tasks;
 
 namespace SCADA.AcquisitionImplementation
 {
     public class AcquisitionCycle
     {
+        private readonly ServiceContext context;
+
         private ReadCommandEnqueuerClient commandEnqueuerClient;
         private ScadaModelReadAccessClient readAccessClient;
 
-        private ILogger logger;
-        private ILogger Logger
+        private ICloudLogger logger;
+
+        private ICloudLogger Logger
         {
-            get { return logger ?? (logger = LoggerWrapper.Instance); }
+            get { return logger ?? (logger = CloudLoggerFactory.GetLogger()); }
         }
 
-        public AcquisitionCycle()
-        {
+        public AcquisitionCycle(ServiceContext context)
+        { 
+            this.context = context;
+
             this.commandEnqueuerClient = ReadCommandEnqueuerClient.CreateClient();
             this.readAccessClient = ScadaModelReadAccessClient.CreateClient();
         }
@@ -36,13 +42,16 @@ namespace SCADA.AcquisitionImplementation
                     if (TryCreateModbusFunction(kvp, out IReadModbusFunction modbusFunction))
                     {
                         await commandEnqueuerClient.EnqueueReadCommand(modbusFunction);
-                        //Logger.LogDebug($"Modbus function enquided. Point type is {kvp.Key}, quantity {modbusFunction.Quantity}.");
+                        Logger.LogVerbose($"Modbus function enquided. Point type is {kvp.Key}, FunctionCode: {modbusFunction.FunctionCode}, StartAddress: {modbusFunction.StartAddress}, Quantity: {modbusFunction.Quantity}.");
                     }
                 }
             }
             catch (Exception e)
             {
-                if(!isRetry)
+                string message = "Exception caught in AcquisitionCycle. Start method.";
+                Logger.LogError(message, e);
+
+                if (!isRetry)
                 {
                     this.commandEnqueuerClient = ReadCommandEnqueuerClient.CreateClient();
                     this.readAccessClient = ScadaModelReadAccessClient.CreateClient();
@@ -50,7 +59,7 @@ namespace SCADA.AcquisitionImplementation
                 }
                 else
                 {
-                    string message = "Exception caught in AcquisitionCycle.Start method.";
+                    message = "Exception caught in (Retry) AcquisitionCycle. Start method.";
                     Logger.LogError(message, e);
                     throw e;
                 }
@@ -68,10 +77,9 @@ namespace SCADA.AcquisitionImplementation
             {
                 functionCode = MapPointTypeToModbusFunctionCode(pointType);
             }
-            catch (ArgumentException)
+            catch (ArgumentException ae)
             {
-                string message = $"PointType:{pointType} value is invalid";
-                Logger.LogError(message);
+                Logger.LogVerbose(ae.Message); //recomended to be verbose
                 return false;
             }
 
@@ -104,7 +112,7 @@ namespace SCADA.AcquisitionImplementation
                     return ModbusFunctionCode.READ_INPUT_REGISTERS;
             }
 
-            throw new ArgumentException("MapPointTypeToModbusFunctionCode");
+            throw new ArgumentException($"PointType {pointType} is not asociated with any member of {typeof(ModbusFunctionCode)}");
         }
     }
 }

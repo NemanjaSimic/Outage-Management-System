@@ -3,22 +3,24 @@ using System.IO;
 using System.Text;
 using System.Windows.Forms;
 using System.Xml;
-using Outage.Common;
+
 using Outage.DataImporter.CIMAdapter;
 using Outage.DataImporter.CIMAdapter.Manager;
 using System.Windows.Threading;
 using System.Threading.Tasks;
 using OMS.Common.NmsContracts.GDA;
+using OMS.Common.Cloud.Logger;
+using OMS.Common.NmsContracts;
 
 namespace Outage.DataImporter.ModelLabsApp
 {
-	public partial class ModelLabsAppForm : Form
+    public partial class ModelLabsAppForm : Form
 	{
-		private ILogger logger;
+		private ICloudLogger logger;
 
-        protected ILogger Logger
+        private ICloudLogger Logger
         {
-            get { return logger ?? (logger = LoggerWrapper.Instance); }
+            get { return logger ?? (logger = CloudLoggerFactory.GetLogger()); }
         }
 
 		private readonly EnumDescs enumDescs;
@@ -76,7 +78,7 @@ namespace Outage.DataImporter.ModelLabsApp
                 if (textBoxCIMFile.Text == string.Empty)
                 {
                     MessageBox.Show("Must enter CIM/XML file.", "Info", MessageBoxButtons.OK, MessageBoxIcon.Information);
-                    Logger.LogInfo("Must enter CIM/XML file.");
+                    Logger.LogInformation("Must enter CIM/XML file.");
                     return;
                 }
 
@@ -87,7 +89,7 @@ namespace Outage.DataImporter.ModelLabsApp
 				{
 					nmsDeltaResult = await adapter.CreateDelta(fs, (SupportedProfiles)(comboBoxProfile.SelectedItem), logBuilder);
 
-                    Logger.LogInfo(logBuilder.ToString());
+                    Logger.LogInformation(logBuilder.ToString());
 					richTextBoxReport.Text = logBuilder.ToString();
 				}
 
@@ -118,7 +120,7 @@ namespace Outage.DataImporter.ModelLabsApp
             if (!nmsDeltaResult.HasValue)
 			{
 				MessageBox.Show("No data is imported into delta object.", "Info", MessageBoxButtons.OK, MessageBoxIcon.Information);
-				Logger.LogInfo("No data is imported into delta object.");
+				Logger.LogInformation("No data is imported into delta object.");
 				return;
 			}
 

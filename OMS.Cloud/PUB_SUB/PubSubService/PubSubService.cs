@@ -3,15 +3,17 @@ using System.Collections.Generic;
 using System.Fabric;
 using System.Threading;
 using System.Threading.Tasks;
-using Common.PubSubContracts;
 using Microsoft.ServiceFabric.Data;
 using Microsoft.ServiceFabric.Data.Collections;
 using Microsoft.ServiceFabric.Services.Communication.Runtime;
 using Microsoft.ServiceFabric.Services.Communication.Wcf;
 using Microsoft.ServiceFabric.Services.Communication.Wcf.Runtime;
 using Microsoft.ServiceFabric.Services.Runtime;
+using OMS.Common.Cloud.Logger;
+using OMS.Common.Cloud.Names;
 using OMS.Common.PubSub;
-using Outage.Common;
+using OMS.Common.PubSubContracts;
+
 using PubSubImplementation;
 
 namespace PubSubService
@@ -21,14 +23,30 @@ namespace PubSubService
     /// </summary>
     internal sealed class PubSubService : StatefulService
     {
+        private readonly ICloudLogger logger;
+
         private readonly PublisherProvider publisherProvider;
         private readonly RegisterSubscriberProvider registerSubscriberProvider;
 
         public PubSubService(StatefulServiceContext context)
             : base(context)
         {
-            this.publisherProvider = new PublisherProvider(this.StateManager);
-            this.registerSubscriberProvider = new RegisterSubscriberProvider(this.StateManager);
+            logger = CloudLoggerFactory.GetLogger();
+
+            try
+            {
+                this.publisherProvider = new PublisherProvider(this.StateManager);
+                this.registerSubscriberProvider = new RegisterSubscriberProvider(this.StateManager);
+
+                string message = "Contract providers initialized.";
+                logger.LogInformation(message);
+                ServiceEventSource.Current.ServiceMessage(this.Context, $"[PubSubService | Information] {message}");
+            }
+            catch (Exception e)
+            {
+                logger.LogError(e.Message, e);
+                ServiceEventSource.Current.ServiceMessage(this.Context, $"[PubSubService | Error] {e.Message}");
+            }
         }
 
         /// <summary>
@@ -75,14 +93,15 @@ namespace PubSubService
             try
             {
                 InitializeReliableCollections();
-                ServiceEventSource.Current.ServiceMessage(this.Context, $"[PubSubService] ReliableDictionaries initialized.");
 
-                //await scadaModel.InitializeScadaModel();
-                //ServiceEventSource.Current.ServiceMessage(this.Context, $"[PubSubService] ScadaModel initialized.");
+                string message = "ReliableDictionaries initialized.";
+                logger.LogInformation(message);
+                ServiceEventSource.Current.ServiceMessage(this.Context, $"[PubSubService | Information] {message}");
             }
             catch (Exception e)
             {
-                ServiceEventSource.Current.ServiceMessage(this.Context, $"[PubSubService] Error: {e.Message}");
+                logger.LogError(e.Message, e);
+                ServiceEventSource.Current.ServiceMessage(this.Context, $"[PubSubService | Error] {e.Message}");
             }
         }
 

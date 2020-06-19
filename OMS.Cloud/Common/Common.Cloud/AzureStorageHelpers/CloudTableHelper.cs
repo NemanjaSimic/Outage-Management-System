@@ -1,19 +1,19 @@
 ﻿using Microsoft.WindowsAzure.Storage;
 using Microsoft.WindowsAzure.Storage.Table;
-using Outage.Common;
+using OMS.Common.Cloud.Logger;
 using System;
 using System.Configuration;
 
 namespace OMS.Common.Cloud.AzureStorageHelpers
 {
-    public static class CloudTableHelper
+    public class CloudTableHelper
     {
         public static bool TryGetTable(string queueName, out CloudTable table)
         {
-            ILogger logger = LoggerWrapper.Instance;
-
             bool success;
             table = null;
+
+            ICloudLogger logger = CloudLoggerFactory.GetLogger();
 
             try
             {

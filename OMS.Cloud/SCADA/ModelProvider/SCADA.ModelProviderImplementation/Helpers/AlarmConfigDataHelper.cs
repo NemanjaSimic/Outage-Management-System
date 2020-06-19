@@ -1,12 +1,12 @@
-﻿using OMS.Common.SCADA;
+﻿using OMS.Common.Cloud.Logger;
+using OMS.Common.SCADA;
 using OMS.Common.ScadaContracts.DataContracts;
-using Outage.Common;
 using System;
 using System.Configuration;
 
 namespace SCADA.ModelProviderImplementation.Helpers
 {
-	internal static class AlarmConfigDataHelper
+    internal class AlarmConfigDataHelper
 	{
 		private static readonly object lockSync = new object();
 		private static IAlarmConfigData alarmConfigData;
@@ -29,7 +29,7 @@ namespace SCADA.ModelProviderImplementation.Helpers
 
 		private static IAlarmConfigData ImportAppSettings()
 		{
-			ILogger logger = LoggerWrapper.Instance;
+			ICloudLogger logger = CloudLoggerFactory.GetLogger();
 			AlarmConfigData data = new AlarmConfigData();
 
 			if (ConfigurationManager.AppSettings["LowPowerLimit"] is string lowPowerLimitSetting)

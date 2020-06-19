@@ -11,13 +11,13 @@ using System.ServiceModel;
 namespace Outage.Common.ServiceContracts.PubSub
 {
     [ServiceContract(CallbackContract = typeof(ISubscriberCallback))]
-    public interface ISubscriber : IService
+    public interface ISubscriber
     {
         [OperationContract(IsOneWay = true)]
         void Subscribe(Topic topic);
     }
 
-    public interface ISubscriberCallback : IService
+    public interface ISubscriberCallback
     {
         [OperationContract]
         string GetSubscriberName();

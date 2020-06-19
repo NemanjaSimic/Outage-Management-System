@@ -1,11 +1,15 @@
 ﻿using System;
 using System.Collections.Generic;
-using Outage.Common;
+
 using OMS.Common.NmsContracts.GDA;
+using OMS.Common.Cloud.Logger;
+using OMS.Common.NmsContracts;
+using OMS.Common.Cloud;
+using OMS.Common.Cloud.Exceptions.NMS;
 
 namespace NMS.DataModel
 {
-	public enum TypeOfReference : short
+    public enum TypeOfReference : short
 	{
 		Reference = 1,
 		Target = 2,
@@ -14,7 +18,12 @@ namespace NMS.DataModel
 
 	public class IdentifiedObject //: ICloneable
 	{
-		protected ILogger Logger = LoggerWrapper.Instance;
+		private ICloudLogger logger;
+
+		protected ICloudLogger Logger
+		{
+			get { return logger ?? (logger = CloudLoggerFactory.GetLogger()); }
+		}
 
 		/// <summary>
 		/// Model Resources Description

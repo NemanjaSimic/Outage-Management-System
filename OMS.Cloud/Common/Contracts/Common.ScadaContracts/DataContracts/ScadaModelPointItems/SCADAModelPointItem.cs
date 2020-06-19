@@ -1,4 +1,4 @@
-﻿using Outage.Common;
+﻿using OMS.Common.Cloud;
 using OMS.Common.SCADA;
 using System.Runtime.Serialization;
 

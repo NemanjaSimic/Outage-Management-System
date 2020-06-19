@@ -1,8 +1,11 @@
 ﻿using NMS.DataModel;
 using NMS.GdaImplementation.GDA;
-using OMS.Common.Cloud.WcfServiceFabricClients.TMS;
+using OMS.Common.Cloud;
+using OMS.Common.Cloud.Logger;
+using OMS.Common.Cloud.Names;
+using OMS.Common.NmsContracts;
 using OMS.Common.NmsContracts.GDA;
-using Outage.Common; 
+using OMS.Common.WcfClient.TMS;
 using System;
 using System.Collections.Generic;
 using System.Text;
@@ -14,11 +17,11 @@ namespace NMS.GdaImplementation
     public class NetworkModel
     {
         #region Fields
-        private ILogger logger;
+        private ICloudLogger logger;
 
-        protected ILogger Logger
+        private ICloudLogger Logger
         {
-            get { return logger ?? (logger = LoggerWrapper.Instance); }
+            get { return logger ?? (logger = CloudLoggerFactory.GetLogger()); }
         }
 
         private MongoAccess mongoDb;
@@ -207,7 +210,7 @@ namespace NMS.GdaImplementation
 
             try
             {
-                Logger.LogInfo("Applying delta to network model.");
+                Logger.LogInformation("Applying delta to network model.");
 
                 Dictionary<short, int> typesCounters = GetCounters();
                 Dictionary<long, long> globalIdPairs = new Dictionary<long, long>();
@@ -272,7 +275,7 @@ namespace NMS.GdaImplementation
                 if (updateResult.Result == ResultType.Succeeded)
                 {
                     string message = "Applying delta to network model successfully finished.";
-                    Logger.LogInfo(message);
+                    Logger.LogInformation(message);
                     updateResult.Message = message;
                 }
             }
@@ -298,7 +301,7 @@ namespace NMS.GdaImplementation
                 await InitializeNetworkModel();
             }
 
-            Logger.LogInfo($"Getting values for GID: 0x{globalId:X16}.");
+            Logger.LogDebug($"Getting values for GID: 0x{globalId:X16}.");
 
             try
             {
@@ -315,7 +318,8 @@ namespace NMS.GdaImplementation
                     io.GetProperty(property);
                     rd.AddProperty(property);
                 }
-                Logger.LogInfo($"Getting values for GID: 0x{globalId:X16} succedded.");
+
+                Logger.LogDebug($"Getting values for GID: 0x{globalId:X16} succedded.");
 
                 return rd;
             }
@@ -345,7 +349,7 @@ namespace NMS.GdaImplementation
                 await InitializeNetworkModel();
             }
 
-            Logger.LogInfo($"Getting extent values for entity type: {entityType}.");
+            Logger.LogDebug($"Getting extent values for entity type: {entityType}.");
 
             try
             {
@@ -363,7 +367,7 @@ namespace NMS.GdaImplementation
 
                 ResourceIterator ri = new ResourceIterator(globalIds, class2PropertyIDs, this);
 
-                Logger.LogInfo($"Getting extent values for entity type: {entityType} succedded.");
+                Logger.LogDebug($"Getting extent values for entity type: {entityType} succedded.");
 
                 return ri;
             }
@@ -396,7 +400,7 @@ namespace NMS.GdaImplementation
                 await InitializeNetworkModel();
             }
 
-            Logger.LogInfo($"Getting related values for source: 0x{source:X16}.");
+            Logger.LogDebug($"Getting related values for source: 0x{source:X16}.");
 
             try
             {
@@ -416,7 +420,7 @@ namespace NMS.GdaImplementation
 
                 ResourceIterator ri = new ResourceIterator(relatedGids, class2PropertyIDs, this);
 
-                Logger.LogInfo($"Getting related values for source: 0x{source:X16} succedded.");
+                Logger.LogDebug($"Getting related values for source: 0x{source:X16} succedded.");
 
                 return ri;
             }
@@ -473,7 +477,7 @@ namespace NMS.GdaImplementation
 
             if (transactionCoordinatorClient == null)
             {
-                Logger.LogWarn("TransactionCoordinatorClient is not initialized. This can be due to TransactionCoordinator not being stared.");
+                Logger.LogWarning("TransactionCoordinatorClient is not initialized. This can be due to TransactionCoordinator not being stared.");
                 Commit(false);
                 return;
             }
@@ -511,7 +515,7 @@ namespace NMS.GdaImplementation
             if (scadaModelUpdateNotifierClient == null)
             {
                 string message = "ModelUpdateNotificationProxy for SCADA is null.";
-                Logger.LogWarn(message);
+                Logger.LogWarning(message);
                 throw new NullReferenceException(message);
             }
 
@@ -527,7 +531,7 @@ namespace NMS.GdaImplementation
                 if (calculationEngineUpdateNotifierClient == null)
                 {
                     string message = "ModelUpdateNotificationProxy for CalculationEngine is null.";
-                    Logger.LogWarn(message);
+                    Logger.LogWarning(message);
                     throw new NullReferenceException(message);
                 }
 
@@ -542,7 +546,7 @@ namespace NMS.GdaImplementation
                     if (outageModelUpdateNotifierClient == null)
                     {
                         string message = "ModelUpdateNotificationProxy for Outage is null.";
-                        Logger.LogWarn(message);
+                        Logger.LogWarning(message);
                         throw new NullReferenceException(message);
                     }
 
@@ -557,11 +561,11 @@ namespace NMS.GdaImplementation
                         if (transactionEnlistmentClient == null)
                         {
                             string message = "TransactionEnlistmentProxy is null.";
-                            Logger.LogWarn(message);
+                            Logger.LogWarning(message);
                             throw new NullReferenceException(message);    
                         }
 
-                        success = transactionEnlistmentClient.Enlist(ServiceNames.NetworkModelService);
+                        success = await transactionEnlistmentClient.Enlist(MicroserviceNames.NmsGdaService);
                         Logger.LogDebug("Enlist() method invoked on Transaction Coordinator.");
                     }
                 }
@@ -570,7 +574,7 @@ namespace NMS.GdaImplementation
             if (transactionCoordinatorClient == null)
             {
                 string message = "TransactionCoordinatorClient is null.";
-                Logger.LogWarn(message);
+                Logger.LogWarning(message);
                 throw new NullReferenceException(message);
             }
 
@@ -603,12 +607,12 @@ namespace NMS.GdaImplementation
         {
             if (rd == null)
             {
-                Logger.LogInfo("Insert entity is not done because update operation is empty.");
+                Logger.LogInformation("Insert entity is not done because update operation is empty.");
                 return;
             }
 
             long globalId = rd.Id;
-            Logger.LogInfo($"Inserting entity with GID: 0x{globalId:X16}");
+            Logger.LogInformation($"Inserting entity with GID: 0x{globalId:X16}");
 
             // check if mapping for specified global id already exists			
             if (this.EntityExistsInIncomingData(globalId))
@@ -714,7 +718,7 @@ namespace NMS.GdaImplementation
                     }
                 }
 
-                Logger.LogInfo($"Inserting entity with GID: 0x{globalId:X16} successfully finished.");
+                Logger.LogInformation($"Inserting entity with GID: 0x{globalId:X16} successfully finished.");
             }
             catch (Exception ex)
             {
@@ -732,14 +736,14 @@ namespace NMS.GdaImplementation
         {
             if (rd == null || rd.Properties == null && rd.Properties.Count == 0)
             {
-                Logger.LogInfo("Update entity is not done because update operation is empty.");
+                Logger.LogInformation("Update entity is not done because update operation is empty.");
                 return;
             }
 
             try
             {
                 long globalId = rd.Id;
-                Logger.LogInfo($"Updating entity with GID: 0x{globalId:X16}.");
+                Logger.LogInformation($"Updating entity with GID: 0x{globalId:X16}.");
 
                 if (!this.EntityExistsInIncomingData(globalId))
                 {
@@ -868,7 +872,7 @@ namespace NMS.GdaImplementation
                     }
                 }
 
-                Logger.LogInfo($"Updating entity with GID: 0x{globalId:X16} successfully finished.");
+                Logger.LogInformation($"Updating entity with GID: 0x{globalId:X16} successfully finished.");
             }
             catch (Exception ex)
             {
@@ -886,14 +890,14 @@ namespace NMS.GdaImplementation
         {
             if (rd == null)
             {
-                Logger.LogInfo("Delete entity is not done because update operation is empty.");
+                Logger.LogInformation("Delete entity is not done because update operation is empty.");
                 return;
             }
 
             try
             {
                 long globalId = rd.Id;
-                Logger.LogInfo($"Deleting entity with GID: 0x{globalId:X16}");
+                Logger.LogInformation($"Deleting entity with GID: 0x{globalId:X16}");
 
                 // check if entity exists
                 if (!this.EntityExistsInIncomingData(globalId))
@@ -1008,7 +1012,7 @@ namespace NMS.GdaImplementation
 
                 // remove entity form netowrk model
                 incomingContainer.RemoveEntity(globalId);
-                Logger.LogInfo($"Deleting entity with GID: 0x{globalId:X16} successfully finished.");
+                Logger.LogInformation($"Deleting entity with GID: 0x{globalId:X16} successfully finished.");
             }
             catch (Exception ex)
             {

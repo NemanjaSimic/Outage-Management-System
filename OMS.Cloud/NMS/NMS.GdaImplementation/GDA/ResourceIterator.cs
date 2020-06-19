@@ -1,5 +1,8 @@
-﻿using OMS.Common.NmsContracts.GDA;
-using Outage.Common;
+﻿using OMS.Common.Cloud;
+using OMS.Common.Cloud.Logger;
+using OMS.Common.NmsContracts;
+using OMS.Common.NmsContracts.GDA;
+
 using System;
 using System.Collections.Generic;
 using System.Threading.Tasks;
@@ -8,11 +11,11 @@ namespace NMS.GdaImplementation.GDA
 {
     public class ResourceIterator
     {
-        private ILogger logger;
+        private ICloudLogger logger;
 
-        protected ILogger Logger
+        private ICloudLogger Logger
         {
-            get { return logger ?? (logger = LoggerWrapper.Instance); }
+            get { return logger ?? (logger = CloudLoggerFactory.GetLogger()); }
         }
 
         private readonly NetworkModel networkModel = null;

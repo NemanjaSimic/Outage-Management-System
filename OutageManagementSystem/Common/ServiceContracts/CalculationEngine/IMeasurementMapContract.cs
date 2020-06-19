@@ -5,7 +5,7 @@ using System.ServiceModel;
 namespace Outage.Common.ServiceContracts.CalculationEngine
 {
     [ServiceContract]
-    public interface IMeasurementMapContract : IService
+    public interface IMeasurementMapContract
     {
         [OperationContract]
         List<long> GetMeasurementsOfElement(long elementId);

@@ -1,6 +1,6 @@
 ﻿using Microsoft.ServiceFabric.Services.Remoting;
-using Outage.Common;
-using Outage.Common.Exceptions.SCADA;
+using OMS.Common.Cloud;
+using OMS.Common.Cloud.Exceptions.SCADA;
 using System;
 using System.Collections.Generic;
 using System.ServiceModel;

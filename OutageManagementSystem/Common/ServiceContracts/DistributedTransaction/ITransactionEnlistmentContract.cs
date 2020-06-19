@@ -6,7 +6,7 @@ namespace Outage.Common.ServiceContracts.DistributedTransaction
 {
     [ServiceContract]
     [Obsolete("Use OMS.Common.DistributedTransactionContracts")]
-    public interface ITransactionEnlistmentContract : IService
+    public interface ITransactionEnlistmentContract
     {
         [OperationContract]
         [Obsolete("Use OMS.Common.DistributedTransactionContracts")]

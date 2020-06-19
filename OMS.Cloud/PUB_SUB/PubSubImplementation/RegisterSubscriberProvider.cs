@@ -1,9 +1,10 @@
-﻿using Common.PubSubContracts;
-using Microsoft.ServiceFabric.Data;
+﻿using Microsoft.ServiceFabric.Data;
 using Microsoft.ServiceFabric.Data.Notifications;
+using OMS.Common.Cloud;
 using OMS.Common.Cloud.ReliableCollectionHelpers;
 using OMS.Common.PubSub;
-using Outage.Common;
+using OMS.Common.PubSubContracts;
+
 using System;
 using System.Collections.Generic;
 using System.Threading.Tasks;
@@ -72,7 +73,7 @@ namespace PubSubImplementation
 
                 if (!RegisteredSubscribersCache.ContainsKey(key))
                 {
-                    await RegisteredSubscribersCache.Add(key, new Dictionary<Uri, RegisteredSubscriber>());
+                    await RegisteredSubscribersCache.SetAsync(key, new Dictionary<Uri, RegisteredSubscriber>());
                 }
 
                 var subscriber = new RegisteredSubscriber(subcriberUri, serviceType);
@@ -109,7 +110,7 @@ namespace PubSubImplementation
                 {
                     if (!RegisteredSubscribersCache.ContainsKey(key))
                     {
-                        await RegisteredSubscribersCache.Add(key, new Dictionary<Uri, RegisteredSubscriber>());
+                        await RegisteredSubscribersCache.SetAsync(key, new Dictionary<Uri, RegisteredSubscriber>());
                     }
 
                     var subscriber = new RegisteredSubscriber(subcriberUri, serviceType);

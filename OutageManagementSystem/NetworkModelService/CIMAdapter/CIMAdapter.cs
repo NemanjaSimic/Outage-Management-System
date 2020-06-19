@@ -7,10 +7,11 @@ using System.IO;
 using System.Reflection;
 using System.Threading;
 using Outage.Common;
-using OMS.Common.Cloud.WcfServiceFabricClients.NMS;
 using System.Threading.Tasks;
 using System.Text;
-using OMS.Common.NmsContracts.GDA;
+using Outage.Common.GDA;
+using Outage.Common.ServiceProxies;
+using Outage.Common.ServiceContracts.GDA;
 
 namespace Outage.DataImporter.CIMAdapter
 {
@@ -38,13 +39,15 @@ namespace Outage.DataImporter.CIMAdapter
         }
 
         private readonly ModelResourcesDesc resourcesDesc;
+        private readonly ProxyFactory proxyFactory;
 
         private TransformAndLoadReport report;
+
 
         public CIMAdapterClass()
         {
             resourcesDesc = new ModelResourcesDesc();
-            //nmsGdaClient = NetworkModelGdaClient.CreateClient();
+            proxyFactory = new ProxyFactory();
         }
 
         public async Task<ConditionalValue<Delta>> CreateDelta(Stream extract, SupportedProfiles extractType, StringBuilder logBuilder)
@@ -70,7 +73,7 @@ namespace Outage.DataImporter.CIMAdapter
             return result;
         }
 
-        public async Task<string> ApplyUpdates(Delta delta)
+        public string ApplyUpdates(Delta delta)
         {
             string updateResult = "Apply Updates Report:\r\n";
             System.Globalization.CultureInfo culture = Thread.CurrentThread.CurrentCulture;
@@ -78,17 +81,18 @@ namespace Outage.DataImporter.CIMAdapter
 
             if ((delta != null) && (delta.NumberOfOperations != 0))
             {
-                NetworkModelGdaClient nmsGdaClient = NetworkModelGdaClient.CreateClient();
-
-                if (nmsGdaClient == null)
+                using (NetworkModelGDAProxy nmsProxy = proxyFactory.CreateProxy<NetworkModelGDAProxy, INetworkModelGDAContract>(EndpointNames.NetworkModelGDAEndpoint))
                 {
-                    string message = "NetworkModelGdaClient is null.";
-                    Logger.LogWarn(message);
-                    throw new NullReferenceException(message);
+                    if (nmsProxy == null)
+                    {
+                        string message = "NetworkModelGdaClient is null.";
+                        Logger.LogWarn(message);
+                        throw new NullReferenceException(message);
+                    }
+
+                    var result = nmsProxy.ApplyUpdate(delta);
+                    updateResult = result.ToString();
                 }
-                    
-                var result = await nmsGdaClient.ApplyUpdate(delta);
-                updateResult = result.ToString();
             }
 
             Thread.CurrentThread.CurrentCulture = culture;
@@ -152,7 +156,7 @@ namespace Outage.DataImporter.CIMAdapter
                     Logger.LogWarn($"Import of {extractType} data is NOT SUPPORTED.");
                 }
 
-                TransformAndLoadReport report = await OutageImporter.Instance.CreateNMSDelta(concreteModel, resourcesDesc);
+                TransformAndLoadReport report = OutageImporter.Instance.CreateNMSDelta(concreteModel, resourcesDesc);
                 success = report.Success;
 
                 nmsDelta = success ? OutageImporter.Instance.NMSDelta : null;

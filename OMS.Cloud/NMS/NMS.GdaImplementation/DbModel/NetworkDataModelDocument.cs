@@ -1,4 +1,5 @@
-﻿using Outage.Common;
+﻿
+using OMS.Common.Cloud;
 using System.Collections.Generic;
 
 namespace NMS.GdaImplementation.DbModel

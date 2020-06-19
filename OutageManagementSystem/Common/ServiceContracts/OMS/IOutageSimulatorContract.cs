@@ -4,7 +4,7 @@ using System.ServiceModel;
 namespace Outage.Common.ServiceContracts.OMS
 {
     [ServiceContract]
-    public interface IOutageSimulatorContract : IService
+    public interface IOutageSimulatorContract
     {
         [OperationContract]
         bool StopOutageSimulation(long outageElementId);

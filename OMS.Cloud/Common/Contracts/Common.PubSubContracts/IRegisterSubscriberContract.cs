@@ -1,11 +1,11 @@
 ﻿using Microsoft.ServiceFabric.Services.Remoting;
-using Outage.Common;
+using OMS.Common.Cloud;
 using System;
 using System.Collections.Generic;
 using System.ServiceModel;
 using System.Threading.Tasks;
 
-namespace Common.PubSubContracts
+namespace OMS.Common.PubSubContracts
 {
     [ServiceContract]
     public interface IRegisterSubscriberContract : IService

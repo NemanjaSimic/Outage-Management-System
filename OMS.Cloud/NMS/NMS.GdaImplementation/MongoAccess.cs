@@ -2,25 +2,26 @@
 using MongoDB.Bson.Serialization;
 using MongoDB.Bson.Serialization.Serializers;
 using MongoDB.Driver;
-using Outage.Common;
+
 using System;
 using System.Collections.Generic;
 using System.Linq;
 using OMS.Common.NmsContracts.GDA;
 using NMS.DataModel;
 using NMS.GdaImplementation.DbModel;
-using System.Threading;
 using System.Threading.Tasks;
+using OMS.Common.Cloud.Logger;
+using OMS.Common.Cloud;
 
 namespace NMS.GdaImplementation
 {
     public class MongoAccess
     {
-        private ILogger logger;
+        private ICloudLogger logger;
 
-        protected ILogger Logger
+        private ICloudLogger Logger
         {
-            get { return logger ?? (logger = LoggerWrapper.Instance); }
+            get { return logger ?? (logger = CloudLoggerFactory.GetLogger()); }
         }
 
         private IMongoDatabase db;

@@ -1,7 +1,7 @@
 ﻿using Microsoft.ServiceFabric.Services.Remoting;
-using Outage.Common;
-using Outage.Common.Exceptions.SCADA;
-using Outage.Common.PubSub.SCADADataContract;
+using OMS.Common.Cloud;
+using OMS.Common.Cloud.Exceptions.SCADA;
+using OMS.Common.PubSubContracts.DataContracts.SCADA;
 using System;
 using System.Collections.Generic;
 using System.ServiceModel;
@@ -19,7 +19,7 @@ namespace OMS.Common.ScadaContracts.ModelProvider
         [ServiceKnownType(typeof(MultipleAnalogValueSCADAMessage))]
         [ServiceKnownType(typeof(SingleDiscreteValueSCADAMessage))]
         [ServiceKnownType(typeof(MultipleDiscreteValueSCADAMessage))]
-        Task<Dictionary<Topic, SCADAPublication>> GetIntegrityUpdate();
+        Task<Dictionary<Topic, ScadaPublication>> GetIntegrityUpdate();
 
         [OperationContract]
         [FaultContract(typeof(ArgumentException))]
@@ -28,6 +28,6 @@ namespace OMS.Common.ScadaContracts.ModelProvider
         [ServiceKnownType(typeof(MultipleAnalogValueSCADAMessage))]
         [ServiceKnownType(typeof(SingleDiscreteValueSCADAMessage))]
         [ServiceKnownType(typeof(MultipleDiscreteValueSCADAMessage))]
-        Task<SCADAPublication> GetIntegrityUpdateForSpecificTopic(Topic topic);
+        Task<ScadaPublication> GetIntegrityUpdateForSpecificTopic(Topic topic);
     }
 }

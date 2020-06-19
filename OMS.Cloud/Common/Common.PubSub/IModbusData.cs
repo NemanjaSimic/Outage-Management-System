@@ -1,4 +1,4 @@
-﻿using Outage.Common;
+﻿using OMS.Common.Cloud;
 
 namespace OMS.Common.PubSub
 {

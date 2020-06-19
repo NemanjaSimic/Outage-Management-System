@@ -7,7 +7,6 @@ namespace Outage.Common.GDA
 {
     //[Serializable]
     [DataContract]
-    [Obsolete("Use Common.NmsContracts alternative")]
     public class PropertyValue
 	{
         List<long> longValues = new List<long>();

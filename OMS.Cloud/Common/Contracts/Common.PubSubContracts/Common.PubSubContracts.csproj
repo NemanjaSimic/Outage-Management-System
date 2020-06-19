@@ -46,17 +46,19 @@
     <Reference Include="System.Xml" />
   </ItemGroup>
   <ItemGroup>
-    <Compile Include="DataContracts\ModbusData.cs" />
-    <Compile Include="DataContracts\SCADAMessage.cs" />
+    <Compile Include="DataContracts\SCADA\ModbusData.cs" />
+    <Compile Include="DataContracts\Publication.cs" />
+    <Compile Include="DataContracts\SCADA\ScadaMessage.cs" />
+    <Compile Include="DataContracts\SCADA\ScadaPublication.cs" />
     <Compile Include="INotifySubscriberContract.cs" />
     <Compile Include="IPublisherContract.cs" />
     <Compile Include="IRegisterSubscriberContract.cs" />
     <Compile Include="Properties\AssemblyInfo.cs" />
   </ItemGroup>
   <ItemGroup>
-    <ProjectReference Include="..\..\..\..\OutageManagementSystem\Common\Common.csproj">
-      <Project>{892CBE15-9ED7-4540-81FA-0EAABA592138}</Project>
-      <Name>Common</Name>
+    <ProjectReference Include="..\..\Common.Cloud\Common.Cloud.csproj">
+      <Project>{FBEE1369-0F6C-41E6-8C62-8C1C5CDBB602}</Project>
+      <Name>Common.Cloud</Name>
     </ProjectReference>
     <ProjectReference Include="..\..\Common.PubSub\Common.PubSub.csproj">
       <Project>{5B775779-A5AE-4F94-90EC-59973FA80D4D}</Project>

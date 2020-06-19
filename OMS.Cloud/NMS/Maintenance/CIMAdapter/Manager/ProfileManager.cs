@@ -1,10 +1,6 @@
-﻿using Outage.Common;
+﻿using OMS.Common.Cloud.Logger;
 using System;
-using System.Collections.Generic;
-using System.Linq;
 using System.Reflection;
-using System.Text;
-using System.Threading.Tasks;
 
 namespace Outage.DataImporter.CIMAdapter.Manager
 {
@@ -16,9 +12,14 @@ namespace Outage.DataImporter.CIMAdapter.Manager
     /// <summary>
 	/// ProfileManager
 	/// </summary>
-	public static class ProfileManager
+	public class ProfileManager
     {
-        private static ILogger Logger = LoggerWrapper.Instance;
+        private static ICloudLogger logger;
+
+        protected static ICloudLogger Logger
+        {
+            get { return logger ?? (logger = CloudLoggerFactory.GetLogger()); }
+        }
 
         public const string Namespace = "Outage";
         public const string ProductName = "NetworkModelService";
@@ -53,7 +54,6 @@ namespace Outage.DataImporter.CIMAdapter.Manager
             catch (Exception e)
             {
                 assembly = null;
-                //LogManager.Log(string.Format("Error during Assembly load. Profile: {0} ; Message: {1}", profile, e.Message), LogLevel.Error);
                 Logger.LogError($"Error during Assembly load. Profile: {profile} ; Message: {e.Message}", e);
                 
                 return false;
@@ -70,7 +70,6 @@ namespace Outage.DataImporter.CIMAdapter.Manager
             catch (Exception e)
             {
                 assembly = null;
-                //LogManager.Log(string.Format("Error during Assembly load. Path: {0} ; Message: {1}", path, e.Message), LogLevel.Error);
                 Logger.LogError($"Error during Assembly load. Path: {path} ; Message: {e.Message}");
                 return false;
             }

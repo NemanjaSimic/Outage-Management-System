@@ -1,4 +1,5 @@
-﻿using Outage.Common;
+﻿using OMS.Common.Cloud;
+using OMS.Common.Cloud.Logger;
 using System;
 using System.Collections.Generic;
 using System.Runtime.Serialization;
@@ -46,11 +47,11 @@ namespace OMS.Common.NmsContracts.GDA
 	[DataContract]	
 	public class Property : IComparable
 	{
-		private ILogger logger;
+		private ICloudLogger logger;
 
-        protected ILogger Logger
+        private ICloudLogger Logger
         {
-            get { return logger ?? (logger = LoggerWrapper.Instance); }
+            get { return logger ?? (logger = CloudLoggerFactory.GetLogger()); }
         }
 
         /// <summary>

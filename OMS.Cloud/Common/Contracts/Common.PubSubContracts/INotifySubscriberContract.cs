@@ -1,11 +1,11 @@
 ﻿using Common.PubSub;
-using Common.PubSubContracts.DataContracts;
+using OMS.Common.PubSubContracts.DataContracts.SCADA;
 using Microsoft.ServiceFabric.Services.Remoting;
 using System;
 using System.ServiceModel;
 using System.Threading.Tasks;
 
-namespace Common.PubSubContracts
+namespace OMS.Common.PubSubContracts
 {
     [ServiceContract]
     public interface INotifySubscriberContract: IService
@@ -25,7 +25,8 @@ namespace Common.PubSubContracts
         [ServiceKnownType(typeof(MultipleAnalogValueSCADAMessage))]
         [ServiceKnownType(typeof(SingleDiscreteValueSCADAMessage))]
         [ServiceKnownType(typeof(MultipleDiscreteValueSCADAMessage))]
-        Task<bool> Notify(IPublishableMessage message);
+
+        Task Notify(IPublishableMessage message);
 
         [OperationContract]
         Task<Uri> GetSubscriberUri();

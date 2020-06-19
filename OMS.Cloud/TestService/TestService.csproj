@@ -51,6 +51,12 @@
     <Reference Include="Microsoft.ServiceFabric.Diagnostics, Version=7.0.0.0, Culture=neutral, PublicKeyToken=31bf3856ad364e35, processorArchitecture=AMD64">
       <HintPath>..\packages\Microsoft.ServiceFabric.Diagnostics.Internal.4.0.470\lib\net472\Microsoft.ServiceFabric.Diagnostics.dll</HintPath>
     </Reference>
+    <Reference Include="Microsoft.ServiceFabric.FabricTransport, Version=7.0.0.0, Culture=neutral, PublicKeyToken=31bf3856ad364e35, processorArchitecture=AMD64">
+      <HintPath>..\packages\Microsoft.ServiceFabric.FabricTransport.Internal.4.0.470\lib\net472\Microsoft.ServiceFabric.FabricTransport.dll</HintPath>
+    </Reference>
+    <Reference Include="Microsoft.ServiceFabric.FabricTransport.V2, Version=7.0.0.0, Culture=neutral, PublicKeyToken=31bf3856ad364e35, processorArchitecture=AMD64">
+      <HintPath>..\packages\Microsoft.ServiceFabric.FabricTransport.Internal.4.0.470\lib\net472\Microsoft.ServiceFabric.FabricTransport.V2.dll</HintPath>
+    </Reference>
     <Reference Include="Microsoft.ServiceFabric.Internal, Version=7.0.0.0, Culture=neutral, PublicKeyToken=31bf3856ad364e35, processorArchitecture=AMD64">
       <HintPath>..\packages\Microsoft.ServiceFabric.7.0.470\lib\net472\Microsoft.ServiceFabric.Internal.dll</HintPath>
     </Reference>
@@ -65,6 +71,13 @@
     </Reference>
     <Reference Include="Microsoft.ServiceFabric.Services, Version=6.0.0.0, Culture=neutral, PublicKeyToken=31bf3856ad364e35, processorArchitecture=AMD64">
       <HintPath>..\packages\Microsoft.ServiceFabric.Services.4.0.470\lib\net472\Microsoft.ServiceFabric.Services.dll</HintPath>
+    </Reference>
+    <Reference Include="Microsoft.ServiceFabric.Services.Remoting, Version=6.0.0.0, Culture=neutral, PublicKeyToken=31bf3856ad364e35, processorArchitecture=AMD64">
+      <HintPath>..\packages\Microsoft.ServiceFabric.Services.Remoting.4.0.470\lib\net472\Microsoft.ServiceFabric.Services.Remoting.dll</HintPath>
+    </Reference>
+    <Reference Include="Microsoft.ServiceFabric.Services.Wcf, Version=6.0.0.0, Culture=neutral, PublicKeyToken=31bf3856ad364e35, processorArchitecture=AMD64">
+      <SpecificVersion>False</SpecificVersion>
+      <HintPath>..\NMS\NMS.GdaService\bin\x64\Debug\Microsoft.ServiceFabric.Services.Wcf.dll</HintPath>
     </Reference>
     <Reference Include="System" />
     <Reference Include="System.Core" />
@@ -93,21 +106,29 @@
     <None Include="packages.config" />
   </ItemGroup>
   <ItemGroup>
-    <ProjectReference Include="..\..\OutageManagementSystem\Common\Common.csproj">
-      <Project>{892CBE15-9ED7-4540-81FA-0EAABA592138}</Project>
-      <Name>Common</Name>
-    </ProjectReference>
     <ProjectReference Include="..\Common\Common.Cloud\Common.Cloud.csproj">
       <Project>{FBEE1369-0F6C-41E6-8C62-8C1C5CDBB602}</Project>
       <Name>Common.Cloud</Name>
+    </ProjectReference>
+    <ProjectReference Include="..\Common\Common.PubSub\Common.PubSub.csproj">
+      <Project>{5B775779-A5AE-4F94-90EC-59973FA80D4D}</Project>
+      <Name>Common.PubSub</Name>
     </ProjectReference>
     <ProjectReference Include="..\Common\Common.SCADA\Common.SCADA.csproj">
       <Project>{6A84DB56-920C-4FC1-9CB0-9C29D0FC1586}</Project>
       <Name>Common.SCADA</Name>
     </ProjectReference>
+    <ProjectReference Include="..\Common\Common.WcfClient\Common.WcfClient.csproj">
+      <Project>{AE91CEB5-378A-4EEF-AEBF-C40ED1EF23CF}</Project>
+      <Name>Common.WcfClient</Name>
+    </ProjectReference>
     <ProjectReference Include="..\Common\Contracts\Common.NmsContracts\Common.NmsContracts.csproj">
       <Project>{235804A8-9C8F-40EC-8786-5DAB24733977}</Project>
       <Name>Common.NmsContracts</Name>
+    </ProjectReference>
+    <ProjectReference Include="..\Common\Contracts\Common.PubSubContracts\Common.PubSubContracts.csproj">
+      <Project>{AA75150D-EE56-49C0-9431-751F83CCC0CD}</Project>
+      <Name>Common.PubSubContracts</Name>
     </ProjectReference>
     <ProjectReference Include="..\Common\Contracts\Common.ScadaContracts\Common.ScadaContracts.csproj">
       <Project>{5F25D9C5-9A93-49E7-92F7-58E399AEF928}</Project>

@@ -1,5 +1,7 @@
 ﻿using NMS.DataModel;
-using Outage.Common;
+using OMS.Common.Cloud;
+using OMS.Common.Cloud.Logger;
+using OMS.Common.NmsContracts;
 using System;
 using System.Collections.Generic;
 using System.Linq;
@@ -8,7 +10,11 @@ namespace NMS.GdaImplementation
 {
     public class Container : IEquatable<Container>
     {
-        ILogger Logger = LoggerWrapper.Instance;
+        ICloudLogger logger;
+        ICloudLogger Logger
+        {
+            get { return logger ?? (logger = CloudLoggerFactory.GetLogger()); }
+        }
 
         /// <summary>
         /// The dictionary of entities. Key = GlobaId, Value = Entity

@@ -5,8 +5,9 @@ using System.Threading;
 using System.Threading.Tasks;
 using Microsoft.ServiceFabric.Services.Communication.Runtime;
 using Microsoft.ServiceFabric.Services.Runtime;
-using OMS.Common.Cloud.WcfServiceFabricClients.SCADA;
+using OMS.Common.Cloud.Logger;
 using OMS.Common.SCADA;
+using OMS.Common.WcfClient.SCADA;
 using SCADA.AcquisitionImplementation;
 
 namespace SCADA.AcquisitionService
@@ -16,9 +17,13 @@ namespace SCADA.AcquisitionService
     /// </summary>
     internal sealed class AcquisitionService : StatelessService
     {
+        private readonly ICloudLogger logger;
+
         public AcquisitionService(StatelessServiceContext context)
             : base(context)
-        { }
+        {
+            logger = CloudLoggerFactory.GetLogger();
+        }
 
         /// <summary>
         /// Optional override to create listeners (e.g., TCP, HTTP) for this service replica to handle client or user requests.
@@ -42,14 +47,18 @@ namespace SCADA.AcquisitionService
 
             try
             {
-                acquisitionCycle = new AcquisitionCycle();
+                acquisitionCycle = new AcquisitionCycle(this.Context);
                 ScadaModelReadAccessClient readAccessClient = ScadaModelReadAccessClient.CreateClient();
                 configData = await readAccessClient.GetScadaConfigData();
-                ServiceEventSource.Current.ServiceMessage(this.Context, $"[AcquisitionService] AcquisitionCycle initialized.");
+
+                string message = "AcquisitionCycle initialized.";
+                logger.LogInformation(message);
+                ServiceEventSource.Current.ServiceMessage(this.Context, $"[AcquisitionService | Information] {message}");
             }
             catch (Exception e)
             {
-                ServiceEventSource.Current.ServiceMessage(this.Context, $"[AcquisitionService] Error: {e.Message}");
+                logger.LogError(e.Message, e);
+                ServiceEventSource.Current.ServiceMessage(this.Context, $"[AcquisitionService | Error] {e.Message}");
                 throw e;
             }
 
@@ -60,11 +69,15 @@ namespace SCADA.AcquisitionService
                 try
                 {
                     await acquisitionCycle.Start();
-                    ServiceEventSource.Current.ServiceMessage(this.Context, $"[AcquisitionService] AcquisitionCycle executed.");
+
+                    string message = "AcquisitionCycle executed.";
+                    logger.LogVerbose(message);
+                    //ServiceEventSource.Current.ServiceMessage(this.Context, $"[AcquisitionService | Information] {message}");
                 }
                 catch (Exception e)
                 {
-                    ServiceEventSource.Current.ServiceMessage(this.Context, $"[AcquisitionService] Error: {e.Message}");
+                    logger.LogError(e.Message, e);
+                    ServiceEventSource.Current.ServiceMessage(this.Context, $"[AcquisitionService | Error] {e.Message}");
                 }
 
                 await Task.Delay(TimeSpan.FromMilliseconds(configData.AcquisitionInterval), cancellationToken);

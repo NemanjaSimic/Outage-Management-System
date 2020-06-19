@@ -1,6 +1,7 @@
 ﻿using System.Collections.Generic;
+using OMS.Common.Cloud;
 using OMS.Common.NmsContracts.GDA;
-using Outage.Common;
+
 
 namespace NMS.DataModel
 {

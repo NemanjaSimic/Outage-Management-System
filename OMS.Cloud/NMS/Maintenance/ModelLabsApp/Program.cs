@@ -1,11 +1,11 @@
-﻿using Outage.Common;
+﻿using OMS.Common.Cloud.Logger;
 using System;
 using System.Windows.Forms;
 
 
 namespace Outage.DataImporter.ModelLabsApp
 {
-	static class Program
+    static class Program
 	{
 		/// <summary>
 		/// The main entry point for the application.
@@ -14,8 +14,8 @@ namespace Outage.DataImporter.ModelLabsApp
 		[STAThread]
 		static void Main()
 		{
-			ILogger Logger = LoggerWrapper.Instance;
-
+			ICloudLogger logger = CloudLoggerFactory.GetLogger();
+		
 			try
 			{
 				Application.EnableVisualStyles();
@@ -25,7 +25,7 @@ namespace Outage.DataImporter.ModelLabsApp
 			catch (Exception e)
 			{
 				MessageBox.Show(string.Format("Application is going down!\n  {0}", e.Message), "Error", MessageBoxButtons.OK, MessageBoxIcon.Error);
-                Logger.LogError($"Application is going down!\n  {e.Message}");
+				logger.LogError($"Application is going down!\n  {e.Message}");
 			}
 			finally
 			{

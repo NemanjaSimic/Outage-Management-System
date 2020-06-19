@@ -1,5 +1,5 @@
-﻿using OMS.Common.NmsContracts.GDA;
-using Outage.Common;
+﻿using OMS.Common.Cloud;
+using OMS.Common.NmsContracts.GDA;
 
 namespace Outage.DataImporter.CIMAdapter.Importer
 {
@@ -341,27 +341,27 @@ namespace Outage.DataImporter.CIMAdapter.Importer
 
         #region Enums convert
 
-        public static Outage.Common.DiscreteMeasurementType GetDiscreteMeasuremetType(Outage.DiscreteMeasurementType measurementType)
+        public static OMS.Common.Cloud.DiscreteMeasurementType GetDiscreteMeasuremetType(Outage.DiscreteMeasurementType measurementType)
         {
             switch (measurementType)
             {
                 case Outage.DiscreteMeasurementType.SwitchStatus:
-                    return  Outage.Common.DiscreteMeasurementType.SWITCH_STATUS;
+                    return OMS.Common.Cloud.DiscreteMeasurementType.SWITCH_STATUS;
                 default:
                     throw new System.Exception($"Unknown enum type: {measurementType}.");
             }
         }
 
-        public static Outage.Common.AnalogMeasurementType GetAnalogMeasurementType(Outage.AnalogMeasurementType measurementType)
+        public static OMS.Common.Cloud.AnalogMeasurementType GetAnalogMeasurementType(Outage.AnalogMeasurementType measurementType)
         {
             switch(measurementType)
             {
                 case Outage.AnalogMeasurementType.Current:
-                    return Outage.Common.AnalogMeasurementType.CURRENT;
+                    return OMS.Common.Cloud.AnalogMeasurementType.CURRENT;
                 case Outage.AnalogMeasurementType.Voltage:
-                    return Outage.Common.AnalogMeasurementType.VOLTAGE;
+                    return OMS.Common.Cloud.AnalogMeasurementType.VOLTAGE;
                 case Outage.AnalogMeasurementType.Power:
-                    return Outage.Common.AnalogMeasurementType.POWER;
+                    return OMS.Common.Cloud.AnalogMeasurementType.POWER;
                 default:
                     throw new System.Exception($"Unknown enum type: {measurementType}.");
             }

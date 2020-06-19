@@ -3,19 +3,21 @@ using System.Collections.Generic;
 using System.Text;
 using System.Threading.Tasks;
 using FTN.Services.NetworkModelService.TestClientUI;
-using OMS.Common.Cloud.WcfServiceFabricClients.NMS;
+using OMS.Common.Cloud;
+using OMS.Common.Cloud.Logger;
 using OMS.Common.NmsContracts.GDA;
-using Outage.Common;
+using OMS.Common.WcfClient.NMS;
+
 
 namespace TelventDMS.Services.NetworkModelService.TestClient.TestsUI
 {
-	public sealed class TestGda : IDisposable
+    public sealed class TestGda : IDisposable
 	{
-		private ILogger logger;
+		private ICloudLogger logger;
 
-		private ILogger Logger
+		private ICloudLogger Logger
 		{
-			get { return logger ?? (logger = LoggerWrapper.Instance); }
+			get { return logger ?? (logger = CloudLoggerFactory.GetLogger()); }
 		}
 
 		//private readonly NetworkModelGdaClient nmsClient;
@@ -30,7 +32,7 @@ namespace TelventDMS.Services.NetworkModelService.TestClient.TestsUI
 		public async Task<ResourceDescription> GetValues(long globalId, List<ModelCode> properties)
 		{
 			string message = "Getting values method started.";
-			Logger.LogInfo(message);
+			Logger.LogInformation(message);
 
 			ResourceDescription rd = null;
 
@@ -41,13 +43,13 @@ namespace TelventDMS.Services.NetworkModelService.TestClient.TestsUI
 				if (nmsClient == null)
 				{
 					string errMsg = "NetworkModelGdaClient is null.";
-					Logger.LogWarn(errMsg);
+					Logger.LogWarning(errMsg);
 					throw new NullReferenceException(errMsg);
 				}
 
 				rd = await nmsClient.GetValues(globalId, properties);
 				message = "Getting values method successfully finished.";
-				Logger.LogInfo(message);
+				Logger.LogInformation(message);
 			}
 			catch (Exception e)
 			{
@@ -61,7 +63,7 @@ namespace TelventDMS.Services.NetworkModelService.TestClient.TestsUI
 		public async Task<List<long>> GetExtentValues(ModelCode modelCodeType, List<ModelCode> properties, StringBuilder sb)
 		{
 			string message = "Getting extent values method started.";
-			Logger.LogInfo(message);
+			Logger.LogInformation(message);
 
 			int iteratorId;
 			int resourcesLeft;
@@ -76,7 +78,7 @@ namespace TelventDMS.Services.NetworkModelService.TestClient.TestsUI
 				if (nmsClient == null)
 				{
 					string errMsg = "NetworkModelGdaClient is null.";
-					Logger.LogWarn(errMsg);
+					Logger.LogWarning(errMsg);
 					throw new NullReferenceException(errMsg);
 				}
 
@@ -131,7 +133,7 @@ namespace TelventDMS.Services.NetworkModelService.TestClient.TestsUI
 				await nmsClient.IteratorClose(iteratorId);
 
 				message = "Getting extent values method successfully finished.";
-				Logger.LogInfo(message);
+				Logger.LogInformation(message);
 			}
 			catch (Exception e)
 			{
@@ -150,7 +152,7 @@ namespace TelventDMS.Services.NetworkModelService.TestClient.TestsUI
 		public async Task<List<long>> GetRelatedValues(long sourceGlobalId, List<ModelCode> properties, Association association, StringBuilder sb)
 		{
 			string message = "Getting related values method started.";
-			Logger.LogInfo(message);
+			Logger.LogInformation(message);
 
 			int iteratorId = 0;
 			int resourcesLeft = 0;
@@ -165,7 +167,7 @@ namespace TelventDMS.Services.NetworkModelService.TestClient.TestsUI
 				if (nmsClient == null)
 				{
 					string errMsg = "NetworkModelGdaClient is null.";
-					Logger.LogWarn(errMsg);
+					Logger.LogWarning(errMsg);
 					throw new NullReferenceException(errMsg);
 				}
 
@@ -220,7 +222,7 @@ namespace TelventDMS.Services.NetworkModelService.TestClient.TestsUI
 				await nmsClient.IteratorClose(iteratorId);
 
 				message = "Getting related values method successfully finished.";
-				Logger.LogInfo(message);
+				Logger.LogInformation(message);
 			}
 			catch (Exception e)
 			{

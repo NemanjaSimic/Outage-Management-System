@@ -4,7 +4,7 @@ using System.ServiceModel;
 namespace Outage.Common.ServiceContracts.OMS
 {
     [ServiceContract]
-    public interface IOutageLifecycleUICommandingContract : IService
+    public interface IOutageLifecycleUICommandingContract
     {
         [OperationContract]
         //SCADA

@@ -5,7 +5,6 @@ using System;
 
 namespace Outage.Common.GDA
 {
-	[Obsolete("Use Common.NmsContracts alternative")]
 	public enum ResultType : byte
 	{
 		Succeeded = 0,	
@@ -13,7 +12,6 @@ namespace Outage.Common.GDA
 	}
 
 	[DataContract]
-	[Obsolete("Use Common.NmsContracts alternative")]
 	public class UpdateResult
 	{
 		private Dictionary<long, long> globalIdPairs;
@@ -28,7 +26,6 @@ namespace Outage.Common.GDA
 		}
 
 		[DataMember]
-		[Obsolete("Use Common.NmsContracts alternative")]
 		public Dictionary<long, long> GlobalIdPairs
 		{
 			get { return globalIdPairs; }
@@ -36,7 +33,6 @@ namespace Outage.Common.GDA
 		}
 
 		[DataMember]
-		[Obsolete("Use Common.NmsContracts alternative")]
 		public string Message
 		{
 			get { return message; }
@@ -44,14 +40,12 @@ namespace Outage.Common.GDA
 		}
 
 		[DataMember]
-		[Obsolete("Use Common.NmsContracts alternative")]
 		public ResultType Result
 		{
 			get { return result; }
 			set { result = value; }
 		}
 
-		[Obsolete("Use Common.NmsContracts alternative")]
 		public override string ToString()
         {
             StringBuilder sb = new StringBuilder();

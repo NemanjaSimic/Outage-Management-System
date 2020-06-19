@@ -8,7 +8,7 @@ namespace Outage.Common.ServiceContracts.CalculationEngine
     [ServiceContract]
     [ServiceKnownType(typeof(OutageTopologyModel))]
     [ServiceKnownType(typeof(OutageTopologyElement))]
-    public interface ITopologyOMSService : IService
+    public interface ITopologyOMSService
     {
         [OperationContract]
         IOutageTopologyModel GetOMSModel();

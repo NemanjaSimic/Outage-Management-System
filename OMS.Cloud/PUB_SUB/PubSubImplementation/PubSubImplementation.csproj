@@ -94,10 +94,6 @@
     <Compile Include="RegisterSubscriberProvider.cs" />
   </ItemGroup>
   <ItemGroup>
-    <ProjectReference Include="..\..\..\OutageManagementSystem\Common\Common.csproj">
-      <Project>{892CBE15-9ED7-4540-81FA-0EAABA592138}</Project>
-      <Name>Common</Name>
-    </ProjectReference>
     <ProjectReference Include="..\..\Common\Common.Cloud\Common.Cloud.csproj">
       <Project>{fbee1369-0f6c-41e6-8c62-8c1c5cdbb602}</Project>
       <Name>Common.Cloud</Name>
@@ -105,6 +101,10 @@
     <ProjectReference Include="..\..\Common\Common.PubSub\Common.PubSub.csproj">
       <Project>{5B775779-A5AE-4F94-90EC-59973FA80D4D}</Project>
       <Name>Common.PubSub</Name>
+    </ProjectReference>
+    <ProjectReference Include="..\..\Common\Common.WcfClient\Common.WcfClient.csproj">
+      <Project>{AE91CEB5-378A-4EEF-AEBF-C40ED1EF23CF}</Project>
+      <Name>Common.WcfClient</Name>
     </ProjectReference>
     <ProjectReference Include="..\..\Common\Contracts\Common.PubSubContracts\Common.PubSubContracts.csproj">
       <Project>{AA75150D-EE56-49C0-9431-751F83CCC0CD}</Project>

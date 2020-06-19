@@ -1,13 +1,13 @@
-﻿using OMS.Common.SCADA;
+﻿using OMS.Common.Cloud.Logger;
+using OMS.Common.SCADA;
 using OMS.Common.ScadaContracts.DataContracts;
-using Outage.Common;
 using System;
 using System.Configuration;
 using System.Net;
 
 namespace SCADA.ModelProviderImplementation.Helpers
 {
-    internal static class ScadaConfigDataHelper
+    internal class ScadaConfigDataHelper
     {
         private static readonly object lockSync = new object();
         private static IScadaConfigData scadaConfigData;
@@ -30,7 +30,7 @@ namespace SCADA.ModelProviderImplementation.Helpers
 
         private static IScadaConfigData ImportAppSettings()
         {
-            ILogger logger = LoggerWrapper.Instance;
+            ICloudLogger logger = CloudLoggerFactory.GetLogger();
             ScadaConfigData data = new ScadaConfigData();
 
             if (ConfigurationManager.AppSettings["TcpPort"] is string tcpPortSetting)
@@ -84,7 +84,7 @@ namespace SCADA.ModelProviderImplementation.Helpers
                 else
                 {
                     data.AcquisitionInterval = 10000;
-                    logger.LogWarn("AcquisitionInterval in SCADA configuration is either not defined or not valid.");
+                    logger.LogWarning("AcquisitionInterval in SCADA configuration is either not defined or not valid.");
                 }
             }
 
@@ -97,7 +97,7 @@ namespace SCADA.ModelProviderImplementation.Helpers
                 else
                 {
                     data.FunctionExecutionInterval = 10000;
-                    logger.LogWarn("FunctionExecutionInterval in SCADA configuration is either not defined or not valid.");
+                    logger.LogWarning("FunctionExecutionInterval in SCADA configuration is either not defined or not valid.");
                 }
             }
 

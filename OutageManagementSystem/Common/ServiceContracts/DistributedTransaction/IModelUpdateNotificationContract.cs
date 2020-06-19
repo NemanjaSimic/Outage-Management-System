@@ -8,7 +8,7 @@ namespace Outage.Common.ServiceContracts.DistributedTransaction
 {
     [ServiceContract]
     [Obsolete("Use OMS.Common.DistributedTransactionContracts")]
-    public interface IModelUpdateNotificationContract : IService
+    public interface IModelUpdateNotificationContract
     {
         [OperationContract]
         [Obsolete("Use OMS.Common.DistributedTransactionContracts")]

@@ -6,11 +6,13 @@ using System;
 using System.IO;
 using System.Reflection;
 using System.Threading;
-using Outage.Common;
-using OMS.Common.Cloud.WcfServiceFabricClients.NMS;
+
 using System.Threading.Tasks;
 using System.Text;
 using OMS.Common.NmsContracts.GDA;
+using OMS.Common.Cloud.Logger;
+using OMS.Common.WcfClient.NMS;
+using OMS.Common.NmsContracts;
 
 namespace Outage.DataImporter.CIMAdapter
 {
@@ -30,11 +32,11 @@ namespace Outage.DataImporter.CIMAdapter
 
     public class CIMAdapterClass
     {
-        private ILogger logger;
+        private ICloudLogger logger;
 
-        protected ILogger Logger
+        private ICloudLogger Logger
         {
-            get { return logger ?? (logger = LoggerWrapper.Instance); }
+            get { return logger ?? (logger = CloudLoggerFactory.GetLogger()); }
         }
 
         private readonly ModelResourcesDesc resourcesDesc;
@@ -44,7 +46,6 @@ namespace Outage.DataImporter.CIMAdapter
         public CIMAdapterClass()
         {
             resourcesDesc = new ModelResourcesDesc();
-            //nmsGdaClient = NetworkModelGdaClient.CreateClient();
         }
 
         public async Task<ConditionalValue<Delta>> CreateDelta(Stream extract, SupportedProfiles extractType, StringBuilder logBuilder)
@@ -83,7 +84,7 @@ namespace Outage.DataImporter.CIMAdapter
                 if (nmsGdaClient == null)
                 {
                     string message = "NetworkModelGdaClient is null.";
-                    Logger.LogWarn(message);
+                    Logger.LogWarning(message);
                     throw new NullReferenceException(message);
                 }
                     
@@ -145,11 +146,11 @@ namespace Outage.DataImporter.CIMAdapter
 
             try
             {
-                Logger.LogInfo($"Importing {extractType} data...");
+                Logger.LogInformation($"Importing {extractType} data...");
 
                 if(extractType != SupportedProfiles.Outage)
                 {
-                    Logger.LogWarn($"Import of {extractType} data is NOT SUPPORTED.");
+                    Logger.LogWarning($"Import of {extractType} data is NOT SUPPORTED.");
                 }
 
                 TransformAndLoadReport report = await OutageImporter.Instance.CreateNMSDelta(concreteModel, resourcesDesc);

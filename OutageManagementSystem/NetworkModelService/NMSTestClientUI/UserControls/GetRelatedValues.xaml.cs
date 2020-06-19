@@ -1,6 +1,6 @@
 ﻿using FTN.Services.NetworkModelService.TestClientUI;
-using OMS.Common.NmsContracts.GDA;
 using Outage.Common;
+using Outage.Common.GDA;
 using System;
 using System.Collections.Generic;
 using System.Collections.ObjectModel;
@@ -9,6 +9,13 @@ using System.Text;
 using System.Threading.Tasks;
 using System.Windows;
 using System.Windows.Controls;
+using System.Windows.Data;
+using System.Windows.Documents;
+using System.Windows.Input;
+using System.Windows.Media;
+using System.Windows.Media.Imaging;
+using System.Windows.Navigation;
+using System.Windows.Shapes;
 using TelventDMS.Services.NetworkModelService.TestClient.TestsUI;
 
 namespace NMSTestClientUI.UserControls
@@ -46,35 +53,21 @@ namespace NMSTestClientUI.UserControls
             catch (Exception ex)
             {
                 MessageBox.Show(ex.Message, "GetRelatedValues", MessageBoxButton.OK, MessageBoxImage.Error);
-                return;
             }
 
-            Task.Run(Initialize);
-        }
-
-        private async void Initialize()
-        {
-            foreach (DMSType dmsType in Enum.GetValues(typeof(DMSType)))
+            foreach(DMSType dmsType in Enum.GetValues(typeof(DMSType)))
             {
-                if (dmsType == DMSType.MASK_TYPE)
+                if(dmsType == DMSType.MASK_TYPE)
                 {
                     continue;
                 }
 
                 ModelCode dmsTypesModelCode = modelResourcesDesc.GetModelCodeFromType(dmsType);
-                List<long> gids = await tgda.GetExtentValues(dmsTypesModelCode, new List<ModelCode> { ModelCode.IDOBJ_GID }, null);
-
-                foreach (long gid in gids)
+                tgda.GetExtentValues(dmsTypesModelCode, new List<ModelCode> { ModelCode.IDOBJ_GID }, null).ForEach(g => GlobalIdentifiersRelated.Add(new GlobalIdentifierViewModel()
                 {
-                    Dispatcher.Invoke(() =>
-                    {
-                        GlobalIdentifiersRelated.Add(new GlobalIdentifierViewModel()
-                        {
-                            GID = gid,
-                            Type = dmsTypesModelCode.ToString(),
-                        });
-                    });
-                }
+                    GID = g,
+                    Type = dmsTypesModelCode.ToString(),
+                }));
             }
         }
 
@@ -272,14 +265,12 @@ namespace NMSTestClientUI.UserControls
             }
         }
 
-        private async void ButtonGetRelatedValues_Click(object sender, RoutedEventArgs e)
+        private void ButtonGetRelatedValues_Click(object sender, RoutedEventArgs e)
         {
             if(SelectedProperty == null)
             {
                 return;
             }
-
-            GetRelatedValuesButton.IsEnabled = false;
 
             List<ModelCode> selectedProperties = new List<ModelCode>();
 
@@ -304,7 +295,7 @@ namespace NMSTestClientUI.UserControls
 
             ////////////////////////////////////////////
             List<long> gidReferences = new List<long>();
-            ResourceDescription rd = await tgda.GetValues(SelectedGID.GID, new List<ModelCode>() { SelectedProperty.Property });
+            ResourceDescription rd = tgda.GetValues(SelectedGID.GID, new List<ModelCode>() { SelectedProperty.Property });
             if (rd != null)
             {
                 Property prop = rd.GetProperty(SelectedProperty.Property);
@@ -338,7 +329,7 @@ namespace NMSTestClientUI.UserControls
                 if (SelectedDmsType != null)
                 {
                     Association association = new Association(SelectedProperty.Property, modelResourcesDesc.GetModelCodeFromType(SelectedDmsType.DmsType));
-                    List<long> gids = await tgda.GetRelatedValues(SelectedGID.GID, selectedProperties, association, sb);
+                    List<long> gids = tgda.GetRelatedValues(SelectedGID.GID, selectedProperties, association, sb);
                 }
                 else
                 {
@@ -378,7 +369,7 @@ namespace NMSTestClientUI.UserControls
                     /////////////////////////////////////////////////////////////
 
                     Association association = new Association(SelectedProperty.Property, 0x0000000000000000);
-                    List<long> gids = await tgda.GetRelatedValues(SelectedGID.GID, selectedProperties, association, sb);
+                    List<long> gids = tgda.GetRelatedValues(SelectedGID.GID, selectedProperties, association, sb);
                 }
             }
             catch (Exception ex)
@@ -388,13 +379,10 @@ namespace NMSTestClientUI.UserControls
 
             RelatedValues.Document.Blocks.Clear();
             RelatedValues.AppendText(sb.ToString());
-            GetRelatedValuesButton.IsEnabled = true;
         }
 
-        private async void ButtonRefreshGids_Click(object sender, RoutedEventArgs e)
+        private void ButtonRefreshGids_Click(object sender, RoutedEventArgs e)
         {
-            RefreshButton.IsEnabled = false;
-
             GlobalIdentifiersRelated.Clear();
 
             foreach (DMSType dmsType in Enum.GetValues(typeof(DMSType)))
@@ -405,23 +393,14 @@ namespace NMSTestClientUI.UserControls
                 }
 
                 ModelCode dmsTypesModelCode = modelResourcesDesc.GetModelCodeFromType(dmsType);
-                List<long> gids = await tgda.GetExtentValues(dmsTypesModelCode, new List<ModelCode> { ModelCode.IDOBJ_GID }, null);
-                
-                foreach(long gid in gids)
+                tgda.GetExtentValues(dmsTypesModelCode, new List<ModelCode> { ModelCode.IDOBJ_GID }, null).ForEach(g => GlobalIdentifiersRelated.Add(new GlobalIdentifierViewModel()
                 {
-                    Dispatcher.Invoke(() =>
-                    {
-                        GlobalIdentifiersRelated.Add(new GlobalIdentifierViewModel()
-                        {
-                            GID = gid,
-                            Type = dmsTypesModelCode.ToString(),
-                        });
-                    });
-                }
+                    GID = g,
+                    Type = dmsTypesModelCode.ToString(),
+                }));
             }
 
             SelectedGID = null;
-            RefreshButton.IsEnabled = true;
         }
     }
 }

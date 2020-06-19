@@ -4,8 +4,9 @@ using Microsoft.ServiceFabric.Services.Communication.Runtime;
 using Microsoft.ServiceFabric.Services.Communication.Wcf;
 using Microsoft.ServiceFabric.Services.Communication.Wcf.Runtime;
 using Microsoft.ServiceFabric.Services.Runtime;
+using OMS.Common.Cloud.Logger;
+using OMS.Common.Cloud.Names;
 using OMS.Common.ScadaContracts.Commanding;
-using Outage.Common;
 using SCADA.CommandingImplementation;
 
 namespace SCADA.CommandingService
@@ -15,9 +16,13 @@ namespace SCADA.CommandingService
     /// </summary>
     internal sealed class CommandingService : StatelessService
     {
+        private readonly ICloudLogger logger;
+
         public CommandingService(StatelessServiceContext context)
             : base(context)
-        { }
+        {
+            logger = CloudLoggerFactory.GetLogger();
+        }
 
         /// <summary>
         /// Optional override to create listeners (e.g., TCP, HTTP) for this service replica to handle client or user requests.
@@ -28,14 +33,14 @@ namespace SCADA.CommandingService
             //return new ServiceInstanceListener[0];
             return new List<ServiceInstanceListener>()
             {
-                //ScadaReadCommandEnqueuerEndpoint
+                //ScadaCommandService
                 new ServiceInstanceListener(context =>
                 {
                     return new WcfCommunicationListener<IScadaCommandingContract>(context,
                                                                                   new CommandingProvider(),
                                                                                   WcfUtility.CreateTcpListenerBinding(),
-                                                                                  EndpointNames.SCADACommandService);
-                }, EndpointNames.SCADACommandService),
+                                                                                  EndpointNames.ScadaCommandService);
+                }, EndpointNames.ScadaCommandService),
             };
         }
     }

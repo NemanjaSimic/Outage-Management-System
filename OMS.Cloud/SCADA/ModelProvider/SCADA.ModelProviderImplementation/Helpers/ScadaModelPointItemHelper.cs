@@ -1,11 +1,12 @@
-﻿using Outage.Common;
+﻿
 using System;
 using System.Collections.Generic;
 using OMS.Common.SCADA;
 using OMS.Common.NmsContracts.GDA;
-using System.Runtime.Serialization;
-using OMS.Common.ScadaContracts.DataContracts;
 using OMS.Common.ScadaContracts.DataContracts.ScadaModelPointItems;
+using OMS.Common.Cloud.Logger;
+using OMS.Common.Cloud;
+using OMS.Common.NmsContracts;
 
 namespace SCADA.ModelProviderImplementation.Data
 {
@@ -13,11 +14,11 @@ namespace SCADA.ModelProviderImplementation.Data
     {
         //private readonly EnumDescs enumDescs;
 
-        private ILogger logger;
+        private ICloudLogger logger;
 
-        private ILogger Logger
+        private ICloudLogger Logger
         {
-            get { return logger ?? (logger = LoggerWrapper.Instance); }
+            get { return logger ?? (logger = CloudLoggerFactory.GetLogger()); }
         }
 
         //public ScadaModelPointItemHelper()

@@ -1,27 +1,30 @@
 ﻿using CIM.Model;
-using OMS.Common.Cloud.WcfServiceFabricClients.NMS;
+using OMS.Common.Cloud;
+using OMS.Common.Cloud.Logger;
+using OMS.Common.NmsContracts;
 using OMS.Common.NmsContracts.GDA;
-using Outage.Common;
+using OMS.Common.WcfClient.NMS;
+
 using System;
 using System.Collections.Generic;
 using System.Threading.Tasks;
 
 namespace Outage.DataImporter.CIMAdapter.Importer
 {
-	public class OutageImporter
+    public class OutageImporter
 	{
-		private ILogger logger;
+		private ICloudLogger logger;
 
-		protected ILogger Logger
+		private ICloudLogger Logger
 		{
-			get { return logger ?? (logger = LoggerWrapper.Instance); }
+			get { return logger ?? (logger = CloudLoggerFactory.GetLogger()); }
 		}
 
 		private static OutageImporter outageImporter = null;
 		private static object singletoneLock = new object();
 
-		private ConcreteModel concreteModel;
 		private Delta delta;
+		private ConcreteModel concreteModel;
 
 		private Dictionary<string, long> mridToPositiveGidFromServer;
 
@@ -107,7 +110,7 @@ namespace Outage.DataImporter.CIMAdapter.Importer
 
 		public async Task<TransformAndLoadReport> CreateNMSDelta(ConcreteModel cimConcreteModel, ModelResourcesDesc resourcesDesc)
 		{
-			Logger.LogInfo("Importing Outage Elements...");
+			Logger.LogInformation("Importing Outage Elements...");
 			report = new TransformAndLoadReport();
 			concreteModel = cimConcreteModel;
 			delta.ClearDeltaOperations();
@@ -130,13 +133,13 @@ namespace Outage.DataImporter.CIMAdapter.Importer
 					report.Success = false;
 				}
 			}
-			Logger.LogInfo("Importing Outage Elements - END");
+			Logger.LogInformation("Importing Outage Elements - END");
 			return report;
 		}
 
 		private async Task ConvertModelAndPopulateDelta(ModelResourcesDesc resourcesDesc)
 		{
-			Logger.LogInfo("Loading elements and creating delta...");
+			Logger.LogInformation("Loading elements and creating delta...");
 
 			await PopulateNmsDataFromServer(resourcesDesc);
 
@@ -158,14 +161,14 @@ namespace Outage.DataImporter.CIMAdapter.Importer
 
 			CorrectNegativeReferences();
 			CreateAndInsertDeleteOperations();
-			Logger.LogInfo("Loading elements and creating delta completed.");
+			Logger.LogInformation("Loading elements and creating delta completed.");
 		}
 
 		private async Task<bool> PopulateNmsDataFromServer(ModelResourcesDesc resourcesDesc)
 		{
 			bool success = false;
 			string message = "Getting nms data from server started.";
-			Logger.LogInfo(message);
+			Logger.LogInformation(message);
 
 			NetworkModelGdaClient nmsGdaClient = NetworkModelGdaClient.CreateClient();
 
@@ -235,7 +238,7 @@ namespace Outage.DataImporter.CIMAdapter.Importer
 					await nmsGdaClient.IteratorClose(iteratorId);
 
 					message = "Getting nms data from server successfully finished.";
-					Logger.LogInfo(message);
+					Logger.LogInformation(message);
 					success = true;
 				}
 				catch (Exception e)

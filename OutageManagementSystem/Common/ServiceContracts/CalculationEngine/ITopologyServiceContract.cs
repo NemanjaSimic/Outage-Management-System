@@ -7,7 +7,7 @@ namespace Outage.Common.ServiceContracts
     [ServiceContract]
     [ServiceKnownType(typeof(UIMeasurement))]
     [ServiceKnownType(typeof(UINode))]
-    public interface ITopologyServiceContract : IService
+    public interface ITopologyServiceContract
     {
         [OperationContract]
         UIModel GetTopology();

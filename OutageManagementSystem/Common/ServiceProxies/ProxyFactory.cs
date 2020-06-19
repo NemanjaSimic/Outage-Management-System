@@ -8,7 +8,7 @@ namespace Outage.Common.ServiceProxies
     {
         private ILogger logger;
 
-        protected ILogger Logger
+        private ILogger Logger
         {
             get { return logger ?? (logger = LoggerWrapper.Instance); }
         }

@@ -1,4 +1,5 @@
-﻿using Outage.Common;
+﻿
+using OMS.Common.Cloud;
 using System;
 using System.Collections.Generic;
 using System.Linq;
