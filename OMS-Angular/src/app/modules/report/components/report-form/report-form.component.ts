@@ -1,23 +1,37 @@
 import { Component, OnInit, Output, EventEmitter } from '@angular/core';
-import { FormControl } from '@angular/forms';
+import * as moment from 'moment';
 import { Observable } from 'rxjs';
+import { FormControl } from '@angular/forms';
+import { MatDatepicker, DateAdapter, MAT_DATE_FORMATS } from '@angular/material';
 import { map, startWith } from 'rxjs/operators';
-import { ReportOptions } from '@shared/models/report-options.model';
 import { GraphService } from '@services/notification/graph.service';
+import { ReportOptions, DateType } from '@shared/models/report-options.model';
+import { DateFormatService } from '@services/report/date-format.service';
+import { ReportDateAdapter } from './adapters/report-date.adapter';
+import { formatStartDate } from './helpers/formatStartDateQuery';
+import { formatEndDate } from './helpers/formatEndDateQuery';
 
 @Component({
   selector: 'app-report-form',
   templateUrl: './report-form.component.html',
-  styleUrls: ['./report-form.component.css']
+  styleUrls: ['./report-form.component.css'],
+  providers: [
+    ReportDateAdapter,
+    {provide: DateAdapter, useClass: ReportDateAdapter},
+  ],
 })
 export class ReportFormComponent implements OnInit {
 
-  // @TODO:
-  // - fetch from backend
   reportTypes: any[] = [
     { value: '0', name: 'Total' },
     { value: '1', name: 'SAIFI' },
     { value: '2', name: 'SAIDI' },
+  ];
+
+  datePickerTypes: any[] = [
+    { value: DateType.Yearly, name: 'Yearly' },
+    { value: DateType.Monthly, name: 'Monthly' },
+    { value: DateType.Daily, name: 'Daily' },
   ];
 
   scopes: any[] = [
@@ -25,14 +39,16 @@ export class ReportFormComponent implements OnInit {
   ];
 
   public selectedReportType;
+  public selectedDateType;
   public filteredScopes: Observable<any[]>;
   public selectedScopeControl = new FormControl();
   public startDate = new FormControl();
-  public endDate = new FormControl();
+  public endDate = new FormControl(moment());
+  private defaultDateType = DateType.Daily;
 
   @Output() generate = new EventEmitter<ReportOptions>();
 
-  constructor(private graphService: GraphService) { }
+  constructor(private graphService: GraphService, private dateFormatService: DateFormatService ) { }
 
   ngOnInit() {
     this.graphService.getTopology().subscribe((graph) => {
@@ -56,12 +72,33 @@ export class ReportFormComponent implements OnInit {
     return this.scopes.filter(option => option.name.toLowerCase().indexOf(filterValue) === 0);
   }
 
+  onDateTypeChangedHandler(dateType): void {
+    this.dateFormatService.setFormat(dateType.value);
+  }
+
+  chosenYearHandler(event: moment.Moment, datePicker: MatDatepicker<moment.Moment>): void {
+    this.startDate = new FormControl(moment());
+    const ctrlValue = this.startDate.value;
+    ctrlValue.year(event.year());
+    this.startDate.setValue(ctrlValue);
+
+    if(this.selectedDateType === DateType.Yearly) datePicker.close();
+  }
+
+  chosenMonthHandler(event: moment.Moment, datePicker: MatDatepicker<string>): void {
+    const ctrlValue = this.startDate.value;
+    ctrlValue.month(event.month());
+    this.startDate.setValue(ctrlValue);
+
+    if(this.selectedDateType === DateType.Monthly) datePicker.close();
+  }
+
   onSubmitHandler(): void {
     const options: ReportOptions = {
       Type: this.selectedReportType,
       ElementId: +this.selectedScopeControl.value,
-      StartDate: this.startDate.value,
-      EndDate: this.endDate.value
+      StartDate: formatStartDate(this.startDate.value, this.selectedDateType),
+      EndDate: formatEndDate(this.startDate.value, this.selectedDateType)
     }
 
     this.generate.emit(options);

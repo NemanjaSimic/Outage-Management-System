@@ -19,18 +19,25 @@
     </mat-autocomplete>
   </mat-form-field>
 
-  <mat-form-field class="form-field">
-    <mat-label class="white-label">Choose a start date</mat-label>
-    <input matInput [matDatepicker]="startDatePicker" [formControl]="startDate">
-    <mat-datepicker-toggle matSuffix [for]="startDatePicker"></mat-datepicker-toggle>
-    <mat-datepicker #startDatePicker></mat-datepicker>
+  <mat-form-field class="form-field white-label">
+    <mat-label class="white-label"> Date Type </mat-label>
+    <mat-select [(value)]="selectedDateType" (selectionChange)="onDateTypeChangedHandler($event)">
+      <mat-option *ngFor="let dateType of datePickerTypes" [value]="dateType.value">
+        {{ dateType.name }}
+      </mat-option>
+    </mat-select>
   </mat-form-field>
 
   <mat-form-field class="form-field">
-    <mat-label class="white-label">Choose a end date</mat-label>
-    <input matInput [matDatepicker]="endDatePicker" [formControl]="endDate">
-    <mat-datepicker-toggle matSuffix [for]="endDatePicker"></mat-datepicker-toggle>
-    <mat-datepicker #endDatePicker></mat-datepicker>
+    <mat-label class="white-label">Choose a date</mat-label>
+    <input matInput [matDatepicker]="startDatePicker" [formControl]="startDate" >
+    <mat-datepicker-toggle matSuffix [for]="startDatePicker"></mat-datepicker-toggle>
+    <mat-datepicker 
+      #startDatePicker 
+      startView="multi-year" 
+      (yearSelected)="chosenYearHandler($event, startDatePicker)"
+      (monthSelected)="chosenMonthHandler($event, startDatePicker)">
+    </mat-datepicker>
   </mat-form-field>
 
   <button class="generate-button" mat-flat-button (click)="onSubmitHandler()">Generate report</button>
