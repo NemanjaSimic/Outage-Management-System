@@ -2,8 +2,7 @@ import { Component, OnInit, NgZone, OnDestroy } from '@angular/core';
 import { Subscription } from 'rxjs';
 import { OmsGraph } from '@shared/models/oms-graph.model';
 
-import { drawBackupEdge } from '@shared/utils/backup-edge';
-import { addGraphTooltip, addEdgeTooltip } from '@shared/utils/tooltip';
+import { addGraphTooltip, addEdgeTooltip, addAnalogMeasurementTooltip } from '@shared/utils/tooltip';
 import { drawWarningOnNode, drawWarningOnLine } from '@shared/utils/warning';
 import { drawCallWarning } from '@shared/utils/outage';
 import { addOutageTooltip } from '@modules/graph/outage-lifecycle/tooltip';
@@ -37,6 +36,7 @@ import cyConfig from './graph.config';
 import popper from 'cytoscape-popper';
 import * as cytoscape from 'cytoscape';
 import * as legendData from './legend.json';
+import { SnackbarService } from '@services/notification/snackbar.service';
 
 cytoscape.use(dagre);
 cytoscape.use(popper);
@@ -81,6 +81,7 @@ export class GraphComponent implements OnInit, OnDestroy {
     private outageNotificationService: OutageNotificationService,
     private commandService: CommandService,
     private outageService: OutageService,
+    private snackBar: SnackbarService,
     private ngZone: NgZone
   ) {
     this.connectionSubscription = Subscription.EMPTY;
@@ -99,6 +100,12 @@ export class GraphComponent implements OnInit, OnDestroy {
     this.getActiveOutages();
 
     this.legendItems = legendData.items;
+    this.drawGraph();
+  }
+
+  openMenu(event, message) : void {
+    console.log(event.clientX);
+    console.log(message);
   }
 
   ngOnDestroy() {
@@ -123,7 +130,10 @@ export class GraphComponent implements OnInit, OnDestroy {
 
   public getTopology(): void {
     this.topologySubscription = this.graphService.getTopology().subscribe(
-      graph => this.onNotification(graph),
+      graph => {
+        console.log(graph);
+        this.onNotification(graph)
+      },
       error => console.log(error)
     );
   }
@@ -133,6 +143,7 @@ export class GraphComponent implements OnInit, OnDestroy {
       outages => {
         console.log(outages);
         this.activeOutages = outages;
+        this.addOutageTooltips();
       },
       err => console.log(err)
     );
@@ -232,19 +243,13 @@ export class GraphComponent implements OnInit, OnDestroy {
     modifyNodeDistance(this.cy.nodes().filter(x => x.data('dmsType') == "ENERGYCONSUMER"));
   };
 
-  public drawBackupEdges(): void {
-    this.cy.ready(() => {
-      this.graphData.backup_edges.forEach(line => {
-        drawBackupEdge(this.cy, line);
-      });
-    });
-  }
-
   public addTooltips(): void {
     this.cy.ready(() => {
       this.cy.nodes().forEach(node => {
         node.sendSwitchCommand = (command) => this.onSwitchCommandHandler(command);
-        addGraphTooltip(this.cy, node);
+        if(node.data('type') != "analogMeasurement"){
+          addGraphTooltip(this.cy, node);
+        }
         if (node.data('dmsType') == "ACLINESEGMENT") {
           const connectedEdges = node.connectedEdges();
           if (connectedEdges.length)
@@ -272,7 +277,7 @@ export class GraphComponent implements OnInit, OnDestroy {
             drawMeasurements(this.cy, node, measurementString, color, nodePosition * counter, meas.Id);
             counter++;
             let newNode = this.cy.$id(meas.Id);
-            // addAnalogMeasurementTooltip(this.cy, newNode, meas.AlarmType);
+            addAnalogMeasurementTooltip(this.cy, newNode, meas.AlarmType);
           });
         }
       })
@@ -324,6 +329,32 @@ export class GraphComponent implements OnInit, OnDestroy {
 
   public onActiveOutageNotification(outage: ActiveOutage): void {
     console.log(outage);
+    let message;
+    if (outage.State == OutageLifeCycleState.Removed)
+    {
+      message = `Outage with gid ${outage.Id} has been removed.`;
+    }
+    else if(outage.State == OutageLifeCycleState.Isolated)
+    {
+      message = `Outage with ID ${outage.Id} has been successfully isolated.`;
+    }
+    else if(outage.State == OutageLifeCycleState.Repaired)
+    {
+      message = `Crew has repaired outage with ID ${outage.Id} successfully.`;
+    }
+    else if(outage.State == OutageLifeCycleState.Created)
+    {
+      message = `Outage with ID ${outage.Id} is successfully created.`;
+    }
+    else if(outage.State == OutageLifeCycleState.Archived)
+    {
+      message = `Outage with ID ${outage.Id} is successfully archived.`;
+    }
+    
+    if (message)
+    {
+        this.snackBar.notify(message);
+    }
     this.activeOutages = this.activeOutages.filter(o => o.Id !== outage.Id);
     this.activeOutages.push(outage);
     this.drawGraph(); // da bi resetovao tooltip-ove, ako je velika mreza, optimizovacemo
@@ -335,7 +366,7 @@ export class GraphComponent implements OnInit, OnDestroy {
       
       if (activeOutage.State == OutageLifeCycleState.Created) {
         if (activeOutage.DefaultIsolationPoints.length)
-          outageElement = this.cy.nodes().filter(node => node.data('id') == activeOutage.DefaultIsolationPoints[0])[0];
+          outageElement = this.cy.nodes().filter(node => node.data('id') == activeOutage.DefaultIsolationPoints[0].Id)[0];
       }
 
       // @TODO:
@@ -353,35 +384,46 @@ export class GraphComponent implements OnInit, OnDestroy {
         outageNode.sendRepairCrewCommand = (id) => this.onSendCrewOutageCommand(id);
         outageNode.sendValidateOutageCommand = (id) => this.onValidateOutageCommand(id);
         outageNode.sendResolveOutageCommand = (id) => this.onResolveOutageCommand(id);
-        addOutageTooltip(this.cy, outageNode, activeOutage);
+        outageNode.sendSendLocationIsolationCrew = (id) => this.onSendLocationIsolationCrewCommand(id);
+        addOutageTooltip(this.cy, outageNode, activeOutage, outageElement);
       }
     }
   }
-
+  public onSendLocationIsolationCrewCommand(id: Number):void{
+    this.outageService.sendLocationIsolationCrewCommand(id).subscribe(
+      status =>
+      {
+        console.log("Status of send location and isolation crew is: ");
+        console.log(status);
+        // this.snackBar.notify(`Crew has isolated outage with ID ${id} successfully.`);
+      },
+      err => console.log(err)
+    );
+  }
   public onIsolateOutageCommand(id: Number): void {
     this.outageService.sendIsolateOutageCommand(id).subscribe(
-      status => console.log(status),
+      status => console.log(status),//this.snackBar.notify(`Outage with ID ${id} has been successfully isolated.`),
       err => console.log(err)
     );
   }
 
   public onSendCrewOutageCommand(id: Number): void {
     this.outageService.sendOutageRepairCrew(id).subscribe(
-      status => console.log(status),
+      status => console.log(status),//this.snackBar.notify(`Crew has repaired outage with ID ${id} successfully.`),
       err => console.log(err)
     );
   }
 
   public onValidateOutageCommand(id: Number): void {
     this.outageService.sendValidateOutageCommand(id).subscribe(
-      status => console.log(status),
+      status => console.log(status),//this.snackBar.notify(`Outage with ID ${id} has been successfully validated.`),
       err => console.log(err)
     );
   }
 
   public onResolveOutageCommand(id: Number): void {
     this.outageService.sendResolveOutageCommand(id).subscribe(
-      status => console.log(status),
+      status => console.log(status),//this.snackBar.notify(`Outage with ID ${id} has been successfully resolved.`),
       err => console.log(err)
     );
 

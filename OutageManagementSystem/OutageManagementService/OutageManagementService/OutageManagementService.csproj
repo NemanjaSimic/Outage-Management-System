@@ -55,13 +55,38 @@
   <ItemGroup>
     <Compile Include="Calling\CallTracker.cs" />
     <Compile Include="Calling\TrackingAlgorithm.cs" />
+    <Compile Include="DBManager\HistoryDBManager.cs" />
     <Compile Include="DistribuedTransaction\OutageModelUpdateNotification.cs" />
     <Compile Include="DistribuedTransaction\OutageTransactionActor.cs" />
+    <Compile Include="LifeCycleServices\IsolateOutageService.cs" />
+    <Compile Include="LifeCycleServices\ReportOutageService.cs" />
+    <Compile Include="LifeCycleServices\ResolveOutageService.cs" />
+    <Compile Include="LifeCycleServices\SendLocationIsolationCrewService.cs" />
+    <Compile Include="LifeCycleServices\SendRepairCrewService.cs" />
+    <Compile Include="LifeCycleServices\ValidateResolveConditionsService.cs" />
     <Compile Include="OutageIsolationAlgorithm\OutageIsolationAlgorithmParameters.cs" />
     <Compile Include="OutageModel.cs" />
     <Compile Include="OutageManagementService.cs" />
     <Compile Include="Outage\OutageService.cs" />
     <Compile Include="Properties\AssemblyInfo.cs" />
+    <Compile Include="Report\DateHelpers.cs" />
+    <Compile Include="Report\Queries\AndSpecification.cs" />
+    <Compile Include="Report\Queries\HistoricalConsumerElementIdQuery.cs" />
+    <Compile Include="Report\Queries\HistoricalConsumerEndDateQuery.cs" />
+    <Compile Include="Report\Queries\HistoricalConsumerStartDateQuery .cs" />
+    <Compile Include="Report\Queries\HistoricalConsumerIdQuery.cs" />
+    <Compile Include="Report\Queries\HistoricalConsumerOperationQuery.cs" />
+    <Compile Include="Report\Queries\HistoricalConsumerSpecification.cs" />
+    <Compile Include="Report\Queries\OutageEndDateQuery.cs" />
+    <Compile Include="Report\Queries\OutageElementIdQuery.cs" />
+    <Compile Include="Report\Queries\OutageLifecycleQuery.cs" />
+    <Compile Include="Report\Queries\OutageSpecification.cs" />
+    <Compile Include="Report\Queries\OutageStartDateQuery.cs" />
+    <Compile Include="Report\Queries\Specification.cs" />
+    <Compile Include="Report\ReportingService.cs" />
+    <Compile Include="Report\SaidiReport.cs" />
+    <Compile Include="Report\SaifiReport.cs" />
+    <Compile Include="Report\TotalReport.cs" />
     <Compile Include="ScadaSubscriber\ScadaNotification.cs" />
   </ItemGroup>
   <ItemGroup>
@@ -90,6 +115,7 @@
     <None Include="App.config" />
     <None Include="packages.config" />
   </ItemGroup>
+  <ItemGroup />
   <Import Project="$(MSBuildToolsPath)\Microsoft.CSharp.targets" />
   <Target Name="EnsureNuGetPackageBuildImports" BeforeTargets="PrepareForBuild">
     <PropertyGroup>

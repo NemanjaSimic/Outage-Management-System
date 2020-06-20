@@ -1,0 +1,32 @@
+<h1 mat-dialog-title>Archived Outage Details</h1>
+<div mat-dialog-content>
+  <p>ID:&nbsp;&nbsp;{{ outage.Id }}</p>
+  <p>ElementId:&nbsp;&nbsp;{{ outage.ElementId == 0 ? '-' : '0x'+((+outage.ElementId).toString(16).toUpperCase()) }}</p>
+  <p>Default Isolation Points:<br/>
+  <ng-container *ngIf="outage.DefaultIsolationPoints.length != 0; else empty_element"> 
+    <div *ngFor="let point of getOutagePointsString(outage.DefaultIsolationPoints)">
+      &nbsp;&nbsp;{{ point }}
+    </div>
+  </ng-container>
+  <p>Optimal Isolation Points:<br/></p>
+  <ng-container *ngIf="outage.OptimalIsolationPoints.length != 0; else empty_element">
+      <div *ngFor="let point of getOutagePointsString(outage.OptimalIsolationPoints)">
+        &nbsp;&nbsp;{{ point }}
+      </div>
+  </ng-container>
+  <p>Affected Consumers:&nbsp;&nbsp;{{ outage.AffectedConsumers.length.toString() }}</p>
+  <ng-container *ngIf="outage.AffectedConsumers.length != 0; else empty_element"> 
+    <div *ngFor="let consumer of getConsumersString(outage.AffectedConsumers); index as i">
+      &nbsp;&nbsp;[{{i + 1}}] {{ consumer }}
+    </div>
+  </ng-container>
+  <p>State:&nbsp;&nbsp;{{ !outage.State ? '-' : getOutageStateString(outage.State) }}</p>
+  <p>Reported at:&nbsp;&nbsp;{{ !outage.ReportedAt ? '-' : outage.ReportedAt | date:'medium' }}</p>
+  <p>Isolated at:&nbsp;&nbsp;{{ !outage.IsolatedAt ? '-' : outage.IsolatedAt | date:'medium' }}</p>
+  <p>Repaired at:&nbsp;&nbsp;{{ !outage.RepairedAt ? '-' : outage.RepairedAt | date:'medium' }}</p>
+  <p>Archived at:&nbsp;&nbsp;{{ !outage.ArchivedAt ? '-' : outage.ArchivedAt | date:'medium' }}</p>
+</div>
+<div mat-dialog-actions>
+  <button mat-raised-button (click)="onCloseClick()">Close</button>
+</div>
+<ng-template #empty_element><p> - </p></ng-template>

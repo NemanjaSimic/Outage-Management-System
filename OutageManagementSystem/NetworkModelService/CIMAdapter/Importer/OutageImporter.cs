@@ -165,6 +165,7 @@ namespace Outage.DataImporter.CIMAdapter.Importer
 			ImportLoadBreakSwitches();
 			ImportACLineSegments();
 			ImportConnectivityNodes();
+			ImportSynchronousMachines();
 			ImportTerminals();
 			ImportDiscretes();
 			ImportAnalogs();
@@ -818,6 +819,47 @@ namespace Outage.DataImporter.CIMAdapter.Importer
 				importHelper.DefineIDMapping(cimAnalog.ID, gid);
 
 				OutageConverter.PopulateAnalogProperties(cimAnalog, rd, importHelper, report);
+			}
+
+			return rd;
+		}
+
+		private void ImportSynchronousMachines()
+		{
+			SortedDictionary<string, object> cimSynchronousMachines = concreteModel.GetAllObjectsOfType("Outage.SynchronousMachine");
+
+			if (cimSynchronousMachines != null)
+			{
+				foreach (KeyValuePair<string, object> cimSynchronousMachinePair in cimSynchronousMachines)
+				{
+					Outage.SynchronousMachine cimSynchronousMachine = cimSynchronousMachinePair.Value as Outage.SynchronousMachine;
+					ResourceDescription rd = CreatSynchronousMachineResourceDescription(cimSynchronousMachine);
+					if (rd != null)
+					{
+						string mrid = cimSynchronousMachine.MRID;
+						CreateAndInsertDeltaOperation(mrid, rd);
+
+						report.Report.Append("SynchronousMachine ID: ").Append(cimSynchronousMachine.ID).Append(" SUCCESSFULLY converted to GID: ").AppendLine($"0x{rd.Id:X16}");
+					}
+					else
+					{
+						report.Report.Append("SynchronousMachine ID: ").Append(cimSynchronousMachine.ID).AppendLine(" FAILED to be converted");
+					}
+				}
+			}
+		}
+
+		private ResourceDescription CreatSynchronousMachineResourceDescription(Outage.SynchronousMachine cimSynchronousMachine)
+		{
+			ResourceDescription rd = null;
+
+			if (cimSynchronousMachine != null)
+			{
+				long gid = ModelCodeHelper.CreateGlobalId(0, (short)DMSType.SYNCHRONOUSMACHINE, importHelper.CheckOutIndexForDMSType(DMSType.SYNCHRONOUSMACHINE));
+				rd = new ResourceDescription(gid);
+				importHelper.DefineIDMapping(cimSynchronousMachine.ID, gid);
+
+				OutageConverter.PopulateSynchronousMachineProperties(cimSynchronousMachine, rd, importHelper, report);
 			}
 
 			return rd;

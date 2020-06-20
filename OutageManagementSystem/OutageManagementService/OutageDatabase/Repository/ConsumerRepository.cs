@@ -14,16 +14,14 @@ namespace OutageDatabase.Repository
 
         public override Consumer Get(long id)
         {
-            return context.Set<Consumer>().Include(c => c.ActiveOutages)
-                                          .Include(c => c.ArchivedOutages)
+            return context.Set<Consumer>().Include(c => c.Outages)
                                           .Where(c => c.ConsumerId == id)
                                           .FirstOrDefault();
         }
 
         public override IEnumerable<Consumer> GetAll()
         {
-            return context.Set<Consumer>().Include(c => c.ActiveOutages)
-                                          .Include(c => c.ArchivedOutages);
+            return context.Set<Consumer>().Include(c => c.Outages);
         }
     }
 }

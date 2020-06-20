@@ -7,12 +7,19 @@ namespace Outage.Common
     {
         VOLTAGE = 1,
         CURRENT = 2,
-        POWER   = 3,
+        FEEDER_CURRENT = 3,
+        POWER   = 4,
     }
 
     public enum DiscreteMeasurementType : short
     {
         SWITCH_STATUS   = 1,
+    }
+
+    public enum EnergyConsumerType : short
+    {
+        HOUSEHOLD = 0,
+        SMALL_INDUSTRY
     }
 
 
@@ -102,12 +109,15 @@ namespace Outage.Common
         OUTAGE_SIMULATOR,
 
         [EnumMember]
+        NON_SCADA_OUTAGE,
+
+        [EnumMember]
         OTHER_COMMAND, //TODO: rethink of name, add others like CE ili tako nesto
     }
 
     //OMS
     [DataContract]
-    public enum ActiveOutageState : short
+    public enum OutageState : short
     {
         [EnumMember]
         CREATED = 1,
@@ -115,7 +125,18 @@ namespace Outage.Common
         ISOLATED = 2,
         [EnumMember]
         REPAIRED = 3,
-        //[EnumMember]
-        //RESOLVED = 4,
+        [EnumMember]
+        ARCHIVED = 4,
+        [EnumMember]
+        REMOVED = 5,
+    }
+
+    [DataContract]
+    public enum DatabaseOperation : short
+    {
+        [EnumMember]
+        INSERT = 1,
+        [EnumMember]
+        DELETE = 2
     }
 }

@@ -1,5 +1,6 @@
 import tippy from 'tippy.js';
 import { SwitchCommand, SwitchCommandType } from '@shared/models/switch-command.model';
+import { AlarmType } from '@shared/models/scada-data.model';
 
 const commandableTypes: string[] = ["LOADBREAKSWITCH", "DISCONNECTOR", "BREAKER", "FUSE"];
 let commandedNodeIds: string[] = [];
@@ -13,6 +14,9 @@ const graphTooltipBody: string =
   <p>Device type: [[deviceType]]</p>
   <p>State: [[state]]</p>
   <p>Nominal voltage: [[nominalVoltage]]</p>`;
+
+const measurementsToolTipBody: string =
+  `<h3>[[alarmType]]</h3>`;
 
 export const addGraphTooltip = (cy, node) => {
   let ref = node.popperRef();
@@ -52,7 +56,7 @@ export const addGraphTooltip = (cy, node) => {
 const createNodeTooltipContent = (node) => {
   const div = document.createElement('div');
   div.innerHTML = graphTooltipBody
-    .replace("[[id]]", (+node.data('id')).toString(16))
+    .replace("[[id]]", "0x" + (+node.data('id')).toString(16).toUpperCase())
     .replace("[[type]]", node.data('dmsType'))
     .replace("[[name]]", node.data('name'))
     .replace("[[mrid]]", node.data('mrid'))
@@ -106,7 +110,7 @@ export const addEdgeTooltip = (cy, node, edge) => {
     content: () => {
       const div = document.createElement('div');
       div.innerHTML = graphTooltipBody
-        .replace("[[id]]", (+node.data('id')).toString(16))
+        .replace("[[id]]", "0x" + (+node.data('id')).toString(16).toUpperCase())
         .replace("[[type]]", node.data('dmsType'))
         .replace("[[name]]", node.data('name'))
         .replace("[[mrid]]", node.data('mrid'))
@@ -138,3 +142,34 @@ export const addEdgeTooltip = (cy, node, edge) => {
     }, 0);
   });
 }; 
+
+export const addAnalogMeasurementTooltip = (cy, node, alarmType) => {
+  let ref = node.popperRef();
+
+  node.tooltip = tippy(ref, {
+    content: () => {
+      const div = document.createElement('div');
+      div.innerHTML = measurementsToolTipBody.replace("[[alarmType]]", AlarmType[alarmType]);
+
+      return div;
+    },
+    animation: 'scale',
+    trigger: 'manual',
+    placement: 'left',
+    arrow: true,
+    interactive: true 
+  })
+
+  node.on('tap', () => {
+    setTimeout(() => {
+      node.tooltip.show();
+    }, 0);
+  });
+
+  // hide the tooltip on zoom and pan
+  cy.on('zoom pan', () => {
+    setTimeout(() => {
+      node.tooltip.hide();
+    }, 0);
+  });
+} 

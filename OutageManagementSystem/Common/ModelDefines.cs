@@ -21,6 +21,7 @@ namespace Outage.Common
         ACLINESEGMENT                       = 0x000c,
         DISCRETE                            = 0x000d,
         ANALOG                              = 0x000e,
+        SYNCHRONOUSMACHINE                  = 0x000f
 
     }
     
@@ -61,6 +62,9 @@ namespace Outage.Common
         ENERGYSOURCE                            = 0x1112100000050000,
 
         ENERGYCONSUMER                          = 0x1112200000060000,
+        ENERGYCONSUMER_FIRSTNAME                = 0x1112200000060107,
+        ENERGYCONSUMER_LASTNAME                 = 0x1112200000060207,
+        ENERGYCONSUMER_TYPE                     = 0x111220000006030a,
 
         TRANSFORMERWINDING                      = 0x1112300000070000,
         TRANSFORMERWINDING_POWERTRANSFORMER     = 0x1112300000070109,
@@ -82,7 +86,12 @@ namespace Outage.Common
 
         ACLINESEGMENT                           = 0x11125100000c0000,
 
-        MEASUREMENT                             = 0x1500000000000000,
+        SYNCHRONOUSMACHINE                      = 0x11126000000f0000,
+        SYNCHRONOUSMACHINE_CAPACITY             = 0x11126000000f0105,
+        SYNCHRONOUSMACHINE_CURRENTREGIME        = 0x11126000000f0205,
+
+
+        MEASUREMENT = 0x1500000000000000,
         MEASUREMENT_ADDRESS                     = 0x1500000000000107,
         MEASUREMENT_ISINPUT                     = 0x1500000000000201,
         MEASUREMENT_TERMINAL                    = 0x1500000000000309,

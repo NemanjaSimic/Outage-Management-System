@@ -45,6 +45,7 @@ namespace OutageManagementService.Calling
             try
             {
                 timeInterval = Int32.Parse(ConfigurationManager.AppSettings["TimerInterval"]);
+                Logger.LogInfo($"TIme interval is set to: {timeInterval}.");
                 
             }
             catch(Exception e)
@@ -56,6 +57,7 @@ namespace OutageManagementService.Calling
             try
             {
                 expectedCalls = Int32.Parse(ConfigurationManager.AppSettings["ExpectedCalls"]);
+                Logger.LogInfo($"Expected calls is set to: {expectedCalls}.");
             }
             catch (Exception e)
             {
@@ -84,6 +86,8 @@ namespace OutageManagementService.Calling
                     return;
                 }
 
+                Logger.LogInfo($"Received call from Energy Consumer with GID: 0x{emailMessage.Gid:X16}.");
+
                 if (!resourcesDesc.GetModelCodeFromId(emailMessage.Gid).Equals(ModelCode.ENERGYCONSUMER))
                 {
                     Logger.LogWarn("Received GID is not id of energy consumer.");
@@ -100,6 +104,7 @@ namespace OutageManagementService.Calling
                     }
 
                     calls.Enqueue(emailMessage.Gid);
+                    Logger.LogInfo($"Current number of calls is: {calls.Count}.");
                     if (calls.Count >= expectedCalls)
                     {
                         trackingAlgorithm.Start(calls);

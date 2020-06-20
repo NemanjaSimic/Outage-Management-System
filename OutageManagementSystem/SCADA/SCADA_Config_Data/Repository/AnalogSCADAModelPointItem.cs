@@ -122,6 +122,11 @@ namespace Outage.SCADA.SCADAData.Repository
                 LowLimit = AlarmConfigData.Instance.LowCurrentLimit;
                 HighLimit = AlarmConfigData.Instance.HighCurrentLimit;
             }
+            else if (AnalogType == AnalogMeasurementType.FEEDER_CURRENT)
+            {
+                LowLimit = AlarmConfigData.Instance.LowFeederCurrentLimit;
+                HighLimit = AlarmConfigData.Instance.HighFeederCurrentLimit;
+            }
             else
             {
                 throw new Exception($"Analog measurement is of type: {AnalogType} which is not supported for alarming.");

@@ -1,4 +1,5 @@
-﻿using System.Collections.Generic;
+﻿using CECommon.Models;
+using System.Collections.Generic;
 
 namespace CECommon.Interfaces
 {
@@ -11,5 +12,6 @@ namespace CECommon.Interfaces
         bool PrepareForTransaction();
         void RollbackTransaction();
         HashSet<long> GetReclosers();
+        bool IsRecloser(long recloserGid);
     }
 }

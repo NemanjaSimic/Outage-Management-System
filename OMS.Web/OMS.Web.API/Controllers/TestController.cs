@@ -70,8 +70,8 @@
             ActiveOutageViewModel initialActiveOutage = new ActiveOutageViewModel
             {
                 Id = 111,
-                DefaultIsolationPoints = new List<long> { 6 },
-                State = ActiveOutageLifecycleState.Created,
+                DefaultIsolationPoints = new List<EquipmentViewModel>() { new EquipmentViewModel() { Id = 6, Mrid = "EL_6" } },
+                State = OutageLifecycleState.Created,
                 ReportedAt = DateTime.Now
             };
 
@@ -88,13 +88,13 @@
             ActiveOutageViewModel initialActiveOutage = new ActiveOutageViewModel
             {
                 Id = id,
-                DefaultIsolationPoints = new List<long> { 6 },
-                ElementId = 12, // ACLINE segment
-                // breaker iznad i fuse ispod (stavio sam elemente okolo aclinesegmenta), ali front ce raditi sa bilo kojim vasim id-evima
-                // mada ovo nije ni bitno toliko za front ?
-                OptimalIsolationPoints = new List<long> { 6, 14 }, 
-                State = ActiveOutageLifecycleState.Isolated,
-                ReportedAt = DateTime.Now // ovo se ne menja al test
+                DefaultIsolationPoints = new List<EquipmentViewModel>() { new EquipmentViewModel() { Id = 6, Mrid = "EL_6" } },
+                ElementId = 12,
+                OptimalIsolationPoints = new List<EquipmentViewModel>() { 
+                    new EquipmentViewModel() { Id = 6, Mrid = "EL_6" },
+                    new EquipmentViewModel() { Id = 14, Mrid = "EL_14" }},
+                State = OutageLifecycleState.Isolated,
+                ReportedAt = DateTime.Now
             };
 
             var outageHubContext = GetOutageHubContext();
@@ -110,13 +110,13 @@
             ActiveOutageViewModel initialActiveOutage = new ActiveOutageViewModel
             {
                 Id = id,
-                DefaultIsolationPoints = new List<long> { 6 },
-                ElementId = 12, // ACLINE segment
-                // breaker iznad i fuse ispod (stavio sam elemente okolo aclinesegmenta), ali front ce raditi sa bilo kojim vasim id-evima
-                // mada ovo nije ni bitno toliko za front ?
-                OptimalIsolationPoints = new List<long> { 6, 14 },
-                State = ActiveOutageLifecycleState.Isolated,
-                ReportedAt = DateTime.Now, // ovo nije isto, al test je
+                DefaultIsolationPoints = new List<EquipmentViewModel>() { new EquipmentViewModel() { Id = 6, Mrid = "EL_6" } },
+                ElementId = 12,
+                OptimalIsolationPoints = new List<EquipmentViewModel>() { 
+                    new EquipmentViewModel() { Id = 6, Mrid = "EL_6" },
+                    new EquipmentViewModel() { Id = 14, Mrid = "EL_14" }},
+                State = OutageLifecycleState.Isolated,
+                ReportedAt = DateTime.Now,
                 RepairedAt = DateTime.Now
             };
 
@@ -141,15 +141,15 @@
             ActiveOutageViewModel initialActiveOutage = new ActiveOutageViewModel
             {
                 Id = id,
-                DefaultIsolationPoints = new List<long> { 6 },
-                ElementId = 12, // ACLINE segment
-                // breaker iznad i fuse ispod (stavio sam elemente okolo aclinesegmenta), ali front ce raditi sa bilo kojim vasim id-evima
-                // mada ovo nije ni bitno toliko za front ?
-                OptimalIsolationPoints = new List<long> { 6, 14 },
-                State = ActiveOutageLifecycleState.Isolated,
-                ReportedAt = DateTime.Now, // ovo nije isto, al test je
+                DefaultIsolationPoints = new List<EquipmentViewModel>() { new EquipmentViewModel() { Id = 6, Mrid = "EL_6" } },
+                ElementId = 12,
+                OptimalIsolationPoints = new List<EquipmentViewModel>() { 
+                    new EquipmentViewModel() { Id = 6, Mrid = "EL_6" },
+                    new EquipmentViewModel() { Id = 14, Mrid = "EL_14" }},
+                State = OutageLifecycleState.Isolated,
+                ReportedAt = DateTime.Now,
                 RepairedAt = DateTime.Now,
-                IsResolveConditionValidated = true  // validiramo ga
+                IsResolveConditionValidated = true
             };
 
             var outageHubContext = GetOutageHubContext();

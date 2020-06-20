@@ -1,0 +1,44 @@
+<div class="report-form">
+  <mat-form-field class="form-field white-label">
+    <mat-label class="white-label"> Report Type </mat-label>
+    <mat-select [(value)]="selectedReportType">
+      <mat-option *ngFor="let reportType of reportTypes" [value]="reportType.value">
+        {{ reportType.name }}
+      </mat-option>
+    </mat-select>
+  </mat-form-field>
+
+  <mat-form-field class="form-field custom-width">
+    <mat-label class="white-label">Scope</mat-label>
+    <input type="text" class="white-label" matInput [formControl]="selectedScopeControl" [matAutocomplete]="auto">
+    <mat-autocomplete #auto="matAutocomplete">
+      <mat-option *ngFor="let scope of filteredScopes | async" [value]="scope.gid">
+        <span>{{ scope.name }}</span> |
+        <small>{{ scope.gid }}</small>
+      </mat-option>
+    </mat-autocomplete>
+  </mat-form-field>
+
+  <mat-form-field class="form-field white-label">
+    <mat-label class="white-label"> Date Type </mat-label>
+    <mat-select [(value)]="selectedDateType" (selectionChange)="onDateTypeChangedHandler($event)">
+      <mat-option *ngFor="let dateType of datePickerTypes" [value]="dateType.value">
+        {{ dateType.name }}
+      </mat-option>
+    </mat-select>
+  </mat-form-field>
+
+  <mat-form-field class="form-field">
+    <mat-label class="white-label">Choose a date</mat-label>
+    <input matInput [matDatepicker]="datePicker" [formControl]="selectedDate" >
+    <mat-datepicker-toggle matSuffix [for]="datePicker"></mat-datepicker-toggle>
+    <mat-datepicker 
+      #datePicker 
+      startView="multi-year" 
+      (yearSelected)="chosenYearHandler($event, datePicker)"
+      (monthSelected)="chosenMonthHandler($event, datePicker)">
+    </mat-datepicker>
+  </mat-form-field>
+
+  <button class="generate-button" mat-flat-button (click)="onSubmitHandler()">Generate report</button>
+</div>
