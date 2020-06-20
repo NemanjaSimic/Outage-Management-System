@@ -4467,6 +4467,7 @@
 		<cim:IdentifiedObject.description> </cim:IdentifiedObject.description>
 		<cim:IdentifiedObject.mRID>EC_1</cim:IdentifiedObject.mRID>
 		<ftn:IdentifiedObject.name>EC_1</ftn:IdentifiedObject.name>
+		<cim:EnergyConsumer.type>Household</cim:EnergyConsumer.type>
 	</cim:EnergyConsumer>
 	
 	<cim:EnergyConsumer rdf:ID="EC_2">
@@ -4474,6 +4475,7 @@
 		<cim:IdentifiedObject.description> </cim:IdentifiedObject.description>
 		<cim:IdentifiedObject.mRID>EC_2</cim:IdentifiedObject.mRID>
 		<ftn:IdentifiedObject.name>EC_2</ftn:IdentifiedObject.name>
+		<cim:EnergyConsumer.type>Household</cim:EnergyConsumer.type>
 	</cim:EnergyConsumer>
 	
 	<cim:EnergyConsumer rdf:ID="EC_3">
@@ -4481,6 +4483,7 @@
 		<cim:IdentifiedObject.description> </cim:IdentifiedObject.description>
 		<cim:IdentifiedObject.mRID>EC_3</cim:IdentifiedObject.mRID>
 		<ftn:IdentifiedObject.name>EC_3</ftn:IdentifiedObject.name>
+		<cim:EnergyConsumer.type>Household</cim:EnergyConsumer.type>
 	</cim:EnergyConsumer>
 	
 	<cim:EnergyConsumer rdf:ID="EC_4">
@@ -4489,6 +4492,7 @@
 		<cim:IdentifiedObject.description> </cim:IdentifiedObject.description>
 		<cim:IdentifiedObject.mRID>EC_4</cim:IdentifiedObject.mRID>
 		<ftn:IdentifiedObject.name>EC_4</ftn:IdentifiedObject.name>
+		<cim:EnergyConsumer.type>Household</cim:EnergyConsumer.type>
 	</cim:EnergyConsumer>
 	
 	<cim:EnergyConsumer rdf:ID="EC_5">
@@ -4497,6 +4501,7 @@
 		<cim:IdentifiedObject.description> </cim:IdentifiedObject.description>
 		<cim:IdentifiedObject.mRID>EC_5</cim:IdentifiedObject.mRID>
 		<ftn:IdentifiedObject.name>EC_5</ftn:IdentifiedObject.name>
+		<cim:EnergyConsumer.type>Household</cim:EnergyConsumer.type>
 	</cim:EnergyConsumer>
 	
 	<cim:EnergyConsumer rdf:ID="EC_6">
@@ -4505,6 +4510,7 @@
 		<cim:IdentifiedObject.description> </cim:IdentifiedObject.description>
 		<cim:IdentifiedObject.mRID>EC_6</cim:IdentifiedObject.mRID>
 		<ftn:IdentifiedObject.name>EC_6</ftn:IdentifiedObject.name>
+		<cim:EnergyConsumer.type>Household</cim:EnergyConsumer.type>
 	</cim:EnergyConsumer>
 	
 	<cim:EnergyConsumer rdf:ID="EC_7">
@@ -4513,6 +4519,7 @@
 		<cim:IdentifiedObject.description> </cim:IdentifiedObject.description>
 		<cim:IdentifiedObject.mRID>EC_7</cim:IdentifiedObject.mRID>
 		<ftn:IdentifiedObject.name>EC_7</ftn:IdentifiedObject.name>
+		<cim:EnergyConsumer.type>Household</cim:EnergyConsumer.type>
 	</cim:EnergyConsumer>
 	
 	<cim:EnergyConsumer rdf:ID="EC_8">
@@ -4521,6 +4528,7 @@
 		<cim:IdentifiedObject.description> </cim:IdentifiedObject.description>
 		<cim:IdentifiedObject.mRID>EC_8</cim:IdentifiedObject.mRID>
 		<ftn:IdentifiedObject.name>EC_8</ftn:IdentifiedObject.name>
+		<cim:EnergyConsumer.type>Household</cim:EnergyConsumer.type>
 	</cim:EnergyConsumer>
 	
 	<cim:EnergyConsumer rdf:ID="EC_9">
@@ -4529,6 +4537,7 @@
 		<cim:IdentifiedObject.description> </cim:IdentifiedObject.description>
 		<cim:IdentifiedObject.mRID>EC_9</cim:IdentifiedObject.mRID>
 		<ftn:IdentifiedObject.name>EC_9</ftn:IdentifiedObject.name>
+		<cim:EnergyConsumer.type>Household</cim:EnergyConsumer.type>
 	</cim:EnergyConsumer>
 	
 	<cim:EnergyConsumer rdf:ID="EC_10">
@@ -4537,6 +4546,7 @@
 		<cim:IdentifiedObject.description> </cim:IdentifiedObject.description>
 		<cim:IdentifiedObject.mRID>EC_10</cim:IdentifiedObject.mRID>
 		<ftn:IdentifiedObject.name>EC_10</ftn:IdentifiedObject.name>
+		<cim:EnergyConsumer.type>Household</cim:EnergyConsumer.type>
 	</cim:EnergyConsumer>
 	
 	<cim:EnergyConsumer rdf:ID="EC_11">
@@ -4545,6 +4555,7 @@
 		<cim:IdentifiedObject.description> </cim:IdentifiedObject.description>
 		<cim:IdentifiedObject.mRID>EC_11</cim:IdentifiedObject.mRID>
 		<ftn:IdentifiedObject.name>EC_11</ftn:IdentifiedObject.name>
+		<cim:EnergyConsumer.type>Household</cim:EnergyConsumer.type>
 	</cim:EnergyConsumer>
 	
 	<cim:EnergyConsumer rdf:ID="EC_12">
@@ -4553,6 +4564,7 @@
 		<cim:IdentifiedObject.description> </cim:IdentifiedObject.description>
 		<cim:IdentifiedObject.mRID>EC_12</cim:IdentifiedObject.mRID>
 		<ftn:IdentifiedObject.name>EC_12</ftn:IdentifiedObject.name>
+		<cim:EnergyConsumer.type>Household</cim:EnergyConsumer.type>
 	</cim:EnergyConsumer>
 	
 	<cim:EnergyConsumer rdf:ID="EC_13">
@@ -4561,6 +4573,7 @@
 		<cim:IdentifiedObject.description> </cim:IdentifiedObject.description>
 		<cim:IdentifiedObject.mRID>EC_13</cim:IdentifiedObject.mRID>
 		<ftn:IdentifiedObject.name>EC_13</ftn:IdentifiedObject.name>
+		<cim:EnergyConsumer.type>Household</cim:EnergyConsumer.type>
 	</cim:EnergyConsumer>
 	
 	<cim:EnergyConsumer rdf:ID="EC_14">
@@ -4569,6 +4582,7 @@
 		<cim:IdentifiedObject.description> </cim:IdentifiedObject.description>
 		<cim:IdentifiedObject.mRID>EC_14</cim:IdentifiedObject.mRID>
 		<ftn:IdentifiedObject.name>EC_14</ftn:IdentifiedObject.name>
+		<cim:EnergyConsumer.type>Household</cim:EnergyConsumer.type>
 	</cim:EnergyConsumer>
 	
 	<cim:EnergyConsumer rdf:ID="EC_15">
@@ -4577,6 +4591,7 @@
 		<cim:IdentifiedObject.description> </cim:IdentifiedObject.description>
 		<cim:IdentifiedObject.mRID>EC_15</cim:IdentifiedObject.mRID>
 		<ftn:IdentifiedObject.name>EC_15</ftn:IdentifiedObject.name>
+		<cim:EnergyConsumer.type>Household</cim:EnergyConsumer.type>
 	</cim:EnergyConsumer>
 	
 	<cim:EnergyConsumer rdf:ID="EC_16">
@@ -4585,6 +4600,7 @@
 		<cim:IdentifiedObject.description> </cim:IdentifiedObject.description>
 		<cim:IdentifiedObject.mRID>EC_16</cim:IdentifiedObject.mRID>
 		<ftn:IdentifiedObject.name>EC_16</ftn:IdentifiedObject.name>
+		<cim:EnergyConsumer.type>Household</cim:EnergyConsumer.type>
 	</cim:EnergyConsumer>
 	
 	<cim:EnergyConsumer rdf:ID="EC_17">
@@ -4593,6 +4609,7 @@
 		<cim:IdentifiedObject.description> </cim:IdentifiedObject.description>
 		<cim:IdentifiedObject.mRID>EC_17</cim:IdentifiedObject.mRID>
 		<ftn:IdentifiedObject.name>EC_17</ftn:IdentifiedObject.name>
+		<cim:EnergyConsumer.type>Household</cim:EnergyConsumer.type>
 	</cim:EnergyConsumer>
 	
 	<cim:EnergyConsumer rdf:ID="EC_18">
@@ -4601,6 +4618,7 @@
 		<cim:IdentifiedObject.description> </cim:IdentifiedObject.description>
 		<cim:IdentifiedObject.mRID>EC_18</cim:IdentifiedObject.mRID>
 		<ftn:IdentifiedObject.name>EC_18</ftn:IdentifiedObject.name>
+		<cim:EnergyConsumer.type>Household</cim:EnergyConsumer.type>
 	</cim:EnergyConsumer>
 	
 	<cim:EnergyConsumer rdf:ID="EC_19">
@@ -4609,6 +4627,7 @@
 		<cim:IdentifiedObject.description> </cim:IdentifiedObject.description>
 		<cim:IdentifiedObject.mRID>EC_19</cim:IdentifiedObject.mRID>
 		<ftn:IdentifiedObject.name>EC_19</ftn:IdentifiedObject.name>
+		<cim:EnergyConsumer.type>Household</cim:EnergyConsumer.type>
 	</cim:EnergyConsumer>
 	
 	<cim:EnergyConsumer rdf:ID="EC_20">
@@ -4617,6 +4636,7 @@
 		<cim:IdentifiedObject.description> </cim:IdentifiedObject.description>
 		<cim:IdentifiedObject.mRID>EC_20</cim:IdentifiedObject.mRID>
 		<ftn:IdentifiedObject.name>EC_20</ftn:IdentifiedObject.name>
+		<cim:EnergyConsumer.type>Household</cim:EnergyConsumer.type>
 	</cim:EnergyConsumer>
 	
 	<cim:EnergyConsumer rdf:ID="EC_21">
@@ -4625,6 +4645,7 @@
 		<cim:IdentifiedObject.description> </cim:IdentifiedObject.description>
 		<cim:IdentifiedObject.mRID>EC_21</cim:IdentifiedObject.mRID>
 		<ftn:IdentifiedObject.name>EC_21</ftn:IdentifiedObject.name>
+		<cim:EnergyConsumer.type>Household</cim:EnergyConsumer.type>
 	</cim:EnergyConsumer>
 	
 	<cim:EnergyConsumer rdf:ID="EC_22">
@@ -4633,6 +4654,7 @@
 		<cim:IdentifiedObject.description> </cim:IdentifiedObject.description>
 		<cim:IdentifiedObject.mRID>EC_22</cim:IdentifiedObject.mRID>
 		<ftn:IdentifiedObject.name>EC_22</ftn:IdentifiedObject.name>
+		<cim:EnergyConsumer.type>Household</cim:EnergyConsumer.type>
 	</cim:EnergyConsumer>
 	<cim:EnergyConsumer rdf:ID="EC_23">
 		<cim:ConductingEquipment.BaseVoltage rdf:resource="#BV_2"/>
@@ -4640,6 +4662,7 @@
 		<cim:IdentifiedObject.description> </cim:IdentifiedObject.description>
 		<cim:IdentifiedObject.mRID>EC_23</cim:IdentifiedObject.mRID>
 		<ftn:IdentifiedObject.name>EC_23</ftn:IdentifiedObject.name>
+		<cim:EnergyConsumer.type>Household</cim:EnergyConsumer.type>
 	</cim:EnergyConsumer>
 	<cim:EnergyConsumer rdf:ID="EC_24">
 		<cim:ConductingEquipment.BaseVoltage rdf:resource="#BV_2"/>
@@ -4647,6 +4670,7 @@
 		<cim:IdentifiedObject.description> </cim:IdentifiedObject.description>
 		<cim:IdentifiedObject.mRID>EC_24</cim:IdentifiedObject.mRID>
 		<ftn:IdentifiedObject.name>EC_24</ftn:IdentifiedObject.name>
+		<cim:EnergyConsumer.type>Household</cim:EnergyConsumer.type>
 	</cim:EnergyConsumer>
 	<cim:EnergyConsumer rdf:ID="EC_25">
 		<cim:ConductingEquipment.BaseVoltage rdf:resource="#BV_2"/>
@@ -4654,6 +4678,7 @@
 		<cim:IdentifiedObject.description> </cim:IdentifiedObject.description>
 		<cim:IdentifiedObject.mRID>EC_25</cim:IdentifiedObject.mRID>
 		<ftn:IdentifiedObject.name>EC_25</ftn:IdentifiedObject.name>
+		<cim:EnergyConsumer.type>Household</cim:EnergyConsumer.type>
 	</cim:EnergyConsumer>
 	<cim:EnergyConsumer rdf:ID="EC_26">
 		<cim:ConductingEquipment.BaseVoltage rdf:resource="#BV_2"/>
@@ -4661,6 +4686,7 @@
 		<cim:IdentifiedObject.description> </cim:IdentifiedObject.description>
 		<cim:IdentifiedObject.mRID>EC_26</cim:IdentifiedObject.mRID>
 		<ftn:IdentifiedObject.name>EC_26</ftn:IdentifiedObject.name>
+		<cim:EnergyConsumer.type>Household</cim:EnergyConsumer.type>
 	</cim:EnergyConsumer>
 	<cim:EnergyConsumer rdf:ID="EC_27">
 		<cim:ConductingEquipment.BaseVoltage rdf:resource="#BV_2"/>
@@ -4668,6 +4694,7 @@
 		<cim:IdentifiedObject.description> </cim:IdentifiedObject.description>
 		<cim:IdentifiedObject.mRID>EC_27</cim:IdentifiedObject.mRID>
 		<ftn:IdentifiedObject.name>EC_27</ftn:IdentifiedObject.name>
+		<cim:EnergyConsumer.type>Household</cim:EnergyConsumer.type>
 	</cim:EnergyConsumer>
 	<cim:EnergyConsumer rdf:ID="EC_28">
 		<cim:ConductingEquipment.BaseVoltage rdf:resource="#BV_2"/>
@@ -4675,6 +4702,7 @@
 		<cim:IdentifiedObject.description> </cim:IdentifiedObject.description>
 		<cim:IdentifiedObject.mRID>EC_28</cim:IdentifiedObject.mRID>
 		<ftn:IdentifiedObject.name>EC_28</ftn:IdentifiedObject.name>
+		<cim:EnergyConsumer.type>Household</cim:EnergyConsumer.type>
 	</cim:EnergyConsumer>
 	<cim:EnergyConsumer rdf:ID="EC_29">
 		<cim:ConductingEquipment.BaseVoltage rdf:resource="#BV_2"/>
@@ -4682,6 +4710,7 @@
 		<cim:IdentifiedObject.description> </cim:IdentifiedObject.description>
 		<cim:IdentifiedObject.mRID>EC_29</cim:IdentifiedObject.mRID>
 		<ftn:IdentifiedObject.name>EC_29</ftn:IdentifiedObject.name>
+		<cim:EnergyConsumer.type>Household</cim:EnergyConsumer.type>
 	</cim:EnergyConsumer>
 	<cim:EnergyConsumer rdf:ID="EC_30">
 		<cim:ConductingEquipment.BaseVoltage rdf:resource="#BV_2"/>
@@ -4689,6 +4718,7 @@
 		<cim:IdentifiedObject.description> </cim:IdentifiedObject.description>
 		<cim:IdentifiedObject.mRID>EC_30</cim:IdentifiedObject.mRID>
 		<ftn:IdentifiedObject.name>EC_30</ftn:IdentifiedObject.name>
+		<cim:EnergyConsumer.type>Household</cim:EnergyConsumer.type>
 	</cim:EnergyConsumer>
 	<cim:EnergyConsumer rdf:ID="EC_31">
 		<cim:ConductingEquipment.BaseVoltage rdf:resource="#BV_2"/>
@@ -4696,6 +4726,7 @@
 		<cim:IdentifiedObject.description> </cim:IdentifiedObject.description>
 		<cim:IdentifiedObject.mRID>EC_31</cim:IdentifiedObject.mRID>
 		<ftn:IdentifiedObject.name>EC_31</ftn:IdentifiedObject.name>
+		<cim:EnergyConsumer.type>Household</cim:EnergyConsumer.type>
 	</cim:EnergyConsumer>
 	<cim:EnergyConsumer rdf:ID="EC_32">
 		<cim:ConductingEquipment.BaseVoltage rdf:resource="#BV_2"/>
@@ -4703,6 +4734,7 @@
 		<cim:IdentifiedObject.description> </cim:IdentifiedObject.description>
 		<cim:IdentifiedObject.mRID>EC_32</cim:IdentifiedObject.mRID>
 		<ftn:IdentifiedObject.name>EC_32</ftn:IdentifiedObject.name>
+		<cim:EnergyConsumer.type>Household</cim:EnergyConsumer.type>
 	</cim:EnergyConsumer>
 	<cim:EnergyConsumer rdf:ID="EC_33">
 		<cim:ConductingEquipment.BaseVoltage rdf:resource="#BV_2"/>
@@ -4710,6 +4742,7 @@
 		<cim:IdentifiedObject.description> </cim:IdentifiedObject.description>
 		<cim:IdentifiedObject.mRID>EC_33</cim:IdentifiedObject.mRID>
 		<ftn:IdentifiedObject.name>EC_33</ftn:IdentifiedObject.name>
+		<cim:EnergyConsumer.type>Household</cim:EnergyConsumer.type>
 	</cim:EnergyConsumer>
 	<cim:EnergyConsumer rdf:ID="EC_34">
 		<cim:ConductingEquipment.BaseVoltage rdf:resource="#BV_2"/>
@@ -4717,6 +4750,7 @@
 		<cim:IdentifiedObject.description> </cim:IdentifiedObject.description>
 		<cim:IdentifiedObject.mRID>EC_34</cim:IdentifiedObject.mRID>
 		<ftn:IdentifiedObject.name>EC_34</ftn:IdentifiedObject.name>
+		<cim:EnergyConsumer.type>Household</cim:EnergyConsumer.type>
 	</cim:EnergyConsumer>
 	<cim:EnergyConsumer rdf:ID="EC_35">
 		<cim:ConductingEquipment.BaseVoltage rdf:resource="#BV_2"/>
@@ -4724,6 +4758,7 @@
 		<cim:IdentifiedObject.description> </cim:IdentifiedObject.description>
 		<cim:IdentifiedObject.mRID>EC_35</cim:IdentifiedObject.mRID>
 		<ftn:IdentifiedObject.name>EC_35</ftn:IdentifiedObject.name>
+		<cim:EnergyConsumer.type>Household</cim:EnergyConsumer.type>
 	</cim:EnergyConsumer>
 	<cim:EnergyConsumer rdf:ID="EC_36">
 		<cim:ConductingEquipment.BaseVoltage rdf:resource="#BV_2"/>
@@ -4731,6 +4766,7 @@
 		<cim:IdentifiedObject.description> </cim:IdentifiedObject.description>
 		<cim:IdentifiedObject.mRID>EC_36</cim:IdentifiedObject.mRID>
 		<ftn:IdentifiedObject.name>EC_36</ftn:IdentifiedObject.name>
+		<cim:EnergyConsumer.type>Household</cim:EnergyConsumer.type>
 	</cim:EnergyConsumer>
 	<cim:EnergyConsumer rdf:ID="EC_37">
 		<cim:ConductingEquipment.BaseVoltage rdf:resource="#BV_2"/>
@@ -4738,6 +4774,7 @@
 		<cim:IdentifiedObject.description> </cim:IdentifiedObject.description>
 		<cim:IdentifiedObject.mRID>EC_37</cim:IdentifiedObject.mRID>
 		<ftn:IdentifiedObject.name>EC_37</ftn:IdentifiedObject.name>
+		<cim:EnergyConsumer.type>Household</cim:EnergyConsumer.type>
 	</cim:EnergyConsumer>
 	<cim:EnergyConsumer rdf:ID="EC_38">
 		<cim:ConductingEquipment.BaseVoltage rdf:resource="#BV_2"/>
@@ -4745,6 +4782,7 @@
 		<cim:IdentifiedObject.description> </cim:IdentifiedObject.description>
 		<cim:IdentifiedObject.mRID>EC_38</cim:IdentifiedObject.mRID>
 		<ftn:IdentifiedObject.name>EC_38</ftn:IdentifiedObject.name>
+		<cim:EnergyConsumer.type>Household</cim:EnergyConsumer.type>
 	</cim:EnergyConsumer>
 	<cim:EnergyConsumer rdf:ID="EC_39">
 		<cim:ConductingEquipment.BaseVoltage rdf:resource="#BV_2"/>
@@ -4752,6 +4790,7 @@
 		<cim:IdentifiedObject.description> </cim:IdentifiedObject.description>
 		<cim:IdentifiedObject.mRID>EC_39</cim:IdentifiedObject.mRID>
 		<ftn:IdentifiedObject.name>EC_39</ftn:IdentifiedObject.name>
+		<cim:EnergyConsumer.type>Household</cim:EnergyConsumer.type>
 	</cim:EnergyConsumer>
 	<cim:EnergyConsumer rdf:ID="EC_40">
 		<cim:ConductingEquipment.BaseVoltage rdf:resource="#BV_2"/>
@@ -4759,6 +4798,7 @@
 		<cim:IdentifiedObject.description> </cim:IdentifiedObject.description>
 		<cim:IdentifiedObject.mRID>EC_40</cim:IdentifiedObject.mRID>
 		<ftn:IdentifiedObject.name>EC_40</ftn:IdentifiedObject.name>
+		<cim:EnergyConsumer.type>Household</cim:EnergyConsumer.type>
 	</cim:EnergyConsumer>
 	<cim:EnergyConsumer rdf:ID="EC_41">
 		<cim:ConductingEquipment.BaseVoltage rdf:resource="#BV_2"/>
@@ -4766,6 +4806,7 @@
 		<cim:IdentifiedObject.description> </cim:IdentifiedObject.description>
 		<cim:IdentifiedObject.mRID>EC_41</cim:IdentifiedObject.mRID>
 		<ftn:IdentifiedObject.name>EC_41</ftn:IdentifiedObject.name>
+		<cim:EnergyConsumer.type>Household</cim:EnergyConsumer.type>
 	</cim:EnergyConsumer>
 	<cim:EnergyConsumer rdf:ID="EC_42">
 		<cim:ConductingEquipment.BaseVoltage rdf:resource="#BV_2"/>
@@ -4773,6 +4814,7 @@
 		<cim:IdentifiedObject.description> </cim:IdentifiedObject.description>
 		<cim:IdentifiedObject.mRID>EC_42</cim:IdentifiedObject.mRID>
 		<ftn:IdentifiedObject.name>EC_42</ftn:IdentifiedObject.name>
+		<cim:EnergyConsumer.type>Household</cim:EnergyConsumer.type>
 	</cim:EnergyConsumer>
 	<cim:EnergyConsumer rdf:ID="EC_43">
 		<cim:ConductingEquipment.BaseVoltage rdf:resource="#BV_2"/>
@@ -4780,6 +4822,7 @@
 		<cim:IdentifiedObject.description> </cim:IdentifiedObject.description>
 		<cim:IdentifiedObject.mRID>EC_43</cim:IdentifiedObject.mRID>
 		<ftn:IdentifiedObject.name>EC_43</ftn:IdentifiedObject.name>
+		<cim:EnergyConsumer.type>Household</cim:EnergyConsumer.type>
 	</cim:EnergyConsumer>
 	<cim:EnergyConsumer rdf:ID="EC_44">
 		<cim:ConductingEquipment.BaseVoltage rdf:resource="#BV_2"/>
@@ -4787,6 +4830,7 @@
 		<cim:IdentifiedObject.description> </cim:IdentifiedObject.description>
 		<cim:IdentifiedObject.mRID>EC_44</cim:IdentifiedObject.mRID>
 		<ftn:IdentifiedObject.name>EC_44</ftn:IdentifiedObject.name>
+		<cim:EnergyConsumer.type>Household</cim:EnergyConsumer.type>
 	</cim:EnergyConsumer>
 	
 	<!--END EnergyConsumer-->
@@ -7816,6 +7860,36 @@
 		<cim:IdentifiedObject.description> </cim:IdentifiedObject.description>
 		<cim:IdentifiedObject.mRID>AN_98</cim:IdentifiedObject.mRID>
 		<ftn:IdentifiedObject.name>AN_98</ftn:IdentifiedObject.name>
+	</cim:Analog>
+	<cim:Analog rdf:ID="AN_99">
+		<cim:Analog.scalingFactor>1</cim:Analog.scalingFactor>
+		<cim:Analog.deviation>0</cim:Analog.deviation>
+		<cim:Analog.currentValue>0</cim:Analog.currentValue>
+		<cim:Analog.maxValue>30</cim:Analog.maxValue>
+		<cim:Analog.measurementType>FeederCurrent</cim:Analog.measurementType>
+		<cim:Analog.minValue>0</cim:Analog.minValue>
+		<cim:Analog.normalValue>20</cim:Analog.normalValue>
+		<cim:Measurement.address>99</cim:Measurement.address>
+		<cim:Measurement.isInput>false</cim:Measurement.isInput>
+		<cim:Measurement.Terminal rdf:resource="#TM_202"/>
+		<cim:IdentifiedObject.description> </cim:IdentifiedObject.description>
+		<cim:IdentifiedObject.mRID>AN_94</cim:IdentifiedObject.mRID>
+		<ftn:IdentifiedObject.name>AN_94</ftn:IdentifiedObject.name>
+	</cim:Analog>
+	<cim:Analog rdf:ID="AN_100">
+		<cim:Analog.scalingFactor>1</cim:Analog.scalingFactor>
+		<cim:Analog.deviation>0</cim:Analog.deviation>
+		<cim:Analog.currentValue>0</cim:Analog.currentValue>
+		<cim:Analog.maxValue>30</cim:Analog.maxValue>
+		<cim:Analog.measurementType>FeederCurrent</cim:Analog.measurementType>
+		<cim:Analog.minValue>0</cim:Analog.minValue>
+		<cim:Analog.normalValue>20</cim:Analog.normalValue>
+		<cim:Measurement.address>100</cim:Measurement.address>
+		<cim:Measurement.isInput>false</cim:Measurement.isInput>
+		<cim:Measurement.Terminal rdf:resource="#TM_203"/>
+		<cim:IdentifiedObject.description> </cim:IdentifiedObject.description>
+		<cim:IdentifiedObject.mRID>AN_100</cim:IdentifiedObject.mRID>
+		<ftn:IdentifiedObject.name>AN_100</ftn:IdentifiedObject.name>
 	</cim:Analog>
 	<!--END Analog-->
 	

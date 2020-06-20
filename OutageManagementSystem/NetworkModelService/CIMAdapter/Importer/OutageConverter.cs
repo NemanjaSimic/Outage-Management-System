@@ -351,7 +351,11 @@ namespace Outage.DataImporter.CIMAdapter.Importer
                 if (cimEnergyConsumer.FirstNameHasValue)
                 {
                     rd.AddProperty(new Property(ModelCode.ENERGYCONSUMER_FIRSTNAME, cimEnergyConsumer.FirstName));
+                }
 
+                if (cimEnergyConsumer.TypeHasValue)
+                {
+                    rd.AddProperty(new Property(ModelCode.ENERGYCONSUMER_TYPE, (short)GetEnergyConsumerType(cimEnergyConsumer.Type)));
                 }
             }
         }
@@ -407,6 +411,18 @@ namespace Outage.DataImporter.CIMAdapter.Importer
             }
         }
 
+        public static Outage.Common.EnergyConsumerType GetEnergyConsumerType(Outage.EnergyConsumerType energyConsumertype)
+        {
+           switch(energyConsumertype)
+           {
+                case Outage.EnergyConsumerType.Household:
+                    return Outage.Common.EnergyConsumerType.HOUSEHOLD;
+                case Outage.EnergyConsumerType.SmallIndustry:
+                    return Outage.Common.EnergyConsumerType.SMALL_INDUSTRY;
+                default:
+                    throw new System.Exception($"Unknown enum type: {energyConsumertype}.");
+            }
+        }
         #endregion Enums convert
     }
 }

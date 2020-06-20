@@ -16,6 +16,12 @@ namespace Outage.Common
         SWITCH_STATUS   = 1,
     }
 
+    public enum EnergyConsumerType : short
+    {
+        HOUSEHOLD = 0,
+        SMALL_INDUSTRY
+    }
+
 
     //PUB_SUB
     [DataContract]

@@ -10,6 +10,8 @@ using System.Threading;
 using CECommon.Models;
 using CECommon.Model;
 using Outage.Common.PubSub.SCADADataContract;
+using CECommon.TopologyConfiguration;
+using Topology.Converters;
 
 namespace Topology
 {
@@ -21,6 +23,7 @@ namespace Topology
         private Dictionary<long, ITopologyElement> feeders;
         //private Dictionary<long, float> loadOfFeeders;
         private Dictionary<long, ITopologyElement> syncMachines;
+        private Dictionary<DailyCurveType, DailyCurve> dailyCurves;
 
         public void UpdateLoadFlow(List<ITopology> topologies)
         {
@@ -28,6 +31,7 @@ namespace Topology
             feeders = new Dictionary<long, ITopologyElement>();
             syncMachines = new Dictionary<long, ITopologyElement>();
             reclosers = Provider.Instance.ModelProvider.GetReclosers();
+            dailyCurves = DailyCurveReader.ReadDailyCurves();
             foreach (var topology in topologies)
             {
                 CalculateLoadFlow(topology, loadOfFeeders);
@@ -244,24 +248,35 @@ namespace Topology
                 }
                 else
                 {
-                    float power = 0;
-                    float voltage = 0;
-                    foreach (var analogMeasurement in analogMeasurements)
+                    if (element.IsRemote)
                     {
-                        if (analogMeasurement.GetMeasurementType().Equals(AnalogMeasurementType.POWER.ToString()))
+                        float power = 0;
+                        float voltage = 0;
+                        foreach (var analogMeasurement in analogMeasurements)
                         {
-                            power = analogMeasurement.GetCurrentValue();
+                            if (analogMeasurement.GetMeasurementType().Equals(AnalogMeasurementType.POWER.ToString()))
+                            {
+                                power = analogMeasurement.GetCurrentValue();
+                            }
+                            else if (analogMeasurement.GetMeasurementType().Equals(AnalogMeasurementType.VOLTAGE.ToString()))
+                            {
+                                voltage = analogMeasurement.GetCurrentValue();
+                            }
                         }
-                        else if (analogMeasurement.GetMeasurementType().Equals(AnalogMeasurementType.VOLTAGE.ToString()))
+
+                        if (power != 0 && voltage != 0)
                         {
-                            voltage = analogMeasurement.GetCurrentValue();
+                            load = (float)Math.Round(power / voltage);
+                        }
+                    }
+                    else if (element is EnergyConsumer consumer)
+                    {
+                        if(dailyCurves.TryGetValue(EnergyConsumerTypeToDailyCurveConverter.GetDailyCurveType(consumer.Type), out DailyCurve curve))
+                        {
+                            load = (float)Math.Round(curve.GetValue((short)DateTime.Now.Hour) * 1000 / 220);
                         }
                     }
 
-                    if (power != 0 && voltage != 0)
-                    {
-                        load = (float)Math.Round(power / voltage);
-                    }
                 }
                 
             }
