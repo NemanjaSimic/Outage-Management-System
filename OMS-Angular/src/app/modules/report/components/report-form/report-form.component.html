@@ -30,13 +30,13 @@
 
   <mat-form-field class="form-field">
     <mat-label class="white-label">Choose a date</mat-label>
-    <input matInput [matDatepicker]="startDatePicker" [formControl]="startDate" >
-    <mat-datepicker-toggle matSuffix [for]="startDatePicker"></mat-datepicker-toggle>
+    <input matInput [matDatepicker]="datePicker" [formControl]="selectedDate" >
+    <mat-datepicker-toggle matSuffix [for]="datePicker"></mat-datepicker-toggle>
     <mat-datepicker 
-      #startDatePicker 
+      #datePicker 
       startView="multi-year" 
-      (yearSelected)="chosenYearHandler($event, startDatePicker)"
-      (monthSelected)="chosenMonthHandler($event, startDatePicker)">
+      (yearSelected)="chosenYearHandler($event, datePicker)"
+      (monthSelected)="chosenMonthHandler($event, datePicker)">
     </mat-datepicker>
   </mat-form-field>
 

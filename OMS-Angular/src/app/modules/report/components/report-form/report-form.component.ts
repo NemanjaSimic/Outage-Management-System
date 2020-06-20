@@ -42,7 +42,7 @@ export class ReportFormComponent implements OnInit {
   public selectedDateType;
   public filteredScopes: Observable<any[]>;
   public selectedScopeControl = new FormControl();
-  public startDate = new FormControl();
+  public selectedDate = new FormControl();
   public endDate = new FormControl(moment());
   private defaultDateType = DateType.Daily;
 
@@ -77,18 +77,18 @@ export class ReportFormComponent implements OnInit {
   }
 
   chosenYearHandler(event: moment.Moment, datePicker: MatDatepicker<moment.Moment>): void {
-    this.startDate = new FormControl(moment());
-    const ctrlValue = this.startDate.value;
+    this.selectedDate = new FormControl(moment());
+    const ctrlValue = this.selectedDate.value;
     ctrlValue.year(event.year());
-    this.startDate.setValue(ctrlValue);
+    this.selectedDate.setValue(ctrlValue);
 
     if(this.selectedDateType === DateType.Yearly) datePicker.close();
   }
 
   chosenMonthHandler(event: moment.Moment, datePicker: MatDatepicker<string>): void {
-    const ctrlValue = this.startDate.value;
+    const ctrlValue = this.selectedDate.value;
     ctrlValue.month(event.month());
-    this.startDate.setValue(ctrlValue);
+    this.selectedDate.setValue(ctrlValue);
 
     if(this.selectedDateType === DateType.Monthly) datePicker.close();
   }
@@ -97,8 +97,8 @@ export class ReportFormComponent implements OnInit {
     const options: ReportOptions = {
       Type: this.selectedReportType,
       ElementId: +this.selectedScopeControl.value,
-      StartDate: formatStartDate(this.startDate.value, this.selectedDateType),
-      EndDate: formatEndDate(this.startDate.value, this.selectedDateType)
+      StartDate: formatStartDate(this.selectedDate.value, this.selectedDateType),
+      EndDate: formatEndDate(this.selectedDate.value, this.selectedDateType)
     }
 
     this.generate.emit(options);
