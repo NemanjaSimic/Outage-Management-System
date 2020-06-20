@@ -17,6 +17,5 @@ export const buildQuery = (options: ReportOptions) => {
   if(options.EndDate)
     query += `endDate=${options.EndDate.format('MM-DD-YYYY')}`;
 
-  console.log(query);
   return query;
 }

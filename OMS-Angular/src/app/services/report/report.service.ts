@@ -4,7 +4,7 @@ import { EnvironmentService } from '@services/environment/environment.service';
 import { ReportOptions } from '@shared/models/report-options.model';
 import { Observable } from 'rxjs';
 import { Report } from '@shared/models/report.model';
-import { buildQuery } from './query-builder';
+import { buildQuery } from './helpers/query-builder';
 
 @Injectable({
   providedIn: 'root'

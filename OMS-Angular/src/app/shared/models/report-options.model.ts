@@ -12,3 +12,9 @@ export enum ReportType {
   SAIFI,
   SAIDI
 }
+
+export enum DateType {
+  Yearly = 0,
+  Monthly,
+  Daily
+}
