@@ -8,6 +8,7 @@ namespace Outage.DataModel
 		#region Fields
 		private string firstName;
 		private string lastName;
+		private EnergyConsumerType type;
 		#endregion
 
 		public EnergyConsumer(long globalId) : base(globalId)
@@ -18,6 +19,7 @@ namespace Outage.DataModel
 		{
 			FirstName = ec.FirstName;
 			LastName = ec.LastName;
+			Type = ec.Type;
 		}
 
 		#region Properties
@@ -31,6 +33,12 @@ namespace Outage.DataModel
 			get { return lastName; }
 			set { lastName = value; } 
 		}
+
+		public EnergyConsumerType Type
+		{
+			get { return type; }
+			set { type = value; }
+		}
 		#endregion
 
 		public override bool Equals(object obj)
@@ -38,7 +46,7 @@ namespace Outage.DataModel
 			if (base.Equals(obj)) //in case we add new props
 			{
 				EnergyConsumer x = (EnergyConsumer)obj;
-				return (x.FirstName == this.FirstName && x.LastName == this.LastName);
+				return (x.FirstName == this.FirstName && x.LastName == this.LastName && x.Type == this.Type);
 			}
 			else
 			{
@@ -65,6 +73,8 @@ namespace Outage.DataModel
 					return true;
 				case ModelCode.ENERGYCONSUMER_FIRSTNAME:
 					return true;
+				case ModelCode.ENERGYCONSUMER_TYPE:
+					return true;
 				default:
 					return base.HasProperty(property);
 			}
@@ -86,6 +96,9 @@ namespace Outage.DataModel
 					break;
 				case ModelCode.ENERGYCONSUMER_FIRSTNAME:
 					property.SetValue(firstName);
+					break;
+				case ModelCode.ENERGYCONSUMER_TYPE:
+					property.SetValue((short)type);
 					break;
 				default:
 					base.GetProperty(property);
@@ -109,6 +122,9 @@ namespace Outage.DataModel
 					break;
 				case ModelCode.ENERGYCONSUMER_FIRSTNAME:
 					firstName = property.AsString();
+					break;
+				case ModelCode.ENERGYCONSUMER_TYPE:
+					type = (EnergyConsumerType)property.AsEnum();
 					break;
 				default:
 					base.SetProperty(property);

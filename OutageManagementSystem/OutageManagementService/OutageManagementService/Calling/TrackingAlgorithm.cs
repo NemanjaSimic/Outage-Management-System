@@ -1,4 +1,6 @@
-﻿using Outage.Common.OutageService.Interface;
+﻿using Outage.Common;
+using Outage.Common.OutageService.Interface;
+using OutageManagementService.LifeCycleServices;
 using System;
 using System.Collections.Concurrent;
 using System.Collections.Generic;
@@ -10,16 +12,26 @@ namespace OutageManagementService.Calling
 {
     public class TrackingAlgorithm
     {
+        private ILogger logger;
+        protected ILogger Logger
+        {
+            get { return logger ?? (logger = LoggerWrapper.Instance); }
+        }
+
         private OutageModel outageModel;
+        private ReportOutageService reportOutageService;
         private List<long> potentialOutages;
         private List<long> outages;
         public TrackingAlgorithm(OutageModel outageModel)
         {
             this.outageModel = outageModel;
+            this.reportOutageService = new ReportOutageService(outageModel);
         }
 
         public void Start(ConcurrentQueue<long> calls)
         {
+            Logger.LogDebug("Starting tracking algorithm.");
+
             this.potentialOutages = LocateSwitchesUsingCalls(calls.ToList());
             this.outages = new List<long>();
             HashSet<long> visited = new HashSet<long>();
@@ -29,8 +41,6 @@ namespace OutageManagementService.Calling
             currentGid = this.potentialOutages[0];
             try
             {
-
-
 
                 while (this.potentialOutages.Count > 0)
                 {
@@ -61,7 +71,7 @@ namespace OutageManagementService.Calling
 
             foreach (var item in this.outages)
             {
-                this.outageModel.ReportPotentialOutage(item);
+                reportOutageService.ReportPotentialOutage(item, CommandOriginType.NON_SCADA_OUTAGE );
             }
         }
         private bool IsSwitch(string dmsType)

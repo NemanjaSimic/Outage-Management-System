@@ -16,6 +16,12 @@ namespace Outage.Common
         SWITCH_STATUS   = 1,
     }
 
+    public enum EnergyConsumerType : short
+    {
+        HOUSEHOLD = 0,
+        SMALL_INDUSTRY
+    }
+
 
     //PUB_SUB
     [DataContract]
@@ -103,6 +109,9 @@ namespace Outage.Common
         OUTAGE_SIMULATOR,
 
         [EnumMember]
+        NON_SCADA_OUTAGE,
+
+        [EnumMember]
         OTHER_COMMAND, //TODO: rethink of name, add others like CE ili tako nesto
     }
 
@@ -118,5 +127,16 @@ namespace Outage.Common
         REPAIRED = 3,
         [EnumMember]
         ARCHIVED = 4,
+        [EnumMember]
+        REMOVED = 5,
+    }
+
+    [DataContract]
+    public enum DatabaseOperation : short
+    {
+        [EnumMember]
+        INSERT = 1,
+        [EnumMember]
+        DELETE = 2
     }
 }

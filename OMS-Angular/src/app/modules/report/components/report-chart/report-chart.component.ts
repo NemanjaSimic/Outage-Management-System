@@ -1,4 +1,4 @@
-import { Component, OnInit } from '@angular/core';
+import { Component, OnInit, Input, OnChanges, SimpleChanges, ChangeDetectionStrategy } from '@angular/core';
 import { data }  from './data.mock';
 
 @Component({
@@ -7,7 +7,8 @@ import { data }  from './data.mock';
   styleUrls: ['./report-chart.component.css']
 })
 export class ReportChartComponent implements OnInit {
-  data: any[];
+  @Input() data: any[];
+  @Input() type: string = "Yearly";
 
   view: any[] = [700, 400];
 
@@ -16,15 +17,10 @@ export class ReportChartComponent implements OnInit {
   showYAxis = true;
   showLegend = true;
   showXAxisLabel = true;
-  xAxisLabel = 'Years';
   showYAxisLabel = true;
   yAxisLabel = '# of outages per consumer';
 
-  constructor() {
-    Object.assign(this, { data })
-   }
+  constructor() {}
 
-  ngOnInit() {
-  }
-
+  ngOnInit() { }
 }

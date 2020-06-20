@@ -359,6 +359,20 @@ When the sensor location is needed both Measurement-PSR and Measurement-Terminal
     <rdfs:label>Equipment</rdfs:label>
     <rdf:type rdf:resource="http://www.w3.org/2000/01/rdf-schema#Class"/>
   </rdf:Description>
+  <rdf:Description rdf:about="#EnergyConsumerType">
+    <cims:belongsToCategory rdf:resource="#Package_Meas"/>
+    <cims:stereotype rdf:resource="http://langdale.com.au/2005/UML#enumeration"/>
+    <rdfs:label>EnergyConsumerType</rdfs:label>
+    <rdf:type rdf:resource="http://www.w3.org/2000/01/rdf-schema#Class"/>
+  </rdf:Description>
+  <rdf:Description rdf:about="#EnergyConsumerType.Household">
+	<rdfs:label>Household</rdfs:label>
+	<rdf:type rdf:resource="#EnergyConsumerType"/>
+  </rdf:Description>
+  <rdf:Description rdf:about="#EnergyConsumerType.SmallIndustry">
+	<rdfs:label>SmallIndustry</rdfs:label>
+	<rdf:type rdf:resource="#EnergyConsumerType"/>
+  </rdf:Description>
   <rdf:Description rdf:about="#AnalogMeasurementType">
     <cims:belongsToCategory rdf:resource="#Package_Meas"/>
     <cims:stereotype rdf:resource="http://langdale.com.au/2005/UML#enumeration"/>
@@ -475,6 +489,14 @@ When the sensor location is needed both Measurement-PSR and Measurement-Terminal
     <cims:dataType rdf:resource="http://www.w3.org/2001/XMLSchema#string"/>
     <rdfs:domain rdf:resource="#EnergyConsumer"/>
     <cims:multiplicity rdf:resource="http://iec.ch/TC57/1999/rdf-schema-extensions-19990926#M:1"/>
+    <rdf:type rdf:resource="http://www.w3.org/1999/02/22-rdf-syntax-ns#Property"/>
+  </rdf:Description>
+  <rdf:Description rdf:about="#EnergyConsumer.type">
+    <cims:stereotype rdf:resource="http://langdale.com.au/2005/UML#attribute"/>
+    <rdfs:label>type</rdfs:label>
+	<rdfs:range rdf:resource="#EnergyConsumerType"/>
+    <rdfs:domain rdf:resource="#EnergyConsumer"/>
+	<cims:multiplicity rdf:resource="http://iec.ch/TC57/1999/rdf-schema-extensions-19990926#M:1"/>
     <rdf:type rdf:resource="http://www.w3.org/1999/02/22-rdf-syntax-ns#Property"/>
   </rdf:Description>
   <rdf:Description rdf:about="#Discrete.minValue">

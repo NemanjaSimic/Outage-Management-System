@@ -26,4 +26,17 @@ namespace CECommon
 		InTransaction = 1,
 		NoTransaction
 	}
+
+	public enum DailyCurveType
+	{
+		Household = 0,
+		SmallIndustry
+	}
+
+	public enum DailyCurveConfigProgress
+	{
+		NewDailyCurve = 0,
+		Value,
+		Time
+	}
 }

@@ -332,6 +332,15 @@ namespace NetworkModelServiceFunctions
 					Reclosers.Add(topologyElement.Id);
 				}
 
+				if (rs.ContainsProperty(ModelCode.ENERGYCONSUMER_TYPE))
+				{
+					topologyElement = new EnergyConsumer(topologyElement)
+					{
+						Type = (EnergyConsumerType)rs.GetProperty(ModelCode.ENERGYCONSUMER_TYPE).AsEnum()
+					};
+
+				}
+
 				if (type == DMSType.SYNCHRONOUSMACHINE)
 				{
 					topologyElement = new SynchronousMachine(topologyElement);

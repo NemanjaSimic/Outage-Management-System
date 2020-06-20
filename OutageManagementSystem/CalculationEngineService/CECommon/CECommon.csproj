@@ -60,6 +60,8 @@
     <Compile Include="Enums.cs" />
     <Compile Include="Interfaces\ITopologyConverterProvider.cs" />
     <Compile Include="Interfaces\ILoadFlow.cs" />
+    <Compile Include="Models\DailyCurve.cs" />
+    <Compile Include="Models\EnergyConsumer.cs" />
     <Compile Include="Models\Feeder.cs" />
     <Compile Include="Models\Field.cs" />
     <Compile Include="Models\Measurement.cs" />
@@ -71,6 +73,7 @@
     <Compile Include="TopologyConfiguration\Config.cs" />
     <Compile Include="TopologyConfiguration\ConfigurationParse.cs" />
     <Compile Include="Models\TopologyElement.cs" />
+    <Compile Include="TopologyConfiguration\DailyCurveReader.cs" />
   </ItemGroup>
   <ItemGroup>
     <ProjectReference Include="..\..\Common\Common.csproj">
