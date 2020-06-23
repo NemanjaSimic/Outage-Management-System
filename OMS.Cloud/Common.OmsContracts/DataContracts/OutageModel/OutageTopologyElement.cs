@@ -1,0 +1,50 @@
+﻿using System;
+using System.Collections.Generic;
+using System.Linq;
+using System.Runtime.Serialization;
+using System.Text;
+using System.Threading.Tasks;
+
+namespace Common.OmsContracts.DataContracts.OutageModel
+{
+    public class OutageTopologyElement
+    {
+        #region Fields
+        private long id;
+        private long firstEnd;
+        private List<long> secondEnd;
+        private string dmsType;
+        private bool isRemote;
+        private ushort distanceFromSource;
+        private bool isActive;
+        private bool noReclosing;
+        #endregion
+
+
+        #region Properties
+        [DataMember]
+        public long Id { get { return id; } set { id = value; } }
+        [DataMember]
+        public long FirstEnd { get { return firstEnd; } set { firstEnd = value; } }
+        [DataMember]
+        public List<long> SecondEnd { get { return secondEnd; } set { secondEnd = value; } }
+        [DataMember]
+        public string DmsType { get { return dmsType; } set { dmsType = value; } }
+        [DataMember]
+        public bool IsRemote { get { return isRemote; } set { isRemote = value; } }
+        [DataMember]
+        public bool IsActive { get { return isActive; } set { isActive = value; } }
+        [DataMember]
+        public ushort DistanceFromSource { get { return distanceFromSource; } set { distanceFromSource = value; } }
+        [DataMember]
+        public bool NoReclosing { get { return noReclosing; } set { noReclosing = value; } }
+        #endregion
+
+        public OutageTopologyElement(long gid)
+        {
+            this.Id = gid;
+            this.SecondEnd = new List<long>();
+        }
+    
+}
+}

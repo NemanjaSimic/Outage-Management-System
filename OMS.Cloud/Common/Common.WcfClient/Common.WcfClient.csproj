@@ -67,8 +67,8 @@
     <Reference Include="Microsoft.ServiceFabric.Services.Remoting, Version=6.0.0.0, Culture=neutral, PublicKeyToken=31bf3856ad364e35, processorArchitecture=AMD64">
       <HintPath>..\..\packages\Microsoft.ServiceFabric.Services.Remoting.4.0.470\lib\net472\Microsoft.ServiceFabric.Services.Remoting.dll</HintPath>
     </Reference>
-    <Reference Include="Microsoft.ServiceFabric.Services.Wcf">
-      <HintPath>..\..\NMS\NMS.GdaService\bin\x64\Debug\Microsoft.ServiceFabric.Services.Wcf.dll</HintPath>
+    <Reference Include="Microsoft.ServiceFabric.Services.Wcf, Version=6.0.0.0, Culture=neutral, PublicKeyToken=31bf3856ad364e35, processorArchitecture=AMD64">
+      <HintPath>..\..\packages\Microsoft.ServiceFabric.Services.Wcf.4.0.470\lib\net45\Microsoft.ServiceFabric.Services.Wcf.dll</HintPath>
     </Reference>
     <Reference Include="System" />
     <Reference Include="System.Configuration" />
