@@ -111,11 +111,12 @@
     <Reference Include="WindowsBase" />
   </ItemGroup>
   <ItemGroup>
+    <Compile Include="OMS\TracingAlgorithmClient.cs" />
     <Compile Include="Properties\AssemblyInfo.cs" />
     <Compile Include="CE\Placeholder.cs" />
     <Compile Include="ClientFactory.cs" />
     <Compile Include="NMS\NetworkModelGdaClient.cs" />
-    <Compile Include="OMS\Placeholder.cs" />
+    <Compile Include="OMS\OutageModelReadAccessClient.cs" />
     <Compile Include="PubSub\NotifySubscriberClient.cs" />
     <Compile Include="PubSub\PublisherClient.cs" />
     <Compile Include="PubSub\RegisterSubscriberClient.cs" />
@@ -137,6 +138,14 @@
     <None Include="packages.config" />
   </ItemGroup>
   <ItemGroup>
+    <ProjectReference Include="..\..\Common.OmsContracts\Common.OmsContracts.csproj">
+      <Project>{7032AEF1-E55A-4D5C-90FF-E0B8B4C98BE0}</Project>
+      <Name>Common.OmsContracts</Name>
+    </ProjectReference>
+    <ProjectReference Include="..\..\Common.OMS\Common.OMS.csproj">
+      <Project>{8F96A078-BE16-4363-9B89-0B313D2E0F5E}</Project>
+      <Name>Common.OMS</Name>
+    </ProjectReference>
     <ProjectReference Include="..\Common.Cloud\Common.Cloud.csproj">
       <Project>{FBEE1369-0F6C-41E6-8C62-8C1C5CDBB602}</Project>
       <Name>Common.Cloud</Name>

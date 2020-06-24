@@ -41,8 +41,8 @@
         public const string OutageModelUpdateNotifierEndpoint = "OutageModelUpdateNotifierEndpoint";
         public const string OutageLifecycleUICommandingEndpoint = "OutageLifecycleUICommandingEndpoint";
         public const string ReportPotentialOutageEndpoint = "ReportPotentialOutageEndpoint";
-        public static readonly string OutageManagementServiceModelReadAccessEndpoint = "OutageManagementServiceModelReadAccessEndpoint";
-
+        public const string OutageManagementServiceModelReadAccessEndpoint = "OutageManagementServiceModelReadAccessEndpoint";
+        public const string TracingAlgorithmEndpoint = "TracingAlgorithmEndpoint";
         public const string OutageSimulatorServiceEndpoint = "OutageSimulatorServiceEndpoint";
 
     }

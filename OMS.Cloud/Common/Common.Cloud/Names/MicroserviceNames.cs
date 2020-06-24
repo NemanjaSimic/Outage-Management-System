@@ -17,5 +17,9 @@
 
         //PUB_SUB
         public const string PubSubService = "PubSubService";
+
+        //OMS
+        public const string OmsModelProviderService = "OmsModelProviderService";
+        public const string OmsTracingAlgorithmService = "OmsTracingAlgorithmService";
     }
 }

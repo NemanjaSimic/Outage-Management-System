@@ -4,9 +4,10 @@ using System.Linq;
 using System.Text;
 using System.Threading.Tasks;
 
-namespace OMS.Common.WcfClient.OMS
+namespace Common.OMS
 {
-    class Placeholder
+    public static class CloudQueueNames
     {
+        public static readonly string CallsQueueName = "CallQueueName";
     }
 }
