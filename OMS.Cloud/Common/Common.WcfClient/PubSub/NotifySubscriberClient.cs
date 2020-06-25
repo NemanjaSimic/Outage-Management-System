@@ -47,7 +47,8 @@ namespace OMS.Common.WcfClient.PubSub
         /// <returns></returns>
         public Task<Uri> GetSubscriberUri()
         {
-            return InvokeWithRetryAsync(client => client.Channel.GetSubscriberUri());
+            return MethodWrapperAsync<Uri>("GetSubscriberUri", new object[0]);
+            //return InvokeWithRetryAsync(client => client.Channel.GetSubscriberUri());
         }
 
         /// <summary>
@@ -57,7 +58,8 @@ namespace OMS.Common.WcfClient.PubSub
         /// <returns></returns>
         public Task Notify(IPublishableMessage message)
         {
-            return InvokeWithRetryAsync(client => client.Channel.Notify(message));
+            return MethodWrapperAsync("Notify", new object[1] { message });
+            //return InvokeWithRetryAsync(client => client.Channel.Notify(message));
         }
         #endregion INotifySubscriberContract
     }

@@ -37,7 +37,8 @@ namespace OMS.Common.WcfClient.SCADA
         #region IModelUpdateCommandEnqueuer
         public Task<bool> EnqueueWriteCommand(IWriteModbusFunction modbusFunctions)
         {
-            return InvokeWithRetryAsync(client => client.Channel.EnqueueWriteCommand(modbusFunctions));
+            return MethodWrapperAsync<bool>("EnqueueWriteCommand", new object[1] { modbusFunctions });
+            //return InvokeWithRetryAsync(client => client.Channel.EnqueueWriteCommand(modbusFunctions));
         }
         #endregion
     }

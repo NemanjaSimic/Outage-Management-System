@@ -17,12 +17,16 @@ namespace SCADA.AcquisitionService
     /// </summary>
     internal sealed class AcquisitionService : StatelessService
     {
+        private readonly string baseLoggString;
         private readonly ICloudLogger logger;
 
         public AcquisitionService(StatelessServiceContext context)
             : base(context)
         {
+            this.baseLoggString = $"{typeof(AcquisitionService)} [{this.GetHashCode()}] =>";
+
             logger = CloudLoggerFactory.GetLogger();
+            logger.LogDebug($"{baseLoggString} Ctor => Logger initialized");
         }
 
         /// <summary>
@@ -51,9 +55,9 @@ namespace SCADA.AcquisitionService
                 ScadaModelReadAccessClient readAccessClient = ScadaModelReadAccessClient.CreateClient();
                 configData = await readAccessClient.GetScadaConfigData();
 
-                string message = "AcquisitionCycle initialized.";
-                logger.LogInformation(message);
+                string message = $"{baseLoggString} RunAsync => AcquisitionCycle initialized.";
                 ServiceEventSource.Current.ServiceMessage(this.Context, $"[AcquisitionService | Information] {message}");
+                logger.LogInformation(message);
             }
             catch (Exception e)
             {
@@ -70,13 +74,13 @@ namespace SCADA.AcquisitionService
                 {
                     await acquisitionCycle.Start();
 
-                    string message = "AcquisitionCycle executed.";
+                    string message = $"{baseLoggString} RunAsync => AcquisitionCycle executed.";
                     logger.LogVerbose(message);
-                    //ServiceEventSource.Current.ServiceMessage(this.Context, $"[AcquisitionService | Information] {message}");
+                    //ServiceEventSource.Current.ServiceMessage(this.Context, $"[AcquisitionService | Verbose] {message}");
                 }
                 catch (Exception e)
                 {
-                    logger.LogError(e.Message, e);
+                    logger.LogError($"{baseLoggString} RunAsync => {e.Message}", e);
                     ServiceEventSource.Current.ServiceMessage(this.Context, $"[AcquisitionService | Error] {e.Message}");
                 }
 

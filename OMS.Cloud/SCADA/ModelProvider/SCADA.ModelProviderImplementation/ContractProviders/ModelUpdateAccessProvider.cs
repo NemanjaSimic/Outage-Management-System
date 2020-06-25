@@ -12,6 +12,7 @@ using OMS.Common.ScadaContracts.ModelProvider;
 using OMS.Common.WcfClient.PubSub;
 using System;
 using System.Collections.Generic;
+using System.ServiceModel;
 using System.Text;
 using System.Threading.Tasks;
 using ReliableDictionaryNames = OMS.Common.SCADA.ReliableDictionaryNames;
@@ -20,13 +21,15 @@ namespace SCADA.ModelProviderImplementation.ContractProviders
 {
     public class ModelUpdateAccessProvider : IScadaModelUpdateAccessContract
     {
+        private readonly string baseLoggString;
         private readonly IReliableStateManager stateManager;
-        private readonly PublisherClient publisherClient;
 
         private bool isGidToPointItemMapInitialized;
         private bool isMeasurementsCacheInitialized;
         private bool isCommandDescriptionCacheInitialized;
         private bool isInfoCacheInitialized;
+        
+        private PublisherClient publisherClient;
 
         #region Private Propetires
         private bool ReliableDictionariesInitialized
@@ -79,6 +82,8 @@ namespace SCADA.ModelProviderImplementation.ContractProviders
 
         public ModelUpdateAccessProvider(IReliableStateManager stateManager)
         {
+            this.baseLoggString = $"{typeof(ModelUpdateAccessProvider)} [{this.GetHashCode()}] =>";
+
             this.stateManager = stateManager;
             stateManager.StateManagerChanged += this.OnStateManagerChangedHandler;
 
@@ -154,14 +159,14 @@ namespace SCADA.ModelProviderImplementation.ContractProviders
 
             if (data == null)
             {
-                string message = $"WriteToMeasurementsCache() => readAnalogCommand.Data is null.";
+                string message = $"{baseLoggString} MakeAnalogEntryToMeasurementCache => readAnalogCommand.Data is null.";
                 Logger.LogError(message);
                 throw new NullReferenceException(message);
             }
 
             if (MeasurementsCache == null)
             {
-                string message = $"GetIntegrityUpdate => gidToPointItemMap is null.";
+                string message = $"{baseLoggString} MakeAnalogEntryToMeasurementCache => gidToPointItemMap is null.";
                 Logger.LogError(message);
                 throw new InternalSCADAServiceException(message);
             }
@@ -175,7 +180,7 @@ namespace SCADA.ModelProviderImplementation.ContractProviders
                 }
                 else if (MeasurementsCache[gid] is AnalogModbusData analogCacheItem && analogCacheItem.Value != data[gid].Value)
                 {
-                    Logger.LogDebug($"Value changed on element with id: {analogCacheItem.MeasurementGid}. Old value: {analogCacheItem.Value}; new value: {data[gid].Value}");
+                    Logger.LogDebug($"{baseLoggString} MakeAnalogEntryToMeasurementCache => Value changed on element with id: {analogCacheItem.MeasurementGid}. Old value: {analogCacheItem.Value}; new value: {data[gid].Value}");
 
                     MeasurementsCache[gid] = data[gid];
                     publicationData[gid] = MeasurementsCache[gid] as AnalogModbusData;
@@ -202,14 +207,14 @@ namespace SCADA.ModelProviderImplementation.ContractProviders
 
             if (data == null)
             {
-                string message = $"WriteToMeasurementsCache() => readAnalogCommand.Data is null.";
+                string message = $"{baseLoggString} MakeDiscreteEntryToMeasurementCache => readAnalogCommand.Data is null.";
                 Logger.LogError(message);
                 throw new NullReferenceException(message);
             }
 
             if (MeasurementsCache == null)
             {
-                string message = $"GetIntegrityUpdate => gidToPointItemMap is null.";
+                string message = $"{baseLoggString} MakeDiscreteEntryToMeasurementCache => gidToPointItemMap is null.";
                 Logger.LogError(message);
                 throw new InternalSCADAServiceException(message);
             }
@@ -223,7 +228,7 @@ namespace SCADA.ModelProviderImplementation.ContractProviders
                 }
                 else if (MeasurementsCache[gid] is DiscreteModbusData discreteCacheItem && discreteCacheItem.Value != data[gid].Value)
                 {
-                    Logger.LogDebug($"Value changed on element with id :{discreteCacheItem.MeasurementGid};. Old value: {discreteCacheItem.Value}; new value: {data[gid].Value}");
+                    Logger.LogDebug($"{baseLoggString} MakeDiscreteEntryToMeasurementCache => Value changed on element with id :{discreteCacheItem.MeasurementGid};. Old value: {discreteCacheItem.Value}; new value: {data[gid].Value}");
 
                     MeasurementsCache[gid] = data[gid];
                     publicationData[gid] = MeasurementsCache[gid] as DiscreteModbusData;
@@ -248,7 +253,7 @@ namespace SCADA.ModelProviderImplementation.ContractProviders
 
             if (!GidToPointItemMap.ContainsKey(gid))
             {
-                string message = $"UpdatePointItemRawValue => Entity with Gid: 0x{gid:X16} does not exist in GidToPointItemMap.";
+                string message = $"{baseLoggString} UpdatePointItemRawValue => Entity with Gid: 0x{gid:X16} does not exist in GidToPointItemMap.";
                 Logger.LogError(message);
                 throw new ArgumentException(message);
             }
@@ -266,7 +271,7 @@ namespace SCADA.ModelProviderImplementation.ContractProviders
                 }
                 else
                 {
-                    throw new Exception("UpdateAnalogPointItemEguValue => TryGetValueAsync() returns no value");
+                    throw new Exception($"{baseLoggString} UpdateAnalogPointItemEguValue => TryGetValueAsync() returns no value");
                 }
             }
             else if (GidToPointItemMap[gid] is IDiscretePointItem discretePoint)
@@ -282,12 +287,12 @@ namespace SCADA.ModelProviderImplementation.ContractProviders
                 }
                 else
                 {
-                    throw new Exception("UpdateAnalogPointItemEguValue => TryGetValueAsync() returns no value");
+                    throw new Exception($"{baseLoggString} UpdateAnalogPointItemEguValue => TryGetValueAsync() returns no value");
                 }
             }
             else
             {
-                string message = $"UpdatePointItemRawValue => Entity with Gid: 0x{gid:X16} does not implement IAnalogPointItem nor IDiscretePointItem.";
+                string message = $"{baseLoggString} UpdatePointItemRawValue => Entity with Gid: 0x{gid:X16} does not implement IAnalogPointItem nor IDiscretePointItem.";
                 Logger.LogError(message);
                 throw new ArgumentException(message);
             }
@@ -317,14 +322,28 @@ namespace SCADA.ModelProviderImplementation.ContractProviders
         #endregion IScadaModelUpdateAccessContract
 
         #region Private Methods
-        private void PublishScadaData(Topic topic, ScadaMessage scadaMessage)
+        private async Task PublishScadaData(Topic topic, ScadaMessage scadaMessage)
         {
-            ScadaPublication scadaPublication = new ScadaPublication(topic, scadaMessage);
-            this.publisherClient.Publish(scadaPublication);
-            Logger.LogInformation($"SCADA service published data from topic: {scadaPublication.Topic}");
+            try
+            {
+                ScadaPublication scadaPublication = new ScadaPublication(topic, scadaMessage);
+                await this.publisherClient.Publish(scadaPublication);
+                Logger.LogInformation($"{baseLoggString} PublishScadaData => SCADA service published data of topic: {scadaPublication.Topic}");
+            }
+            catch (CommunicationObjectFaultedException e)
+            {
+                string message = $"{baseLoggString} PublishScadaData => CommunicationObjectFaultedException caught.";
+                Logger.LogError(message, e);
+
+                await Task.Delay(2000);
+
+                this.publisherClient = PublisherClient.CreateClient();
+                await PublishScadaData(topic, scadaMessage);
+                //todo: different logic on multiple rety?
+            }
 
             StringBuilder sb = new StringBuilder();
-            sb.AppendLine("MeasurementCache content: ");
+            sb.AppendLine($"{baseLoggString} PublishScadaData => MeasurementCache content: ");
 
             foreach (long gid in MeasurementsCache.Keys)
             {

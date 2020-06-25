@@ -35,12 +35,14 @@ namespace OMS.Common.WcfClient.TMS
         #region ITransactionCoordinatorContract
         public Task FinishDistributedUpdate(bool success)
         {
-            return InvokeWithRetryAsync(client => client.Channel.FinishDistributedUpdate(success));
+            return MethodWrapperAsync<bool>("FinishDistributedUpdate", new object[1] { success });
+            //return InvokeWithRetryAsync(client => client.Channel.FinishDistributedUpdate(success));
         }
 
         public Task StartDistributedUpdate()
         {
-            return InvokeWithRetryAsync(client => client.Channel.StartDistributedUpdate());
+            return MethodWrapperAsync<bool>("StartDistributedUpdate", new object[0]);
+            //return InvokeWithRetryAsync(client => client.Channel.StartDistributedUpdate());
         }
         #endregion
     }

@@ -36,7 +36,8 @@ namespace OMS.Common.WcfClient.TMS
         #region IModelUpdateNotificationContract
         public Task<bool> NotifyAboutUpdate(Dictionary<DeltaOpType, List<long>> modelChanges)
         {
-            return InvokeWithRetryAsync(client => client.Channel.NotifyAboutUpdate(modelChanges));
+            return MethodWrapperAsync<bool>("NotifyAboutUpdate", new object[1] { modelChanges });
+            //return InvokeWithRetryAsync(client => client.Channel.NotifyAboutUpdate(modelChanges));
         }
         #endregion
     }

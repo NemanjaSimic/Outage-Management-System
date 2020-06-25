@@ -37,32 +37,38 @@ namespace OMS.Common.WcfClient.PubSub
         #region IRegisterSubscriberContract
         public Task<HashSet<Topic>> GetAllSubscribedTopics(Uri subcriberUri)
         {
-            return InvokeWithRetryAsync(client => client.Channel.GetAllSubscribedTopics(subcriberUri));
+            return MethodWrapperAsync<HashSet<Topic>>("GetAllSubscribedTopics", new object[1] { subcriberUri });
+            //return InvokeWithRetryAsync(client => client.Channel.GetAllSubscribedTopics(subcriberUri));
         }
 
         public Task<bool> SubscribeToTopic(Topic topic, Uri subcriberUri, ServiceType serviceType)
         {
-            return InvokeWithRetryAsync(client => client.Channel.SubscribeToTopic(topic, subcriberUri, serviceType));
+            return MethodWrapperAsync<bool>("SubscribeToTopic", new object[3] { topic, subcriberUri, serviceType });
+            //return InvokeWithRetryAsync(client => client.Channel.SubscribeToTopic(topic, subcriberUri, serviceType));
         }
 
         public Task<bool> SubscribeToTopics(IEnumerable<Topic> topics, Uri subcriberUri, ServiceType serviceType)
         {
-            return InvokeWithRetryAsync(client => client.Channel.SubscribeToTopics(topics, subcriberUri, serviceType));
+            return MethodWrapperAsync<bool>("SubscribeToTopics", new object[3] { topics, subcriberUri, serviceType });
+            //return InvokeWithRetryAsync(client => client.Channel.SubscribeToTopics(topics, subcriberUri, serviceType));
         }
 
         public Task<bool> UnsubscribeFromAllTopics(Uri subcriberUri)
         {
-            return InvokeWithRetryAsync(client => client.Channel.UnsubscribeFromAllTopics(subcriberUri));
+            return MethodWrapperAsync<bool>("UnsubscribeFromAllTopics", new object[1] { subcriberUri });
+            //return InvokeWithRetryAsync(client => client.Channel.UnsubscribeFromAllTopics(subcriberUri));
         }
 
         public Task<bool> UnsubscribeFromTopic(Topic topic, Uri subcriberUri)
         {
-            return InvokeWithRetryAsync(client => client.Channel.UnsubscribeFromTopic(topic, subcriberUri));
+            return MethodWrapperAsync<bool>("UnsubscribeFromTopic", new object[2] { topic, subcriberUri });
+            //return InvokeWithRetryAsync(client => client.Channel.UnsubscribeFromTopic(topic, subcriberUri));
         }
 
         public Task<bool> UnsubscribeFromTopics(IEnumerable<Topic> topics, Uri subcriberUri)
         {
-            return InvokeWithRetryAsync(client => client.Channel.UnsubscribeFromTopics(topics, subcriberUri));
+            return MethodWrapperAsync<bool>("UnsubscribeFromTopics", new object[2] { topics, subcriberUri });
+            //return InvokeWithRetryAsync(client => client.Channel.UnsubscribeFromTopics(topics, subcriberUri));
         }
         #endregion ISubscriberContract
     }

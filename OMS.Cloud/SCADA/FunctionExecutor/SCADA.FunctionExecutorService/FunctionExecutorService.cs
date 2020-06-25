@@ -23,6 +23,7 @@ namespace SCADA.FunctionExecutorService
     /// </summary>
     internal sealed class FunctionExecutorService : StatelessService
     {
+        private readonly string baseLoggString;
         private readonly ICloudLogger logger;
 
         private readonly ReadCommandEnqueuer readCommandEnqueuer;
@@ -32,7 +33,10 @@ namespace SCADA.FunctionExecutorService
         public FunctionExecutorService(StatelessServiceContext context)
             : base(context)
         {
+            this.baseLoggString = $"{typeof(FunctionExecutorService)} [{this.GetHashCode()}] =>";
+
             this.logger = CloudLoggerFactory.GetLogger();
+            logger.LogDebug($"{baseLoggString} Ctor => Logger initialized");
 
             try
             {
@@ -40,14 +44,15 @@ namespace SCADA.FunctionExecutorService
                 this.writeCommandEnqueuer = new WriteCommandEnqueuer();
                 this.modelUpdateCommandEnqueuer = new ModelUpdateCommandEnqueuer();
 
-                string message = "Contract providers initialized.";
+                string message = $"{baseLoggString} Ctor => Contract providers initialized.";
                 logger.LogInformation(message);
                 ServiceEventSource.Current.ServiceMessage(this.Context, $"[FunctionExecutorService | Information] {message}");
             }
             catch (Exception e)
             {
-                logger.LogError(e.Message, e);
-                ServiceEventSource.Current.ServiceMessage(this.Context, $"[FunctionExecutorService | Error] {e.Message}");
+                string errorMessage = $"{baseLoggString} Ctor => exception {e.Message}";
+                logger.LogError(errorMessage, e);
+                ServiceEventSource.Current.ServiceMessage(this.Context, $"[FunctionExecutorService | Error] {errorMessage}");
             }
         }
 
@@ -107,14 +112,15 @@ namespace SCADA.FunctionExecutorService
                 ScadaModelReadAccessClient readAccessClient = ScadaModelReadAccessClient.CreateClient();
                 configData = await readAccessClient.GetScadaConfigData();
 
-                string message = "FunctionExecutorCycle initialized.";
+                string message = $"{baseLoggString} RunAsync => FunctionExecutorCycle initialized.";
                 logger.LogInformation(message);
                 ServiceEventSource.Current.ServiceMessage(this.Context, $"[FunctionExecutorService | Information] {message}");
             }
             catch (Exception e)
             {
-                logger.LogError(e.Message, e);
-                ServiceEventSource.Current.ServiceMessage(this.Context, $"[FunctionExecutorService | Error] {e.Message}");
+                string errorMessage = $"{baseLoggString} RunAsync => exception {e.Message}";
+                logger.LogError(errorMessage, e);
+                ServiceEventSource.Current.ServiceMessage(this.Context, $"[FunctionExecutorService | Error] {errorMessage}");
                 throw e;
             }
 
@@ -126,14 +132,15 @@ namespace SCADA.FunctionExecutorService
                 {
                     await functionExecutorCycle.Start();
 
-                    string message = "FunctionExecutorCycle executed.";
+                    string message = $"{baseLoggString} RunAsync => FunctionExecutorCycle executed.";
                     logger.LogVerbose(message);
                     //ServiceEventSource.Current.ServiceMessage(this.Context, $"[FunctionExecutorService | Information] {message}");
                 }
                 catch (Exception e)
                 {
-                    logger.LogError(e.Message, e);
-                    ServiceEventSource.Current.ServiceMessage(this.Context, $"[FunctionExecutorService | Error] {e.Message}");
+                    string errorMessage = $"{baseLoggString} RunAsync => exception {e.Message}";
+                    logger.LogError(errorMessage, e);
+                    ServiceEventSource.Current.ServiceMessage(this.Context, $"[FunctionExecutorService | Error] {errorMessage}");
                 }
 
                 await Task.Delay(TimeSpan.FromMilliseconds(configData.FunctionExecutionInterval), cancellationToken);

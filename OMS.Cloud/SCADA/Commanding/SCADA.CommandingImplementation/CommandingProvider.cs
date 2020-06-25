@@ -9,11 +9,14 @@ using OMS.Common.WcfClient.SCADA;
 using OMS.Common.Cloud.Logger;
 using OMS.Common.Cloud;
 using OMS.Common.Cloud.Exceptions.SCADA;
+using System.ServiceModel;
 
 namespace SCADA.CommandingImplementation
 {
     public class CommandingProvider : IScadaCommandingContract
     {
+        private readonly string baseLoggString;
+
         private WriteCommandEnqueuerClient commandEnqueuerClient;
         private ScadaModelReadAccessClient scadaModelReadAccessClient;
 
@@ -25,6 +28,8 @@ namespace SCADA.CommandingImplementation
 
         public CommandingProvider()
         {
+            this.baseLoggString = $"{typeof(CommandingProvider)} [{this.GetHashCode()}] =>";
+
             this.commandEnqueuerClient = WriteCommandEnqueuerClient.CreateClient();
             this.scadaModelReadAccessClient = ScadaModelReadAccessClient.CreateClient();
         }
@@ -270,7 +275,7 @@ namespace SCADA.CommandingImplementation
                 }
                 else
                 {
-                    string errorMessage = $"Commanding arguments are not valid. Registry type: {pointItem.RegisterType}, expected: {PointType.ANALOG_OUTPUT}, {PointType.DIGITAL_OUTPUT}";
+                    string errorMessage = $"{baseLoggString} SendSingleCommand => Commanding arguments are not valid. Registry type: {pointItem.RegisterType}, expected: {PointType.ANALOG_OUTPUT}, {PointType.DIGITAL_OUTPUT}";
                     Logger.LogError(errorMessage);
                     throw new ArgumentException(errorMessage);
                 }
@@ -278,8 +283,20 @@ namespace SCADA.CommandingImplementation
                 IWriteModbusFunction modbusFunction = new WriteSingleFunction(functionCode, pointItem.Address, commandingValue, commandOriginType);
                 await this.commandEnqueuerClient.EnqueueWriteCommand(modbusFunction);
 
-                string message = $"Command SUCCESSFULLY enqueued. Function code: {modbusFunction.FunctionCode}, Origin: {modbusFunction.CommandOrigin}";
+                string message = $"{baseLoggString} SendSingleCommand => Command SUCCESSFULLY enqueued. Function code: {modbusFunction.FunctionCode}, Origin: {modbusFunction.CommandOrigin}";
                 Logger.LogInformation(message);
+            }
+            catch (CommunicationObjectFaultedException e)
+            {
+                string message = $"{baseLoggString} SendSingleCommand => CommunicationObjectFaultedException caught.";
+                Logger.LogError(message, e);
+
+                await Task.Delay(2000);
+
+                this.commandEnqueuerClient = WriteCommandEnqueuerClient.CreateClient();
+                this.scadaModelReadAccessClient = ScadaModelReadAccessClient.CreateClient();
+                await SendSingleCommand(pointItem, commandingValue, commandOriginType, true);
+                //todo: different logic on multiple rety?
             }
             catch (Exception e)
             {
@@ -288,11 +305,12 @@ namespace SCADA.CommandingImplementation
                     await Task.Delay(2000);
 
                     this.commandEnqueuerClient = WriteCommandEnqueuerClient.CreateClient();
+                    this.scadaModelReadAccessClient = ScadaModelReadAccessClient.CreateClient();
                     await SendSingleCommand(pointItem, commandingValue, commandOriginType, true);
                 }
                 else
                 {
-                    string message = $"Exception in SendCommand() method.";
+                    string message = $"{baseLoggString} SendSingleCommand => Exception in SendCommand() method.";
                     Logger.LogError(message, e);
                     throw new InternalSCADAServiceException(message, e);
                 }

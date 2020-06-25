@@ -17,6 +17,7 @@ using SCADA.ModelProviderImplementation.Helpers;
 using System;
 using System.Collections.Generic;
 using System.Diagnostics;
+using System.ServiceModel;
 using System.Threading.Tasks;
 
 namespace SCADA.ModelProviderImplementation
@@ -24,10 +25,12 @@ namespace SCADA.ModelProviderImplementation
     public sealed class ScadaModel : IModelUpdateNotificationContract, ITransactionActorContract
     {
         private ICloudLogger logger;
-        private ICloudLogger Logger 
+        private ICloudLogger Logger
         {
-            get { return logger ?? (logger = CloudLoggerFactory.GetLogger()); } 
+            get { return logger ?? (logger = CloudLoggerFactory.GetLogger()); }
         }
+
+        private readonly string baseLoggString;
 
         private readonly EnumDescs enumDescs;
         private readonly ModelResourcesDesc modelResourceDesc;
@@ -122,6 +125,8 @@ namespace SCADA.ModelProviderImplementation
 
         public ScadaModel(IReliableStateManager stateManager, ModelResourcesDesc modelResourceDesc, EnumDescs enumDescs)
         {
+            this.baseLoggString = $"{typeof(ScadaModel)} [{this.GetHashCode()}] =>";
+
             this.stateManager = stateManager;
             this.modelResourceDesc = modelResourceDesc;
             this.enumDescs = enumDescs;
@@ -180,6 +185,10 @@ namespace SCADA.ModelProviderImplementation
 
         public async Task InitializeScadaModel(bool isRetry = false)
         {
+            string isRetryString = isRetry ? "yes" : "no";
+            string verboseMessage = $"{baseLoggString} InitializeScadaModel method called, isRetry: {isRetryString}.";
+            Logger.LogVerbose(verboseMessage);
+
             while (!ReliableDictionariesInitialized)
             {
                 //TODO: something smarter
@@ -193,27 +202,35 @@ namespace SCADA.ModelProviderImplementation
 
                 if (!isModelImported)
                 {
+                    string message = $"{baseLoggString} InitializeScadaModel => failed to import model";
+                    Logger.LogWarning(message);
+
+                    await Task.Delay(2000);
+                    await InitializeScadaModel(true);
+
                     //TODO: neka ozbiljnija retry logiga
-                    throw new Exception("InitializeScadaModel: failed to import model");
+                    //throw new Exception($"{baseLoggString} InitializeScadaModel => failed to import model");
                 }
 
                 await SendModelUpdateCommands();
             }
+            catch (CommunicationObjectFaultedException e)
+            {
+                string message = $"{baseLoggString} InitializeScadaModel => CommunicationObjectFaultedException caught.";
+                Logger.LogError(message, e);
+
+                await Task.Delay(2000);
+
+                this.nmsGdaClient = NetworkModelGdaClient.CreateClient();
+                this.scadaCommandingClient = ScadaCommandingClient.CreateClient();
+                await InitializeScadaModel(true);
+                //todo: different logic on multiple rety?
+            }
             catch (Exception e)
             {
-                if (!isRetry)
-                {
-                    await Task.Delay(2000);
-                    this.nmsGdaClient = NetworkModelGdaClient.CreateClient();
-                    this.scadaCommandingClient = ScadaCommandingClient.CreateClient();
-                    await InitializeScadaModel(true);
-                }
-                else
-                {
-                    string message = "Exception caught in InitializeScadaModel method.";
-                    Logger.LogError(message, e);
-                    throw e;
-                }
+                string message = $"{baseLoggString} InitializeScadaModel => Exception caught.";
+                Logger.LogError(message, e);
+                throw e;
             }
         }
 
@@ -228,23 +245,21 @@ namespace SCADA.ModelProviderImplementation
                 dictionary.Clear();
             }
 
-            string message = "Importing analog measurements started...";
+            string message = $"{baseLoggString} ImportModel => Importing analog measurements started...";
             Logger.LogInformation(message);
-            Trace.WriteLine(message);
+
             bool analogImportSuccess = await ImportAnalog();
 
-            message = $"Importing analog measurements finished. ['success' value: {analogImportSuccess}]";
+            message = $"{baseLoggString} ImportModel =>Importing analog measurements finished. ['success' value: {analogImportSuccess}]";
             Logger.LogInformation(message);
-            Trace.WriteLine(message);
 
-            message = "Importing discrete measurements started...";
+            message = $"{baseLoggString} ImportModel => Importing discrete measurements started...";
             Logger.LogInformation(message);
-            Trace.WriteLine(message);
+
             bool discreteImportSuccess = await ImportDiscrete();
 
-            message = $"Importing discrete measurements finished. ['success' value: {discreteImportSuccess}]";
+            message = $"{baseLoggString} ImportModel => Importing discrete measurements finished. ['success' value: {discreteImportSuccess}]";
             Logger.LogInformation(message);
-            Console.WriteLine(message);
 
             success = analogImportSuccess && discreteImportSuccess;
 
@@ -290,7 +305,7 @@ namespace SCADA.ModelProviderImplementation
                             
                         if(CurrentGidToPointItemMap.ContainsKey(gid))
                         {
-                            string message = $"SCADA model is invalid => Gid: {gid} belongs to more than one entity.";
+                            string message = $"{baseLoggString} ImportAnalog => SCADA model is invalid => Gid: {gid} belongs to more than one entity.";
                             Logger.LogError(message);
                             throw new InternalSCADAServiceException(message);
                         }
@@ -305,13 +320,13 @@ namespace SCADA.ModelProviderImplementation
 
                         if(CurrentAddressToGidMap[registerType].ContainsKey(pointItem.Address))
                         {
-                            string message = $"SCADA model is invalid => Address: {pointItem.Address} (RegType: {registerType}) belongs to more than one entity.";
+                            string message = $"{baseLoggString} ImportAnalog => SCADA model is invalid => Address: {pointItem.Address} (RegType: {registerType}) belongs to more than one entity.";
                             Logger.LogError(message);
                             throw new InternalSCADAServiceException(message);
                         }
 
                         CurrentAddressToGidMap[registerType].Add(pointItem.Address, rds[i].Id);
-                        Logger.LogDebug($"ANALOG measurement added to SCADA model [Gid: {gid}, Address: {pointItem.Address}]");
+                        Logger.LogDebug($"{baseLoggString} ImportAnalog => ANALOG measurement added to SCADA model [Gid: {gid}, Address: {pointItem.Address}]");
                     }
 
                     resourcesLeft = await this.nmsGdaClient.IteratorResourcesLeft(iteratorId);
@@ -319,10 +334,22 @@ namespace SCADA.ModelProviderImplementation
 
                 success = true;
             }
+            catch (CommunicationObjectFaultedException e)
+            {
+                success = false;
+                string message = $"{baseLoggString} ImportAnalog => CommunicationObjectFaultedException caught.";
+                Logger.LogError(message, e);
+
+                await Task.Delay(2000);
+
+                this.nmsGdaClient = NetworkModelGdaClient.CreateClient();
+                this.scadaCommandingClient = ScadaCommandingClient.CreateClient();
+                //todo: different logic on multiple rety?
+            }
             catch (Exception ex)
             {
                 success = false;
-                string errorMessage = $"ImportAnalog failed with error: {ex.Message}";
+                string errorMessage = $"{baseLoggString} ImportAnalog => failed with error: {ex.Message}";
                 Trace.WriteLine(errorMessage);
                 Logger.LogError(errorMessage, ex);
             }
@@ -360,7 +387,7 @@ namespace SCADA.ModelProviderImplementation
 
                         if (CurrentGidToPointItemMap.ContainsKey(gid))
                         {
-                            string message = $"SCADA model is invalid => Gid: {gid} belongs to more than one entity.";
+                            string message = $"{baseLoggString} ImportDiscrete => SCADA model is invalid => Gid: {gid} belongs to more than one entity.";
                             Logger.LogError(message);
                             throw new InternalSCADAServiceException(message);
                         }
@@ -375,13 +402,13 @@ namespace SCADA.ModelProviderImplementation
 
                         if (CurrentAddressToGidMap[registerType].ContainsKey(pointItem.Address))
                         {
-                            string message = $"SCADA model is invalid => Address: {pointItem.Address} (RegType: {registerType}) belongs to more than one entity.";
+                            string message = $"{baseLoggString} ImportDiscrete => SCADA model is invalid => Address: {pointItem.Address} (RegType: {registerType}) belongs to more than one entity.";
                             Logger.LogError(message);
                             throw new InternalSCADAServiceException(message);
                         }
 
                         CurrentAddressToGidMap[registerType].Add(pointItem.Address, gid);
-                        Logger.LogDebug($"DISCRETE measurement added to SCADA model [Gid: {gid}, Address: {pointItem.Address}]");
+                        Logger.LogDebug($"{baseLoggString} ImportDiscrete => DISCRETE measurement added to SCADA model [Gid: {gid}, Address: {pointItem.Address}]");
                     }
 
                     resourcesLeft = await this.nmsGdaClient.IteratorResourcesLeft(iteratorId);
@@ -389,10 +416,22 @@ namespace SCADA.ModelProviderImplementation
 
                 success = true;
             }
+            catch (CommunicationObjectFaultedException e)
+            {
+                success = false;
+                string message = $"{baseLoggString} ImportAnalog => CommunicationObjectFaultedException caught.";
+                Logger.LogError(message, e);
+
+                await Task.Delay(2000);
+
+                this.nmsGdaClient = NetworkModelGdaClient.CreateClient();
+                this.scadaCommandingClient = ScadaCommandingClient.CreateClient();
+                //todo: different logic on multiple rety?
+            }
             catch (Exception ex)
             {
                 success = false;
-                string errorMessage = $"ImportDiscrete failed with error: {ex.Message}";
+                string errorMessage = $"{baseLoggString} ImportDiscrete => failed with error: {ex.Message}";
                 Console.WriteLine(errorMessage);
                 Logger.LogError(errorMessage, ex);
             }
