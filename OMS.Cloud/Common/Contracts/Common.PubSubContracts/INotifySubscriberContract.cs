@@ -4,6 +4,7 @@ using Microsoft.ServiceFabric.Services.Remoting;
 using System;
 using System.ServiceModel;
 using System.Threading.Tasks;
+using Common.PubSubContracts.DataContracts.EMAIL;
 
 namespace OMS.Common.PubSubContracts
 {
@@ -14,13 +15,13 @@ namespace OMS.Common.PubSubContracts
         //[ServiceKnownType(typeof(CalculationEngineMessage))]
         //[ServiceKnownType(typeof(CalculationEnginePublication))]
         //[ServiceKnownType(typeof(TopologyForUIMessage))]
-        //[ServiceKnownType(typeof(EmailServiceMessage))]
-        //[ServiceKnownType(typeof(EmailToOutageMessage))]
+        [ServiceKnownType(typeof(EmailServiceMessage))]
+        [ServiceKnownType(typeof(EmailToOutageMessage))]
         //[ServiceKnownType(typeof(OMSModelMessage))]
         //[ServiceKnownType(typeof(ActiveOutageMessage))]
         //[ServiceKnownType(typeof(ArchivedOutageMessage))]
         //[ServiceKnownType(typeof(OutageTopologyModel))]
-        //[ServiceKnownType(typeof(OutageTopologyElement))]
+        //[ServiceKnownType(typeof(OutageTopologyElement))]  
         [ServiceKnownType(typeof(SingleAnalogValueSCADAMessage))]
         [ServiceKnownType(typeof(MultipleAnalogValueSCADAMessage))]
         [ServiceKnownType(typeof(SingleDiscreteValueSCADAMessage))]
