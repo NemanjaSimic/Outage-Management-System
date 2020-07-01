@@ -19,7 +19,8 @@ namespace OMS.OutageSimulator.Services
 
         public bool IsOutageElement(long outageElementId)
         {
-            return Overview.ActiveOutages.Any(outage => outage.OutageElement.GID == outageElementId);
+            var retVal = Overview.ActiveOutages.Where(outage => outage.OutageElement.GID == outageElementId).ToList();
+            return retVal.Count > 0;
         }
     }
 }

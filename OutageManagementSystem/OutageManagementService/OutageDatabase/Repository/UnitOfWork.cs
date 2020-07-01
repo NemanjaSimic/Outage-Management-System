@@ -11,6 +11,8 @@ namespace OutageDatabase.Repository
         public OutageRepository OutageRepository { get; set; }
         public ConsumerRepository ConsumerRepository { get; set; }
         public EquipmentRepository EquipmentRepository { get; set; }
+        public ConsumerHistoricalRepository ConsumerHistoricalRepository { get; set; }
+        public EquipmentHistoricalRepository EquipmentHistoricalRepository { get; set; }
 
         public UnitOfWork()
         {
@@ -19,6 +21,8 @@ namespace OutageDatabase.Repository
             OutageRepository = new OutageRepository(context);
             ConsumerRepository = new ConsumerRepository(context);
             EquipmentRepository = new EquipmentRepository(context);
+            ConsumerHistoricalRepository = new ConsumerHistoricalRepository(context);
+            EquipmentHistoricalRepository = new EquipmentHistoricalRepository(context);
         }
 
         public UnitOfWork(OutageContext context)
@@ -28,6 +32,8 @@ namespace OutageDatabase.Repository
             OutageRepository = new OutageRepository(context);
             ConsumerRepository = new ConsumerRepository(context);
             EquipmentRepository = new EquipmentRepository(context);
+            ConsumerHistoricalRepository = new ConsumerHistoricalRepository(context);
+            EquipmentHistoricalRepository = new EquipmentHistoricalRepository(context);
         }
 
         public int Complete()

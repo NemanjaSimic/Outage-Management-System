@@ -10,13 +10,27 @@ namespace Outage.Common.ServiceProxies.Outage
         {
         }
 
-        public bool ReportPotentialOutage(long elementGid)
+        public void OnSwitchClose(long elementGid)
+        {
+            try
+            {
+               Channel.OnSwitchClose(elementGid);
+            }
+            catch (Exception e)
+            {
+                string message = "Exception in ReportPotentialOutage() proxy method.";
+                LoggerWrapper.Instance.LogError(message, e);
+                throw e;
+            }
+        }
+
+        public bool ReportPotentialOutage(long elementGid, CommandOriginType commandOriginType)
         {
             bool success;
 
             try
             {
-                success = Channel.ReportPotentialOutage(elementGid);
+                success = Channel.ReportPotentialOutage(elementGid, commandOriginType);
             }
             catch (Exception e)
             {

@@ -19,6 +19,12 @@ namespace CalculationEngine.SCADAFunctions
 		private Dictionary<long, DiscreteMeasurement> discreteMeasurements;
 		private Dictionary<long, List<long>> elementToMeasurementMap;
 		private Dictionary<long, long> measurementToElementMap;
+
+		private Dictionary<long, AnalogMeasurement> tempAnalogMeasurements;
+		private Dictionary<long, DiscreteMeasurement> tempDiscreteMeasurements;
+		private Dictionary<long, List<long>> tempElementToMeasurementMap;
+		private Dictionary<long, long> tempMeasurementToElementMap;
+
 		private ProxyFactory proxyFactory;
 		private readonly HashSet<CommandOriginType> ignorableOriginTypes;
         #endregion
@@ -29,12 +35,11 @@ namespace CalculationEngine.SCADAFunctions
 			measurementToElementMap = new Dictionary<long, long>();
 			analogMeasurements = new Dictionary<long, AnalogMeasurement>();
 			discreteMeasurements = new Dictionary<long, DiscreteMeasurement>();
-			ignorableOriginTypes = new HashSet<CommandOriginType>() { CommandOriginType.USER_COMMAND, CommandOriginType.ISOLATING_ALGORITHM_COMMAND };
+			ignorableOriginTypes = new HashSet<CommandOriginType>() { /*CommandOriginType.USER_COMMAND,*/ CommandOriginType.ISOLATING_ALGORITHM_COMMAND };
 
 			proxyFactory = new ProxyFactory();
 			Provider.Instance.MeasurementProvider = this;
 		}
-
 		public DiscreteMeasurementDelegate DiscreteMeasurementDelegate { get; set; }
 		public void AddAnalogMeasurement(AnalogMeasurement analogMeasurement)
 		{
@@ -52,7 +57,7 @@ namespace CalculationEngine.SCADAFunctions
 		}
 		public float GetAnalogValue(long measurementGid)
 		{
-			float value = 0;
+			float value = -1;
 			if (analogMeasurements.ContainsKey(measurementGid))
 			{
 				value = analogMeasurements[measurementGid].CurrentValue;
@@ -69,11 +74,12 @@ namespace CalculationEngine.SCADAFunctions
 			}
 			return isOpen;
 		}
-		public void UpdateAnalogMeasurement(long measurementGid, float value, CommandOriginType commandOrigin)
+		private void UpdateAnalogMeasurement(long measurementGid, float value, CommandOriginType commandOrigin, AlarmType alarmType)
 		{
 			if (analogMeasurements.TryGetValue(measurementGid, out AnalogMeasurement measurement))
 			{
 				measurement.CurrentValue = value;
+				measurement.Alarm = alarmType;
 			}
 			else
 			{
@@ -86,10 +92,11 @@ namespace CalculationEngine.SCADAFunctions
 			{
 				AnalogModbusData measurementData = data[gid];
 
-				UpdateAnalogMeasurement(gid, (float)measurementData.Value, measurementData.CommandOrigin);
+				UpdateAnalogMeasurement(gid, (float)measurementData.Value, measurementData.CommandOrigin, measurementData.Alarm);
 			}
+			//DiscreteMeasurementDelegate?.Invoke();
 		}
-		public bool UpdateDiscreteMeasurement(long measurementGid, int value, CommandOriginType commandOrigin)
+		private bool UpdateDiscreteMeasurement(long measurementGid, int value, CommandOriginType commandOrigin)
 		{
 			bool success = true;
 			if (discreteMeasurements.TryGetValue(measurementGid, out DiscreteMeasurement measurement))
@@ -100,34 +107,48 @@ namespace CalculationEngine.SCADAFunctions
 				}
 				else
 				{
-					if (!measurement.CurrentOpen && !ignorableOriginTypes.Contains(commandOrigin))
-					{
-						using (ReportPotentialOutageProxy reportPotentialOutageProxy = proxyFactory.CreateProxy<ReportPotentialOutageProxy, IReportPotentialOutageContract>(EndpointNames.ReportPotentialOutageEndpoint))
-						{
-							if (reportPotentialOutageProxy == null)
-							{
-								string message = "UpdateDiscreteMeasurement => ReportPotentialOutageProxy is null.";
-								logger.LogError(message);
-								throw new NullReferenceException(message);
-							}
-
-							try
-							{
-								reportPotentialOutageProxy.ReportPotentialOutage(measurement.ElementId);
-							}
-							catch (Exception e)
-							{
-								logger.LogError("Failed to report potential outage.", e);
-							}
-						}
-					}
 					measurement.CurrentOpen = true;
 				}
+
+				using (ReportPotentialOutageProxy reportPotentialOutageProxy = proxyFactory.CreateProxy<ReportPotentialOutageProxy, IReportPotentialOutageContract>(EndpointNames.ReportPotentialOutageEndpoint))
+				{
+					if (reportPotentialOutageProxy == null)
+					{
+						string message = "UpdateDiscreteMeasurement => ReportPotentialOutageProxy is null.";
+						logger.LogError(message);
+						throw new NullReferenceException(message);
+					}
+
+					try
+					{
+						if (measurement.CurrentOpen)
+						{
+							reportPotentialOutageProxy.ReportPotentialOutage(measurement.ElementId, commandOrigin);
+						}
+						else
+						{
+							reportPotentialOutageProxy.OnSwitchClose(measurement.ElementId);
+						}
+					}
+					catch (Exception e)
+					{
+						logger.LogError("Failed to report potential outage.", e);
+					}
+				}
+
 			}
 			else
 			{
 				logger.LogWarn($"Failed to update discrete measurement with GID 0x{measurementGid.ToString("X16")}. There is no such a measurement.");
 				success = false;
+			}
+
+			if (measurementToElementMap.TryGetValue(measurementGid, out long recloserGid) 
+				&& Provider.Instance.ModelProvider.IsRecloser(recloserGid)
+				&& commandOrigin != CommandOriginType.CE_COMMAND
+				&& commandOrigin != CommandOriginType.OUTAGE_SIMULATOR)
+			{
+				Provider.Instance.TopologyProvider.ResetRecloser(recloserGid);
 			}
 			return success;
 		}
@@ -143,7 +164,7 @@ namespace CalculationEngine.SCADAFunctions
 					signalGids.Add(gid);
 				}
 			}
-			DiscreteMeasurementDelegate?.Invoke(signalGids);
+			DiscreteMeasurementDelegate?.Invoke();
 		}
 		public long GetElementGidForMeasurement(long measurementGid)
 		{
@@ -180,7 +201,6 @@ namespace CalculationEngine.SCADAFunctions
 			}
 			return success;
 		}
-
 		public void AddMeasurementElementPair(long measurementId, long elementId)
 		{
 			if (measurementToElementMap.ContainsKey(measurementId))
@@ -221,6 +241,46 @@ namespace CalculationEngine.SCADAFunctions
 		public Dictionary<long, long> GetMeasurementToElementMap()
 		{
 			return measurementToElementMap;
+		}
+        #endregion
+
+        #region Transaction Manager
+		public bool PrepareForTransaction()
+		{
+			bool success = true;
+			try
+			{
+				tempAnalogMeasurements = new Dictionary<long, AnalogMeasurement>(analogMeasurements);
+				tempDiscreteMeasurements = new Dictionary<long, DiscreteMeasurement>(discreteMeasurements);
+				tempElementToMeasurementMap = new Dictionary<long, List<long>>(elementToMeasurementMap);
+				tempMeasurementToElementMap = new Dictionary<long, long>(measurementToElementMap);
+
+				elementToMeasurementMap = new Dictionary<long, List<long>>();
+				measurementToElementMap = new Dictionary<long, long>();
+				analogMeasurements = new Dictionary<long, AnalogMeasurement>();
+				discreteMeasurements = new Dictionary<long, DiscreteMeasurement>();
+			}
+			catch (Exception)
+			{
+				success = false;
+			}
+			return success;
+		}
+
+		public void CommitTransaction()
+		{
+			tempAnalogMeasurements = null;
+			tempDiscreteMeasurements = null;
+			tempElementToMeasurementMap = null;
+			tempMeasurementToElementMap = null;
+		}
+
+		public void RollbackTransaction()
+		{
+			elementToMeasurementMap = tempElementToMeasurementMap;
+			measurementToElementMap = tempMeasurementToElementMap;
+			analogMeasurements = tempAnalogMeasurements;
+			discreteMeasurements = tempDiscreteMeasurements;
 		}
 		#endregion
 	}

@@ -221,6 +221,7 @@
     <Compile Include="Areas\HelpPage\XmlDocumentationProvider.cs" />
     <Compile Include="Controllers\HomeController.cs" />
     <Compile Include="Controllers\OutageController.cs" />
+    <Compile Include="Controllers\ReportController.cs" />
     <Compile Include="Controllers\ScadaController.cs" />
     <Compile Include="Controllers\TestController.cs" />
     <Compile Include="Controllers\TopologyController.cs" />

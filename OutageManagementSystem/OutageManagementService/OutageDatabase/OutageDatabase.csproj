@@ -40,6 +40,9 @@
     <Reference Include="EntityFramework.SqlServer, Version=6.0.0.0, Culture=neutral, PublicKeyToken=b77a5c561934e089, processorArchitecture=MSIL">
       <HintPath>..\..\packages\EntityFramework.6.4.0\lib\net45\EntityFramework.SqlServer.dll</HintPath>
     </Reference>
+    <Reference Include="LinqKit, Version=1.1.17.0, Culture=neutral, PublicKeyToken=bc217f8844052a91, processorArchitecture=MSIL">
+      <HintPath>..\..\packages\LinqKit.1.1.17\lib\net45\LinqKit.dll</HintPath>
+    </Reference>
     <Reference Include="System" />
     <Reference Include="System.ComponentModel.DataAnnotations" />
     <Reference Include="System.Core" />
@@ -63,6 +66,12 @@
     <Compile Include="Migrations\202003061017231_Merge ActiveOutage and ArchivedOutage into OutageEntity.designer.cs">
       <DependentUpon>202003061017231_Merge ActiveOutage and ArchivedOutage into OutageEntity.cs</DependentUpon>
     </Compile>
+    <Compile Include="Migrations\202003151453535_HistoricalDatabase.cs" />
+    <Compile Include="Migrations\202003151453535_HistoricalDatabase.designer.cs">
+      <DependentUpon>202003151453535_HistoricalDatabase.cs</DependentUpon>
+    </Compile>
+    <Compile Include="Repository\ConsumerHistoricalRepository.cs" />
+    <Compile Include="Repository\EquipmentHistoricalRepository.cs" />
     <Compile Include="Repository\OutageRepository.cs" />
     <Compile Include="Repository\ConsumerRepository.cs" />
     <Compile Include="Repository\EquipmentRepository.cs" />
@@ -152,6 +161,9 @@
     </EmbeddedResource>
     <EmbeddedResource Include="Migrations\202003061017231_Merge ActiveOutage and ArchivedOutage into OutageEntity.resx">
       <DependentUpon>202003061017231_Merge ActiveOutage and ArchivedOutage into OutageEntity.cs</DependentUpon>
+    </EmbeddedResource>
+    <EmbeddedResource Include="Migrations\202003151453535_HistoricalDatabase.resx">
+      <DependentUpon>202003151453535_HistoricalDatabase.cs</DependentUpon>
     </EmbeddedResource>
   </ItemGroup>
   <Import Project="$(MSBuildToolsPath)\Microsoft.CSharp.targets" />

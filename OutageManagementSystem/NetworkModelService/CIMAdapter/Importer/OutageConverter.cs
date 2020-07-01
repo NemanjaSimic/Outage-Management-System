@@ -337,6 +337,48 @@ namespace Outage.DataImporter.CIMAdapter.Importer
             }
         }
 
+        public static void PopulateEnergyConsumeProperties(Outage.EnergyConsumer cimEnergyConsumer, ResourceDescription rd, ImportHelper importHelper, TransformAndLoadReport report)
+        {
+            if ((cimEnergyConsumer != null) && (rd != null))
+            {
+                OutageConverter.PopulateConductingEquipmentProperties(cimEnergyConsumer, rd, importHelper, report);
+
+                if (cimEnergyConsumer.LastNameHasValue)
+                {
+                    rd.AddProperty(new Property(ModelCode.ENERGYCONSUMER_LASTNAME, cimEnergyConsumer.LastName));
+                }
+
+                if (cimEnergyConsumer.FirstNameHasValue)
+                {
+                    rd.AddProperty(new Property(ModelCode.ENERGYCONSUMER_FIRSTNAME, cimEnergyConsumer.FirstName));
+                }
+
+                if (cimEnergyConsumer.TypeHasValue)
+                {
+                    rd.AddProperty(new Property(ModelCode.ENERGYCONSUMER_TYPE, (short)GetEnergyConsumerType(cimEnergyConsumer.Type)));
+                }
+            }
+        }
+
+        public static void PopulateSynchronousMachineProperties(Outage.SynchronousMachine cimSynchronousMachine, ResourceDescription rd, ImportHelper importHelper, TransformAndLoadReport report)
+        {
+            if ((cimSynchronousMachine != null) && (rd != null))
+            {
+                OutageConverter.PopulateConductingEquipmentProperties(cimSynchronousMachine, rd, importHelper, report);
+
+                if (cimSynchronousMachine.CapacityHasValue)
+                {
+                    rd.AddProperty(new Property(ModelCode.SYNCHRONOUSMACHINE_CAPACITY, cimSynchronousMachine.Capacity));
+                }
+
+                if (cimSynchronousMachine.CurrentRegimeHasValue)
+                {
+                    rd.AddProperty(new Property(ModelCode.SYNCHRONOUSMACHINE_CURRENTREGIME, cimSynchronousMachine.CurrentRegime));
+
+                }
+            }
+        }
+
         #endregion Populate ResourceDescription
 
         #region Enums convert
@@ -358,6 +400,8 @@ namespace Outage.DataImporter.CIMAdapter.Importer
             {
                 case Outage.AnalogMeasurementType.Current:
                     return Outage.Common.AnalogMeasurementType.CURRENT;
+                case Outage.AnalogMeasurementType.FeederCurrent:
+                    return Outage.Common.AnalogMeasurementType.FEEDER_CURRENT;
                 case Outage.AnalogMeasurementType.Voltage:
                     return Outage.Common.AnalogMeasurementType.VOLTAGE;
                 case Outage.AnalogMeasurementType.Power:
@@ -367,6 +411,18 @@ namespace Outage.DataImporter.CIMAdapter.Importer
             }
         }
 
+        public static Outage.Common.EnergyConsumerType GetEnergyConsumerType(Outage.EnergyConsumerType energyConsumertype)
+        {
+           switch(energyConsumertype)
+           {
+                case Outage.EnergyConsumerType.Household:
+                    return Outage.Common.EnergyConsumerType.HOUSEHOLD;
+                case Outage.EnergyConsumerType.SmallIndustry:
+                    return Outage.Common.EnergyConsumerType.SMALL_INDUSTRY;
+                default:
+                    throw new System.Exception($"Unknown enum type: {energyConsumertype}.");
+            }
+        }
         #endregion Enums convert
     }
 }
