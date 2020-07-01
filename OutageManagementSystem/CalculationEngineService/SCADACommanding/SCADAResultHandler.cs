@@ -19,7 +19,11 @@ namespace CalculationEngine.SCADAFunctions
 		{
 			if (message is SingleAnalogValueSCADAMessage singleAnalog)
 			{
-				Provider.Instance.MeasurementProvider.UpdateAnalogMeasurement(singleAnalog.AnalogModbusData.MeasurementGid, singleAnalog.AnalogModbusData.Value, singleAnalog.AnalogModbusData.CommandOrigin);
+				Dictionary<long, AnalogModbusData> data = new Dictionary<long, AnalogModbusData>(1)
+				{
+					{ singleAnalog.AnalogModbusData.MeasurementGid, singleAnalog.AnalogModbusData }, 
+				};
+				Provider.Instance.MeasurementProvider.UpdateAnalogMeasurement(data);
 			}
 			else if (message is MultipleAnalogValueSCADAMessage multipleAnalog)
 			{
@@ -29,7 +33,7 @@ namespace CalculationEngine.SCADAFunctions
 			{
 				Dictionary<long, DiscreteModbusData> data = new Dictionary<long, DiscreteModbusData>(1) 
 				{ 
-					{ singleDiscrete.DiscreteModbusData.MeasurementGid, singleDiscrete.DiscreteModbusData }, //new DiscreteModbusData(singleDiscrete.DiscreteModbusData.Value, singleDiscrete.DiscreteModbusData.Alarm, singleDiscrete.DiscreteModbusData.MeasurementGid, singleDiscrete.DiscreteModbusData.CommandOrigin) } 
+					{ singleDiscrete.DiscreteModbusData.MeasurementGid, singleDiscrete.DiscreteModbusData },
 				};
 				Provider.Instance.MeasurementProvider.UpdateDiscreteMeasurement(data);
 			}

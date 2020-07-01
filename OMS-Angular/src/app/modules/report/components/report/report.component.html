@@ -7,7 +7,9 @@
 
   <div class="chart-area">
     <div *ngIf="hasChartData" class="chart">
-      <app-report-chart>        
+      <app-report-chart
+      [data]="chartData"
+      [type]="chartType">        
       </app-report-chart>
     </div>
     <div *ngIf="!hasChartData" >

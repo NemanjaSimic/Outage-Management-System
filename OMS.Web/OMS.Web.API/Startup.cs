@@ -23,7 +23,7 @@ namespace OMS.Web.API
 
                 map.RunSignalR(hubConfiguration);
             });
-
+            GlobalHost.Configuration.MaxIncomingWebSocketMessageSize = null;
         }
     }
 }

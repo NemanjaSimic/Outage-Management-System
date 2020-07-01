@@ -12,5 +12,6 @@ namespace Outage.Common.OutageService.Interface
         bool IsActive { get; set; }
         ushort DistanceFromSource { get; set; }
         bool NoReclosing { get; set; }
+        bool IsOpen { get; set; }
     }
 }

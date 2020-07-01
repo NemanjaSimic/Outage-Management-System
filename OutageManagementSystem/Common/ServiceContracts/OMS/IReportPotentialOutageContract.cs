@@ -7,6 +7,9 @@ namespace Outage.Common.ServiceContracts.OMS
     public interface IReportPotentialOutageContract
     {
         [OperationContract]
-        bool ReportPotentialOutage(long elementGid);
+        bool ReportPotentialOutage(long elementGid, CommandOriginType commandOriginType);
+
+        [OperationContract]
+        void OnSwitchClose(long elementGid);
     }
 }

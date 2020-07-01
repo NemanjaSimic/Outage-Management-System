@@ -16,6 +16,7 @@ namespace Outage.Common.OutageService.Model
         private ushort distanceFromSource;
         private bool isActive;
         private bool noReclosing;
+        private bool isOpen;
         #endregion
 
 
@@ -36,6 +37,8 @@ namespace Outage.Common.OutageService.Model
         public ushort DistanceFromSource { get { return distanceFromSource; } set { distanceFromSource = value; } }
         [DataMember]
         public bool NoReclosing { get { return noReclosing; } set { noReclosing = value; } }
+        [DataMember]
+        public bool IsOpen { get { return isOpen; } set { isOpen = value; } }
         #endregion
 
         public OutageTopologyElement(long gid)

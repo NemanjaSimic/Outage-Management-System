@@ -1,5 +1,6 @@
 ﻿using CECommon;
 using CECommon.Interfaces;
+using CECommon.Models;
 using CECommon.Providers;
 using Outage.Common;
 using System;
@@ -51,7 +52,7 @@ namespace Topology
         private List<ITopology> TransactionTopology { get; set; }
         public ProviderTopologyDelegate ProviderTopologyDelegate { get; set; }
         public ProviderTopologyConnectionDelegate ProviderTopologyConnectionDelegate{get; set;}
-        public void DiscreteMeasurementDelegate(List<long> elementGids)
+        public void DiscreteMeasurementDelegate()
         {
             loadFlow.UpdateLoadFlow(Topology);
             ProviderTopologyDelegate?.Invoke(Topology);
@@ -81,12 +82,33 @@ namespace Topology
             }
             return isRemote;
         }
+        //Veruj developeru na rec da je recloser, umoran sam
+        public void ResetRecloser(long recloserGid)
+        {
+            try
+            {
+                foreach (var topology in Topology)
+                {
+                    if (topology.GetElementByGid(recloserGid, out ITopologyElement recloser))
+                    {
+                        ((Recloser)recloser).NumberOfTry = 0;
+                        break;
+                    }
+                }
+            }
+            catch (Exception)
+            {
+
+                throw;
+            }
+        }
 
         #region Distributed Transaction
         public void CommitTransaction()
         {
-            Topology = TransactionTopology;
             transactionFlag = TransactionFlag.NoTransaction;
+            this.loadFlow.UpdateLoadFlow(TransactionTopology);
+            Topology = TransactionTopology;
             ProviderTopologyConnectionDelegate?.Invoke(Topology);
         }
         public bool PrepareForTransaction()
@@ -96,7 +118,6 @@ namespace Topology
             {
                 logger.LogDebug($"Topology provider preparing for transaction.");
                 TransactionTopology = CreateTopology();
-                this.loadFlow.UpdateLoadFlow(TransactionTopology);
                 transactionFlag = TransactionFlag.InTransaction;
             }
             catch (Exception ex)

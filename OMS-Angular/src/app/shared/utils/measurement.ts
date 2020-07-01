@@ -12,6 +12,10 @@ export const GetUnitMeasurement = (type : string ) => {
             retVal = "A";
             break;
         }
+        case "FEEDER_CURRENT":{
+            retVal = "A";
+            break;
+        }
         case "POWER":{
             retVal = "W";
             break;
