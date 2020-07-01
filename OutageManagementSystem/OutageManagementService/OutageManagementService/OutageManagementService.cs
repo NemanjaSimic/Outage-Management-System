@@ -1,16 +1,21 @@
 ﻿using OMSCommon.OutageDatabaseModel;
 using Outage.Common;
 using Outage.Common.GDA;
+using Outage.Common.PubSub.EmailDataContract;
 using Outage.Common.ServiceContracts.GDA;
 using Outage.Common.ServiceContracts.PubSub;
 using Outage.Common.ServiceProxies;
 using Outage.Common.ServiceProxies.PubSub;
 using OutageDatabase;
+using OutageDatabase.Repository;
 using OutageManagementService.Calling;
+using OutageManagementService.DBManager;
 using OutageManagementService.DistribuedTransaction;
+using OutageManagementService.LifeCycleServices;
 using OutageManagementService.Outage;
 using System;
 using System.Collections.Generic;
+using System.Linq;
 using System.ServiceModel;
 using System.Text;
 using System.Threading.Tasks;
@@ -24,6 +29,12 @@ namespace OutageManagementService
         private ILogger logger;
         private List<ServiceHost> hosts = null;
         private OutageModel outageModel;
+        private ReportOutageService reportOutageService;
+        private IsolateOutageService isolateOutageService;
+        private ResolveOutageService resolveOutageService;
+        private ValidateResolveConditionsService validateResolveConditionsService;
+        private SendRepairCrewService sendRepairCrewService;
+        private SendLocationIsolationCrewService sendLocationIsolationCrewService;
         private SubscriberProxy subscriberProxy;
         private CallTracker callTracker;
         private ModelResourcesDesc modelResourcesDesc;
@@ -42,18 +53,40 @@ namespace OutageManagementService
             //TODO: Initialize what is needed
             //TODO: restauration of data...
             modelResourcesDesc = new ModelResourcesDesc();
-            
-            Task.Run(InitializeEnergyConsumers);
+            using (UnitOfWork db = new UnitOfWork())
+            {
+                //db.DeleteAllData();
+                InitializeEnergyConsumers(db);
+            }
 
             outageModel = new OutageModel();
+            HistoryDBManager historyDBManager = new HistoryDBManager();
+
+            outageModel.ConsumersBlackedOut += historyDBManager.OnConsumersBlackedOut;
+            outageModel.ConsumersEnergized += historyDBManager.OnConsumersEnergized;
+            outageModel.SwitchOpened += historyDBManager.OnSwitchOpened;
+            OutageService.SwitchClosed += historyDBManager.OnSwitchClosed;
+
+            reportOutageService = new ReportOutageService(outageModel);
+            isolateOutageService = new IsolateOutageService(outageModel);
+            resolveOutageService = new ResolveOutageService(outageModel);
+            validateResolveConditionsService = new ValidateResolveConditionsService(outageModel);
+            sendRepairCrewService = new SendRepairCrewService(outageModel);
+            sendLocationIsolationCrewService = new SendLocationIsolationCrewService(outageModel);
+            OutageService.reportOutageService = reportOutageService;
+            OutageService.isolateOutageService = isolateOutageService;
+            OutageService.resolveOutageService = resolveOutageService;
+            OutageService.validateResolveConditionsService = validateResolveConditionsService;
+            OutageService.sendLocationIsolationCrewService = sendLocationIsolationCrewService;
+            OutageService.sendRepairCrewService = sendRepairCrewService;
             OutageService.outageModel = outageModel;
             OutageTransactionActor.OutageModel = outageModel;
             OutageModelUpdateNotification.OutageModel = outageModel;
 
             callTracker = new CallTracker("CallTrackerSubscriber", outageModel);
             SubscribeOnEmailService();
-            
             InitializeHosts();
+
         }
 
         #region GDAHelper
@@ -142,9 +175,11 @@ namespace OutageManagementService
             }
 
             subscriberProxy.Subscribe(Topic.OUTAGE_EMAIL);
+            Logger.LogDebug("Successfully subscribed to Email Service messages.");
+
         }
 
-        private async Task InitializeEnergyConsumers()
+        private void InitializeEnergyConsumers(UnitOfWork db)
         {
             using (OutageContext db = new OutageContext())
             {
@@ -154,24 +189,24 @@ namespace OutageManagementService
 
                 foreach(ResourceDescription energyConsumer in energyConsumers)
                 {
-                    Consumer consumer = new Consumer
-                    {
-                        ConsumerId = energyConsumer.GetProperty(ModelCode.IDOBJ_GID).AsLong(),
-                        ConsumerMRID = energyConsumer.GetProperty(ModelCode.IDOBJ_MRID).AsString(),
-                        FirstName = $"FirstName{i}", //TODO: energyConsumer.GetProperty(ModelCode.ENERGYCONSUMER_FIRSTNAME).AsString(); 
-                        LastName = $"LastName{i}"   //TODO: energyConsumer.GetProperty(ModelCode.ENERGYCONSUMER_LASTNAME).AsString();
-                    };
+                    ConsumerId = energyConsumer.GetProperty(ModelCode.IDOBJ_GID).AsLong(),
+                    ConsumerMRID = energyConsumer.GetProperty(ModelCode.IDOBJ_MRID).AsString(),
+                    FirstName = $"FirstName{i}", //TODO: energyConsumer.GetProperty(ModelCode.ENERGYCONSUMER_FIRSTNAME).AsString();
+                    LastName = $"LastName{i}"   //TODO: energyConsumer.GetProperty(ModelCode.ENERGYCONSUMER_LASTNAME).AsString();
+                };
 
-                    i++;
-
-                    db.Consumers.Add(consumer);
+                i++;
+                if (db.ConsumerRepository.Get(consumer.ConsumerId) == null)
+                {
+                    db.ConsumerRepository.Add(consumer);
                     Logger.LogDebug($"Add consumer: {consumer.ConsumerMRID}");
                 }
 
-                db.SaveChanges();
-                Logger.LogDebug("Init energy consumers: SaveChanges()");
+                
             }
 
+            db.Complete();
+            Logger.LogDebug("Init energy consumers: SaveChanges()");
         }
 
 
@@ -252,7 +287,7 @@ namespace OutageManagementService
             Console.WriteLine("\n{0}", message);
             Logger.LogInfo(message);
         }
-        
+
         private void CloseHosts()
         {
             if (hosts == null || hosts.Count == 0)

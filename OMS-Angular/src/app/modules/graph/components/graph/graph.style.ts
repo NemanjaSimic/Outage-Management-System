@@ -149,6 +149,16 @@ export const style = cytoscape.stylesheet()
         'width': '2px',
         'height': '150px'
     })
+    .selector('node[dmsType="SYNCHRONOUSMACHINE"]')
+    .style({
+        'shape': 'rectangle',
+        'background-color': '#2b2935',
+        'background-fit': 'cover',
+        'background-image': 'assets/img/plant.png',
+        'background-opacity': '0',
+        'height': '60px',
+        'width': '60px',
+    })
     .selector('node[deviceType = "remote"]')
     .style({
         'opacity': 1.0 // change this

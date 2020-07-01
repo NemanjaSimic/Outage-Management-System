@@ -1,6 +1,7 @@
 ﻿using CECommon;
 using CECommon.Interfaces;
 using CECommon.Model;
+using CECommon.Models;
 using CECommon.Providers;
 using NetworkModelServiceFunctions;
 using Outage.Common;
@@ -23,7 +24,8 @@ namespace Topology
         #endregion
 
         public ITopology CreateGraphTopology(long firstElementGid)
-        { 
+        {
+            ITopologyElement currentFider = null;
             elements = Provider.Instance.ModelProvider.GetElementModels();
             connections = Provider.Instance.ModelProvider.GetConnections();
             reclosers = Provider.Instance.ModelProvider.GetReclosers();
@@ -87,7 +89,17 @@ namespace Topology
                     {
                         logger.LogError($"[GraphBuilder] Element with GID 0x{element.ToString("X16")} does not exist in collection of elements.");
                     }
-                }         
+                }
+
+                if (currentElement is Feeder)
+                {
+                    currentFider = currentElement;
+                }
+                else
+                {
+                    currentElement.Feeder = currentFider;
+                }
+
                 topology.AddElement(currentElement);
             }
 

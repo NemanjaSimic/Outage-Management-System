@@ -1,5 +1,6 @@
 ﻿using OMSCommon.OutageDatabaseModel;
 using Outage.Common;
+using System;
 using System.Collections.Generic;
 using System.Data.Entity;
 using System.Linq;
@@ -18,8 +19,7 @@ namespace OutageDatabase.Repository
             return context.Set<OutageEntity>().Include(o => o.AffectedConsumers)
                                               .Include(o => o.DefaultIsolationPoints)
                                               .Include(o => o.OptimumIsolationPoints)
-                                              .Where(o => o.OutageId == id)
-                                              .FirstOrDefault();
+                                              .Where(o => o.OutageId == id).FirstOrDefault();
         }
 
         public IEnumerable<OutageEntity> GetAllActive()

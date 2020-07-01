@@ -51,7 +51,7 @@ namespace Topology
                         }
                     }
                     List<UIMeasurement> measurements = new List<UIMeasurement>();
-                    foreach (var meausrementGid in element.Measurements)
+                    foreach (var meausrementGid in element.Measurements.Keys)
                     {
                         if (Provider.Instance.MeasurementProvider.TryGetDiscreteMeasurement(meausrementGid, out DiscreteMeasurement discreteMeasurement))
                         {
@@ -59,7 +59,7 @@ namespace Topology
                             {
                                 Gid = discreteMeasurement.Id,
                                 Type = discreteMeasurement.GetMeasurementType(),
-                                Value = discreteMeasurement.GetCurrentVaule()
+                                Value = discreteMeasurement.GetCurrentValue()
                             });
                         }
                         else if (Provider.Instance.MeasurementProvider.TryGetAnalogMeasurement(meausrementGid, out AnalogMeasurement analogMeasurement))
@@ -68,7 +68,7 @@ namespace Topology
                             {
                                 Gid = analogMeasurement.Id,
                                 Type = analogMeasurement.GetMeasurementType(),
-                                Value = analogMeasurement.GetCurrentVaule()
+                                Value = analogMeasurement.GetCurrentValue()
                             });
                         }
                         else
@@ -118,12 +118,14 @@ namespace Topology
             long nextElement = 0;
             long nextElementGid = 0;
             ITopologyElement element;
+            bool isOpen;
 
             while (stack.Count > 0)
             {
                 nextElementGid = stack.Pop();
                 if (topology.GetElementByGid(nextElementGid, out element))
                 {
+
                     secondEnd.Clear();
                     if (!reclosers.Contains(nextElementGid))
                     {
@@ -147,6 +149,16 @@ namespace Topology
                         }
                     }
 
+                    isOpen = false;
+
+                    foreach (var meausrementGid in element.Measurements.Keys)
+                    {
+                        if (Provider.Instance.MeasurementProvider.TryGetDiscreteMeasurement(meausrementGid, out DiscreteMeasurement discreteMeasurement))
+                        {
+                            isOpen = discreteMeasurement.CurrentOpen;
+                        }
+                    }
+
                     if (!outageTopologyModel.GetElementByGid(element.Id, out var _))
                     {
                         outageTopologyModel.AddElement(
@@ -158,6 +170,7 @@ namespace Topology
                                 IsActive = element.IsActive,
                                 SecondEnd = new List<long>(secondEnd),
                                 NoReclosing = element.NoReclosing,
+                                IsOpen = isOpen
                             });
                     }
                 }
@@ -167,7 +180,6 @@ namespace Topology
                 }
             }
             logger.LogDebug("Topology to OMSModel convert finished successfully.");
-
             return outageTopologyModel;
         }
     }

@@ -6,6 +6,8 @@ import { EnvironmentService } from './environment/environment.service';
 import { GraphService } from './notification/graph.service';
 import { CommandService } from './command/command.service';
 import { OutageService } from './outage/outage.service';
+import { ReportService } from './report/report.service';
+import { DateFormatService } from './report/date-format.service';
 
 @NgModule({
   declarations: [],
@@ -13,7 +15,9 @@ import { OutageService } from './outage/outage.service';
     EnvironmentService,
     GraphService,
     CommandService,
-    OutageService
+    OutageService,
+    ReportService,
+    DateFormatService
   ],
   imports: [
     HttpClientModule,

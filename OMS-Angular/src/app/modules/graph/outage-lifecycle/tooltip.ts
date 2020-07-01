@@ -9,7 +9,7 @@ import { ActiveOutage, OutageLifeCycleState } from '@shared/models/outage.model'
 
 let commandedNodeIds: string[] = [];
 
-export const addOutageTooltip = (cy, node, outage: ActiveOutage) => {
+export const addOutageTooltip = (cy, node, outage: ActiveOutage, outageElement) => {
     if (!outage) return;
 
     let ref = node.popperRef();
@@ -18,7 +18,7 @@ export const addOutageTooltip = (cy, node, outage: ActiveOutage) => {
         content: () => {
             const div = document.createElement('div');
             div.innerHTML = generateTemplate(outage);
-            const button = generateButton(outage, node);
+            const button = generateButton(outage, node, outageElement);
 
             div.appendChild(button);
             return div;
@@ -57,14 +57,27 @@ const generateTemplate = (outage: ActiveOutage) => {
         return generateRepairCrewOutageTemplate(outage);
 }
 
-const generateButton = (outage: ActiveOutage, node) => {
+const generateButton = (outage: ActiveOutage, node, outageElement) => {
     if (outage.State == OutageLifeCycleState.Created) {
         const button = document.createElement('button');
         button.innerHTML = "Isolate";
-        button.addEventListener('click', () => {
-            node.sendIsolateOutageCommand(outage.Id);
-            commandedNodeIds.push(node.data('id'));
-        });
+        let deviceType = outageElement.data('deviceType');
+        if(deviceType == 'remote')
+        {
+            button.addEventListener('click', () =>
+            {
+                node.sendIsolateOutageCommand(outage.Id);
+                commandedNodeIds.push(node.data('id'));
+            });
+        }
+        else if (deviceType == 'local')
+        {
+            button.addEventListener('click', () =>
+            {
+                node.sendSendLocationIsolationCrew(outage.Id);
+                commandedNodeIds.push(node.data('id'));
+            });    
+        }
         return button;
     }
 
@@ -91,6 +104,7 @@ const generateButton = (outage: ActiveOutage, node) => {
             validateButton.addEventListener('click', () => {
                 node.sendValidateOutageCommand(outage.Id);
                 commandedNodeIds.push(node.data('id'));
+                validateButton.disabled = true;
             });
 
             const buttonDiv = document.createElement('div');

@@ -2564,6 +2564,20 @@
 		<cim:IdentifiedObject.mRID>TM_360</cim:IdentifiedObject.mRID>
 		<ftn:IdentifiedObject.name>TM_360</ftn:IdentifiedObject.name>
 	</cim:Terminal>
+	<cim:Terminal rdf:ID="TM_361">
+		<cim:Terminal.ConductingEquipment rdf:resource="#EC_6"/>
+		<cim:Terminal.ConnectivityNode rdf:resource="#CN_158"/>
+		<cim:IdentifiedObject.description>Terminal361</cim:IdentifiedObject.description>
+		<cim:IdentifiedObject.mRID>TM_361</cim:IdentifiedObject.mRID>
+		<ftn:IdentifiedObject.name>TM_361</ftn:IdentifiedObject.name>
+	</cim:Terminal>
+	<cim:Terminal rdf:ID="TM_362">
+		<cim:Terminal.ConductingEquipment rdf:resource="#SM_1"/>
+		<cim:Terminal.ConnectivityNode rdf:resource="#CN_158"/>
+		<cim:IdentifiedObject.description>Terminal362</cim:IdentifiedObject.description>
+		<cim:IdentifiedObject.mRID>TM_362</cim:IdentifiedObject.mRID>
+		<ftn:IdentifiedObject.name>TM_362</ftn:IdentifiedObject.name>
+	</cim:Terminal>
 	
 	<!--END Terminal-->
 <!--[END Package_Core ]-->
@@ -2581,6 +2595,15 @@
 		<ftn:IdentifiedObject.name>ACL_</ftn:IdentifiedObject.name>
 	</cim:ACLineSegment>
 	-->
+	<cim:SynchronousMachine rdf:ID="SM_1">
+		<cim:ConductingEquipment.BaseVoltage rdf:resource="#BV_2"/>
+		<cim:ConductingEquipment.isRemote>true</cim:ConductingEquipment.isRemote>
+		<cim:IdentifiedObject.description>SynchronousMachine1</cim:IdentifiedObject.description>
+		<cim:IdentifiedObject.mRID>SM_1</cim:IdentifiedObject.mRID>
+		<ftn:IdentifiedObject.name>SM_1</ftn:IdentifiedObject.name>
+		<cim:SynchronousMachine.capacity>5</cim:SynchronousMachine.capacity>
+		<cim:SynchronousMachine.currentRegime>0</cim:SynchronousMachine.currentRegime>
+	</cim:SynchronousMachine>
 	<cim:ACLineSegment rdf:ID="ACL_1">
 		<cim:ConductingEquipment.BaseVoltage rdf:resource="#BV_1"/>
 		<cim:ConductingEquipment.isRemote>true</cim:ConductingEquipment.isRemote>
@@ -5148,6 +5171,11 @@
 		<cim:IdentifiedObject.mRID>CN_157</cim:IdentifiedObject.mRID>
 		<ftn:IdentifiedObject.name>CN_157</ftn:IdentifiedObject.name>
 	</cim:ConnectivityNode>
+	<cim:ConnectivityNode rdf:ID="CN_158">
+		<cim:IdentifiedObject.description>ConnectivityNode158</cim:IdentifiedObject.description>
+		<cim:IdentifiedObject.mRID>CN_158</cim:IdentifiedObject.mRID>
+		<ftn:IdentifiedObject.name>CN_158</ftn:IdentifiedObject.name>
+	</cim:ConnectivityNode>
 	<!--suvisni-->
 	<!--
 	<cim:ConnectivityNode rdf:ID="CN_89">
@@ -5908,6 +5936,742 @@
 		<cim:IdentifiedObject.description> </cim:IdentifiedObject.description>
 		<cim:IdentifiedObject.mRID>AN_43</cim:IdentifiedObject.mRID>
 		<ftn:IdentifiedObject.name>AN_43</ftn:IdentifiedObject.name>
+	</cim:Analog>
+	<cim:Analog rdf:ID="AN_44">
+		<cim:Analog.scalingFactor>1</cim:Analog.scalingFactor>
+		<cim:Analog.deviation>0</cim:Analog.deviation>
+		<cim:Analog.currentValue>0</cim:Analog.currentValue>
+		<cim:Analog.maxValue>30</cim:Analog.maxValue>
+		<cim:Analog.measurementType>FeederCurrent</cim:Analog.measurementType>
+		<cim:Analog.minValue>0</cim:Analog.minValue>
+		<cim:Analog.normalValue>20</cim:Analog.normalValue>
+		<cim:Measurement.address>44</cim:Measurement.address>
+		<cim:Measurement.isInput>false</cim:Measurement.isInput>
+		<cim:Measurement.Terminal rdf:resource="#TM_41"/>
+		<cim:IdentifiedObject.description> </cim:IdentifiedObject.description>
+		<cim:IdentifiedObject.mRID>AN_44</cim:IdentifiedObject.mRID>
+		<ftn:IdentifiedObject.name>AN_44</ftn:IdentifiedObject.name>
+	</cim:Analog>
+	<cim:Analog rdf:ID="AN_45">
+		<cim:Analog.scalingFactor>1</cim:Analog.scalingFactor>
+		<cim:Analog.deviation>0</cim:Analog.deviation>
+		<cim:Analog.currentValue>0</cim:Analog.currentValue>
+		<cim:Analog.maxValue>30</cim:Analog.maxValue>
+		<cim:Analog.measurementType>FeederCurrent</cim:Analog.measurementType>
+		<cim:Analog.minValue>0</cim:Analog.minValue>
+		<cim:Analog.normalValue>20</cim:Analog.normalValue>
+		<cim:Measurement.address>45</cim:Measurement.address>
+		<cim:Measurement.isInput>false</cim:Measurement.isInput>
+		<cim:Measurement.Terminal rdf:resource="#TM_198"/>
+		<cim:IdentifiedObject.description> </cim:IdentifiedObject.description>
+		<cim:IdentifiedObject.mRID>AN_45</cim:IdentifiedObject.mRID>
+		<ftn:IdentifiedObject.name>AN_45</ftn:IdentifiedObject.name>
+	</cim:Analog>
+	<cim:Analog rdf:ID="AN_46">
+		<cim:Analog.scalingFactor>1</cim:Analog.scalingFactor>
+		<cim:Analog.deviation>0</cim:Analog.deviation>
+		<cim:Analog.currentValue>0</cim:Analog.currentValue>
+		<cim:Analog.maxValue>5</cim:Analog.maxValue>
+		<cim:Analog.measurementType>Current</cim:Analog.measurementType>
+		<cim:Analog.minValue>0</cim:Analog.minValue>
+		<cim:Analog.normalValue>0</cim:Analog.normalValue>
+		<cim:Measurement.address>46</cim:Measurement.address>
+		<cim:Measurement.isInput>false</cim:Measurement.isInput>
+		<cim:Measurement.Terminal rdf:resource="#TM_362"/>
+		<cim:IdentifiedObject.description> </cim:IdentifiedObject.description>
+		<cim:IdentifiedObject.mRID>AN_46</cim:IdentifiedObject.mRID>
+		<ftn:IdentifiedObject.name>AN_46</ftn:IdentifiedObject.name>
+	</cim:Analog>
+	<!-- Measurements of consumers -->
+	<cim:Analog rdf:ID="AN_47">
+		<cim:Analog.scalingFactor>1</cim:Analog.scalingFactor>
+		<cim:Analog.deviation>0</cim:Analog.deviation>
+		<cim:Analog.currentValue>220</cim:Analog.currentValue>
+		<cim:Analog.maxValue>2000</cim:Analog.maxValue>
+		<cim:Analog.measurementType>Voltage</cim:Analog.measurementType>
+		<cim:Analog.minValue>0</cim:Analog.minValue>
+		<cim:Analog.normalValue>220</cim:Analog.normalValue>
+		<cim:Measurement.address>47</cim:Measurement.address>
+		<cim:Measurement.isInput>false</cim:Measurement.isInput>
+		<cim:Measurement.Terminal rdf:resource="#TM_74"/>
+		<cim:IdentifiedObject.description> </cim:IdentifiedObject.description>
+		<cim:IdentifiedObject.mRID>AN_47</cim:IdentifiedObject.mRID>
+		<ftn:IdentifiedObject.name>AN_47</ftn:IdentifiedObject.name>
+	</cim:Analog>
+	<cim:Analog rdf:ID="AN_48">
+		<cim:Analog.scalingFactor>1</cim:Analog.scalingFactor>
+		<cim:Analog.deviation>0</cim:Analog.deviation>
+		<cim:Analog.currentValue>440</cim:Analog.currentValue>
+		<cim:Analog.maxValue>10000</cim:Analog.maxValue>
+		<cim:Analog.measurementType>Power</cim:Analog.measurementType>
+		<cim:Analog.minValue>0</cim:Analog.minValue>
+		<cim:Analog.normalValue>440</cim:Analog.normalValue>
+		<cim:Measurement.address>48</cim:Measurement.address>
+		<cim:Measurement.isInput>false</cim:Measurement.isInput>
+		<cim:Measurement.Terminal rdf:resource="#TM_74"/>
+		<cim:IdentifiedObject.description> </cim:IdentifiedObject.description>
+		<cim:IdentifiedObject.mRID>AN_48</cim:IdentifiedObject.mRID>
+		<ftn:IdentifiedObject.name>AN_48</ftn:IdentifiedObject.name>
+	</cim:Analog>
+	<cim:Analog rdf:ID="AN_49">
+		<cim:Analog.scalingFactor>1</cim:Analog.scalingFactor>
+		<cim:Analog.deviation>0</cim:Analog.deviation>
+		<cim:Analog.currentValue>220</cim:Analog.currentValue>
+		<cim:Analog.maxValue>2000</cim:Analog.maxValue>
+		<cim:Analog.measurementType>Voltage</cim:Analog.measurementType>
+		<cim:Analog.minValue>0</cim:Analog.minValue>
+		<cim:Analog.normalValue>220</cim:Analog.normalValue>
+		<cim:Measurement.address>49</cim:Measurement.address>
+		<cim:Measurement.isInput>false</cim:Measurement.isInput>
+		<cim:Measurement.Terminal rdf:resource="#TM_78"/>
+		<cim:IdentifiedObject.description> </cim:IdentifiedObject.description>
+		<cim:IdentifiedObject.mRID>AN_49</cim:IdentifiedObject.mRID>
+		<ftn:IdentifiedObject.name>AN_49</ftn:IdentifiedObject.name>
+	</cim:Analog>
+	<cim:Analog rdf:ID="AN_50">
+		<cim:Analog.scalingFactor>1</cim:Analog.scalingFactor>
+		<cim:Analog.deviation>0</cim:Analog.deviation>
+		<cim:Analog.currentValue>440</cim:Analog.currentValue>
+		<cim:Analog.maxValue>10000</cim:Analog.maxValue>
+		<cim:Analog.measurementType>Power</cim:Analog.measurementType>
+		<cim:Analog.minValue>0</cim:Analog.minValue>
+		<cim:Analog.normalValue>440</cim:Analog.normalValue>
+		<cim:Measurement.address>50</cim:Measurement.address>
+		<cim:Measurement.isInput>false</cim:Measurement.isInput>
+		<cim:Measurement.Terminal rdf:resource="#TM_78"/>
+		<cim:IdentifiedObject.description> </cim:IdentifiedObject.description>
+		<cim:IdentifiedObject.mRID>AN_50</cim:IdentifiedObject.mRID>
+		<ftn:IdentifiedObject.name>AN_50</ftn:IdentifiedObject.name>
+	</cim:Analog>
+	<!-- <cim:Analog rdf:ID="AN_51">
+		<cim:Analog.scalingFactor>1</cim:Analog.scalingFactor>
+		<cim:Analog.deviation>0</cim:Analog.deviation>
+		<cim:Analog.currentValue>220</cim:Analog.currentValue>
+		<cim:Analog.maxValue>2000</cim:Analog.maxValue>
+		<cim:Analog.measurementType>Voltage</cim:Analog.measurementType>
+		<cim:Analog.minValue>0</cim:Analog.minValue>
+		<cim:Analog.normalValue>220</cim:Analog.normalValue>
+		<cim:Measurement.address>51</cim:Measurement.address>
+		<cim:Measurement.isInput>false</cim:Measurement.isInput>
+		<cim:Measurement.Terminal rdf:resource="#TM_78"/>
+		<cim:IdentifiedObject.description> </cim:IdentifiedObject.description>
+		<cim:IdentifiedObject.mRID>AN_51</cim:IdentifiedObject.mRID>
+		<ftn:IdentifiedObject.name>AN_51</ftn:IdentifiedObject.name>
+	</cim:Analog>
+	<cim:Analog rdf:ID="AN_52">
+		<cim:Analog.scalingFactor>1</cim:Analog.scalingFactor>
+		<cim:Analog.deviation>0</cim:Analog.deviation>
+		<cim:Analog.currentValue>440</cim:Analog.currentValue>
+		<cim:Analog.maxValue>10000</cim:Analog.maxValue>
+		<cim:Analog.measurementType>Power</cim:Analog.measurementType>
+		<cim:Analog.minValue>0</cim:Analog.minValue>
+		<cim:Analog.normalValue>440</cim:Analog.normalValue>
+		<cim:Measurement.address>52</cim:Measurement.address>
+		<cim:Measurement.isInput>false</cim:Measurement.isInput>
+		<cim:Measurement.Terminal rdf:resource="#TM_78"/>
+		<cim:IdentifiedObject.description> </cim:IdentifiedObject.description>
+		<cim:IdentifiedObject.mRID>AN_52</cim:IdentifiedObject.mRID>
+		<ftn:IdentifiedObject.name>AN_52</ftn:IdentifiedObject.name>
+	</cim:Analog> -->
+	<cim:Analog rdf:ID="AN_53">
+		<cim:Analog.scalingFactor>1</cim:Analog.scalingFactor>
+		<cim:Analog.deviation>0</cim:Analog.deviation>
+		<cim:Analog.currentValue>220</cim:Analog.currentValue>
+		<cim:Analog.maxValue>2000</cim:Analog.maxValue>
+		<cim:Analog.measurementType>Voltage</cim:Analog.measurementType>
+		<cim:Analog.minValue>0</cim:Analog.minValue>
+		<cim:Analog.normalValue>220</cim:Analog.normalValue>
+		<cim:Measurement.address>53</cim:Measurement.address>
+		<cim:Measurement.isInput>false</cim:Measurement.isInput>
+		<cim:Measurement.Terminal rdf:resource="#TM_82"/>
+		<cim:IdentifiedObject.description> </cim:IdentifiedObject.description>
+		<cim:IdentifiedObject.mRID>AN_53</cim:IdentifiedObject.mRID>
+		<ftn:IdentifiedObject.name>AN_53</ftn:IdentifiedObject.name>
+	</cim:Analog>
+	<cim:Analog rdf:ID="AN_54">
+		<cim:Analog.scalingFactor>1</cim:Analog.scalingFactor>
+		<cim:Analog.deviation>0</cim:Analog.deviation>
+		<cim:Analog.currentValue>440</cim:Analog.currentValue>
+		<cim:Analog.maxValue>10000</cim:Analog.maxValue>
+		<cim:Analog.measurementType>Power</cim:Analog.measurementType>
+		<cim:Analog.minValue>0</cim:Analog.minValue>
+		<cim:Analog.normalValue>440</cim:Analog.normalValue>
+		<cim:Measurement.address>54</cim:Measurement.address>
+		<cim:Measurement.isInput>false</cim:Measurement.isInput>
+		<cim:Measurement.Terminal rdf:resource="#TM_82"/>
+		<cim:IdentifiedObject.description> </cim:IdentifiedObject.description>
+		<cim:IdentifiedObject.mRID>AN_54</cim:IdentifiedObject.mRID>
+		<ftn:IdentifiedObject.name>AN_54</ftn:IdentifiedObject.name>
+	</cim:Analog>
+	<cim:Analog rdf:ID="AN_55">
+		<cim:Analog.scalingFactor>1</cim:Analog.scalingFactor>
+		<cim:Analog.deviation>0</cim:Analog.deviation>
+		<cim:Analog.currentValue>220</cim:Analog.currentValue>
+		<cim:Analog.maxValue>2000</cim:Analog.maxValue>
+		<cim:Analog.measurementType>Voltage</cim:Analog.measurementType>
+		<cim:Analog.minValue>0</cim:Analog.minValue>
+		<cim:Analog.normalValue>220</cim:Analog.normalValue>
+		<cim:Measurement.address>55</cim:Measurement.address>
+		<cim:Measurement.isInput>false</cim:Measurement.isInput>
+		<cim:Measurement.Terminal rdf:resource="#TM_86"/>
+		<cim:IdentifiedObject.description> </cim:IdentifiedObject.description>
+		<cim:IdentifiedObject.mRID>AN_55</cim:IdentifiedObject.mRID>
+		<ftn:IdentifiedObject.name>AN_55</ftn:IdentifiedObject.name>
+	</cim:Analog>
+	<cim:Analog rdf:ID="AN_56">
+		<cim:Analog.scalingFactor>1</cim:Analog.scalingFactor>
+		<cim:Analog.deviation>0</cim:Analog.deviation>
+		<cim:Analog.currentValue>440</cim:Analog.currentValue>
+		<cim:Analog.maxValue>10000</cim:Analog.maxValue>
+		<cim:Analog.measurementType>Power</cim:Analog.measurementType>
+		<cim:Analog.minValue>0</cim:Analog.minValue>
+		<cim:Analog.normalValue>440</cim:Analog.normalValue>
+		<cim:Measurement.address>56</cim:Measurement.address>
+		<cim:Measurement.isInput>false</cim:Measurement.isInput>
+		<cim:Measurement.Terminal rdf:resource="#TM_86"/>
+		<cim:IdentifiedObject.description> </cim:IdentifiedObject.description>
+		<cim:IdentifiedObject.mRID>AN_56</cim:IdentifiedObject.mRID>
+		<ftn:IdentifiedObject.name>AN_56</ftn:IdentifiedObject.name>
+	</cim:Analog>
+	<cim:Analog rdf:ID="AN_57">
+		<cim:Analog.scalingFactor>1</cim:Analog.scalingFactor>
+		<cim:Analog.deviation>0</cim:Analog.deviation>
+		<cim:Analog.currentValue>220</cim:Analog.currentValue>
+		<cim:Analog.maxValue>2000</cim:Analog.maxValue>
+		<cim:Analog.measurementType>Voltage</cim:Analog.measurementType>
+		<cim:Analog.minValue>0</cim:Analog.minValue>
+		<cim:Analog.normalValue>220</cim:Analog.normalValue>
+		<cim:Measurement.address>57</cim:Measurement.address>
+		<cim:Measurement.isInput>false</cim:Measurement.isInput>
+		<cim:Measurement.Terminal rdf:resource="#TM_90"/>
+		<cim:IdentifiedObject.description> </cim:IdentifiedObject.description>
+		<cim:IdentifiedObject.mRID>AN_57</cim:IdentifiedObject.mRID>
+		<ftn:IdentifiedObject.name>AN_57</ftn:IdentifiedObject.name>
+	</cim:Analog>
+	<cim:Analog rdf:ID="AN_58">
+		<cim:Analog.scalingFactor>1</cim:Analog.scalingFactor>
+		<cim:Analog.deviation>0</cim:Analog.deviation>
+		<cim:Analog.currentValue>440</cim:Analog.currentValue>
+		<cim:Analog.maxValue>10000</cim:Analog.maxValue>
+		<cim:Analog.measurementType>Power</cim:Analog.measurementType>
+		<cim:Analog.minValue>0</cim:Analog.minValue>
+		<cim:Analog.normalValue>440</cim:Analog.normalValue>
+		<cim:Measurement.address>58</cim:Measurement.address>
+		<cim:Measurement.isInput>false</cim:Measurement.isInput>
+		<cim:Measurement.Terminal rdf:resource="#TM_90"/>
+		<cim:IdentifiedObject.description> </cim:IdentifiedObject.description>
+		<cim:IdentifiedObject.mRID>AN_58</cim:IdentifiedObject.mRID>
+		<ftn:IdentifiedObject.name>AN_58</ftn:IdentifiedObject.name>
+	</cim:Analog>
+	<cim:Analog rdf:ID="AN_59">
+		<cim:Analog.scalingFactor>1</cim:Analog.scalingFactor>
+		<cim:Analog.deviation>0</cim:Analog.deviation>
+		<cim:Analog.currentValue>220</cim:Analog.currentValue>
+		<cim:Analog.maxValue>2000</cim:Analog.maxValue>
+		<cim:Analog.measurementType>Voltage</cim:Analog.measurementType>
+		<cim:Analog.minValue>0</cim:Analog.minValue>
+		<cim:Analog.normalValue>220</cim:Analog.normalValue>
+		<cim:Measurement.address>59</cim:Measurement.address>
+		<cim:Measurement.isInput>false</cim:Measurement.isInput>
+		<cim:Measurement.Terminal rdf:resource="#TM_96"/>
+		<cim:IdentifiedObject.description> </cim:IdentifiedObject.description>
+		<cim:IdentifiedObject.mRID>AN_59</cim:IdentifiedObject.mRID>
+		<ftn:IdentifiedObject.name>AN_59</ftn:IdentifiedObject.name>
+	</cim:Analog>
+	<cim:Analog rdf:ID="AN_60">
+		<cim:Analog.scalingFactor>1</cim:Analog.scalingFactor>
+		<cim:Analog.deviation>0</cim:Analog.deviation>
+		<cim:Analog.currentValue>440</cim:Analog.currentValue>
+		<cim:Analog.maxValue>10000</cim:Analog.maxValue>
+		<cim:Analog.measurementType>Power</cim:Analog.measurementType>
+		<cim:Analog.minValue>0</cim:Analog.minValue>
+		<cim:Analog.normalValue>440</cim:Analog.normalValue>
+		<cim:Measurement.address>60</cim:Measurement.address>
+		<cim:Measurement.isInput>false</cim:Measurement.isInput>
+		<cim:Measurement.Terminal rdf:resource="#TM_96"/>
+		<cim:IdentifiedObject.description> </cim:IdentifiedObject.description>
+		<cim:IdentifiedObject.mRID>AN_60</cim:IdentifiedObject.mRID>
+		<ftn:IdentifiedObject.name>AN_60</ftn:IdentifiedObject.name>
+	</cim:Analog>
+	<cim:Analog rdf:ID="AN_61">
+		<cim:Analog.scalingFactor>1</cim:Analog.scalingFactor>
+		<cim:Analog.deviation>0</cim:Analog.deviation>
+		<cim:Analog.currentValue>220</cim:Analog.currentValue>
+		<cim:Analog.maxValue>2000</cim:Analog.maxValue>
+		<cim:Analog.measurementType>Voltage</cim:Analog.measurementType>
+		<cim:Analog.minValue>0</cim:Analog.minValue>
+		<cim:Analog.normalValue>220</cim:Analog.normalValue>
+		<cim:Measurement.address>61</cim:Measurement.address>
+		<cim:Measurement.isInput>false</cim:Measurement.isInput>
+		<cim:Measurement.Terminal rdf:resource="#TM_105"/>
+		<cim:IdentifiedObject.description> </cim:IdentifiedObject.description>
+		<cim:IdentifiedObject.mRID>AN_61</cim:IdentifiedObject.mRID>
+		<ftn:IdentifiedObject.name>AN_61</ftn:IdentifiedObject.name>
+	</cim:Analog>
+	<cim:Analog rdf:ID="AN_62">
+		<cim:Analog.scalingFactor>1</cim:Analog.scalingFactor>
+		<cim:Analog.deviation>0</cim:Analog.deviation>
+		<cim:Analog.currentValue>440</cim:Analog.currentValue>
+		<cim:Analog.maxValue>10000</cim:Analog.maxValue>
+		<cim:Analog.measurementType>Power</cim:Analog.measurementType>
+		<cim:Analog.minValue>0</cim:Analog.minValue>
+		<cim:Analog.normalValue>440</cim:Analog.normalValue>
+		<cim:Measurement.address>62</cim:Measurement.address>
+		<cim:Measurement.isInput>false</cim:Measurement.isInput>
+		<cim:Measurement.Terminal rdf:resource="#TM_105"/>
+		<cim:IdentifiedObject.description> </cim:IdentifiedObject.description>
+		<cim:IdentifiedObject.mRID>AN_62</cim:IdentifiedObject.mRID>
+		<ftn:IdentifiedObject.name>AN_62</ftn:IdentifiedObject.name>
+	</cim:Analog>
+	<cim:Analog rdf:ID="AN_63">
+		<cim:Analog.scalingFactor>1</cim:Analog.scalingFactor>
+		<cim:Analog.deviation>0</cim:Analog.deviation>
+		<cim:Analog.currentValue>220</cim:Analog.currentValue>
+		<cim:Analog.maxValue>2000</cim:Analog.maxValue>
+		<cim:Analog.measurementType>Voltage</cim:Analog.measurementType>
+		<cim:Analog.minValue>0</cim:Analog.minValue>
+		<cim:Analog.normalValue>220</cim:Analog.normalValue>
+		<cim:Measurement.address>63</cim:Measurement.address>
+		<cim:Measurement.isInput>false</cim:Measurement.isInput>
+		<cim:Measurement.Terminal rdf:resource="#TM_109"/>
+		<cim:IdentifiedObject.description> </cim:IdentifiedObject.description>
+		<cim:IdentifiedObject.mRID>AN_63</cim:IdentifiedObject.mRID>
+		<ftn:IdentifiedObject.name>AN_63</ftn:IdentifiedObject.name>
+	</cim:Analog>
+	<cim:Analog rdf:ID="AN_64">
+		<cim:Analog.scalingFactor>1</cim:Analog.scalingFactor>
+		<cim:Analog.deviation>0</cim:Analog.deviation>
+		<cim:Analog.currentValue>440</cim:Analog.currentValue>
+		<cim:Analog.maxValue>10000</cim:Analog.maxValue>
+		<cim:Analog.measurementType>Power</cim:Analog.measurementType>
+		<cim:Analog.minValue>0</cim:Analog.minValue>
+		<cim:Analog.normalValue>440</cim:Analog.normalValue>
+		<cim:Measurement.address>64</cim:Measurement.address>
+		<cim:Measurement.isInput>false</cim:Measurement.isInput>
+		<cim:Measurement.Terminal rdf:resource="#TM_109"/>
+		<cim:IdentifiedObject.description> </cim:IdentifiedObject.description>
+		<cim:IdentifiedObject.mRID>AN_64</cim:IdentifiedObject.mRID>
+		<ftn:IdentifiedObject.name>AN_64</ftn:IdentifiedObject.name>
+	</cim:Analog>
+	<cim:Analog rdf:ID="AN_65">
+		<cim:Analog.scalingFactor>1</cim:Analog.scalingFactor>
+		<cim:Analog.deviation>0</cim:Analog.deviation>
+		<cim:Analog.currentValue>220</cim:Analog.currentValue>
+		<cim:Analog.maxValue>2000</cim:Analog.maxValue>
+		<cim:Analog.measurementType>Voltage</cim:Analog.measurementType>
+		<cim:Analog.minValue>0</cim:Analog.minValue>
+		<cim:Analog.normalValue>220</cim:Analog.normalValue>
+		<cim:Measurement.address>65</cim:Measurement.address>
+		<cim:Measurement.isInput>false</cim:Measurement.isInput>
+		<cim:Measurement.Terminal rdf:resource="#TM_113"/>
+		<cim:IdentifiedObject.description> </cim:IdentifiedObject.description>
+		<cim:IdentifiedObject.mRID>AN_65</cim:IdentifiedObject.mRID>
+		<ftn:IdentifiedObject.name>AN_65</ftn:IdentifiedObject.name>
+	</cim:Analog>
+	<cim:Analog rdf:ID="AN_66">
+		<cim:Analog.scalingFactor>1</cim:Analog.scalingFactor>
+		<cim:Analog.deviation>0</cim:Analog.deviation>
+		<cim:Analog.currentValue>440</cim:Analog.currentValue>
+		<cim:Analog.maxValue>10000</cim:Analog.maxValue>
+		<cim:Analog.measurementType>Power</cim:Analog.measurementType>
+		<cim:Analog.minValue>0</cim:Analog.minValue>
+		<cim:Analog.normalValue>440</cim:Analog.normalValue>
+		<cim:Measurement.address>66</cim:Measurement.address>
+		<cim:Measurement.isInput>false</cim:Measurement.isInput>
+		<cim:Measurement.Terminal rdf:resource="#TM_113"/>
+		<cim:IdentifiedObject.description> </cim:IdentifiedObject.description>
+		<cim:IdentifiedObject.mRID>AN_66</cim:IdentifiedObject.mRID>
+		<ftn:IdentifiedObject.name>AN_66</ftn:IdentifiedObject.name>
+	</cim:Analog>
+	<cim:Analog rdf:ID="AN_67">
+		<cim:Analog.scalingFactor>1</cim:Analog.scalingFactor>
+		<cim:Analog.deviation>0</cim:Analog.deviation>
+		<cim:Analog.currentValue>220</cim:Analog.currentValue>
+		<cim:Analog.maxValue>2000</cim:Analog.maxValue>
+		<cim:Analog.measurementType>Voltage</cim:Analog.measurementType>
+		<cim:Analog.minValue>0</cim:Analog.minValue>
+		<cim:Analog.normalValue>220</cim:Analog.normalValue>
+		<cim:Measurement.address>67</cim:Measurement.address>
+		<cim:Measurement.isInput>false</cim:Measurement.isInput>
+		<cim:Measurement.Terminal rdf:resource="#TM_117"/>
+		<cim:IdentifiedObject.description> </cim:IdentifiedObject.description>
+		<cim:IdentifiedObject.mRID>AN_67</cim:IdentifiedObject.mRID>
+		<ftn:IdentifiedObject.name>AN_67</ftn:IdentifiedObject.name>
+	</cim:Analog>
+	<cim:Analog rdf:ID="AN_68">
+		<cim:Analog.scalingFactor>1</cim:Analog.scalingFactor>
+		<cim:Analog.deviation>0</cim:Analog.deviation>
+		<cim:Analog.currentValue>440</cim:Analog.currentValue>
+		<cim:Analog.maxValue>10000</cim:Analog.maxValue>
+		<cim:Analog.measurementType>Power</cim:Analog.measurementType>
+		<cim:Analog.minValue>0</cim:Analog.minValue>
+		<cim:Analog.normalValue>440</cim:Analog.normalValue>
+		<cim:Measurement.address>68</cim:Measurement.address>
+		<cim:Measurement.isInput>false</cim:Measurement.isInput>
+		<cim:Measurement.Terminal rdf:resource="#TM_117"/>
+		<cim:IdentifiedObject.description> </cim:IdentifiedObject.description>
+		<cim:IdentifiedObject.mRID>AN_68</cim:IdentifiedObject.mRID>
+		<ftn:IdentifiedObject.name>AN_68</ftn:IdentifiedObject.name>
+	</cim:Analog>
+	<cim:Analog rdf:ID="AN_69">
+		<cim:Analog.scalingFactor>1</cim:Analog.scalingFactor>
+		<cim:Analog.deviation>0</cim:Analog.deviation>
+		<cim:Analog.currentValue>220</cim:Analog.currentValue>
+		<cim:Analog.maxValue>2000</cim:Analog.maxValue>
+		<cim:Analog.measurementType>Voltage</cim:Analog.measurementType>
+		<cim:Analog.minValue>0</cim:Analog.minValue>
+		<cim:Analog.normalValue>220</cim:Analog.normalValue>
+		<cim:Measurement.address>69</cim:Measurement.address>
+		<cim:Measurement.isInput>false</cim:Measurement.isInput>
+		<cim:Measurement.Terminal rdf:resource="#TM_125"/>
+		<cim:IdentifiedObject.description> </cim:IdentifiedObject.description>
+		<cim:IdentifiedObject.mRID>AN_69</cim:IdentifiedObject.mRID>
+		<ftn:IdentifiedObject.name>AN_69</ftn:IdentifiedObject.name>
+	</cim:Analog>
+	<cim:Analog rdf:ID="AN_70">
+		<cim:Analog.scalingFactor>1</cim:Analog.scalingFactor>
+		<cim:Analog.deviation>0</cim:Analog.deviation>
+		<cim:Analog.currentValue>440</cim:Analog.currentValue>
+		<cim:Analog.maxValue>10000</cim:Analog.maxValue>
+		<cim:Analog.measurementType>Power</cim:Analog.measurementType>
+		<cim:Analog.minValue>0</cim:Analog.minValue>
+		<cim:Analog.normalValue>440</cim:Analog.normalValue>
+		<cim:Measurement.address>70</cim:Measurement.address>
+		<cim:Measurement.isInput>false</cim:Measurement.isInput>
+		<cim:Measurement.Terminal rdf:resource="#TM_125"/>
+		<cim:IdentifiedObject.description> </cim:IdentifiedObject.description>
+		<cim:IdentifiedObject.mRID>AN_70</cim:IdentifiedObject.mRID>
+		<ftn:IdentifiedObject.name>AN_70</ftn:IdentifiedObject.name>
+	</cim:Analog>
+	<cim:Analog rdf:ID="AN_71">
+		<cim:Analog.scalingFactor>1</cim:Analog.scalingFactor>
+		<cim:Analog.deviation>0</cim:Analog.deviation>
+		<cim:Analog.currentValue>220</cim:Analog.currentValue>
+		<cim:Analog.maxValue>2000</cim:Analog.maxValue>
+		<cim:Analog.measurementType>Voltage</cim:Analog.measurementType>
+		<cim:Analog.minValue>0</cim:Analog.minValue>
+		<cim:Analog.normalValue>220</cim:Analog.normalValue>
+		<cim:Measurement.address>71</cim:Measurement.address>
+		<cim:Measurement.isInput>false</cim:Measurement.isInput>
+		<cim:Measurement.Terminal rdf:resource="#TM_129"/>
+		<cim:IdentifiedObject.description> </cim:IdentifiedObject.description>
+		<cim:IdentifiedObject.mRID>AN_71</cim:IdentifiedObject.mRID>
+		<ftn:IdentifiedObject.name>AN_71</ftn:IdentifiedObject.name>
+	</cim:Analog>
+	<cim:Analog rdf:ID="AN_72">
+		<cim:Analog.scalingFactor>1</cim:Analog.scalingFactor>
+		<cim:Analog.deviation>0</cim:Analog.deviation>
+		<cim:Analog.currentValue>440</cim:Analog.currentValue>
+		<cim:Analog.maxValue>10000</cim:Analog.maxValue>
+		<cim:Analog.measurementType>Power</cim:Analog.measurementType>
+		<cim:Analog.minValue>0</cim:Analog.minValue>
+		<cim:Analog.normalValue>440</cim:Analog.normalValue>
+		<cim:Measurement.address>72</cim:Measurement.address>
+		<cim:Measurement.isInput>false</cim:Measurement.isInput>
+		<cim:Measurement.Terminal rdf:resource="#TM_129"/>
+		<cim:IdentifiedObject.description> </cim:IdentifiedObject.description>
+		<cim:IdentifiedObject.mRID>AN_72</cim:IdentifiedObject.mRID>
+		<ftn:IdentifiedObject.name>AN_72</ftn:IdentifiedObject.name>
+	</cim:Analog>
+	<cim:Analog rdf:ID="AN_73">
+		<cim:Analog.scalingFactor>1</cim:Analog.scalingFactor>
+		<cim:Analog.deviation>0</cim:Analog.deviation>
+		<cim:Analog.currentValue>220</cim:Analog.currentValue>
+		<cim:Analog.maxValue>2000</cim:Analog.maxValue>
+		<cim:Analog.measurementType>Voltage</cim:Analog.measurementType>
+		<cim:Analog.minValue>0</cim:Analog.minValue>
+		<cim:Analog.normalValue>220</cim:Analog.normalValue>
+		<cim:Measurement.address>73</cim:Measurement.address>
+		<cim:Measurement.isInput>false</cim:Measurement.isInput>
+		<cim:Measurement.Terminal rdf:resource="#TM_133"/>
+		<cim:IdentifiedObject.description> </cim:IdentifiedObject.description>
+		<cim:IdentifiedObject.mRID>AN_73</cim:IdentifiedObject.mRID>
+		<ftn:IdentifiedObject.name>AN_73</ftn:IdentifiedObject.name>
+	</cim:Analog>
+	<cim:Analog rdf:ID="AN_74">
+		<cim:Analog.scalingFactor>1</cim:Analog.scalingFactor>
+		<cim:Analog.deviation>0</cim:Analog.deviation>
+		<cim:Analog.currentValue>440</cim:Analog.currentValue>
+		<cim:Analog.maxValue>10000</cim:Analog.maxValue>
+		<cim:Analog.measurementType>Power</cim:Analog.measurementType>
+		<cim:Analog.minValue>0</cim:Analog.minValue>
+		<cim:Analog.normalValue>440</cim:Analog.normalValue>
+		<cim:Measurement.address>74</cim:Measurement.address>
+		<cim:Measurement.isInput>false</cim:Measurement.isInput>
+		<cim:Measurement.Terminal rdf:resource="#TM_133"/>
+		<cim:IdentifiedObject.description> </cim:IdentifiedObject.description>
+		<cim:IdentifiedObject.mRID>AN_74</cim:IdentifiedObject.mRID>
+		<ftn:IdentifiedObject.name>AN_74</ftn:IdentifiedObject.name>
+	</cim:Analog>
+	<cim:Analog rdf:ID="AN_75">
+		<cim:Analog.scalingFactor>1</cim:Analog.scalingFactor>
+		<cim:Analog.deviation>0</cim:Analog.deviation>
+		<cim:Analog.currentValue>220</cim:Analog.currentValue>
+		<cim:Analog.maxValue>2000</cim:Analog.maxValue>
+		<cim:Analog.measurementType>Voltage</cim:Analog.measurementType>
+		<cim:Analog.minValue>0</cim:Analog.minValue>
+		<cim:Analog.normalValue>220</cim:Analog.normalValue>
+		<cim:Measurement.address>75</cim:Measurement.address>
+		<cim:Measurement.isInput>false</cim:Measurement.isInput>
+		<cim:Measurement.Terminal rdf:resource="#TM_140"/>
+		<cim:IdentifiedObject.description> </cim:IdentifiedObject.description>
+		<cim:IdentifiedObject.mRID>AN_75</cim:IdentifiedObject.mRID>
+		<ftn:IdentifiedObject.name>AN_75</ftn:IdentifiedObject.name>
+	</cim:Analog>
+	<cim:Analog rdf:ID="AN_76">
+		<cim:Analog.scalingFactor>1</cim:Analog.scalingFactor>
+		<cim:Analog.deviation>0</cim:Analog.deviation>
+		<cim:Analog.currentValue>440</cim:Analog.currentValue>
+		<cim:Analog.maxValue>10000</cim:Analog.maxValue>
+		<cim:Analog.measurementType>Power</cim:Analog.measurementType>
+		<cim:Analog.minValue>0</cim:Analog.minValue>
+		<cim:Analog.normalValue>440</cim:Analog.normalValue>
+		<cim:Measurement.address>76</cim:Measurement.address>
+		<cim:Measurement.isInput>false</cim:Measurement.isInput>
+		<cim:Measurement.Terminal rdf:resource="#TM_140"/>
+		<cim:IdentifiedObject.description> </cim:IdentifiedObject.description>
+		<cim:IdentifiedObject.mRID>AN_76</cim:IdentifiedObject.mRID>
+		<ftn:IdentifiedObject.name>AN_76</ftn:IdentifiedObject.name>
+	</cim:Analog>
+	<cim:Analog rdf:ID="AN_77">
+		<cim:Analog.scalingFactor>1</cim:Analog.scalingFactor>
+		<cim:Analog.deviation>0</cim:Analog.deviation>
+		<cim:Analog.currentValue>220</cim:Analog.currentValue>
+		<cim:Analog.maxValue>2000</cim:Analog.maxValue>
+		<cim:Analog.measurementType>Voltage</cim:Analog.measurementType>
+		<cim:Analog.minValue>0</cim:Analog.minValue>
+		<cim:Analog.normalValue>220</cim:Analog.normalValue>
+		<cim:Measurement.address>77</cim:Measurement.address>
+		<cim:Measurement.isInput>false</cim:Measurement.isInput>
+		<cim:Measurement.Terminal rdf:resource="#TM_144"/>
+		<cim:IdentifiedObject.description> </cim:IdentifiedObject.description>
+		<cim:IdentifiedObject.mRID>AN_77</cim:IdentifiedObject.mRID>
+		<ftn:IdentifiedObject.name>AN_77</ftn:IdentifiedObject.name>
+	</cim:Analog>
+	<cim:Analog rdf:ID="AN_78">
+		<cim:Analog.scalingFactor>1</cim:Analog.scalingFactor>
+		<cim:Analog.deviation>0</cim:Analog.deviation>
+		<cim:Analog.currentValue>440</cim:Analog.currentValue>
+		<cim:Analog.maxValue>10000</cim:Analog.maxValue>
+		<cim:Analog.measurementType>Power</cim:Analog.measurementType>
+		<cim:Analog.minValue>0</cim:Analog.minValue>
+		<cim:Analog.normalValue>440</cim:Analog.normalValue>
+		<cim:Measurement.address>78</cim:Measurement.address>
+		<cim:Measurement.isInput>false</cim:Measurement.isInput>
+		<cim:Measurement.Terminal rdf:resource="#TM_144"/>
+		<cim:IdentifiedObject.description> </cim:IdentifiedObject.description>
+		<cim:IdentifiedObject.mRID>AN_78</cim:IdentifiedObject.mRID>
+		<ftn:IdentifiedObject.name>AN_78</ftn:IdentifiedObject.name>
+	</cim:Analog>
+	<cim:Analog rdf:ID="AN_79">
+		<cim:Analog.scalingFactor>1</cim:Analog.scalingFactor>
+		<cim:Analog.deviation>0</cim:Analog.deviation>
+		<cim:Analog.currentValue>220</cim:Analog.currentValue>
+		<cim:Analog.maxValue>2000</cim:Analog.maxValue>
+		<cim:Analog.measurementType>Voltage</cim:Analog.measurementType>
+		<cim:Analog.minValue>0</cim:Analog.minValue>
+		<cim:Analog.normalValue>220</cim:Analog.normalValue>
+		<cim:Measurement.address>79</cim:Measurement.address>
+		<cim:Measurement.isInput>false</cim:Measurement.isInput>
+		<cim:Measurement.Terminal rdf:resource="#TM_165"/>
+		<cim:IdentifiedObject.description> </cim:IdentifiedObject.description>
+		<cim:IdentifiedObject.mRID>AN_79</cim:IdentifiedObject.mRID>
+		<ftn:IdentifiedObject.name>AN_79</ftn:IdentifiedObject.name>
+	</cim:Analog>
+	<cim:Analog rdf:ID="AN_80">
+		<cim:Analog.scalingFactor>1</cim:Analog.scalingFactor>
+		<cim:Analog.deviation>0</cim:Analog.deviation>
+		<cim:Analog.currentValue>440</cim:Analog.currentValue>
+		<cim:Analog.maxValue>10000</cim:Analog.maxValue>
+		<cim:Analog.measurementType>Power</cim:Analog.measurementType>
+		<cim:Analog.minValue>0</cim:Analog.minValue>
+		<cim:Analog.normalValue>440</cim:Analog.normalValue>
+		<cim:Measurement.address>80</cim:Measurement.address>
+		<cim:Measurement.isInput>false</cim:Measurement.isInput>
+		<cim:Measurement.Terminal rdf:resource="#TM_165"/>
+		<cim:IdentifiedObject.description> </cim:IdentifiedObject.description>
+		<cim:IdentifiedObject.mRID>AN_80</cim:IdentifiedObject.mRID>
+		<ftn:IdentifiedObject.name>AN_80</ftn:IdentifiedObject.name>
+	</cim:Analog>
+	<cim:Analog rdf:ID="AN_81">
+		<cim:Analog.scalingFactor>1</cim:Analog.scalingFactor>
+		<cim:Analog.deviation>0</cim:Analog.deviation>
+		<cim:Analog.currentValue>220</cim:Analog.currentValue>
+		<cim:Analog.maxValue>2000</cim:Analog.maxValue>
+		<cim:Analog.measurementType>Voltage</cim:Analog.measurementType>
+		<cim:Analog.minValue>0</cim:Analog.minValue>
+		<cim:Analog.normalValue>220</cim:Analog.normalValue>
+		<cim:Measurement.address>81</cim:Measurement.address>
+		<cim:Measurement.isInput>false</cim:Measurement.isInput>
+		<cim:Measurement.Terminal rdf:resource="#TM_169"/>
+		<cim:IdentifiedObject.description> </cim:IdentifiedObject.description>
+		<cim:IdentifiedObject.mRID>AN_81</cim:IdentifiedObject.mRID>
+		<ftn:IdentifiedObject.name>AN_81</ftn:IdentifiedObject.name>
+	</cim:Analog>
+	<cim:Analog rdf:ID="AN_82">
+		<cim:Analog.scalingFactor>1</cim:Analog.scalingFactor>
+		<cim:Analog.deviation>0</cim:Analog.deviation>
+		<cim:Analog.currentValue>440</cim:Analog.currentValue>
+		<cim:Analog.maxValue>10000</cim:Analog.maxValue>
+		<cim:Analog.measurementType>Power</cim:Analog.measurementType>
+		<cim:Analog.minValue>0</cim:Analog.minValue>
+		<cim:Analog.normalValue>440</cim:Analog.normalValue>
+		<cim:Measurement.address>82</cim:Measurement.address>
+		<cim:Measurement.isInput>false</cim:Measurement.isInput>
+		<cim:Measurement.Terminal rdf:resource="#TM_169"/>
+		<cim:IdentifiedObject.description> </cim:IdentifiedObject.description>
+		<cim:IdentifiedObject.mRID>AN_82</cim:IdentifiedObject.mRID>
+		<ftn:IdentifiedObject.name>AN_82</ftn:IdentifiedObject.name>
+	</cim:Analog>
+	<cim:Analog rdf:ID="AN_83">
+		<cim:Analog.scalingFactor>1</cim:Analog.scalingFactor>
+		<cim:Analog.deviation>0</cim:Analog.deviation>
+		<cim:Analog.currentValue>220</cim:Analog.currentValue>
+		<cim:Analog.maxValue>2000</cim:Analog.maxValue>
+		<cim:Analog.measurementType>Voltage</cim:Analog.measurementType>
+		<cim:Analog.minValue>0</cim:Analog.minValue>
+		<cim:Analog.normalValue>220</cim:Analog.normalValue>
+		<cim:Measurement.address>83</cim:Measurement.address>
+		<cim:Measurement.isInput>false</cim:Measurement.isInput>
+		<cim:Measurement.Terminal rdf:resource="#TM_173"/>
+		<cim:IdentifiedObject.description> </cim:IdentifiedObject.description>
+		<cim:IdentifiedObject.mRID>AN_83</cim:IdentifiedObject.mRID>
+		<ftn:IdentifiedObject.name>AN_83</ftn:IdentifiedObject.name>
+	</cim:Analog>
+	<cim:Analog rdf:ID="AN_84">
+		<cim:Analog.scalingFactor>1</cim:Analog.scalingFactor>
+		<cim:Analog.deviation>0</cim:Analog.deviation>
+		<cim:Analog.currentValue>440</cim:Analog.currentValue>
+		<cim:Analog.maxValue>10000</cim:Analog.maxValue>
+		<cim:Analog.measurementType>Power</cim:Analog.measurementType>
+		<cim:Analog.minValue>0</cim:Analog.minValue>
+		<cim:Analog.normalValue>440</cim:Analog.normalValue>
+		<cim:Measurement.address>84</cim:Measurement.address>
+		<cim:Measurement.isInput>false</cim:Measurement.isInput>
+		<cim:Measurement.Terminal rdf:resource="#TM_173"/>
+		<cim:IdentifiedObject.description> </cim:IdentifiedObject.description>
+		<cim:IdentifiedObject.mRID>AN_84</cim:IdentifiedObject.mRID>
+		<ftn:IdentifiedObject.name>AN_84</ftn:IdentifiedObject.name>
+	</cim:Analog>
+	<cim:Analog rdf:ID="AN_85">
+		<cim:Analog.scalingFactor>1</cim:Analog.scalingFactor>
+		<cim:Analog.deviation>0</cim:Analog.deviation>
+		<cim:Analog.currentValue>220</cim:Analog.currentValue>
+		<cim:Analog.maxValue>2000</cim:Analog.maxValue>
+		<cim:Analog.measurementType>Voltage</cim:Analog.measurementType>
+		<cim:Analog.minValue>0</cim:Analog.minValue>
+		<cim:Analog.normalValue>220</cim:Analog.normalValue>
+		<cim:Measurement.address>85</cim:Measurement.address>
+		<cim:Measurement.isInput>false</cim:Measurement.isInput>
+		<cim:Measurement.Terminal rdf:resource="#TM_177"/>
+		<cim:IdentifiedObject.description> </cim:IdentifiedObject.description>
+		<cim:IdentifiedObject.mRID>AN_85</cim:IdentifiedObject.mRID>
+		<ftn:IdentifiedObject.name>AN_85</ftn:IdentifiedObject.name>
+	</cim:Analog>
+	<cim:Analog rdf:ID="AN_86">
+		<cim:Analog.scalingFactor>1</cim:Analog.scalingFactor>
+		<cim:Analog.deviation>0</cim:Analog.deviation>
+		<cim:Analog.currentValue>440</cim:Analog.currentValue>
+		<cim:Analog.maxValue>10000</cim:Analog.maxValue>
+		<cim:Analog.measurementType>Power</cim:Analog.measurementType>
+		<cim:Analog.minValue>0</cim:Analog.minValue>
+		<cim:Analog.normalValue>440</cim:Analog.normalValue>
+		<cim:Measurement.address>86</cim:Measurement.address>
+		<cim:Measurement.isInput>false</cim:Measurement.isInput>
+		<cim:Measurement.Terminal rdf:resource="#TM_177"/>
+		<cim:IdentifiedObject.description> </cim:IdentifiedObject.description>
+		<cim:IdentifiedObject.mRID>AN_86</cim:IdentifiedObject.mRID>
+		<ftn:IdentifiedObject.name>AN_86</ftn:IdentifiedObject.name>
+	</cim:Analog>
+	<cim:Analog rdf:ID="AN_87">
+		<cim:Analog.scalingFactor>1</cim:Analog.scalingFactor>
+		<cim:Analog.deviation>0</cim:Analog.deviation>
+		<cim:Analog.currentValue>220</cim:Analog.currentValue>
+		<cim:Analog.maxValue>2000</cim:Analog.maxValue>
+		<cim:Analog.measurementType>Voltage</cim:Analog.measurementType>
+		<cim:Analog.minValue>0</cim:Analog.minValue>
+		<cim:Analog.normalValue>220</cim:Analog.normalValue>
+		<cim:Measurement.address>87</cim:Measurement.address>
+		<cim:Measurement.isInput>false</cim:Measurement.isInput>
+		<cim:Measurement.Terminal rdf:resource="#TM_185"/>
+		<cim:IdentifiedObject.description> </cim:IdentifiedObject.description>
+		<cim:IdentifiedObject.mRID>AN_87</cim:IdentifiedObject.mRID>
+		<ftn:IdentifiedObject.name>AN_87</ftn:IdentifiedObject.name>
+	</cim:Analog>
+	<cim:Analog rdf:ID="AN_88">
+		<cim:Analog.scalingFactor>1</cim:Analog.scalingFactor>
+		<cim:Analog.deviation>0</cim:Analog.deviation>
+		<cim:Analog.currentValue>440</cim:Analog.currentValue>
+		<cim:Analog.maxValue>10000</cim:Analog.maxValue>
+		<cim:Analog.measurementType>Power</cim:Analog.measurementType>
+		<cim:Analog.minValue>0</cim:Analog.minValue>
+		<cim:Analog.normalValue>440</cim:Analog.normalValue>
+		<cim:Measurement.address>88</cim:Measurement.address>
+		<cim:Measurement.isInput>false</cim:Measurement.isInput>
+		<cim:Measurement.Terminal rdf:resource="#TM_185"/>
+		<cim:IdentifiedObject.description> </cim:IdentifiedObject.description>
+		<cim:IdentifiedObject.mRID>AN_88</cim:IdentifiedObject.mRID>
+		<ftn:IdentifiedObject.name>AN_88</ftn:IdentifiedObject.name>
+	</cim:Analog>
+	<cim:Analog rdf:ID="AN_89">
+		<cim:Analog.scalingFactor>1</cim:Analog.scalingFactor>
+		<cim:Analog.deviation>0</cim:Analog.deviation>
+		<cim:Analog.currentValue>220</cim:Analog.currentValue>
+		<cim:Analog.maxValue>2000</cim:Analog.maxValue>
+		<cim:Analog.measurementType>Voltage</cim:Analog.measurementType>
+		<cim:Analog.minValue>0</cim:Analog.minValue>
+		<cim:Analog.normalValue>220</cim:Analog.normalValue>
+		<cim:Measurement.address>89</cim:Measurement.address>
+		<cim:Measurement.isInput>false</cim:Measurement.isInput>
+		<cim:Measurement.Terminal rdf:resource="#TM_189"/>
+		<cim:IdentifiedObject.description> </cim:IdentifiedObject.description>
+		<cim:IdentifiedObject.mRID>AN_89</cim:IdentifiedObject.mRID>
+		<ftn:IdentifiedObject.name>AN_89</ftn:IdentifiedObject.name>
+	</cim:Analog>
+	<cim:Analog rdf:ID="AN_90">
+		<cim:Analog.scalingFactor>1</cim:Analog.scalingFactor>
+		<cim:Analog.deviation>0</cim:Analog.deviation>
+		<cim:Analog.currentValue>440</cim:Analog.currentValue>
+		<cim:Analog.maxValue>10000</cim:Analog.maxValue>
+		<cim:Analog.measurementType>Power</cim:Analog.measurementType>
+		<cim:Analog.minValue>0</cim:Analog.minValue>
+		<cim:Analog.normalValue>440</cim:Analog.normalValue>
+		<cim:Measurement.address>90</cim:Measurement.address>
+		<cim:Measurement.isInput>false</cim:Measurement.isInput>
+		<cim:Measurement.Terminal rdf:resource="#TM_189"/>
+		<cim:IdentifiedObject.description> </cim:IdentifiedObject.description>
+		<cim:IdentifiedObject.mRID>AN_90</cim:IdentifiedObject.mRID>
+		<ftn:IdentifiedObject.name>AN_90</ftn:IdentifiedObject.name>
+	</cim:Analog>
+	<cim:Analog rdf:ID="AN_91">
+		<cim:Analog.scalingFactor>1</cim:Analog.scalingFactor>
+		<cim:Analog.deviation>0</cim:Analog.deviation>
+		<cim:Analog.currentValue>220</cim:Analog.currentValue>
+		<cim:Analog.maxValue>2000</cim:Analog.maxValue>
+		<cim:Analog.measurementType>Voltage</cim:Analog.measurementType>
+		<cim:Analog.minValue>0</cim:Analog.minValue>
+		<cim:Analog.normalValue>220</cim:Analog.normalValue>
+		<cim:Measurement.address>91</cim:Measurement.address>
+		<cim:Measurement.isInput>false</cim:Measurement.isInput>
+		<cim:Measurement.Terminal rdf:resource="#TM_193"/>
+		<cim:IdentifiedObject.description> </cim:IdentifiedObject.description>
+		<cim:IdentifiedObject.mRID>AN_91</cim:IdentifiedObject.mRID>
+		<ftn:IdentifiedObject.name>AN_91</ftn:IdentifiedObject.name>
+	</cim:Analog>
+	<cim:Analog rdf:ID="AN_92">
+		<cim:Analog.scalingFactor>1</cim:Analog.scalingFactor>
+		<cim:Analog.deviation>0</cim:Analog.deviation>
+		<cim:Analog.currentValue>440</cim:Analog.currentValue>
+		<cim:Analog.maxValue>10000</cim:Analog.maxValue>
+		<cim:Analog.measurementType>Power</cim:Analog.measurementType>
+		<cim:Analog.minValue>0</cim:Analog.minValue>
+		<cim:Analog.normalValue>440</cim:Analog.normalValue>
+		<cim:Measurement.address>92</cim:Measurement.address>
+		<cim:Measurement.isInput>false</cim:Measurement.isInput>
+		<cim:Measurement.Terminal rdf:resource="#TM_193"/>
+		<cim:IdentifiedObject.description> </cim:IdentifiedObject.description>
+		<cim:IdentifiedObject.mRID>AN_92</cim:IdentifiedObject.mRID>
+		<ftn:IdentifiedObject.name>AN_92</ftn:IdentifiedObject.name>
 	</cim:Analog>
 	<!--END Analog-->
 	
