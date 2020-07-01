@@ -26,6 +26,9 @@ namespace OMS.Common.Cloud.Logger
             var serviceLogFilePath = GetServiceLogFilePath(this.sourceName);
             var logLevel = GetLogLevel();
 
+            //TODO istraziti
+            //new LoggerConfiguration().ReadFrom.AppSettings().CreateLogger();
+
             this.sharedSerilogLogger = new LoggerConfiguration().WriteTo.RollingFile(pathFormat: sharedLogFilePath,
                                                                                      restrictedToMinimumLevel: sharedLogLevel,
                                                                                      outputTemplate: logOutputTemplate,
