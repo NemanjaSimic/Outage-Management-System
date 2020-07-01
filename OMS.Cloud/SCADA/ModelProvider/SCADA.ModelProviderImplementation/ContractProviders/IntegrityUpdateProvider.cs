@@ -17,12 +17,13 @@ namespace SCADA.ModelProviderImplementation.ContractProviders
 {
     public class IntegrityUpdateProvider : IScadaIntegrityUpdateContract
     {
+        private readonly string baseLogString;
         private readonly IReliableStateManager stateManager;
+
+        #region Private Properties
         private bool isGidToPointItemMapInitialized;
         private bool isCommandDescriptionCacheInitialized;
         private bool isInfoCacheInitialized;
-
-        #region Private Properties
         private bool ReliableDictionariesInitialized
         {
             get { return isGidToPointItemMapInitialized && isCommandDescriptionCacheInitialized && isInfoCacheInitialized; }
@@ -64,6 +65,8 @@ namespace SCADA.ModelProviderImplementation.ContractProviders
 
         public IntegrityUpdateProvider(IReliableStateManager stateManager)
         {
+            this.baseLogString = $"{this.GetType()} [{this.GetHashCode()}] =>";
+
             this.stateManager = stateManager;
 
             this.isGidToPointItemMapInitialized = false;
@@ -85,18 +88,27 @@ namespace SCADA.ModelProviderImplementation.ContractProviders
                     //_ = GidToPointItemMap;
                     gidToPointItemMap = await ReliableDictionaryAccess<long, IScadaModelPointItem>.Create(stateManager, ReliableDictionaryNames.GidToPointItemMap);
                     this.isGidToPointItemMapInitialized = true;
+
+                    string debugMessage = $"{baseLogString} OnStateManagerChangedHandler => '{ReliableDictionaryNames.GidToPointItemMap}' ReliableDictionaryAccess initialized.";
+                    Logger.LogDebug(debugMessage);
                 }
                 else if (reliableStateName == ReliableDictionaryNames.CommandDescriptionCache)
                 {
                     //_ = CommandDescriptionCache;
                     commandDescriptionCache = await ReliableDictionaryAccess<long, CommandDescription>.Create(stateManager, ReliableDictionaryNames.CommandDescriptionCache);
                     this.isCommandDescriptionCacheInitialized = true;
+
+                    string debugMessage = $"{baseLogString} OnStateManagerChangedHandler => '{ReliableDictionaryNames.CommandDescriptionCache}' ReliableDictionaryAccess initialized.";
+                    Logger.LogDebug(debugMessage);
                 }
                 else if (reliableStateName == ReliableDictionaryNames.InfoCache)
                 {
                     //_ = InfoCache;
                     infoCache = await ReliableDictionaryAccess<string, bool>.Create(stateManager, ReliableDictionaryNames.InfoCache);
                     isInfoCacheInitialized = true;
+
+                    string debugMessage = $"{baseLogString} OnStateManagerChangedHandler => '{ReliableDictionaryNames.InfoCache}' ReliableDictionaryAccess initialized.";
+                    Logger.LogDebug(debugMessage);
                 }
             }
         }

@@ -24,32 +24,30 @@ namespace SCADA.ModelProviderImplementation
 {
     public sealed class ScadaModel : IModelUpdateNotificationContract, ITransactionActorContract
     {
-        private ICloudLogger logger;
-        private ICloudLogger Logger
-        {
-            get { return logger ?? (logger = CloudLoggerFactory.GetLogger()); }
-        }
-
-        private readonly string baseLoggString;
-
+        private readonly string baseLogString;
         private readonly EnumDescs enumDescs;
         private readonly ModelResourcesDesc modelResourceDesc;
         private readonly IReliableStateManager stateManager;
         private readonly ScadaModelPointItemHelper pointItemHelper;
 
+        private NetworkModelGdaClient nmsGdaClient;
+        private ScadaCommandingClient scadaCommandingClient;
+
+        #region Private Properties
         private bool isModelImported;
         private bool isGidToPointItemMapInitialized;
         private bool isAddressToGidMapInitialized;
         private bool isCommandDescriptionCacheInitialized;
         private bool isInfoCacheInitialized;
-
-        private NetworkModelGdaClient nmsGdaClient;
-        private ScadaCommandingClient scadaCommandingClient;
-
-        #region Private Properties
         private bool ReliableDictionariesInitialized
         {
             get {   return isGidToPointItemMapInitialized && isAddressToGidMapInitialized && isCommandDescriptionCacheInitialized && isInfoCacheInitialized; }
+        }
+
+        private ICloudLogger logger;
+        private ICloudLogger Logger
+        {
+            get { return logger ?? (logger = CloudLoggerFactory.GetLogger()); }
         }
 
         private Dictionary<DeltaOpType, List<long>> modelChanges;
@@ -125,7 +123,7 @@ namespace SCADA.ModelProviderImplementation
 
         public ScadaModel(IReliableStateManager stateManager, ModelResourcesDesc modelResourceDesc, EnumDescs enumDescs)
         {
-            this.baseLoggString = $"{typeof(ScadaModel)} [{this.GetHashCode()}] =>";
+            this.baseLogString = $"{this.GetType()} [{this.GetHashCode()}] =>";
 
             this.stateManager = stateManager;
             this.modelResourceDesc = modelResourceDesc;
@@ -155,6 +153,9 @@ namespace SCADA.ModelProviderImplementation
                     //_ = CurrentGidToPointItemMap;
                     currentGidToPointItemMap = await ReliableDictionaryAccess<long, IScadaModelPointItem>.Create(stateManager, ReliableDictionaryNames.GidToPointItemMap);
                     this.isGidToPointItemMapInitialized = true;
+
+                    string debugMessage = $"{baseLogString} OnStateManagerChangedHandler => '{ReliableDictionaryNames.GidToPointItemMap}' ReliableDictionaryAccess initialized.";
+                    Logger.LogDebug(debugMessage);
                 }
                 else if(reliableStateName == ReliableDictionaryNames.AddressToGidMap)
                 {
@@ -166,18 +167,27 @@ namespace SCADA.ModelProviderImplementation
                     await currentAddressToGidMap.SetAsync((short)PointType.DIGITAL_OUTPUT, new Dictionary<ushort, long>());
                     await currentAddressToGidMap.SetAsync((short)PointType.HR_LONG, new Dictionary<ushort, long>());
                     this.isAddressToGidMapInitialized = true;
+
+                    string debugMessage = $"{baseLogString} OnStateManagerChangedHandler => '{ReliableDictionaryNames.AddressToGidMap}' ReliableDictionaryAccess initialized.";
+                    Logger.LogDebug(debugMessage);
                 }
                 else if(reliableStateName == ReliableDictionaryNames.CommandDescriptionCache)
                 {
                     //_ = CommandDescriptionCache;
                     commandDescriptionCache = await ReliableDictionaryAccess<long, CommandDescription>.Create(stateManager, ReliableDictionaryNames.CommandDescriptionCache);
                     this.isCommandDescriptionCacheInitialized = true;
+
+                    string debugMessage = $"{baseLogString} OnStateManagerChangedHandler => '{ReliableDictionaryNames.CommandDescriptionCache}' ReliableDictionaryAccess initialized.";
+                    Logger.LogDebug(debugMessage);
                 }
                 else if (reliableStateName == ReliableDictionaryNames.InfoCache)
                 {
                     //_ = InfoCache;
                     infoCache = await ReliableDictionaryAccess<string, bool>.Create(stateManager, ReliableDictionaryNames.InfoCache);
                     isInfoCacheInitialized = true;
+
+                    string debugMessage = $"{baseLogString} OnStateManagerChangedHandler => '{ReliableDictionaryNames.InfoCache}' ReliableDictionaryAccess initialized.";
+                    Logger.LogDebug(debugMessage);
                 }
             }
             //else if(e.Action == UPDATE, what if?)
@@ -186,7 +196,7 @@ namespace SCADA.ModelProviderImplementation
         public async Task InitializeScadaModel(bool isRetry = false)
         {
             string isRetryString = isRetry ? "yes" : "no";
-            string verboseMessage = $"{baseLoggString} InitializeScadaModel method called, isRetry: {isRetryString}.";
+            string verboseMessage = $"{baseLogString} InitializeScadaModel method called, isRetry: {isRetryString}.";
             Logger.LogVerbose(verboseMessage);
 
             while (!ReliableDictionariesInitialized)
@@ -202,22 +212,22 @@ namespace SCADA.ModelProviderImplementation
 
                 if (!isModelImported)
                 {
-                    string message = $"{baseLoggString} InitializeScadaModel => failed to import model";
+                    string message = $"{baseLogString} InitializeScadaModel => failed to import model";
                     Logger.LogWarning(message);
 
                     await Task.Delay(2000);
                     await InitializeScadaModel(true);
 
                     //TODO: neka ozbiljnija retry logiga
-                    //throw new Exception($"{baseLoggString} InitializeScadaModel => failed to import model");
+                    //throw new Exception($"{baseLogString} InitializeScadaModel => failed to import model");
                 }
 
                 await SendModelUpdateCommands();
             }
             catch (CommunicationObjectFaultedException e)
             {
-                string message = $"{baseLoggString} InitializeScadaModel => CommunicationObjectFaultedException caught.";
-                Logger.LogError(message, e);
+                string errorMessage = $"{baseLogString} InitializeScadaModel => CommunicationObjectFaultedException caught.";
+                Logger.LogError(errorMessage, e);
 
                 await Task.Delay(2000);
 
@@ -228,8 +238,8 @@ namespace SCADA.ModelProviderImplementation
             }
             catch (Exception e)
             {
-                string message = $"{baseLoggString} InitializeScadaModel => Exception caught.";
-                Logger.LogError(message, e);
+                string errorMessage = $"{baseLogString} InitializeScadaModel => Exception caught.";
+                Logger.LogError(errorMessage, e);
                 throw e;
             }
         }
@@ -245,20 +255,20 @@ namespace SCADA.ModelProviderImplementation
                 dictionary.Clear();
             }
 
-            string message = $"{baseLoggString} ImportModel => Importing analog measurements started...";
+            string message = $"{baseLogString} ImportModel => Importing analog measurements started...";
             Logger.LogInformation(message);
 
             bool analogImportSuccess = await ImportAnalog();
 
-            message = $"{baseLoggString} ImportModel =>Importing analog measurements finished. ['success' value: {analogImportSuccess}]";
+            message = $"{baseLogString} ImportModel =>Importing analog measurements finished. ['success' value: {analogImportSuccess}]";
             Logger.LogInformation(message);
 
-            message = $"{baseLoggString} ImportModel => Importing discrete measurements started...";
+            message = $"{baseLogString} ImportModel => Importing discrete measurements started...";
             Logger.LogInformation(message);
 
             bool discreteImportSuccess = await ImportDiscrete();
 
-            message = $"{baseLoggString} ImportModel => Importing discrete measurements finished. ['success' value: {discreteImportSuccess}]";
+            message = $"{baseLogString} ImportModel => Importing discrete measurements finished. ['success' value: {discreteImportSuccess}]";
             Logger.LogInformation(message);
 
             success = analogImportSuccess && discreteImportSuccess;
@@ -305,9 +315,9 @@ namespace SCADA.ModelProviderImplementation
                             
                         if(CurrentGidToPointItemMap.ContainsKey(gid))
                         {
-                            string message = $"{baseLoggString} ImportAnalog => SCADA model is invalid => Gid: {gid} belongs to more than one entity.";
-                            Logger.LogError(message);
-                            throw new InternalSCADAServiceException(message);
+                            string errorMessage = $"{baseLogString} ImportAnalog => SCADA model is invalid => Gid: {gid} belongs to more than one entity.";
+                            Logger.LogError(errorMessage);
+                            throw new InternalSCADAServiceException(errorMessage);
                         }
 
                         await CurrentGidToPointItemMap.SetAsync(gid, pointItem);
@@ -320,13 +330,13 @@ namespace SCADA.ModelProviderImplementation
 
                         if(CurrentAddressToGidMap[registerType].ContainsKey(pointItem.Address))
                         {
-                            string message = $"{baseLoggString} ImportAnalog => SCADA model is invalid => Address: {pointItem.Address} (RegType: {registerType}) belongs to more than one entity.";
+                            string message = $"{baseLogString} ImportAnalog => SCADA model is invalid => Address: {pointItem.Address} (RegType: {registerType}) belongs to more than one entity.";
                             Logger.LogError(message);
                             throw new InternalSCADAServiceException(message);
                         }
 
                         CurrentAddressToGidMap[registerType].Add(pointItem.Address, rds[i].Id);
-                        Logger.LogDebug($"{baseLoggString} ImportAnalog => ANALOG measurement added to SCADA model [Gid: {gid}, Address: {pointItem.Address}]");
+                        Logger.LogDebug($"{baseLogString} ImportAnalog => ANALOG measurement added to SCADA model [Gid: {gid}, Address: {pointItem.Address}]");
                     }
 
                     resourcesLeft = await this.nmsGdaClient.IteratorResourcesLeft(iteratorId);
@@ -337,7 +347,7 @@ namespace SCADA.ModelProviderImplementation
             catch (CommunicationObjectFaultedException e)
             {
                 success = false;
-                string message = $"{baseLoggString} ImportAnalog => CommunicationObjectFaultedException caught.";
+                string message = $"{baseLogString} ImportAnalog => CommunicationObjectFaultedException caught.";
                 Logger.LogError(message, e);
 
                 await Task.Delay(2000);
@@ -349,7 +359,7 @@ namespace SCADA.ModelProviderImplementation
             catch (Exception ex)
             {
                 success = false;
-                string errorMessage = $"{baseLoggString} ImportAnalog => failed with error: {ex.Message}";
+                string errorMessage = $"{baseLogString} ImportAnalog => failed with error: {ex.Message}";
                 Trace.WriteLine(errorMessage);
                 Logger.LogError(errorMessage, ex);
             }
@@ -387,9 +397,9 @@ namespace SCADA.ModelProviderImplementation
 
                         if (CurrentGidToPointItemMap.ContainsKey(gid))
                         {
-                            string message = $"{baseLoggString} ImportDiscrete => SCADA model is invalid => Gid: {gid} belongs to more than one entity.";
-                            Logger.LogError(message);
-                            throw new InternalSCADAServiceException(message);
+                            string errorMessage = $"{baseLogString} ImportDiscrete => SCADA model is invalid => Gid: {gid:X16} belongs to more than one entity.";
+                            Logger.LogError(errorMessage);
+                            throw new InternalSCADAServiceException(errorMessage);
                         }
 
                         await CurrentGidToPointItemMap.SetAsync(gid, pointItem);
@@ -402,13 +412,13 @@ namespace SCADA.ModelProviderImplementation
 
                         if (CurrentAddressToGidMap[registerType].ContainsKey(pointItem.Address))
                         {
-                            string message = $"{baseLoggString} ImportDiscrete => SCADA model is invalid => Address: {pointItem.Address} (RegType: {registerType}) belongs to more than one entity.";
-                            Logger.LogError(message);
-                            throw new InternalSCADAServiceException(message);
+                            string errorMessage = $"{baseLogString} ImportDiscrete => SCADA model is invalid => Address: {pointItem.Address} (RegType: {registerType}) belongs to more than one entity.";
+                            Logger.LogError(errorMessage);
+                            throw new InternalSCADAServiceException(errorMessage);
                         }
 
                         CurrentAddressToGidMap[registerType].Add(pointItem.Address, gid);
-                        Logger.LogDebug($"{baseLoggString} ImportDiscrete => DISCRETE measurement added to SCADA model [Gid: {gid}, Address: {pointItem.Address}]");
+                        Logger.LogDebug($"{baseLogString} ImportDiscrete => DISCRETE measurement added to SCADA model [Gid: {gid:X16}, Address: {pointItem.Address}]");
                     }
 
                     resourcesLeft = await this.nmsGdaClient.IteratorResourcesLeft(iteratorId);
@@ -419,7 +429,7 @@ namespace SCADA.ModelProviderImplementation
             catch (CommunicationObjectFaultedException e)
             {
                 success = false;
-                string message = $"{baseLoggString} ImportAnalog => CommunicationObjectFaultedException caught.";
+                string message = $"{baseLogString} ImportAnalog => CommunicationObjectFaultedException caught.";
                 Logger.LogError(message, e);
 
                 await Task.Delay(2000);
@@ -431,7 +441,7 @@ namespace SCADA.ModelProviderImplementation
             catch (Exception ex)
             {
                 success = false;
-                string errorMessage = $"{baseLoggString} ImportDiscrete => failed with error: {ex.Message}";
+                string errorMessage = $"{baseLogString} ImportDiscrete => failed with error: {ex.Message}";
                 Console.WriteLine(errorMessage);
                 Logger.LogError(errorMessage, ex);
             }
@@ -485,9 +495,9 @@ namespace SCADA.ModelProviderImplementation
                         if (!IncomingScadaModel.ContainsKey(gid))
                         {
                             success = false;
-                            string message = $"Model update data in fault state. Deleting entity with gid: {gid}, that does not exists in SCADA model.";
-                            Logger.LogError(message);
-                            throw new ArgumentException(message);
+                            string errorMessage = $"Model update data in fault state. Deleting entity with gid: {gid:X16}, that does not exists in SCADA model.";
+                            Logger.LogError(errorMessage);
+                            throw new ArgumentException(errorMessage);
                         }
 
                         IScadaModelPointItem oldPointItem = IncomingScadaModel[gid];
@@ -537,7 +547,6 @@ namespace SCADA.ModelProviderImplementation
                             IncomingAddressToGidMap[oldPointItem.RegisterType].Remove(oldPointItem.Address);
                             IncomingAddressToGidMap[incomingPointItem.RegisterType].Add(incomingPointItem.Address, gid);
                         }
-
                     }
                 }
 

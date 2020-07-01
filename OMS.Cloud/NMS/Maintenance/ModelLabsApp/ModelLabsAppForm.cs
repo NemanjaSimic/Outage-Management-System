@@ -16,17 +16,20 @@ namespace Outage.DataImporter.ModelLabsApp
 {
     public partial class ModelLabsAppForm : Form
 	{
-		private ICloudLogger logger;
-
-        private ICloudLogger Logger
-        {
-            get { return logger ?? (logger = CloudLoggerFactory.GetLogger()); }
-        }
-
 		private readonly EnumDescs enumDescs;
         private readonly CIMAdapterClass adapter;
 
         private ConditionalValue<Delta> nmsDeltaResult;
+		
+		#region Private Properties
+		private ICloudLogger logger;
+
+		protected ICloudLogger Logger
+		{
+			get { return logger ?? (logger = CloudLoggerFactory.GetLogger()); }
+		}
+		#endregion Private Properties
+
 
         public ModelLabsAppForm()
 		{

@@ -1,4 +1,5 @@
 ﻿using OMS.Common.Cloud;
+using OMS.Common.Cloud.Logger;
 using System;
 using System.Collections.Generic;
 
@@ -6,10 +7,22 @@ namespace OMS.Common.NmsContracts
 {
     public class EnumDescs
     {
+        private readonly string baseLogString;
+
         private Dictionary<ModelCode, Type> property2enumType = new Dictionary<ModelCode, Type>();
+
+        #region Private Properties
+        private ICloudLogger logger;
+        private ICloudLogger Logger
+        {
+            get { return logger ?? (logger = CloudLoggerFactory.GetLogger()); }
+        }
+        #endregion Private Properties
 
         public EnumDescs()
         {
+            this.baseLogString = $"{this.GetType()} [{this.GetHashCode()}] =>";
+
             property2enumType.Add(ModelCode.ANALOG_SIGNALTYPE, typeof(AnalogMeasurementType));
             property2enumType.Add(ModelCode.DISCRETE_MEASUREMENTTYPE, typeof(DiscreteMeasurementType));
         }
@@ -30,7 +43,9 @@ namespace OMS.Common.NmsContracts
             }
             else
             {
-                throw new Exception($"Failed to get enum list. Property ({propertyId} is not of enum type.");
+                string message = $"{baseLogString} GetEnumList => Failed to get enum list. Property ({propertyId} is not of enum type.";
+                Logger.LogError(message);
+                throw new Exception(message);
             }
 
             return enumList;
@@ -51,7 +66,9 @@ namespace OMS.Common.NmsContracts
             }
             catch
             {
-                throw new Exception(string.Format("Failed to get enum list. Type ({0}) is not of enum type.", enumType));
+                string message = $"{baseLogString} GetEnumList => Failed to get enum list. Type ({enumType}) is not of enum type.";
+                Logger.LogError(message);
+                throw new Exception(message);
             }
         }
 
@@ -63,7 +80,9 @@ namespace OMS.Common.NmsContracts
             }
             else
             {
-                throw new Exception(string.Format("Property ({0}) is not of enum type.", propertyId));
+                string message = $"{baseLogString} GetEnumTypeForPropertyId => Property ({propertyId}) is not of enum type.";
+                Logger.LogError(message);
+                throw new Exception(message);
             }
         }
 
@@ -75,7 +94,9 @@ namespace OMS.Common.NmsContracts
             }
             else if (throwsException)
             {
-                throw new Exception(string.Format("Property ({0}) is not of enum type.", propertyId));
+                string message = $"{baseLogString} GetEnumTypeForPropertyId => Property ({propertyId}) is not of enum type.";
+                Logger.LogError(message);
+                throw new Exception(message);
             }
             else
             {
@@ -105,7 +126,9 @@ namespace OMS.Common.NmsContracts
             }
             else
             {
-                throw new Exception(string.Format("Failed to get enum value from string ({0}). Invalid underlying type.", value));
+                string message = $"{baseLogString} GetEnumValueFromString => Failed to get enum value from string ({value}). Invalid underlying type.";
+                Logger.LogError(message);
+                throw new Exception(message);
             }
         }
 

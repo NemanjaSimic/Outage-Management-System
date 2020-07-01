@@ -12,19 +12,21 @@ namespace SCADA.ModelProviderImplementation.Data
 {
     internal class ScadaModelPointItemHelper
     {
-        //private readonly EnumDescs enumDescs;
+        private readonly string baseLogString;
 
+        #region Private Properties
         private ICloudLogger logger;
 
         private ICloudLogger Logger
         {
             get { return logger ?? (logger = CloudLoggerFactory.GetLogger()); }
         }
+        #endregion Private Properties
 
-        //public ScadaModelPointItemHelper()
-        //{
-        //    enumDescs = new EnumDescs();
-        //}
+        public ScadaModelPointItemHelper()
+        {
+            this.baseLogString = $"{this.GetType()} [{this.GetHashCode()}] =>";
+        }
 
         public void InitializeScadaModelPointItem(ScadaModelPointItem pointItem, List<Property> props, ModelCode type, EnumDescs enumDescs)
         {
@@ -49,9 +51,9 @@ namespace SCADA.ModelProviderImplementation.Data
                         }
                         else
                         {
-                            string message = "SCADAModelPointItem constructor => Address is either not defined or is invalid.";
-                            Logger.LogError(message);
-                            throw new ArgumentException(message);
+                            string errorMessage = $"{baseLogString} InitializeScadaModelPointItem => Address ('{item.AsString()}') is either not defined or is invalid.";
+                            Logger.LogError(errorMessage);
+                            throw new ArgumentException(errorMessage);
                         }
                         break;
 
@@ -66,9 +68,9 @@ namespace SCADA.ModelProviderImplementation.Data
                         }
                         else
                         {
-                            string message = "SCADAModelPointItem constructor => ModelCode type is neither ANALOG nor DISCRETE.";
-                            Logger.LogError(message);
-                            throw new ArgumentException(message);
+                            string errorMessage = $"{baseLogString} InitializeScadaModelPointItem => ModelCode type is neither ANALOG nor DISCRETE.";
+                            Logger.LogError(errorMessage);
+                            throw new ArgumentException(errorMessage);
                         }
                         break;
 
@@ -153,6 +155,14 @@ namespace SCADA.ModelProviderImplementation.Data
                     default:
                         break;
                 }
+            }
+
+            if(pointItem.ScalingFactor == 0)
+            {
+                string warnMessage = $"{baseLogString} InitializeAnalogPointItem => Analog measurement is of type: {pointItem.AnalogType} which is not supported for alarming. Gid: 0x{pointItem.Gid:X16}, Addres: {pointItem.Address}, Name: {pointItem.Name}, RegisterType: {pointItem.RegisterType}, Initialized: {pointItem.Initialized}";
+                Logger.LogWarning(warnMessage);
+                
+                pointItem.ScalingFactor = 1;
             }
 
             pointItem.Initialized = true;

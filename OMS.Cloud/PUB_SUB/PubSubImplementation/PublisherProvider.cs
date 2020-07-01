@@ -1,6 +1,7 @@
 ﻿using Common.PubSub;
 using Microsoft.ServiceFabric.Data;
 using Microsoft.ServiceFabric.Data.Notifications;
+using OMS.Common.Cloud.Logger;
 using OMS.Common.Cloud.ReliableCollectionHelpers;
 using OMS.Common.PubSub;
 using OMS.Common.PubSubContracts;
@@ -13,10 +14,17 @@ namespace PubSubImplementation
 {
     public class PublisherProvider : IPublisherContract
     {
+        private readonly string baseLogString;
         private readonly IReliableStateManager stateManager;
-        private bool isSubscriberCacheInitialized;
 
         #region Private Properties
+        private ICloudLogger logger;
+        private ICloudLogger Logger
+        {
+            get { return logger ?? (logger = CloudLoggerFactory.GetLogger()); }
+        }
+
+        private bool isSubscriberCacheInitialized;
         private bool ReliableDictionariesInitialized
         {
             get { return isSubscriberCacheInitialized; }
@@ -30,10 +38,12 @@ namespace PubSubImplementation
                 return registeredSubscribersCache ?? (registeredSubscribersCache = ReliableDictionaryAccess<short, Dictionary<Uri, RegisteredSubscriber>>.Create(stateManager, ReliableDictionaryNames.RegisteredSubscribersCache).Result);
             }
         }
-        #endregion Properties
+        #endregion Private Properties
 
         public PublisherProvider(IReliableStateManager stateManager)
         {
+            this.baseLogString = $"{this.GetType()} [{this.GetHashCode()}] =>";
+
             this.isSubscriberCacheInitialized = false;
 
             this.stateManager = stateManager;
@@ -52,6 +62,9 @@ namespace PubSubImplementation
                     //_ = SubscriberCache;
                     registeredSubscribersCache = await ReliableDictionaryAccess<short, Dictionary<Uri, RegisteredSubscriber>>.Create(stateManager, ReliableDictionaryNames.RegisteredSubscribersCache);
                     isSubscriberCacheInitialized = true;
+
+                    string debugMessage = $"{baseLogString} OnStateManagerChangedHandler => '{ReliableDictionaryNames.RegisteredSubscribersCache}' ReliableDictionaryAccess initialized.";
+                    Logger.LogDebug(debugMessage);
                 }
             }
         }

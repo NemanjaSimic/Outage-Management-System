@@ -46,6 +46,7 @@
     <Reference Include="System.Xml" />
   </ItemGroup>
   <ItemGroup>
+    <Compile Include="CloudStorageQueueNames.cs" />
     <Compile Include="Enums.cs" />
     <Compile Include="IAlarmConfigData.cs" />
     <Compile Include="IExecuteModbusFunctionResult.cs" />

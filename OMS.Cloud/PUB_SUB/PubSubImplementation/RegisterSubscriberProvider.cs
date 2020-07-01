@@ -1,10 +1,10 @@
 ﻿using Microsoft.ServiceFabric.Data;
 using Microsoft.ServiceFabric.Data.Notifications;
 using OMS.Common.Cloud;
+using OMS.Common.Cloud.Logger;
 using OMS.Common.Cloud.ReliableCollectionHelpers;
 using OMS.Common.PubSub;
 using OMS.Common.PubSubContracts;
-
 using System;
 using System.Collections.Generic;
 using System.Threading.Tasks;
@@ -13,13 +13,20 @@ namespace PubSubImplementation
 {
     public class RegisterSubscriberProvider : IRegisterSubscriberContract
     {
+        private readonly string baseLogString;
         private readonly IReliableStateManager stateManager;
-        private bool isSubscriberCacheInitialized;
 
         #region Private Properties
+        private bool isSubscriberCacheInitialized;
         private bool ReliableDictionariesInitialized
         {
             get { return isSubscriberCacheInitialized; }
+        }
+
+        private ICloudLogger logger;
+        private ICloudLogger Logger
+        {
+            get { return logger ?? (logger = CloudLoggerFactory.GetLogger()); }
         }
 
         private ReliableDictionaryAccess<short, Dictionary<Uri, RegisteredSubscriber>> registeredSubscribersCache;
@@ -34,6 +41,8 @@ namespace PubSubImplementation
 
         public RegisterSubscriberProvider(IReliableStateManager stateManager)
         {
+            this.baseLogString = $"{this.GetType()} [{this.GetHashCode()}] =>";
+
             this.isSubscriberCacheInitialized = false;
 
             this.stateManager = stateManager;
@@ -87,7 +96,8 @@ namespace PubSubImplementation
             }
             catch (Exception e)
             {
-                //TODO: log
+                string errorMessage = $"{baseLogString} SubscribeToTopic => Exception: {e.Message}";
+                Logger.LogError(errorMessage, e);
                 result = false;
             }
 
@@ -125,7 +135,8 @@ namespace PubSubImplementation
             }
             catch (Exception e)
             {
-                //TODO: log
+                string errorMessage = $"{baseLogString} SubscribeToTopics => Exception: {e.Message}";
+                Logger.LogError(errorMessage, e);
                 result = false;
             }
 
@@ -159,7 +170,8 @@ namespace PubSubImplementation
             }
             catch (Exception e)
             {
-                //TODO: log
+                string errorMessage = $"{baseLogString} GetAllSubscribedTopics => Exception: {e.Message}";
+                Logger.LogError(errorMessage, e);
                 throw e;
             }
         }    
@@ -193,7 +205,8 @@ namespace PubSubImplementation
             }
             catch (Exception e)
             {
-                //TODO: log
+                string errorMessage = $"{baseLogString} UnsubscribeFromTopic => Exception: {e.Message}";
+                Logger.LogError(errorMessage, e);
                 result = false;
             }
 
@@ -231,7 +244,8 @@ namespace PubSubImplementation
             }
             catch (Exception e)
             {
-                //TODO: log
+                string errorMessage = $"{baseLogString} UnsubscribeFromTopics => Exception: {e.Message}";
+                Logger.LogError(errorMessage, e);
                 result = false;
             }
 
@@ -264,7 +278,8 @@ namespace PubSubImplementation
             }
             catch (Exception e)
             {
-                //TODO: log
+                string errorMessage = $"{baseLogString} UnsubscribeFromAllTopics => Exception: {e.Message}";
+                Logger.LogError(errorMessage, e);
                 result = false;
             }
 

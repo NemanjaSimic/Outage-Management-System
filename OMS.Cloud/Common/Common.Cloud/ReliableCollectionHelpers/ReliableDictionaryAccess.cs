@@ -21,39 +21,31 @@ namespace OMS.Common.Cloud.ReliableCollectionHelpers
         
         private IReliableDictionary<TKey, TValue> reliableDictionary;
 
-        #region Private Properties
-        private IDictionary<TKey, TValue> localDictionary;
-        private IDictionary<TKey, TValue> LocalDictionary
-        {
-            get { return localDictionary ?? (localDictionary = new Dictionary<TKey, TValue>()); }
-        }
-        
-        private IDictionary<TKey, TValue> enumerableDictionary;
-        private IDictionary<TKey, TValue> EnumerableDictionary
-        {
-            get { return enumerableDictionary ?? (enumerableDictionary = new Dictionary<TKey, TValue>()); }
-        }
-        #endregion Private Properties
-
         #region Static Members
+        private static ICloudLogger logger;
+        private static ICloudLogger Logger
+        {
+            get { return logger ?? (logger = CloudLoggerFactory.GetLogger()); }
+        }
+
         public static async Task<ReliableDictionaryAccess<TKey, TValue>> Create(IReliableStateManager stateManager, string reliableDictioanryName)
         {
-            int numOfTriesLeft = 30; 
+            int numOfTriesLeft = 30;
 
-            while(true)
+            while (true)
             {
                 try
                 {
                     ReliableDictionaryAccess<TKey, TValue> reliableDictionaryAccess = new ReliableDictionaryAccess<TKey, TValue>(stateManager, reliableDictioanryName);
                     await reliableDictionaryAccess.InitializeReliableDictionary(reliableDictioanryName);
-                    return reliableDictionaryAccess;   
+                    return reliableDictionaryAccess;
                 }
                 catch (Exception e)
                 {
                     string message = $"Exception caught in {typeof(ReliableDictionaryAccess<TKey, TValue>)}.Create() method.";
-                    CloudLoggerFactory.GetLogger().LogError(message, e);
+                    Logger.LogError(message, e);
 
-                    if(numOfTriesLeft > 0)
+                    if (numOfTriesLeft > 0)
                     {
                         await Task.Delay(1000);
                         numOfTriesLeft--;
@@ -63,7 +55,7 @@ namespace OMS.Common.Cloud.ReliableCollectionHelpers
                         throw e;
                     }
 
-                    return await Create(stateManager, reliableDictioanryName);
+                    //return await Create(stateManager, reliableDictioanryName);
                 }
             }
         }
@@ -82,8 +74,8 @@ namespace OMS.Common.Cloud.ReliableCollectionHelpers
                 }
                 catch (Exception e)
                 {
-                    string message = $"Exception caught in {typeof(ReliableDictionaryAccess<TKey, TValue>)}.Create() method.";
-                    CloudLoggerFactory.GetLogger().LogError(message, e);
+                    string message = $"Exception caught in {typeof(ReliableDictionaryAccess<TKey, TValue>)}.Create() method. NumOfTriesLeft: {numOfTriesLeft}";
+                    Logger.LogError(message, e);
 
                     if (numOfTriesLeft > 0)
                     {
@@ -95,11 +87,25 @@ namespace OMS.Common.Cloud.ReliableCollectionHelpers
                         throw e;
                     }
 
-                    return await Create(stateManager, reliableDictionary);
+                    //return await Create(stateManager, reliableDictionary);
                 }
             }
         }
         #endregion Static Members
+
+        #region Private Properties
+        private IDictionary<TKey, TValue> localDictionary;
+        private IDictionary<TKey, TValue> LocalDictionary
+        {
+            get { return localDictionary ?? (localDictionary = new Dictionary<TKey, TValue>()); }
+        }
+        
+        private IDictionary<TKey, TValue> enumerableDictionary;
+        private IDictionary<TKey, TValue> EnumerableDictionary
+        {
+            get { return enumerableDictionary ?? (enumerableDictionary = new Dictionary<TKey, TValue>()); }
+        }
+        #endregion Private Properties
 
         #region Constructors
         internal ReliableDictionaryAccess(IReliableStateManager stateManager, string reliableDictioanryName)
@@ -210,10 +216,7 @@ namespace OMS.Common.Cloud.ReliableCollectionHelpers
 
         private void ProcessAddNotification(NotifyDictionaryItemAddedEventArgs<TKey, TValue> e)
         {
-            if(!LocalDictionary.ContainsKey(e.Key))
-            {
-                LocalDictionary.Add(e.Key, e.Value);
-            }    
+            LocalDictionary[e.Key] = e.Value;
         }
 
         private void ProcessUpdateNotification(NotifyDictionaryItemUpdatedEventArgs<TKey, TValue> e)

@@ -47,22 +47,23 @@ namespace OMS.Common.NmsContracts.GDA
 	[DataContract]	
 	public class Property : IComparable
 	{
-		private ICloudLogger logger;
-
-        private ICloudLogger Logger
-        {
-            get { return logger ?? (logger = CloudLoggerFactory.GetLogger()); }
-        }
-
-        /// <summary>
-        /// Code for property of model type 
-        /// </summary>
-        private ModelCode id;
+		/// <summary>
+		/// Code for property of model type 
+		/// </summary>
+		private ModelCode id;
 
 		/// <summary>
 		/// Current value of the property
 		/// </summary>
 		private PropertyValue value;
+
+		#region Private Properties
+		private ICloudLogger logger;
+		private ICloudLogger Logger
+		{
+			get { return logger ?? (logger = CloudLoggerFactory.GetLogger()); }
+		}
+		#endregion Private Properties
 
 		/// <summary>
 		/// Initializes a new instance of the Property class

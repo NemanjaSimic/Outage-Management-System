@@ -18,17 +18,18 @@ namespace NMS.DataModel
 
 	public class IdentifiedObject //: ICloneable
 	{
-		private ICloudLogger logger;
-
-		protected ICloudLogger Logger
-		{
-			get { return logger ?? (logger = CloudLoggerFactory.GetLogger()); }
-		}
-
 		/// <summary>
 		/// Model Resources Description
 		/// </summary>
 		private static ModelResourcesDesc resourcesDescs = new ModelResourcesDesc();
+
+		#region Private Properties
+		private ICloudLogger logger;
+		protected ICloudLogger Logger
+		{
+			get { return logger ?? (logger = CloudLoggerFactory.GetLogger()); }
+		}
+		#endregion Private Properties
 
         #region Fields
         /// <summary>
@@ -51,7 +52,6 @@ namespace NMS.DataModel
         /// </summary>
         private string description = string.Empty;
         #endregion
-
 
         /// <summary>
         /// Initializes a new instance of the IdentifiedObject class.

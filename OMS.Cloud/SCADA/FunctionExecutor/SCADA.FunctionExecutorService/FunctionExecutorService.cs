@@ -23,20 +23,22 @@ namespace SCADA.FunctionExecutorService
     /// </summary>
     internal sealed class FunctionExecutorService : StatelessService
     {
-        private readonly string baseLoggString;
-        private readonly ICloudLogger logger;
-
+        private readonly string baseLogString;
         private readonly ReadCommandEnqueuer readCommandEnqueuer;
         private readonly WriteCommandEnqueuer writeCommandEnqueuer;
         private readonly ModelUpdateCommandEnqueuer modelUpdateCommandEnqueuer;
 
+        private ICloudLogger logger;
+        private ICloudLogger Logger
+        {
+            get { return logger ?? (logger = CloudLoggerFactory.GetLogger()); }
+        }
+
         public FunctionExecutorService(StatelessServiceContext context)
             : base(context)
         {
-            this.baseLoggString = $"{typeof(FunctionExecutorService)} [{this.GetHashCode()}] =>";
-
-            this.logger = CloudLoggerFactory.GetLogger();
-            logger.LogDebug($"{baseLoggString} Ctor => Logger initialized");
+            this.baseLogString = $"{this.GetType()} [{this.GetHashCode()}] =>";
+            Logger.LogDebug($"{baseLogString} Ctor => Logger initialized");
 
             try
             {
@@ -44,14 +46,14 @@ namespace SCADA.FunctionExecutorService
                 this.writeCommandEnqueuer = new WriteCommandEnqueuer();
                 this.modelUpdateCommandEnqueuer = new ModelUpdateCommandEnqueuer();
 
-                string message = $"{baseLoggString} Ctor => Contract providers initialized.";
-                logger.LogInformation(message);
-                ServiceEventSource.Current.ServiceMessage(this.Context, $"[FunctionExecutorService | Information] {message}");
+                string infoMessage = $"{baseLogString} Ctor => Contract providers initialized.";
+                Logger.LogInformation(infoMessage);
+                ServiceEventSource.Current.ServiceMessage(this.Context, $"[FunctionExecutorService | Information] {infoMessage}");
             }
             catch (Exception e)
             {
-                string errorMessage = $"{baseLoggString} Ctor => exception {e.Message}";
-                logger.LogError(errorMessage, e);
+                string errorMessage = $"{baseLogString} Ctor => exception {e.Message}";
+                Logger.LogError(errorMessage, e);
                 ServiceEventSource.Current.ServiceMessage(this.Context, $"[FunctionExecutorService | Error] {errorMessage}");
             }
         }
@@ -112,14 +114,14 @@ namespace SCADA.FunctionExecutorService
                 ScadaModelReadAccessClient readAccessClient = ScadaModelReadAccessClient.CreateClient();
                 configData = await readAccessClient.GetScadaConfigData();
 
-                string message = $"{baseLoggString} RunAsync => FunctionExecutorCycle initialized.";
-                logger.LogInformation(message);
-                ServiceEventSource.Current.ServiceMessage(this.Context, $"[FunctionExecutorService | Information] {message}");
+                string infoMessage = $"{baseLogString} RunAsync => FunctionExecutorCycle initialized.";
+                Logger.LogInformation(infoMessage);
+                ServiceEventSource.Current.ServiceMessage(this.Context, $"[FunctionExecutorService | Information] {infoMessage}");
             }
             catch (Exception e)
             {
-                string errorMessage = $"{baseLoggString} RunAsync => exception {e.Message}";
-                logger.LogError(errorMessage, e);
+                string errorMessage = $"{baseLogString} RunAsync => exception {e.Message}";
+                Logger.LogError(errorMessage, e);
                 ServiceEventSource.Current.ServiceMessage(this.Context, $"[FunctionExecutorService | Error] {errorMessage}");
                 throw e;
             }
@@ -132,14 +134,14 @@ namespace SCADA.FunctionExecutorService
                 {
                     await functionExecutorCycle.Start();
 
-                    string message = $"{baseLoggString} RunAsync => FunctionExecutorCycle executed.";
-                    logger.LogVerbose(message);
+                    string verboseMessage = $"{baseLogString} RunAsync => FunctionExecutorCycle executed.";
+                    Logger.LogVerbose(verboseMessage);
                     //ServiceEventSource.Current.ServiceMessage(this.Context, $"[FunctionExecutorService | Information] {message}");
                 }
                 catch (Exception e)
                 {
-                    string errorMessage = $"{baseLoggString} RunAsync => exception {e.Message}";
-                    logger.LogError(errorMessage, e);
+                    string errorMessage = $"{baseLogString} RunAsync => exception {e.Message}";
+                    Logger.LogError(errorMessage, e);
                     ServiceEventSource.Current.ServiceMessage(this.Context, $"[FunctionExecutorService | Error] {errorMessage}");
                 }
 

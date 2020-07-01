@@ -14,15 +14,17 @@ namespace Outage.DataImporter.CIMAdapter.Manager
 	/// </summary>
 	public class ProfileManager
     {
+        public const string Namespace = "Outage";
+        public const string ProductName = "NetworkModelService";
+
+        #region Private Properties
         private static ICloudLogger logger;
 
         protected static ICloudLogger Logger
         {
             get { return logger ?? (logger = CloudLoggerFactory.GetLogger()); }
         }
-
-        public const string Namespace = "Outage";
-        public const string ProductName = "NetworkModelService";
+        #endregion Private Properties
 
         /// <summary>
         /// Method returns the name of CIM profile based on the defined enumeration.

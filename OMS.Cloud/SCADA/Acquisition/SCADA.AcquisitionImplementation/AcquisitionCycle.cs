@@ -12,22 +12,23 @@ namespace SCADA.AcquisitionImplementation
 {
     public class AcquisitionCycle
     {
-        private readonly string baseLoggString;
+        private readonly string baseLogString;
         private readonly ServiceContext context;
 
         private ReadCommandEnqueuerClient commandEnqueuerClient;
         private ScadaModelReadAccessClient readAccessClient;
 
+        #region Private Properties
         private ICloudLogger logger;
-
         private ICloudLogger Logger
         {
             get { return logger ?? (logger = CloudLoggerFactory.GetLogger()); }
         }
+        #endregion Private Properties
 
         public AcquisitionCycle(ServiceContext context)
         {
-            this.baseLoggString = $"{typeof(AcquisitionCycle)} [{this.GetHashCode()}] =>";
+            this.baseLogString = $"{this.GetType()} [{this.GetHashCode()}] =>";
             this.context = context;
 
             this.commandEnqueuerClient = ReadCommandEnqueuerClient.CreateClient();
@@ -37,35 +38,40 @@ namespace SCADA.AcquisitionImplementation
         public async Task Start(bool isRetry = false)
         {
             string isRetryString = isRetry ? "yes" : "no";
-            string verboseMessage = $"{baseLoggString} entering Start method, isRetry: {isRetryString}.";
+            string verboseMessage = $"{baseLogString} entering Start method, isRetry: {isRetryString}.";
             Logger.LogVerbose(verboseMessage);
 
             try
             {
-                verboseMessage = $"{baseLoggString} Start => Trying to get AddressToGidMap.";
+                verboseMessage = $"{baseLogString} Start => Trying to get AddressToGidMap.";
                 Logger.LogVerbose(verboseMessage);
 
                 Dictionary<short, Dictionary<ushort, long>> addressToGidMap = await this.readAccessClient.GetAddressToGidMap();
 
-                verboseMessage = $"{baseLoggString} Start => AddressToGidMap received, Count: {addressToGidMap.Count}.";
+                verboseMessage = $"{baseLogString} Start => AddressToGidMap received, Count: {addressToGidMap.Count}.";
                 Logger.LogVerbose(verboseMessage);
 
                 foreach (var kvp in addressToGidMap)
                 {
-                    verboseMessage = $"{baseLoggString} Start => AddressToGidMap value for key {kvp.Key} is dictionary with Count: {kvp.Value.Count}.";
+                    if((PointType)kvp.Key == PointType.HR_LONG)
+                    {
+                        continue;
+                    }
+
+                    verboseMessage = $"{baseLogString} Start => AddressToGidMap value for key {kvp.Key} is dictionary with Count: {kvp.Value.Count}.";
                     Logger.LogVerbose(verboseMessage);
 
                     if (TryCreateModbusFunction(kvp, out IReadModbusFunction modbusFunction))
                     {
                         await commandEnqueuerClient.EnqueueReadCommand(modbusFunction);
-                        verboseMessage = $"{baseLoggString} Start => Modbus function enquided. Point type is {kvp.Key}, FunctionCode: {modbusFunction.FunctionCode}, StartAddress: {modbusFunction.StartAddress}, Quantity: {modbusFunction.Quantity}.";
+                        verboseMessage = $"{baseLogString} Start => Modbus function enquided. Point type is {kvp.Key}, FunctionCode: {modbusFunction.FunctionCode}, StartAddress: {modbusFunction.StartAddress}, Quantity: {modbusFunction.Quantity}.";
                         Logger.LogVerbose(verboseMessage);
                     }
                 }
             }
             catch(CommunicationObjectFaultedException e)
             {
-                string message = $"{baseLoggString} Start => CommunicationObjectFaultedException caught.";
+                string message = $"{baseLogString} Start => CommunicationObjectFaultedException caught.";
                 Logger.LogError(message, e);
 
                 this.commandEnqueuerClient = ReadCommandEnqueuerClient.CreateClient();
@@ -75,7 +81,7 @@ namespace SCADA.AcquisitionImplementation
             }
             catch (Exception e)
             {
-                string message = $"{baseLoggString} Start => Exception caught.";
+                string message = $"{baseLogString} Start => Exception caught.";
                 Logger.LogError(message, e);
                 throw e;
             }
@@ -83,7 +89,7 @@ namespace SCADA.AcquisitionImplementation
 
         private bool TryCreateModbusFunction(KeyValuePair<short, Dictionary<ushort, long>> addressToGidMapKvp, out IReadModbusFunction modbusFunction)
         {
-            string verboseMessage = $"{baseLoggString} entering TryCreateModbusFunction method => addressToGidMapKvp(key: {addressToGidMapKvp.Key}, value count: {addressToGidMapKvp.Value.Count}).";
+            string verboseMessage = $"{baseLogString} entering TryCreateModbusFunction method => addressToGidMapKvp(key: {addressToGidMapKvp.Key}, value count: {addressToGidMapKvp.Value.Count}).";
             Logger.LogVerbose(verboseMessage);
 
             modbusFunction = null;
@@ -94,7 +100,7 @@ namespace SCADA.AcquisitionImplementation
             try
             {
                 functionCode = MapPointTypeToModbusFunctionCode(pointType);
-                verboseMessage = $"{baseLoggString} TryCreateModbusFunction => function code mapped: {functionCode}.";
+                verboseMessage = $"{baseLogString} TryCreateModbusFunction => function code mapped: {functionCode}.";
                 Logger.LogVerbose(verboseMessage);
             }
             catch (ArgumentException ae)
@@ -112,7 +118,7 @@ namespace SCADA.AcquisitionImplementation
             }
 
             modbusFunction = new ReadFunction(functionCode, startAddress, quantity);
-            verboseMessage = $"{baseLoggString} TryCreateModbusFunction => ReadFunction with code: {modbusFunction.FunctionCode}, stratring address: {modbusFunction.StartAddress} and quantity: {modbusFunction.Quantity} SUCCESSFULLY created.";
+            verboseMessage = $"{baseLogString} TryCreateModbusFunction => ReadFunction with code: {modbusFunction.FunctionCode}, stratring address: {modbusFunction.StartAddress} and quantity: {modbusFunction.Quantity} SUCCESSFULLY created.";
             Logger.LogVerbose(verboseMessage);
             return true;
         }
@@ -134,7 +140,8 @@ namespace SCADA.AcquisitionImplementation
                     return ModbusFunctionCode.READ_INPUT_REGISTERS;
             }
 
-            string message = $"{baseLoggString} MapPointTypeToModbusFunctionCode => PointType {pointType} is not asociated with any member of {typeof(ModbusFunctionCode)}";
+            string message = $"{baseLogString} MapPointTypeToModbusFunctionCode => PointType {pointType} is not asociated with any member of {typeof(ModbusFunctionCode)}";
+            Logger.LogError(message);
             throw new ArgumentException(message);
         }
     }

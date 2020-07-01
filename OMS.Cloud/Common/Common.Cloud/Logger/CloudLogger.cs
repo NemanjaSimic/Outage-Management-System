@@ -8,8 +8,11 @@ namespace OMS.Common.Cloud.Logger
 {
     internal class CloudLogger : ICloudLogger
     {
+        private const LogEventLevel sharedLogLevel = LogEventLevel.Debug;
+
         private readonly string sourceName;
-        private readonly ILogger serilogLogger;
+        private readonly ILogger sharedSerilogLogger;
+        private readonly ILogger serviceSerilogLogger;
 
         private const string logLevelSettingKey = "logLevelSettingKey";
         private const string logFilePathSettingKey = "logFilePathSettingKey";
@@ -18,20 +21,48 @@ namespace OMS.Common.Cloud.Logger
         {
             this.sourceName = sourceName;
 
-            var logOutputTemplate = "{Timestamp:yyyy-MM-dd HH:mm:ss.fff zzz} [{Level}] {Message}{NewLine}{Exception}";
-            var logFilePath = GetLogFilePath(this.sourceName);
+            var logOutputTemplate = "{NewLine}{NewLine}{NewLine}{Timestamp:yyyy-MM-dd HH:mm:ss.fff} [{Level}]{NewLine}{Message}{NewLine}{Exception}";
+            var sharedLogFilePath = GetSharedLogFilePath();
+            var serviceLogFilePath = GetServiceLogFilePath(this.sourceName);
             var logLevel = GetLogLevel();
 
-            this.serilogLogger = new LoggerConfiguration().WriteTo.RollingFile(pathFormat: logFilePath,
-                                                                               restrictedToMinimumLevel: logLevel,
-                                                                               outputTemplate: logOutputTemplate,
-                                                                               retainedFileCountLimit: null,
-                                                                               fileSizeLimitBytes: 52430000, //50 MiB
-                                                                               shared: true).CreateLogger();
+            this.sharedSerilogLogger = new LoggerConfiguration().WriteTo.RollingFile(pathFormat: sharedLogFilePath,
+                                                                                     restrictedToMinimumLevel: sharedLogLevel,
+                                                                                     outputTemplate: logOutputTemplate,
+                                                                                     retainedFileCountLimit: null,
+                                                                                     fileSizeLimitBytes: 52430000, //50 MiB
+                                                                                     shared: true).CreateLogger();
+
+            this.serviceSerilogLogger = new LoggerConfiguration().WriteTo.RollingFile(pathFormat: serviceLogFilePath,
+                                                                                      restrictedToMinimumLevel: logLevel,
+                                                                                      outputTemplate: logOutputTemplate,
+                                                                                      retainedFileCountLimit: null,
+                                                                                      fileSizeLimitBytes: 52430000, //50 MiB
+                                                                                      shared: false).CreateLogger();
         }
 
         //ako se putanjom cilja fajl unutar C: direktorijuma
-        private string GetLogFilePath(string sourceName)
+        private string GetSharedLogFilePath()
+        {
+            //ako se sloution nalazi unutar C: direktorijuma nista se nece desiti
+            //TOOD: testirati sa solutionom prekopiranim u neki drugi direktorijum
+            string logFilePath = $@"..\..\..\..\..\..\LogFiles\SharedLogFile.txt";
+
+            if (ConfigurationManager.AppSettings[logFilePathSettingKey] is string)
+            {
+                string baseDirectory = ConfigurationManager.AppSettings[logFilePathSettingKey];
+
+                if (Directory.Exists(baseDirectory))
+                {
+                    return $@"{baseDirectory}\LogFiles\SharedLogFile.txt";
+                }
+            }
+
+            return logFilePath;
+        }
+
+        //ako se putanjom cilja fajl unutar C: direktorijuma
+        private string GetServiceLogFilePath(string sourceName)
         {
             //ako se sloution nalazi unutar C: direktorijuma nista se nece desiti
             //TOOD: testirati sa solutionom prekopiranim u neki drugi direktorijum
@@ -88,11 +119,13 @@ namespace OMS.Common.Cloud.Logger
         {
             if (e == null)
             {
-                serilogLogger.Verbose(MessageFormat(message));
+                serviceSerilogLogger.Verbose(MessageFormat(message));
+                sharedSerilogLogger.Verbose(MessageFormat(message));
             }
             else
             {
-                serilogLogger.Verbose(e, MessageFormat(message));
+                serviceSerilogLogger. Verbose(e, MessageFormat(message));
+                sharedSerilogLogger.Verbose(e, MessageFormat(message));
             }
         }
 
@@ -100,11 +133,13 @@ namespace OMS.Common.Cloud.Logger
         {
             if (e == null)
             {
-                serilogLogger.Information(MessageFormat(message));
+                serviceSerilogLogger.Information(MessageFormat(message));
+                sharedSerilogLogger.Information(MessageFormat(message));
             }
             else
             {
-                serilogLogger.Information(e, MessageFormat(message));
+                serviceSerilogLogger.Information(e, MessageFormat(message));
+                sharedSerilogLogger.Information(e, MessageFormat(message));
             }
         }
 
@@ -112,11 +147,13 @@ namespace OMS.Common.Cloud.Logger
         {
             if (e == null)
             {
-                serilogLogger.Debug(MessageFormat(message));
+                serviceSerilogLogger.Debug(MessageFormat(message));
+                sharedSerilogLogger.Debug(MessageFormat(message));
             }
             else
             {
-                serilogLogger.Debug(e, MessageFormat(message));
+                serviceSerilogLogger.Debug(e, MessageFormat(message));
+                sharedSerilogLogger.Debug(e, MessageFormat(message));
             }
         }
 
@@ -124,11 +161,13 @@ namespace OMS.Common.Cloud.Logger
         {
             if (e == null)
             {
-                serilogLogger.Warning(MessageFormat(message));
+                serviceSerilogLogger.Warning(MessageFormat(message));
+                sharedSerilogLogger.Warning(MessageFormat(message));
             }
             else
             {
-                serilogLogger.Warning(e, MessageFormat(message));
+                serviceSerilogLogger.Warning(e, MessageFormat(message));
+                sharedSerilogLogger.Warning(e, MessageFormat(message));
             }
         }
 
@@ -136,11 +175,13 @@ namespace OMS.Common.Cloud.Logger
         {
             if (e == null)
             {
-                serilogLogger.Error(MessageFormat(message));
+                serviceSerilogLogger.Error(MessageFormat(message));
+                sharedSerilogLogger.Error(MessageFormat(message));
             }
             else
             {
-                serilogLogger.Error(e, MessageFormat(message));
+                serviceSerilogLogger.Error(e, MessageFormat(message));
+                sharedSerilogLogger.Error(e, MessageFormat(message));
             }
         }
 
@@ -148,11 +189,13 @@ namespace OMS.Common.Cloud.Logger
         {
             if (e == null)
             {
-                serilogLogger.Fatal(MessageFormat(message));
+                serviceSerilogLogger.Fatal(MessageFormat(message));
+                sharedSerilogLogger.Fatal(MessageFormat(message));
             }
             else
             {
-                serilogLogger.Fatal(e, MessageFormat(message));
+                serviceSerilogLogger.Fatal(e, MessageFormat(message));
+                sharedSerilogLogger.Fatal(e, MessageFormat(message));
             }
         }
         #endregion ICloudLogger

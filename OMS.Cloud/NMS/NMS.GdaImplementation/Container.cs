@@ -10,25 +10,20 @@ namespace NMS.GdaImplementation
 {
     public class Container : IEquatable<Container>
     {
-        ICloudLogger logger;
-        ICloudLogger Logger
-        {
-            get { return logger ?? (logger = CloudLoggerFactory.GetLogger()); }
-        }
-
         /// <summary>
         /// The dictionary of entities. Key = GlobaId, Value = Entity
         /// </summary>	
-
         private Dictionary<long, IdentifiedObject> entities = new Dictionary<long, IdentifiedObject>();
 
-        /// <summary>
-        /// Initializes a new instance of the Container class
-        /// </summary>
-        public Container()
+        #region Private Properties
+        private ICloudLogger logger;
+        protected ICloudLogger Logger
         {
+            get { return logger ?? (logger = CloudLoggerFactory.GetLogger()); }
         }
+        #endregion Private Properties
 
+        #region Public Properties
         /// <summary>
         /// Gets or sets dictionary of entities (identified objects) inside container.
         /// </summary>	
@@ -52,6 +47,14 @@ namespace NMS.GdaImplementation
         public bool IsEmpty
         {
             get { return entities.Count == 0; }
+        }
+        #endregion Public Properties
+
+        /// <summary>
+        /// Initializes a new instance of the Container class
+        /// </summary>
+        public Container()
+        {
         }
 
         #region operators

@@ -17,13 +17,6 @@ namespace NMS.GdaImplementation
     public class NetworkModel
     {
         #region Fields
-        private ICloudLogger logger;
-
-        private ICloudLogger Logger
-        {
-            get { return logger ?? (logger = CloudLoggerFactory.GetLogger()); }
-        }
-
         private MongoAccess mongoDb;
         private Delta currentDelta;
 
@@ -34,11 +27,6 @@ namespace NMS.GdaImplementation
 
         private bool isNetworkModelInitialized = false;
         private bool isTransactionInProgress = false;
-
-        /// <summary>
-        /// Dictionary which contains all data: Key - DMSType, Value - Container
-        /// </summary>
-        private Dictionary<DMSType, Container> networkDataModel;
 
         /// <summary>
 		/// Dictionaru which contains all incoming data: Key - DMSType, Value - Container;
@@ -53,7 +41,20 @@ namespace NMS.GdaImplementation
         private Dictionary<DMSType, Container> oldNetworkDataModel;
         #endregion
 
-        #region Properties
+        #region Private Properties
+        private ICloudLogger logger;
+        protected ICloudLogger Logger
+        {
+            get { return logger ?? (logger = CloudLoggerFactory.GetLogger()); }
+        }
+        #endregion Private Properties
+
+        #region Public Properties
+        /// <summary>
+        /// Dictionary which contains all data: Key - DMSType, Value - Container
+        /// </summary>
+        private Dictionary<DMSType, Container> networkDataModel;
+
         /// <summary>
         /// Dictionary which contains all data: Key - DMSType, Value - Container
         /// </summary>
@@ -274,7 +275,7 @@ namespace NMS.GdaImplementation
 
                 if (updateResult.Result == ResultType.Succeeded)
                 {
-                    string message = "Applying delta to network model successfully finished.";
+                    string message = "Applying delta to network model SUCCESSFULLY finished.";
                     Logger.LogInformation(message);
                     updateResult.Message = message;
                 }
@@ -718,7 +719,7 @@ namespace NMS.GdaImplementation
                     }
                 }
 
-                Logger.LogInformation($"Inserting entity with GID: 0x{globalId:X16} successfully finished.");
+                Logger.LogInformation($"Inserting entity with GID: 0x{globalId:X16} SUCCESSFULLY finished.");
             }
             catch (Exception ex)
             {
@@ -872,7 +873,7 @@ namespace NMS.GdaImplementation
                     }
                 }
 
-                Logger.LogInformation($"Updating entity with GID: 0x{globalId:X16} successfully finished.");
+                Logger.LogInformation($"Updating entity with GID: 0x{globalId:X16} SUCCESSFULLY finished.");
             }
             catch (Exception ex)
             {
@@ -1012,7 +1013,7 @@ namespace NMS.GdaImplementation
 
                 // remove entity form netowrk model
                 incomingContainer.RemoveEntity(globalId);
-                Logger.LogInformation($"Deleting entity with GID: 0x{globalId:X16} successfully finished.");
+                Logger.LogInformation($"Deleting entity with GID: 0x{globalId:X16} SUCCESSFULLY finished.");
             }
             catch (Exception ex)
             {

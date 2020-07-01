@@ -13,19 +13,21 @@ namespace OMS.Common.WcfClient
 {
     public class WcfSeviceFabricClientBase<TContract> : ServicePartitionClient<WcfCommunicationClient<TContract>> where TContract : class, IService
     {
-        private readonly string baseLoggString;
-        private readonly int maxTryCount = 30;
+        private const int maxTryCount = 30;
+        private readonly string baseLogString;
 
+        #region Private Properties
         private ICloudLogger logger;
-        protected ICloudLogger Logger
+        private ICloudLogger Logger
         {
             get { return logger ?? (logger = CloudLoggerFactory.GetLogger()); }
         }
+        #endregion Private Properties
 
         public WcfSeviceFabricClientBase(WcfCommunicationClientFactory<TContract> clientFactory, Uri serviceName, ServicePartitionKey servicePartition, string listenerName)
             : base(clientFactory, serviceName, servicePartition, TargetReplicaSelector.Default, listenerName)
         {
-            this.baseLoggString = $"{typeof(WcfSeviceFabricClientBase<TContract>)} [{this.GetHashCode()}] =>";
+            this.baseLogString = $"{this.GetType()} [{this.GetHashCode()}] =>";
         }
 
         /// <summary>
@@ -37,12 +39,12 @@ namespace OMS.Common.WcfClient
         protected Task MethodWrapperAsync(string methodName, object[] passedParameters)
         {
             int objectId = this.GetHashCode();
-            string debugMessage = $"{baseLoggString} MethodWrapperAsync method called => MethodName: {methodName}, ReturnType: {typeof(Task)}, passedParameters count: {passedParameters.Length}";
+            string debugMessage = $"{baseLogString} MethodWrapperAsync method called => MethodName: {methodName}, ReturnType: {typeof(Task)}, passedParameters count: {passedParameters.Length}";
             Logger.LogDebug(debugMessage);
 
             return InvokeWithRetryAsync(client =>
             {
-                string varboseMessage = $"{baseLoggString} MethodWrapperAsync => ServicePartitionClient.InvokeWithRetryAsync method called[{objectId}].";
+                string varboseMessage = $"{baseLogString} MethodWrapperAsync => ServicePartitionClient.InvokeWithRetryAsync method called[{objectId}].";
                 Logger.LogVerbose(varboseMessage);
 
                 var type = typeof(TContract);
@@ -57,7 +59,7 @@ namespace OMS.Common.WcfClient
 
                     if (method.ReturnType != typeof(Task))
                     {
-                        string errMessage = $"{baseLoggString} MethodWrapperAsync => Method with name '{methodName}' has ReturnType: {method.ReturnType}, but {typeof(Task)} was expected.";
+                        string errMessage = $"{baseLogString} MethodWrapperAsync => Method with name '{methodName}' has ReturnType: {method.ReturnType}, but {typeof(Task)} was expected.";
                         Logger.LogError(errMessage);
                         throw new Exception(errMessage);
                     }
@@ -67,7 +69,7 @@ namespace OMS.Common.WcfClient
                     return InvokeMethodAsync(method, client.Channel, passedParameters);
                 }
 
-                string message = $"{baseLoggString} MethodWrapperAsync => {type} does not contain method with name '{methodName}'.";
+                string message = $"{baseLogString} MethodWrapperAsync => {type} does not contain method with name '{methodName}'.";
                 Logger.LogError(message);
                 throw new Exception(message);
             });
@@ -81,12 +83,12 @@ namespace OMS.Common.WcfClient
         /// <returns>Vraca objekat koji predstavlja resultat inovk-ovane metode.</returns>
         protected Task<TResult> MethodWrapperAsync<TResult>(string methodName, object[] passedParameters)
         {
-            string debugMessage = $"{baseLoggString} MethodWrapperAsync<{typeof(TResult)}> method called => MethodName: {methodName}, ReturnType: {typeof(Task<TResult>)}, passedParameters count: {passedParameters.Length}";
+            string debugMessage = $"{baseLogString} MethodWrapperAsync<{typeof(TResult)}> method called => MethodName: {methodName}, ReturnType: {typeof(Task<TResult>)}, passedParameters count: {passedParameters.Length}";
             Logger.LogDebug(debugMessage);
 
             return InvokeWithRetryAsync(client =>
             {
-                string varboseMessage = $"{baseLoggString} MethodWrapperAsync<{typeof(TResult)}> => InvokeWithRetryAsync method called.";
+                string varboseMessage = $"{baseLogString} MethodWrapperAsync<{typeof(TResult)}> => InvokeWithRetryAsync method called.";
                 Logger.LogVerbose(varboseMessage);
                 
                 var type = typeof(TContract);
@@ -102,7 +104,7 @@ namespace OMS.Common.WcfClient
 
                     if(passedReturenType != method.ReturnType)
                     {
-                        string errMessage = $"{baseLoggString} MethodWrapperAsync<{typeof(TResult)}> =>  Passed return type: {passedReturenType} does not match return type of method with name '{methodName}' [ReturnType: {method.ReturnType}].";
+                        string errMessage = $"{baseLogString} MethodWrapperAsync<{typeof(TResult)}> =>  Passed return type: {passedReturenType} does not match return type of method with name '{methodName}' [ReturnType: {method.ReturnType}].";
                         Logger.LogError(errMessage);
                         throw new Exception(errMessage);
                     }
@@ -112,7 +114,7 @@ namespace OMS.Common.WcfClient
                     return InvokeMethodAsync<TResult>(method, client.Channel, passedParameters);
                 }
 
-                string message = $"{baseLoggString} MethodWrapperAsync<{typeof(TResult)}> => {type} does not contain method with name '{methodName}'.";
+                string message = $"{baseLogString} MethodWrapperAsync<{typeof(TResult)}> => {type} does not contain method with name '{methodName}'.";
                 Logger.LogError(message);
                 throw new Exception(message);
 
@@ -121,14 +123,14 @@ namespace OMS.Common.WcfClient
 
         protected void CheckArgumentsValidity(MethodInfo method, object[] passedParameters)
         {
-            string varboseMessage = $"{baseLoggString} CheckArgumentsValidity method called => MethodName: {method.Name}, PassedParameters count: {passedParameters.Length}.";
+            string varboseMessage = $"{baseLogString} CheckArgumentsValidity method called => MethodName: {method.Name}, PassedParameters count: {passedParameters.Length}.";
             Logger.LogVerbose(varboseMessage);
 
             var paramsInfo = method.GetParameters();
 
             if (passedParameters.Length != paramsInfo.Length)
             {
-                string errorMessage = $"{baseLoggString} CheckArgumentsValidity => Trying to invoke method {method.Name} that has {paramsInfo.Length} parameters - but passing {passedParameters.Length} parameters";
+                string errorMessage = $"{baseLogString} CheckArgumentsValidity => Trying to invoke method {method.Name} that has {paramsInfo.Length} parameters - but passing {passedParameters.Length} parameters";
                 Logger.LogError(errorMessage);
                 throw new TargetParameterCountException(errorMessage);
             }
@@ -146,13 +148,13 @@ namespace OMS.Common.WcfClient
                     passedParam = Type.Missing; //sets the mechanism that acquires the default value
                     passedParameters[i] = passedParam;
                     
-                    varboseMessage = $"{baseLoggString} CheckArgumentsValidity => {Type.Missing} value assigned to non-nullable type parameter '{paramInfoType.Name}' that has default value defined.";
+                    varboseMessage = $"{baseLogString} CheckArgumentsValidity => {Type.Missing} value assigned to non-nullable type parameter '{paramInfoType.Name}' that has default value defined.";
                     Logger.LogVerbose(varboseMessage);
                 }
                 //type not nullable and method does not have default value
                 else if (passedParam == null && (Nullable.GetUnderlyingType(paramInfoType) == null) && !paramInfo.HasDefaultValue)
                 {
-                    string errorMessage = $"{baseLoggString} CheckArgumentsValidity => Trying to invoke method {method.Name} by passing null for not nullable paramter => type {paramInfoType}";
+                    string errorMessage = $"{baseLogString} CheckArgumentsValidity => Trying to invoke method {method.Name} by passing null for not nullable paramter => type {paramInfoType}";
                     Logger.LogError(errorMessage);
                     throw new Exception(errorMessage);
                 }
@@ -161,13 +163,13 @@ namespace OMS.Common.WcfClient
 
                 if (!paramInfoType.IsAssignableFrom(passedParamType) && passedParamType != Type.Missing.GetType())
                 {
-                    string errorMessage = $"{baseLoggString} CheckArgumentsValidity => Trying to invoke method {method.Name} with invalid type of paramters => type {passedParamType} instead of expected {paramInfoType}";
+                    string errorMessage = $"{baseLogString} CheckArgumentsValidity => Trying to invoke method {method.Name} with invalid type of paramters => type {passedParamType} instead of expected {paramInfoType}";
                     Logger.LogError(errorMessage);
                     throw new Exception(errorMessage);
                 }
             }
 
-            varboseMessage = $"{baseLoggString} CheckArgumentsValidity => All passed parameters are valid.";
+            varboseMessage = $"{baseLogString} CheckArgumentsValidity => All passed parameters are valid.";
             Logger.LogVerbose(varboseMessage);
         }
 
@@ -179,17 +181,18 @@ namespace OMS.Common.WcfClient
             {
                 try
                 {
-                    string debugMessage = $"{baseLoggString} InvokeMethodAsync => Invoking method '{method.Name}'.";
+                    string debugMessage = $"{baseLogString} InvokeMethodAsync => Invoking method '{method.Name}'.";
                     Logger.LogDebug(debugMessage);
 
                     method.Invoke(obj, parameters);
                     
-                    debugMessage = $"{baseLoggString} InvokeMethodAsync => Method '{method.Name}' invoked successfully.";
+                    debugMessage = $"{baseLogString} InvokeMethodAsync => Method '{method.Name}' invoked successfully.";
                     Logger.LogDebug(debugMessage);
+                    return;
                 }
                 catch (FabricNotReadableException fnre)
                 {
-                    string message = $"{baseLoggString} InvokeMethodAsync => FabricNotReadableException caught while invoking {method.Name} method. RetryCount: {tryCount}";
+                    string message = $"{baseLogString} InvokeMethodAsync => FabricNotReadableException caught while invoking {method.Name} method. RetryCount: {tryCount}";
                     Logger.LogDebug(message);
 
                     if (++tryCount < maxTryCount)
@@ -199,7 +202,7 @@ namespace OMS.Common.WcfClient
                     }
                     else
                     {
-                        message = $"{baseLoggString} InvokeMethodAsync => FabricNotReadableException re-throwen after {maxTryCount} retries. See the inner exception for more details.";
+                        message = $"{baseLogString} InvokeMethodAsync => FabricNotReadableException re-throwen after {maxTryCount} retries. See the inner exception for more details.";
                         Logger.LogError(message, fnre);
                         throw new Exception(message, fnre);
                     }
@@ -208,14 +211,14 @@ namespace OMS.Common.WcfClient
                 {
                     if (e.InnerException is CommunicationObjectFaultedException communicationException)
                     {
-                        string message = $"{baseLoggString} InvokeMethodAsync => CommunicationObjectFaultedException caught.";
+                        string message = $"{baseLogString} InvokeMethodAsync => CommunicationObjectFaultedException caught.";
                         Logger.LogError(message, communicationException);
-                        throw communicationException;
+                        //throw communicationException;
                     }
                 }
                 catch (Exception e)
                 {
-                    string message = "{baseLoggString} InvokeMethodAsync => exception caught.";
+                    string message = "{baseLogString} InvokeMethodAsync => exception caught.";
                     Logger.LogError(message, e);
                     throw e;
                 }
@@ -230,19 +233,19 @@ namespace OMS.Common.WcfClient
             {
                 try
                 {
-                    string debugMessage = $"{baseLoggString} InvokeMethodAsync<{typeof(TResult)}> => Invoking method '{method.Name}'.";
+                    string debugMessage = $"{baseLogString} InvokeMethodAsync<{typeof(TResult)}> => Invoking method '{method.Name}'.";
                     Logger.LogDebug(debugMessage);
 
                     var task = (Task<TResult>)method.Invoke(obj, parameters);
 
-                    debugMessage = $"{baseLoggString} InvokeMethodAsync<{typeof(TResult)}> => Method '{method.Name}' invoked successfully.";
+                    debugMessage = $"{baseLogString} InvokeMethodAsync<{typeof(TResult)}> => Method '{method.Name}' invoked successfully.";
                     Logger.LogDebug(debugMessage);
 
                     return task;
                 }
                 catch (FabricNotReadableException fnre)
                 {
-                    string message = $"{baseLoggString} InvokeMethodAsync<{typeof(TResult)}> => FabricNotReadableException caught while invoking {method.Name} method. RetryCount: {tryCount}";
+                    string message = $"{baseLogString} InvokeMethodAsync<{typeof(TResult)}> => FabricNotReadableException caught while invoking {method.Name} method. RetryCount: {tryCount}";
                     Logger.LogDebug(message);
 
                     if (++tryCount < maxTryCount)
@@ -252,23 +255,23 @@ namespace OMS.Common.WcfClient
                     }
                     else
                     {
-                        message = $"{baseLoggString} InvokeMethodAsync<{typeof(TResult)}> => FabricNotReadableException re-throwen after {maxTryCount} retries. See the inner exception for more details.";
+                        message = $"{baseLogString} InvokeMethodAsync<{typeof(TResult)}> => FabricNotReadableException re-throwen after {maxTryCount} retries. See the inner exception for more details.";
                         Logger.LogError(message, fnre);
                         throw new Exception(message, fnre);
                     }
                 }
                 catch (TargetInvocationException e)
                 {
-                    if(e.InnerException is CommunicationObjectFaultedException communicationException)
+                    if (e.InnerException is CommunicationObjectFaultedException communicationException)
                     {
-                        string message = $"{baseLoggString} InvokeMethodAsync<{typeof(TResult)}> => CommunicationObjectFaultedException caught.";
+                        string message = $"{baseLogString} InvokeMethodAsync<{typeof(TResult)}> => CommunicationObjectFaultedException caught.";
                         Logger.LogError(message, communicationException);
-                        throw communicationException;
+                        //throw communicationException;
                     }
                 }
                 catch (Exception e)
                 {
-                    string message = $"{baseLoggString} InvokeMethodAsync<{typeof(TResult)}> => exception caught.";
+                    string message = $"{baseLogString} InvokeMethodAsync<{typeof(TResult)}> => exception caught.";
                     Logger.LogError(message, e);
                     throw e;
                 }
