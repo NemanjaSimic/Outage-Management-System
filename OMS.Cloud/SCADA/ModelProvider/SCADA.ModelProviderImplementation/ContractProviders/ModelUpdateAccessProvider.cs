@@ -45,43 +45,31 @@ namespace SCADA.ModelProviderImplementation.ContractProviders
         private ReliableDictionaryAccess<long, IScadaModelPointItem> gidToPointItemMap;
         private ReliableDictionaryAccess<long, IScadaModelPointItem> GidToPointItemMap
         {
-            get
-            {
-                return gidToPointItemMap ?? (gidToPointItemMap = ReliableDictionaryAccess<long, IScadaModelPointItem>.Create(stateManager, ReliableDictionaryNames.GidToPointItemMap).Result);
-            }
+            get { return gidToPointItemMap; }
         }
 
         private ReliableDictionaryAccess<long, ModbusData> measurementsCache;
         private ReliableDictionaryAccess<long, ModbusData> MeasurementsCache
         {
-            get
-            {
-                return measurementsCache ?? (measurementsCache = ReliableDictionaryAccess<long, ModbusData>.Create(stateManager, ReliableDictionaryNames.MeasurementsCache).Result);
-            }
+            get { return measurementsCache; }
         }
 
         private ReliableDictionaryAccess<long, CommandDescription> commandDescriptionCache;
         private ReliableDictionaryAccess<long, CommandDescription> CommandDescriptionCache
         {
-            get
-            {
-                return commandDescriptionCache ?? (commandDescriptionCache = ReliableDictionaryAccess<long, CommandDescription>.Create(stateManager, ReliableDictionaryNames.CommandDescriptionCache).Result);
-            }
+            get { return commandDescriptionCache; }
         }
 
         private ReliableDictionaryAccess<string, bool> infoCache;
         private ReliableDictionaryAccess<string, bool> InfoCache
         {
-            get
-            {
-                return infoCache ?? (infoCache = ReliableDictionaryAccess<string, bool>.Create(stateManager, ReliableDictionaryNames.InfoCache).Result);
-            }
+            get { return infoCache; }
         }
         #endregion Private Propetires
 
         public ModelUpdateAccessProvider(IReliableStateManager stateManager)
         {
-            this.baseLogString = $"{this.GetType()} [{this.GetHashCode()}] =>";
+            this.baseLogString = $"{this.GetType()} [{this.GetHashCode()}] =>{Environment.NewLine}";
 
             this.stateManager = stateManager;
             stateManager.StateManagerChanged += this.OnStateManagerChangedHandler;
@@ -152,15 +140,16 @@ namespace SCADA.ModelProviderImplementation.ContractProviders
             }
 
             string key = "IsScadaModelImported";
-            if (!InfoCache.ContainsKey(key))
+            if (!await InfoCache.ContainsKeyAsync(key))
             {
-                InfoCache[key] = false;
+                await InfoCache.SetAsync(key, false);
             }
 
-            verboseMessage = $"{baseLogString} GetIsScadaModelImportedIndicator => returning value: {InfoCache[key]}.";
+            bool isScadaModelImported = (await InfoCache.TryGetValueAsync(key)).Value;
+            verboseMessage = $"{baseLogString} GetIsScadaModelImportedIndicator => returning value: {isScadaModelImported}.";
             Logger.LogVerbose(verboseMessage);
 
-            return InfoCache[key];
+            return isScadaModelImported;
         }
 
         #region IScadaModelUpdateAccessContract
@@ -193,19 +182,30 @@ namespace SCADA.ModelProviderImplementation.ContractProviders
 
             foreach (long gid in data.Keys)
             {
-                if (!MeasurementsCache.ContainsKey(gid))
+                if (!await MeasurementsCache.ContainsKeyAsync(gid))
                 {
                     Logger.LogDebug($"{baseLogString} MakeAnalogEntryToMeasurementCache => Adding entry to MeasurementCache. Gid: {gid:X16}, Value: {data[gid].Value}, Alarm: {data[gid].Alarm}, CommandOrigin: {data[gid].CommandOrigin}");
 
                     await MeasurementsCache.SetAsync(gid, data[gid]);
                     publicationData[gid] = data[gid];
                 }
-                else if (MeasurementsCache[gid] is AnalogModbusData analogCacheItem && analogCacheItem.Value != data[gid].Value)
+                else
                 {
-                    Logger.LogDebug($"{baseLogString} MakeAnalogEntryToMeasurementCache => Value changed on element with Gid: {analogCacheItem.MeasurementGid:X16}. Old value: {analogCacheItem.Value}, New value: {data[gid].Value}, Alarm: {data[gid].Alarm}, CommandOrigin: {data[gid].CommandOrigin}");
+                    var result = await MeasurementsCache.TryGetValueAsync(gid);
+                    if(!result.HasValue)
+                    {
+                        string errorMessage = $"{baseLogString} MakeAnalogEntryToMeasurementCache => Gid 0x{gid:X16} does not exist in '{ReliableDictionaryNames.MeasurementsCache}'.";
+                        Logger.LogError(errorMessage);
+                        throw new Exception(errorMessage);
+                    }
 
-                    MeasurementsCache[gid] = data[gid];
-                    publicationData[gid] = MeasurementsCache[gid] as AnalogModbusData;
+                    if(result.Value is AnalogModbusData analogCacheItem && analogCacheItem.Value != data[gid].Value)
+                    {
+                        Logger.LogDebug($"{baseLogString} MakeAnalogEntryToMeasurementCache => Value changed on element with Gid: 0x{analogCacheItem.MeasurementGid:X16}. Old value: {analogCacheItem.Value}, New value: {data[gid].Value}, Alarm: {data[gid].Alarm}, CommandOrigin: {data[gid].CommandOrigin}");
+
+                        await MeasurementsCache.SetAsync(gid, data[gid]);
+                        publicationData[gid] = data[gid];
+                    }
                 }
             }
 
@@ -246,19 +246,30 @@ namespace SCADA.ModelProviderImplementation.ContractProviders
 
             foreach (long gid in data.Keys)
             {
-                if (!MeasurementsCache.ContainsKey(gid))
+                if (!await MeasurementsCache.ContainsKeyAsync(gid))
                 {
                     Logger.LogDebug($"{baseLogString} MakeDiscreteEntryToMeasurementCache => Adding entry to MeasurementCache. Gid: {gid:X16}, Value: {data[gid].Value}, Alarm: {data[gid].Alarm}, CommandOrigin: {data[gid].CommandOrigin}");
 
                     await MeasurementsCache.SetAsync(gid, data[gid]);
                     publicationData[gid] = data[gid];
                 }
-                else if (MeasurementsCache[gid] is DiscreteModbusData discreteCacheItem && discreteCacheItem.Value != data[gid].Value)
+                else
                 {
-                    Logger.LogDebug($"{baseLogString} MakeDiscreteEntryToMeasurementCache => Value changed on element with id :{discreteCacheItem.MeasurementGid};. Old value: {discreteCacheItem.Value}; new value: {data[gid].Value}");
+                    var result = await MeasurementsCache.TryGetValueAsync(gid);
+                    if (!result.HasValue)
+                    {
+                        string errorMessage = $"{baseLogString} MakeAnalogEntryToMeasurementCache => Gid 0x{gid:X16} does not exist in '{ReliableDictionaryNames.MeasurementsCache}'.";
+                        Logger.LogError(errorMessage);
+                        throw new Exception(errorMessage);
+                    }
 
-                    MeasurementsCache[gid] = data[gid];
-                    publicationData[gid] = MeasurementsCache[gid] as DiscreteModbusData;
+                    if(result.Value is DiscreteModbusData discreteCacheItem && discreteCacheItem.Value != data[gid].Value)
+                    {
+                        Logger.LogDebug($"{baseLogString} MakeDiscreteEntryToMeasurementCache => Value changed on element with Gid: 0x{discreteCacheItem.MeasurementGid:X16}; Old value: {discreteCacheItem.Value}; new value: {data[gid].Value}");
+
+                        await MeasurementsCache.SetAsync(gid, data[gid]);
+                        publicationData[gid] = data[gid];
+                    }
                 }
             }
 
@@ -281,17 +292,23 @@ namespace SCADA.ModelProviderImplementation.ContractProviders
                 await Task.Delay(1000);
             }
 
-            if (!GidToPointItemMap.ContainsKey(gid))
+            if (!await GidToPointItemMap.ContainsKeyAsync(gid))
             {
                 string message = $"{baseLogString} UpdatePointItemRawValue => Entity with Gid: 0x{gid:X16} does not exist in GidToPointItemMap.";
                 Logger.LogError(message);
                 throw new ArgumentException(message);
             }
 
-            if (GidToPointItemMap[gid] is IAnalogPointItem analogPoint)
+            if ((await GidToPointItemMap.TryGetValueAsync(gid)).Value is IAnalogPointItem analogPoint)
             {
+                if (!analogPoint.Initialized)
+                {
+                    string errorMessage = $"{baseLogString} SendSingleAnalogCommand => PointItem was initialized. Gid: 0x{analogPoint.Gid:X16}, Addres: {analogPoint.Address}, Name: {analogPoint.Name}, RegisterType: {analogPoint.RegisterType}, Initialized: {analogPoint.Initialized}";
+                    Logger.LogError(errorMessage);
+                }
+
                 analogPoint.CurrentEguValue = analogPoint.RawToEguValueConversion(rawValue);
-                await GidToPointItemMap.SetAsync(analogPoint.Gid, analogPoint); //seems redundant, but it sets in motion the update mechanism
+                await GidToPointItemMap.SetAsync(analogPoint.Gid, analogPoint);
 
                 var result = await GidToPointItemMap.TryGetValueAsync(analogPoint.Gid);
 
@@ -306,10 +323,10 @@ namespace SCADA.ModelProviderImplementation.ContractProviders
                     throw new Exception(errorMessage);
                 }
             }
-            else if (GidToPointItemMap[gid] is IDiscretePointItem discretePoint)
+            else if ((await GidToPointItemMap.TryGetValueAsync(gid)).Value is IDiscretePointItem discretePoint)
             {
                 discretePoint.CurrentValue = (ushort)rawValue;
-                await GidToPointItemMap.SetAsync(discretePoint.Gid, discretePoint); //seems redundant, but it sets in motion the update mechanism
+                await GidToPointItemMap.SetAsync(discretePoint.Gid, discretePoint);
 
                 var result = await GidToPointItemMap.TryGetValueAsync(discretePoint.Gid);
 
@@ -343,7 +360,7 @@ namespace SCADA.ModelProviderImplementation.ContractProviders
                 await Task.Delay(1000);
             }
 
-            CommandDescriptionCache[gid] = commandDescription;
+            await CommandDescriptionCache.SetAsync(gid, commandDescription);
         }
 
         public async Task<bool> RemoveCommandDescription(long gid)
@@ -385,28 +402,28 @@ namespace SCADA.ModelProviderImplementation.ContractProviders
                 //todo: different logic on multiple rety?
             }
 
-            StringBuilder sb = new StringBuilder();
-            sb.AppendLine($"{baseLogString} PublishScadaData => MeasurementCache content: ");
+            //StringBuilder sb = new StringBuilder();
+            //sb.AppendLine($"{baseLogString} PublishScadaData => MeasurementCache content: ");
 
-            foreach (long gid in MeasurementsCache.Keys)
-            {
-                IModbusData data = MeasurementsCache[gid];
+            //foreach (long gid in MeasurementsCache.Keys)
+            //{
+            //    IModbusData data = MeasurementsCache.TryGetValueAsync();
 
-                if (data is AnalogModbusData analogModbusData)
-                {
-                    sb.AppendLine($"Analog data line: [gid] 0x{gid:X16}, [value] {analogModbusData.Value}, [alarm] {analogModbusData.Alarm}");
-                }
-                else if (data is DiscreteModbusData discreteModbusData)
-                {
-                    sb.AppendLine($"Discrete data line: [gid] 0x{gid:X16}, [value] {discreteModbusData.Value}, [alarm] {discreteModbusData.Alarm}");
-                }
-                else
-                {
-                    sb.AppendLine($"UNKNOWN data type: {data.GetType()}");
-                }
-            }
+            //    if (data is AnalogModbusData analogModbusData)
+            //    {
+            //        sb.AppendLine($"Analog data line: [gid] 0x{gid:X16}, [value] {analogModbusData.Value}, [alarm] {analogModbusData.Alarm}");
+            //    }
+            //    else if (data is DiscreteModbusData discreteModbusData)
+            //    {
+            //        sb.AppendLine($"Discrete data line: [gid] 0x{gid:X16}, [value] {discreteModbusData.Value}, [alarm] {discreteModbusData.Alarm}");
+            //    }
+            //    else
+            //    {
+            //        sb.AppendLine($"UNKNOWN data type: {data.GetType()}");
+            //    }
+            //}
 
-            Logger.LogDebug(sb.ToString());
+            //Logger.LogDebug(sb.ToString());
         }
         #endregion Private Methods
     }

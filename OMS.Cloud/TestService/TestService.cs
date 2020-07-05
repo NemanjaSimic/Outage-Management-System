@@ -48,7 +48,7 @@ namespace TestService
         public TestService(StatelessServiceContext context)
             : base(context)
         {
-            this.baseLogString = $"{this.GetType()} [{this.GetHashCode()}] =>";
+            this.baseLogString = $"{this.GetType()} [{this.GetHashCode()}] =>{Environment.NewLine}";
             Logger.LogDebug($"{baseLogString} Ctor => Logger initialized");
 
             subscriberUri = new Uri("fabric:/OMS.Cloud/TestService");

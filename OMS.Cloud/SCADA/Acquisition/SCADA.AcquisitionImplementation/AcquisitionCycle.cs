@@ -28,7 +28,7 @@ namespace SCADA.AcquisitionImplementation
 
         public AcquisitionCycle(ServiceContext context)
         {
-            this.baseLogString = $"{this.GetType()} [{this.GetHashCode()}] =>";
+            this.baseLogString = $"{this.GetType()} [{this.GetHashCode()}] =>{Environment.NewLine}";
             this.context = context;
 
             this.commandEnqueuerClient = ReadCommandEnqueuerClient.CreateClient();

@@ -25,7 +25,7 @@ namespace SCADA.ModelProviderImplementation.Data
 
         public ScadaModelPointItemHelper()
         {
-            this.baseLogString = $"{this.GetType()} [{this.GetHashCode()}] =>";
+            this.baseLogString = $"{this.GetType()} [{this.GetHashCode()}] =>{Environment.NewLine}";
         }
 
         public void InitializeScadaModelPointItem(ScadaModelPointItem pointItem, List<Property> props, ModelCode type, EnumDescs enumDescs)

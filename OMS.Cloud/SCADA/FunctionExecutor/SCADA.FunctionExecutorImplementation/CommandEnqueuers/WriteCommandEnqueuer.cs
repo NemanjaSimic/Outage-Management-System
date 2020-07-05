@@ -28,7 +28,7 @@ namespace SCADA.FunctionExecutorImplementation.CommandEnqueuers
 
         public WriteCommandEnqueuer()
         {
-            this.baseLogString = $"{this.GetType()} [{this.GetHashCode()}] =>";
+            this.baseLogString = $"{this.GetType()} [{this.GetHashCode()}] =>{Environment.NewLine}";
 
             string verboseMessage = $"{baseLogString} entering Ctor.";
             Logger.LogVerbose(verboseMessage);

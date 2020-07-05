@@ -14,7 +14,10 @@ namespace OMS.Common.ScadaContracts.DataContracts.ScadaModelPointItems
         public AnalogPointItem(IAlarmConfigData alarmConfigData)
             : base(alarmConfigData)
         {
-            this.baseLogString = $"{this.GetType()} [{this.GetHashCode()}] =>";
+            this.baseLogString = $"{this.GetType()} [{this.GetHashCode()}] =>{Environment.NewLine}";
+
+            ScalingFactor = 1;
+            Deviation = 0;
         }
 
         [DataMember]
@@ -46,6 +49,11 @@ namespace OMS.Common.ScadaContracts.DataContracts.ScadaModelPointItems
         {
             get
             {
+                if(!Initialized)
+                {
+                    return 0;
+                }
+
                 return EguToRawValueConversion(CurrentEguValue);
             }
         }
@@ -55,6 +63,11 @@ namespace OMS.Common.ScadaContracts.DataContracts.ScadaModelPointItems
         {
             get
             {
+                if (!Initialized)
+                {
+                    return 0;
+                }
+
                 return EguToRawValueConversion(CurrentEguValue);
             }
         }
@@ -64,6 +77,11 @@ namespace OMS.Common.ScadaContracts.DataContracts.ScadaModelPointItems
         {
             get
             {
+                if (!Initialized)
+                {
+                    return 0;
+                }
+
                 return EguToRawValueConversion(CurrentEguValue);
             }
         }
@@ -163,6 +181,12 @@ namespace OMS.Common.ScadaContracts.DataContracts.ScadaModelPointItems
 
         public float RawToEguValueConversion(int rawValue)
         {
+            if(!Initialized)
+            {
+                Logger.LogDebug($"{baseLogString} EguToRawValueConversion => Method called before PointItem was initialized. Gid: 0x{Gid:X16}, Addres: {Address}, Name: {Name}, RegisterType: {RegisterType}, Initialized: {Initialized}");
+                return 0;
+            }
+
             float eguValue = ((ScalingFactor * rawValue) + Deviation);
 
             if (eguValue > float.MaxValue || eguValue < float.MinValue)
@@ -175,11 +199,18 @@ namespace OMS.Common.ScadaContracts.DataContracts.ScadaModelPointItems
 
         public int EguToRawValueConversion(float eguValue)
         {
+            if (!Initialized)
+            {
+                Logger.LogDebug($"{baseLogString} EguToRawValueConversion => Method called before PointItem was initialized. Gid: 0x{Gid:X16}, Addres: {Address}, Name: {Name}, RegisterType: {RegisterType}, Initialized: {Initialized}");
+                return 0;
+            }
+
+            //TODO: veoma cudno ponasanje - conditional breakpoint sa uslovom 'ScalingFactor == 0', po zaustavljanju ScalingFactor ima vrednost 1, odustajem razumevanja baga dok ne ispolji zacajnije posledice - donji fix resava slucaj
             if (ScalingFactor == 0)
             {
                 ScalingFactor = 1;
                 //throw new DivideByZeroException($"Scaling factor is zero."); 
-                Logger.LogWarning($"{baseLogString} EguToRawValueConversion => Scaling factor is zero, and set to 1 to prevent throw of DivideByZeroException. Gid: 0x{Gid:X16}, Addres: {Address}, Name: {Name}, RegisterType: {RegisterType}, Initialized: {Initialized}");
+                Logger.LogVerbose($"{baseLogString} EguToRawValueConversion => Scaling factor is zero, and set to 1 to prevent throw of DivideByZeroException. Gid: 0x{Gid:X16}, Addres: {Address}, Name: {Name}, RegisterType: {RegisterType}, Initialized: {Initialized}");
             }
 
             int rawValue = (int)((eguValue - Deviation) / ScalingFactor);

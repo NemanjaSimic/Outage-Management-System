@@ -38,34 +38,25 @@ namespace SCADA.ModelProviderImplementation.ContractProviders
         private ReliableDictionaryAccess<long, IScadaModelPointItem> gidToPointItemMap;
         private ReliableDictionaryAccess<long, IScadaModelPointItem> GidToPointItemMap
         {
-            get
-            {
-                return gidToPointItemMap ?? (gidToPointItemMap = ReliableDictionaryAccess<long, IScadaModelPointItem>.Create(stateManager, ReliableDictionaryNames.GidToPointItemMap).Result);
-            }
+            get { return gidToPointItemMap; }
         }
 
         private ReliableDictionaryAccess<long, CommandDescription> commandDescriptionCache;
         private ReliableDictionaryAccess<long, CommandDescription> CommandDescriptionCache
         {
-            get
-            {
-                return commandDescriptionCache ?? (commandDescriptionCache = ReliableDictionaryAccess<long, CommandDescription>.Create(stateManager, ReliableDictionaryNames.CommandDescriptionCache).Result);
-            }
+            get { return commandDescriptionCache; }
         }
 
         private ReliableDictionaryAccess<string, bool> infoCache;
         private ReliableDictionaryAccess<string, bool> InfoCache
         {
-            get
-            {
-                return infoCache ?? (infoCache = ReliableDictionaryAccess<string, bool>.Create(stateManager, ReliableDictionaryNames.InfoCache).Result);
-            }
+            get { return infoCache; }
         }
         #endregion Private Properties
 
         public IntegrityUpdateProvider(IReliableStateManager stateManager)
         {
-            this.baseLogString = $"{this.GetType()} [{this.GetHashCode()}] =>";
+            this.baseLogString = $"{this.GetType()} [{this.GetHashCode()}] =>{Environment.NewLine}";
 
             this.stateManager = stateManager;
 
@@ -115,6 +106,9 @@ namespace SCADA.ModelProviderImplementation.ContractProviders
 
         private async Task<bool> GetIsScadaModelImportedIndicator()
         {
+            string verboseMessage = $"{baseLogString} entering GetIsScadaModelImportedIndicator method.";
+            Logger.LogVerbose(verboseMessage);
+
             while (!ReliableDictionariesInitialized)
             {
                 //TODO: something smarter
@@ -122,12 +116,16 @@ namespace SCADA.ModelProviderImplementation.ContractProviders
             }
 
             string key = "IsScadaModelImported";
-            if (!InfoCache.ContainsKey(key))
+            if (!await InfoCache.ContainsKeyAsync(key))
             {
-                InfoCache[key] = false;
+                await InfoCache.SetAsync(key, false);
             }
 
-            return InfoCache[key];
+            bool isScadaModelImported = (await InfoCache.TryGetValueAsync(key)).Value;
+            verboseMessage = $"{baseLogString} GetIsScadaModelImportedIndicator => returning value: {isScadaModelImported}.";
+            Logger.LogVerbose(verboseMessage);
+
+            return isScadaModelImported;
         }
 
         #region IScadaIntegrityUpdateContract
@@ -156,25 +154,30 @@ namespace SCADA.ModelProviderImplementation.ContractProviders
             Dictionary<long, AnalogModbusData> analogModbusData = new Dictionary<long, AnalogModbusData>();
             Dictionary<long, DiscreteModbusData> discreteModbusData = new Dictionary<long, DiscreteModbusData>();
 
-            foreach (long gid in GidToPointItemMap.Keys)
+            var enumerableGidToPointItemMap = await GidToPointItemMap.GetEnumerableDictionaryAsync();
+            foreach (long gid in enumerableGidToPointItemMap.Keys)
             {
                 CommandOriginType commandOrigin = CommandOriginType.OTHER_COMMAND;
 
-                if (GidToPointItemMap[gid] is IAnalogPointItem analogPointItem)
+                if (enumerableGidToPointItemMap[gid] is IAnalogPointItem analogPointItem)
                 {
-                    if (CommandDescriptionCache.ContainsKey(gid) && CommandDescriptionCache[gid].Value == analogPointItem.CurrentRawValue)
+                    var result = await CommandDescriptionCache.TryGetValueAsync(gid);
+
+                    if(result.HasValue && result.Value.Value == analogPointItem.CurrentRawValue)
                     {
-                        commandOrigin = CommandDescriptionCache[gid].CommandOrigin;
+                        commandOrigin = result.Value.CommandOrigin;
                     }
 
                     AnalogModbusData analogValue = new AnalogModbusData(analogPointItem.CurrentEguValue, analogPointItem.Alarm, gid, commandOrigin);
                     analogModbusData.Add(gid, analogValue);
                 }
-                else if (GidToPointItemMap[gid] is IDiscretePointItem discretePointItem)
+                else if (enumerableGidToPointItemMap[gid] is IDiscretePointItem discretePointItem)
                 {
-                    if (CommandDescriptionCache.ContainsKey(gid) && CommandDescriptionCache[gid].Value == discretePointItem.CurrentValue)
+                    var result = await CommandDescriptionCache.TryGetValueAsync(gid);
+
+                    if (result.HasValue && result.Value.Value == discretePointItem.CurrentValue)
                     {
-                        commandOrigin = CommandDescriptionCache[gid].CommandOrigin;
+                        commandOrigin = result.Value.CommandOrigin;
                     }
 
                     DiscreteModbusData discreteValue = new DiscreteModbusData(discretePointItem.CurrentValue, discretePointItem.Alarm, gid, commandOrigin);
@@ -222,26 +225,32 @@ namespace SCADA.ModelProviderImplementation.ContractProviders
             Dictionary<long, AnalogModbusData> analogModbusData = new Dictionary<long, AnalogModbusData>();
             Dictionary<long, DiscreteModbusData> discreteModbusData = new Dictionary<long, DiscreteModbusData>();
 
-            foreach (long gid in GidToPointItemMap.Keys)
+            var enumerableGidToPointItemMap = await GidToPointItemMap.GetEnumerableDictionaryAsync();
+            foreach (long gid in enumerableGidToPointItemMap.Keys)
             {
                 CommandOriginType commandOrigin = CommandOriginType.OTHER_COMMAND;
 
-                if (topic == Topic.MEASUREMENT && GidToPointItemMap[gid] is IAnalogPointItem analogPointItem)
+                if (topic == Topic.MEASUREMENT && enumerableGidToPointItemMap[gid] is IAnalogPointItem analogPointItem)
                 {
-                    if (CommandDescriptionCache.ContainsKey(gid) && CommandDescriptionCache[gid].Value == analogPointItem.CurrentRawValue)
+                    var result = await CommandDescriptionCache.TryGetValueAsync(gid);
+
+                    if (result.HasValue && result.Value.Value == analogPointItem.CurrentRawValue)
                     {
-                        commandOrigin = CommandDescriptionCache[gid].CommandOrigin;
+                        commandOrigin = result.Value.CommandOrigin;
                     }
 
                     AnalogModbusData analogValue = new AnalogModbusData(analogPointItem.CurrentEguValue, analogPointItem.Alarm, gid, commandOrigin);
                     analogModbusData.Add(gid, analogValue);
                 }
-                else if (topic == Topic.SWITCH_STATUS && GidToPointItemMap[gid] is IDiscretePointItem discretePointItem)
+                else if (topic == Topic.SWITCH_STATUS && enumerableGidToPointItemMap[gid] is IDiscretePointItem discretePointItem)
                 {
-                    if (CommandDescriptionCache.ContainsKey(gid) && CommandDescriptionCache[gid].Value == discretePointItem.CurrentValue)
+                    var result = await CommandDescriptionCache.TryGetValueAsync(gid);
+
+                    if (result.HasValue && result.Value.Value == discretePointItem.CurrentValue)
                     {
-                        commandOrigin = CommandDescriptionCache[gid].CommandOrigin;
+                        commandOrigin = result.Value.CommandOrigin;
                     }
+
 
                     DiscreteModbusData discreteValue = new DiscreteModbusData(discretePointItem.CurrentValue, discretePointItem.Alarm, gid, commandOrigin);
                     discreteModbusData.Add(gid, discreteValue);

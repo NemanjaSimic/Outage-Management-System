@@ -30,7 +30,7 @@ namespace SCADA.CommandingImplementation
 
         public CommandingProvider()
         {
-            this.baseLogString = $"{this.GetType()} [{this.GetHashCode()}] =>";
+            this.baseLogString = $"{this.GetType()} [{this.GetHashCode()}] =>{Environment.NewLine}";
 
             string verboseMessage = $"{baseLogString} entering Ctor.";
             Logger.LogVerbose(verboseMessage);
@@ -75,6 +75,12 @@ namespace SCADA.CommandingImplementation
 
             try
             {
+                if (!analogPointItem.Initialized)
+                {
+                    string errorMessage = $"{baseLogString} SendSingleAnalogCommand => PointItem was initialized. Gid: 0x{analogPointItem.Gid:X16}, Addres: {analogPointItem.Address}, Name: {analogPointItem.Name}, RegisterType: {analogPointItem.RegisterType}, Initialized: {analogPointItem.Initialized}";
+                    Logger.LogError(errorMessage);
+                }
+
                 //LOGIC
                 int modbusValue = analogPointItem.EguToRawValueConversion(commandingValue);
 
@@ -138,6 +144,12 @@ namespace SCADA.CommandingImplementation
                 }
                 else
                 {
+                    if (!analogPointItem.Initialized)
+                    {
+                        string errorMessage = $"{baseLogString} SendSingleAnalogCommand => PointItem was initialized. Gid: 0x{analogPointItem.Gid:X16}, Addres: {analogPointItem.Address}, Name: {analogPointItem.Name}, RegisterType: {analogPointItem.RegisterType}, Initialized: {analogPointItem.Initialized}";
+                        Logger.LogError(errorMessage);
+                    }
+
                     int commandingValue;
 
                     if (commandingValues.ContainsKey(gid))

@@ -1,4 +1,5 @@
-﻿using System.Collections.Generic;
+﻿using System;
+using System.Collections.Generic;
 using System.Fabric;
 using Microsoft.ServiceFabric.Services.Communication.Runtime;
 using Microsoft.ServiceFabric.Services.Communication.Wcf;
@@ -28,7 +29,7 @@ namespace SCADA.CommandingService
         public CommandingService(StatelessServiceContext context)
             : base(context)
         {
-            this.baseLogString = $"{this.GetType()} [{this.GetHashCode()}] =>";
+            this.baseLogString = $"{this.GetType()} [{this.GetHashCode()}] =>{Environment.NewLine}";
             Logger.LogDebug($"{baseLogString} Ctor => Logger initialized");
 
             this.commandingProvider = new CommandingProvider();

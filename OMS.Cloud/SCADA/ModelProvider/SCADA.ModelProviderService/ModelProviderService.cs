@@ -42,7 +42,7 @@ namespace SCADA.ModelProviderService
         public ModelProviderService(StatefulServiceContext context)
             : base(context)
         {
-            this.baseLogString = $"{this.GetType()} [{this.GetHashCode()}] =>";
+            this.baseLogString = $"{this.GetType()} [{this.GetHashCode()}] =>{Environment.NewLine}";
             Logger.LogDebug($"{baseLogString} Ctor => Logger initialized");
 
             try

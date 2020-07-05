@@ -33,16 +33,13 @@ namespace PubSubImplementation
         private ReliableDictionaryAccess<short, Dictionary<Uri, RegisteredSubscriber>> registeredSubscribersCache;
         private ReliableDictionaryAccess<short, Dictionary<Uri, RegisteredSubscriber>> RegisteredSubscribersCache
         {
-            get
-            {
-                return registeredSubscribersCache ?? (registeredSubscribersCache = ReliableDictionaryAccess<short, Dictionary<Uri, RegisteredSubscriber>>.Create(stateManager, ReliableDictionaryNames.RegisteredSubscribersCache).Result);
-            }
+            get { return registeredSubscribersCache; }
         }
         #endregion Private Properties
 
         public PublisherProvider(IReliableStateManager stateManager)
         {
-            this.baseLogString = $"{this.GetType()} [{this.GetHashCode()}] =>";
+            this.baseLogString = $"{this.GetType()} [{this.GetHashCode()}] =>{Environment.NewLine}";
 
             this.isSubscriberCacheInitialized = false;
 
@@ -82,9 +79,11 @@ namespace PubSubImplementation
             List<Task> tasks = new List<Task>();
             short key = (short)publication.Topic;
 
-            if (RegisteredSubscribersCache.ContainsKey(key))
+            var enumerableSubscribersCache = await RegisteredSubscribersCache.GetEnumerableDictionaryAsync();
+
+            if (enumerableSubscribersCache.ContainsKey(key))
             {
-                var registeredSubscribers = RegisteredSubscribersCache[key];
+                var registeredSubscribers = enumerableSubscribersCache[key];
                 
                 foreach(var subscriber in registeredSubscribers.Values)
                 {

@@ -27,7 +27,7 @@ namespace OMS.Common.WcfClient
         public WcfSeviceFabricClientBase(WcfCommunicationClientFactory<TContract> clientFactory, Uri serviceName, ServicePartitionKey servicePartition, string listenerName)
             : base(clientFactory, serviceName, servicePartition, TargetReplicaSelector.Default, listenerName)
         {
-            this.baseLogString = $"{this.GetType()} [{this.GetHashCode()}] =>";
+            this.baseLogString = $"{this.GetType()} [{this.GetHashCode()}] =>{Environment.NewLine}";
         }
 
         /// <summary>
