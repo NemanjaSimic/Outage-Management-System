@@ -96,6 +96,12 @@
     <Reference Include="Microsoft.ServiceFabric.Diagnostics, Version=7.0.0.0, Culture=neutral, PublicKeyToken=31bf3856ad364e35, processorArchitecture=AMD64">
       <HintPath>..\..\..\packages\Microsoft.ServiceFabric.Diagnostics.Internal.4.0.470\lib\net472\Microsoft.ServiceFabric.Diagnostics.dll</HintPath>
     </Reference>
+    <Reference Include="Microsoft.ServiceFabric.FabricTransport, Version=7.0.0.0, Culture=neutral, PublicKeyToken=31bf3856ad364e35, processorArchitecture=AMD64">
+      <HintPath>..\..\..\packages\Microsoft.ServiceFabric.FabricTransport.Internal.4.0.470\lib\net472\Microsoft.ServiceFabric.FabricTransport.dll</HintPath>
+    </Reference>
+    <Reference Include="Microsoft.ServiceFabric.FabricTransport.V2, Version=7.0.0.0, Culture=neutral, PublicKeyToken=31bf3856ad364e35, processorArchitecture=AMD64">
+      <HintPath>..\..\..\packages\Microsoft.ServiceFabric.FabricTransport.Internal.4.0.470\lib\net472\Microsoft.ServiceFabric.FabricTransport.V2.dll</HintPath>
+    </Reference>
     <Reference Include="Microsoft.ServiceFabric.Internal, Version=7.0.0.0, Culture=neutral, PublicKeyToken=31bf3856ad364e35, processorArchitecture=AMD64">
       <HintPath>..\..\..\packages\Microsoft.ServiceFabric.7.0.470\lib\net472\Microsoft.ServiceFabric.Internal.dll</HintPath>
     </Reference>
@@ -110,6 +116,9 @@
     </Reference>
     <Reference Include="Microsoft.ServiceFabric.Services, Version=6.0.0.0, Culture=neutral, PublicKeyToken=31bf3856ad364e35, processorArchitecture=AMD64">
       <HintPath>..\..\..\packages\Microsoft.ServiceFabric.Services.4.0.470\lib\net472\Microsoft.ServiceFabric.Services.dll</HintPath>
+    </Reference>
+    <Reference Include="Microsoft.ServiceFabric.Services.Remoting, Version=6.0.0.0, Culture=neutral, PublicKeyToken=31bf3856ad364e35, processorArchitecture=AMD64">
+      <HintPath>..\..\..\packages\Microsoft.ServiceFabric.Services.Remoting.4.0.470\lib\net472\Microsoft.ServiceFabric.Services.Remoting.dll</HintPath>
     </Reference>
     <Reference Include="System" />
     <Reference Include="System.Buffers, Version=4.0.2.0, Culture=neutral, PublicKeyToken=cc7b13ffcd2ddd51, processorArchitecture=MSIL">

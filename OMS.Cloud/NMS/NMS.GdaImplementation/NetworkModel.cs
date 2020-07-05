@@ -3,6 +3,7 @@ using NMS.GdaImplementation.GDA;
 using OMS.Common.Cloud;
 using OMS.Common.Cloud.Logger;
 using OMS.Common.Cloud.Names;
+using OMS.Common.DistributedTransactionContracts;
 using OMS.Common.NmsContracts;
 using OMS.Common.NmsContracts.GDA;
 using OMS.Common.WcfClient.TMS;
@@ -473,8 +474,8 @@ namespace NMS.GdaImplementation
         private async Task StartDistributedTransaction(Delta delta)
         {
             isTransactionInProgress = true;
-            
-            TransactionCoordinatorClient transactionCoordinatorClient = TransactionCoordinatorClient.CreateClient();
+
+            ITransactionCoordinatorContract transactionCoordinatorClient = TransactionCoordinatorClient.CreateClient();
 
             if (transactionCoordinatorClient == null)
             {
@@ -511,7 +512,7 @@ namespace NMS.GdaImplementation
             bool success = false;
 
             //TODO: specify actor name...
-            ModelUpdateNotificationClient scadaModelUpdateNotifierClient = ModelUpdateNotificationClient.CreateClient();
+            IModelUpdateNotificationContract scadaModelUpdateNotifierClient = ModelUpdateNotificationClient.CreateClient();
 
             if (scadaModelUpdateNotifierClient == null)
             {
@@ -527,7 +528,7 @@ namespace NMS.GdaImplementation
             if (success)
             {
                 //TODO: specify actor name...
-                ModelUpdateNotificationClient calculationEngineUpdateNotifierClient = ModelUpdateNotificationClient.CreateClient();
+                IModelUpdateNotificationContract calculationEngineUpdateNotifierClient = ModelUpdateNotificationClient.CreateClient();
 
                 if (calculationEngineUpdateNotifierClient == null)
                 {
@@ -542,7 +543,7 @@ namespace NMS.GdaImplementation
                 if (success)
                 {
                     //TODO: specify actor name...
-                    ModelUpdateNotificationClient outageModelUpdateNotifierClient = ModelUpdateNotificationClient.CreateClient();
+                    IModelUpdateNotificationContract outageModelUpdateNotifierClient = ModelUpdateNotificationClient.CreateClient();
 
                     if (outageModelUpdateNotifierClient == null)
                     {
@@ -557,7 +558,7 @@ namespace NMS.GdaImplementation
                     if (success)
                     {
                         //TODO: specify actor name...
-                        TransactionEnlistmentClient transactionEnlistmentClient = TransactionEnlistmentClient.CreateClient();
+                        ITransactionEnlistmentContract transactionEnlistmentClient = TransactionEnlistmentClient.CreateClient();
 
                         if (transactionEnlistmentClient == null)
                         {

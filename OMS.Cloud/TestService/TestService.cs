@@ -12,8 +12,12 @@ using Microsoft.ServiceFabric.Services.Runtime;
 using OMS.Common.Cloud;
 using OMS.Common.Cloud.Logger;
 using OMS.Common.Cloud.Names;
+using OMS.Common.NmsContracts;
 using OMS.Common.PubSubContracts;
 using OMS.Common.PubSubContracts.DataContracts.SCADA;
+using OMS.Common.ScadaContracts.Commanding;
+using OMS.Common.ScadaContracts.FunctionExecutior;
+using OMS.Common.ScadaContracts.ModelProvider;
 using OMS.Common.WcfClient.NMS;
 using OMS.Common.WcfClient.PubSub;
 using OMS.Common.WcfClient.SCADA;
@@ -28,16 +32,16 @@ namespace TestService
     {
         private readonly string baseLogString;
         private readonly Uri subscriberUri;
-        private readonly ReadCommandEnqueuerClient readCommandEnqueuerClient;
-        private readonly WriteCommandEnqueuerClient writeCommandEnqueuerClient;
-        private readonly ModelUpdateCommandEnqueuerClient modelUpdateCommandEnqueuerClient;
-        private readonly ScadaModelReadAccessClient scadaModelReadAccessClient;
-        private readonly ScadaModelUpdateAccessClient scadaModelUpdateAccessClient;
-        private readonly ScadaIntegrityUpdateClient scadaIntegrityUpdateClient;
-        private readonly ScadaCommandingClient scadaCommandingClient;
-        private readonly NetworkModelGdaClient networkModelGdaClient;
-        private readonly RegisterSubscriberClient registerSubscriberClient;
-        private readonly PublisherClient publisherClient;
+        private readonly IReadCommandEnqueuerContract readCommandEnqueuerClient;
+        private readonly IWriteCommandEnqueuerContract writeCommandEnqueuerClient;
+        private readonly IModelUpdateCommandEnqueuerContract modelUpdateCommandEnqueuerClient;
+        private readonly IScadaModelReadAccessContract scadaModelReadAccessClient;
+        private readonly IScadaModelUpdateAccessContract scadaModelUpdateAccessClient;
+        private readonly IScadaIntegrityUpdateContract scadaIntegrityUpdateClient;
+        private readonly IScadaCommandingContract scadaCommandingClient;
+        private readonly INetworkModelGDAContract networkModelGdaClient;
+        private readonly IRegisterSubscriberContract registerSubscriberClient;
+        private readonly IPublisherContract publisherClient;
 
         private ICloudLogger logger;
         private ICloudLogger Logger

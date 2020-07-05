@@ -8,6 +8,7 @@ using OMS.Common.DistributedTransactionContracts;
 using OMS.Common.NmsContracts;
 using OMS.Common.NmsContracts.GDA;
 using OMS.Common.SCADA;
+using OMS.Common.ScadaContracts.Commanding;
 using OMS.Common.ScadaContracts.DataContracts;
 using OMS.Common.ScadaContracts.DataContracts.ScadaModelPointItems;
 using OMS.Common.WcfClient.NMS;
@@ -30,8 +31,8 @@ namespace SCADA.ModelProviderImplementation
         private readonly IReliableStateManager stateManager;
         private readonly ScadaModelPointItemHelper pointItemHelper;
 
-        private NetworkModelGdaClient nmsGdaClient;
-        private ScadaCommandingClient scadaCommandingClient;
+        private INetworkModelGDAContract nmsGdaClient;
+        private IScadaCommandingContract scadaCommandingClient;
 
         #region Private Properties
         private bool isModelImported;

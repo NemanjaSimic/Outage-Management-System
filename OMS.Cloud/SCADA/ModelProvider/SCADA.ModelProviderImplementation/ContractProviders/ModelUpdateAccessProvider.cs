@@ -5,6 +5,7 @@ using OMS.Common.Cloud.Exceptions.SCADA;
 using OMS.Common.Cloud.Logger;
 using OMS.Common.Cloud.ReliableCollectionHelpers;
 using OMS.Common.PubSub;
+using OMS.Common.PubSubContracts;
 using OMS.Common.PubSubContracts.DataContracts.SCADA;
 using OMS.Common.ScadaContracts.DataContracts;
 using OMS.Common.ScadaContracts.DataContracts.ScadaModelPointItems;
@@ -24,7 +25,7 @@ namespace SCADA.ModelProviderImplementation.ContractProviders
         private readonly string baseLogString;
         private readonly IReliableStateManager stateManager;
 
-        private PublisherClient publisherClient;
+        private IPublisherContract publisherClient;
 
         #region Private Propetires
         private bool isGidToPointItemMapInitialized;

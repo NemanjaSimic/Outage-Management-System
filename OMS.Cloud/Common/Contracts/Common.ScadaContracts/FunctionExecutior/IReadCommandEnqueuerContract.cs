@@ -7,12 +7,12 @@ using System.Threading.Tasks;
 namespace OMS.Common.ScadaContracts.FunctionExecutior
 {
     [ServiceContract]
-    public interface IWriteCommandEnqueuer : IService
+    public interface IReadCommandEnqueuerContract : IService
     {
         [OperationContract]
         [ServiceKnownType(typeof(ReadFunction))]
         [ServiceKnownType(typeof(WriteSingleFunction))]
         [ServiceKnownType(typeof(WriteMultipleFunction))]
-        Task<bool> EnqueueWriteCommand(IWriteModbusFunction modbusFunction);
+        Task<bool> EnqueueReadCommand(IReadModbusFunction modbusFunction);
     }
 }

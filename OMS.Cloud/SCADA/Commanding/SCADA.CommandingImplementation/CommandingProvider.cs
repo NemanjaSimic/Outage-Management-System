@@ -10,6 +10,8 @@ using OMS.Common.Cloud.Logger;
 using OMS.Common.Cloud;
 using OMS.Common.Cloud.Exceptions.SCADA;
 using System.ServiceModel;
+using OMS.Common.ScadaContracts.FunctionExecutior;
+using OMS.Common.ScadaContracts.ModelProvider;
 
 namespace SCADA.CommandingImplementation
 {
@@ -17,8 +19,8 @@ namespace SCADA.CommandingImplementation
     {
         private readonly string baseLogString;
 
-        private WriteCommandEnqueuerClient commandEnqueuerClient;
-        private ScadaModelReadAccessClient scadaModelReadAccessClient;
+        private IWriteCommandEnqueuerContract commandEnqueuerClient;
+        private IScadaModelReadAccessContract scadaModelReadAccessClient;
 
         #region Private Properties
         private ICloudLogger logger;

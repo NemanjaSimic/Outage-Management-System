@@ -10,7 +10,7 @@ using System.Threading.Tasks;
 
 namespace SCADA.FunctionExecutorImplementation.CommandEnqueuers
 {
-    public class ModelUpdateCommandEnqueuer : IModelUpdateCommandEnqueuer
+    public class ModelUpdateCommandEnqueuer : IModelUpdateCommandEnqueuerContract
     {
         private readonly string baseLogString;
         private readonly CloudQueue readCommandQueue;
