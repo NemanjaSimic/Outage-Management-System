@@ -250,7 +250,7 @@ namespace OMS.Common.WcfClient
 
                     if (++tryCount < maxTryCount)
                     {
-                        Task.Delay(1000).Wait(); //Tread.Sleep(1000); ?
+                        Task.Delay(1000).Wait(); //TODO: Tread.Sleep(1000); ?
                         continue;
                     }
                     else
