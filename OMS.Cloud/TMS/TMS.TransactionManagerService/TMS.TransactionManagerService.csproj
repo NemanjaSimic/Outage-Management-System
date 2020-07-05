@@ -66,6 +66,9 @@
     <Reference Include="Microsoft.ServiceFabric.Services, Version=6.0.0.0, Culture=neutral, PublicKeyToken=31bf3856ad364e35, processorArchitecture=AMD64">
       <HintPath>..\..\packages\Microsoft.ServiceFabric.Services.4.1.416\lib\net472\Microsoft.ServiceFabric.Services.dll</HintPath>
     </Reference>
+    <Reference Include="Microsoft.ServiceFabric.Services.Wcf">
+      <HintPath>..\..\NMS\NMS.GdaService\bin\x64\Debug\Microsoft.ServiceFabric.Services.Wcf.dll</HintPath>
+    </Reference>
     <Reference Include="System" />
     <Reference Include="System.Core" />
     <Reference Include="System.Fabric, Version=7.0.0.0, Culture=neutral, PublicKeyToken=31bf3856ad364e35, processorArchitecture=AMD64">
@@ -91,6 +94,16 @@
     <None Include="PackageRoot\ServiceManifest.xml" />
     <None Include="App.config" />
     <None Include="packages.config" />
+  </ItemGroup>
+  <ItemGroup>
+    <ProjectReference Include="..\..\Common\Common.Cloud\Common.Cloud.csproj">
+      <Project>{FBEE1369-0F6C-41E6-8C62-8C1C5CDBB602}</Project>
+      <Name>Common.Cloud</Name>
+    </ProjectReference>
+    <ProjectReference Include="..\..\Common\Contracts\Common.DistributedTransactionContracts\Common.DistributedTransactionContracts.csproj">
+      <Project>{A07D94C2-40EF-48DB-B828-7E53E7F5A372}</Project>
+      <Name>Common.DistributedTransactionContracts</Name>
+    </ProjectReference>
   </ItemGroup>
   <Import Project="$(MSBuildToolsPath)\Microsoft.CSharp.targets" />
   <!-- To modify your build process, add your task inside one of the targets below and uncomment it. 

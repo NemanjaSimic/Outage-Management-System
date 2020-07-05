@@ -1,6 +1,8 @@
 ﻿using OMS.Common.Cloud.Logger;
 using OMS.Common.SCADA;
 using OMS.Common.ScadaContracts.DataContracts.ModbusFunctions;
+using OMS.Common.ScadaContracts.FunctionExecutior;
+using OMS.Common.ScadaContracts.ModelProvider;
 using OMS.Common.WcfClient.SCADA;
 using System;
 using System.Collections.Generic;
@@ -15,8 +17,8 @@ namespace SCADA.AcquisitionImplementation
         private readonly string baseLogString;
         private readonly ServiceContext context;
 
-        private ReadCommandEnqueuerClient commandEnqueuerClient;
-        private ScadaModelReadAccessClient readAccessClient;
+        private IReadCommandEnqueuerContract commandEnqueuerClient;
+        private IScadaModelReadAccessContract readAccessClient;
 
         #region Private Properties
         private ICloudLogger logger;

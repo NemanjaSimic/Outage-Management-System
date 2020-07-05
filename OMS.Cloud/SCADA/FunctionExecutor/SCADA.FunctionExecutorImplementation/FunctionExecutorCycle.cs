@@ -10,6 +10,7 @@ using OMS.Common.PubSubContracts.DataContracts.SCADA;
 using OMS.Common.SCADA;
 using OMS.Common.ScadaContracts.DataContracts;
 using OMS.Common.ScadaContracts.DataContracts.ScadaModelPointItems;
+using OMS.Common.ScadaContracts.ModelProvider;
 using OMS.Common.WcfClient.SCADA;
 using System;
 using System.Collections.Generic;
@@ -29,10 +30,8 @@ namespace SCADA.FunctionExecutorImplementation
         private readonly CloudQueue modelUpdateCommandQueue;
 
         private IScadaConfigData configData;
-        //TODO: prebaci sve u kontrakte
-        //private IScadaModelUpdateAccessContract modelUpdateAccessClient;
-        private ScadaModelReadAccessClient modelReadAccessClient;
-        private ScadaModelUpdateAccessClient modelUpdateAccessClient;
+        private IScadaModelReadAccessContract modelReadAccessClient;
+        private IScadaModelUpdateAccessContract modelUpdateAccessClient;
         private ModbusClient modbusClient;
 
         #region Private Properties
@@ -343,8 +342,8 @@ namespace SCADA.FunctionExecutorImplementation
             }
 
             var measurementCache = new Dictionary<long, DiscreteModbusData>(data.Length);
-            
-            ScadaModelReadAccessClient modelReadAccessClient = ScadaModelReadAccessClient.CreateClient();
+
+            IScadaModelReadAccessContract modelReadAccessClient = ScadaModelReadAccessClient.CreateClient();
             var currentSCADAModel = await modelReadAccessClient.GetGidToPointItemMap();
             var currentAddressToGidMap = await modelReadAccessClient.GetAddressToGidMap();
             var commandValuesCache = await modelReadAccessClient.GetCommandDescriptionCache();
@@ -449,7 +448,7 @@ namespace SCADA.FunctionExecutorImplementation
 
             var measurementCache = new Dictionary<long, AnalogModbusData>(data.Length);
 
-            ScadaModelReadAccessClient modelReadAccessClient = ScadaModelReadAccessClient.CreateClient();
+            IScadaModelReadAccessContract modelReadAccessClient = ScadaModelReadAccessClient.CreateClient();
             var gidToPointItemMap = await modelReadAccessClient.GetGidToPointItemMap();
             var addressToGidMap = await modelReadAccessClient.GetAddressToGidMap();
             var commandDescriptionCache = await modelReadAccessClient.GetCommandDescriptionCache();

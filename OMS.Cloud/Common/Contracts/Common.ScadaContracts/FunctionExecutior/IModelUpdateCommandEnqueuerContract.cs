@@ -8,7 +8,7 @@ using System.Threading.Tasks;
 namespace OMS.Common.ScadaContracts.FunctionExecutior
 {
     [ServiceContract]
-    public interface IModelUpdateCommandEnqueuer : IService
+    public interface IModelUpdateCommandEnqueuerContract : IService
     {
         [OperationContract]
         [ServiceKnownType(typeof(ReadFunction))]

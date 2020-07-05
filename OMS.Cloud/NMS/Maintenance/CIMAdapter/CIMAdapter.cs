@@ -79,7 +79,7 @@ namespace Outage.DataImporter.CIMAdapter
 
             if ((delta != null) && (delta.NumberOfOperations != 0))
             {
-                NetworkModelGdaClient nmsGdaClient = NetworkModelGdaClient.CreateClient();
+                INetworkModelGDAContract nmsGdaClient = NetworkModelGdaClient.CreateClient();
 
                 if (nmsGdaClient == null)
                 {

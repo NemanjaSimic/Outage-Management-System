@@ -23,7 +23,7 @@ namespace NMS.GdaService
     {
         private readonly string baseLogString;
         private readonly NetworkModel networkModel;
-        private readonly GenericDataAccess genericDataAccess;
+        private readonly INetworkModelGDAContract genericDataAccess;
 
         #region Private Properties
         private ICloudLogger logger;

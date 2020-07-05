@@ -11,7 +11,7 @@ using System.Threading.Tasks;
 
 namespace SCADA.FunctionExecutorImplementation.CommandEnqueuers
 {
-    public class WriteCommandEnqueuer : IWriteCommandEnqueuer
+    public class WriteCommandEnqueuer : IWriteCommandEnqueuerContract
     {
         private readonly string baseLogString;
         private readonly CloudQueue readCommandQueue;

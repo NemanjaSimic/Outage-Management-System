@@ -5,6 +5,7 @@ using System.Threading.Tasks;
 using FTN.Services.NetworkModelService.TestClientUI;
 using OMS.Common.Cloud;
 using OMS.Common.Cloud.Logger;
+using OMS.Common.NmsContracts;
 using OMS.Common.NmsContracts.GDA;
 using OMS.Common.WcfClient.NMS;
 
@@ -40,7 +41,7 @@ namespace TelventDMS.Services.NetworkModelService.TestClient.TestsUI
 
 			try
 			{
-				NetworkModelGdaClient nmsClient = NetworkModelGdaClient.CreateClient();
+				INetworkModelGDAContract nmsClient = NetworkModelGdaClient.CreateClient();
 
 				if (nmsClient == null)
 				{
@@ -75,7 +76,7 @@ namespace TelventDMS.Services.NetworkModelService.TestClient.TestsUI
 
 			try
 			{
-				NetworkModelGdaClient nmsClient = NetworkModelGdaClient.CreateClient();
+				INetworkModelGDAContract nmsClient = NetworkModelGdaClient.CreateClient();
 
 				if (nmsClient == null)
 				{
@@ -164,7 +165,7 @@ namespace TelventDMS.Services.NetworkModelService.TestClient.TestsUI
 
 			try
 			{
-				NetworkModelGdaClient nmsClient = NetworkModelGdaClient.CreateClient();
+				INetworkModelGDAContract nmsClient = NetworkModelGdaClient.CreateClient();
 
 				if (nmsClient == null)
 				{

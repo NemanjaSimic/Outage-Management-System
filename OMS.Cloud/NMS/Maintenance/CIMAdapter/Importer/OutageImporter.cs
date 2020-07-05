@@ -168,7 +168,7 @@ namespace Outage.DataImporter.CIMAdapter.Importer
 			string message = "Getting nms data from server started.";
 			Logger.LogInformation(message);
 
-			NetworkModelGdaClient nmsGdaClient = NetworkModelGdaClient.CreateClient();
+			INetworkModelGDAContract nmsGdaClient = NetworkModelGdaClient.CreateClient();
 
 			if (nmsGdaClient == null)
 			{

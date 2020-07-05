@@ -11,6 +11,7 @@ using OMS.Common.Cloud.Logger;
 using OMS.Common.Cloud.Names;
 using OMS.Common.SCADA;
 using OMS.Common.ScadaContracts.FunctionExecutior;
+using OMS.Common.ScadaContracts.ModelProvider;
 using OMS.Common.WcfClient.SCADA;
 
 using SCADA.FunctionExecutorImplementation;
@@ -70,7 +71,7 @@ namespace SCADA.FunctionExecutorService
                 //ScadaReadCommandEnqueuerEndpoint
                 new ServiceInstanceListener(context =>
                 {
-                    return new WcfCommunicationListener<IReadCommandEnqueuer>(context,
+                    return new WcfCommunicationListener<IReadCommandEnqueuerContract>(context,
                                                                               this.readCommandEnqueuer,
                                                                               WcfUtility.CreateTcpListenerBinding(),
                                                                               EndpointNames.ScadaReadCommandEnqueuerEndpoint);
@@ -79,7 +80,7 @@ namespace SCADA.FunctionExecutorService
                 //ScadaWriteCommandEnqueuerEndpoint
                 new ServiceInstanceListener(context =>
                 {
-                    return new WcfCommunicationListener<IWriteCommandEnqueuer>(context,
+                    return new WcfCommunicationListener<IWriteCommandEnqueuerContract>(context,
                                                                                this.writeCommandEnqueuer,
                                                                                WcfUtility.CreateTcpListenerBinding(),
                                                                                EndpointNames.ScadaWriteCommandEnqueuerEndpoint);
@@ -88,7 +89,7 @@ namespace SCADA.FunctionExecutorService
                 //ScadaModelUpdateCommandEnqueueurEndpoint
                 new ServiceInstanceListener(context =>
                 {
-                    return new WcfCommunicationListener<IModelUpdateCommandEnqueuer>(context,
+                    return new WcfCommunicationListener<IModelUpdateCommandEnqueuerContract>(context,
                                                                                      this.modelUpdateCommandEnqueuer,
                                                                                      WcfUtility.CreateTcpListenerBinding(),
                                                                                      EndpointNames.ScadaModelUpdateCommandEnqueueurEndpoint);
@@ -111,7 +112,7 @@ namespace SCADA.FunctionExecutorService
             try
             {
                 functionExecutorCycle = new FunctionExecutorCycle();
-                ScadaModelReadAccessClient readAccessClient = ScadaModelReadAccessClient.CreateClient();
+                IScadaModelReadAccessContract readAccessClient = ScadaModelReadAccessClient.CreateClient();
                 configData = await readAccessClient.GetScadaConfigData();
 
                 string infoMessage = $"{baseLogString} RunAsync => FunctionExecutorCycle initialized.";

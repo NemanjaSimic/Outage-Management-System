@@ -7,6 +7,7 @@ using Microsoft.ServiceFabric.Services.Communication.Runtime;
 using Microsoft.ServiceFabric.Services.Runtime;
 using OMS.Common.Cloud.Logger;
 using OMS.Common.SCADA;
+using OMS.Common.ScadaContracts.ModelProvider;
 using OMS.Common.WcfClient.SCADA;
 using SCADA.AcquisitionImplementation;
 
@@ -55,7 +56,7 @@ namespace SCADA.AcquisitionService
             try
             {
                 acquisitionCycle = new AcquisitionCycle(this.Context);
-                ScadaModelReadAccessClient readAccessClient = ScadaModelReadAccessClient.CreateClient();
+                IScadaModelReadAccessContract readAccessClient = ScadaModelReadAccessClient.CreateClient();
                 configData = await readAccessClient.GetScadaConfigData();
 
                 string message = $"{baseLogString} RunAsync => AcquisitionCycle initialized.";
