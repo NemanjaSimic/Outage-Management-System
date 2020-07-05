@@ -37,7 +37,7 @@ namespace Outage.Common
 		public ResourcePropertiesDesc(ModelCode resourceId)
 		{
 			this.resourceId = resourceId;
-			this.resourceName = resourceId.ToString();			
+			this.resourceName = resourceId.ToString();
 		}
 
 		public ResourcePropertiesDesc(ModelCode resourceId, string resourceName)
@@ -898,10 +898,11 @@ namespace Outage.Common
             typeIdsInInsertOrder.Add(ModelCode.LOADBREAKSWITCH);
             typeIdsInInsertOrder.Add(ModelCode.ACLINESEGMENT);
             typeIdsInInsertOrder.Add(ModelCode.CONNECTIVITYNODE);
+            typeIdsInInsertOrder.Add(ModelCode.SYNCHRONOUSMACHINE);
             typeIdsInInsertOrder.Add(ModelCode.TERMINAL);
             typeIdsInInsertOrder.Add(ModelCode.DISCRETE);
             typeIdsInInsertOrder.Add(ModelCode.ANALOG);
-        }
+		}
 
         private void InitializeNotSettablePropertyIds()
         { 

@@ -59,6 +59,7 @@
     <Reference Include="System.Xml" />
   </ItemGroup>
   <ItemGroup>
+    <Compile Include="Converters\EnergyConsumerTypeToDailyCurveConverter.cs" />
     <Compile Include="Functions\GraphBuilder.cs" />
     <Compile Include="Properties\AssemblyInfo.cs" />
     <Compile Include="Converters\TopologyConverterProvider.cs" />

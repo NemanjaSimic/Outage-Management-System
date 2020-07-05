@@ -12,25 +12,32 @@
     <mat-label class="white-label">Scope</mat-label>
     <input type="text" class="white-label" matInput [formControl]="selectedScopeControl" [matAutocomplete]="auto">
     <mat-autocomplete #auto="matAutocomplete">
-      <mat-option *ngFor="let scope of filteredScopes | async" [value]="scope.name">
+      <mat-option *ngFor="let scope of filteredScopes | async" [value]="scope.gid">
         <span>{{ scope.name }}</span> |
         <small>{{ scope.gid }}</small>
       </mat-option>
     </mat-autocomplete>
   </mat-form-field>
 
-  <mat-form-field class="form-field">
-    <mat-label class="white-label">Choose a start date</mat-label>
-    <input matInput [matDatepicker]="startDatePicker" [formControl]="startDate">
-    <mat-datepicker-toggle matSuffix [for]="startDatePicker"></mat-datepicker-toggle>
-    <mat-datepicker #startDatePicker></mat-datepicker>
+  <mat-form-field class="form-field white-label">
+    <mat-label class="white-label"> Date Type </mat-label>
+    <mat-select [(value)]="selectedDateType" (selectionChange)="onDateTypeChangedHandler($event)">
+      <mat-option *ngFor="let dateType of datePickerTypes" [value]="dateType.value">
+        {{ dateType.name }}
+      </mat-option>
+    </mat-select>
   </mat-form-field>
 
   <mat-form-field class="form-field">
-    <mat-label class="white-label">Choose a end date</mat-label>
-    <input matInput [matDatepicker]="endDatePicker" [formControl]="endDate">
-    <mat-datepicker-toggle matSuffix [for]="endDatePicker"></mat-datepicker-toggle>
-    <mat-datepicker #endDatePicker></mat-datepicker>
+    <mat-label class="white-label">Choose a date</mat-label>
+    <input matInput [matDatepicker]="datePicker" [formControl]="selectedDate" >
+    <mat-datepicker-toggle matSuffix [for]="datePicker"></mat-datepicker-toggle>
+    <mat-datepicker 
+      #datePicker 
+      startView="multi-year" 
+      (yearSelected)="chosenYearHandler($event, datePicker)"
+      (monthSelected)="chosenMonthHandler($event, datePicker)">
+    </mat-datepicker>
   </mat-form-field>
 
   <button class="generate-button" mat-flat-button (click)="onSubmitHandler()">Generate report</button>
