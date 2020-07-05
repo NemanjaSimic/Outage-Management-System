@@ -74,13 +74,18 @@ namespace Outage.DataImporter.ModelLabsApp
                     return;
                 }
 
-				string log;
+				StringBuilder log = new StringBuilder();
 				nmsDelta = null;
 				using (FileStream fs = File.Open(textBoxCIMFile.Text, FileMode.Open))
 				{
-					nmsDelta = adapter.CreateDelta(fs, (SupportedProfiles)(comboBoxProfile.SelectedItem), out log);
-                    Logger.LogInfo(log);
-					richTextBoxReport.Text = log;
+					var result = adapter.CreateDelta(fs, (SupportedProfiles)(comboBoxProfile.SelectedItem), log);
+
+					if(result.HasValue)
+                    {
+						nmsDelta = result.Value;
+						Logger.LogInfo(log.ToString());
+						richTextBoxReport.Text = log.ToString();
+                    }
 				}
 
 				if (nmsDelta != null)

@@ -5,6 +5,7 @@ using System.Threading.Tasks;
 using FTN.Services.NetworkModelService.TestClientUI;
 using OMS.Common.Cloud;
 using OMS.Common.Cloud.Logger;
+using OMS.Common.NmsContracts;
 using OMS.Common.NmsContracts.GDA;
 using OMS.Common.WcfClient.NMS;
 
@@ -13,12 +14,14 @@ namespace TelventDMS.Services.NetworkModelService.TestClient.TestsUI
 {
     public sealed class TestGda : IDisposable
 	{
+		#region Private Properties
 		private ICloudLogger logger;
 
 		private ICloudLogger Logger
 		{
 			get { return logger ?? (logger = CloudLoggerFactory.GetLogger()); }
 		}
+		#endregion Private Properties
 
 		//private readonly NetworkModelGdaClient nmsClient;
 
@@ -38,7 +41,7 @@ namespace TelventDMS.Services.NetworkModelService.TestClient.TestsUI
 
 			try
 			{
-				NetworkModelGdaClient nmsClient = NetworkModelGdaClient.CreateClient();
+				INetworkModelGDAContract nmsClient = NetworkModelGdaClient.CreateClient();
 
 				if (nmsClient == null)
 				{
@@ -48,7 +51,7 @@ namespace TelventDMS.Services.NetworkModelService.TestClient.TestsUI
 				}
 
 				rd = await nmsClient.GetValues(globalId, properties);
-				message = "Getting values method successfully finished.";
+				message = "Getting values method SUCCESSFULLY finished.";
 				Logger.LogInformation(message);
 			}
 			catch (Exception e)
@@ -73,7 +76,7 @@ namespace TelventDMS.Services.NetworkModelService.TestClient.TestsUI
 
 			try
 			{
-				NetworkModelGdaClient nmsClient = NetworkModelGdaClient.CreateClient();
+				INetworkModelGDAContract nmsClient = NetworkModelGdaClient.CreateClient();
 
 				if (nmsClient == null)
 				{
@@ -132,7 +135,7 @@ namespace TelventDMS.Services.NetworkModelService.TestClient.TestsUI
 
 				await nmsClient.IteratorClose(iteratorId);
 
-				message = "Getting extent values method successfully finished.";
+				message = "Getting extent values method SUCCESSFULLY finished.";
 				Logger.LogInformation(message);
 			}
 			catch (Exception e)
@@ -162,7 +165,7 @@ namespace TelventDMS.Services.NetworkModelService.TestClient.TestsUI
 
 			try
 			{
-				NetworkModelGdaClient nmsClient = NetworkModelGdaClient.CreateClient();
+				INetworkModelGDAContract nmsClient = NetworkModelGdaClient.CreateClient();
 
 				if (nmsClient == null)
 				{
@@ -221,7 +224,7 @@ namespace TelventDMS.Services.NetworkModelService.TestClient.TestsUI
 
 				await nmsClient.IteratorClose(iteratorId);
 
-				message = "Getting related values method successfully finished.";
+				message = "Getting related values method SUCCESSFULLY finished.";
 				Logger.LogInformation(message);
 			}
 			catch (Exception e)

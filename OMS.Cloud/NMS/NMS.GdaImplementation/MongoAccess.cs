@@ -2,7 +2,6 @@
 using MongoDB.Bson.Serialization;
 using MongoDB.Bson.Serialization.Serializers;
 using MongoDB.Driver;
-
 using System;
 using System.Collections.Generic;
 using System.Linq;
@@ -17,14 +16,15 @@ namespace NMS.GdaImplementation
 {
     public class MongoAccess
     {
-        private ICloudLogger logger;
+        private readonly IMongoDatabase db;
 
-        private ICloudLogger Logger
+        #region Private Properties
+        private ICloudLogger logger;
+        protected ICloudLogger Logger
         {
             get { return logger ?? (logger = CloudLoggerFactory.GetLogger()); }
         }
-
-        private IMongoDatabase db;
+        #endregion Private Properties
 
         public MongoAccess()
         {
@@ -65,10 +65,9 @@ namespace NMS.GdaImplementation
             }
             catch (Exception e)
             {
-                //TODO: log...
-                Logger.LogError(e.Message);
+                string errorMessage = $"InitializeBsonSerializer => Exception: {e.Message}.";
+                Logger.LogError(errorMessage, e);
             }
-            
         }
 
         public Dictionary<DMSType, Container> GetLatesNetworkModel(long networkModelVersion)
@@ -109,7 +108,8 @@ namespace NMS.GdaImplementation
             }
             catch (Exception e)
             {
-                Logger.LogError($"Error on database: {e.Message}.", e);
+                string errorMessage = $"SaveDelta => Error on database: {e.Message}.";
+                Logger.LogError(errorMessage, e);
             }
         }
 
@@ -161,7 +161,10 @@ namespace NMS.GdaImplementation
             }
             catch (TimeoutException toe)
             {
-                if(!isRetry)
+                string errorMessage = $"GetVersions => Exception: {toe.Message}";
+                Logger.LogError(errorMessage, toe);
+
+                if (!isRetry)
                 {
                     Task.Delay(60000).Wait();
                     GetVersions(ref networkModelVersion, ref deltaVersion, true);

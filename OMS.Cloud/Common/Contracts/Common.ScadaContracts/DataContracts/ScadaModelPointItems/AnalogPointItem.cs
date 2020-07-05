@@ -1,4 +1,5 @@
 ﻿using OMS.Common.Cloud;
+using OMS.Common.Cloud.Logger;
 using OMS.Common.SCADA;
 using System;
 using System.Runtime.Serialization;
@@ -13,6 +14,10 @@ namespace OMS.Common.ScadaContracts.DataContracts.ScadaModelPointItems
         public AnalogPointItem(IAlarmConfigData alarmConfigData)
             : base(alarmConfigData)
         {
+            this.baseLogString = $"{this.GetType()} [{this.GetHashCode()}] =>{Environment.NewLine}";
+
+            ScalingFactor = 1;
+            Deviation = 0;
         }
 
         [DataMember]
@@ -44,6 +49,11 @@ namespace OMS.Common.ScadaContracts.DataContracts.ScadaModelPointItems
         {
             get
             {
+                if(!Initialized)
+                {
+                    return 0;
+                }
+
                 return EguToRawValueConversion(CurrentEguValue);
             }
         }
@@ -53,6 +63,11 @@ namespace OMS.Common.ScadaContracts.DataContracts.ScadaModelPointItems
         {
             get
             {
+                if (!Initialized)
+                {
+                    return 0;
+                }
+
                 return EguToRawValueConversion(CurrentEguValue);
             }
         }
@@ -62,6 +77,11 @@ namespace OMS.Common.ScadaContracts.DataContracts.ScadaModelPointItems
         {
             get
             {
+                if (!Initialized)
+                {
+                    return 0;
+                }
+
                 return EguToRawValueConversion(CurrentEguValue);
             }
         }
@@ -95,7 +115,9 @@ namespace OMS.Common.ScadaContracts.DataContracts.ScadaModelPointItems
             }
             else
             {
-                throw new Exception($"Analog measurement is of type: {AnalogType} which is not supported for alarming.");
+                string message = $"{baseLogString} SetAlarms => Analog measurement is of type: {AnalogType} which is not supported for alarming. Gid: 0x{Gid:X16}, Addres: {Address}, Name: {Name}, RegisterType: {RegisterType}, Initialized: {Initialized}";
+                Logger.LogError(message);
+                throw new Exception(message);
             }
 
             //ALARMS FOR ANALOG VALUES
@@ -147,7 +169,9 @@ namespace OMS.Common.ScadaContracts.DataContracts.ScadaModelPointItems
             }
             else
             {
-                throw new Exception($"PointItem [Gid: 0x{Gid:X16}, Address: {Address}] RegisterType value is invalid. Value: {RegisterType}");
+                string errorMessage = $"{baseLogString} SetAlarms => PointItem [Gid: 0x{Gid:X16}, Address: {Address}] RegisterType value is invalid. Value: {RegisterType}";
+                Logger.LogError(errorMessage);
+                throw new Exception(errorMessage);
             }
 
             return alarmChanged;
@@ -157,11 +181,17 @@ namespace OMS.Common.ScadaContracts.DataContracts.ScadaModelPointItems
 
         public float RawToEguValueConversion(int rawValue)
         {
+            if(!Initialized)
+            {
+                Logger.LogDebug($"{baseLogString} EguToRawValueConversion => Method called before PointItem was initialized. Gid: 0x{Gid:X16}, Addres: {Address}, Name: {Name}, RegisterType: {RegisterType}, Initialized: {Initialized}");
+                return 0;
+            }
+
             float eguValue = ((ScalingFactor * rawValue) + Deviation);
 
             if (eguValue > float.MaxValue || eguValue < float.MinValue)
             {
-                throw new Exception($"Egu value: {eguValue} is out of float data type boundaries [{float.MinValue}, {float.MaxValue}]");
+                throw new Exception($"{baseLogString} RawToEguValueConversion => Egu value: {eguValue} is out of float data type boundaries [{float.MinValue}, {float.MaxValue}]. Gid: 0x{Gid:X16}, Addres: {Address}, Name: {Name}, RegisterType: {RegisterType}, Initialized: {Initialized}");
             }
 
             return eguValue;
@@ -169,11 +199,18 @@ namespace OMS.Common.ScadaContracts.DataContracts.ScadaModelPointItems
 
         public int EguToRawValueConversion(float eguValue)
         {
+            if (!Initialized)
+            {
+                Logger.LogDebug($"{baseLogString} EguToRawValueConversion => Method called before PointItem was initialized. Gid: 0x{Gid:X16}, Addres: {Address}, Name: {Name}, RegisterType: {RegisterType}, Initialized: {Initialized}");
+                return 0;
+            }
+
+            //TODO: veoma cudno ponasanje - conditional breakpoint sa uslovom 'ScalingFactor == 0', po zaustavljanju ScalingFactor ima vrednost 1, odustajem razumevanja baga dok ne ispolji zacajnije posledice - donji fix resava slucaj
             if (ScalingFactor == 0)
             {
                 ScalingFactor = 1;
-                //TODO: investigate scaling factor == 0 at begingin
                 //throw new DivideByZeroException($"Scaling factor is zero."); 
+                Logger.LogVerbose($"{baseLogString} EguToRawValueConversion => Scaling factor is zero, and set to 1 to prevent throw of DivideByZeroException. Gid: 0x{Gid:X16}, Addres: {Address}, Name: {Name}, RegisterType: {RegisterType}, Initialized: {Initialized}");
             }
 
             int rawValue = (int)((eguValue - Deviation) / ScalingFactor);

@@ -9,12 +9,12 @@ using System.Threading.Tasks;
 
 namespace OMS.Common.WcfClient.SCADA
 {
-    public class ReadCommandEnqueuerClient : WcfSeviceFabricClientBase<IReadCommandEnqueuer>, IReadCommandEnqueuer
+    public class ReadCommandEnqueuerClient : WcfSeviceFabricClientBase<IReadCommandEnqueuerContract>, IReadCommandEnqueuerContract
     {
         private static readonly string microserviceName = MicroserviceNames.ScadaFunctionExecutorService;
         private static readonly string listenerName = EndpointNames.ScadaReadCommandEnqueuerEndpoint;
 
-        public ReadCommandEnqueuerClient(WcfCommunicationClientFactory<IReadCommandEnqueuer> clientFactory, Uri serviceUri, ServicePartitionKey servicePartition)
+        public ReadCommandEnqueuerClient(WcfCommunicationClientFactory<IReadCommandEnqueuerContract> clientFactory, Uri serviceUri, ServicePartitionKey servicePartition)
             : base(clientFactory, serviceUri, servicePartition, listenerName)
         {
         }
@@ -26,18 +26,19 @@ namespace OMS.Common.WcfClient.SCADA
 
             if (serviceUri == null)
             {
-                return factory.CreateClient<ReadCommandEnqueuerClient, IReadCommandEnqueuer>(microserviceName, servicePartition);
+                return factory.CreateClient<ReadCommandEnqueuerClient, IReadCommandEnqueuerContract>(microserviceName, servicePartition);
             }
             else
             {
-                return factory.CreateClient<ReadCommandEnqueuerClient, IReadCommandEnqueuer>(serviceUri, servicePartition);
+                return factory.CreateClient<ReadCommandEnqueuerClient, IReadCommandEnqueuerContract>(serviceUri, servicePartition);
             }
         }
 
         #region IModelUpdateCommandEnqueuer
         public Task<bool> EnqueueReadCommand(IReadModbusFunction modbusFunctions)
         {
-            return InvokeWithRetryAsync(client => client.Channel.EnqueueReadCommand(modbusFunctions));
+            return MethodWrapperAsync<bool>("EnqueueReadCommand", new object[1] { modbusFunctions });
+            //return InvokeWithRetryAsync(client => client.Channel.EnqueueReadCommand(modbusFunctions));
         }
         #endregion
     }

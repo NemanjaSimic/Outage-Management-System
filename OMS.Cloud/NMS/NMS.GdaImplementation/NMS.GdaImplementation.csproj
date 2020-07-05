@@ -190,6 +190,10 @@
       <Project>{AE91CEB5-378A-4EEF-AEBF-C40ED1EF23CF}</Project>
       <Name>Common.WcfClient</Name>
     </ProjectReference>
+    <ProjectReference Include="..\..\Common\Contracts\Common.DistributedTransactionContracts\Common.DistributedTransactionContracts.csproj">
+      <Project>{A07D94C2-40EF-48DB-B828-7E53E7F5A372}</Project>
+      <Name>Common.DistributedTransactionContracts</Name>
+    </ProjectReference>
     <ProjectReference Include="..\..\Common\Contracts\Common.NmsContracts\Common.NmsContracts.csproj">
       <Project>{235804A8-9C8F-40EC-8786-5DAB24733977}</Project>
       <Name>Common.NmsContracts</Name>

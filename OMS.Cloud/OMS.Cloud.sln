@@ -81,6 +81,8 @@ Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "Common.PubSub", "Common\Com
 EndProject
 Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "Common.WcfClient", "Common\Common.WcfClient\Common.WcfClient.csproj", "{AE91CEB5-378A-4EEF-AEBF-C40ED1EF23CF}"
 EndProject
+Project("{2150E333-8FDC-42A3-9474-1A3956D46DE8}") = "TMS", "TMS", "{3767D842-1115-4B94-BD63-D2CD4BE82F62}"
+EndProject
 Global
 	GlobalSection(SolutionConfigurationPlatforms) = preSolution
 		Debug|Any CPU = Debug|Any CPU

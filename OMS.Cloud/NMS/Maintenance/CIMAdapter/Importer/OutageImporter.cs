@@ -13,28 +13,9 @@ namespace Outage.DataImporter.CIMAdapter.Importer
 {
     public class OutageImporter
 	{
-		private ICloudLogger logger;
-
-		private ICloudLogger Logger
-		{
-			get { return logger ?? (logger = CloudLoggerFactory.GetLogger()); }
-		}
-
-		private static OutageImporter outageImporter = null;
+        #region Instance
+        private static OutageImporter outageImporter = null;
 		private static object singletoneLock = new object();
-
-		private Delta delta;
-		private ConcreteModel concreteModel;
-
-		private Dictionary<string, long> mridToPositiveGidFromServer;
-
-		private HashSet<string> mridsFromConcreteModel;
-		private Dictionary<long, string> negativeGidToMrid;
-		private ImportHelper importHelper;
-		private TransformAndLoadReport report;
-
-		#region Properties
-
 		public static OutageImporter Instance
 		{
 			get
@@ -53,7 +34,22 @@ namespace Outage.DataImporter.CIMAdapter.Importer
 				return outageImporter;
 			}
 		}
+        #endregion Instance
 
+		private ConcreteModel concreteModel;
+		private ImportHelper importHelper;
+		private TransformAndLoadReport report;
+
+		#region Private Properties
+		private ICloudLogger logger;
+		protected ICloudLogger Logger
+		{
+			get { return logger ?? (logger = CloudLoggerFactory.GetLogger()); }
+		}
+		#endregion Private Properties
+
+		#region Public Properties
+		private Delta delta;
 		public Delta NMSDelta
 		{
 			get
@@ -62,6 +58,7 @@ namespace Outage.DataImporter.CIMAdapter.Importer
 			}
 		}
 
+		private Dictionary<long, string> negativeGidToMrid;
 		/// <summary>
 		/// Dictionary which contains all data: Key - negative gid, Value - MRID
 		/// </summary>
@@ -73,6 +70,7 @@ namespace Outage.DataImporter.CIMAdapter.Importer
 			}
 		}
 
+		private Dictionary<string, long> mridToPositiveGidFromServer;
 		/// <summary>
 		/// Dictionary which contains all data: Key - MRID, Value - gid with positive counter
 		/// </summary>
@@ -84,6 +82,7 @@ namespace Outage.DataImporter.CIMAdapter.Importer
 			}
 		}
 
+		private HashSet<string> mridsFromConcreteModel;
 		/// <summary>
 		/// Dictionary which contains all data: Key - MRID, Value - Resource
 		/// </summary>
@@ -94,8 +93,7 @@ namespace Outage.DataImporter.CIMAdapter.Importer
 				return mridsFromConcreteModel ?? (mridsFromConcreteModel = new HashSet<string>());
 			}
 		}
-
-		#endregion Properties
+		#endregion Public Properties
 
 		public void Reset()
 		{
@@ -170,7 +168,7 @@ namespace Outage.DataImporter.CIMAdapter.Importer
 			string message = "Getting nms data from server started.";
 			Logger.LogInformation(message);
 
-			NetworkModelGdaClient nmsGdaClient = NetworkModelGdaClient.CreateClient();
+			INetworkModelGDAContract nmsGdaClient = NetworkModelGdaClient.CreateClient();
 
 			if (nmsGdaClient == null)
 			{
@@ -237,7 +235,7 @@ namespace Outage.DataImporter.CIMAdapter.Importer
 
 					await nmsGdaClient.IteratorClose(iteratorId);
 
-					message = "Getting nms data from server successfully finished.";
+					message = "Getting nms data from server SUCCESSFULLY finished.";
 					Logger.LogInformation(message);
 					success = true;
 				}

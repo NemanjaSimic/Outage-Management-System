@@ -17,7 +17,6 @@ using OMS.Common.SCADA;
 using OMS.Common.ScadaContracts.DataContracts;
 using OMS.Common.ScadaContracts.DataContracts.ScadaModelPointItems;
 using OMS.Common.ScadaContracts.ModelProvider;
-
 using SCADA.ModelProviderImplementation;
 using SCADA.ModelProviderImplementation.ContractProviders;
 
@@ -28,17 +27,23 @@ namespace SCADA.ModelProviderService
     /// </summary>
     internal sealed class ModelProviderService : StatefulService
     {
-        private readonly ICloudLogger logger;
-
+        private readonly string baseLogString;
         private readonly ScadaModel scadaModel;
         private readonly ModelReadAccessProvider modelReadAccessProvider;
         private readonly ModelUpdateAccessProvider modelUpdateAccessProvider;
         private readonly IntegrityUpdateProvider integrityUpdateProvider;
 
+        private ICloudLogger logger;
+        private ICloudLogger Logger
+        {
+            get { return logger ?? (logger = CloudLoggerFactory.GetLogger()); }
+        }
+
         public ModelProviderService(StatefulServiceContext context)
             : base(context)
         {
-            logger = CloudLoggerFactory.GetLogger();
+            this.baseLogString = $"{this.GetType()} [{this.GetHashCode()}] =>{Environment.NewLine}";
+            Logger.LogDebug($"{baseLogString} Ctor => Logger initialized");
 
             try
             {
@@ -48,14 +53,15 @@ namespace SCADA.ModelProviderService
                 this.modelUpdateAccessProvider = new ModelUpdateAccessProvider(this.StateManager);
                 this.integrityUpdateProvider = new IntegrityUpdateProvider(this.StateManager);
  
-                string message = "Contract providers initialized.";
-                logger.LogInformation(message);
-                ServiceEventSource.Current.ServiceMessage(this.Context, $"[ModelProviderService | Information] {message}");
+                string infoMessage = $"{baseLogString} Ctor => Contract providers initialized.";
+                Logger.LogInformation(infoMessage);
+                ServiceEventSource.Current.ServiceMessage(this.Context, $"[ModelProviderService | Information] {infoMessage}");
             }
             catch (Exception e)
             {
-                logger.LogError(e.Message, e);
-                ServiceEventSource.Current.ServiceMessage(this.Context, $"[ModelProviderService | Error] {e.Message}");
+                string errorMessage = $"{baseLogString} Ctor => Exception caught: {e.Message}.";
+                Logger.LogError(errorMessage, e);
+                ServiceEventSource.Current.ServiceMessage(this.Context, $"[ModelProviderService | Error] {errorMessage}");
             }
         }
 
@@ -125,19 +131,20 @@ namespace SCADA.ModelProviderService
             try
             {
                 InitializeReliableCollections();
-                string message = "ReliableDictionaries initialized.";
-                logger.LogInformation(message);
-                ServiceEventSource.Current.ServiceMessage(this.Context, $"[ModelProviderService | Information] {message}");
+                string debugMessage = $"{baseLogString} RunAsync => ReliableDictionaries initialized.";
+                Logger.LogDebug(debugMessage);
+                ServiceEventSource.Current.ServiceMessage(this.Context, $"[ModelProviderService | Information] {debugMessage}");
 
                 await scadaModel.InitializeScadaModel();
-                message = "ScadaModel initialized.";
-                logger.LogInformation(message);
-                ServiceEventSource.Current.ServiceMessage(this.Context, $"[ModelProviderService | Information] {message}");
+                string infoMessage = $"{baseLogString} RunAsync => ScadaModel initialized.";
+                Logger.LogInformation(infoMessage);
+                ServiceEventSource.Current.ServiceMessage(this.Context, $"[ModelProviderService | Information] {infoMessage}");
             }
             catch (Exception e)
             {
-                logger.LogInformation(e.Message, e);
-                ServiceEventSource.Current.ServiceMessage(this.Context, $"[ModelProviderService | Error] {e.Message}");
+                string errorMessage = $"{baseLogString} RunAsync => Exception caught: {e.Message}.";
+                Logger.LogInformation(errorMessage, e);
+                ServiceEventSource.Current.ServiceMessage(this.Context, $"[ModelProviderService | Error] {errorMessage}");
             }
         }
 

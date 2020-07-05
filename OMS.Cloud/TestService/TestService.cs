@@ -12,8 +12,12 @@ using Microsoft.ServiceFabric.Services.Runtime;
 using OMS.Common.Cloud;
 using OMS.Common.Cloud.Logger;
 using OMS.Common.Cloud.Names;
+using OMS.Common.NmsContracts;
 using OMS.Common.PubSubContracts;
 using OMS.Common.PubSubContracts.DataContracts.SCADA;
+using OMS.Common.ScadaContracts.Commanding;
+using OMS.Common.ScadaContracts.FunctionExecutior;
+using OMS.Common.ScadaContracts.ModelProvider;
 using OMS.Common.WcfClient.NMS;
 using OMS.Common.WcfClient.PubSub;
 using OMS.Common.WcfClient.SCADA;
@@ -26,24 +30,31 @@ namespace TestService
     /// </summary>
     internal sealed class TestService : StatelessService, INotifySubscriberContract
     {
-        private readonly ICloudLogger logger;
+        private readonly string baseLogString;
         private readonly Uri subscriberUri;
+        private readonly IReadCommandEnqueuerContract readCommandEnqueuerClient;
+        private readonly IWriteCommandEnqueuerContract writeCommandEnqueuerClient;
+        private readonly IModelUpdateCommandEnqueuerContract modelUpdateCommandEnqueuerClient;
+        private readonly IScadaModelReadAccessContract scadaModelReadAccessClient;
+        private readonly IScadaModelUpdateAccessContract scadaModelUpdateAccessClient;
+        private readonly IScadaIntegrityUpdateContract scadaIntegrityUpdateClient;
+        private readonly IScadaCommandingContract scadaCommandingClient;
+        private readonly INetworkModelGDAContract networkModelGdaClient;
+        private readonly IRegisterSubscriberContract registerSubscriberClient;
+        private readonly IPublisherContract publisherClient;
 
-        private readonly ReadCommandEnqueuerClient readCommandEnqueuerClient;
-        private readonly WriteCommandEnqueuerClient writeCommandEnqueuerClient;
-        private readonly ModelUpdateCommandEnqueuerClient modelUpdateCommandEnqueuerClient;
-        private readonly ScadaModelReadAccessClient scadaModelReadAccessClient;
-        private readonly ScadaModelUpdateAccessClient scadaModelUpdateAccessClient;
-        private readonly ScadaIntegrityUpdateClient scadaIntegrityUpdateClient;
-        private readonly ScadaCommandingClient scadaCommandingClient;
-        private readonly NetworkModelGdaClient networkModelGdaClient;
-        private readonly RegisterSubscriberClient registerSubscriberClient;
-        private readonly PublisherClient publisherClient;
+        private ICloudLogger logger;
+        private ICloudLogger Logger
+        {
+            get { return logger ?? (logger = CloudLoggerFactory.GetLogger()); }
+        }
 
         public TestService(StatelessServiceContext context)
             : base(context)
         {
-            logger = CloudLoggerFactory.GetLogger();
+            this.baseLogString = $"{this.GetType()} [{this.GetHashCode()}] =>{Environment.NewLine}";
+            Logger.LogDebug($"{baseLogString} Ctor => Logger initialized");
+
             subscriberUri = new Uri("fabric:/OMS.Cloud/TestService");
 
             this.readCommandEnqueuerClient = ReadCommandEnqueuerClient.CreateClient();
@@ -70,7 +81,7 @@ namespace TestService
                 var analogData = singleAnalog.AnalogModbusData;
                 string dataMessage = $"Gid: 0x{analogData.MeasurementGid:X16} | Value: {analogData.Value} | Alarm: {analogData.Alarm} | Origin: {analogData.CommandOrigin}";
                 ServiceEventSource.Current.ServiceMessage(this.Context, $"[TestService] Notify message single analog: {dataMessage}");
-                logger.LogDebug(dataMessage);
+                Logger.LogDebug(dataMessage);
             }
             else if (message is MultipleAnalogValueSCADAMessage multipleAnalog)
             {
@@ -83,14 +94,14 @@ namespace TestService
                 }
                 
                 ServiceEventSource.Current.ServiceMessage(this.Context, sb.ToString());
-                logger.LogDebug(sb.ToString());
+                Logger.LogDebug(sb.ToString());
             }
             else if (message is SingleDiscreteValueSCADAMessage singleDiscrete)
             {
                 var discreteData = singleDiscrete.DiscreteModbusData;
                 string dataMessage = $"Gid: 0x{discreteData.MeasurementGid:X16} | Value: {discreteData.Value} | Alarm: {discreteData.Alarm} | Origin: {discreteData.CommandOrigin}";
                 ServiceEventSource.Current.ServiceMessage(this.Context, $"[TestService] Notify message single discrete: {dataMessage}");
-                logger.LogDebug(dataMessage);
+                Logger.LogDebug(dataMessage);
             }
             else if (message is MultipleDiscreteValueSCADAMessage multipleDiscrete)
             {
@@ -103,7 +114,7 @@ namespace TestService
                 }
 
                 ServiceEventSource.Current.ServiceMessage(this.Context, sb.ToString());
-                logger.LogDebug(sb.ToString());
+                Logger.LogDebug(sb.ToString());
             }
         }
 

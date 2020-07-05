@@ -39,27 +39,32 @@ namespace OMS.Common.WcfClient.SCADA
         #region IScadaModelUpdateAccessContract
         public Task MakeAnalogEntryToMeasurementCache(Dictionary<long, AnalogModbusData> data, bool permissionToPublishData)
         {
-            return InvokeWithRetryAsync(client => client.Channel.MakeAnalogEntryToMeasurementCache(data, permissionToPublishData));
+            return MethodWrapperAsync("MakeAnalogEntryToMeasurementCache", new object[2] { data, permissionToPublishData });
+            //return InvokeWithRetryAsync(client => client.Channel.MakeAnalogEntryToMeasurementCache(data, permissionToPublishData));
         }
 
         public Task MakeDiscreteEntryToMeasurementCache(Dictionary<long, DiscreteModbusData> data, bool permissionToPublishData)
         {
-            return InvokeWithRetryAsync(client => client.Channel.MakeDiscreteEntryToMeasurementCache(data, permissionToPublishData));
+            return MethodWrapperAsync("MakeDiscreteEntryToMeasurementCache", new object[2] { data, permissionToPublishData });
+            //return InvokeWithRetryAsync(client => client.Channel.MakeDiscreteEntryToMeasurementCache(data, permissionToPublishData));
         }
 
         public Task<IScadaModelPointItem> UpdatePointItemRawValue(long gid, int rawValue)
         {
-            return InvokeWithRetryAsync(client => client.Channel.UpdatePointItemRawValue(gid, rawValue));
+            return MethodWrapperAsync<IScadaModelPointItem>("UpdatePointItemRawValue", new object[2] { gid, rawValue });
+            //return InvokeWithRetryAsync(client => client.Channel.UpdatePointItemRawValue(gid, rawValue));
         }
 
         public Task AddOrUpdateCommandDescription(long gid, CommandDescription commandDescription)
         {
-            return InvokeWithRetryAsync(client => client.Channel.AddOrUpdateCommandDescription(gid, commandDescription));
+            return MethodWrapperAsync("AddOrUpdateCommandDescription", new object[2] { gid, commandDescription });
+            //return InvokeWithRetryAsync(client => client.Channel.AddOrUpdateCommandDescription(gid, commandDescription));
         }
 
         public Task<bool> RemoveCommandDescription(long gid)
         {
-            return InvokeWithRetryAsync(client => client.Channel.RemoveCommandDescription(gid));
+            return MethodWrapperAsync<bool>("RemoveCommandDescription", new object[1] { gid });
+            //return InvokeWithRetryAsync(client => client.Channel.RemoveCommandDescription(gid));
         }
         #endregion
     }

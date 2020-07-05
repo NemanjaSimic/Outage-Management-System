@@ -13,6 +13,7 @@ namespace OMS.Common.ScadaContracts.DataContracts.ScadaModelPointItems
         public DiscretePointItem(IAlarmConfigData alarmConfigData)
             : base(alarmConfigData)
         {
+            this.baseLogString = $"{this.GetType()} [{this.GetHashCode()}] =>{Environment.NewLine}";
         }
 
         [DataMember]
@@ -82,7 +83,9 @@ namespace OMS.Common.ScadaContracts.DataContracts.ScadaModelPointItems
             }
             else
             {
-                throw new Exception($"PointItem [Gid: 0x{Gid:X16}, Address: {Address}] RegisterType value is invalid. Value: {RegisterType}");
+                string errorMessage = $"{baseLogString} SetAlarms => PointItem [Gid: 0x{Gid:X16}, Address: {Address}] RegisterType value is invalid. Value: {RegisterType}";
+                Logger.LogError(errorMessage);
+                throw new Exception(errorMessage);
             }
 
             return alarmChanged;

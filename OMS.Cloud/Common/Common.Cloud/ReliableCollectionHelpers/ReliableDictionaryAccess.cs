@@ -11,7 +11,7 @@ using System.Threading.Tasks;
 namespace OMS.Common.Cloud.ReliableCollectionHelpers
 {
     public sealed class ReliableDictionaryAccess<TKey, TValue> : IReliableDictionary<TKey, TValue>,
-                                                                 IEnumerable,
+                                                                 //IEnumerable,
                                                                  IDisposable
                                                                  where TKey : IComparable<TKey>, IEquatable<TKey>
     {
@@ -21,39 +21,31 @@ namespace OMS.Common.Cloud.ReliableCollectionHelpers
         
         private IReliableDictionary<TKey, TValue> reliableDictionary;
 
-        #region Private Properties
-        private IDictionary<TKey, TValue> localDictionary;
-        private IDictionary<TKey, TValue> LocalDictionary
-        {
-            get { return localDictionary ?? (localDictionary = new Dictionary<TKey, TValue>()); }
-        }
-        
-        private IDictionary<TKey, TValue> enumerableDictionary;
-        private IDictionary<TKey, TValue> EnumerableDictionary
-        {
-            get { return enumerableDictionary ?? (enumerableDictionary = new Dictionary<TKey, TValue>()); }
-        }
-        #endregion Private Properties
-
         #region Static Members
+        private static ICloudLogger logger;
+        private static ICloudLogger Logger
+        {
+            get { return logger ?? (logger = CloudLoggerFactory.GetLogger()); }
+        }
+
         public static async Task<ReliableDictionaryAccess<TKey, TValue>> Create(IReliableStateManager stateManager, string reliableDictioanryName)
         {
-            int numOfTriesLeft = 30; 
+            int numOfTriesLeft = 30;
 
-            while(true)
+            while (true)
             {
                 try
                 {
                     ReliableDictionaryAccess<TKey, TValue> reliableDictionaryAccess = new ReliableDictionaryAccess<TKey, TValue>(stateManager, reliableDictioanryName);
                     await reliableDictionaryAccess.InitializeReliableDictionary(reliableDictioanryName);
-                    return reliableDictionaryAccess;   
+                    return reliableDictionaryAccess;
                 }
                 catch (Exception e)
                 {
                     string message = $"Exception caught in {typeof(ReliableDictionaryAccess<TKey, TValue>)}.Create() method.";
-                    CloudLoggerFactory.GetLogger().LogError(message, e);
+                    Logger.LogError(message, e);
 
-                    if(numOfTriesLeft > 0)
+                    if (numOfTriesLeft > 0)
                     {
                         await Task.Delay(1000);
                         numOfTriesLeft--;
@@ -63,7 +55,7 @@ namespace OMS.Common.Cloud.ReliableCollectionHelpers
                         throw e;
                     }
 
-                    return await Create(stateManager, reliableDictioanryName);
+                    //return await Create(stateManager, reliableDictioanryName);
                 }
             }
         }
@@ -82,8 +74,8 @@ namespace OMS.Common.Cloud.ReliableCollectionHelpers
                 }
                 catch (Exception e)
                 {
-                    string message = $"Exception caught in {typeof(ReliableDictionaryAccess<TKey, TValue>)}.Create() method.";
-                    CloudLoggerFactory.GetLogger().LogError(message, e);
+                    string message = $"Exception caught in {typeof(ReliableDictionaryAccess<TKey, TValue>)}.Create() method. NumOfTriesLeft: {numOfTriesLeft}";
+                    Logger.LogError(message, e);
 
                     if (numOfTriesLeft > 0)
                     {
@@ -95,11 +87,25 @@ namespace OMS.Common.Cloud.ReliableCollectionHelpers
                         throw e;
                     }
 
-                    return await Create(stateManager, reliableDictionary);
+                    //return await Create(stateManager, reliableDictionary);
                 }
             }
         }
         #endregion Static Members
+
+        #region Private Properties
+        //private IDictionary<TKey, TValue> localDictionary;
+        //private IDictionary<TKey, TValue> LocalDictionary
+        //{
+        //    get { return localDictionary ?? (localDictionary = new Dictionary<TKey, TValue>()); }
+        //}
+        
+        //private IDictionary<TKey, TValue> enumerableDictionary;
+        //private IDictionary<TKey, TValue> EnumerableDictionary
+        //{
+        //    get { return enumerableDictionary ?? (enumerableDictionary = new Dictionary<TKey, TValue>()); }
+        //}
+        #endregion Private Properties
 
         #region Constructors
         internal ReliableDictionaryAccess(IReliableStateManager stateManager, string reliableDictioanryName)
@@ -134,8 +140,8 @@ namespace OMS.Common.Cloud.ReliableCollectionHelpers
                 {
                     //cast is necessary
                     this.reliableDictionary = result.Value;
-                    this.reliableDictionary.RebuildNotificationAsyncCallback = this.OnDictionaryRebuildNotificationHandlerAsync;
-                    this.reliableDictionary.DictionaryChanged += this.OnDictionaryChangedHandler;
+                    //this.reliableDictionary.RebuildNotificationAsyncCallback = this.OnDictionaryRebuildNotificationHandlerAsync;
+                    //this.reliableDictionary.DictionaryChanged += this.OnDictionaryChangedHandler;
                     await tx.CommitAsync();
                 }
                 else
@@ -148,100 +154,114 @@ namespace OMS.Common.Cloud.ReliableCollectionHelpers
 
         public event EventHandler<NotifyDictionaryChangedEventArgs<TKey, TValue>> DictionaryChanged;
         
-        public Dictionary<TKey, TValue> GetDataCopy()
+        public async Task<Dictionary<TKey, TValue>> GetDataCopyAsync()
         {
-            return new Dictionary<TKey, TValue>(LocalDictionary);
-        }
+            Dictionary<TKey, TValue> copy = new Dictionary<TKey, TValue>();
+            Microsoft.ServiceFabric.Data.IAsyncEnumerable<KeyValuePair<TKey, TValue>> asyncEnumerable;
 
-        #region NotificationHandlers
-        private async Task OnDictionaryRebuildNotificationHandlerAsync(IReliableDictionary<TKey, TValue> origin, NotifyDictionaryRebuildEventArgs<TKey, TValue> e)
-        {
-            this.LocalDictionary.Clear();
-
-            var enumerator = e.State.GetAsyncEnumerator();
-
-            while (await enumerator.MoveNextAsync(CancellationToken.None))
+            using (ITransaction tx = stateManager.CreateTransaction())
             {
-                this.LocalDictionary.Add(enumerator.Current.Key, enumerator.Current.Value);
-
-                //IReliableState reliableState = reliableStatesEnumerator.Current;
-                // // TODO: Add dictionary rebuild handler to reliableState as necessary
+                asyncEnumerable = await reliableDictionary.CreateEnumerableAsync(tx);
             }
-        }
 
-        private void OnDictionaryChangedHandler(object sender, NotifyDictionaryChangedEventArgs<TKey, TValue> e)
-        {
-            switch (e.Action)
+            var asyncEnumerator = asyncEnumerable.GetAsyncEnumerator();
+            CancellationTokenSource tokenSource = new CancellationTokenSource();
+
+            while (await asyncEnumerator.MoveNextAsync(tokenSource.Token))
             {
-                case NotifyDictionaryChangedAction.Clear:
-                    var clearEvent = e as NotifyDictionaryClearEventArgs<TKey, TValue>;
-                    ProcessClearNotification(clearEvent);
-                    return;
-
-                case NotifyDictionaryChangedAction.Add:
-                    var addEvent = e as NotifyDictionaryItemAddedEventArgs<TKey, TValue>;
-                    ProcessAddNotification(addEvent);
-                    return;
-
-                case NotifyDictionaryChangedAction.Update:
-                    var updateEvent = e as NotifyDictionaryItemUpdatedEventArgs<TKey, TValue>;
-                    ProcessUpdateNotification(updateEvent);
-                    return;
-
-                case NotifyDictionaryChangedAction.Remove:
-                    var deleteEvent = e as NotifyDictionaryItemRemovedEventArgs<TKey, TValue>;
-                    ProcessRemoveNotification(deleteEvent);
-                    return;
-
-                case NotifyDictionaryChangedAction.Rebuild:
-                    var rebuildEvent = e as NotifyDictionaryRebuildEventArgs<TKey, TValue>;
-                    ProcessRebuildNotification(rebuildEvent);
-                    return;
-
-                default:
-                    break;
+                var currentEntry = asyncEnumerator.Current;
+                copy.Add(currentEntry.Key, currentEntry.Value);
             }
+
+            return copy;
         }
 
-        private void ProcessClearNotification(NotifyDictionaryClearEventArgs<TKey, TValue> e)
-        {
-            LocalDictionary.Clear();
-        }
+        //#region NotificationHandlers
+        //private async Task OnDictionaryRebuildNotificationHandlerAsync(IReliableDictionary<TKey, TValue> origin, NotifyDictionaryRebuildEventArgs<TKey, TValue> e)
+        //{
+        //    this.LocalDictionary.Clear();
 
-        private void ProcessAddNotification(NotifyDictionaryItemAddedEventArgs<TKey, TValue> e)
-        {
-            if(!LocalDictionary.ContainsKey(e.Key))
-            {
-                LocalDictionary.Add(e.Key, e.Value);
-            }    
-        }
+        //    var enumerator = e.State.GetAsyncEnumerator();
 
-        private void ProcessUpdateNotification(NotifyDictionaryItemUpdatedEventArgs<TKey, TValue> e)
-        {
-            LocalDictionary[e.Key] = e.Value;
-        }
+        //    while (await enumerator.MoveNextAsync(CancellationToken.None))
+        //    {
+        //        this.LocalDictionary.Add(enumerator.Current.Key, enumerator.Current.Value);
 
-        private void ProcessRemoveNotification(NotifyDictionaryItemRemovedEventArgs<TKey, TValue> e)
-        {
-            if (LocalDictionary.ContainsKey(e.Key))
-            {
-                LocalDictionary.Remove(e.Key);
-            }
-        }
+        //        //IReliableState reliableState = reliableStatesEnumerator.Current;
+        //        // // TODO: Add dictionary rebuild handler to reliableState as necessary
+        //    }
+        //}
 
-        private async void ProcessRebuildNotification(NotifyDictionaryRebuildEventArgs<TKey, TValue> e)
-        {
-            //TODO: test behavier; question: to use OnDictionaryChangedHandler or OnDictionaryRebuildNotificationHandlerAsync?
-            //this.LocalDictionary.Clear();
+        //private void OnDictionaryChangedHandler(object sender, NotifyDictionaryChangedEventArgs<TKey, TValue> e)
+        //{
+        //    switch (e.Action)
+        //    {
+        //        case NotifyDictionaryChangedAction.Clear:
+        //            var clearEvent = e as NotifyDictionaryClearEventArgs<TKey, TValue>;
+        //            ProcessClearNotification(clearEvent);
+        //            return;
 
-            //var enumerator = e.State.GetAsyncEnumerator();
+        //        case NotifyDictionaryChangedAction.Add:
+        //            var addEvent = e as NotifyDictionaryItemAddedEventArgs<TKey, TValue>;
+        //            ProcessAddNotification(addEvent);
+        //            return;
 
-            //while (await enumerator.MoveNextAsync(CancellationToken.None))
-            //{
-            //    this.LocalDictionary.Add(enumerator.Current.Key, enumerator.Current.Value);
-            //}
-        }
-        #endregion NotificationHandlers
+        //        case NotifyDictionaryChangedAction.Update:
+        //            var updateEvent = e as NotifyDictionaryItemUpdatedEventArgs<TKey, TValue>;
+        //            ProcessUpdateNotification(updateEvent);
+        //            return;
+
+        //        case NotifyDictionaryChangedAction.Remove:
+        //            var deleteEvent = e as NotifyDictionaryItemRemovedEventArgs<TKey, TValue>;
+        //            ProcessRemoveNotification(deleteEvent);
+        //            return;
+
+        //        case NotifyDictionaryChangedAction.Rebuild:
+        //            var rebuildEvent = e as NotifyDictionaryRebuildEventArgs<TKey, TValue>;
+        //            ProcessRebuildNotification(rebuildEvent);
+        //            return;
+
+        //        default:
+        //            break;
+        //    }
+        //}
+
+        //private void ProcessClearNotification(NotifyDictionaryClearEventArgs<TKey, TValue> e)
+        //{
+        //    LocalDictionary.Clear();
+        //}
+
+        //private void ProcessAddNotification(NotifyDictionaryItemAddedEventArgs<TKey, TValue> e)
+        //{
+        //    LocalDictionary.Add(e.Key, e.Value);
+        //}
+
+        //private void ProcessUpdateNotification(NotifyDictionaryItemUpdatedEventArgs<TKey, TValue> e)
+        //{
+        //    LocalDictionary[e.Key] = e.Value;
+        //}
+
+        //private void ProcessRemoveNotification(NotifyDictionaryItemRemovedEventArgs<TKey, TValue> e)
+        //{
+        //    if (LocalDictionary.ContainsKey(e.Key))
+        //    {
+        //        LocalDictionary.Remove(e.Key);
+        //    }
+        //}
+
+        //private async void ProcessRebuildNotification(NotifyDictionaryRebuildEventArgs<TKey, TValue> e)
+        //{
+        //    //TODO: test behavier; question: to use OnDictionaryChangedHandler or OnDictionaryRebuildNotificationHandlerAsync?
+        //    //this.LocalDictionary.Clear();
+
+        //    //var enumerator = e.State.GetAsyncEnumerator();
+
+        //    //while (await enumerator.MoveNextAsync(CancellationToken.None))
+        //    //{
+        //    //    this.LocalDictionary.Add(enumerator.Current.Key, enumerator.Current.Value);
+        //    //}
+        //}
+        //#endregion NotificationHandlers
 
         #region IReliableDictionary
         public Func<IReliableDictionary<TKey, TValue>, NotifyDictionaryRebuildEventArgs<TKey, TValue>, Task> RebuildNotificationAsyncCallback 
@@ -707,73 +727,79 @@ namespace OMS.Common.Cloud.ReliableCollectionHelpers
                 return result;
             }
         }
+
+        public async Task<Dictionary<TKey, TValue>> GetEnumerableDictionaryAsync()
+        {
+            var enumerableDictionary = await GetDataCopyAsync();
+            return enumerableDictionary;
+        }
         #endregion Async Wrapper
 
-        #region IDictionary
-        /// <summary>
-        /// razmotriti upotreby Update() metode u slucaju wpf/win form aplikacija
-        /// </summary>
-        /// <param name="key"></param>
-        /// <returns></returns>
-        public TValue this[TKey key] 
-        {
-            get { return LocalDictionary[key]; }
-            
-            set
-            {
-                if (reliableDictionary == null)
-                {
-                    InitializeReliableDictionary().Wait(); //TODO: razmotriti 
-                }
+        //#region IDictionary
+        ///// <summary>
+        ///// razmotriti upotreby Update() metode u slucaju wpf/win form aplikacija
+        ///// </summary>
+        ///// <param name="key"></param>
+        ///// <returns></returns>
+        //public TValue this[TKey key] 
+        //{
+        //    get { return LocalDictionary[key]; }
 
-                using (ITransaction tx = stateManager.CreateTransaction())
-                {
-                    reliableDictionary.AddOrUpdateAsync(tx, key, k => value, (k, v) => value).Wait(); //TODO: razmotriti 
-                    tx.CommitAsync().Wait(); //TODO: razmotriti 
-                }
-            }
-        }
+        //    set
+        //    {
+        //        if (reliableDictionary == null)
+        //        {
+        //            InitializeReliableDictionary().Wait(); //TODO: razmotriti 
+        //        }
 
-        public ICollection<TKey> Keys => LocalDictionary.Keys;
+        //        using (ITransaction tx = stateManager.CreateTransaction())
+        //        {
+        //            reliableDictionary.AddOrUpdateAsync(tx, key, k => value, (k, v) => value).Wait(); //TODO: razmotriti 
+        //            tx.CommitAsync().Wait(); //TODO: razmotriti 
+        //        }
+        //    }
+        //}
 
-        public ICollection<TValue> Values => LocalDictionary.Values;
+        //public ICollection<TKey> Keys => LocalDictionary.Keys;
 
-        public int Count => LocalDictionary.Count;
+        //public ICollection<TValue> Values => LocalDictionary.Values;
 
-        public bool IsReadOnly => LocalDictionary.IsReadOnly;
+        //public int Count => LocalDictionary.Count;
 
-        public bool Contains(KeyValuePair<TKey, TValue> item)
-        {
-            return LocalDictionary.Contains(item);
-        }
+        //public bool IsReadOnly => LocalDictionary.IsReadOnly;
 
-        public bool ContainsKey(TKey key)
-        {
-            return LocalDictionary.ContainsKey(key);
-        }
+        //public bool Contains(KeyValuePair<TKey, TValue> item)
+        //{
+        //    return LocalDictionary.Contains(item);
+        //}
 
-        public void CopyTo(KeyValuePair<TKey, TValue>[] array, int arrayIndex)
-        {
-            throw new NotImplementedException("ReliableDictionaryAccess.CopyTo(KeyValuePair<TKey, TValue>[] array, int arrayIndex)");
-        }
+        //public bool ContainsKey(TKey key)
+        //{
+        //    return LocalDictionary.ContainsKey(key);
+        //}
 
-        public IEnumerator<KeyValuePair<TKey, TValue>> GetEnumerator()
-        {
-            enumerableDictionary = new Dictionary<TKey, TValue>(LocalDictionary);
-            return EnumerableDictionary.GetEnumerator();
-        }
+        //public void CopyTo(KeyValuePair<TKey, TValue>[] array, int arrayIndex)
+        //{
+        //    throw new NotImplementedException("ReliableDictionaryAccess.CopyTo(KeyValuePair<TKey, TValue>[] array, int arrayIndex)");
+        //}
 
-        public bool TryGetValue(TKey key, out TValue value)
-        {
-            return LocalDictionary.TryGetValue(key, out value);
-        }
-        #endregion IDictionary
+        //public IEnumerator<KeyValuePair<TKey, TValue>> GetEnumerator()
+        //{
+        //    enumerableDictionary = new Dictionary<TKey, TValue>(LocalDictionary);
+        //    return EnumerableDictionary.GetEnumerator();
+        //}
+
+        //public bool TryGetValue(TKey key, out TValue value)
+        //{
+        //    return LocalDictionary.TryGetValue(key, out value);
+        //}
+        //#endregion IDictionary
 
         #region IEnumerable
-        IEnumerator IEnumerable.GetEnumerator()
+        public async Task<IEnumerator> GetEnumerator()
         {
-            enumerableDictionary = new Dictionary<TKey, TValue>(LocalDictionary);
-            return EnumerableDictionary.GetEnumerator();
+            var enumerableDictionary = await GetDataCopyAsync();
+            return enumerableDictionary.GetEnumerator();
         }
         #endregion IEnumerable
 

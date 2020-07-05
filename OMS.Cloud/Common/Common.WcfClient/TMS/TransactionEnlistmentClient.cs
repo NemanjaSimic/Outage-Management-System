@@ -34,7 +34,8 @@ namespace OMS.Common.WcfClient.TMS
         #region ITransactionEnlistmentContract
         public Task<bool> Enlist(string actorName)
         {
-            return InvokeWithRetryAsync(client => client.Channel.Enlist(actorName));
+            return MethodWrapperAsync<bool>("Enlist", new object[1] { actorName });
+            //return InvokeWithRetryAsync(client => client.Channel.Enlist(actorName));
         }
         #endregion
     }

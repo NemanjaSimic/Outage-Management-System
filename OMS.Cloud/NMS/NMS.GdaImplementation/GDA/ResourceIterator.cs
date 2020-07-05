@@ -11,20 +11,20 @@ namespace NMS.GdaImplementation.GDA
 {
     public class ResourceIterator
     {
-        private ICloudLogger logger;
-
-        private ICloudLogger Logger
-        {
-            get { return logger ?? (logger = CloudLoggerFactory.GetLogger()); }
-        }
-
+        private const int maxReturnNo = 5000;
         private readonly NetworkModel networkModel = null;
 
+        private int lastReadIndex = 0; // index of the last read resource description
         private List<long> globalDs = new List<long>();
         private Dictionary<DMSType, List<ModelCode>> class2PropertyIDs = new Dictionary<DMSType, List<ModelCode>>();
 
-        private int lastReadIndex = 0; // index of the last read resource description
-        private int maxReturnNo = 5000;
+        #region Private Properties
+        private ICloudLogger logger;
+        protected ICloudLogger Logger
+        {
+            get { return logger ?? (logger = CloudLoggerFactory.GetLogger()); }
+        }
+        #endregion Private Properties
 
         public ResourceIterator(NetworkModel networkModel)
         {

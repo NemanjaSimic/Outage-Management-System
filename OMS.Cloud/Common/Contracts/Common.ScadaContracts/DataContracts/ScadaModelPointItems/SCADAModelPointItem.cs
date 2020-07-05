@@ -1,4 +1,5 @@
 ﻿using OMS.Common.Cloud;
+using OMS.Common.Cloud.Logger;
 using OMS.Common.SCADA;
 using System.Runtime.Serialization;
 
@@ -13,11 +14,18 @@ namespace OMS.Common.ScadaContracts.DataContracts.ScadaModelPointItems
         [DataMember]
         protected readonly IAlarmConfigData alarmConfigData;
 
-        protected ScadaModelPointItem(IAlarmConfigData alarmConfigData)
-        {
-            this.alarmConfigData = alarmConfigData;
-        }
+        [DataMember]
+        protected string baseLogString;
 
+        #region Private Properties
+        private ICloudLogger logger;
+        protected ICloudLogger Logger
+        {
+            get { return logger ?? (logger = CloudLoggerFactory.GetLogger()); }
+        }
+        #endregion Private Properties
+
+        #region Public Properties
         [DataMember]
         public long Gid { get; set; }
         [DataMember]
@@ -30,6 +38,12 @@ namespace OMS.Common.ScadaContracts.DataContracts.ScadaModelPointItems
         public AlarmType Alarm { get; set; }
         [DataMember]
         public bool Initialized { get; set; }
+        #endregion Public Properties
+
+        protected ScadaModelPointItem(IAlarmConfigData alarmConfigData)
+        {
+            this.alarmConfigData = alarmConfigData;
+        }
 
         public abstract bool SetAlarms();
 
@@ -39,6 +53,5 @@ namespace OMS.Common.ScadaContracts.DataContracts.ScadaModelPointItems
 
 
         #endregion IClonable
-
     }
 }

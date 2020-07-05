@@ -103,14 +103,14 @@
     <Compile Include="DataContracts\ScadaModelPointItems\IScadaModelPointItem.cs" />
     <Compile Include="DataContracts\ScadaModelPointItems\ISetAlarmStrategy.cs" />
     <Compile Include="DataContracts\ScadaConfigData.cs" />
-    <Compile Include="FunctionExecutior\IModelUpdateCommandEnqueuer.cs" />
-    <Compile Include="FunctionExecutior\IReadCommandEnqueuer.cs" />
+    <Compile Include="FunctionExecutior\IModelUpdateCommandEnqueuerContract.cs" />
+    <Compile Include="FunctionExecutior\IReadCommandEnqueuerContract.cs" />
     <Compile Include="Commanding\IScadaCommandingContract.cs" />
     <Compile Include="DataContracts\ScadaModelPointItems\ScadaModelPointItem.cs" />
     <Compile Include="ModelProvider\IScadaIntegrityUpdateContract.cs" />
     <Compile Include="ModelProvider\IScadaModelReadAccessContract.cs" />
     <Compile Include="ModelProvider\IScadaModelUpdateAccessContract.cs" />
-    <Compile Include="FunctionExecutior\IWriteCommandEnqueuer.cs" />
+    <Compile Include="FunctionExecutior\IWriteCommandEnqueuerContract.cs" />
     <Compile Include="Properties\AssemblyInfo.cs" />
   </ItemGroup>
   <ItemGroup>

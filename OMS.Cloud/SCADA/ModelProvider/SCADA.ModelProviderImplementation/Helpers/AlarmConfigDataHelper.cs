@@ -27,9 +27,16 @@ namespace SCADA.ModelProviderImplementation.Helpers
 			return alarmConfigData;
 		}
 
+		private static ICloudLogger logger;
+		private static ICloudLogger Logger
+		{
+			get { return logger ?? (logger = CloudLoggerFactory.GetLogger()); }
+		}
+
 		private static IAlarmConfigData ImportAppSettings()
 		{
-			ICloudLogger logger = CloudLoggerFactory.GetLogger();
+			string baseLogString = $"{typeof(AlarmConfigDataHelper)} [static] =>";
+
 			AlarmConfigData data = new AlarmConfigData();
 
 			if (ConfigurationManager.AppSettings["LowPowerLimit"] is string lowPowerLimitSetting)
@@ -40,9 +47,9 @@ namespace SCADA.ModelProviderImplementation.Helpers
 				}
 				else
 				{
-					string message = "LowPowerLimit in Alarm configuration is either not defined or not valid.";
-					logger.LogError(message);
-					throw new Exception(message);
+					string errorMessage = $"{baseLogString} ImportAppSettings => LowPowerLimit in Alarm configuration is either not defined or not valid.";
+					Logger.LogError(errorMessage);
+					throw new Exception(errorMessage);
 				}
 			}
 
@@ -54,9 +61,9 @@ namespace SCADA.ModelProviderImplementation.Helpers
 				}
 				else
 				{
-					string message = "HighPowerLimit in Alarm configuration is either not defined or not valid.";
-					logger.LogError(message);
-					throw new Exception(message);
+					string errorMessage = $"{baseLogString} ImportAppSettings => HighPowerLimit in Alarm configuration is either not defined or not valid.";
+					Logger.LogError(errorMessage);
+					throw new Exception(errorMessage);
 				}
 			}
 
@@ -68,9 +75,9 @@ namespace SCADA.ModelProviderImplementation.Helpers
 				}
 				else
 				{
-					string message = "LowVoltageLimit in Alarm configuration is either not defined or not valid.";
-					logger.LogError(message);
-					throw new Exception(message);
+					string errorMessage = $"{baseLogString} ImportAppSettings => LowVoltageLimit in Alarm configuration is either not defined or not valid.";
+					Logger.LogError(errorMessage);
+					throw new Exception(errorMessage);
 				}
 			}
 
@@ -82,9 +89,9 @@ namespace SCADA.ModelProviderImplementation.Helpers
 				}
 				else
 				{
-					string message = "HighVoltageLimit in Alarm configuration is either not defined or not valid.";
-					logger.LogError(message);
-					throw new Exception(message);
+					string errorMessage = $"{baseLogString} ImportAppSettings => HighVoltageLimit in Alarm configuration is either not defined or not valid.";
+					Logger.LogError(errorMessage);
+					throw new Exception(errorMessage);
 				}
 			}
 
@@ -96,9 +103,9 @@ namespace SCADA.ModelProviderImplementation.Helpers
 				}
 				else
 				{
-					string message = "LowCurrentLimit in Alarm configuration is either not defined or not valid.";
-					logger.LogError(message);
-					throw new Exception(message);
+					string errorMessage = $"{baseLogString} ImportAppSettings => LowCurrentLimit in Alarm configuration is either not defined or not valid.";
+					Logger.LogError(errorMessage);
+					throw new Exception(errorMessage);
 				}
 			}
 
@@ -110,11 +117,17 @@ namespace SCADA.ModelProviderImplementation.Helpers
 				}
 				else
 				{
-					string message = "HighCurrentLimit in Alarm configuration is either not defined or not valid.";
-					logger.LogError(message);
-					throw new Exception(message);
+					string errorMessage = $"{baseLogString} ImportAppSettings => HighCurrentLimit in Alarm configuration is either not defined or not valid.";
+					Logger.LogError(errorMessage);
+					throw new Exception(errorMessage);
 				}
 			}
+
+			string infoMessage = $"{baseLogString} ImportAppSettings => Alarm config data Imported.";
+			Logger.LogInformation(infoMessage);
+
+			string debugMessage = $"{baseLogString} ImportAppSettings => CurrentLimits: [{data.LowCurrentLimit}, {data.HighCurrentLimit}], PowerLimits: [{data.LowPowerLimit}, {data.HighPowerLimit}], VoltageLimits: [{data.LowVoltageLimit}, {data.HighVolageLimit}].";
+			Logger.LogDebug(debugMessage);
 
 			return data;
 		}

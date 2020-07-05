@@ -59,7 +59,7 @@ namespace OMS.Common.NmsContracts
 		/// Resets current position in resource iterator to the iterator's beginning
 		/// </summary>
 		/// <param name="id">Id of the resource iterator</param>
-		/// <returns>TRUE if current position in iterator is successfully reseted</returns>
+		/// <returns>TRUE if current position in iterator is SUCCESSFULLY reseted</returns>
 		[OperationContract]
 		Task<bool> IteratorRewind(int id);
 
@@ -83,7 +83,7 @@ namespace OMS.Common.NmsContracts
 		/// Closes the iterator.
 		/// </summary>
 		/// <param name="id">Id of the resource iterator</param>
-		/// <returns>TRUE if iterator is successfully closed</returns>
+		/// <returns>TRUE if iterator is SUCCESSFULLY closed</returns>
 		[OperationContract]
 		Task<bool> IteratorClose(int id);
 	}

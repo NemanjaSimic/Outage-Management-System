@@ -7,45 +7,21 @@ using System.Linq;
 
 namespace OMS.Common.NmsContracts
 {
-	public class ResourcePropertiesDesc
+    public class ResourcePropertiesDesc
 	{
+		#region Private Properties
 		private ICloudLogger logger;
-
 		private ICloudLogger Logger
 		{
 			get { return logger ?? (logger = CloudLoggerFactory.GetLogger()); }
 		}
+		#endregion Private Properties
 
+		#region Public Properties
 		/// <summary>
 		/// Code of the class type.
 		/// </summary>
 		private ModelCode resourceId;
-
-		/// <summary>
-		/// Name of the class type.
-		/// </summary>
-		private string resourceName;
-
-		/// <summary>
-		/// Collection of the property codes for class type.
-		/// </summary>
-		private Dictionary<ModelCode, string> propertyIds = new Dictionary<ModelCode, string>(new ModelCodeComparer());
-
-		/// <summary>
-		/// Initializes a new instance of the ResourcePropertiesDesc class.
-		/// </summary>
-		/// <param name="resourceId">Model type code</param>
-		public ResourcePropertiesDesc(ModelCode resourceId)
-		{
-			this.resourceId = resourceId;
-			this.resourceName = resourceId.ToString();
-		}
-
-		public ResourcePropertiesDesc(ModelCode resourceId, string resourceName)
-		{
-			this.resourceId = resourceId;
-			this.resourceName = resourceName;
-		}
 
 		/// <summary>
 		/// Gets code of the class type.
@@ -59,6 +35,11 @@ namespace OMS.Common.NmsContracts
 		}
 
 		/// <summary>
+		/// Name of the class type.
+		/// </summary>
+		private string resourceName;
+
+		/// <summary>
 		/// Gets name of the class type.
 		/// </summary>
 		public string ResourceName
@@ -68,6 +49,11 @@ namespace OMS.Common.NmsContracts
 				return resourceName;
 			}
 		}
+
+		/// <summary>
+		/// Collection of the property codes for class type.
+		/// </summary>
+		private Dictionary<ModelCode, string> propertyIds = new Dictionary<ModelCode, string>(new ModelCodeComparer());
 
 		/// <summary>
 		/// Gets read-only collection of property codes for class type.
@@ -87,6 +73,24 @@ namespace OMS.Common.NmsContracts
 				return propertyIds;
 			}
 		}
+		#endregion Public Properties
+
+		/// <summary>
+		/// Initializes a new instance of the ResourcePropertiesDesc class.
+		/// </summary>
+		/// <param name="resourceId">Model type code</param>
+		public ResourcePropertiesDesc(ModelCode resourceId)
+		{
+			this.resourceId = resourceId;
+			this.resourceName = resourceId.ToString();
+		}
+
+		public ResourcePropertiesDesc(ModelCode resourceId, string resourceName)
+		{
+			this.resourceId = resourceId;
+			this.resourceName = resourceName;
+		}
+
 		/// <summary>
 		/// Adds new property code to class type.
 		/// </summary>
@@ -121,8 +125,8 @@ namespace OMS.Common.NmsContracts
 				}
 			}
 
-			string message = String.Format("Specified property ( ID: {0} ) does not exists for {1} resource.", (ModelCode)propertyId, resourceName);
-			Logger.LogError($"Specified property ( ID: {(ModelCode)propertyId} ) does not exists for {resourceName} resource.");
+			string message = $"Specified property ( ID: {(ModelCode)propertyId} ) does not exists for {resourceName} resource.";
+			Logger.LogError(message);
 			throw new Exception(message);
 		}
 
@@ -144,12 +148,112 @@ namespace OMS.Common.NmsContracts
 	/// </summary>
 	public class ModelResourcesDesc
 	{
-		private ICloudLogger logger;
-
-		private ICloudLogger Logger
+		#region Static Members
+		public static DMSType GetTypeFromModelCode(ModelCode code)
 		{
-			get { return logger ?? (logger = CloudLoggerFactory.GetLogger()); }
+			return (DMSType)((long)((long)code & (long)ModelCodeMask.MASK_TYPE) >> 16);
 		}
+
+		public static ModelCode GetPropertyOwnerFromProperty(ModelCode propertyCode)
+		{
+			return (ModelCode)GetPropertyOwnerFromProperty((long)propertyCode);
+		}
+
+		public static long GetPropertyOwnerFromProperty(long propertyCode)
+		{
+			ulong propertyOwnerMask = 0xffffffffffff0000;
+			long propertyOwner = (long)(propertyOwnerMask & (ulong)propertyCode);
+
+			return propertyOwner;
+		}
+
+		/// <summary>
+		/// Finds model code of the parent class, according to the given ModelCode of the class
+		/// </summary>
+		/// <param name="typeId">entity type identifier</param>
+		/// <returns>identifier of the parent class</returns>
+		public static ModelCode FindFirstParent(ModelCode typeId)
+		{
+			return (ModelCode)FindFirstParent((long)typeId);
+		}
+
+		public static long FindFirstParent(long typeId)
+		{
+			ulong firstNullMask = (ulong)0xf000000000000000;
+			ulong parentMask = 0;
+			while (((firstNullMask / 16) & (ulong)typeId) != 0)
+			{
+				parentMask += firstNullMask;
+				firstNullMask = firstNullMask / 16;
+			}
+
+			ulong parentModelCode = (parentMask & (ulong)typeId);
+
+			firstNullMask *= 16;
+
+			while (parentModelCode != 0 && (firstNullMask & parentModelCode) == firstNullMask)
+			{
+				if ((firstNullMask & parentModelCode) == firstNullMask)
+				{
+					parentModelCode &= ~firstNullMask;
+				}
+
+				firstNullMask *= 16;
+			}
+
+			return (long)parentModelCode;
+		}
+
+		/// <summary>
+		/// Gets all leaves which inherit specified entity type  
+		/// </summary>
+		/// <param name="entityType">ModelCode that represents entity type</param>
+		/// <returns>List of leaves (DMSType)</returns>
+		public static List<DMSType> GetLeavesForCoreEntities(ModelCode entityType)
+		{
+			List<DMSType> children = new List<DMSType>();
+
+			foreach (ModelCode leafCM in Enum.GetValues(typeof(ModelCode)))
+			{
+				//// if it is not property code and it is leaf code and it is inhereted from submited type
+				if (((long)leafCM & (long)ModelCodeMask.MASK_ATTRIBUTE_TYPE) == 0 && ((long)leafCM & (long)ModelCodeMask.MASK_TYPE) != 0 && InheritsFrom(entityType, leafCM))
+				{
+					children.Add(GetTypeFromModelCode(leafCM));
+				}
+			}
+
+			return children;
+		}
+
+		public static bool InheritsFrom(ModelCode parentModelCode, ModelCode childModelCode)
+		{
+			ulong nibbleMask = (ulong)0xf000000000000000;
+			bool zeroAtStart = ((ulong)parentModelCode & nibbleMask) == 0;
+
+			while (nibbleMask > (ulong)0x00000000f0000000)
+			{
+				ulong childNibbleExt = ((ulong)childModelCode) & nibbleMask;
+				ulong parentNibbleExt = ((ulong)parentModelCode) & nibbleMask;
+
+				if (parentNibbleExt == 0 && !zeroAtStart)
+				{
+					return true;
+				}
+				else if (parentNibbleExt != childNibbleExt)
+				{
+					return false;
+				}
+				else if (parentNibbleExt != 0)
+				{
+					zeroAtStart = false;
+				}
+
+				nibbleMask /= 16;
+			}
+
+			return true;
+		}
+		#endregion Static Members
 
 		/// <summary>
 		/// Dictionary of model type code to model type description mappings.
@@ -161,45 +265,87 @@ namespace OMS.Common.NmsContracts
 		/// </summary>
 		private Dictionary<DMSType, ModelCode> type2modelCode = new Dictionary<DMSType, ModelCode>(new DMSTypeComparer());
 
-		/// <summary>
-		/// Insert order for Data model.
-		/// </summary>
-		private List<ModelCode> typeIdsInInsertOrder = new List<ModelCode>();
+		#region Private Properties
+		private ICloudLogger logger;
+		private ICloudLogger Logger
+		{
+			get { return logger ?? (logger = CloudLoggerFactory.GetLogger()); }
+		}
+        #endregion Private Properties
 
-		/// <summary>
-		/// List of non abstract class Ids.
-		/// </summary>
-		private List<ModelCode> nonAbstractClassIds = new List<ModelCode>();
-
-		/// <summary>
-		/// HashSet of not settable property Ids.
-		/// </summary>
-		private HashSet<ModelCode> notSettablePropertyIds = new HashSet<ModelCode>(new ModelCodeComparer());
-
-		/// <summary>
-		/// Dictionary of not accessible property Ids.
-		/// </summary>
-		private Dictionary<ModelCode, bool> notAccessiblePropertyIds = new Dictionary<ModelCode, bool>(new ModelCodeComparer());
-
-		/// <summary>
-		/// All ModelCodes, codes and from ModelCode enum end from extensibility
-		/// </summary>
-		private HashSet<ModelCode> allModelCodes = new HashSet<ModelCode>(new ModelCodeComparer());
-
-		/// <summary>
-		/// All types, codes and from DMSType enum end from extensibility
-		/// </summary>
-		private HashSet<DMSType> allDMSTypes = new HashSet<DMSType>(new DMSTypeComparer());
-
+        #region Public Properties
+        /// <summary>
+        /// All ModelCodes, codes and from ModelCode enum end from extensibility
+        /// </summary>
+        private HashSet<ModelCode> allModelCodes = new HashSet<ModelCode>(new ModelCodeComparer());
 		public HashSet<ModelCode> AllModelCodes
 		{
 			get { return allModelCodes; }
 		}
 
+		/// <summary>
+		/// All types, codes and from DMSType enum end from extensibility
+		/// </summary>
+		private HashSet<DMSType> allDMSTypes = new HashSet<DMSType>(new DMSTypeComparer());
 		public HashSet<DMSType> AllDMSTypes
 		{
 			get { return allDMSTypes; }
 		}
+
+		/// <summary>
+		/// Insert order for Data model.
+		/// </summary>
+		private List<ModelCode> typeIdsInInsertOrder = new List<ModelCode>();
+		/// <summary>
+		/// Gets insert order for Data model.
+		/// </summary>		
+		public List<ModelCode> TypeIdsInInsertOrder
+		{
+			get
+			{
+				return typeIdsInInsertOrder;
+			}
+		}
+
+		/// <summary>
+		/// List of non abstract class Ids.
+		/// </summary>
+		private List<ModelCode> nonAbstractClassIds = new List<ModelCode>();
+		/// <summary>
+		/// Gets list of non abstract class Ids.
+		/// </summary>
+		public List<ModelCode> NonAbstractClassIds
+		{
+			get { return nonAbstractClassIds; }
+			set { nonAbstractClassIds = value; }
+		}
+
+		/// <summary>
+		/// HashSet of not settable property Ids.
+		/// </summary>
+		private HashSet<ModelCode> notSettablePropertyIds = new HashSet<ModelCode>(new ModelCodeComparer());
+		/// <summary>
+		/// Gets dictionary of not settable property Ids.
+		/// </summary>
+		public HashSet<ModelCode> NotSettablePropertyIds
+		{
+			get { return notSettablePropertyIds; }
+			set { notSettablePropertyIds = value; }
+		}
+
+		/// <summary>
+		/// Dictionary of not accessible property Ids.
+		/// </summary>
+		private Dictionary<ModelCode, bool> notAccessiblePropertyIds = new Dictionary<ModelCode, bool>(new ModelCodeComparer());
+		/// <summary>
+		/// Gets dictionary of not accessible property Ids.
+		/// </summary>
+		public Dictionary<ModelCode, bool> NotAccessiblePropertyIds
+		{
+			get { return notAccessiblePropertyIds; }
+			set { notAccessiblePropertyIds = value; }
+		}
+		#endregion Public Properties
 
 		/// <summary>
 		/// Initializes a new instance of the ModelResourcesDesc class.
@@ -324,7 +470,11 @@ namespace OMS.Common.NmsContracts
 								}
 							}
 						}
-						catch { }
+						catch(Exception e)
+						{
+							string message = $"Initialize => Exception: {e.Message}";
+							Logger.LogDebug(message, e);
+						}
 					}
 				}
 			}
@@ -332,121 +482,7 @@ namespace OMS.Common.NmsContracts
 			#endregion Initialize type 2 model code map
 		}
 
-		/// <summary>
-		/// Gets insert order for Data model.
-		/// </summary>		
-		public List<ModelCode> TypeIdsInInsertOrder
-		{
-			get
-			{
-				return typeIdsInInsertOrder;
-			}
-		}
-
-		/// <summary>
-		/// Gets list of non abstract class Ids.
-		/// </summary>
-		public List<ModelCode> NonAbstractClassIds
-		{
-			get { return nonAbstractClassIds; }
-			set { nonAbstractClassIds = value; }
-		}
-
-		/// <summary>
-		/// Gets dictionary of not settable property Ids.
-		/// </summary>
-		public HashSet<ModelCode> NotSettablePropertyIds
-		{
-			get { return notSettablePropertyIds; }
-			set { notSettablePropertyIds = value; }
-		}
-
-		/// <summary>
-		/// Gets dictionary of not accessible property Ids.
-		/// </summary>
-		public Dictionary<ModelCode, bool> NotAccessiblePropertyIds
-		{
-			get { return notAccessiblePropertyIds; }
-			set { notAccessiblePropertyIds = value; }
-		}
-
-		public static DMSType GetTypeFromModelCode(ModelCode code)
-		{
-			return (DMSType)((long)((long)code & (long)ModelCodeMask.MASK_TYPE) >> 16);
-		}
-
-		public static ModelCode GetPropertyOwnerFromProperty(ModelCode propertyCode)
-		{
-			return (ModelCode)GetPropertyOwnerFromProperty((long)propertyCode);
-		}
-
-		public static long GetPropertyOwnerFromProperty(long propertyCode)
-		{
-			ulong propertyOwnerMask = 0xffffffffffff0000;
-			long propertyOwner = (long)(propertyOwnerMask & (ulong)propertyCode);
-
-			return propertyOwner;
-		}
-
-		/// <summary>
-		/// Finds model code of the parent class, according to the given ModelCode of the class
-		/// </summary>
-		/// <param name="typeId">entity type identifier</param>
-		/// <returns>identifier of the parent class</returns>
-		public static ModelCode FindFirstParent(ModelCode typeId)
-		{
-			return (ModelCode)FindFirstParent((long)typeId);
-		}
-
-		public static long FindFirstParent(long typeId)
-		{
-			ulong firstNullMask = (ulong)0xf000000000000000;
-			ulong parentMask = 0;
-			while (((firstNullMask / 16) & (ulong)typeId) != 0)
-			{
-				parentMask += firstNullMask;
-				firstNullMask = firstNullMask / 16;
-			}
-
-			ulong parentModelCode = (parentMask & (ulong)typeId);
-
-			firstNullMask *= 16;
-
-			while (parentModelCode != 0 && (firstNullMask & parentModelCode) == firstNullMask)
-			{
-				if ((firstNullMask & parentModelCode) == firstNullMask)
-				{
-					parentModelCode &= ~firstNullMask;
-				}
-
-				firstNullMask *= 16;
-			}
-
-			return (long)parentModelCode;
-		}
-
-		/// <summary>
-		/// Gets all leaves which inherit specified entity type  
-		/// </summary>
-		/// <param name="entityType">ModelCode that represents entity type</param>
-		/// <returns>List of leaves (DMSType)</returns>
-		public static List<DMSType> GetLeavesForCoreEntities(ModelCode entityType)
-		{
-			List<DMSType> children = new List<DMSType>();
-
-			foreach (ModelCode leafCM in Enum.GetValues(typeof(ModelCode)))
-			{
-				//// if it is not property code and it is leaf code and it is inhereted from submited type
-				if (((long)leafCM & (long)ModelCodeMask.MASK_ATTRIBUTE_TYPE) == 0 && ((long)leafCM & (long)ModelCodeMask.MASK_TYPE) != 0 && InheritsFrom(entityType, leafCM))
-				{
-					children.Add(GetTypeFromModelCode(leafCM));
-				}
-			}
-
-			return children;
-		}
-
-		public List<DMSType> GetLeaves(ModelCode entityType)
+        public List<DMSType> GetLeaves(ModelCode entityType)
 		{
 			List<DMSType> children = new List<DMSType>();
 
@@ -460,35 +496,6 @@ namespace OMS.Common.NmsContracts
 			}
 
 			return children;
-		}
-
-		public static bool InheritsFrom(ModelCode parentModelCode, ModelCode childModelCode)
-		{
-			ulong nibbleMask = (ulong)0xf000000000000000;
-			bool zeroAtStart = ((ulong)parentModelCode & nibbleMask) == 0;
-
-			while (nibbleMask > (ulong)0x00000000f0000000)
-			{
-				ulong childNibbleExt = ((ulong)childModelCode) & nibbleMask;
-				ulong parentNibbleExt = ((ulong)parentModelCode) & nibbleMask;
-
-				if (parentNibbleExt == 0 && !zeroAtStart)
-				{
-					return true;
-				}
-				else if (parentNibbleExt != childNibbleExt)
-				{
-					return false;
-				}
-				else if (parentNibbleExt != 0)
-				{
-					zeroAtStart = false;
-				}
-
-				nibbleMask /= 16;
-			}
-
-			return true;
 		}
 
 		/// <summary>
@@ -978,9 +985,7 @@ namespace OMS.Common.NmsContracts
 		}
 
 		#endregion Switching between enums and values
-
 	}
-
 
 	#region utility
 

@@ -10,23 +10,25 @@ namespace NMS.GdaImplementation.GDA
 {
     public class GenericDataAccess : INetworkModelGDAContract
     {
-        private ICloudLogger logger;
-
-        private ICloudLogger Logger
-        {
-            get { return logger ?? (logger = CloudLoggerFactory.GetLogger()); }
-        }
-
         private static Dictionary<int, ResourceIterator> resourceIterators = new Dictionary<int, ResourceIterator>();
         private static int resourceItId = 0;
 
         private readonly NetworkModel networkModel;
+
+        #region Private Properties
+        private ICloudLogger logger;
+        protected ICloudLogger Logger
+        {
+            get { return logger ?? (logger = CloudLoggerFactory.GetLogger()); }
+        }
+        #endregion Private Properties
 
         public GenericDataAccess(NetworkModel networkModel)
         {
             this.networkModel = networkModel;
         }
 
+        #region INetworkModelGDAContract
         public async Task<UpdateResult> ApplyUpdate(Delta delta)
         {
             return await networkModel.ApplyDelta(delta);
@@ -187,5 +189,6 @@ namespace NMS.GdaImplementation.GDA
                 return resourceIterators.Remove(iteratorId);
             }
         }
+        #endregion INetworkModelGDAContract
     }
 }

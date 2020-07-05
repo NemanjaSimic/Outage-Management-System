@@ -23,29 +23,36 @@ namespace PubSubService
     /// </summary>
     internal sealed class PubSubService : StatefulService
     {
-        private readonly ICloudLogger logger;
-
+        private readonly string baseLogString;
         private readonly PublisherProvider publisherProvider;
         private readonly RegisterSubscriberProvider registerSubscriberProvider;
+
+        private ICloudLogger logger;
+        private ICloudLogger Logger
+        {
+            get { return logger ?? (logger = CloudLoggerFactory.GetLogger()); }
+        }
 
         public PubSubService(StatefulServiceContext context)
             : base(context)
         {
-            logger = CloudLoggerFactory.GetLogger();
+            this.baseLogString = $"{this.GetType()} [{this.GetHashCode()}] =>{Environment.NewLine}";
+            Logger.LogDebug($"{baseLogString} Ctor => Logger initialized");
 
             try
             {
                 this.publisherProvider = new PublisherProvider(this.StateManager);
                 this.registerSubscriberProvider = new RegisterSubscriberProvider(this.StateManager);
 
-                string message = "Contract providers initialized.";
-                logger.LogInformation(message);
-                ServiceEventSource.Current.ServiceMessage(this.Context, $"[PubSubService | Information] {message}");
+                string infoMessage = $"{baseLogString} Ctor => Contract providers initialized.";
+                Logger.LogInformation(infoMessage);
+                ServiceEventSource.Current.ServiceMessage(this.Context, $"[PubSubService | Information] {infoMessage}");
             }
             catch (Exception e)
             {
-                logger.LogError(e.Message, e);
-                ServiceEventSource.Current.ServiceMessage(this.Context, $"[PubSubService | Error] {e.Message}");
+                string errMessage = $"{baseLogString} Ctor => Exception caught: {e.Message}.";
+                Logger.LogError(errMessage, e);
+                ServiceEventSource.Current.ServiceMessage(this.Context, $"[PubSubService | Error] {errMessage}");
             }
         }
 
@@ -94,14 +101,15 @@ namespace PubSubService
             {
                 InitializeReliableCollections();
 
-                string message = "ReliableDictionaries initialized.";
-                logger.LogInformation(message);
-                ServiceEventSource.Current.ServiceMessage(this.Context, $"[PubSubService | Information] {message}");
+                string debugMessage = $"{baseLogString} RunAsync => ReliableDictionaries initialized.";
+                Logger.LogDebug(debugMessage);
+                ServiceEventSource.Current.ServiceMessage(this.Context, $"[PubSubService | Debug] {debugMessage}");
             }
             catch (Exception e)
             {
-                logger.LogError(e.Message, e);
-                ServiceEventSource.Current.ServiceMessage(this.Context, $"[PubSubService | Error] {e.Message}");
+                string errMessage = $"{baseLogString} RunAsync => Exception caught: {e.Message}.";
+                Logger.LogError(errMessage, e);
+                ServiceEventSource.Current.ServiceMessage(this.Context, $"[PubSubService | Error] {errMessage}");
             }
         }
 

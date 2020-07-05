@@ -38,47 +38,56 @@ namespace OMS.Common.WcfClient.NMS
         #region INetworkModelGDAContract
         public Task<UpdateResult> ApplyUpdate(Delta delta)
         {
-            return InvokeWithRetryAsync(client => client.Channel.ApplyUpdate(delta));
+            return MethodWrapperAsync<UpdateResult>("ApplyUpdate", new object[1] { delta });
+            //return InvokeWithRetryAsync(client => client.Channel.ApplyUpdate(delta));
         }
 
         public Task<int> GetExtentValues(ModelCode entityType, List<ModelCode> propIds)
         {
-            return InvokeWithRetryAsync(client => client.Channel.GetExtentValues(entityType, propIds));
+            return MethodWrapperAsync<int>("GetExtentValues", new object[2] { entityType, propIds });
+            //return InvokeWithRetryAsync(client => client.Channel.GetExtentValues(entityType, propIds));
         }
 
         public Task<int> GetRelatedValues(long source, List<ModelCode> propIds, Association association)
         {
-            return InvokeWithRetryAsync(client => client.Channel.GetRelatedValues(source, propIds, association));
+            return MethodWrapperAsync<int>("GetRelatedValues", new object[3] { source, propIds, association });
+            //return InvokeWithRetryAsync(client => client.Channel.GetRelatedValues(source, propIds, association));
         }
 
         public Task<ResourceDescription> GetValues(long resourceId, List<ModelCode> propIds)
         {
-            return InvokeWithRetryAsync(client => client.Channel.GetValues(resourceId, propIds));
+            return MethodWrapperAsync<ResourceDescription>("GetValues", new object[2] { resourceId, propIds });
+            //return InvokeWithRetryAsync(client => client.Channel.GetValues(resourceId, propIds));
         }
 
         public Task<bool> IteratorClose(int id)
         {
-            return InvokeWithRetryAsync(client => client.Channel.IteratorClose(id));
+            return MethodWrapperAsync<bool>("IteratorClose", new object[1] { id });
+            //return InvokeWithRetryAsync(client => client.Channel.IteratorClose(id));
         }
 
         public Task<List<ResourceDescription>> IteratorNext(int n, int id)
         {
-            return InvokeWithRetryAsync(client => client.Channel.IteratorNext(n, id));
+            return MethodWrapperAsync<List<ResourceDescription>>("IteratorNext", new object[2] { n, id });
+            //return InvokeWithRetryAsync(client => client.Channel.IteratorNext(n, id));
         }
 
         public Task<int> IteratorResourcesLeft(int id)
         {
-            return InvokeWithRetryAsync(client => client.Channel.IteratorResourcesLeft(id));
+            return MethodWrapperAsync<int>("IteratorResourcesLeft", new object[1] { id });
+            //return InvokeWithRetryAsync(client => client.Channel.IteratorResourcesLeft(id));
         }
 
         public Task<int> IteratorResourcesTotal(int id)
         {
-            return InvokeWithRetryAsync(client => client.Channel.IteratorResourcesTotal(id));
+            return MethodWrapperAsync<int>("IteratorResourcesTotal", new object[1] { id });
+            //return InvokeWithRetryAsync(client => client.Channel.IteratorResourcesTotal(id));
         }
 
         public Task<bool> IteratorRewind(int id)
         {
-            return InvokeWithRetryAsync(client => client.Channel.IteratorRewind(id));
+            return MethodWrapperAsync<bool>("IteratorRewind", new object[1] { id });
+            //return InvokeWithRetryAsync(client => client.Channel.IteratorRewind(id));
         }
         #endregion
     }
