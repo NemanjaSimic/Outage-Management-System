@@ -38,7 +38,7 @@ namespace OMS.TracingAlgorithmImplementation
             HashSet<long> visited = new HashSet<long>();
             bool FoundOutage = false;
             long currentGid, previousGid;
-
+            Logger.LogDebug("Start tracing algorithm.");
             try
             {
                 while (this.potentialOutages.Count > 0)
