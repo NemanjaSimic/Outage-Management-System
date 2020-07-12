@@ -17,8 +17,11 @@ using OMS.Common.SCADA;
 using OMS.Common.ScadaContracts.DataContracts;
 using OMS.Common.ScadaContracts.DataContracts.ScadaModelPointItems;
 using OMS.Common.ScadaContracts.ModelProvider;
+using OMS.Common.TmsContracts;
+using OMS.Common.TmsContracts.Notifications;
 using SCADA.ModelProviderImplementation;
 using SCADA.ModelProviderImplementation.ContractProviders;
+using SCADA.ModelProviderImplementation.DistributedTransaction;
 
 namespace SCADA.ModelProviderService
 {
@@ -29,9 +32,12 @@ namespace SCADA.ModelProviderService
     {
         private readonly string baseLogString;
         private readonly ScadaModel scadaModel;
-        private readonly ModelReadAccessProvider modelReadAccessProvider;
-        private readonly ModelUpdateAccessProvider modelUpdateAccessProvider;
-        private readonly IntegrityUpdateProvider integrityUpdateProvider;
+
+        private readonly IScadaModelReadAccessContract modelReadAccessProvider;
+        private readonly IScadaModelUpdateAccessContract modelUpdateAccessProvider;
+        private readonly IScadaIntegrityUpdateContract integrityUpdateProvider;
+        private readonly INotifyNetworkModelUpdateContract scadaNotifyNetworkModelUpdate;
+        private readonly ITransactionActorContract scadaTransactionActorProviders;
 
         private ICloudLogger logger;
         private ICloudLogger Logger
@@ -52,7 +58,9 @@ namespace SCADA.ModelProviderService
                 this.modelReadAccessProvider = new ModelReadAccessProvider(this.StateManager);
                 this.modelUpdateAccessProvider = new ModelUpdateAccessProvider(this.StateManager);
                 this.integrityUpdateProvider = new IntegrityUpdateProvider(this.StateManager);
- 
+                this.scadaNotifyNetworkModelUpdate = new ScadaNotifyNetworkModelUpdate(scadaModel);
+                this.scadaTransactionActorProviders = new ScadaTransactionActor(scadaModel);
+
                 string infoMessage = $"{baseLogString} Ctor => Contract providers initialized.";
                 Logger.LogInformation(infoMessage);
                 ServiceEventSource.Current.ServiceMessage(this.Context, $"[ModelProviderService | Information] {infoMessage}");
@@ -104,23 +112,23 @@ namespace SCADA.ModelProviderService
                                                                            EndpointNames.ScadaIntegrityUpdateEndpoint);
                 }, EndpointNames.ScadaIntegrityUpdateEndpoint),
 
-                ////SCADAModelUpdateNotifierEndpoint
-                //new ServiceReplicaListener(context =>
-                //{
-                //    return new WcfCommunicationListener<IModelUpdateNotificationContract>(context,
-                //                                                            new ScadaModelUpdateNotification(scadaModel),
-                //                                                            WcfUtility.CreateTcpListenerBinding(),
-                //                                                            EndpointNames.SCADAModelUpdateNotifierEndpoint);
-                //}, EndpointNames.SCADAModelUpdateNotifierEndpoint),
+                //SCADAModelUpdateNotifierEndpoint
+                new ServiceReplicaListener(context =>
+                {
+                    return new WcfCommunicationListener<INotifyNetworkModelUpdateContract>(context,
+                                                                            this.scadaNotifyNetworkModelUpdate,
+                                                                            WcfUtility.CreateTcpListenerBinding(),
+                                                                            EndpointNames.TmsNotifyNetworkModelUpdateEndpoint);
+                }, EndpointNames.TmsNotifyNetworkModelUpdateEndpoint),
 
-                ////SCADATransactionActorEndpoint
-                //new ServiceReplicaListener(context =>
-                //{
-                //    return new WcfCommunicationListener<ITransactionActorContract>(context,
-                //                                                            new ScadaTransactionActor(scadaModel),
-                //                                                            WcfUtility.CreateTcpListenerBinding(),
-                //                                                            EndpointNames.SCADATransactionActorEndpoint);
-                //}, EndpointNames.SCADATransactionActorEndpoint),
+                //SCADATransactionActorEndpoint
+                new ServiceReplicaListener(context =>
+                {
+                    return new WcfCommunicationListener<ITransactionActorContract>(context,
+                                                                            this.scadaTransactionActorProviders,
+                                                                            WcfUtility.CreateTcpListenerBinding(),
+                                                                            EndpointNames.TmsTransactionActorEndpoint);
+                }, EndpointNames.TmsTransactionActorEndpoint),
             };
         }
 

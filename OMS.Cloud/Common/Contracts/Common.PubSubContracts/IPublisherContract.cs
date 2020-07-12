@@ -29,6 +29,6 @@ namespace OMS.Common.PubSubContracts
         [ServiceKnownType(typeof(MultipleAnalogValueSCADAMessage))]
         [ServiceKnownType(typeof(SingleDiscreteValueSCADAMessage))]
         [ServiceKnownType(typeof(MultipleDiscreteValueSCADAMessage))]
-        Task<bool> Publish(IPublication publication, Uri publisherUri = null);
+        Task<bool> Publish(IPublication publication, string publisherName);
     }
 }

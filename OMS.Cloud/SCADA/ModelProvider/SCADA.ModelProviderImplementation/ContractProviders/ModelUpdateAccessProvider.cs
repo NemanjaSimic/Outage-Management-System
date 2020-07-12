@@ -3,6 +3,7 @@ using Microsoft.ServiceFabric.Data.Notifications;
 using OMS.Common.Cloud;
 using OMS.Common.Cloud.Exceptions.SCADA;
 using OMS.Common.Cloud.Logger;
+using OMS.Common.Cloud.Names;
 using OMS.Common.Cloud.ReliableCollectionHelpers;
 using OMS.Common.PubSub;
 using OMS.Common.PubSubContracts;
@@ -200,7 +201,7 @@ namespace SCADA.ModelProviderImplementation.ContractProviders
                         throw new Exception(errorMessage);
                     }
 
-                    if(result.Value is AnalogModbusData analogCacheItem && analogCacheItem.Value != data[gid].Value)
+                    if(result.Value is AnalogModbusData analogCacheItem && (analogCacheItem.Value != data[gid].Value || analogCacheItem.CommandOrigin != data[gid].CommandOrigin))
                     {
                         Logger.LogDebug($"{baseLogString} MakeAnalogEntryToMeasurementCache => Value changed on element with Gid: 0x{analogCacheItem.MeasurementGid:X16}. Old value: {analogCacheItem.Value}, New value: {data[gid].Value}, Alarm: {data[gid].Alarm}, CommandOrigin: {data[gid].CommandOrigin}");
 
@@ -264,7 +265,7 @@ namespace SCADA.ModelProviderImplementation.ContractProviders
                         throw new Exception(errorMessage);
                     }
 
-                    if(result.Value is DiscreteModbusData discreteCacheItem && discreteCacheItem.Value != data[gid].Value)
+                    if(result.Value is DiscreteModbusData discreteCacheItem && (discreteCacheItem.Value != data[gid].Value || discreteCacheItem.CommandOrigin != data[gid].CommandOrigin))
                     {
                         Logger.LogDebug($"{baseLogString} MakeDiscreteEntryToMeasurementCache => Value changed on element with Gid: 0x{discreteCacheItem.MeasurementGid:X16}; Old value: {discreteCacheItem.Value}; new value: {data[gid].Value}");
 
@@ -364,6 +365,27 @@ namespace SCADA.ModelProviderImplementation.ContractProviders
             await CommandDescriptionCache.SetAsync(gid, commandDescription);
         }
 
+        public async Task AddOrUpdateMultipleCommandDescriptions(Dictionary<long, CommandDescription> commandDescriptions)
+        {
+            string verboseMessage = $"{baseLogString} entering AddOrUpdateMultipleCommandDescriptions method.";
+            Logger.LogVerbose(verboseMessage);
+
+            while (!ReliableDictionariesInitialized || !(await GetIsScadaModelImportedIndicator()))
+            {
+                //TODO: something smarter
+                await Task.Delay(1000);
+            }
+
+            var tasks = new List<Task>();
+
+            foreach(var commandDescription in commandDescriptions)
+            {
+                tasks.Add(CommandDescriptionCache.SetAsync(commandDescription.Key, commandDescription.Value));
+            }
+
+            Task.WaitAll(tasks.ToArray());
+        }
+
         public async Task<bool> RemoveCommandDescription(long gid)
         {
             string verboseMessage = $"{baseLogString} entering RemoveCommandDescription method.";
@@ -388,8 +410,8 @@ namespace SCADA.ModelProviderImplementation.ContractProviders
             try
             {
                 ScadaPublication scadaPublication = new ScadaPublication(topic, scadaMessage);
-                await this.publisherClient.Publish(scadaPublication);
-                Logger.LogInformation($"{baseLogString} PublishScadaData => SCADA service published data of topic: {scadaPublication.Topic}");
+                await this.publisherClient.Publish(scadaPublication, MicroserviceNames.ScadaModelProviderService);
+                Logger.LogInformation($"{baseLogString} PublishScadaData => SCADA service published data of topic: {scadaPublication.Topic}, publisher name: {MicroserviceNames.ScadaModelProviderService}");
             }
             catch (CommunicationObjectFaultedException e)
             {
@@ -403,28 +425,29 @@ namespace SCADA.ModelProviderImplementation.ContractProviders
                 //todo: different logic on multiple rety?
             }
 
-            //StringBuilder sb = new StringBuilder();
-            //sb.AppendLine($"{baseLogString} PublishScadaData => MeasurementCache content: ");
+            StringBuilder sb = new StringBuilder();
+            sb.AppendLine($"{baseLogString} PublishScadaData => MeasurementCache content: ");
 
-            //foreach (long gid in MeasurementsCache.Keys)
-            //{
-            //    IModbusData data = MeasurementsCache.TryGetValueAsync();
+            var enumerableMeasurementCache = await MeasurementsCache.GetEnumerableDictionaryAsync();
+            foreach (long gid in enumerableMeasurementCache.Keys)
+            {
+                IModbusData data = enumerableMeasurementCache[gid];
 
-            //    if (data is AnalogModbusData analogModbusData)
-            //    {
-            //        sb.AppendLine($"Analog data line: [gid] 0x{gid:X16}, [value] {analogModbusData.Value}, [alarm] {analogModbusData.Alarm}");
-            //    }
-            //    else if (data is DiscreteModbusData discreteModbusData)
-            //    {
-            //        sb.AppendLine($"Discrete data line: [gid] 0x{gid:X16}, [value] {discreteModbusData.Value}, [alarm] {discreteModbusData.Alarm}");
-            //    }
-            //    else
-            //    {
-            //        sb.AppendLine($"UNKNOWN data type: {data.GetType()}");
-            //    }
-            //}
+                if (data is AnalogModbusData analogModbusData)
+                {
+                    sb.AppendLine($"Analog data line: [gid] 0x{gid:X16}, [value] {analogModbusData.Value}, [alarm] {analogModbusData.Alarm}");
+                }
+                else if (data is DiscreteModbusData discreteModbusData)
+                {
+                    sb.AppendLine($"Discrete data line: [gid] 0x{gid:X16}, [value] {discreteModbusData.Value}, [alarm] {discreteModbusData.Alarm}");
+                }
+                else
+                {
+                    sb.AppendLine($"UNKNOWN data type: {data.GetType()}");
+                }
+            }
 
-            //Logger.LogDebug(sb.ToString());
+            Logger.LogDebug(sb.ToString());
         }
         #endregion Private Methods
     }

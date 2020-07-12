@@ -1,5 +1,6 @@
 ﻿using Microsoft.ServiceFabric.Services.Client;
 using Microsoft.ServiceFabric.Services.Communication.Wcf.Client;
+using OMS.Common.Cloud;
 using OMS.Common.Cloud.Names;
 using OMS.Common.SCADA;
 using OMS.Common.ScadaContracts.DataContracts;
@@ -21,19 +22,16 @@ namespace OMS.Common.WcfClient.SCADA
         {
         }
 
-        public static ScadaModelReadAccessClient CreateClient(Uri serviceUri = null)
+        public static ScadaModelReadAccessClient CreateClient()
         {
             ClientFactory factory = new ClientFactory();
-            ServicePartitionKey servicePartition = new ServicePartitionKey(0);
+            return factory.CreateClient<ScadaModelReadAccessClient, IScadaModelReadAccessContract>(microserviceName);
+        }
 
-            if (serviceUri == null)
-            {
-                return factory.CreateClient<ScadaModelReadAccessClient, IScadaModelReadAccessContract>(microserviceName, servicePartition);
-            }
-            else
-            {
-                return factory.CreateClient<ScadaModelReadAccessClient, IScadaModelReadAccessContract>(serviceUri, servicePartition);
-            }
+        public static ScadaModelReadAccessClient CreateClient(Uri serviceUri, ServicePartitionKey servicePartitionKey)
+        {
+            ClientFactory factory = new ClientFactory();
+            return factory.CreateClient<ScadaModelReadAccessClient, IScadaModelReadAccessContract>(serviceUri, servicePartitionKey);
         }
 
         #region IScadaModelAccessContract

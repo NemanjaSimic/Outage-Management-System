@@ -30,8 +30,8 @@ namespace PubSubImplementation
             get { return isSubscriberCacheInitialized; }
         }
 
-        private ReliableDictionaryAccess<short, Dictionary<Uri, RegisteredSubscriber>> registeredSubscribersCache;
-        private ReliableDictionaryAccess<short, Dictionary<Uri, RegisteredSubscriber>> RegisteredSubscribersCache
+        private ReliableDictionaryAccess<short, HashSet<string>> registeredSubscribersCache;
+        private ReliableDictionaryAccess<short, HashSet<string>> RegisteredSubscribersCache
         {
             get { return registeredSubscribersCache; }
         }
@@ -57,7 +57,7 @@ namespace PubSubImplementation
                 if (reliableStateName == ReliableDictionaryNames.RegisteredSubscribersCache)
                 {
                     //_ = SubscriberCache;
-                    registeredSubscribersCache = await ReliableDictionaryAccess<short, Dictionary<Uri, RegisteredSubscriber>>.Create(stateManager, ReliableDictionaryNames.RegisteredSubscribersCache);
+                    registeredSubscribersCache = await ReliableDictionaryAccess<short, HashSet<string>>.Create(stateManager, ReliableDictionaryNames.RegisteredSubscribersCache);
                     isSubscriberCacheInitialized = true;
 
                     string debugMessage = $"{baseLogString} OnStateManagerChangedHandler => '{ReliableDictionaryNames.RegisteredSubscribersCache}' ReliableDictionaryAccess initialized.";
@@ -67,7 +67,7 @@ namespace PubSubImplementation
         }
 
         #region IPublisherContract
-        public async Task<bool> Publish(IPublication publication, Uri publisherUri)
+        public async Task<bool> Publish(IPublication publication, string publisherName)
         {
             while (!ReliableDictionariesInitialized)
             {
@@ -85,10 +85,10 @@ namespace PubSubImplementation
             {
                 var registeredSubscribers = enumerableSubscribersCache[key];
                 
-                foreach(var subscriber in registeredSubscribers.Values)
+                foreach(var subscriberName in registeredSubscribers)
                 {
-                    var notifySubscriberClient = NotifySubscriberClient.CreateClient(subscriber.SubcriberUri, subscriber.ServiceType);
-                    var task = notifySubscriberClient.Notify(publication.Message); 
+                    INotifySubscriberContract notifySubscriberClient = NotifySubscriberClient.CreateClient(subscriberName);
+                    var task = notifySubscriberClient.Notify(publication.Message, publisherName); 
                     tasks.Add(task);
                 }
             }

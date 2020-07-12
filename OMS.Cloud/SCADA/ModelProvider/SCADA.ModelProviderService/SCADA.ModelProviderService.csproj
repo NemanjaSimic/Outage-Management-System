@@ -175,6 +175,10 @@
       <Project>{5F25D9C5-9A93-49E7-92F7-58E399AEF928}</Project>
       <Name>Common.ScadaContracts</Name>
     </ProjectReference>
+    <ProjectReference Include="..\..\..\Common\Contracts\Common.TmsContracts\Common.TmsContracts.csproj">
+      <Project>{A07D94C2-40EF-48DB-B828-7E53E7F5A372}</Project>
+      <Name>Common.TmsContracts</Name>
+    </ProjectReference>
     <ProjectReference Include="..\SCADA.ModelProviderImplementation\SCADA.ModelProviderImplementation.csproj">
       <Project>{01D58FA3-7E45-4310-8C89-2F0226F4A0D6}</Project>
       <Name>SCADA.ModelProviderImplementation</Name>

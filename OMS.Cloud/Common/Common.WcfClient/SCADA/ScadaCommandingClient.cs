@@ -13,26 +13,23 @@ namespace OMS.Common.WcfClient.SCADA
     public class ScadaCommandingClient : WcfSeviceFabricClientBase<IScadaCommandingContract>, IScadaCommandingContract
     {
         private static readonly string microserviceName = MicroserviceNames.ScadaCommandingService;
-        private static readonly string listenerName = EndpointNames.ScadaCommandService;
+        private static readonly string listenerName = EndpointNames.ScadaCommandingEndpoint;
 
         public ScadaCommandingClient(WcfCommunicationClientFactory<IScadaCommandingContract> clientFactory, Uri serviceUri, ServicePartitionKey servicePartition)
             : base(clientFactory, serviceUri, servicePartition, listenerName)
         {
         }
 
-        public static ScadaCommandingClient CreateClient(Uri serviceUri = null)
+        public static ScadaCommandingClient CreateClient()
         {
             ClientFactory factory = new ClientFactory();
-            ServicePartitionKey servicePartition = ServicePartitionKey.Singleton;
+            return factory.CreateClient<ScadaCommandingClient, IScadaCommandingContract>(microserviceName);
+        }
 
-            if (serviceUri == null)
-            {
-                return factory.CreateClient<ScadaCommandingClient, IScadaCommandingContract>(microserviceName, servicePartition);
-            }
-            else
-            {
-                return factory.CreateClient<ScadaCommandingClient, IScadaCommandingContract>(serviceUri, servicePartition);
-            }
+        public static ScadaCommandingClient CreateClient(Uri serviceUri, ServicePartitionKey servicePartitionKey)
+        {
+            ClientFactory factory = new ClientFactory();
+            return factory.CreateClient<ScadaCommandingClient, IScadaCommandingContract>(serviceUri, servicePartitionKey);
         }
 
         #region IScadaCommandingContract

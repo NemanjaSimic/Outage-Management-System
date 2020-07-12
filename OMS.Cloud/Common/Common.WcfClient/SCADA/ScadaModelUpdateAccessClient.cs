@@ -1,5 +1,6 @@
 ﻿using Microsoft.ServiceFabric.Services.Client;
 using Microsoft.ServiceFabric.Services.Communication.Wcf.Client;
+using OMS.Common.Cloud;
 using OMS.Common.Cloud.Names;
 using OMS.Common.PubSubContracts.DataContracts.SCADA;
 using OMS.Common.ScadaContracts.DataContracts;
@@ -21,19 +22,16 @@ namespace OMS.Common.WcfClient.SCADA
         {
         }
 
-        public static ScadaModelUpdateAccessClient CreateClient(Uri serviceUri = null)
+        public static ScadaModelUpdateAccessClient CreateClient()
         {
             ClientFactory factory = new ClientFactory();
-            ServicePartitionKey servicePartition = new ServicePartitionKey(0);
+            return factory.CreateClient<ScadaModelUpdateAccessClient, IScadaModelUpdateAccessContract>(microserviceName);
+        }
 
-            if (serviceUri == null)
-            {
-                return factory.CreateClient<ScadaModelUpdateAccessClient, IScadaModelUpdateAccessContract>(microserviceName, servicePartition);
-            }
-            else
-            {
-                return factory.CreateClient<ScadaModelUpdateAccessClient, IScadaModelUpdateAccessContract>(serviceUri, servicePartition);
-            }
+        public static ScadaModelUpdateAccessClient CreateClient(Uri serviceUri, ServicePartitionKey servicePartitionKey)
+        {
+            ClientFactory factory = new ClientFactory();
+            return factory.CreateClient<ScadaModelUpdateAccessClient, IScadaModelUpdateAccessContract>(serviceUri, servicePartitionKey);
         }
 
         #region IScadaModelUpdateAccessContract
@@ -59,6 +57,12 @@ namespace OMS.Common.WcfClient.SCADA
         {
             return MethodWrapperAsync("AddOrUpdateCommandDescription", new object[2] { gid, commandDescription });
             //return InvokeWithRetryAsync(client => client.Channel.AddOrUpdateCommandDescription(gid, commandDescription));
+        }
+
+        public Task AddOrUpdateMultipleCommandDescriptions(Dictionary<long, CommandDescription> commandDescriptions)
+        {
+            return MethodWrapperAsync("AddOrUpdateMultipleCommandDescriptions", new object[1] { commandDescriptions });
+            //return InvokeWithRetryAsync(client => client.Channel.AddOrUpdateMultipleCommandDescriptions(commandDescriptions));
         }
 
         public Task<bool> RemoveCommandDescription(long gid)

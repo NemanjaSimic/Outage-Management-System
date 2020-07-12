@@ -4,13 +4,14 @@ using OMS.Common.Cloud;
 using OMS.Common.Cloud.Exceptions.SCADA;
 using OMS.Common.Cloud.Logger;
 using OMS.Common.Cloud.ReliableCollectionHelpers;
-using OMS.Common.DistributedTransactionContracts;
 using OMS.Common.NmsContracts;
 using OMS.Common.NmsContracts.GDA;
 using OMS.Common.SCADA;
 using OMS.Common.ScadaContracts.Commanding;
 using OMS.Common.ScadaContracts.DataContracts;
 using OMS.Common.ScadaContracts.DataContracts.ScadaModelPointItems;
+using OMS.Common.TmsContracts;
+using OMS.Common.TmsContracts.Notifications;
 using OMS.Common.WcfClient.NMS;
 using OMS.Common.WcfClient.SCADA;
 using SCADA.ModelProviderImplementation.Data;
@@ -23,7 +24,7 @@ using System.Threading.Tasks;
 
 namespace SCADA.ModelProviderImplementation
 {
-    public sealed class ScadaModel : IModelUpdateNotificationContract, ITransactionActorContract
+    public sealed class ScadaModel : INotifyNetworkModelUpdateContract, ITransactionActorContract
     {
         private readonly string baseLogString;
         private readonly EnumDescs enumDescs;
@@ -517,10 +518,13 @@ namespace SCADA.ModelProviderImplementation
         #endregion ImportScadaModel
 
         #region IModelUpdateNotificationContract
-        public async Task<bool> NotifyAboutUpdate(Dictionary<DeltaOpType, List<long>> modelChanges)
+        public Task<bool> Notify(Dictionary<DeltaOpType, List<long>> modelChanges)
         {
-            this.modelChanges = modelChanges;
-            return true;
+            return Task.Run(() =>
+            {
+                this.modelChanges = modelChanges;
+                return true;
+            });
         }
         #endregion IModelUpdateNotificationContract
 

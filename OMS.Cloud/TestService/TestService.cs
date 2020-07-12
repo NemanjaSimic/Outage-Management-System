@@ -31,7 +31,6 @@ namespace TestService
     internal sealed class TestService : StatelessService, INotifySubscriberContract
     {
         private readonly string baseLogString;
-        private readonly Uri subscriberUri;
         private readonly IReadCommandEnqueuerContract readCommandEnqueuerClient;
         private readonly IWriteCommandEnqueuerContract writeCommandEnqueuerClient;
         private readonly IModelUpdateCommandEnqueuerContract modelUpdateCommandEnqueuerClient;
@@ -55,8 +54,6 @@ namespace TestService
             this.baseLogString = $"{this.GetType()} [{this.GetHashCode()}] =>{Environment.NewLine}";
             Logger.LogDebug($"{baseLogString} Ctor => Logger initialized");
 
-            subscriberUri = new Uri("fabric:/OMS.Cloud/TestService");
-
             this.readCommandEnqueuerClient = ReadCommandEnqueuerClient.CreateClient();
             this.writeCommandEnqueuerClient = WriteCommandEnqueuerClient.CreateClient();
             this.modelUpdateCommandEnqueuerClient = ModelUpdateCommandEnqueuerClient.CreateClient();
@@ -74,7 +71,7 @@ namespace TestService
         }
 
         #region INotifySubscriberContract
-        public async Task Notify(IPublishableMessage message)
+        public async Task Notify(IPublishableMessage message, string publisherName)
         {
             if(message  is SingleAnalogValueSCADAMessage singleAnalog)
             {
@@ -118,9 +115,9 @@ namespace TestService
             }
         }
 
-        public async Task<Uri> GetSubscriberUri()
+        public async Task<string> GetSubscriberName()
         {
-            return subscriberUri;
+            return "TestService";
         }
         #endregion
 
@@ -139,8 +136,8 @@ namespace TestService
                     return new WcfCommunicationListener<INotifySubscriberContract>(context,
                                                                                    this,
                                                                                    WcfUtility.CreateTcpListenerBinding(),
-                                                                                   EndpointNames.NotifySubscriberEndpoint);
-                }, EndpointNames.NotifySubscriberEndpoint),
+                                                                                   EndpointNames.PubSubNotifySubscriberEndpoint);
+                }, EndpointNames.PubSubNotifySubscriberEndpoint),
             };
         }
 
@@ -153,9 +150,9 @@ namespace TestService
             //TEST Subscribe
             try
             {
-                var subscriptions = await registerSubscriberClient.GetAllSubscribedTopics(subscriberUri);
-                var result = await registerSubscriberClient.SubscribeToTopics(new List<Topic>() { Topic.MEASUREMENT, Topic.SWITCH_STATUS }, subscriberUri, ServiceType.STATELESS_SERVICE);
-                subscriptions = await registerSubscriberClient.GetAllSubscribedTopics(subscriberUri);
+                var subscriptions = await registerSubscriberClient.GetAllSubscribedTopics("TestService");
+                var result = await registerSubscriberClient.SubscribeToTopics(new List<Topic>() { Topic.MEASUREMENT, Topic.SWITCH_STATUS }, MicroserviceNames.TestService);
+                subscriptions = await registerSubscriberClient.GetAllSubscribedTopics(MicroserviceNames.TestService);
             }
             catch (Exception e)
             {
@@ -167,7 +164,7 @@ namespace TestService
             //    var data = new AnalogModbusData(1, AlarmType.NO_ALARM, 0, CommandOriginType.OTHER_COMMAND);
             //    var publishableMessage = new SingleAnalogValueSCADAMessage(data);
             //    var publication = new ScadaPublication(Topic.MEASUREMENT, publishableMessage);
-            //    await publisherClient.Publish(publication, subscriberUri);
+            //    await publisherClient.Publish(publication, MicroserviceNames.TestService);
             //}
             //catch (Exception e)
             //{

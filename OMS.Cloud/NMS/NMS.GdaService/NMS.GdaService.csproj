@@ -163,6 +163,10 @@
       <Project>{235804A8-9C8F-40EC-8786-5DAB24733977}</Project>
       <Name>Common.NmsContracts</Name>
     </ProjectReference>
+    <ProjectReference Include="..\..\Common\Contracts\Common.TmsContracts\Common.TmsContracts.csproj">
+      <Project>{A07D94C2-40EF-48DB-B828-7E53E7F5A372}</Project>
+      <Name>Common.TmsContracts</Name>
+    </ProjectReference>
     <ProjectReference Include="..\NMS.GdaImplementation\NMS.GdaImplementation.csproj">
       <Project>{BA3D0EA9-5697-412C-B9A3-B71E988709CE}</Project>
       <Name>NMS.GdaImplementation</Name>

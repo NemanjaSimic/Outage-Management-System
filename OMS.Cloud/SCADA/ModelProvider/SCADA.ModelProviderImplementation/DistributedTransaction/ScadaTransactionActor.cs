@@ -1,71 +1,81 @@
-﻿//using OMS.Cloud.TMS.DistributedTransactionActor;
-//using OMS.Common.DistributedTransactionContracts;
-//using System;
-//using System.Threading.Tasks;
+﻿using OMS.Common.Cloud.Logger;
+using OMS.Common.TmsContracts;
+using System;
+using System.Threading.Tasks;
 
-//namespace SCADA.ModelProviderImplementation.DistributedTransaction
-//{
-//    internal class ScadaTransactionActor : TransactionActor
-//    {
-//        private readonly ITransactionActorContract scadaTransactionActor;
+namespace SCADA.ModelProviderImplementation.DistributedTransaction
+{
+    public class ScadaTransactionActor : ITransactionActorContract
+    {
+        private readonly string baseLogString;
+        private readonly ITransactionActorContract contractProvider;
 
-//        public ScadaTransactionActor(ITransactionActorContract scadaTransactionActor)
-//        {
-//            this.scadaTransactionActor = scadaTransactionActor;
-//        }
+        #region Private Properties
+        private ICloudLogger logger;
+        protected ICloudLogger Logger
+        {
+            get { return logger ?? (logger = CloudLoggerFactory.GetLogger()); }
+        }
+        #endregion Private Properties
 
-//        public override async Task<bool> Prepare()
-//        {
-//            bool success;
+        public ScadaTransactionActor(ITransactionActorContract contractProvider)
+        {
+            this.baseLogString = $"{this.GetType()} [{this.GetHashCode()}] =>{Environment.NewLine}";
+            this.contractProvider = contractProvider;
+        }
 
-//            try
-//            {
-//                success = await this.scadaTransactionActor.Prepare();
-//            }
-//            catch (Exception ex)
-//            {
-//                Logger.LogError($"Exception caught in Prepare method on SCADA Transaction actor. Exception: {ex.Message}", ex);
-//                success = false;
-//            }
+        public async Task<bool> Prepare()
+        {
+            bool success;
 
-//            if (success)
-//            {
-//                Logger.LogInfo("Preparation on SCADA Transaction actor SUCCESSFULLY finished.");
-//            }
-//            else
-//            {
-//                Logger.LogInfo("Preparation on SCADA Transaction actor UNSUCCESSFULLY finished.");
-//            }
+            try
+            {
+                success = await this.contractProvider.Prepare();
+            }
+            catch (Exception ex)
+            {
+                Logger.LogError($"{baseLogString} Prepare => Exception: {ex.Message}", ex);
+                success = false;
+            }
 
-//            return success;
-//        }
+            if (success)
+            {
+                Logger.LogInformation($"{baseLogString} Prepare => Preparation on SCADA Transaction actor SUCCESSFULLY finished.");
+            }
+            else
+            {
+                Logger.LogInformation($"{baseLogString} Prepare => Preparation on SCADA Transaction actor UNSUCCESSFULLY finished.");
+            }
 
-//        public override async Task Commit()
-//        {
-//            try
-//            {
-//                await this.scadaTransactionActor.Commit();
-//                Logger.LogInfo("Commit on SCADA Transaction actor SUCCESSFULLY finished.");
-//            }
-//            catch (Exception ex)
-//            {
-//                Logger.LogError($"Exception caught in Commit method on SCADA Transaction actor. Exception: {ex.Message}", ex);
-//                Logger.LogInfo("Commit on SCADA Transaction actor UNSUCCESSFULLY finished.");
-//            }
-//        }
+            return success;
+        }
 
-//        public override async Task Rollback()
-//        {
-//            try
-//            {
-//                await this.scadaTransactionActor.Rollback();
-//                Logger.LogInfo("Rollback on SCADA Transaction actor SUCCESSFULLY finished.");
-//            }
-//            catch (Exception ex)
-//            {
-//                Logger.LogError($"Exception caught in Rollback method on SCADA Transaction actor. Exception: {ex.Message}", ex);
-//                Logger.LogInfo("Rollback on SCADA Transaction actor UNSUCCESSFULLY finished.");
-//            }
-//        }
-//    }
-//}
+        public async Task Commit()
+        {
+            try
+            {
+                await this.contractProvider.Commit();
+                Logger.LogInformation($"{baseLogString} Commit => Commit on SCADA Transaction actor SUCCESSFULLY finished.");
+            }
+            catch (Exception ex)
+            {
+                Logger.LogError($"{baseLogString} Commit => Exception: {ex.Message}", ex);
+                Logger.LogInformation($"{baseLogString} Commit => Commit on SCADA Transaction actor UNSUCCESSFULLY finished.");
+            }
+        }
+
+        public async Task Rollback()
+        {
+            try
+            {
+                await this.contractProvider.Rollback();
+                Logger.LogInformation($"{baseLogString} Rollback => Rollback on SCADA Transaction actor SUCCESSFULLY finished.");
+            }
+            catch (Exception ex)
+            {
+                Logger.LogError($"{baseLogString} Rollback => Exception: {ex.Message}", ex);
+                Logger.LogInformation($"{baseLogString} Rollback => Rollback on SCADA Transaction actor UNSUCCESSFULLY finished.");
+            }
+        }
+    }
+}

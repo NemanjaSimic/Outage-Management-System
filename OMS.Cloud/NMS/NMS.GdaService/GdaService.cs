@@ -8,11 +8,12 @@ using Microsoft.ServiceFabric.Services.Communication.Wcf;
 using Microsoft.ServiceFabric.Services.Communication.Wcf.Runtime;
 using Microsoft.ServiceFabric.Services.Runtime;
 using NMS.GdaImplementation;
+using NMS.GdaImplementation.DistributedTransaction;
 using NMS.GdaImplementation.GDA;
 using OMS.Common.Cloud.Logger;
 using OMS.Common.Cloud.Names;
 using OMS.Common.NmsContracts;
-
+using OMS.Common.TmsContracts;
 
 namespace NMS.GdaService
 {
@@ -24,6 +25,7 @@ namespace NMS.GdaService
         private readonly string baseLogString;
         private readonly NetworkModel networkModel;
         private readonly INetworkModelGDAContract genericDataAccess;
+        private readonly ITransactionActorContract nmsTransactionActor;
 
         #region Private Properties
         private ICloudLogger logger;
@@ -57,6 +59,7 @@ namespace NMS.GdaService
 
                 //LOGIC
                 this.genericDataAccess = new GenericDataAccess(networkModel);
+                this.nmsTransactionActor = new NmsTransactionActor(networkModel);
 
                 infoMessage = $"{baseLogString} Ctor => Contract providers initialized.";
                 Logger.LogInformation(infoMessage);
@@ -85,17 +88,17 @@ namespace NMS.GdaService
                     return new WcfCommunicationListener<INetworkModelGDAContract>(context,
                                                                                   this.genericDataAccess,
                                                                                   WcfUtility.CreateTcpListenerBinding(),
-                                                                                  EndpointNames.NetworkModelGDAEndpoint);
-                }, EndpointNames.NetworkModelGDAEndpoint),
+                                                                                  EndpointNames.NmsGdaEndpoint);
+                }, EndpointNames.NmsGdaEndpoint),
 
-                ////NetworkModelTransactionActorEndpoint
-                //new ServiceInstanceListener(context =>
-                //{
-                //    return new WcfCommunicationListener<ITransactionActorContract>(context,
-                //                                                           new NMSTransactionActor(networkModel),
-                //                                                           WcfUtility.CreateTcpListenerBinding(),
-                //                                                           EndpointNames.NetworkModelTransactionActorEndpoint);
-                //}, EndpointNames.NetworkModelTransactionActorEndpoint),
+                //TransactionActorEndpoint
+                new ServiceInstanceListener(context =>
+                {
+                    return new WcfCommunicationListener<ITransactionActorContract>(context,
+                                                                                   this.nmsTransactionActor,
+                                                                                   WcfUtility.CreateTcpListenerBinding(),
+                                                                                   EndpointNames.TmsTransactionActorEndpoint);
+                }, EndpointNames.TmsTransactionActorEndpoint),
             };
         }
 

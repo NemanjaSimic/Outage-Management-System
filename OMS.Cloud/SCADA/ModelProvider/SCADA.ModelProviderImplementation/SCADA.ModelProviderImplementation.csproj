@@ -146,7 +146,7 @@
     <Compile Include="ContractProviders\ModelUpdateAccessProvider.cs" />
     <Compile Include="Helpers\ScadaConfigDataHelper.cs" />
     <Compile Include="Helpers\ScadaModelPointItemHelper.cs" />
-    <Compile Include="DistributedTransaction\ScadaModelUpdateNotification.cs" />
+    <Compile Include="DistributedTransaction\ScadaNotifyNetworkModelUpdate.cs" />
     <Compile Include="DistributedTransaction\ScadaTransactionActor.cs" />
     <Compile Include="Properties\AssemblyInfo.cs" />
     <Compile Include="ScadaModel.cs" />
@@ -168,10 +168,6 @@
       <Project>{AE91CEB5-378A-4EEF-AEBF-C40ED1EF23CF}</Project>
       <Name>Common.WcfClient</Name>
     </ProjectReference>
-    <ProjectReference Include="..\..\..\Common\Contracts\Common.DistributedTransactionContracts\Common.DistributedTransactionContracts.csproj">
-      <Project>{A07D94C2-40EF-48DB-B828-7E53E7F5A372}</Project>
-      <Name>Common.DistributedTransactionContracts</Name>
-    </ProjectReference>
     <ProjectReference Include="..\..\..\Common\Contracts\Common.NmsContracts\Common.NmsContracts.csproj">
       <Project>{235804A8-9C8F-40EC-8786-5DAB24733977}</Project>
       <Name>Common.NmsContracts</Name>
@@ -183,6 +179,10 @@
     <ProjectReference Include="..\..\..\Common\Contracts\Common.ScadaContracts\Common.ScadaContracts.csproj">
       <Project>{5F25D9C5-9A93-49E7-92F7-58E399AEF928}</Project>
       <Name>Common.ScadaContracts</Name>
+    </ProjectReference>
+    <ProjectReference Include="..\..\..\Common\Contracts\Common.TmsContracts\Common.TmsContracts.csproj">
+      <Project>{A07D94C2-40EF-48DB-B828-7E53E7F5A372}</Project>
+      <Name>Common.TmsContracts</Name>
     </ProjectReference>
   </ItemGroup>
   <ItemGroup>

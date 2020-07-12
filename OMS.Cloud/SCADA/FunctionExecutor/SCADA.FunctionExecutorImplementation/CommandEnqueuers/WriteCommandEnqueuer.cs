@@ -66,6 +66,7 @@ namespace SCADA.FunctionExecutorImplementation.CommandEnqueuers
 
             try
             {
+                //KEY LOGIC
                 await this.writeCommandQueue.AddMessageAsync(new CloudQueueMessage(Serialization.ObjectToByteArray(modbusFunction)));
                 success = true;
 

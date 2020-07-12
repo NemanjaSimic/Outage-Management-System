@@ -29,8 +29,12 @@ namespace PubSubImplementation
             get { return logger ?? (logger = CloudLoggerFactory.GetLogger()); }
         }
 
-        private ReliableDictionaryAccess<short, Dictionary<Uri, RegisteredSubscriber>> registeredSubscribersCache;
-        private ReliableDictionaryAccess<short, Dictionary<Uri, RegisteredSubscriber>> RegisteredSubscribersCache
+        private ReliableDictionaryAccess<short, HashSet<string>> registeredSubscribersCache;
+        /// <summary>
+        /// key - topic enumeration
+        /// value - hashset of registered subscriber names (from MicroserviceNames)
+        /// </summary>
+        private ReliableDictionaryAccess<short, HashSet<string>> RegisteredSubscribersCache
         {
             get { return registeredSubscribersCache; }
         }
@@ -56,14 +60,14 @@ namespace PubSubImplementation
                 if (reliableStateName == ReliableDictionaryNames.RegisteredSubscribersCache)
                 {
                     //_ = SubscriberCache;
-                    registeredSubscribersCache = await ReliableDictionaryAccess<short, Dictionary<Uri, RegisteredSubscriber>>.Create(stateManager, ReliableDictionaryNames.RegisteredSubscribersCache);
+                    registeredSubscribersCache = await ReliableDictionaryAccess<short, HashSet<string>>.Create(stateManager, ReliableDictionaryNames.RegisteredSubscribersCache);
                     isSubscriberCacheInitialized = true;
                 }
             }
         }
 
         #region IRegisterSubscriberContract
-        public async Task<bool> SubscribeToTopic(Topic topic, Uri subscriberUri, ServiceType serviceType)
+        public async Task<bool> SubscribeToTopic(Topic topic, string subscriberServiceName)
         {
             while (!ReliableDictionariesInitialized)
             {
@@ -78,10 +82,8 @@ namespace PubSubImplementation
                 short key = (short)topic;
                 if (!(await RegisteredSubscribersCache.ContainsKeyAsync(key)))
                 {
-                    await RegisteredSubscribersCache.SetAsync(key, new Dictionary<Uri, RegisteredSubscriber>());
+                    await RegisteredSubscribersCache.SetAsync(key, new HashSet<string>());
                 }
-
-                var subscriber = new RegisteredSubscriber(subscriberUri, serviceType);
 
                 var result = await RegisteredSubscribersCache.TryGetValueAsync(key);
 
@@ -92,15 +94,15 @@ namespace PubSubImplementation
                 
                 var subscribers = result.Value;
 
-                if(subscribers.ContainsKey(subscriberUri))
+                if(subscribers.Contains(subscriberServiceName))
                 {
                     return false;
                 }
                 
-                subscribers.Add(subscriber.SubcriberUri, subscriber);
+                subscribers.Add(subscriberServiceName);
                 await RegisteredSubscribersCache.SetAsync(key, subscribers);
 
-                string debugMessage = $"{baseLogString} SubscribeToTopic => {subscriberUri} SUCCESSFULLY subscribed to topic '{topic}'.";
+                string debugMessage = $"{baseLogString} SubscribeToTopic => {subscriberServiceName} SUCCESSFULLY subscribed to topic '{topic}'.";
                 Logger.LogDebug(debugMessage);
                 success = true;
             }
@@ -114,7 +116,7 @@ namespace PubSubImplementation
             return success;
         }
 
-        public async Task<bool> SubscribeToTopics(IEnumerable<Topic> topics, Uri subscriberUri, ServiceType serviceType)
+        public async Task<bool> SubscribeToTopics(IEnumerable<Topic> topics, string subscriberServiceName)
         {
             while (!ReliableDictionariesInitialized)
             {
@@ -131,10 +133,8 @@ namespace PubSubImplementation
                     short key = (short)topic;
                     if (!(await RegisteredSubscribersCache.ContainsKeyAsync(key)))
                     {
-                        await RegisteredSubscribersCache.SetAsync(key, new Dictionary<Uri, RegisteredSubscriber>());
+                        await RegisteredSubscribersCache.SetAsync(key, new HashSet<string>());
                     }
-
-                    var subscriber = new RegisteredSubscriber(subscriberUri, serviceType);
 
                     var result = await RegisteredSubscribersCache.TryGetValueAsync(key);
 
@@ -145,12 +145,12 @@ namespace PubSubImplementation
                     
                     var subscribers = result.Value;
 
-                    if (!subscribers.ContainsKey(subscriberUri))
+                    if (!subscribers.Contains(subscriberServiceName))
                     {
-                        subscribers.Add(subscriber.SubcriberUri, subscriber);
+                        subscribers.Add(subscriberServiceName);
                         await RegisteredSubscribersCache.SetAsync(key, subscribers);
 
-                        string debugMessage = $"{baseLogString} SubscribeToTopics => {subscriberUri} SUCCESSFULLY subscribed to topic '{topic}'.";
+                        string debugMessage = $"{baseLogString} SubscribeToTopics => {subscriberServiceName} SUCCESSFULLY subscribed to topic '{topic}'.";
                         Logger.LogDebug(debugMessage);
                     }
                 }
@@ -167,7 +167,7 @@ namespace PubSubImplementation
             return success;
         }
 
-        public async Task<HashSet<Topic>> GetAllSubscribedTopics(Uri subcriberUri)
+        public async Task<HashSet<Topic>> GetAllSubscribedTopics(string subscriberServiceName)
         {
             while (!ReliableDictionariesInitialized)
             {
@@ -186,7 +186,7 @@ namespace PubSubImplementation
                     var topic = kvp.Key;
                     var subscribers = kvp.Value;
 
-                    if (subscribers.ContainsKey(subcriberUri))
+                    if (subscribers.Contains(subscriberServiceName))
                     {
                         result.Add((Topic)topic);
                     }
@@ -202,7 +202,7 @@ namespace PubSubImplementation
             }
         }    
 
-        public async Task<bool> UnsubscribeFromTopic(Topic topic, Uri subscriberUri)
+        public async Task<bool> UnsubscribeFromTopic(Topic topic, string subscriberServiceName)
         {
             while (!ReliableDictionariesInitialized)
             {
@@ -224,15 +224,15 @@ namespace PubSubImplementation
                 
                 var subscribers = result.Value;
 
-                if (!subscribers.ContainsKey(subscriberUri))
+                if (!subscribers.Contains(subscriberServiceName))
                 {
                     return false;
                 }
 
-                subscribers.Remove(subscriberUri);
+                subscribers.Remove(subscriberServiceName);
                 await RegisteredSubscribersCache.SetAsync(key, subscribers);
 
-                string debugMessage = $"{baseLogString} UnsubscribeFromTopic => {subscriberUri} SUCCESSFULLY unsubscribed from topic '{topic}'.";
+                string debugMessage = $"{baseLogString} UnsubscribeFromTopic => {subscriberServiceName} SUCCESSFULLY unsubscribed from topic '{topic}'.";
                 Logger.LogDebug(debugMessage);
                 success = true;
             }
@@ -246,7 +246,7 @@ namespace PubSubImplementation
             return success;
         }
 
-        public async Task<bool> UnsubscribeFromTopics(IEnumerable<Topic> topics, Uri subscriberUri)
+        public async Task<bool> UnsubscribeFromTopics(IEnumerable<Topic> topics, string subscriberServiceName)
         {
             while (!ReliableDictionariesInitialized)
             {
@@ -270,15 +270,15 @@ namespace PubSubImplementation
 
                     var subscribers = result.Value;
 
-                    if (!subscribers.ContainsKey(subscriberUri))
+                    if (!subscribers.Contains(subscriberServiceName))
                     {
                         continue;
                     }
 
-                    subscribers.Remove(subscriberUri);
+                    subscribers.Remove(subscriberServiceName);
                     await RegisteredSubscribersCache.SetAsync(key, subscribers);
 
-                    string debugMessage = $"{baseLogString} UnsubscribeFromTopics => {subscriberUri} SUCCESSFULLY unsubscribed from topic '{topic}'.";
+                    string debugMessage = $"{baseLogString} UnsubscribeFromTopics => {subscriberServiceName} SUCCESSFULLY unsubscribed from topic '{topic}'.";
                     Logger.LogDebug(debugMessage);
                 }
 
@@ -294,7 +294,7 @@ namespace PubSubImplementation
             return success;
         }
 
-        public async Task<bool> UnsubscribeFromAllTopics(Uri subscriberUri)
+        public async Task<bool> UnsubscribeFromAllTopics(string subscriberServiceName)
         {
             while (!ReliableDictionariesInitialized)
             {
@@ -311,15 +311,15 @@ namespace PubSubImplementation
                 {
                     var subscribers = enumerableSubscribersCache[topicKey];
 
-                    if (!subscribers.ContainsKey(subscriberUri))
+                    if (!subscribers.Contains(subscriberServiceName))
                     {
                         continue;
                     }
 
-                    subscribers.Remove(subscriberUri);
+                    subscribers.Remove(subscriberServiceName);
                     await RegisteredSubscribersCache.SetAsync(topicKey, subscribers);
 
-                    string debugMessage = $"{baseLogString} UnsubscribeFromAllTopics => {subscriberUri} SUCCESSFULLY unsubscribed from topic '{(Topic)topicKey}'.";
+                    string debugMessage = $"{baseLogString} UnsubscribeFromAllTopics => {subscriberServiceName} SUCCESSFULLY unsubscribed from topic '{(Topic)topicKey}'.";
                     Logger.LogDebug(debugMessage);
                 }
 

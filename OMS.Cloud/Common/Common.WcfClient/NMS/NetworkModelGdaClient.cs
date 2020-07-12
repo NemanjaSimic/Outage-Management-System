@@ -13,26 +13,23 @@ namespace OMS.Common.WcfClient.NMS
     public class NetworkModelGdaClient : WcfSeviceFabricClientBase<INetworkModelGDAContract>, INetworkModelGDAContract
     {
         private static readonly string microserviceName = MicroserviceNames.NmsGdaService;
-        private static readonly string listenerName = EndpointNames.NetworkModelGDAEndpoint;
+        private static readonly string listenerName = EndpointNames.NmsGdaEndpoint;
 
         public NetworkModelGdaClient(WcfCommunicationClientFactory<INetworkModelGDAContract> clientFactory, Uri serviceUri, ServicePartitionKey servicePartition) 
             : base(clientFactory, serviceUri, servicePartition, listenerName)
         {
         }
 
-        public static NetworkModelGdaClient CreateClient(Uri serviceUri = null)
+        public static NetworkModelGdaClient CreateClient()
         {
             ClientFactory factory = new ClientFactory();
-            ServicePartitionKey servicePartition = ServicePartitionKey.Singleton;
+            return factory.CreateClient<NetworkModelGdaClient, INetworkModelGDAContract>(microserviceName);
+        }
 
-            if (serviceUri == null)
-            {
-                return factory.CreateClient<NetworkModelGdaClient, INetworkModelGDAContract>(microserviceName, servicePartition);
-            }
-            else
-            {
-                return factory.CreateClient<NetworkModelGdaClient, INetworkModelGDAContract>(serviceUri, servicePartition);
-            }
+        public static NetworkModelGdaClient CreateClient(Uri serviceUri, ServicePartitionKey servicePartitionKey)
+        {
+            ClientFactory factory = new ClientFactory();
+            return factory.CreateClient<NetworkModelGdaClient, INetworkModelGDAContract>(serviceUri, servicePartitionKey);
         }
 
         #region INetworkModelGDAContract

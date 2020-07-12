@@ -74,8 +74,8 @@ namespace PubSubService
                     return new WcfCommunicationListener<IPublisherContract>(context,
                                                                             this.publisherProvider,
                                                                             WcfUtility.CreateTcpListenerBinding(),
-                                                                            EndpointNames.PublisherEndpoint);
-                }, EndpointNames.PublisherEndpoint),
+                                                                            EndpointNames.PubSubPublisherEndpoint);
+                }, EndpointNames.PubSubPublisherEndpoint),
 
                 //SubscriberEndpoint
                 new ServiceReplicaListener(context =>
@@ -83,8 +83,8 @@ namespace PubSubService
                     return new WcfCommunicationListener<IRegisterSubscriberContract>(context,
                                                                                      this.registerSubscriberProvider,
                                                                                      WcfUtility.CreateTcpListenerBinding(),
-                                                                                     EndpointNames.SubscriberEndpoint);
-                }, EndpointNames.SubscriberEndpoint),
+                                                                                     EndpointNames.PubSubRegisterSubscriberEndpoint);
+                }, EndpointNames.PubSubRegisterSubscriberEndpoint),
             };
         }
 
@@ -121,7 +121,7 @@ namespace PubSubService
                 {
                     using (ITransaction tx = this.StateManager.CreateTransaction())
                     {
-                        var result = await StateManager.TryGetAsync<IReliableDictionary<short, Dictionary<Uri, RegisteredSubscriber>>>(ReliableDictionaryNames.RegisteredSubscribersCache);
+                        var result = await StateManager.TryGetAsync<IReliableDictionary<short, HashSet<string>>>(ReliableDictionaryNames.RegisteredSubscribersCache);
                         if(result.HasValue)
                         {
                             var subscribers = result.Value;
@@ -130,7 +130,7 @@ namespace PubSubService
                         }
                         else
                         {
-                            await StateManager.GetOrAddAsync<IReliableDictionary<short, Dictionary<Uri, RegisteredSubscriber>>>(tx, ReliableDictionaryNames.RegisteredSubscribersCache);
+                            await StateManager.GetOrAddAsync<IReliableDictionary<short, HashSet<string>>>(tx, ReliableDictionaryNames.RegisteredSubscribersCache);
                             await tx.CommitAsync();
                         }
                     }

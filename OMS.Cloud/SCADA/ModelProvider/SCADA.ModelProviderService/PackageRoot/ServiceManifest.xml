@@ -37,8 +37,8 @@
       <Endpoint Name="ScadaModelReadAccessEndpoint" Protocol="tcp" Type="Input"/>
       <Endpoint Name="ScadaModelUpdateAccessEndpoint" Protocol="tcp" Type="Input"/>
       <Endpoint Name="ScadaIntegrityUpdateEndpoint" Protocol="tcp" Type="Input"/>
-      <!--<Endpoint Name="ScadaModelUpdateNotifierEndpoint" Protocol="tcp" Type="Input"/>
-      <Endpoint Name="ScadaTransactionActorEndpoint" Protocol="tcp" Type="Input"/>-->
+      <Endpoint Name="TmsNotifyNetworkModelUpdateEndpoint" Protocol="tcp" Type="Input"/>
+      <Endpoint Name="TmsTransactionActorEndpoint" Protocol="tcp" Type="Input"/>
     </Endpoints>
   </Resources>
 </ServiceManifest>

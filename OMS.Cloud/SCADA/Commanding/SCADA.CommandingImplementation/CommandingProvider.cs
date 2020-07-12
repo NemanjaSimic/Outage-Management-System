@@ -89,7 +89,7 @@ namespace SCADA.CommandingImplementation
                 string debugMessage = $"{baseLogString} SendSingleAnalogCommand => Calling SendSingleCommand({pointItem}, {modbusValue}, {commandOriginType})";
                 Logger.LogDebug(verboseMessage);
 
-                //LOGIC
+                //KEY LOGIC
                 await SendSingleCommand(pointItem, modbusValue, commandOriginType);
 
                 debugMessage = $"{baseLogString} SendSingleAnalogCommand => SendSingleCommand() executed SUCCESSFULLY";
@@ -181,7 +181,7 @@ namespace SCADA.CommandingImplementation
                 string debugMessage = $"{baseLogString} SendMultipleAnalogCommand => Calling SendMultipleCommand({ModbusFunctionCode.WRITE_MULTIPLE_REGISTERS}, {startAddress}, {multipleCommandingValues}, {commandOriginType})";
                 Logger.LogDebug(debugMessage);
 
-                //LOGIC
+                //KEY LOGIC
                 await SendMultipleCommand(ModbusFunctionCode.WRITE_MULTIPLE_REGISTERS, startAddress, multipleCommandingValues, commandOriginType);
 
                 debugMessage = $"{baseLogString} SendMultipleAnalogCommand => SendMultipleCommand() executed SUCCESSFULLY";
@@ -227,7 +227,7 @@ namespace SCADA.CommandingImplementation
                 string debugMessage = $"{baseLogString} SendSingleDiscreteCommand => Calling SendSingleCommand({pointItem}, {commandingValue}, {commandOriginType})";
                 Logger.LogDebug(debugMessage);
 
-                //LOGIC
+                //KEY LOGIC
                 await SendSingleCommand(pointItem, commandingValue, commandOriginType);
 
                 debugMessage = $"{baseLogString} SendSingleDiscreteCommand => SendSingleCommand() executed SUCCESSFULLY";
@@ -312,7 +312,7 @@ namespace SCADA.CommandingImplementation
                 string debugMessage = $"{baseLogString} SendMultipleDiscreteCommand => Calling SendMultipleCommand({ModbusFunctionCode.WRITE_MULTIPLE_COILS}, {multipleCommandingValues}, {commandOriginType})";
                 Logger.LogDebug(debugMessage);
 
-                //LOGIC
+                //KEY LOGIC
                 await SendMultipleCommand(ModbusFunctionCode.WRITE_MULTIPLE_COILS, startAddress, multipleCommandingValues, commandOriginType);
 
                 debugMessage = $"{baseLogString} SendMultipleDiscreteCommand => SendMultipleCommand() executed SUCCESSFULLY";
@@ -388,7 +388,8 @@ namespace SCADA.CommandingImplementation
         private async Task SendMultipleCommand(ModbusFunctionCode functionCode, ushort startAddress, int[] commandingValues, CommandOriginType commandOriginType, bool isRetry = false)
         {
             try
-            { 
+            {
+                //KEY LOGIC
                 IWriteModbusFunction modbusFunction = new WriteMultipleFunction(functionCode, startAddress, commandingValues, commandOriginType);
                 await this.commandEnqueuerClient.EnqueueWriteCommand(modbusFunction);
 

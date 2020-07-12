@@ -3,31 +3,37 @@ using NMS.GdaImplementation.GDA;
 using OMS.Common.Cloud;
 using OMS.Common.Cloud.Logger;
 using OMS.Common.Cloud.Names;
-using OMS.Common.DistributedTransactionContracts;
+using OMS.Common.NMS;
 using OMS.Common.NmsContracts;
 using OMS.Common.NmsContracts.GDA;
+using OMS.Common.TmsContracts;
+using OMS.Common.TmsContracts.Notifications;
 using OMS.Common.WcfClient.TMS;
 using System;
 using System.Collections.Generic;
+using System.Configuration;
+using System.Linq;
 using System.Text;
 using System.Threading.Tasks;
 using UpdateResult = OMS.Common.NmsContracts.GDA.UpdateResult;
 
 namespace NMS.GdaImplementation
 {
-    public class NetworkModel
+    public class NetworkModel : ITransactionActorContract
     {
         #region Fields
-        private MongoAccess mongoDb;
-        private Delta currentDelta;
+        private readonly string baseLogString;
+        private readonly MongoAccess mongoDb;
 
         /// <summary>
         /// ModelResourceDesc class contains metadata of the model
         /// </summary>
-        private ModelResourcesDesc resourcesDescs;
+        private readonly ModelResourcesDesc resourcesDescs;
 
-        private bool isNetworkModelInitialized = false;
+        private bool isModelCurrentlyInitializating = false;
+        private bool isModelInitialized = false;
         private bool isTransactionInProgress = false;
+        private Delta currentDelta;
 
         /// <summary>
 		/// Dictionaru which contains all incoming data: Key - DMSType, Value - Container;
@@ -74,16 +80,19 @@ namespace NMS.GdaImplementation
         /// </summary>
         public NetworkModel()
         {
+            this.baseLogString = $"{this.GetType()} [{this.GetHashCode()}] =>{Environment.NewLine}";
+
             this.mongoDb = new MongoAccess();
             this.resourcesDescs = new ModelResourcesDesc();
             
-            this.isNetworkModelInitialized = false;
-            //InitializeNetworkModel();
-        }
+            this.isModelCurrentlyInitializating = false;
+            this.isModelInitialized = false;
+            this.isTransactionInProgress = false;
+    }
 
         public async Task InitializeNetworkModel()
         {
-            this.isNetworkModelInitialized = false;
+            this.isModelInitialized = false;
 
             long deltaVersion = 0, networkModelVersion = 0;
             mongoDb.GetVersions(ref networkModelVersion, ref deltaVersion);
@@ -99,7 +108,8 @@ namespace NMS.GdaImplementation
                 {
                     try
                     {
-                        await ApplyDelta(delta, true);
+                        this.isModelCurrentlyInitializating = true;
+                        await ApplyDelta(delta);
                     }
                     catch (Exception ex)
                     {
@@ -108,16 +118,16 @@ namespace NMS.GdaImplementation
                 }
 
                 mongoDb.SaveNetworkModel(NetworkDataModel);
-                this.isNetworkModelInitialized = true;
+                this.isModelInitialized = true;
             }
             else if (networkModelVersion > 0)
             {
                 networkDataModel = mongoDb.GetLatesNetworkModel(networkModelVersion);
-                this.isNetworkModelInitialized = true;
+                this.isModelInitialized = true;
             }
             else if (deltaVersion == 0 && networkModelVersion == 0)
             {
-                this.isNetworkModelInitialized = true;
+                this.isModelInitialized = true;
                 return;
             }
             else
@@ -194,10 +204,10 @@ namespace NMS.GdaImplementation
 
         #endregion Find
 
-        #region GDA Contract
-        public async Task<UpdateResult> ApplyDelta(Delta delta, bool isInitialization = false)
+        #region INetworkModelGDAContract Methods
+        public async Task<UpdateResult> ApplyDelta(Delta delta)
         {
-            while (!isNetworkModelInitialized && !isInitialization)
+            while (!isModelInitialized && !isModelCurrentlyInitializating)
             {
                 await Task.Delay(1000);
             }
@@ -217,7 +227,7 @@ namespace NMS.GdaImplementation
                 Dictionary<short, int> typesCounters = GetCounters();
                 Dictionary<long, long> globalIdPairs = new Dictionary<long, long>();
 
-                if (!isInitialization)
+                if (!isModelCurrentlyInitializating)
                 {
                     delta.FixNegativeToPositiveIds(ref typesCounters, ref globalIdPairs);
 
@@ -247,15 +257,13 @@ namespace NMS.GdaImplementation
                 networkDataModel = incomingNetworkDataModel;
                 Logger.LogDebug($"Current model [HashCode: 0x{networkDataModel.GetHashCode():X16}] becomes Incoming model [HashCode: 0x{incomingNetworkDataModel.GetHashCode():X16}].");
 
-                if (isInitialization)
+                if (isModelCurrentlyInitializating)
                 {
-                    Commit(isInitialization);
+                    await Commit();
                 }
                 else
                 {
-                    Commit();
-                    //TODO: kad budemo podigli transakcioni....
-                    //StartDistributedTransaction(delta);
+                    await StartDistributedTransaction(delta);
                 }
             }
             catch (Exception ex)
@@ -293,7 +301,7 @@ namespace NMS.GdaImplementation
         /// <returns>Resource description of the specified entity</returns>
         public async Task<ResourceDescription> GetValues(long globalId, List<ModelCode> properties)
         {
-            while (!isNetworkModelInitialized)
+            while (!isModelInitialized)
             {
                 await Task.Delay(1000);
             }
@@ -341,7 +349,7 @@ namespace NMS.GdaImplementation
         /// <returns>Resource iterator for the requested entities</returns>
         public async Task<ResourceIterator> GetExtentValues(ModelCode entityType, List<ModelCode> properties)
         {
-            while (!isNetworkModelInitialized)
+            while (!isModelInitialized)
             {
                 await Task.Delay(1000);
             }
@@ -392,7 +400,7 @@ namespace NMS.GdaImplementation
         /// <returns>Resource iterator for the requested entities</returns>
         public async Task<ResourceIterator> GetRelatedValues(long source, List<ModelCode> properties, Association association)
         {
-            while (!isNetworkModelInitialized)
+            while (!isModelInitialized)
             {
                 await Task.Delay(1000);
             }
@@ -433,157 +441,8 @@ namespace NMS.GdaImplementation
                 throw new Exception(message);
             }
         }
-        #endregion GDA query	
 
-        #region ITransactionActorContract
-        public bool Prepare()
-        {
-            return oldNetworkDataModel != null && networkDataModel != null && oldNetworkDataModel.GetHashCode() != networkDataModel.GetHashCode();
-        }
-
-        /// <summary>
-        /// 2PhaseCommitProtocol - Commit Phase
-        /// </summary>
-        /// <param name="isInitialization">Indicates if changes are commited in initialization step, after the Network Model service has started.</param>
-        /// <returns></returns>
-        public bool Commit(bool isInitialization = false)
-        {
-            isTransactionInProgress = false;
-            if (!isInitialization && currentDelta != null)
-            {
-                mongoDb.SaveDelta(currentDelta);
-            }
-
-            currentDelta = null;
-            oldNetworkDataModel = null;
-            Logger.LogDebug($"Current model [HashCode: 0x{incomingNetworkDataModel.GetHashCode():X16}] commited. Old model is set to null.");
-            return true;
-        }
-
-        public bool Rollback()
-        {
-            isTransactionInProgress = false;
-            currentDelta = null;
-            networkDataModel = oldNetworkDataModel;
-            Logger.LogDebug($"Current model [HashCode: 0x{networkDataModel.GetHashCode():X16}] rollbacked to Old model [HashCode: 0x{oldNetworkDataModel.GetHashCode():X16}].");
-            return true;
-        }
-        #endregion
-
-        #region Private Members
-        private async Task StartDistributedTransaction(Delta delta)
-        {
-            isTransactionInProgress = true;
-
-            ITransactionCoordinatorContract transactionCoordinatorClient = TransactionCoordinatorClient.CreateClient();
-
-            if (transactionCoordinatorClient == null)
-            {
-                Logger.LogWarning("TransactionCoordinatorClient is not initialized. This can be due to TransactionCoordinator not being stared.");
-                Commit(false);
-                return;
-            }
-
-            await transactionCoordinatorClient.StartDistributedUpdate();
-            Logger.LogDebug("StartDistributedUpdate() invoked on Transaction Coordinator.");
-
-            Dictionary<DeltaOpType, List<long>> modelChanges = new Dictionary<DeltaOpType, List<long>>()
-            {
-                { DeltaOpType.Insert, new List<long>(delta.InsertOperations.Count) },
-                { DeltaOpType.Update, new List<long>(delta.UpdateOperations.Count) },
-                { DeltaOpType.Delete, new List<long>(delta.DeleteOperations.Count) },
-            };
-
-            foreach (ResourceDescription rd in delta.InsertOperations)
-            {
-                modelChanges[DeltaOpType.Insert].Add(rd.Id);
-            }
-
-            foreach (ResourceDescription rd in delta.UpdateOperations)
-            {
-                modelChanges[DeltaOpType.Update].Add(rd.Id);
-            }
-
-            foreach (ResourceDescription rd in delta.DeleteOperations)
-            {
-                modelChanges[DeltaOpType.Delete].Add(rd.Id);
-            }
-
-            bool success = false;
-
-            //TODO: specify actor name...
-            IModelUpdateNotificationContract scadaModelUpdateNotifierClient = ModelUpdateNotificationClient.CreateClient();
-
-            if (scadaModelUpdateNotifierClient == null)
-            {
-                string message = "ModelUpdateNotificationProxy for SCADA is null.";
-                Logger.LogWarning(message);
-                throw new NullReferenceException(message);
-            }
-
-            success = await scadaModelUpdateNotifierClient.NotifyAboutUpdate(modelChanges);
-            Logger.LogDebug("NotifyAboutUpdate() method invoked on SCADA Transaction actor.");
-            
-
-            if (success)
-            {
-                //TODO: specify actor name...
-                IModelUpdateNotificationContract calculationEngineUpdateNotifierClient = ModelUpdateNotificationClient.CreateClient();
-
-                if (calculationEngineUpdateNotifierClient == null)
-                {
-                    string message = "ModelUpdateNotificationProxy for CalculationEngine is null.";
-                    Logger.LogWarning(message);
-                    throw new NullReferenceException(message);
-                }
-
-                success = await calculationEngineUpdateNotifierClient.NotifyAboutUpdate(modelChanges);
-                Logger.LogDebug("NotifyAboutUpdate() method invoked on CE Transaction actor.");
-
-                if (success)
-                {
-                    //TODO: specify actor name...
-                    IModelUpdateNotificationContract outageModelUpdateNotifierClient = ModelUpdateNotificationClient.CreateClient();
-
-                    if (outageModelUpdateNotifierClient == null)
-                    {
-                        string message = "ModelUpdateNotificationProxy for Outage is null.";
-                        Logger.LogWarning(message);
-                        throw new NullReferenceException(message);
-                    }
-
-                    success = await outageModelUpdateNotifierClient.NotifyAboutUpdate(modelChanges);
-                    Logger.LogDebug("NotifyAboutUpdate() method invoked on Outage Transaction actor. ");
-
-                    if (success)
-                    {
-                        //TODO: specify actor name...
-                        ITransactionEnlistmentContract transactionEnlistmentClient = TransactionEnlistmentClient.CreateClient();
-
-                        if (transactionEnlistmentClient == null)
-                        {
-                            string message = "TransactionEnlistmentProxy is null.";
-                            Logger.LogWarning(message);
-                            throw new NullReferenceException(message);    
-                        }
-
-                        success = await transactionEnlistmentClient.Enlist(MicroserviceNames.NmsGdaService);
-                        Logger.LogDebug("Enlist() method invoked on Transaction Coordinator.");
-                    }
-                }
-            }
-
-            if (transactionCoordinatorClient == null)
-            {
-                string message = "TransactionCoordinatorClient is null.";
-                Logger.LogWarning(message);
-                throw new NullReferenceException(message);
-            }
-
-            await transactionCoordinatorClient.FinishDistributedUpdate(success);
-            Logger.LogDebug($"FinishDistributedUpdate() invoked on Transaction Coordinator with parameter 'success' value: {success}.");
-        }
-
+        #region Private Methods
         private Dictionary<short, int> GetCounters()
         {
             Dictionary<short, int> typesCounters = new Dictionary<short, int>();
@@ -1099,6 +958,163 @@ namespace NMS.GdaImplementation
             Logger.LogDebug($"Incoming model Entity [0x{globalId:X16}, HashCode: 0x{incomingEntity.GetHashCode():X16}] is shallow copy of Current model Entity [HashCode: 0x{currentEntity.GetHashCode():X16}].");
             return incomingEntity;
         }
-        #endregion
+        #endregion Private Methods
+        
+        #endregion INetworkModelGDAContract Methods
+
+        #region ITransactionActorContract
+        public Task<bool> Prepare()
+        {
+            return Task.Run(() =>
+            {
+                return oldNetworkDataModel != null && networkDataModel != null && oldNetworkDataModel.GetHashCode() != networkDataModel.GetHashCode();
+            });
+        }
+
+        /// <summary>
+        /// 2PhaseCommitProtocol - Commit Phase
+        /// </summary>
+        /// <param name="isInitialization">Indicates if changes are commited in initialization step, after the Network Model service has started.</param>
+        /// <returns></returns>
+        public Task Commit()
+        {
+            return Task.Run(() =>
+            {
+                this.isTransactionInProgress = false;
+
+                if (!isModelCurrentlyInitializating && currentDelta != null)
+                {
+                    mongoDb.SaveDelta(currentDelta);
+                }
+
+                currentDelta = null;
+                oldNetworkDataModel = null;
+                Logger.LogDebug($"{baseLogString} Commit => Current model [HashCode: 0x{incomingNetworkDataModel.GetHashCode():X16}] commited. Old model is set to null.");
+            });
+        }
+
+        public Task Rollback()
+        {
+            return Task.Run(() =>
+            {
+                this.isTransactionInProgress = false;
+
+                currentDelta = null;
+                networkDataModel = oldNetworkDataModel;
+                Logger.LogDebug($"{baseLogString} Rollback => Current model [HashCode: 0x{networkDataModel.GetHashCode():X16}] rollbacked to Old model [HashCode: 0x{oldNetworkDataModel.GetHashCode():X16}].");
+            });
+        }
+
+        #region Private Members
+        private async Task StartDistributedTransaction(Delta delta)
+        {
+            this.isTransactionInProgress = true;
+            var transactionActors = NetorkModelUpdateTransaction.Instance.TransactionActorsNames;
+            var modelChanges = CreateModelChangesData(delta);
+            
+            ITransactionCoordinatorContract transactionCoordinatorClient = TransactionCoordinatorClient.CreateClient();
+            await transactionCoordinatorClient.StartDistributedTransaction(DistributedTransactionNames.NetworkModelUpdateTransaction, transactionActors);
+            Logger.LogDebug($"{baseLogString} StartDistributedTransaction => StartDistributedTransaction('{DistributedTransactionNames.NetworkModelUpdateTransaction}', transactionActors count: {transactionActors.Count()}) called.");
+
+            var tasks = new List<Task<Tuple<string, bool>>>();
+            foreach (var transactionActorName in NetorkModelUpdateTransaction.Instance.TransactionActorsNames)
+            {
+                if(transactionActorName == MicroserviceNames.NmsGdaService)
+                {
+                    //No need to notify NMS about update
+                    continue;
+                }
+                else
+                {
+                    //Notifying service about Model Update
+                    tasks.Add(Task.Run(async () =>
+                    {
+                        INotifyNetworkModelUpdateContract notifyNetworkModelUpdateClient = NotifyNetworkModelUpdateClient.CreateClient(transactionActorName);
+
+                        var taskSuccess = await notifyNetworkModelUpdateClient.Notify(modelChanges);
+                        Logger.LogDebug($"{baseLogString} StartDistributedTransaction => Notify() method invoked on '{transactionActorName}' Transaction actor.");
+
+                        return new Tuple<string, bool>(transactionActorName, taskSuccess);
+                    }));
+                }
+            }
+
+            var taskResults = await Task.WhenAll(tasks.ToArray());
+            var notifyPhaseSuccess = true;
+
+            //Checking task results
+            foreach (var taskResult in taskResults)
+            {
+                var actorName = taskResult.Item1;
+                var notifySuccess = taskResult.Item2;
+
+                notifyPhaseSuccess = notifyPhaseSuccess && notifySuccess;
+
+                if (notifyPhaseSuccess)
+                {
+                    Logger.LogInformation($"{baseLogString} StartDistributedTransaction => Notify on Transaction actor: {actorName} finsihed SUCCESSFULLY.");
+                }
+                else
+                {
+                    Logger.LogInformation($"{baseLogString} StartDistributedTransaction => Notify on Transaction actor: {actorName} finsihed UNSUCCESSFULLY.");
+                    break;
+                }
+            }
+
+            bool nmsEnlistSuccess;
+
+            //IF ALL notify tasks return true
+            if (notifyPhaseSuccess)
+            {
+                nmsEnlistSuccess = await EnlistNmsTransactionActor();
+            }
+            else
+            {
+                //NO need to enlist nms if any of notify taks failed
+                nmsEnlistSuccess = false;
+            }
+
+            await transactionCoordinatorClient.FinishDistributedTransaction(DistributedTransactionNames.NetworkModelUpdateTransaction, nmsEnlistSuccess);
+            Logger.LogDebug($"FinishDistributedUpdate() invoked on Transaction Coordinator with parameter 'success' value: {nmsEnlistSuccess}.");
+        }
+
+        private Dictionary<DeltaOpType, List<long>> CreateModelChangesData(Delta delta)
+        {
+            var modelChanges = new Dictionary<DeltaOpType, List<long>>()
+            {
+                { DeltaOpType.Insert, new List<long>(delta.InsertOperations.Count) },
+                { DeltaOpType.Update, new List<long>(delta.UpdateOperations.Count) },
+                { DeltaOpType.Delete, new List<long>(delta.DeleteOperations.Count) },
+            };
+
+            foreach (ResourceDescription rd in delta.InsertOperations)
+            {
+                modelChanges[DeltaOpType.Insert].Add(rd.Id);
+            }
+
+            foreach (ResourceDescription rd in delta.UpdateOperations)
+            {
+                modelChanges[DeltaOpType.Update].Add(rd.Id);
+            }
+
+            foreach (ResourceDescription rd in delta.DeleteOperations)
+            {
+                modelChanges[DeltaOpType.Delete].Add(rd.Id);
+            }
+
+            return modelChanges;
+        }
+
+        private async Task<bool> EnlistNmsTransactionActor()
+        {
+            ITransactionEnlistmentContract transactionEnlistmentClient = TransactionEnlistmentClient.CreateClient();
+            bool nmsEnlistSuccess = await transactionEnlistmentClient.Enlist(DistributedTransactionNames.NetworkModelUpdateTransaction, MicroserviceNames.NmsGdaService);
+            Logger.LogDebug("{baseLogString} StartDistributedTransaction => Enlist() method invoked on Transaction Coordinator.");
+
+            return nmsEnlistSuccess;
+        }
+        #endregion Private Members
+
+        #endregion ITransactionActorContract
     }
 }
