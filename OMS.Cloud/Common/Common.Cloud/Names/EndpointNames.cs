@@ -25,9 +25,13 @@
         public const string CalculationEngineTransactionActorEndpoint = "CalculationEngineTransactionActorEndpoint";
         public const string CalculationEngineModelUpdateNotifierEndpoint = "CalculationEngineModelUpdateNotifierEndpoint";
         public const string TopologyServiceEndpoint = "TopologyServiceEndpoint";
+        public const string TopologyProviderServiceEndpoint = "TopologyProviderServiceEndpoint";
+        public const string TopologyBuilderServiceEndpoint = "TopologyBuilderServiceEndpoint";
         public const string TopologyOMSServiceEndpoint = "TopologyOMSServiceEndpoint";
         public const string SwitchStatusCommandingEndpoint = "SwitchStatusCommandingEndpoint";
-        public const string MeasurementMapEndpoint = "MeasurementMapEndpoint";
+        public const string MeasurementProviderEndpoint = "MeasurementProviderEndpoint";
+        public const string ModelProviderServiceEndpoint = "ModelProviderServiceEndpoint";
+        public const string LoadFlowServiceEndpoint = "LoadFlowServiceEndpoint";
 
         //PUBSUB - 4
         public const string PublisherEndpoint = "PublisherEndpoint";
