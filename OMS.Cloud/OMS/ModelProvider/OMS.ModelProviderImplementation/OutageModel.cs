@@ -1,6 +1,7 @@
 ﻿using Common.OMS;
 using Microsoft.ServiceFabric.Data;
 using Microsoft.ServiceFabric.Data.Notifications;
+using OMS.Common.Cloud;
 using OMS.Common.Cloud.Logger;
 using OMS.Common.Cloud.ReliableCollectionHelpers;
 using System;
@@ -44,6 +45,28 @@ namespace OMS.ModelProviderImplementation
 
 		}
 
+		private ReliableDictionaryAccess<long,long> commandedElements;
+
+		public ReliableDictionaryAccess<long,long> CommandedElements
+		{
+			get { return commandedElements ?? (commandedElements = ReliableDictionaryAccess<long, long>.Create(this.stateManager, ReliableDictionaryNames.CommandedElements).Result); }
+		}
+
+		private ReliableDictionaryAccess<long,long> optimumIsloationPoints;
+
+		public ReliableDictionaryAccess<long,long> OptimumIsolatioPoints
+		{
+			get { return optimumIsloationPoints ?? (optimumIsloationPoints =  ReliableDictionaryAccess<long,long>.Create(this.stateManager,ReliableDictionaryNames.OptimumIsolatioPoints).Result); }
+		
+		}
+
+		private ReliableDictionaryAccess<long,CommandOriginType> potentialOutage;
+
+		public ReliableDictionaryAccess<long, CommandOriginType> PotentialOutage
+		{
+			get { return potentialOutage ?? (potentialOutage = ReliableDictionaryAccess<long,CommandOriginType>.Create(this.stateManager,ReliableDictionaryNames.PotentialOutage).Result); }
+		}
+
 		private async void OnStateManagerChangedHandler(object sender, NotifyStateManagerChangedEventArgs e)
 		{
 			if(e.Action == NotifyStateManagerChangedAction.Add)
@@ -53,7 +76,17 @@ namespace OMS.ModelProviderImplementation
 				if(reliableStateName == ReliableDictionaryNames.OutageTopologyModel)
 				{
 					topologyModel = await ReliableDictionaryAccess<long, IOutageTopologyModel>.Create(this.stateManager, ReliableDictionaryNames.OutageTopologyModel);
+				}else if(reliableStateName == ReliableDictionaryNames.CommandedElements)
+				{
+					commandedElements = await ReliableDictionaryAccess<long, long>.Create(this.stateManager, ReliableDictionaryNames.CommandedElements);
+				}else if(reliableStateName == ReliableDictionaryNames.OptimumIsolatioPoints)
+				{
+					optimumIsloationPoints = await ReliableDictionaryAccess<long, long>.Create(this.stateManager, ReliableDictionaryNames.OptimumIsolatioPoints);
+				}else if(reliableStateName == ReliableDictionaryNames.PotentialOutage)
+				{
+					potentialOutage = await ReliableDictionaryAccess<long, CommandOriginType>.Create(this.stateManager, ReliableDictionaryNames.PotentialOutage);
 				}
+
 			}
 		}
 	}

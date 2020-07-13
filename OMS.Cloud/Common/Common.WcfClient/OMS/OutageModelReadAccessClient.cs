@@ -2,6 +2,7 @@
 using Common.OmsContracts.ModelProvider;
 using Microsoft.ServiceFabric.Services.Client;
 using Microsoft.ServiceFabric.Services.Communication.Wcf.Client;
+using OMS.Common.Cloud;
 using OMS.Common.Cloud.Names;
 using System;
 using System.Collections.Generic;
@@ -32,6 +33,21 @@ namespace OMS.Common.WcfClient.OMS
             {
                 return factory.CreateClient<OutageModelReadAccessClient, IOutageModelReadAccessContract>(serviceUri, servicePartition);
             }
+        }
+
+        public Task<Dictionary<long, long>> GetCommandedElements()
+        {
+            return InvokeWithRetryAsync(client => client.Channel.GetCommandedElements());
+        }
+
+        public Task<Dictionary<long, long>> GetOptimumIsolatioPoints()
+        {
+            return InvokeWithRetryAsync(client => client.Channel.GetOptimumIsolatioPoints());
+        }
+
+        public Task<Dictionary<long, CommandOriginType>> GetPotentialOutage()
+        {
+            return InvokeWithRetryAsync(client => client.Channel.GetPotentialOutage());
         }
 
         #region IOutageModelReadAccessContract
