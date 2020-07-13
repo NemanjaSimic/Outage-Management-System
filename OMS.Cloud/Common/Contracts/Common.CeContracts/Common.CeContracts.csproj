@@ -82,10 +82,12 @@
     <Reference Include="System.Xml" />
   </ItemGroup>
   <ItemGroup>
-    <Compile Include="ILoadFlowService.cs" />
-    <Compile Include="ITopologyProviderService.cs" />
-    <Compile Include="IModelProviderService.cs" />
+    <Compile Include="ILoadFlowContract.cs" />
+    <Compile Include="IMeasurementProviderContract.cs" />
+    <Compile Include="ITopologyProviderContract.cs" />
+    <Compile Include="IModelProviderContract.cs" />
     <Compile Include="Properties\AssemblyInfo.cs" />
+    <Compile Include="ITopologyBuilderContract.cs" />
   </ItemGroup>
   <ItemGroup>
     <None Include="app.config" />
@@ -95,6 +97,14 @@
     <ProjectReference Include="..\..\Common.CE\Common.CE.csproj">
       <Project>{2b5dafd3-879b-4876-972f-0cc48463ac0c}</Project>
       <Name>Common.CE</Name>
+    </ProjectReference>
+    <ProjectReference Include="..\..\Common.Cloud\Common.Cloud.csproj">
+      <Project>{FBEE1369-0F6C-41E6-8C62-8C1C5CDBB602}</Project>
+      <Name>Common.Cloud</Name>
+    </ProjectReference>
+    <ProjectReference Include="..\Common.PubSubContracts\Common.PubSubContracts.csproj">
+      <Project>{AA75150D-EE56-49C0-9431-751F83CCC0CD}</Project>
+      <Name>Common.PubSubContracts</Name>
     </ProjectReference>
   </ItemGroup>
   <Import Project="$(MSBuildToolsPath)\Microsoft.CSharp.targets" />

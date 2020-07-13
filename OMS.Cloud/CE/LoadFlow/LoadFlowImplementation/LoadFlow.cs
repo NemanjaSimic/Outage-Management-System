@@ -1,5 +1,4 @@
 ﻿using CECommon;
-using CECommon.Configuration;
 using CECommon.Interfaces;
 using CECommon.Model;
 using CECommon.Models;
@@ -16,9 +15,9 @@ using System.Linq;
 using System.Threading;
 using System.Threading.Tasks;
 
-namespace Topology
+namespace TopologyBuilderImplementation
 {
-    public class LoadFlow : ILoadFlowService
+    public class LoadFlow : ILoadFlowContract
     {
         #region Private fields
         private HashSet<long> reclosers;

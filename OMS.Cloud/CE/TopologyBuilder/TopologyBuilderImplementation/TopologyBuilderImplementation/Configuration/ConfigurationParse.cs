@@ -1,8 +1,10 @@
-﻿using OMS.Common.Cloud;
+﻿using CECommon;
+using OMS.Common.Cloud;
+using OMS.Common.Cloud.Logger;
 using System;
 using System.Collections.Generic;
 
-namespace CECommon.Configuration
+namespace TopologyBuilderImplementation.Configuration
 {
 	public class ConfigurationParse
 	{
@@ -14,11 +16,29 @@ namespace CECommon.Configuration
 		private readonly string measurementFilePath = "measurement.txt";
 		#endregion
 
-		//private ILogger logger = LoggerWrapper.Instance;
-        private List<DMSType> ParseConfigFile(string path)
+		private readonly string baseLogString;
+
+		private ICloudLogger logger;
+		private ICloudLogger Logger
 		{
+			get { return logger ?? (logger = CloudLoggerFactory.GetLogger()); }
+		}
+
+		public ConfigurationParse()
+		{
+			this.baseLogString = $"{this.GetType()} [{this.GetHashCode()}] =>{Environment.NewLine}";
+			string verboseMessage = $"{baseLogString} entering Ctor.";
+			Logger.LogVerbose(verboseMessage);
+		}
+
+		private List<DMSType> ParseConfigFile(string path)
+		{
+			string verboseMessage = $"{baseLogString} ParseConfigFile method called for file {path}.";
+			Logger.LogVerbose(verboseMessage);
+
 			string[] elements = Config.Instance.ReadConfiguration(path).Split(';');
 			List<DMSType> retValue = new List<DMSType>();
+
 			foreach (var item in elements)
 			{
 				DMSType type;
@@ -27,16 +47,20 @@ namespace CECommon.Configuration
 					type = (DMSType)Enum.Parse(typeof(DMSType), item);
 					retValue.Add(type);
 				}
-				catch (Exception ex)
+				catch (Exception)
 				{
-					//logger.LogError($"Failed to parse configuration file on path {path}. Exception message: {ex.Message}");
-					throw ex;
+					string message = $"{baseLogString} ParseConfigFile => Failed to parse [{item}] from configuration file {path}.";
+					Logger.LogError(message);
+					throw new Exception(message);
 				}
 			}
 			return retValue;
 		}
 		public Dictionary<TopologyStatus, List<DMSType>> GetAllElementStatus()
 		{
+			string verboseMessage = $"{baseLogString} GetAllElementStatus method called.";
+			Logger.LogVerbose(verboseMessage);
+
 			Dictionary<TopologyStatus, List<DMSType>> elements = new Dictionary<TopologyStatus, List<DMSType>>
 			{
 				{ TopologyStatus.Ignorable, new List<DMSType>(ParseConfigFile(ignorableFilePath)) },
@@ -46,6 +70,9 @@ namespace CECommon.Configuration
 		}
 		public Dictionary<TopologyType, List<DMSType>> GetAllTopologyTypes()
 		{
+			string verboseMessage = $"{baseLogString} GetAllTopologyTypes method called.";
+			Logger.LogVerbose(verboseMessage);
+
 			Dictionary<TopologyType, List<DMSType>> elements = new Dictionary<TopologyType, List<DMSType>>
 			{
 				{TopologyType.Node, new List<DMSType>(ParseConfigFile(nodeFilePath))},

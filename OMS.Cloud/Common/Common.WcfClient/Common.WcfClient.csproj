@@ -112,9 +112,12 @@
     <Reference Include="WindowsBase" />
   </ItemGroup>
   <ItemGroup>
+    <Compile Include="CE\LoadFlowClient.cs" />
+    <Compile Include="CE\MeasurementProviderClient.cs" />
     <Compile Include="CE\ModelProviderClient.cs" />
+    <Compile Include="CE\TopologyBuilderClient.cs" />
+    <Compile Include="CE\TopologyProviderClient.cs" />
     <Compile Include="Properties\AssemblyInfo.cs" />
-    <Compile Include="CE\Placeholder.cs" />
     <Compile Include="ClientFactory.cs" />
     <Compile Include="NMS\NetworkModelGdaClient.cs" />
     <Compile Include="OMS\Placeholder.cs" />
@@ -139,6 +142,10 @@
     <None Include="packages.config" />
   </ItemGroup>
   <ItemGroup>
+    <ProjectReference Include="..\Common.CE\Common.CE.csproj">
+      <Project>{2b5dafd3-879b-4876-972f-0cc48463ac0c}</Project>
+      <Name>Common.CE</Name>
+    </ProjectReference>
     <ProjectReference Include="..\Common.Cloud\Common.Cloud.csproj">
       <Project>{FBEE1369-0F6C-41E6-8C62-8C1C5CDBB602}</Project>
       <Name>Common.Cloud</Name>
@@ -150,6 +157,10 @@
     <ProjectReference Include="..\Common.SCADA\Common.SCADA.csproj">
       <Project>{6A84DB56-920C-4FC1-9CB0-9C29D0FC1586}</Project>
       <Name>Common.SCADA</Name>
+    </ProjectReference>
+    <ProjectReference Include="..\Contracts\Common.CeContracts\Common.CeContracts.csproj">
+      <Project>{D8B669F1-9B73-4F6A-9AFC-53AF4B0272AC}</Project>
+      <Name>Common.CeContracts</Name>
     </ProjectReference>
     <ProjectReference Include="..\Contracts\Common.DistributedTransactionContracts\Common.DistributedTransactionContracts.csproj">
       <Project>{A07D94C2-40EF-48DB-B828-7E53E7F5A372}</Project>

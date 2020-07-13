@@ -7,7 +7,7 @@ using System.Threading.Tasks;
 namespace Common.CeContracts.ModelProvider
 {
     [ServiceContract]
-    public interface IModelProviderService : IService
+    public interface IModelProviderContract : IService
 	{
         [OperationContract]
         Task<List<long>> GetEnergySources();

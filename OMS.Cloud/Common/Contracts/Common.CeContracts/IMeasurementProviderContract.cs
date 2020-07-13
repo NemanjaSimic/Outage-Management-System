@@ -9,7 +9,7 @@ using System.Threading.Tasks;
 namespace Common.CeContracts
 {
     [ServiceContract]
-	public interface IMeasurementProviderService : IService
+	public interface IMeasurementProviderContract : IService
 	{
         [OperationContract]
         Task AddAnalogMeasurement(AnalogMeasurement analogMeasurement);

@@ -8,11 +8,11 @@ using System.Threading.Tasks;
 
 namespace OMS.Common.WcfClient.CE
 {
-	public class TopologyBuilderClient : WcfSeviceFabricClientBase<ITopologyBuilderService>, ITopologyBuilderService
+	public class TopologyBuilderClient : WcfSeviceFabricClientBase<ITopologyBuilderContract>, ITopologyBuilderContract
 	{
 		private static readonly string microserviceName = MicroserviceNames.TopologyBuilderService;
 		private static readonly string listenerName = EndpointNames.TopologyBuilderServiceEndpoint;
-		public TopologyBuilderClient(WcfCommunicationClientFactory<ITopologyBuilderService> clientFactory, Uri serviceUri, ServicePartitionKey servicePartition)
+		public TopologyBuilderClient(WcfCommunicationClientFactory<ITopologyBuilderContract> clientFactory, Uri serviceUri, ServicePartitionKey servicePartition)
 			: base(clientFactory, serviceUri, servicePartition, listenerName)
 		{
 
@@ -25,11 +25,11 @@ namespace OMS.Common.WcfClient.CE
 
 			if (serviceUri == null)
 			{
-				return factory.CreateClient<TopologyBuilderClient, ITopologyBuilderService>(microserviceName, servicePartition);
+				return factory.CreateClient<TopologyBuilderClient, ITopologyBuilderContract>(microserviceName, servicePartition);
 			}
 			else
 			{
-				return factory.CreateClient<TopologyBuilderClient, ITopologyBuilderService>(serviceUri, servicePartition);
+				return factory.CreateClient<TopologyBuilderClient, ITopologyBuilderContract>(serviceUri, servicePartition);
 			}
 		}
 		public Task<ITopology> CreateGraphTopology(long firstElementGid)

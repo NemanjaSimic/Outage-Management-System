@@ -79,9 +79,6 @@
     <Reference Include="System.Xml" />
   </ItemGroup>
   <ItemGroup>
-    <Compile Include="Configuration\Config.cs" />
-    <Compile Include="Configuration\ConfigurationParse.cs" />
-    <Compile Include="Configuration\DailyCurveReader.cs" />
     <Compile Include="Enums.cs" />
     <Compile Include="Interfaces\IGraphElement.cs" />
     <Compile Include="Interfaces\ILoadFlow.cs" />

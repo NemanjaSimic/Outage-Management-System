@@ -11,12 +11,12 @@ using System.Threading.Tasks;
 
 namespace OMS.Common.WcfClient.CE
 {
-	public class TopologyProviderClient : WcfSeviceFabricClientBase<ITopologyProviderService>, ITopologyProviderService
+	public class TopologyProviderClient : WcfSeviceFabricClientBase<ITopologyProviderContract>, ITopologyProviderContract
 	{
 		private static readonly string microserviceName = MicroserviceNames.TopologyProviderService;
 		private static readonly string listenerName = EndpointNames.TopologyProviderServiceEndpoint;
 
-		public TopologyProviderClient(WcfCommunicationClientFactory<ITopologyProviderService> clientFactory, Uri serviceUri, ServicePartitionKey servicePartition)
+		public TopologyProviderClient(WcfCommunicationClientFactory<ITopologyProviderContract> clientFactory, Uri serviceUri, ServicePartitionKey servicePartition)
 			: base(clientFactory, serviceUri, servicePartition, listenerName)
 		{
 
@@ -29,11 +29,11 @@ namespace OMS.Common.WcfClient.CE
 
 			if (serviceUri == null)
 			{
-				return factory.CreateClient<TopologyProviderClient, ITopologyProviderService>(microserviceName, servicePartition);
+				return factory.CreateClient<TopologyProviderClient, ITopologyProviderContract>(microserviceName, servicePartition);
 			}
 			else
 			{
-				return factory.CreateClient<TopologyProviderClient, ITopologyProviderService>(serviceUri, servicePartition);
+				return factory.CreateClient<TopologyProviderClient, ITopologyProviderContract>(serviceUri, servicePartition);
 			}
 		}
 

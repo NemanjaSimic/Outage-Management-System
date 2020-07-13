@@ -11,11 +11,11 @@ using System.Threading.Tasks;
 
 namespace OMS.Common.WcfClient.CE
 {
-	public class MeasurementProviderClient : WcfSeviceFabricClientBase<IMeasurementProviderService>, IMeasurementProviderService
+	public class MeasurementProviderClient : WcfSeviceFabricClientBase<IMeasurementProviderContract>, IMeasurementProviderContract
 	{
 		private static readonly string microserviceName = MicroserviceNames.MeasurementProviderService;
 		private static readonly string listenerName = EndpointNames.MeasurementProviderEndpoint;
-		public MeasurementProviderClient(WcfCommunicationClientFactory<IMeasurementProviderService> clientFactory, Uri serviceUri, ServicePartitionKey servicePartition)
+		public MeasurementProviderClient(WcfCommunicationClientFactory<IMeasurementProviderContract> clientFactory, Uri serviceUri, ServicePartitionKey servicePartition)
 			: base(clientFactory, serviceUri, servicePartition, listenerName)
 		{
 
@@ -28,11 +28,11 @@ namespace OMS.Common.WcfClient.CE
 
 			if (serviceUri == null)
 			{
-				return factory.CreateClient<MeasurementProviderClient, IMeasurementProviderService>(microserviceName, servicePartition);
+				return factory.CreateClient<MeasurementProviderClient, IMeasurementProviderContract>(microserviceName, servicePartition);
 			}
 			else
 			{
-				return factory.CreateClient<MeasurementProviderClient, IMeasurementProviderService>(serviceUri, servicePartition);
+				return factory.CreateClient<MeasurementProviderClient, IMeasurementProviderContract>(serviceUri, servicePartition);
 			}
 		}
 		public Task AddAnalogMeasurement(AnalogMeasurement analogMeasurement)

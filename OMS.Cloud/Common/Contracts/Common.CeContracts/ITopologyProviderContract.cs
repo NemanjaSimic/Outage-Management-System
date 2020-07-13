@@ -9,7 +9,7 @@ using System.Threading.Tasks;
 namespace Common.CeContracts.TopologyProvider
 {
     [ServiceContract]
-	public interface ITopologyProviderService : IService
+	public interface ITopologyProviderContract : IService
 	{
         [OperationContract]
         Task<List<ITopology>> GetTopologies();

@@ -11,11 +11,11 @@ using System.Threading.Tasks;
 
 namespace OMS.Common.WcfClient.CE
 {
-	public class LoadFlowClient : WcfSeviceFabricClientBase<ILoadFlowService>, ILoadFlowService
+	public class LoadFlowClient : WcfSeviceFabricClientBase<ILoadFlowContract>, ILoadFlowContract
 	{
 		private static readonly string microserviceName = MicroserviceNames.LoadFlowService;
 		private static readonly string listenerName = EndpointNames.LoadFlowServiceEndpoint;
-		public LoadFlowClient(WcfCommunicationClientFactory<ILoadFlowService> clientFactory, Uri serviceUri, ServicePartitionKey servicePartition)
+		public LoadFlowClient(WcfCommunicationClientFactory<ILoadFlowContract> clientFactory, Uri serviceUri, ServicePartitionKey servicePartition)
 			: base(clientFactory, serviceUri, servicePartition, listenerName)
 		{
 
@@ -28,11 +28,11 @@ namespace OMS.Common.WcfClient.CE
 
 			if (serviceUri == null)
 			{
-				return factory.CreateClient<LoadFlowClient, ILoadFlowService>(microserviceName, servicePartition);
+				return factory.CreateClient<LoadFlowClient, ILoadFlowContract>(microserviceName, servicePartition);
 			}
 			else
 			{
-				return factory.CreateClient<LoadFlowClient, ILoadFlowService>(serviceUri, servicePartition);
+				return factory.CreateClient<LoadFlowClient, ILoadFlowContract>(serviceUri, servicePartition);
 			}
 		}
 		public Task UpdateLoadFlow(List<ITopology> topologies)

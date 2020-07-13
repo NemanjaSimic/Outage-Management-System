@@ -11,7 +11,7 @@ using Microsoft.ServiceFabric.Services.Communication.Wcf.Runtime;
 using Microsoft.ServiceFabric.Services.Runtime;
 using OMS.Common.Cloud.Logger;
 using OMS.Common.Cloud.Names;
-using Topology;
+using TopologyBuilderImplementation;
 
 namespace LoadFlowService
 {
@@ -61,7 +61,7 @@ namespace LoadFlowService
 			{
 				new ServiceInstanceListener(context =>
 				{
-					 return new WcfCommunicationListener<ILoadFlowService>(context,
+					 return new WcfCommunicationListener<ILoadFlowContract>(context,
 																			   this.loadFlowEngine,
 																			   WcfUtility.CreateTcpListenerBinding(),
 																			   EndpointNames.LoadFlowServiceEndpoint);
@@ -76,7 +76,7 @@ namespace LoadFlowService
 		protected override async Task RunAsync(CancellationToken cancellationToken)
 		{
 			cancellationToken.ThrowIfCancellationRequested();
-
+			//To DO
 
 			long iterations = 0;
 

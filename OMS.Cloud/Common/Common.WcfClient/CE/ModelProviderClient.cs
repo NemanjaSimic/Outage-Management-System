@@ -9,11 +9,11 @@ using System.Threading.Tasks;
 
 namespace OMS.Common.WcfClient.CE
 {
-	public class ModelProviderClient : WcfSeviceFabricClientBase<IModelProviderService>, IModelProviderService
+	public class ModelProviderClient : WcfSeviceFabricClientBase<IModelProviderContract>, IModelProviderContract
 	{
 		private static readonly string microserviceName = MicroserviceNames.ModelProviderService;
 		private static readonly string listenerName = EndpointNames.ModelProviderServiceEndpoint;
-		public ModelProviderClient(WcfCommunicationClientFactory<IModelProviderService> clientFactory, Uri serviceUri, ServicePartitionKey servicePartition) 
+		public ModelProviderClient(WcfCommunicationClientFactory<IModelProviderContract> clientFactory, Uri serviceUri, ServicePartitionKey servicePartition) 
             : base(clientFactory, serviceUri, servicePartition, listenerName)
 		{
 
@@ -26,11 +26,11 @@ namespace OMS.Common.WcfClient.CE
 
 			if (serviceUri == null)
 			{
-				return factory.CreateClient<ModelProviderClient, IModelProviderService>(microserviceName, servicePartition);
+				return factory.CreateClient<ModelProviderClient, IModelProviderContract>(microserviceName, servicePartition);
 			}
 			else
 			{
-				return factory.CreateClient<ModelProviderClient, IModelProviderService>(serviceUri, servicePartition);
+				return factory.CreateClient<ModelProviderClient, IModelProviderContract>(serviceUri, servicePartition);
 			}
 		}
 

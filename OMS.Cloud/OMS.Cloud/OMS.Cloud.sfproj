@@ -32,6 +32,7 @@
     <Content Include="packages.config" />
   </ItemGroup>
   <ItemGroup>
+    <ProjectReference Include="..\CE\TopologyBuilder\TopologyBuilderService\TopologyBuilderService.csproj" />
     <ProjectReference Include="..\CE\TopologyProviderService\TopologyProviderService.csproj" />
     <ProjectReference Include="..\NMS\NMS.GdaService\NMS.GdaService.csproj" />
     <ProjectReference Include="..\PUB_SUB\PubSubService\PubSubService.csproj" />
