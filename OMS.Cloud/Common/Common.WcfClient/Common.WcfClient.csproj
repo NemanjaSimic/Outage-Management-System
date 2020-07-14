@@ -112,6 +112,7 @@
     <Reference Include="WindowsBase" />
   </ItemGroup>
   <ItemGroup>
+    <Compile Include="OMS\OutageModelUpdateAccessClient.cs" />
     <Compile Include="OMS\HistoryDBManagerClient.cs" />
     <Compile Include="OMS\TracingAlgorithmClient.cs" />
     <Compile Include="Properties\AssemblyInfo.cs" />

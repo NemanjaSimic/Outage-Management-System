@@ -9,8 +9,10 @@ using Microsoft.ServiceFabric.Services.Communication.Wcf;
 using Microsoft.ServiceFabric.Services.Communication.Wcf.Runtime;
 using Microsoft.ServiceFabric.Services.Runtime;
 using OMS.CallingServiceImplementation;
+using OMS.Common.Cloud;
 using OMS.Common.Cloud.Names;
 using OMS.Common.PubSubContracts;
+using OMS.Common.WcfClient.PubSub;
 
 namespace OMS.CallingService
 {
@@ -20,10 +22,13 @@ namespace OMS.CallingService
     internal sealed class CallingService : StatelessService
     {
         private readonly CallTracker callTracker;
+        private readonly RegisterSubscriberClient registerSubscriberClient;
         public CallingService(StatelessServiceContext context)
             : base(context)
         {
             callTracker = new CallTracker();
+            registerSubscriberClient = RegisterSubscriberClient.CreateClient();
+            registerSubscriberClient.SubscribeToTopic(Topic.OUTAGE_EMAIL, callTracker.GetSubscriberUri().Result, ServiceType.STATELESS_SERVICE);
         }
 
         /// <summary>

@@ -63,6 +63,10 @@
       <Project>{FBEE1369-0F6C-41E6-8C62-8C1C5CDBB602}</Project>
       <Name>Common.Cloud</Name>
     </ProjectReference>
+    <ProjectReference Include="..\..\..\Common\Common.WcfClient\Common.WcfClient.csproj">
+      <Project>{AE91CEB5-378A-4EEF-AEBF-C40ED1EF23CF}</Project>
+      <Name>Common.WcfClient</Name>
+    </ProjectReference>
     <ProjectReference Include="..\..\..\Common\Contracts\Common.PubSubContracts\Common.PubSubContracts.csproj">
       <Project>{AA75150D-EE56-49C0-9431-751F83CCC0CD}</Project>
       <Name>Common.PubSubContracts</Name>

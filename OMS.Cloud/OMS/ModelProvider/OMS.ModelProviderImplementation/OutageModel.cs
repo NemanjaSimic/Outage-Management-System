@@ -1,9 +1,12 @@
 ﻿using Common.OMS;
+using Common.PubSub;
 using Microsoft.ServiceFabric.Data;
 using Microsoft.ServiceFabric.Data.Notifications;
 using OMS.Common.Cloud;
 using OMS.Common.Cloud.Logger;
 using OMS.Common.Cloud.ReliableCollectionHelpers;
+using OMS.Common.PubSubContracts;
+using OMS.Common.WcfClient.OMS;
 using System;
 using System.Collections.Generic;
 using System.Linq;
@@ -12,20 +15,27 @@ using System.Threading.Tasks;
 
 namespace OMS.ModelProviderImplementation
 {
-    public class OutageModel
-    {
+    public class OutageModel: INotifySubscriberContract
+	{
 		private readonly IReliableStateManager stateManager;
 		private ICloudLogger logger;
 		private ICloudLogger Logger
 		{
 			get { return logger ?? (logger = CloudLoggerFactory.GetLogger()); }
 		}
+		private HistoryDBManagerClient historyDBManagerClient;
+		private OutageModelReadAccessClient outageModelReadAccessClient;
+		private OutageModelUpdateAccessClient outageModelUpdateAccessClient;
 		public OutageModel(IReliableStateManager stateManager)
 		{
 			this.stateManager = stateManager;
 			this.stateManager.StateManagerChanged += this.OnStateManagerChangedHandler;
+			this.subscriberUri = new Uri("fabric:/OMS.Cloud/ModelProviderService");
+			this.historyDBManagerClient = HistoryDBManagerClient.CreateClient();
+			this.outageModelReadAccessClient = OutageModelReadAccessClient.CreateClient();
+			this.outageModelUpdateAccessClient = OutageModelUpdateAccessClient.CreateClient();
 		}
-		private bool IsTopologyModelInitialized;
+		#region ReliableDictionaryAccess
 
 		private ReliableDictionaryAccess<long, IOutageTopologyModel> topologyModel;
 
@@ -33,14 +43,7 @@ namespace OMS.ModelProviderImplementation
 		{
 			get
 			{
-				if (topologyModel == null)
-				{
-					topologyModel = ReliableDictionaryAccess<long, IOutageTopologyModel>.Create(stateManager, ReliableDictionaryNames.OutageTopologyModel).Result;
-					//Get topologyModel from CE
-					IOutageTopologyModel model = null;
-					topologyModel.SetAsync(0, model);
-				}
-				return topologyModel;
+				return topologyModel ?? (ReliableDictionaryAccess<long, IOutageTopologyModel>.Create(stateManager, ReliableDictionaryNames.OutageTopologyModel).Result);
 			}
 
 		}
@@ -66,6 +69,7 @@ namespace OMS.ModelProviderImplementation
 		{
 			get { return potentialOutage ?? (potentialOutage = ReliableDictionaryAccess<long,CommandOriginType>.Create(this.stateManager,ReliableDictionaryNames.PotentialOutage).Result); }
 		}
+		#endregion
 
 		private async void OnStateManagerChangedHandler(object sender, NotifyStateManagerChangedEventArgs e)
 		{
@@ -89,5 +93,47 @@ namespace OMS.ModelProviderImplementation
 
 			}
 		}
+		#region INotifySubscriberContract
+		private readonly Uri subscriberUri;
+
+		public async Task Notify(IPublishableMessage message)
+		{
+			//if OMSModelMessage
+			using(var tx = this.stateManager.CreateTransaction())
+			{
+				//await topologyModel.SetAsync(0, value);
+				var topology = outageModelReadAccessClient.GetTopologyModel().Result;
+				HashSet<long> energizedConsumers = new HashSet<long>();
+				foreach (var element in topology.OutageTopology.Values)
+				{
+					if (element.DmsType.Equals(DMSType.ENERGYCONSUMER.ToString()))
+					{
+						if (element.IsActive)
+						{
+							energizedConsumers.Add(element.Id);
+						}
+					}
+				}
+
+				await historyDBManagerClient.OnConsumersEnergized(energizedConsumers);
+				var potentialOutage = outageModelReadAccessClient.GetPotentialOutage().Result;
+
+				foreach (var item in potentialOutage)
+				{
+					//Report
+				}
+				await outageModelUpdateAccessClient.UpdatePotentialOutage(0, 0, ModelUpdateOperationType.CLEAR);
+				//else
+				Logger.LogWarning("OutageModel::Notify => UNKNOWN message type. OMSModelMessage expected.");
+
+
+			}
+		}
+
+		public async Task<Uri> GetSubscriberUri()
+		{
+			return this.subscriberUri;
+		}
+		#endregion
 	}
 }

@@ -10,7 +10,10 @@ using Microsoft.ServiceFabric.Services.Communication.Runtime;
 using Microsoft.ServiceFabric.Services.Communication.Wcf;
 using Microsoft.ServiceFabric.Services.Communication.Wcf.Runtime;
 using Microsoft.ServiceFabric.Services.Runtime;
+using OMS.Common.Cloud;
 using OMS.Common.Cloud.Names;
+using OMS.Common.PubSubContracts;
+using OMS.Common.WcfClient.PubSub;
 using OMS.ModelProviderImplementation;
 using OMS.ModelProviderImplementation.ContractProviders;
 
@@ -23,12 +26,17 @@ namespace OMS.ModelProviderService
     {
         private readonly OutageModel outageModel;
         private readonly OutageModelReadAccessProvider outageModelReadAccessProvider;
+        private readonly OutageModelUpdateAccessProvider outageModelUpdateAccessProvider;
+        private readonly RegisterSubscriberClient registerSubscriberClient;
 
         public ModelProviderService(StatefulServiceContext context)
             : base(context)
         {
             this.outageModel = new OutageModel(this.StateManager);
             this.outageModelReadAccessProvider = new OutageModelReadAccessProvider(this.StateManager);
+            this.outageModelUpdateAccessProvider = new OutageModelUpdateAccessProvider(this.StateManager);
+            this.registerSubscriberClient = RegisterSubscriberClient.CreateClient();
+            this.registerSubscriberClient.SubscribeToTopic(Topic.TOPOLOGY,this.outageModel.GetSubscriberUri().Result,ServiceType.STATEFUL_SERVICE);
         }
 
         /// <summary>
@@ -48,7 +56,21 @@ namespace OMS.ModelProviderService
                                                                             this.outageModelReadAccessProvider,
                                                                             WcfUtility.CreateTcpListenerBinding(),
                                                                             EndpointNames.OutageManagementServiceModelReadAccessEndpoint);
-                }, EndpointNames.OutageManagementServiceModelReadAccessEndpoint)
+                }, EndpointNames.OutageManagementServiceModelReadAccessEndpoint),
+                new ServiceReplicaListener(context =>
+                {
+                    return new WcfCommunicationListener<IOutageModelUpdateAccessContract>(context,
+                                                                             this.outageModelUpdateAccessProvider,
+                                                                             WcfUtility.CreateTcpListenerBinding(),
+                                                                             EndpointNames.OutageManagmenetServiceModelUpdateAccessEndpoint);
+                },EndpointNames.OutageManagmenetServiceModelUpdateAccessEndpoint),
+                new ServiceReplicaListener(context =>
+                {
+                    return new WcfCommunicationListener<INotifySubscriberContract>(context,
+                                                                             this.outageModel,
+                                                                             WcfUtility.CreateTcpListenerBinding(),
+                                                                             EndpointNames.NotifySubscriberEndpoint);
+                },EndpointNames.NotifySubscriberEndpoint)
 
             };
         }
