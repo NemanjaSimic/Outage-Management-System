@@ -90,7 +90,7 @@ namespace OutageManagementService
         }
 
         #region GDAHelper
-        public async Task<List<ResourceDescription>> GetExtentValues(ModelCode entityType, List<ModelCode> propIds)
+        public List<ResourceDescription> GetExtentValues(ModelCode entityType, List<ModelCode> propIds)
         {
             int iteratorId;
 
@@ -115,10 +115,10 @@ namespace OutageManagementService
                 }
             }
 
-            return await ProcessIterator(iteratorId);
+            return ProcessIterator(iteratorId);
         }
 
-        private async Task<List<ResourceDescription>> ProcessIterator(int iteratorId)
+        private List<ResourceDescription> ProcessIterator(int iteratorId)
         {
             //TODO: mozda vec ovde napakovati dictionary<long, rd> ?
             int resourcesLeft;
@@ -181,29 +181,32 @@ namespace OutageManagementService
 
         private void InitializeEnergyConsumers(UnitOfWork db)
         {
-            using (OutageContext db = new OutageContext())
-            {
-                List<ResourceDescription> energyConsumers = await GetExtentValues(ModelCode.ENERGYCONSUMER, modelResourcesDesc.GetAllPropertyIds(ModelCode.ENERGYCONSUMER));
+            
+                List<ResourceDescription> energyConsumers =  GetExtentValues(ModelCode.ENERGYCONSUMER, modelResourcesDesc.GetAllPropertyIds(ModelCode.ENERGYCONSUMER));
 
                 int i = 0; //TODO: delete, for first/last name placeholder
 
                 foreach(ResourceDescription energyConsumer in energyConsumers)
                 {
-                    ConsumerId = energyConsumer.GetProperty(ModelCode.IDOBJ_GID).AsLong(),
-                    ConsumerMRID = energyConsumer.GetProperty(ModelCode.IDOBJ_MRID).AsString(),
-                    FirstName = $"FirstName{i}", //TODO: energyConsumer.GetProperty(ModelCode.ENERGYCONSUMER_FIRSTNAME).AsString();
-                    LastName = $"LastName{i}"   //TODO: energyConsumer.GetProperty(ModelCode.ENERGYCONSUMER_LASTNAME).AsString();
-                };
+                    Consumer consumer = new Consumer
+                    {
+                        ConsumerId = energyConsumer.GetProperty(ModelCode.IDOBJ_GID).AsLong(),
+                        ConsumerMRID = energyConsumer.GetProperty(ModelCode.IDOBJ_MRID).AsString(),
+                        FirstName = $"FirstName{i}", //TODO: energyConsumer.GetProperty(ModelCode.ENERGYCONSUMER_FIRSTNAME).AsString();
+                        LastName = $"LastName{i}"   //TODO: energyConsumer.GetProperty(ModelCode.ENERGYCONSUMER_LASTNAME).AsString();
+                    };
+            
 
-                i++;
-                if (db.ConsumerRepository.Get(consumer.ConsumerId) == null)
-                {
-                    db.ConsumerRepository.Add(consumer);
-                    Logger.LogDebug($"Add consumer: {consumer.ConsumerMRID}");
+                    i++;
+                    if (db.ConsumerRepository.Get(consumer.ConsumerId) == null)
+                    {
+                        db.ConsumerRepository.Add(consumer);
+                        Logger.LogDebug($"Add consumer: {consumer.ConsumerMRID}");
+                    }
                 }
 
-                
-            }
+
+
 
             db.Complete();
             Logger.LogDebug("Init energy consumers: SaveChanges()");

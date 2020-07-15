@@ -32,6 +32,7 @@
   </PropertyGroup>
   <ItemGroup>
     <Reference Include="System" />
+    <Reference Include="System.ComponentModel.DataAnnotations" />
     <Reference Include="System.Core" />
     <Reference Include="System.Xml.Linq" />
     <Reference Include="System.Data.DataSetExtensions" />
@@ -44,8 +45,19 @@
     <Compile Include="CloudQueueNames.cs" />
     <Compile Include="IOutageTopologyElement.cs" />
     <Compile Include="IOutageTopologyModel.cs" />
+    <Compile Include="OutageDatabaseModel\Consumer.cs" />
+    <Compile Include="OutageDatabaseModel\ConsumerHistorical.cs" />
+    <Compile Include="OutageDatabaseModel\Equipment.cs" />
+    <Compile Include="OutageDatabaseModel\EquipmentHistorical.cs" />
+    <Compile Include="OutageDatabaseModel\OutageEntity.cs" />
     <Compile Include="ReliableDictionaryNames.cs" />
     <Compile Include="Properties\AssemblyInfo.cs" />
+  </ItemGroup>
+  <ItemGroup>
+    <ProjectReference Include="..\Common\Common.Cloud\Common.Cloud.csproj">
+      <Project>{FBEE1369-0F6C-41E6-8C62-8C1C5CDBB602}</Project>
+      <Name>Common.Cloud</Name>
+    </ProjectReference>
   </ItemGroup>
   <Import Project="$(MSBuildToolsPath)\Microsoft.CSharp.targets" />
 </Project>
