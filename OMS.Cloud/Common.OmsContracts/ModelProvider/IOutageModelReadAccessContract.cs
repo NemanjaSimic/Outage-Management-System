@@ -1,6 +1,7 @@
 ﻿using Common.OMS;
 using Common.OmsContracts.DataContracts.OutageModel;
 using Microsoft.ServiceFabric.Services.Remoting;
+using OMS.Common.Cloud;
 using System;
 using System.Collections.Generic;
 using System.Linq;
@@ -17,6 +18,14 @@ namespace Common.OmsContracts.ModelProvider
         [OperationContract]
         [ServiceKnownType(typeof(OutageTopologyModel))]
         Task<IOutageTopologyModel> GetTopologyModel();
+        
+        [OperationContract]
+        Task<Dictionary<long, long>> GetCommandedElements();
+        
+        [OperationContract]
+        Task<Dictionary<long, long>> GetOptimumIsolatioPoints();
 
+        [OperationContract]
+        Task<Dictionary<long, CommandOriginType>> GetPotentialOutage();
     }
 }

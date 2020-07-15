@@ -2,6 +2,7 @@
 using Common.OmsContracts.ModelProvider;
 using Microsoft.ServiceFabric.Data;
 using Microsoft.ServiceFabric.Data.Notifications;
+using OMS.Common.Cloud;
 using OMS.Common.Cloud.ReliableCollectionHelpers;
 using System;
 using System.Collections.Generic;
@@ -14,6 +15,11 @@ namespace OMS.ModelProviderImplementation.ContractProviders
     public class OutageModelReadAccessProvider : IOutageModelReadAccessContract
     {
         private readonly IReliableStateManager stateManager;
+        private bool isTopologyModelInitialized = false;
+        private bool isCommandedElementsInitialized = false;
+        private bool isOptimumIsolatioPointsInitialized = false;
+        private bool isPotentialOutageInitialized = false;
+
         private ReliableDictionaryAccess<long, IOutageTopologyModel> topologyModel;
 
         public ReliableDictionaryAccess<long, IOutageTopologyModel> TopologyModel
@@ -25,6 +31,27 @@ namespace OMS.ModelProviderImplementation.ContractProviders
                 
             }
 
+        }
+        private ReliableDictionaryAccess<long, long> commandedElements;
+
+        public ReliableDictionaryAccess<long, long> CommandedElements
+        {
+            get { return commandedElements ?? (commandedElements = ReliableDictionaryAccess<long, long>.Create(this.stateManager, ReliableDictionaryNames.CommandedElements).Result); }
+        }
+
+        private ReliableDictionaryAccess<long, long> optimumIsloationPoints;
+
+        public ReliableDictionaryAccess<long, long> OptimumIsolatioPoints
+        {
+            get { return optimumIsloationPoints ?? (optimumIsloationPoints = ReliableDictionaryAccess<long, long>.Create(this.stateManager, ReliableDictionaryNames.OptimumIsolatioPoints).Result); }
+
+        }
+
+        private ReliableDictionaryAccess<long, CommandOriginType> potentialOutage;
+
+        public ReliableDictionaryAccess<long, CommandOriginType> PotentialOutage
+        {
+            get { return potentialOutage ?? (potentialOutage = ReliableDictionaryAccess<long, CommandOriginType>.Create(this.stateManager, ReliableDictionaryNames.PotentialOutage).Result); }
         }
         public OutageModelReadAccessProvider(IReliableStateManager stateManager)
         {
@@ -46,8 +73,54 @@ namespace OMS.ModelProviderImplementation.ContractProviders
                 if (reliableStateName == ReliableDictionaryNames.OutageTopologyModel)
                 {
                     topologyModel = await ReliableDictionaryAccess<long, IOutageTopologyModel>.Create(this.stateManager, ReliableDictionaryNames.OutageTopologyModel);
+                    isTopologyModelInitialized = true;
                 }
+                else if (reliableStateName == ReliableDictionaryNames.CommandedElements)
+                {
+                    commandedElements = await ReliableDictionaryAccess<long, long>.Create(this.stateManager, ReliableDictionaryNames.CommandedElements);
+                    isCommandedElementsInitialized = true;
+                }
+                else if (reliableStateName == ReliableDictionaryNames.OptimumIsolatioPoints)
+                {
+                    optimumIsloationPoints = await ReliableDictionaryAccess<long, long>.Create(this.stateManager, ReliableDictionaryNames.OptimumIsolatioPoints);
+                    isOptimumIsolatioPointsInitialized = true;
+                }
+                else if (reliableStateName == ReliableDictionaryNames.PotentialOutage)
+                {
+                    potentialOutage = await ReliableDictionaryAccess<long, CommandOriginType>.Create(this.stateManager, ReliableDictionaryNames.PotentialOutage);
+                    isPotentialOutageInitialized = true;
+                }
+
             }
+        }
+
+        public bool ReliableDictionariesInitialized { get { return isTopologyModelInitialized && isCommandedElementsInitialized && isOptimumIsolatioPointsInitialized && isPotentialOutageInitialized; } }
+
+        public async Task<Dictionary<long, long>> GetCommandedElements()
+        {
+            while (!ReliableDictionariesInitialized)
+            {
+                await Task.Delay(1000);
+            }
+            return CommandedElements.GetDataCopy();
+        }
+
+        public async Task<Dictionary<long, long>> GetOptimumIsolatioPoints()
+        {
+            while (!ReliableDictionariesInitialized)
+            {
+                await Task.Delay(1000);
+            }
+            return OptimumIsolatioPoints.GetDataCopy();
+        }
+
+        public async Task<Dictionary<long, CommandOriginType>> GetPotentialOutage()
+        {
+            while (!ReliableDictionariesInitialized)
+            {
+                await Task.Delay(1000);
+            }
+            return PotentialOutage.GetDataCopy();
         }
     }
 }

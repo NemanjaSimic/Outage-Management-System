@@ -21,6 +21,7 @@
     <DefineConstants>DEBUG;TRACE</DefineConstants>
     <ErrorReport>prompt</ErrorReport>
     <WarningLevel>4</WarningLevel>
+    <PlatformTarget>x64</PlatformTarget>
   </PropertyGroup>
   <PropertyGroup Condition=" '$(Configuration)|$(Platform)' == 'Release|AnyCPU' ">
     <DebugType>pdbonly</DebugType>
@@ -88,9 +89,13 @@
     <Reference Include="System.Xml" />
   </ItemGroup>
   <ItemGroup>
+    <Compile Include="DataContracts\HistoryModel\ConsumerHistorical.cs" />
+    <Compile Include="DataContracts\HistoryModel\EquipmentHistorical.cs" />
     <Compile Include="DataContracts\OutageModel\OutageTopologyElement.cs" />
     <Compile Include="DataContracts\OutageModel\OutageTopologyModel.cs" />
+    <Compile Include="HistoryDBManager\IHistoryDBManagerContract.cs" />
     <Compile Include="ModelProvider\IOutageModelReadAccessContract.cs" />
+    <Compile Include="ModelProvider\IOutageModelUpdateAccessContract.cs" />
     <Compile Include="Properties\AssemblyInfo.cs" />
     <Compile Include="TracingAlgorithm\ITracingAlgorithmContract.cs" />
   </ItemGroup>
