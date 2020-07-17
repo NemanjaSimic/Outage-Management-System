@@ -89,8 +89,6 @@
     <Reference Include="System.Xml" />
   </ItemGroup>
   <ItemGroup>
-    <Compile Include="DataContracts\HistoryModel\ConsumerHistorical.cs" />
-    <Compile Include="DataContracts\HistoryModel\EquipmentHistorical.cs" />
     <Compile Include="DataContracts\OutageModel\OutageTopologyElement.cs" />
     <Compile Include="DataContracts\OutageModel\OutageTopologyModel.cs" />
     <Compile Include="HistoryDBManager\IHistoryDBManagerContract.cs" />
@@ -103,7 +101,9 @@
     <None Include="app.config" />
     <None Include="packages.config" />
   </ItemGroup>
-  <ItemGroup />
+  <ItemGroup>
+    <Folder Include="DataContracts\HistoryModel\" />
+  </ItemGroup>
   <ItemGroup>
     <ProjectReference Include="..\Common.OMS\Common.OMS.csproj">
       <Project>{8F96A078-BE16-4363-9B89-0B313D2E0F5E}</Project>
