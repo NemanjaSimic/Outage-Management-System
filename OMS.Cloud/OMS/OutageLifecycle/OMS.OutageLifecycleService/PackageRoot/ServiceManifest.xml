@@ -1,5 +1,5 @@
 ﻿<?xml version="1.0" encoding="utf-8"?>
-<ServiceManifest Name="OMS.ModelProviderServicePkg"
+<ServiceManifest Name="OMS.OutageLifecycleServicePkg"
                  Version="1.0.0"
                  xmlns="http://schemas.microsoft.com/2011/01/fabric"
                  xmlns:xsd="http://www.w3.org/2001/XMLSchema"
@@ -7,14 +7,14 @@
   <ServiceTypes>
     <!-- This is the name of your ServiceType. 
          This name must match the string used in RegisterServiceType call in Program.cs. -->
-    <StatefulServiceType ServiceTypeName="OMS.ModelProviderServiceType" HasPersistedState="true" />
+    <StatelessServiceType ServiceTypeName="OMS.OutageLifecycleServiceType" />
   </ServiceTypes>
 
   <!-- Code package is your service executable. -->
   <CodePackage Name="Code" Version="1.0.0">
     <EntryPoint>
       <ExeHost>
-        <Program>OMS.ModelProviderService.exe</Program>
+        <Program>OMS.OutageLifecycleService.exe</Program>
       </ExeHost>
     </EntryPoint>
   </CodePackage>
@@ -29,15 +29,6 @@
            listen. Please note that if your service is partitioned, this port is shared with 
            replicas of different partitions that are placed in your code. -->
       <Endpoint Name="ServiceEndpoint" />
-
-      <!-- This endpoint is used by the replicator for replicating the state of your service.
-           This endpoint is configured through a ReplicatorSettings config section in the Settings.xml
-           file under the ConfigPackage. -->
-      <Endpoint Name="ReplicatorEndpoint" />
-
-			<Endpoint Name="OutageManagementServiceModelReadAccessEndpoint" Protocol="tcp" Type="Input"/>
-			<Endpoint Name="OutageManagmenetServiceModelUpdateAccessEndpoint" Protocol="tcp" Type="Input"/>
-			<Endpoint Name="NotifySubscriberEndpoint" Protocol="tcp" Type="Input"/>
     </Endpoints>
   </Resources>
 </ServiceManifest>

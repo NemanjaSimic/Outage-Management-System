@@ -46,6 +46,12 @@
         public const string TracingAlgorithmEndpoint = "TracingAlgorithmEndpoint";
         public const string OutageSimulatorServiceEndpoint = "OutageSimulatorServiceEndpoint";
         public const string HistoryDBManagerEndpoint = "HistoryDBManagerEndpoint";
+        public const string IsolateOutageEndpoint = "IsolateOutageEndpoint";
+        public const string ReportOutageEndpoint = "ReportOutageEndpoint";
+        public const string ResolveOutageEndpoint = "ResolveOutageEndpoint";
+        public const string SendLocationIsolationCrewEndpoint = "SendLocationIsolationCrewEndpoint";
+        public const string SendRepairCrewEndpoint = "SendRepairCrewEndpoint";
+        public const string ValidateResolveConditionsEndpoint = "ValidateResolveConditionsEndpoint";
 
     }
 }

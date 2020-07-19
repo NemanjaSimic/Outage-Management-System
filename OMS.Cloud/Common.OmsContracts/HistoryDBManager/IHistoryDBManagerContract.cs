@@ -9,7 +9,7 @@ using System.Threading.Tasks;
 namespace Common.OmsContracts.HistoryDBManager
 {
     [ServiceContract]
-    public interface IHistoryDBManagerContract:IService
+    public interface IHistoryDBManagerContract : IService
     {
         [OperationContract]
         Task OnSwitchClosed(long elementGid);
