@@ -116,6 +116,7 @@
     <Compile Include="CE\MeasurementProviderClient.cs" />
     <Compile Include="CE\ModelProviderClient.cs" />
     <Compile Include="CE\TopologyBuilderClient.cs" />
+    <Compile Include="CE\TopologyConverterClient.cs" />
     <Compile Include="CE\TopologyProviderClient.cs" />
     <Compile Include="Properties\AssemblyInfo.cs" />
     <Compile Include="ClientFactory.cs" />

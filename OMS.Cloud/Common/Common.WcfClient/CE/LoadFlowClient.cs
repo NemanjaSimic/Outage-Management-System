@@ -4,9 +4,6 @@ using Microsoft.ServiceFabric.Services.Client;
 using Microsoft.ServiceFabric.Services.Communication.Wcf.Client;
 using OMS.Common.Cloud.Names;
 using System;
-using System.Collections.Generic;
-using System.Linq;
-using System.Text;
 using System.Threading.Tasks;
 
 namespace OMS.Common.WcfClient.CE
@@ -35,9 +32,9 @@ namespace OMS.Common.WcfClient.CE
 				return factory.CreateClient<LoadFlowClient, ILoadFlowContract>(serviceUri, servicePartition);
 			}
 		}
-		public Task UpdateLoadFlow(List<ITopology> topologies)
+		public Task<ITopology> UpdateLoadFlow(ITopology topology)
 		{
-			return MethodWrapperAsync("UpdateLoadFlow", new object[1] { topologies });
+			return MethodWrapperAsync<ITopology>("UpdateLoadFlow", new object[1] { topology });
 		}
 	}
 }

@@ -1,7 +1,9 @@
 ﻿using CECommon.Interfaces;
+using System.Runtime.Serialization;
 
 namespace CECommon.Models
 {
+	[DataContract]
     public class Recloser : TopologyElement
     {
         private readonly int maxNumberOfTries = 3;
@@ -21,6 +23,7 @@ namespace CECommon.Models
             NoReclosing = element.NoReclosing;
             NumberOfTry = 0;
         }
+        [DataMember]
         public int NumberOfTry { get; set; }
         public bool IsReachedMaximumOfTries()
         {

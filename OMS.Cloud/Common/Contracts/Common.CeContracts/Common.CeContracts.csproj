@@ -84,6 +84,7 @@
   <ItemGroup>
     <Compile Include="ILoadFlowContract.cs" />
     <Compile Include="IMeasurementProviderContract.cs" />
+    <Compile Include="ITopologyConverterContract.cs" />
     <Compile Include="ITopologyProviderContract.cs" />
     <Compile Include="IModelProviderContract.cs" />
     <Compile Include="Properties\AssemblyInfo.cs" />

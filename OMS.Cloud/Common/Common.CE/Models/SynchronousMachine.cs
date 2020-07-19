@@ -1,9 +1,11 @@
 ﻿using CECommon.Interfaces;
+using System.Runtime.Serialization;
 
 namespace CECommon.Models
 {
+	[DataContract]
     public class SynchronousMachine : TopologyElement
-	{
+    {
 		public SynchronousMachine(ITopologyElement element) : base (element.Id)
 		{
             Id = element.Id;
@@ -19,7 +21,9 @@ namespace CECommon.Models
             IsActive = element.IsActive;
         }
 
+        [DataMember]
         public float Capacity { get; set; }
+        [DataMember]
         public float CurrentRegime { get; set; }
     }
 }

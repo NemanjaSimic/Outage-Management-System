@@ -1,7 +1,10 @@
 ﻿using CECommon.Interfaces;
+using System.Runtime.Serialization;
+
 namespace CECommon.Models
 {
-	public class Feeder : TopologyElement
+    [DataContract]
+    public class Feeder : TopologyElement
 	{
 		public Feeder(ITopologyElement element) : base(element.Id)
 		{

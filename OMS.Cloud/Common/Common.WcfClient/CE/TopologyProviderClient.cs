@@ -6,7 +6,6 @@ using Microsoft.ServiceFabric.Services.Client;
 using Microsoft.ServiceFabric.Services.Communication.Wcf.Client;
 using OMS.Common.Cloud.Names;
 using System;
-using System.Collections.Generic;
 using System.Threading.Tasks;
 
 namespace OMS.Common.WcfClient.CE
@@ -47,14 +46,14 @@ namespace OMS.Common.WcfClient.CE
 			return MethodWrapperAsync<IOutageTopologyModel>("GetOMSModel", new object[0]);
 		}
 
-		public Task<List<ITopology>> GetTopologies()
+		public Task<ITopology> GetTopology()
 		{
-			return MethodWrapperAsync<List<ITopology>>("GetTopologies", new object[0]);
+			return MethodWrapperAsync<ITopology>("GetTopology", new object[0]);
 		}
 
-		public Task<UIModel> GetTopology()
+		public Task<UIModel> GetUIModel()
 		{
-			return MethodWrapperAsync<UIModel>("GetTopology", new object[0]);
+			return MethodWrapperAsync<UIModel>("GetUIModel", new object[0]);
 		}
 
 		public Task<bool> IsElementRemote(long elementGid)

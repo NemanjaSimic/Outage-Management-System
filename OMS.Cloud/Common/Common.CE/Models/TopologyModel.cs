@@ -1,12 +1,15 @@
 ﻿using CECommon.Interfaces;
 using System.Collections.Generic;
-//using Logger = Outage.Common.LoggerWrapper;
+using System.Runtime.Serialization;
 
 namespace CECommon.Model
 {
+	[DataContract]
 	public class TopologyModel : ITopology
     {
+		[DataMember]
 		public long FirstNode { get; set; }
+		[DataMember]
 		public Dictionary<long, ITopologyElement> TopologyElements { get; set; }
 		public TopologyModel()
 		{

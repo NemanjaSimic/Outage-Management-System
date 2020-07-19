@@ -23,5 +23,12 @@
         //MISCELLANEOUS
         public const string NMSTestClientUI = "NMSTestClientUI";
         public const string CimProfilCreator = "CimProfilCreator";
+
+        //CE
+        public const string LoadFlowService = "LoadFlowService";
+        public const string ModelProviderService = "ModelProviderService";
+        public const string MeasurementProviderService = "MeasurementProviderService";
+        public const string TopologyProviderService = "TopologyProviderService";
+        public const string TopologyBuilderService = "TopologyBuilderService";
     }
 }

@@ -2,7 +2,6 @@
 using CECommon.Interface;
 using CECommon.Interfaces;
 using Microsoft.ServiceFabric.Services.Remoting;
-using System.Collections.Generic;
 using System.ServiceModel;
 using System.Threading.Tasks;
 
@@ -12,7 +11,7 @@ namespace Common.CeContracts.TopologyProvider
 	public interface ITopologyProviderContract : IService
 	{
         [OperationContract]
-        Task<List<ITopology>> GetTopologies();
+        Task<ITopology> GetTopology();
         [OperationContract]
         Task CommitTransaction();
         [OperationContract]
@@ -26,6 +25,6 @@ namespace Common.CeContracts.TopologyProvider
         [OperationContract]
         Task<IOutageTopologyModel> GetOMSModel();
         [OperationContract]
-        Task<UIModel> GetTopology();
+        Task<UIModel> GetUIModel();
     }
 }

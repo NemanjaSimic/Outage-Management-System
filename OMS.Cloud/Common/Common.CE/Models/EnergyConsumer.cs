@@ -1,8 +1,10 @@
 ﻿using CECommon.Interfaces;
 using OMS.Common.Cloud;
+using System.Runtime.Serialization;
 
 namespace CECommon.Models
 {
+    [DataContract]
     public class EnergyConsumer : TopologyElement
 	{
 		public EnergyConsumer(ITopologyElement element) : base (element.Id)
@@ -20,6 +22,7 @@ namespace CECommon.Models
             IsActive = element.IsActive;
         }
 
+        [DataMember]
         public EnergyConsumerType Type { get; set; }
-	}
+    }
 }

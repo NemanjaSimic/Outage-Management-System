@@ -51,10 +51,12 @@ namespace TopologyBuilderImplementation
         }
 
 		#region ILoadFlowService
-		public async Task UpdateLoadFlow(List<ITopology> topologies)
+		public async Task<ITopology> UpdateLoadFlow(ITopology inputTopology)
         {
             string verboseMessage = $"{baseLogString} UpdateLoadFlow method called.";
             Logger.LogVerbose(verboseMessage);
+
+            ITopology topology = inputTopology;
 
             Dictionary<long, float> loadOfFeeders = new Dictionary<long, float>();
             feeders = new Dictionary<long, ITopologyElement>();
@@ -66,23 +68,20 @@ namespace TopologyBuilderImplementation
             Logger.LogDebug($"{baseLogString} UpdateLoadFlow => Reclosers were delivered successfully.");
 
 
-            if (topologies == null)
+            if (topology == null)
             {
-                string message = $"{baseLogString} UpdateLoadFlow => Topologies are null.";
+                string message = $"{baseLogString} UpdateLoadFlow => Topology is null.";
                 Logger.LogError(message);
                 throw new Exception(message);
             }
 
-            foreach (var topology in topologies)
-            {
-                await CalculateLoadFlow(topology, loadOfFeeders);
-            }
+            await CalculateLoadFlow(topology, loadOfFeeders);
 
-            await UpdateLoadFlowFromRecloser(topologies, loadOfFeeders);
+            await UpdateLoadFlowFromRecloser(topology, loadOfFeeders);
 
             foreach (var syncMachine in syncMachines.Values)
             {
-                SyncMachine(syncMachine, loadOfFeeders);
+                await SyncMachine(syncMachine, loadOfFeeders);
             }
 
             foreach (var loadFeeder in loadOfFeeders)
@@ -121,6 +120,8 @@ namespace TopologyBuilderImplementation
                     }
                 }
             }
+
+            return topology;
         }
 		#endregion
 
@@ -219,7 +220,6 @@ namespace TopologyBuilderImplementation
                         Logger.LogError($"{baseLogString} UpdateLoadFlow => Synchronous machine with GID {element.Id:X16} does not have measurements for calculating CURRENT.");
                     }
                 }
-
             }
             else
             {
@@ -415,12 +415,12 @@ namespace TopologyBuilderImplementation
         }
 
         #region RecloserLogic
-        private async Task UpdateLoadFlowFromRecloser(List<ITopology> topologies, Dictionary<long, float> loadOfFeeders)
+        private async Task UpdateLoadFlowFromRecloser(ITopology topology, Dictionary<long, float> loadOfFeeders)
         {
             string verboseMessage = $"{baseLogString} UpdateLoadFlowFromRecloser method called.";
             Logger.LogVerbose(verboseMessage);
 
-            if (topologies == null)
+            if (topology == null)
             {
                 string message = $"{baseLogString} UpdateLoadFlowFromRecloser => Topologies are null.";
                 Logger.LogError(message);
@@ -429,13 +429,9 @@ namespace TopologyBuilderImplementation
 
             foreach (var recloserGid in reclosers)
             {
-                foreach (var topology in topologies)
+                if (topology.GetElementByGid(recloserGid, out ITopologyElement recloser))
                 {
-                    if (topology.GetElementByGid(recloserGid, out ITopologyElement recloser))
-                    {
-                        await CalculateLoadFlowFromRecloser(recloser, topology, loadOfFeeders);
-                        break;
-                    }
+                    await CalculateLoadFlowFromRecloser(recloser, topology, loadOfFeeders);
                 }
             }
         }

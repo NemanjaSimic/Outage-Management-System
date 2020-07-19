@@ -99,7 +99,6 @@
     <Compile Include="Models\EnergyConsumer.cs" />
     <Compile Include="Models\Feeder.cs" />
     <Compile Include="Models\Field.cs" />
-    <Compile Include="Models\Graph.cs" />
     <Compile Include="Models\Measurement.cs" />
     <Compile Include="Models\Recloser.cs" />
     <Compile Include="Models\SynchronousMachine.cs" />
@@ -110,6 +109,7 @@
     <Compile Include="OutageService\Model\OutageTopologyElement.cs" />
     <Compile Include="OutageService\Model\OutageTopologyModel.cs" />
     <Compile Include="Properties\AssemblyInfo.cs" />
+    <Compile Include="ReliableDictionaryNames.cs" />
     <Compile Include="UIModels\UIMeasurement.cs" />
     <Compile Include="UIModels\UIModel.cs" />
     <Compile Include="UIModels\UINode.cs" />
@@ -122,10 +122,6 @@
     <ProjectReference Include="..\Common.PubSub\Common.PubSub.csproj">
       <Project>{5B775779-A5AE-4F94-90EC-59973FA80D4D}</Project>
       <Name>Common.PubSub</Name>
-    </ProjectReference>
-    <ProjectReference Include="..\Contracts\Common.PubSubContracts\Common.PubSubContracts.csproj">
-      <Project>{AA75150D-EE56-49C0-9431-751F83CCC0CD}</Project>
-      <Name>Common.PubSubContracts</Name>
     </ProjectReference>
   </ItemGroup>
   <ItemGroup>
