@@ -1,11 +1,12 @@
 ﻿using Common.OMS;
-using Common.OmsContracts.DataContracts.HistoryModel;
+using Common.OMS.OutageDatabaseModel;
 using Common.OmsContracts.HistoryDBManager;
 using Microsoft.ServiceFabric.Data;
 using Microsoft.ServiceFabric.Data.Notifications;
 using OMS.Common.Cloud;
 using OMS.Common.Cloud.Logger;
 using OMS.Common.Cloud.ReliableCollectionHelpers;
+using OutageDatabase.Repository;
 using System;
 using System.Collections.Generic;
 using System.Linq;
@@ -17,7 +18,7 @@ namespace HistoryDBManagerServiceImplementation
     public class HistoryDBManager:IHistoryDBManagerContract
     {
         private readonly IReliableStateManager stateManager;
-
+        private UnitOfWork dbContext;
         private ReliableDictionaryAccess<long, long> unenergizedConsumers;
         public ReliableDictionaryAccess<long, long> UnenergizedConsumers
         {
@@ -61,6 +62,7 @@ namespace HistoryDBManagerServiceImplementation
         {
             this.stateManager = stateManager;
             this.stateManager.StateManagerChanged += OnStateManagerChangedHandler;
+            this.dbContext = new UnitOfWork();
         }
 
         private async void OnStateManagerChangedHandler(object sender, NotifyStateManagerChangedEventArgs e)
@@ -87,9 +89,9 @@ namespace HistoryDBManagerServiceImplementation
                 {
                     if(OpenedSwitches.ContainsKey(elementGid))
                     {
-                        //TO DO add to db
+                        dbContext.EquipmentHistoricalRepository.Add(new EquipmentHistorical() { EquipmentId = elementGid, OperationTime = DateTime.Now, DatabaseOperation = DatabaseOperation.DELETE });
                         await OpenedSwitches.TryRemoveAsync(tx, elementGid);
-                        //SaveChanges
+                        dbContext.Complete();
                         await tx.CommitAsync();
                     }
                 }
@@ -118,8 +120,8 @@ namespace HistoryDBManagerServiceImplementation
                             await UnenergizedConsumers.AddAsync(tx,consumer,0);
                         }
                     }
-                    //TO DO add to db
-                    //SaveChanges
+                    dbContext.ConsumerHistoricalRepository.AddRange(consumerHistoricals);
+                    dbContext.Complete();
                     await tx.CommitAsync();
                 }
             }
@@ -139,9 +141,9 @@ namespace HistoryDBManagerServiceImplementation
                 {
                     if (!OpenedSwitches.ContainsKey(elementGid))
                     {
-                        //TO DO add to db
+                        dbContext.EquipmentHistoricalRepository.Add(new EquipmentHistorical() { OutageId = outageId, EquipmentId = elementGid, OperationTime = DateTime.Now, DatabaseOperation = DatabaseOperation.INSERT });
                         await OpenedSwitches.AddAsync(tx,elementGid,0);
-                        //SaveChanges
+                        dbContext.Complete();
                         await tx.CommitAsync();
                     }
                 }
@@ -175,7 +177,8 @@ namespace HistoryDBManagerServiceImplementation
                             await UnenergizedConsumers.TryRemoveAsync(tx,changed);
                     }
 
-                    //Add to db
+                    dbContext.ConsumerHistoricalRepository.AddRange(consumerHistoricals);
+                    dbContext.Complete();
                     //savechanges
                     await tx.CommitAsync();
                 }
