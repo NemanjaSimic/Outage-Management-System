@@ -18,6 +18,7 @@ import { zoom } from '@shared/utils/zoom';
 import { OutageService } from '@services/outage/outage.service';
 import { CommandService } from '@services/command/command.service';
 import { ScadaService } from '@services/notification/scada.service';
+import { GraphCoreService } from '@services/notification/core/graph.service.core';
 import { GraphService } from '@services/notification/graph.service';
 import { OutageNotificationService } from '@services/notification/outage-notification.service';
 
@@ -77,6 +78,7 @@ export class GraphComponent implements OnInit, OnDestroy {
 
   constructor(
     private graphService: GraphService,
+    private graphCoreService: GraphCoreService,
     private scadaService: ScadaService,
     private outageNotificationService: OutageNotificationService,
     private commandService: CommandService,
@@ -150,6 +152,8 @@ export class GraphComponent implements OnInit, OnDestroy {
   }
 
   public startConnection(): void {
+    this.graphCoreService.startConnection();
+
     this.connectionSubscription = this.graphService.startConnection().subscribe(
       (didConnect) => {
         if (didConnect) {
