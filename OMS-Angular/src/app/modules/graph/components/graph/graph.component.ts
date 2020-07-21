@@ -18,9 +18,11 @@ import { zoom } from '@shared/utils/zoom';
 import { OutageService } from '@services/outage/outage.service';
 import { CommandService } from '@services/command/command.service';
 import { ScadaService } from '@services/notification/scada.service';
-import { GraphCoreService } from '@services/notification/core/graph.service.core';
+import { ScadaCoreService } from '@services/notification/core/scada.service.core';
 import { GraphService } from '@services/notification/graph.service';
+import { GraphCoreService } from '@services/notification/core/graph.service.core';
 import { OutageNotificationService } from '@services/notification/outage-notification.service';
+import { OutageNotificationCoreService } from '@services/notification/core/outage-notification.service.core';
 
 import { IMeasurement } from '@shared/models/node.model';
 import { ScadaData } from '@shared/models/scada-data.model';
@@ -80,7 +82,9 @@ export class GraphComponent implements OnInit, OnDestroy {
     private graphService: GraphService,
     private graphCoreService: GraphCoreService,
     private scadaService: ScadaService,
+    private scadaCoreService: ScadaCoreService,
     private outageNotificationService: OutageNotificationService,
+    private outageNotificationCoreService: OutageNotificationCoreService,
     private commandService: CommandService,
     private outageService: OutageService,
     private snackBar: SnackbarService,
@@ -178,6 +182,8 @@ export class GraphComponent implements OnInit, OnDestroy {
   }
 
   public startScadaConnection(): void {
+    this.scadaCoreService.startConnection();
+
     this.scadaServiceConnectionSubscription = this.scadaService.startConnection().subscribe(
       (didConnect) => {
         if (didConnect) {
@@ -196,6 +202,8 @@ export class GraphComponent implements OnInit, OnDestroy {
   }
 
   public startOutageConnection(): void {
+    this.outageNotificationCoreService.startConnection();
+
     this.outageServiceConnectionSubscription = this.outageNotificationService.startConnection().subscribe(
       (didConnect) => {
         if (didConnect) {

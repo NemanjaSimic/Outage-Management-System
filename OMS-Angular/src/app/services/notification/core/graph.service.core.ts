@@ -14,7 +14,7 @@ export class GraphCoreService {
  
   public startConnection = () => {
     this.hubConnection = new signalR.HubConnectionBuilder()
-                            .withUrl(`${environment.serverUrl}\\${this.hubName}`)
+                            .withUrl(`${environment.serverUrl}/${this.hubName}`)
                             .build();
  
     this.hubConnection
