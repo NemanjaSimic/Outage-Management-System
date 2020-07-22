@@ -114,7 +114,9 @@
   <ItemGroup>
     <Compile Include="OMS\OutageModelUpdateAccessClient.cs" />
     <Compile Include="OMS\HistoryDBManagerClient.cs" />
+    <Compile Include="OMS\ReportOutageClient.cs" />
     <Compile Include="OMS\TracingAlgorithmClient.cs" />
+    <Compile Include="OMS\ValidateResolveConditionsClient.cs" />
     <Compile Include="Properties\AssemblyInfo.cs" />
     <Compile Include="CE\Placeholder.cs" />
     <Compile Include="ClientFactory.cs" />

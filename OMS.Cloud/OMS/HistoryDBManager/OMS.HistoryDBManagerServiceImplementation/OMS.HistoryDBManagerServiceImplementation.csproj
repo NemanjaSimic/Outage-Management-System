@@ -38,6 +38,7 @@
     <Reference Include="Microsoft.ServiceFabric.Data.Extensions, Version=1.4.5.0, Culture=neutral, PublicKeyToken=31bf3856ad364e35, processorArchitecture=MSIL">
       <HintPath>..\packages\Microsoft.ServiceFabric.Data.Extensions.4.1.417\lib\net472\Microsoft.ServiceFabric.Data.Extensions.dll</HintPath>
     </Reference>
+    <Reference Include="Microsoft.ServiceFabric.Data.Interfaces, Version=5.0.0.0, Culture=neutral, PublicKeyToken=31bf3856ad364e35, processorArchitecture=AMD64" />
     <Reference Include="Microsoft.ServiceFabric.Diagnostics, Version=7.0.0.0, Culture=neutral, PublicKeyToken=31bf3856ad364e35, processorArchitecture=AMD64">
       <HintPath>..\packages\Microsoft.ServiceFabric.Diagnostics.Internal.4.1.417\lib\net472\Microsoft.ServiceFabric.Diagnostics.dll</HintPath>
     </Reference>
@@ -95,6 +96,10 @@
     <ProjectReference Include="..\..\..\Common\Common.Cloud\Common.Cloud.csproj">
       <Project>{FBEE1369-0F6C-41E6-8C62-8C1C5CDBB602}</Project>
       <Name>Common.Cloud</Name>
+    </ProjectReference>
+    <ProjectReference Include="..\..\OutageDataAccess\OutageDatabase\OutageDatabase\OutageDatabase.csproj">
+      <Project>{D4F63B28-12CA-4B86-8DC6-778AE40C79AE}</Project>
+      <Name>OutageDatabase</Name>
     </ProjectReference>
   </ItemGroup>
   <ItemGroup>

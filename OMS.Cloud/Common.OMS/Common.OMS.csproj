@@ -45,11 +45,14 @@
     <Compile Include="CloudQueueNames.cs" />
     <Compile Include="IOutageTopologyElement.cs" />
     <Compile Include="IOutageTopologyModel.cs" />
+    <Compile Include="Mappers\ConsumerMessageMapper.cs" />
+    <Compile Include="Mappers\EquipmentMapper.cs" />
     <Compile Include="OutageDatabaseModel\Consumer.cs" />
     <Compile Include="OutageDatabaseModel\ConsumerHistorical.cs" />
     <Compile Include="OutageDatabaseModel\Equipment.cs" />
     <Compile Include="OutageDatabaseModel\EquipmentHistorical.cs" />
     <Compile Include="OutageDatabaseModel\OutageEntity.cs" />
+    <Compile Include="Mappers\OutageMessageMapper.cs" />
     <Compile Include="ReliableDictionaryNames.cs" />
     <Compile Include="Properties\AssemblyInfo.cs" />
   </ItemGroup>
@@ -57,6 +60,10 @@
     <ProjectReference Include="..\Common\Common.Cloud\Common.Cloud.csproj">
       <Project>{FBEE1369-0F6C-41E6-8C62-8C1C5CDBB602}</Project>
       <Name>Common.Cloud</Name>
+    </ProjectReference>
+    <ProjectReference Include="..\Common\Contracts\Common.PubSubContracts\Common.PubSubContracts.csproj">
+      <Project>{AA75150D-EE56-49C0-9431-751F83CCC0CD}</Project>
+      <Name>Common.PubSubContracts</Name>
     </ProjectReference>
   </ItemGroup>
   <Import Project="$(MSBuildToolsPath)\Microsoft.CSharp.targets" />

@@ -90,6 +90,8 @@
   </ItemGroup>
   <ItemGroup>
     <Compile Include="DataContracts\EMAIL\EmailServiceMessage.cs" />
+    <Compile Include="DataContracts\OMS\OutageMessage.cs" />
+    <Compile Include="DataContracts\OMS\OutagePublication.cs" />
     <Compile Include="DataContracts\SCADA\ModbusData.cs" />
     <Compile Include="DataContracts\Publication.cs" />
     <Compile Include="DataContracts\SCADA\ScadaMessage.cs" />

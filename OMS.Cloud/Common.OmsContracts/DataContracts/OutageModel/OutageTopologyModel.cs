@@ -8,7 +8,7 @@ using System.Threading.Tasks;
 
 namespace Common.OmsContracts.DataContracts.OutageModel
 {
-    public class OutageTopologyModel
+    public class OutageTopologyModel:IOutageTopologyModel
     {
         private long firstNode;
         private Dictionary<long, IOutageTopologyElement> outageTopology;

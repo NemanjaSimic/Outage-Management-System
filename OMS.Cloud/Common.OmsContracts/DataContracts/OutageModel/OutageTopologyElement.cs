@@ -1,4 +1,5 @@
-﻿using System;
+﻿using Common.OMS;
+using System;
 using System.Collections.Generic;
 using System.Linq;
 using System.Runtime.Serialization;
@@ -7,7 +8,7 @@ using System.Threading.Tasks;
 
 namespace Common.OmsContracts.DataContracts.OutageModel
 {
-    public class OutageTopologyElement
+    public class OutageTopologyElement:IOutageTopologyElement
     {
         #region Fields
         private long id;
@@ -18,6 +19,7 @@ namespace Common.OmsContracts.DataContracts.OutageModel
         private ushort distanceFromSource;
         private bool isActive;
         private bool noReclosing;
+        private bool isOpen;
         #endregion
 
 
@@ -38,6 +40,8 @@ namespace Common.OmsContracts.DataContracts.OutageModel
         public ushort DistanceFromSource { get { return distanceFromSource; } set { distanceFromSource = value; } }
         [DataMember]
         public bool NoReclosing { get { return noReclosing; } set { noReclosing = value; } }
+        [DataMember]
+        public bool IsOpen { get { return isOpen; } set { isOpen = value; } }
         #endregion
 
         public OutageTopologyElement(long gid)
