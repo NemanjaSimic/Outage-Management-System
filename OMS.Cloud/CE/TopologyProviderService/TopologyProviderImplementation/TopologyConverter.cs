@@ -1,5 +1,4 @@
 ﻿using CECommon;
-using CECommon.CeContrats;
 using CECommon.Interface;
 using CECommon.Interfaces;
 using CECommon.Model;

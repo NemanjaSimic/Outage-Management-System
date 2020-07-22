@@ -1,5 +1,4 @@
-﻿using CECommon.CeContrats;
-using CECommon.Interface;
+﻿using CECommon.Interface;
 using System.Collections.Generic;
 
 namespace CECommon.Interfaces

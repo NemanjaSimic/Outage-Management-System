@@ -1,6 +1,6 @@
 ﻿using System.Runtime.Serialization;
 
-namespace CECommon.CeContrats
+namespace CECommon
 {
     [DataContract]
     public class UIMeasurement

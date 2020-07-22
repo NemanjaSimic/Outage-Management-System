@@ -8,8 +8,15 @@ namespace Common.CE
 {
 	public static class ReliableDictionaryNames
 	{
+		//Topology provider
 		public static readonly string TopologyCache = "Topology";
 		public static readonly string TopologyCacheUI = "TopologyUI";
 		public static readonly string TopologyCacheOMS = "TopologyOMS";
+
+		//Model provider
+		public static readonly string ElementCache = "ElementCache";
+		public static readonly string ElementConnectionCache = "ElementConnectionCache";
+		public static readonly string RecloserCache = "RecloserCache";
+		public static readonly string EnergySourceCache = "EnergySourceCache";
 	}
 }

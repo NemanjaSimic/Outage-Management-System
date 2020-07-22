@@ -2,7 +2,7 @@
 using System.Collections.Generic;
 using System.Runtime.Serialization;
 
-namespace CECommon.CeContrats
+namespace CECommon
 {
 	[DataContract]
 	public class UIModel

@@ -1,9 +1,8 @@
 ﻿using System.Runtime.Serialization;
-using CECommon.CeContrats;
 using CECommon.Interface;
 using Common.PubSub;
 
-namespace Outage.Common.PubSub.CalculationEngineDataContract
+namespace CECommon.Models
 {
     [DataContract]
     public abstract class CalculationEngineMessage : IPublishableMessage

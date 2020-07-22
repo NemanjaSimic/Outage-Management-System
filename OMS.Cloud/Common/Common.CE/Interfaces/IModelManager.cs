@@ -1,13 +1,11 @@
-﻿using System.Collections.Generic;
+﻿
+using CECommon.Model;
+using System.Threading.Tasks;
 
 namespace CECommon.Interfaces
 {
     public interface IModelManager
     {
-        bool TryGetAllModelEntities(
-            out Dictionary<long, ITopologyElement> topologyElements, 
-            out Dictionary<long, List<long>> elementConnections, 
-            out HashSet<long> reclosers, 
-            out List<long> energySources);
+        Task<ModelDelta> TryGetAllModelEntitiesAsync();
     }
 }

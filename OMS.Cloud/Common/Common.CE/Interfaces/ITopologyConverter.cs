@@ -1,5 +1,4 @@
 ﻿
-using CECommon.CeContrats;
 using CECommon.Interface;
 
 namespace CECommon.Interfaces

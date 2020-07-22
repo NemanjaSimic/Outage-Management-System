@@ -111,6 +111,10 @@ Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "TopologyBuilderService", "C
 EndProject
 Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "TopologyBuilderImplementation", "CE\TopologyBuilder\TopologyBuilderImplementation\TopologyBuilderImplementation\TopologyBuilderImplementation.csproj", "{7A3DB6F7-0C7D-4F5C-AAD0-C9A8B659AE67}"
 EndProject
+Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "ModelProviderService", "CE\ModelProvider\ModelProviderService\ModelProviderService.csproj", "{0FC95DFC-C5AC-4297-BD05-E4CC51231A55}"
+EndProject
+Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "ModelProviderImplementation", "CE\ModelProvider\ModelProviderImplementation\ModelProviderImplementation.csproj", "{C94BE1A1-2D10-4FB6-9074-CB6623219DBD}"
+EndProject
 Global
 	GlobalSection(SolutionConfigurationPlatforms) = preSolution
 		Debug|Any CPU = Debug|Any CPU
@@ -517,6 +521,26 @@ Global
 		{7A3DB6F7-0C7D-4F5C-AAD0-C9A8B659AE67}.Release|x64.Build.0 = Release|Any CPU
 		{7A3DB6F7-0C7D-4F5C-AAD0-C9A8B659AE67}.Release|x86.ActiveCfg = Release|Any CPU
 		{7A3DB6F7-0C7D-4F5C-AAD0-C9A8B659AE67}.Release|x86.Build.0 = Release|Any CPU
+		{0FC95DFC-C5AC-4297-BD05-E4CC51231A55}.Debug|Any CPU.ActiveCfg = Debug|x64
+		{0FC95DFC-C5AC-4297-BD05-E4CC51231A55}.Debug|x64.ActiveCfg = Debug|x64
+		{0FC95DFC-C5AC-4297-BD05-E4CC51231A55}.Debug|x64.Build.0 = Debug|x64
+		{0FC95DFC-C5AC-4297-BD05-E4CC51231A55}.Debug|x86.ActiveCfg = Debug|x64
+		{0FC95DFC-C5AC-4297-BD05-E4CC51231A55}.Release|Any CPU.ActiveCfg = Release|x64
+		{0FC95DFC-C5AC-4297-BD05-E4CC51231A55}.Release|x64.ActiveCfg = Release|x64
+		{0FC95DFC-C5AC-4297-BD05-E4CC51231A55}.Release|x64.Build.0 = Release|x64
+		{0FC95DFC-C5AC-4297-BD05-E4CC51231A55}.Release|x86.ActiveCfg = Release|x64
+		{C94BE1A1-2D10-4FB6-9074-CB6623219DBD}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
+		{C94BE1A1-2D10-4FB6-9074-CB6623219DBD}.Debug|Any CPU.Build.0 = Debug|Any CPU
+		{C94BE1A1-2D10-4FB6-9074-CB6623219DBD}.Debug|x64.ActiveCfg = Debug|Any CPU
+		{C94BE1A1-2D10-4FB6-9074-CB6623219DBD}.Debug|x64.Build.0 = Debug|Any CPU
+		{C94BE1A1-2D10-4FB6-9074-CB6623219DBD}.Debug|x86.ActiveCfg = Debug|Any CPU
+		{C94BE1A1-2D10-4FB6-9074-CB6623219DBD}.Debug|x86.Build.0 = Debug|Any CPU
+		{C94BE1A1-2D10-4FB6-9074-CB6623219DBD}.Release|Any CPU.ActiveCfg = Release|Any CPU
+		{C94BE1A1-2D10-4FB6-9074-CB6623219DBD}.Release|Any CPU.Build.0 = Release|Any CPU
+		{C94BE1A1-2D10-4FB6-9074-CB6623219DBD}.Release|x64.ActiveCfg = Release|Any CPU
+		{C94BE1A1-2D10-4FB6-9074-CB6623219DBD}.Release|x64.Build.0 = Release|Any CPU
+		{C94BE1A1-2D10-4FB6-9074-CB6623219DBD}.Release|x86.ActiveCfg = Release|Any CPU
+		{C94BE1A1-2D10-4FB6-9074-CB6623219DBD}.Release|x86.Build.0 = Release|Any CPU
 	EndGlobalSection
 	GlobalSection(SolutionProperties) = preSolution
 		HideSolutionNode = FALSE
@@ -568,6 +592,8 @@ Global
 		{D8B669F1-9B73-4F6A-9AFC-53AF4B0272AC} = {34A9CA67-9D17-4AD5-B259-B1D60BACBF17}
 		{7DFA9EE0-2604-4939-A886-06104F388217} = {10B54644-AF14-4856-95B1-9D8FE8B35025}
 		{7A3DB6F7-0C7D-4F5C-AAD0-C9A8B659AE67} = {10B54644-AF14-4856-95B1-9D8FE8B35025}
+		{0FC95DFC-C5AC-4297-BD05-E4CC51231A55} = {2F7D3D64-14A7-49EC-A7C0-E725413A93DE}
+		{C94BE1A1-2D10-4FB6-9074-CB6623219DBD} = {2F7D3D64-14A7-49EC-A7C0-E725413A93DE}
 	EndGlobalSection
 	GlobalSection(ExtensibilityGlobals) = postSolution
 		SolutionGuid = {900889C5-0CD3-44E8-ADE4-9BED7AA01A1E}

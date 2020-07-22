@@ -1,4 +1,4 @@
-﻿using CECommon.CeContrats;
+﻿using CECommon;
 using CECommon.Interface;
 using CECommon.Interfaces;
 using Common.CeContracts.TopologyProvider;

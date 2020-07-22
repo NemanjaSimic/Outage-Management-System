@@ -2,7 +2,7 @@
 using OMS.Common.PubSubContracts.DataContracts;
 using System.Runtime.Serialization;
 
-namespace Outage.Common.PubSub.CalculationEngineDataContract
+namespace CECommon.Models
 {
     [DataContract]
     public class CalculationEnginePublication : Publication

@@ -1,7 +1,7 @@
 ﻿using System.Collections.Generic;
 using System.Runtime.Serialization;
 
-namespace CECommon.CeContrats
+namespace CECommon
 {
     //[Serializable]
     [DataContract]

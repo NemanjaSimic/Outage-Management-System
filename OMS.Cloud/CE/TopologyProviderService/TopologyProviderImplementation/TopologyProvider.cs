@@ -1,5 +1,4 @@
 ﻿using CECommon;
-using CECommon.CeContrats;
 using CECommon.Interface;
 using CECommon.Interfaces;
 using CECommon.Models;
@@ -13,7 +12,6 @@ using OMS.Common.Cloud.ReliableCollectionHelpers;
 using OMS.Common.PubSubContracts;
 using OMS.Common.WcfClient.CE;
 using OMS.Common.WcfClient.PubSub;
-using Outage.Common.PubSub.CalculationEngineDataContract;
 using System;
 using System.Collections.Generic;
 using System.Linq;

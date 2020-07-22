@@ -3,7 +3,7 @@ using System.Collections.Generic;
 using System.Fabric;
 using System.Threading;
 using System.Threading.Tasks;
-using CECommon.CeContrats;
+using CECommon;
 using CECommon.Interface;
 using CECommon.Interfaces;
 using Common.CE;
