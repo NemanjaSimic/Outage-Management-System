@@ -52,7 +52,7 @@ namespace OMS.OutageLifecycleService
 				new ServiceInstanceListener (context =>
 				{
 					return new WcfCommunicationListener<IResolveOutageContract>(context,
-																			   new ResolveOutageService(),
+																			   new ResolveOutageService(this.dbContext),
 																			   WcfUtility.CreateTcpListenerBinding(),
 																			   EndpointNames.ResolveOutageEndpoint);
 				}, EndpointNames.ResolveOutageEndpoint),

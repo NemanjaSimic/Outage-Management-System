@@ -21,7 +21,7 @@ namespace OMS.OutageLifecycleServiceImplementation.OutageLCHelper
         private UnitOfWork dbContext;
         private IOutageTopologyModel outageTopology;
         private ICloudLogger logger;
-        public ModelResourcesDesc modelResourcesDesc;
+        public static ModelResourcesDesc modelResourcesDesc = new ModelResourcesDesc();
         private NetworkModelGdaClient networkModelGdaClient;
         private PublisherClient publisherClient;
         
@@ -33,7 +33,6 @@ namespace OMS.OutageLifecycleServiceImplementation.OutageLCHelper
         {
             this.dbContext = unitOfWork;
             this.outageTopology = outageTopology;
-            this.modelResourcesDesc = new ModelResourcesDesc();
             this.networkModelGdaClient = NetworkModelGdaClient.CreateClient();
             this.publisherClient = PublisherClient.CreateClient();
         }
