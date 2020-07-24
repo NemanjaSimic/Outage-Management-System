@@ -79,11 +79,11 @@ export class GraphComponent implements OnInit, OnDestroy {
   private activeOutages: ActiveOutage[] = [];
 
   constructor(
-    private graphService: GraphService,
+    // private graphService: GraphService,
     private graphCoreService: GraphCoreService,
-    private scadaService: ScadaService,
+    // private scadaService: ScadaService,
     private scadaCoreService: ScadaCoreService,
-    private outageNotificationService: OutageNotificationService,
+    // private outageNotificationService: OutageNotificationService,
     private outageNotificationCoreService: OutageNotificationCoreService,
     private commandService: CommandService,
     private outageService: OutageService,
@@ -135,7 +135,8 @@ export class GraphComponent implements OnInit, OnDestroy {
   }
 
   public getTopology(): void {
-    this.topologySubscription = this.graphService.getTopology().subscribe(
+    this.topologySubscription = this.graphCoreService.getTopology().subscribe(
+    // this.topologySubscription = this.graphService.getTopology().subscribe(
       graph => {
         console.log(graph);
         this.onNotification(graph)
@@ -157,73 +158,95 @@ export class GraphComponent implements OnInit, OnDestroy {
 
   public startConnection(): void {
     this.graphCoreService.startConnection();
+    this.updateSubscription =  this.graphCoreService.updateRecieved.subscribe(
+      data => this.onNotification(data),
+      err => console.log(err));
+    
+    this.outageSubscription = this.graphCoreService.outageRecieved.subscribe(
+      data => drawCallWarning(this.cy, data),
+      err => console.log(err));
 
-    this.connectionSubscription = this.graphService.startConnection().subscribe(
-      (didConnect) => {
-        if (didConnect) {
-          console.log('Connected to graph service');
+    this.drawGraph();
 
-          this.updateSubscription = this.graphService.updateRecieved.subscribe(
-            data => this.onNotification(data),
-            err => console.log(err));
+    /// OBSOLETE (.NET SignalR)
+    // this.connectionSubscription = this.graphService.startConnection().subscribe(
+    //   (didConnect) => {
+    //     if (didConnect) {
+    //       console.log('Connected to graph service');
 
-          this.outageSubscription = this.graphService.outageRecieved.subscribe(
-            data => drawCallWarning(this.cy, data),
-            err => console.log(err));
+    //       this.updateSubscription = this.graphService.updateRecieved.subscribe(
+    //         data => this.onNotification(data),
+    //         err => console.log(err));
 
-          this.drawGraph();
-        }
-        else {
-          console.log('Could not connect to graph service');
-        }
-      },
-      (err) => console.log(err)
-    );
+    //       this.outageSubscription = this.graphService.outageRecieved.subscribe(
+    //         data => drawCallWarning(this.cy, data),
+    //         err => console.log(err));
+
+    //       this.drawGraph();
+    //     }
+    //     else {
+    //       console.log('Could not connect to graph service');
+    //     }
+    //   },
+    //   (err) => console.log(err)
+    // );
   }
 
   public startScadaConnection(): void {
     this.scadaCoreService.startConnection();
+    this.scadaSubscription = this.scadaCoreService.updateRecieved.subscribe(
+      (data: ScadaData) => this.onScadaNotification(data),
+      err => console.log(err));
 
-    this.scadaServiceConnectionSubscription = this.scadaService.startConnection().subscribe(
-      (didConnect) => {
-        if (didConnect) {
-          console.log('Connected to scada service');
+    /// OBSOLETE (.NET SignalR)
+    // this.scadaServiceConnectionSubscription = this.scadaService.startConnection().subscribe(
+    //   (didConnect) => {
+    //     if (didConnect) {
+    //       console.log('Connected to scada service');
 
-          this.scadaSubscription = this.scadaService.updateRecieved.subscribe(
-            (data: ScadaData) => this.onScadaNotification(data),
-            err => console.log(err));
-        }
-        else {
-          console.log('Could not connect to scada service');
-        }
-      },
-      (err) => console.log(err)
-    );
+    //       this.scadaSubscription = this.scadaService.updateRecieved.subscribe(
+    //         (data: ScadaData) => this.onScadaNotification(data),
+    //         err => console.log(err));
+    //     }
+    //     else {
+    //       console.log('Could not connect to scada service');
+    //     }
+    //   },
+    //   (err) => console.log(err)
+    // );
   }
 
   public startOutageConnection(): void {
     this.outageNotificationCoreService.startConnection();
+    this.activeOutageSubcription = this.outageNotificationCoreService.activeOutageUpdateRecieved.subscribe(
+      (data: ActiveOutage) => this.onActiveOutageNotification(data),
+      err => console.log(err));
 
-    this.outageServiceConnectionSubscription = this.outageNotificationService.startConnection().subscribe(
-      (didConnect) => {
-        if (didConnect) {
-          console.log('Connected to Outage Notification service');
+    this.archivedOutageSubcription = this.outageNotificationCoreService.archivedOutageUpdateRecieved.subscribe(
+      (data: ArchivedOutage) => this.onArchivedOutageNotification(data),
+      err => console.log(err));
+            
+    /// OBSOLETE (.NET SignalR)
+    // this.outageServiceConnectionSubscription = this.outageNotificationService.startConnection().subscribe(
+    //   (didConnect) => {
+    //     if (didConnect) {
+    //       console.log('Connected to Outage Notification service');
 
-          this.activeOutageSubcription = this.outageNotificationService.activeOutageUpdateRecieved.subscribe(
-            (data: ActiveOutage) => this.onActiveOutageNotification(data),
-            err => console.log(err));
+    //       this.activeOutageSubcription = this.outageNotificationService.activeOutageUpdateRecieved.subscribe(
+    //         (data: ActiveOutage) => this.onActiveOutageNotification(data),
+    //         err => console.log(err));
 
-          this.archivedOutageSubcription = this.outageNotificationService.archivedOutageUpdateRecieved.subscribe(
-            (data: ArchivedOutage) => this.onArchivedOutageNotification(data),
-            err => console.log(err));
+    //       this.archivedOutageSubcription = this.outageNotificationService.archivedOutageUpdateRecieved.subscribe(
+    //         (data: ArchivedOutage) => this.onArchivedOutageNotification(data),
+    //         err => console.log(err));
 
-        }
-        else {
-          console.log('Could not connect to Outage Notification service');
-        }
-      },
-      (err) => console.log(err)
-    );
+    //     }
+    //     else {
+    //       console.log('Could not connect to Outage Notification service');
+    //     }
+    //   },
+    //   (err) => console.log(err)
+    // );
   }
 
   public drawGraph(): void {

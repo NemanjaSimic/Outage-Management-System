@@ -25,11 +25,12 @@ export class OutageNotificationCoreService {
    
       this.hubConnection
         .start()
-        .then(() => console.log('Connection started'))
-        .catch(err => console.log('Error while starting connection: ' + err))
-
-      this.registerActiveOutageUpdateListener();
-      this.registerArchivedOutageUpdateListener();
+        .then(() => {
+          console.log('Connected to Outage Notification service');
+          this.registerActiveOutageUpdateListener();
+          this.registerArchivedOutageUpdateListener();
+        })
+        .catch(err => console.log('Could not connect to Outage Notification service: ' + err))
     }
 
     public registerActiveOutageUpdateListener = () => {

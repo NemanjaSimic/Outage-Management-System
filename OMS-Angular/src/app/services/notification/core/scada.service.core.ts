@@ -23,10 +23,11 @@ export class ScadaCoreService {
         
         this.hubConnection
         .start()
-        .then(() => console.log('Connection started'))
-        .catch(err => console.log('Error while starting connection: ' + err))
-        
-        this.registerScadaDataUpdateListener();
+        .then(() => {
+            console.log('Connected to scada service');
+            this.registerScadaDataUpdateListener();
+        })
+        .catch(err => console.log('Could not connect to scada service: ' + err))
     }
 
     public registerScadaDataUpdateListener = () => {

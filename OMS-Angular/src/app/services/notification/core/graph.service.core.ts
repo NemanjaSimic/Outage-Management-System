@@ -27,11 +27,12 @@ export class GraphCoreService {
  
     this.hubConnection
       .start()
-      .then(() => console.log('Connection started'))
-      .catch(err => console.log('Error while starting connection: ' + err))
-
-    this.registerGraphUpdateListener();
-    this.registerOutageListener();
+      .then(() => {
+        console.log('Connected to graph service');
+        this.registerGraphUpdateListener();
+        this.registerOutageListener();
+      })
+      .catch(err => console.log('Could not connect to graph service: ' + err))
   }
  
   public registerGraphUpdateListener = () => {
