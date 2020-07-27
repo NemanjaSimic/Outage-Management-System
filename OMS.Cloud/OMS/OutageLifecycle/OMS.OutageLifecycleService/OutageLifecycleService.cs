@@ -66,7 +66,7 @@ namespace OMS.OutageLifecycleService
 				new ServiceInstanceListener (context =>
 				{
 					return new WcfCommunicationListener<ISendRepairCrewContract>(context,
-																			   new SendRepairCrewService(),
+																			   new SendRepairCrewService(this.dbContext),
 																			   WcfUtility.CreateTcpListenerBinding(),
 																			   EndpointNames.SendRepairCrewEndpoint);
 				}, EndpointNames.SendRepairCrewEndpoint),

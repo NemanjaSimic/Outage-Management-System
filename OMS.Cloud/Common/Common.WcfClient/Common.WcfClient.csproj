@@ -116,6 +116,7 @@
     <Compile Include="OMS\HistoryDBManagerClient.cs" />
     <Compile Include="OMS\ReportOutageClient.cs" />
     <Compile Include="OMS\ResolveOutageClient.cs" />
+    <Compile Include="OMS\SendRepairCrewClient.cs" />
     <Compile Include="OMS\TracingAlgorithmClient.cs" />
     <Compile Include="OMS\ValidateResolveConditionsClient.cs" />
     <Compile Include="Properties\AssemblyInfo.cs" />

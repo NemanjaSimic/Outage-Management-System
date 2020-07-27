@@ -44,7 +44,7 @@
         public const string OutageManagementServiceModelReadAccessEndpoint = "OutageManagementServiceModelReadAccessEndpoint";
         public const string OutageManagmenetServiceModelUpdateAccessEndpoint = "OutageManagmenetServiceModelUpdateAccessEndpoint";
         public const string TracingAlgorithmEndpoint = "TracingAlgorithmEndpoint";
-        public const string OutageSimulatorServiceEndpoint = "OutageSimulatorServiceEndpoint";
+        public const string OutageSimulatorEndpoint = "OutageSimulatorEndpoint";
         public const string HistoryDBManagerEndpoint = "HistoryDBManagerEndpoint";
         public const string IsolateOutageEndpoint = "IsolateOutageEndpoint";
         public const string ReportOutageEndpoint = "ReportOutageEndpoint";
