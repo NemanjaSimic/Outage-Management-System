@@ -26,5 +26,7 @@ namespace Common.CeContracts.TopologyProvider
         Task<IOutageTopologyModel> GetOMSModel();
         [OperationContract]
         Task<UIModel> GetUIModel();
+        [OperationContract]
+        Task DiscreteMeasurementDelegate();
     }
 }

@@ -206,12 +206,18 @@ namespace TopologyProviderImplementation
             return topology;
         }
 
-        public void DiscreteMeasurementDelegate()
+        public async Task DiscreteMeasurementDelegate()
         {
-            //loadFlow.UpdateLoadFlow(Topology);
-            //ProviderTopologyDelegate?.Invoke(Topology);
-            
-           // ProviderTopologyConnectionDelegate?.Invoke(Topology);
+            string verboseMessage = $"{baseLogString} entering DiscreteMeasurementDelegate method.";
+            Logger.LogVerbose(verboseMessage);
+
+            var topology = await GetTopologyFromCache(TopologyType.NonTransactionTopology);
+            topology = await loadFlowClient.UpdateLoadFlow(topology);
+
+            await TopologyCache.SetAsync((short)TopologyType.NonTransactionTopology, topology);
+
+            await RefreshUIModel();
+            await RefreshOMSModel();
         }
         public async Task<ITopology> GetTopology()
         {

@@ -41,6 +41,11 @@ namespace OMS.Common.WcfClient.CE
 			return MethodWrapperAsync("CommitTransaction", new object[0]);
 		}
 
+		public Task DiscreteMeasurementDelegate()
+		{
+			return MethodWrapperAsync("DiscreteMeasurementDelegate", new object[0]);
+		}
+
 		public Task<IOutageTopologyModel> GetOMSModel()
 		{
 			return MethodWrapperAsync<IOutageTopologyModel>("GetOMSModel", new object[0]);
