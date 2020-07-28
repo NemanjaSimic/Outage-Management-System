@@ -27,6 +27,9 @@ namespace OMS.Common.ScadaContracts.ModelProvider
         Task AddOrUpdateCommandDescription(long gid, CommandDescription commandDescription);
 
         [OperationContract]
+        Task AddOrUpdateMultipleCommandDescriptions(Dictionary<long, CommandDescription> commandDescriptions);
+
+        [OperationContract]
         Task<bool> RemoveCommandDescription(long gid);
     }
 }

@@ -24,9 +24,15 @@ namespace SCADA.ModelProviderImplementation.ContractProviders
         private bool isGidToPointItemMapInitialized;
         private bool isCommandDescriptionCacheInitialized;
         private bool isInfoCacheInitialized;
+
         private bool ReliableDictionariesInitialized
         {
-            get { return isGidToPointItemMapInitialized && isCommandDescriptionCacheInitialized && isInfoCacheInitialized; }
+            get 
+            { 
+                return isGidToPointItemMapInitialized && 
+                       isCommandDescriptionCacheInitialized && 
+                       isInfoCacheInitialized;
+            }
         }
 
         private ICloudLogger logger;
@@ -58,13 +64,12 @@ namespace SCADA.ModelProviderImplementation.ContractProviders
         {
             this.baseLogString = $"{this.GetType()} [{this.GetHashCode()}] =>{Environment.NewLine}";
 
-            this.stateManager = stateManager;
-
             this.isGidToPointItemMapInitialized = false;
             this.isCommandDescriptionCacheInitialized = false;
             this.isInfoCacheInitialized = false;
 
-            stateManager.StateManagerChanged += this.OnStateManagerChangedHandler;
+            this.stateManager = stateManager;
+            this.stateManager.StateManagerChanged += this.OnStateManagerChangedHandler;
         }
 
         private async void OnStateManagerChangedHandler(object sender, NotifyStateManagerChangedEventArgs e)
@@ -111,7 +116,6 @@ namespace SCADA.ModelProviderImplementation.ContractProviders
 
             while (!ReliableDictionariesInitialized)
             {
-                //TODO: something smarter
                 await Task.Delay(1000);
             }
 
@@ -133,7 +137,6 @@ namespace SCADA.ModelProviderImplementation.ContractProviders
         {
             while (!ReliableDictionariesInitialized || !(await GetIsScadaModelImportedIndicator()))
             {
-                //TODO: something smarter
                 await Task.Delay(1000);
             }
 
@@ -157,7 +160,7 @@ namespace SCADA.ModelProviderImplementation.ContractProviders
             var enumerableGidToPointItemMap = await GidToPointItemMap.GetEnumerableDictionaryAsync();
             foreach (long gid in enumerableGidToPointItemMap.Keys)
             {
-                CommandOriginType commandOrigin = CommandOriginType.OTHER_COMMAND;
+                CommandOriginType commandOrigin = CommandOriginType.UNKNOWN_ORIGIN;
 
                 if (enumerableGidToPointItemMap[gid] is IAnalogPointItem analogPointItem)
                 {
@@ -204,7 +207,6 @@ namespace SCADA.ModelProviderImplementation.ContractProviders
         {
             while (!ReliableDictionariesInitialized || !(await GetIsScadaModelImportedIndicator()))
             {
-                //TODO: something smarter
                 await Task.Delay(1000);
             }
 
@@ -228,7 +230,7 @@ namespace SCADA.ModelProviderImplementation.ContractProviders
             var enumerableGidToPointItemMap = await GidToPointItemMap.GetEnumerableDictionaryAsync();
             foreach (long gid in enumerableGidToPointItemMap.Keys)
             {
-                CommandOriginType commandOrigin = CommandOriginType.OTHER_COMMAND;
+                CommandOriginType commandOrigin = CommandOriginType.UNKNOWN_ORIGIN;
 
                 if (topic == Topic.MEASUREMENT && enumerableGidToPointItemMap[gid] is IAnalogPointItem analogPointItem)
                 {

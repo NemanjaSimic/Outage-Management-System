@@ -26,9 +26,9 @@ namespace OMS.Common.PubSubContracts
         [ServiceKnownType(typeof(SingleDiscreteValueSCADAMessage))]
         [ServiceKnownType(typeof(MultipleDiscreteValueSCADAMessage))]
 
-        Task Notify(IPublishableMessage message);
+        Task Notify(IPublishableMessage message, string publisherName);
 
         [OperationContract]
-        Task<Uri> GetSubscriberUri();
+        Task<string> GetSubscriberName();
     }
 }

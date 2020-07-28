@@ -4,6 +4,7 @@ using Microsoft.ServiceFabric.Services.Communication.Wcf.Client;
 using Microsoft.ServiceFabric.Services.Remoting;
 using OMS.Common.Cloud.Logger;
 using System;
+using System.Collections.Generic;
 using System.Fabric;
 using System.Reflection;
 using System.ServiceModel;
@@ -36,43 +37,85 @@ namespace OMS.Common.WcfClient
         /// <param name="methodName">Kratnko ime same metode (npr. Method1, a ne MojaKlasa.Method1)</param>
         /// <param name="passedParameters">Niz parametara - Mora se proslediti onoliko prametara koliko ih metoda ima. Ako metoda ima opcione paramtere mora se proslediti barem null, ako ne vrednost tih parametara.</param>
         /// <returns>Vraca objekat koji predstavlja resultat inovk-ovane metode.</returns>
-        protected Task MethodWrapperAsync(string methodName, object[] passedParameters)
+        protected async Task MethodWrapperAsync(string methodName, object[] passedParameters)
         {
             int objectId = this.GetHashCode();
             string debugMessage = $"{baseLogString} MethodWrapperAsync method called => MethodName: {methodName}, ReturnType: {typeof(Task)}, passedParameters count: {passedParameters.Length}";
             Logger.LogDebug(debugMessage);
 
-            return InvokeWithRetryAsync(client =>
+            try
             {
-                string varboseMessage = $"{baseLogString} MethodWrapperAsync => ServicePartitionClient.InvokeWithRetryAsync method called[{objectId}].";
-                Logger.LogVerbose(varboseMessage);
-
-                var type = typeof(TContract);
-                var methods = type.GetMethods();
-
-                foreach (var method in methods)
+                await InvokeWithRetryAsync(client =>
                 {
-                    if (methodName != method.Name)
+                    try
                     {
-                        continue;
-                    }
+                        string varboseMessage = $"{baseLogString} MethodWrapperAsync => ServicePartitionClient.InvokeWithRetryAsync method called[{objectId}].";
+                        Logger.LogVerbose(varboseMessage);
 
-                    if (method.ReturnType != typeof(Task))
+                        var type = typeof(TContract);
+                        var methods = type.GetMethods();
+
+                        foreach (var method in methods)
+                        {
+                            if (methodName != method.Name)
+                            {
+                                continue;
+                            }
+
+                            if (method.ReturnType != typeof(Task))
+                            {
+                                string errMessage = $"{baseLogString} MethodWrapperAsync => Method with name '{methodName}' has ReturnType: {method.ReturnType}, but {typeof(Task)} was expected.";
+                                Logger.LogError(errMessage);
+                                throw new Exception(errMessage);
+                            }
+
+                            CheckArgumentsValidity(method, passedParameters);
+
+                            return InvokeMethodAsync(method, client.Channel, passedParameters);
+                        }
+
+                        string message = $"{baseLogString} MethodWrapperAsync => {type} does not contain method with name '{methodName}'.";
+                        Logger.LogError(message);
+                        throw new Exception(message);
+                    }
+                    catch (OperationCanceledException e)
                     {
-                        string errMessage = $"{baseLogString} MethodWrapperAsync => Method with name '{methodName}' has ReturnType: {method.ReturnType}, but {typeof(Task)} was expected.";
-                        Logger.LogError(errMessage);
-                        throw new Exception(errMessage);
+                        string message = $"{baseLogString} MethodWrapperAsync => Exception ({e.GetType()}).";
+                        Logger.LogError(message, e);
+                        throw;
                     }
-
-                    CheckArgumentsValidity(method, passedParameters);
-
-                    return InvokeMethodAsync(method, client.Channel, passedParameters);
-                }
-
-                string message = $"{baseLogString} MethodWrapperAsync => {type} does not contain method with name '{methodName}'.";
+                    catch (CommunicationObjectFaultedException e)
+                    {
+                        string message = $"{baseLogString} MethodWrapperAsync => Exception ({e.GetType()}).";
+                        Logger.LogError(message, e);
+                        throw;
+                    }
+                    catch (Exception e)
+                    {
+                        string message = $"{baseLogString} MethodWrapperAsync => Exception ({e.GetType()}).";
+                        Logger.LogError(message);
+                        throw;
+                    }
+                }, new List<Type>() { typeof(CommunicationObjectFaultedException) }.ToArray());
+            }
+            catch (OperationCanceledException e)
+            {
+                string message = $"{baseLogString} MethodWrapperAsync => Exception ({e.GetType()}).";
+                Logger.LogError(message, e);
+                throw;
+            }
+            catch (CommunicationObjectFaultedException e)
+            {
+                string message = $"{baseLogString} MethodWrapperAsync => Exception ({e.GetType()}).";
+                Logger.LogError(message, e);
+                throw;
+            }
+            catch (Exception e)
+            {
+                string message = $"{baseLogString} MethodWrapperAsync => Exception ({e.GetType()}).";
                 Logger.LogError(message);
-                throw new Exception(message);
-            });
+                throw;
+            }
         }
 
         /// <summary>
@@ -81,44 +124,89 @@ namespace OMS.Common.WcfClient
         /// <param name="methodName">Kratnko ime same metode (npr. Method1, a ne MojaKlasa.Method1)</param>
         /// <param name="passedParameters">Niz parametara - Mora se proslediti onoliko prametara koliko ih metoda ima. Ako metoda ima opcione paramtere mora se proslediti barem null, ako ne vrednost tih parametara.</param>
         /// <returns>Vraca objekat koji predstavlja resultat inovk-ovane metode.</returns>
-        protected Task<TResult> MethodWrapperAsync<TResult>(string methodName, object[] passedParameters)
+        protected async Task<TResult> MethodWrapperAsync<TResult>(string methodName, object[] passedParameters)
         {
             string debugMessage = $"{baseLogString} MethodWrapperAsync<{typeof(TResult)}> method called => MethodName: {methodName}, ReturnType: {typeof(Task<TResult>)}, passedParameters count: {passedParameters.Length}";
             Logger.LogDebug(debugMessage);
 
-            return InvokeWithRetryAsync(client =>
+            TResult resut;
+
+            try
             {
-                string varboseMessage = $"{baseLogString} MethodWrapperAsync<{typeof(TResult)}> => InvokeWithRetryAsync method called.";
-                Logger.LogVerbose(varboseMessage);
-                
-                var type = typeof(TContract);
-                var methods = type.GetMethods();
-                var passedReturenType = typeof(Task<TResult>);
-
-                foreach (var method in methods)
+                resut = await InvokeWithRetryAsync(client =>
                 {
-                    if (methodName != method.Name)
+                    try
                     {
-                        continue;
-                    }
+                        string varboseMessage = $"{baseLogString} MethodWrapperAsync<{typeof(TResult)}> => InvokeWithRetryAsync method called.";
+                        Logger.LogVerbose(varboseMessage);
 
-                    if(passedReturenType != method.ReturnType)
+                        var type = typeof(TContract);
+                        var methods = type.GetMethods();
+                        var passedReturenType = typeof(Task<TResult>);
+
+                        foreach (var method in methods)
+                        {
+                            if (methodName != method.Name)
+                            {
+                                continue;
+                            }
+
+                            if (passedReturenType != method.ReturnType)
+                            {
+                                string errMessage = $"{baseLogString} MethodWrapperAsync<{typeof(TResult)}> =>  Passed return type: {passedReturenType} does not match return type of method with name '{methodName}' [ReturnType: {method.ReturnType}].";
+                                Logger.LogError(errMessage);
+                                throw new Exception(errMessage);
+                            }
+
+                            CheckArgumentsValidity(method, passedParameters);
+
+                            return InvokeMethodAsync<TResult>(method, client.Channel, passedParameters);
+                        }
+
+                        string message = $"{baseLogString} MethodWrapperAsync<{typeof(TResult)}> => {type} does not contain method with name '{methodName}'.";
+                        Logger.LogError(message);
+                        throw new Exception(message);
+                    }
+                    catch (OperationCanceledException e)
                     {
-                        string errMessage = $"{baseLogString} MethodWrapperAsync<{typeof(TResult)}> =>  Passed return type: {passedReturenType} does not match return type of method with name '{methodName}' [ReturnType: {method.ReturnType}].";
-                        Logger.LogError(errMessage);
-                        throw new Exception(errMessage);
+                        string message = $"{baseLogString} MethodWrapperAsync<{typeof(TResult)}> => Exception ({e.GetType()}).";
+                        Logger.LogError(message, e);
+                        throw;
                     }
-
-                    CheckArgumentsValidity(method, passedParameters);
-
-                    return InvokeMethodAsync<TResult>(method, client.Channel, passedParameters);
-                }
-
-                string message = $"{baseLogString} MethodWrapperAsync<{typeof(TResult)}> => {type} does not contain method with name '{methodName}'.";
+                    catch (CommunicationObjectFaultedException e)
+                    {
+                        string message = $"{baseLogString} MethodWrapperAsync<{typeof(TResult)}> => Exception ({e.GetType()}).";
+                        Logger.LogError(message, e);
+                        throw;
+                    }
+                    catch (Exception e)
+                    {
+                        string message = $"{baseLogString} MethodWrapperAsync<{typeof(TResult)}> => Exception ({e.GetType()}).";
+                        Logger.LogError(message);
+                        throw;
+                    }
+                }, new List<Type>() { typeof(CommunicationObjectFaultedException) }.ToArray());
+            }
+            catch (OperationCanceledException e)
+            {
+                string message = $"{baseLogString} MethodWrapperAsync<{typeof(TResult)}> => Exception ({e.GetType()}).";
+                Logger.LogError(message, e);
+                throw;
+            }
+            catch (CommunicationObjectFaultedException e)
+            {
+                string message = $"{baseLogString} MethodWrapperAsync<{typeof(TResult)}> => Exception ({e.GetType()}).";
+                Logger.LogError(message, e);
+                throw;
+            }
+            catch (Exception e)
+            {
+                string message = $"{baseLogString} MethodWrapperAsync<{typeof(TResult)}> => Exception ({e.GetType()}).";
                 Logger.LogError(message);
-                throw new Exception(message);
+                throw;
+            }
 
-            }, new Type[1] { typeof(CommunicationObjectFaultedException) });
+            return resut;
         }
 
         protected void CheckArgumentsValidity(MethodInfo method, object[] passedParameters)
@@ -213,7 +301,7 @@ namespace OMS.Common.WcfClient
                     {
                         string message = $"{baseLogString} InvokeMethodAsync => CommunicationObjectFaultedException caught.";
                         Logger.LogError(message, communicationException);
-                        //throw communicationException;
+                        throw communicationException;
                     }
                 }
                 catch (Exception e)
@@ -266,7 +354,7 @@ namespace OMS.Common.WcfClient
                     {
                         string message = $"{baseLogString} InvokeMethodAsync<{typeof(TResult)}> => CommunicationObjectFaultedException caught.";
                         Logger.LogError(message, communicationException);
-                        //throw communicationException;
+                        throw communicationException;
                     }
                 }
                 catch (Exception e)

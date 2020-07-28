@@ -54,8 +54,8 @@ namespace SCADA.CommandingService
                     return new WcfCommunicationListener<IScadaCommandingContract>(context,
                                                                                   this.commandingProvider,
                                                                                   WcfUtility.CreateTcpListenerBinding(),
-                                                                                  EndpointNames.ScadaCommandService);
-                }, EndpointNames.ScadaCommandService),
+                                                                                  EndpointNames.ScadaCommandingEndpoint);
+                }, EndpointNames.ScadaCommandingEndpoint),
             };
         }
     }

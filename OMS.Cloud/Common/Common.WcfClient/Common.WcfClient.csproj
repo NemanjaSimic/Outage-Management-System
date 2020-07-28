@@ -127,7 +127,7 @@
     <Compile Include="SCADA\ScadaModelReadAccessClient.cs" />
     <Compile Include="SCADA\ScadaModelUpdateAccessClient.cs" />
     <Compile Include="SCADA\WriteCommandEnqueuerClient.cs" />
-    <Compile Include="TMS\ModelUpdateNotificationClient.cs" />
+    <Compile Include="TMS\Notifications\NotifyNetworkModelUpdateClient.cs" />
     <Compile Include="TMS\TransactionActorClient.cs" />
     <Compile Include="TMS\TransactionCoordinatorClient.cs" />
     <Compile Include="TMS\TransactionEnlistmentClient.cs" />
@@ -150,10 +150,6 @@
       <Project>{6A84DB56-920C-4FC1-9CB0-9C29D0FC1586}</Project>
       <Name>Common.SCADA</Name>
     </ProjectReference>
-    <ProjectReference Include="..\Contracts\Common.DistributedTransactionContracts\Common.DistributedTransactionContracts.csproj">
-      <Project>{A07D94C2-40EF-48DB-B828-7E53E7F5A372}</Project>
-      <Name>Common.DistributedTransactionContracts</Name>
-    </ProjectReference>
     <ProjectReference Include="..\Contracts\Common.NmsContracts\Common.NmsContracts.csproj">
       <Project>{235804A8-9C8F-40EC-8786-5DAB24733977}</Project>
       <Name>Common.NmsContracts</Name>
@@ -166,6 +162,11 @@
       <Project>{5F25D9C5-9A93-49E7-92F7-58E399AEF928}</Project>
       <Name>Common.ScadaContracts</Name>
     </ProjectReference>
+    <ProjectReference Include="..\Contracts\Common.TmsContracts\Common.TmsContracts.csproj">
+      <Project>{A07D94C2-40EF-48DB-B828-7E53E7F5A372}</Project>
+      <Name>Common.TmsContracts</Name>
+    </ProjectReference>
   </ItemGroup>
+  <ItemGroup />
   <Import Project="$(MSBuildToolsPath)\Microsoft.CSharp.targets" />
 </Project>

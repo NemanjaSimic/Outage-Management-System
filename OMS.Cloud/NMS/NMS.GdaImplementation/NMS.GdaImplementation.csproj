@@ -132,6 +132,7 @@
       <HintPath>..\..\packages\System.ComponentModel.Annotations.4.7.0\lib\net461\System.ComponentModel.Annotations.dll</HintPath>
     </Reference>
     <Reference Include="System.ComponentModel.DataAnnotations" />
+    <Reference Include="System.Configuration" />
     <Reference Include="System.Core" />
     <Reference Include="System.Fabric, Version=7.0.0.0, Culture=neutral, PublicKeyToken=31bf3856ad364e35, processorArchitecture=AMD64">
       <HintPath>..\..\packages\Microsoft.ServiceFabric.7.0.470\lib\net472\System.Fabric.dll</HintPath>
@@ -172,9 +173,10 @@
   <ItemGroup>
     <Compile Include="Config.cs" />
     <Compile Include="Container.cs" />
-    <Compile Include="DbModel\ModelVersionDocument.cs" />
-    <Compile Include="DbModel\NetworkDataModelDocument.cs" />
-    <Compile Include="DistributedTransaction\NMSTransactionActor.cs" />
+    <Compile Include="DbModel\LatestVersionsDocument.cs" />
+    <Compile Include="DbModel\MongoStrings.cs" />
+    <Compile Include="DbModel\NetworkModelsDocument.cs" />
+    <Compile Include="DistributedTransaction\NmsTransactionActor.cs" />
     <Compile Include="GDA\GenericDataAccess.cs" />
     <Compile Include="GDA\ResourceIterator.cs" />
     <Compile Include="MongoAccess.cs" />
@@ -186,17 +188,21 @@
       <Project>{FBEE1369-0F6C-41E6-8C62-8C1C5CDBB602}</Project>
       <Name>Common.Cloud</Name>
     </ProjectReference>
+    <ProjectReference Include="..\..\Common\Common.NMS\Common.NMS.csproj">
+      <Project>{E07DFE6A-8C18-460A-8DD4-47A3320223D7}</Project>
+      <Name>Common.NMS</Name>
+    </ProjectReference>
     <ProjectReference Include="..\..\Common\Common.WcfClient\Common.WcfClient.csproj">
       <Project>{AE91CEB5-378A-4EEF-AEBF-C40ED1EF23CF}</Project>
       <Name>Common.WcfClient</Name>
     </ProjectReference>
-    <ProjectReference Include="..\..\Common\Contracts\Common.DistributedTransactionContracts\Common.DistributedTransactionContracts.csproj">
-      <Project>{A07D94C2-40EF-48DB-B828-7E53E7F5A372}</Project>
-      <Name>Common.DistributedTransactionContracts</Name>
-    </ProjectReference>
     <ProjectReference Include="..\..\Common\Contracts\Common.NmsContracts\Common.NmsContracts.csproj">
       <Project>{235804A8-9C8F-40EC-8786-5DAB24733977}</Project>
       <Name>Common.NmsContracts</Name>
+    </ProjectReference>
+    <ProjectReference Include="..\..\Common\Contracts\Common.TmsContracts\Common.TmsContracts.csproj">
+      <Project>{A07D94C2-40EF-48DB-B828-7E53E7F5A372}</Project>
+      <Name>Common.TmsContracts</Name>
     </ProjectReference>
     <ProjectReference Include="..\DataModel\NMS.DataModel.csproj">
       <Project>{274DCAF7-5FDD-46A0-97E2-91DBCA365381}</Project>

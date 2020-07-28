@@ -8,9 +8,7 @@ namespace OMS.Common.ScadaContracts.DataContracts.ScadaModelPointItems
 {
     [DataContract]
     public class AnalogPointItem : ScadaModelPointItem, IAnalogPointItem
-    {
-        private float currentEguValue;
-
+    { 
         public AnalogPointItem(IAlarmConfigData alarmConfigData)
             : base(alarmConfigData)
         {
@@ -23,16 +21,7 @@ namespace OMS.Common.ScadaContracts.DataContracts.ScadaModelPointItems
         [DataMember]
         public float NormalValue { get; set; }
         [DataMember]
-        public float CurrentEguValue
-        {
-            get { return currentEguValue; }
-            set
-            {
-                currentEguValue = value;
-                SetAlarms();
-            }
-        }
-        
+        public float CurrentEguValue { get; set; }
         [DataMember]
         public float EGU_Min { get; set; }
         [DataMember]
@@ -86,18 +75,16 @@ namespace OMS.Common.ScadaContracts.DataContracts.ScadaModelPointItems
             }
         }
 
-        public override bool SetAlarms()
+        protected override AlarmType CheckAlarmValue()
         {
             if (!Initialized)
             {
-                return false;
+                return AlarmType.NO_ALARM;
             }
 
-            bool alarmChanged = false;
             float LowLimit;
             float HighLimit;
-            AlarmType currentAlarm = Alarm;
-
+            
             if (AnalogType == AnalogMeasurementType.POWER)
             {
                 LowLimit = alarmConfigData.LowPowerLimit;
@@ -121,60 +108,38 @@ namespace OMS.Common.ScadaContracts.DataContracts.ScadaModelPointItems
             }
 
             //ALARMS FOR ANALOG VALUES
-            if (RegisterType == PointType.ANALOG_INPUT || RegisterType == PointType.ANALOG_OUTPUT)
-            {
-                //VALUE IS INVALID
-                if (CurrentRawValue < MinRawValue || CurrentRawValue > MaxRawValue)
-                {
-                    Alarm = AlarmType.ABNORMAL_VALUE;
-                    if (currentAlarm != Alarm)
-                    {
-                        alarmChanged = true;
-                    }
-
-                    //TODO: maybe throw new Exception("Invalid value");
-                }
-                else if (CurrentEguValue < EGU_Min || CurrentEguValue > EGU_Max)
-                {
-                    Alarm = AlarmType.REASONABILITY_FAILURE;
-                    if (currentAlarm != Alarm)
-                    {
-                        alarmChanged = true;
-                    }
-                }
-                else if (CurrentEguValue > EGU_Min && CurrentEguValue < LowLimit)
-                {
-                    Alarm = AlarmType.LOW_ALARM;
-                    if (currentAlarm != Alarm)
-                    {
-                        alarmChanged = true;
-                    }
-                }
-                else if (CurrentEguValue < EGU_Max && CurrentEguValue > HighLimit)
-                {
-                    Alarm = AlarmType.HIGH_ALARM;
-                    if (currentAlarm != Alarm)
-                    {
-                        alarmChanged = true;
-                    }
-                }
-                else
-                {
-                    Alarm = AlarmType.NO_ALARM;
-                    if (currentAlarm != Alarm)
-                    {
-                        alarmChanged = true;
-                    }
-                }
-            }
-            else
+            if (RegisterType != PointType.ANALOG_INPUT && RegisterType != PointType.ANALOG_OUTPUT)
             {
                 string errorMessage = $"{baseLogString} SetAlarms => PointItem [Gid: 0x{Gid:X16}, Address: {Address}] RegisterType value is invalid. Value: {RegisterType}";
                 Logger.LogError(errorMessage);
                 throw new Exception(errorMessage);
             }
 
-            return alarmChanged;
+            AlarmType currentAlarm;
+
+            //VALUE IS INVALID
+            if (CurrentRawValue < MinRawValue || CurrentRawValue > MaxRawValue)
+            {
+                currentAlarm = AlarmType.ABNORMAL_VALUE;
+            }
+            else if (CurrentEguValue < EGU_Min || CurrentEguValue > EGU_Max)
+            {
+                currentAlarm = AlarmType.REASONABILITY_FAILURE;
+            }
+            else if (CurrentEguValue > EGU_Min && CurrentEguValue < LowLimit)
+            {
+                currentAlarm = AlarmType.LOW_ALARM;
+            }
+            else if (CurrentEguValue < EGU_Max && CurrentEguValue > HighLimit)
+            {
+                currentAlarm = AlarmType.HIGH_ALARM;
+            }
+            else
+            {
+                currentAlarm = AlarmType.NO_ALARM;
+            }
+
+            return currentAlarm;
         }
 
         #region Conversions

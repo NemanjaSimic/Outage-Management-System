@@ -17,8 +17,11 @@ using OMS.Common.SCADA;
 using OMS.Common.ScadaContracts.DataContracts;
 using OMS.Common.ScadaContracts.DataContracts.ScadaModelPointItems;
 using OMS.Common.ScadaContracts.ModelProvider;
+using OMS.Common.TmsContracts;
+using OMS.Common.TmsContracts.Notifications;
 using SCADA.ModelProviderImplementation;
 using SCADA.ModelProviderImplementation.ContractProviders;
+using SCADA.ModelProviderImplementation.DistributedTransaction;
 
 namespace SCADA.ModelProviderService
 {
@@ -28,10 +31,13 @@ namespace SCADA.ModelProviderService
     internal sealed class ModelProviderService : StatefulService
     {
         private readonly string baseLogString;
-        private readonly ScadaModel scadaModel;
-        private readonly ModelReadAccessProvider modelReadAccessProvider;
-        private readonly ModelUpdateAccessProvider modelUpdateAccessProvider;
-        private readonly IntegrityUpdateProvider integrityUpdateProvider;
+        private readonly ScadaModelImporter scadaModelImporter;
+
+        private readonly IScadaModelReadAccessContract modelReadAccessProvider;
+        private readonly IScadaModelUpdateAccessContract modelUpdateAccessProvider;
+        private readonly IScadaIntegrityUpdateContract integrityUpdateProvider;
+        private readonly INotifyNetworkModelUpdateContract scadaNotifyNetworkModelUpdate;
+        private readonly ITransactionActorContract scadaTransactionActorProviders;
 
         private ICloudLogger logger;
         private ICloudLogger Logger
@@ -48,11 +54,17 @@ namespace SCADA.ModelProviderService
             try
             {
                 //DONE THIS WAY (in this order) BECAUSE: there is a mechanism that tracks the initialization process of reliable collections, which is set in constructors of these classes
-                this.scadaModel = new ScadaModel(this.StateManager, new ModelResourcesDesc(), new EnumDescs());
+                var modelResourceDesc = new ModelResourcesDesc();
+                var enumDescs = new EnumDescs();
+
+                this.scadaModelImporter = new ScadaModelImporter(this.StateManager, modelResourceDesc, enumDescs);
+
                 this.modelReadAccessProvider = new ModelReadAccessProvider(this.StateManager);
                 this.modelUpdateAccessProvider = new ModelUpdateAccessProvider(this.StateManager);
                 this.integrityUpdateProvider = new IntegrityUpdateProvider(this.StateManager);
- 
+                this.scadaNotifyNetworkModelUpdate = new ScadaNotifyNetworkModelUpdate(this.StateManager);
+                this.scadaTransactionActorProviders = new ScadaTransactionActor(this.StateManager, modelResourceDesc, enumDescs);
+
                 string infoMessage = $"{baseLogString} Ctor => Contract providers initialized.";
                 Logger.LogInformation(infoMessage);
                 ServiceEventSource.Current.ServiceMessage(this.Context, $"[ModelProviderService | Information] {infoMessage}");
@@ -104,23 +116,23 @@ namespace SCADA.ModelProviderService
                                                                            EndpointNames.ScadaIntegrityUpdateEndpoint);
                 }, EndpointNames.ScadaIntegrityUpdateEndpoint),
 
-                ////SCADAModelUpdateNotifierEndpoint
-                //new ServiceReplicaListener(context =>
-                //{
-                //    return new WcfCommunicationListener<IModelUpdateNotificationContract>(context,
-                //                                                            new ScadaModelUpdateNotification(scadaModel),
-                //                                                            WcfUtility.CreateTcpListenerBinding(),
-                //                                                            EndpointNames.SCADAModelUpdateNotifierEndpoint);
-                //}, EndpointNames.SCADAModelUpdateNotifierEndpoint),
+                //SCADAModelUpdateNotifierEndpoint
+                new ServiceReplicaListener(context =>
+                {
+                    return new WcfCommunicationListener<INotifyNetworkModelUpdateContract>(context,
+                                                                            this.scadaNotifyNetworkModelUpdate,
+                                                                            WcfUtility.CreateTcpListenerBinding(),
+                                                                            EndpointNames.TmsNotifyNetworkModelUpdateEndpoint);
+                }, EndpointNames.TmsNotifyNetworkModelUpdateEndpoint),
 
-                ////SCADATransactionActorEndpoint
-                //new ServiceReplicaListener(context =>
-                //{
-                //    return new WcfCommunicationListener<ITransactionActorContract>(context,
-                //                                                            new ScadaTransactionActor(scadaModel),
-                //                                                            WcfUtility.CreateTcpListenerBinding(),
-                //                                                            EndpointNames.SCADATransactionActorEndpoint);
-                //}, EndpointNames.SCADATransactionActorEndpoint),
+                //SCADATransactionActorEndpoint
+                new ServiceReplicaListener(context =>
+                {
+                    return new WcfCommunicationListener<ITransactionActorContract>(context,
+                                                                            this.scadaTransactionActorProviders,
+                                                                            WcfUtility.CreateTcpListenerBinding(),
+                                                                            EndpointNames.TmsTransactionActorEndpoint);
+                }, EndpointNames.TmsTransactionActorEndpoint),
             };
         }
 
@@ -135,7 +147,7 @@ namespace SCADA.ModelProviderService
                 Logger.LogDebug(debugMessage);
                 ServiceEventSource.Current.ServiceMessage(this.Context, $"[ModelProviderService | Information] {debugMessage}");
 
-                await scadaModel.InitializeScadaModel();
+                await scadaModelImporter.InitializeScadaModel();
                 string infoMessage = $"{baseLogString} RunAsync => ScadaModel initialized.";
                 Logger.LogInformation(infoMessage);
                 ServiceEventSource.Current.ServiceMessage(this.Context, $"[ModelProviderService | Information] {infoMessage}");
@@ -170,6 +182,26 @@ namespace SCADA.ModelProviderService
                         }
                     }
                 }),
+
+                Task.Run(async() =>
+                {
+                    using (ITransaction tx = this.StateManager.CreateTransaction())
+                    {
+                        var result = await StateManager.TryGetAsync<IReliableDictionary<long, IScadaModelPointItem>>(ReliableDictionaryNames.IncomingGidToPointItemMap);
+                        if(result.HasValue)
+                        {
+                            var gidToPointItemMap = result.Value;
+                            await gidToPointItemMap.ClearAsync();
+                            await tx.CommitAsync();
+                        }
+                        else
+                        {
+                            await StateManager.GetOrAddAsync<IReliableDictionary<long, IScadaModelPointItem>>(tx, ReliableDictionaryNames.IncomingGidToPointItemMap);
+                            await tx.CommitAsync();
+                        }
+                    }
+                }),
+
                 Task.Run(async() =>
                 {
                     using (ITransaction tx = this.StateManager.CreateTransaction())
@@ -188,6 +220,26 @@ namespace SCADA.ModelProviderService
                         }
                     }
                 }),
+
+                Task.Run(async() =>
+                {
+                    using (ITransaction tx = this.StateManager.CreateTransaction())
+                    {
+                        var result = await StateManager.TryGetAsync<IReliableDictionary<short, Dictionary<ushort, long>>>(ReliableDictionaryNames.IncomingAddressToGidMap);
+                        if(result.HasValue)
+                        {
+                            var addressToGidMap = result.Value;
+                            await addressToGidMap.ClearAsync();
+                            await tx.CommitAsync();
+                        }
+                        else
+                        {
+                            await StateManager.GetOrAddAsync<IReliableDictionary<short, Dictionary<ushort, long>>>(tx, ReliableDictionaryNames.IncomingAddressToGidMap);
+                            await tx.CommitAsync();
+                        }
+                    }
+                }),
+
                 Task.Run(async() =>
                 {
                     using (ITransaction tx = this.StateManager.CreateTransaction())
@@ -206,6 +258,7 @@ namespace SCADA.ModelProviderService
                         }
                     }
                 }),
+
                 Task.Run(async() =>
                 {
                     using (ITransaction tx = this.StateManager.CreateTransaction())
@@ -224,6 +277,7 @@ namespace SCADA.ModelProviderService
                         }
                     }
                 }),
+
                 Task.Run(async() =>
                 {
                     using (ITransaction tx = this.StateManager.CreateTransaction())
@@ -238,6 +292,25 @@ namespace SCADA.ModelProviderService
                         else
                         {
                             await StateManager.GetOrAddAsync<IReliableDictionary<string, bool>>(tx, ReliableDictionaryNames.InfoCache);
+                            await tx.CommitAsync();
+                        }
+                    }
+                }),
+
+                Task.Run(async() =>
+                {
+                    using (ITransaction tx = this.StateManager.CreateTransaction())
+                    {
+                        var result = await StateManager.TryGetAsync<IReliableDictionary<byte, List<long>>>(ReliableDictionaryNames.ModelChanges);
+                        if(result.HasValue)
+                        {
+                            var modelChanges = result.Value;
+                            await modelChanges.ClearAsync();
+                            await tx.CommitAsync();
+                        }
+                        else
+                        {
+                            await StateManager.GetOrAddAsync<IReliableDictionary<byte, List<long>>>(tx, ReliableDictionaryNames.ModelChanges);
                             await tx.CommitAsync();
                         }
                     }

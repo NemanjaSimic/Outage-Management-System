@@ -4,12 +4,12 @@ using System.Collections.Generic;
 using System.ServiceModel;
 using System.Threading.Tasks;
 
-namespace OMS.Common.DistributedTransactionContracts
+namespace OMS.Common.TmsContracts.Notifications
 {
     [ServiceContract]
-    public interface IModelUpdateNotificationContract : IService
+    public interface INotifyNetworkModelUpdateContract : IService
     {
         [OperationContract]
-        Task<bool> NotifyAboutUpdate(Dictionary<DeltaOpType, List<long>> modelChanges);
+        Task<bool> Notify(Dictionary<DeltaOpType, List<long>> modelChanges);
     }
 }

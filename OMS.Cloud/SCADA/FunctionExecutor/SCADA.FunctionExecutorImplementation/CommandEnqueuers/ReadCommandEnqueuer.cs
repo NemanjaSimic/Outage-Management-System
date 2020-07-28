@@ -54,22 +54,24 @@ namespace SCADA.FunctionExecutorImplementation.CommandEnqueuers
                 throw new ArgumentException(message);
             }
 
-            //TODO: while treba da predje u IF i da se read commanda ne upise u queue ako je uslov zadovoljen -> tek ce izvrsena w/mu komanda uzrokovati promenu vrednosti, te nema potrebe upisivati r komandu pre toga
-            while (modelUpdateCommandQueue.PeekMessage() != null || writeCommandQueue.PeekMessage() != null)
+            var modelUpdatePeakResult = modelUpdateCommandQueue.PeekMessage() != null;
+            var writePeakResult = writeCommandQueue.PeekMessage() != null;
+
+            if (modelUpdatePeakResult || writePeakResult)
             {
-                while (modelUpdateCommandQueue.PeekMessage() != null)
+                if (modelUpdatePeakResult)
                 {
-                    verboseMessage = $"{baseLogString} EnqueueReadCommand => waiting for '{CloudStorageQueueNames.ModelUpdateCommandQueue}' queue to be empty.";
-                    Logger.LogVerbose(verboseMessage);
-                    await Task.Delay(1000);
+                    verboseMessage = $"{baseLogString} EnqueueReadCommand => '{CloudStorageQueueNames.ModelUpdateCommandQueue}' queue to is not empty. ";
+                    Logger.LogDebug(verboseMessage);
                 }
 
-                while (writeCommandQueue.PeekMessage() == null)
+                if (writePeakResult)
                 {
-                    verboseMessage = $"{baseLogString} EnqueueReadCommand => waiting for '{CloudStorageQueueNames.WriteCommandQueue}' queue to be empty.";
-                    Logger.LogVerbose(verboseMessage);
-                    await Task.Delay(1000);
+                    verboseMessage = $"{baseLogString} EnqueueReadCommand => '{CloudStorageQueueNames.WriteCommandQueue}' queue to is not empty.";
+                    Logger.LogDebug(verboseMessage);
                 }
+
+                return false;
             }
 
             try

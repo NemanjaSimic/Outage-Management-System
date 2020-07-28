@@ -28,8 +28,8 @@
       <!-- This endpoint is used by the communication listener to obtain the port on which to 
            listen. Please note that if your service is partitioned, this port is shared with 
            replicas of different partitions that are placed in your code. -->
-      <Endpoint Name="NetworkModelGDAEndpoint" Protocol="tcp" Type="Input" />
-      <!--<Endpoint Name="NetworkModelServiceTransactionActorEndpoint" Protocol="tcp" Type="Input" />-->
+      <Endpoint Name="NmsGdaEndpoint" Protocol="tcp" Type="Input" />
+      <Endpoint Name="TmsTransactionActorEndpoint" Protocol="tcp" Type="Input" />
     </Endpoints>
   </Resources>
 </ServiceManifest>

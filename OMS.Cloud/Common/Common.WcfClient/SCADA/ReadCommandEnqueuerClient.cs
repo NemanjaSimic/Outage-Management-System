@@ -19,26 +19,23 @@ namespace OMS.Common.WcfClient.SCADA
         {
         }
 
-        public static ReadCommandEnqueuerClient CreateClient(Uri serviceUri = null)
+        public static ReadCommandEnqueuerClient CreateClient()
         {
             ClientFactory factory = new ClientFactory();
-            ServicePartitionKey servicePartition = ServicePartitionKey.Singleton;
+            return factory.CreateClient<ReadCommandEnqueuerClient, IReadCommandEnqueuerContract>(microserviceName);
+        }
 
-            if (serviceUri == null)
-            {
-                return factory.CreateClient<ReadCommandEnqueuerClient, IReadCommandEnqueuerContract>(microserviceName, servicePartition);
-            }
-            else
-            {
-                return factory.CreateClient<ReadCommandEnqueuerClient, IReadCommandEnqueuerContract>(serviceUri, servicePartition);
-            }
+        public static ReadCommandEnqueuerClient CreateClient(Uri serviceUri, ServicePartitionKey servicePartitionKey)
+        {
+            ClientFactory factory = new ClientFactory();
+            return factory.CreateClient<ReadCommandEnqueuerClient, IReadCommandEnqueuerContract>(serviceUri, servicePartitionKey);
         }
 
         #region IModelUpdateCommandEnqueuer
         public Task<bool> EnqueueReadCommand(IReadModbusFunction modbusFunctions)
         {
-            return MethodWrapperAsync<bool>("EnqueueReadCommand", new object[1] { modbusFunctions });
-            //return InvokeWithRetryAsync(client => client.Channel.EnqueueReadCommand(modbusFunctions));
+            //return MethodWrapperAsync<bool>("EnqueueReadCommand", new object[1] { modbusFunctions });
+            return InvokeWithRetryAsync(client => client.Channel.EnqueueReadCommand(modbusFunctions));
         }
         #endregion
     }

@@ -55,6 +55,7 @@
     <Compile Include="Logger\CloudLoggerFactory.cs" />
     <Compile Include="Logger\ICloudLogger.cs" />
     <Compile Include="ModelDefines.cs" />
+    <Compile Include="Names\DistributedTransactionNames.cs" />
     <Compile Include="Names\LoggerSourceNames.cs" />
     <Compile Include="Names\MicroserviceNames.cs" />
     <Compile Include="Names\EndpointNames.cs" />
@@ -63,6 +64,7 @@
     <Compile Include="ReliableCollectionHelpers\ReliableDictionaryHelper.cs" />
     <Compile Include="ReliableCollectionHelpers\ReliableStateManagerHelper.cs" />
     <Compile Include="ReliableCollectionHelpers\Serialization.cs" />
+    <Compile Include="ServiceDefines.cs" />
   </ItemGroup>
   <ItemGroup>
     <None Include="app.config" />
