@@ -37,6 +37,7 @@ namespace OMS.OutageLifecycleServiceImplementation
         {
             this.dbContext = dbContext;
             this.outageMessageMapper = new OutageMessageMapper();
+            this.outageModelReadAccessClient = OutageModelReadAccessClient.CreateClient();
             this.proxy = channelFactory.CreateChannel();
 
         }

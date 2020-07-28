@@ -12,6 +12,6 @@ namespace Common.OmsContracts.OutageLifecycle
 	public interface ISendLocationIsolationCrewContract : IService
 	{
 		[OperationContract]
-		bool SendLocationIsolationCrew(long outageId);
+		Task<bool> SendLocationIsolationCrew(long outageId);
 	}
 }

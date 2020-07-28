@@ -138,6 +138,9 @@ namespace OMS.Common.Cloud
 
         [EnumMember]
         ARCHIVED = 4,
+
+        [EnumMember]
+        REMOVED = 5
     }
     [DataContract]
     public enum DatabaseOperation : short
