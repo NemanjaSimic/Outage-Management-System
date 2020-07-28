@@ -55,7 +55,7 @@ namespace SCADA.AcquisitionService
 
             try
             {
-                acquisitionCycle = new AcquisitionCycle(this.Context);
+                acquisitionCycle = new AcquisitionCycle();
                 IScadaModelReadAccessContract readAccessClient = ScadaModelReadAccessClient.CreateClient();
                 configData = await readAccessClient.GetScadaConfigData();
 
@@ -71,15 +71,32 @@ namespace SCADA.AcquisitionService
                 throw e;
             }
 
+            int acquisitionCycleCount = 1;
+
             while (true)
             {
                 cancellationToken.ThrowIfCancellationRequested();
+
+                string message = $"{baseLogString} RunAsync => AcquisitionCycleCount: {acquisitionCycleCount}";
+
+                if(acquisitionCycleCount % 100 == 0)
+                {
+                    Logger.LogInformation(message);
+                }
+                else if(acquisitionCycleCount % 10 == 0)
+                {
+                    Logger.LogDebug(message);
+                }
+                else
+                {
+                    Logger.LogVerbose(message);
+                }
 
                 try
                 {
                     await acquisitionCycle.Start();
 
-                    string message = $"{baseLogString} RunAsync => AcquisitionCycle executed.";
+                    message = $"{baseLogString} RunAsync => AcquisitionCycle executed.";
                     Logger.LogVerbose(message);
                     //ServiceEventSource.Current.ServiceMessage(this.Context, $"[AcquisitionService | Verbose] {message}");
                 }
@@ -91,6 +108,7 @@ namespace SCADA.AcquisitionService
                 }
 
                 await Task.Delay(TimeSpan.FromMilliseconds(configData.AcquisitionInterval), cancellationToken);
+                acquisitionCycleCount++;
             }
         }
     }

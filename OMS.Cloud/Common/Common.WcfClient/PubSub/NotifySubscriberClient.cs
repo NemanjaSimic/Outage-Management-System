@@ -37,8 +37,8 @@ namespace OMS.Common.WcfClient.PubSub
         /// <returns></returns>
         public Task<string> GetSubscriberName()
         {
-            return MethodWrapperAsync<string>("GetSubscriberUri", new object[0]);
-            //return InvokeWithRetryAsync(client => client.Channel.GetSubscriberUri());
+            //return MethodWrapperAsync<string>("GetSubscriberName", new object[0]);
+            return InvokeWithRetryAsync(client => client.Channel.GetSubscriberName());
         }
 
         /// <summary>
@@ -48,8 +48,8 @@ namespace OMS.Common.WcfClient.PubSub
         /// <returns></returns>
         public Task Notify(IPublishableMessage message, string publisherName)
         {
-            return MethodWrapperAsync("Notify", new object[2] { message, publisherName });
-            //return InvokeWithRetryAsync(client => client.Channel.Notify(message));
+            //return MethodWrapperAsync("Notify", new object[2] { message, publisherName });
+            return InvokeWithRetryAsync(client => client.Channel.Notify(message, publisherName));
         }
         #endregion INotifySubscriberContract
     }

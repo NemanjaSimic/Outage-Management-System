@@ -32,8 +32,8 @@ namespace OMS.Common.WcfClient.TMS
         #region ITransactionEnlistmentContract
         public Task<bool> Enlist(string transactionName, string transactionActorName)
         {
-            return MethodWrapperAsync<bool>("Enlist", new object[2] { transactionName, transactionActorName });
-            //return InvokeWithRetryAsync(client => client.Channel.Enlist(transactionName, transactionActorUri, transactionActorServiceType));
+            //return MethodWrapperAsync<bool>("Enlist", new object[2] { transactionName, transactionActorName });
+            return InvokeWithRetryAsync(client => client.Channel.Enlist(transactionName, transactionActorName));
         }
         #endregion
     }

@@ -9,6 +9,7 @@ using OMS.Common.ScadaContracts.ModelProvider;
 using SCADA.ModelProviderImplementation.Helpers;
 using System;
 using System.Collections.Generic;
+using System.Text;
 using System.Threading.Tasks;
 
 namespace SCADA.ModelProviderImplementation.ContractProviders
@@ -23,9 +24,16 @@ namespace SCADA.ModelProviderImplementation.ContractProviders
         private bool isAddressToGidMapInitialized;
         private bool isCommandDescriptionCacheInitialized;
         private bool isInfoCacheInitialized;
+
         private bool ReliableDictionariesInitialized
         {
-            get { return isGidToPointItemMapInitialized && isAddressToGidMapInitialized && isCommandDescriptionCacheInitialized && isInfoCacheInitialized; }
+            get 
+            { 
+                return isGidToPointItemMapInitialized && 
+                       isAddressToGidMapInitialized && 
+                       isCommandDescriptionCacheInitialized && 
+                       isInfoCacheInitialized;
+            }
         }
 
         private ICloudLogger logger;
@@ -63,14 +71,13 @@ namespace SCADA.ModelProviderImplementation.ContractProviders
         {
             this.baseLogString = $"{this.GetType()} [{this.GetHashCode()}] =>{Environment.NewLine}";
 
-            this.stateManager = stateManager;
-
             this.isGidToPointItemMapInitialized = false;
             this.isAddressToGidMapInitialized = false;
             this.isCommandDescriptionCacheInitialized = false;
             this.isInfoCacheInitialized = false;
-
-            stateManager.StateManagerChanged += this.OnStateManagerChangedHandler;
+            
+            this.stateManager = stateManager;
+            this.stateManager.StateManagerChanged += this.OnStateManagerChangedHandler;
         }
 
         private async void OnStateManagerChangedHandler(object sender, NotifyStateManagerChangedEventArgs e)
@@ -127,7 +134,6 @@ namespace SCADA.ModelProviderImplementation.ContractProviders
 
             while (!ReliableDictionariesInitialized)
             {
-                //TODO: something smarter
                 await Task.Delay(1000);
             }
 
@@ -151,17 +157,16 @@ namespace SCADA.ModelProviderImplementation.ContractProviders
 
             while (!ReliableDictionariesInitialized || !(await GetIsScadaModelImportedIndicator()))
             {
-                //TODO: something smarter
                 await Task.Delay(1000);
             }
 
-            string debugMessage = $"{baseLogString} GetScadaConfigData => about to execut ScadaConfigDataHelper.GetScadaConfigData().";
-            Logger.LogDebug(debugMessage);
+            verboseMessage = $"{baseLogString} GetScadaConfigData => about to execut ScadaConfigDataHelper.GetScadaConfigData().";
+            Logger.LogVerbose(verboseMessage);
 
             var config = ScadaConfigDataHelper.GetScadaConfigData();
 
-            debugMessage = $"{baseLogString} GetScadaConfigData => ScadaConfigDataHelper.GetScadaConfigData() SUCCESSFULLY executed.";
-            Logger.LogDebug(debugMessage);
+            verboseMessage = $"{baseLogString} GetScadaConfigData => ScadaConfigDataHelper.GetScadaConfigData() SUCCESSFULLY executed.";
+            Logger.LogVerbose(verboseMessage);
 
             return config;
         }
@@ -173,25 +178,16 @@ namespace SCADA.ModelProviderImplementation.ContractProviders
 
             while (!ReliableDictionariesInitialized || !(await GetIsScadaModelImportedIndicator()))
             {
-                //TODO: something smarter
                 await Task.Delay(1000);
             }
 
-            //Dictionary<long, IScadaModelPointItem> copy = GidToPointItemMap.GetDataCopy();
-            //Dictionary<long, IScadaModelPointItem> result = new Dictionary<long, IScadaModelPointItem>(copy.Count);
-
-            //foreach(var element in copy)
-            //{
-            //    result.Add(element.Key, element.Value);
-            //}
-
-            string debugMessage = $"{baseLogString} GetGidToPointItemMap => about to execut GidToPointItemMap.GetDataCopy().";
-            Logger.LogDebug(debugMessage);
+            verboseMessage = $"{baseLogString} GetGidToPointItemMap => about to execut GidToPointItemMap.GetDataCopy().";
+            Logger.LogVerbose(verboseMessage);
 
             var copy = await GidToPointItemMap.GetDataCopyAsync();
 
-            debugMessage = $"{baseLogString} GetGidToPointItemMap => GidToPointItemMap.GetDataCopy() SUCCESSFULLY executed. Returning the collection with {copy.Count} elements.";
-            Logger.LogDebug(debugMessage);
+            verboseMessage = $"{baseLogString} GetGidToPointItemMap => GidToPointItemMap.GetDataCopy() SUCCESSFULLY executed. Returning the collection with {copy.Count} elements.";
+            Logger.LogVerbose(verboseMessage);
 
             return copy;
         }
@@ -203,7 +199,6 @@ namespace SCADA.ModelProviderImplementation.ContractProviders
 
             while (!ReliableDictionariesInitialized || !(await GetIsScadaModelImportedIndicator()))
             {
-                //TODO: something smarter
                 await Task.Delay(1000);
             }
 
@@ -232,17 +227,16 @@ namespace SCADA.ModelProviderImplementation.ContractProviders
 
             while (!ReliableDictionariesInitialized || !(await GetIsScadaModelImportedIndicator()))
             {
-                //TODO: something smarter
                 await Task.Delay(1000);
             }
 
-            string debugMessage = $"{baseLogString} GetAddressToGidMap => about to execut AddressToGidMap.GetDataCopy().";
-            Logger.LogDebug(debugMessage);
+            verboseMessage = $"{baseLogString} GetAddressToGidMap => about to execut AddressToGidMap.GetDataCopy().";
+            Logger.LogVerbose(verboseMessage);
 
             var copy = await AddressToGidMap.GetDataCopyAsync();
-
-            debugMessage = $"{baseLogString} GetAddressToGidMap => AddressToGidMap.GetDataCopy() SUCCESSFULLY executed. Returning the collection with {copy.Count} elements.";
-            Logger.LogDebug(debugMessage);
+            
+            verboseMessage = $"{baseLogString} GetAddressToGidMap => AddressToGidMap.GetDataCopy() SUCCESSFULLY executed. Returning the collection with {copy.Count} elements.";
+            Logger.LogVerbose(verboseMessage);
 
             return copy;
         }
@@ -254,17 +248,29 @@ namespace SCADA.ModelProviderImplementation.ContractProviders
 
             while (!ReliableDictionariesInitialized || !(await GetIsScadaModelImportedIndicator()))
             {
-                //TODO: something smarter
                 await Task.Delay(1000);
             }
 
-            string debugMessage = $"{baseLogString} GetCommandDescriptionCache => about to execut CommandDescriptionCache.GetDataCopy().";
-            Logger.LogDebug(debugMessage);
+            verboseMessage = $"{baseLogString} GetCommandDescriptionCache => about to execut CommandDescriptionCache.GetDataCopy().";
+            Logger.LogVerbose(verboseMessage);
 
             var copy = await CommandDescriptionCache.GetDataCopyAsync();
 
-            debugMessage = $"{baseLogString} GetCommandDescriptionCache => CommandDescriptionCache.GetDataCopy() SUCCESSFULLY executed. Returning the collection with {copy.Count} elements.";
-            Logger.LogDebug(debugMessage);
+            if(copy.Count > 0)
+            {
+                var sb = new StringBuilder();
+                sb.AppendLine("GettingCommandDescriptionCache => elements:");
+
+                foreach (var element in copy.Values)
+                {
+                    sb.AppendLine($"Gid: {element.Gid}, Address: {element.Address}, Value: {element.Value}, CommandOrigin: {element.CommandOrigin}");
+                }
+
+                Logger.LogDebug(sb.ToString());
+            }
+
+            verboseMessage = $"{baseLogString} GetCommandDescriptionCache => CommandDescriptionCache.GetDataCopy() SUCCESSFULLY executed. Returning the collection with {copy.Count} elements.";
+            Logger.LogVerbose(verboseMessage);
 
             return copy;
         }

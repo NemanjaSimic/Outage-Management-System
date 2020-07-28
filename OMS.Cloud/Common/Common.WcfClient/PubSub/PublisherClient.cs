@@ -36,8 +36,8 @@ namespace OMS.Common.WcfClient.PubSub
         #region ISubscriberContract
         public Task<bool> Publish(IPublication publication, string publisherName)
         {
-            return MethodWrapperAsync<bool>("Publish", new object[2] { publication, publisherName });
-            //return InvokeWithRetryAsync(client => client.Channel.Publish(publication, publisherUri));
+            //return MethodWrapperAsync<bool>("Publish", new object[2] { publication, publisherName });
+            return InvokeWithRetryAsync(client => client.Channel.Publish(publication, publisherName));
         }
         #endregion ISubscriberContract
     }

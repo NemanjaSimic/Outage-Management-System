@@ -31,7 +31,7 @@ namespace SCADA.ModelProviderService
     internal sealed class ModelProviderService : StatefulService
     {
         private readonly string baseLogString;
-        private readonly ScadaModel scadaModel;
+        private readonly ScadaModelImporter scadaModelImporter;
 
         private readonly IScadaModelReadAccessContract modelReadAccessProvider;
         private readonly IScadaModelUpdateAccessContract modelUpdateAccessProvider;
@@ -54,12 +54,16 @@ namespace SCADA.ModelProviderService
             try
             {
                 //DONE THIS WAY (in this order) BECAUSE: there is a mechanism that tracks the initialization process of reliable collections, which is set in constructors of these classes
-                this.scadaModel = new ScadaModel(this.StateManager, new ModelResourcesDesc(), new EnumDescs());
+                var modelResourceDesc = new ModelResourcesDesc();
+                var enumDescs = new EnumDescs();
+
+                this.scadaModelImporter = new ScadaModelImporter(this.StateManager, modelResourceDesc, enumDescs);
+
                 this.modelReadAccessProvider = new ModelReadAccessProvider(this.StateManager);
                 this.modelUpdateAccessProvider = new ModelUpdateAccessProvider(this.StateManager);
                 this.integrityUpdateProvider = new IntegrityUpdateProvider(this.StateManager);
-                this.scadaNotifyNetworkModelUpdate = new ScadaNotifyNetworkModelUpdate(scadaModel);
-                this.scadaTransactionActorProviders = new ScadaTransactionActor(scadaModel);
+                this.scadaNotifyNetworkModelUpdate = new ScadaNotifyNetworkModelUpdate(this.StateManager);
+                this.scadaTransactionActorProviders = new ScadaTransactionActor(this.StateManager, modelResourceDesc, enumDescs);
 
                 string infoMessage = $"{baseLogString} Ctor => Contract providers initialized.";
                 Logger.LogInformation(infoMessage);
@@ -143,7 +147,7 @@ namespace SCADA.ModelProviderService
                 Logger.LogDebug(debugMessage);
                 ServiceEventSource.Current.ServiceMessage(this.Context, $"[ModelProviderService | Information] {debugMessage}");
 
-                await scadaModel.InitializeScadaModel();
+                await scadaModelImporter.InitializeScadaModel();
                 string infoMessage = $"{baseLogString} RunAsync => ScadaModel initialized.";
                 Logger.LogInformation(infoMessage);
                 ServiceEventSource.Current.ServiceMessage(this.Context, $"[ModelProviderService | Information] {infoMessage}");
@@ -178,6 +182,26 @@ namespace SCADA.ModelProviderService
                         }
                     }
                 }),
+
+                Task.Run(async() =>
+                {
+                    using (ITransaction tx = this.StateManager.CreateTransaction())
+                    {
+                        var result = await StateManager.TryGetAsync<IReliableDictionary<long, IScadaModelPointItem>>(ReliableDictionaryNames.IncomingGidToPointItemMap);
+                        if(result.HasValue)
+                        {
+                            var gidToPointItemMap = result.Value;
+                            await gidToPointItemMap.ClearAsync();
+                            await tx.CommitAsync();
+                        }
+                        else
+                        {
+                            await StateManager.GetOrAddAsync<IReliableDictionary<long, IScadaModelPointItem>>(tx, ReliableDictionaryNames.IncomingGidToPointItemMap);
+                            await tx.CommitAsync();
+                        }
+                    }
+                }),
+
                 Task.Run(async() =>
                 {
                     using (ITransaction tx = this.StateManager.CreateTransaction())
@@ -196,6 +220,26 @@ namespace SCADA.ModelProviderService
                         }
                     }
                 }),
+
+                Task.Run(async() =>
+                {
+                    using (ITransaction tx = this.StateManager.CreateTransaction())
+                    {
+                        var result = await StateManager.TryGetAsync<IReliableDictionary<short, Dictionary<ushort, long>>>(ReliableDictionaryNames.IncomingAddressToGidMap);
+                        if(result.HasValue)
+                        {
+                            var addressToGidMap = result.Value;
+                            await addressToGidMap.ClearAsync();
+                            await tx.CommitAsync();
+                        }
+                        else
+                        {
+                            await StateManager.GetOrAddAsync<IReliableDictionary<short, Dictionary<ushort, long>>>(tx, ReliableDictionaryNames.IncomingAddressToGidMap);
+                            await tx.CommitAsync();
+                        }
+                    }
+                }),
+
                 Task.Run(async() =>
                 {
                     using (ITransaction tx = this.StateManager.CreateTransaction())
@@ -214,6 +258,7 @@ namespace SCADA.ModelProviderService
                         }
                     }
                 }),
+
                 Task.Run(async() =>
                 {
                     using (ITransaction tx = this.StateManager.CreateTransaction())
@@ -232,6 +277,7 @@ namespace SCADA.ModelProviderService
                         }
                     }
                 }),
+
                 Task.Run(async() =>
                 {
                     using (ITransaction tx = this.StateManager.CreateTransaction())
@@ -246,6 +292,25 @@ namespace SCADA.ModelProviderService
                         else
                         {
                             await StateManager.GetOrAddAsync<IReliableDictionary<string, bool>>(tx, ReliableDictionaryNames.InfoCache);
+                            await tx.CommitAsync();
+                        }
+                    }
+                }),
+
+                Task.Run(async() =>
+                {
+                    using (ITransaction tx = this.StateManager.CreateTransaction())
+                    {
+                        var result = await StateManager.TryGetAsync<IReliableDictionary<byte, List<long>>>(ReliableDictionaryNames.ModelChanges);
+                        if(result.HasValue)
+                        {
+                            var modelChanges = result.Value;
+                            await modelChanges.ClearAsync();
+                            await tx.CommitAsync();
+                        }
+                        else
+                        {
+                            await StateManager.GetOrAddAsync<IReliableDictionary<byte, List<long>>>(tx, ReliableDictionaryNames.ModelChanges);
                             await tx.CommitAsync();
                         }
                     }

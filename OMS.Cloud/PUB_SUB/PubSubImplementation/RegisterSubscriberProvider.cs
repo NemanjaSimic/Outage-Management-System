@@ -69,13 +69,12 @@ namespace PubSubImplementation
         #region IRegisterSubscriberContract
         public async Task<bool> SubscribeToTopic(Topic topic, string subscriberServiceName)
         {
+            bool success;
+            
             while (!ReliableDictionariesInitialized)
             {
-                //TODO: something smarter
                 await Task.Delay(1000);
             }
-
-            bool success;
 
             try
             {
@@ -118,13 +117,12 @@ namespace PubSubImplementation
 
         public async Task<bool> SubscribeToTopics(IEnumerable<Topic> topics, string subscriberServiceName)
         {
+            bool success;
+            
             while (!ReliableDictionariesInitialized)
             {
-                //TODO: something smarter
                 await Task.Delay(1000);
             }
-
-            bool success;
 
             try
             {
@@ -169,16 +167,15 @@ namespace PubSubImplementation
 
         public async Task<HashSet<Topic>> GetAllSubscribedTopics(string subscriberServiceName)
         {
+            var result = new HashSet<Topic>();
+
             while (!ReliableDictionariesInitialized)
             {
-                //TODO: something smarter
                 await Task.Delay(1000);
             }
 
             try
             {
-                var result = new HashSet<Topic>();
-
                 var enumerableSubscribersCache = await RegisteredSubscribersCache.GetEnumerableDictionaryAsync();
 
                 foreach (var kvp in enumerableSubscribersCache)
@@ -204,13 +201,12 @@ namespace PubSubImplementation
 
         public async Task<bool> UnsubscribeFromTopic(Topic topic, string subscriberServiceName)
         {
+            bool success;
+            
             while (!ReliableDictionariesInitialized)
             {
-                //TODO: something smarter
                 await Task.Delay(1000);
             }
-
-            bool success;
 
             try
             {
@@ -248,13 +244,12 @@ namespace PubSubImplementation
 
         public async Task<bool> UnsubscribeFromTopics(IEnumerable<Topic> topics, string subscriberServiceName)
         {
+            bool success;
+            
             while (!ReliableDictionariesInitialized)
             {
-                //TODO: something smarter
                 await Task.Delay(1000);
             }
-
-            bool success;
 
             try
             {
@@ -296,13 +291,12 @@ namespace PubSubImplementation
 
         public async Task<bool> UnsubscribeFromAllTopics(string subscriberServiceName)
         {
+            bool result;
+            
             while (!ReliableDictionariesInitialized)
             {
-                //TODO: something smarter
                 await Task.Delay(1000);
             }
-
-            bool result;
 
             try
             {

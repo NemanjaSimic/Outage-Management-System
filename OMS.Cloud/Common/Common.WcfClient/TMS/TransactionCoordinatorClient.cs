@@ -34,14 +34,14 @@ namespace OMS.Common.WcfClient.TMS
         #region ITransactionCoordinatorContract
         public Task StartDistributedTransaction(string transactionName, IEnumerable<string> transactionActors)
         {
-            return MethodWrapperAsync<bool>("StartDistributedTransaction", new object[2] { transactionName, transactionActors });
-            //return InvokeWithRetryAsync(client => client.Channel.StartDistributedTransaction(transactionName, transactionActors));
+            //return MethodWrapperAsync("StartDistributedTransaction", new object[2] { transactionName, transactionActors });
+            return InvokeWithRetryAsync(client => client.Channel.StartDistributedTransaction(transactionName, transactionActors));
         }
 
         public Task FinishDistributedTransaction(string transactionName, bool success)
         {
-            return MethodWrapperAsync<bool>("FinishDistributedTransaction", new object[2] { transactionName, success });
-            //return InvokeWithRetryAsync(client => client.Channel.FinishDistributedTransaction(transactionName, success));
+            //return MethodWrapperAsync("FinishDistributedTransaction", new object[2] { transactionName, success });
+            return InvokeWithRetryAsync(client => client.Channel.FinishDistributedTransaction(transactionName, success));
         }
         #endregion
     }

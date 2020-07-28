@@ -32,20 +32,20 @@ namespace OMS.Common.WcfClient.TMS
         #region ITransactionActorContract
         public Task<bool> Prepare()
         {
-            return MethodWrapperAsync<bool>("Prepare", new object[0]);
-            //return InvokeWithRetryAsync(client => client.Channel.Prepare());
+            //return MethodWrapperAsync<bool>("Prepare", new object[0]);
+            return InvokeWithRetryAsync(client => client.Channel.Prepare());
         }
 
         public Task Commit()
         {
-            return MethodWrapperAsync<bool>("Commit", new object[0]);
-            //return InvokeWithRetryAsync(client => client.Channel.Commit());
+            //return MethodWrapperAsync<bool>("Commit", new object[0]);
+            return InvokeWithRetryAsync(client => client.Channel.Commit());
         }
 
         public Task Rollback()
         {
-            return MethodWrapperAsync<bool>("Rollback", new object[0]);
-            //return InvokeWithRetryAsync(client => client.Channel.Rollback());
+            //return MethodWrapperAsync<bool>("Rollback", new object[0]);
+            return InvokeWithRetryAsync(client => client.Channel.Rollback());
         }
         #endregion
     }

@@ -149,7 +149,7 @@
     <Compile Include="DistributedTransaction\ScadaNotifyNetworkModelUpdate.cs" />
     <Compile Include="DistributedTransaction\ScadaTransactionActor.cs" />
     <Compile Include="Properties\AssemblyInfo.cs" />
-    <Compile Include="ScadaModel.cs" />
+    <Compile Include="ScadaModelImporter.cs" />
   </ItemGroup>
   <ItemGroup>
     <ProjectReference Include="..\..\..\Common\Common.Cloud\Common.Cloud.csproj">

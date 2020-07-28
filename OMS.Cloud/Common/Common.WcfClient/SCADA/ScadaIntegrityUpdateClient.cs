@@ -35,14 +35,14 @@ namespace OMS.Common.WcfClient.SCADA
         #region IScadaIntegrityUpdateContract
         public Task<Dictionary<Topic, ScadaPublication>> GetIntegrityUpdate()
         {
-            return MethodWrapperAsync<Dictionary<Topic, ScadaPublication>>("GetIntegrityUpdate", new object[0]);
-            //return InvokeWithRetryAsync(client => client.Channel.GetIntegrityUpdate());
+            //return MethodWrapperAsync<Dictionary<Topic, ScadaPublication>>("GetIntegrityUpdate", new object[0]);
+            return InvokeWithRetryAsync(client => client.Channel.GetIntegrityUpdate());
         }
 
         public Task<ScadaPublication> GetIntegrityUpdateForSpecificTopic(Topic topic)
         {
-            return MethodWrapperAsync<ScadaPublication>("GetIntegrityUpdateForSpecificTopic", new object[1] { topic });
-            //return InvokeWithRetryAsync(client => client.Channel.GetIntegrityUpdateForSpecificTopic(topic));
+            //return MethodWrapperAsync<ScadaPublication>("GetIntegrityUpdateForSpecificTopic", new object[1] { topic });
+            return InvokeWithRetryAsync(client => client.Channel.GetIntegrityUpdateForSpecificTopic(topic));
         }
         #endregion
     }

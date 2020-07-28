@@ -71,7 +71,6 @@ namespace PubSubImplementation
         {
             while (!ReliableDictionariesInitialized)
             {
-                //TODO: something smarter
                 await Task.Delay(1000);
             }
 

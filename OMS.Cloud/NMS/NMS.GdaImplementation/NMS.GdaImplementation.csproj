@@ -173,8 +173,9 @@
   <ItemGroup>
     <Compile Include="Config.cs" />
     <Compile Include="Container.cs" />
-    <Compile Include="DbModel\ModelVersionDocument.cs" />
-    <Compile Include="DbModel\NetworkDataModelDocument.cs" />
+    <Compile Include="DbModel\LatestVersionsDocument.cs" />
+    <Compile Include="DbModel\MongoStrings.cs" />
+    <Compile Include="DbModel\NetworkModelsDocument.cs" />
     <Compile Include="DistributedTransaction\NmsTransactionActor.cs" />
     <Compile Include="GDA\GenericDataAccess.cs" />
     <Compile Include="GDA\ResourceIterator.cs" />

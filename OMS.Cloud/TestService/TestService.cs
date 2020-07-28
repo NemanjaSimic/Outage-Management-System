@@ -31,16 +31,16 @@ namespace TestService
     internal sealed class TestService : StatelessService, INotifySubscriberContract
     {
         private readonly string baseLogString;
-        private readonly IReadCommandEnqueuerContract readCommandEnqueuerClient;
-        private readonly IWriteCommandEnqueuerContract writeCommandEnqueuerClient;
-        private readonly IModelUpdateCommandEnqueuerContract modelUpdateCommandEnqueuerClient;
-        private readonly IScadaModelReadAccessContract scadaModelReadAccessClient;
-        private readonly IScadaModelUpdateAccessContract scadaModelUpdateAccessClient;
-        private readonly IScadaIntegrityUpdateContract scadaIntegrityUpdateClient;
-        private readonly IScadaCommandingContract scadaCommandingClient;
-        private readonly INetworkModelGDAContract networkModelGdaClient;
-        private readonly IRegisterSubscriberContract registerSubscriberClient;
-        private readonly IPublisherContract publisherClient;
+        //private readonly IReadCommandEnqueuerContract readCommandEnqueuerClient;
+        //private readonly IWriteCommandEnqueuerContract writeCommandEnqueuerClient;
+        //private readonly IModelUpdateCommandEnqueuerContract modelUpdateCommandEnqueuerClient;
+        //private readonly IScadaModelReadAccessContract scadaModelReadAccessClient;
+        //private readonly IScadaModelUpdateAccessContract scadaModelUpdateAccessClient;
+        //private readonly IScadaIntegrityUpdateContract scadaIntegrityUpdateClient;
+        //private readonly IScadaCommandingContract scadaCommandingClient;
+        //private readonly INetworkModelGDAContract networkModelGdaClient;
+        //private readonly IRegisterSubscriberContract registerSubscriberClient;
+        //private readonly IPublisherContract publisherClient;
 
         private ICloudLogger logger;
         private ICloudLogger Logger
@@ -54,20 +54,20 @@ namespace TestService
             this.baseLogString = $"{this.GetType()} [{this.GetHashCode()}] =>{Environment.NewLine}";
             Logger.LogDebug($"{baseLogString} Ctor => Logger initialized");
 
-            this.readCommandEnqueuerClient = ReadCommandEnqueuerClient.CreateClient();
-            this.writeCommandEnqueuerClient = WriteCommandEnqueuerClient.CreateClient();
-            this.modelUpdateCommandEnqueuerClient = ModelUpdateCommandEnqueuerClient.CreateClient();
+            //this.readCommandEnqueuerClient = ReadCommandEnqueuerClient.CreateClient();
+            //this.writeCommandEnqueuerClient = WriteCommandEnqueuerClient.CreateClient();
+            //this.modelUpdateCommandEnqueuerClient = ModelUpdateCommandEnqueuerClient.CreateClient();
 
-            this.scadaModelReadAccessClient = ScadaModelReadAccessClient.CreateClient();
-            this.scadaModelUpdateAccessClient = ScadaModelUpdateAccessClient.CreateClient();
-            this.scadaIntegrityUpdateClient = ScadaIntegrityUpdateClient.CreateClient();
+            //this.scadaModelReadAccessClient = ScadaModelReadAccessClient.CreateClient();
+            //this.scadaModelUpdateAccessClient = ScadaModelUpdateAccessClient.CreateClient();
+            //this.scadaIntegrityUpdateClient = ScadaIntegrityUpdateClient.CreateClient();
 
-            this.scadaCommandingClient = ScadaCommandingClient.CreateClient();
+            //this.scadaCommandingClient = ScadaCommandingClient.CreateClient();
 
-            this.networkModelGdaClient = NetworkModelGdaClient.CreateClient();
+            //this.networkModelGdaClient = NetworkModelGdaClient.CreateClient();
 
-            this.registerSubscriberClient = RegisterSubscriberClient.CreateClient();
-            this.publisherClient = PublisherClient.CreateClient();
+            //this.registerSubscriberClient = RegisterSubscriberClient.CreateClient();
+            //this.publisherClient = PublisherClient.CreateClient();
         }
 
         #region INotifySubscriberContract
@@ -150,6 +150,7 @@ namespace TestService
             //TEST Subscribe
             try
             {
+                IRegisterSubscriberContract registerSubscriberClient = RegisterSubscriberClient.CreateClient();
                 var subscriptions = await registerSubscriberClient.GetAllSubscribedTopics("TestService");
                 var result = await registerSubscriberClient.SubscribeToTopics(new List<Topic>() { Topic.MEASUREMENT, Topic.SWITCH_STATUS }, MicroserviceNames.TestService);
                 subscriptions = await registerSubscriberClient.GetAllSubscribedTopics(MicroserviceNames.TestService);

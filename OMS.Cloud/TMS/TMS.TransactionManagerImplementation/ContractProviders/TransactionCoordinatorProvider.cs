@@ -22,7 +22,11 @@ namespace TMS.TransactionManagerImplementation.ContractProviders
 
         private bool ReliableDictionariesInitialized
         {
-            get { return isActiveTransactionsInitialized && isTransactionEnlistmentLedgerInitialized; }
+            get 
+            { 
+                return isActiveTransactionsInitialized &&
+                       isTransactionEnlistmentLedgerInitialized;
+            }
         }
 
         private ICloudLogger logger;
@@ -58,11 +62,10 @@ namespace TMS.TransactionManagerImplementation.ContractProviders
         {
             this.baseLogString = $"{this.GetType()} [{this.GetHashCode()}] =>{Environment.NewLine}";
 
-            this.stateManager = stateManager;
-
             this.isActiveTransactionsInitialized = false;
             this.isTransactionEnlistmentLedgerInitialized = false;
 
+            this.stateManager = stateManager;
             stateManager.StateManagerChanged += this.OnStateManagerChangedHandler;
         }
 
@@ -109,6 +112,7 @@ namespace TMS.TransactionManagerImplementation.ContractProviders
 
             var actorsHashSet = new HashSet<string>(transactionActors);
             await ActiveTransactions.SetAsync(transactionName, actorsHashSet);
+            await TransactionEnlistmentLedger.SetAsync(transactionName, new HashSet<string>());
 
             var actorsSb = new StringBuilder();
             foreach (var actor in actorsHashSet)

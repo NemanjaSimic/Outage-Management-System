@@ -19,8 +19,8 @@ namespace SCADA.CommandingImplementation
     {
         private readonly string baseLogString;
 
-        private IWriteCommandEnqueuerContract commandEnqueuerClient;
-        private IScadaModelReadAccessContract scadaModelReadAccessClient;
+        //private IWriteCommandEnqueuerContract commandEnqueuerClient;
+        //private IScadaModelReadAccessContract scadaModelReadAccessClient;
 
         #region Private Properties
         private ICloudLogger logger;
@@ -37,8 +37,8 @@ namespace SCADA.CommandingImplementation
             string verboseMessage = $"{baseLogString} entering Ctor.";
             Logger.LogVerbose(verboseMessage);
 
-            this.commandEnqueuerClient = WriteCommandEnqueuerClient.CreateClient();
-            this.scadaModelReadAccessClient = ScadaModelReadAccessClient.CreateClient();
+            //this.commandEnqueuerClient = WriteCommandEnqueuerClient.CreateClient();
+            //this.scadaModelReadAccessClient = ScadaModelReadAccessClient.CreateClient();
 
             string debugMessage = $"{baseLogString} Ctor => Clients initialized.";
             Logger.LogDebug(debugMessage);
@@ -50,7 +50,8 @@ namespace SCADA.CommandingImplementation
             string verboseMessage = $"{baseLogString} SendSingleAnalogCommand method called. gid: {gid:X16}, commandingValue: {commandingValue}, commandOriginType: {commandOriginType}";
             Logger.LogVerbose(verboseMessage);
 
-            Dictionary<long, IScadaModelPointItem> gidToPointItemMap = await this.scadaModelReadAccessClient.GetGidToPointItemMap();
+            IScadaModelReadAccessContract scadaModelReadAccessClient = ScadaModelReadAccessClient.CreateClient();
+            Dictionary<long, IScadaModelPointItem> gidToPointItemMap = await scadaModelReadAccessClient.GetGidToPointItemMap();
 
             if (gidToPointItemMap == null)
             {
@@ -113,8 +114,9 @@ namespace SCADA.CommandingImplementation
             }
 
             ushort startAddress = 1; //EasyModbus spec
-            Dictionary<long, IScadaModelPointItem> gidToPointItemMap = await this.scadaModelReadAccessClient.GetGidToPointItemMap();
-            Dictionary<short, Dictionary<ushort, long>> addressToGidMap = await this.scadaModelReadAccessClient.GetAddressToGidMap();
+            IScadaModelReadAccessContract scadaModelReadAccessClient = ScadaModelReadAccessClient.CreateClient();
+            Dictionary<long, IScadaModelPointItem> gidToPointItemMap = await scadaModelReadAccessClient.GetGidToPointItemMap();
+            Dictionary<short, Dictionary<ushort, long>> addressToGidMap = await scadaModelReadAccessClient.GetAddressToGidMap();
 
             if (gidToPointItemMap == null)
             {
@@ -197,7 +199,8 @@ namespace SCADA.CommandingImplementation
 
         public async Task SendSingleDiscreteCommand(long gid, ushort commandingValue, CommandOriginType commandOriginType)
         {
-            Dictionary<long, IScadaModelPointItem> gidToPointItemMap = await this.scadaModelReadAccessClient.GetGidToPointItemMap();
+            IScadaModelReadAccessContract scadaModelReadAccessClient = ScadaModelReadAccessClient.CreateClient();
+            Dictionary<long, IScadaModelPointItem> gidToPointItemMap = await scadaModelReadAccessClient.GetGidToPointItemMap();
 
             if (gidToPointItemMap == null)
             {
@@ -251,8 +254,9 @@ namespace SCADA.CommandingImplementation
             }
 
             ushort startAddress = 1; //EasyModbus spec
-            Dictionary<long, IScadaModelPointItem> gidToPointItemMap = await this.scadaModelReadAccessClient.GetGidToPointItemMap();
-            Dictionary<short, Dictionary<ushort, long>> addressToGidMap = await this.scadaModelReadAccessClient.GetAddressToGidMap();
+            IScadaModelReadAccessContract scadaModelReadAccessClient = ScadaModelReadAccessClient.CreateClient();
+            Dictionary<long, IScadaModelPointItem> gidToPointItemMap = await scadaModelReadAccessClient.GetGidToPointItemMap();
+            Dictionary<short, Dictionary<ushort, long>> addressToGidMap = await scadaModelReadAccessClient.GetAddressToGidMap();
 
             if (gidToPointItemMap == null)
             {
@@ -349,31 +353,33 @@ namespace SCADA.CommandingImplementation
                 }
 
                 IWriteModbusFunction modbusFunction = new WriteSingleFunction(functionCode, pointItem.Address, commandingValue, commandOriginType);
-                await this.commandEnqueuerClient.EnqueueWriteCommand(modbusFunction);
+                
+                IWriteCommandEnqueuerContract commandEnqueuerClient = WriteCommandEnqueuerClient.CreateClient();
+                await commandEnqueuerClient.EnqueueWriteCommand(modbusFunction);
 
                 string message = $"{baseLogString} SendSingleCommand => Command SUCCESSFULLY enqueued. Function code: {modbusFunction.FunctionCode}, Origin: {modbusFunction.CommandOrigin}";
                 Logger.LogInformation(message);
             }
-            catch (CommunicationObjectFaultedException e)
-            {
-                string message = $"{baseLogString} SendSingleCommand => CommunicationObjectFaultedException caught.";
-                Logger.LogError(message, e);
+            //catch (CommunicationObjectFaultedException e)
+            //{
+            //    string message = $"{baseLogString} SendSingleCommand => CommunicationObjectFaultedException caught.";
+            //    Logger.LogError(message, e);
 
-                await Task.Delay(2000);
+            //    await Task.Delay(2000);
 
-                this.commandEnqueuerClient = WriteCommandEnqueuerClient.CreateClient();
-                this.scadaModelReadAccessClient = ScadaModelReadAccessClient.CreateClient();
-                await SendSingleCommand(pointItem, commandingValue, commandOriginType, true);
-                //todo: different logic on multiple rety?
-            }
+            //    this.commandEnqueuerClient = WriteCommandEnqueuerClient.CreateClient();
+            //    this.scadaModelReadAccessClient = ScadaModelReadAccessClient.CreateClient();
+            //    await SendSingleCommand(pointItem, commandingValue, commandOriginType, true);
+            //    //todo: different logic on multiple rety?
+            //}
             catch (Exception e)
             {
                 if (!isRetry)
                 {
                     await Task.Delay(2000);
 
-                    this.commandEnqueuerClient = WriteCommandEnqueuerClient.CreateClient();
-                    this.scadaModelReadAccessClient = ScadaModelReadAccessClient.CreateClient();
+                    //this.commandEnqueuerClient = WriteCommandEnqueuerClient.CreateClient();
+                    //this.scadaModelReadAccessClient = ScadaModelReadAccessClient.CreateClient();
                     await SendSingleCommand(pointItem, commandingValue, commandOriginType, true);
                 }
                 else
@@ -391,7 +397,9 @@ namespace SCADA.CommandingImplementation
             {
                 //KEY LOGIC
                 IWriteModbusFunction modbusFunction = new WriteMultipleFunction(functionCode, startAddress, commandingValues, commandOriginType);
-                await this.commandEnqueuerClient.EnqueueWriteCommand(modbusFunction);
+                
+                IWriteCommandEnqueuerContract commandEnqueuerClient = WriteCommandEnqueuerClient.CreateClient();
+                await commandEnqueuerClient.EnqueueWriteCommand(modbusFunction);
 
                 string message = $"{baseLogString} SendMultipleCommand => Command SUCCESSFULLY enqueued. Function code: {modbusFunction.FunctionCode}, Origin: {modbusFunction.CommandOrigin}";
                 Logger.LogInformation(message);
@@ -402,7 +410,7 @@ namespace SCADA.CommandingImplementation
                 {
                     await Task.Delay(2000);
 
-                    this.commandEnqueuerClient = WriteCommandEnqueuerClient.CreateClient();
+                    //this.commandEnqueuerClient = WriteCommandEnqueuerClient.CreateClient();
                     await SendMultipleCommand(functionCode, startAddress, commandingValues, commandOriginType, true);
                 }
                 else

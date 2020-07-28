@@ -21,7 +21,11 @@ namespace TMS.TransactionManagerImplementation.ContractProviders
 
         private bool ReliableDictionariesInitialized
         {
-            get { return isActiveTransactionsInitialized && isTransactionEnlistmentLedgerInitialized; }
+            get 
+            { 
+                return isActiveTransactionsInitialized &&
+                       isTransactionEnlistmentLedgerInitialized;
+            }
         }
 
         private ICloudLogger logger;
@@ -57,11 +61,10 @@ namespace TMS.TransactionManagerImplementation.ContractProviders
         {
             this.baseLogString = $"{this.GetType()} [{this.GetHashCode()}] =>{Environment.NewLine}";
 
-            this.stateManager = stateManager;
-
             this.isActiveTransactionsInitialized = false;
             this.isTransactionEnlistmentLedgerInitialized = false;
 
+            this.stateManager = stateManager;
             stateManager.StateManagerChanged += this.OnStateManagerChangedHandler;
         }
 
@@ -94,10 +97,15 @@ namespace TMS.TransactionManagerImplementation.ContractProviders
         #region ITransactionEnlistmentContract
         public async Task<bool> Enlist(string transactionName, string transactionActorName)
         {
+            while (!ReliableDictionariesInitialized)
+            {
+                await Task.Delay(1000);
+            }
+
             var enumerableActiveTransactions = await ActiveTransactions.GetEnumerableDictionaryAsync();
             if (!enumerableActiveTransactions.ContainsKey(transactionName))
             {
-                string errorMessage = $"{baseLogString} InvokePreparationOnActors => transaction '{transactionName}' not found in '{ReliableDictionaryNames.ActiveTransactions}'.";
+                string errorMessage = $"{baseLogString} Enlist => transaction '{transactionName}' not found in '{ReliableDictionaryNames.ActiveTransactions}'.";
                 Logger.LogError(errorMessage);
                 throw new Exception(errorMessage);
             }
@@ -105,14 +113,14 @@ namespace TMS.TransactionManagerImplementation.ContractProviders
             var result = await TransactionEnlistmentLedger.TryGetValueAsync(transactionName);
             if (!result.HasValue)
             {
-                string errorMessage = $"{baseLogString} InvokePreparationOnActors => Transaction '{transactionName}' not found in '{ReliableDictionaryNames.TransactionEnlistmentLedger}'.";
+                string errorMessage = $"{baseLogString} Enlist => Transaction '{transactionName}' not found in '{ReliableDictionaryNames.TransactionEnlistmentLedger}'.";
                 Logger.LogError(errorMessage);
                 throw new Exception(errorMessage);
             }
 
             var transactionLedger = result.Value;
 
-            if(enumerableActiveTransactions[transactionName].Contains(transactionActorName))
+            if(!enumerableActiveTransactions[transactionName].Contains(transactionActorName))
             {
                 string errorMessage = $"{baseLogString} InvokePreparationOnActors => Transaction '{transactionName}' not found in '{ReliableDictionaryNames.TransactionEnlistmentLedger}'.";
                 Logger.LogError(errorMessage);

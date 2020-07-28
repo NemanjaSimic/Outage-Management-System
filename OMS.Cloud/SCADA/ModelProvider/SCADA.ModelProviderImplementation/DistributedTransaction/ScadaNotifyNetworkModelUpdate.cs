@@ -1,13 +1,15 @@
-﻿using OMS.Common.Cloud;
+﻿using Microsoft.ServiceFabric.Data;
+using Microsoft.ServiceFabric.Data.Notifications;
 using OMS.Common.Cloud.Logger;
 using OMS.Common.Cloud.Names;
+using OMS.Common.Cloud.ReliableCollectionHelpers;
 using OMS.Common.NmsContracts.GDA;
+using OMS.Common.SCADA;
 using OMS.Common.TmsContracts;
 using OMS.Common.TmsContracts.Notifications;
 using OMS.Common.WcfClient.TMS;
 using System;
 using System.Collections.Generic;
-using System.Configuration;
 using System.Threading.Tasks;
 
 namespace SCADA.ModelProviderImplementation.DistributedTransaction
@@ -15,30 +17,68 @@ namespace SCADA.ModelProviderImplementation.DistributedTransaction
     public class ScadaNotifyNetworkModelUpdate : INotifyNetworkModelUpdateContract
     {
         private readonly string baseLogString;
-        private readonly INotifyNetworkModelUpdateContract contractProvider;
+        private readonly IReliableStateManager stateManager;
 
-        #region Private Properties
         private ICloudLogger logger;
-        protected ICloudLogger Logger
+        private ICloudLogger Logger
         {
             get { return logger ?? (logger = CloudLoggerFactory.GetLogger()); }
         }
-        #endregion Private Properties
 
-        public ScadaNotifyNetworkModelUpdate(INotifyNetworkModelUpdateContract contractProvider)
+        #region Reliable Dictionaries
+        private bool isModelChangesInitialized;
+        private bool ReliableDictionariesInitialized
         {
-            this.baseLogString = $"{this.GetType()} [{this.GetHashCode()}] =>{Environment.NewLine}";
-            this.contractProvider = contractProvider;
+            get { return isModelChangesInitialized; }
         }
 
+        private ReliableDictionaryAccess<byte, List<long>> ModelChanges { get; set; }
+
+        private async void OnStateManagerChangedHandler(object sender, NotifyStateManagerChangedEventArgs e)
+        {
+            if (e.Action == NotifyStateManagerChangedAction.Add)
+            {
+                var operation = e as NotifyStateManagerSingleEntityChangedEventArgs;
+                string reliableStateName = operation.ReliableState.Name.AbsolutePath;
+
+                if (reliableStateName == ReliableDictionaryNames.ModelChanges)
+                {
+                    ModelChanges = await ReliableDictionaryAccess<byte, List<long>>.Create(stateManager, ReliableDictionaryNames.ModelChanges);
+                    this.isModelChangesInitialized = true;
+
+                    string debugMessage = $"{baseLogString} OnStateManagerChangedHandler => '{ReliableDictionaryNames.ModelChanges}' ReliableDictionaryAccess initialized.";
+                    Logger.LogDebug(debugMessage);
+                }
+            }
+        }
+        #endregion Reliable Dictionaries
+
+        public ScadaNotifyNetworkModelUpdate(IReliableStateManager stateManager)
+        {
+            this.baseLogString = $"{this.GetType()} [{this.GetHashCode()}] =>{Environment.NewLine}";
+
+            this.isModelChangesInitialized = false;
+
+            this.stateManager = stateManager;
+            this.stateManager.StateManagerChanged += this.OnStateManagerChangedHandler;
+        }
+
+        #region IModelUpdateNotificationContract
         public async Task<bool> Notify(Dictionary<DeltaOpType, List<long>> modelChanges)
         {
-            bool result = await this.contractProvider.Notify(modelChanges);
-
-            if (!result)
+            while (!ReliableDictionariesInitialized)
             {
-                return false;
+                await Task.Delay(1000);
             }
+
+            var tasks = new List<Task>();
+
+            foreach(var element in modelChanges)
+            {
+                tasks.Add(ModelChanges.SetAsync((byte)element.Key, element.Value));
+            }
+
+            Task.WaitAll(tasks.ToArray());
 
             ITransactionEnlistmentContract transactionEnlistmentClient = TransactionEnlistmentClient.CreateClient();
             bool success = await transactionEnlistmentClient.Enlist(DistributedTransactionNames.NetworkModelUpdateTransaction, MicroserviceNames.ScadaModelProviderService);
@@ -54,5 +94,6 @@ namespace SCADA.ModelProviderImplementation.DistributedTransaction
 
             return success;
         }
+        #endregion IModelUpdateNotificationContract
     }
 }
