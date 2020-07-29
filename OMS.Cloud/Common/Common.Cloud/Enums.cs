@@ -161,5 +161,12 @@ namespace OMS.Common.Cloud
         [EnumMember]
         CLEAR = 3
     }
+
+    public enum ReportType
+    {
+        Total = 0,
+        SAIFI,
+        SAIDI
+    }
 }
 

@@ -1,5 +1,5 @@
 ﻿using Common.OMS;
-using Common.OmsContracts.DataContracts.OutageModel;
+using Common.OMS.OutageModel;
 using Microsoft.ServiceFabric.Services.Remoting;
 using OMS.Common.Cloud;
 using System;
