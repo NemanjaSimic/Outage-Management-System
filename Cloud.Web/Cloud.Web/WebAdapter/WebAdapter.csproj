@@ -249,6 +249,8 @@
   </ItemGroup>
   <ItemGroup>
     <Compile Include="HubDispatchers\GraphHubDispatcher.cs" />
+    <Compile Include="HubDispatchers\OutageHubDispatcher.cs" />
+    <Compile Include="HubDispatchers\ScadaHubDispatcher.cs" />
     <Compile Include="Properties\AssemblyInfo.cs" />
     <Compile Include="WebAdapter.cs" />
     <Compile Include="Program.cs" />
@@ -268,6 +270,10 @@
     <ProjectReference Include="..\..\..\OMS.Web\OMS.Web.UI.Models\OMS.Web.UI.Models.csproj">
       <Project>{B4ED1DFF-BFC2-44B2-B98A-D985B1BC8179}</Project>
       <Name>OMS.Web.UI.Models</Name>
+    </ProjectReference>
+    <ProjectReference Include="..\..\..\OutageManagementSystem\Common\Common.csproj">
+      <Project>{892CBE15-9ED7-4540-81FA-0EAABA592138}</Project>
+      <Name>Common</Name>
     </ProjectReference>
     <ProjectReference Include="..\..\WebAPI\WebAPI.csproj">
       <Project>{09E87B48-4957-48EA-B29B-A6EC648CD3F0}</Project>
