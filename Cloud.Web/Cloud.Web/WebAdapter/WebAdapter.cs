@@ -5,6 +5,8 @@ using System.Linq;
 using System.Threading;
 using System.Threading.Tasks;
 using Microsoft.ServiceFabric.Services.Communication.Runtime;
+using Microsoft.ServiceFabric.Services.Communication.Wcf;
+using Microsoft.ServiceFabric.Services.Communication.Wcf.Runtime;
 using Microsoft.ServiceFabric.Services.Runtime;
 
 namespace WebAdapter
@@ -24,7 +26,16 @@ namespace WebAdapter
         /// <returns>A collection of listeners.</returns>
         protected override IEnumerable<ServiceInstanceListener> CreateServiceInstanceListeners()
         {
-            return new ServiceInstanceListener[0];
+            return new List<ServiceInstanceListener>()
+            {
+                //new ServiceInstanceListener(context =>
+                //{
+                //    return new WcfCommunicationListener<IWebAdapterContract>(context,
+                //        this.smthingProvider,
+                //        WcfUtility.CreateTcpListenerBinding(),
+                //        EndpointNames.WebAdapterService);
+                //})
+            };
         }
 
         /// <summary>
@@ -33,19 +44,8 @@ namespace WebAdapter
         /// <param name="cancellationToken">Canceled when Service Fabric needs to shut down this service instance.</param>
         protected override async Task RunAsync(CancellationToken cancellationToken)
         {
-            // TODO: Replace the following sample code with your own logic 
-            //       or remove this RunAsync override if it's not needed in your service.
+            cancellationToken.ThrowIfCancellationRequested();
 
-            long iterations = 0;
-
-            while (true)
-            {
-                cancellationToken.ThrowIfCancellationRequested();
-
-                ServiceEventSource.Current.ServiceMessage(this.Context, "Working-{0}", ++iterations);
-
-                await Task.Delay(TimeSpan.FromSeconds(1), cancellationToken);
-            }
         }
     }
 }
