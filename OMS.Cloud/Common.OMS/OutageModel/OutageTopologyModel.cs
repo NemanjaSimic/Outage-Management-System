@@ -6,9 +6,9 @@ using System.Runtime.Serialization;
 using System.Text;
 using System.Threading.Tasks;
 
-namespace Common.OmsContracts.DataContracts.OutageModel
+namespace Common.OMS.OutageModel
 {
-    public class OutageTopologyModel
+    public class OutageTopologyModel:IOutageTopologyModel
     {
         private long firstNode;
         private Dictionary<long, IOutageTopologyElement> outageTopology;

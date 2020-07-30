@@ -141,6 +141,9 @@ namespace OMS.Common.Cloud
 
         [EnumMember]
         ARCHIVED = 4,
+
+        [EnumMember]
+        REMOVED = 5
     }
     [DataContract]
     public enum DatabaseOperation : short
@@ -160,6 +163,13 @@ namespace OMS.Common.Cloud
         DELETE = 2,
         [EnumMember]
         CLEAR = 3
+    }
+
+    public enum ReportType
+    {
+        Total = 0,
+        SAIFI,
+        SAIDI
     }
 }
 

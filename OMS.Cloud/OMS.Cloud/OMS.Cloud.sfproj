@@ -33,6 +33,7 @@
   </ItemGroup>
   <ItemGroup>
     <ProjectReference Include="..\NMS\NMS.GdaService\NMS.GdaService.csproj" />
+    <ProjectReference Include="..\OMS.ReportingService\OMS.ReportingService.csproj" />
     <ProjectReference Include="..\OMS\ModelProvider\OMS.ModelProviderService\OMS.ModelProviderService.csproj" />
     <ProjectReference Include="..\OMS\OutageLifecycle\OMS.OutageLifecycleService\OMS.OutageLifecycleService.csproj" />
     <ProjectReference Include="..\PUB_SUB\PubSubService\PubSubService.csproj" />

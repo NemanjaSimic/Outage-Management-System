@@ -21,6 +21,7 @@
     <DefineConstants>DEBUG;TRACE</DefineConstants>
     <ErrorReport>prompt</ErrorReport>
     <WarningLevel>4</WarningLevel>
+    <PlatformTarget>x64</PlatformTarget>
   </PropertyGroup>
   <PropertyGroup Condition=" '$(Configuration)|$(Platform)' == 'Release|AnyCPU' ">
     <DebugType>pdbonly</DebugType>
@@ -34,6 +35,7 @@
     <Reference Include="System" />
     <Reference Include="System.ComponentModel.DataAnnotations" />
     <Reference Include="System.Core" />
+    <Reference Include="System.Runtime.Serialization" />
     <Reference Include="System.Xml.Linq" />
     <Reference Include="System.Data.DataSetExtensions" />
     <Reference Include="Microsoft.CSharp" />
@@ -43,18 +45,36 @@
   </ItemGroup>
   <ItemGroup>
     <Compile Include="CloudQueueNames.cs" />
+<<<<<<< HEAD
+=======
+    <Compile Include="IOutageTopologyElement.cs" />
+    <Compile Include="IOutageTopologyModel.cs" />
+    <Compile Include="Mappers\ConsumerMessageMapper.cs" />
+    <Compile Include="Mappers\EquipmentMapper.cs" />
+>>>>>>> cd7f9220d6bb8a65279d66b031e89d9049f32cf6
     <Compile Include="OutageDatabaseModel\Consumer.cs" />
     <Compile Include="OutageDatabaseModel\ConsumerHistorical.cs" />
     <Compile Include="OutageDatabaseModel\Equipment.cs" />
     <Compile Include="OutageDatabaseModel\EquipmentHistorical.cs" />
     <Compile Include="OutageDatabaseModel\OutageEntity.cs" />
+    <Compile Include="Mappers\OutageMessageMapper.cs" />
+    <Compile Include="OutageModel\OutageTopologyElement.cs" />
+    <Compile Include="OutageModel\OutageTopologyModel.cs" />
     <Compile Include="ReliableDictionaryNames.cs" />
     <Compile Include="Properties\AssemblyInfo.cs" />
+    <Compile Include="Report\DateHelpers.cs" />
+    <Compile Include="Report\IReport.cs" />
+    <Compile Include="Report\OutageReport.cs" />
+    <Compile Include="Report\ReportOptions.cs" />
   </ItemGroup>
   <ItemGroup>
     <ProjectReference Include="..\Common\Common.Cloud\Common.Cloud.csproj">
       <Project>{FBEE1369-0F6C-41E6-8C62-8C1C5CDBB602}</Project>
       <Name>Common.Cloud</Name>
+    </ProjectReference>
+    <ProjectReference Include="..\Common\Contracts\Common.PubSubContracts\Common.PubSubContracts.csproj">
+      <Project>{AA75150D-EE56-49C0-9431-751F83CCC0CD}</Project>
+      <Name>Common.PubSubContracts</Name>
     </ProjectReference>
   </ItemGroup>
   <Import Project="$(MSBuildToolsPath)\Microsoft.CSharp.targets" />

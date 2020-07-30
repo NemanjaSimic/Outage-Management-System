@@ -92,6 +92,12 @@
     <None Include="App.config" />
     <None Include="packages.config" />
   </ItemGroup>
+  <ItemGroup>
+    <ProjectReference Include="..\OMS.CallTrackingServiceImplementation\OMS.CallTrackingServiceImplementation.csproj">
+      <Project>{5F0FD4E5-D37F-4C3E-B0B4-CFC6B57F8982}</Project>
+      <Name>OMS.CallTrackingServiceImplementation</Name>
+    </ProjectReference>
+  </ItemGroup>
   <Import Project="$(MSBuildToolsPath)\Microsoft.CSharp.targets" />
   <!-- To modify your build process, add your task inside one of the targets below and uncomment it. 
        Other similar extension points exist, see Microsoft.Common.targets.

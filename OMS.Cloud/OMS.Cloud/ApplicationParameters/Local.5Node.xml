@@ -1,16 +1,9 @@
 ﻿<?xml version="1.0" encoding="utf-8"?>
 <Application xmlns:xsd="http://www.w3.org/2001/XMLSchema" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" Name="fabric:/OMS.Cloud" xmlns="http://schemas.microsoft.com/2011/01/fabric">
   <Parameters>
-    <Parameter Name="OMS.CallTrackingService_PartitionCount" Value="1" />
-    <Parameter Name="OMS.CallTrackingService_MinReplicaSetSize" Value="3" />
-    <Parameter Name="OMS.CallTrackingService_TargetReplicaSetSize" Value="3" />
+    <Parameter Name="OMS.ReportingService_InstanceCount" Value="1" />
     <Parameter Name="OMS.OutageLifecycleService_InstanceCount" Value="1" />
     <Parameter Name="OMS.OutageLifecycleService_InstanceCount" Value="1" />
-    <Parameter Name="OMS.HistoryDBManagerService_PartitionCount" Value="1" />
-    <Parameter Name="OMS.HistoryDBManagerService_MinReplicaSetSize" Value="3" />
-    <Parameter Name="OMS.HistoryDBManagerService_TargetReplicaSetSize" Value="3" />
-    <Parameter Name="OMS.CallingService_InstanceCount" Value="1" />
-    <Parameter Name="OMS.TracingAlgorithmService_InstanceCount" Value="1" />
     <Parameter Name="OMS.ModelProviderService_PartitionCount" Value="1" />
     <Parameter Name="OMS.ModelProviderService_MinReplicaSetSize" Value="3" />
     <Parameter Name="OMS.ModelProviderService_TargetReplicaSetSize" Value="3" />

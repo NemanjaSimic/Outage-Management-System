@@ -11,6 +11,7 @@ using Microsoft.ServiceFabric.Services.Communication.Wcf.Runtime;
 using Microsoft.ServiceFabric.Services.Runtime;
 using OMS.Common.Cloud.Names;
 using OMS.OutageLifecycleServiceImplementation;
+using OutageDatabase.Repository;
 
 namespace OMS.OutageLifecycleService
 {
@@ -19,9 +20,12 @@ namespace OMS.OutageLifecycleService
 	/// </summary>
 	internal sealed class OutageLifecycleService : StatelessService
 	{
+		private UnitOfWork dbContext;
 		public OutageLifecycleService(StatelessServiceContext context)
 			: base(context)
-		{ }
+		{
+			this.dbContext = new UnitOfWork();
+		}
 
 		/// <summary>
 		/// Optional override to create listeners (e.g., TCP, HTTP) for this service replica to handle client or user requests.
@@ -41,35 +45,35 @@ namespace OMS.OutageLifecycleService
 				new ServiceInstanceListener (context =>
 				{
 					return new WcfCommunicationListener<IReportOutageContract>(context,
-																			   new ReportOutageService(),
+																			   new ReportOutageService(this.dbContext),
 																			   WcfUtility.CreateTcpListenerBinding(),
 																			   EndpointNames.ReportOutageEndpoint);
 				}, EndpointNames.ReportOutageEndpoint),
 				new ServiceInstanceListener (context =>
 				{
 					return new WcfCommunicationListener<IResolveOutageContract>(context,
-																			   new ResolveOutageService(),
+																			   new ResolveOutageService(this.dbContext),
 																			   WcfUtility.CreateTcpListenerBinding(),
 																			   EndpointNames.ResolveOutageEndpoint);
 				}, EndpointNames.ResolveOutageEndpoint),
 				new ServiceInstanceListener (context =>
 				{
 					return new WcfCommunicationListener<ISendLocationIsolationCrewContract>(context,
-																			   new SendLocationIsolationCrewService(),
+																			   new SendLocationIsolationCrewService(this.dbContext),
 																			   WcfUtility.CreateTcpListenerBinding(),
 																			   EndpointNames.SendLocationIsolationCrewEndpoint);
 				}, EndpointNames.SendLocationIsolationCrewEndpoint),
 				new ServiceInstanceListener (context =>
 				{
 					return new WcfCommunicationListener<ISendRepairCrewContract>(context,
-																			   new SendRepairCrewService(),
+																			   new SendRepairCrewService(this.dbContext),
 																			   WcfUtility.CreateTcpListenerBinding(),
 																			   EndpointNames.SendRepairCrewEndpoint);
 				}, EndpointNames.SendRepairCrewEndpoint),
 				new ServiceInstanceListener (context =>
 				{
 					return new WcfCommunicationListener<IValidateResolveConditionsContract>(context,
-																			   new ValidateResolveConditionsService(),
+																			   new ValidateResolveConditionsService(this.dbContext),
 																			   WcfUtility.CreateTcpListenerBinding(),
 																			   EndpointNames.ValidateResolveConditionsEndpoint);
 				}, EndpointNames.ValidateResolveConditionsEndpoint),

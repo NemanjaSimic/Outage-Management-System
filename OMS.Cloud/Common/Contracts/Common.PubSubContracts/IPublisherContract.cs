@@ -4,6 +4,7 @@ using Microsoft.ServiceFabric.Services.Remoting;
 using System;
 using System.ServiceModel;
 using System.Threading.Tasks;
+using Common.PubSubContracts.DataContracts.OMS;
 
 namespace OMS.Common.PubSubContracts
 {
@@ -29,6 +30,11 @@ namespace OMS.Common.PubSubContracts
         [ServiceKnownType(typeof(MultipleAnalogValueSCADAMessage))]
         [ServiceKnownType(typeof(SingleDiscreteValueSCADAMessage))]
         [ServiceKnownType(typeof(MultipleDiscreteValueSCADAMessage))]
+        [ServiceKnownType(typeof(OutagePublication))]
+        [ServiceKnownType(typeof(ActiveOutageMessage))]
+        [ServiceKnownType(typeof(ArchivedOutageMessage))]
+        [ServiceKnownType(typeof(ConsumerMessage))]
+        [ServiceKnownType(typeof(EquipmentMessage))]
         Task<bool> Publish(IPublication publication, Uri publisherUri);
     }
 }

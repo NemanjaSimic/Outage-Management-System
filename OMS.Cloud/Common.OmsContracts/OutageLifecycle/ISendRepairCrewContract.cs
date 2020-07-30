@@ -12,6 +12,6 @@ namespace Common.OmsContracts.OutageLifecycle
 	public interface ISendRepairCrewContract : IService
 	{
 		[OperationContract]
-		bool SendRepairCrew(long outageId);
+		Task<bool> SendRepairCrew(long outageId);
 	}
 }

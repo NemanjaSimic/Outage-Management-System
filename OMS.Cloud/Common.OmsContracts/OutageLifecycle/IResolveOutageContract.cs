@@ -12,6 +12,6 @@ namespace Common.OmsContracts.OutageLifecycle
 	public interface IResolveOutageContract : IService
 	{
 		[OperationContract]
-		bool ResolveOutage(long outageId);
+		Task<bool> ResolveOutage(long outageId);
 	}
 }

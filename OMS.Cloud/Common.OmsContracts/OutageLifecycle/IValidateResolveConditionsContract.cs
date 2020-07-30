@@ -12,6 +12,6 @@ namespace Common.OmsContracts.OutageLifecycle
 	public interface IValidateResolveConditionsContract : IService
 	{
 		[OperationContract]
-		bool ValidateResolveConditions(long outageId);
+		Task<bool> ValidateResolveConditions(long outageId);
 	}
 }
