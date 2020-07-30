@@ -1,10 +1,6 @@
 ﻿using Microsoft.AspNetCore.SignalR.Client;
 using Outage.Common.PubSub.SCADADataContract;
-using System;
 using System.Collections.Generic;
-using System.Linq;
-using System.Text;
-using System.Threading.Tasks;
 
 namespace WebAdapter.HubDispatchers
 {
@@ -19,7 +15,7 @@ namespace WebAdapter.HubDispatchers
                 .Build();
         }
 
-        public void NotifyScadaDataUpdate(Dictionary<long, AnalogModbusData> scadaData)
+        public void Connect()
         {
             _connection.StartAsync().ContinueWith(task =>
             {
@@ -29,9 +25,14 @@ namespace WebAdapter.HubDispatchers
                 }
                 else
                 {
-                    _connection.InvokeAsync("NotifyScadaDataUpdate", scadaData);
+                    // TODO: log error
                 }
             }).Wait();
+        }
+
+        public void NotifyScadaDataUpdate(Dictionary<long, AnalogModbusData> scadaData)
+        {
+            _connection.InvokeAsync("NotifyScadaDataUpdate", scadaData).Wait();
         }
     }
 }

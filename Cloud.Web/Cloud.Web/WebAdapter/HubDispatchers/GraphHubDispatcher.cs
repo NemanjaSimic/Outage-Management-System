@@ -1,13 +1,6 @@
-﻿using Microsoft.AspNetCore.SignalR;
-using Microsoft.AspNetCore.SignalR.Client;
-using OMS.Web.Common;
+﻿using Microsoft.AspNetCore.SignalR.Client;
 using OMS.Web.UI.Models.ViewModels;
-using System;
 using System.Collections.Generic;
-using System.Linq;
-using System.Text;
-using System.Threading.Tasks;
-using WebAPI.Hubs;
 
 namespace WebAdapter.HubDispatchers
 {
@@ -22,7 +15,7 @@ namespace WebAdapter.HubDispatchers
                 .Build();
         }
 
-        public void NotifyGraphUpdate(List<NodeViewModel> nodes, List<RelationViewModel> relations)
+        public void Connect()
         {
             _connection.StartAsync().ContinueWith(task =>
             {
@@ -32,9 +25,14 @@ namespace WebAdapter.HubDispatchers
                 }
                 else
                 {
-                    _connection.InvokeAsync("NotifyGraphUpdate", nodes, relations);
+                    // TODO: log error
                 }
             }).Wait();
+        }
+
+        public void NotifyGraphUpdate(List<NodeViewModel> nodes, List<RelationViewModel> relations)
+        {
+            _connection.InvokeAsync("NotifyGraphUpdate", nodes, relations).Wait();
         }
     }
 }

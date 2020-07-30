@@ -251,7 +251,10 @@
     <Compile Include="HubDispatchers\GraphHubDispatcher.cs" />
     <Compile Include="HubDispatchers\OutageHubDispatcher.cs" />
     <Compile Include="HubDispatchers\ScadaHubDispatcher.cs" />
+    <Compile Include="Outage\OutageNotification.cs" />
     <Compile Include="Properties\AssemblyInfo.cs" />
+    <Compile Include="Scada\SCADANotification.cs" />
+    <Compile Include="Topology\TopologyNotification.cs" />
     <Compile Include="WebAdapter.cs" />
     <Compile Include="Program.cs" />
     <Compile Include="ServiceEventSource.cs" />
@@ -280,6 +283,7 @@
       <Name>WebAPI</Name>
     </ProjectReference>
   </ItemGroup>
+  <ItemGroup />
   <Import Project="$(MSBuildToolsPath)\Microsoft.CSharp.targets" />
   <!-- To modify your build process, add your task inside one of the targets below and uncomment it. 
        Other similar extension points exist, see Microsoft.Common.targets.
