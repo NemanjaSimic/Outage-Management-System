@@ -11,6 +11,7 @@ using System.Text;
 using System.Threading.Tasks;
 using Common.OMS.OutageDatabaseModel;
 using OMS.OutageLifecycleServiceImplementation.OutageLCHelper;
+using Common.CE;
 
 namespace OMS.OutageLifecycleServiceImplementation
 {

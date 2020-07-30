@@ -1,4 +1,5 @@
-﻿using Common.OMS;
+﻿using Common.CE;
+using Common.OMS;
 using Common.OMS.OutageDatabaseModel;
 using Common.OmsContracts.OutageLifecycle;
 using Common.OmsContracts.OutageSimulator;

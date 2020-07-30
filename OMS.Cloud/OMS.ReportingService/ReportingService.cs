@@ -4,8 +4,14 @@ using System.Fabric;
 using System.Linq;
 using System.Threading;
 using System.Threading.Tasks;
+using Common.OmsContracts.HistoryDBManager;
+using Common.OmsContracts.Report;
 using Microsoft.ServiceFabric.Services.Communication.Runtime;
+using Microsoft.ServiceFabric.Services.Communication.Wcf;
+using Microsoft.ServiceFabric.Services.Communication.Wcf.Runtime;
 using Microsoft.ServiceFabric.Services.Runtime;
+using OMS.Common.Cloud.Names;
+using OMS.ReportingServiceImplementation;
 
 namespace OMS.ReportingService
 {
@@ -14,9 +20,13 @@ namespace OMS.ReportingService
     /// </summary>
     internal sealed class ReportingService : StatelessService
     {
+        private ReportService reportService;
         public ReportingService(StatelessServiceContext context)
             : base(context)
-        { }
+        {
+            this.reportService = new ReportService();
+
+        }
 
         /// <summary>
         /// Optional override to create listeners (e.g., TCP, HTTP) for this service replica to handle client or user requests.
@@ -24,7 +34,16 @@ namespace OMS.ReportingService
         /// <returns>A collection of listeners.</returns>
         protected override IEnumerable<ServiceInstanceListener> CreateServiceInstanceListeners()
         {
-            return new ServiceInstanceListener[0];
+            return new List<ServiceInstanceListener>()
+            {
+                new ServiceInstanceListener(context =>
+                {
+                    return new WcfCommunicationListener<IReportingContract>(context,
+                                                                                    reportService,
+                                                                                    WcfUtility.CreateTcpListenerBinding(),
+                                                                                    EndpointNames.ReportingEndpoint);
+                },EndpointNames.ReportingEndpoint),
+            };
         }
 
         /// <summary>
