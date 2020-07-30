@@ -89,6 +89,7 @@
     <Reference Include="System.Xml" />
   </ItemGroup>
   <ItemGroup>
+    <Compile Include="DataContracts\CE\CalculationEngineMessage.cs" />
     <Compile Include="DataContracts\EMAIL\EmailServiceMessage.cs" />
     <Compile Include="DataContracts\SCADA\ModbusData.cs" />
     <Compile Include="DataContracts\Publication.cs" />
@@ -100,6 +101,10 @@
     <Compile Include="Properties\AssemblyInfo.cs" />
   </ItemGroup>
   <ItemGroup>
+    <ProjectReference Include="..\..\Common.CE\Common.CE.csproj">
+      <Project>{4EAD0377-BD2D-4B7E-93A6-705DB815E8A7}</Project>
+      <Name>Common.CE</Name>
+    </ProjectReference>
     <ProjectReference Include="..\..\Common.Cloud\Common.Cloud.csproj">
       <Project>{FBEE1369-0F6C-41E6-8C62-8C1C5CDBB602}</Project>
       <Name>Common.Cloud</Name>

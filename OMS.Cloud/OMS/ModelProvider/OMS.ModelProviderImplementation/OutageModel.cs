@@ -1,5 +1,7 @@
-﻿using Common.OMS;
+﻿using Common.CE;
+using Common.OMS;
 using Common.PubSub;
+using Common.PubSubContracts.DataContracts.CE;
 using Microsoft.ServiceFabric.Data;
 using Microsoft.ServiceFabric.Data.Notifications;
 using OMS.Common.Cloud;
@@ -7,6 +9,7 @@ using OMS.Common.Cloud.Logger;
 using OMS.Common.Cloud.ReliableCollectionHelpers;
 using OMS.Common.PubSubContracts;
 using OMS.Common.WcfClient.OMS;
+using OMS.Common.WcfClient.OMS.Lifecycle;
 using System;
 using System.Collections.Generic;
 using System.Linq;
@@ -26,14 +29,17 @@ namespace OMS.ModelProviderImplementation
 		private HistoryDBManagerClient historyDBManagerClient;
 		private OutageModelReadAccessClient outageModelReadAccessClient;
 		private OutageModelUpdateAccessClient outageModelUpdateAccessClient;
+		private ReportOutageClient reportOutageClient;
 		public OutageModel(IReliableStateManager stateManager)
 		{
 			this.stateManager = stateManager;
 			this.stateManager.StateManagerChanged += this.OnStateManagerChangedHandler;
 			this.subscriberUri = new Uri("fabric:/OMS.Cloud/ModelProviderService");
+
 			this.historyDBManagerClient = HistoryDBManagerClient.CreateClient();
 			this.outageModelReadAccessClient = OutageModelReadAccessClient.CreateClient();
 			this.outageModelUpdateAccessClient = OutageModelUpdateAccessClient.CreateClient();
+			this.reportOutageClient = ReportOutageClient.CreateClient();
 		}
 		#region ReliableDictionaryAccess
 
@@ -99,9 +105,8 @@ namespace OMS.ModelProviderImplementation
 		public async Task Notify(IPublishableMessage message)
 		{
 			//if OMSModelMessage
-			using(var tx = this.stateManager.CreateTransaction())
+			if (message is OMSModelMessage omsModelMessage)
 			{
-				//await topologyModel.SetAsync(0, value);
 				var topology = outageModelReadAccessClient.GetTopologyModel().Result;
 				HashSet<long> energizedConsumers = new HashSet<long>();
 				foreach (var element in topology.OutageTopology.Values)
@@ -116,18 +121,23 @@ namespace OMS.ModelProviderImplementation
 				}
 
 				await historyDBManagerClient.OnConsumersEnergized(energizedConsumers);
-				var potentialOutage = outageModelReadAccessClient.GetPotentialOutage().Result;
+				Dictionary<long, CommandOriginType> potentialOutages = await outageModelReadAccessClient.GetPotentialOutage();
 
-				foreach (var item in potentialOutage)
+				Task[] reportOutageTasks = new Task[potentialOutage.Count];
+				int index = 0;
+				foreach (var item in potentialOutages)
 				{
-					//Report
+					reportOutageTasks[index] = reportOutageClient.ReportPotentialOutage(item.Key, item.Value);
+					reportOutageTasks[index].Start();
+					index++;
 				}
+				Task.WaitAll(reportOutageTasks);
 				await outageModelUpdateAccessClient.UpdatePotentialOutage(0, 0, ModelUpdateOperationType.CLEAR);
-				//else
-				Logger.LogWarning("OutageModel::Notify => UNKNOWN message type. OMSModelMessage expected.");
-
-
 			}
+			else
+			{
+				Logger.LogWarning("OutageModel::Notify => UNKNOWN message type. OMSModelMessage expected.");
+			}			
 		}
 
 		public async Task<Uri> GetSubscriberUri()

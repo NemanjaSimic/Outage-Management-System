@@ -1,4 +1,5 @@
-﻿using Common.OMS;
+﻿using Common.CE;
+using Common.OMS;
 using Common.OmsContracts.ModelProvider;
 using Microsoft.ServiceFabric.Data;
 using Microsoft.ServiceFabric.Data.Notifications;
@@ -58,11 +59,7 @@ namespace OMS.ModelProviderImplementation.ContractProviders
             this.stateManager = stateManager;
             this.stateManager.StateManagerChanged += this.OnStateManagerChangedHandler;
         }
-        public async Task<IOutageTopologyModel> GetTopologyModel()
-        {
-            //Get topologyModel from CE service
-            return topologyModel[0];
-        }
+       
 
         private async void OnStateManagerChangedHandler(object sender, NotifyStateManagerChangedEventArgs e)
         {
@@ -96,6 +93,7 @@ namespace OMS.ModelProviderImplementation.ContractProviders
 
         public bool ReliableDictionariesInitialized { get { return isTopologyModelInitialized && isCommandedElementsInitialized && isOptimumIsolatioPointsInitialized && isPotentialOutageInitialized; } }
 
+        #region IOutageModelReadAccessContract Implementation
         public async Task<Dictionary<long, long>> GetCommandedElements()
         {
             while (!ReliableDictionariesInitialized)
@@ -122,5 +120,29 @@ namespace OMS.ModelProviderImplementation.ContractProviders
             }
             return PotentialOutage.GetDataCopy();
         }
+
+        public async Task<IOutageTopologyModel> GetTopologyModel()
+        {
+            while (!ReliableDictionariesInitialized)
+            {
+                await Task.Delay(1000);
+            }
+            //Get topologyModel from CE service
+            return TopologyModel.GetDataCopy()[0];
+        }
+
+        public async Task<IOutageTopologyElement> GetElementById(long gid)
+        {
+            while (!ReliableDictionariesInitialized)
+			{
+                await Task.Delay(1000);
+			}
+
+			TopologyModel.GetDataCopy()[0].GetElementByGid(gid, out IOutageTopologyElement outageTopologyElement);
+
+            return outageTopologyElement;
+        }
+        #endregion
+
     }
 }

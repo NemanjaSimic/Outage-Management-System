@@ -1,17 +1,14 @@
-﻿using Common.OMS;
+﻿using Common.CE;
 using Common.OmsContracts.DataContracts.OutageModel;
 using Microsoft.ServiceFabric.Services.Remoting;
 using OMS.Common.Cloud;
-using System;
 using System.Collections.Generic;
-using System.Linq;
 using System.ServiceModel;
-using System.Text;
 using System.Threading.Tasks;
 
 namespace Common.OmsContracts.ModelProvider
 {
-    [ServiceContract]
+	[ServiceContract]
     public interface IOutageModelReadAccessContract : IService
     {
 
@@ -27,5 +24,8 @@ namespace Common.OmsContracts.ModelProvider
 
         [OperationContract]
         Task<Dictionary<long, CommandOriginType>> GetPotentialOutage();
+
+        [OperationContract]
+        Task<IOutageTopologyElement> GetElementById(long gid);
     }
 }

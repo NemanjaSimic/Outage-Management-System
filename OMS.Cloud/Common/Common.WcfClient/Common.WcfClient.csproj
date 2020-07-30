@@ -112,6 +112,7 @@
     <Reference Include="WindowsBase" />
   </ItemGroup>
   <ItemGroup>
+    <Compile Include="OMS\Lifecycle\ReportOutageClient.cs" />
     <Compile Include="OMS\OutageModelUpdateAccessClient.cs" />
     <Compile Include="OMS\HistoryDBManagerClient.cs" />
     <Compile Include="OMS\TracingAlgorithmClient.cs" />
@@ -148,6 +149,10 @@
     <ProjectReference Include="..\..\Common.OMS\Common.OMS.csproj">
       <Project>{8F96A078-BE16-4363-9B89-0B313D2E0F5E}</Project>
       <Name>Common.OMS</Name>
+    </ProjectReference>
+    <ProjectReference Include="..\Common.CE\Common.CE.csproj">
+      <Project>{4EAD0377-BD2D-4B7E-93A6-705DB815E8A7}</Project>
+      <Name>Common.CE</Name>
     </ProjectReference>
     <ProjectReference Include="..\Common.Cloud\Common.Cloud.csproj">
       <Project>{FBEE1369-0F6C-41E6-8C62-8C1C5CDBB602}</Project>

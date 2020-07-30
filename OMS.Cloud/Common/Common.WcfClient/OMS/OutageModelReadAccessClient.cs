@@ -1,4 +1,5 @@
-﻿using Common.OMS;
+﻿using Common.CE;
+using Common.OMS;
 using Common.OmsContracts.ModelProvider;
 using Microsoft.ServiceFabric.Services.Client;
 using Microsoft.ServiceFabric.Services.Communication.Wcf.Client;
@@ -16,8 +17,8 @@ namespace OMS.Common.WcfClient.OMS
     {
         private static readonly string microserviceName = MicroserviceNames.OmsModelProviderService;
         private static readonly string listenerName = EndpointNames.OutageManagementServiceModelReadAccessEndpoint;
-        public OutageModelReadAccessClient(WcfCommunicationClientFactory<IOutageModelReadAccessContract> clientFactory,Uri serviceUri,ServicePartitionKey servicePartition)
-            :base(clientFactory,serviceUri,servicePartition,listenerName)
+        public OutageModelReadAccessClient(WcfCommunicationClientFactory<IOutageModelReadAccessContract> clientFactory, Uri serviceUri, ServicePartitionKey servicePartition)
+            : base(clientFactory, serviceUri,servicePartition, listenerName)
         {
 
         }
@@ -40,7 +41,12 @@ namespace OMS.Common.WcfClient.OMS
             return InvokeWithRetryAsync(client => client.Channel.GetCommandedElements());
         }
 
-        public Task<Dictionary<long, long>> GetOptimumIsolatioPoints()
+		public Task<IOutageTopologyElement> GetElementById(long gid)
+		{
+            return InvokeWithRetryAsync(client => client.Channel.GetElementById(gid));
+		}
+
+		public Task<Dictionary<long, long>> GetOptimumIsolatioPoints()
         {
             return InvokeWithRetryAsync(client => client.Channel.GetOptimumIsolatioPoints());
         }

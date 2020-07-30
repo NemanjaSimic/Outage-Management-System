@@ -79,24 +79,23 @@ namespace OMS.ModelProviderImplementation.ContractProviders
             {
                 await Task.Delay(1000);
             }
-            using (var tx = this.stateManager.CreateTransaction()) {
-                switch (modelUpdateOperationType)
-                {
-                    case ModelUpdateOperationType.INSERT:
-                        if(!CommandedElements.ContainsKey(gid))
-                        await CommandedElements.AddAsync(tx, gid, 0);
-                        break;
-                    case ModelUpdateOperationType.DELETE:
-                        await CommandedElements.TryRemoveAsync(gid);
-                        break;
-                    case ModelUpdateOperationType.CLEAR:
-                        await CommandedElements.ClearAsync();
-                        break;
-                    default:
-                        break;
-                }
-                await tx.CommitAsync();
+            
+            switch (modelUpdateOperationType)
+            {
+                case ModelUpdateOperationType.INSERT:
+                    if(!CommandedElements.ContainsKey(gid))
+                    await CommandedElements.SetAsync(gid, 0);
+                    break;
+                case ModelUpdateOperationType.DELETE:
+                    await CommandedElements.TryRemoveAsync(gid);
+                    break;
+                case ModelUpdateOperationType.CLEAR:
+                    await CommandedElements.ClearAsync();
+                    break;
+                default:
+                    break;
             }
+                
         }
 
         public async Task UpdateOptimumIsolationPoints(long gid, ModelUpdateOperationType modelUpdateOperationType)
@@ -105,25 +104,23 @@ namespace OMS.ModelProviderImplementation.ContractProviders
             {
                 await Task.Delay(1000);
             }
-            using (var tx = this.stateManager.CreateTransaction())
+            
+            switch (modelUpdateOperationType)
             {
-                switch (modelUpdateOperationType)
-                {
-                    case ModelUpdateOperationType.INSERT:
-                        if (!OptimumIsolatioPoints.ContainsKey(gid))
-                            await OptimumIsolatioPoints.AddAsync(tx, gid, 0);
-                        break;
-                    case ModelUpdateOperationType.DELETE:
-                        await OptimumIsolatioPoints.TryRemoveAsync(gid);
-                        break;
-                    case ModelUpdateOperationType.CLEAR:
-                        await OptimumIsolatioPoints.ClearAsync();
-                        break;
-                    default:
-                        break;
-                }
-                await tx.CommitAsync();
+                case ModelUpdateOperationType.INSERT:
+                    if (!OptimumIsolatioPoints.ContainsKey(gid))
+                        await OptimumIsolatioPoints.SetAsync(gid, 0);
+                    break;
+                case ModelUpdateOperationType.DELETE:
+                    await OptimumIsolatioPoints.TryRemoveAsync(gid);
+                    break;
+                case ModelUpdateOperationType.CLEAR:
+                    await OptimumIsolatioPoints.ClearAsync();
+                    break;
+                default:
+                    break;
             }
+            
         }
 
         public async Task UpdatePotentialOutage(long gid , CommandOriginType commandOriginType, ModelUpdateOperationType modelUpdateOperationType)
@@ -132,24 +129,21 @@ namespace OMS.ModelProviderImplementation.ContractProviders
             {
                 await Task.Delay(1000);
             }
-            using (var tx = this.stateManager.CreateTransaction())
+            
+            switch (modelUpdateOperationType)
             {
-                switch (modelUpdateOperationType)
-                {
-                    case ModelUpdateOperationType.INSERT:
-                        if (!PotentialOutage.ContainsKey(gid))
-                            await PotentialOutage.AddAsync(tx, gid, commandOriginType);
-                        break;
-                    case ModelUpdateOperationType.DELETE:
-                        await PotentialOutage.TryRemoveAsync(gid);
-                        break;
-                    case ModelUpdateOperationType.CLEAR:
-                        await PotentialOutage.ClearAsync();
-                        break;
-                    default:
-                        break;
-                }
-                await tx.CommitAsync();
+                case ModelUpdateOperationType.INSERT:
+                    if (!PotentialOutage.ContainsKey(gid))
+                        await PotentialOutage.SetAsync(gid, commandOriginType);
+                    break;
+                case ModelUpdateOperationType.DELETE:
+                    await PotentialOutage.TryRemoveAsync(gid);
+                    break;
+                case ModelUpdateOperationType.CLEAR:
+                    await PotentialOutage.ClearAsync();
+                    break;
+                default:
+                    break;
             }
         }
     }

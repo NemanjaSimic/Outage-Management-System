@@ -115,6 +115,8 @@ Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "OMS.CallTrackingService", "
 EndProject
 Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "OMS.CallTrackingServiceImplementation", "OMS\CallTracking\OMS.CallTrackingServiceImplementation\OMS.CallTrackingServiceImplementation.csproj", "{5F0FD4E5-D37F-4C3E-B0B4-CFC6B57F8982}"
 EndProject
+Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "Common.CE", "Common\Common.CE\Common.CE.csproj", "{4EAD0377-BD2D-4B7E-93A6-705DB815E8A7}"
+EndProject
 Global
 	GlobalSection(SolutionConfigurationPlatforms) = preSolution
 		Debug|Any CPU = Debug|Any CPU
@@ -553,6 +555,18 @@ Global
 		{5F0FD4E5-D37F-4C3E-B0B4-CFC6B57F8982}.Release|x64.Build.0 = Release|Any CPU
 		{5F0FD4E5-D37F-4C3E-B0B4-CFC6B57F8982}.Release|x86.ActiveCfg = Release|Any CPU
 		{5F0FD4E5-D37F-4C3E-B0B4-CFC6B57F8982}.Release|x86.Build.0 = Release|Any CPU
+		{4EAD0377-BD2D-4B7E-93A6-705DB815E8A7}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
+		{4EAD0377-BD2D-4B7E-93A6-705DB815E8A7}.Debug|Any CPU.Build.0 = Debug|Any CPU
+		{4EAD0377-BD2D-4B7E-93A6-705DB815E8A7}.Debug|x64.ActiveCfg = Debug|Any CPU
+		{4EAD0377-BD2D-4B7E-93A6-705DB815E8A7}.Debug|x64.Build.0 = Debug|Any CPU
+		{4EAD0377-BD2D-4B7E-93A6-705DB815E8A7}.Debug|x86.ActiveCfg = Debug|Any CPU
+		{4EAD0377-BD2D-4B7E-93A6-705DB815E8A7}.Debug|x86.Build.0 = Debug|Any CPU
+		{4EAD0377-BD2D-4B7E-93A6-705DB815E8A7}.Release|Any CPU.ActiveCfg = Release|Any CPU
+		{4EAD0377-BD2D-4B7E-93A6-705DB815E8A7}.Release|Any CPU.Build.0 = Release|Any CPU
+		{4EAD0377-BD2D-4B7E-93A6-705DB815E8A7}.Release|x64.ActiveCfg = Release|Any CPU
+		{4EAD0377-BD2D-4B7E-93A6-705DB815E8A7}.Release|x64.Build.0 = Release|Any CPU
+		{4EAD0377-BD2D-4B7E-93A6-705DB815E8A7}.Release|x86.ActiveCfg = Release|Any CPU
+		{4EAD0377-BD2D-4B7E-93A6-705DB815E8A7}.Release|x86.Build.0 = Release|Any CPU
 	EndGlobalSection
 	GlobalSection(SolutionProperties) = preSolution
 		HideSolutionNode = FALSE
@@ -607,6 +621,7 @@ Global
 		{D579389E-05D5-4A9E-99D5-52436846B0A0} = {9714296F-0442-4365-80D7-35BAF473DAB1}
 		{9D879368-F34C-4014-8E6A-E09DB2FFF3F3} = {D579389E-05D5-4A9E-99D5-52436846B0A0}
 		{5F0FD4E5-D37F-4C3E-B0B4-CFC6B57F8982} = {D579389E-05D5-4A9E-99D5-52436846B0A0}
+		{4EAD0377-BD2D-4B7E-93A6-705DB815E8A7} = {1273566C-3127-47ED-987F-48FE148D53F9}
 	EndGlobalSection
 	GlobalSection(ExtensibilityGlobals) = postSolution
 		SolutionGuid = {900889C5-0CD3-44E8-ADE4-9BED7AA01A1E}

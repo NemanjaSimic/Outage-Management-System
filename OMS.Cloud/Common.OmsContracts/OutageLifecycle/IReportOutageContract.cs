@@ -13,6 +13,6 @@ namespace Common.OmsContracts.OutageLifecycle
 	public interface IReportOutageContract : IService
 	{
 		[OperationContract]
-		bool ReportPotentialOutage(long gid, CommandOriginType commandOriginType);
+		Task<bool> ReportPotentialOutage(long gid, CommandOriginType commandOriginType);
 	}
 }

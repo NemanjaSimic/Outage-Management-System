@@ -120,6 +120,9 @@ namespace OMS.Common.Cloud
         OUTAGE_SIMULATOR,
 
         [EnumMember]
+        NON_SCADA_OUTAGE,
+
+        [EnumMember]
         OTHER_COMMAND, //TODO: rethink of name, add others like CE ili tako nesto
     }
 
