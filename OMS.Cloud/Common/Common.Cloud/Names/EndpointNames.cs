@@ -31,6 +31,7 @@
         public const string TopologyOMSServiceEndpoint = "TopologyOMSServiceEndpoint";
         public const string SwitchStatusCommandingEndpoint = "SwitchStatusCommandingEndpoint";
         public const string MeasurementProviderEndpoint = "MeasurementProviderEndpoint";
+        public const string MeasurementMapEndpoint = "MeasurementMapEndpoint";
         public const string ModelProviderServiceEndpoint = "ModelProviderServiceEndpoint";
         public const string LoadFlowServiceEndpoint = "LoadFlowServiceEndpoint";
 

@@ -30,6 +30,7 @@ namespace ModelProviderImplementation
 
         private ReliableDictionaryAccess<short, HashSet<long>> recloserCache;
         public ReliableDictionaryAccess<short, HashSet<long>> RecloserCache { get => recloserCache; }
+
         #endregion
 
         private ModelManager modelManager;
@@ -133,7 +134,14 @@ namespace ModelProviderImplementation
 
         private async Task<ModelDelta> ImportDataInCache()
         {
-            return await modelManager.TryGetAllModelEntitiesAsync();
+            ModelDelta modelDelta = await modelManager.TryGetAllModelEntitiesAsync();
+
+            await ElementCache.SetAsync((short)TransactionFlag.NoTransaction, modelDelta.TopologyElements);
+            await ElementConnectionCache.SetAsync((short)TransactionFlag.NoTransaction, modelDelta.ElementConnections);
+            await EnergySourceCache.SetAsync((short)TransactionFlag.NoTransaction, modelDelta.EnergySources);
+            await RecloserCache.SetAsync((short)TransactionFlag.NoTransaction, modelDelta.Reclosers);
+
+            return modelDelta;
         }
 
 		#region Model Provider
@@ -196,7 +204,7 @@ namespace ModelProviderImplementation
 
                 transactionFlag = TransactionFlag.InTransaction;
 
-                ModelDelta modelDelta = await ImportDataInCache();
+                ModelDelta modelDelta = await modelManager.TryGetAllModelEntitiesAsync();
 
                 Logger.LogDebug($"{baseLogString} PrepareForTransaction => Writting new data in cache under InTransaction flag.");
                 await ElementCache.SetAsync((short)TransactionFlag.InTransaction, modelDelta.TopologyElements);
@@ -287,7 +295,7 @@ namespace ModelProviderImplementation
             {
                 ModelDelta newModelDelta = await ImportDataInCache();
 
-                await ElementCache.SetAsync((short)TransactionFlag.NoTransaction, newModelDelta.TopologyElements);
+                //await ElementCache.SetAsync((short)TransactionFlag.NoTransaction, newModelDelta.TopologyElements);
 
                 return newModelDelta.TopologyElements;
             }
@@ -322,7 +330,7 @@ namespace ModelProviderImplementation
             {
                 ModelDelta newModelDelta = await ImportDataInCache();
 
-                await ElementConnectionCache.SetAsync((short)TransactionFlag.NoTransaction, newModelDelta.ElementConnections);
+                //await ElementConnectionCache.SetAsync((short)TransactionFlag.NoTransaction, newModelDelta.ElementConnections);
 
                 return newModelDelta.ElementConnections;
             }
@@ -357,7 +365,7 @@ namespace ModelProviderImplementation
             {
                 ModelDelta newModelDelta = await ImportDataInCache();
 
-                await RecloserCache.SetAsync((short)TransactionFlag.NoTransaction, newModelDelta.Reclosers);
+                //await RecloserCache.SetAsync((short)TransactionFlag.NoTransaction, newModelDelta.Reclosers);
 
                 return newModelDelta.Reclosers;
             }
@@ -392,7 +400,7 @@ namespace ModelProviderImplementation
             {
                 ModelDelta newModelDelta = await ImportDataInCache();
 
-                await EnergySourceCache.SetAsync((short)TransactionFlag.NoTransaction, newModelDelta.EnergySources);
+                //await EnergySourceCache.SetAsync((short)TransactionFlag.NoTransaction, newModelDelta.EnergySources);
 
                 return newModelDelta.EnergySources;
             }

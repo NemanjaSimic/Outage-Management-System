@@ -27,7 +27,6 @@ namespace TopologyBuilderImplementation
 
         private readonly string baseLogString;
 
-        private readonly MeasurementProviderClient measurementProviderClient;
         private readonly ModelProviderClient modelProviderClient;
 
         private ICloudLogger logger;
@@ -42,7 +41,6 @@ namespace TopologyBuilderImplementation
             string verboseMessage = $"{baseLogString} entering Ctor.";
             Logger.LogVerbose(verboseMessage);
 
-            measurementProviderClient = MeasurementProviderClient.CreateClient();
             modelProviderClient = ModelProviderClient.CreateClient();
 
             string debugMessage = $"{baseLogString} Ctor => Clients initialized.";

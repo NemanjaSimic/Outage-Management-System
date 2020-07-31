@@ -68,26 +68,5 @@ namespace LoadFlowService
 				}, EndpointNames.LoadFlowServiceEndpoint)
 			};
 		}
-
-		/// <summary>
-		/// This is the main entry point for your service instance.
-		/// </summary>
-		/// <param name="cancellationToken">Canceled when Service Fabric needs to shut down this service instance.</param>
-		protected override async Task RunAsync(CancellationToken cancellationToken)
-		{
-			cancellationToken.ThrowIfCancellationRequested();
-			//To DO
-
-			long iterations = 0;
-
-			while (true)
-			{
-				cancellationToken.ThrowIfCancellationRequested();
-
-				ServiceEventSource.Current.ServiceMessage(this.Context, "Working-{0}", ++iterations);
-
-				await Task.Delay(TimeSpan.FromSeconds(1), cancellationToken);
-			}
-		}
 	}
 }

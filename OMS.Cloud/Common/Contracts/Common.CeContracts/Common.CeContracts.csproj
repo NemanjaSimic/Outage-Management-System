@@ -83,7 +83,9 @@
   </ItemGroup>
   <ItemGroup>
     <Compile Include="ILoadFlowContract.cs" />
+    <Compile Include="IMeasurementMapContract.cs" />
     <Compile Include="IMeasurementProviderContract.cs" />
+    <Compile Include="ISwitchStatusCommandingContract.cs" />
     <Compile Include="ITopologyConverterContract.cs" />
     <Compile Include="ITopologyProviderContract.cs" />
     <Compile Include="IModelProviderContract.cs" />
