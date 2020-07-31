@@ -6,8 +6,8 @@ using System.Runtime.Serialization;
 namespace Outage.Common.GDA
 {
     //[Serializable]
-    [DataContract]	
-	public class PropertyValue
+    [DataContract]
+    public class PropertyValue
 	{
         List<long> longValues = new List<long>();
         List<float> floatValues = new List<float>();

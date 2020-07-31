@@ -1,9 +1,4 @@
 ﻿using Outage.Common;
-using Outage.SCADA.ModBus;
-using Outage.SCADA.ModBus.Acquisitor;
-using Outage.SCADA.ModBus.Connection;
-using Outage.SCADA.SCADACommon;
-using Outage.SCADA.SCADAData.Configuration;
 using Outage.SCADA.SCADAData.Repository;
 using Outage.SCADA.SCADAService.Command;
 using Outage.SCADA.SCADAService.DistributedTransaction;
@@ -12,6 +7,8 @@ using System.Text;
 using System.Collections.Generic;
 using System.ServiceModel;
 using Outage.SCADA.SCADAService.IntegrityUpdate;
+using Outage.SCADA.ModbusFunctions;
+using Outage.SCADA.Modbus;
 
 namespace Outage.SCADA.SCADAService
 {
@@ -24,18 +21,19 @@ namespace Outage.SCADA.SCADAService
             get { return logger ?? (logger = LoggerWrapper.Instance); }
         }
 
-        private List<ServiceHost> hosts = null;
-        private SCADAModel scadaModel = null;
-        private Acquisition acquisition = null;
-        private FunctionExecutor functionExecutor = null;
-        private EnumDescs enumDescs = null;
-        private ModelResourcesDesc modelResourcesDesc = null;
+        private readonly ModelResourcesDesc modelResourcesDesc;
+        private readonly EnumDescs enumDescs;
+        private readonly SCADAModel scadaModel;
+
+        private FunctionExecutor functionExecutor;
+        private Acquisition acquisition;
+
+        private List<ServiceHost> hosts;
 
         public SCADAService()
         {
             modelResourcesDesc = new ModelResourcesDesc();
             enumDescs = new EnumDescs();
-
             scadaModel = new SCADAModel(modelResourcesDesc, enumDescs);
             functionExecutor = new FunctionExecutor(scadaModel);
 

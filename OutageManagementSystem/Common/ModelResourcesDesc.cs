@@ -2,6 +2,7 @@
 using System.Collections.Generic;
 using System.Linq;
 using Outage.Common.GDA;
+using Microsoft.Extensions.Logging;
 
 namespace Outage.Common
 {
@@ -9,7 +10,7 @@ namespace Outage.Common
 	{
 		private ILogger logger;
 
-        protected ILogger Logger
+		private ILogger Logger
         {
             get { return logger ?? (logger = LoggerWrapper.Instance); }
         }
@@ -144,15 +145,15 @@ namespace Outage.Common
 	{
 		private ILogger logger;
 
-        protected ILogger Logger
-        {
-            get { return logger ?? (logger = LoggerWrapper.Instance); }
-        }
+		private ILogger Logger
+		{
+			get { return logger ?? (logger = LoggerWrapper.Instance); }
+		}
 
-        /// <summary>
-        /// Dictionary of model type code to model type description mappings.
-        /// </summary>
-        private Dictionary<long, ResourcePropertiesDesc> resourceDescs;
+		/// <summary>
+		/// Dictionary of model type code to model type description mappings.
+		/// </summary>
+		private Dictionary<long, ResourcePropertiesDesc> resourceDescs;
 
 		/// <summary>
 		/// Dictionary of DMS type to class type code mappings.

@@ -1,0 +1,791 @@
+<?xml version="1.0" encoding="utf-8"?>
+<PredefinedDataTypes>
+	<DataType name="AbsoluteDate">
+		<Property>
+			<URI value="#AbsoluteDate.value"/>
+			<Type value="string"/>
+		</Property>
+	</DataType>
+
+	<DataType name="AbsoluteDateTime">
+		<Property>
+			<URI value="#AbsoluteDateTime.value"/>
+			<Type value="string"/>
+		</Property>
+	</DataType>
+
+	<DataType name="ActivePower">
+		<Property>
+			<URI value="#ActivePower.value"/>
+			<Type value="float"/>
+		</Property>
+		<Property>
+			<URI value="#ActivePower.unit"/>
+			<Type value="#UnitSymbol"/>
+		</Property>
+		<Property>
+			<URI value="#ActivePower.multiplier"/>
+			<Type value="#UnitMultiplier"/>
+		</Property>
+	</DataType>
+
+	<DataType name="ActivePowerChangeRate">
+		<Property>
+			<URI value="#ActivePowerChangeRate.value"/>
+			<Type value="float"/>
+		</Property>
+		<Property>
+			<URI value="#ActivePowerChangeRate.unit"/>
+			<Type value="#UnitSymbol"/>
+		</Property>
+		<Property>
+			<URI value="#ActivePowerChangeRate.multiplier"/>
+			<Type value="#UnitMultiplier"/>
+		</Property>
+	</DataType>
+
+	<DataType name="Admittance">
+		<Property>
+			<URI value="#Admittance.value"/>
+			<Type value="float"/>
+		</Property>
+		<Property>
+			<URI value="#Admittance.unit"/>
+			<Type value="#UnitSymbol"/>
+		</Property>
+		<Property>
+			<URI value="#Admittance.multiplier"/>
+			<Type value="#UnitMultiplier"/>
+		</Property>
+	</DataType>
+
+	<DataType name="AngleDegrees">
+		<Property>
+			<URI value="#AngleDegrees.value"/>
+			<Type value="float"/>
+		</Property>
+		<Property>
+			<URI value="#AngleDegrees.unit"/>
+			<Type value="#UnitSymbol"/>
+		</Property>
+		<Property>
+			<URI value="#AngleDegrees.multiplier"/>
+			<Type value="#UnitMultiplier"/>
+		</Property>
+	</DataType>
+
+	<DataType name="AngleRadians">
+		<Property>
+			<URI value="#AngleRadians.value"/>
+			<Type value="float"/>
+		</Property>
+		<Property>
+			<URI value="#AngleRadians.unit"/>
+			<Type value="#UnitSymbol"/>
+		</Property>
+		<Property>
+			<URI value="#AngleRadians.multiplier"/>
+			<Type value="#UnitMultiplier"/>
+		</Property>
+	</DataType>
+
+	<DataType name="ApparentPower">
+		<Property>
+			<URI value="#ApparentPower.value"/>
+			<Type value="float"/>
+		</Property>
+		<Property>
+			<URI value="#ApparentPower.unit"/>
+			<Type value="#UnitSymbol"/>
+		</Property>
+		<Property>
+			<URI value="#ApparentPower.multiplier"/>
+			<Type value="#UnitMultiplier"/>
+		</Property>
+	</DataType>
+
+	<DataType name="Capacitance">
+		<Property>
+			<URI value="#Capacitance.value"/>
+			<Type value="float"/>
+		</Property>
+		<Property>
+			<URI value="#Capacitance.unit"/>
+			<Type value="#UnitSymbol"/>
+		</Property>
+		<Property>
+			<URI value="#Capacitance.multiplier"/>
+			<Type value="#UnitMultiplier"/>
+		</Property>
+	</DataType>
+
+	<DataType name="Conductance">
+		<Property>
+			<URI value="#Conductance.value"/>
+			<Type value="float"/>
+		</Property>
+		<Property>
+			<URI value="#Conductance.unit"/>
+			<Type value="#UnitSymbol"/>
+		</Property>
+		<Property>
+			<URI value="#Conductance.multiplier"/>
+			<Type value="#UnitMultiplier"/>
+		</Property>
+	</DataType>
+
+	<DataType name="CostPerEnergyUnit">
+		<Property>
+			<URI value="#CostPerEnergyUnit.value"/>
+			<Type value="float"/>
+		</Property>
+		<Property>
+			<URI value="#CostPerEnergyUnit.unit"/>
+			<Type value="#UnitSymbol"/>
+		</Property>
+		<Property>
+			<URI value="#CostPerEnergyUnit.multiplier"/>
+			<Type value="#UnitMultiplier"/>
+		</Property>
+	</DataType>
+
+	<DataType name="CostRate">
+		<Property>
+			<URI value="#CostRate.value"/>
+			<Type value="float"/>
+		</Property>
+		<Property>
+			<URI value="#CostRate.unit"/>
+			<Type value="#UnitSymbol"/>
+		</Property>
+		<Property>
+			<URI value="#CostRate.multiplier"/>
+			<Type value="#UnitMultiplier"/>
+		</Property>
+	</DataType>
+
+	<DataType name="CurrentFlow">
+		<Property>
+			<URI value="#CurrentFlow.value"/>
+			<Type value="float"/>
+		</Property>
+		<Property>
+			<URI value="#CurrentFlow.unit"/>
+			<Type value="#UnitSymbol"/>
+		</Property>
+		<Property>
+			<URI value="#CurrentFlow.multiplier"/>
+			<Type value="#UnitMultiplier"/>
+		</Property>
+	</DataType>
+
+	<DataType name="Damping">
+		<Property>
+			<URI value="#Damping.value"/>
+			<Type value="float"/>
+		</Property>
+		<Property>
+			<URI value="#Damping.unit"/>
+			<Type value="#UnitSymbol"/>
+		</Property>
+		<Property>
+			<URI value="#Damping.multiplier"/>
+			<Type value="#UnitMultiplier"/>
+		</Property>
+	</DataType>
+
+	<DataType name="FloatQuantity">
+		<Property>
+			<URI value="#FloatQuantity.value"/>
+			<Type value="float"/>
+		</Property>
+		<Property>
+			<URI value="#FloatQuantity.unit"/>
+			<Type value="#UnitSymbol"/>
+		</Property>
+		<Property>
+			<URI value="#FloatQuantity.multiplier"/>
+			<Type value="#UnitMultiplier"/>
+		</Property>
+	</DataType>
+
+	<DataType name="Frequency">
+		<Property>
+			<URI value="#Frequency.value"/>
+			<Type value="float"/>
+		</Property>
+		<Property>
+			<URI value="#Frequency.unit"/>
+			<Type value="#UnitSymbol"/>
+		</Property>
+		<Property>
+			<URI value="#Frequency.multiplier"/>
+			<Type value="#UnitMultiplier"/>
+		</Property>
+	</DataType>
+
+	<DataType name="Hours">
+		<Property>
+			<URI value="#Hours.value"/>
+			<Type value="float"/>
+		</Property>
+		<Property>
+			<URI value="#Hours.unit"/>
+			<Type value="#UnitSymbol"/>
+		</Property>
+		<Property>
+			<URI value="#Hours.multiplier"/>
+			<Type value="#UnitMultiplier"/>
+		</Property>
+	</DataType>
+
+	<DataType name="Impedance">
+		<Property>
+			<URI value="#Impedance.value"/>
+			<Type value="float"/>
+		</Property>
+		<Property>
+			<URI value="#Impedance.unit"/>
+			<Type value="#UnitSymbol"/>
+		</Property>
+		<Property>
+			<URI value="#Impedance.multiplier"/>
+			<Type value="#UnitMultiplier"/>
+		</Property>
+	</DataType>
+
+	<DataType name="Inductance">
+		<Property>
+			<URI value="#Inductance.value"/>
+			<Type value="float"/>
+		</Property>
+		<Property>
+			<URI value="#Inductance.unit"/>
+			<Type value="#UnitSymbol"/>
+		</Property>
+		<Property>
+			<URI value="#Inductance.multiplier"/>
+			<Type value="#UnitMultiplier"/>
+		</Property>
+	</DataType>
+
+	<DataType name="IntegerQuantity">
+		<Property>
+			<URI value="#IntegerQuantity.value"/>
+			<Type value="integer"/>
+		</Property>
+		<Property>
+			<URI value="#IntegerQuantity.unit"/>
+			<Type value="#UnitSymbol"/>
+		</Property>
+		<Property>
+			<URI value="#IntegerQuantity.multiplier"/>
+			<Type value="#UnitMultiplier"/>
+		</Property>
+	</DataType>
+
+	<DataType name="KWActivePower">
+		<Property>
+			<URI value="#KWActivePower.value"/>
+			<Type value="float"/>
+		</Property>
+		<Property>
+			<URI value="#KWActivePower.unit"/>
+			<Type value="#UnitSymbol"/>
+		</Property>
+		<Property>
+			<URI value="#KWActivePower.multiplier"/>
+			<Type value="#UnitMultiplier"/>
+		</Property>
+	</DataType>
+
+	<DataType name="Length">
+		<Property>
+			<URI value="#Length.value"/>
+			<Type value="float"/>
+		</Property>
+		<Property>
+			<URI value="#Length.unit"/>
+			<Type value="#UnitSymbol"/>
+		</Property>
+		<Property>
+			<URI value="#Length.multiplier"/>
+			<Type value="#UnitMultiplier"/>
+		</Property>
+	</DataType>
+
+	<DataType name="Minutes">
+		<Property>
+			<URI value="#Minutes.value"/>
+			<Type value="float"/>
+		</Property>
+		<Property>
+			<URI value="#Minutes.unit"/>
+			<Type value="#UnitSymbol"/>
+		</Property>
+		<Property>
+			<URI value="#Minutes.multiplier"/>
+			<Type value="#UnitMultiplier"/>
+		</Property>
+	</DataType>
+
+	<DataType name="Money">
+		<Property>
+			<URI value="#Money.value"/>
+			<Type value="float"/>
+		</Property>
+		<Property>
+			<URI value="#Money.unit"/>
+			<Type value="#UnitSymbol"/>
+		</Property>
+		<Property>
+			<URI value="#Money.multiplier"/>
+			<Type value="#UnitMultiplier"/>
+		</Property>
+	</DataType>
+
+	<DataType name="PerCent">
+		<Property>
+			<URI value="#PerCent.value"/>
+			<Type value="float"/>
+		</Property>
+		<Property>
+			<URI value="#PerCent.unit"/>
+			<Type value="#UnitSymbol"/>
+		</Property>
+		<Property>
+			<URI value="#PerCent.multiplier"/>
+			<Type value="#UnitMultiplier"/>
+		</Property>
+	</DataType>
+
+	<DataType name="Pressure">
+		<Property>
+			<URI value="#Pressure.value"/>
+			<Type value="float"/>
+		</Property>
+		<Property>
+			<URI value="#Pressure.unit"/>
+			<Type value="#UnitSymbol"/>
+		</Property>
+		<Property>
+			<URI value="#Pressure.multiplier"/>
+			<Type value="#UnitMultiplier"/>
+		</Property>
+	</DataType>
+
+	<DataType name="Pressure">
+		<Property>
+			<URI value="#Pressure.value"/>
+			<Type value="float"/>
+		</Property>
+		<Property>
+			<URI value="#Pressure.unit"/>
+			<Type value="#UnitSymbol"/>
+		</Property>
+		<Property>
+			<URI value="#Pressure.multiplier"/>
+			<Type value="#UnitMultiplier"/>
+		</Property>
+	</DataType>
+
+	<DataType name="PU">
+		<Property>
+			<URI value="#PU.value"/>
+			<Type value="float"/>
+		</Property>
+		<Property>
+			<URI value="#PU.unit"/>
+			<Type value="#UnitSymbol"/>
+		</Property>
+		<Property>
+			<URI value="#PU.multiplier"/>
+			<Type value="#UnitMultiplier"/>
+		</Property>
+	</DataType>
+
+	<DataType name="Reactance">
+		<Property>
+			<URI value="#Reactance.value"/>
+			<Type value="float"/>
+		</Property>
+		<Property>
+			<URI value="#Reactance.unit"/>
+			<Type value="#UnitSymbol"/>
+		</Property>
+		<Property>
+			<URI value="#Reactance.multiplier"/>
+			<Type value="#UnitMultiplier"/>
+		</Property>
+	</DataType>
+
+	<DataType name="ReactivePower">
+		<Property>
+			<URI value="#ReactivePower.value"/>
+			<Type value="float"/>
+		</Property>
+		<Property>
+			<URI value="#ReactivePower.unit"/>
+			<Type value="#UnitSymbol"/>
+		</Property>
+		<Property>
+			<URI value="#ReactivePower.multiplier"/>
+			<Type value="#UnitMultiplier"/>
+		</Property>
+	</DataType>
+
+	<DataType name="RealEnergy">
+		<Property>
+			<URI value="#RealEnergy.value"/>
+			<Type value="float"/>
+		</Property>
+		<Property>
+			<URI value="#RealEnergy.unit"/>
+			<Type value="#UnitSymbol"/>
+		</Property>
+		<Property>
+			<URI value="#RealEnergy.multiplier"/>
+			<Type value="#UnitMultiplier"/>
+		</Property>
+	</DataType>
+
+	<DataType name="Resistance">
+		<Property>
+			<URI value="#Resistance.value"/>
+			<Type value="float"/>
+		</Property>
+		<Property>
+			<URI value="#Resistance.unit"/>
+			<Type value="#UnitSymbol"/>
+		</Property>
+		<Property>
+			<URI value="#Resistance.multiplier"/>
+			<Type value="#UnitMultiplier"/>
+		</Property>
+	</DataType>
+
+	<DataType name="RotationSpeed">
+		<Property>
+			<URI value="#RotationSpeed.value"/>
+			<Type value="float"/>
+		</Property>
+		<Property>
+			<URI value="#RotationSpeed.unit"/>
+			<Type value="#UnitSymbol"/>
+		</Property>
+		<Property>
+			<URI value="#RotationSpeed.multiplier"/>
+			<Type value="#UnitMultiplier"/>
+		</Property>
+	</DataType>
+
+	<DataType name="Seconds">
+		<Property>
+			<URI value="#Seconds.value"/>
+			<Type value="float"/>
+		</Property>
+		<Property>
+			<URI value="#Seconds.unit"/>
+			<Type value="#UnitSymbol"/>
+		</Property>
+		<Property>
+			<URI value="#Seconds.multiplier"/>
+			<Type value="#UnitMultiplier"/>
+		</Property>
+	</DataType>
+
+	<DataType name="StringQuantity">
+		<Property>
+			<URI value="#StringQuantity.value"/>
+			<Type value="string"/>
+		</Property>
+		<Property>
+			<URI value="#StringQuantity.unit"/>
+			<Type value="#UnitSymbol"/>
+		</Property>
+		<Property>
+			<URI value="#StringQuantity.multiplier"/>
+			<Type value="#UnitMultiplier"/>
+		</Property>
+	</DataType>
+
+	<DataType name="Susceptance">
+		<Property>
+			<URI value="#Susceptance.value"/>
+			<Type value="float"/>
+		</Property>
+		<Property>
+			<URI value="#Susceptance.unit"/>
+			<Type value="#UnitSymbol"/>
+		</Property>
+		<Property>
+			<URI value="#Susceptance.multiplier"/>
+			<Type value="#UnitMultiplier"/>
+		</Property>
+	</DataType>
+
+	<DataType name="Temperature">
+		<Property>
+			<URI value="#Temperature.value"/>
+			<Type value="float"/>
+		</Property>
+		<Property>
+			<URI value="#Temperature.unit"/>
+			<Type value="#UnitSymbol"/>
+		</Property>
+		<Property>
+			<URI value="#Temperature.multiplier"/>
+			<Type value="#UnitMultiplier"/>
+		</Property>
+	</DataType>
+
+	<DataType name="Voltage">
+		<Property>
+			<URI value="#Voltage.value"/>
+			<Type value="float"/>
+		</Property>
+		<Property>
+			<URI value="#Voltage.unit"/>
+			<Type value="#UnitSymbol"/>
+		</Property>
+		<Property>
+			<URI value="#Voltage.multiplier"/>
+			<Type value="#UnitMultiplier"/>
+		</Property>
+	</DataType>
+
+	<DataType name="VoltagePerReactivePower">
+		<Property>
+			<URI value="#VoltagePerReactivePower.value"/>
+			<Type value="float"/>
+		</Property>
+		<Property>
+			<URI value="#VoltagePerReactivePower.unit"/>
+			<Type value="#UnitSymbol"/>
+		</Property>
+		<Property>
+			<URI value="#VoltagePerReactivePower.multiplier"/>
+			<Type value="#UnitMultiplier"/>
+		</Property>
+	</DataType>
+
+	<DataType name="Volume">
+		<Property>
+			<URI value="#Volume.value"/>
+			<Type value="float"/>
+		</Property>
+		<Property>
+			<URI value="#Volume.unit"/>
+			<Type value="#UnitSymbol"/>
+		</Property>
+		<Property>
+			<URI value="#Volume.multiplier"/>
+			<Type value="#UnitMultiplier"/>
+		</Property>
+	</DataType>
+
+	<DataType name="WaterLevel">
+		<Property>
+			<URI value="#WaterLevel.value"/>
+			<Type value="float"/>
+		</Property>
+		<Property>
+			<URI value="#WaterLevel.unit"/>
+			<Type value="#UnitSymbol"/>
+		</Property>
+		<Property>
+			<URI value="#WaterLevel.multiplier"/>
+			<Type value="#UnitMultiplier"/>
+		</Property>
+	</DataType>
+
+	<DataType name="Weight">
+		<Property>
+			<URI value="#Weight.value"/>
+			<Type value="float"/>
+		</Property>
+		<Property>
+			<URI value="#Weight.unit"/>
+			<Type value="#UnitSymbol"/>
+		</Property>
+		<Property>
+			<URI value="#Weight.multiplier"/>
+			<Type value="#UnitMultiplier"/>
+		</Property>
+	</DataType>
+
+	<DataType name="CompositeSwitchType">
+		<Property>
+			<URI value="#CompositeSwitchType.value"/>
+			<Type value="string"/>
+		</Property>
+	</DataType>
+
+	<DataType name="OperatingMode">
+		<Property>
+			<URI value="#CompositeSwitchType.value"/>
+			<Type value="string"/>
+		</Property>
+	</DataType>
+
+	<DataType name="Classification">
+		<Property>
+			<URI value="#Classification.value"/>
+			<Type value="integer"/>
+		</Property>
+		<Property>
+			<URI value="#Classification.unit"/>
+			<Type value="#UnitSymbol"/>
+		</Property>
+		<Property>
+			<URI value="#Classification.multiplier"/>
+			<Type value="#UnitMultiplier"/>
+		</Property>
+	</DataType>
+
+	<DataType name="CostPerHeatUnit">
+		<Property>
+			<URI value="#Weight.value"/>
+			<Type value="float"/>
+		</Property>
+		<Property>
+			<URI value="#Weight.unit"/>
+			<Type value="#UnitSymbol"/>
+		</Property>
+		<Property>
+			<URI value="#Weight.multiplier"/>
+			<Type value="#UnitMultiplier"/>
+		</Property>
+	</DataType>
+
+	<DataType name="Emission">
+		<Property>
+			<URI value="#Emission.value"/>
+			<Type value="float"/>
+		</Property>
+		<Property>
+			<URI value="#Emission.unit"/>
+			<Type value="#UnitSymbol"/>
+		</Property>
+		<Property>
+			<URI value="#Emission.multiplier"/>
+			<Type value="#UnitMultiplier"/>
+		</Property>
+	</DataType>
+	<DataType name="HeatRate">
+		<Property>
+			<URI value="#HeatRate.value"/>
+			<Type value="float"/>
+		</Property>
+		<Property>
+			<URI value="#HeatRate.unit"/>
+			<Type value="#UnitSymbol"/>
+		</Property>
+		<Property>
+			<URI value="#HeatRate.multiplier"/>
+			<Type value="#UnitMultiplier"/>
+		</Property>
+	</DataType>
+	<DataType name="HeatRate">
+		<Property>
+			<URI value="#HeatRate.value"/>
+			<Type value="float"/>
+		</Property>
+		<Property>
+			<URI value="#HeatRate.unit"/>
+			<Type value="#UnitSymbol"/>
+		</Property>
+		<Property>
+			<URI value="#HeatRate.multiplier"/>
+			<Type value="#UnitMultiplier"/>
+		</Property>
+	</DataType>
+	<DataType name="ConductancePerLength">
+		<Property>
+			<URI value="#ConductancePerLength.value"/>
+			<Type value="float"/>
+		</Property>
+		<Property>
+			<URI value="#ConductancePerLength.unit"/>
+			<Type value="#UnitSymbol"/>
+		</Property>
+		<Property>
+			<URI value="#ConductancePerLength.denominatorUnit"/>
+			<Type value="#UnitSymbol"/>
+		</Property>
+		<Property>
+			<URI value="#ConductancePerLength.multiplier"/>
+			<Type value="#UnitMultiplier"/>
+		</Property>
+		<Property>
+			<URI value="#ConductancePerLength.denominatorMultiplier"/>
+			<Type value="#UnitMultiplier"/>
+		</Property>
+	</DataType>
+	<DataType name="ReactancePerLength">
+		<Property>
+			<URI value="#ReactancePerLength.value"/>
+			<Type value="float"/>
+		</Property>
+		<Property>
+			<URI value="#ReactancePerLength.unit"/>
+			<Type value="#UnitSymbol"/>
+		</Property>
+		<Property>
+			<URI value="#ReactancePerLength.denominatorUnit"/>
+			<Type value="#UnitSymbol"/>
+		</Property>
+		<Property>
+			<URI value="#ReactancePerLength.multiplier"/>
+			<Type value="#UnitMultiplier"/>
+		</Property>
+		<Property>
+			<URI value="#ReactancePerLength.denominatorMultiplier"/>
+			<Type value="#UnitMultiplier"/>
+		</Property>
+	</DataType>
+	<DataType name="ResistancePerLength">
+		<Property>
+			<URI value="#ResistancePerLength.value"/>
+			<Type value="float"/>
+		</Property>
+		<Property>
+			<URI value="#ResistancePerLength.unit"/>
+			<Type value="#UnitSymbol"/>
+		</Property>
+		<Property>
+			<URI value="#ResistancePerLength.denominatorUnit"/>
+			<Type value="#UnitSymbol"/>
+		</Property>
+		<Property>
+			<URI value="#ResistancePerLength.multiplier"/>
+			<Type value="#UnitMultiplier"/>
+		</Property>
+		<Property>
+			<URI value="#ResistancePerLength.denominatorMultiplier"/>
+			<Type value="#UnitMultiplier"/>
+		</Property>
+	</DataType>
+	<DataType name="SusceptancePerLength">
+		<Property>
+			<URI value="#SusceptancePerLength.value"/>
+			<Type value="float"/>
+		</Property>
+		<Property>
+			<URI value="#SusceptancePerLength.unit"/>
+			<Type value="#UnitSymbol"/>
+		</Property>
+		<Property>
+			<URI value="#SusceptancePerLength.denominatorUnit"/>
+			<Type value="#UnitSymbol"/>
+		</Property>
+		<Property>
+			<URI value="#SusceptancePerLength.multiplier"/>
+			<Type value="#UnitMultiplier"/>
+		</Property>
+		<Property>
+			<URI value="#SusceptancePerLength.denominatorMultiplier"/>
+			<Type value="#UnitMultiplier"/>
+		</Property>
+	</DataType>
+</PredefinedDataTypes>

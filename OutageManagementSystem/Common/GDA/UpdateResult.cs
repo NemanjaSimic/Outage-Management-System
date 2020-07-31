@@ -1,6 +1,7 @@
 ﻿using System.Collections.Generic;
 using System.Text;
 using System.Runtime.Serialization;
+using System;
 
 namespace Outage.Common.GDA
 {
@@ -45,7 +46,7 @@ namespace Outage.Common.GDA
 			set { result = value; }
 		}
 
-        public override string ToString()
+		public override string ToString()
         {
             StringBuilder sb = new StringBuilder();
 

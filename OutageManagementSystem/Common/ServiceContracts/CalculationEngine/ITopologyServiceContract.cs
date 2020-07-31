@@ -1,4 +1,5 @@
-﻿using Outage.Common.UI;
+﻿using Microsoft.ServiceFabric.Services.Remoting;
+using Outage.Common.UI;
 using System.ServiceModel;
 
 namespace Outage.Common.ServiceContracts

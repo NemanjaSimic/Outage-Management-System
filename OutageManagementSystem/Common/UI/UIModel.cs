@@ -1,4 +1,4 @@
-﻿using Outage.Common;
+﻿using Microsoft.Extensions.Logging;
 using System;
 using System.Collections.Generic;
 using System.Runtime.Serialization;
@@ -8,7 +8,12 @@ namespace Outage.Common.UI
 	[DataContract]
 	public class UIModel
 	{
-		private ILogger logger = LoggerWrapper.Instance;
+		private ILogger logger;
+
+		private ILogger Logger
+		{
+			get { return logger ?? (logger = LoggerWrapper.Instance); }
+		}
 
 		[DataMember]
 		public long FirstNode { get; set; }

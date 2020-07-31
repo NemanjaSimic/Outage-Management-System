@@ -1,11 +1,12 @@
 ﻿using Outage.DistributedTransactionActor;
 using System;
+using System.Threading.Tasks;
 
 namespace CalculationEngineService.DistributedTransaction
 {
     public class CETransactionActor : TransactionActor
     {
-        public override bool Prepare()
+        public override async Task<bool> Prepare()
         {
             bool success = false;
 
@@ -31,7 +32,7 @@ namespace CalculationEngineService.DistributedTransaction
             return success;
         }
 
-        public override void Commit()
+        public override async Task Commit()
         {
             try
             {
@@ -45,7 +46,7 @@ namespace CalculationEngineService.DistributedTransaction
             }
         }
 
-        public override void Rollback()
+        public override async Task Rollback()
         {
             try
             {

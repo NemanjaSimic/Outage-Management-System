@@ -1,24 +1,34 @@
 ﻿using CIM.Model;
 using CIMParser;
-using Outage.DataImporter.CIMAdapter;
 using Outage.DataImporter.CIMAdapter.Importer;
 using Outage.DataImporter.CIMAdapter.Manager;
+using System;
+using System.IO;
+using System.Reflection;
+using System.Threading;
+using Outage.Common;
+using System.Threading.Tasks;
+using System.Text;
 using Outage.Common.GDA;
 using Outage.Common.ServiceProxies;
-using System;
-using System.Collections.Generic;
-using System.IO;
-using System.Linq;
-using System.Reflection;
-using System.Text;
-using System.Threading;
-using System.Threading.Tasks;
-using Outage.Common;
-using System.ServiceModel;
 using Outage.Common.ServiceContracts.GDA;
 
 namespace Outage.DataImporter.CIMAdapter
 {
+    public struct ConditionalValue<TValue>
+    { 
+        public ConditionalValue(bool hasValue, TValue value)
+        {
+            HasValue = hasValue;
+            Value = value;
+        }
+
+        public bool HasValue { get; private set; }
+
+        public TValue Value { get; private set; }
+    }
+
+
     public class CIMAdapterClass
     {
         private ILogger logger;
@@ -28,34 +38,39 @@ namespace Outage.DataImporter.CIMAdapter
             get { return logger ?? (logger = LoggerWrapper.Instance); }
         }
 
-        private ModelResourcesDesc resourcesDesc = new ModelResourcesDesc();
+        private readonly ModelResourcesDesc resourcesDesc;
+        private readonly ProxyFactory proxyFactory;
+
         private TransformAndLoadReport report;
-        private ProxyFactory proxyFactory;
+
 
         public CIMAdapterClass()
         {
+            resourcesDesc = new ModelResourcesDesc();
             proxyFactory = new ProxyFactory();
         }
 
-        public Delta CreateDelta(Stream extract, SupportedProfiles extractType, out string log)
+        public ConditionalValue<Delta> CreateDelta(Stream extract, SupportedProfiles extractType, StringBuilder logBuilder)
         {
-            Delta nmsDelta = null;
+            ConditionalValue<Delta> result;
             ConcreteModel concreteModel = null;
             Assembly assembly = null;
 
-            string loadLog = string.Empty;
-            string transformLog = string.Empty;
-
             report = new TransformAndLoadReport();
+
+            string loadLog;
 
             if (LoadModelFromExtractFile(extract, extractType, ref concreteModel, ref assembly, out loadLog))
             {
-                DoTransformAndLoad(assembly, concreteModel, extractType, out nmsDelta, out transformLog);
+                logBuilder.AppendLine($"Load report:\r\n{loadLog}");
+                result = DoTransformAndLoad(assembly, concreteModel, extractType, logBuilder);
+            }
+            else
+            {
+                result = new ConditionalValue<Delta>(false, null);
             }
 
-            log = string.Concat("Load report:\r\n", loadLog, "\r\nTransform report:\r\n", transformLog, "\r\n\r\n");
-
-            return nmsDelta;
+            return result;
         }
 
         public string ApplyUpdates(Delta delta)
@@ -66,24 +81,23 @@ namespace Outage.DataImporter.CIMAdapter
 
             if ((delta != null) && (delta.NumberOfOperations != 0))
             {
-                //// NetworkModelService->ApplyUpdates
-                using (NetworkModelGDAProxy gdaQueryProxy = proxyFactory.CreateProxy<NetworkModelGDAProxy, INetworkModelGDAContract>(EndpointNames.NetworkModelGDAEndpoint))
+                using (NetworkModelGDAProxy nmsProxy = proxyFactory.CreateProxy<NetworkModelGDAProxy, INetworkModelGDAContract>(EndpointNames.NetworkModelGDAEndpoint))
                 {
-                    if (gdaQueryProxy == null)
+                    if (nmsProxy == null)
                     {
-                        string message = "NetworkModelGDAProxy is null.";
+                        string message = "NetworkModelGdaClient is null.";
                         Logger.LogWarn(message);
                         throw new NullReferenceException(message);
                     }
-                    
-                    updateResult = gdaQueryProxy.ApplyUpdate(delta).ToString();
+
+                    var result = nmsProxy.ApplyUpdate(delta);
+                    updateResult = result.ToString();
                 }
             }
 
             Thread.CurrentThread.CurrentCulture = culture;
             return updateResult;
         }
-
 
         private bool LoadModelFromExtractFile(Stream extract, SupportedProfiles extractType, ref ConcreteModel concreteModelResult, ref Assembly assembly, out string log)
         {
@@ -128,51 +142,36 @@ namespace Outage.DataImporter.CIMAdapter
             return valid;
         }
 
-        private bool DoTransformAndLoad(Assembly assembly, ConcreteModel concreteModel, SupportedProfiles extractType, out Delta nmsDelta, out string log)
+        private ConditionalValue<Delta> DoTransformAndLoad(Assembly assembly, ConcreteModel concreteModel, SupportedProfiles extractType, StringBuilder logBuilder)
         {
-            nmsDelta = null;
-            log = string.Empty;
-
-            bool success = false;
+            Delta nmsDelta;
+            bool success;
 
             try
             {
                 Logger.LogInfo($"Importing {extractType} data...");
 
-                switch (extractType)
+                if(extractType != SupportedProfiles.Outage)
                 {
-                    case SupportedProfiles.Outage:
-                        {
-                            TransformAndLoadReport report = OutageImporter.Instance.CreateNMSDelta(concreteModel, proxyFactory, resourcesDesc);
-
-                            if (report.Success)
-                            {
-                                nmsDelta = OutageImporter.Instance.NMSDelta;
-                                success = true;
-                            }
-                            else
-                            {
-                                success = false;
-                            }
-                            log = report.Report.ToString();
-                            OutageImporter.Instance.Reset();
-
-                            break;
-                        }
-                    default:
-                        {
-                            Logger.LogWarn($"Import of {extractType} data is NOT SUPPORTED.");
-                            break;
-                        }
+                    Logger.LogWarn($"Import of {extractType} data is NOT SUPPORTED.");
                 }
 
-                return success;
+                TransformAndLoadReport report = OutageImporter.Instance.CreateNMSDelta(concreteModel, resourcesDesc);
+                success = report.Success;
+
+                nmsDelta = success ? OutageImporter.Instance.NMSDelta : null;
+
+                logBuilder.Append(report.Report.ToString());
+                OutageImporter.Instance.Reset();
             }
             catch (Exception ex)
             {
+                success = false;
+                nmsDelta = null;
                 Logger.LogError("Import unsuccessful.", ex);
-                return false;
             }
+            
+            return new ConditionalValue<Delta>(success, nmsDelta);
         }
     }
 }

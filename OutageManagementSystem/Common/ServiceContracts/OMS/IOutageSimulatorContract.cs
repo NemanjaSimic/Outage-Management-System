@@ -1,4 +1,5 @@
-﻿using System.ServiceModel;
+﻿using Microsoft.ServiceFabric.Services.Remoting;
+using System.ServiceModel;
 
 namespace Outage.Common.ServiceContracts.OMS
 {

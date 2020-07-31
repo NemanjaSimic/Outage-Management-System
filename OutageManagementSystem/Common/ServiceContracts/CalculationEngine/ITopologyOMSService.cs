@@ -1,4 +1,5 @@
-﻿using Outage.Common.OutageService.Interface;
+﻿using Microsoft.ServiceFabric.Services.Remoting;
+using Outage.Common.OutageService.Interface;
 using Outage.Common.OutageService.Model;
 using System.ServiceModel;
 

@@ -1,12 +1,11 @@
 ﻿using System;
 using System.Collections.Generic;
-using System.ServiceModel;
 using Outage.Common.GDA;
 using Outage.Common.ServiceContracts.GDA;
 
 namespace Outage.Common.ServiceProxies
 {
-	public class NetworkModelGDAProxy : BaseProxy<INetworkModelGDAContract>, INetworkModelGDAContract
+    public class NetworkModelGDAProxy : BaseProxy<INetworkModelGDAContract>, INetworkModelGDAContract
 	{
 		public NetworkModelGDAProxy(string endpointName)
 			: base(endpointName)

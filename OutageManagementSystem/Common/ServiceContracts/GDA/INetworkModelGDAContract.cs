@@ -1,10 +1,11 @@
-﻿using System.Collections.Generic;
+﻿using System;
+using System.Collections.Generic;
 using System.ServiceModel;
 using Outage.Common.GDA;
 
 namespace Outage.Common.ServiceContracts.GDA
 {
-	[ServiceContract]
+    [ServiceContract]
 	public interface INetworkModelGDAContract
 	{
 		/// <summary>

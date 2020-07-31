@@ -3,16 +3,24 @@
 namespace Outage.Common
 {
     //NMS
+    [DataContract]
     public enum AnalogMeasurementType : short
     {
+        [EnumMember]
         VOLTAGE = 1,
+
+        [EnumMember]
         CURRENT = 2,
+        [EnumMember]
         FEEDER_CURRENT = 3,
+        [EnumMember]
         POWER   = 4,
     }
 
+    [DataContract]
     public enum DiscreteMeasurementType : short
     {
+        [EnumMember]
         SWITCH_STATUS   = 1,
     }
 
@@ -25,28 +33,38 @@ namespace Outage.Common
 
     //PUB_SUB
     [DataContract]
-    public enum Topic
+    public enum Topic : short
     {
         [EnumMember]
-        MEASUREMENT = 1,
+        MEASUREMENT         = 1,
+        
+        [EnumMember]
+        SWITCH_STATUS       = 2,
+        
+        [EnumMember]
+        TOPOLOGY            = 3,
+        
+        [EnumMember]
+        OUTAGE_EMAIL        = 4,
+        
+        [EnumMember]
+        ACTIVE_OUTAGE       = 5,
+        
+        [EnumMember]
+        ARCHIVED_OUTAGE     = 6,
+        
+        [EnumMember]
+        OMS_MODEL           = 7,
+    }
+
+    [DataContract]
+    public enum ServiceType
+    {
+        [EnumMember]
+        STATEFUL_SERVICE    = 1,
 
         [EnumMember]
-        SWITCH_STATUS,
-
-        [EnumMember]
-        TOPOLOGY,
-
-        [EnumMember]
-        OUTAGE_EMAIL,
-
-        [EnumMember]
-        ACTIVE_OUTAGE,
-
-        [EnumMember]
-        ARCHIVED_OUTAGE,
-
-        [EnumMember]
-        OMS_MODEL
+        STATELESS_SERVICE   = 2,
     }
 
     //SCADA
@@ -121,10 +139,13 @@ namespace Outage.Common
     {
         [EnumMember]
         CREATED = 1,
+
         [EnumMember]
         ISOLATED = 2,
+
         [EnumMember]
         REPAIRED = 3,
+
         [EnumMember]
         ARCHIVED = 4,
         [EnumMember]

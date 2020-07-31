@@ -5,12 +5,11 @@ using Outage.Common.ServiceContracts.GDA;
 using Outage.Common.ServiceProxies;
 using System;
 using System.Collections.Generic;
-using System.ServiceModel;
-using System.Threading;
+using System.Threading.Tasks;
 
 namespace Outage.DataImporter.CIMAdapter.Importer
 {
-	public class OutageImporter
+    public class OutageImporter
 	{
 		private ILogger logger;
 
@@ -24,6 +23,8 @@ namespace Outage.DataImporter.CIMAdapter.Importer
 
 		private ConcreteModel concreteModel;
 		private Delta delta;
+
+		private readonly ProxyFactory proxyFactory;
 
 		private Dictionary<string, long> mridToPositiveGidFromServer;
 
@@ -96,6 +97,11 @@ namespace Outage.DataImporter.CIMAdapter.Importer
 
 		#endregion Properties
 
+		private OutageImporter()
+        {
+			proxyFactory = new ProxyFactory();
+		}
+
 		public void Reset()
 		{
 			concreteModel = null;
@@ -107,7 +113,7 @@ namespace Outage.DataImporter.CIMAdapter.Importer
 			report = null;
 		}
 
-		public TransformAndLoadReport CreateNMSDelta(ConcreteModel cimConcreteModel, ProxyFactory proxyFactory, ModelResourcesDesc resourcesDesc)
+		public TransformAndLoadReport CreateNMSDelta(ConcreteModel cimConcreteModel, ModelResourcesDesc resourcesDesc)
 		{
 			Logger.LogInfo("Importing Outage Elements...");
 			report = new TransformAndLoadReport();
@@ -121,7 +127,7 @@ namespace Outage.DataImporter.CIMAdapter.Importer
 			{
 				try
 				{
-					ConvertModelAndPopulateDelta(proxyFactory, resourcesDesc);
+					ConvertModelAndPopulateDelta(resourcesDesc);
 				}
 				catch (Exception ex)
 				{
@@ -136,22 +142,11 @@ namespace Outage.DataImporter.CIMAdapter.Importer
 			return report;
 		}
 
-		private void ConvertModelAndPopulateDelta(ProxyFactory proxyFactory, ModelResourcesDesc resourcesDesc)
+		private void ConvertModelAndPopulateDelta(ModelResourcesDesc resourcesDesc)
 		{
 			Logger.LogInfo("Loading elements and creating delta...");
 
-
-			using (NetworkModelGDAProxy gdaQueryProxy = proxyFactory.CreateProxy<NetworkModelGDAProxy, INetworkModelGDAContract>(EndpointNames.NetworkModelGDAEndpoint))
-			{
-				if (gdaQueryProxy == null)
-				{
-					string message = "ProcessIterator() => NetworkModelGDAProxy is null.";
-					Logger.LogError(message);
-					throw new NullReferenceException(message);
-				}
-
-				PopulateNmsDataFromServer(gdaQueryProxy, resourcesDesc);
-			}
+			PopulateNmsDataFromServer(resourcesDesc);
 
 			//// import all concrete model types (DMSType enum)
 			ImportBaseVoltages();
@@ -175,78 +170,89 @@ namespace Outage.DataImporter.CIMAdapter.Importer
 			Logger.LogInfo("Loading elements and creating delta completed.");
 		}
 
-		private bool PopulateNmsDataFromServer(NetworkModelGDAProxy gdaQueryProxy, ModelResourcesDesc resourcesDesc)
+		private bool PopulateNmsDataFromServer(ModelResourcesDesc resourcesDesc)
 		{
 			bool success = false;
 			string message = "Getting nms data from server started.";
 			Logger.LogInfo(message);
 
-			HashSet<ModelCode> requiredEntityTypes = new HashSet<ModelCode>();
-
-			foreach (DMSType dmsType in Enum.GetValues(typeof(DMSType)))
+			using (NetworkModelGDAProxy nmsProxy = proxyFactory.CreateProxy<NetworkModelGDAProxy, INetworkModelGDAContract>(EndpointNames.NetworkModelGDAEndpoint))
 			{
-				if (dmsType == DMSType.MASK_TYPE)
+				if (nmsProxy == null)
 				{
-					continue;
+					string errMessage = "NetworkModelGdaClient is null.";
+					Logger.LogWarn(errMessage);
+					throw new NullReferenceException(errMessage);
 				}
 
-				ModelCode mc = resourcesDesc.GetModelCodeFromType(dmsType);
+				HashSet<ModelCode> requiredEntityTypes = new HashSet<ModelCode>();
 
-				if (!requiredEntityTypes.Contains(mc))
+				foreach (DMSType dmsType in Enum.GetValues(typeof(DMSType)))
 				{
-					requiredEntityTypes.Add(mc);
-				}
-			}
-
-			List<ModelCode> mrIdProp = new List<ModelCode>() { ModelCode.IDOBJ_MRID };
-			foreach (ModelCode modelCodeType in requiredEntityTypes)
-			{
-				int iteratorId = 0;
-				int resourcesLeft = 0;
-				int numberOfResources = 10000; //TODO: connfigurabilno
-
-				try
-				{
-					iteratorId = gdaQueryProxy.GetExtentValues(modelCodeType, mrIdProp);
-					resourcesLeft = gdaQueryProxy.IteratorResourcesLeft(iteratorId);
-
-					while (resourcesLeft > 0)
+					if (dmsType == DMSType.MASK_TYPE)
 					{
-						List<ResourceDescription> gdaResult = gdaQueryProxy.IteratorNext(numberOfResources, iteratorId);
-
-						foreach (ResourceDescription rd in gdaResult)
-						{
-							if (rd.Properties[0].Id != ModelCode.IDOBJ_MRID)
-							{
-								continue;
-							}
-
-							string mrId = rd.Properties[0].PropertyValue.StringValue;
-
-							if (!MridToPositiveGidFromServer.ContainsKey(mrId))
-							{
-								MridToPositiveGidFromServer.Add(mrId, rd.Id);
-							}
-							else
-							{
-								throw new NotImplementedException("Method PopulateNmsDataFromServer() -> MridToPositiveGid.ContainsKey(mrId) == true");
-							}
-						}
-
-						resourcesLeft = gdaQueryProxy.IteratorResourcesLeft(iteratorId);
+						continue;
 					}
 
-					gdaQueryProxy.IteratorClose(iteratorId);
+					ModelCode mc = resourcesDesc.GetModelCodeFromType(dmsType);
 
-					message = "Getting nms data from server successfully finished.";
-					Logger.LogInfo(message);
-					success = true;
+					if (!requiredEntityTypes.Contains(mc))
+					{
+						requiredEntityTypes.Add(mc);
+					}
 				}
-				catch (Exception e)
+
+				List<ModelCode> mrIdProp = new List<ModelCode>() { ModelCode.IDOBJ_MRID };
+
+				foreach (ModelCode modelCodeType in requiredEntityTypes)
 				{
-					message = string.Format("Getting extent values method failed for {0}.\n\t{1}", modelCodeType, e.Message);
-					Logger.LogError(message);
-					success = false;
+					int iteratorId = 0;
+					int resourcesLeft = 0;
+					int numberOfResources = 10000; //TODO: connfigurabilno
+
+					try
+					{
+						iteratorId = nmsProxy.GetExtentValues(modelCodeType, mrIdProp);
+						resourcesLeft = nmsProxy.IteratorResourcesLeft(iteratorId);
+
+						while (resourcesLeft > 0)
+						{
+							List<ResourceDescription> gdaResult = nmsProxy.IteratorNext(numberOfResources, iteratorId);
+
+							foreach (ResourceDescription rd in gdaResult)
+							{
+								if (rd.Properties[0].Id != ModelCode.IDOBJ_MRID)
+								{
+									continue;
+								}
+
+								string mrId = rd.Properties[0].PropertyValue.StringValue;
+
+								if (!MridToPositiveGidFromServer.ContainsKey(mrId))
+								{
+									MridToPositiveGidFromServer.Add(mrId, rd.Id);
+								}
+								else
+								{
+									throw new NotImplementedException("Method PopulateNmsDataFromServer() -> MridToPositiveGid.ContainsKey(mrId) == true");
+								}
+							}
+
+							resourcesLeft = nmsProxy.IteratorResourcesLeft(iteratorId);
+						}
+
+						nmsProxy.IteratorClose(iteratorId);
+
+						message = "Getting nms data from server successfully finished.";
+						Logger.LogInfo(message);
+						success = true;
+					}
+					catch (Exception e)
+					{
+						message = string.Format("Getting extent values method failed for {0}.\n\t{1}", modelCodeType, e.Message);
+						Logger.LogError(message);
+						success = false;
+					}
 				}
 			}
 

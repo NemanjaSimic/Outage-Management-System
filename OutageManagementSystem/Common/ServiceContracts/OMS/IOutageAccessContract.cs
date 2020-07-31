@@ -1,4 +1,5 @@
-﻿using Outage.Common.PubSub.OutageDataContract;
+﻿using Microsoft.ServiceFabric.Services.Remoting;
+using Outage.Common.PubSub.OutageDataContract;
 using System.Collections.Generic;
 using System.ServiceModel;
 

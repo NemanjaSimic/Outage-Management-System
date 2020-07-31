@@ -1,4 +1,5 @@
-﻿using System;
+﻿using Microsoft.ServiceFabric.Services.Remoting;
+using System;
 using System.ServiceModel;
 
 namespace Outage.Common.ServiceContracts.CalculationEngine

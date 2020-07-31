@@ -5,6 +5,7 @@ using Outage.Common.PubSub.CalculationEngineDataContract;
 using Outage.Common.PubSub.EmailDataContract;
 using Outage.Common.PubSub.OutageDataContract;
 using Outage.Common.OutageService.Model;
+using Microsoft.ServiceFabric.Services.Remoting;
 
 namespace Outage.Common.ServiceContracts.PubSub
 {

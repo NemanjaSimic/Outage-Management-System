@@ -1,14 +1,24 @@
-﻿using System;
-using System.Collections.Generic;
-using System.Linq;
-using System.Runtime.Serialization;
-using System.Text;
-using System.Threading.Tasks;
+﻿using System.Runtime.Serialization;
 
 namespace Outage.Common.PubSub.SCADADataContract
 {
     [DataContract]
-    public class AnalogModbusData : IModbusData
+    [KnownType(typeof(AnalogModbusData))]
+    [KnownType(typeof(DiscreteModbusData))]
+    public abstract class ModbusData : IModbusData
+    {
+        [DataMember]
+        public long MeasurementGid { get; protected set; }
+
+        [DataMember]
+        public AlarmType Alarm { get; protected set; }
+
+        [DataMember]
+        public CommandOriginType CommandOrigin { get; protected set; }
+    }
+
+    [DataContract]
+    public class AnalogModbusData : ModbusData
     {
         public AnalogModbusData(float value, AlarmType alarm, long measurementGid, CommandOriginType commandOrigin)
         {
@@ -19,20 +29,11 @@ namespace Outage.Common.PubSub.SCADADataContract
         }
 
         [DataMember]
-        public long MeasurementGid { get; private set; }
-
-        [DataMember]
         public float Value { get; private set; }
-
-        [DataMember]
-        public AlarmType Alarm { get; private set; }
-
-        [DataMember]
-        public CommandOriginType CommandOrigin { get; private set; }
     }
 
     [DataContract]
-    public class DiscreteModbusData : IModbusData
+    public class DiscreteModbusData : ModbusData
     {
         public DiscreteModbusData(ushort value, AlarmType alarm, long measurementGid, CommandOriginType commandOrigin)
         {
@@ -43,15 +44,6 @@ namespace Outage.Common.PubSub.SCADADataContract
         }
 
         [DataMember]
-        public long MeasurementGid { get; private set; }
-
-        [DataMember]
         public ushort Value { get; private set; }
-
-        [DataMember]
-        public AlarmType Alarm { get; private set; }
-
-        [DataMember]
-        public CommandOriginType CommandOrigin { get; private set; }
     }
 }

@@ -4,6 +4,7 @@ using Outage.Common.ServiceContracts.GDA;
 using Outage.Common.ServiceProxies;
 using System;
 using System.Collections.Generic;
+using System.Threading.Tasks;
 
 namespace NetworkModelServiceFunctions
 {
@@ -22,7 +23,7 @@ namespace NetworkModelServiceFunctions
 			proxyFactory = new ProxyFactory();
 		}
 
-		public List<ResourceDescription> GetExtentValues(ModelCode entityType, List<ModelCode> propIds)
+		public async Task<List<ResourceDescription>> GetExtentValues(ModelCode entityType, List<ModelCode> propIds)
 		{
 			int iteratorId;
 
@@ -47,9 +48,9 @@ namespace NetworkModelServiceFunctions
 				}
 			}
 
-			return ProcessIterator(iteratorId);
+			return await ProcessIterator(iteratorId);
 		}
-		public List<ResourceDescription> GetRelatedValues(long source, List<ModelCode> propIds, Association association)
+		public async Task<List<ResourceDescription>> GetRelatedValues(long source, List<ModelCode> propIds, Association association)
 		{
 			int iteratorId;
 
@@ -74,9 +75,9 @@ namespace NetworkModelServiceFunctions
 				}
 			}
 
-			return ProcessIterator(iteratorId);
+			return await ProcessIterator(iteratorId);
 		}
-		public ResourceDescription GetValues(long resourceId, List<ModelCode> propIds)
+		public async Task<ResourceDescription> GetValues(long resourceId, List<ModelCode> propIds)
 		{
 			ResourceDescription resource;
 
@@ -103,7 +104,7 @@ namespace NetworkModelServiceFunctions
 
 			return resource;
 		}
-		private List<ResourceDescription> ProcessIterator(int iteratorId)
+		private async Task<List<ResourceDescription>> ProcessIterator(int iteratorId)
 		{
 			int resourcesLeft;
 			int numberOfResources = 10000;

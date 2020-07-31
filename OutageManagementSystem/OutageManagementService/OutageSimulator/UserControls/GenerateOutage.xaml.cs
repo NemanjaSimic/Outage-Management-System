@@ -213,7 +213,7 @@ namespace OMS.OutageSimulator.UserControls
             InitializeGlobalIdentifiers();
         }
 
-        private void InitializeGlobalIdentifiers()
+        private async void InitializeGlobalIdentifiers()
         {
             using (NetworkModelGDAProxy gdaProxy = proxyFactory.CreateProxy<NetworkModelGDAProxy, INetworkModelGDAContract>(EndpointNames.NetworkModelGDAEndpoint))
             {
@@ -233,8 +233,8 @@ namespace OMS.OutageSimulator.UserControls
 
                     ModelCode dmsTypesModelCode = modelResourcesDesc.GetModelCodeFromType(dmsType);
 
-                    int iteratorId = 0;
-                    int resourcesLeft = 0;
+                    int iteratorId;
+                    int resourcesLeft;
                     int numberOfResources = 10000; //TODO: connfigurabilno
 
                     try
@@ -248,13 +248,14 @@ namespace OMS.OutageSimulator.UserControls
 
                             foreach (ResourceDescription rd in gdaResult)
                             {
-                                GlobalIDBindingModel globalIdentifier = new GlobalIDBindingModel()
+                                Dispatcher.Invoke(() =>
                                 {
-                                    GID = rd.Id,
-                                    Type = dmsTypesModelCode.ToString(),
-                                };
-
-                                GlobalIdentifiers.Add(globalIdentifier);
+                                    GlobalIdentifiers.Add(new GlobalIDBindingModel()
+                                    {
+                                        GID = rd.Id,
+                                        Type = dmsTypesModelCode.ToString(),
+                                    });
+                                });
                             }
 
                             resourcesLeft = gdaProxy.IteratorResourcesLeft(iteratorId);

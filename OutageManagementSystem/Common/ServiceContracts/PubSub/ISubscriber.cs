@@ -1,4 +1,5 @@
-﻿using Outage.Common.OutageService.Model;
+﻿using Microsoft.ServiceFabric.Services.Remoting;
+using Outage.Common.OutageService.Model;
 using Outage.Common.PubSub;
 using Outage.Common.PubSub.CalculationEngineDataContract;
 using Outage.Common.PubSub.EmailDataContract;

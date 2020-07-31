@@ -4,10 +4,10 @@ using System.IO;
 using System.Runtime.Serialization;
 using System.Xml;
 using System.Runtime.Serialization.Formatters.Binary;
+using Microsoft.Extensions.Logging;
 
 namespace Outage.Common.GDA
 {
-
 	public enum DeltaOpType : byte 
 	{ 
 		Insert = 0, 
@@ -15,12 +15,12 @@ namespace Outage.Common.GDA
 		Delete = 2 
 	}
 
-	[DataContract]	
+	[DataContract]
 	public class Delta
 	{
         private ILogger logger;
 
-        protected ILogger Logger
+        private ILogger Logger
         {
             get { return logger ?? (logger = LoggerWrapper.Instance); }
         } 

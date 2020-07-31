@@ -4,7 +4,6 @@ using System.Runtime.Serialization;
 namespace Outage.Common.GDA
 {
 	[DataContract]
-	
 	public class Association
 	{
 		private bool inverse;

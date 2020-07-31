@@ -3,10 +3,8 @@ using System.Text;
 using Outage.Common;
 using Outage.Common.Exceptions.SCADA;
 using Outage.Common.ServiceContracts.SCADA;
-using Outage.SCADA.ModBus;
-using Outage.SCADA.ModBus.Connection;
-using Outage.SCADA.ModBus.FunctionParameters;
-using Outage.SCADA.ModBus.ModbusFuntions;
+using Outage.SCADA.ModbusFunctions;
+using Outage.SCADA.ModbusFunctions.Parameters;
 using Outage.SCADA.SCADACommon;
 using Outage.SCADA.SCADAData.Repository;
 

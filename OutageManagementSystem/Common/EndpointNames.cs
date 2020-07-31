@@ -11,6 +11,11 @@
         public static readonly string SCADATransactionActorEndpoint = "SCADATransactionActorEndpoint";
         public static readonly string SCADAModelUpdateNotifierEndpoint = "SCADAModelUpdateNotifierEndpoint";
         public static readonly string SCADAIntegrityUpdateEndpoint = "SCADAIntegrityUpdateEndpoint";
+        public static readonly string ScadaModelReadAccessEndpoint = "ScadaModelReadAccessEndpoint";
+        public static readonly string ScadaModelUpdateAccessEndpoint = "ScadaModelUpdateAccessEndpoint";
+        public static readonly string ScadaReadCommandEnqueuerEndpoint = "ScadaReadCommandEnqueuerEndpoint";
+        public static readonly string ScadaWriteCommandEnqueuerEndpoint = "ScadaWriteCommandEnqueuerEndpoint";
+        public static readonly string ScadaModelUpdateCommandEnqueueurEndpoint = "ScadaModelUpdateCommandEnqueueurEndpoint";
 
         //NMS - 2
         public static readonly string NetworkModelGDAEndpoint = "NetworkModelGDAEndpoint";
@@ -27,6 +32,7 @@
         //PUBSUB - 4
         public static readonly string PublisherEndpoint = "PublisherEndpoint";
         public static readonly string SubscriberEndpoint = "SubscriberEndpoint";
+        public static readonly string NotifySubscriberEndpoint = "NotifySubscriberEndpoint";
 
         //OMS - 5
         public static readonly string CallingEndpoint = "CallingEndpoint";

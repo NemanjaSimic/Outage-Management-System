@@ -1,4 +1,4 @@
-﻿using System;
+﻿using Microsoft.ServiceFabric.Services.Remoting;
 using System.Collections.Generic;
 using System.ServiceModel;
 

@@ -138,7 +138,6 @@ namespace OutageManagementService.Calling
             calls = new ConcurrentQueue<long>();
         }
 
-
         //method for manual stopping of timer
         private void StopTimer()
         {

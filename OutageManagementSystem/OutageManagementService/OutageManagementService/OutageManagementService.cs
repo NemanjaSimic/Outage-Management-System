@@ -18,10 +18,11 @@ using System.Collections.Generic;
 using System.Linq;
 using System.ServiceModel;
 using System.Text;
+using System.Threading.Tasks;
 
 namespace OutageManagementService
 {
-    public class OutageManagementService : IDisposable
+    public sealed class OutageManagementService : IDisposable
     {
         #region Private Fields
 
@@ -89,7 +90,7 @@ namespace OutageManagementService
         }
 
         #region GDAHelper
-        public List<ResourceDescription> GetExtentValues(ModelCode entityType, List<ModelCode> propIds)
+        public async Task<List<ResourceDescription>> GetExtentValues(ModelCode entityType, List<ModelCode> propIds)
         {
             int iteratorId;
 
@@ -114,10 +115,10 @@ namespace OutageManagementService
                 }
             }
 
-            return ProcessIterator(iteratorId);
+            return await ProcessIterator(iteratorId);
         }
 
-        private List<ResourceDescription> ProcessIterator(int iteratorId)
+        private async Task<List<ResourceDescription>> ProcessIterator(int iteratorId)
         {
             //TODO: mozda vec ovde napakovati dictionary<long, rd> ?
             int resourcesLeft;
@@ -164,8 +165,7 @@ namespace OutageManagementService
         private void SubscribeOnEmailService()
         {
             ProxyFactory proxyFactory = new ProxyFactory();
-            subscriberProxy = proxyFactory.CreateProxy<SubscriberProxy, ISubscriber>(callTracker, EndpointNames.SubscriberEndpoint);
-            //proxyFactory = new SubscriberProxy(callTracker, EndpointNames.SubscriberEndpoint);
+            this.subscriberProxy = proxyFactory.CreateProxy<SubscriberProxy, ISubscriber>(callTracker, EndpointNames.SubscriberEndpoint);
 
             if (subscriberProxy == null)
             {
@@ -181,13 +181,13 @@ namespace OutageManagementService
 
         private void InitializeEnergyConsumers(UnitOfWork db)
         {
-            List<ResourceDescription> energyConsumers = GetExtentValues(ModelCode.ENERGYCONSUMER, modelResourcesDesc.GetAllPropertyIds(ModelCode.ENERGYCONSUMER));
-
-            int i = 0; //TODO: delete, for first/last name placeholder
-
-            foreach(ResourceDescription energyConsumer in energyConsumers)
+            using (OutageContext db = new OutageContext())
             {
-                Consumer consumer = new Consumer
+                List<ResourceDescription> energyConsumers = await GetExtentValues(ModelCode.ENERGYCONSUMER, modelResourcesDesc.GetAllPropertyIds(ModelCode.ENERGYCONSUMER));
+
+                int i = 0; //TODO: delete, for first/last name placeholder
+
+                foreach(ResourceDescription energyConsumer in energyConsumers)
                 {
                     ConsumerId = energyConsumer.GetProperty(ModelCode.IDOBJ_GID).AsLong(),
                     ConsumerMRID = energyConsumer.GetProperty(ModelCode.IDOBJ_MRID).AsString(),
