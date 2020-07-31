@@ -45,7 +45,6 @@ namespace WebAdapter
         protected override async Task RunAsync(CancellationToken cancellationToken)
         {
             cancellationToken.ThrowIfCancellationRequested();
-
         }
     }
 }

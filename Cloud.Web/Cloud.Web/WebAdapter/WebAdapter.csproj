@@ -248,6 +248,7 @@
     </Reference>
   </ItemGroup>
   <ItemGroup>
+    <Compile Include="Adapter.cs" />
     <Compile Include="HubDispatchers\GraphHubDispatcher.cs" />
     <Compile Include="HubDispatchers\OutageHubDispatcher.cs" />
     <Compile Include="HubDispatchers\ScadaHubDispatcher.cs" />
@@ -258,6 +259,7 @@
     <Compile Include="WebAdapter.cs" />
     <Compile Include="Program.cs" />
     <Compile Include="ServiceEventSource.cs" />
+    <Compile Include="WebService\WebService.cs" />
   </ItemGroup>
   <ItemGroup>
     <None Include="PackageRoot\Config\Settings.xml" />
@@ -266,6 +268,10 @@
     <None Include="packages.config" />
   </ItemGroup>
   <ItemGroup>
+    <ProjectReference Include="..\..\..\OMS.Web\OMS.Web.Adapter\OMS.Web.Adapter.Contracts\OMS.Web.Adapter.Contracts.csproj">
+      <Project>{0CAD32C4-5C09-467F-B5DC-57C646BAC2A2}</Project>
+      <Name>OMS.Web.Adapter.Contracts</Name>
+    </ProjectReference>
     <ProjectReference Include="..\..\..\OMS.Web\OMS.Web.Common\OMS.Web.Common.csproj">
       <Project>{63EA1AA4-DC22-4552-8454-346F1DA85082}</Project>
       <Name>OMS.Web.Common</Name>
