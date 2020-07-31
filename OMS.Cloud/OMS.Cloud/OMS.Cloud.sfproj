@@ -42,6 +42,7 @@
     <ProjectReference Include="..\SCADA\Commanding\SCADA.CommandingService\SCADA.CommandingService.csproj" />
     <ProjectReference Include="..\SCADA\FunctionExecutor\SCADA.FunctionExecutorService\SCADA.FunctionExecutorService.csproj" />
     <ProjectReference Include="..\SCADA\ModelProvider\SCADA.ModelProviderService\SCADA.ModelProviderService.csproj" />
+    <ProjectReference Include="..\TMS\TMS.TransactionManagerService\TMS.TransactionManagerService.csproj" />
   </ItemGroup>
   <Import Project="$(MSBuildToolsPath)\Microsoft.Common.targets" />
   <PropertyGroup>

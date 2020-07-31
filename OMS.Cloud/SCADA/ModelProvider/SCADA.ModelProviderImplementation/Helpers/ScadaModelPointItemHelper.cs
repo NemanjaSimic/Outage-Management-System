@@ -30,8 +30,6 @@ namespace SCADA.ModelProviderImplementation.Data
 
         public void InitializeScadaModelPointItem(ScadaModelPointItem pointItem, List<Property> props, ModelCode type, EnumDescs enumDescs)
         {
-            pointItem.Alarm = AlarmType.NO_ALARM;
-
             foreach (var item in props)
             {
                 switch (item.Id)
@@ -113,7 +111,6 @@ namespace SCADA.ModelProviderImplementation.Data
             }
 
             pointItem.Initialized = true;
-            pointItem.SetAlarms();
         }
 
         public void InitializeAnalogPointItem(AnalogPointItem pointItem, List<Property> props, ModelCode type, EnumDescs enumDescs)
@@ -166,7 +163,6 @@ namespace SCADA.ModelProviderImplementation.Data
             }
 
             pointItem.Initialized = true;
-            pointItem.SetAlarms();
         }
     }
 }

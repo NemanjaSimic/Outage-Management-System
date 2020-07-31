@@ -3,6 +3,7 @@ using Microsoft.ServiceFabric.Data.Notifications;
 using OMS.Common.Cloud;
 using OMS.Common.Cloud.Exceptions.SCADA;
 using OMS.Common.Cloud.Logger;
+using OMS.Common.Cloud.Names;
 using OMS.Common.Cloud.ReliableCollectionHelpers;
 using OMS.Common.PubSub;
 using OMS.Common.PubSubContracts;
@@ -25,16 +26,23 @@ namespace SCADA.ModelProviderImplementation.ContractProviders
         private readonly string baseLogString;
         private readonly IReliableStateManager stateManager;
 
-        private IPublisherContract publisherClient;
+        //private IPublisherContract publisherClient;
 
         #region Private Propetires
         private bool isGidToPointItemMapInitialized;
         private bool isMeasurementsCacheInitialized;
         private bool isCommandDescriptionCacheInitialized;
         private bool isInfoCacheInitialized;
+
         private bool ReliableDictionariesInitialized
         {
-            get { return isGidToPointItemMapInitialized && isMeasurementsCacheInitialized && isCommandDescriptionCacheInitialized && isInfoCacheInitialized; }
+            get 
+            { 
+                return isGidToPointItemMapInitialized && 
+                       isMeasurementsCacheInitialized && 
+                       isCommandDescriptionCacheInitialized && 
+                       isInfoCacheInitialized; 
+            }
         }
 
         private ICloudLogger logger;
@@ -72,15 +80,15 @@ namespace SCADA.ModelProviderImplementation.ContractProviders
         {
             this.baseLogString = $"{this.GetType()} [{this.GetHashCode()}] =>{Environment.NewLine}";
 
-            this.stateManager = stateManager;
-            stateManager.StateManagerChanged += this.OnStateManagerChangedHandler;
-
-            this.publisherClient = PublisherClient.CreateClient();
-
             this.isGidToPointItemMapInitialized = false;
             this.isMeasurementsCacheInitialized = false;
             this.isCommandDescriptionCacheInitialized = false;
             this.isInfoCacheInitialized = false;
+
+            this.stateManager = stateManager;
+            this.stateManager.StateManagerChanged += this.OnStateManagerChangedHandler;
+
+            //this.publisherClient = PublisherClient.CreateClient();
         }
 
         private async void OnStateManagerChangedHandler(object sender, NotifyStateManagerChangedEventArgs e)
@@ -136,7 +144,6 @@ namespace SCADA.ModelProviderImplementation.ContractProviders
 
             while (!ReliableDictionariesInitialized)
             {
-                //TODO: something smarter
                 await Task.Delay(1000);
             }
 
@@ -161,7 +168,6 @@ namespace SCADA.ModelProviderImplementation.ContractProviders
 
             while (!ReliableDictionariesInitialized || !(await GetIsScadaModelImportedIndicator()))
             {
-                //TODO: something smarter
                 await Task.Delay(1000);
             }
 
@@ -200,7 +206,14 @@ namespace SCADA.ModelProviderImplementation.ContractProviders
                         throw new Exception(errorMessage);
                     }
 
-                    if(result.Value is AnalogModbusData analogCacheItem && analogCacheItem.Value != data[gid].Value)
+                    if (!(result.Value is AnalogModbusData analogCacheItem))
+                    {
+                        string errorMessage = $"{baseLogString} MakeAnalogEntryToMeasurementCache => Entity with Gid 0x{gid:X16} is not of type: {typeof(AnalogModbusData)}.";
+                        Logger.LogError(errorMessage);
+                        throw new Exception(errorMessage);
+                    }
+
+                    if (analogCacheItem.Value != data[gid].Value || (analogCacheItem.CommandOrigin != data[gid].CommandOrigin && data[gid].CommandOrigin != CommandOriginType.UNKNOWN_ORIGIN))
                     {
                         Logger.LogDebug($"{baseLogString} MakeAnalogEntryToMeasurementCache => Value changed on element with Gid: 0x{analogCacheItem.MeasurementGid:X16}. Old value: {analogCacheItem.Value}, New value: {data[gid].Value}, Alarm: {data[gid].Alarm}, CommandOrigin: {data[gid].CommandOrigin}");
 
@@ -225,7 +238,6 @@ namespace SCADA.ModelProviderImplementation.ContractProviders
 
             while (!ReliableDictionariesInitialized || !(await GetIsScadaModelImportedIndicator()))
             {
-                //TODO: something smarter
                 await Task.Delay(1000);
             }
 
@@ -259,12 +271,19 @@ namespace SCADA.ModelProviderImplementation.ContractProviders
                     var result = await MeasurementsCache.TryGetValueAsync(gid);
                     if (!result.HasValue)
                     {
-                        string errorMessage = $"{baseLogString} MakeAnalogEntryToMeasurementCache => Gid 0x{gid:X16} does not exist in '{ReliableDictionaryNames.MeasurementsCache}'.";
+                        string errorMessage = $"{baseLogString} MakeDiscreteEntryToMeasurementCache => Gid 0x{gid:X16} does not exist in '{ReliableDictionaryNames.MeasurementsCache}'.";
                         Logger.LogError(errorMessage);
                         throw new Exception(errorMessage);
                     }
 
-                    if(result.Value is DiscreteModbusData discreteCacheItem && discreteCacheItem.Value != data[gid].Value)
+                    if (!(result.Value is DiscreteModbusData discreteCacheItem))
+                    {
+                        string errorMessage = $"{baseLogString} MakeDiscreteEntryToMeasurementCache => Entity with Gid 0x{gid:X16} is not of type: {typeof(DiscreteModbusData)}.";
+                        Logger.LogError(errorMessage);
+                        throw new Exception(errorMessage);
+                    }
+
+                    if (discreteCacheItem.Value != data[gid].Value || discreteCacheItem.CommandOrigin != data[gid].CommandOrigin)
                     {
                         Logger.LogDebug($"{baseLogString} MakeDiscreteEntryToMeasurementCache => Value changed on element with Gid: 0x{discreteCacheItem.MeasurementGid:X16}; Old value: {discreteCacheItem.Value}; new value: {data[gid].Value}");
 
@@ -289,7 +308,6 @@ namespace SCADA.ModelProviderImplementation.ContractProviders
 
             while (!ReliableDictionariesInitialized || !(await GetIsScadaModelImportedIndicator()))
             {
-                //TODO: something smarter
                 await Task.Delay(1000);
             }
 
@@ -357,11 +375,39 @@ namespace SCADA.ModelProviderImplementation.ContractProviders
 
             while (!ReliableDictionariesInitialized || !(await GetIsScadaModelImportedIndicator()))
             {
-                //TODO: something smarter
                 await Task.Delay(1000);
             }
 
             await CommandDescriptionCache.SetAsync(gid, commandDescription);
+        }
+
+        public async Task AddOrUpdateMultipleCommandDescriptions(Dictionary<long, CommandDescription> commandDescriptions)
+        {
+            string verboseMessage = $"{baseLogString} entering AddOrUpdateMultipleCommandDescriptions method.";
+            Logger.LogVerbose(verboseMessage);
+
+            while (!ReliableDictionariesInitialized || !(await GetIsScadaModelImportedIndicator()))
+            {
+                await Task.Delay(1000);
+            }
+
+            var tasks = new List<Task>();
+
+            foreach(var commandDescription in commandDescriptions.Values)
+            {
+                tasks.Add(Task.Run(async () =>
+                {
+                    await CommandDescriptionCache.SetAsync(commandDescription.Gid, commandDescription);
+
+                    string infoMessage = $"{baseLogString} AddOrUpdateMultipleCommandDescriptions => CommandDescription successfuly set to CommandDescriptionCache. Gid: {commandDescription.Gid:X16}, Address: {commandDescription.Address}, Value: {commandDescription.Value}, CommandOrigin: {commandDescription.CommandOrigin}";
+                    Logger.LogInformation(infoMessage);
+                }));
+            }
+
+            Task.WaitAll(tasks.ToArray());
+
+            string message = $"{baseLogString} AddOrUpdateMultipleCommandDescriptions => collection of CommandDescriptions SUCCESSFULLY set to CommandDescriptionCache. collection count: {commandDescriptions.Count}";
+            Logger.LogInformation(message);
         }
 
         public async Task<bool> RemoveCommandDescription(long gid)
@@ -371,7 +417,6 @@ namespace SCADA.ModelProviderImplementation.ContractProviders
 
             while (!ReliableDictionariesInitialized || !(await GetIsScadaModelImportedIndicator()))
             {
-                //TODO: something smarter
                 await Task.Delay(1000);
             }
 
@@ -388,43 +433,51 @@ namespace SCADA.ModelProviderImplementation.ContractProviders
             try
             {
                 ScadaPublication scadaPublication = new ScadaPublication(topic, scadaMessage);
-                await this.publisherClient.Publish(scadaPublication);
-                Logger.LogInformation($"{baseLogString} PublishScadaData => SCADA service published data of topic: {scadaPublication.Topic}");
+                IPublisherContract publisherClient = PublisherClient.CreateClient();
+                await publisherClient.Publish(scadaPublication, MicroserviceNames.ScadaModelProviderService);
+                Logger.LogInformation($"{baseLogString} PublishScadaData => SCADA service published data of topic: {scadaPublication.Topic}, publisher name: {MicroserviceNames.ScadaModelProviderService}");
             }
-            catch (CommunicationObjectFaultedException e)
-            {
-                string message = $"{baseLogString} PublishScadaData => CommunicationObjectFaultedException caught.";
-                Logger.LogError(message, e);
-
-                await Task.Delay(2000);
-
-                this.publisherClient = PublisherClient.CreateClient();
-                await PublishScadaData(topic, scadaMessage);
-                //todo: different logic on multiple rety?
-            }
-
-            //StringBuilder sb = new StringBuilder();
-            //sb.AppendLine($"{baseLogString} PublishScadaData => MeasurementCache content: ");
-
-            //foreach (long gid in MeasurementsCache.Keys)
+            //catch (CommunicationObjectFaultedException e)
             //{
-            //    IModbusData data = MeasurementsCache.TryGetValueAsync();
+            //    string message = $"{baseLogString} PublishScadaData => CommunicationObjectFaultedException caught.";
+            //    Logger.LogError(message, e);
 
-            //    if (data is AnalogModbusData analogModbusData)
-            //    {
-            //        sb.AppendLine($"Analog data line: [gid] 0x{gid:X16}, [value] {analogModbusData.Value}, [alarm] {analogModbusData.Alarm}");
-            //    }
-            //    else if (data is DiscreteModbusData discreteModbusData)
-            //    {
-            //        sb.AppendLine($"Discrete data line: [gid] 0x{gid:X16}, [value] {discreteModbusData.Value}, [alarm] {discreteModbusData.Alarm}");
-            //    }
-            //    else
-            //    {
-            //        sb.AppendLine($"UNKNOWN data type: {data.GetType()}");
-            //    }
+            //    await Task.Delay(2000);
+
+            //    this.publisherClient = PublisherClient.CreateClient();
+            //    await PublishScadaData(topic, scadaMessage);
+            //    //todo: different logic on multiple rety?
             //}
+            catch (Exception e)
+            {
+                string errorMessage = $"{baseLogString} PublishScadaData => exception {e.Message}";
+                Logger.LogError(errorMessage, e);
+                throw e;
+            }
 
-            //Logger.LogDebug(sb.ToString());
+            StringBuilder sb = new StringBuilder();
+            sb.AppendLine($"{baseLogString} PublishScadaData => MeasurementCache content: ");
+
+            var enumerableMeasurementCache = await MeasurementsCache.GetEnumerableDictionaryAsync();
+            foreach (long gid in enumerableMeasurementCache.Keys)
+            {
+                IModbusData data = enumerableMeasurementCache[gid];
+
+                if (data is AnalogModbusData analogModbusData)
+                {
+                    sb.AppendLine($"Analog data line: [gid] 0x{gid:X16}, [value] {analogModbusData.Value}, [alarm] {analogModbusData.Alarm}");
+                }
+                else if (data is DiscreteModbusData discreteModbusData)
+                {
+                    sb.AppendLine($"Discrete data line: [gid] 0x{gid:X16}, [value] {discreteModbusData.Value}, [alarm] {discreteModbusData.Alarm}");
+                }
+                else
+                {
+                    sb.AppendLine($"UNKNOWN data type: {data.GetType()}");
+                }
+            }
+
+            Logger.LogDebug(sb.ToString());
         }
         #endregion Private Methods
     }

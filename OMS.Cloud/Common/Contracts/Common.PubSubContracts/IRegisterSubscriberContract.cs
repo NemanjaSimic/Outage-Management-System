@@ -11,21 +11,21 @@ namespace OMS.Common.PubSubContracts
     public interface IRegisterSubscriberContract : IService
     {
         [OperationContract]
-        Task<bool> SubscribeToTopic(Topic topic, Uri subcriberUri, ServiceType serviceType);
+        Task<bool> SubscribeToTopic(Topic topic, string subcriberServiceName);
 
         [OperationContract]
-        Task<bool> SubscribeToTopics(IEnumerable<Topic> topics, Uri subcriberUri, ServiceType serviceType);
+        Task<bool> SubscribeToTopics(IEnumerable<Topic> topics, string subcriberServiceName);
 
         [OperationContract]
-        Task<HashSet<Topic>> GetAllSubscribedTopics(Uri subcriberUri);
+        Task<HashSet<Topic>> GetAllSubscribedTopics(string subcriberServiceName);
 
         [OperationContract]
-        Task<bool> UnsubscribeFromTopic(Topic topic, Uri subcriberUri);
+        Task<bool> UnsubscribeFromTopic(Topic topic, string subcriberServiceName);
 
         [OperationContract]
-        Task<bool> UnsubscribeFromTopics(IEnumerable<Topic> topics, Uri subcriberUri);
+        Task<bool> UnsubscribeFromTopics(IEnumerable<Topic> topics, string subcriberServiceName);
 
         [OperationContract]
-        Task<bool> UnsubscribeFromAllTopics(Uri subcriberUri);
+        Task<bool> UnsubscribeFromAllTopics(string subcriberServiceName);
     }
 }

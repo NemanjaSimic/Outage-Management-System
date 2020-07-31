@@ -98,7 +98,11 @@ namespace Outage.DataImporter.CIMAdapter.Importer
 		public void Reset()
 		{
 			concreteModel = null;
-			delta = new Delta();
+			delta = new Delta()
+			{
+				DeltaOrigin = DeltaOriginType.ImporterDelta,
+			};
+
 			mridToPositiveGidFromServer = new Dictionary<string, long>();
 			mridsFromConcreteModel = new HashSet<string>();
 			negativeGidToMrid = new Dictionary<long, string>();

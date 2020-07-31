@@ -66,7 +66,8 @@ namespace OMS.Common.Cloud.ReliableCollectionHelpers
             {
                 foreach (var kvp in source)
                 {
-                    await reliableDictionary.AddOrUpdateAsync(tx, kvp.Key, kvp.Value, (key, value) => kvp.Value);
+                    //TODO: do not await one by one but await all
+                    await reliableDictionary.SetAsync(tx, kvp.Key, kvp.Value);
                 }
 
                 await tx.CommitAsync();
@@ -104,7 +105,8 @@ namespace OMS.Common.Cloud.ReliableCollectionHelpers
                 while(await asyncEnumerator.MoveNextAsync(tokenSource.Token))
                 {
                     var currentEntry = asyncEnumerator.Current;
-                    await target.AddOrUpdateAsync(tx, currentEntry.Key, currentEntry.Value, (key, value) => currentEntry.Value);
+                    //TODO: do not await one by one but await all
+                    await target.SetAsync(tx, currentEntry.Key, currentEntry.Value);
                 }
 
                 await tx.CommitAsync();

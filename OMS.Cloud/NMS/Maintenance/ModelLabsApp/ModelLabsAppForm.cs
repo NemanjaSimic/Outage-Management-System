@@ -44,6 +44,7 @@ namespace Outage.DataImporter.ModelLabsApp
 
 		private void InitGUIElements()
 		{
+			buttonBrowseLocation.Enabled = true;
 			buttonConvertCIM.Enabled = false;
             buttonApplyDelta.Enabled = false;
 
@@ -64,12 +65,15 @@ namespace Outage.DataImporter.ModelLabsApp
 			{
 				textBoxCIMFile.Text = openFileDialog.FileName;
 				toolTipControl.SetToolTip(textBoxCIMFile, openFileDialog.FileName);
-                buttonConvertCIM.Enabled = true;
+
+				buttonBrowseLocation.Enabled = true;
+				buttonConvertCIM.Enabled = true;
                 richTextBoxReport.Clear();
 			}
 			else
 			{
-                buttonConvertCIM.Enabled = false;
+				buttonBrowseLocation.Enabled = true;
+				buttonConvertCIM.Enabled = false;
             }
 		}
 
@@ -80,7 +84,8 @@ namespace Outage.DataImporter.ModelLabsApp
 			{
                 if (textBoxCIMFile.Text == string.Empty)
                 {
-                    MessageBox.Show("Must enter CIM/XML file.", "Info", MessageBoxButtons.OK, MessageBoxIcon.Information);
+					this.buttonBrowseLocation.Enabled = true;
+					MessageBox.Show("Must enter CIM/XML file.", "Info", MessageBoxButtons.OK, MessageBoxIcon.Information);
                     Logger.LogInformation("Must enter CIM/XML file.");
                     return;
                 }
@@ -113,6 +118,7 @@ namespace Outage.DataImporter.ModelLabsApp
                 Logger.LogError("An error occurred.", e);
             }
 
+			this.buttonBrowseLocation.Enabled = true;
 			buttonApplyDelta.Enabled = nmsDeltaResult.HasValue;
             textBoxCIMFile.Text = string.Empty;
 		}
@@ -122,6 +128,7 @@ namespace Outage.DataImporter.ModelLabsApp
 			//// APPLY Delta
             if (!nmsDeltaResult.HasValue)
 			{
+				this.buttonBrowseLocation.Enabled = true;
 				MessageBox.Show("No data is imported into delta object.", "Info", MessageBoxButtons.OK, MessageBoxIcon.Information);
 				Logger.LogInformation("No data is imported into delta object.");
 				return;
@@ -139,7 +146,9 @@ namespace Outage.DataImporter.ModelLabsApp
             {
                 MessageBox.Show(string.Format("An error occurred.\n\n{0}", e.Message), "Error", MessageBoxButtons.OK, MessageBoxIcon.Error);
                 Logger.LogError("An error occurred.", e);
-            }            
+            }
+
+			this.buttonBrowseLocation.Enabled = true;
 		}
 
 		
@@ -155,12 +164,14 @@ namespace Outage.DataImporter.ModelLabsApp
 
 		private void buttonConvertCIMOnClick(object sender, EventArgs e)
 		{
+			this.buttonBrowseLocation.Enabled = false;
 			this.buttonConvertCIM.Enabled = false;
 			Dispatcher.CurrentDispatcher.Invoke(ConvertCIMXMLToDMSNetworkModelDelta);
 		}
 
         private void buttonApplyDeltaOnClick(object sender, EventArgs e)
         {
+			this.buttonBrowseLocation.Enabled = false;
 			this.buttonApplyDelta.Enabled = false;
 			Dispatcher.CurrentDispatcher.Invoke(ApplyDMSNetworkModelDelta);
 		}

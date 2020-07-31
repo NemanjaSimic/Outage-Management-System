@@ -17,13 +17,13 @@ namespace OMS.Common.ScadaContracts.DataContracts.ScadaModelPointItems
         [DataMember]
         protected string baseLogString;
 
-        #region Private Properties
+        #region Protected Properties
         private ICloudLogger logger;
         protected ICloudLogger Logger
         {
             get { return logger ?? (logger = CloudLoggerFactory.GetLogger()); }
         }
-        #endregion Private Properties
+        #endregion Protected Properties
 
         #region Public Properties
         [DataMember]
@@ -35,9 +35,16 @@ namespace OMS.Common.ScadaContracts.DataContracts.ScadaModelPointItems
         [DataMember]
         public PointType RegisterType { get; set; }
         [DataMember]
-        public AlarmType Alarm { get; set; }
-        [DataMember]
         public bool Initialized { get; set; }
+
+        [IgnoreDataMember]
+        public AlarmType Alarm
+        {
+            get
+            {
+                return CheckAlarmValue();
+            }
+        }
         #endregion Public Properties
 
         protected ScadaModelPointItem(IAlarmConfigData alarmConfigData)
@@ -45,7 +52,7 @@ namespace OMS.Common.ScadaContracts.DataContracts.ScadaModelPointItems
             this.alarmConfigData = alarmConfigData;
         }
 
-        public abstract bool SetAlarms();
+        protected abstract AlarmType CheckAlarmValue();
 
         #region IClonable
 

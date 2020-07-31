@@ -23,15 +23,7 @@ namespace TelventDMS.Services.NetworkModelService.TestClient.TestsUI
 		}
 		#endregion Private Properties
 
-		//private readonly NetworkModelGdaClient nmsClient;
-
-		public TestGda()
-		{
-			//nmsClient = NetworkModelGdaClient.CreateClient();
-		}
-
 		#region GDAQueryService
-
 		public async Task<ResourceDescription> GetValues(long globalId, List<ModelCode> properties)
 		{
 			string message = "Getting values method started.";

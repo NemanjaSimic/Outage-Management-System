@@ -7,7 +7,6 @@ using OMS.Common.WcfClient.SCADA;
 using System;
 using System.Collections.Generic;
 using System.Fabric;
-using System.ServiceModel;
 using System.Threading.Tasks;
 
 namespace SCADA.AcquisitionImplementation
@@ -15,10 +14,9 @@ namespace SCADA.AcquisitionImplementation
     public class AcquisitionCycle
     {
         private readonly string baseLogString;
-        private readonly ServiceContext context;
 
-        private IReadCommandEnqueuerContract commandEnqueuerClient;
-        private IScadaModelReadAccessContract readAccessClient;
+        //private IReadCommandEnqueuerContract commandEnqueuerClient;
+        //private IScadaModelReadAccessContract readAccessClient;
 
         #region Private Properties
         private ICloudLogger logger;
@@ -28,13 +26,12 @@ namespace SCADA.AcquisitionImplementation
         }
         #endregion Private Properties
 
-        public AcquisitionCycle(ServiceContext context)
+        public AcquisitionCycle()
         {
             this.baseLogString = $"{this.GetType()} [{this.GetHashCode()}] =>{Environment.NewLine}";
-            this.context = context;
 
-            this.commandEnqueuerClient = ReadCommandEnqueuerClient.CreateClient();
-            this.readAccessClient = ScadaModelReadAccessClient.CreateClient();
+            //this.commandEnqueuerClient = ReadCommandEnqueuerClient.CreateClient();
+            //this.readAccessClient = ScadaModelReadAccessClient.CreateClient();
         }
 
         public async Task Start(bool isRetry = false)
@@ -45,10 +42,13 @@ namespace SCADA.AcquisitionImplementation
 
             try
             {
+                IReadCommandEnqueuerContract commandEnqueuerClient = ReadCommandEnqueuerClient.CreateClient();
+                IScadaModelReadAccessContract readAccessClient = ScadaModelReadAccessClient.CreateClient();
+
                 verboseMessage = $"{baseLogString} Start => Trying to get AddressToGidMap.";
                 Logger.LogVerbose(verboseMessage);
 
-                Dictionary<short, Dictionary<ushort, long>> addressToGidMap = await this.readAccessClient.GetAddressToGidMap();
+                Dictionary<short, Dictionary<ushort, long>> addressToGidMap = await readAccessClient.GetAddressToGidMap();
 
                 verboseMessage = $"{baseLogString} Start => AddressToGidMap received, Count: {addressToGidMap.Count}.";
                 Logger.LogVerbose(verboseMessage);
@@ -71,16 +71,16 @@ namespace SCADA.AcquisitionImplementation
                     }
                 }
             }
-            catch(CommunicationObjectFaultedException e)
-            {
-                string message = $"{baseLogString} Start => CommunicationObjectFaultedException caught.";
-                Logger.LogError(message, e);
+            //catch(CommunicationObjectFaultedException e)
+            //{
+            //    string message = $"{baseLogString} Start => CommunicationObjectFaultedException caught.";
+            //    Logger.LogError(message, e);
 
-                this.commandEnqueuerClient = ReadCommandEnqueuerClient.CreateClient();
-                this.readAccessClient = ScadaModelReadAccessClient.CreateClient();
-                await Start(true);
-                //todo: different logic on multiple rety?
-            }
+            //    this.commandEnqueuerClient = ReadCommandEnqueuerClient.CreateClient();
+            //    this.readAccessClient = ScadaModelReadAccessClient.CreateClient();
+            //    await Start(true);
+            //    //todo: different logic on multiple rety?
+            //}
             catch (Exception e)
             {
                 string message = $"{baseLogString} Start => Exception caught.";

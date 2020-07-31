@@ -13,7 +13,6 @@
 
         //TMS
         public const string TransactionManagerService = "TransactionManagerService";
-        public const string TransactionActorService = "TransactionActorService";
 
         //PUB_SUB
         public const string PubSubService = "PubSubService";

@@ -10,12 +10,27 @@ using OMS.Common.Cloud;
 
 namespace OMS.Common.NmsContracts.GDA
 {
+	[DataContract]
+	public enum DeltaOriginType : byte
+    {
+		[EnumMember]
+		ImporterDelta = 1,
 
-    public enum DeltaOpType : byte 
+		[EnumMember]
+		DatabaseDelta = 2,
+    }
+
+	[DataContract]
+	public enum DeltaOpType : byte 
 	{ 
-		Insert = 0, 
-		Update = 1, 
-		Delete = 2 
+		[EnumMember]
+		Insert = 0,
+
+		[EnumMember]
+		Update = 1,
+
+		[EnumMember]
+		Delete = 2,
 	}
 
 	[DataContract]	
@@ -118,6 +133,9 @@ namespace OMS.Common.NmsContracts.GDA
 			get { return id; }
 			set { id = value; }
 		}		
+
+		[DataMember]
+		public DeltaOriginType DeltaOrigin { get; set; }
 
 		[DataMember]		
 		public List<ResourceDescription> InsertOperations

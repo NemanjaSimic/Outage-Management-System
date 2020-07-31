@@ -20,32 +20,29 @@ namespace OMS.Common.WcfClient.SCADA
         {
         }
 
-        public static ScadaIntegrityUpdateClient CreateClient(Uri serviceUri = null)
+        public static ScadaIntegrityUpdateClient CreateClient()
         {
             ClientFactory factory = new ClientFactory();
-            ServicePartitionKey servicePartition = new ServicePartitionKey(0);
+            return factory.CreateClient<ScadaIntegrityUpdateClient, IScadaIntegrityUpdateContract>(microserviceName);
+        }
 
-            if (serviceUri == null)
-            {
-                return factory.CreateClient<ScadaIntegrityUpdateClient, IScadaIntegrityUpdateContract>(microserviceName, servicePartition);
-            }
-            else
-            {
-                return factory.CreateClient<ScadaIntegrityUpdateClient, IScadaIntegrityUpdateContract>(serviceUri, servicePartition);
-            }
+        public static ScadaIntegrityUpdateClient CreateClient(Uri serviceUri, ServicePartitionKey servicePartitionKey)
+        {
+            ClientFactory factory = new ClientFactory();
+            return factory.CreateClient<ScadaIntegrityUpdateClient, IScadaIntegrityUpdateContract>(serviceUri, servicePartitionKey);
         }
 
         #region IScadaIntegrityUpdateContract
         public Task<Dictionary<Topic, ScadaPublication>> GetIntegrityUpdate()
         {
-            return MethodWrapperAsync<Dictionary<Topic, ScadaPublication>>("GetIntegrityUpdate", new object[0]);
-            //return InvokeWithRetryAsync(client => client.Channel.GetIntegrityUpdate());
+            //return MethodWrapperAsync<Dictionary<Topic, ScadaPublication>>("GetIntegrityUpdate", new object[0]);
+            return InvokeWithRetryAsync(client => client.Channel.GetIntegrityUpdate());
         }
 
         public Task<ScadaPublication> GetIntegrityUpdateForSpecificTopic(Topic topic)
         {
-            return MethodWrapperAsync<ScadaPublication>("GetIntegrityUpdateForSpecificTopic", new object[1] { topic });
-            //return InvokeWithRetryAsync(client => client.Channel.GetIntegrityUpdateForSpecificTopic(topic));
+            //return MethodWrapperAsync<ScadaPublication>("GetIntegrityUpdateForSpecificTopic", new object[1] { topic });
+            return InvokeWithRetryAsync(client => client.Channel.GetIntegrityUpdateForSpecificTopic(topic));
         }
         #endregion
     }

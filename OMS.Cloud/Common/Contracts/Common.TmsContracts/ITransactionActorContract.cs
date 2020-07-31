@@ -2,7 +2,7 @@
 using System.ServiceModel;
 using System.Threading.Tasks;
 
-namespace OMS.Common.DistributedTransactionContracts
+namespace OMS.Common.TmsContracts
 {
     [ServiceContract]
     public interface ITransactionActorContract : IService

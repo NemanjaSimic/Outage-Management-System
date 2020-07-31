@@ -14,8 +14,6 @@ namespace OMS.Common.Cloud.Logger
 
         private readonly string sourceName;
         private readonly IEnumerable<ILogger> serilogLoggers;
-        //private readonly ILogger sharedSerilogLogger;
-        //private readonly ILogger serviceSerilogLogger;
 
         private const string logLevelSettingKey = "logLevelSettingKey";
         private const string logFilePathSettingKey = "logFilePathSettingKey";
@@ -28,9 +26,6 @@ namespace OMS.Common.Cloud.Logger
             var sharedLogFilePath = GetSharedLogFilePath();
             var serviceLogFilePath = GetServiceLogFilePath(this.sourceName);
             var logLevel = GetLogLevel();
-
-            //TODO istraziti
-            //var logger = new LoggerConfiguration().ReadFrom.AppSettings().CreateLogger();
 
             var sharedSerilogLogger = new LoggerConfiguration().MinimumLevel.Verbose()
                                                                .WriteTo.RollingFile(pathFormat: sharedLogFilePath,

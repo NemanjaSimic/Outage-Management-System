@@ -45,10 +45,11 @@ namespace OMS.Common.Cloud.Logger
                 }
             }
 
+            //values of public and static fields, from class LoggerSourceNames, of string type, grouped into hashset<string>
             HashSet<string> loggerSourceNames = typeof(LoggerSourceNames).GetFields(BindingFlags.Public | BindingFlags.Static)
                                                                          .Where(f => f.FieldType == typeof(string))
                                                                          .Select(f => (string)f.GetValue(null))
-                                                                         .ToHashSet<string>();
+                                                                         .ToHashSet();
             if (!loggerSourceNames.Contains(sourceName))
             {
                 sourceName = "Unknown";

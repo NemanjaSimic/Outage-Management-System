@@ -56,16 +56,17 @@ namespace SCADA.FunctionExecutorImplementation.CommandEnqueuers
                 throw new ArgumentException(message);
             }
 
-            //TODO: while treba da predje u IF i da se read commanda ne upise u queue ako je uslov zadovoljen -> postojanje komandi u mu redu znaci da se desio commit distribuirane transakcije, te je w komanda izdata nad starim modelom 
-            while (modelUpdateCommandQueue.PeekMessage() != null)
+            if (modelUpdateCommandQueue.PeekMessage() != null)
             {
-                verboseMessage = $"{baseLogString} EnqueueWriteCommand => waiting for '{CloudStorageQueueNames.ModelUpdateCommandQueue}' queue to be empty.";
-                Logger.LogVerbose(verboseMessage);
-                await Task.Delay(1000);
+                verboseMessage = $"{baseLogString} EnqueueWriteCommand => '{CloudStorageQueueNames.ModelUpdateCommandQueue}' queue is not empty.";
+                Logger.LogDebug(verboseMessage);
+
+                return false;
             }
 
             try
             {
+                //KEY LOGIC
                 await this.writeCommandQueue.AddMessageAsync(new CloudQueueMessage(Serialization.ObjectToByteArray(modbusFunction)));
                 success = true;
 

@@ -6,8 +6,8 @@ namespace OMS.Common.NmsContracts.GDA
 {
 	public enum ResultType : byte
 	{
-		Succeeded = 0,	
-		Failed = 1	
+		Succeeded = 1,	
+		Failed = 2	
 	}
 
 	[DataContract]
@@ -20,8 +20,7 @@ namespace OMS.Common.NmsContracts.GDA
 		public UpdateResult()			
 		{
 			globalIdPairs = new Dictionary<long, long>();
-			message = string.Empty;
-			result = ResultType.Succeeded;			
+			message = string.Empty;		
 		}
 
 		[DataMember]

@@ -7,6 +7,8 @@ using Microsoft.ServiceFabric.Services.Communication.Runtime;
 using Microsoft.ServiceFabric.Services.Communication.Wcf;
 using Microsoft.ServiceFabric.Services.Communication.Wcf.Runtime;
 using Microsoft.ServiceFabric.Services.Runtime;
+using Microsoft.WindowsAzure.Storage.Queue;
+using OMS.Common.Cloud.AzureStorageHelpers;
 using OMS.Common.Cloud.Logger;
 using OMS.Common.Cloud.Names;
 using OMS.Common.SCADA;
@@ -43,6 +45,14 @@ namespace SCADA.FunctionExecutorService
 
             try
             {
+                //CloudQueueHelper.TryGetQueue(CloudStorageQueueNames.ReadCommandQueue, out CloudQueue readCommandQueue);
+                //CloudQueueHelper.TryGetQueue(CloudStorageQueueNames.WriteCommandQueue, out CloudQueue writeCommandQueue);
+                //CloudQueueHelper.TryGetQueue(CloudStorageQueueNames.ModelUpdateCommandQueue, out CloudQueue modelUpdateCommandQueue);
+
+                //this.readCommandEnqueuer = new ReadCommandEnqueuer(readCommandQueue, writeCommandQueue, modelUpdateCommandQueue);
+                //this.writeCommandEnqueuer = new WriteCommandEnqueuer(readCommandQueue, writeCommandQueue, modelUpdateCommandQueue);
+                //this.modelUpdateCommandEnqueuer = new ModelUpdateCommandEnqueuer(readCommandQueue, writeCommandQueue, modelUpdateCommandQueue);
+
                 this.readCommandEnqueuer = new ReadCommandEnqueuer();
                 this.writeCommandEnqueuer = new WriteCommandEnqueuer();
                 this.modelUpdateCommandEnqueuer = new ModelUpdateCommandEnqueuer();

@@ -4,7 +4,7 @@ using System.Collections.Generic;
 
 namespace NMS.GdaImplementation.DbModel
 {
-    public class NetworkDataModelDocument
+    public class NetworkModelsDocument
     {
         public long Id { get; set; }
 

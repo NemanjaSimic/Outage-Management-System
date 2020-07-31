@@ -5056,9 +5056,9 @@
 		<ftn:IdentifiedObject.name>AN_3</ftn:IdentifiedObject.name>
 	</cim:Analog>
 	<!-- NO SCADA -->
-	<!--
+	<!-- MERENJE AN_4 ostavljeno radi zadovoljenja forme sukcesivnih adresa -->
 	<cim:Analog rdf:ID="AN_4">
-		<cim:Analog.scalingFactor>1</cim:Analog.scalingFactor>
+	    <cim:Analog.scalingFactor>1</cim:Analog.scalingFactor>
 		<cim:Analog.deviation>0</cim:Analog.deviation>
 		<cim:Analog.currentValue>1100</cim:Analog.currentValue>
 		<cim:Analog.maxValue>2000</cim:Analog.maxValue>
@@ -5067,12 +5067,11 @@
 		<cim:Analog.normalValue>1100</cim:Analog.normalValue>
 		<cim:Measurement.address>4</cim:Measurement.address>
 		<cim:Measurement.isInput>false</cim:Measurement.isInput>
-		<cim:Measurement.Terminal rdf:resource="#TM_24"/>
+		<cim:Measurement.Terminal rdf:resource="#TM_21"/>
 		<cim:IdentifiedObject.description> </cim:IdentifiedObject.description>
 		<cim:IdentifiedObject.mRID>AN_4</cim:IdentifiedObject.mRID>
 		<ftn:IdentifiedObject.name>AN_4</ftn:IdentifiedObject.name>
-	</cim:Analog>
-	-->
+	</cim:Analog> 
 	<cim:Analog rdf:ID="AN_5">
 		<cim:Analog.scalingFactor>1</cim:Analog.scalingFactor>
 		<cim:Analog.deviation>0</cim:Analog.deviation>

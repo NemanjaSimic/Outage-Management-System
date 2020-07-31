@@ -8,8 +8,6 @@ namespace OMS.Common.ScadaContracts.DataContracts.ScadaModelPointItems
     [DataContract]
     public class DiscretePointItem : ScadaModelPointItem, IDiscretePointItem
     {
-        private ushort currentValue;
-
         public DiscretePointItem(IAlarmConfigData alarmConfigData)
             : base(alarmConfigData)
         {
@@ -23,72 +21,46 @@ namespace OMS.Common.ScadaContracts.DataContracts.ScadaModelPointItems
         [DataMember]
         public ushort NormalValue { get; set; }
         [DataMember]
-        public ushort CurrentValue
-        {
-            get { return currentValue; }
-            set
-            {
-                currentValue = value;
-                SetAlarms();
-            }
-        }
-
+        public ushort CurrentValue { get; set; }
         [DataMember]
         public ushort AbnormalValue { get; set; }
         [DataMember]
         public DiscreteMeasurementType DiscreteType { get; set; }
 
-        public override bool SetAlarms()
+        protected override AlarmType CheckAlarmValue()
         {
             if (!Initialized)
             {
-                return false;
+                return AlarmType.NO_ALARM;
             }
-
-            bool alarmChanged = false;
-            AlarmType currentAlarm = Alarm;
 
             //ALARMS FOR DIGITAL VALUES
-            if (RegisterType == PointType.DIGITAL_INPUT || RegisterType == PointType.DIGITAL_OUTPUT)
-            {
-                //VALUE IS INVALID
-                if (CurrentValue < MinValue || CurrentValue > MaxValue)
-                {
-                    Alarm = AlarmType.REASONABILITY_FAILURE;
-                    if (currentAlarm != Alarm)
-                    {
-                        alarmChanged = true;
-                    }
-
-                    //TODO: maybe throw new Exception("Invalid value.");
-                }
-                //VALUE IS NOT A NORMAL VALUE -> ABNORMAL ALARM
-                else if (CurrentValue != NormalValue && DiscreteType == DiscreteMeasurementType.SWITCH_STATUS)
-                {
-                    Alarm = AlarmType.ABNORMAL_VALUE;
-                    if (currentAlarm != Alarm)
-                    {
-                        alarmChanged = true;
-                    }
-                }
-                //VALUE IS NORMAL VALUE - NO ALARM
-                else
-                {
-                    Alarm = AlarmType.NO_ALARM;
-                    if (currentAlarm != Alarm)
-                    {
-                        alarmChanged = true;
-                    }
-                }
-            }
-            else
+            if (RegisterType != PointType.DIGITAL_INPUT && RegisterType != PointType.DIGITAL_OUTPUT)
             {
                 string errorMessage = $"{baseLogString} SetAlarms => PointItem [Gid: 0x{Gid:X16}, Address: {Address}] RegisterType value is invalid. Value: {RegisterType}";
                 Logger.LogError(errorMessage);
                 throw new Exception(errorMessage);
             }
 
-            return alarmChanged;
+            AlarmType currentAlarm;
+
+            //VALUE IS INVALID
+            if (CurrentValue < MinValue || CurrentValue > MaxValue)
+            {
+                currentAlarm = AlarmType.REASONABILITY_FAILURE;
+            }
+            //VALUE IS NOT A NORMAL VALUE -> ABNORMAL ALARM
+            else if (CurrentValue != NormalValue && DiscreteType == DiscreteMeasurementType.SWITCH_STATUS)
+            {
+                currentAlarm = AlarmType.ABNORMAL_VALUE;
+            }
+            //VALUE IS NORMAL VALUE - NO ALARM
+            else
+            {
+                currentAlarm = AlarmType.NO_ALARM;
+            }
+
+            return currentAlarm;
         }
 
         #region IClonable

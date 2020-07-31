@@ -131,7 +131,7 @@ namespace OMS.Common.Cloud
         OUTAGE_SIMULATOR,
 
         [EnumMember]
-        OTHER_COMMAND, //TODO: rethink of name, add others like CE ili tako nesto
+        UNKNOWN_ORIGIN,
     }
 
     //OMS

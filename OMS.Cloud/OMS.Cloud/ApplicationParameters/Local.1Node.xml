@@ -22,6 +22,9 @@
     <Parameter Name="TopologyProvider_PartitionCount" Value="1" />
     <Parameter Name="TopologyProvider_MinReplicaSetSize" Value="1" />
     <Parameter Name="TopologyProvider_TargetReplicaSetSize" Value="1" />
+    <Parameter Name="TMS.TransactionManagerService_PartitionCount" Value="1" />
+    <Parameter Name="TMS.TransactionManagerService_MinReplicaSetSize" Value="1" />
+    <Parameter Name="TMS.TransactionManagerService_TargetReplicaSetSize" Value="1" />
     <Parameter Name="TestService_InstanceCount" Value="1" />
     <Parameter Name="PubSubService_PartitionCount" Value="1" />
     <Parameter Name="PubSubService_MinReplicaSetSize" Value="1" />

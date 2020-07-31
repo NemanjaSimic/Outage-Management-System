@@ -9,7 +9,7 @@ namespace OMS.Common.ScadaContracts.DataContracts.ScadaModelPointItems
         ushort Address { get; set; }
         string Name { get; set; }
         PointType RegisterType { get; set; }
-        AlarmType Alarm { get; set; }
+        AlarmType Alarm { get; }
         bool Initialized { get; set; }
 
         IScadaModelPointItem Clone();
