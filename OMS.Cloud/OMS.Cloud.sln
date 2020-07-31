@@ -51,8 +51,6 @@ Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "NMS.DataModel", "NMS\DataMo
 EndProject
 Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "NMS.GdaImplementation", "NMS\NMS.GdaImplementation\NMS.GdaImplementation.csproj", "{BA3D0EA9-5697-412C-B9A3-B71E988709CE}"
 EndProject
-Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "TestService", "TestService\TestService.csproj", "{1CBAD4E4-7C41-4273-9B8B-70CC97EFEE4A}"
-EndProject
 Project("{2150E333-8FDC-42A3-9474-1A3956D46DE8}") = "Maintenance", "Maintenance", "{DF04B40F-DF58-4085-A6E6-AB5C4B38D8DA}"
 EndProject
 Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "NMS.GdaService", "NMS\NMS.GdaService\NMS.GdaService.csproj", "{4CC0B3F4-8E22-4AEB-82ED-F8F67DAA0699}"
@@ -116,12 +114,12 @@ EndProject
 Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "MeasurementProviderService", "CE\MeasurementProvider\MeasurementProviderService\MeasurementProviderService.csproj", "{997DADCA-9C9A-4852-A5FB-6FEF1CE4682E}"
 EndProject
 Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "MeasurementProviderImplementation", "CE\MeasurementProvider\MeasurementProviderImplementation\MeasurementProviderImplementation\MeasurementProviderImplementation.csproj", "{8FF00246-6BBF-4CCE-AE04-0325DCCF4444}"
+EndProject
 Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "TMS.TransactionManagerImplementation", "TMS\TMS.TransactionManagerImplementation\TMS.TransactionManagerImplementation.csproj", "{E055B5EE-A711-4163-90F8-88B27DD47FC7}"
 EndProject
 Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "TMS.TransactionManagerService", "TMS\TMS.TransactionManagerService\TMS.TransactionManagerService.csproj", "{E48F763C-558F-47ED-A78C-53BC43F172B4}"
 EndProject
 Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "Common.TmsContracts", "Common\Contracts\Common.TmsContracts\Common.TmsContracts.csproj", "{A07D94C2-40EF-48DB-B828-7E53E7F5A372}"
-
 EndProject
 Global
 	GlobalSection(SolutionConfigurationPlatforms) = preSolution
@@ -307,14 +305,6 @@ Global
 		{BA3D0EA9-5697-412C-B9A3-B71E988709CE}.Release|x64.Build.0 = Release|Any CPU
 		{BA3D0EA9-5697-412C-B9A3-B71E988709CE}.Release|x86.ActiveCfg = Release|Any CPU
 		{BA3D0EA9-5697-412C-B9A3-B71E988709CE}.Release|x86.Build.0 = Release|Any CPU
-		{1CBAD4E4-7C41-4273-9B8B-70CC97EFEE4A}.Debug|Any CPU.ActiveCfg = Debug|x64
-		{1CBAD4E4-7C41-4273-9B8B-70CC97EFEE4A}.Debug|x64.ActiveCfg = Debug|x64
-		{1CBAD4E4-7C41-4273-9B8B-70CC97EFEE4A}.Debug|x64.Build.0 = Debug|x64
-		{1CBAD4E4-7C41-4273-9B8B-70CC97EFEE4A}.Debug|x86.ActiveCfg = Debug|x64
-		{1CBAD4E4-7C41-4273-9B8B-70CC97EFEE4A}.Release|Any CPU.ActiveCfg = Release|x64
-		{1CBAD4E4-7C41-4273-9B8B-70CC97EFEE4A}.Release|x64.ActiveCfg = Release|x64
-		{1CBAD4E4-7C41-4273-9B8B-70CC97EFEE4A}.Release|x64.Build.0 = Release|x64
-		{1CBAD4E4-7C41-4273-9B8B-70CC97EFEE4A}.Release|x86.ActiveCfg = Release|x64
 		{4CC0B3F4-8E22-4AEB-82ED-F8F67DAA0699}.Debug|Any CPU.ActiveCfg = Debug|x64
 		{4CC0B3F4-8E22-4AEB-82ED-F8F67DAA0699}.Debug|x64.ActiveCfg = Debug|x64
 		{4CC0B3F4-8E22-4AEB-82ED-F8F67DAA0699}.Debug|x64.Build.0 = Debug|x64

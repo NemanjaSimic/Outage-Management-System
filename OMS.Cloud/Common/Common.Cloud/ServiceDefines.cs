@@ -72,7 +72,7 @@ namespace OMS.Common.Cloud
                 //TODO: WEB_ADAPTER
 
                 //TEST
-                { MicroserviceNames.TestService,                    ServiceType.STATELESS_SERVICE   },
+                //{ MicroserviceNames.TestService,                    ServiceType.STATELESS_SERVICE   },
             };
 
             //TODO: moguce ucitavanje iz konfiguracije
@@ -99,7 +99,7 @@ namespace OMS.Common.Cloud
 
                 //TODO: WEB_ADAPTER
 
-                { MicroserviceNames.TestService,                    new Uri("fabric:/OMS.Cloud/TestService")                    },
+                //{ MicroserviceNames.TestService,                    new Uri("fabric:/OMS.Cloud/TestService")                    },
             };
         }
     }

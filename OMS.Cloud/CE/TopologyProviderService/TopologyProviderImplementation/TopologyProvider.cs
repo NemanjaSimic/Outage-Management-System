@@ -8,6 +8,7 @@ using Microsoft.ServiceFabric.Data;
 using Microsoft.ServiceFabric.Data.Notifications;
 using OMS.Common.Cloud;
 using OMS.Common.Cloud.Logger;
+using OMS.Common.Cloud.Names;
 using OMS.Common.Cloud.ReliableCollectionHelpers;
 using OMS.Common.PubSubContracts;
 using OMS.Common.WcfClient.CE;
@@ -429,7 +430,7 @@ namespace TopologyProviderImplementation
             CalculationEnginePublication publication = new CalculationEnginePublication(Topic.OMS_MODEL, message);
             try
             {
-                await publisherClient.Publish(publication);
+                await publisherClient.Publish(publication, MicroserviceNames.TopologyProviderService);
                 Logger.LogInformation($"{baseLogString} PublishOMSModel => Topology provider service published data of topic: {publication.Topic}");
             }
             catch (Exception e)
@@ -453,7 +454,7 @@ namespace TopologyProviderImplementation
             CalculationEnginePublication publication = new CalculationEnginePublication(Topic.TOPOLOGY, message);
             try
             {
-                await publisherClient.Publish(publication);
+                await publisherClient.Publish(publication, MicroserviceNames.TopologyProviderService);
                 Logger.LogInformation($"{baseLogString} PublishUIModel => Topology provider service published data of topic: {publication.Topic}");
             }
             catch (Exception e)

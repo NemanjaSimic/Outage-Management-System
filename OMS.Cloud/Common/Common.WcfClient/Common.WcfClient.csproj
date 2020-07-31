@@ -165,7 +165,7 @@
       <Project>{D8B669F1-9B73-4F6A-9AFC-53AF4B0272AC}</Project>
       <Name>Common.CeContracts</Name>
     </ProjectReference>
-    <ProjectReference Include="..\Contracts\Common.DistributedTransactionContracts\Common.DistributedTransactionContracts.csproj">
+    <ProjectReference Include="..\Contracts\Common.TmsContracts\Common.TmsContracts.csproj">
       <Project>{A07D94C2-40EF-48DB-B828-7E53E7F5A372}</Project>
       <Name>Common.DistributedTransactionContracts</Name>
     </ProjectReference>
