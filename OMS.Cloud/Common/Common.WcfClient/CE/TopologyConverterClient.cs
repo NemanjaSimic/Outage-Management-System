@@ -12,7 +12,7 @@ namespace OMS.Common.WcfClient.CE
 {
 	public class TopologyConverterClient : WcfSeviceFabricClientBase<ITopologyConverterContract>, ITopologyConverterContract
 	{
-		private static readonly string microserviceName = MicroserviceNames.TopologyConverterService;
+		private static readonly string microserviceName = MicroserviceNames.TopologyProviderService;
 		private static readonly string listenerName = EndpointNames.TopologyConverterServiceEndpoint;
 
 		public TopologyConverterClient(WcfCommunicationClientFactory<ITopologyConverterContract> clientFactory, Uri serviceUri, ServicePartitionKey servicePartition)
@@ -21,29 +21,26 @@ namespace OMS.Common.WcfClient.CE
 
 		}
 
-		public static TopologyConverterClient CreateClient(Uri serviceUri = null)
+		public static TopologyConverterClient CreateClient()
 		{
 			ClientFactory factory = new ClientFactory();
-			ServicePartitionKey servicePartition = ServicePartitionKey.Singleton;
+			return factory.CreateClient<TopologyConverterClient, ITopologyConverterContract>(microserviceName);
+		}
 
-			if (serviceUri == null)
-			{
-				return factory.CreateClient<TopologyConverterClient, ITopologyConverterContract>(microserviceName, servicePartition);
-			}
-			else
-			{
-				return factory.CreateClient<TopologyConverterClient, ITopologyConverterContract>(serviceUri, servicePartition);
-			}
+		public static TopologyConverterClient CreateClient(Uri serviceUri, ServicePartitionKey servicePartitionKey)
+		{
+			ClientFactory factory = new ClientFactory();
+			return factory.CreateClient<TopologyConverterClient, ITopologyConverterContract>(serviceUri, servicePartitionKey);
 		}
 
 		public Task<IOutageTopologyModel> ConvertTopologyToOMSModel(ITopology topology)
 		{
-			return MethodWrapperAsync<IOutageTopologyModel>("ConvertTopologyToOMSModel", new object[1] { topology});
+            return InvokeWithRetryAsync(client => client.Channel.ConvertTopologyToOMSModel(topology));
 		}
 
 		public Task<UIModel> ConvertTopologyToUIModel(ITopology topology)
 		{
-			return MethodWrapperAsync<UIModel>("ConvertTopologyToUIModel", new object[1] { topology });
+            return InvokeWithRetryAsync(client => client.Channel.ConvertTopologyToUIModel(topology));
 		}
 	}
 }

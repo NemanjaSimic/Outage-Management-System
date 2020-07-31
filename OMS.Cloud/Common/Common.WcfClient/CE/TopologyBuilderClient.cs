@@ -18,23 +18,21 @@ namespace OMS.Common.WcfClient.CE
 
 		}
 
-		public static TopologyBuilderClient CreateClient(Uri serviceUri = null)
+		public static TopologyBuilderClient CreateClient()
 		{
 			ClientFactory factory = new ClientFactory();
-			ServicePartitionKey servicePartition = ServicePartitionKey.Singleton;
-
-			if (serviceUri == null)
-			{
-				return factory.CreateClient<TopologyBuilderClient, ITopologyBuilderContract>(microserviceName, servicePartition);
-			}
-			else
-			{
-				return factory.CreateClient<TopologyBuilderClient, ITopologyBuilderContract>(serviceUri, servicePartition);
-			}
+			return factory.CreateClient<TopologyBuilderClient, ITopologyBuilderContract>(microserviceName);
 		}
+
+		public static TopologyBuilderClient CreateClient(Uri serviceUri, ServicePartitionKey servicePartitionKey)
+		{
+			ClientFactory factory = new ClientFactory();
+			return factory.CreateClient<TopologyBuilderClient, ITopologyBuilderContract>(serviceUri, servicePartitionKey);
+		}
+
 		public Task<ITopology> CreateGraphTopology(long firstElementGid)
 		{
-			return MethodWrapperAsync<ITopology>("CreateGraphTopology", new object[1] { firstElementGid});
+            return InvokeWithRetryAsync(client => client.Channel.CreateGraphTopology(firstElementGid));
 		}
 	}
 }

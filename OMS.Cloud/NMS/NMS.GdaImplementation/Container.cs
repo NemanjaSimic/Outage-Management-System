@@ -196,6 +196,11 @@ namespace NMS.GdaImplementation
                         io = new Analog(globalId);
                         break;
                     }
+                case DMSType.SYNCHRONOUSMACHINE:
+                    {
+                        io = new SynchronousMachine(globalId);
+                        break;
+                    }
                 default:
                     {
                         string message = String.Format("Failed to create entity because specified type ({0}) is not supported.", type);

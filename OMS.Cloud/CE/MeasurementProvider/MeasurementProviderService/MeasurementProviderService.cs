@@ -137,7 +137,7 @@ namespace MeasurementProviderService
 						}
 						else
 						{
-							await StateManager.GetOrAddAsync<IReliableDictionary<short, Dictionary<long, AnalogMeasurement>>>(tx, ReliableDictionaryNames.DiscreteMeasurementsCache);
+							await StateManager.GetOrAddAsync<IReliableDictionary<short, Dictionary<long, AnalogMeasurement>>>(tx, ReliableDictionaryNames.AnalogMeasurementsCache);
 							await tx.CommitAsync();
 						}
 					}
@@ -155,7 +155,7 @@ namespace MeasurementProviderService
 						}
 						else
 						{
-							await StateManager.GetOrAddAsync<IReliableDictionary<short, Dictionary<long, DiscreteMeasurement>>>(tx, ReliableDictionaryNames.TopologyCacheUI);
+							await StateManager.GetOrAddAsync<IReliableDictionary<short, Dictionary<long, DiscreteMeasurement>>>(tx, ReliableDictionaryNames.DiscreteMeasurementsCache);
 							await tx.CommitAsync();
 						}
 					}

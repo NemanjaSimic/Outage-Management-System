@@ -21,11 +21,8 @@
         public const string ModelProviderService = "ModelProviderService";
         public const string TopologyProviderService = "TopologyProviderService";
         public const string MeasurementProviderService = "MeasurementProviderService";
-        public const string MeasurementMapService = "MeasurementMapService";
         public const string LoadFlowService = "LoadFlowService";
         public const string TopologyBuilderService = "TopologyBuilderService";
-        public const string TopologyConverterService = "TopologyConverterService";
-        public const string SwitchStatusCommandingService = "SwitchStatusCommandingService";
 
     }
 }

@@ -19,67 +19,56 @@ namespace OMS.Common.WcfClient.CE
 
 		}
 
-		public static ModelProviderClient CreateClient(Uri serviceUri = null)
+		public static ModelProviderClient CreateClient()
 		{
 			ClientFactory factory = new ClientFactory();
-			ServicePartitionKey servicePartition = ServicePartitionKey.Singleton;
+			return factory.CreateClient<ModelProviderClient, IModelProviderContract>(microserviceName);
+		}
 
-			if (serviceUri == null)
-			{
-				return factory.CreateClient<ModelProviderClient, IModelProviderContract>(microserviceName, servicePartition);
-			}
-			else
-			{
-				return factory.CreateClient<ModelProviderClient, IModelProviderContract>(serviceUri, servicePartition);
-			}
+		public static ModelProviderClient CreateClient(Uri serviceUri, ServicePartitionKey servicePartitionKey)
+		{
+			ClientFactory factory = new ClientFactory();
+			return factory.CreateClient<ModelProviderClient, IModelProviderContract>(serviceUri, servicePartitionKey);
 		}
 
 		public Task CommitTransaction()
 		{
-			return MethodWrapperAsync("CommitTransaction", new object[0]);
-			//return InvokeWithRetryAsync(client => client.Channel.CommitTransaction());
+			return InvokeWithRetryAsync(client => client.Channel.CommitTransaction());
 		}
 
 		public Task<Dictionary<long, List<long>>> GetConnections()
 		{
-			return MethodWrapperAsync<Dictionary<long, List<long>>>("GetConnections", new object[0]);
-			//return InvokeWithRetryAsync(client => client.Channel.GetConnections());
+			return InvokeWithRetryAsync(client => client.Channel.GetConnections());
 		}
 
 		public Task<Dictionary<long, ITopologyElement>> GetElementModels()
 		{
-			return MethodWrapperAsync<Dictionary<long, ITopologyElement>>("GetElementModels", new object[0]);
-			//return InvokeWithRetryAsync(client => client.Channel.GetElementModels());
+			return InvokeWithRetryAsync(client => client.Channel.GetElementModels());
 		}
 
 		public Task<List<long>> GetEnergySources()
 		{
-			return MethodWrapperAsync<List<long>>("GetEnergySources", new object[0]);
-			//return InvokeWithRetryAsync(client => client.Channel.GetEnergySources());
+			return InvokeWithRetryAsync(client => client.Channel.GetEnergySources());
 		}
 
 		public Task<HashSet<long>> GetReclosers()
 		{
-			return MethodWrapperAsync<HashSet<long>>("GetReclosers", new object[0]);
-			//return InvokeWithRetryAsync(client => client.Channel.GetReclosers());
+			return InvokeWithRetryAsync(client => client.Channel.GetReclosers());
 		}
 
 		public Task<bool> IsRecloser(long recloserGid)
 		{
-			return MethodWrapperAsync<bool>("IsRecloser", new object[1] { recloserGid});
-			//return InvokeWithRetryAsync(client => client.Channel.IsRecloser(recloserGid));
+			return InvokeWithRetryAsync(client => client.Channel.IsRecloser(recloserGid));
 		}
 
 		public Task<bool> PrepareForTransaction()
 		{
-			return MethodWrapperAsync<bool>("PrepareForTransaction", new object[0]);
-			//return InvokeWithRetryAsync(client => client.Channel.PrepareForTransaction());
+			return InvokeWithRetryAsync(client => client.Channel.PrepareForTransaction());
 		}
 
 		public Task RollbackTransaction()
 		{
-			return MethodWrapperAsync("RollbackTransaction", new object[0]);
-			//return InvokeWithRetryAsync(client => client.Channel.RollbackTransaction());
+			return InvokeWithRetryAsync(client => client.Channel.RollbackTransaction());
 		}
 
 	}

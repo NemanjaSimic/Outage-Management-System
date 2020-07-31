@@ -10,7 +10,7 @@ namespace OMS.Common.WcfClient.CE
 {
 	public class MeasurementMapServiceClient : WcfSeviceFabricClientBase<IMeasurementMapContract>, IMeasurementMapContract
 	{
-		private static readonly string microserviceName = MicroserviceNames.MeasurementMapService;
+		private static readonly string microserviceName = MicroserviceNames.MeasurementProviderService;
 		private static readonly string listenerName = EndpointNames.MeasurementMapEndpoint;
 
 		public MeasurementMapServiceClient(WcfCommunicationClientFactory<IMeasurementMapContract> clientFactory, Uri serviceUri, ServicePartitionKey servicePartition)
@@ -19,36 +19,34 @@ namespace OMS.Common.WcfClient.CE
 
 		}
 
-		public static MeasurementMapServiceClient CreateClient(Uri serviceUri = null)
+		public static MeasurementMapServiceClient CreateClient()
 		{
 			ClientFactory factory = new ClientFactory();
-			ServicePartitionKey servicePartition = ServicePartitionKey.Singleton;
-
-			if (serviceUri == null)
-			{
-				return factory.CreateClient<MeasurementMapServiceClient, IMeasurementMapContract>(microserviceName, servicePartition);
-			}
-			else
-			{
-				return factory.CreateClient<MeasurementMapServiceClient, IMeasurementMapContract>(serviceUri, servicePartition);
-			}
+			return factory.CreateClient<MeasurementMapServiceClient, IMeasurementMapContract>(microserviceName);
 		}
+
+		public static MeasurementMapServiceClient CreateClient(Uri serviceUri, ServicePartitionKey servicePartitionKey)
+		{
+			ClientFactory factory = new ClientFactory();
+			return factory.CreateClient<MeasurementMapServiceClient, IMeasurementMapContract>(serviceUri, servicePartitionKey);
+		}
+
 
 		public Task<Dictionary<long, List<long>>> GetElementToMeasurementMap()
 		{
-			return MethodWrapperAsync<Dictionary<long, List<long>>>("GetElementToMeasurementMap", new object[0]);
+			return InvokeWithRetryAsync(client => client.Channel.GetElementToMeasurementMap());
 
 		}
 
 		public Task<List<long>> GetMeasurementsOfElement(long elementId)
 		{
-			return MethodWrapperAsync<List<long>>("GetMeasurementsOfElement", new object[1] { elementId});
+			return InvokeWithRetryAsync(client => client.Channel.GetMeasurementsOfElement(elementId));
 
 		}
 
 		public Task<Dictionary<long, long>> GetMeasurementToElementMap()
 		{
-			return MethodWrapperAsync<Dictionary<long, long>>("GetMeasurementToElementMap", new object[0]);
+			return InvokeWithRetryAsync(client => client.Channel.GetMeasurementToElementMap());
 		}
 	}
 }

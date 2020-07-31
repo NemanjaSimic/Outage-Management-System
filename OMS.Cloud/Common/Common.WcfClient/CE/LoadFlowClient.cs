@@ -18,23 +18,21 @@ namespace OMS.Common.WcfClient.CE
 
 		}
 
-		public static LoadFlowClient CreateClient(Uri serviceUri = null)
+		public static LoadFlowClient CreateClient()
 		{
 			ClientFactory factory = new ClientFactory();
-			ServicePartitionKey servicePartition = ServicePartitionKey.Singleton;
-
-			if (serviceUri == null)
-			{
-				return factory.CreateClient<LoadFlowClient, ILoadFlowContract>(microserviceName, servicePartition);
-			}
-			else
-			{
-				return factory.CreateClient<LoadFlowClient, ILoadFlowContract>(serviceUri, servicePartition);
-			}
+			return factory.CreateClient<LoadFlowClient, ILoadFlowContract>(microserviceName);
 		}
+
+		public static LoadFlowClient CreateClient(Uri serviceUri, ServicePartitionKey servicePartitionKey)
+		{
+			ClientFactory factory = new ClientFactory();
+			return factory.CreateClient<LoadFlowClient, ILoadFlowContract>(serviceUri, servicePartitionKey);
+		}
+
 		public Task<ITopology> UpdateLoadFlow(ITopology topology)
 		{
-			return MethodWrapperAsync<ITopology>("UpdateLoadFlow", new object[1] { topology });
+			return InvokeWithRetryAsync(client => client.Channel.UpdateLoadFlow(topology));
 		}
 	}
 }

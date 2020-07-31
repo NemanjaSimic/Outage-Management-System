@@ -21,65 +21,62 @@ namespace OMS.Common.WcfClient.CE
 
 		}
 
-		public static TopologyProviderClient CreateClient(Uri serviceUri = null)
+		public static TopologyProviderClient CreateClient()
 		{
 			ClientFactory factory = new ClientFactory();
-			ServicePartitionKey servicePartition = ServicePartitionKey.Singleton;
-
-			if (serviceUri == null)
-			{
-				return factory.CreateClient<TopologyProviderClient, ITopologyProviderContract>(microserviceName, servicePartition);
-			}
-			else
-			{
-				return factory.CreateClient<TopologyProviderClient, ITopologyProviderContract>(serviceUri, servicePartition);
-			}
+			return factory.CreateClient<TopologyProviderClient, ITopologyProviderContract>(microserviceName);
 		}
+
+		public static TopologyProviderClient CreateClient(Uri serviceUri, ServicePartitionKey servicePartitionKey)
+		{
+			ClientFactory factory = new ClientFactory();
+			return factory.CreateClient<TopologyProviderClient, ITopologyProviderContract>(serviceUri, servicePartitionKey);
+		}
+
 
 		public Task CommitTransaction()
 		{
-			return MethodWrapperAsync("CommitTransaction", new object[0]);
+            return InvokeWithRetryAsync(client => client.Channel.CommitTransaction());
 		}
 
 		public Task DiscreteMeasurementDelegate()
 		{
-			return MethodWrapperAsync("DiscreteMeasurementDelegate", new object[0]);
+            return InvokeWithRetryAsync(client => client.Channel.DiscreteMeasurementDelegate());
 		}
 
 		public Task<IOutageTopologyModel> GetOMSModel()
 		{
-			return MethodWrapperAsync<IOutageTopologyModel>("GetOMSModel", new object[0]);
+            return InvokeWithRetryAsync(client => client.Channel.GetOMSModel());
 		}
 
 		public Task<ITopology> GetTopology()
 		{
-			return MethodWrapperAsync<ITopology>("GetTopology", new object[0]);
+            return InvokeWithRetryAsync(client => client.Channel.GetTopology());
 		}
 
 		public Task<UIModel> GetUIModel()
 		{
-			return MethodWrapperAsync<UIModel>("GetUIModel", new object[0]);
+            return InvokeWithRetryAsync(client => client.Channel.GetUIModel());
 		}
 
 		public Task<bool> IsElementRemote(long elementGid)
 		{
-			return MethodWrapperAsync<bool>("IsElementRemote", new object[1] { elementGid});
+            return InvokeWithRetryAsync(client => client.Channel.IsElementRemote(elementGid));
 		}
 
 		public Task<bool> PrepareForTransaction()
 		{
-			return MethodWrapperAsync<bool>("PrepareForTransaction", new object[0]);
-
+            return InvokeWithRetryAsync(client => client.Channel.PrepareForTransaction());
 		}
 
 		public Task ResetRecloser(long recloserGid)
 		{
-			return MethodWrapperAsync("ResetRecloser", new object[1] { recloserGid});
+            return InvokeWithRetryAsync(client => client.Channel.ResetRecloser(recloserGid));
 		}
 
 		public Task RollbackTransaction()
 		{
-			return MethodWrapperAsync("RollbackTransaction", new object[0]);
+            return InvokeWithRetryAsync(client => client.Channel.RollbackTransaction());
 		}
 	}
 }

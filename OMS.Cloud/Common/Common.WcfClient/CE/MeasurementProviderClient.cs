@@ -21,108 +21,107 @@ namespace OMS.Common.WcfClient.CE
 
 		}
 
-		public static MeasurementProviderClient CreateClient(Uri serviceUri = null)
+		public static MeasurementProviderClient CreateClient()
 		{
 			ClientFactory factory = new ClientFactory();
-			ServicePartitionKey servicePartition = ServicePartitionKey.Singleton;
-
-			if (serviceUri == null)
-			{
-				return factory.CreateClient<MeasurementProviderClient, IMeasurementProviderContract>(microserviceName, servicePartition);
-			}
-			else
-			{
-				return factory.CreateClient<MeasurementProviderClient, IMeasurementProviderContract>(serviceUri, servicePartition);
-			}
+			return factory.CreateClient<MeasurementProviderClient, IMeasurementProviderContract>(microserviceName);
 		}
+
+		public static MeasurementProviderClient CreateClient(Uri serviceUri, ServicePartitionKey servicePartitionKey)
+		{
+			ClientFactory factory = new ClientFactory();
+			return factory.CreateClient<MeasurementProviderClient, IMeasurementProviderContract>(serviceUri, servicePartitionKey);
+		}
+
 		public Task AddAnalogMeasurement(AnalogMeasurement analogMeasurement)
 		{
-			return MethodWrapperAsync("AddAnalogMeasurement", new object[1] { analogMeasurement} );
+			return InvokeWithRetryAsync(client => client.Channel.AddAnalogMeasurement(analogMeasurement));
+
 		}
 
 		public Task AddDiscreteMeasurement(DiscreteMeasurement discreteMeasurement)
 		{
-			return MethodWrapperAsync("AddDiscreteMeasurement", new object[1] { discreteMeasurement });
+			return InvokeWithRetryAsync(client => client.Channel.AddDiscreteMeasurement(discreteMeasurement));
 		}
 
 		public Task AddMeasurementElementPair(long measurementId, long elementId)
 		{
-			return MethodWrapperAsync("AddMeasurementElementPair", new object[2] { measurementId, elementId });
+			return InvokeWithRetryAsync(client => client.Channel.AddMeasurementElementPair(measurementId, elementId));
 		}
 
 		public Task CommitTransaction()
 		{
-			return MethodWrapperAsync("CommitTransaction", new object[0]);
+			return InvokeWithRetryAsync(client => client.Channel.CommitTransaction());
 		}
 
 		public Task<float> GetAnalogValue(long measurementGid)
 		{
-			return MethodWrapperAsync<float>("GetAnalogValue", new object[1] { measurementGid });
+			return InvokeWithRetryAsync(client => client.Channel.GetAnalogValue(measurementGid));
 		}
 
 		public Task<bool> GetDiscreteValue(long measurementGid)
 		{
-			return MethodWrapperAsync<bool>("GetDiscreteValue", new object[1] { measurementGid });
+			return InvokeWithRetryAsync(client => client.Channel.GetDiscreteValue(measurementGid));
 		}
 
 		public Task<long> GetElementGidForMeasurement(long measurementGid)
 		{
-			return MethodWrapperAsync<long>("GetElementGidForMeasurement", new object[1] { measurementGid });
+			return InvokeWithRetryAsync(client => client.Channel.GetElementGidForMeasurement(measurementGid));
 		}
 
 		public Task<Dictionary<long, List<long>>> GetElementToMeasurementMap()
 		{
-			return MethodWrapperAsync<Dictionary<long, List<long>>>("GetElementToMeasurementMap", new object[0]);
+			return InvokeWithRetryAsync(client => client.Channel.GetElementToMeasurementMap());
 		}
 
 		public Task<List<long>> GetMeasurementsOfElement(long elementGid)
 		{
-			return MethodWrapperAsync<List<long>>("GetMeasurementsOfElement", new object[1] { elementGid });
+			return InvokeWithRetryAsync(client => client.Channel.GetMeasurementsOfElement(elementGid));
 		}
 
 		public Task<Dictionary<long, long>> GetMeasurementToElementMap()
 		{
-			return MethodWrapperAsync<Dictionary<long, long>>("GetMeasurementToElementMap", new object[0]);
+			return InvokeWithRetryAsync(client => client.Channel.GetMeasurementToElementMap());
 		}
 
 		public Task<bool> PrepareForTransaction()
 		{
-			return MethodWrapperAsync<bool>("PrepareForTransaction", new object[0]);
+			return InvokeWithRetryAsync(client => client.Channel.PrepareForTransaction());
 		}
 
 		public Task RollbackTransaction()
 		{
-			return MethodWrapperAsync("RollbackTransaction", new object[0]);
+			return InvokeWithRetryAsync(client => client.Channel.RollbackTransaction());
 		}
 
 		public Task<AnalogMeasurement> GetAnalogMeasurement(long measurementGid)
 		{
-			return MethodWrapperAsync<AnalogMeasurement>("GetAnalogMeasurement", new object[1] { measurementGid });
+			return InvokeWithRetryAsync(client => client.Channel.GetAnalogMeasurement(measurementGid));
 		}
 
 		public Task<DiscreteMeasurement> GetDiscreteMeasurement(long measurementGid)
 		{
-			return MethodWrapperAsync<DiscreteMeasurement>("GetDiscreteMeasurement", new object[1] { measurementGid });
+			return InvokeWithRetryAsync(client => client.Channel.GetDiscreteMeasurement(measurementGid));
 		}
 
 		public Task UpdateAnalogMeasurement(Dictionary<long, AnalogModbusData> data)
 		{
-			return MethodWrapperAsync("UpdateAnalogMeasurement", new object[1] { data });
+			return InvokeWithRetryAsync(client => client.Channel.UpdateAnalogMeasurement(data));
 		}
 
 		public Task UpdateDiscreteMeasurement(Dictionary<long, DiscreteModbusData> data)
 		{
-			return MethodWrapperAsync("UpdateDiscreteMeasurement", new object[1] { data });
+			return InvokeWithRetryAsync(client => client.Channel.UpdateDiscreteMeasurement(data));
 		}
 
 		public Task SendAnalogCommand(long measurementGid, float commandingValue, CommandOriginType commandOrigin)
 		{
-			return MethodWrapperAsync("SendAnalogCommand", new object[3] { measurementGid, commandingValue, commandOrigin });
+			return InvokeWithRetryAsync(client => client.Channel.SendAnalogCommand(measurementGid, commandingValue, commandOrigin));
 		}
 
 		public Task SendDiscreteCommand(long measurementGid, int value, CommandOriginType commandOrigin)
 		{
-			return MethodWrapperAsync("SendAnalogCommand", new object[3] { measurementGid, value, commandOrigin });
+			return InvokeWithRetryAsync(client => client.Channel.SendAnalogCommand(measurementGid, value, commandOrigin));
 		}
 	}
 }

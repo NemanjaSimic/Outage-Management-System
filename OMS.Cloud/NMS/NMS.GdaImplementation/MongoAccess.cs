@@ -65,6 +65,7 @@ namespace NMS.GdaImplementation
                 BsonClassMap.RegisterClassMap<ACLineSegment>();
                 BsonClassMap.RegisterClassMap<Discrete>();
                 BsonClassMap.RegisterClassMap<Analog>();
+                BsonClassMap.RegisterClassMap<SynchronousMachine>();
             }
             catch (Exception e)
             {

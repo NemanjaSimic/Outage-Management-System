@@ -151,6 +151,7 @@
     <Compile Include="Outage\PowerTransformer.cs" />
     <Compile Include="Outage\ProtectedSwitch.cs" />
     <Compile Include="Outage\Switch.cs" />
+    <Compile Include="Outage\SynchronousMachine.cs" />
     <Compile Include="Outage\Terminal.cs" />
     <Compile Include="Outage\TransformerWinding.cs" />
     <Compile Include="Properties\AssemblyInfo.cs" />
