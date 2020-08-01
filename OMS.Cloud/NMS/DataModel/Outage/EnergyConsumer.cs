@@ -6,89 +6,140 @@ namespace NMS.DataModel
 {
     public class EnergyConsumer : ConductingEquipment
     {
-        public EnergyConsumer(long globalId) : base(globalId)
-        {
-        }
+		#region Fields
+		private string firstName;
+		private string lastName;
+		private EnergyConsumerType type;
+		#endregion
 
-        protected EnergyConsumer(EnergyConsumer ec) : base(ec)
-        {
-        }
+		public EnergyConsumer(long globalId) : base(globalId)
+		{
+		}
 
-        public override bool Equals(object obj)
-        {
-            if (base.Equals(obj)) //in case we add new props
-            {
-                return true;
-            }
-            else
-            {
-                return false;
-            }
-        }
+		protected EnergyConsumer(EnergyConsumer ec) : base(ec)
+		{
+			FirstName = ec.FirstName;
+			LastName = ec.LastName;
+			Type = ec.Type;
+		}
 
-        public override int GetHashCode()
-        {
-            return base.GetHashCode();
-        }
+		#region Properties
+		public string FirstName
+		{
+			get { return firstName; }
+			set { firstName = value; }
+		}
+		public string LastName
+		{
+			get { return lastName; }
+			set { lastName = value; }
+		}
 
-        #region IAccess implementation
+		public EnergyConsumerType Type
+		{
+			get { return type; }
+			set { type = value; }
+		}
+		#endregion
 
-        public override bool HasProperty(ModelCode property)
-        {
-            switch (property) //in case we add new props
-            {
-                //case ModelCode.EQUIPMENT_AGGREGATE:
-                //case ModelCode.EQUIPMENT_NORMALLYINSERVICE:
+		public override bool Equals(object obj)
+		{
+			if (base.Equals(obj)) //in case we add new props
+			{
+				EnergyConsumer x = (EnergyConsumer)obj;
+				return (x.FirstName == this.FirstName && x.LastName == this.LastName && x.Type == this.Type);
+			}
+			else
+			{
+				return false;
+			}
+		}
 
-                //	return true;
-                default:
-                    return base.HasProperty(property);
-            }
-        }
+		public override int GetHashCode()
+		{
+			return base.GetHashCode();
+		}
 
-        public override void GetProperty(Property property)
-        {
-            switch (property.Id) //in case we add new props
-            {
-                //case ModelCode.EQUIPMENT_AGGREGATE:
-                //	property.SetValue(aggregate);
-                //	break;
+		#region IAccess implementation
 
-                //case ModelCode.EQUIPMENT_NORMALLYINSERVICE:
-                //	property.SetValue(normallyInService);
-                //	break;			
+		public override bool HasProperty(ModelCode property)
+		{
+			switch (property) //in case we add new props
+			{
+				//case ModelCode.EQUIPMENT_AGGREGATE:
+				//case ModelCode.EQUIPMENT_NORMALLYINSERVICE:
 
-                default:
-                    base.GetProperty(property);
-                    break;
-            }
-        }
+				//	return true;
+				case ModelCode.ENERGYCONSUMER_LASTNAME:
+					return true;
+				case ModelCode.ENERGYCONSUMER_FIRSTNAME:
+					return true;
+				case ModelCode.ENERGYCONSUMER_TYPE:
+					return true;
+				default:
+					return base.HasProperty(property);
+			}
+		}
 
-        public override void SetProperty(Property property)
-        {
-            switch (property.Id) //in case we add new props
-            {
-                //case ModelCode.EQUIPMENT_AGGREGATE:					
-                //	aggregate = property.AsBool();
-                //	break;
+		public override void GetProperty(Property property)
+		{
+			switch (property.Id) //in case we add new props
+			{
+				//case ModelCode.EQUIPMENT_AGGREGATE:
+				//	property.SetValue(aggregate);
+				//	break;
 
-                //case ModelCode.EQUIPMENT_NORMALLYINSERVICE:
-                //	normallyInService = property.AsBool();
-                //	break;
+				//case ModelCode.EQUIPMENT_NORMALLYINSERVICE:
+				//	property.SetValue(normallyInService);
+				//	break;			
+				case ModelCode.ENERGYCONSUMER_LASTNAME:
+					property.SetValue(lastName);
+					break;
+				case ModelCode.ENERGYCONSUMER_FIRSTNAME:
+					property.SetValue(firstName);
+					break;
+				case ModelCode.ENERGYCONSUMER_TYPE:
+					property.SetValue((short)type);
+					break;
+				default:
+					base.GetProperty(property);
+					break;
+			}
+		}
 
-                default:
-                    base.SetProperty(property);
-                    break;
-            }
-        }
+		public override void SetProperty(Property property)
+		{
+			switch (property.Id) //in case we add new props
+			{
+				//case ModelCode.EQUIPMENT_AGGREGATE:					
+				//	aggregate = property.AsBool();
+				//	break;
 
-        #endregion IAccess implementation
+				//case ModelCode.EQUIPMENT_NORMALLYINSERVICE:
+				//	normallyInService = property.AsBool();
+				//	break;
+				case ModelCode.ENERGYCONSUMER_LASTNAME:
+					lastName = property.AsString();
+					break;
+				case ModelCode.ENERGYCONSUMER_FIRSTNAME:
+					firstName = property.AsString();
+					break;
+				case ModelCode.ENERGYCONSUMER_TYPE:
+					type = (EnergyConsumerType)property.AsEnum();
+					break;
+				default:
+					base.SetProperty(property);
+					break;
+			}
+		}
 
-        #region IClonable
-        public override IdentifiedObject Clone()
-        {
-            return new EnergyConsumer(this);
-        }
-        #endregion
-    }
+		#endregion IAccess implementation
+
+		#region IClonable
+		public override IdentifiedObject Clone()
+		{
+			return new EnergyConsumer(this);
+		}
+		#endregion
+	}
 }

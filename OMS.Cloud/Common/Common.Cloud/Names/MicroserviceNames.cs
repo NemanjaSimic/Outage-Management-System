@@ -17,7 +17,12 @@
         //PUB_SUB
         public const string PubSubService = "PubSubService";
 
-        //TEST
-        public const string TestService = "TestService";
+        //CE
+        public const string ModelProviderService = "ModelProviderService";
+        public const string TopologyProviderService = "TopologyProviderService";
+        public const string MeasurementProviderService = "MeasurementProviderService";
+        public const string LoadFlowService = "LoadFlowService";
+        public const string TopologyBuilderService = "TopologyBuilderService";
+
     }
 }

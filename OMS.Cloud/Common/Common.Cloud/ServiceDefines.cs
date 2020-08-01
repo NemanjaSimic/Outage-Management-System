@@ -64,15 +64,19 @@ namespace OMS.Common.Cloud
                 
                 //TMS
                 { MicroserviceNames.TransactionManagerService,      ServiceType.STATEFUL_SERVICE    },
-                
-                //TODO: CE
 
+                //TODO: CE
+                { MicroserviceNames.LoadFlowService,                ServiceType.STATELESS_SERVICE},
+                { MicroserviceNames.MeasurementProviderService,     ServiceType.STATEFUL_SERVICE},
+                { MicroserviceNames.ModelProviderService,           ServiceType.STATEFUL_SERVICE},
+                { MicroserviceNames.TopologyBuilderService,         ServiceType.STATELESS_SERVICE},
+                { MicroserviceNames.TopologyProviderService,        ServiceType.STATEFUL_SERVICE},
                 //TODO: OMS
 
                 //TODO: WEB_ADAPTER
 
                 //TEST
-                { MicroserviceNames.TestService,                    ServiceType.STATELESS_SERVICE   },
+                //{ MicroserviceNames.TestService,                    ServiceType.STATELESS_SERVICE   },
             };
 
             //TODO: moguce ucitavanje iz konfiguracije
@@ -94,12 +98,17 @@ namespace OMS.Common.Cloud
                 { MicroserviceNames.TransactionManagerService,      new Uri("fabric:/OMS.Cloud/TMS.TransactionManagerService")  },
 
                 //TODO: CE
+                { MicroserviceNames.LoadFlowService,                 new Uri("fabric:/OMS.Cloud/LoadFlowService")},
+                { MicroserviceNames.MeasurementProviderService,      new Uri("fabric:/OMS.Cloud/MeasurementProviderService")},
+                { MicroserviceNames.ModelProviderService,            new Uri("fabric:/OMS.Cloud/ModelProviderService")},
+                { MicroserviceNames.TopologyBuilderService,          new Uri("fabric:/OMS.Cloud/TopologyBuilderService")},
+                { MicroserviceNames.TopologyProviderService,         new Uri("fabric:/OMS.Cloud/TopologyProviderService")},
 
                 //TODO: OMS
 
                 //TODO: WEB_ADAPTER
 
-                { MicroserviceNames.TestService,                    new Uri("fabric:/OMS.Cloud/TestService")                    },
+                //{ MicroserviceNames.TestService,                    new Uri("fabric:/OMS.Cloud/TestService")                    },
             };
         }
     }

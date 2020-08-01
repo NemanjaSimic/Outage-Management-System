@@ -14,6 +14,9 @@ namespace OMS.Common.Cloud
 
         [EnumMember]
         POWER = 3,
+
+        [EnumMember]
+        FEEDER_CURRENT = 4,
     }
 
     [DataContract]
@@ -23,6 +26,14 @@ namespace OMS.Common.Cloud
         SWITCH_STATUS = 1,
     }
 
+    [DataContract]
+    public enum EnergyConsumerType : short
+    {
+        [EnumMember]
+        HOUSEHOLD = 0,
+        [EnumMember]
+        SMALL_INDUSTRY
+    }
 
     //PUB_SUB
     [DataContract]

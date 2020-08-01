@@ -32,13 +32,16 @@
     <Content Include="packages.config" />
   </ItemGroup>
   <ItemGroup>
+    <ProjectReference Include="..\CE\MeasurementProvider\MeasurementProviderService\MeasurementProviderService.csproj" />
+    <ProjectReference Include="..\CE\ModelProvider\ModelProviderService\ModelProviderService.csproj" />
+    <ProjectReference Include="..\CE\TopologyBuilder\TopologyBuilderService\TopologyBuilderService.csproj" />
+    <ProjectReference Include="..\CE\TopologyProviderService\TopologyProviderService.csproj" />
     <ProjectReference Include="..\NMS\NMS.GdaService\NMS.GdaService.csproj" />
     <ProjectReference Include="..\PUB_SUB\PubSubService\PubSubService.csproj" />
     <ProjectReference Include="..\SCADA\Acquisition\SCADA.AcquisitionService\SCADA.AcquisitionService.csproj" />
     <ProjectReference Include="..\SCADA\Commanding\SCADA.CommandingService\SCADA.CommandingService.csproj" />
     <ProjectReference Include="..\SCADA\FunctionExecutor\SCADA.FunctionExecutorService\SCADA.FunctionExecutorService.csproj" />
     <ProjectReference Include="..\SCADA\ModelProvider\SCADA.ModelProviderService\SCADA.ModelProviderService.csproj" />
-    <ProjectReference Include="..\TestService\TestService.csproj" />
     <ProjectReference Include="..\TMS\TMS.TransactionManagerService\TMS.TransactionManagerService.csproj" />
   </ItemGroup>
   <Import Project="$(MSBuildToolsPath)\Microsoft.Common.targets" />
