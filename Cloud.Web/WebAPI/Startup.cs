@@ -2,6 +2,8 @@
 using System.Collections.Generic;
 using System.Linq;
 using System.Threading.Tasks;
+using Common.Web.Exceptions;
+using Common.Web.Mappers;
 using MediatR;
 using Microsoft.AspNetCore.Builder;
 using Microsoft.AspNetCore.Hosting;
@@ -9,10 +11,6 @@ using Microsoft.AspNetCore.Mvc;
 using Microsoft.Extensions.Configuration;
 using Microsoft.Extensions.DependencyInjection;
 using Microsoft.Extensions.Options;
-using OMS.Web.Common.Exceptions;
-using OMS.Web.Common.Loggers;
-using OMS.Web.Common.Mappers;
-using Outage.Common.ServiceProxies;
 using Unity.Lifetime;
 using WebAPI.Hubs;
 

@@ -24,10 +24,10 @@
     <PackageReference Include="Microsoft.AspNetCore" Version="2.2.0" />
     <PackageReference Include="Microsoft.AspNetCore.Mvc" Version="2.2.0" />
     <PackageReference Include="Microsoft.AspNetCore.SignalR" Version="1.1.0" />
-    <PackageReference Include="Microsoft.ServiceFabric" Version="7.1.428" />
-    <PackageReference Include="Microsoft.ServiceFabric.AspNetCore.Kestrel" Version="4.1.428" />
-    <PackageReference Include="Microsoft.ServiceFabric.Data" Version="4.1.428" />
-    <PackageReference Include="Microsoft.ServiceFabric.Services" Version="4.1.428" />
+    <PackageReference Include="Microsoft.ServiceFabric" Version="7.0.470" />
+    <PackageReference Include="Microsoft.ServiceFabric.AspNetCore.Kestrel" Version="4.0.470" />
+    <PackageReference Include="Microsoft.ServiceFabric.Data" Version="4.0.470" />
+    <PackageReference Include="Microsoft.ServiceFabric.Services" Version="4.0.470" />
     <PackageReference Include="Unity" Version="5.11.7" />
     <PackageReference Include="Unity.Mvc" Version="5.11.1" />
     <PackageReference Include="Unity.WebAPI" Version="5.4.0" />
@@ -35,8 +35,7 @@
   </ItemGroup>
 
   <ItemGroup>
-    <ProjectReference Include="..\..\OMS.Web\OMS.Web.Services\OMS.Web.Services.csproj" />
-    <ProjectReference Include="..\..\OMS.Web\OMS.Web.UI.Models\OMS.Web.UI.Models.csproj" />
+    <ProjectReference Include="..\Common.Web\Common.Web.csproj" />
   </ItemGroup>
 
 </Project>
