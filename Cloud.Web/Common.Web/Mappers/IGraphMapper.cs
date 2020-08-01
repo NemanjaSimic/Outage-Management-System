@@ -1,4 +1,5 @@
-﻿using Common.Web.UI.Models.ViewModels;
+﻿using CECommon;
+using Common.Web.UI.Models.ViewModels;
 
 namespace Common.Web.Mappers
 {

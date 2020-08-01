@@ -79,6 +79,10 @@
     <None Include="packages.config" />
   </ItemGroup>
   <ItemGroup>
+    <ProjectReference Include="..\..\OMS.Cloud\Common\Common.CE\Common.CE.csproj">
+      <Project>{2B5DAFD3-879B-4876-972F-0CC48463AC0C}</Project>
+      <Name>Common.CE</Name>
+    </ProjectReference>
     <ProjectReference Include="..\..\OMS.Cloud\Common\Common.Cloud\Common.Cloud.csproj">
       <Project>{FBEE1369-0F6C-41E6-8C62-8C1C5CDBB602}</Project>
       <Name>Common.Cloud</Name>
