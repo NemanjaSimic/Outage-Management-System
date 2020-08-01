@@ -1,6 +1,6 @@
 ﻿using NLog;
 using System;
-using ILogger = Outage.Common.ILogger;
+using ILogger = OMS.Common.Cloud.Logger.ICloudLogger;
 
 namespace Common.Web.Loggers
 {
@@ -33,14 +33,19 @@ namespace Common.Web.Loggers
             _logger.Fatal(e, message ?? e.Message);
         }
 
-        public void LogInfo(string message, Exception e = null)
+        public void LogInformation(string message, Exception e = null)
         {
             _logger.Info(message);
         }
 
-        public void LogWarn(string message, Exception e = null)
+        public void LogWarning(string message, Exception e = null)
         {
             _logger.Warn(message);
+        }
+
+        public void LogVerbose(string message, Exception e = null)
+        {
+            throw new NotImplementedException();
         }
     }
 }
