@@ -4,6 +4,7 @@ using Common.OMS.OutageDatabaseModel;
 using Common.OmsContracts.OutageLifecycle;
 using OMS.Common.Cloud;
 using OMS.Common.Cloud.Logger;
+using OMS.Common.PubSub;
 using OMS.Common.WcfClient.OMS;
 using OMS.OutageLifecycleServiceImplementation.OutageLCHelper;
 using OutageDatabase.Repository;

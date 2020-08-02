@@ -1,6 +1,8 @@
 ﻿using Common.CE;
 using OMS.Common.Cloud;
+using OMS.Common.PubSub;
 using OMS.Common.WcfClient.OMS;
+using OMS.Common.WcfClient.OMS.Lifecycle;
 using System;
 using System.Collections.Generic;
 using System.Linq;

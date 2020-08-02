@@ -5,13 +5,13 @@ namespace OMS.Common.Cloud.Names
     public static class EndpointNames
     {
         //TM - 0
-        public const string TransactionCoordinatorEndpoint = "TransactionCoordinatorEndpoint";
-        public const string TransactionEnlistmentEndpoint = "TransactionEnlistmentEndpoint";
+        public const string TmsTransactionCoordinatorEndpoint = "TmsTransactionCoordinatorEndpoint";
+        public const string TmsTransactionEnlistmentEndpoint = "TmsTransactionEnlistmentEndpoint";
+        public const string TmsNotifyNetworkModelUpdateEndpoint = "TmsNotifyNetworkModelUpdateEndpoint";
+        public const string TmsTransactionActorEndpoint = "TmsTransactionActorEndpoint";
 
         //SCADA - 1
-        public const string ScadaCommandService = "ScadaCommandService";
-        public const string ScadaTransactionActorEndpoint = "ScadaTransactionActorEndpoint";
-        public const string ScadaModelUpdateNotifierEndpoint = "ScadaModelUpdateNotifierEndpoint";
+        public const string ScadaCommandingEndpoint = "ScadaCommandingEndpoint";
         public const string ScadaIntegrityUpdateEndpoint = "ScadaIntegrityUpdateEndpoint";
         public const string ScadaModelReadAccessEndpoint = "ScadaModelReadAccessEndpoint";
         public const string ScadaModelUpdateAccessEndpoint = "ScadaModelUpdateAccessEndpoint";
@@ -20,41 +20,44 @@ namespace OMS.Common.Cloud.Names
         public const string ScadaModelUpdateCommandEnqueueurEndpoint = "ScadaModelUpdateCommandEnqueueurEndpoint";
 
         //NMS - 2
-        public const string NetworkModelGDAEndpoint = "NetworkModelGDAEndpoint";
-        public const string NetworkModelTransactionActorEndpoint = "NetworkModelServiceTransactionActorEndpoint";
+        public const string NmsGdaEndpoint = "NmsGdaEndpoint";
 
         //CE - 3
-        public const string CalculationEngineTransactionActorEndpoint = "CalculationEngineTransactionActorEndpoint";
-        public const string CalculationEngineModelUpdateNotifierEndpoint = "CalculationEngineModelUpdateNotifierEndpoint";
         public const string TopologyServiceEndpoint = "TopologyServiceEndpoint";
+        public const string TopologyProviderServiceEndpoint = "TopologyProviderServiceEndpoint";
+        public const string TopologyBuilderServiceEndpoint = "TopologyBuilderServiceEndpoint";
+        public const string TopologyConverterServiceEndpoint = "TopologyConverterServiceEndpoint";
         public const string TopologyOMSServiceEndpoint = "TopologyOMSServiceEndpoint";
         public const string SwitchStatusCommandingEndpoint = "SwitchStatusCommandingEndpoint";
+        public const string MeasurementProviderEndpoint = "MeasurementProviderEndpoint";
         public const string MeasurementMapEndpoint = "MeasurementMapEndpoint";
+        public const string ModelProviderServiceEndpoint = "ModelProviderServiceEndpoint";
+        public const string LoadFlowServiceEndpoint = "LoadFlowServiceEndpoint";
 
         //PUBSUB - 4
-        public const string PublisherEndpoint = "PublisherEndpoint";
-        public const string SubscriberEndpoint = "SubscriberEndpoint";
-        public const string NotifySubscriberEndpoint = "NotifySubscriberEndpoint";
+        public const string PubSubPublisherEndpoint = "PubSubPublisherEndpoint";
+        public const string PubSubRegisterSubscriberEndpoint = "PubSubRegisterSubscriberEndpoint";
+        public const string PubSubNotifySubscriberEndpoint = "PubSubNotifySubscriberEndpoint";
 
         //OMS - 5
         public const string CallingEndpoint = "CallingEndpoint";
         public const string OutageAccessEndpoint = "OutageAccessEndpoint";
-        public const string OutageTransactionActorEndpoint = "OutageTransactionActorEndpoint";
-        public const string OutageModelUpdateNotifierEndpoint = "OutageModelUpdateNotifierEndpoint";
         public const string OutageLifecycleUICommandingEndpoint = "OutageLifecycleUICommandingEndpoint";
         public const string ReportPotentialOutageEndpoint = "ReportPotentialOutageEndpoint";
-        public const string OutageManagementServiceModelReadAccessEndpoint = "OutageManagementServiceModelReadAccessEndpoint";
-        public const string OutageManagmenetServiceModelUpdateAccessEndpoint = "OutageManagmenetServiceModelUpdateAccessEndpoint";
-        public const string TracingAlgorithmEndpoint = "TracingAlgorithmEndpoint";
-        public const string OutageSimulatorEndpoint = "OutageSimulatorEndpoint";
+        public const string OutageSimulatorServiceEndpoint = "OutageSimulatorServiceEndpoint";
         public const string HistoryDBManagerEndpoint = "HistoryDBManagerEndpoint";
-        public const string IsolateOutageEndpoint = "IsolateOutageEndpoint";
+        public const string ReportingEndpoint = "ReportingEndpoint";
+        public const string OutageManagementServiceModelReadAccessEndpoint = "OutageManagementServiceModelReadAccessEndpoint";
         public const string ReportOutageEndpoint = "ReportOutageEndpoint";
         public const string ResolveOutageEndpoint = "ResolveOutageEndpoint";
         public const string SendLocationIsolationCrewEndpoint = "SendLocationIsolationCrewEndpoint";
         public const string SendRepairCrewEndpoint = "SendRepairCrewEndpoint";
         public const string ValidateResolveConditionsEndpoint = "ValidateResolveConditionsEndpoint";
-        public const string ReportingEndpoint = "ReportingEndpoint";
+        public const string TracingAlgorithmEndpoint = "TracingAlgorithmEndpoint";
+        public const string OutageManagmenetServiceModelUpdateAccessEndpoint = "OutageManagmenetServiceModelUpdateAccessEndpoint";
+        public const string OutageSimulatorEndpoint = "OutageSimulatorEndpoint";
+        public const string NotifySubscriberEndpoint = "NotifySubscriberEndpoint";
+        public const string IsolateOutageEndpoint = "IsolateOutageEndpoint";
     }
 }
 

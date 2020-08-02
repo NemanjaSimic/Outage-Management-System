@@ -36,7 +36,7 @@ namespace OMS.ModelProviderService
             this.outageModelReadAccessProvider = new OutageModelReadAccessProvider(this.StateManager);
             this.outageModelUpdateAccessProvider = new OutageModelUpdateAccessProvider(this.StateManager);
             this.registerSubscriberClient = RegisterSubscriberClient.CreateClient();
-            this.registerSubscriberClient.SubscribeToTopic(Topic.TOPOLOGY,this.outageModel.GetSubscriberUri().Result,ServiceType.STATEFUL_SERVICE);
+            this.registerSubscriberClient.SubscribeToTopic(Topic.TOPOLOGY, this.outageModel.GetSubscriberName().Result);
         }
 
         /// <summary>

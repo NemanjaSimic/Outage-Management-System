@@ -1,23 +1,20 @@
-﻿using System;
-using System.Collections.Generic;
-using System.Linq;
-using System.Text;
-using System.Threading.Tasks;
-using OutageDatabase.Repository;
-using Common.OMS;
-using OMS.Common.Cloud.Logger;
-using Common.OMS.OutageDatabaseModel;
-using OMS.Common.NmsContracts;
-using OMS.Common.Cloud;
-using OMS.Common.WcfClient.NMS;
-using OMS.Common.NmsContracts.GDA;
+﻿using Common.OMS.OutageDatabaseModel;
 using Common.PubSubContracts.DataContracts.OMS;
+using OMS.Common.Cloud;
+using OMS.Common.Cloud.Logger;
+using OMS.Common.NmsContracts;
+using OMS.Common.NmsContracts.GDA;
+using OMS.Common.PubSub;
+using OMS.Common.WcfClient.NMS;
 using OMS.Common.WcfClient.PubSub;
-using Common.CE;
+using OutageDatabase.Repository;
+using System;
+using System.Collections.Generic;
+using System.Threading.Tasks;
 
 namespace OMS.OutageLifecycleServiceImplementation.OutageLCHelper
 {
-    public class OutageLifecycleHelper
+	public class OutageLifecycleHelper
     {
         private UnitOfWork dbContext;
         private IOutageTopologyModel outageTopology;
@@ -277,7 +274,7 @@ namespace OMS.OutageLifecycleServiceImplementation.OutageLCHelper
 
                 try
                 {
-                    await publisherClient.Publish(outagePublication, new Uri("OUTAGE_PUBLISHER"));
+                    await publisherClient.Publish(outagePublication, "OutagePublisher"); //TODO: Service defines
                     Logger.LogWarning($"Outage service published data from topic: {outagePublication.Topic}");
                     success = true;
                 }

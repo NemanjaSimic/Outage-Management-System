@@ -87,7 +87,7 @@ namespace HistoryDBManagerServiceImplementation
             {
                 using(var tx = this.stateManager.CreateTransaction())
                 {
-                    if(OpenedSwitches.ContainsKey(elementGid))
+                    if(await OpenedSwitches.ContainsKeyAsync(elementGid))
                     {
                         dbContext.EquipmentHistoricalRepository.Add(new EquipmentHistorical() { EquipmentId = elementGid, OperationTime = DateTime.Now, DatabaseOperation = DatabaseOperation.DELETE });
                         await OpenedSwitches.TryRemoveAsync(tx, elementGid);
@@ -113,7 +113,7 @@ namespace HistoryDBManagerServiceImplementation
                 {
                     foreach (var consumer in consumers)
                     {
-                        if (!UnenergizedConsumers.ContainsKey(consumer))
+                        if (! await UnenergizedConsumers.ContainsKeyAsync(consumer))
                         {
 
                             consumerHistoricals.Add(new ConsumerHistorical() { OutageId = outageId, ConsumerId = consumer, OperationTime = DateTime.Now, DatabaseOperation = DatabaseOperation.INSERT });
@@ -139,7 +139,7 @@ namespace HistoryDBManagerServiceImplementation
             {
                 using (var tx = this.stateManager.CreateTransaction())
                 {
-                    if (!OpenedSwitches.ContainsKey(elementGid))
+                    if (! await OpenedSwitches.ContainsKeyAsync(elementGid))
                     {
                         dbContext.EquipmentHistoricalRepository.Add(new EquipmentHistorical() { OutageId = outageId, EquipmentId = elementGid, OperationTime = DateTime.Now, DatabaseOperation = DatabaseOperation.INSERT });
                         await OpenedSwitches.AddAsync(tx,elementGid,0);
@@ -159,7 +159,7 @@ namespace HistoryDBManagerServiceImplementation
         public async Task OnConsumersEnergized(HashSet<long> consumers)
         {
             List<ConsumerHistorical> consumerHistoricals = new List<ConsumerHistorical>();
-            var copy = UnenergizedConsumers.GetDataCopy().Keys.ToList();
+            var copy = (await UnenergizedConsumers.GetDataCopyAsync()).Keys.ToList();
             var changedConsumers = copy.Intersect(consumers).ToList();
 
             foreach (var consumer in changedConsumers)
@@ -173,8 +173,10 @@ namespace HistoryDBManagerServiceImplementation
                 {
                     foreach (var changed in changedConsumers)
                     {
-                        if (UnenergizedConsumers.ContainsKey(changed))
+                        if (await UnenergizedConsumers.ContainsKeyAsync(changed))
+						{
                             await UnenergizedConsumers.TryRemoveAsync(tx,changed);
+						}
                     }
 
                     dbContext.ConsumerHistoricalRepository.AddRange(consumerHistoricals);

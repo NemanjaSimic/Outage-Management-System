@@ -2,7 +2,6 @@
 using MongoDB.Bson.Serialization;
 using MongoDB.Bson.Serialization.Serializers;
 using MongoDB.Driver;
-
 using System;
 using System.Collections.Generic;
 using System.Linq;
@@ -17,25 +16,29 @@ namespace NMS.GdaImplementation
 {
     public class MongoAccess
     {
-        private ICloudLogger logger;
+        private readonly string baseLogString;
+        private readonly IMongoDatabase db;
 
-        private ICloudLogger Logger
+        #region Private Properties
+        private ICloudLogger logger;
+        protected ICloudLogger Logger
         {
             get { return logger ?? (logger = CloudLoggerFactory.GetLogger()); }
         }
-
-        private IMongoDatabase db;
+        #endregion Private Properties
 
         public MongoAccess()
         {
+            this.baseLogString = $"{this.GetType()} [{this.GetHashCode()}] =>{Environment.NewLine}";
+
             try
             {
                 MongoClient dbClient = new MongoClient(Config.GetInstance().DbConnectionString);
-                db = dbClient.GetDatabase("NMSDatabase");
+                db = dbClient.GetDatabase(MongoStrings.NMSDatabase);
             }
             catch (Exception e)
             {
-                Logger.LogError("Error on database Init.", e);
+                Logger.LogError($"{baseLogString} Ctor => Error on database Init.", e);
             }
 
             InitializeBsonSerializer();
@@ -62,127 +65,195 @@ namespace NMS.GdaImplementation
                 BsonClassMap.RegisterClassMap<ACLineSegment>();
                 BsonClassMap.RegisterClassMap<Discrete>();
                 BsonClassMap.RegisterClassMap<Analog>();
+                BsonClassMap.RegisterClassMap<SynchronousMachine>();
             }
             catch (Exception e)
             {
-                //TODO: log...
-                Logger.LogError(e.Message);
+                string errorMessage = $"{baseLogString} InitializeBsonSerializer => Exception: {e.Message}.";
+                Logger.LogError(errorMessage, e);
             }
-            
         }
 
-        public Dictionary<DMSType, Container> GetLatesNetworkModel(long networkModelVersion)
+        public void SaveNetworkModel(Dictionary<DMSType, Container> networkModel, long version)
         {
-            Dictionary<DMSType, Container> networkDataModel = new Dictionary<DMSType, Container>();
+            long latestNetworkModelVersion = GetLatestNetworkModelVersions();
+            long latestDeltaVersion = GetLatestDeltaVersions();
 
-            var networkModelFilter = Builders<NetworkDataModelDocument>.Filter.Eq("_id", networkModelVersion);
+            if (latestNetworkModelVersion < 0 || latestDeltaVersion < 0)
+            {
+                string errorMessage = $"{baseLogString} SaveNetworkModel => latest version has a negative value.";
+                Logger.LogError(errorMessage);
+                throw new Exception(errorMessage);
+            }
+
+            long latestVersion = latestDeltaVersion > latestNetworkModelVersion ? latestDeltaVersion : latestNetworkModelVersion;
+
+            if (version <= latestVersion)
+            {
+                string warnMessage = $"{baseLogString} SaveNetworkModel => NetworkModel version is lower then the latest version. NetworkModel version: {version}, LatestVersion: {latestVersion}";
+                Logger.LogWarning(warnMessage);
+
+                version = latestDeltaVersion + 1;
+
+                warnMessage = $"{baseLogString} SaveNetworkModel => NetworkModel version is set to a new value: {version}";
+                Logger.LogWarning(warnMessage);
+            }
+
+            var latestNetworkModelVersionDocument = new LatestVersionsDocument 
+            {
+                Id = MongoStrings.LatestVersions_NetworkModelVersion,
+                Version = version,
+            };
+
+            var latestVersionsCollection = db.GetCollection<LatestVersionsDocument>(MongoStrings.LatestVersionsCollection);
+            latestVersionsCollection.ReplaceOne(new BsonDocument("_id", MongoStrings.LatestVersions_NetworkModelVersion), latestNetworkModelVersionDocument, new ReplaceOptions { IsUpsert = true });
+
+            var networkModelDocument = new NetworkModelsDocument()
+            {
+                Id = version,
+                NetworkModel = networkModel,
+            };
+
+            var networkModelsCollection = db.GetCollection<NetworkModelsDocument>(MongoStrings.NetworkModelsCollection);
+            networkModelsCollection.InsertOne(networkModelDocument);
+        }
+
+        public void SaveDelta(Delta delta)
+        {
+            long latestNetworkModelVersion = GetLatestNetworkModelVersions();
+            long latestDeltaVersion = GetLatestDeltaVersions();
+
+            if (latestNetworkModelVersion < 0 || latestDeltaVersion < 0)
+            {
+                string errorMessage = $"{baseLogString} SaveDelta => latest version has a negative value.";
+                throw new Exception(errorMessage);
+            }
+
+            long latestVersion = latestDeltaVersion > latestNetworkModelVersion ? latestDeltaVersion : latestNetworkModelVersion;
+
+            if (delta.Id <= latestVersion)
+            {
+                string warnMessage = $"{baseLogString} SaveDelta => Delta version is lower then the latest version. NetworkModel version: {delta.Id}, LatestVersion: {latestVersion}";
+                Logger.LogWarning(warnMessage);
+
+                delta.Id = latestDeltaVersion + 1;
+
+                warnMessage = $"{baseLogString} SaveDelta => Delta version is set to a new value: {delta.Id}";
+                Logger.LogWarning(warnMessage);
+            }
+
+            var newLatestDeltaVersionDocument = new LatestVersionsDocument()
+            {
+                Id = MongoStrings.LatestVersions_DeltaVersion,
+                Version = delta.Id,
+            };
+
+            try
+            { 
+                var latestVersionsCollection = db.GetCollection<LatestVersionsDocument>(MongoStrings.LatestVersionsCollection);
+                latestVersionsCollection.ReplaceOne(new BsonDocument("_id", MongoStrings.LatestVersions_DeltaVersion), newLatestDeltaVersionDocument, new ReplaceOptions { IsUpsert = true });
+
+                var deltasCollection = db.GetCollection<Delta>(MongoStrings.DeltasCollection);
+                delta.DeltaOrigin = DeltaOriginType.DatabaseDelta;
+                deltasCollection.InsertOne(delta);
+            }
+            catch (Exception e)
+            {
+                string errorMessage = $"{baseLogString} SaveDelta => Error: {e.Message}.";
+                Logger.LogError(errorMessage, e);
+            }
+        }
+
+        public long GetLatestNetworkModelVersions(bool isRetry = false)
+        {
+            long networkModelVersion = 0;
+
+            try
+            {
+                var latestVersionsCollection = db.GetCollection<LatestVersionsDocument>(MongoStrings.LatestVersionsCollection);
+                var networkModelVersionFilter = Builders<LatestVersionsDocument>.Filter.Eq("_id", "networkModelVersion");
+
+                var findNetworkModelVersionResult = latestVersionsCollection.Find(networkModelVersionFilter);
+                if (findNetworkModelVersionResult.CountDocuments() > 0)
+                {
+                    networkModelVersion = findNetworkModelVersionResult.First().Version;
+                }
+            }
+            catch (TimeoutException toe)
+            {
+                string errorMessage = $"{baseLogString} GetLatestNetworkModelVersions => Exception: {toe.Message}";
+                Logger.LogError(errorMessage, toe);
+
+                if (!isRetry)
+                {
+                    Task.Delay(60000).Wait();
+                    GetLatestNetworkModelVersions(true);
+                }
+            }
+
+            return networkModelVersion;
+        }
+
+        public long GetLatestDeltaVersions(bool isRetry = false)
+        {
+            long latestDeltaVersion = 0;
+
+            try
+            {
+                var latestVersionsCollection = db.GetCollection<LatestVersionsDocument>(MongoStrings.LatestVersionsCollection);
+                var deltaVersionFilter = Builders<LatestVersionsDocument>.Filter.Eq("_id", MongoStrings.LatestVersions_DeltaVersion);
+
+                var findDeltaVersionResult = latestVersionsCollection.Find(deltaVersionFilter);
+                if (findDeltaVersionResult.CountDocuments() > 0)
+                {
+                    latestDeltaVersion = findDeltaVersionResult.First().Version;
+                }
+            }
+            catch (TimeoutException toe)
+            {
+                string errorMessage = $"{baseLogString} GetLatestDeltaVersions => Exception: {toe.Message}";
+                Logger.LogError(errorMessage, toe);
+
+                if (!isRetry)
+                {
+                    Task.Delay(60000).Wait();
+                    GetLatestDeltaVersions(true);
+                }
+            }
+
+            return latestDeltaVersion;
+        }
+
+        public Dictionary<DMSType, Container> GetNetworkModel(long networkModelVersion)
+        {
+            var networkDataModel = new Dictionary<DMSType, Container>();
+            var networkModelFilter = Builders<NetworkModelsDocument>.Filter.Eq("_id", networkModelVersion);
+
             if (networkModelVersion > 0)
             {
-                var networkDataModelCollection = db.GetCollection<NetworkDataModelDocument>("networkModels");
-                
-                if(networkDataModelCollection.CountDocuments(networkModelFilter) > 0)
+                var networkModelsCollection = db.GetCollection<NetworkModelsDocument>(MongoStrings.NetworkModelsCollection);
+
+                if (networkModelsCollection.CountDocuments(networkModelFilter) > 0)
                 {
-                    networkDataModel = networkDataModelCollection.Find(networkModelFilter).First().NetworkModel;
+                    networkDataModel = networkModelsCollection.Find(networkModelFilter).First().NetworkModel;
                 }
             }
 
             return networkDataModel;
         }
 
-        public void SaveDelta(Delta delta)
+        public List<Delta> GetAllDeltasFromVersionRange(long firstDelta, long lastDelta)
         {
-            long deltaVersion = 0, networkModelVersion = 0, newestVersion = 0;
+            var deltas = new List<Delta>();
+            var deltasCollection = db.GetCollection<Delta>(MongoStrings.DeltasCollection);
 
-            GetVersions(ref networkModelVersion, ref deltaVersion);
-
-            newestVersion = deltaVersion > networkModelVersion ? deltaVersion : networkModelVersion;
-            delta.Id = ++newestVersion;
-
-            try
+            for (long currentDeltaVersion = firstDelta; currentDeltaVersion <= lastDelta; currentDeltaVersion++)
             {
-                var counterCollection = db.GetCollection<ModelVersionDocument>("versions");
-                //counterCollection.ReplaceOne(new BsonDocument("_id", "deltaVersion"), new ModelVersionDocument { Id = "deltaVersion", Version = delta.Id }, new UpdateOptions { IsUpsert = true });
-                counterCollection.ReplaceOne(new BsonDocument("_id", "deltaVersion"), new ModelVersionDocument { Id = "deltaVersion", Version = delta.Id }, new ReplaceOptions { IsUpsert = true });
-
-                var deltaCollection = db.GetCollection<Delta>("deltas");
-                deltaCollection.InsertOne(delta);
-            }
-            catch (Exception e)
-            {
-                Logger.LogError($"Error on database: {e.Message}.", e);
-            }
-        }
-
-        public void SaveNetworkModel(Dictionary<DMSType, Container> networkDataModel)
-        {
-            long networkModelVersion = 0, deltaVersion = 0;
-
-            GetVersions(ref networkModelVersion, ref deltaVersion);
-
-            if ((networkModelVersion == 0 && deltaVersion == 0) || (networkModelVersion > deltaVersion)) //there is no model and deltas or model in use is already saved, so there is no need for datamodel storing
-            {
-                return;
-            }
-            else if (deltaVersion > networkModelVersion) //there is new deltas since startup, so store current dataModel
-            {
-
-                IMongoCollection<NetworkDataModelDocument> networkModelCollection = db.GetCollection<NetworkDataModelDocument>("networkModels");
-                networkModelCollection.InsertOne(new NetworkDataModelDocument { Id = deltaVersion + 1, NetworkModel = networkDataModel });
-
-                IMongoCollection<ModelVersionDocument> versionsCollection = db.GetCollection<ModelVersionDocument>("versions");
-                //versionsCollection.ReplaceOne(new BsonDocument("_id", "networkModelVersion"), new ModelVersionDocument { Id = "networkModelVersion", Version = deltaVersion + 1 }, new UpdateOptions { IsUpsert = true });
-                versionsCollection.ReplaceOne(new BsonDocument("_id", "networkModelVersion"), new ModelVersionDocument { Id = "networkModelVersion", Version = deltaVersion + 1 }, new ReplaceOptions { IsUpsert = true });
-            }
-            else
-            {
-                throw new Exception("SaveNetwrokModel error!");  //better message needed :((
-            }
-        }
-
-        public void GetVersions(ref long networkModelVersion, ref long deltaVersion, bool isRetry=false)
-        {
-            try
-            {
-                //TODO: bug fix, runtime faliure
-                IMongoCollection<ModelVersionDocument> versionsCollection = db.GetCollection<ModelVersionDocument>("versions");
-
-                var networkModelVersionFilter = Builders<ModelVersionDocument>.Filter.Eq("_id", "networkModelVersion");
-                var deltaVersionFilter = Builders<ModelVersionDocument>.Filter.Eq("_id", "deltaVersion");
-
-                if (versionsCollection.Find(networkModelVersionFilter).CountDocuments() > 0)
-                {
-                    networkModelVersion = versionsCollection.Find(networkModelVersionFilter).First().Version;
-                }
-
-                if (versionsCollection.Find(deltaVersionFilter).CountDocuments() > 0)
-                {
-                    deltaVersion = versionsCollection.Find(deltaVersionFilter).First().Version;
-                }
-            }
-            catch (TimeoutException toe)
-            {
-                if(!isRetry)
-                {
-                    Task.Delay(60000).Wait();
-                    GetVersions(ref networkModelVersion, ref deltaVersion, true);
-                }
-            }
-        }
-
-        public List<Delta> GetAllDeltas(long deltaVersion, long networkModelVersion)
-        {
-
-            List<Delta> deltasFromDb = new List<Delta>();
-
-            var collection = db.GetCollection<Delta>("deltas");
-
-            for (long deltaV = networkModelVersion + 1; deltaV <= deltaVersion; deltaV++)
-            {
-                var deltaFilter = Builders<Delta>.Filter.Eq("_id", deltaV);
-                deltasFromDb.Add(collection.Find(deltaFilter).First());
+                var deltaFilter = Builders<Delta>.Filter.Eq("_id", currentDeltaVersion);
+                deltas.Add(deltasCollection.Find(deltaFilter).First());
             }
 
-            return deltasFromDb;
+            return deltas;
         }
     }
 }

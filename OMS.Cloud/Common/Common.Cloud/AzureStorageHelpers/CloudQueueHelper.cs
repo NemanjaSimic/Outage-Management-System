@@ -6,14 +6,18 @@ using System.Configuration;
 
 namespace OMS.Common.Cloud.AzureStorageHelpers
 {
-    public class CloudQueueHelper
+    public static class CloudQueueHelper
     {
+        private static ICloudLogger logger;
+        private static ICloudLogger Logger
+        {
+            get { return logger ?? (logger = CloudLoggerFactory.GetLogger()); }
+        }
+
         public static bool TryGetQueue(string queueName, out CloudQueue queue)
         {
             bool success;
             queue = null;
-
-            ICloudLogger logger = CloudLoggerFactory.GetLogger();
 
             try
             {
@@ -33,7 +37,7 @@ namespace OMS.Common.Cloud.AzureStorageHelpers
             catch (Exception e)
             {
                 string message = "Exception caught in TryGetQueue.";
-                logger.LogError(message, e);
+                Logger.LogError(message, e);
                 success = false;
             }
 

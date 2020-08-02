@@ -1,14 +1,21 @@
 ﻿<?xml version="1.0" encoding="utf-8"?>
 <ApplicationManifest xmlns:xsd="http://www.w3.org/2001/XMLSchema" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" ApplicationTypeName="OMS.CloudType" ApplicationTypeVersion="1.0.0" xmlns="http://schemas.microsoft.com/2011/01/fabric">
   <Parameters>
-    <Parameter Name="OMS.EmailService_InstanceCount" DefaultValue="-1" />
-    <Parameter Name="OMS.EmailService_InstanceCount" DefaultValue="-1" />
     <Parameter Name="OMS.ReportingService_InstanceCount" DefaultValue="-1" />
-    <Parameter Name="OMS.OutageLifecycleService_InstanceCount" DefaultValue="-1" />
     <Parameter Name="OMS.OutageLifecycleService_InstanceCount" DefaultValue="-1" />
     <Parameter Name="OMS.ModelProviderService_MinReplicaSetSize" DefaultValue="3" />
     <Parameter Name="OMS.ModelProviderService_PartitionCount" DefaultValue="1" />
     <Parameter Name="OMS.ModelProviderService_TargetReplicaSetSize" DefaultValue="3" />
+    <Parameter Name="MeasurementProviderService_MinReplicaSetSize" DefaultValue="3" />
+    <Parameter Name="MeasurementProviderService_PartitionCount" DefaultValue="1" />
+    <Parameter Name="MeasurementProviderService_TargetReplicaSetSize" DefaultValue="3" />
+    <Parameter Name="ModelProviderService_MinReplicaSetSize" DefaultValue="3" />
+    <Parameter Name="ModelProviderService_PartitionCount" DefaultValue="1" />
+    <Parameter Name="ModelProviderService_TargetReplicaSetSize" DefaultValue="3" />
+    <Parameter Name="TopologyBuilderService_InstanceCount" DefaultValue="-1" />
+    <Parameter Name="TopologyProviderService_MinReplicaSetSize" DefaultValue="3" />
+    <Parameter Name="TopologyProviderService_PartitionCount" DefaultValue="1" />
+    <Parameter Name="TopologyProviderService_TargetReplicaSetSize" DefaultValue="3" />
     <Parameter Name="PubSubService_MinReplicaSetSize" DefaultValue="3" />
     <Parameter Name="PubSubService_PartitionCount" DefaultValue="1" />
     <Parameter Name="PubSubService_TargetReplicaSetSize" DefaultValue="3" />
@@ -19,19 +26,10 @@
     <Parameter Name="SCADA.ModelProviderService_MinReplicaSetSize" DefaultValue="3" />
     <Parameter Name="SCADA.ModelProviderService_PartitionCount" DefaultValue="1" />
     <Parameter Name="SCADA.ModelProviderService_TargetReplicaSetSize" DefaultValue="3" />
-    <Parameter Name="TestService_InstanceCount" DefaultValue="-1" />
   </Parameters>
-  <!-- Import the ServiceManifest from the ServicePackage. The ServiceManifestName and ServiceManifestVersion 
-       should match the Name and Version attributes of the ServiceManifest element defined in the 
+  <!-- Import the ServiceManifest from the ServicePackage. The ServiceManifestName and ServiceManifestVersion
+       should match the Name and Version attributes of the ServiceManifest element defined in the
        ServiceManifest.xml file. -->
-  <ServiceManifestImport>
-    <ServiceManifestRef ServiceManifestName="OMS.EmailServicePkg" ServiceManifestVersion="1.0.0" />
-    <ConfigOverrides />
-  </ServiceManifestImport>
-  <ServiceManifestImport>
-    <ServiceManifestRef ServiceManifestName="OMS.EmailServicePkg" ServiceManifestVersion="1.0.0" />
-    <ConfigOverrides />
-  </ServiceManifestImport>
   <ServiceManifestImport>
     <ServiceManifestRef ServiceManifestName="OMS.ReportingServicePkg" ServiceManifestVersion="1.0.0" />
     <ConfigOverrides />
@@ -46,6 +44,25 @@
   </ServiceManifestImport>
   <ServiceManifestImport>
     <ServiceManifestRef ServiceManifestName="OMS.ModelProviderServicePkg" ServiceManifestVersion="1.0.0" />
+  </ServiceManifestImport>
+  <ServiceManifestImport>
+    <ServiceManifestRef ServiceManifestName="MeasurementProviderServicePkg" ServiceManifestVersion="1.0.0" />
+    <ConfigOverrides />
+  </ServiceManifestImport>
+  <ServiceManifestImport>
+    <ServiceManifestRef ServiceManifestName="ModelProviderServicePkg" ServiceManifestVersion="1.0.0" />
+    <ConfigOverrides />
+  </ServiceManifestImport>
+  <ServiceManifestImport>
+    <ServiceManifestRef ServiceManifestName="TopologyBuilderServicePkg" ServiceManifestVersion="1.0.0" />
+    <ConfigOverrides />
+  </ServiceManifestImport>
+  <ServiceManifestImport>
+    <ServiceManifestRef ServiceManifestName="TopologyProviderServicePkg" ServiceManifestVersion="1.0.0" />
+    <ConfigOverrides />
+  </ServiceManifestImport>
+  <ServiceManifestImport>
+    <ServiceManifestRef ServiceManifestName="TMS.TransactionManagerServicePkg" ServiceManifestVersion="1.0.0" />
     <ConfigOverrides />
   </ServiceManifestImport>
   <ServiceManifestImport>
@@ -72,26 +89,12 @@
     <ServiceManifestRef ServiceManifestName="SCADA.ModelProviderServicePkg" ServiceManifestVersion="1.0.0" />
     <ConfigOverrides />
   </ServiceManifestImport>
-  <ServiceManifestImport>
-    <ServiceManifestRef ServiceManifestName="TestServicePkg" ServiceManifestVersion="1.0.0" />
-    <ConfigOverrides />
-  </ServiceManifestImport>
   <DefaultServices>
-    <!-- The section below creates instances of service types, when an instance of this 
-         application type is created. You can also create one or more instances of service type using the 
+    <!-- The section below creates instances of service types, when an instance of this
+         application type is created. You can also create one or more instances of service type using the
          ServiceFabric PowerShell module.
-         
+
          The attribute ServiceTypeName below must match the name defined in the imported ServiceManifest.xml file. -->
-    <Service Name="OMS.EmailService" ServicePackageActivationMode="ExclusiveProcess">
-      <StatelessService ServiceTypeName="OMS.EmailServiceType" InstanceCount="[OMS.EmailService_InstanceCount]">
-        <SingletonPartition />
-      </StatelessService>
-    </Service>
-    <Service Name="OMS.EmailService" ServicePackageActivationMode="ExclusiveProcess">
-      <StatelessService ServiceTypeName="OMS.EmailServiceType" InstanceCount="[OMS.EmailService_InstanceCount]">
-        <SingletonPartition />
-      </StatelessService>
-    </Service>
     <Service Name="OMS.ReportingService" ServicePackageActivationMode="ExclusiveProcess">
       <StatelessService ServiceTypeName="OMS.ReportingServiceType" InstanceCount="[OMS.ReportingService_InstanceCount]">
         <SingletonPartition />
@@ -112,11 +115,31 @@
         <UniformInt64Partition PartitionCount="[OMS.ModelProviderService_PartitionCount]" LowKey="-9223372036854775808" HighKey="9223372036854775807" />
       </StatefulService>
     </Service>
-    <Service Name="TestService" ServicePackageActivationMode="ExclusiveProcess">
-      <StatelessService ServiceTypeName="TestServiceType" InstanceCount="[TestService_InstanceCount]">
+    <Service Name="MeasurementProviderService" ServicePackageActivationMode="ExclusiveProcess">
+      <StatefulService ServiceTypeName="MeasurementProviderServiceType" TargetReplicaSetSize="[MeasurementProviderService_TargetReplicaSetSize]" MinReplicaSetSize="[MeasurementProviderService_MinReplicaSetSize]">
+        <UniformInt64Partition PartitionCount="[MeasurementProviderService_PartitionCount]" LowKey="-9223372036854775808" HighKey="9223372036854775807" />
+      </StatefulService>
+    </Service>
+    <Service Name="ModelProviderService" ServicePackageActivationMode="ExclusiveProcess">
+      <StatefulService ServiceTypeName="ModelProviderServiceType" TargetReplicaSetSize="[ModelProviderService_TargetReplicaSetSize]" MinReplicaSetSize="[ModelProviderService_MinReplicaSetSize]">
+        <UniformInt64Partition PartitionCount="[ModelProviderService_PartitionCount]" LowKey="-9223372036854775808" HighKey="9223372036854775807" />
+      </StatefulService>
+    </Service>
+    <Service Name="TopologyBuilderService" ServicePackageActivationMode="ExclusiveProcess">
+      <StatelessService ServiceTypeName="TopologyBuilderServiceType" InstanceCount="[TopologyBuilderService_InstanceCount]">
         <SingletonPartition />
       </StatelessService>
     </Service>
+    <Service Name="TopologyProviderService" ServicePackageActivationMode="ExclusiveProcess">
+      <StatefulService ServiceTypeName="TopologyProviderServiceType" TargetReplicaSetSize="[TopologyProviderService_TargetReplicaSetSize]" MinReplicaSetSize="[TopologyProviderService_MinReplicaSetSize]">
+        <UniformInt64Partition PartitionCount="[TopologyProviderService_PartitionCount]" LowKey="-9223372036854775808" HighKey="9223372036854775807" />
+      </StatefulService>
+    </Service>
+    <!--<Service Name="TestService" ServicePackageActivationMode="ExclusiveProcess">
+      <StatelessService ServiceTypeName="TestServiceType" InstanceCount="[TestService_InstanceCount]">
+        <SingletonPartition />
+      </StatelessService>
+    </Service>-->
     <Service Name="PubSubService" ServicePackageActivationMode="ExclusiveProcess">
       <StatefulService ServiceTypeName="PubSubServiceType" TargetReplicaSetSize="[PubSubService_TargetReplicaSetSize]" MinReplicaSetSize="[PubSubService_MinReplicaSetSize]">
         <UniformInt64Partition PartitionCount="[PubSubService_PartitionCount]" LowKey="-9223372036854775808" HighKey="9223372036854775807" />

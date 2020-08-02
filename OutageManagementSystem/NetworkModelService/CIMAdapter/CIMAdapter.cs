@@ -50,7 +50,7 @@ namespace Outage.DataImporter.CIMAdapter
             proxyFactory = new ProxyFactory();
         }
 
-        public async Task<ConditionalValue<Delta>> CreateDelta(Stream extract, SupportedProfiles extractType, StringBuilder logBuilder)
+        public ConditionalValue<Delta> CreateDelta(Stream extract, SupportedProfiles extractType, StringBuilder logBuilder)
         {
             ConditionalValue<Delta> result;
             ConcreteModel concreteModel = null;
@@ -63,7 +63,7 @@ namespace Outage.DataImporter.CIMAdapter
             if (LoadModelFromExtractFile(extract, extractType, ref concreteModel, ref assembly, out loadLog))
             {
                 logBuilder.AppendLine($"Load report:\r\n{loadLog}");
-                result = await DoTransformAndLoad(assembly, concreteModel, extractType, logBuilder);
+                result = DoTransformAndLoad(assembly, concreteModel, extractType, logBuilder);
             }
             else
             {
@@ -142,7 +142,7 @@ namespace Outage.DataImporter.CIMAdapter
             return valid;
         }
 
-        private async Task<ConditionalValue<Delta>> DoTransformAndLoad(Assembly assembly, ConcreteModel concreteModel, SupportedProfiles extractType, StringBuilder logBuilder)
+        private ConditionalValue<Delta> DoTransformAndLoad(Assembly assembly, ConcreteModel concreteModel, SupportedProfiles extractType, StringBuilder logBuilder)
         {
             Delta nmsDelta;
             bool success;

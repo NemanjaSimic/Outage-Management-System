@@ -4,16 +4,27 @@ using System.Fabric;
 using System.Threading;
 using System.Threading.Tasks;
 using Microsoft.ServiceFabric.Services.Runtime;
+using OMS.Common.Cloud.Logger;
 
 namespace SCADA.AcquisitionService
 {
     internal static class Program
     {
+        private const string serviceTypeName = "SCADA.AcquisitionServiceType";
+
+        private static ICloudLogger logger;
+        private static ICloudLogger Logger
+        {
+            get { return logger ?? (logger = CloudLoggerFactory.GetLogger()); }
+        }
+
         /// <summary>
         /// This is the entry point of the service host process.
         /// </summary>
         private static void Main()
         {
+            string baseLogString = $"{typeof(Program)} [static] =>";
+            
             try
             {
                 // The ServiceManifest.XML file defines one or more service type names.
@@ -21,9 +32,11 @@ namespace SCADA.AcquisitionService
                 // When Service Fabric creates an instance of this service type,
                 // an instance of the class is created in this host process.
 
-                ServiceRuntime.RegisterServiceAsync("SCADA.AcquisitionServiceType",
-                    context => new AcquisitionService(context)).GetAwaiter().GetResult();
+                Logger.LogDebug($"{baseLogString} Main => Calling RegisterServiceAsync for type '{serviceTypeName}'.");
 
+                ServiceRuntime.RegisterServiceAsync(serviceTypeName, context => new AcquisitionService(context)).GetAwaiter().GetResult();
+
+                Logger.LogInformation($"{baseLogString} Main => '{serviceTypeName}' type registered.");
                 ServiceEventSource.Current.ServiceTypeRegistered(Process.GetCurrentProcess().Id, typeof(AcquisitionService).Name);
 
                 // Prevents this host process from terminating so services keep running.
@@ -31,6 +44,7 @@ namespace SCADA.AcquisitionService
             }
             catch (Exception e)
             {
+                Logger.LogError($"{baseLogString} Main => Exception: {e.Message}.", e);
                 ServiceEventSource.Current.ServiceHostInitializationFailed(e.ToString());
                 throw;
             }

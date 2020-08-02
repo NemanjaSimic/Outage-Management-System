@@ -34,7 +34,7 @@ namespace OMS.CallTrackingServiceImplementation
 		private readonly IReliableStateManager stateManager;
 		private int expectedCalls;
 		private int timerInterval;
-		private Uri subscriberUri;
+		private string subscriberName;
 
 		private ModelResourcesDesc modelResourcesDesc;
 
@@ -48,7 +48,7 @@ namespace OMS.CallTrackingServiceImplementation
 
 			trackingAlgorithm = new TrackingAlgorithm();
 
-			subscriberUri = new Uri("fabric:/OMS.Cloud/CallTrackingService");
+			subscriberName = "CallTrackingService"; //TODO: ServiceDefines
 
 			modelResourcesDesc = new ModelResourcesDesc();
 
@@ -86,12 +86,12 @@ namespace OMS.CallTrackingServiceImplementation
 		}
 
 		#region INotifySubscriberContract
-		public async Task<Uri> GetSubscriberUri()
+		public async Task<string> GetSubscriberName()
 		{
-			return subscriberUri;
+			return subscriberName;
 		}
 
-		public async Task Notify(IPublishableMessage message)
+		public async Task Notify(IPublishableMessage message, string publisherName)
 		{
 			if (message is EmailToOutageMessage emailMessage)
 			{
@@ -120,10 +120,10 @@ namespace OMS.CallTrackingServiceImplementation
 
 					await Calls.SetAsync(emailMessage.Gid, emailMessage.Gid);
 					//Logger.LogInfo($"Current number of calls is: {Calls.Count}.");
-
-					if (Calls.Count >= expectedCalls)
+					
+					if ((await Calls.GetCountAsync()) >= expectedCalls)
 					{
-						await trackingAlgorithm.Start(Calls.GetDataCopy().Keys.ToList());
+						await trackingAlgorithm.Start((await Calls.GetDataCopyAsync()).Keys.ToList());
 
 						await Calls.ClearAsync();
 						timer.Stop();
@@ -136,13 +136,13 @@ namespace OMS.CallTrackingServiceImplementation
 
 		private void TimerElapsedMethod(object sender, ElapsedEventArgs e)
 		{
-			if (Calls.Count < expectedCalls)
+			if ((Calls.GetCountAsync().Result) < expectedCalls)
 			{
 				//Logger.LogInfo($"Timer elapsed (timer interval is {timerInterval}) and there is no enough calls to start tracing algorithm.");
 			}
 			else
 			{
-				trackingAlgorithm.Start(Calls.GetDataCopy().Keys.ToList()).Wait();
+				trackingAlgorithm.Start((Calls.GetDataCopyAsync().Result).Keys.ToList()).Wait();
 			}
 
 			Calls.ClearAsync().Wait();

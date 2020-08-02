@@ -19,7 +19,6 @@ namespace OMS.Common.Cloud.ReliableCollectionHelpers
         public async Task<ConditionalValue<Dictionary<TKey, TValue>>> TryCopyToDictionary<TKey, TValue>(string sourceKey, IReliableStateManager stateManager) where TKey : IComparable<TKey>, IEquatable<TKey>
         {
             var conditionalValue = await reliableStateManagerHelper.TryGetAsync<IReliableDictionary<TKey, TValue>>(stateManager, sourceKey);
-            //var conditionalValue = await stateManager.TryGetAsync<IReliableDictionary<TKey, TValue>>(sourceKey);
 
             if (!conditionalValue.HasValue)
             {
@@ -33,7 +32,6 @@ namespace OMS.Common.Cloud.ReliableCollectionHelpers
         public async Task<ConditionalValue<Dictionary<TKey, TValue>>> TryCopyToDictionary<TKey, TValue>(IReliableDictionary<TKey, TValue> source, IReliableStateManager stateManager) where TKey : IComparable<TKey>, IEquatable<TKey>
         {
             Dictionary<TKey, TValue> target = new Dictionary<TKey, TValue>();
-
             Microsoft.ServiceFabric.Data.IAsyncEnumerable<KeyValuePair<TKey, TValue>> asyncEnumerable;
 
             using (ITransaction tx = stateManager.CreateTransaction())
@@ -42,14 +40,11 @@ namespace OMS.Common.Cloud.ReliableCollectionHelpers
             }
 
             var asyncEnumerator = asyncEnumerable.GetAsyncEnumerator();
-            var currentEntry = asyncEnumerator.Current;
-            target.Add(currentEntry.Key, currentEntry.Value);
-
             CancellationTokenSource tokenSource = new CancellationTokenSource();
 
             while(await asyncEnumerator.MoveNextAsync(tokenSource.Token))
             {
-                currentEntry = asyncEnumerator.Current;
+                var currentEntry = asyncEnumerator.Current;
                 target.Add(currentEntry.Key, currentEntry.Value);
             }
 
@@ -59,7 +54,6 @@ namespace OMS.Common.Cloud.ReliableCollectionHelpers
         public async Task<ConditionalValue<IReliableDictionary<TKey, TValue>>> TryCopyToReliableDictionary<TKey, TValue>(Dictionary<TKey, TValue> source, string targetKey, IReliableStateManager stateManager) where TKey : IComparable<TKey>, IEquatable<TKey>
         {
             var conditionalValue = await reliableStateManagerHelper.TryGetAsync<IReliableDictionary<TKey, TValue>>(stateManager, targetKey);
-            //var conditionalValue = await stateManager.TryGetAsync<IReliableDictionary<TKey, TValue>>(targetKey);
 
             if (!conditionalValue.HasValue)
             {
@@ -72,7 +66,8 @@ namespace OMS.Common.Cloud.ReliableCollectionHelpers
             {
                 foreach (var kvp in source)
                 {
-                    await reliableDictionary.AddOrUpdateAsync(tx, kvp.Key, kvp.Value, (key, value) => kvp.Value);
+                    //TODO: do not await one by one but await all
+                    await reliableDictionary.SetAsync(tx, kvp.Key, kvp.Value);
                 }
 
                 await tx.CommitAsync();
@@ -84,7 +79,7 @@ namespace OMS.Common.Cloud.ReliableCollectionHelpers
         public async Task<ConditionalValue<IReliableDictionary<TKey, TValue>>> TryCopyToReliableDictionary<TKey, TValue>(string sourceKey, string targetKey, IReliableStateManager stateManager) where TKey : IComparable<TKey>, IEquatable<TKey>
         {
             var conditionalValue = await reliableStateManagerHelper.TryGetAsync<IReliableDictionary<TKey, TValue>>(stateManager, sourceKey);
-            //var conditionalValue = await stateManager.TryGetAsync<IReliableDictionary<TKey, TValue>>(sourceKey);
+
             if (!conditionalValue.HasValue)
             {
                 return new ConditionalValue<IReliableDictionary<TKey, TValue>>(false, null);
@@ -93,7 +88,7 @@ namespace OMS.Common.Cloud.ReliableCollectionHelpers
             IReliableDictionary<TKey, TValue> source = conditionalValue.Value;
 
             conditionalValue = await reliableStateManagerHelper.TryGetAsync<IReliableDictionary<TKey, TValue>>(stateManager, targetKey);
-            //conditionalValue = await stateManager.TryGetAsync<IReliableDictionary<TKey, TValue>>(targetKey);
+
             if (!conditionalValue.HasValue)
             {
                 return new ConditionalValue<IReliableDictionary<TKey, TValue>>(false, null);
@@ -105,16 +100,13 @@ namespace OMS.Common.Cloud.ReliableCollectionHelpers
             {
                 var asyncEnumerable = await source.CreateEnumerableAsync(tx);
                 var asyncEnumerator = asyncEnumerable.GetAsyncEnumerator();
-
-                var currentEntry = asyncEnumerator.Current;
-                await target.AddOrUpdateAsync(tx, currentEntry.Key, currentEntry.Value, (key, value) => currentEntry.Value);
-
                 CancellationTokenSource tokenSource = new CancellationTokenSource();
 
                 while(await asyncEnumerator.MoveNextAsync(tokenSource.Token))
                 {
-                    currentEntry = asyncEnumerator.Current;
-                    await target.AddOrUpdateAsync(tx, currentEntry.Key, currentEntry.Value, (key, value) => currentEntry.Value);
+                    var currentEntry = asyncEnumerator.Current;
+                    //TODO: do not await one by one but await all
+                    await target.SetAsync(tx, currentEntry.Key, currentEntry.Value);
                 }
 
                 await tx.CommitAsync();

@@ -8,11 +8,12 @@ using Microsoft.ServiceFabric.Services.Communication.Wcf;
 using Microsoft.ServiceFabric.Services.Communication.Wcf.Runtime;
 using Microsoft.ServiceFabric.Services.Runtime;
 using NMS.GdaImplementation;
+using NMS.GdaImplementation.DistributedTransaction;
 using NMS.GdaImplementation.GDA;
 using OMS.Common.Cloud.Logger;
 using OMS.Common.Cloud.Names;
 using OMS.Common.NmsContracts;
-
+using OMS.Common.TmsContracts;
 
 namespace NMS.GdaService
 {
@@ -21,31 +22,54 @@ namespace NMS.GdaService
     /// </summary>
     internal sealed class GdaService : StatelessService
     {
-        private readonly ICloudLogger logger;
-
+        private readonly string baseLogString;
         private readonly NetworkModel networkModel;
+        private readonly INetworkModelGDAContract genericDataAccess;
+        private readonly ITransactionActorContract nmsTransactionActor;
+
+        #region Private Properties
+        private ICloudLogger logger;
+        private ICloudLogger Logger
+        {
+            get { return logger ?? (logger = CloudLoggerFactory.GetLogger()); }
+        }
+        #endregion Private Properties
 
         public GdaService(StatelessServiceContext context)
             : base(context)
         {
-            logger = CloudLoggerFactory.GetLogger();
+            this.baseLogString = $"{this.GetType()} [{this.GetHashCode()}] =>{Environment.NewLine}";
+            Logger.LogDebug($"{baseLogString} Ctor => Logger initialized");
 
             try
             {
+                //LOGIC
                 _ = Config.GetInstance(this.Context);
-                string message = "Configuration initialized.";
-                logger.LogInformation(message);
-                ServiceEventSource.Current.ServiceMessage(this.Context, $"[GdaService | Information] {message}");
+                
+                string debugMessage = $"{baseLogString} Ctor => Configuration initialized.";
+                Logger.LogDebug(debugMessage);
+                ServiceEventSource.Current.ServiceMessage(this.Context, $"[GdaService | Debug] {debugMessage}");
 
+                //LOGIC
                 this.networkModel = new NetworkModel();
-                message = "NetworkModel created.";
-                logger.LogInformation(message);
-                ServiceEventSource.Current.ServiceMessage(this.Context, $"[GdaService | Information] {message}");
+
+                string infoMessage = $"{baseLogString} Ctor => NetworkModel created.";
+                Logger.LogInformation(infoMessage);
+                ServiceEventSource.Current.ServiceMessage(this.Context, $"[GdaService | Information] {infoMessage}");
+
+                //LOGIC
+                this.genericDataAccess = new GenericDataAccess(networkModel);
+                this.nmsTransactionActor = new NmsTransactionActor(networkModel);
+
+                infoMessage = $"{baseLogString} Ctor => Contract providers initialized.";
+                Logger.LogInformation(infoMessage);
+                ServiceEventSource.Current.ServiceMessage(this.Context, $"[GdaService | Information] {infoMessage}");
             }
             catch (Exception e)
             {
-                logger.LogError(e.Message, e);
-                ServiceEventSource.Current.ServiceMessage(this.Context, $"[GdaService | Error] {e.Message}");
+                string errMessage = $"{baseLogString} Ctor => Exception caught: {e.Message}.";
+                Logger.LogError(errMessage, e);
+                ServiceEventSource.Current.ServiceMessage(this.Context, $"[GdaService | Error] {errMessage}");
             }
         }
 
@@ -62,19 +86,19 @@ namespace NMS.GdaService
                 new ServiceInstanceListener(context =>
                 {
                     return new WcfCommunicationListener<INetworkModelGDAContract>(context,
-                                                                           new GenericDataAccess(networkModel),
-                                                                           WcfUtility.CreateTcpListenerBinding(),
-                                                                           EndpointNames.NetworkModelGDAEndpoint);
-                }, EndpointNames.NetworkModelGDAEndpoint),
+                                                                                  this.genericDataAccess,
+                                                                                  WcfUtility.CreateTcpListenerBinding(),
+                                                                                  EndpointNames.NmsGdaEndpoint);
+                }, EndpointNames.NmsGdaEndpoint),
 
-                ////NetworkModelTransactionActorEndpoint
-                //new ServiceInstanceListener(context =>
-                //{
-                //    return new WcfCommunicationListener<ITransactionActorContract>(context,
-                //                                                           new NMSTransactionActor(networkModel),
-                //                                                           WcfUtility.CreateTcpListenerBinding(),
-                //                                                           EndpointNames.NetworkModelTransactionActorEndpoint);
-                //}, EndpointNames.NetworkModelTransactionActorEndpoint),
+                //TransactionActorEndpoint
+                new ServiceInstanceListener(context =>
+                {
+                    return new WcfCommunicationListener<ITransactionActorContract>(context,
+                                                                                   this.nmsTransactionActor,
+                                                                                   WcfUtility.CreateTcpListenerBinding(),
+                                                                                   EndpointNames.TmsTransactionActorEndpoint);
+                }, EndpointNames.TmsTransactionActorEndpoint),
             };
         }
 
@@ -84,15 +108,18 @@ namespace NMS.GdaService
 
             try
             {
+                //LOGIC
                 await this.networkModel.InitializeNetworkModel();
-                string message = $"NetworkModel initialized.";
-                logger.LogInformation(message);
-                ServiceEventSource.Current.ServiceMessage(this.Context, $"[GdaService | Information] {message}");
+
+                string infoMessage = $"{baseLogString} RunAsync => NetworkModel initialized.";
+                Logger.LogInformation(infoMessage);
+                ServiceEventSource.Current.ServiceMessage(this.Context, $"[GdaService | Information] {infoMessage}");
             }
             catch (Exception e)
             {
-                logger.LogError(e.Message, e);
-                ServiceEventSource.Current.ServiceMessage(this.Context, $"[GdaService | Error] {e.Message}");
+                string errMessage = $"{baseLogString} RunAsync => Exception caught: {e.Message}.";
+                Logger.LogError(errMessage, e);
+                ServiceEventSource.Current.ServiceMessage(this.Context, $"[GdaService | Error] {errMessage}");
             }
         }
     }

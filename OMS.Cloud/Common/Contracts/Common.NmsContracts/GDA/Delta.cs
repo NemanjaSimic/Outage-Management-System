@@ -10,23 +10,39 @@ using OMS.Common.Cloud;
 
 namespace OMS.Common.NmsContracts.GDA
 {
+	[DataContract]
+	public enum DeltaOriginType : byte
+    {
+		[EnumMember]
+		ImporterDelta = 1,
 
-    public enum DeltaOpType : byte 
+		[EnumMember]
+		DatabaseDelta = 2,
+    }
+
+	[DataContract]
+	public enum DeltaOpType : byte 
 	{ 
-		Insert = 0, 
-		Update = 1, 
-		Delete = 2 
+		[EnumMember]
+		Insert = 0,
+
+		[EnumMember]
+		Update = 1,
+
+		[EnumMember]
+		Delete = 2,
 	}
 
 	[DataContract]	
 	public class Delta
 	{
-        private ICloudLogger logger;
-
-        private ICloudLogger Logger
-        {
-            get { return logger ?? (logger = CloudLoggerFactory.GetLogger()); }
-        } 
+		#region Private Properties
+		private ICloudLogger logger;
+		private ICloudLogger Logger
+		{
+			get { return logger ?? (logger = CloudLoggerFactory.GetLogger()); }
+		}
+		#endregion Private Properties
 
 		private long id;
 		private List<ResourceDescription> insertOps = new List<ResourceDescription>();
@@ -117,6 +133,9 @@ namespace OMS.Common.NmsContracts.GDA
 			get { return id; }
 			set { id = value; }
 		}		
+
+		[DataMember]
+		public DeltaOriginType DeltaOrigin { get; set; }
 
 		[DataMember]		
 		public List<ResourceDescription> InsertOperations
@@ -242,7 +261,7 @@ namespace OMS.Common.NmsContracts.GDA
 				}
 			}
 
-			string message = string.Format("There is no {0} delta operation with GID: 0x{1:X16}.", type.ToString(), id);
+			string message = string.Format($"There is no {type.ToString()} delta operation with GID: 0x{id:X16}.");
 			Logger.LogError(message);
 			throw new Exception(message);
 		}
@@ -296,7 +315,9 @@ namespace OMS.Common.NmsContracts.GDA
 
 						if (type <= 0)
 						{
-							throw new ModelException(ErrorCode.InvalidDelta, gidOld, 0, string.Format("Invalid DMS type found in insert delta operation ID: 0x{0:X16}.", rd.Id));
+							string errorMessage = $"FixNegativeToPositiveIds => Invalid DMS type found in insert delta operation ID: 0x{rd.Id:X16}.";
+							Logger.LogError(errorMessage);
+							throw new ModelException(ErrorCode.InvalidDelta, gidOld, 0, errorMessage);
 						}
 
 						int idNew = typesCounters[type] + 1;
@@ -310,18 +331,19 @@ namespace OMS.Common.NmsContracts.GDA
 					}
 					else
 					{
-						message = String.Format("Failed to fix negative to positive IDs in insert delta operations for delta with ID: {0} because negative resource ID: 0x{1:X16} already exists in previous insert delta operations.", GetCompositeId(id), gidOld);
+						message = $"FixNegativeToPositiveIds => Failed to fix negative to positive IDs in insert delta operations for delta with ID: {GetCompositeId(id)} because negative resource ID: 0x{gidOld:X16} already exists in previous insert delta operations.";
 						Logger.LogError(message);
-						string exceptionMessage = String.Format("Invalid delta. Negative resource ID: 0x{0:X16} already exists in previous insert delta operations.", gidOld);
+
+						string exceptionMessage = $"Invalid delta. Negative resource ID: 0x{gidOld:X16} already exists in previous insert delta operations.";
 						throw new Exception(exceptionMessage);
 					}
 				}
 				else if (!this.positiveIdsAllowed)
 				{
-					message = String.Format("Failed to fix negative to positive IDs in insert delta operations for delta with ID: {0} because resource ID: 0x{1:X16} must not be positive.", GetCompositeId(id), gidOld);
+					message = $"Failed to fix negative to positive IDs in insert delta operations for delta with ID: {GetCompositeId(id)} because resource ID: 0x{gidOld:X16} must not be positive.";
 					Logger.LogError(message);
 
-					string exceptionMessage = String.Format("Invalid insert delta operation. Resource ID: 0x{0:X16} must not be positive.", gidOld);
+					string exceptionMessage = $"Invalid insert delta operation. Resource ID: 0x{gidOld:X16} must not be positive.";
 					throw new Exception(exceptionMessage);
 				}
 			}
@@ -343,10 +365,10 @@ namespace OMS.Common.NmsContracts.GDA
 							}
 							else
 							{
-								message = String.Format("Failed to fix negative to positive IDs in insert delta operations for delta with ID: {0} because negative reference (property code: {1}, value: 0x{2:X16}) does not exist in insert delta operations. Resource ID: 0x{3:X16}. ", GetCompositeId(id), p.Id, gidOld, rd.Id);
+								message = $"Failed to fix negative to positive IDs in insert delta operations for delta with ID: {GetCompositeId(id)} because negative reference (property code: {p.Id}, value: 0x{gidOld:X16}) does not exist in insert delta operations. Resource ID: 0x{rd.Id:X16}.";
 								Logger.LogError(message);
 
-								string exceptionMessage = String.Format("Invalid insert delta operation. Negative reference (property code: {0}, value: 0x{1:X16}) does not exist in insert delta operations. Resource ID: 0x{2:X16}. ", p.Id, gidOld, rd.Id);
+								string exceptionMessage = $"Invalid insert delta operation. Negative reference (property code: {p.Id}, value: 0x{gidOld:X16}) does not exist in insert delta operations. Resource ID: 0x{rd.Id:X16}.";
 								throw new Exception(exceptionMessage);
 							}
 						}
@@ -369,10 +391,10 @@ namespace OMS.Common.NmsContracts.GDA
 								}
 								else
 								{
-									message = String.Format("Failed to fix negative to positive IDs in insert delta operations for delta with ID: {0} because negative reference (property code: {1}, value: 0x{2:X16}) does not exist in insert delta operations. Resource ID: 0x{3:X16}. ", GetCompositeId(id), p.Id, gidOldRef, rd.Id);
+									message = $"Failed to fix negative to positive IDs in insert delta operations for delta with ID: {GetCompositeId(id)} because negative reference (property code: {p.Id}, value: 0x{gidOldRef:X16}) does not exist in insert delta operations. Resource ID: 0x{rd.Id:X16}.";
 									Logger.LogError(message);
 
-									string exceptionMessage = String.Format("Invalid insert delta operation. Negative reference (property code: {0}, value: 0x{1:X16}) does not exist in insert delta operations. Resource ID: 0x{2:X16}. ", p.Id, gidOldRef, rd.Id);
+									string exceptionMessage = $"Invalid insert delta operation. Negative reference (property code: {p.Id}, value: 0x{gidOldRef:X16}) does not exist in insert delta operations. Resource ID: 0x{rd.Id:X16}.";
 									throw new Exception(exceptionMessage);
 								}
 							}
@@ -399,10 +421,10 @@ namespace OMS.Common.NmsContracts.GDA
 					}
 					else
 					{
-						message = String.Format("Failed to fix negative to positive IDs in update delta operations for delta with ID {0} because negative resource ID: 0x{1:X16} does not exists in insert delta operations.", GetCompositeId(id), gidOld);
+						message = $"Failed to fix negative to positive IDs in update delta operations for delta with ID {GetCompositeId(id)} because negative resource ID: 0x{gidOld:X16} does not exists in insert delta operations.";
 						Logger.LogError(message);
 
-						string exceptionMessage = String.Format("Invalid update delta operation. Negative resource ID: 0x{0:X16} does not exists in insert delta operations.", gidOld);
+						string exceptionMessage = $"Invalid update delta operation. Negative resource ID: 0x{gidOld:X16} does not exists in insert delta operations.";
 						throw new Exception(exceptionMessage);
 					}
 				}
@@ -421,10 +443,10 @@ namespace OMS.Common.NmsContracts.GDA
 							}
 							else
 							{
-								message = String.Format("Failed to fix negative to positive IDs in update delta operations for delta with ID: {0} because negative reference (property code: {1}, value: 0x{2:X16}) does not exist in insert delta operations. Resource ID: 0x{3:X16}. ", GetCompositeId(id), p.Id, gidOldRef, rd.Id);
+								message = $"Failed to fix negative to positive IDs in update delta operations for delta with ID: {GetCompositeId(id)} because negative reference (property code: {p.Id}, value: 0x{gidOldRef:X16}) does not exist in insert delta operations. Resource ID: 0x{rd.Id:X16}.";
 								Logger.LogError(message);
 
-								string exceptionMessage = String.Format("Invalid update delta operation. Negative reference (property code: {0}, value: 0x{1:X16}) does not exist in insert delta operations. Resource ID: 0x{2:X16}. ", p.Id, gidOldRef, rd.Id);
+								string exceptionMessage = $"Invalid update delta operation. Negative reference (property code: {p.Id}, value: 0x{gidOldRef:X16}) does not exist in insert delta operations. Resource ID: 0x{rd.Id:X16}.";
 								throw new Exception(exceptionMessage);
 							}
 						}
@@ -447,10 +469,10 @@ namespace OMS.Common.NmsContracts.GDA
 								}
 								else
 								{
-									message = String.Format("Failed to fix negative to positive IDs in update delta operations for delta with ID: {0} because negative reference (property code: {1}, value: 0x{2:X16}) does not exist in insert delta operations. Resource ID: 0x{3:X16}. ", GetCompositeId(id), p.Id, gidOldRef, rd.Id);									
+									message = $"Failed to fix negative to positive IDs in update delta operations for delta with ID: {GetCompositeId(id)} because negative reference (property code: {p.Id}, value: 0x{gidOldRef:X16}) does not exist in insert delta operations. Resource ID: 0x{rd.Id:X16}.";									
 									Logger.LogError(message);
 
-									string exceptionMessage = String.Format("Invalid update delta operation. Negative reference (property code: {0}, value: 0x{1:X16}) does not exist in insert delta operations. Resource ID: 0x{2:X16}. ", p.Id, gidOldRef, rd.Id);
+									string exceptionMessage = $"Invalid update delta operation. Negative reference (property code: {p.Id}, value: 0x{gidOldRef:X16}) does not exist in insert delta operations. Resource ID: 0x{rd.Id:X16}.";
 									throw new Exception(exceptionMessage);
 								}
 							}
@@ -477,22 +499,22 @@ namespace OMS.Common.NmsContracts.GDA
 					}
 					else
 					{
-						message = String.Format("Failed to fix negative to positive IDs in delete delta operations for delta with ID: {0} because negative resource ID: 0x{1:X16} does not exists in insert delta operations.", GetCompositeId(id), gidOld);
+						message = $"Failed to fix negative to positive IDs in delete delta operations for delta with ID: {GetCompositeId(id)} because negative resource ID: 0x{gidOld:X16} does not exists in insert delta operations.";
 						Logger.LogError(message);						
 
-						string exceptionMessage = String.Format("Invalid delete delta operation. Negative resource ID: 0x{0:X16} does not exists in insert delta operations.", gidOld);
+						string exceptionMessage = $"Invalid delete delta operation. Negative resource ID: 0x{gidOld:X16} does not exists in insert delta operations.";
 						throw new Exception(message);
 					}
 				}
 			}
 
-			message = String.Format("Fixing negative to positive IDs for delta with ID: {0} completed successfully.", GetCompositeId(id));
+			message = $"Fixing negative to positive IDs for delta with ID: {GetCompositeId(id)} completed successfully.";
 			Logger.LogDebug(message);
 		}
 
 		public void SortOperations()
 		{
-			string message = String.Format("Sorting delta operations for delta with ID: {0}.", GetCompositeId(id));
+			string message = $"Sorting delta operations for delta with ID: {GetCompositeId(id)}.";
 			Logger.LogDebug(message);
 
 			List<ResourceDescription> insertOpsOrdered = new List<ResourceDescription>();
@@ -554,10 +576,10 @@ namespace OMS.Common.NmsContracts.GDA
 					}
 				}
 
-				message = String.Format("Failed to sort delta operations because there are some insert operations (count = {0}) whose type (e.g {1}) is not specified in the given list of types.", insertOps.Count - insertOpsOrderedNo, typeNotDefined);
+				message = $"Failed to sort delta operations because there are some insert operations (count = {insertOps.Count - insertOpsOrderedNo}) whose type (e.g {typeNotDefined}) is not specified in the given list of types.";
 				Logger.LogError(message);
 
-				string exceptionMessage = String.Format("Invalid delta. Some insert operations (count = {0}) whose type (e.g {1}) is not correct.", insertOps.Count - insertOpsOrderedNo, typeNotDefined);
+				string exceptionMessage = $"Invalid delta. Some insert operations (count = {insertOps.Count - insertOpsOrderedNo}) whose type (e.g {typeNotDefined}) is not correct.";
 				throw new ModelException(ErrorCode.InvalidDelta, exceptionMessage);
 			}
 
@@ -576,10 +598,10 @@ namespace OMS.Common.NmsContracts.GDA
 						typeNotDefined = ModelCodeHelper.ExtractTypeFromGlobalId(deleteOps[indexOp].Id);
 					}
 				}
-				message = String.Format("Failed to sort delta operations because there are some delete operations (count = {0}) which type (e.g. {1}) is not specified in given list of types.", deleteOps.Count, typeNotDefined);
+				message = $"Failed to sort delta operations because there are some delete operations (count = {deleteOps.Count}) which type (e.g. {typeNotDefined}) is not specified in given list of types.";
 				Logger.LogError(message);
 
-				string exceptionMessage = String.Format("Invalid delta. Some delete operations (count = {0}) which type (e.g. {1}) is not correct.", deleteOps.Count, typeNotDefined);
+				string exceptionMessage = $"Invalid delta. Some delete operations (count = {deleteOps.Count}) which type (e.g. {typeNotDefined}) is not correct.";
 				throw new ModelException(ErrorCode.InvalidDelta, exceptionMessage);
 			}
 
@@ -587,7 +609,7 @@ namespace OMS.Common.NmsContracts.GDA
 			deleteOpsOrdered.Reverse();
 			deleteOps = deleteOpsOrdered;
 
-			message = String.Format("Sorting delta operations for delta with ID: {0} completed successfully.", GetCompositeId(id));
+			message = $"Sorting delta operations for delta with ID: {GetCompositeId(id)} completed successfully.";
 			Logger.LogDebug(message);
 		}
      
@@ -745,7 +767,8 @@ namespace OMS.Common.NmsContracts.GDA
 			string systemId = (Math.Abs(valueWithSystemId) >> 48).ToString();
 			string valueWithoutSystemId = (Math.Abs(valueWithSystemId) & 0x0000FFFFFFFFFFFF).ToString();
 
-			return String.Format("{0}{1}.{2}", valueWithSystemId < 0 ? "-" : "", systemId, valueWithoutSystemId);
+			string dash = valueWithSystemId < 0 ? "-" : "";
+			return $"{dash}{systemId}.{valueWithoutSystemId}";
 		}
 
 		private long IncorporateSystemIdToValue(long valueWithoutSystemId, short systemId)

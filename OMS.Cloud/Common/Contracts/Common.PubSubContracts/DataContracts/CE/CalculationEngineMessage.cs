@@ -1,11 +1,12 @@
-﻿using Common.CE;
-using Common.PubSub;
+﻿using Common.PubSub;
+using OMS.Common.PubSub;
 using System;
 using System.Collections.Generic;
 using System.Linq;
 using System.Runtime.Serialization;
 using System.Text;
 using System.Threading.Tasks;
+
 
 namespace Common.PubSubContracts.DataContracts.CE
 {

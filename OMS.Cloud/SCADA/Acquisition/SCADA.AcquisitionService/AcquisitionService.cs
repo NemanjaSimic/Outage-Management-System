@@ -7,6 +7,7 @@ using Microsoft.ServiceFabric.Services.Communication.Runtime;
 using Microsoft.ServiceFabric.Services.Runtime;
 using OMS.Common.Cloud.Logger;
 using OMS.Common.SCADA;
+using OMS.Common.ScadaContracts.ModelProvider;
 using OMS.Common.WcfClient.SCADA;
 using SCADA.AcquisitionImplementation;
 
@@ -17,12 +18,19 @@ namespace SCADA.AcquisitionService
     /// </summary>
     internal sealed class AcquisitionService : StatelessService
     {
-        private readonly ICloudLogger logger;
+        private readonly string baseLogString;
+
+        private ICloudLogger logger;
+        private ICloudLogger Logger
+        {
+            get { return logger ?? (logger = CloudLoggerFactory.GetLogger()); }
+        }
 
         public AcquisitionService(StatelessServiceContext context)
             : base(context)
         {
-            logger = CloudLoggerFactory.GetLogger();
+            this.baseLogString = $"{this.GetType()} [{this.GetHashCode()}] =>{Environment.NewLine}";
+            Logger.LogDebug($"{baseLogString} Ctor => Logger initialized");
         }
 
         /// <summary>
@@ -47,40 +55,60 @@ namespace SCADA.AcquisitionService
 
             try
             {
-                acquisitionCycle = new AcquisitionCycle(this.Context);
-                ScadaModelReadAccessClient readAccessClient = ScadaModelReadAccessClient.CreateClient();
+                acquisitionCycle = new AcquisitionCycle();
+                IScadaModelReadAccessContract readAccessClient = ScadaModelReadAccessClient.CreateClient();
                 configData = await readAccessClient.GetScadaConfigData();
 
-                string message = "AcquisitionCycle initialized.";
-                logger.LogInformation(message);
+                string message = $"{baseLogString} RunAsync => AcquisitionCycle initialized.";
                 ServiceEventSource.Current.ServiceMessage(this.Context, $"[AcquisitionService | Information] {message}");
+                Logger.LogInformation(message);
             }
             catch (Exception e)
             {
-                logger.LogError(e.Message, e);
-                ServiceEventSource.Current.ServiceMessage(this.Context, $"[AcquisitionService | Error] {e.Message}");
+                string errMessage = $"{baseLogString} RunAsync => Exception caught: {e.Message}.";
+                Logger.LogError(errMessage, e);
+                ServiceEventSource.Current.ServiceMessage(this.Context, $"[AcquisitionService | Error] {errMessage}");
                 throw e;
             }
+
+            int acquisitionCycleCount = 1;
 
             while (true)
             {
                 cancellationToken.ThrowIfCancellationRequested();
 
+                string message = $"{baseLogString} RunAsync => AcquisitionCycleCount: {acquisitionCycleCount}";
+
+                if(acquisitionCycleCount % 100 == 0)
+                {
+                    Logger.LogInformation(message);
+                }
+                else if(acquisitionCycleCount % 10 == 0)
+                {
+                    Logger.LogDebug(message);
+                }
+                else
+                {
+                    Logger.LogVerbose(message);
+                }
+
                 try
                 {
                     await acquisitionCycle.Start();
 
-                    string message = "AcquisitionCycle executed.";
-                    logger.LogVerbose(message);
-                    //ServiceEventSource.Current.ServiceMessage(this.Context, $"[AcquisitionService | Information] {message}");
+                    message = $"{baseLogString} RunAsync => AcquisitionCycle executed.";
+                    Logger.LogVerbose(message);
+                    //ServiceEventSource.Current.ServiceMessage(this.Context, $"[AcquisitionService | Verbose] {message}");
                 }
                 catch (Exception e)
                 {
-                    logger.LogError(e.Message, e);
-                    ServiceEventSource.Current.ServiceMessage(this.Context, $"[AcquisitionService | Error] {e.Message}");
+                    string errMessage = $"{baseLogString} RunAsync => Exception caught: {e.Message}";
+                    Logger.LogError(errMessage, e);
+                    ServiceEventSource.Current.ServiceMessage(this.Context, $"[AcquisitionService | Error] {errMessage}");
                 }
 
                 await Task.Delay(TimeSpan.FromMilliseconds(configData.AcquisitionInterval), cancellationToken);
+                acquisitionCycleCount++;
             }
         }
     }

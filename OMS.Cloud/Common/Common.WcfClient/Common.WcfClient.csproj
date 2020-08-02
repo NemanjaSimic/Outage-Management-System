@@ -33,43 +33,43 @@
   </PropertyGroup>
   <ItemGroup>
     <Reference Include="Microsoft.ServiceFabric.Data, Version=7.0.0.0, Culture=neutral, PublicKeyToken=31bf3856ad364e35, processorArchitecture=AMD64">
-      <HintPath>..\..\packages\Microsoft.ServiceFabric.Data.4.0.470\lib\net472\Microsoft.ServiceFabric.Data.dll</HintPath>
+      <HintPath>..\..\packages\Microsoft.ServiceFabric.Data.4.1.417\lib\net472\Microsoft.ServiceFabric.Data.dll</HintPath>
     </Reference>
     <Reference Include="Microsoft.ServiceFabric.Data.Extensions, Version=1.4.5.0, Culture=neutral, PublicKeyToken=31bf3856ad364e35, processorArchitecture=MSIL">
-      <HintPath>..\..\packages\Microsoft.ServiceFabric.Data.Extensions.4.0.470\lib\net472\Microsoft.ServiceFabric.Data.Extensions.dll</HintPath>
+      <HintPath>..\..\packages\Microsoft.ServiceFabric.Data.Extensions.4.1.417\lib\net472\Microsoft.ServiceFabric.Data.Extensions.dll</HintPath>
     </Reference>
     <Reference Include="Microsoft.ServiceFabric.Data.Interfaces, Version=5.0.0.0, Culture=neutral, PublicKeyToken=31bf3856ad364e35, processorArchitecture=AMD64">
-      <HintPath>..\..\packages\Microsoft.ServiceFabric.Data.Interfaces.4.0.470\lib\net472\Microsoft.ServiceFabric.Data.Interfaces.dll</HintPath>
+      <HintPath>..\..\packages\Microsoft.ServiceFabric.Data.Interfaces.4.1.417\lib\net472\Microsoft.ServiceFabric.Data.Interfaces.dll</HintPath>
     </Reference>
     <Reference Include="Microsoft.ServiceFabric.Diagnostics, Version=7.0.0.0, Culture=neutral, PublicKeyToken=31bf3856ad364e35, processorArchitecture=AMD64">
-      <HintPath>..\..\packages\Microsoft.ServiceFabric.Diagnostics.Internal.4.0.470\lib\net472\Microsoft.ServiceFabric.Diagnostics.dll</HintPath>
+      <HintPath>..\..\packages\Microsoft.ServiceFabric.Diagnostics.Internal.4.1.417\lib\net472\Microsoft.ServiceFabric.Diagnostics.dll</HintPath>
     </Reference>
     <Reference Include="Microsoft.ServiceFabric.FabricTransport, Version=7.0.0.0, Culture=neutral, PublicKeyToken=31bf3856ad364e35, processorArchitecture=AMD64">
-      <HintPath>..\..\packages\Microsoft.ServiceFabric.FabricTransport.Internal.4.0.470\lib\net472\Microsoft.ServiceFabric.FabricTransport.dll</HintPath>
+      <HintPath>..\..\packages\Microsoft.ServiceFabric.FabricTransport.Internal.4.1.417\lib\net472\Microsoft.ServiceFabric.FabricTransport.dll</HintPath>
     </Reference>
     <Reference Include="Microsoft.ServiceFabric.FabricTransport.V2, Version=7.0.0.0, Culture=neutral, PublicKeyToken=31bf3856ad364e35, processorArchitecture=AMD64">
-      <HintPath>..\..\packages\Microsoft.ServiceFabric.FabricTransport.Internal.4.0.470\lib\net472\Microsoft.ServiceFabric.FabricTransport.V2.dll</HintPath>
+      <HintPath>..\..\packages\Microsoft.ServiceFabric.FabricTransport.Internal.4.1.417\lib\net472\Microsoft.ServiceFabric.FabricTransport.V2.dll</HintPath>
     </Reference>
     <Reference Include="Microsoft.ServiceFabric.Internal, Version=7.0.0.0, Culture=neutral, PublicKeyToken=31bf3856ad364e35, processorArchitecture=AMD64">
-      <HintPath>..\..\packages\Microsoft.ServiceFabric.7.0.470\lib\net472\Microsoft.ServiceFabric.Internal.dll</HintPath>
+      <HintPath>..\..\packages\Microsoft.ServiceFabric.7.1.417\lib\net472\Microsoft.ServiceFabric.Internal.dll</HintPath>
     </Reference>
     <Reference Include="Microsoft.ServiceFabric.Internal.Strings, Version=7.0.0.0, Culture=neutral, PublicKeyToken=31bf3856ad364e35, processorArchitecture=AMD64">
-      <HintPath>..\..\packages\Microsoft.ServiceFabric.7.0.470\lib\net472\Microsoft.ServiceFabric.Internal.Strings.dll</HintPath>
+      <HintPath>..\..\packages\Microsoft.ServiceFabric.7.1.417\lib\net472\Microsoft.ServiceFabric.Internal.Strings.dll</HintPath>
     </Reference>
     <Reference Include="Microsoft.ServiceFabric.Preview, Version=7.0.0.0, Culture=neutral, PublicKeyToken=31bf3856ad364e35, processorArchitecture=AMD64">
-      <HintPath>..\..\packages\Microsoft.ServiceFabric.7.0.470\lib\net472\Microsoft.ServiceFabric.Preview.dll</HintPath>
+      <HintPath>..\..\packages\Microsoft.ServiceFabric.7.1.417\lib\net472\Microsoft.ServiceFabric.Preview.dll</HintPath>
     </Reference>
     <Reference Include="Microsoft.ServiceFabric.ReliableCollection.Interop, Version=1.0.0.0, Culture=neutral, PublicKeyToken=31bf3856ad364e35, processorArchitecture=MSIL">
-      <HintPath>..\..\packages\Microsoft.ServiceFabric.Data.Extensions.4.0.470\lib\net472\Microsoft.ServiceFabric.ReliableCollection.Interop.dll</HintPath>
+      <HintPath>..\..\packages\Microsoft.ServiceFabric.Data.Extensions.4.1.417\lib\net472\Microsoft.ServiceFabric.ReliableCollection.Interop.dll</HintPath>
     </Reference>
     <Reference Include="Microsoft.ServiceFabric.Services, Version=6.0.0.0, Culture=neutral, PublicKeyToken=31bf3856ad364e35, processorArchitecture=AMD64">
-      <HintPath>..\..\packages\Microsoft.ServiceFabric.Services.4.0.470\lib\net472\Microsoft.ServiceFabric.Services.dll</HintPath>
+      <HintPath>..\..\packages\Microsoft.ServiceFabric.Services.4.1.417\lib\net472\Microsoft.ServiceFabric.Services.dll</HintPath>
     </Reference>
     <Reference Include="Microsoft.ServiceFabric.Services.Remoting, Version=6.0.0.0, Culture=neutral, PublicKeyToken=31bf3856ad364e35, processorArchitecture=AMD64">
-      <HintPath>..\..\packages\Microsoft.ServiceFabric.Services.Remoting.4.0.470\lib\net472\Microsoft.ServiceFabric.Services.Remoting.dll</HintPath>
+      <HintPath>..\..\packages\Microsoft.ServiceFabric.Services.Remoting.4.1.417\lib\net472\Microsoft.ServiceFabric.Services.Remoting.dll</HintPath>
     </Reference>
     <Reference Include="Microsoft.ServiceFabric.Services.Wcf, Version=6.0.0.0, Culture=neutral, PublicKeyToken=31bf3856ad364e35, processorArchitecture=AMD64">
-      <HintPath>..\..\packages\Microsoft.ServiceFabric.Services.Wcf.4.0.470\lib\net45\Microsoft.ServiceFabric.Services.Wcf.dll</HintPath>
+      <HintPath>..\..\packages\Microsoft.ServiceFabric.Services.Wcf.4.1.417\lib\net45\Microsoft.ServiceFabric.Services.Wcf.dll</HintPath>
     </Reference>
     <Reference Include="System" />
     <Reference Include="System.Configuration" />
@@ -80,13 +80,13 @@
     <Reference Include="System.Data.OracleClient" />
     <Reference Include="System.Drawing" />
     <Reference Include="System.Fabric, Version=7.0.0.0, Culture=neutral, PublicKeyToken=31bf3856ad364e35, processorArchitecture=AMD64">
-      <HintPath>..\..\packages\Microsoft.ServiceFabric.7.0.470\lib\net472\System.Fabric.dll</HintPath>
+      <HintPath>..\..\packages\Microsoft.ServiceFabric.7.1.417\lib\net472\System.Fabric.dll</HintPath>
     </Reference>
     <Reference Include="System.Fabric.Management.ServiceModel, Version=7.0.0.0, Culture=neutral, PublicKeyToken=31bf3856ad364e35, processorArchitecture=AMD64">
-      <HintPath>..\..\packages\Microsoft.ServiceFabric.7.0.470\lib\net472\System.Fabric.Management.ServiceModel.dll</HintPath>
+      <HintPath>..\..\packages\Microsoft.ServiceFabric.7.1.417\lib\net472\System.Fabric.Management.ServiceModel.dll</HintPath>
     </Reference>
     <Reference Include="System.Fabric.Strings, Version=7.0.0.0, Culture=neutral, PublicKeyToken=31bf3856ad364e35, processorArchitecture=AMD64">
-      <HintPath>..\..\packages\Microsoft.ServiceFabric.7.0.470\lib\net472\System.Fabric.Strings.dll</HintPath>
+      <HintPath>..\..\packages\Microsoft.ServiceFabric.7.1.417\lib\net472\System.Fabric.Strings.dll</HintPath>
     </Reference>
     <Reference Include="System.Net" />
     <Reference Include="System.Runtime.Serialization" />
@@ -116,14 +116,20 @@
     <Compile Include="OMS\OutageModelUpdateAccessClient.cs" />
     <Compile Include="OMS\HistoryDBManagerClient.cs" />
     <Compile Include="OMS\ReportingClient.cs" />
-    <Compile Include="OMS\ReportOutageClient.cs" />
     <Compile Include="OMS\ResolveOutageClient.cs" />
     <Compile Include="OMS\SendLocationIsolationCrewClient.cs" />
     <Compile Include="OMS\SendRepairCrewClient.cs" />
     <Compile Include="OMS\TracingAlgorithmClient.cs" />
     <Compile Include="OMS\ValidateResolveConditionsClient.cs" />
+    <Compile Include="CE\LoadFlowClient.cs" />
+    <Compile Include="CE\MeasurementMapServiceClient.cs" />
+    <Compile Include="CE\MeasurementProviderClient.cs" />
+    <Compile Include="CE\ModelProviderClient.cs" />
+    <Compile Include="CE\SwitchStatusCommandingClient.cs" />
+    <Compile Include="CE\TopologyBuilderClient.cs" />
+    <Compile Include="CE\TopologyConverterClient.cs" />
+    <Compile Include="CE\TopologyProviderClient.cs" />
     <Compile Include="Properties\AssemblyInfo.cs" />
-    <Compile Include="CE\Placeholder.cs" />
     <Compile Include="ClientFactory.cs" />
     <Compile Include="NMS\NetworkModelGdaClient.cs" />
     <Compile Include="OMS\OutageModelReadAccessClient.cs" />
@@ -137,7 +143,7 @@
     <Compile Include="SCADA\ScadaModelReadAccessClient.cs" />
     <Compile Include="SCADA\ScadaModelUpdateAccessClient.cs" />
     <Compile Include="SCADA\WriteCommandEnqueuerClient.cs" />
-    <Compile Include="TMS\ModelUpdateNotificationClient.cs" />
+    <Compile Include="TMS\Notifications\NotifyNetworkModelUpdateClient.cs" />
     <Compile Include="TMS\TransactionActorClient.cs" />
     <Compile Include="TMS\TransactionCoordinatorClient.cs" />
     <Compile Include="TMS\TransactionEnlistmentClient.cs" />
@@ -151,6 +157,10 @@
     <ProjectReference Include="..\..\Common.OmsContracts\Common.OmsContracts.csproj">
       <Project>{7032AEF1-E55A-4D5C-90FF-E0B8B4C98BE0}</Project>
       <Name>Common.OmsContracts</Name>
+    </ProjectReference>
+    <ProjectReference Include="..\..\Common.OMS\Common.OMS.csproj">
+      <Project>{8F96A078-BE16-4363-9B89-0B313D2E0F5E}</Project>
+      <Name>Common.OMS</Name>
     </ProjectReference>
     <ProjectReference Include="..\Common.CE\Common.CE.csproj">
       <Project>{4EAD0377-BD2D-4B7E-93A6-705DB815E8A7}</Project>
@@ -168,7 +178,11 @@
       <Project>{6A84DB56-920C-4FC1-9CB0-9C29D0FC1586}</Project>
       <Name>Common.SCADA</Name>
     </ProjectReference>
-    <ProjectReference Include="..\Contracts\Common.DistributedTransactionContracts\Common.DistributedTransactionContracts.csproj">
+    <ProjectReference Include="..\Contracts\Common.CeContracts\Common.CeContracts.csproj">
+      <Project>{D8B669F1-9B73-4F6A-9AFC-53AF4B0272AC}</Project>
+      <Name>Common.CeContracts</Name>
+    </ProjectReference>
+    <ProjectReference Include="..\Contracts\Common.TmsContracts\Common.TmsContracts.csproj">
       <Project>{A07D94C2-40EF-48DB-B828-7E53E7F5A372}</Project>
       <Name>Common.DistributedTransactionContracts</Name>
     </ProjectReference>
@@ -184,6 +198,11 @@
       <Project>{5F25D9C5-9A93-49E7-92F7-58E399AEF928}</Project>
       <Name>Common.ScadaContracts</Name>
     </ProjectReference>
+    <ProjectReference Include="..\Contracts\Common.TmsContracts\Common.TmsContracts.csproj">
+      <Project>{A07D94C2-40EF-48DB-B828-7E53E7F5A372}</Project>
+      <Name>Common.TmsContracts</Name>
+    </ProjectReference>
   </ItemGroup>
+  <ItemGroup />
   <Import Project="$(MSBuildToolsPath)\Microsoft.CSharp.targets" />
 </Project>

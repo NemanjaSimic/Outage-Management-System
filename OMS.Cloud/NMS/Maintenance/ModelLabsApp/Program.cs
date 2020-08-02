@@ -7,15 +7,19 @@ namespace Outage.DataImporter.ModelLabsApp
 {
     static class Program
 	{
+		private static ICloudLogger logger;
+		private static ICloudLogger Logger
+		{
+			get { return logger ?? (logger = CloudLoggerFactory.GetLogger()); }
+		}
+
 		/// <summary>
 		/// The main entry point for the application.
 		/// </summary>
-        
+
 		[STAThread]
 		static void Main()
-		{
-			ICloudLogger logger = CloudLoggerFactory.GetLogger();
-		
+		{		
 			try
 			{
 				Application.EnableVisualStyles();
@@ -25,7 +29,7 @@ namespace Outage.DataImporter.ModelLabsApp
 			catch (Exception e)
 			{
 				MessageBox.Show(string.Format("Application is going down!\n  {0}", e.Message), "Error", MessageBoxButtons.OK, MessageBoxIcon.Error);
-				logger.LogError($"Application is going down!\n  {e.Message}");
+				Logger.LogError($"Application is going down!\n  {e.Message}");
 			}
 			finally
 			{

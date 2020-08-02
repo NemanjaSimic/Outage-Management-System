@@ -5,11 +5,13 @@ using Microsoft.ServiceFabric.Data;
 using Microsoft.ServiceFabric.Data.Notifications;
 using OMS.Common.Cloud;
 using OMS.Common.Cloud.ReliableCollectionHelpers;
+using OMS.Common.PubSub;
 using System;
 using System.Collections.Generic;
 using System.Linq;
 using System.Text;
 using System.Threading.Tasks;
+using ReliableDictionaryNames = Common.OMS.ReliableDictionaryNames;
 
 namespace OMS.ModelProviderImplementation.ContractProviders
 {
@@ -100,7 +102,7 @@ namespace OMS.ModelProviderImplementation.ContractProviders
             {
                 await Task.Delay(1000);
             }
-            return CommandedElements.GetDataCopy();
+            return await CommandedElements.GetDataCopyAsync();
         }
 
         public async Task<Dictionary<long, long>> GetOptimumIsolatioPoints()
@@ -109,7 +111,7 @@ namespace OMS.ModelProviderImplementation.ContractProviders
             {
                 await Task.Delay(1000);
             }
-            return OptimumIsolatioPoints.GetDataCopy();
+            return await OptimumIsolatioPoints.GetDataCopyAsync();
         }
 
         public async Task<Dictionary<long, CommandOriginType>> GetPotentialOutage()
@@ -118,7 +120,7 @@ namespace OMS.ModelProviderImplementation.ContractProviders
             {
                 await Task.Delay(1000);
             }
-            return PotentialOutage.GetDataCopy();
+            return await PotentialOutage.GetDataCopyAsync();
         }
 
         public async Task<IOutageTopologyModel> GetTopologyModel()
@@ -128,7 +130,7 @@ namespace OMS.ModelProviderImplementation.ContractProviders
                 await Task.Delay(1000);
             }
             //Get topologyModel from CE service
-            return TopologyModel.GetDataCopy()[0];
+            return (await TopologyModel.GetDataCopyAsync())[0];
         }
 
         public async Task<IOutageTopologyElement> GetElementById(long gid)
@@ -138,7 +140,7 @@ namespace OMS.ModelProviderImplementation.ContractProviders
                 await Task.Delay(1000);
 			}
 
-			TopologyModel.GetDataCopy()[0].GetElementByGid(gid, out IOutageTopologyElement outageTopologyElement);
+			(await TopologyModel.GetDataCopyAsync())[0].GetElementByGid(gid, out IOutageTopologyElement outageTopologyElement);
 
             return outageTopologyElement;
         }

@@ -6,6 +6,7 @@ using Common.OMS.OutageModel;
 
 using Microsoft.ServiceFabric.Services.Remoting;
 using OMS.Common.Cloud;
+using OMS.Common.PubSub;
 using System.Collections.Generic;
 using System.ServiceModel;
 using System.Threading.Tasks;

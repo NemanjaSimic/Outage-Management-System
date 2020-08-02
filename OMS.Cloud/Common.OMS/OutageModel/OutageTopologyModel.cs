@@ -1,4 +1,5 @@
 ﻿using Common.CE;
+using OMS.Common.PubSub;
 using System;
 using System.Collections.Generic;
 using System.Linq;
@@ -8,7 +9,7 @@ using System.Threading.Tasks;
 
 namespace Common.OMS.OutageModel
 {
-    public class OutageTopologyModel:IOutageTopologyModel
+    public class OutageTopologyModel : IOutageTopologyModel
     {
         private long firstNode;
         private Dictionary<long, IOutageTopologyElement> outageTopology;

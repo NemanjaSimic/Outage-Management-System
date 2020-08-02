@@ -6,14 +6,18 @@ using System.Configuration;
 
 namespace OMS.Common.Cloud.AzureStorageHelpers
 {
-    public class CloudTableHelper
+    public static class CloudTableHelper
     {
+        private static ICloudLogger logger;
+        private static ICloudLogger Logger
+        {
+            get { return logger ?? (logger = CloudLoggerFactory.GetLogger()); }
+        }
+
         public static bool TryGetTable(string queueName, out CloudTable table)
         {
             bool success;
             table = null;
-
-            ICloudLogger logger = CloudLoggerFactory.GetLogger();
 
             try
             {
@@ -33,7 +37,7 @@ namespace OMS.Common.Cloud.AzureStorageHelpers
             catch (Exception e)
             {
                 string message = "Exception caught in TryGetTable.";
-                logger.LogError(message, e);
+                Logger.LogError(message, e);
                 success = false;
             }
 

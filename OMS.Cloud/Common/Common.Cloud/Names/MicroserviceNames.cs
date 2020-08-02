@@ -13,7 +13,6 @@
 
         //TMS
         public const string TransactionManagerService = "TransactionManagerService";
-        public const string TransactionActorService = "TransactionActorService";
 
         //PUB_SUB
         public const string PubSubService = "PubSubService";
@@ -24,5 +23,12 @@
         public const string OmsHistoryDBManagerService = "OmsHistoryDBManagerService";
         public const string OmsOutageLifecycleService = "OmsOutageLifecycleService";
         public const string OmsReportingService = "OmsReportingService";
+        //CE
+        public const string ModelProviderService = "ModelProviderService";
+        public const string TopologyProviderService = "TopologyProviderService";
+        public const string MeasurementProviderService = "MeasurementProviderService";
+        public const string LoadFlowService = "LoadFlowService";
+        public const string TopologyBuilderService = "TopologyBuilderService";
+
     }
 }

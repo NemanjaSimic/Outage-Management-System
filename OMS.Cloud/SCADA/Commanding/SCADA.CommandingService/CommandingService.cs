@@ -1,4 +1,5 @@
-﻿using System.Collections.Generic;
+﻿using System;
+using System.Collections.Generic;
 using System.Fabric;
 using Microsoft.ServiceFabric.Services.Communication.Runtime;
 using Microsoft.ServiceFabric.Services.Communication.Wcf;
@@ -16,12 +17,26 @@ namespace SCADA.CommandingService
     /// </summary>
     internal sealed class CommandingService : StatelessService
     {
-        private readonly ICloudLogger logger;
+        private readonly string baseLogString;
+        private readonly CommandingProvider commandingProvider;
+
+        private ICloudLogger logger;
+        private ICloudLogger Logger
+        {
+            get { return logger ?? (logger = CloudLoggerFactory.GetLogger()); }
+        }
 
         public CommandingService(StatelessServiceContext context)
             : base(context)
         {
-            logger = CloudLoggerFactory.GetLogger();
+            this.baseLogString = $"{this.GetType()} [{this.GetHashCode()}] =>{Environment.NewLine}";
+            Logger.LogDebug($"{baseLogString} Ctor => Logger initialized");
+
+            this.commandingProvider = new CommandingProvider();
+
+            string infoMessage = $"{baseLogString} Ctor => Contract providers initialized.";
+            Logger.LogInformation(infoMessage);
+            ServiceEventSource.Current.ServiceMessage(this.Context, $"[CommandingService | Information] {infoMessage}");
         }
 
         /// <summary>
@@ -37,10 +52,10 @@ namespace SCADA.CommandingService
                 new ServiceInstanceListener(context =>
                 {
                     return new WcfCommunicationListener<IScadaCommandingContract>(context,
-                                                                                  new CommandingProvider(),
+                                                                                  this.commandingProvider,
                                                                                   WcfUtility.CreateTcpListenerBinding(),
-                                                                                  EndpointNames.ScadaCommandService);
-                }, EndpointNames.ScadaCommandService),
+                                                                                  EndpointNames.ScadaCommandingEndpoint);
+                }, EndpointNames.ScadaCommandingEndpoint),
             };
         }
     }

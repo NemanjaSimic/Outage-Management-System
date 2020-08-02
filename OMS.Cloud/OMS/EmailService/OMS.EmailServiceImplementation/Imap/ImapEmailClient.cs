@@ -84,10 +84,8 @@ namespace OMS.CallTrackingServiceImplementation.Imap
 
 				try
 				{
-					publisher.Publish(
-						publication: new OutageEmailPublication(Topic.OUTAGE_EMAIL, new EmailToOutageMessage(tracingModel.Gid))
-						);
-				}
+					publisher.Publish(new OutageEmailPublication(Topic.OUTAGE_EMAIL, new EmailToOutageMessage(tracingModel.Gid)), "EmailService"); //TODO: SErvice defines
+ 				}
 				catch (Exception)
 				{
 					Console.WriteLine("[ImapEmailClient::GetUnreadMessages] Sending to PubSub Engine failed.");

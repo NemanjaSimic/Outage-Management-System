@@ -9,34 +9,32 @@ using System.Threading.Tasks;
 
 namespace OMS.Common.WcfClient.SCADA
 {
-    public class ModelUpdateCommandEnqueuerClient : WcfSeviceFabricClientBase<IModelUpdateCommandEnqueuer>, IModelUpdateCommandEnqueuer
+    public class ModelUpdateCommandEnqueuerClient : WcfSeviceFabricClientBase<IModelUpdateCommandEnqueuerContract>, IModelUpdateCommandEnqueuerContract
     {
         private static readonly string microserviceName = MicroserviceNames.ScadaFunctionExecutorService;
         private static readonly string listenerName = EndpointNames.ScadaModelUpdateCommandEnqueueurEndpoint; 
 
-        public ModelUpdateCommandEnqueuerClient(WcfCommunicationClientFactory<IModelUpdateCommandEnqueuer> clientFactory, Uri serviceUri, ServicePartitionKey servicePartition)
+        public ModelUpdateCommandEnqueuerClient(WcfCommunicationClientFactory<IModelUpdateCommandEnqueuerContract> clientFactory, Uri serviceUri, ServicePartitionKey servicePartition)
             : base(clientFactory, serviceUri, servicePartition, listenerName)
         {
         }
 
-        public static ModelUpdateCommandEnqueuerClient CreateClient(Uri serviceUri = null)
+        public static ModelUpdateCommandEnqueuerClient CreateClient()
         {
             ClientFactory factory = new ClientFactory();
-            ServicePartitionKey servicePartition = ServicePartitionKey.Singleton;
+            return factory.CreateClient<ModelUpdateCommandEnqueuerClient, IModelUpdateCommandEnqueuerContract>(microserviceName);
+        }
 
-            if (serviceUri == null)
-            {
-                return factory.CreateClient<ModelUpdateCommandEnqueuerClient, IModelUpdateCommandEnqueuer>(microserviceName, servicePartition);
-            }
-            else
-            {
-                return factory.CreateClient<ModelUpdateCommandEnqueuerClient, IModelUpdateCommandEnqueuer>(serviceUri, servicePartition);
-            }
+        public static ModelUpdateCommandEnqueuerClient CreateClient(Uri serviceUri, ServicePartitionKey servicePartitionKey)
+        {
+            ClientFactory factory = new ClientFactory();
+            return factory.CreateClient<ModelUpdateCommandEnqueuerClient, IModelUpdateCommandEnqueuerContract>(serviceUri, servicePartitionKey);
         }
 
         #region IModelUpdateCommandEnqueuer
         public Task<bool> EnqueueModelUpdateCommands(List<IWriteModbusFunction> modbusFunctions)
         {
+            //return MethodWrapperAsync<bool>("EnqueueModelUpdateCommands", new object[1] { modbusFunctions });
             return InvokeWithRetryAsync(client => client.Channel.EnqueueModelUpdateCommands(modbusFunctions));
         }
         #endregion

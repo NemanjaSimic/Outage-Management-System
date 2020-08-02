@@ -63,9 +63,7 @@ namespace OMS.CallTrackingServiceImplementation.Imap
 
                 try
                 {
-                    publisher.Publish(
-                        publication: new OutageEmailPublication(Topic.OUTAGE_EMAIL, new EmailToOutageMessage(tracingModel.Gid))
-                        );
+                    publisher.Publish(new OutageEmailPublication(Topic.OUTAGE_EMAIL, new EmailToOutageMessage(tracingModel.Gid)), "EmailService"); //TODO: Service defines
                 }
                 catch (Exception)
                 {

@@ -6,7 +6,6 @@ using System;
 using System.IO;
 using System.Reflection;
 using System.Threading;
-
 using System.Threading.Tasks;
 using System.Text;
 using OMS.Common.NmsContracts.GDA;
@@ -32,16 +31,16 @@ namespace Outage.DataImporter.CIMAdapter
 
     public class CIMAdapterClass
     {
-        private ICloudLogger logger;
+        private readonly ModelResourcesDesc resourcesDesc;
+        private TransformAndLoadReport report;
 
-        private ICloudLogger Logger
+        #region Private Properties
+        private ICloudLogger logger;
+        protected ICloudLogger Logger
         {
             get { return logger ?? (logger = CloudLoggerFactory.GetLogger()); }
         }
-
-        private readonly ModelResourcesDesc resourcesDesc;
-
-        private TransformAndLoadReport report;
+        #endregion Private Properties
 
         public CIMAdapterClass()
         {
@@ -79,7 +78,7 @@ namespace Outage.DataImporter.CIMAdapter
 
             if ((delta != null) && (delta.NumberOfOperations != 0))
             {
-                NetworkModelGdaClient nmsGdaClient = NetworkModelGdaClient.CreateClient();
+                INetworkModelGDAContract nmsGdaClient = NetworkModelGdaClient.CreateClient();
 
                 if (nmsGdaClient == null)
                 {

@@ -89,6 +89,21 @@ namespace Outage.DataImporter.CIMAdapter.Importer
             {
                 OutageConverter.PopulateConductingEquipmentProperties(cimEnergyConsumer, rd, importHelper, report);
             }
+
+            if (cimEnergyConsumer.LastNameHasValue)
+            {
+                rd.AddProperty(new Property(ModelCode.ENERGYCONSUMER_LASTNAME, cimEnergyConsumer.LastName));
+            }
+
+            if (cimEnergyConsumer.FirstNameHasValue)
+            {
+                rd.AddProperty(new Property(ModelCode.ENERGYCONSUMER_FIRSTNAME, cimEnergyConsumer.FirstName));
+            }
+
+            if (cimEnergyConsumer.TypeHasValue)
+            {
+                rd.AddProperty(new Property(ModelCode.ENERGYCONSUMER_TYPE, (short)GetEnergyConsumerType(cimEnergyConsumer.Type)));
+            }
         }
 
         public static void PopulateTransformerWindingProperties(Outage.TransformerWinding cimTransformerWinding, ResourceDescription rd, ImportHelper importHelper, TransformAndLoadReport report)
@@ -337,6 +352,24 @@ namespace Outage.DataImporter.CIMAdapter.Importer
             }
         }
 
+        public static void PopulateSynchronousMachineProperties(Outage.SynchronousMachine cimSynchronousMachine, ResourceDescription rd, ImportHelper importHelper, TransformAndLoadReport report)
+        {
+            if ((cimSynchronousMachine != null) && (rd != null))
+            {
+                OutageConverter.PopulateConductingEquipmentProperties(cimSynchronousMachine, rd, importHelper, report);
+
+                if (cimSynchronousMachine.CapacityHasValue)
+                {
+                    rd.AddProperty(new Property(ModelCode.SYNCHRONOUSMACHINE_CAPACITY, cimSynchronousMachine.Capacity));
+                }
+
+                if (cimSynchronousMachine.CurrentRegimeHasValue)
+                {
+                    rd.AddProperty(new Property(ModelCode.SYNCHRONOUSMACHINE_CURRENTREGIME, cimSynchronousMachine.CurrentRegime));
+
+                }
+            }
+        }
         #endregion Populate ResourceDescription
 
         #region Enums convert
@@ -367,6 +400,19 @@ namespace Outage.DataImporter.CIMAdapter.Importer
             }
         }
 
+
+        public static OMS.Common.Cloud.EnergyConsumerType GetEnergyConsumerType(Outage.EnergyConsumerType energyConsumertype)
+        {
+            switch (energyConsumertype)
+            {
+                case Outage.EnergyConsumerType.Household:
+                    return OMS.Common.Cloud.EnergyConsumerType.HOUSEHOLD;
+                case Outage.EnergyConsumerType.SmallIndustry:
+                    return OMS.Common.Cloud.EnergyConsumerType.SMALL_INDUSTRY;
+                default:
+                    throw new System.Exception($"Unknown enum type: {energyConsumertype}.");
+            }
+        }
         #endregion Enums convert
     }
 }

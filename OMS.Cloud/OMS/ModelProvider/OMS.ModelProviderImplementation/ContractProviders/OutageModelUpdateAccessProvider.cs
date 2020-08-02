@@ -83,7 +83,7 @@ namespace OMS.ModelProviderImplementation.ContractProviders
             switch (modelUpdateOperationType)
             {
                 case ModelUpdateOperationType.INSERT:
-                    if(!CommandedElements.ContainsKey(gid))
+                    if(!(await CommandedElements.ContainsKeyAsync(gid)))
                     await CommandedElements.SetAsync(gid, 0);
                     break;
                 case ModelUpdateOperationType.DELETE:
@@ -108,7 +108,7 @@ namespace OMS.ModelProviderImplementation.ContractProviders
             switch (modelUpdateOperationType)
             {
                 case ModelUpdateOperationType.INSERT:
-                    if (!OptimumIsolatioPoints.ContainsKey(gid))
+                    if (!(await OptimumIsolatioPoints.ContainsKeyAsync(gid)))
                         await OptimumIsolatioPoints.SetAsync(gid, 0);
                     break;
                 case ModelUpdateOperationType.DELETE:
@@ -133,7 +133,7 @@ namespace OMS.ModelProviderImplementation.ContractProviders
             switch (modelUpdateOperationType)
             {
                 case ModelUpdateOperationType.INSERT:
-                    if (!PotentialOutage.ContainsKey(gid))
+                    if (!(await PotentialOutage.ContainsKeyAsync(gid)))
                         await PotentialOutage.SetAsync(gid, commandOriginType);
                     break;
                 case ModelUpdateOperationType.DELETE:

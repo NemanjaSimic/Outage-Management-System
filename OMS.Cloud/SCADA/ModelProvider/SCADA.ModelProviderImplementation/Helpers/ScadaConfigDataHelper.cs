@@ -28,9 +28,16 @@ namespace SCADA.ModelProviderImplementation.Helpers
             return scadaConfigData;
         }
 
+        private static ICloudLogger logger;
+        private static ICloudLogger Logger
+        {
+            get { return logger ?? (logger = CloudLoggerFactory.GetLogger()); }
+        }
+
         private static IScadaConfigData ImportAppSettings()
         {
-            ICloudLogger logger = CloudLoggerFactory.GetLogger();
+            string baseLogString = $"{typeof(ScadaConfigDataHelper)} [static] =>";
+
             ScadaConfigData data = new ScadaConfigData();
 
             if (ConfigurationManager.AppSettings["TcpPort"] is string tcpPortSetting)
@@ -41,9 +48,9 @@ namespace SCADA.ModelProviderImplementation.Helpers
                 }
                 else
                 {
-                    string message = "TcpPort in SCADA configuration is either not defined or not valid.";
-                    logger.LogError(message);
-                    throw new Exception(message);
+                    string errorMessage = $"{baseLogString} ImportAppSettings => TcpPort in SCADA configuration is either not defined or not valid.";
+                    Logger.LogError(errorMessage);
+                    throw new Exception(errorMessage);
                 }
             }
 
@@ -55,9 +62,9 @@ namespace SCADA.ModelProviderImplementation.Helpers
                 }
                 else
                 {
-                    string message = "IpAddress in SCADA configuration is either not defined or not valid.";
-                    logger.LogError(message);
-                    throw new Exception(message);
+                    string errorMessage = $"{baseLogString} ImportAppSettings => IpAddress in SCADA configuration is either not defined or not valid.";
+                    Logger.LogError(errorMessage);
+                    throw new Exception(errorMessage);
                 }
             }
 
@@ -69,9 +76,9 @@ namespace SCADA.ModelProviderImplementation.Helpers
                 }
                 else
                 {
-                    string message = "UnitAddress in SCADA configuration is either not defined or not valid.";
-                    logger.LogError(message);
-                    throw new Exception(message);
+                    string errorMessage = $"{baseLogString} ImportAppSettings => UnitAddress in SCADA configuration is either not defined or not valid.";
+                    Logger.LogError(errorMessage);
+                    throw new Exception(errorMessage);
                 }
             }
 
@@ -84,7 +91,8 @@ namespace SCADA.ModelProviderImplementation.Helpers
                 else
                 {
                     data.AcquisitionInterval = 10000;
-                    logger.LogWarning("AcquisitionInterval in SCADA configuration is either not defined or not valid.");
+                    string warnMessage = $"{baseLogString} ImportAppSettings => AcquisitionInterval in SCADA configuration is either not defined or not valid.";
+                    Logger.LogWarning(warnMessage);
                 }
             }
 
@@ -97,7 +105,8 @@ namespace SCADA.ModelProviderImplementation.Helpers
                 else
                 {
                     data.FunctionExecutionInterval = 10000;
-                    logger.LogWarning("FunctionExecutionInterval in SCADA configuration is either not defined or not valid.");
+                    string warnMessage = $"{baseLogString} ImportAppSettings => FunctionExecutionInterval in SCADA configuration is either not defined or not valid.";
+                    Logger.LogWarning(warnMessage);
                 }
             }
 
@@ -109,7 +118,23 @@ namespace SCADA.ModelProviderImplementation.Helpers
                 {
                     data.ModbusSimulatorExePath = Environment.CurrentDirectory.Replace(@"\SCADAServiceHost\bin\Debug", $@"{mdbSimExePath}\{data.ModbusSimulatorExeName}");
                 }
+                else
+                {
+                    string warnMessage = $"{baseLogString} ImportAppSettings => ModbusSimulatorExePath in SCADA configuration is either not defined or not valid.";
+                    Logger.LogWarning(warnMessage);
+                }
             }
+            else
+            {
+                string warnMessage = $"{baseLogString} ImportAppSettings => ModbusSimulatorExeName in SCADA configuration is either not defined or not valid.";
+                Logger.LogWarning(warnMessage);
+            }
+
+            string infoMessage = $"{baseLogString} ImportAppSettings => Scada config data Imported.";
+            Logger.LogInformation(infoMessage);
+
+            string debugMessage = $"{baseLogString} ImportAppSettings => AcquisitionInterval: {data.AcquisitionInterval}, FunctionExecutionInterval: {data.FunctionExecutionInterval}, IpAddress: [{data.IpAddress}, ModbusSimulatorExeName: {data.ModbusSimulatorExeName}, ModbusSimulatorExePath: {data.ModbusSimulatorExePath}, TcpPort: {data.TcpPort}, UnitAddress: {data.UnitAddress}.";
+            Logger.LogDebug(debugMessage);
 
             return data;
         }

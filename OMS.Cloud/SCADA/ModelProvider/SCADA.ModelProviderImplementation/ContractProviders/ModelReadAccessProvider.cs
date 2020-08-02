@@ -1,77 +1,83 @@
 ﻿using Microsoft.ServiceFabric.Data;
 using Microsoft.ServiceFabric.Data.Notifications;
+using OMS.Common.Cloud.Logger;
 using OMS.Common.Cloud.ReliableCollectionHelpers;
 using OMS.Common.SCADA;
 using OMS.Common.ScadaContracts.DataContracts;
 using OMS.Common.ScadaContracts.DataContracts.ScadaModelPointItems;
 using OMS.Common.ScadaContracts.ModelProvider;
 using SCADA.ModelProviderImplementation.Helpers;
+using System;
 using System.Collections.Generic;
+using System.Text;
 using System.Threading.Tasks;
 
 namespace SCADA.ModelProviderImplementation.ContractProviders
 {
     public class ModelReadAccessProvider : IScadaModelReadAccessContract
     {
+        private readonly string baseLogString;
         private readonly IReliableStateManager stateManager;
+        
+        #region Private Properties
         private bool isGidToPointItemMapInitialized;
         private bool isAddressToGidMapInitialized;
         private bool isCommandDescriptionCacheInitialized;
         private bool isInfoCacheInitialized;
 
-        #region Private Properties
         private bool ReliableDictionariesInitialized
         {
-            get { return isGidToPointItemMapInitialized && isAddressToGidMapInitialized && isCommandDescriptionCacheInitialized && isInfoCacheInitialized; }
+            get 
+            { 
+                return isGidToPointItemMapInitialized && 
+                       isAddressToGidMapInitialized && 
+                       isCommandDescriptionCacheInitialized && 
+                       isInfoCacheInitialized;
+            }
+        }
+
+        private ICloudLogger logger;
+        private ICloudLogger Logger
+        {
+            get { return logger ?? (logger = CloudLoggerFactory.GetLogger()); }
         }
 
         private ReliableDictionaryAccess<long, IScadaModelPointItem> gidToPointItemMap;
         private ReliableDictionaryAccess<long, IScadaModelPointItem> GidToPointItemMap
         {
-            get
-            {
-                return gidToPointItemMap ?? (gidToPointItemMap = ReliableDictionaryAccess<long, IScadaModelPointItem>.Create(stateManager, ReliableDictionaryNames.GidToPointItemMap).Result);
-            }
+            get { return gidToPointItemMap; }
         }
 
         private ReliableDictionaryAccess<short, Dictionary<ushort, long>> addressToGidMap;
         private ReliableDictionaryAccess<short, Dictionary<ushort, long>> AddressToGidMap
         {
-            get
-            {
-                return addressToGidMap ?? (addressToGidMap = ReliableDictionaryAccess<short, Dictionary<ushort, long>>.Create(stateManager, ReliableDictionaryNames.AddressToGidMap).Result);
-            }
+            get { return addressToGidMap; }
         }
 
         private ReliableDictionaryAccess<long, CommandDescription> commandDescriptionCache;
         private ReliableDictionaryAccess<long, CommandDescription> CommandDescriptionCache
         {
-            get
-            {
-                return commandDescriptionCache ?? (commandDescriptionCache = ReliableDictionaryAccess<long, CommandDescription>.Create(stateManager, ReliableDictionaryNames.CommandDescriptionCache).Result);
-            }
+            get { return commandDescriptionCache; }
         }
 
         private ReliableDictionaryAccess<string, bool> infoCache;
         private ReliableDictionaryAccess<string, bool> InfoCache
         {
-            get
-            {
-                return infoCache ?? (infoCache = ReliableDictionaryAccess<string, bool>.Create(stateManager, ReliableDictionaryNames.InfoCache).Result);
-            }
+            get { return infoCache; }
         }
         #endregion Properties
 
         public ModelReadAccessProvider(IReliableStateManager stateManager)
         {
-            this.stateManager = stateManager;
+            this.baseLogString = $"{this.GetType()} [{this.GetHashCode()}] =>{Environment.NewLine}";
 
             this.isGidToPointItemMapInitialized = false;
             this.isAddressToGidMapInitialized = false;
             this.isCommandDescriptionCacheInitialized = false;
             this.isInfoCacheInitialized = false;
-
-            stateManager.StateManagerChanged += this.OnStateManagerChangedHandler;
+            
+            this.stateManager = stateManager;
+            this.stateManager.StateManagerChanged += this.OnStateManagerChangedHandler;
         }
 
         private async void OnStateManagerChangedHandler(object sender, NotifyStateManagerChangedEventArgs e)
@@ -86,24 +92,36 @@ namespace SCADA.ModelProviderImplementation.ContractProviders
                     //_ = GidToPointItemMap;
                     gidToPointItemMap = await ReliableDictionaryAccess<long, IScadaModelPointItem>.Create(stateManager, ReliableDictionaryNames.GidToPointItemMap);
                     isGidToPointItemMapInitialized = true;
+
+                    string debugMessage = $"{baseLogString} OnStateManagerChangedHandler => '{ReliableDictionaryNames.GidToPointItemMap}' ReliableDictionaryAccess initialized.";
+                    Logger.LogDebug(debugMessage);
                 }
                 else if (reliableStateName == ReliableDictionaryNames.AddressToGidMap)
                 {
                     //_ = AddressToGidMap;
                     addressToGidMap = await ReliableDictionaryAccess<short, Dictionary<ushort, long>>.Create(stateManager, ReliableDictionaryNames.AddressToGidMap);
                     isAddressToGidMapInitialized = true;
+
+                    string debugMessage = $"{baseLogString} OnStateManagerChangedHandler => '{ReliableDictionaryNames.AddressToGidMap}' ReliableDictionaryAccess initialized.";
+                    Logger.LogDebug(debugMessage);
                 }
                 else if (reliableStateName == ReliableDictionaryNames.CommandDescriptionCache)
                 {
                     //_ = CommandDescriptionCache;
                     commandDescriptionCache = await ReliableDictionaryAccess<long, CommandDescription>.Create(stateManager, ReliableDictionaryNames.CommandDescriptionCache);
                     isCommandDescriptionCacheInitialized = true;
+
+                    string debugMessage = $"{baseLogString} OnStateManagerChangedHandler => '{ReliableDictionaryNames.CommandDescriptionCache}' ReliableDictionaryAccess initialized.";
+                    Logger.LogDebug(debugMessage);
                 }
                 else if (reliableStateName == ReliableDictionaryNames.InfoCache)
                 {
                     //_ = InfoCache;
                     infoCache = await ReliableDictionaryAccess<string, bool>.Create(stateManager, ReliableDictionaryNames.InfoCache);
                     isInfoCacheInitialized = true;
+
+                    string debugMessage = $"{baseLogString} OnStateManagerChangedHandler => '{ReliableDictionaryNames.InfoCache}' ReliableDictionaryAccess initialized.";
+                    Logger.LogDebug(debugMessage);
                 }
             }
         }
@@ -111,56 +129,76 @@ namespace SCADA.ModelProviderImplementation.ContractProviders
         #region IScadaModelReadAccessContract
         public async Task<bool> GetIsScadaModelImportedIndicator()
         {
+            string verboseMessage = $"{baseLogString} entering GetIsScadaModelImportedIndicator method.";
+            Logger.LogVerbose(verboseMessage);
+
             while (!ReliableDictionariesInitialized)
             {
-                //TODO: something smarter
                 await Task.Delay(1000);
             }
 
             string key = "IsScadaModelImported";
-            if (!InfoCache.ContainsKey(key))
+            if (!await InfoCache.ContainsKeyAsync(key))
             {
-                InfoCache[key] = false;
+                await InfoCache.SetAsync(key, false);
             }
 
-            return InfoCache[key];
+            bool isScadaModelImported = (await InfoCache.TryGetValueAsync(key)).Value;
+            verboseMessage = $"{baseLogString} GetIsScadaModelImportedIndicator => returning value: {isScadaModelImported}.";
+            Logger.LogVerbose(verboseMessage);
+
+            return isScadaModelImported;
         }
 
         public async Task<IScadaConfigData> GetScadaConfigData()
         {
+            string verboseMessage = $"{baseLogString} entering GetScadaConfigData method.";
+            Logger.LogVerbose(verboseMessage);
+
             while (!ReliableDictionariesInitialized || !(await GetIsScadaModelImportedIndicator()))
             {
-                //TODO: something smarter
                 await Task.Delay(1000);
             }
 
-            return ScadaConfigDataHelper.GetScadaConfigData();
+            verboseMessage = $"{baseLogString} GetScadaConfigData => about to execut ScadaConfigDataHelper.GetScadaConfigData().";
+            Logger.LogVerbose(verboseMessage);
+
+            var config = ScadaConfigDataHelper.GetScadaConfigData();
+
+            verboseMessage = $"{baseLogString} GetScadaConfigData => ScadaConfigDataHelper.GetScadaConfigData() SUCCESSFULLY executed.";
+            Logger.LogVerbose(verboseMessage);
+
+            return config;
         }
 
         public async Task<Dictionary<long, IScadaModelPointItem>> GetGidToPointItemMap()
         {
+            string verboseMessage = $"{baseLogString} entering GetGidToPointItemMap method.";
+            Logger.LogVerbose(verboseMessage);
+
             while (!ReliableDictionariesInitialized || !(await GetIsScadaModelImportedIndicator()))
             {
-                //TODO: something smarter
                 await Task.Delay(1000);
             }
 
-            //Dictionary<long, IScadaModelPointItem> copy = GidToPointItemMap.GetDataCopy();
-            //Dictionary<long, IScadaModelPointItem> result = new Dictionary<long, IScadaModelPointItem>(copy.Count);
+            verboseMessage = $"{baseLogString} GetGidToPointItemMap => about to execut GidToPointItemMap.GetDataCopy().";
+            Logger.LogVerbose(verboseMessage);
 
-            //foreach(var element in copy)
-            //{
-            //    result.Add(element.Key, element.Value);
-            //}
+            var copy = await GidToPointItemMap.GetDataCopyAsync();
 
-            return GidToPointItemMap.GetDataCopy();
+            verboseMessage = $"{baseLogString} GetGidToPointItemMap => GidToPointItemMap.GetDataCopy() SUCCESSFULLY executed. Returning the collection with {copy.Count} elements.";
+            Logger.LogVerbose(verboseMessage);
+
+            return copy;
         }
 
         public async Task<Dictionary<short, Dictionary<ushort, IScadaModelPointItem>>> GetAddressToPointItemMap()
         {
+            string verboseMessage = $"{baseLogString} entering GetAddressToPointItemMap method.";
+            Logger.LogVerbose(verboseMessage);
+
             while (!ReliableDictionariesInitialized || !(await GetIsScadaModelImportedIndicator()))
             {
-                //TODO: something smarter
                 await Task.Delay(1000);
             }
 
@@ -176,29 +214,65 @@ namespace SCADA.ModelProviderImplementation.ContractProviders
                 }
             }
 
+            verboseMessage = $"{baseLogString} GetAddressToPointItemMap => returning collection with {addressToPointItemMap.Count} elements.";
+            Logger.LogVerbose(verboseMessage);
+
             return addressToPointItemMap;
         }
 
         public async Task<Dictionary<short, Dictionary<ushort, long>>> GetAddressToGidMap()
         {
+            string verboseMessage = $"{baseLogString} entering GetAddressToGidMap method.";
+            Logger.LogVerbose(verboseMessage);
+
             while (!ReliableDictionariesInitialized || !(await GetIsScadaModelImportedIndicator()))
             {
-                //TODO: something smarter
                 await Task.Delay(1000);
             }
 
-            return AddressToGidMap.GetDataCopy();
+            verboseMessage = $"{baseLogString} GetAddressToGidMap => about to execut AddressToGidMap.GetDataCopy().";
+            Logger.LogVerbose(verboseMessage);
+
+            var copy = await AddressToGidMap.GetDataCopyAsync();
+            
+            verboseMessage = $"{baseLogString} GetAddressToGidMap => AddressToGidMap.GetDataCopy() SUCCESSFULLY executed. Returning the collection with {copy.Count} elements.";
+            Logger.LogVerbose(verboseMessage);
+
+            return copy;
         }
 
         public async Task<Dictionary<long, CommandDescription>> GetCommandDescriptionCache()
         {
+            string verboseMessage = $"{baseLogString} entering GetCommandDescriptionCache method.";
+            Logger.LogVerbose(verboseMessage);
+
             while (!ReliableDictionariesInitialized || !(await GetIsScadaModelImportedIndicator()))
             {
-                //TODO: something smarter
                 await Task.Delay(1000);
             }
 
-            return CommandDescriptionCache.GetDataCopy();
+            verboseMessage = $"{baseLogString} GetCommandDescriptionCache => about to execut CommandDescriptionCache.GetDataCopy().";
+            Logger.LogVerbose(verboseMessage);
+
+            var copy = await CommandDescriptionCache.GetDataCopyAsync();
+
+            if(copy.Count > 0)
+            {
+                var sb = new StringBuilder();
+                sb.AppendLine("GettingCommandDescriptionCache => elements:");
+
+                foreach (var element in copy.Values)
+                {
+                    sb.AppendLine($"Gid: {element.Gid}, Address: {element.Address}, Value: {element.Value}, CommandOrigin: {element.CommandOrigin}");
+                }
+
+                Logger.LogDebug(sb.ToString());
+            }
+
+            verboseMessage = $"{baseLogString} GetCommandDescriptionCache => CommandDescriptionCache.GetDataCopy() SUCCESSFULLY executed. Returning the collection with {copy.Count} elements.";
+            Logger.LogVerbose(verboseMessage);
+
+            return copy;
         }
 
         #endregion IScadaModelReadAccessContract

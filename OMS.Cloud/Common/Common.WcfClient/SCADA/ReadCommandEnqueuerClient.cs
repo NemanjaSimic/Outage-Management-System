@@ -9,34 +9,32 @@ using System.Threading.Tasks;
 
 namespace OMS.Common.WcfClient.SCADA
 {
-    public class ReadCommandEnqueuerClient : WcfSeviceFabricClientBase<IReadCommandEnqueuer>, IReadCommandEnqueuer
+    public class ReadCommandEnqueuerClient : WcfSeviceFabricClientBase<IReadCommandEnqueuerContract>, IReadCommandEnqueuerContract
     {
         private static readonly string microserviceName = MicroserviceNames.ScadaFunctionExecutorService;
         private static readonly string listenerName = EndpointNames.ScadaReadCommandEnqueuerEndpoint;
 
-        public ReadCommandEnqueuerClient(WcfCommunicationClientFactory<IReadCommandEnqueuer> clientFactory, Uri serviceUri, ServicePartitionKey servicePartition)
+        public ReadCommandEnqueuerClient(WcfCommunicationClientFactory<IReadCommandEnqueuerContract> clientFactory, Uri serviceUri, ServicePartitionKey servicePartition)
             : base(clientFactory, serviceUri, servicePartition, listenerName)
         {
         }
 
-        public static ReadCommandEnqueuerClient CreateClient(Uri serviceUri = null)
+        public static ReadCommandEnqueuerClient CreateClient()
         {
             ClientFactory factory = new ClientFactory();
-            ServicePartitionKey servicePartition = ServicePartitionKey.Singleton;
+            return factory.CreateClient<ReadCommandEnqueuerClient, IReadCommandEnqueuerContract>(microserviceName);
+        }
 
-            if (serviceUri == null)
-            {
-                return factory.CreateClient<ReadCommandEnqueuerClient, IReadCommandEnqueuer>(microserviceName, servicePartition);
-            }
-            else
-            {
-                return factory.CreateClient<ReadCommandEnqueuerClient, IReadCommandEnqueuer>(serviceUri, servicePartition);
-            }
+        public static ReadCommandEnqueuerClient CreateClient(Uri serviceUri, ServicePartitionKey servicePartitionKey)
+        {
+            ClientFactory factory = new ClientFactory();
+            return factory.CreateClient<ReadCommandEnqueuerClient, IReadCommandEnqueuerContract>(serviceUri, servicePartitionKey);
         }
 
         #region IModelUpdateCommandEnqueuer
         public Task<bool> EnqueueReadCommand(IReadModbusFunction modbusFunctions)
         {
+            //return MethodWrapperAsync<bool>("EnqueueReadCommand", new object[1] { modbusFunctions });
             return InvokeWithRetryAsync(client => client.Channel.EnqueueReadCommand(modbusFunctions));
         }
         #endregion

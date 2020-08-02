@@ -120,6 +120,8 @@
   <ItemGroup>
     <Compile Include="Dispatchers\GraphHubDispatcher.cs" />
     <Compile Include="EmailParsers\OutageEmailParser.cs" />
+    <Compile Include="Factories\ImapClientFactory.cs" />
+    <Compile Include="Factories\ImapIdleClientFactory.cs" />
     <Compile Include="Imap\ImapEmailClient.cs" />
     <Compile Include="Imap\ImapEmailMapper.cs" />
     <Compile Include="Imap\ImapIdleClient.cs" />
@@ -132,9 +134,7 @@
     <Compile Include="Models\OutageTracingModel.cs" />
     <Compile Include="Properties\AssemblyInfo.cs" />
   </ItemGroup>
-  <ItemGroup>
-    <Folder Include="Factories\" />
-  </ItemGroup>
+  <ItemGroup />
   <ItemGroup>
     <None Include="app.config" />
     <None Include="packages.config" />
@@ -147,6 +147,10 @@
     <ProjectReference Include="..\..\..\Common\Common.PubSub\Common.PubSub.csproj">
       <Project>{5B775779-A5AE-4F94-90EC-59973FA80D4D}</Project>
       <Name>Common.PubSub</Name>
+    </ProjectReference>
+    <ProjectReference Include="..\..\..\Common\Common.WcfClient\Common.WcfClient.csproj">
+      <Project>{AE91CEB5-378A-4EEF-AEBF-C40ED1EF23CF}</Project>
+      <Name>Common.WcfClient</Name>
     </ProjectReference>
     <ProjectReference Include="..\..\..\Common\Contracts\Common.PubSubContracts\Common.PubSubContracts.csproj">
       <Project>{AA75150D-EE56-49C0-9431-751F83CCC0CD}</Project>

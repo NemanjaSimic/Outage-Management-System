@@ -25,8 +25,8 @@
 
   <Resources>
     <Endpoints>
-      <Endpoint Name="PublisherEndpoint" Protocol="tcp" Type="Input"/>
-      <Endpoint Name="SubscriberEndpoint" Protocol="tcp" Type="Input"/>
+      <Endpoint Name="PubSubPublisherEndpoint" Protocol="tcp" Type="Input"/>
+      <Endpoint Name="PubSubRegisterSubscriberEndpoint" Protocol="tcp" Type="Input"/>
     </Endpoints>
   </Resources>
 </ServiceManifest>

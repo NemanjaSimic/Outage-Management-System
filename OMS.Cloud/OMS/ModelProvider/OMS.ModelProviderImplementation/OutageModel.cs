@@ -7,13 +7,16 @@ using Microsoft.ServiceFabric.Data.Notifications;
 using OMS.Common.Cloud;
 using OMS.Common.Cloud.Logger;
 using OMS.Common.Cloud.ReliableCollectionHelpers;
+using OMS.Common.PubSub;
 using OMS.Common.PubSubContracts;
 using OMS.Common.WcfClient.OMS;
+using OMS.Common.WcfClient.OMS.Lifecycle;
 using System;
 using System.Collections.Generic;
 using System.Linq;
 using System.Text;
 using System.Threading.Tasks;
+using ReliableDictionaryNames = Common.OMS.ReliableDictionaryNames;
 
 namespace OMS.ModelProviderImplementation
 {
@@ -33,7 +36,7 @@ namespace OMS.ModelProviderImplementation
 		{
 			this.stateManager = stateManager;
 			this.stateManager.StateManagerChanged += this.OnStateManagerChangedHandler;
-			this.subscriberUri = new Uri("fabric:/OMS.Cloud/ModelProviderService");
+			this.subscriberUri = "OutageModel"; //TODO: Service defines, name
 
 			this.historyDBManagerClient = HistoryDBManagerClient.CreateClient();
 			this.outageModelReadAccessClient = OutageModelReadAccessClient.CreateClient();
@@ -99,9 +102,9 @@ namespace OMS.ModelProviderImplementation
 			}
 		}
 		#region INotifySubscriberContract
-		private readonly Uri subscriberUri;
+		private readonly string subscriberUri;
 
-		public async Task Notify(IPublishableMessage message)
+		public async Task Notify(IPublishableMessage message, string publisherName)
 		{
 			//if OMSModelMessage
 			if (message is OMSModelMessage omsModelMessage)
@@ -122,7 +125,7 @@ namespace OMS.ModelProviderImplementation
 				await historyDBManagerClient.OnConsumersEnergized(energizedConsumers);
 				Dictionary<long, CommandOriginType> potentialOutages = await outageModelReadAccessClient.GetPotentialOutage();
 
-				Task[] reportOutageTasks = new Task[potentialOutage.Count];
+				Task[] reportOutageTasks = new Task[potentialOutages.Count];
 				int index = 0;
 				foreach (var item in potentialOutages)
 				{
@@ -139,7 +142,7 @@ namespace OMS.ModelProviderImplementation
 			}			
 		}
 
-		public async Task<Uri> GetSubscriberUri()
+		public async Task<string> GetSubscriberName()
 		{
 			return this.subscriberUri;
 		}

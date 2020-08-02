@@ -7,10 +7,13 @@ using Microsoft.ServiceFabric.Services.Communication.Runtime;
 using Microsoft.ServiceFabric.Services.Communication.Wcf;
 using Microsoft.ServiceFabric.Services.Communication.Wcf.Runtime;
 using Microsoft.ServiceFabric.Services.Runtime;
+using Microsoft.WindowsAzure.Storage.Queue;
+using OMS.Common.Cloud.AzureStorageHelpers;
 using OMS.Common.Cloud.Logger;
 using OMS.Common.Cloud.Names;
 using OMS.Common.SCADA;
 using OMS.Common.ScadaContracts.FunctionExecutior;
+using OMS.Common.ScadaContracts.ModelProvider;
 using OMS.Common.WcfClient.SCADA;
 
 using SCADA.FunctionExecutorImplementation;
@@ -23,31 +26,46 @@ namespace SCADA.FunctionExecutorService
     /// </summary>
     internal sealed class FunctionExecutorService : StatelessService
     {
-        private readonly ICloudLogger logger;
-
+        private readonly string baseLogString;
         private readonly ReadCommandEnqueuer readCommandEnqueuer;
         private readonly WriteCommandEnqueuer writeCommandEnqueuer;
         private readonly ModelUpdateCommandEnqueuer modelUpdateCommandEnqueuer;
 
+        private ICloudLogger logger;
+        private ICloudLogger Logger
+        {
+            get { return logger ?? (logger = CloudLoggerFactory.GetLogger()); }
+        }
+
         public FunctionExecutorService(StatelessServiceContext context)
             : base(context)
         {
-            this.logger = CloudLoggerFactory.GetLogger();
+            this.baseLogString = $"{this.GetType()} [{this.GetHashCode()}] =>{Environment.NewLine}";
+            Logger.LogDebug($"{baseLogString} Ctor => Logger initialized");
 
             try
             {
+                //CloudQueueHelper.TryGetQueue(CloudStorageQueueNames.ReadCommandQueue, out CloudQueue readCommandQueue);
+                //CloudQueueHelper.TryGetQueue(CloudStorageQueueNames.WriteCommandQueue, out CloudQueue writeCommandQueue);
+                //CloudQueueHelper.TryGetQueue(CloudStorageQueueNames.ModelUpdateCommandQueue, out CloudQueue modelUpdateCommandQueue);
+
+                //this.readCommandEnqueuer = new ReadCommandEnqueuer(readCommandQueue, writeCommandQueue, modelUpdateCommandQueue);
+                //this.writeCommandEnqueuer = new WriteCommandEnqueuer(readCommandQueue, writeCommandQueue, modelUpdateCommandQueue);
+                //this.modelUpdateCommandEnqueuer = new ModelUpdateCommandEnqueuer(readCommandQueue, writeCommandQueue, modelUpdateCommandQueue);
+
                 this.readCommandEnqueuer = new ReadCommandEnqueuer();
                 this.writeCommandEnqueuer = new WriteCommandEnqueuer();
                 this.modelUpdateCommandEnqueuer = new ModelUpdateCommandEnqueuer();
 
-                string message = "Contract providers initialized.";
-                logger.LogInformation(message);
-                ServiceEventSource.Current.ServiceMessage(this.Context, $"[FunctionExecutorService | Information] {message}");
+                string infoMessage = $"{baseLogString} Ctor => Contract providers initialized.";
+                Logger.LogInformation(infoMessage);
+                ServiceEventSource.Current.ServiceMessage(this.Context, $"[FunctionExecutorService | Information] {infoMessage}");
             }
             catch (Exception e)
             {
-                logger.LogError(e.Message, e);
-                ServiceEventSource.Current.ServiceMessage(this.Context, $"[FunctionExecutorService | Error] {e.Message}");
+                string errorMessage = $"{baseLogString} Ctor => exception {e.Message}";
+                Logger.LogError(errorMessage, e);
+                ServiceEventSource.Current.ServiceMessage(this.Context, $"[FunctionExecutorService | Error] {errorMessage}");
             }
         }
 
@@ -63,7 +81,7 @@ namespace SCADA.FunctionExecutorService
                 //ScadaReadCommandEnqueuerEndpoint
                 new ServiceInstanceListener(context =>
                 {
-                    return new WcfCommunicationListener<IReadCommandEnqueuer>(context,
+                    return new WcfCommunicationListener<IReadCommandEnqueuerContract>(context,
                                                                               this.readCommandEnqueuer,
                                                                               WcfUtility.CreateTcpListenerBinding(),
                                                                               EndpointNames.ScadaReadCommandEnqueuerEndpoint);
@@ -72,7 +90,7 @@ namespace SCADA.FunctionExecutorService
                 //ScadaWriteCommandEnqueuerEndpoint
                 new ServiceInstanceListener(context =>
                 {
-                    return new WcfCommunicationListener<IWriteCommandEnqueuer>(context,
+                    return new WcfCommunicationListener<IWriteCommandEnqueuerContract>(context,
                                                                                this.writeCommandEnqueuer,
                                                                                WcfUtility.CreateTcpListenerBinding(),
                                                                                EndpointNames.ScadaWriteCommandEnqueuerEndpoint);
@@ -81,7 +99,7 @@ namespace SCADA.FunctionExecutorService
                 //ScadaModelUpdateCommandEnqueueurEndpoint
                 new ServiceInstanceListener(context =>
                 {
-                    return new WcfCommunicationListener<IModelUpdateCommandEnqueuer>(context,
+                    return new WcfCommunicationListener<IModelUpdateCommandEnqueuerContract>(context,
                                                                                      this.modelUpdateCommandEnqueuer,
                                                                                      WcfUtility.CreateTcpListenerBinding(),
                                                                                      EndpointNames.ScadaModelUpdateCommandEnqueueurEndpoint);
@@ -104,17 +122,18 @@ namespace SCADA.FunctionExecutorService
             try
             {
                 functionExecutorCycle = new FunctionExecutorCycle();
-                ScadaModelReadAccessClient readAccessClient = ScadaModelReadAccessClient.CreateClient();
+                IScadaModelReadAccessContract readAccessClient = ScadaModelReadAccessClient.CreateClient();
                 configData = await readAccessClient.GetScadaConfigData();
 
-                string message = "FunctionExecutorCycle initialized.";
-                logger.LogInformation(message);
-                ServiceEventSource.Current.ServiceMessage(this.Context, $"[FunctionExecutorService | Information] {message}");
+                string infoMessage = $"{baseLogString} RunAsync => FunctionExecutorCycle initialized.";
+                Logger.LogInformation(infoMessage);
+                ServiceEventSource.Current.ServiceMessage(this.Context, $"[FunctionExecutorService | Information] {infoMessage}");
             }
             catch (Exception e)
             {
-                logger.LogError(e.Message, e);
-                ServiceEventSource.Current.ServiceMessage(this.Context, $"[FunctionExecutorService | Error] {e.Message}");
+                string errorMessage = $"{baseLogString} RunAsync => exception {e.Message}";
+                Logger.LogError(errorMessage, e);
+                ServiceEventSource.Current.ServiceMessage(this.Context, $"[FunctionExecutorService | Error] {errorMessage}");
                 throw e;
             }
 
@@ -126,14 +145,15 @@ namespace SCADA.FunctionExecutorService
                 {
                     await functionExecutorCycle.Start();
 
-                    string message = "FunctionExecutorCycle executed.";
-                    logger.LogVerbose(message);
+                    string verboseMessage = $"{baseLogString} RunAsync => FunctionExecutorCycle executed.";
+                    Logger.LogVerbose(verboseMessage);
                     //ServiceEventSource.Current.ServiceMessage(this.Context, $"[FunctionExecutorService | Information] {message}");
                 }
                 catch (Exception e)
                 {
-                    logger.LogError(e.Message, e);
-                    ServiceEventSource.Current.ServiceMessage(this.Context, $"[FunctionExecutorService | Error] {e.Message}");
+                    string errorMessage = $"{baseLogString} RunAsync => exception {e.Message}";
+                    Logger.LogError(errorMessage, e);
+                    ServiceEventSource.Current.ServiceMessage(this.Context, $"[FunctionExecutorService | Error] {errorMessage}");
                 }
 
                 await Task.Delay(TimeSpan.FromMilliseconds(configData.FunctionExecutionInterval), cancellationToken);
