@@ -1,4 +1,5 @@
 ﻿using Common.OMS.Report;
+using Microsoft.ServiceFabric.Services.Remoting;
 using System;
 using System.Collections.Generic;
 using System.Linq;
@@ -10,7 +11,7 @@ namespace Common.OmsContracts.Report
 {
 
     [ServiceContract]
-    public interface IReportingContract
+    public interface IReportingContract:IService
     {
         [OperationContract]
         Task<OutageReport> GenerateReport(ReportOptions options);

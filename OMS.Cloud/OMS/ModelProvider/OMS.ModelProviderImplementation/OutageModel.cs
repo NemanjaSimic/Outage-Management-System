@@ -9,7 +9,6 @@ using OMS.Common.Cloud.Logger;
 using OMS.Common.Cloud.ReliableCollectionHelpers;
 using OMS.Common.PubSubContracts;
 using OMS.Common.WcfClient.OMS;
-using OMS.Common.WcfClient.OMS.Lifecycle;
 using System;
 using System.Collections.Generic;
 using System.Linq;

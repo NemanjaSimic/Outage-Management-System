@@ -23,6 +23,6 @@
         public const string OmsTracingAlgorithmService = "OmsTracingAlgorithmService";
         public const string OmsHistoryDBManagerService = "OmsHistoryDBManagerService";
         public const string OmsOutageLifecycleService = "OmsOutageLifecycleService";
-
+        public const string OmsReportingService = "OmsReportingService";
     }
 }

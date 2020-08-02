@@ -13,6 +13,7 @@ using OMS.Common.WcfClient.NMS;
 using OMS.Common.NmsContracts.GDA;
 using Common.PubSubContracts.DataContracts.OMS;
 using OMS.Common.WcfClient.PubSub;
+using Common.CE;
 
 namespace OMS.OutageLifecycleServiceImplementation.OutageLCHelper
 {

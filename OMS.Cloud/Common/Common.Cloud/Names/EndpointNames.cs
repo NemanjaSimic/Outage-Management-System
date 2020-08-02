@@ -1,4 +1,6 @@
-﻿namespace OMS.Common.Cloud.Names
+﻿using System.Fabric.Health;
+
+namespace OMS.Common.Cloud.Names
 {
     public static class EndpointNames
     {
@@ -52,7 +54,7 @@
         public const string SendLocationIsolationCrewEndpoint = "SendLocationIsolationCrewEndpoint";
         public const string SendRepairCrewEndpoint = "SendRepairCrewEndpoint";
         public const string ValidateResolveConditionsEndpoint = "ValidateResolveConditionsEndpoint";
-
+        public const string ReportingEndpoint = "ReportingEndpoint";
     }
 }
 
