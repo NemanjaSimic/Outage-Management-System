@@ -7,6 +7,7 @@ using OMS.Common.Cloud.Names;
 using System;
 using System.Threading;
 using System.Threading.Tasks;
+using ILogger = OMS.Common.Cloud.Logger.ICloudLogger;
 
 namespace Common.Web.Services.Handlers
 {
@@ -29,7 +30,7 @@ namespace Common.Web.Services.Handlers
                 {
                     try
                     {
-                        _logger.LogInfo("[ReportCommandHandler::GenerateReport] Sending a Generate command to Outage service.");
+                        _logger.LogInformation("[ReportCommandHandler::GenerateReport] Sending a Generate command to Outage service.");
 
                         var options = new ReportOptions
                         {

@@ -1,5 +1,5 @@
 ﻿using Microsoft.AspNetCore.SignalR;
-using Outage.Common.PubSub.SCADADataContract;
+using OMS.Common.PubSubContracts.DataContracts.SCADA;
 using System.Collections.Generic;
 using System.Threading.Tasks;
 

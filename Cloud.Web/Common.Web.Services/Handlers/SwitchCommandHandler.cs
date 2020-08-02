@@ -4,6 +4,7 @@ using OMS.Common.Cloud.Names;
 using System;
 using System.Threading;
 using System.Threading.Tasks;
+using ILogger = OMS.Common.Cloud.Logger.ICloudLogger;
 
 namespace Common.Web.Services.Handlers
 {
@@ -20,7 +21,7 @@ namespace Common.Web.Services.Handlers
 
         public Task<Unit> Handle(OpenSwitchCommand request, CancellationToken cancellationToken)
         {
-            _logger.LogInfo($"[SwitchCommandHandler::TurnOffSwitchCommand] Sending {request.Command.ToString()} command to {request.Gid}");
+            _logger.LogInformation($"[SwitchCommandHandler::TurnOffSwitchCommand] Sending {request.Command.ToString()} command to {request.Gid}");
 
             using (SwitchStatusCommandingProxy commandingProxy = _proxyFactory.CreateProxy<SwitchStatusCommandingProxy, ISwitchStatusCommandingContract>(EndpointNames.SwitchStatusCommandingEndpoint))
             {

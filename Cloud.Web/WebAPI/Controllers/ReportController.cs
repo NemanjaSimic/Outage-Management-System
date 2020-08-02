@@ -1,9 +1,9 @@
 ﻿using System.Threading.Tasks;
+using Common.Web.Services.Commands;
+using Common.Web.UI.Models.BindingModels;
+using Common.Web.UI.Models.ViewModels;
 using MediatR;
 using Microsoft.AspNetCore.Mvc;
-using OMS.Web.Services.Commands;
-using OMS.Web.UI.Models.BindingModels;
-using OMS.Web.UI.Models.ViewModels;
 
 namespace WebAPI.Controllers
 {

@@ -4,6 +4,7 @@ using OMS.Common.Cloud.Names;
 using System;
 using System.Threading;
 using System.Threading.Tasks;
+using ILogger = OMS.Common.Cloud.Logger.ICloudLogger;
 
 namespace Common.Web.Services.Handlers
 {
@@ -28,7 +29,7 @@ namespace Common.Web.Services.Handlers
         {
             return Task.Run<Unit>(() =>
             {
-                _logger.LogInfo($"[OutageLifecycleCommandHandler::IsolateOutageCommand] Sending isolate outage command for outage: {request.OutageId}");
+                _logger.LogInformation($"[OutageLifecycleCommandHandler::IsolateOutageCommand] Sending isolate outage command for outage: {request.OutageId}");
 
                 using (OutageLifecycleUICommandingProxy commandingProxy =
                     _proxyFactory.CreateProxy<OutageLifecycleUICommandingProxy, IOutageLifecycleUICommandingContract>(
@@ -55,7 +56,7 @@ namespace Common.Web.Services.Handlers
         {
             return Task.Run<Unit>(() =>
             {
-                _logger.LogInfo($"[OutageLifecycleCommandHandler::SendOutageLocationIsolationCrewCommand] Sending outage location isolation crew command for outage: {request.OutageId}");
+                _logger.LogInformation($"[OutageLifecycleCommandHandler::SendOutageLocationIsolationCrewCommand] Sending outage location isolation crew command for outage: {request.OutageId}");
 
 
                 using (OutageLifecycleUICommandingProxy commandingProxy =
@@ -82,7 +83,7 @@ namespace Common.Web.Services.Handlers
         {
             return Task.Run<Unit>(() =>
             {
-                _logger.LogInfo($"[OutageLifecycleCommandHandler::SendOutageRepairCrewCommand] Sending outage repair crew command for outage: {request.OutageId}");
+                _logger.LogInformation($"[OutageLifecycleCommandHandler::SendOutageRepairCrewCommand] Sending outage repair crew command for outage: {request.OutageId}");
 
 
                 using (OutageLifecycleUICommandingProxy commandingProxy = _proxyFactory.CreateProxy<OutageLifecycleUICommandingProxy, IOutageLifecycleUICommandingContract>(EndpointNames.OutageLifecycleUICommandingEndpoint))
@@ -106,7 +107,7 @@ namespace Common.Web.Services.Handlers
         {
             return Task.Run<Unit>(() => 
             { 
-                _logger.LogInfo($"[OutageLifecycleCommandHandler::ValidateResolveConditionsCommand] Sending validate resolve conditions command for outage: {request.OutageId}");
+                _logger.LogInformation($"[OutageLifecycleCommandHandler::ValidateResolveConditionsCommand] Sending validate resolve conditions command for outage: {request.OutageId}");
 
 
                 using (OutageLifecycleUICommandingProxy commandingProxy =
@@ -133,7 +134,7 @@ namespace Common.Web.Services.Handlers
         {
             return Task.Run<Unit>(() => 
             { 
-                _logger.LogInfo($"[OutageLifecycleCommandHandler::IsolateOutageCommand] Sending isolate outage command for outage: {request.OutageId}");
+                _logger.LogInformation($"[OutageLifecycleCommandHandler::IsolateOutageCommand] Sending isolate outage command for outage: {request.OutageId}");
 
 
                 using (OutageLifecycleUICommandingProxy commandingProxy =

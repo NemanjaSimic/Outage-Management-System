@@ -2,10 +2,12 @@
 using Common.Web.UI.Models.ViewModels;
 using MediatR;
 using OMS.Common.Cloud.Names;
+using Outage.Common.PubSub.OutageDataContract;
 using System;
 using System.Collections.Generic;
 using System.Threading;
 using System.Threading.Tasks;
+using ILogger = OMS.Common.Cloud.Logger.ICloudLogger;
 
 namespace Common.Web.Services.Handlers
 {
@@ -32,7 +34,7 @@ namespace Common.Web.Services.Handlers
                 {
                     try
                     {
-                        _logger.LogInfo("[OutageQueryHandler::GetActiveOutages] Sending a GET query to Outage service for active outages.");
+                        _logger.LogInformation("[OutageQueryHandler::GetActiveOutages] Sending a GET query to Outage service for active outages.");
                         IEnumerable<ActiveOutageMessage> activeOutages = outageProxy.GetActiveOutages();
 
                         IEnumerable<ActiveOutageViewModel> activeOutageViewModels = _mapper.MapActiveOutages(activeOutages);
@@ -55,7 +57,7 @@ namespace Common.Web.Services.Handlers
                 {
                     try
                     {
-                        _logger.LogInfo("[OutageQueryHandler::GetArchivedOutages] Sending a GET query to Outage service for archived outages.");
+                        _logger.LogInformation("[OutageQueryHandler::GetArchivedOutages] Sending a GET query to Outage service for archived outages.");
                         IEnumerable<ArchivedOutageMessage> archivedOutages = outageProxy.GetArchivedOutages();
 
                         IEnumerable<ArchivedOutageViewModel> archivedOutageViewModels = _mapper.MapArchivedOutages(archivedOutages);

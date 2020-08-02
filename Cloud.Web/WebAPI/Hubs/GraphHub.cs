@@ -1,5 +1,5 @@
-﻿using Microsoft.AspNetCore.SignalR;
-using OMS.Web.UI.Models.ViewModels;
+﻿using Common.Web.UI.Models.ViewModels;
+using Microsoft.AspNetCore.SignalR;
 using System.Collections.Generic;
 using System.Threading.Tasks;
 

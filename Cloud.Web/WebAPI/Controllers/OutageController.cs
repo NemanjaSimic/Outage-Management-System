@@ -1,11 +1,11 @@
 ﻿using System;
 using System.Collections.Generic;
 using System.Threading.Tasks;
+using Common.Web.Services.Commands;
+using Common.Web.Services.Queries;
+using Common.Web.UI.Models.ViewModels;
 using MediatR;
 using Microsoft.AspNetCore.Mvc;
-using OMS.Web.Services.Commands;
-using OMS.Web.Services.Queries;
-using OMS.Web.UI.Models.ViewModels;
 
 // For more information on enabling Web API for empty projects, visit https://go.microsoft.com/fwlink/?LinkID=397860
 
