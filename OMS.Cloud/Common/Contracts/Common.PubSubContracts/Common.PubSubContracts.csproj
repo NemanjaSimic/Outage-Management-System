@@ -91,6 +91,7 @@
   <ItemGroup>
     <Compile Include="DataContracts\CE\CalculationEngineMessage.cs" />
     <Compile Include="DataContracts\EMAIL\EmailServiceMessage.cs" />
+    <Compile Include="DataContracts\EMAIL\OutageEmailPublication.cs" />
     <Compile Include="DataContracts\OMS\OutageMessage.cs" />
     <Compile Include="DataContracts\OMS\OutagePublication.cs" />
     <Compile Include="DataContracts\SCADA\ModbusData.cs" />

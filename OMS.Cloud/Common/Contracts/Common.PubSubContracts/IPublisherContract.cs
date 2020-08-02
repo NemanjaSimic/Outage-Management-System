@@ -35,6 +35,6 @@ namespace OMS.Common.PubSubContracts
         [ServiceKnownType(typeof(ArchivedOutageMessage))]
         [ServiceKnownType(typeof(ConsumerMessage))]
         [ServiceKnownType(typeof(EquipmentMessage))]
-        Task<bool> Publish(IPublication publication, Uri publisherUri);
+        Task<bool> Publish(IPublication publication, Uri publisherUri = null);
     }
 }

@@ -49,10 +49,6 @@
       <Project>{7032AEF1-E55A-4D5C-90FF-E0B8B4C98BE0}</Project>
       <Name>Common.OmsContracts</Name>
     </ProjectReference>
-    <ProjectReference Include="..\Common.OMS\Common.OMS.csproj">
-      <Project>{8F96A078-BE16-4363-9B89-0B313D2E0F5E}</Project>
-      <Name>Common.OMS</Name>
-    </ProjectReference>
   </ItemGroup>
   <Import Project="$(MSBuildToolsPath)\Microsoft.CSharp.targets" />
 </Project>

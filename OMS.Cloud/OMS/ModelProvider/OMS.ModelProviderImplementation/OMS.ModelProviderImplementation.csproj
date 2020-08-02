@@ -57,10 +57,6 @@
       <Project>{7032AEF1-E55A-4D5C-90FF-E0B8B4C98BE0}</Project>
       <Name>Common.OmsContracts</Name>
     </ProjectReference>
-    <ProjectReference Include="..\..\..\Common.OMS\Common.OMS.csproj">
-      <Project>{8F96A078-BE16-4363-9B89-0B313D2E0F5E}</Project>
-      <Name>Common.OMS</Name>
-    </ProjectReference>
     <ProjectReference Include="..\..\..\Common\Common.CE\Common.CE.csproj">
       <Project>{4EAD0377-BD2D-4B7E-93A6-705DB815E8A7}</Project>
       <Name>Common.CE</Name>
