@@ -89,6 +89,7 @@
     <Reference Include="System.Xml" />
   </ItemGroup>
   <ItemGroup>
+    <Compile Include="DataContracts\Outage\OutageMessage.cs" />
     <Compile Include="DataContracts\SCADA\ModbusData.cs" />
     <Compile Include="DataContracts\Publication.cs" />
     <Compile Include="DataContracts\SCADA\ScadaMessage.cs" />
