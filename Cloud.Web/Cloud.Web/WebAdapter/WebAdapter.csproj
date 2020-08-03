@@ -271,10 +271,6 @@
     <None Include="packages.config" />
   </ItemGroup>
   <ItemGroup>
-    <ProjectReference Include="..\..\..\OMS.Web\OMS.Web.Adapter\OMS.Web.Adapter.Contracts\OMS.Web.Adapter.Contracts.csproj">
-      <Project>{0CAD32C4-5C09-467F-B5DC-57C646BAC2A2}</Project>
-      <Name>OMS.Web.Adapter.Contracts</Name>
-    </ProjectReference>
     <ProjectReference Include="..\..\WebAPI\WebAPI.csproj">
       <Project>{09E87B48-4957-48EA-B29B-A6EC648CD3F0}</Project>
       <Name>WebAPI</Name>

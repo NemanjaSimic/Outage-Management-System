@@ -46,6 +46,10 @@
     <Compile Include="IScadaClient.cs" />
     <Compile Include="ITopologyClient.cs" />
     <Compile Include="IWebService.cs" />
+    <Compile Include="IOutageAccessContract.cs" />
+    <Compile Include="IOutageLifecycleUICommandingContract.cs" />
+    <Compile Include="ISwitchStatusCommandingContract.cs" />
+    <Compile Include="ITopologyServiceContract.cs" />
     <Compile Include="Properties\AssemblyInfo.cs" />
   </ItemGroup>
   <ItemGroup>
@@ -56,10 +60,6 @@
     <ProjectReference Include="..\..\..\..\OMS.Cloud\Common\Contracts\Common.PubSubContracts\Common.PubSubContracts.csproj">
       <Project>{AA75150D-EE56-49C0-9431-751F83CCC0CD}</Project>
       <Name>Common.PubSubContracts</Name>
-    </ProjectReference>
-    <ProjectReference Include="..\..\Web\Common.Web\Common.Web.csproj">
-      <Project>{4D11B605-EA66-40C1-8A96-644E42BBA91B}</Project>
-      <Name>Common.Web</Name>
     </ProjectReference>
   </ItemGroup>
   <ItemGroup>
