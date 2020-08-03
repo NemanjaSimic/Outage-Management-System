@@ -1,5 +1,5 @@
 ﻿using CECommon;
-using Common.Web.UI.Models.ViewModels;
+using Common.Web.Models.ViewModels;
 
 namespace Common.Web.Mappers
 {

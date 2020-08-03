@@ -1,4 +1,4 @@
-﻿using Common.Web.UI.Models.ViewModels;
+﻿using Common.Web.Models.ViewModels;
 using OMS.Common.PubSubContracts.DataContracts.SCADA;
 using System.Collections.Generic;
 using System.ServiceModel;

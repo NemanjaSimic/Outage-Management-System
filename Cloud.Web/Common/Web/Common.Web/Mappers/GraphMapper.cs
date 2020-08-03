@@ -1,6 +1,6 @@
 ﻿using CECommon;
 using Common.Web.Extensions;
-using Common.Web.UI.Models.ViewModels;
+using Common.Web.Models.ViewModels;
 using OMS.Common.Cloud;
 using System.Collections.Generic;
 

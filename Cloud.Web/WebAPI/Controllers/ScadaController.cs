@@ -1,7 +1,7 @@
 ﻿using System;
 using System.Collections.Generic;
 using Common.Web.Services.Commands;
-using Common.Web.UI.Models.BindingModels;
+using Common.Web.Models.BindingModels;
 using MediatR;
 using Microsoft.AspNetCore.Mvc;
 

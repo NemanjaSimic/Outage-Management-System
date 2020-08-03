@@ -57,10 +57,13 @@
       <Project>{AA75150D-EE56-49C0-9431-751F83CCC0CD}</Project>
       <Name>Common.PubSubContracts</Name>
     </ProjectReference>
-    <ProjectReference Include="..\..\Web\Common.Web.UI.Models\Common.Web.UI.Models.csproj">
-      <Project>{B30F060F-056F-40E3-9AF8-CBD9ADBC6F6E}</Project>
-      <Name>Common.Web.UI.Models</Name>
+    <ProjectReference Include="..\..\Web\Common.Web\Common.Web.csproj">
+      <Project>{4D11B605-EA66-40C1-8A96-644E42BBA91B}</Project>
+      <Name>Common.Web</Name>
     </ProjectReference>
+  </ItemGroup>
+  <ItemGroup>
+    <None Include="app.config" />
   </ItemGroup>
   <Import Project="$(MSBuildToolsPath)\Microsoft.CSharp.targets" />
 </Project>

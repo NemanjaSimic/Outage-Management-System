@@ -1,6 +1,6 @@
 ﻿using System.Threading.Tasks;
 using Common.Web.Services.Queries;
-using Common.Web.UI.Models.ViewModels;
+using Common.Web.Models.ViewModels;
 using MediatR;
 using Microsoft.AspNetCore.Mvc;
 

@@ -1,4 +1,4 @@
-﻿using Common.Web.UI.Models.ViewModels;
+﻿using Common.Web.Models.ViewModels;
 using Microsoft.AspNetCore.SignalR;
 using System.Threading.Tasks;
 
