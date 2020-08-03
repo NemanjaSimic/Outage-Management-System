@@ -26,7 +26,7 @@ namespace WebAdapterService
         { 
             try
             {
-                this.webAdapterProvider = new WebAdapterProvider;
+                this.webAdapterProvider = new WebAdapterProvider();
             } 
             catch
             {
