@@ -29,6 +29,8 @@ Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "Common.CE", "..\..\OMS.Clou
 EndProject
 Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "Common.PubSubContracts", "..\..\OMS.Cloud\Common\Contracts\Common.PubSubContracts\Common.PubSubContracts.csproj", "{AA75150D-EE56-49C0-9431-751F83CCC0CD}"
 EndProject
+Project("{2150E333-8FDC-42A3-9474-1A3956D46DE8}") = "Contracts", "Contracts", "{33DE5465-D8C6-4657-8415-3B5B8C66605E}"
+EndProject
 Global
 	GlobalSection(SolutionConfigurationPlatforms) = preSolution
 		Debug|Any CPU = Debug|Any CPU
@@ -166,6 +168,7 @@ Global
 		{FBEE1369-0F6C-41E6-8C62-8C1C5CDBB602} = {91813790-03F2-4F10-855E-96D66B4BE487}
 		{2B5DAFD3-879B-4876-972F-0CC48463AC0C} = {91813790-03F2-4F10-855E-96D66B4BE487}
 		{AA75150D-EE56-49C0-9431-751F83CCC0CD} = {91813790-03F2-4F10-855E-96D66B4BE487}
+		{33DE5465-D8C6-4657-8415-3B5B8C66605E} = {91813790-03F2-4F10-855E-96D66B4BE487}
 	EndGlobalSection
 	GlobalSection(ExtensibilityGlobals) = postSolution
 		SolutionGuid = {FBAD191B-57E1-4FD5-B6B1-5009A9A04CF0}

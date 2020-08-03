@@ -1,4 +1,5 @@
-﻿using Common.Web.Services.Queries;
+﻿using Common.Web.Mappers;
+using Common.Web.Services.Queries;
 using Common.Web.UI.Models.ViewModels;
 using MediatR;
 using OMS.Common.Cloud.Names;
@@ -14,16 +15,15 @@ namespace Common.Web.Services.Handlers
     public class OutageQueryHandler :
         IRequestHandler<GetActiveOutagesQuery, IEnumerable<ActiveOutageViewModel>>,
         IRequestHandler<GetArchivedOutagesQuery, IEnumerable<ArchivedOutageViewModel>>
+        //outageaccesssclient
     {
         private readonly ILogger _logger;
         private readonly IOutageMapper _mapper;
-        IProxyFactory _proxyFactory;
 
-        public OutageQueryHandler(ILogger logger, IOutageMapper mapper, IProxyFactory factory)
+        public OutageQueryHandler(ILogger logger, IOutageMapper mapper)
         {
             _logger = logger;
             _mapper = mapper;
-            _proxyFactory = factory;
         }
 
         public Task<IEnumerable<ActiveOutageViewModel>> Handle(GetActiveOutagesQuery request, CancellationToken cancellationToken)
