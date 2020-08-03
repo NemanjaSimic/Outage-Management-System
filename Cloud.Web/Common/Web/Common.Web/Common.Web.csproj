@@ -76,22 +76,6 @@
     <Compile Include="Mappers\IGraphMapper.cs" />
     <Compile Include="Mappers\IOutageMapper.cs" />
     <Compile Include="Mappers\OutageMapper.cs" />
-    <Compile Include="Models\BindingModels\ReportOptions.cs" />
-    <Compile Include="Models\BindingModels\SwitchCommandBindingModel.cs" />
-    <Compile Include="Models\IViewModel.cs" />
-    <Compile Include="Models\OutageLifecycleState.cs" />
-    <Compile Include="Models\ReportType.cs" />
-    <Compile Include="Models\ViewModels\ActiveOutageViewModel.cs" />
-    <Compile Include="Models\ViewModels\ArchivedOutageViewModel.cs" />
-    <Compile Include="Models\ViewModels\ConsumerViewModel.cs" />
-    <Compile Include="Models\ViewModels\EquipmentViewModel.cs" />
-    <Compile Include="Models\ViewModels\MeasurementViewModel.cs" />
-    <Compile Include="Models\ViewModels\NodeViewModel.cs" />
-    <Compile Include="Models\ViewModels\OmsGraphViewModel.cs" />
-    <Compile Include="Models\ViewModels\OutageViewModel.cs" />
-    <Compile Include="Models\ViewModels\RelationViewModel.cs" />
-    <Compile Include="Models\ViewModels\ReportViewModel.cs" />
-    <Compile Include="Models\ViewModels\TransformerNodeViewModel.cs" />
     <Compile Include="Properties\AssemblyInfo.cs" />
     <Compile Include="Services\Commands\GenerateReportCommand.cs" />
     <Compile Include="Services\Commands\IsolateOutageCommand.cs" />
@@ -128,6 +112,10 @@
     <ProjectReference Include="..\..\..\..\OMS.Cloud\Common\Contracts\Common.PubSubContracts\Common.PubSubContracts.csproj">
       <Project>{AA75150D-EE56-49C0-9431-751F83CCC0CD}</Project>
       <Name>Common.PubSubContracts</Name>
+    </ProjectReference>
+    <ProjectReference Include="..\..\Contracts\Common.WebAdapterContracts\Common.WebAdapterContracts.csproj">
+      <Project>{A726658E-55CA-4F1B-BFF8-0E69816DEDAC}</Project>
+      <Name>Common.WebAdapterContracts</Name>
     </ProjectReference>
   </ItemGroup>
   <Import Project="$(MSBuildToolsPath)\Microsoft.CSharp.targets" />

@@ -1,4 +1,5 @@
-﻿using Common.Web.Services.Commands;
+﻿using Common.Contracts.WebAdapterContracts;
+using Common.Web.Services.Commands;
 using MediatR;
 using OMS.Common.Cloud.Names;
 using System;

@@ -8,6 +8,7 @@ using System;
 using System.Threading;
 using System.Threading.Tasks;
 using ILogger = OMS.Common.Cloud.Logger.ICloudLogger;
+using Common.Contracts.WebAdapterContracts;
 
 namespace Common.Web.Services.Handlers
 {

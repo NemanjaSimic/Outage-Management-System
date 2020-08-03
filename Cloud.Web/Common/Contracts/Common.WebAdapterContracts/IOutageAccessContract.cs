@@ -1,4 +1,5 @@
 ﻿using Outage.Common.PubSub.OutageDataContract;
+using Outage.Common.ServiceContracts.OMS;
 using System.Collections.Generic;
 using System.ServiceModel;
 
