@@ -4,11 +4,11 @@
   <PropertyGroup>
     <Configuration Condition=" '$(Configuration)' == '' ">Debug</Configuration>
     <Platform Condition=" '$(Platform)' == '' ">AnyCPU</Platform>
-    <ProjectGuid>{A726658E-55CA-4F1B-BFF8-0E69816DEDAC}</ProjectGuid>
+    <ProjectGuid>{EE590ABB-4685-4F34-A344-6D5803FC2325}</ProjectGuid>
     <OutputType>Library</OutputType>
     <AppDesignerFolder>Properties</AppDesignerFolder>
-    <RootNamespace>Common.WebAdapterContracts</RootNamespace>
-    <AssemblyName>Common.WebAdapterContracts</AssemblyName>
+    <RootNamespace>WebAdapterImplementation</RootNamespace>
+    <AssemblyName>WebAdapterImplementation</AssemblyName>
     <TargetFrameworkVersion>v4.8</TargetFrameworkVersion>
     <FileAlignment>512</FileAlignment>
     <Deterministic>true</Deterministic>
@@ -32,52 +32,51 @@
   </PropertyGroup>
   <ItemGroup>
     <Reference Include="Microsoft.ServiceFabric.Data, Version=7.0.0.0, Culture=neutral, PublicKeyToken=31bf3856ad364e35, processorArchitecture=AMD64">
-      <HintPath>..\..\..\Cloud.Web\packages\Microsoft.ServiceFabric.Data.4.1.428\lib\net472\Microsoft.ServiceFabric.Data.dll</HintPath>
+      <HintPath>..\Cloud.Web\packages\Microsoft.ServiceFabric.Data.4.1.428\lib\net472\Microsoft.ServiceFabric.Data.dll</HintPath>
     </Reference>
     <Reference Include="Microsoft.ServiceFabric.Data.Extensions, Version=1.4.5.0, Culture=neutral, PublicKeyToken=31bf3856ad364e35, processorArchitecture=MSIL">
-      <HintPath>..\..\..\Cloud.Web\packages\Microsoft.ServiceFabric.Data.Extensions.4.1.428\lib\net472\Microsoft.ServiceFabric.Data.Extensions.dll</HintPath>
+      <HintPath>..\Cloud.Web\packages\Microsoft.ServiceFabric.Data.Extensions.4.1.428\lib\net472\Microsoft.ServiceFabric.Data.Extensions.dll</HintPath>
     </Reference>
     <Reference Include="Microsoft.ServiceFabric.Data.Interfaces, Version=5.0.0.0, Culture=neutral, PublicKeyToken=31bf3856ad364e35, processorArchitecture=AMD64">
-      <HintPath>..\..\..\Cloud.Web\packages\Microsoft.ServiceFabric.Data.Interfaces.4.1.428\lib\net472\Microsoft.ServiceFabric.Data.Interfaces.dll</HintPath>
+      <HintPath>..\Cloud.Web\packages\Microsoft.ServiceFabric.Data.Interfaces.4.1.428\lib\net472\Microsoft.ServiceFabric.Data.Interfaces.dll</HintPath>
     </Reference>
     <Reference Include="Microsoft.ServiceFabric.Diagnostics, Version=7.0.0.0, Culture=neutral, PublicKeyToken=31bf3856ad364e35, processorArchitecture=AMD64">
-      <HintPath>..\..\..\Cloud.Web\packages\Microsoft.ServiceFabric.Diagnostics.Internal.4.1.428\lib\net472\Microsoft.ServiceFabric.Diagnostics.dll</HintPath>
+      <HintPath>..\Cloud.Web\packages\Microsoft.ServiceFabric.Diagnostics.Internal.4.1.428\lib\net472\Microsoft.ServiceFabric.Diagnostics.dll</HintPath>
     </Reference>
     <Reference Include="Microsoft.ServiceFabric.FabricTransport, Version=7.0.0.0, Culture=neutral, PublicKeyToken=31bf3856ad364e35, processorArchitecture=AMD64">
-      <HintPath>..\..\..\Cloud.Web\packages\Microsoft.ServiceFabric.FabricTransport.Internal.4.1.428\lib\net472\Microsoft.ServiceFabric.FabricTransport.dll</HintPath>
+      <HintPath>..\Cloud.Web\packages\Microsoft.ServiceFabric.FabricTransport.Internal.4.1.428\lib\net472\Microsoft.ServiceFabric.FabricTransport.dll</HintPath>
     </Reference>
     <Reference Include="Microsoft.ServiceFabric.FabricTransport.V2, Version=7.0.0.0, Culture=neutral, PublicKeyToken=31bf3856ad364e35, processorArchitecture=AMD64">
-      <HintPath>..\..\..\Cloud.Web\packages\Microsoft.ServiceFabric.FabricTransport.Internal.4.1.428\lib\net472\Microsoft.ServiceFabric.FabricTransport.V2.dll</HintPath>
+      <HintPath>..\Cloud.Web\packages\Microsoft.ServiceFabric.FabricTransport.Internal.4.1.428\lib\net472\Microsoft.ServiceFabric.FabricTransport.V2.dll</HintPath>
     </Reference>
     <Reference Include="Microsoft.ServiceFabric.Internal, Version=7.0.0.0, Culture=neutral, PublicKeyToken=31bf3856ad364e35, processorArchitecture=AMD64">
-      <HintPath>..\..\..\Cloud.Web\packages\Microsoft.ServiceFabric.7.1.428\lib\net472\Microsoft.ServiceFabric.Internal.dll</HintPath>
+      <HintPath>..\Cloud.Web\packages\Microsoft.ServiceFabric.7.1.428\lib\net472\Microsoft.ServiceFabric.Internal.dll</HintPath>
     </Reference>
     <Reference Include="Microsoft.ServiceFabric.Internal.Strings, Version=7.0.0.0, Culture=neutral, PublicKeyToken=31bf3856ad364e35, processorArchitecture=AMD64">
-      <HintPath>..\..\..\Cloud.Web\packages\Microsoft.ServiceFabric.7.1.428\lib\net472\Microsoft.ServiceFabric.Internal.Strings.dll</HintPath>
+      <HintPath>..\Cloud.Web\packages\Microsoft.ServiceFabric.7.1.428\lib\net472\Microsoft.ServiceFabric.Internal.Strings.dll</HintPath>
     </Reference>
     <Reference Include="Microsoft.ServiceFabric.Preview, Version=7.0.0.0, Culture=neutral, PublicKeyToken=31bf3856ad364e35, processorArchitecture=AMD64">
-      <HintPath>..\..\..\Cloud.Web\packages\Microsoft.ServiceFabric.7.1.428\lib\net472\Microsoft.ServiceFabric.Preview.dll</HintPath>
+      <HintPath>..\Cloud.Web\packages\Microsoft.ServiceFabric.7.1.428\lib\net472\Microsoft.ServiceFabric.Preview.dll</HintPath>
     </Reference>
     <Reference Include="Microsoft.ServiceFabric.ReliableCollection.Interop, Version=1.0.0.0, Culture=neutral, PublicKeyToken=31bf3856ad364e35, processorArchitecture=MSIL">
-      <HintPath>..\..\..\Cloud.Web\packages\Microsoft.ServiceFabric.Data.Extensions.4.1.428\lib\net472\Microsoft.ServiceFabric.ReliableCollection.Interop.dll</HintPath>
+      <HintPath>..\Cloud.Web\packages\Microsoft.ServiceFabric.Data.Extensions.4.1.428\lib\net472\Microsoft.ServiceFabric.ReliableCollection.Interop.dll</HintPath>
     </Reference>
     <Reference Include="Microsoft.ServiceFabric.Services, Version=6.0.0.0, Culture=neutral, PublicKeyToken=31bf3856ad364e35, processorArchitecture=AMD64">
-      <HintPath>..\..\..\Cloud.Web\packages\Microsoft.ServiceFabric.Services.4.1.428\lib\net472\Microsoft.ServiceFabric.Services.dll</HintPath>
+      <HintPath>..\Cloud.Web\packages\Microsoft.ServiceFabric.Services.4.1.428\lib\net472\Microsoft.ServiceFabric.Services.dll</HintPath>
     </Reference>
     <Reference Include="Microsoft.ServiceFabric.Services.Remoting, Version=6.0.0.0, Culture=neutral, PublicKeyToken=31bf3856ad364e35, processorArchitecture=AMD64">
-      <HintPath>..\..\..\Cloud.Web\packages\Microsoft.ServiceFabric.Services.Remoting.4.1.428\lib\net472\Microsoft.ServiceFabric.Services.Remoting.dll</HintPath>
+      <HintPath>..\Cloud.Web\packages\Microsoft.ServiceFabric.Services.Remoting.4.1.428\lib\net472\Microsoft.ServiceFabric.Services.Remoting.dll</HintPath>
     </Reference>
     <Reference Include="System" />
-    <Reference Include="System.ComponentModel.DataAnnotations" />
     <Reference Include="System.Core" />
     <Reference Include="System.Fabric, Version=7.0.0.0, Culture=neutral, PublicKeyToken=31bf3856ad364e35, processorArchitecture=AMD64">
-      <HintPath>..\..\..\Cloud.Web\packages\Microsoft.ServiceFabric.7.1.428\lib\net472\System.Fabric.dll</HintPath>
+      <HintPath>..\Cloud.Web\packages\Microsoft.ServiceFabric.7.1.428\lib\net472\System.Fabric.dll</HintPath>
     </Reference>
     <Reference Include="System.Fabric.Management.ServiceModel, Version=7.0.0.0, Culture=neutral, PublicKeyToken=31bf3856ad364e35, processorArchitecture=AMD64">
-      <HintPath>..\..\..\Cloud.Web\packages\Microsoft.ServiceFabric.7.1.428\lib\net472\System.Fabric.Management.ServiceModel.dll</HintPath>
+      <HintPath>..\Cloud.Web\packages\Microsoft.ServiceFabric.7.1.428\lib\net472\System.Fabric.Management.ServiceModel.dll</HintPath>
     </Reference>
     <Reference Include="System.Fabric.Strings, Version=7.0.0.0, Culture=neutral, PublicKeyToken=31bf3856ad364e35, processorArchitecture=AMD64">
-      <HintPath>..\..\..\Cloud.Web\packages\Microsoft.ServiceFabric.7.1.428\lib\net472\System.Fabric.Strings.dll</HintPath>
+      <HintPath>..\Cloud.Web\packages\Microsoft.ServiceFabric.7.1.428\lib\net472\System.Fabric.Strings.dll</HintPath>
     </Reference>
     <Reference Include="System.Runtime.Serialization" />
     <Reference Include="System.ServiceModel" />
@@ -89,46 +88,17 @@
     <Reference Include="System.Xml" />
   </ItemGroup>
   <ItemGroup>
-    <Compile Include="IPubSubClient.cs" />
-    <Compile Include="IReportingContract.cs" />
-    <Compile Include="IScadaClient.cs" />
-    <Compile Include="ITopologyClient.cs" />
-    <Compile Include="IWebAdapterContract.cs" />
-    <Compile Include="IOutageAccessContract.cs" />
-    <Compile Include="IOutageLifecycleUICommandingContract.cs" />
-    <Compile Include="ISwitchStatusCommandingContract.cs" />
-    <Compile Include="ITopologyServiceContract.cs" />
-    <Compile Include="Models\BindingModels\ReportOptions.cs" />
-    <Compile Include="Models\BindingModels\SwitchCommandBindingModel.cs" />
-    <Compile Include="Models\IViewModel.cs" />
-    <Compile Include="Models\OutageLifecycleState.cs" />
-    <Compile Include="Models\ReportType.cs" />
-    <Compile Include="Models\ViewModels\ActiveOutageViewModel.cs" />
-    <Compile Include="Models\ViewModels\ArchivedOutageViewModel.cs" />
-    <Compile Include="Models\ViewModels\ConsumerViewModel.cs" />
-    <Compile Include="Models\ViewModels\EquipmentViewModel.cs" />
-    <Compile Include="Models\ViewModels\MeasurementViewModel.cs" />
-    <Compile Include="Models\ViewModels\NodeViewModel.cs" />
-    <Compile Include="Models\ViewModels\OmsGraphViewModel.cs" />
-    <Compile Include="Models\ViewModels\OutageViewModel.cs" />
-    <Compile Include="Models\ViewModels\RelationViewModel.cs" />
-    <Compile Include="Models\ViewModels\ReportViewModel.cs" />
-    <Compile Include="Models\ViewModels\TransformerNodeViewModel.cs" />
-    <Compile Include="OutageReport.cs" />
     <Compile Include="Properties\AssemblyInfo.cs" />
+    <Compile Include="WebAdapterProvider.cs" />
   </ItemGroup>
   <ItemGroup>
-    <ProjectReference Include="..\..\..\..\OMS.Cloud\Common\Common.CE\Common.CE.csproj">
-      <Project>{2B5DAFD3-879B-4876-972F-0CC48463AC0C}</Project>
-      <Name>Common.CE</Name>
-    </ProjectReference>
-    <ProjectReference Include="..\..\..\..\OMS.Cloud\Common\Common.Cloud\Common.Cloud.csproj">
-      <Project>{FBEE1369-0F6C-41E6-8C62-8C1C5CDBB602}</Project>
-      <Name>Common.Cloud</Name>
-    </ProjectReference>
-    <ProjectReference Include="..\..\..\..\OMS.Cloud\Common\Contracts\Common.PubSubContracts\Common.PubSubContracts.csproj">
+    <ProjectReference Include="..\..\OMS.Cloud\Common\Contracts\Common.PubSubContracts\Common.PubSubContracts.csproj">
       <Project>{AA75150D-EE56-49C0-9431-751F83CCC0CD}</Project>
       <Name>Common.PubSubContracts</Name>
+    </ProjectReference>
+    <ProjectReference Include="..\Common\Contracts\Common.WebAdapterContracts\Common.WebAdapterContracts.csproj">
+      <Project>{A726658E-55CA-4F1B-BFF8-0E69816DEDAC}</Project>
+      <Name>Common.WebAdapterContracts</Name>
     </ProjectReference>
   </ItemGroup>
   <ItemGroup>

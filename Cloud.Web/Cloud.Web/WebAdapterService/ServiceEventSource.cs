@@ -7,9 +7,9 @@ using System.Text;
 using System.Threading.Tasks;
 using Microsoft.ServiceFabric.Services.Runtime;
 
-namespace WebAdapter
+namespace WebAdapterService
 {
-    [EventSource(Name = "MyCompany-Cloud.Web-WebAdapter")]
+    [EventSource(Name = "MyCompany-Cloud.Web-WebAdapterService")]
     internal sealed class ServiceEventSource : EventSource
     {
         public static readonly ServiceEventSource Current = new ServiceEventSource();

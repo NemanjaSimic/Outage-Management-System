@@ -27,5 +27,8 @@
         public const string MeasurementProviderService = "MeasurementProviderService";
         public const string TopologyProviderService = "TopologyProviderService";
         public const string TopologyBuilderService = "TopologyBuilderService";
+
+        //WEB
+        public const string WebAdapterService = "WebAdapterService";
     }
 }

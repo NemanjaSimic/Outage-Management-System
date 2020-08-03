@@ -24,5 +24,7 @@
         public const string LoadFlowService = "LoadFlowService";
         public const string TopologyBuilderService = "TopologyBuilderService";
 
+        //WEB
+        public const string WebAdapterService = "WebAdapterService";
     }
 }

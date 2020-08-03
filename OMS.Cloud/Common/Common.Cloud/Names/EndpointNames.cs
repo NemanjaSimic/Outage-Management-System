@@ -44,6 +44,9 @@
         public const string ReportPotentialOutageEndpoint = "ReportPotentialOutageEndpoint";
 
         public const string OutageSimulatorServiceEndpoint = "OutageSimulatorServiceEndpoint";
+
+        //WEB - 6
+        public const string WebAdapterEndpoint = "WebAdapterEndpoint";
     }
 }
 

@@ -1,7 +1,9 @@
-﻿using Common.Contracts.WebAdapterContracts;
+﻿using Common.CeContracts;
+using Common.Contracts.WebAdapterContracts;
 using Common.Web.Services.Commands;
 using MediatR;
 using OMS.Common.Cloud.Names;
+using OMS.Common.WcfClient.CE;
 using System;
 using System.Threading;
 using System.Threading.Tasks;
@@ -12,54 +14,50 @@ namespace Common.Web.Services.Handlers
     public class SwitchCommandHandler : IRequestHandler<OpenSwitchCommand>, IRequestHandler<CloseSwitchCommand>
     {
         private readonly ILogger _logger;
-        private IProxyFactory _proxyFactory;
 
-        public SwitchCommandHandler(ILogger logger, IProxyFactory factory)
+        public SwitchCommandHandler(ILogger logger)
         {
             _logger = logger;
-            _proxyFactory = factory;
         }
 
-        public Task<Unit> Handle(OpenSwitchCommand request, CancellationToken cancellationToken)
+        public async Task<Unit> Handle(OpenSwitchCommand request, CancellationToken cancellationToken)
         {
             _logger.LogInformation($"[SwitchCommandHandler::TurnOffSwitchCommand] Sending {request.Command.ToString()} command to {request.Gid}");
 
-            using (SwitchStatusCommandingProxy commandingProxy = _proxyFactory.CreateProxy<SwitchStatusCommandingProxy, ISwitchStatusCommandingContract>(EndpointNames.SwitchStatusCommandingEndpoint))
+            CeContracts.ISwitchStatusCommandingContract switchStatusCommandingClient = SwitchStatusCommandingClient.CreateClient();
+            try
             {
-                try
-                {
-                    commandingProxy.SendOpenCommand(request.Gid);
-                }
-                catch (Exception ex)
-                {
-                    _logger.LogError("[SwitchCommandHandler::TurnOffSwitchCommand] SwitchCommandHandler failed on TurnOffSwitch handler.", ex);
-                    throw;
-                }
+                await switchStatusCommandingClient.SendOpenCommand(request.Gid);
+            }
+            catch (Exception ex)
+            {
+                _logger.LogError("[SwitchCommandHandler::TurnOffSwitchCommand] SwitchCommandHandler failed on TurnOffSwitch handler.", ex);
+                throw;
             }
 
-            return null;
+            //return null;
+            return new Unit();
         }
 
-        public Task<Unit> Handle(CloseSwitchCommand request, CancellationToken cancellationToken)
+        public async Task<Unit> Handle(CloseSwitchCommand request, CancellationToken cancellationToken)
         {
             _logger.LogDebug($"[SwitchCommandHandler::TurnOnSwitchCommand] Sending {request.Command.ToString()} command to {request.Gid}");
 
+            CeContracts.ISwitchStatusCommandingContract switchStatusCommandingClient = SwitchStatusCommandingClient.CreateClient();
 
-            using (SwitchStatusCommandingProxy commandingProxy = _proxyFactory.CreateProxy<SwitchStatusCommandingProxy, ISwitchStatusCommandingContract>(EndpointNames.SwitchStatusCommandingEndpoint))
+            try
             {
-                try
-                {
-                    //commandingProxy.SendSwitchCommand(request.Gid, (int)request.Command);
-                    commandingProxy.SendCloseCommand(request.Gid);
-                }
-                catch (Exception ex)
-                {
-                    _logger.LogError("[SwitchCommandHandler::TurnOnSwitchCommand] Failed on TurnOnSwitch handler.", ex);
-                    throw;
-                }
+                //commandingProxy.SendSwitchCommand(request.Gid, (int)request.Command);
+                await switchStatusCommandingClient.SendCloseCommand(request.Gid);
+            }
+            catch (Exception ex)
+            {
+                _logger.LogError("[SwitchCommandHandler::TurnOnSwitchCommand] Failed on TurnOnSwitch handler.", ex);
+                throw;
             }
 
-            return null;
+            //return null;
+            return new Unit();
         }
     }
 }

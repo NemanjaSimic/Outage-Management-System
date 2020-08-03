@@ -139,12 +139,17 @@
     <Compile Include="TMS\TransactionCoordinatorClient.cs" />
     <Compile Include="TMS\TransactionEnlistmentClient.cs" />
     <Compile Include="WcfSeviceFabricClientBase.cs" />
+    <Compile Include="WebAdapter\WebAdapterClient.cs" />
   </ItemGroup>
   <ItemGroup>
     <None Include="app.config" />
     <None Include="packages.config" />
   </ItemGroup>
   <ItemGroup>
+    <ProjectReference Include="..\..\..\Cloud.Web\Common\Contracts\Common.WebAdapterContracts\Common.WebAdapterContracts.csproj">
+      <Project>{A726658E-55CA-4F1B-BFF8-0E69816DEDAC}</Project>
+      <Name>Common.WebAdapterContracts</Name>
+    </ProjectReference>
     <ProjectReference Include="..\Common.CE\Common.CE.csproj">
       <Project>{2b5dafd3-879b-4876-972f-0cc48463ac0c}</Project>
       <Name>Common.CE</Name>
@@ -186,8 +191,6 @@
       <Name>Common.TmsContracts</Name>
     </ProjectReference>
   </ItemGroup>
-  <ItemGroup>
-    <Folder Include="WebAdapter\" />
-  </ItemGroup>
+  <ItemGroup />
   <Import Project="$(MSBuildToolsPath)\Microsoft.CSharp.targets" />
 </Project>

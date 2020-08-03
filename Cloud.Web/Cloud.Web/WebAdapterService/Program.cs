@@ -5,7 +5,7 @@ using System.Threading;
 using System.Threading.Tasks;
 using Microsoft.ServiceFabric.Services.Runtime;
 
-namespace WebAdapter
+namespace WebAdapterService
 {
     internal static class Program
     {
@@ -21,10 +21,10 @@ namespace WebAdapter
                 // When Service Fabric creates an instance of this service type,
                 // an instance of the class is created in this host process.
 
-                ServiceRuntime.RegisterServiceAsync("WebAdapterType",
-                    context => new WebAdapter(context)).GetAwaiter().GetResult();
+                ServiceRuntime.RegisterServiceAsync("WebAdapterServiceType",
+                    context => new WebAdapterService(context)).GetAwaiter().GetResult();
 
-                ServiceEventSource.Current.ServiceTypeRegistered(Process.GetCurrentProcess().Id, typeof(WebAdapter).Name);
+                ServiceEventSource.Current.ServiceTypeRegistered(Process.GetCurrentProcess().Id, typeof(WebAdapterService).Name);
 
                 // Prevents this host process from terminating so services keep running.
                 Thread.Sleep(Timeout.Infinite);

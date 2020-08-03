@@ -32,7 +32,7 @@
     <ProjectReference Include="..\WebAPI\WebAPI.csproj">
       <ServiceLaunchUrl>http://{MachineName}:{ServicePort}/api/values</ServiceLaunchUrl>
     </ProjectReference>
-    <ProjectReference Include="WebAdapter\WebAdapter.csproj" />
+    <ProjectReference Include="WebAdapterService\WebAdapterService.csproj" />
   </ItemGroup>
   <ItemGroup>
     <Content Include="packages.config" />

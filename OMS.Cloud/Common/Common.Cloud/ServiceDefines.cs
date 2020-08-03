@@ -74,7 +74,7 @@ namespace OMS.Common.Cloud
                 //TODO: OMS
 
                 //TODO: WEB_ADAPTER
-
+                { MicroserviceNames.WebAdapterService,              ServiceType.STATELESS_SERVICE},
                 //TEST
                 //{ MicroserviceNames.TestService,                    ServiceType.STATELESS_SERVICE   },
             };
@@ -107,6 +107,7 @@ namespace OMS.Common.Cloud
                 //TODO: OMS
 
                 //TODO: WEB_ADAPTER
+                { MicroserviceNames.WebAdapterService,               new Uri("fabric:/Cloud.Web/WebAdapterService")},
 
                 //{ MicroserviceNames.TestService,                    new Uri("fabric:/OMS.Cloud/TestService")                    },
             };

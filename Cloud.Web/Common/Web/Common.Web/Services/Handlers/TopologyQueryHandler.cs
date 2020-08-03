@@ -3,12 +3,12 @@ using Common.Web.Mappers;
 using Common.Web.Services.Queries;
 using Common.Web.Models.ViewModels;
 using MediatR;
-using OMS.Common.Cloud.Names;
 using System;
 using System.Threading;
 using System.Threading.Tasks;
 using ILogger = OMS.Common.Cloud.Logger.ICloudLogger;
-using Common.Contracts.WebAdapterContracts;
+using OMS.Common.WcfClient.CE;
+using Common.CeContracts.TopologyProvider;
 
 namespace Common.Web.Services.Handlers
 {
@@ -23,27 +23,22 @@ namespace Common.Web.Services.Handlers
             _logger = logger;
         }
 
-        public Task<OmsGraphViewModel> Handle(GetTopologyQuery request, CancellationToken cancellationToken)
+        public async Task<OmsGraphViewModel> Handle(GetTopologyQuery request, CancellationToken cancellationToken)
         {
-            return Task.Run(() =>
-            {
-                using (UITopologyServiceProxy topologyProxy = _proxyFactory.CreateProxy<UITopologyServiceProxy, ITopologyServiceContract>(EndpointNames.TopologyServiceEndpoint))
-                {
-                    try
-                    {
-                        _logger.LogInformation("[TopologyQueryHandler::GetTopologyQuery] Sending GET query to topology client.");
-                        UIModel topologyModel = topologyProxy.GetTopology();
-                        OmsGraphViewModel graph = _mapper.Map(topologyModel);
-                        return graph;
-                    }
-                    catch (Exception ex)
-                    {
-                        _logger.LogError("[TopologyQueryHandler::GetTopologyQuery] Sending GET query to topology client failed.", ex);
-                        return null;
-                    }
-                }
+            ITopologyProviderContract topologyServiceClient = TopologyProviderClient.CreateClient();
 
-            });
+            try
+            {
+                _logger.LogInformation("[TopologyQueryHandler::GetTopologyQuery] Sending GET query to topology client.");
+                UIModel topologyModel = await topologyServiceClient.GetUIModel();
+                OmsGraphViewModel graph = _mapper.Map(topologyModel);
+                return graph;
+            }
+            catch (Exception ex)
+            {
+                _logger.LogError("[TopologyQueryHandler::GetTopologyQuery] Sending GET query to topology client failed.", ex);
+                return null;
+            }
         }
     }
 }
