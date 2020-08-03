@@ -61,7 +61,7 @@
     <Compile Include="ViewModels\TransformerNodeViewModel.cs" />
   </ItemGroup>
   <ItemGroup>
-    <ProjectReference Include="..\..\OMS.Cloud\Common\Common.Cloud\Common.Cloud.csproj">
+    <ProjectReference Include="..\..\..\..\OMS.Cloud\Common\Common.Cloud\Common.Cloud.csproj">
       <Project>{FBEE1369-0F6C-41E6-8C62-8C1C5CDBB602}</Project>
       <Name>Common.Cloud</Name>
     </ProjectReference>

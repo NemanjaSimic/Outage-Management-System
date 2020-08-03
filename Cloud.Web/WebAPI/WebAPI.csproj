@@ -37,6 +37,9 @@
   <ItemGroup>
     <ProjectReference Include="..\Common.Web.Services\Common.Web.Services.csproj" />
     <ProjectReference Include="..\Common.Web\Common.Web.csproj" />
+    <ProjectReference Include="..\Common\Web\Common.Web.Services\Common.Web.Services.csproj" />
+    <ProjectReference Include="..\Common\Web\Common.Web.UI.Models\Common.Web.UI.Models.csproj" />
+    <ProjectReference Include="..\Common\Web\Common.Web\Common.Web.csproj" />
   </ItemGroup>
 
 </Project>

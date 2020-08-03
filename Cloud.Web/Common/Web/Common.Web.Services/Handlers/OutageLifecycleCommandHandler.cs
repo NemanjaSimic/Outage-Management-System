@@ -17,12 +17,10 @@ namespace Common.Web.Services.Handlers
     {
 
         private readonly ILogger _logger;
-        private readonly IProxyFactory _proxyFactory;
 
-        public OutageLifecycleCommandHandler(ILogger logger, IProxyFactory proxyFactory)
+        public OutageLifecycleCommandHandler(ILogger logger)
         {
             _logger = logger;
-            _proxyFactory = proxyFactory;
         }
 
         public Task<Unit> Handle(IsolateOutageCommand request, CancellationToken cancellationToken)

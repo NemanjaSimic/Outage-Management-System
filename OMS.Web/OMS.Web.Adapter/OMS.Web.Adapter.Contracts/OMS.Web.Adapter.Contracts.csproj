@@ -44,8 +44,8 @@
     <Compile Include="Properties\AssemblyInfo.cs" />
   </ItemGroup>
   <ItemGroup>
-    <ProjectReference Include="..\..\..\Cloud.Web\Common.Web.UI.Models\Common.Web.UI.Models.csproj">
-      <Project>{b30f060f-056f-40e3-9af8-cbd9adbc6f6e}</Project>
+    <ProjectReference Include="..\..\..\Cloud.Web\Common\Web\Common.Web.UI.Models\Common.Web.UI.Models.csproj">
+      <Project>{B30F060F-056F-40E3-9AF8-CBD9ADBC6F6E}</Project>
       <Name>Common.Web.UI.Models</Name>
     </ProjectReference>
     <ProjectReference Include="..\..\..\OMS.Cloud\Common\Common.CE\Common.CE.csproj">

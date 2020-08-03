@@ -1,8 +1,5 @@
-﻿using System;
-using System.Collections.Generic;
-using System.Linq;
-using System.Threading.Tasks;
-using Common.Web.Exceptions;
+﻿using Common.Web.Exceptions;
+using Common.Web.Loggers;
 using Common.Web.Mappers;
 using MediatR;
 using Microsoft.AspNetCore.Builder;
@@ -10,8 +7,7 @@ using Microsoft.AspNetCore.Hosting;
 using Microsoft.AspNetCore.Mvc;
 using Microsoft.Extensions.Configuration;
 using Microsoft.Extensions.DependencyInjection;
-using Microsoft.Extensions.Options;
-using Unity.Lifetime;
+using OMS.Common.Cloud.Logger;
 using WebAPI.Hubs;
 
 namespace WebAPI
@@ -47,8 +43,8 @@ namespace WebAPI
             services.AddScoped<IConsumerMapper, ConsumerMapper>();
             services.AddScoped<IOutageMapper, OutageMapper>();
             services.AddScoped<IEquipmentMapper, EquipmentMapper>();
-            services.AddScoped<IProxyFactory, ProxyFactory>();
-            services.AddScoped<Outage.Common.ILogger, FileLogger>(); // TODO: Proveriti da li treba 'ContainerControlledLifetimeManager()'
+            //services.AddScoped<IProxyFactory, ProxyFactory>();
+            services.AddScoped<ICloudLogger, FileLogger>(); // TODO: Proveriti da li treba 'ContainerControlledLifetimeManager()'
 
             services.AddMediatR(typeof(Startup));
             services.AddSignalR();
