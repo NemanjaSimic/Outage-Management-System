@@ -906,6 +906,7 @@ namespace OMS.Common.NmsContracts
 			typeIdsInInsertOrder.Add(ModelCode.LOADBREAKSWITCH);
 			typeIdsInInsertOrder.Add(ModelCode.ACLINESEGMENT);
 			typeIdsInInsertOrder.Add(ModelCode.CONNECTIVITYNODE);
+			typeIdsInInsertOrder.Add(ModelCode.SYNCHRONOUSMACHINE);
 			typeIdsInInsertOrder.Add(ModelCode.TERMINAL);
 			typeIdsInInsertOrder.Add(ModelCode.DISCRETE);
 			typeIdsInInsertOrder.Add(ModelCode.ANALOG);

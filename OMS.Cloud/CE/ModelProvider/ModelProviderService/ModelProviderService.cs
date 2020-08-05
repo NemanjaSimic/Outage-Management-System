@@ -1,9 +1,9 @@
 ﻿using System;
 using System.Collections.Generic;
 using System.Fabric;
-using System.Linq;
 using System.Threading;
 using System.Threading.Tasks;
+using CE.ModelProviderImplementation;
 using CECommon.Interfaces;
 using Common.CE;
 using Common.CeContracts.ModelProvider;
@@ -13,16 +13,15 @@ using Microsoft.ServiceFabric.Services.Communication.Runtime;
 using Microsoft.ServiceFabric.Services.Communication.Wcf;
 using Microsoft.ServiceFabric.Services.Communication.Wcf.Runtime;
 using Microsoft.ServiceFabric.Services.Runtime;
-using ModelProviderImplementation;
 using OMS.Common.Cloud.Logger;
 using OMS.Common.Cloud.Names;
 
-namespace ModelProviderService
+namespace CE.ModelProviderService
 {
-	/// <summary>
-	/// An instance of this class is created for each service replica by the Service Fabric runtime.
-	/// </summary>
-	internal sealed class ModelProviderService : StatefulService
+    /// <summary>
+    /// An instance of this class is created for each service replica by the Service Fabric runtime.
+    /// </summary>
+    internal sealed class ModelProviderService : StatefulService
 	{
 		private readonly string baseLogString;
 
@@ -71,8 +70,8 @@ namespace ModelProviderService
 					return new WcfCommunicationListener<IModelProviderContract>(context,
 																			this.modelProvider,
 																			WcfUtility.CreateTcpListenerBinding(),
-																			EndpointNames.ModelProviderServiceEndpoint);
-				}, EndpointNames.ModelProviderServiceEndpoint)
+																			EndpointNames.CeModelProviderServiceEndpoint);
+				}, EndpointNames.CeModelProviderServiceEndpoint)
 			};
 		}
 

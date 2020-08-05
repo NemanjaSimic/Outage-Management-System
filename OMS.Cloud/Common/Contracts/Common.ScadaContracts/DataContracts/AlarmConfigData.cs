@@ -10,13 +10,20 @@ namespace OMS.Common.ScadaContracts.DataContracts
 		public float LowPowerLimit { get; set; }
 		[DataMember]
 		public float HighPowerLimit { get; set; }
+
 		[DataMember]
 		public float LowVoltageLimit { get; set; }
 		[DataMember]
 		public float HighVolageLimit { get; set; }
+
+		[DataMember]
+		public float LowFeederCurrentLimit { get; set; }
+		[DataMember]
+		public float HighFeederCurrentLimit { get; set; }
+
 		[DataMember]
 		public float LowCurrentLimit { get; set; }
 		[DataMember]
-		public float HighCurrentLimit { get; set; }
-	}
+		public float HighCurrentLimit { get; set; }		
+    }
 }

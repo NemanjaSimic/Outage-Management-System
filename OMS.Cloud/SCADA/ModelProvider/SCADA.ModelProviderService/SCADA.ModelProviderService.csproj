@@ -81,12 +81,6 @@
     <Reference Include="Microsoft.ServiceFabric.Diagnostics, Version=7.0.0.0, Culture=neutral, PublicKeyToken=31bf3856ad364e35, processorArchitecture=AMD64">
       <HintPath>..\..\..\packages\Microsoft.ServiceFabric.Diagnostics.Internal.4.1.417\lib\net472\Microsoft.ServiceFabric.Diagnostics.dll</HintPath>
     </Reference>
-    <Reference Include="Microsoft.ServiceFabric.FabricTransport, Version=7.0.0.0, Culture=neutral, PublicKeyToken=31bf3856ad364e35, processorArchitecture=AMD64">
-      <HintPath>..\..\..\packages\Microsoft.ServiceFabric.FabricTransport.Internal.4.1.417\lib\net472\Microsoft.ServiceFabric.FabricTransport.dll</HintPath>
-    </Reference>
-    <Reference Include="Microsoft.ServiceFabric.FabricTransport.V2, Version=7.0.0.0, Culture=neutral, PublicKeyToken=31bf3856ad364e35, processorArchitecture=AMD64">
-      <HintPath>..\..\..\packages\Microsoft.ServiceFabric.FabricTransport.Internal.4.1.417\lib\net472\Microsoft.ServiceFabric.FabricTransport.V2.dll</HintPath>
-    </Reference>
     <Reference Include="Microsoft.ServiceFabric.Internal, Version=7.0.0.0, Culture=neutral, PublicKeyToken=31bf3856ad364e35, processorArchitecture=AMD64">
       <HintPath>..\..\..\packages\Microsoft.ServiceFabric.7.1.417\lib\net472\Microsoft.ServiceFabric.Internal.dll</HintPath>
     </Reference>

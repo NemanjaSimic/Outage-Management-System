@@ -4,6 +4,7 @@ using System.Fabric;
 using System.Linq;
 using System.Threading;
 using System.Threading.Tasks;
+using CE.TopologyBuilderImplementation;
 using Common.CeContracts;
 using Microsoft.ServiceFabric.Services.Communication.Runtime;
 using Microsoft.ServiceFabric.Services.Communication.Wcf;
@@ -11,9 +12,8 @@ using Microsoft.ServiceFabric.Services.Communication.Wcf.Runtime;
 using Microsoft.ServiceFabric.Services.Runtime;
 using OMS.Common.Cloud.Logger;
 using OMS.Common.Cloud.Names;
-using TopologyBuilderImplementation;
 
-namespace TopologyBuilderService
+namespace CE.TopologyBuilderService
 {
 	/// <summary>
 	/// An instance of this class is created for each service instance by the Service Fabric runtime.
@@ -63,8 +63,8 @@ namespace TopologyBuilderService
 					 return new WcfCommunicationListener<ITopologyBuilderContract>(context,
 																			   this.topologyBuilder,
 																			   WcfUtility.CreateTcpListenerBinding(),
-																			   EndpointNames.TopologyBuilderServiceEndpoint);
-				}, EndpointNames.TopologyBuilderServiceEndpoint)
+																			   EndpointNames.CeTopologyBuilderServiceEndpoint);
+				}, EndpointNames.CeTopologyBuilderServiceEndpoint)
 			};
 		}
 	}

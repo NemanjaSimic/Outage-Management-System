@@ -12,7 +12,7 @@ using System.Collections.Generic;
 using System.Linq;
 using System.Threading.Tasks;
 
-namespace ModelProviderImplementation
+namespace CE.ModelProviderImplementation
 {
 	public class ModelManager : IModelManager
 	{

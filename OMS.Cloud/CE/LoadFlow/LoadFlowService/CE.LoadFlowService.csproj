@@ -1,34 +1,42 @@
 ﻿<?xml version="1.0" encoding="utf-8"?>
-<Project ToolsVersion="15.0" xmlns="http://schemas.microsoft.com/developer/msbuild/2003">
+<Project ToolsVersion="14.0" DefaultTargets="Build" xmlns="http://schemas.microsoft.com/developer/msbuild/2003">
   <Import Project="$(MSBuildExtensionsPath)\$(MSBuildToolsVersion)\Microsoft.Common.props" Condition="Exists('$(MSBuildExtensionsPath)\$(MSBuildToolsVersion)\Microsoft.Common.props')" />
   <PropertyGroup>
     <Configuration Condition=" '$(Configuration)' == '' ">Debug</Configuration>
-    <Platform Condition=" '$(Platform)' == '' ">AnyCPU</Platform>
-    <ProjectGuid>{FA93BD4E-3236-43BF-A12C-0FDAFBA0558F}</ProjectGuid>
-    <OutputType>Library</OutputType>
+    <Platform Condition=" '$(Platform)' == '' ">x64</Platform>
+    <ProjectGuid>{0299CCA6-DDEB-412E-8DA2-A6DBF8A17636}</ProjectGuid>
+    <OutputType>Exe</OutputType>
     <AppDesignerFolder>Properties</AppDesignerFolder>
-    <RootNamespace>TopologyProviderImplementation</RootNamespace>
-    <AssemblyName>TopologyProviderImplementation</AssemblyName>
+    <RootNamespace>CE.LoadFlowService</RootNamespace>
+    <AssemblyName>CE.LoadFlowService</AssemblyName>
     <TargetFrameworkVersion>v4.8</TargetFrameworkVersion>
     <FileAlignment>512</FileAlignment>
-    <Deterministic>true</Deterministic>
+    <AutoGenerateBindingRedirects>true</AutoGenerateBindingRedirects>
   </PropertyGroup>
-  <PropertyGroup Condition=" '$(Configuration)|$(Platform)' == 'Debug|AnyCPU' ">
+  <PropertyGroup Condition=" '$(Configuration)|$(Platform)' == 'Debug|x64' ">
     <DebugSymbols>true</DebugSymbols>
     <DebugType>full</DebugType>
     <Optimize>false</Optimize>
-    <OutputPath>bin\Debug\</OutputPath>
+    <OutputPath>bin\x64\Debug\</OutputPath>
     <DefineConstants>DEBUG;TRACE</DefineConstants>
     <ErrorReport>prompt</ErrorReport>
-    <WarningLevel>4</WarningLevel>
+    <PlatformTarget>x64</PlatformTarget>
+    <CodeAnalysisRuleSet>MinimumRecommendedRules.ruleset</CodeAnalysisRuleSet>
   </PropertyGroup>
-  <PropertyGroup Condition=" '$(Configuration)|$(Platform)' == 'Release|AnyCPU' ">
+  <PropertyGroup Condition=" '$(Configuration)|$(Platform)' == 'Release|x64' ">
     <DebugType>pdbonly</DebugType>
     <Optimize>true</Optimize>
-    <OutputPath>bin\Release\</OutputPath>
+    <OutputPath>bin\x64\Release\</OutputPath>
     <DefineConstants>TRACE</DefineConstants>
     <ErrorReport>prompt</ErrorReport>
-    <WarningLevel>4</WarningLevel>
+    <PlatformTarget>x64</PlatformTarget>
+    <CodeAnalysisRuleSet>MinimumRecommendedRules.ruleset</CodeAnalysisRuleSet>
+  </PropertyGroup>
+  <PropertyGroup>
+    <AdditionalFileItemNames>$(AdditionalFileItemNames);None</AdditionalFileItemNames>
+  </PropertyGroup>
+  <PropertyGroup>
+    <IsServiceFabricServiceProject>true</IsServiceFabricServiceProject>
   </PropertyGroup>
   <ItemGroup>
     <Reference Include="Microsoft.ServiceFabric.Data, Version=7.0.0.0, Culture=neutral, PublicKeyToken=31bf3856ad364e35, processorArchitecture=AMD64">
@@ -67,6 +75,9 @@
     <Reference Include="Microsoft.ServiceFabric.Services.Remoting, Version=6.0.0.0, Culture=neutral, PublicKeyToken=31bf3856ad364e35, processorArchitecture=AMD64">
       <HintPath>..\..\..\packages\Microsoft.ServiceFabric.Services.Remoting.4.1.417\lib\net472\Microsoft.ServiceFabric.Services.Remoting.dll</HintPath>
     </Reference>
+    <Reference Include="Microsoft.ServiceFabric.Services.Wcf, Version=6.0.0.0, Culture=neutral, PublicKeyToken=31bf3856ad364e35, processorArchitecture=AMD64">
+      <HintPath>..\..\..\packages\Microsoft.ServiceFabric.Services.Wcf.4.1.417\lib\net45\Microsoft.ServiceFabric.Services.Wcf.dll</HintPath>
+    </Reference>
     <Reference Include="System" />
     <Reference Include="System.Core" />
     <Reference Include="System.Fabric, Version=7.0.0.0, Culture=neutral, PublicKeyToken=31bf3856ad364e35, processorArchitecture=AMD64">
@@ -80,51 +91,39 @@
     </Reference>
     <Reference Include="System.Runtime.Serialization" />
     <Reference Include="System.ServiceModel" />
-    <Reference Include="System.Xml.Linq" />
-    <Reference Include="System.Data.DataSetExtensions" />
-    <Reference Include="Microsoft.CSharp" />
-    <Reference Include="System.Data" />
-    <Reference Include="System.Net.Http" />
-    <Reference Include="System.Xml" />
   </ItemGroup>
   <ItemGroup>
     <Compile Include="Properties\AssemblyInfo.cs" />
-    <Compile Include="TopologyConverter.cs" />
-    <Compile Include="TopologyProvider.cs" />
+    <Compile Include="LoadFlowService.cs" />
+    <Compile Include="Program.cs" />
+    <Compile Include="ServiceEventSource.cs" />
   </ItemGroup>
   <ItemGroup>
-    <ProjectReference Include="..\..\..\Common\Common.CE\Common.CE.csproj">
-      <Project>{2B5DAFD3-879B-4876-972F-0CC48463AC0C}</Project>
-      <Name>Common.CE</Name>
-    </ProjectReference>
+    <None Include="PackageRoot\Config\Settings.xml" />
+    <None Include="PackageRoot\ServiceManifest.xml" />
+    <None Include="App.config" />
+    <None Include="packages.config" />
+  </ItemGroup>
+  <ItemGroup>
     <ProjectReference Include="..\..\..\Common\Common.Cloud\Common.Cloud.csproj">
       <Project>{FBEE1369-0F6C-41E6-8C62-8C1C5CDBB602}</Project>
       <Name>Common.Cloud</Name>
-    </ProjectReference>
-    <ProjectReference Include="..\..\..\Common\Common.PubSub\Common.PubSub.csproj">
-      <Project>{5B775779-A5AE-4F94-90EC-59973FA80D4D}</Project>
-      <Name>Common.PubSub</Name>
-    </ProjectReference>
-    <ProjectReference Include="..\..\..\Common\Common.WcfClient\Common.WcfClient.csproj">
-      <Project>{AE91CEB5-378A-4EEF-AEBF-C40ED1EF23CF}</Project>
-      <Name>Common.WcfClient</Name>
     </ProjectReference>
     <ProjectReference Include="..\..\..\Common\Contracts\Common.CeContracts\Common.CeContracts.csproj">
       <Project>{D8B669F1-9B73-4F6A-9AFC-53AF4B0272AC}</Project>
       <Name>Common.CeContracts</Name>
     </ProjectReference>
-    <ProjectReference Include="..\..\..\Common\Contracts\Common.NmsContracts\Common.NmsContracts.csproj">
-      <Project>{235804A8-9C8F-40EC-8786-5DAB24733977}</Project>
-      <Name>Common.NmsContracts</Name>
+    <ProjectReference Include="..\LoadFlowImplementation\CE.LoadFlowImplementation.csproj">
+      <Project>{B0452EAB-CCCB-4401-824A-4B549C374690}</Project>
+      <Name>CE.LoadFlowImplementation</Name>
     </ProjectReference>
-    <ProjectReference Include="..\..\..\Common\Contracts\Common.PubSubContracts\Common.PubSubContracts.csproj">
-      <Project>{AA75150D-EE56-49C0-9431-751F83CCC0CD}</Project>
-      <Name>Common.PubSubContracts</Name>
-    </ProjectReference>
-  </ItemGroup>
-  <ItemGroup>
-    <None Include="app.config" />
-    <None Include="packages.config" />
   </ItemGroup>
   <Import Project="$(MSBuildToolsPath)\Microsoft.CSharp.targets" />
+  <!-- To modify your build process, add your task inside one of the targets below and uncomment it. 
+       Other similar extension points exist, see Microsoft.Common.targets.
+  <Target Name="BeforeBuild">
+  </Target>
+  <Target Name="AfterBuild">
+  </Target>
+  -->
 </Project>

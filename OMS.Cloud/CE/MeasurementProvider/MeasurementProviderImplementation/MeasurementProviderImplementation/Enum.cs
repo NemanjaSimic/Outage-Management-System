@@ -1,4 +1,4 @@
-﻿namespace MeasurementProviderImplementation
+﻿namespace CE.MeasurementProviderImplementation
 {
 	public enum MeasurementPorviderCacheType
 	{

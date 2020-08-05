@@ -5,7 +5,7 @@ using System.Threading;
 using System.Threading.Tasks;
 using Microsoft.ServiceFabric.Services.Runtime;
 
-namespace TopologyBuilderService
+namespace CE.TopologyBuilderService
 {
 	internal static class Program
 	{
@@ -21,7 +21,7 @@ namespace TopologyBuilderService
 				// When Service Fabric creates an instance of this service type,
 				// an instance of the class is created in this host process.
 
-				ServiceRuntime.RegisterServiceAsync("TopologyBuilderServiceType",
+				ServiceRuntime.RegisterServiceAsync("CE.TopologyBuilderServiceType",
 					context => new TopologyBuilderService(context)).GetAwaiter().GetResult();
 
 				ServiceEventSource.Current.ServiceTypeRegistered(Process.GetCurrentProcess().Id, typeof(TopologyBuilderService).Name);

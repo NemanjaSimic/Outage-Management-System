@@ -32,10 +32,11 @@
     <Content Include="packages.config" />
   </ItemGroup>
   <ItemGroup>
-    <ProjectReference Include="..\CE\MeasurementProvider\MeasurementProviderService\MeasurementProviderService.csproj" />
-    <ProjectReference Include="..\CE\ModelProvider\ModelProviderService\ModelProviderService.csproj" />
-    <ProjectReference Include="..\CE\TopologyBuilder\TopologyBuilderService\TopologyBuilderService.csproj" />
-    <ProjectReference Include="..\CE\TopologyProviderService\TopologyProviderService.csproj" />
+    <ProjectReference Include="..\CE\LoadFlow\LoadFlowService\CE.LoadFlowService.csproj" />
+    <ProjectReference Include="..\CE\MeasurementProvider\MeasurementProviderService\CE.MeasurementProviderService.csproj" />
+    <ProjectReference Include="..\CE\ModelProvider\ModelProviderService\CE.ModelProviderService.csproj" />
+    <ProjectReference Include="..\CE\TopologyBuilder\TopologyBuilderService\CE.TopologyBuilderService.csproj" />
+    <ProjectReference Include="..\CE\TopologyProviderService\CE.TopologyProviderService.csproj" />
     <ProjectReference Include="..\NMS\NMS.GdaService\NMS.GdaService.csproj" />
     <ProjectReference Include="..\PUB_SUB\PubSubService\PubSubService.csproj" />
     <ProjectReference Include="..\SCADA\Acquisition\SCADA.AcquisitionService\SCADA.AcquisitionService.csproj" />

@@ -1,15 +1,11 @@
 ﻿using System;
-using System.Collections.Generic;
 using System.Diagnostics.Tracing;
 using System.Fabric;
-using System.Linq;
-using System.Text;
 using System.Threading.Tasks;
-using Microsoft.ServiceFabric.Services.Runtime;
 
-namespace ModelProviderService
+namespace CE.ModelProviderService
 {
-	[EventSource(Name = "MyCompany-OMS.Cloud-ModelProviderService")]
+    [EventSource(Name = "MyCompany-OMS.Cloud-CE.ModelProviderService")]
 	internal sealed class ServiceEventSource : EventSource
 	{
 		public static readonly ServiceEventSource Current = new ServiceEventSource();

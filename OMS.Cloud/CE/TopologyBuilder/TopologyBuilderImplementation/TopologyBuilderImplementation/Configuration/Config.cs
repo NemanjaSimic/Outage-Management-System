@@ -2,7 +2,7 @@
 using System;
 using System.IO;
 
-namespace TopologyBuilderImplementation.Configuration
+namespace CE.TopologyBuilderImplementation.Configuration
 {
 	public class Config
 	{

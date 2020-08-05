@@ -11,7 +11,7 @@ using System.Collections.Generic;
 using System.Linq;
 using System.Threading.Tasks;
 
-namespace TopologyProviderImplementation
+namespace CE.TopologyProviderImplementation
 {
     public class TopologyConverter : ITopologyConverterContract
     {

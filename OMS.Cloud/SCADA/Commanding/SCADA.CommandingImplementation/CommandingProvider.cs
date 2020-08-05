@@ -268,7 +268,6 @@ namespace SCADA.CommandingImplementation
             int digitalOutputCount = addressToGidMap[(short)PointType.DIGITAL_OUTPUT].Count;
             int[] multipleCommandingValues = new int[addressToGidMap[(short)PointType.DIGITAL_OUTPUT].Count];
 
-            //for (ushort address = 1; address <= digitalOutputCount; address++)
             foreach (ushort address in addressToGidMap[(short)PointType.DIGITAL_OUTPUT].Keys)
             {
                 long gid = addressToGidMap[(short)PointType.DIGITAL_OUTPUT][address];
@@ -360,18 +359,6 @@ namespace SCADA.CommandingImplementation
                 string message = $"{baseLogString} SendSingleCommand => Command SUCCESSFULLY enqueued. Function code: {modbusFunction.FunctionCode}, Origin: {modbusFunction.CommandOrigin}";
                 Logger.LogInformation(message);
             }
-            //catch (CommunicationObjectFaultedException e)
-            //{
-            //    string message = $"{baseLogString} SendSingleCommand => CommunicationObjectFaultedException caught.";
-            //    Logger.LogError(message, e);
-
-            //    await Task.Delay(2000);
-
-            //    this.commandEnqueuerClient = WriteCommandEnqueuerClient.CreateClient();
-            //    this.scadaModelReadAccessClient = ScadaModelReadAccessClient.CreateClient();
-            //    await SendSingleCommand(pointItem, commandingValue, commandOriginType, true);
-            //    //todo: different logic on multiple rety?
-            //}
             catch (Exception e)
             {
                 if (!isRetry)
@@ -400,7 +387,7 @@ namespace SCADA.CommandingImplementation
                 
                 IWriteCommandEnqueuerContract commandEnqueuerClient = WriteCommandEnqueuerClient.CreateClient();
                 await commandEnqueuerClient.EnqueueWriteCommand(modbusFunction);
-
+                
                 string message = $"{baseLogString} SendMultipleCommand => Command SUCCESSFULLY enqueued. Function code: {modbusFunction.FunctionCode}, Origin: {modbusFunction.CommandOrigin}";
                 Logger.LogInformation(message);
             }

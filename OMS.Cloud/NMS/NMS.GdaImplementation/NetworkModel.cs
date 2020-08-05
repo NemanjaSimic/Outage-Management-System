@@ -299,7 +299,7 @@ namespace NMS.GdaImplementation
             }
             catch (Exception ex)
             {
-                string message = string.Format("Applying delta to network model failed. {0}.", ex.Message);
+                string message = $"Applying delta to network model failed. Message: {ex.Message}";
                 Logger.LogError(message, ex);
 
                 updateResult.Result = ResultType.Failed;
@@ -313,6 +313,13 @@ namespace NMS.GdaImplementation
                     string message = "Applying delta to network model SUCCESSFULLY finished.";
                     Logger.LogInformation(message);
                     updateResult.Message = message;
+                }
+                else if(updateResult.Result == ResultType.Failed)
+                {
+                    string message = "Applying delta to network model UNSUCCESSFULLY finished.";
+                    Logger.LogInformation(message);
+                    updateResult.Message = message;
+                    //updateResult.Message = $"{updateResult.Message}{Enviroment.Newline}{message}";
                 }
             }
 
@@ -1010,6 +1017,18 @@ namespace NMS.GdaImplementation
 
                 if (currentDelta != null && currentDelta.DeltaOrigin == DeltaOriginType.ImporterDelta)
                 {
+                    long latestNetworkModelVersion = mongoDbAccess.GetLatestNetworkModelVersions();
+                    long latestDeltaVersion = mongoDbAccess.GetLatestDeltaVersions();
+
+                    if (latestNetworkModelVersion < 0 || latestDeltaVersion < 0)
+                    {
+                        string errorMessage = $"{baseLogString} SaveDelta => latest version has a negative value.";
+                        throw new Exception(errorMessage);
+                    }
+
+                    long latestVersion = latestDeltaVersion > latestNetworkModelVersion ? latestDeltaVersion : latestNetworkModelVersion;
+
+                    currentDelta.Id = latestDeltaVersion + 1;
                     mongoDbAccess.SaveDelta(currentDelta);
 
                     CurrentVersion = currentDelta.Id;

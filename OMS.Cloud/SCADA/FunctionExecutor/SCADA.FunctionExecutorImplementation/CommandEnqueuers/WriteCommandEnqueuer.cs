@@ -1,4 +1,5 @@
 ﻿using Microsoft.WindowsAzure.Storage.Queue;
+using OMS.Common.Cloud;
 using OMS.Common.Cloud.AzureStorageHelpers;
 using OMS.Common.Cloud.Logger;
 using OMS.Common.Cloud.ReliableCollectionHelpers;
@@ -67,9 +68,17 @@ namespace SCADA.FunctionExecutorImplementation.CommandEnqueuers
             try
             {
                 //KEY LOGIC
-                await this.writeCommandQueue.AddMessageAsync(new CloudQueueMessage(Serialization.ObjectToByteArray(modbusFunction)));
-                success = true;
+                if (modbusFunction.CommandOrigin == CommandOriginType.MODEL_UPDATE_COMMAND)
+                {
+                    await this.modelUpdateCommandQueue.AddMessageAsync(new CloudQueueMessage(Serialization.ObjectToByteArray(modbusFunction)));
+                }
+                else
+                {
+                    await this.writeCommandQueue.AddMessageAsync(new CloudQueueMessage(Serialization.ObjectToByteArray(modbusFunction)));
+                }
 
+                success = true;
+                
                 if(writeModbusFunction is IWriteSingleFunction writeSingleFunction)
                 {
                     string informationMessage = $"{baseLogString} EnqueueWriteCommand => write command SUCCESSFULLY enqueued to '{CloudStorageQueueNames.WriteCommandQueue}' queue. FunctionCode: {writeSingleFunction.FunctionCode}, OutputAddress: {writeSingleFunction.OutputAddress}, CommandValue: {writeSingleFunction.CommandValue}, CommandOrigin: {writeSingleFunction.CommandOrigin},";

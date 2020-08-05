@@ -2,11 +2,16 @@
 {
     public interface IAlarmConfigData
     {
+        float HighFeederCurrentLimit { get; }
+        float LowFeederCurrentLimit { get; }
+
         float HighCurrentLimit { get; }
-        float HighPowerLimit { get; }
-        float HighVolageLimit { get; }
         float LowCurrentLimit { get; }
+
+        float HighPowerLimit { get; }
         float LowPowerLimit { get; }
+
+        float HighVolageLimit { get; }
         float LowVoltageLimit { get; }
     }
 }

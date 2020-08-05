@@ -11,8 +11,8 @@ namespace OMS.Common.WcfClient.CE
 {
 	public class ModelProviderClient : WcfSeviceFabricClientBase<IModelProviderContract>, IModelProviderContract
 	{
-		private static readonly string microserviceName = MicroserviceNames.ModelProviderService;
-		private static readonly string listenerName = EndpointNames.ModelProviderServiceEndpoint;
+		private static readonly string microserviceName = MicroserviceNames.CeModelProviderService;
+		private static readonly string listenerName = EndpointNames.CeModelProviderServiceEndpoint;
 		public ModelProviderClient(WcfCommunicationClientFactory<IModelProviderContract> clientFactory, Uri serviceUri, ServicePartitionKey servicePartition) 
             : base(clientFactory, serviceUri, servicePartition, listenerName)
 		{

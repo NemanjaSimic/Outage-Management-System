@@ -37,7 +37,7 @@ namespace SCADA.ModelProviderImplementation.Helpers
 		{
 			string baseLogString = $"{typeof(AlarmConfigDataHelper)} [static] =>";
 
-			AlarmConfigData data = new AlarmConfigData();
+			var data = new AlarmConfigData();
 
 			if (ConfigurationManager.AppSettings["LowPowerLimit"] is string lowPowerLimitSetting)
 			{
@@ -90,6 +90,34 @@ namespace SCADA.ModelProviderImplementation.Helpers
 				else
 				{
 					string errorMessage = $"{baseLogString} ImportAppSettings => HighVoltageLimit in Alarm configuration is either not defined or not valid.";
+					Logger.LogError(errorMessage);
+					throw new Exception(errorMessage);
+				}
+			}
+
+			if (ConfigurationManager.AppSettings["LowFeederCurrentLimit"] is string LowFeederCurrentLimitSetting)
+			{
+				if (float.TryParse(LowFeederCurrentLimitSetting, out float lowFeederCurrentLimit))
+				{
+					data.LowFeederCurrentLimit = lowFeederCurrentLimit;
+				}
+				else
+				{
+					string errorMessage = $"{baseLogString} ImportAppSettings => LowFeederCurrentLimit in Alarm configuration is either not defined or not valid.";
+					Logger.LogError(errorMessage);
+					throw new Exception(errorMessage);
+				}
+			}
+
+			if (ConfigurationManager.AppSettings["HighFeederCurrentLimit"] is string highFeederCurrentLimitSetting)
+			{
+				if (float.TryParse(highFeederCurrentLimitSetting, out float highFeederCurrentLimit))
+				{
+					data.HighFeederCurrentLimit = highFeederCurrentLimit;
+				}
+				else
+				{
+					string errorMessage = $"{baseLogString} ImportAppSettings => HighFeederCurrentLimit in Alarm configuration is either not defined or not valid.";
 					Logger.LogError(errorMessage);
 					throw new Exception(errorMessage);
 				}

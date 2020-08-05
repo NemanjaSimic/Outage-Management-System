@@ -1,5 +1,5 @@
 ﻿<?xml version="1.0" encoding="utf-8"?>
-<ServiceManifest Name="MeasurementProviderServicePkg"
+<ServiceManifest Name="CE.MeasurementProviderServicePkg"
                  Version="1.0.0"
                  xmlns="http://schemas.microsoft.com/2011/01/fabric"
                  xmlns:xsd="http://www.w3.org/2001/XMLSchema"
@@ -7,14 +7,14 @@
   <ServiceTypes>
     <!-- This is the name of your ServiceType. 
          This name must match the string used in RegisterServiceType call in Program.cs. -->
-    <StatefulServiceType ServiceTypeName="MeasurementProviderServiceType" HasPersistedState="true" />
+    <StatefulServiceType ServiceTypeName="CE.MeasurementProviderServiceType" HasPersistedState="true" />
   </ServiceTypes>
 
   <!-- Code package is your service executable. -->
   <CodePackage Name="Code" Version="1.0.0">
     <EntryPoint>
       <ExeHost>
-        <Program>MeasurementProviderService.exe</Program>
+        <Program>CE.MeasurementProviderService.exe</Program>
       </ExeHost>
     </EntryPoint>
   </CodePackage>
@@ -25,9 +25,9 @@
 
   <Resources>
     <Endpoints>
-      <Endpoint Name="MeasurementProviderEndpoint" Protocol="tcp" Type="Input" />
-      <Endpoint Name="MeasurementMapEndpoint" Protocol="tcp" Type="Input" />
-      <Endpoint Name="SwitchStatusCommandingEndpoint" Protocol="tcp" Type="Input" />
+      <Endpoint Name="CeMeasurementProviderEndpoint" Protocol="tcp" Type="Input" />
+      <Endpoint Name="CeMeasurementMapEndpoint" Protocol="tcp" Type="Input" />
+      <Endpoint Name="CeSwitchStatusCommandingEndpoint" Protocol="tcp" Type="Input" />
     </Endpoints>
   </Resources>
 </ServiceManifest>
