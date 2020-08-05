@@ -312,14 +312,13 @@ namespace NMS.GdaImplementation
                 {
                     string message = "Applying delta to network model SUCCESSFULLY finished.";
                     Logger.LogInformation(message);
-                    updateResult.Message = message;
+                    updateResult.Message = $"{updateResult.Message}{Environment.NewLine}{message}";
                 }
                 else if(updateResult.Result == ResultType.Failed)
                 {
                     string message = "Applying delta to network model UNSUCCESSFULLY finished.";
                     Logger.LogInformation(message);
-                    updateResult.Message = message;
-                    //updateResult.Message = $"{updateResult.Message}{Enviroment.Newline}{message}";
+                    updateResult.Message = $"{updateResult.Message}{Environment.NewLine}{message}";
                 }
             }
 
