@@ -2,7 +2,6 @@
 <ApplicationManifest xmlns:xsd="http://www.w3.org/2001/XMLSchema" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" ApplicationTypeName="Cloud.WebType" ApplicationTypeVersion="1.0.0" xmlns="http://schemas.microsoft.com/2011/01/fabric">
   <Parameters>
     <Parameter Name="WebAdapterService_InstanceCount" DefaultValue="-1" />
-    <Parameter Name="WebAdapter_InstanceCount" DefaultValue="-1" />
     <Parameter Name="WebAPI_ASPNETCORE_ENVIRONMENT" DefaultValue="" />
     <Parameter Name="WebAPI_InstanceCount" DefaultValue="-1" />
   </Parameters>
@@ -11,10 +10,6 @@
        ServiceManifest.xml file. -->
   <ServiceManifestImport>
     <ServiceManifestRef ServiceManifestName="WebAdapterServicePkg" ServiceManifestVersion="1.0.0" />
-    <ConfigOverrides />
-  </ServiceManifestImport>
-  <ServiceManifestImport>
-    <ServiceManifestRef ServiceManifestName="WebAdapterPkg" ServiceManifestVersion="1.0.0" />
     <ConfigOverrides />
   </ServiceManifestImport>
   <ServiceManifestImport>
@@ -32,11 +27,6 @@
          The attribute ServiceTypeName below must match the name defined in the imported ServiceManifest.xml file. -->
     <Service Name="WebAdapterService" ServicePackageActivationMode="ExclusiveProcess">
       <StatelessService ServiceTypeName="WebAdapterServiceType" InstanceCount="[WebAdapterService_InstanceCount]">
-        <SingletonPartition />
-      </StatelessService>
-    </Service>
-    <Service Name="WebAdapter" ServicePackageActivationMode="ExclusiveProcess">
-      <StatelessService ServiceTypeName="WebAdapterType" InstanceCount="[WebAdapter_InstanceCount]">
         <SingletonPartition />
       </StatelessService>
     </Service>

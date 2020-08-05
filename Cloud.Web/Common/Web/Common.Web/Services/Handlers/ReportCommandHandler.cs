@@ -15,20 +15,18 @@ namespace Common.Web.Services.Handlers
     public class ReportCommandHandler : IRequestHandler<GenerateReportCommand, ReportViewModel>
     {
         private readonly ILogger _logger;
-        private readonly IProxyFactory _proxyFactory;
 
-        public ReportCommandHandler(ILogger logger, IProxyFactory factory)
+        public ReportCommandHandler(ILogger logger)
         {
             _logger = logger;
-            _proxyFactory = factory;
         }
 
         public Task<ReportViewModel> Handle(GenerateReportCommand request, CancellationToken cancellationToken)
         {
             return Task.Run(() =>
             {
-                using (OutageAccessProxy outageProxy = _proxyFactory.CreateProxy<OutageAccessProxy, IOutageAccessContract>(EndpointNames.OutageAccessEndpoint))
-                {
+                //using (OutageAccessProxy outageProxy = _proxyFactory.CreateProxy<OutageAccessProxy, IOutageAccessContract>(EndpointNames.OutageAccessEndpoint))
+                //{
                     try
                     {
                         _logger.LogInformation("[ReportCommandHandler::GenerateReport] Sending a Generate command to Outage service.");
@@ -41,12 +39,12 @@ namespace Common.Web.Services.Handlers
                             EndDate = request.Options.EndDate
                         };
 
-                        var report = outageProxy.GenerateReport(options);
+                        //var report = outageProxy.GenerateReport(options);
 
                         return new ReportViewModel
                         {
-                            Data = report.Data,
-                            Type = report.Type
+                            //Data = report.Data,
+                            //Type = report.Type
                         };
                     }
                     catch (Exception ex)
@@ -54,7 +52,7 @@ namespace Common.Web.Services.Handlers
                         _logger.LogError("[ReportCommandHandler::GenerateReport] Failed to generate active outages from Outage service.", ex);
                         throw ex;
                     }
-                }
+                //}
 
 
             }, cancellationToken);

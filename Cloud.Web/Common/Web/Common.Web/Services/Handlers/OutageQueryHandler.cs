@@ -31,14 +31,16 @@ namespace Common.Web.Services.Handlers
         {
             return Task.Run(() =>
             {
-                using (OutageAccessProxy outageProxy = _proxyFactory.CreateProxy<OutageAccessProxy, IOutageAccessContract>(EndpointNames.OutageAccessEndpoint))
+                //using (OutageAccessProxy outageProxy = _proxyFactory.CreateProxy<OutageAccessProxy, IOutageAccessContract>(EndpointNames.OutageAccessEndpoint))
                 {
                     try
                     {
                         _logger.LogInformation("[OutageQueryHandler::GetActiveOutages] Sending a GET query to Outage service for active outages.");
-                        IEnumerable<ActiveOutageMessage> activeOutages = outageProxy.GetActiveOutages();
+                        //IEnumerable<ActiveOutageMessage> activeOutages = outageProxy.GetActiveOutages();
 
-                        IEnumerable<ActiveOutageViewModel> activeOutageViewModels = _mapper.MapActiveOutages(activeOutages);
+                        //TODO: FIX
+                        //IEnumerable<ActiveOutageViewModel> activeOutageViewModels = _mapper.MapActiveOutages(activeOutages);
+                        IEnumerable<ActiveOutageViewModel> activeOutageViewModels = _mapper.MapActiveOutages(null);
                         return activeOutageViewModels;
                     }
                     catch (Exception ex)
@@ -54,14 +56,16 @@ namespace Common.Web.Services.Handlers
         {
             return Task.Run(() =>
             {
-                using (OutageAccessProxy outageProxy = _proxyFactory.CreateProxy<OutageAccessProxy, IOutageAccessContract>(EndpointNames.OutageAccessEndpoint))
+                //using (OutageAccessProxy outageProxy = _proxyFactory.CreateProxy<OutageAccessProxy, IOutageAccessContract>(EndpointNames.OutageAccessEndpoint))
                 {
                     try
                     {
                         _logger.LogInformation("[OutageQueryHandler::GetArchivedOutages] Sending a GET query to Outage service for archived outages.");
-                        IEnumerable<ArchivedOutageMessage> archivedOutages = outageProxy.GetArchivedOutages();
+                        //IEnumerable<ArchivedOutageMessage> archivedOutages = outageProxy.GetArchivedOutages();
 
-                        IEnumerable<ArchivedOutageViewModel> archivedOutageViewModels = _mapper.MapArchivedOutages(archivedOutages);
+                        //TODO: FIX
+                        //IEnumerable<ArchivedOutageViewModel> archivedOutageViewModels = _mapper.MapArchivedOutages(archivedOutages);
+                        IEnumerable<ArchivedOutageViewModel> archivedOutageViewModels = _mapper.MapArchivedOutages(null);
                         return archivedOutageViewModels;
                     }
                     catch (Exception ex)

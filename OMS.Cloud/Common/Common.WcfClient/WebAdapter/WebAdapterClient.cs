@@ -33,12 +33,12 @@ namespace OMS.Common.WcfClient.WebAdapter
             return factory.CreateClient<WebAdapterClient, IWebAdapterContract>(serviceUri, servicePartitionKey);
         }
 
-        public void UpdateGraph(List<NodeViewModel> nodes, List<RelationViewModel> relations)
+        public Task UpdateGraph(List<NodeViewModel> nodes, List<RelationViewModel> relations)
         {
-            throw new NotImplementedException();
+            return InvokeWithRetryAsync(client => client.Channel.UpdateGraph(nodes, relations));
         }
 
-        public void UpdateScadaData(Dictionary<long, AnalogModbusData> scadaData)
+        public Task UpdateScadaData(Dictionary<long, AnalogModbusData> scadaData)
         {
             throw new NotImplementedException();
         }

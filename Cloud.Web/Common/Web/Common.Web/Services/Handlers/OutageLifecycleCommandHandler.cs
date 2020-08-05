@@ -30,15 +30,11 @@ namespace Common.Web.Services.Handlers
             {
                 _logger.LogInformation($"[OutageLifecycleCommandHandler::IsolateOutageCommand] Sending isolate outage command for outage: {request.OutageId}");
 
-                using (OutageLifecycleUICommandingProxy commandingProxy =
-                    _proxyFactory.CreateProxy<OutageLifecycleUICommandingProxy, IOutageLifecycleUICommandingContract>(
-                        EndpointNames.OutageLifecycleUICommandingEndpoint
-                        )
-                    )
+                //using (OutageLifecycleUICommandingProxy commandingProxy = _proxyFactory.CreateProxy<OutageLifecycleUICommandingProxy, IOutageLifecycleUICommandingContract>(EndpointNames.OutageLifecycleUICommandingEndpoint))
                 {
                     try
                     {
-                        commandingProxy.IsolateOutage(request.OutageId);
+                        //commandingProxy.IsolateOutage(request.OutageId);
                     }
                     catch (Exception ex)
                     {
@@ -58,14 +54,11 @@ namespace Common.Web.Services.Handlers
                 _logger.LogInformation($"[OutageLifecycleCommandHandler::SendOutageLocationIsolationCrewCommand] Sending outage location isolation crew command for outage: {request.OutageId}");
 
 
-                using (OutageLifecycleUICommandingProxy commandingProxy =
-                    _proxyFactory.CreateProxy<OutageLifecycleUICommandingProxy, IOutageLifecycleUICommandingContract>(
-                        EndpointNames.OutageLifecycleUICommandingEndpoint)
-                    )
+                //using (OutageLifecycleUICommandingProxy commandingProxy = _proxyFactory.CreateProxy<OutageLifecycleUICommandingProxy, IOutageLifecycleUICommandingContract>(EndpointNames.OutageLifecycleUICommandingEndpoint))
                 {
                     try
                     {
-                        commandingProxy.SendLocationIsolationCrew(request.OutageId);
+                        //commandingProxy.SendLocationIsolationCrew(request.OutageId);
                     }
                     catch (Exception ex)
                     {
@@ -74,7 +67,7 @@ namespace Common.Web.Services.Handlers
                     }
                 }
 
-                return Task.FromResult(new Unit()); 
+                return Task.FromResult(new Unit());
             }, cancellationToken);
         }
 
@@ -85,11 +78,11 @@ namespace Common.Web.Services.Handlers
                 _logger.LogInformation($"[OutageLifecycleCommandHandler::SendOutageRepairCrewCommand] Sending outage repair crew command for outage: {request.OutageId}");
 
 
-                using (OutageLifecycleUICommandingProxy commandingProxy = _proxyFactory.CreateProxy<OutageLifecycleUICommandingProxy, IOutageLifecycleUICommandingContract>(EndpointNames.OutageLifecycleUICommandingEndpoint))
+                //using (OutageLifecycleUICommandingProxy commandingProxy = _proxyFactory.CreateProxy<OutageLifecycleUICommandingProxy, IOutageLifecycleUICommandingContract>(EndpointNames.OutageLifecycleUICommandingEndpoint))
                 {
                     try
                     {
-                        commandingProxy.SendRepairCrew(request.OutageId);
+                        //commandingProxy.SendRepairCrew(request.OutageId);
                     }
                     catch (Exception ex)
                     {
@@ -104,19 +97,16 @@ namespace Common.Web.Services.Handlers
 
         public Task<Unit> Handle(ValidateResolveConditionsCommand request, CancellationToken cancellationToken)
         {
-            return Task.Run<Unit>(() => 
-            { 
+            return Task.Run<Unit>(() =>
+            {
                 _logger.LogInformation($"[OutageLifecycleCommandHandler::ValidateResolveConditionsCommand] Sending validate resolve conditions command for outage: {request.OutageId}");
 
 
-                using (OutageLifecycleUICommandingProxy commandingProxy =
-                    _proxyFactory.CreateProxy<OutageLifecycleUICommandingProxy, IOutageLifecycleUICommandingContract>(
-                        EndpointNames.OutageLifecycleUICommandingEndpoint)
-                    )
+                //using (OutageLifecycleUICommandingProxy commandingProxy = _proxyFactory.CreateProxy<OutageLifecycleUICommandingProxy, IOutageLifecycleUICommandingContract>(EndpointNames.OutageLifecycleUICommandingEndpoint))
                 {
                     try
                     {
-                        commandingProxy.ValidateResolveConditions(request.OutageId);
+                        //commandingProxy.ValidateResolveConditions(request.OutageId);
                     }
                     catch (Exception ex)
                     {
@@ -131,19 +121,16 @@ namespace Common.Web.Services.Handlers
 
         public Task<Unit> Handle(ResolveOutageCommand request, CancellationToken cancellationToken)
         {
-            return Task.Run<Unit>(() => 
-            { 
+            return Task.Run<Unit>(() =>
+            {
                 _logger.LogInformation($"[OutageLifecycleCommandHandler::IsolateOutageCommand] Sending isolate outage command for outage: {request.OutageId}");
 
 
-                using (OutageLifecycleUICommandingProxy commandingProxy =
-                    _proxyFactory.CreateProxy<OutageLifecycleUICommandingProxy, IOutageLifecycleUICommandingContract>(
-                        EndpointNames.OutageLifecycleUICommandingEndpoint)
-                    )
+                //using (OutageLifecycleUICommandingProxy commandingProxy = _proxyFactory.CreateProxy<OutageLifecycleUICommandingProxy, IOutageLifecycleUICommandingContract>(EndpointNames.OutageLifecycleUICommandingEndpoint))
                 {
                     try
                     {
-                        commandingProxy.ResolveOutage(request.OutageId);
+                        //commandingProxy.ResolveOutage(request.OutageId);
                     }
                     catch (Exception ex)
                     {
