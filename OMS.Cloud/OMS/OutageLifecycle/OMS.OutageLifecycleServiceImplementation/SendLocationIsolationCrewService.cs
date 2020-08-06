@@ -7,6 +7,7 @@ using OMS.Common.Cloud;
 using OMS.Common.Cloud.Logger;
 using OMS.Common.Cloud.Names;
 using OMS.Common.PubSub;
+using OMS.Common.WcfClient.CE;
 using OMS.Common.WcfClient.OMS;
 using OMS.OutageLifecycleServiceImplementation.OutageLCHelper;
 using OutageDatabase.Repository;
@@ -34,6 +35,8 @@ namespace OMS.OutageLifecycleServiceImplementation
         private OutageLifecycleHelper outageLifecycleHelper;
         private OutageModelReadAccessClient outageModelReadAccessClient;
         private OutageModelUpdateAccessClient outageModelUpdateAccessClient;
+        private MeasurementMapServiceClient measurementMapServiceClient;
+        private SwitchStatusCommandingClient switchStatusCommandingClient;
         private ChannelFactory<IOutageSimulatorContract> channelFactory = new ChannelFactory<IOutageSimulatorContract>(EndpointNames.OutageSimulatorEndpoint);
         private IOutageSimulatorContract proxy;
         private Dictionary<long, long> CommandedElements;
@@ -43,6 +46,8 @@ namespace OMS.OutageLifecycleServiceImplementation
             this.outageMessageMapper = new OutageMessageMapper();
             this.outageModelReadAccessClient = OutageModelReadAccessClient.CreateClient();
             this.outageModelUpdateAccessClient = OutageModelUpdateAccessClient.CreateClient();
+            this.measurementMapServiceClient =  MeasurementMapServiceClient.CreateClient();
+            this.switchStatusCommandingClient = SwitchStatusCommandingClient.CreateClient();
             this.proxy = channelFactory.CreateChannel();
             this.CommandedElements = new Dictionary<long, long>();
         }
@@ -211,12 +216,12 @@ namespace OMS.OutageLifecycleServiceImplementation
         //TO DO use CE client
         private async void SendSCADACommand(long currentBreakerId, DiscreteCommandingType discreteCommandingType)
         {
-            long measrement = -1;
+            long measurement = -1;
 
             List<long> measuremnts = new List<long>();
             try
             {
-                //measuremnts = measurementMapProxy.GetMeasurementsOfElement(currentBreakerId);
+                measuremnts = measurementMapServiceClient.GetMeasurementsOfElement(currentBreakerId).Result;
 
             }
             catch (Exception e)
@@ -227,12 +232,12 @@ namespace OMS.OutageLifecycleServiceImplementation
 
             if (measuremnts.Count > 0)
             {
-                measrement = measuremnts[0];
+                measurement = measuremnts[0];
             }
 
             CommandedElements = await outageModelReadAccessClient.GetCommandedElements();
 
-            if (measrement != -1)
+            if (measurement != -1)
             {
                 if (discreteCommandingType == DiscreteCommandingType.OPEN && !CommandedElements.ContainsKey(currentBreakerId))
                 {
@@ -240,22 +245,21 @@ namespace OMS.OutageLifecycleServiceImplementation
                     await this.outageModelUpdateAccessClient.UpdateCommandedElements(currentBreakerId,ModelUpdateOperationType.INSERT);
                 }
 
-            
-               /* using (SwitchStatusCommandingProxy scadaCommandProxy = proxyFactory.CreateProxy<SwitchStatusCommandingProxy, ISwitchStatusCommandingContract>(EndpointNames.SwitchStatusCommandingEndpoint))
+
+
+                try
                 {
-                    try
+                    await switchStatusCommandingClient.SendOpenCommand(measurement);
+                }
+                catch (Exception e)
+                {
+                    if (discreteCommandingType == DiscreteCommandingType.OPEN && CommandedElements.ContainsKey(currentBreakerId))
                     {
-                        scadaCommandProxy.SendOpenCommand(measrement);
+                        await this.outageModelUpdateAccessClient.UpdateCommandedElements(currentBreakerId, ModelUpdateOperationType.DELETE);
                     }
-                    catch (Exception e)
-                    {
-                        if (discreteCommandingType == DiscreteCommandingType.OPEN && CommandedElements.ContainsKey(currentBreakerId))
-                        {
-                            await this.outageModelUpdateAccessClient.UpdateCommandedElements(currentBreakerId,ModelUpdateOperationType.DELETE);
-                        }
-                        throw e;
-                    }
-                }*/
+                    throw e;
+                }
+                
             }
          
         }

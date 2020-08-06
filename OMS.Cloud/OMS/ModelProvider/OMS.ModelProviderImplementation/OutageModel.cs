@@ -109,7 +109,8 @@ namespace OMS.ModelProviderImplementation
 			//if OMSModelMessage
 			if (message is OMSModelMessage omsModelMessage)
 			{
-				var topology = outageModelReadAccessClient.GetTopologyModel().Result;
+				var topology = omsModelMessage.OutageTopologyModel;
+				await TopologyModel.SetAsync(0, topology);
 				HashSet<long> energizedConsumers = new HashSet<long>();
 				foreach (var element in topology.OutageTopology.Values)
 				{
