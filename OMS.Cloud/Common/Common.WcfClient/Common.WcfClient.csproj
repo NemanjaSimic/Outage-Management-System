@@ -119,7 +119,6 @@
     <Compile Include="OMS\ResolveOutageClient.cs" />
     <Compile Include="OMS\SendLocationIsolationCrewClient.cs" />
     <Compile Include="OMS\SendRepairCrewClient.cs" />
-    <Compile Include="OMS\TracingAlgorithmClient.cs" />
     <Compile Include="OMS\ValidateResolveConditionsClient.cs" />
     <Compile Include="CE\LoadFlowClient.cs" />
     <Compile Include="CE\MeasurementMapServiceClient.cs" />

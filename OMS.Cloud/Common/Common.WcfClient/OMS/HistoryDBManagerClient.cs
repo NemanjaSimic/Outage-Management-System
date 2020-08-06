@@ -19,18 +19,16 @@ namespace OMS.Common.WcfClient.OMS
         {
 
         }
-        public static HistoryDBManagerClient CreateClient(Uri serviceUri = null)
+        public static HistoryDBManagerClient CreateClient()
         {
             ClientFactory factory = new ClientFactory();
-            ServicePartitionKey servicePartition = new ServicePartitionKey(0);
-            if (serviceUri == null)
-            {
-                return factory.CreateClient<HistoryDBManagerClient, IHistoryDBManagerContract>(microserviceName, servicePartition);
-            }
-            else
-            {
-                return factory.CreateClient<HistoryDBManagerClient, IHistoryDBManagerContract>(serviceUri, servicePartition);
-            }
+            return factory.CreateClient<HistoryDBManagerClient, IHistoryDBManagerContract>(microserviceName);
+        }
+
+        public static HistoryDBManagerClient CreateClient(Uri serviceUri, ServicePartitionKey servicePartitionKey)
+        {
+            ClientFactory factory = new ClientFactory();
+            return factory.CreateClient<HistoryDBManagerClient, IHistoryDBManagerContract>(serviceUri, servicePartitionKey);
         }
         public Task OnConsumerBlackedOut(List<long> consumers, long? outageId)
         {

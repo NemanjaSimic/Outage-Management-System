@@ -2,10 +2,14 @@
 using System.Collections.Generic;
 using System.Fabric;
 using System.Linq;
+using System.ServiceModel.Configuration;
 using System.Threading;
 using System.Threading.Tasks;
 using Microsoft.ServiceFabric.Services.Communication.Runtime;
 using Microsoft.ServiceFabric.Services.Runtime;
+using OMS.CallTrackingServiceImplementation.Interfaces;
+using OMS.CallTrackingServiceImplementation.Models;
+using OMS.EmailServiceImplementation.Factories;
 
 namespace OMS.EmailService
 {
@@ -16,16 +20,11 @@ namespace OMS.EmailService
 	{
 		public EmailService(StatelessServiceContext context)
 			: base(context)
-		{ }
-
-		/// <summary>
-		/// Optional override to create listeners (e.g., TCP, HTTP) for this service replica to handle client or user requests.
-		/// </summary>
-		/// <returns>A collection of listeners.</returns>
-		protected override IEnumerable<ServiceInstanceListener> CreateServiceInstanceListeners()
 		{
-			return new ServiceInstanceListener[0];
+		
 		}
+
+		
 
 		/// <summary>
 		/// This is the main entry point for your service instance.
@@ -36,16 +35,22 @@ namespace OMS.EmailService
 			// TODO: Replace the following sample code with your own logic 
 			//       or remove this RunAsync override if it's not needed in your service.
 
-			long iterations = 0;
+			IIdleEmailClient idleEmailclient = new ImapIdleClientFactory().CreateClient();
 
-			while (true)
+			if (!idleEmailclient.Connect())
 			{
-				cancellationToken.ThrowIfCancellationRequested();
-
-				ServiceEventSource.Current.ServiceMessage(this.Context, "Working-{0}", ++iterations);
-
-				await Task.Delay(TimeSpan.FromSeconds(1), cancellationToken);
+				//TODO log error
+				return;
 			}
+
+			idleEmailclient.RegisterIdleHandler();
+
+			if (!idleEmailclient.StartIdling())
+			{
+				//TODO log error
+			}
+
+			await Task.Delay(-1); //TODO: for now
 		}
 	}
 }

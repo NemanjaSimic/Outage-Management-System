@@ -20,19 +20,16 @@ namespace OMS.Common.WcfClient.OMS
 
         }
 
-        public static ValidateResolveConditionsClient CreateClient(Uri serviceUri = null)
+        public static ValidateResolveConditionsClient CreateClient()
         {
             ClientFactory factory = new ClientFactory();
-            ServicePartitionKey servicePartition = ServicePartitionKey.Singleton;
+            return factory.CreateClient<ValidateResolveConditionsClient, IValidateResolveConditionsContract>(microserviceName);
+        }
 
-            if (serviceUri == null)
-            {
-                return factory.CreateClient<ValidateResolveConditionsClient, IValidateResolveConditionsContract>(microserviceName, servicePartition);
-            }
-            else
-            {
-                return factory.CreateClient<ValidateResolveConditionsClient, IValidateResolveConditionsContract>(serviceUri, servicePartition);
-            }
+        public static ValidateResolveConditionsClient CreateClient(Uri serviceUri, ServicePartitionKey servicePartitionKey)
+        {
+            ClientFactory factory = new ClientFactory();
+            return factory.CreateClient<ValidateResolveConditionsClient, IValidateResolveConditionsContract>(serviceUri, servicePartitionKey);
         }
         public Task<bool> ValidateResolveConditions(long outageId)
         {

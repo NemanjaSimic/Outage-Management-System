@@ -9,11 +9,11 @@ using System.Linq;
 using System.Text;
 using System.Threading.Tasks;
 
-namespace OMS.Common.WcfClient.OMS
+namespace OMS.Common.WcfClient
 {
     public class ReportingClient : WcfSeviceFabricClientBase<IReportingContract>, IReportingContract
     {
-        private static readonly string microserviceName = MicroserviceNames.OmsOutageLifecycleService;
+        private static readonly string microserviceName = MicroserviceNames.OmsReportingService;
         private static readonly string listenerName = EndpointNames.ReportingEndpoint;
         public ReportingClient(WcfCommunicationClientFactory<IReportingContract> clientFactory, Uri serviceUri, ServicePartitionKey servicePartition)
            : base(clientFactory, serviceUri, servicePartition, listenerName)

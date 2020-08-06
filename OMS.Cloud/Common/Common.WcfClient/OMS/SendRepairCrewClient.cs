@@ -19,19 +19,16 @@ namespace OMS.Common.WcfClient.OMS
         {
 
         }
-        public static SendRepairCrewClient CreateClient(Uri serviceUri = null)
+        public static SendRepairCrewClient CreateClient()
         {
             ClientFactory factory = new ClientFactory();
-            ServicePartitionKey servicePartition = ServicePartitionKey.Singleton;
+            return factory.CreateClient<SendRepairCrewClient, ISendRepairCrewContract>(microserviceName);
+        }
 
-            if (serviceUri == null)
-            {
-                return factory.CreateClient<SendRepairCrewClient, ISendRepairCrewContract>(microserviceName, servicePartition);
-            }
-            else
-            {
-                return factory.CreateClient<SendRepairCrewClient, ISendRepairCrewContract>(serviceUri, servicePartition);
-            }
+        public static SendRepairCrewClient CreateClient(Uri serviceUri, ServicePartitionKey servicePartitionKey)
+        {
+            ClientFactory factory = new ClientFactory();
+            return factory.CreateClient<SendRepairCrewClient, ISendRepairCrewContract>(serviceUri, servicePartitionKey);
         }
         public Task<bool> SendRepairCrew(long outageId)
         {

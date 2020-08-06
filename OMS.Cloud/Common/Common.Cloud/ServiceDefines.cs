@@ -71,7 +71,13 @@ namespace OMS.Common.Cloud
                 { MicroserviceNames.ModelProviderService,           ServiceType.STATEFUL_SERVICE},
                 { MicroserviceNames.TopologyBuilderService,         ServiceType.STATELESS_SERVICE},
                 { MicroserviceNames.TopologyProviderService,        ServiceType.STATEFUL_SERVICE},
+
                 //TODO: OMS
+                { MicroserviceNames.OmsModelProviderService,        ServiceType.STATEFUL_SERVICE},
+                { MicroserviceNames.OmsOutageLifecycleService,      ServiceType.STATELESS_SERVICE},
+                { MicroserviceNames.OmsCallTrackingService,         ServiceType.STATELESS_SERVICE},
+                { MicroserviceNames.OmsHistoryDBManagerService,     ServiceType.STATEFUL_SERVICE},
+                { MicroserviceNames.OmsReportingService,            ServiceType.STATELESS_SERVICE},
 
                 //TODO: WEB_ADAPTER
 
@@ -105,7 +111,11 @@ namespace OMS.Common.Cloud
                 { MicroserviceNames.TopologyProviderService,         new Uri("fabric:/OMS.Cloud/TopologyProviderService")},
 
                 //TODO: OMS
-
+                { MicroserviceNames.OmsModelProviderService,         new Uri("fabric:/OMS.Cloud/OMS.ModelProviderService")},
+                { MicroserviceNames.OmsCallTrackingService,          new Uri("fabric:/OMS.Cloud/OMS.CallTrackingService")},
+                { MicroserviceNames.OmsHistoryDBManagerService,      new Uri("fabric:/OMS.Cloud/OMS.HistoryDBManagerService")},
+                { MicroserviceNames.OmsOutageLifecycleService,       new Uri("fabric:/OMS.Cloud/OMS.OutageLifecycleService")},
+                { MicroserviceNames.OmsReportingService,             new Uri("fabric:/OMS.Cloud/OMS.ReportingService")},                
                 //TODO: WEB_ADAPTER
 
                 //{ MicroserviceNames.TestService,                    new Uri("fabric:/OMS.Cloud/TestService")                    },

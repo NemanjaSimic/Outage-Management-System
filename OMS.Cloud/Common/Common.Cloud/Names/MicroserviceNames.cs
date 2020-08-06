@@ -19,10 +19,12 @@
 
         //OMS
         public const string OmsModelProviderService = "OmsModelProviderService";
-        public const string OmsTracingAlgorithmService = "OmsTracingAlgorithmService";
+        public const string OmsCallTrackingService = "OmsCallTrackingService";
         public const string OmsHistoryDBManagerService = "OmsHistoryDBManagerService";
         public const string OmsOutageLifecycleService = "OmsOutageLifecycleService";
         public const string OmsReportingService = "OmsReportingService";
+
+        
         //CE
         public const string ModelProviderService = "ModelProviderService";
         public const string TopologyProviderService = "TopologyProviderService";

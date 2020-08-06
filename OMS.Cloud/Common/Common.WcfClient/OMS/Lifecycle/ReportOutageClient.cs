@@ -21,18 +21,16 @@ namespace OMS.Common.WcfClient.OMS.Lifecycle
 
 		}
 
-		public static ReportOutageClient CreateClient(Uri serviceUri = null)
+		public static ReportOutageClient CreateClient()
 		{
 			ClientFactory factory = new ClientFactory();
-			ServicePartitionKey servicePartition = new ServicePartitionKey(0);
-			if (serviceUri == null)
-			{
-				return factory.CreateClient<ReportOutageClient, IReportOutageContract>(microserviceName, servicePartition);
-			}
-			else
-			{
-				return factory.CreateClient<ReportOutageClient, IReportOutageContract>(serviceUri, servicePartition);
-			}
+			return factory.CreateClient<ReportOutageClient, IReportOutageContract>(microserviceName);
+		}
+
+		public static ReportOutageClient CreateClient(Uri serviceUri, ServicePartitionKey servicePartitionKey)
+		{
+			ClientFactory factory = new ClientFactory();
+			return factory.CreateClient<ReportOutageClient, IReportOutageContract>(serviceUri, servicePartitionKey);
 		}
 
 		public Task<bool> ReportPotentialOutage(long gid, CommandOriginType commandOriginType)

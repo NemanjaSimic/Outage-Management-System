@@ -92,6 +92,12 @@
     <None Include="App.config" />
     <None Include="packages.config" />
   </ItemGroup>
+  <ItemGroup>
+    <ProjectReference Include="..\OMS.EmailServiceImplementation\OMS.EmailServiceImplementation.csproj">
+      <Project>{D39CBFCE-3D53-4AFC-98B5-29E9FF332D6E}</Project>
+      <Name>OMS.EmailServiceImplementation</Name>
+    </ProjectReference>
+  </ItemGroup>
   <Import Project="$(MSBuildToolsPath)\Microsoft.CSharp.targets" />
   <!-- To modify your build process, add your task inside one of the targets below and uncomment it. 
        Other similar extension points exist, see Microsoft.Common.targets.

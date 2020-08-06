@@ -19,18 +19,16 @@ namespace OMS.Common.WcfClient.OMS
         {
 
         }
-        public static OutageModelReadAccessClient CreateClient(Uri serviceUri = null)
+        public static OutageModelReadAccessClient CreateClient()
         {
             ClientFactory factory = new ClientFactory();
-            ServicePartitionKey servicePartition = new ServicePartitionKey(0);
-            if(serviceUri == null)
-            {
-                return factory.CreateClient<OutageModelReadAccessClient, IOutageModelReadAccessContract>(microserviceName, servicePartition);
-            }
-            else
-            {
-                return factory.CreateClient<OutageModelReadAccessClient, IOutageModelReadAccessContract>(serviceUri, servicePartition);
-            }
+            return factory.CreateClient<OutageModelReadAccessClient, IOutageModelReadAccessContract>(microserviceName);
+        }
+
+        public static OutageModelReadAccessClient CreateClient(Uri serviceUri, ServicePartitionKey servicePartitionKey)
+        {
+            ClientFactory factory = new ClientFactory();
+            return factory.CreateClient<OutageModelReadAccessClient, IOutageModelReadAccessContract>(serviceUri, servicePartitionKey);
         }
 
         public Task<Dictionary<long, long>> GetCommandedElements()
