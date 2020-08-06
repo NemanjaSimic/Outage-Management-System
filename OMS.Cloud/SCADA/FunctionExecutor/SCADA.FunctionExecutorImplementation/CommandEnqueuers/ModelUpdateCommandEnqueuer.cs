@@ -50,14 +50,14 @@ namespace SCADA.FunctionExecutorImplementation.CommandEnqueuers
 
             try
             {
-                Task[] addTasks = new Task[modbusFunctions.Count];
+                var addTasks = new List<Task>();
 
                 for (int i = 0; i < modbusFunctions.Count; i++)
                 {
-                    addTasks[i] = this.modelUpdateCommandQueue.AddMessageAsync(new CloudQueueMessage(Serialization.ObjectToByteArray(modbusFunctions[i])));
+                    addTasks.Add(this.modelUpdateCommandQueue.AddMessageAsync(new CloudQueueMessage(Serialization.ObjectToByteArray(modbusFunctions[i]))));
                 }
 
-                Task.WaitAll(addTasks);
+                Task.WaitAll(addTasks.ToArray());
                 success = true;
 
                 string informationMessage = $"{baseLogString} EnqueueModelUpdateCommands => {modbusFunctions.Count} commands SUCCESSFULLY enqueued to '{CloudStorageQueueNames.ModelUpdateCommandQueue}' queue.";

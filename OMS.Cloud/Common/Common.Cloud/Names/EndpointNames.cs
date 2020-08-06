@@ -23,16 +23,16 @@ namespace OMS.Common.Cloud.Names
         public const string NmsGdaEndpoint = "NmsGdaEndpoint";
 
         //CE - 3
-        public const string TopologyServiceEndpoint = "TopologyServiceEndpoint";
-        public const string TopologyProviderServiceEndpoint = "TopologyProviderServiceEndpoint";
-        public const string TopologyBuilderServiceEndpoint = "TopologyBuilderServiceEndpoint";
-        public const string TopologyConverterServiceEndpoint = "TopologyConverterServiceEndpoint";
-        public const string TopologyOMSServiceEndpoint = "TopologyOMSServiceEndpoint";
-        public const string SwitchStatusCommandingEndpoint = "SwitchStatusCommandingEndpoint";
-        public const string MeasurementProviderEndpoint = "MeasurementProviderEndpoint";
-        public const string MeasurementMapEndpoint = "MeasurementMapEndpoint";
-        public const string ModelProviderServiceEndpoint = "ModelProviderServiceEndpoint";
-        public const string LoadFlowServiceEndpoint = "LoadFlowServiceEndpoint";
+        public const string CeTopologyServiceEndpoint = "CeTopologyServiceEndpoint";
+        public const string CeTopologyProviderServiceEndpoint = "CeTopologyProviderServiceEndpoint";
+        public const string CeTopologyBuilderServiceEndpoint = "CeTopologyBuilderServiceEndpoint";
+        public const string CeTopologyConverterServiceEndpoint = "CeTopologyConverterServiceEndpoint";
+        public const string CeTopologyOMSServiceEndpoint = "CeTopologyOMSServiceEndpoint";
+        public const string CeSwitchStatusCommandingEndpoint = "CeSwitchStatusCommandingEndpoint";
+        public const string CeMeasurementProviderEndpoint = "CeMeasurementProviderEndpoint";
+        public const string CeMeasurementMapEndpoint = "CeMeasurementMapEndpoint";
+        public const string CeModelProviderServiceEndpoint = "CeModelProviderServiceEndpoint";
+        public const string CeLoadFlowServiceEndpoint = "CeLoadFlowServiceEndpoint";
 
         //PUBSUB - 4
         public const string PubSubPublisherEndpoint = "PubSubPublisherEndpoint";

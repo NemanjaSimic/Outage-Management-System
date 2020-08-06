@@ -1,15 +1,11 @@
 ﻿using System;
-using System.Collections.Generic;
 using System.Diagnostics.Tracing;
 using System.Fabric;
-using System.Linq;
-using System.Text;
 using System.Threading.Tasks;
-using Microsoft.ServiceFabric.Services.Runtime;
 
-namespace LoadFlowService
+namespace CE.LoadFlowService
 {
-	[EventSource(Name = "MyCompany-OMS.Cloud-LoadFlowService")]
+    [EventSource(Name = "MyCompany-OMS.Cloud-CE.LoadFlowService")]
 	internal sealed class ServiceEventSource : EventSource
 	{
 		public static readonly ServiceEventSource Current = new ServiceEventSource();

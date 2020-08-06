@@ -64,6 +64,8 @@ namespace OMS.Common.Cloud.ReliableCollectionHelpers
 
             using (ITransaction tx = stateManager.CreateTransaction())
             {
+                await reliableDictionary.ClearAsync();
+
                 foreach (var kvp in source)
                 {
                     //TODO: do not await one by one but await all
@@ -98,6 +100,8 @@ namespace OMS.Common.Cloud.ReliableCollectionHelpers
 
             using (ITransaction tx = stateManager.CreateTransaction())
             {
+                await target.ClearAsync();
+
                 var asyncEnumerable = await source.CreateEnumerableAsync(tx);
                 var asyncEnumerator = asyncEnumerable.GetAsyncEnumerator();
                 CancellationTokenSource tokenSource = new CancellationTokenSource();

@@ -12,8 +12,8 @@ namespace OMS.Common.WcfClient.CE
 {
 	public class TopologyProviderClient : WcfSeviceFabricClientBase<ITopologyProviderContract>, ITopologyProviderContract
 	{
-		private static readonly string microserviceName = MicroserviceNames.TopologyProviderService;
-		private static readonly string listenerName = EndpointNames.TopologyProviderServiceEndpoint;
+		private static readonly string microserviceName = MicroserviceNames.CeTopologyProviderService;
+		private static readonly string listenerName = EndpointNames.CeTopologyProviderServiceEndpoint;
 
 		public TopologyProviderClient(WcfCommunicationClientFactory<ITopologyProviderContract> clientFactory, Uri serviceUri, ServicePartitionKey servicePartition)
 			: base(clientFactory, serviceUri, servicePartition, listenerName)

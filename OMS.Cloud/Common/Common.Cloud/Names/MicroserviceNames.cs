@@ -26,11 +26,10 @@
 
         
         //CE
-        public const string ModelProviderService = "ModelProviderService";
-        public const string TopologyProviderService = "TopologyProviderService";
-        public const string MeasurementProviderService = "MeasurementProviderService";
-        public const string LoadFlowService = "LoadFlowService";
-        public const string TopologyBuilderService = "TopologyBuilderService";
-
+        public const string CeModelProviderService = "CeModelProviderService";
+        public const string CeTopologyProviderService = "CeTopologyProviderService";
+        public const string CeMeasurementProviderService = "CeMeasurementProviderService";
+        public const string CeLoadFlowService = "CeLoadFlowService";
+        public const string CeTopologyBuilderService = "CeTopologyBuilderService";
     }
 }

@@ -2,7 +2,6 @@
 using Common.CE.Interfaces;
 using Common.CeContracts;
 using Common.CeContracts.LoadFlow;
-using LoadFlowImplementation;
 using OMS.Common.Cloud;
 using OMS.Common.Cloud.Logger;
 using OMS.Common.NmsContracts;
@@ -14,7 +13,7 @@ using System.Linq;
 using System.Threading;
 using System.Threading.Tasks;
 
-namespace TopologyBuilderImplementation
+namespace CE.LoadFlowImplementation
 {
 	public class LoadFlow : ILoadFlowContract
     {

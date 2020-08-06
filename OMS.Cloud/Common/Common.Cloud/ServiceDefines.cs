@@ -66,12 +66,11 @@ namespace OMS.Common.Cloud
                 { MicroserviceNames.TransactionManagerService,      ServiceType.STATEFUL_SERVICE    },
 
                 //TODO: CE
-                { MicroserviceNames.LoadFlowService,                ServiceType.STATELESS_SERVICE},
-                { MicroserviceNames.MeasurementProviderService,     ServiceType.STATEFUL_SERVICE},
-                { MicroserviceNames.ModelProviderService,           ServiceType.STATEFUL_SERVICE},
-                { MicroserviceNames.TopologyBuilderService,         ServiceType.STATELESS_SERVICE},
-                { MicroserviceNames.TopologyProviderService,        ServiceType.STATEFUL_SERVICE},
-
+                { MicroserviceNames.CeLoadFlowService,              ServiceType.STATELESS_SERVICE   },
+                { MicroserviceNames.CeMeasurementProviderService,   ServiceType.STATEFUL_SERVICE    },
+                { MicroserviceNames.CeModelProviderService,         ServiceType.STATEFUL_SERVICE    },
+                { MicroserviceNames.CeTopologyBuilderService,       ServiceType.STATELESS_SERVICE   },
+                { MicroserviceNames.CeTopologyProviderService,      ServiceType.STATEFUL_SERVICE    },
                 //TODO: OMS
                 { MicroserviceNames.OmsModelProviderService,        ServiceType.STATEFUL_SERVICE},
                 { MicroserviceNames.OmsOutageLifecycleService,      ServiceType.STATELESS_SERVICE},
@@ -104,11 +103,11 @@ namespace OMS.Common.Cloud
                 { MicroserviceNames.TransactionManagerService,      new Uri("fabric:/OMS.Cloud/TMS.TransactionManagerService")  },
 
                 //TODO: CE
-                { MicroserviceNames.LoadFlowService,                 new Uri("fabric:/OMS.Cloud/LoadFlowService")},
-                { MicroserviceNames.MeasurementProviderService,      new Uri("fabric:/OMS.Cloud/MeasurementProviderService")},
-                { MicroserviceNames.ModelProviderService,            new Uri("fabric:/OMS.Cloud/ModelProviderService")},
-                { MicroserviceNames.TopologyBuilderService,          new Uri("fabric:/OMS.Cloud/TopologyBuilderService")},
-                { MicroserviceNames.TopologyProviderService,         new Uri("fabric:/OMS.Cloud/TopologyProviderService")},
+                { MicroserviceNames.CeLoadFlowService,              new Uri("fabric:/OMS.Cloud/LoadFlowService")                },
+                { MicroserviceNames.CeMeasurementProviderService,   new Uri("fabric:/OMS.Cloud/MeasurementProviderService")     },
+                { MicroserviceNames.CeModelProviderService,         new Uri("fabric:/OMS.Cloud/ModelProviderService")           },
+                { MicroserviceNames.CeTopologyBuilderService,       new Uri("fabric:/OMS.Cloud/TopologyBuilderService")         },
+                { MicroserviceNames.CeTopologyProviderService,      new Uri("fabric:/OMS.Cloud/TopologyProviderService")        },
 
                 //TODO: OMS
                 { MicroserviceNames.OmsModelProviderService,         new Uri("fabric:/OMS.Cloud/OMS.ModelProviderService")},

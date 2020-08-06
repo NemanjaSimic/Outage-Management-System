@@ -5,7 +5,7 @@ using System.Threading;
 using System.Threading.Tasks;
 using Microsoft.ServiceFabric.Services.Runtime;
 
-namespace LoadFlowService
+namespace CE.LoadFlowService
 {
 	internal static class Program
 	{
@@ -21,7 +21,7 @@ namespace LoadFlowService
 				// When Service Fabric creates an instance of this service type,
 				// an instance of the class is created in this host process.
 
-				ServiceRuntime.RegisterServiceAsync("LoadFlowServiceType",
+				ServiceRuntime.RegisterServiceAsync("CE.LoadFlowServiceType",
 					context => new LoadFlowService(context)).GetAwaiter().GetResult();
 
 				ServiceEventSource.Current.ServiceTypeRegistered(Process.GetCurrentProcess().Id, typeof(LoadFlowService).Name);

@@ -7,9 +7,9 @@ using System.Text;
 using System.Threading.Tasks;
 using Microsoft.ServiceFabric.Services.Runtime;
 
-namespace TopologyProviderService
+namespace CE.TopologyProviderService
 {
-	[EventSource(Name = "MyCompany-OMS.Cloud-TopologyProviderService")]
+	[EventSource(Name = "MyCompany-OMS.Cloud-CE.TopologyProviderService")]
 	internal sealed class ServiceEventSource : EventSource
 	{
 		public static readonly ServiceEventSource Current = new ServiceEventSource();

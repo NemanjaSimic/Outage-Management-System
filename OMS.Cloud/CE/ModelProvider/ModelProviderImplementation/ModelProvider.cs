@@ -11,7 +11,7 @@ using System;
 using System.Collections.Generic;
 using System.Threading.Tasks;
 
-namespace ModelProviderImplementation
+namespace CE.ModelProviderImplementation
 {
 	public class ModelProvider : IModelProviderContract
     {

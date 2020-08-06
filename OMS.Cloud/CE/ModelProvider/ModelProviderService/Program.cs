@@ -4,7 +4,7 @@ using System.Threading;
 using System.Threading.Tasks;
 using Microsoft.ServiceFabric.Services.Runtime;
 
-namespace ModelProviderService
+namespace CE.ModelProviderService
 {
 	internal static class Program
 	{
@@ -20,7 +20,7 @@ namespace ModelProviderService
 				// When Service Fabric creates an instance of this service type,
 				// an instance of the class is created in this host process.
 
-				ServiceRuntime.RegisterServiceAsync("ModelProviderServiceType",
+				ServiceRuntime.RegisterServiceAsync("CE.ModelProviderServiceType",
 					context => new ModelProviderService(context)).GetAwaiter().GetResult();
 
 				ServiceEventSource.Current.ServiceTypeRegistered(Process.GetCurrentProcess().Id, typeof(ModelProviderService).Name);

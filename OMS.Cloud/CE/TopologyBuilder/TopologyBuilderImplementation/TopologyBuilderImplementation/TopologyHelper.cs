@@ -1,14 +1,14 @@
 ﻿using Common.CE;
+using CE.TopologyBuilderImplementation.Configuration;
 using OMS.Common.Cloud;
 using OMS.Common.Cloud.Logger;
 using OMS.Common.NmsContracts;
 using System;
 using System.Collections.Generic;
-using TopologyBuilderImplementation.Configuration;
 
-namespace TopologyBuilderImplementation
+namespace CE.TopologyBuilderImplementation
 {
-	class TopologyHelper
+    class TopologyHelper
 	{
 		private readonly Dictionary<TopologyStatus, List<DMSType>> elementsStatus;
 		private readonly Dictionary<TopologyType, List<DMSType>> topologyTypes;

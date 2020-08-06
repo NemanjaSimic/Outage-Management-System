@@ -9,8 +9,8 @@ namespace OMS.Common.WcfClient.CE
 {
 	public class SwitchStatusCommandingClient : WcfSeviceFabricClientBase<ISwitchStatusCommandingContract>, ISwitchStatusCommandingContract
 	{
-		private static readonly string microserviceName = MicroserviceNames.MeasurementProviderService;
-		private static readonly string listenerName = EndpointNames.SwitchStatusCommandingEndpoint;
+		private static readonly string microserviceName = MicroserviceNames.CeMeasurementProviderService;
+		private static readonly string listenerName = EndpointNames.CeSwitchStatusCommandingEndpoint;
 
 		public SwitchStatusCommandingClient(WcfCommunicationClientFactory<ISwitchStatusCommandingContract> clientFactory, Uri serviceUri, ServicePartitionKey servicePartition)
 			: base(clientFactory, serviceUri, servicePartition, listenerName)

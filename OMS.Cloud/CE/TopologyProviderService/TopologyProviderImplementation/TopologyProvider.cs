@@ -18,7 +18,7 @@ using System.Linq;
 using System.Threading.Tasks;
 using ReliableDictionaryNames = Common.CE.ReliableDictionaryNames;
 
-namespace TopologyProviderImplementation
+namespace CE.TopologyProviderImplementation
 {
 	public class TopologyProvider : ITopologyProviderContract
     {
@@ -430,7 +430,7 @@ namespace TopologyProviderImplementation
             CalculationEnginePublication publication = new CalculationEnginePublication(Topic.OMS_MODEL, message);
             try
             {
-                await publisherClient.Publish(publication, MicroserviceNames.TopologyProviderService);
+                await publisherClient.Publish(publication, MicroserviceNames.CeTopologyProviderService);
                 Logger.LogInformation($"{baseLogString} PublishOMSModel => Topology provider service published data of topic: {publication.Topic}");
             }
             catch (Exception e)
@@ -454,7 +454,7 @@ namespace TopologyProviderImplementation
             CalculationEnginePublication publication = new CalculationEnginePublication(Topic.TOPOLOGY, message);
             try
             {
-                await publisherClient.Publish(publication, MicroserviceNames.TopologyProviderService);
+                await publisherClient.Publish(publication, MicroserviceNames.CeTopologyProviderService);
                 Logger.LogInformation($"{baseLogString} PublishUIModel => Topology provider service published data of topic: {publication.Topic}");
             }
             catch (Exception e)

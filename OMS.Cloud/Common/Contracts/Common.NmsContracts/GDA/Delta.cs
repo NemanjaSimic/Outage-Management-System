@@ -576,7 +576,7 @@ namespace OMS.Common.NmsContracts.GDA
 					}
 				}
 
-				message = $"Failed to sort delta operations because there are some insert operations (count = {insertOps.Count - insertOpsOrderedNo}) whose type (e.g {typeNotDefined}) is not specified in the given list of types.";
+				message = $"Failed to sort delta operations because there are some insert operations (count = {(int)(insertOps.Count - insertOpsOrderedNo)}) whose type (e.g {typeNotDefined}) is not specified in the given list of types.";
 				Logger.LogError(message);
 
 				string exceptionMessage = $"Invalid delta. Some insert operations (count = {insertOps.Count - insertOpsOrderedNo}) whose type (e.g {typeNotDefined}) is not correct.";

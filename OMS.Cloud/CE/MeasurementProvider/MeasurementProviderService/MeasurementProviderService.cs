@@ -3,9 +3,9 @@ using System.Collections.Generic;
 using System.Fabric;
 using System.Threading;
 using System.Threading.Tasks;
+using CE.MeasurementProviderImplementation;
 using Common.CE;
 using Common.CeContracts;
-using MeasurementProviderImplementation;
 using Microsoft.ServiceFabric.Data;
 using Microsoft.ServiceFabric.Data.Collections;
 using Microsoft.ServiceFabric.Services.Communication.Runtime;
@@ -15,12 +15,12 @@ using Microsoft.ServiceFabric.Services.Runtime;
 using OMS.Common.Cloud.Logger;
 using OMS.Common.Cloud.Names;
 
-namespace MeasurementProviderService
+namespace CE.MeasurementProviderService
 {
-	/// <summary>
-	/// An instance of this class is created for each service replica by the Service Fabric runtime.
-	/// </summary>
-	internal sealed class MeasurementProviderService : StatefulService
+    /// <summary>
+    /// An instance of this class is created for each service replica by the Service Fabric runtime.
+    /// </summary>
+    internal sealed class MeasurementProviderService : StatefulService
 	{
 		private readonly string baseLogString;
 
@@ -73,24 +73,24 @@ namespace MeasurementProviderService
 					return new WcfCommunicationListener<IMeasurementProviderContract>(context,
 																			this.measurementProvider,
 																			WcfUtility.CreateTcpListenerBinding(),
-																			EndpointNames.MeasurementProviderEndpoint);
-				}, EndpointNames.MeasurementProviderEndpoint),
+																			EndpointNames.CeMeasurementProviderEndpoint);
+				}, EndpointNames.CeMeasurementProviderEndpoint),
 
 				new ServiceReplicaListener(context =>
 				{
 					return new WcfCommunicationListener<IMeasurementMapContract>(context,
 																			this.measurementMap,
 																			WcfUtility.CreateTcpListenerBinding(),
-																			EndpointNames.MeasurementMapEndpoint);
-				}, EndpointNames.MeasurementMapEndpoint),
+																			EndpointNames.CeMeasurementMapEndpoint);
+				}, EndpointNames.CeMeasurementMapEndpoint),
 
 				new ServiceReplicaListener(context =>
 				{
 					return new WcfCommunicationListener<ISwitchStatusCommandingContract>(context,
 																			this.switchStatusCommanding,
 																			WcfUtility.CreateTcpListenerBinding(),
-																			EndpointNames.SwitchStatusCommandingEndpoint);
-				}, EndpointNames.SwitchStatusCommandingEndpoint),
+																			EndpointNames.CeSwitchStatusCommandingEndpoint);
+				}, EndpointNames.CeSwitchStatusCommandingEndpoint),
 			};
 		}
 

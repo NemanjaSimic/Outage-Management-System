@@ -4,7 +4,7 @@ using System.Threading;
 using System.Threading.Tasks;
 using Microsoft.ServiceFabric.Services.Runtime;
 
-namespace MeasurementProviderService
+namespace CE.MeasurementProviderService
 {
 	internal static class Program
 	{
@@ -20,7 +20,7 @@ namespace MeasurementProviderService
 				// When Service Fabric creates an instance of this service type,
 				// an instance of the class is created in this host process.
 
-				ServiceRuntime.RegisterServiceAsync("MeasurementProviderServiceType",
+				ServiceRuntime.RegisterServiceAsync("CE.MeasurementProviderServiceType",
 					context => new MeasurementProviderService(context)).GetAwaiter().GetResult();
 
 				ServiceEventSource.Current.ServiceTypeRegistered(Process.GetCurrentProcess().Id, typeof(MeasurementProviderService).Name);

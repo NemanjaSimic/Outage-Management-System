@@ -14,7 +14,6 @@ using OMS.Common.ScadaContracts.ModelProvider;
 using OMS.Common.WcfClient.SCADA;
 using System;
 using System.Collections.Generic;
-using System.ServiceModel;
 using System.Text;
 using System.Threading;
 using System.Threading.Tasks;
@@ -28,10 +27,15 @@ namespace SCADA.FunctionExecutorImplementation
         private readonly CloudQueue writeCommandQueue;
         private readonly CloudQueue modelUpdateCommandQueue;
 
-        private IScadaConfigData configData;
-        //private IScadaModelReadAccessContract modelReadAccessClient;
-        //private IScadaModelUpdateAccessContract modelUpdateAccessClient;
+        private readonly Dictionary<long, AnalogModbusData> analogMeasurementCache;
+        private readonly Dictionary<long, DiscreteModbusData> discreteMeasurementCache;
+        private readonly Dictionary<long, CommandDescription> commandDescriptions;
+
         private ModbusClient modbusClient;
+        private IScadaConfigData configData;
+
+        private IScadaModelReadAccessContract modelReadAccessClient;
+        private IScadaModelUpdateAccessContract modelUpdateAccessClient;
 
         #region Private Properties
         private ICloudLogger logger;
@@ -60,11 +64,9 @@ namespace SCADA.FunctionExecutorImplementation
             string debugMessage = $"{baseLogString} Ctor => CloudQueues initialized.";
             Logger.LogDebug(debugMessage);
 
-            //this.modelReadAccessClient = ScadaModelReadAccessClient.CreateClient();
-            //this.modelUpdateAccessClient = ScadaModelUpdateAccessClient.CreateClient();
-
-            debugMessage = $"{baseLogString} Ctor => Clients initialized.";
-            Logger.LogDebug(debugMessage);
+            this.analogMeasurementCache = new Dictionary<long, AnalogModbusData>();
+            this.discreteMeasurementCache = new Dictionary<long, DiscreteModbusData>();
+            this.commandDescriptions = new Dictionary<long, CommandDescription>();
         }
 
         public async Task Start(bool isRetry = false)
@@ -139,22 +141,6 @@ namespace SCADA.FunctionExecutorImplementation
                     }
                 }
             }
-            //catch (CommunicationObjectFaultedException e)
-            //{
-            //    string message = $"{baseLogString} Start => CommunicationObjectFaultedException caught.";
-            //    Logger.LogError(message, e);
-
-            //    await Task.Delay(2000);
-
-            //    this.modelReadAccessClient = ScadaModelReadAccessClient.CreateClient();
-            //    this.modelUpdateAccessClient = ScadaModelUpdateAccessClient.CreateClient();
-
-            //    string debugMessage = $"{baseLogString} Start => Clients re-initialized.";
-            //    Logger.LogDebug(debugMessage);
-
-            //    await Start(true);
-            //    //todo: different logic on multiple rety?
-            //}
             catch (Exception e)
             {
                 string message = $"{baseLogString} Start => Exception caught.";
@@ -168,7 +154,7 @@ namespace SCADA.FunctionExecutorImplementation
         {
             try
             {
-                IScadaModelReadAccessContract modelReadAccessClient = ScadaModelReadAccessClient.CreateClient();
+                this.modelReadAccessClient = ScadaModelReadAccessClient.CreateClient();
                 this.configData = await modelReadAccessClient.GetScadaConfigData();
                 this.modbusClient = new ModbusClient(configData.IpAddress.ToString(), configData.TcpPort);
             }
@@ -347,10 +333,11 @@ namespace SCADA.FunctionExecutorImplementation
                 throw new ArgumentException(errorMessage);
             }
 
-            var measurementCache = new Dictionary<long, DiscreteModbusData>(data.Length);
+            //this.discreteMeasurementCache = new Dictionary<long, DiscreteModbusData>(data.Length);
+            this.discreteMeasurementCache.Clear();
 
-            IScadaModelReadAccessContract modelReadAccessClient = ScadaModelReadAccessClient.CreateClient();
-            IScadaModelUpdateAccessContract modelUpdateAccessClient = ScadaModelUpdateAccessClient.CreateClient();
+            this.modelReadAccessClient = ScadaModelReadAccessClient.CreateClient();
+            this.modelUpdateAccessClient = ScadaModelUpdateAccessClient.CreateClient();
 
             var currentSCADAModel = await modelReadAccessClient.GetGidToPointItemMap();
             var currentAddressToGidMap = await modelReadAccessClient.GetAddressToGidMap();
@@ -403,16 +390,16 @@ namespace SCADA.FunctionExecutorImplementation
 
                 //LOGIC
                 DiscreteModbusData digitalData = new DiscreteModbusData(value, pointItem.Alarm, gid, commandOrigin);
-                measurementCache.Add(gid, digitalData);
+                this.discreteMeasurementCache.Add(gid, digitalData);
 
                 verboseMessage = $"{baseLogString} ExecuteDiscreteReadCommand => DiscreteModbusData added to measurementCache. MeasurementGid: {digitalData.MeasurementGid:X16}, Value: {digitalData.Value}, Alarm: {digitalData.Alarm}, CommandOrigin: {digitalData.CommandOrigin} .";
                 Logger.LogVerbose(verboseMessage);
             }
             
             //LOGIC
-            await modelUpdateAccessClient.MakeDiscreteEntryToMeasurementCache(measurementCache, true);
+            await modelUpdateAccessClient.MakeDiscreteEntryToMeasurementCache(this.discreteMeasurementCache, true);
             
-            verboseMessage = $"{baseLogString} ExecuteDiscreteReadCommand => MakeDiscreteEntryToMeasurementCache method called. measurementCache count: {measurementCache.Count}.";
+            verboseMessage = $"{baseLogString} ExecuteDiscreteReadCommand => MakeDiscreteEntryToMeasurementCache method called. measurementCache count: {this.discreteMeasurementCache.Count}.";
             Logger.LogVerbose(verboseMessage);
         }
 
@@ -455,10 +442,11 @@ namespace SCADA.FunctionExecutorImplementation
                 throw new ArgumentException(message);
             }
 
-            var measurementCache = new Dictionary<long, AnalogModbusData>(data.Length);
+            //this.analogMeasurementCache = new Dictionary<long, AnalogModbusData>(data.Length);
+            this.analogMeasurementCache.Clear();
 
-            IScadaModelReadAccessContract modelReadAccessClient = ScadaModelReadAccessClient.CreateClient();
-            IScadaModelUpdateAccessContract modelUpdateAccessClient = ScadaModelUpdateAccessClient.CreateClient();
+            this.modelReadAccessClient = ScadaModelReadAccessClient.CreateClient();
+            this.modelUpdateAccessClient = ScadaModelUpdateAccessClient.CreateClient();
 
             var gidToPointItemMap = await modelReadAccessClient.GetGidToPointItemMap();
             var addressToGidMap = await modelReadAccessClient.GetAddressToGidMap();
@@ -512,16 +500,16 @@ namespace SCADA.FunctionExecutorImplementation
 
                 //LOGIC
                 AnalogModbusData analogData = new AnalogModbusData(pointItem.CurrentEguValue, pointItem.Alarm, gid, commandOrigin);
-                measurementCache.Add(gid, analogData);
+                this.analogMeasurementCache.Add(gid, analogData);
 
                 verboseMessage = $"{baseLogString} ExecuteAnalogReadCommand => AnalogModbusData added to measurementCache. MeasurementGid: {analogData.MeasurementGid:X16}, Value: {analogData.Value}, Alarm: {analogData.Alarm}, CommandOrigin: {analogData.CommandOrigin} .";
                 Logger.LogVerbose(verboseMessage);
             }
 
             //LOGIC
-            await modelUpdateAccessClient.MakeAnalogEntryToMeasurementCache(measurementCache, true);
+            await modelUpdateAccessClient.MakeAnalogEntryToMeasurementCache(this.analogMeasurementCache, true);
 
-            verboseMessage = $"{baseLogString} ExecuteAnalogReadCommand => MakeAnalogEntryToMeasurementCache method called. measurementCache count: {measurementCache.Count}.";
+            verboseMessage = $"{baseLogString} ExecuteAnalogReadCommand => MakeAnalogEntryToMeasurementCache method called. measurementCache count: {this.analogMeasurementCache.Count}.";
             Logger.LogVerbose(verboseMessage);
         }
         #endregion Execute Read
@@ -549,8 +537,8 @@ namespace SCADA.FunctionExecutorImplementation
                 throw new ArgumentException(errorMessage);
             }
 
-            IScadaModelReadAccessContract modelReadAccessClient = ScadaModelReadAccessClient.CreateClient();
-            IScadaModelUpdateAccessContract modelUpdateAccessClient = ScadaModelUpdateAccessClient.CreateClient();
+            this.modelReadAccessClient = ScadaModelReadAccessClient.CreateClient();
+            this.modelUpdateAccessClient = ScadaModelUpdateAccessClient.CreateClient();
 
             //LOGIC
             var addressToGidMap = await modelReadAccessClient.GetAddressToGidMap();
@@ -691,13 +679,15 @@ namespace SCADA.FunctionExecutorImplementation
             string verboseMessage = $"{baseLogString} entering ExecuteWriteMultipleDiscreteCommand method, command's startAddress: {startAddress}, commandValues: {commandValuesSB}, commandOrigin: {commandOrigin}.";
             Logger.LogVerbose(verboseMessage);
 
-            IScadaModelReadAccessContract modelReadAccessClient = ScadaModelReadAccessClient.CreateClient();
-            IScadaModelUpdateAccessContract modelUpdateAccessClient = ScadaModelUpdateAccessClient.CreateClient();
+            this.modelReadAccessClient = ScadaModelReadAccessClient.CreateClient();
+            this.modelUpdateAccessClient = ScadaModelUpdateAccessClient.CreateClient();
             
             //LOGIC
             int quantity = commandValues.Length;
             var addressToGidMap = await modelReadAccessClient.GetAddressToGidMap();
-            var commandDescriptions = new Dictionary<long, CommandDescription>();
+
+            //this.commandDescriptions = new Dictionary<long, CommandDescription>();
+            this.commandDescriptions.Clear();
 
             bool[] booleanCommands = new bool[quantity];
             StringBuilder booleanCommandsSB = new StringBuilder();
@@ -756,7 +746,7 @@ namespace SCADA.FunctionExecutorImplementation
                     };
 
                     //LOGIC
-                    commandDescriptions.Add(gid, commandDescription);
+                    this.commandDescriptions.Add(gid, commandDescription);
 
                     string message = $"{baseLogString} ExecuteWriteMultipleDiscreteCommand => CommandDescription added to the collection of commandDescriptions. Gid: {commandDescription.Gid:X16}, Address: {commandDescription.Address}, Value: {commandDescription.Value}, CommandOrigin: {commandDescription.CommandOrigin}";
                     Logger.LogDebug(message);
@@ -767,7 +757,7 @@ namespace SCADA.FunctionExecutorImplementation
             Logger.LogDebug(debugMessage);
 
             //LOGIC
-            await modelUpdateAccessClient.AddOrUpdateMultipleCommandDescriptions(commandDescriptions);
+            await modelUpdateAccessClient.AddOrUpdateMultipleCommandDescriptions(this.commandDescriptions);
 
             debugMessage = $"{baseLogString} ExecuteWriteMultipleDiscreteCommand => about to call ModbusClient.WriteMultipleCoils({startAddress - 1}, {booleanCommandsSB}) method. StartAddress: {startAddress}, Quantity: {quantity}";
             Logger.LogDebug(debugMessage);
@@ -794,11 +784,14 @@ namespace SCADA.FunctionExecutorImplementation
             Logger.LogVerbose(verboseMessage);
 
             //LOGIC
+            this.modelReadAccessClient = ScadaModelReadAccessClient.CreateClient();
+            this.modelUpdateAccessClient = ScadaModelUpdateAccessClient.CreateClient();
+
             int quantity = commandValues.Length;
-            IScadaModelReadAccessContract modelReadAccessClient = ScadaModelReadAccessClient.CreateClient();
-            IScadaModelUpdateAccessContract modelUpdateAccessClient = ScadaModelUpdateAccessClient.CreateClient();
             var addressToGidMap = await modelReadAccessClient.GetAddressToGidMap();
-            var commandDescriptions = new Dictionary<long, CommandDescription>();
+
+            //this.commandDescriptions = new Dictionary<long, CommandDescription>();
+            this.commandDescriptions.Clear();
 
             //LOGIC
             for (ushort index = 0; index < quantity; index++)
@@ -818,7 +811,7 @@ namespace SCADA.FunctionExecutorImplementation
                     };
 
                     //LOGIC
-                    commandDescriptions.Add(gid, commandDescription);
+                    this.commandDescriptions.Add(gid, commandDescription);
 
                     string message = $"{baseLogString} ExecuteWriteMultipleAnalogCommand => CommandDescription added to the collection of commandDescriptions. Gid: {commandDescription.Gid:X16}, Address: {commandDescription.Address}, Value: {commandDescription.Value}, CommandOrigin: {commandDescription.CommandOrigin}";
                     Logger.LogInformation(message);
@@ -829,7 +822,7 @@ namespace SCADA.FunctionExecutorImplementation
             Logger.LogDebug(debugMessage);
 
             //LOGIC
-            await modelUpdateAccessClient.AddOrUpdateMultipleCommandDescriptions(commandDescriptions);
+            await modelUpdateAccessClient.AddOrUpdateMultipleCommandDescriptions(this.commandDescriptions);
 
             debugMessage = $"{baseLogString} ExecuteWriteMultipleAnalogCommand => about to call ModbusClient.WriteMultipleRegisters({startAddress - 1}, {commandValuesSB}) method. StartAddress: {startAddress}, Quantity: {quantity}";
             Logger.LogDebug(debugMessage);

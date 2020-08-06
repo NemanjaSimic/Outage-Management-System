@@ -183,7 +183,7 @@
     </ProjectReference>
     <ProjectReference Include="..\Contracts\Common.TmsContracts\Common.TmsContracts.csproj">
       <Project>{A07D94C2-40EF-48DB-B828-7E53E7F5A372}</Project>
-      <Name>Common.DistributedTransactionContracts</Name>
+      <Name>Common.TmsContracts</Name>
     </ProjectReference>
     <ProjectReference Include="..\Contracts\Common.NmsContracts\Common.NmsContracts.csproj">
       <Project>{235804A8-9C8F-40EC-8786-5DAB24733977}</Project>

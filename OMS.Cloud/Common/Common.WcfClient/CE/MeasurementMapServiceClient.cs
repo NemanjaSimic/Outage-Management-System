@@ -10,8 +10,8 @@ namespace OMS.Common.WcfClient.CE
 {
 	public class MeasurementMapServiceClient : WcfSeviceFabricClientBase<IMeasurementMapContract>, IMeasurementMapContract
 	{
-		private static readonly string microserviceName = MicroserviceNames.MeasurementProviderService;
-		private static readonly string listenerName = EndpointNames.MeasurementMapEndpoint;
+		private static readonly string microserviceName = MicroserviceNames.CeMeasurementProviderService;
+		private static readonly string listenerName = EndpointNames.CeMeasurementMapEndpoint;
 
 		public MeasurementMapServiceClient(WcfCommunicationClientFactory<IMeasurementMapContract> clientFactory, Uri serviceUri, ServicePartitionKey servicePartition)
 			: base(clientFactory, serviceUri, servicePartition, listenerName)
