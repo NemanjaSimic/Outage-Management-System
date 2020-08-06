@@ -1,9 +1,7 @@
 ﻿using System;
 using System.Collections.Generic;
 using System.Fabric;
-using System.Linq;
-using System.Threading;
-using System.Threading.Tasks;
+using CE.LoadFlowImplementation;
 using Common.CeContracts.LoadFlow;
 using Microsoft.ServiceFabric.Services.Communication.Runtime;
 using Microsoft.ServiceFabric.Services.Communication.Wcf;
@@ -11,14 +9,13 @@ using Microsoft.ServiceFabric.Services.Communication.Wcf.Runtime;
 using Microsoft.ServiceFabric.Services.Runtime;
 using OMS.Common.Cloud.Logger;
 using OMS.Common.Cloud.Names;
-using TopologyBuilderImplementation;
 
-namespace LoadFlowService
+namespace CE.LoadFlowService
 {
-	/// <summary>
-	/// An instance of this class is created for each service instance by the Service Fabric runtime.
-	/// </summary>
-	internal sealed class LoadFlowService : StatelessService
+    /// <summary>
+    /// An instance of this class is created for each service instance by the Service Fabric runtime.
+    /// </summary>
+    internal sealed class LoadFlowService : StatelessService
 	{
 		private readonly string baseLogString;
 		private readonly LoadFlow loadFlowEngine;
@@ -64,8 +61,8 @@ namespace LoadFlowService
 					 return new WcfCommunicationListener<ILoadFlowContract>(context,
 																			   this.loadFlowEngine,
 																			   WcfUtility.CreateTcpListenerBinding(),
-																			   EndpointNames.LoadFlowServiceEndpoint);
-				}, EndpointNames.LoadFlowServiceEndpoint)
+																			   EndpointNames.CeLoadFlowServiceEndpoint);
+				}, EndpointNames.CeLoadFlowServiceEndpoint)
 			};
 		}
 	}

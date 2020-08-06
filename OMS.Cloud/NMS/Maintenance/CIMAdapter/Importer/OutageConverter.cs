@@ -395,6 +395,8 @@ namespace Outage.DataImporter.CIMAdapter.Importer
                     return OMS.Common.Cloud.AnalogMeasurementType.VOLTAGE;
                 case Outage.AnalogMeasurementType.Power:
                     return OMS.Common.Cloud.AnalogMeasurementType.POWER;
+                case Outage.AnalogMeasurementType.FeederCurrent:
+                    return OMS.Common.Cloud.AnalogMeasurementType.FEEDER_CURRENT;
                 default:
                     throw new System.Exception($"Unknown enum type: {measurementType}.");
             }

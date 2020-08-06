@@ -15,8 +15,9 @@ namespace SCADA.AcquisitionImplementation
     {
         private readonly string baseLogString;
 
-        //private IReadCommandEnqueuerContract commandEnqueuerClient;
-        //private IScadaModelReadAccessContract readAccessClient;
+        private IReadCommandEnqueuerContract commandEnqueuerClient;
+        private IScadaModelReadAccessContract readAccessClient;
+        Dictionary<short, Dictionary<ushort, long>> addressToGidMap;
 
         #region Private Properties
         private ICloudLogger logger;
@@ -29,26 +30,25 @@ namespace SCADA.AcquisitionImplementation
         public AcquisitionCycle()
         {
             this.baseLogString = $"{this.GetType()} [{this.GetHashCode()}] =>{Environment.NewLine}";
-
-            //this.commandEnqueuerClient = ReadCommandEnqueuerClient.CreateClient();
-            //this.readAccessClient = ScadaModelReadAccessClient.CreateClient();
+            addressToGidMap = new Dictionary<short, Dictionary<ushort, long>>();
         }
 
-        public async Task Start(bool isRetry = false)
+        public async Task Start()
         {
-            string isRetryString = isRetry ? "yes" : "no";
-            string verboseMessage = $"{baseLogString} entering Start method, isRetry: {isRetryString}.";
+            string verboseMessage = $"{baseLogString} entering Start method.";
             Logger.LogVerbose(verboseMessage);
 
             try
             {
-                IReadCommandEnqueuerContract commandEnqueuerClient = ReadCommandEnqueuerClient.CreateClient();
-                IScadaModelReadAccessContract readAccessClient = ScadaModelReadAccessClient.CreateClient();
+                commandEnqueuerClient = ReadCommandEnqueuerClient.CreateClient();
+                readAccessClient = ScadaModelReadAccessClient.CreateClient();
 
                 verboseMessage = $"{baseLogString} Start => Trying to get AddressToGidMap.";
                 Logger.LogVerbose(verboseMessage);
 
-                Dictionary<short, Dictionary<ushort, long>> addressToGidMap = await readAccessClient.GetAddressToGidMap();
+                //LOGIC
+                addressToGidMap.Clear();
+                addressToGidMap = await readAccessClient.GetAddressToGidMap();
 
                 verboseMessage = $"{baseLogString} Start => AddressToGidMap received, Count: {addressToGidMap.Count}.";
                 Logger.LogVerbose(verboseMessage);
@@ -65,22 +65,14 @@ namespace SCADA.AcquisitionImplementation
 
                     if (TryCreateModbusFunction(kvp, out IReadModbusFunction modbusFunction))
                     {
+                        //KEY LOGIC
                         await commandEnqueuerClient.EnqueueReadCommand(modbusFunction);
+
                         verboseMessage = $"{baseLogString} Start => Modbus function enquided. Point type is {kvp.Key}, FunctionCode: {modbusFunction.FunctionCode}, StartAddress: {modbusFunction.StartAddress}, Quantity: {modbusFunction.Quantity}.";
                         Logger.LogVerbose(verboseMessage);
                     }
                 }
             }
-            //catch(CommunicationObjectFaultedException e)
-            //{
-            //    string message = $"{baseLogString} Start => CommunicationObjectFaultedException caught.";
-            //    Logger.LogError(message, e);
-
-            //    this.commandEnqueuerClient = ReadCommandEnqueuerClient.CreateClient();
-            //    this.readAccessClient = ScadaModelReadAccessClient.CreateClient();
-            //    await Start(true);
-            //    //todo: different logic on multiple rety?
-            //}
             catch (Exception e)
             {
                 string message = $"{baseLogString} Start => Exception caught.";

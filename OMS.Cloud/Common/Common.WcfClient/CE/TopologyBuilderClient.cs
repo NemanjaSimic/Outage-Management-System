@@ -10,8 +10,8 @@ namespace OMS.Common.WcfClient.CE
 {
 	public class TopologyBuilderClient : WcfSeviceFabricClientBase<ITopologyBuilderContract>, ITopologyBuilderContract
 	{
-		private static readonly string microserviceName = MicroserviceNames.TopologyBuilderService;
-		private static readonly string listenerName = EndpointNames.TopologyBuilderServiceEndpoint;
+		private static readonly string microserviceName = MicroserviceNames.CeTopologyBuilderService;
+		private static readonly string listenerName = EndpointNames.CeTopologyBuilderServiceEndpoint;
 		public TopologyBuilderClient(WcfCommunicationClientFactory<ITopologyBuilderContract> clientFactory, Uri serviceUri, ServicePartitionKey servicePartition)
 			: base(clientFactory, serviceUri, servicePartition, listenerName)
 		{

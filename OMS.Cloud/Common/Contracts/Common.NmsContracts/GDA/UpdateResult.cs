@@ -49,13 +49,14 @@ namespace OMS.Common.NmsContracts.GDA
             StringBuilder sb = new StringBuilder();
 
             sb.AppendFormat("Update result: {0}\n", result);
-            sb.AppendFormat("Message: {0}\n", message);
             sb.AppendLine("GlobalId pairs:");
 
             foreach (KeyValuePair<long, long> kvp in globalIdPairs)
             {
-                sb.AppendFormat("Client globalId: 0x{0:X16}\t - Server globalId: 0x{1:X16}\n", kvp.Key, kvp.Value);
+                sb.AppendFormat($"Client globalId: 0x{kvp.Key:X16}\t - Server globalId: 0x{kvp.Value:X16}\n");
             }
+
+            sb.AppendFormat("Message: {0}\n", message);
 
             return sb.ToString();
         }

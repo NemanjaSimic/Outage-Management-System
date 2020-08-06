@@ -5,7 +5,7 @@ using OMS.Common.WcfClient.CE;
 using System;
 using System.Threading.Tasks;
 
-namespace MeasurementProviderImplementation
+namespace CE.MeasurementProviderImplementation
 {
 	public class SwitchStatusCommanding : ISwitchStatusCommandingContract
 	{

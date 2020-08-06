@@ -4,7 +4,7 @@ using OMS.Common.Cloud.Logger;
 using System;
 using System.Collections.Generic;
 
-namespace TopologyBuilderImplementation.Configuration
+namespace CE.TopologyBuilderImplementation.Configuration
 {
 	public class ConfigurationParse
 	{

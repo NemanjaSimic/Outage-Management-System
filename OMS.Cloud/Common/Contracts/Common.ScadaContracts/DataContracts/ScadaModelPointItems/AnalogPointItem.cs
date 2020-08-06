@@ -100,6 +100,11 @@ namespace OMS.Common.ScadaContracts.DataContracts.ScadaModelPointItems
                 LowLimit = alarmConfigData.LowCurrentLimit;
                 HighLimit = alarmConfigData.HighCurrentLimit;
             }
+            else  if(AnalogType == AnalogMeasurementType.FEEDER_CURRENT)
+            {
+                LowLimit = alarmConfigData.LowFeederCurrentLimit;
+                HighLimit = alarmConfigData.HighFeederCurrentLimit;
+            }
             else
             {
                 string message = $"{baseLogString} SetAlarms => Analog measurement is of type: {AnalogType} which is not supported for alarming. Gid: 0x{Gid:X16}, Addres: {Address}, Name: {Name}, RegisterType: {RegisterType}, Initialized: {Initialized}";

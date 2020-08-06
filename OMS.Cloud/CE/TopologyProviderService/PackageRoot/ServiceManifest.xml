@@ -1,5 +1,5 @@
 ﻿<?xml version="1.0" encoding="utf-8"?>
-<ServiceManifest Name="TopologyProviderServicePkg"
+<ServiceManifest Name="CE.TopologyProviderServicePkg"
                  Version="1.0.0"
                  xmlns="http://schemas.microsoft.com/2011/01/fabric"
                  xmlns:xsd="http://www.w3.org/2001/XMLSchema"
@@ -7,14 +7,14 @@
   <ServiceTypes>
     <!-- This is the name of your ServiceType. 
          This name must match the string used in RegisterServiceType call in Program.cs. -->
-    <StatefulServiceType ServiceTypeName="TopologyProviderServiceType" HasPersistedState="true" />
+    <StatefulServiceType ServiceTypeName="CE.TopologyProviderServiceType" HasPersistedState="true" />
   </ServiceTypes>
 
   <!-- Code package is your service executable. -->
   <CodePackage Name="Code" Version="1.0.0">
     <EntryPoint>
       <ExeHost>
-        <Program>TopologyProviderService.exe</Program>
+        <Program>CE.TopologyProviderService.exe</Program>
       </ExeHost>
     </EntryPoint>
   </CodePackage>
@@ -25,8 +25,8 @@
 
   <Resources>
     <Endpoints>
-      <Endpoint Name="TopologyProviderServiceEndpoint" Protocol="tcp" Type="Input" />
-      <Endpoint Name="TopologyConverterServiceEndpoint" Protocol="tcp" Type="Input" />
+      <Endpoint Name="CeTopologyProviderServiceEndpoint" Protocol="tcp" Type="Input" />
+      <Endpoint Name="CeTopologyConverterServiceEndpoint" Protocol="tcp" Type="Input" />
     </Endpoints>
   </Resources>
 </ServiceManifest>
