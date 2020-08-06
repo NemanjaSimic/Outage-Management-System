@@ -1,4 +1,4 @@
-﻿namespace CECommon
+﻿namespace Common.CE
 {
 	public enum TopologyType
 	{

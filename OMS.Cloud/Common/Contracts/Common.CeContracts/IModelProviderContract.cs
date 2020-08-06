@@ -1,4 +1,4 @@
-﻿using CECommon.Interfaces;
+﻿using Common.CE.Interfaces;
 using Microsoft.ServiceFabric.Services.Remoting;
 using System.Collections.Generic;
 using System.ServiceModel;
@@ -6,7 +6,7 @@ using System.Threading.Tasks;
 
 namespace Common.CeContracts.ModelProvider
 {
-    [ServiceContract]
+	[ServiceContract]
     public interface IModelProviderContract : IService
 	{
         [OperationContract]

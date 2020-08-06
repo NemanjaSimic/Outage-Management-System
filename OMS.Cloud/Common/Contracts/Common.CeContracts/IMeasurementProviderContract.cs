@@ -1,5 +1,4 @@
-﻿using CECommon.Model;
-using Microsoft.ServiceFabric.Services.Remoting;
+﻿using Microsoft.ServiceFabric.Services.Remoting;
 using OMS.Common.Cloud;
 using OMS.Common.PubSubContracts.DataContracts.SCADA;
 using System.Collections.Generic;
@@ -8,7 +7,7 @@ using System.Threading.Tasks;
 
 namespace Common.CeContracts
 {
-    [ServiceContract]
+	[ServiceContract]
 	public interface IMeasurementProviderContract : IService
 	{
         [OperationContract]

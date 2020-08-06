@@ -1,11 +1,11 @@
-﻿using CECommon;
-using CECommon.Models;
+﻿using Common.CE;
+using Common.CeContracts;
 using OMS.Common.Cloud.Logger;
 using System;
 using System.Collections.Generic;
 using System.Xml;
 
-namespace LoadFlowImplementation
+namespace CE.LoadFlowImplementation
 {
 	public class DailyCurveReader
 	{

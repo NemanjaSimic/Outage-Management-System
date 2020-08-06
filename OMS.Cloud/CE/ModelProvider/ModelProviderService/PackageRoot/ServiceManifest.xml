@@ -1,5 +1,5 @@
 ﻿<?xml version="1.0" encoding="utf-8"?>
-<ServiceManifest Name="ModelProviderServicePkg"
+<ServiceManifest Name="CE.ModelProviderServicePkg"
                  Version="1.0.0"
                  xmlns="http://schemas.microsoft.com/2011/01/fabric"
                  xmlns:xsd="http://www.w3.org/2001/XMLSchema"
@@ -7,14 +7,14 @@
   <ServiceTypes>
     <!-- This is the name of your ServiceType. 
          This name must match the string used in RegisterServiceType call in Program.cs. -->
-    <StatefulServiceType ServiceTypeName="ModelProviderServiceType" HasPersistedState="true" />
+    <StatefulServiceType ServiceTypeName="CE.ModelProviderServiceType" HasPersistedState="true" />
   </ServiceTypes>
 
   <!-- Code package is your service executable. -->
   <CodePackage Name="Code" Version="1.0.0">
     <EntryPoint>
       <ExeHost>
-        <Program>ModelProviderService.exe</Program>
+        <Program>CE.ModelProviderService.exe</Program>
       </ExeHost>
     </EntryPoint>
   </CodePackage>
@@ -25,7 +25,7 @@
 
   <Resources>
     <Endpoints>
-      <Endpoint Name="ModelProviderServiceEndpoint" Protocol="tcp" Type="Input" />
+      <Endpoint Name="CeModelProviderServiceEndpoint" Protocol="tcp" Type="Input" />
     </Endpoints>
   </Resources>
 </ServiceManifest>

@@ -1,5 +1,4 @@
-﻿using CECommon.Model;
-using Common.CeContracts;
+﻿using Common.CeContracts;
 using Microsoft.ServiceFabric.Services.Client;
 using Microsoft.ServiceFabric.Services.Communication.Wcf.Client;
 using OMS.Common.Cloud;
@@ -13,8 +12,8 @@ namespace OMS.Common.WcfClient.CE
 {
 	public class MeasurementProviderClient : WcfSeviceFabricClientBase<IMeasurementProviderContract>, IMeasurementProviderContract
 	{
-		private static readonly string microserviceName = MicroserviceNames.MeasurementProviderService;
-		private static readonly string listenerName = EndpointNames.MeasurementProviderEndpoint;
+		private static readonly string microserviceName = MicroserviceNames.CeMeasurementProviderService;
+		private static readonly string listenerName = EndpointNames.CeMeasurementProviderEndpoint;
 		public MeasurementProviderClient(WcfCommunicationClientFactory<IMeasurementProviderContract> clientFactory, Uri serviceUri, ServicePartitionKey servicePartition)
 			: base(clientFactory, serviceUri, servicePartition, listenerName)
 		{

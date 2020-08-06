@@ -89,7 +89,11 @@
     <Reference Include="System.Xml" />
   </ItemGroup>
   <ItemGroup>
-    <Compile Include="DataContracts\Outage\OutageMessage.cs" />
+    <Compile Include="DataContracts\CE\CalculationEngineMessage.cs" />
+    <Compile Include="DataContracts\EMAIL\EmailServiceMessage.cs" />
+    <Compile Include="DataContracts\EMAIL\OutageEmailPublication.cs" />
+    <Compile Include="DataContracts\OMS\OutageMessage.cs" />
+    <Compile Include="DataContracts\OMS\OutagePublication.cs" />
     <Compile Include="DataContracts\SCADA\ModbusData.cs" />
     <Compile Include="DataContracts\Publication.cs" />
     <Compile Include="DataContracts\SCADA\ScadaMessage.cs" />
@@ -97,6 +101,8 @@
     <Compile Include="INotifySubscriberContract.cs" />
     <Compile Include="IPublisherContract.cs" />
     <Compile Include="IRegisterSubscriberContract.cs" />
+    <Compile Include="DataContracts\CE\OutageTopologyElement.cs" />
+    <Compile Include="DataContracts\CE\OutageTopologyModel.cs" />
     <Compile Include="Properties\AssemblyInfo.cs" />
   </ItemGroup>
   <ItemGroup>

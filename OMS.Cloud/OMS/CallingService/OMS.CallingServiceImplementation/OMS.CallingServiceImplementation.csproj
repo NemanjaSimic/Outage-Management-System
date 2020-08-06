@@ -1,0 +1,110 @@
+﻿<?xml version="1.0" encoding="utf-8"?>
+<Project ToolsVersion="15.0" xmlns="http://schemas.microsoft.com/developer/msbuild/2003">
+  <Import Project="$(MSBuildExtensionsPath)\$(MSBuildToolsVersion)\Microsoft.Common.props" Condition="Exists('$(MSBuildExtensionsPath)\$(MSBuildToolsVersion)\Microsoft.Common.props')" />
+  <PropertyGroup>
+    <Configuration Condition=" '$(Configuration)' == '' ">Debug</Configuration>
+    <Platform Condition=" '$(Platform)' == '' ">AnyCPU</Platform>
+    <ProjectGuid>{051C2B1F-7491-4576-A7ED-62628234B80A}</ProjectGuid>
+    <OutputType>Library</OutputType>
+    <AppDesignerFolder>Properties</AppDesignerFolder>
+    <RootNamespace>OMS.CallingServiceImplementation</RootNamespace>
+    <AssemblyName>OMS.CallingServiceImplementation</AssemblyName>
+    <TargetFrameworkVersion>v4.8</TargetFrameworkVersion>
+    <FileAlignment>512</FileAlignment>
+    <Deterministic>true</Deterministic>
+  </PropertyGroup>
+  <PropertyGroup Condition=" '$(Configuration)|$(Platform)' == 'Debug|AnyCPU' ">
+    <DebugSymbols>true</DebugSymbols>
+    <DebugType>full</DebugType>
+    <Optimize>false</Optimize>
+    <OutputPath>bin\Debug\</OutputPath>
+    <DefineConstants>DEBUG;TRACE</DefineConstants>
+    <ErrorReport>prompt</ErrorReport>
+    <WarningLevel>4</WarningLevel>
+    <PlatformTarget>x64</PlatformTarget>
+  </PropertyGroup>
+  <PropertyGroup Condition=" '$(Configuration)|$(Platform)' == 'Release|AnyCPU' ">
+    <DebugType>pdbonly</DebugType>
+    <Optimize>true</Optimize>
+    <OutputPath>bin\Release\</OutputPath>
+    <DefineConstants>TRACE</DefineConstants>
+    <ErrorReport>prompt</ErrorReport>
+    <WarningLevel>4</WarningLevel>
+  </PropertyGroup>
+  <ItemGroup>
+    <Reference Include="Microsoft.ServiceFabric.Preview, Version=7.0.0.0, Culture=neutral, PublicKeyToken=31bf3856ad364e35, processorArchitecture=AMD64">
+      <HintPath>..\packages\Microsoft.ServiceFabric.7.1.417\lib\net472\Microsoft.ServiceFabric.Preview.dll</HintPath>
+    </Reference>
+    <Reference Include="System" />
+    <Reference Include="System.Configuration" />
+    <Reference Include="System.Core" />
+    <Reference Include="System.Runtime.Serialization" />
+    <Reference Include="System.ServiceModel" />
+    <Reference Include="System.Xml.Linq" />
+    <Reference Include="System.Data.DataSetExtensions" />
+    <Reference Include="Microsoft.CSharp" />
+    <Reference Include="System.Data" />
+    <Reference Include="System.Net.Http" />
+    <Reference Include="System.Xml" />
+  </ItemGroup>
+  <ItemGroup>
+    <Compile Include="CallTracker.cs" />
+    <Compile Include="Properties\AssemblyInfo.cs" />
+  </ItemGroup>
+  <ItemGroup>
+    <ProjectReference Include="..\..\..\Common.OMS\Common.OMS.csproj">
+      <Project>{8F96A078-BE16-4363-9B89-0B313D2E0F5E}</Project>
+      <Name>Common.OMS</Name>
+    </ProjectReference>
+    <ProjectReference Include="..\..\..\Common\Common.Cloud\Common.Cloud.csproj">
+      <Project>{FBEE1369-0F6C-41E6-8C62-8C1C5CDBB602}</Project>
+      <Name>Common.Cloud</Name>
+    </ProjectReference>
+    <ProjectReference Include="..\..\..\Common\Common.PubSub\Common.PubSub.csproj">
+      <Project>{5B775779-A5AE-4F94-90EC-59973FA80D4D}</Project>
+      <Name>Common.PubSub</Name>
+    </ProjectReference>
+    <ProjectReference Include="..\..\..\Common\Common.WcfClient\Common.WcfClient.csproj">
+      <Project>{AE91CEB5-378A-4EEF-AEBF-C40ED1EF23CF}</Project>
+      <Name>Common.WcfClient</Name>
+    </ProjectReference>
+    <ProjectReference Include="..\..\..\Common\Contracts\Common.NmsContracts\Common.NmsContracts.csproj">
+      <Project>{235804A8-9C8F-40EC-8786-5DAB24733977}</Project>
+      <Name>Common.NmsContracts</Name>
+    </ProjectReference>
+    <ProjectReference Include="..\..\..\Common\Contracts\Common.PubSubContracts\Common.PubSubContracts.csproj">
+      <Project>{AA75150D-EE56-49C0-9431-751F83CCC0CD}</Project>
+      <Name>Common.PubSubContracts</Name>
+    </ProjectReference>
+  </ItemGroup>
+  <ItemGroup>
+    <None Include="app.config" />
+  </ItemGroup>
+  <ItemGroup>
+    <PackageReference Include="Microsoft.ServiceFabric">
+      <Version>7.1.417</Version>
+    </PackageReference>
+    <PackageReference Include="Microsoft.ServiceFabric.Data">
+      <Version>4.1.417</Version>
+    </PackageReference>
+    <PackageReference Include="Microsoft.ServiceFabric.Data.Extensions">
+      <Version>4.1.417</Version>
+    </PackageReference>
+    <PackageReference Include="Microsoft.ServiceFabric.Data.Interfaces">
+      <Version>4.1.417</Version>
+    </PackageReference>
+    <PackageReference Include="Microsoft.ServiceFabric.Diagnostics.Internal">
+      <Version>4.1.417</Version>
+    </PackageReference>
+    <PackageReference Include="Microsoft.ServiceFabric.FabricTransport.Internal">
+      <Version>4.1.417</Version>
+    </PackageReference>
+    <PackageReference Include="Microsoft.ServiceFabric.Services">
+      <Version>4.1.417</Version>
+    </PackageReference>
+    <PackageReference Include="Microsoft.ServiceFabric.Services.Remoting">
+      <Version>4.1.417</Version>
+    </PackageReference>
+  </ItemGroup>
+  <Import Project="$(MSBuildToolsPath)\Microsoft.CSharp.targets" />
+</Project>

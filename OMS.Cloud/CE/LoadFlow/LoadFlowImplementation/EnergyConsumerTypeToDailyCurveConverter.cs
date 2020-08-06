@@ -1,8 +1,8 @@
-﻿using CECommon;
+﻿using Common.CE;
 using OMS.Common.Cloud;
 using System;
 
-namespace LoadFlowImplementation
+namespace CE.LoadFlowImplementation
 {
 	public class EnergyConsumerTypeToDailyCurveConverter
 	{

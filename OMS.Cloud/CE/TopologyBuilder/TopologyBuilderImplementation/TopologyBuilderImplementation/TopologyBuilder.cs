@@ -1,7 +1,5 @@
-﻿using CECommon;
-using CECommon.Interfaces;
-using CECommon.Model;
-using CECommon.Models;
+﻿using Common.CE;
+using Common.CE.Interfaces;
 using Common.CeContracts;
 using OMS.Common.Cloud;
 using OMS.Common.Cloud.Logger;
@@ -12,9 +10,9 @@ using System.Collections.Generic;
 using System.Linq;
 using System.Threading.Tasks;
 
-namespace TopologyBuilderImplementation
+namespace CE.TopologyBuilderImplementation
 {
-    public class TopologyBuilder : ITopologyBuilderContract
+	public class TopologyBuilder : ITopologyBuilderContract
     {
         #region Fields
         private List<Field> fields;

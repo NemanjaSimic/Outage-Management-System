@@ -66,12 +66,17 @@ namespace OMS.Common.Cloud
                 { MicroserviceNames.TransactionManagerService,      ServiceType.STATEFUL_SERVICE    },
 
                 //TODO: CE
-                { MicroserviceNames.LoadFlowService,                ServiceType.STATELESS_SERVICE},
-                { MicroserviceNames.MeasurementProviderService,     ServiceType.STATEFUL_SERVICE},
-                { MicroserviceNames.ModelProviderService,           ServiceType.STATEFUL_SERVICE},
-                { MicroserviceNames.TopologyBuilderService,         ServiceType.STATELESS_SERVICE},
-                { MicroserviceNames.TopologyProviderService,        ServiceType.STATEFUL_SERVICE},
+                { MicroserviceNames.CeLoadFlowService,              ServiceType.STATELESS_SERVICE   },
+                { MicroserviceNames.CeMeasurementProviderService,   ServiceType.STATEFUL_SERVICE    },
+                { MicroserviceNames.CeModelProviderService,         ServiceType.STATEFUL_SERVICE    },
+                { MicroserviceNames.CeTopologyBuilderService,       ServiceType.STATELESS_SERVICE   },
+                { MicroserviceNames.CeTopologyProviderService,      ServiceType.STATEFUL_SERVICE    },
                 //TODO: OMS
+                { MicroserviceNames.OmsModelProviderService,        ServiceType.STATEFUL_SERVICE},
+                { MicroserviceNames.OmsOutageLifecycleService,      ServiceType.STATELESS_SERVICE},
+                { MicroserviceNames.OmsCallTrackingService,         ServiceType.STATELESS_SERVICE},
+                { MicroserviceNames.OmsHistoryDBManagerService,     ServiceType.STATEFUL_SERVICE},
+                { MicroserviceNames.OmsReportingService,            ServiceType.STATELESS_SERVICE},
 
                 //TODO: WEB_ADAPTER
                 { MicroserviceNames.WebAdapterService,              ServiceType.STATELESS_SERVICE},
@@ -98,14 +103,18 @@ namespace OMS.Common.Cloud
                 { MicroserviceNames.TransactionManagerService,      new Uri("fabric:/OMS.Cloud/TMS.TransactionManagerService")  },
 
                 //TODO: CE
-                { MicroserviceNames.LoadFlowService,                 new Uri("fabric:/OMS.Cloud/LoadFlowService")},
-                { MicroserviceNames.MeasurementProviderService,      new Uri("fabric:/OMS.Cloud/MeasurementProviderService")},
-                { MicroserviceNames.ModelProviderService,            new Uri("fabric:/OMS.Cloud/ModelProviderService")},
-                { MicroserviceNames.TopologyBuilderService,          new Uri("fabric:/OMS.Cloud/TopologyBuilderService")},
-                { MicroserviceNames.TopologyProviderService,         new Uri("fabric:/OMS.Cloud/TopologyProviderService")},
+                { MicroserviceNames.CeLoadFlowService,              new Uri("fabric:/OMS.Cloud/LoadFlowService")                },
+                { MicroserviceNames.CeMeasurementProviderService,   new Uri("fabric:/OMS.Cloud/MeasurementProviderService")     },
+                { MicroserviceNames.CeModelProviderService,         new Uri("fabric:/OMS.Cloud/ModelProviderService")           },
+                { MicroserviceNames.CeTopologyBuilderService,       new Uri("fabric:/OMS.Cloud/TopologyBuilderService")         },
+                { MicroserviceNames.CeTopologyProviderService,      new Uri("fabric:/OMS.Cloud/TopologyProviderService")        },
 
                 //TODO: OMS
-
+                { MicroserviceNames.OmsModelProviderService,         new Uri("fabric:/OMS.Cloud/OMS.ModelProviderService")},
+                { MicroserviceNames.OmsCallTrackingService,          new Uri("fabric:/OMS.Cloud/OMS.CallTrackingService")},
+                { MicroserviceNames.OmsHistoryDBManagerService,      new Uri("fabric:/OMS.Cloud/OMS.HistoryDBManagerService")},
+                { MicroserviceNames.OmsOutageLifecycleService,       new Uri("fabric:/OMS.Cloud/OMS.OutageLifecycleService")},
+                { MicroserviceNames.OmsReportingService,             new Uri("fabric:/OMS.Cloud/OMS.ReportingService")},                
                 //TODO: WEB_ADAPTER
                 { MicroserviceNames.WebAdapterService,               new Uri("fabric:/Cloud.Web/WebAdapterService")},
 

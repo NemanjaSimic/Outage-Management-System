@@ -17,14 +17,21 @@
         //PUB_SUB
         public const string PubSubService = "PubSubService";
 
-        //CE
-        public const string ModelProviderService = "ModelProviderService";
-        public const string TopologyProviderService = "TopologyProviderService";
-        public const string MeasurementProviderService = "MeasurementProviderService";
-        public const string LoadFlowService = "LoadFlowService";
-        public const string TopologyBuilderService = "TopologyBuilderService";
+        //OMS
+        public const string OmsModelProviderService = "OmsModelProviderService";
+        public const string OmsCallTrackingService = "OmsCallTrackingService";
+        public const string OmsHistoryDBManagerService = "OmsHistoryDBManagerService";
+        public const string OmsOutageLifecycleService = "OmsOutageLifecycleService";
+        public const string OmsReportingService = "OmsReportingService";
 
         //WEB
         public const string WebAdapterService = "WebAdapterService";
+        
+        //CE
+        public const string CeModelProviderService = "CeModelProviderService";
+        public const string CeTopologyProviderService = "CeTopologyProviderService";
+        public const string CeMeasurementProviderService = "CeMeasurementProviderService";
+        public const string CeLoadFlowService = "CeLoadFlowService";
+        public const string CeTopologyBuilderService = "CeTopologyBuilderService";
     }
 }

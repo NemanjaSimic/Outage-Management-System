@@ -18,6 +18,7 @@ using SCADA.ModelProviderImplementation.Data;
 using SCADA.ModelProviderImplementation.Helpers;
 using System;
 using System.Collections.Generic;
+using System.Text;
 using System.Threading.Tasks;
 
 namespace SCADA.ModelProviderImplementation.DistributedTransaction
@@ -216,7 +217,8 @@ namespace SCADA.ModelProviderImplementation.DistributedTransaction
                     }
                 }
 
-                success = true;
+                success = await CheckSuccessiveAddressCondition();
+;
             }
             catch (Exception e)
             {
@@ -251,6 +253,8 @@ namespace SCADA.ModelProviderImplementation.DistributedTransaction
                 Logger.LogInformation(message);
 
                 await SendModelUpdateCommands();
+
+                await LogAllReliableCollections();
             }
             catch (Exception e)
             {
@@ -274,6 +278,8 @@ namespace SCADA.ModelProviderImplementation.DistributedTransaction
 
                 string message = $"{baseLogString} Rollback => Incoming SCADA model is rejected.";
                 Logger.LogInformation(message);
+
+                await LogAllReliableCollections();
             }
             catch (Exception e)
             {
@@ -444,6 +450,7 @@ namespace SCADA.ModelProviderImplementation.DistributedTransaction
 
             Dictionary<ushort, long> incomingAddressToGidMapDictionary;
             var type = (short)oldPointItem.RegisterType;
+
             var addressToGidMapResult = await IncomingAddressToGidMap.TryGetValueAsync(type);
 
             if (!addressToGidMapResult.HasValue)
@@ -566,6 +573,37 @@ namespace SCADA.ModelProviderImplementation.DistributedTransaction
             Logger.LogDebug(debugMessage);
         }
 
+        private async Task<bool> CheckSuccessiveAddressCondition()
+        {
+            bool condition = true;
+
+            var addressToGidMapDictionary = await IncomingAddressToGidMap.GetEnumerableDictionaryAsync();
+
+            foreach(var type in addressToGidMapDictionary.Keys)
+            {
+                var addressToGidMap = addressToGidMapDictionary[type];
+
+                for (ushort address = 1; address <= addressToGidMap.Values.Count; address++)
+                {
+                    condition = addressToGidMap.ContainsKey(address);
+
+                    if (condition == false)
+                    {
+                        string errorMessage = $"{baseLogString} CheckSuccessiveAddressCondition => Addresses of {(PointType)type} measurements are not successive. Probably a problem with cim/xml.";
+                        Logger.LogError(errorMessage);
+                        break;
+                    }
+                }
+
+                if(condition == false)
+                {
+                    break;
+                }
+            }
+
+            return condition;
+        }
+
         private async Task SendModelUpdateCommands()
         {
             IScadaCommandingContract scadaCommandingClient = ScadaCommandingClient.CreateClient();
@@ -592,7 +630,10 @@ namespace SCADA.ModelProviderImplementation.DistributedTransaction
                         analogCommandingValues.Add(gid, analogPointItem.CurrentEguValue);
                     }
 
-                    await scadaCommandingClient.SendMultipleAnalogCommand(analogCommandingValues, CommandOriginType.MODEL_UPDATE_COMMAND);
+                    if(analogCommandingValues.Count > 0)
+                    {
+                        await scadaCommandingClient.SendMultipleAnalogCommand(analogCommandingValues, CommandOriginType.MODEL_UPDATE_COMMAND);
+                    }
                 }),
 
                 Task.Run(async () =>
@@ -614,11 +655,91 @@ namespace SCADA.ModelProviderImplementation.DistributedTransaction
                         discreteCommandingValues.Add(gid, discretePointItem.CurrentValue);
                     }
 
-                    await scadaCommandingClient.SendMultipleDiscreteCommand(discreteCommandingValues, CommandOriginType.MODEL_UPDATE_COMMAND);
+                    if(discreteCommandingValues.Count > 0)
+                    {
+                        await scadaCommandingClient.SendMultipleDiscreteCommand(discreteCommandingValues, CommandOriginType.MODEL_UPDATE_COMMAND);
+                    }
                 }),
             };
 
             Task.WaitAll(tasks.ToArray());
+        }
+
+        private async Task LogAllReliableCollections()
+        {
+            while (!ReliableDictionariesInitialized)
+            {
+                await Task.Delay(1000);
+            }
+
+            StringBuilder sb = new StringBuilder();
+            sb.AppendLine("Reliable Collections");
+
+            sb.AppendLine("CurrentGidToPointItemMap =>");
+            var currentGidToPointItemMap = await CurrentGidToPointItemMap.GetEnumerableDictionaryAsync();
+            foreach(var element in currentGidToPointItemMap)
+            {
+                sb.AppendLine($"Key => {element.Key}, Value => Gid: 0x{element.Value.Gid:X16}, Address: {element.Value.Address}, Name: {element.Value.Name}, RegisterType: {element.Value.RegisterType}, Alarm: {element.Value.Alarm}, Initialized: {element.Value.Initialized}");
+            }
+            sb.AppendLine();
+
+            sb.AppendLine("IncomingGidToPointItemMap =>");
+            var incomingGidToPointItemMap = await IncomingGidToPointItemMap.GetEnumerableDictionaryAsync();
+            foreach (var element in incomingGidToPointItemMap)
+            {
+                sb.AppendLine($"Key => {element.Key}, Value => Gid: 0x{element.Value.Gid:X16}, Address: {element.Value.Address}, Name: {element.Value.Name}, RegisterType: {element.Value.RegisterType}, Alarm: {element.Value.Alarm}, Initialized: {element.Value.Initialized}");
+            }
+            sb.AppendLine();
+
+            sb.AppendLine("CurrentAddressToGidMap =>");
+            var currentAddressToGidMap = await CurrentAddressToGidMap.GetEnumerableDictionaryAsync();
+            foreach (var element in currentAddressToGidMap)
+            {
+                sb.AppendLine($"Key => {element.Key}, Value => Dictionary Count: {element.Value.Count}");
+            }
+            sb.AppendLine();
+
+            sb.AppendLine("IncomingAddressToGidMap =>");
+            var incomingAddressToGidMap = await IncomingAddressToGidMap.GetEnumerableDictionaryAsync();
+            foreach (var element in incomingAddressToGidMap)
+            {
+                sb.AppendLine($"Key => {element.Key}, Value => Dictionary Count: {element.Value.Count}");
+            }
+            sb.AppendLine();
+
+            sb.AppendLine("InfoCache =>");
+            var infoCache = await InfoCache.GetEnumerableDictionaryAsync();
+            foreach (var element in infoCache)
+            {
+                sb.AppendLine($"Key => {element.Key}, Value => {element.Value}");
+            }
+            sb.AppendLine();
+
+            sb.AppendLine("ModelChanges =>");
+            var modelChanges = await ModelChanges.GetEnumerableDictionaryAsync();
+            foreach (var element in modelChanges)
+            {
+                sb.AppendLine($"Key => {element.Key}, Value => List Count: {element.Value.Count}");
+            }
+            sb.AppendLine();
+
+            sb.AppendLine("MeasurementsCache =>");
+            var measurementsCache = await MeasurementsCache.GetEnumerableDictionaryAsync();
+            foreach (var element in measurementsCache)
+            {
+                sb.AppendLine($"Key => {element.Key}, Value => MeasurementGid: {element.Value.MeasurementGid:X16}, Alarm: {element.Value.Alarm}, CommandOrigin: {element.Value.CommandOrigin}");
+            }
+            sb.AppendLine();
+
+            sb.AppendLine("CommandDescriptionCache =>");
+            var commandDescriptionCache = await CommandDescriptionCache.GetEnumerableDictionaryAsync();
+            foreach (var element in commandDescriptionCache)
+            {
+                sb.AppendLine($"Key => {element.Key}, Value => Gid: {element.Value.Gid:X16}, Address: {element.Value.Address}, Value: {element.Value.Value}, CommandOrigin: {element.Value.CommandOrigin}");
+            }
+            sb.AppendLine();
+
+            Logger.LogDebug($"{baseLogString} LogAllReliableCollections => {sb}");
         }
         #endregion Private Methods
     }

@@ -1,5 +1,4 @@
-﻿using CECommon.Model;
-using Common.CE;
+﻿using Common.CE;
 using Common.CeContracts;
 using Microsoft.ServiceFabric.Data;
 using Microsoft.ServiceFabric.Data.Notifications;
@@ -13,7 +12,7 @@ using System;
 using System.Collections.Generic;
 using System.Threading.Tasks;
 
-namespace MeasurementProviderImplementation
+namespace CE.MeasurementProviderImplementation
 {
 	public class MeasurementProvider : IMeasurementProviderContract
 	{

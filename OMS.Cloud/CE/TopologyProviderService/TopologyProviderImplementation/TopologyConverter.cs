@@ -1,19 +1,18 @@
-﻿using CECommon;
-using CECommon.Interface;
-using CECommon.Interfaces;
-using CECommon.Model;
+﻿using Common.CE.Interfaces;
 using Common.CeContracts;
+using Common.OMS.OutageModel;
 using OMS.Common.Cloud.Logger;
 using OMS.Common.NmsContracts;
+using OMS.Common.PubSub;
 using OMS.Common.WcfClient.CE;
 using System;
 using System.Collections.Generic;
 using System.Linq;
 using System.Threading.Tasks;
 
-namespace TopologyProviderImplementation
+namespace CE.TopologyProviderImplementation
 {
-    public class TopologyConverter : ITopologyConverterContract
+	public class TopologyConverter : ITopologyConverterContract
     {
         private readonly MeasurementProviderClient measurementProviderClient;
         private readonly ModelProviderClient modelProviderClient;
@@ -91,7 +90,7 @@ namespace TopologyProviderImplementation
                         }
                     }
 
-                    List<UIMeasurement> measurements = new List<UIMeasurement>();
+                    List<IUIMeasurement> measurements = new List<IUIMeasurement>();
                     foreach (var measurementGid in element.Measurements.Keys)
                     {
                         Logger.LogDebug($"{baseLogString} ConvertTopologyToUIModel => Calling GetDiscreteMeasurement method from measurement provider client for measurement GID {measurementGid:X16}.");

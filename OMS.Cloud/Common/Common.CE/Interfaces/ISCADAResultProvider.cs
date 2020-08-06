@@ -1,6 +1,6 @@
 ﻿using Common.PubSub;
 
-namespace CECommon.Interfaces
+namespace Common.CE.Interfaces
 {
     public interface ISCADAResultHandler
     {

@@ -1,7 +1,5 @@
-﻿using CECommon;
-using CECommon.Interfaces;
-using CECommon.Model;
-using CECommon.Models;
+﻿using Common.CE.Interfaces;
+using Common.CeContracts;
 using OMS.Common.Cloud;
 using OMS.Common.Cloud.Logger;
 using OMS.Common.NmsContracts;
@@ -12,7 +10,7 @@ using System.Collections.Generic;
 using System.Linq;
 using System.Threading.Tasks;
 
-namespace ModelProviderImplementation
+namespace CE.ModelProviderImplementation
 {
 	public class ModelManager : IModelManager
 	{
@@ -108,7 +106,7 @@ namespace ModelProviderImplementation
 		}
 
 		#region Functions
-		public async Task<ModelDelta> TryGetAllModelEntitiesAsync()
+		public async Task<IModelDelta> TryGetAllModelEntitiesAsync()
 		{
 			string verboseMessage = $"{baseLogString} entering TryGetAllModelEntities method.";
 			Logger.LogVerbose(verboseMessage);

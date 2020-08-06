@@ -1,4 +1,4 @@
-﻿namespace CECommon.Interfaces
+﻿namespace Common.CE.Interfaces
 {
     public interface IMeasurement : IGraphElement
     {

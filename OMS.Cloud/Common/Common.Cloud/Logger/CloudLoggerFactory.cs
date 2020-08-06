@@ -9,7 +9,8 @@ namespace OMS.Common.Cloud.Logger
     public static class CloudLoggerFactory
     {
         private const string loggerSourceNameKey = "loggerSourceNameKey";
-        
+        private static readonly object lockSync = new object();
+
         private static Dictionary<string, CloudLogger> loggers;
         private static Dictionary<string, CloudLogger> Loggers
         {
@@ -25,7 +26,14 @@ namespace OMS.Common.Cloud.Logger
 
             if (!Loggers.ContainsKey(sourceName))
             {
-                Loggers[sourceName] = new CloudLogger(sourceName);
+                lock(lockSync)
+                {
+                    if (!Loggers.ContainsKey(sourceName))
+                    {
+                        var logger = new CloudLogger(sourceName);
+                        Loggers.Add(sourceName, logger);
+                    }
+                }
             }
 
             return Loggers[sourceName];

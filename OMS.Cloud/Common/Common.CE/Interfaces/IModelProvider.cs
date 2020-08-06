@@ -1,9 +1,8 @@
-﻿using CECommon.Models;
-using System.Collections.Generic;
+﻿using System.Collections.Generic;
 
-namespace CECommon.Interfaces
+namespace Common.CE.Interfaces
 {
-    public interface IModelProvider
+	public interface IModelProvider
     {
         List<long> GetEnergySources();
         Dictionary<long, List<long>> GetConnections();

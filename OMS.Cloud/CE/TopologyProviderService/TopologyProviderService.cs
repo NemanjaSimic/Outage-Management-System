@@ -3,10 +3,8 @@ using System.Collections.Generic;
 using System.Fabric;
 using System.Threading;
 using System.Threading.Tasks;
-using CECommon;
-using CECommon.Interface;
-using CECommon.Interfaces;
 using Common.CE;
+using Common.CE.Interfaces;
 using Common.CeContracts;
 using Common.CeContracts.TopologyProvider;
 using Microsoft.ServiceFabric.Data;
@@ -17,9 +15,11 @@ using Microsoft.ServiceFabric.Services.Communication.Wcf.Runtime;
 using Microsoft.ServiceFabric.Services.Runtime;
 using OMS.Common.Cloud.Logger;
 using OMS.Common.Cloud.Names;
-using TopologyProviderImplementation;
+using OMS.Common.PubSub;
+using ReliableDictionaryNames = Common.CE.ReliableDictionaryNames;
+using CE.TopologyProviderImplementation;
 
-namespace TopologyProviderService
+namespace CE.TopologyProviderService
 {
 	/// <summary>
 	/// An instance of this class is created for each service replica by the Service Fabric runtime.
@@ -76,16 +76,16 @@ namespace TopologyProviderService
 					return new WcfCommunicationListener<ITopologyProviderContract>(context,
 																			this.topologyProvider,
 																			WcfUtility.CreateTcpListenerBinding(),
-																			EndpointNames.TopologyProviderServiceEndpoint);
-				}, EndpointNames.TopologyProviderServiceEndpoint),
+																			EndpointNames.CeTopologyProviderServiceEndpoint);
+				}, EndpointNames.CeTopologyProviderServiceEndpoint),
 
 				new ServiceReplicaListener(context =>
 				{
 					return new WcfCommunicationListener<ITopologyConverterContract>(context,
 																			this.topologyConverter,
 																			WcfUtility.CreateTcpListenerBinding(),
-																			EndpointNames.TopologyConverterServiceEndpoint);
-				}, EndpointNames.TopologyConverterServiceEndpoint),
+																			EndpointNames.CeTopologyConverterServiceEndpoint);
+				}, EndpointNames.CeTopologyConverterServiceEndpoint),
 			};
 		}
 

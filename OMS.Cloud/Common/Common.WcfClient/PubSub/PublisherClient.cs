@@ -12,7 +12,7 @@ using System.Threading.Tasks;
 namespace OMS.Common.WcfClient.PubSub
 {
     public class PublisherClient : WcfSeviceFabricClientBase<IPublisherContract>, IPublisherContract
-    {
+	{
         private static readonly string microserviceName = MicroserviceNames.PubSubService;
         private static readonly string listenerName = EndpointNames.PubSubPublisherEndpoint;
 

@@ -1,6 +1,6 @@
 ﻿using OMS.Common.Cloud;
 
-namespace CECommon.Interfaces
+namespace Common.CE.Interfaces
 {
     public interface ISCADACommanding
     {

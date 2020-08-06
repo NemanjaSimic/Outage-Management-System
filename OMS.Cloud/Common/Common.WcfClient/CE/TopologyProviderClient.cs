@@ -1,10 +1,10 @@
-﻿using CECommon;
-using CECommon.Interface;
-using CECommon.Interfaces;
+﻿using Common.CE.Interfaces;
+using Common.CeContracts;
 using Common.CeContracts.TopologyProvider;
 using Microsoft.ServiceFabric.Services.Client;
 using Microsoft.ServiceFabric.Services.Communication.Wcf.Client;
 using OMS.Common.Cloud.Names;
+using OMS.Common.PubSub;
 using System;
 using System.Threading.Tasks;
 
@@ -12,8 +12,8 @@ namespace OMS.Common.WcfClient.CE
 {
 	public class TopologyProviderClient : WcfSeviceFabricClientBase<ITopologyProviderContract>, ITopologyProviderContract
 	{
-		private static readonly string microserviceName = MicroserviceNames.TopologyProviderService;
-		private static readonly string listenerName = EndpointNames.TopologyProviderServiceEndpoint;
+		private static readonly string microserviceName = MicroserviceNames.CeTopologyProviderService;
+		private static readonly string listenerName = EndpointNames.CeTopologyProviderServiceEndpoint;
 
 		public TopologyProviderClient(WcfCommunicationClientFactory<ITopologyProviderContract> clientFactory, Uri serviceUri, ServicePartitionKey servicePartition)
 			: base(clientFactory, serviceUri, servicePartition, listenerName)

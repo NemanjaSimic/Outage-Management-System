@@ -16,7 +16,6 @@ using SCADA.ModelProviderImplementation.Helpers;
 using System;
 using System.Collections.Generic;
 using System.Diagnostics;
-using System.ServiceModel;
 using System.Threading.Tasks;
 
 namespace SCADA.ModelProviderImplementation
@@ -483,7 +482,10 @@ namespace SCADA.ModelProviderImplementation
                         analogCommandingValues.Add(gid, analogPointItem.CurrentEguValue);
                     }
 
-                    await scadaCommandingClient.SendMultipleAnalogCommand(analogCommandingValues, CommandOriginType.MODEL_UPDATE_COMMAND);
+                    if(analogCommandingValues.Count > 0)
+                    {
+                        await scadaCommandingClient.SendMultipleAnalogCommand(analogCommandingValues, CommandOriginType.MODEL_UPDATE_COMMAND);
+                    }
                 }),
 
                 Task.Run(async () =>
@@ -505,7 +507,10 @@ namespace SCADA.ModelProviderImplementation
                         discreteCommandingValues.Add(gid, discretePointItem.CurrentValue);
                     }
 
-                    await scadaCommandingClient.SendMultipleDiscreteCommand(discreteCommandingValues, CommandOriginType.MODEL_UPDATE_COMMAND);
+                    if(discreteCommandingValues.Count > 0)
+                    {
+                        await scadaCommandingClient.SendMultipleDiscreteCommand(discreteCommandingValues, CommandOriginType.MODEL_UPDATE_COMMAND);
+                    }
                 }),
             };
 
