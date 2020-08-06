@@ -31,6 +31,10 @@
     <WarningLevel>4</WarningLevel>
   </PropertyGroup>
   <ItemGroup>
+    <Reference Include="Common.CeContracts, Version=1.0.0.0, Culture=neutral, processorArchitecture=MSIL">
+      <SpecificVersion>False</SpecificVersion>
+      <HintPath>..\..\OMS.Cloud\Common\Contracts\Common.CeContracts\bin\Debug\Common.CeContracts.dll</HintPath>
+    </Reference>
     <Reference Include="Microsoft.AspNet.SignalR.Client, Version=2.4.1.0, Culture=neutral, PublicKeyToken=31bf3856ad364e35, processorArchitecture=MSIL">
       <HintPath>..\Cloud.Web\packages\Microsoft.AspNet.SignalR.Client.2.4.1\lib\net45\Microsoft.AspNet.SignalR.Client.dll</HintPath>
     </Reference>
@@ -127,6 +131,10 @@
     <Reference Include="Newtonsoft.Json, Version=6.0.0.0, Culture=neutral, PublicKeyToken=30ad4fe6b2a6aeed, processorArchitecture=MSIL">
       <HintPath>..\Cloud.Web\packages\Newtonsoft.Json.6.0.4\lib\net45\Newtonsoft.Json.dll</HintPath>
     </Reference>
+    <Reference Include="OMS.Common.PubSub, Version=1.0.0.0, Culture=neutral, processorArchitecture=AMD64">
+      <SpecificVersion>False</SpecificVersion>
+      <HintPath>..\..\OMS.Cloud\Common\Common.PubSub\bin\Debug\OMS.Common.PubSub.dll</HintPath>
+    </Reference>
     <Reference Include="System" />
     <Reference Include="System.Buffers, Version=4.0.3.0, Culture=neutral, PublicKeyToken=cc7b13ffcd2ddd51, processorArchitecture=MSIL">
       <HintPath>..\Cloud.Web\packages\System.Buffers.4.5.1\lib\net461\System.Buffers.dll</HintPath>
@@ -187,6 +195,10 @@
     <Compile Include="HubDispatchers\GraphHubDispatcher.cs" />
     <Compile Include="HubDispatchers\OutageHubDispatcher.cs" />
     <Compile Include="HubDispatchers\ScadaHubDispatcher.cs" />
+    <Compile Include="NotificationSubscribers\OutageNotification.cs" />
+    <Compile Include="NotificationSubscribers\SCADANotification.cs" />
+    <Compile Include="NotificationSubscribers\TopologyNotification.cs" />
+    <Compile Include="NotifySubscriberProvider.cs" />
     <Compile Include="Properties\AssemblyInfo.cs" />
     <Compile Include="WebAdapterProvider.cs" />
   </ItemGroup>

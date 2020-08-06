@@ -34,6 +34,7 @@
     <Reference Include="Common.CeContracts">
       <HintPath>..\..\..\..\OMS.Cloud\Common\Contracts\Common.CeContracts\bin\Debug\Common.CeContracts.dll</HintPath>
     </Reference>
+    <Reference Include="Common.OMS, Version=1.0.0.0, Culture=neutral, PublicKeyToken=null" />
     <Reference Include="Common.OmsContracts, Version=1.0.0.0, Culture=neutral, processorArchitecture=AMD64">
       <SpecificVersion>False</SpecificVersion>
       <HintPath>..\..\..\..\OMS.Cloud\Common.OmsContracts\bin\Debug\Common.OmsContracts.dll</HintPath>

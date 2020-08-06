@@ -1,14 +1,13 @@
 ﻿using Common.Web.Services.Commands;
-using Common.Web.Models;
-using Common.Web.Models.BindingModels;
 using Common.Web.Models.ViewModels;
 using MediatR;
-using OMS.Common.Cloud.Names;
 using System;
 using System.Threading;
 using System.Threading.Tasks;
 using ILogger = OMS.Common.Cloud.Logger.ICloudLogger;
-using Common.Contracts.WebAdapterContracts;
+using OMS.Common.WcfClient.OMS;
+using Common.OmsContracts.Report;
+using ReportType = OMS.Common.Cloud.ReportType;
 
 namespace Common.Web.Services.Handlers
 {
@@ -21,42 +20,35 @@ namespace Common.Web.Services.Handlers
             _logger = logger;
         }
 
-        public Task<ReportViewModel> Handle(GenerateReportCommand request, CancellationToken cancellationToken)
+        public async Task<ReportViewModel> Handle(GenerateReportCommand request, CancellationToken cancellationToken)
         {
-            return Task.Run(() =>
+            IReportingContract reportingClient = ReportingClient.CreateClient();
+            try
             {
-                
-                //using (OutageAccessProxy outageProxy = _proxyFactory.CreateProxy<OutageAccessProxy, IOutageAccessContract>(EndpointNames.OutageAccessEndpoint))
-                //{
-                    try
-                    {
-                        _logger.LogInformation("[ReportCommandHandler::GenerateReport] Sending a Generate command to Outage service.");
+                _logger.LogInformation("[ReportCommandHandler::GenerateReport] Sending a Generate command to Outage service.");
 
-                        var options = new ReportOptions
-                        {
-                            Type = (ReportType)request.Options.Type,
-                            ElementId = request.Options.ElementId,
-                            StartDate = request.Options.StartDate,
-                            EndDate = request.Options.EndDate
-                        };
+                var options = new OMS.Report.ReportOptions
+                {
+                    Type = (ReportType)request.Options.Type,
+                    ElementId = request.Options.ElementId,
+                    StartDate = request.Options.StartDate,
+                    EndDate = request.Options.EndDate
+                };
 
-                        //var report = outageProxy.GenerateReport(options);
+                var report = await reportingClient.GenerateReport(options);
 
-                        return new ReportViewModel
-                        {
-                            //Data = report.Data,
-                            //Type = report.Type
-                        };
-                    }
-                    catch (Exception ex)
-                    {
-                        _logger.LogError("[ReportCommandHandler::GenerateReport] Failed to generate active outages from Outage service.", ex);
-                        throw ex;
-                    }
-                //}
+                return new ReportViewModel
+                {
+                    Data = report.Data,
+                    Type = report.Type
+                };
+            }
+            catch (Exception ex)
+            {
+                _logger.LogError("[ReportCommandHandler::GenerateReport] Failed to generate active outages from Outage service.", ex);
+                throw ex;
+            }
 
-
-            }, cancellationToken);
         }
     }
 }

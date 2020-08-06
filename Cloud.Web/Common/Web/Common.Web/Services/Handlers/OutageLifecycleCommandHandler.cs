@@ -1,9 +1,8 @@
-﻿using Common.Contracts.WebAdapterContracts;
-using Common.OmsContracts.OutageLifecycle;
+﻿using Common.OmsContracts.OutageLifecycle;
 using Common.Web.Services.Commands;
 using MediatR;
-using OMS.Common.Cloud.Names;
 using OMS.Common.WcfClient.OMS;
+using OMS.Common.WcfClient.OMS.Lifecycle;
 using System;
 using System.Threading;
 using System.Threading.Tasks;
@@ -26,113 +25,94 @@ namespace Common.Web.Services.Handlers
             _logger = logger;
         }
 
-        public Task<Unit> Handle(IsolateOutageCommand request, CancellationToken cancellationToken)
+        public async Task<Unit> Handle(IsolateOutageCommand request, CancellationToken cancellationToken)
         {
-            return Task.Run<Unit>(() =>
+            _logger.LogInformation($"[OutageLifecycleCommandHandler::IsolateOutageCommand] Sending isolate outage command for outage: {request.OutageId}");
+
+            IIsolateOutageContract isolateOutageClient = IsolateOutageClient.CreateClient();
+            try
             {
-                _logger.LogInformation($"[OutageLifecycleCommandHandler::IsolateOutageCommand] Sending isolate outage command for outage: {request.OutageId}");
+                await isolateOutageClient.IsolateOutage(request.OutageId);
+            }
+            catch (Exception ex)
+            {
+                _logger.LogError("[OutageLifecycleCommandHandler::IsolateOutageCommand] OutageLifecycleCommandHandler failed on IsolateOutage handler.", ex);
+                throw;
+            }
 
-                
-                //using (OutageLifecycleUICommandingProxy commandingProxy = _proxyFactory.CreateProxy<OutageLifecycleUICommandingProxy, IOutageLifecycleUICommandingContract>(EndpointNames.OutageLifecycleUICommandingEndpoint))
-                {
-                    try
-                    {
-                        //commandingProxy.IsolateOutage(request.OutageId);
-                    }
-                    catch (Exception ex)
-                    {
-                        _logger.LogError("[OutageLifecycleCommandHandler::IsolateOutageCommand] OutageLifecycleCommandHandler failed on IsolateOutage handler.", ex);
-                        throw;
-                    }
-                }
-
-                return Task.FromResult(new Unit());
-            }, cancellationToken);
+            return new Unit();
         }
 
-        public Task<Unit> Handle(SendOutageLocationIsolationCrewCommand request, CancellationToken cancellationToken)
+        public async Task<Unit> Handle(SendOutageLocationIsolationCrewCommand request, CancellationToken cancellationToken)
         {
-            return Task.Run<Unit>(() =>
+            _logger.LogInformation($"[OutageLifecycleCommandHandler::SendOutageLocationIsolationCrewCommand] Sending outage location isolation crew command for outage: {request.OutageId}");
+
+            ISendLocationIsolationCrewContract sendLocationIsolationCrewClient = SendLocationIsolationCrewClient.CreateClient();
+            try
             {
-                _logger.LogInformation($"[OutageLifecycleCommandHandler::SendOutageLocationIsolationCrewCommand] Sending outage location isolation crew command for outage: {request.OutageId}");
+                await sendLocationIsolationCrewClient.SendLocationIsolationCrew(request.OutageId);
+            }
+            catch (Exception ex)
+            {
+                _logger.LogError("[OutageLifecycleCommandHandler::SendOutageLocationIsolationCrewCommand] OutageLifecycleCommandHandler failed on SendOutageLocationIsolationCrew handler.", ex);
+                throw;
+            }
 
-                ISendLocationIsolationCrewContract sendLocationIsolationCrewClient = SendLocationIsolationCrewClient.CreateClient();
-                try
-                {
-                    sendLocationIsolationCrewClient.SendLocationIsolationCrew(request.OutageId);
-                }
-                catch (Exception ex)
-                {
-                    _logger.LogError("[OutageLifecycleCommandHandler::SendOutageLocationIsolationCrewCommand] OutageLifecycleCommandHandler failed on SendOutageLocationIsolationCrew handler.", ex);
-                    throw;
-                }
-
-                return Task.FromResult(new Unit());
-            }, cancellationToken);
+            return new Unit();
         }
 
-        public Task<Unit> Handle(SendOutageRepairCrewCommand request, CancellationToken cancellationToken)
+        public async Task<Unit> Handle(SendOutageRepairCrewCommand request, CancellationToken cancellationToken)
         {
-            return Task.Run<Unit>(() =>
+            _logger.LogInformation($"[OutageLifecycleCommandHandler::SendOutageRepairCrewCommand] Sending outage repair crew command for outage: {request.OutageId}");
+
+            ISendRepairCrewContract sendRepairCrewClient = SendRepairCrewClient.CreateClient();
+            try
             {
-                _logger.LogInformation($"[OutageLifecycleCommandHandler::SendOutageRepairCrewCommand] Sending outage repair crew command for outage: {request.OutageId}");
+                await sendRepairCrewClient.SendRepairCrew(request.OutageId);
+            }
+            catch (Exception ex)
+            {
+                _logger.LogError("[OutageLifecycleCommandHandler::SendOutageRepairCrewCommand] OutageLifecycleCommandHandler failed on SendOutageRepairCrew handler.", ex);
+                throw;
+            }
 
-                ISendRepairCrewContract sendRepairCrewClient = SendRepairCrewClient.CreateClient();
-                try
-                {
-                    sendRepairCrewClient.SendRepairCrew(request.OutageId);
-                }
-                catch (Exception ex)
-                {
-                    _logger.LogError("[OutageLifecycleCommandHandler::SendOutageRepairCrewCommand] OutageLifecycleCommandHandler failed on SendOutageRepairCrew handler.", ex);
-                    throw;
-                }
-
-                return Task.FromResult(new Unit());
-            }, cancellationToken);
+            return new Unit();
         }
 
-        public Task<Unit> Handle(ValidateResolveConditionsCommand request, CancellationToken cancellationToken)
+        public async Task<Unit> Handle(ValidateResolveConditionsCommand request, CancellationToken cancellationToken)
         {
-            return Task.Run<Unit>(() =>
+            _logger.LogInformation($"[OutageLifecycleCommandHandler::ValidateResolveConditionsCommand] Sending validate resolve conditions command for outage: {request.OutageId}");
+
+            IValidateResolveConditionsContract validateResolveConditionsClient = ValidateResolveConditionsClient.CreateClient();
+            try
             {
-                _logger.LogInformation($"[OutageLifecycleCommandHandler::ValidateResolveConditionsCommand] Sending validate resolve conditions command for outage: {request.OutageId}");
+                await validateResolveConditionsClient.ValidateResolveConditions(request.OutageId);
+            }
+            catch (Exception ex)
+            {
+                _logger.LogError("[OutageLifecycleCommandHandler::ValidateResolveConditionsCommand] OutageLifecycleCommandHandler failed on ValidateResolveConditions handler.", ex);
+                throw;
+            }
 
-                IValidateResolveConditionsContract validateResolveConditionsClient = ValidateResolveConditionsClient.CreateClient();
-                try
-                {
-                    validateResolveConditionsClient.ValidateResolveConditions(request.OutageId);
-                }
-                catch (Exception ex)
-                {
-                    _logger.LogError("[OutageLifecycleCommandHandler::ValidateResolveConditionsCommand] OutageLifecycleCommandHandler failed on ValidateResolveConditions handler.", ex);
-                    throw;
-                }
-
-                return Task.FromResult(new Unit());
-            }, cancellationToken);
+            return new Unit();
         }
 
-        public Task<Unit> Handle(ResolveOutageCommand request, CancellationToken cancellationToken)
+        public async Task<Unit> Handle(ResolveOutageCommand request, CancellationToken cancellationToken)
         {
-            return Task.Run<Unit>(() =>
+            _logger.LogInformation($"[OutageLifecycleCommandHandler::IsolateOutageCommand] Sending isolate outage command for outage: {request.OutageId}");
+
+            IResolveOutageContract resolveOutageClient = ResolveOutageClient.CreateClient();
+            try
             {
-                _logger.LogInformation($"[OutageLifecycleCommandHandler::IsolateOutageCommand] Sending isolate outage command for outage: {request.OutageId}");
+                await resolveOutageClient.ResolveOutage(request.OutageId);
+            }
+            catch (Exception ex)
+            {
+                _logger.LogError("[OutageLifecycleCommandHandler::IsolateOutageCommand] OutageLifecycleCommandHandler failed on IsolateOutage handler.", ex);
+                throw;
+            }
 
-                IResolveOutageContract resolveOutageClient = ResolveOutageClient.CreateClient();
-                try
-                {
-                    resolveOutageClient.ResolveOutage(request.OutageId);
-                }
-                catch (Exception ex)
-                {
-                    _logger.LogError("[OutageLifecycleCommandHandler::IsolateOutageCommand] OutageLifecycleCommandHandler failed on IsolateOutage handler.", ex);
-                    throw;
-                }
-
-
-                return Task.FromResult(new Unit());
-            }, cancellationToken);
+            return new Unit();
         }
     }
 }

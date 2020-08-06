@@ -12,6 +12,6 @@ namespace Common.OmsContracts.OutageLifecycle
 	public interface IIsolateOutageContract : IService
 	{
 		[OperationContract]
-		void IsolateOutage(long outageId);
+		Task IsolateOutage(long outageId);
 	}
 }

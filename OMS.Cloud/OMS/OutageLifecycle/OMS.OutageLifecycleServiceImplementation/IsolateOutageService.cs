@@ -9,7 +9,7 @@ namespace OMS.OutageLifecycleServiceImplementation
 {
 	public class IsolateOutageService : IIsolateOutageContract
 	{
-		public void IsolateOutage(long outageId)
+		public Task IsolateOutage(long outageId)
 		{
 			throw new NotImplementedException();
 		}

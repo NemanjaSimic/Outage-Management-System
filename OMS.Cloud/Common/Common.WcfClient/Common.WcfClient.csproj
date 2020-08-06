@@ -112,7 +112,9 @@
     <Reference Include="WindowsBase" />
   </ItemGroup>
   <ItemGroup>
+    <Compile Include="OMS\Lifecycle\IsolateOutageClient.cs" />
     <Compile Include="OMS\Lifecycle\ReportOutageClient.cs" />
+    <Compile Include="OMS\OutageAccessClient.cs" />
     <Compile Include="OMS\OutageModelUpdateAccessClient.cs" />
     <Compile Include="OMS\HistoryDBManagerClient.cs" />
     <Compile Include="OMS\ReportingClient.cs" />

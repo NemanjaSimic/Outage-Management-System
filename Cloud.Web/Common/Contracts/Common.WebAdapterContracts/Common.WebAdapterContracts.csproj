@@ -90,20 +90,11 @@
     <Reference Include="System.Xml" />
   </ItemGroup>
   <ItemGroup>
-    <Compile Include="IPubSubClient.cs" />
-    <Compile Include="IReportingContract.cs" />
-    <Compile Include="IScadaClient.cs" />
-    <Compile Include="ITopologyClient.cs" />
     <Compile Include="IWebAdapterContract.cs" />
-    <Compile Include="IOutageAccessContract.cs" />
-    <Compile Include="IOutageLifecycleUICommandingContract.cs" />
-    <Compile Include="ISwitchStatusCommandingContract.cs" />
-    <Compile Include="ITopologyServiceContract.cs" />
     <Compile Include="Models\BindingModels\ReportOptions.cs" />
     <Compile Include="Models\BindingModels\SwitchCommandBindingModel.cs" />
     <Compile Include="Models\IViewModel.cs" />
     <Compile Include="Models\OutageLifecycleState.cs" />
-    <Compile Include="Models\ReportType.cs" />
     <Compile Include="Models\ViewModels\ActiveOutageViewModel.cs" />
     <Compile Include="Models\ViewModels\ArchivedOutageViewModel.cs" />
     <Compile Include="Models\ViewModels\ConsumerViewModel.cs" />
@@ -115,7 +106,6 @@
     <Compile Include="Models\ViewModels\RelationViewModel.cs" />
     <Compile Include="Models\ViewModels\ReportViewModel.cs" />
     <Compile Include="Models\ViewModels\TransformerNodeViewModel.cs" />
-    <Compile Include="OutageReport.cs" />
     <Compile Include="Properties\AssemblyInfo.cs" />
   </ItemGroup>
   <ItemGroup>

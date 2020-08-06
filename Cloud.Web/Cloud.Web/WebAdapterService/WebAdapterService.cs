@@ -11,6 +11,9 @@ using OMS.Common.Cloud.Names;
 using Common.Contracts.WebAdapterContracts;
 using Microsoft.ServiceFabric.Services.Communication.Wcf.Runtime;
 using WebAdapterImplementation;
+using OMS.Common.PubSubContracts;
+using OMS.Common.WcfClient.PubSub;
+using OMS.Common.Cloud;
 
 namespace WebAdapterService
 {
@@ -20,14 +23,19 @@ namespace WebAdapterService
     internal sealed class WebAdapterService : StatelessService
     {
         private readonly WebAdapterProvider webAdapterProvider;
+        private readonly NotifySubscriberProvider notifySubscriberProvider;
+        private readonly RegisterSubscriberClient registerSubscriberClient;
 
         public WebAdapterService(StatelessServiceContext context)
             : base(context)
-        { 
+        {
             try
             {
                 this.webAdapterProvider = new WebAdapterProvider();
-            } 
+                this.notifySubscriberProvider = new NotifySubscriberProvider(MicroserviceNames.WebAdapterService);
+
+                this.registerSubscriberClient = RegisterSubscriberClient.CreateClient();
+            }
             catch
             {
                 // TODO : error handling
@@ -48,7 +56,15 @@ namespace WebAdapterService
                                                                                this.webAdapterProvider,
                                                                                WcfUtility.CreateTcpListenerBinding(),
                                                                                EndpointNames.WebAdapterEndpoint);
-                }, EndpointNames.WebAdapterEndpoint)
+                }, EndpointNames.WebAdapterEndpoint),
+
+                new ServiceInstanceListener(context =>
+                {
+                     return new WcfCommunicationListener<INotifySubscriberContract>(context,
+                                                                               this.notifySubscriberProvider,
+                                                                               WcfUtility.CreateTcpListenerBinding(),
+                                                                               EndpointNames.NotifySubscriberEndpoint);
+                }, EndpointNames.NotifySubscriberEndpoint)
             };
         }
 
@@ -58,18 +74,23 @@ namespace WebAdapterService
         /// <param name="cancellationToken">Canceled when Service Fabric needs to shut down this service instance.</param>
         protected override async Task RunAsync(CancellationToken cancellationToken)
         {
-            // TODO: Replace the following sample code with your own logic 
-            //       or remove this RunAsync override if it's not needed in your service.
-
-            long iterations = 0;
-
-            while (true)
+            //TEST Subscribe
+            try
             {
-                cancellationToken.ThrowIfCancellationRequested();
+                var topics = new List<Topic>()
+                {
+                    Topic.MEASUREMENT,
+                    Topic.SWITCH_STATUS,
+                    Topic.ACTIVE_OUTAGE,
+                    Topic.ARCHIVED_OUTAGE,
+                    Topic.TOPOLOGY,
+                };
 
-                ServiceEventSource.Current.ServiceMessage(this.Context, "Working-{0}", ++iterations);
-
-                await Task.Delay(TimeSpan.FromSeconds(1), cancellationToken);
+                var result = await registerSubscriberClient.SubscribeToTopics(topics, MicroserviceNames.WebAdapterService);
+                var subscriptions = await registerSubscriberClient.GetAllSubscribedTopics(MicroserviceNames.WebAdapterService);
+            }
+            catch (Exception e)
+            {
             }
         }
     }

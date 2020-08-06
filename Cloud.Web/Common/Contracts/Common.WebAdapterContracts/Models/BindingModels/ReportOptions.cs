@@ -1,4 +1,5 @@
-﻿using System;
+﻿using OMS.Common.Cloud;
+using System;
 
 namespace Common.Web.Models.BindingModels
 {
