@@ -1,6 +1,6 @@
-﻿using Common.Web.Mappers;
+﻿using Common.PubSubContracts.DataContracts.OMS;
+using Common.Web.Mappers;
 using Microsoft.AspNetCore.SignalR.Client;
-using Outage.Common.PubSub.OutageDataContract;
 
 namespace WebAdapterImplementation.HubDispatchers
 {

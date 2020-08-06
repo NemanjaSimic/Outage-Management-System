@@ -1,6 +1,6 @@
-﻿using Common.Web.Models;
+﻿using Common.PubSubContracts.DataContracts.OMS;
+using Common.Web.Models;
 using Common.Web.Models.ViewModels;
-using Outage.Common.PubSub.OutageDataContract;
 using System.Collections.Generic;
 using System.Linq;
 

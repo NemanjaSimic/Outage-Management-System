@@ -1,4 +1,5 @@
-﻿using CECommon;
+﻿using Common.CE.Interfaces;
+using Common.CeContracts;
 using Common.Web.Extensions;
 using Common.Web.Models.ViewModels;
 using OMS.Common.Cloud;
@@ -15,7 +16,7 @@ namespace Common.Web.Mappers
             OmsGraphViewModel graph = new OmsGraphViewModel();
             
             // map nodes
-            foreach (KeyValuePair<long, UINode> keyValue in topologyModel.Nodes)
+            foreach (KeyValuePair<long, IUINode> keyValue in topologyModel.Nodes)
             {
                 NodeViewModel graphNode = new NodeViewModel
                 {

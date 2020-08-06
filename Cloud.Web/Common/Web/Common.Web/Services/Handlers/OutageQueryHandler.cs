@@ -2,8 +2,6 @@
 using Common.Web.Services.Queries;
 using Common.Web.Models.ViewModels;
 using MediatR;
-using OMS.Common.Cloud.Names;
-using Outage.Common.PubSub.OutageDataContract;
 using System;
 using System.Collections.Generic;
 using System.Threading;

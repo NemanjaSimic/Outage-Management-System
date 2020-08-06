@@ -1,4 +1,4 @@
-﻿using CECommon;
+﻿using Common.CeContracts;
 using Common.Web.Models.ViewModels;
 
 namespace Common.Web.Mappers

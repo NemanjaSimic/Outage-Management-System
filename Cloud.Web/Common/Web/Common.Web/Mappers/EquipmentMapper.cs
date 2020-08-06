@@ -1,5 +1,5 @@
-﻿using Common.Web.Models.ViewModels;
-using Outage.Common.PubSub.OutageDataContract;
+﻿using Common.PubSubContracts.DataContracts.OMS;
+using Common.Web.Models.ViewModels;
 using System.Collections.Generic;
 using System.Linq;
 

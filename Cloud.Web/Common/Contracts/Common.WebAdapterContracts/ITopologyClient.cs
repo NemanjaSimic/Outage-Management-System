@@ -1,10 +1,10 @@
-﻿using CECommon;
+﻿//using CECommon;
 
-namespace Common.Contracts.WebAdapterContracts
-{
+//namespace Common.Contracts.WebAdapterContracts
+//{
 
-    public interface ITopologyClient
-    {
-        UIModel GetTopology();
-    }
-}
+//    public interface ITopologyClient
+//    {
+//        UIModel GetTopology();
+//    }
+//}

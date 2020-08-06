@@ -1,5 +1,4 @@
-﻿using CECommon;
-using Common.Web.Mappers;
+﻿using Common.Web.Mappers;
 using Common.Web.Services.Queries;
 using Common.Web.Models.ViewModels;
 using MediatR;
@@ -9,6 +8,7 @@ using System.Threading.Tasks;
 using ILogger = OMS.Common.Cloud.Logger.ICloudLogger;
 using OMS.Common.WcfClient.CE;
 using Common.CeContracts.TopologyProvider;
+using Common.CeContracts;
 
 namespace Common.Web.Services.Handlers
 {

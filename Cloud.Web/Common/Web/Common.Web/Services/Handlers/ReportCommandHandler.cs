@@ -25,6 +25,7 @@ namespace Common.Web.Services.Handlers
         {
             return Task.Run(() =>
             {
+                
                 //using (OutageAccessProxy outageProxy = _proxyFactory.CreateProxy<OutageAccessProxy, IOutageAccessContract>(EndpointNames.OutageAccessEndpoint))
                 //{
                     try
