@@ -14,6 +14,7 @@ using WebAdapterImplementation;
 using OMS.Common.PubSubContracts;
 using OMS.Common.WcfClient.PubSub;
 using OMS.Common.Cloud;
+using OMS.Common.Cloud.Logger;
 
 namespace WebAdapterService
 {
@@ -22,13 +23,24 @@ namespace WebAdapterService
     /// </summary>
     internal sealed class WebAdapterService : StatelessService
     {
+        private readonly string baseLogString;
+
         private readonly WebAdapterProvider webAdapterProvider;
         private readonly NotifySubscriberProvider notifySubscriberProvider;
-        private readonly RegisterSubscriberClient registerSubscriberClient;
+        private readonly IRegisterSubscriberContract registerSubscriberClient;
+
+        private ICloudLogger logger;
+        protected ICloudLogger Logger
+        {
+            get { return logger ?? (logger = CloudLoggerFactory.GetLogger()); }
+        }
 
         public WebAdapterService(StatelessServiceContext context)
             : base(context)
         {
+            this.baseLogString = $"{this.GetType()} [{this.GetHashCode()}] =>{Environment.NewLine}";
+            Logger.LogDebug($"{baseLogString} Ctor => Logger initialized");
+
             try
             {
                 this.webAdapterProvider = new WebAdapterProvider();
@@ -36,9 +48,11 @@ namespace WebAdapterService
 
                 this.registerSubscriberClient = RegisterSubscriberClient.CreateClient();
             }
-            catch
+            catch (Exception e)
             {
-                // TODO : error handling
+                string errorMessage = $"{baseLogString} Ctor => exception {e.Message}";
+                Logger.LogError(errorMessage, e);
+                ServiceEventSource.Current.ServiceMessage(this.Context, $"[WebAdapterService | Error] {errorMessage}");
             }
         }
 
@@ -91,6 +105,9 @@ namespace WebAdapterService
             }
             catch (Exception e)
             {
+                string errorMessage = $"{baseLogString} RynAsync => exception {e.Message}";
+                Logger.LogError(errorMessage, e);
+                ServiceEventSource.Current.ServiceMessage(this.Context, $"[WebAdapterService | Error] {errorMessage}");
             }
         }
     }

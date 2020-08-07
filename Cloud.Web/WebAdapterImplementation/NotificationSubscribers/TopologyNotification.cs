@@ -2,6 +2,7 @@
 using Common.PubSub;
 using Common.Web.Mappers;
 using Common.Web.Models.ViewModels;
+using OMS.Common.Cloud.Logger;
 using OMS.Common.PubSubContracts;
 using System;
 using System.Runtime.Serialization;
@@ -15,12 +16,23 @@ namespace WebAdapterImplementation.NotificationSubscribers
     [CallbackBehavior(ConcurrencyMode = ConcurrencyMode.Multiple)]
     class TopologyNotification : INotifySubscriberContract
     {
+        private readonly string baseLogString;
+
+        private ICloudLogger logger;
+        protected ICloudLogger Logger
+        {
+            get { return logger ?? (logger = CloudLoggerFactory.GetLogger()); }
+        }
+
         private readonly string _subscriberName;
         private readonly IGraphMapper _mapper;
         private readonly GraphHubDispatcher _dispatcher;
 
         public TopologyNotification(string subscriberName, IGraphMapper mapper)
         {
+            this.baseLogString = $"{this.GetType()} [{this.GetHashCode()}] =>{Environment.NewLine}";
+            Logger.LogDebug($"{baseLogString} Ctor => Logger initialized");
+
             _subscriberName = subscriberName;
             _mapper = mapper;
 
@@ -38,9 +50,10 @@ namespace WebAdapterImplementation.NotificationSubscribers
                 {
                     _dispatcher.NotifyGraphUpdate(graph.Nodes, graph.Relations);
                 }
-                catch (Exception)
+                catch (Exception e)
                 {
-                    // TODO: log error/retry
+                    string errorMessage = $"{baseLogString} Notify => exception {e.Message}";
+                    Logger.LogError(errorMessage, e);
                 }
 
             }

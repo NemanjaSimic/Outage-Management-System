@@ -1,5 +1,4 @@
 ﻿using Common.Web.Exceptions;
-using Common.Web.Loggers;
 using Common.Web.Mappers;
 using MediatR;
 using Microsoft.AspNetCore.Builder;
@@ -43,8 +42,6 @@ namespace WebAPI
             services.AddScoped<IConsumerMapper, ConsumerMapper>();
             services.AddScoped<IOutageMapper, OutageMapper>();
             services.AddScoped<IEquipmentMapper, EquipmentMapper>();
-            //services.AddScoped<IProxyFactory, ProxyFactory>();
-            services.AddScoped<ICloudLogger, FileLogger>(); // TODO: Proveriti da li treba 'ContainerControlledLifetimeManager()'
 
             services.AddMediatR(typeof(Startup));
             services.AddSignalR();

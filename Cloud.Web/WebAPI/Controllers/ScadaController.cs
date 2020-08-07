@@ -4,6 +4,7 @@ using Common.Web.Services.Commands;
 using Common.Web.Models.BindingModels;
 using MediatR;
 using Microsoft.AspNetCore.Mvc;
+using OMS.Common.Cloud.Logger;
 
 // For more information on enabling Web API for empty projects, visit https://go.microsoft.com/fwlink/?LinkID=397860
 
@@ -13,6 +14,14 @@ namespace WebAPI.Controllers
     [ApiController]
     public class ScadaController : ControllerBase
     {
+        private readonly string baseLogString;
+
+        private ICloudLogger logger;
+        protected ICloudLogger Logger
+        {
+            get { return logger ?? (logger = CloudLoggerFactory.GetLogger()); }
+        }
+
         private readonly IMediator _mediator;
 
         private readonly Dictionary<SwitchCommandType, Func<long, SwitchCommandBase>> switchCommandMap =
@@ -24,6 +33,9 @@ namespace WebAPI.Controllers
 
         public ScadaController(IMediator mediator)
         {
+            this.baseLogString = $"{this.GetType()} [{this.GetHashCode()}] =>{Environment.NewLine}";
+            Logger.LogDebug($"{baseLogString} Ctor => Logger initialized");
+
             _mediator = mediator;
         }
 
@@ -41,8 +53,10 @@ namespace WebAPI.Controllers
             {
                 _mediator.Send(switchCommand);
             }
-            catch (Exception)
+            catch (Exception e)
             {
+                string errorMessage = $"{baseLogString} Post => exception {e.Message}";
+                Logger.LogError(errorMessage, e);
                 return StatusCode(500);
             }
 

@@ -117,7 +117,6 @@
     <Compile Include="Extensions\NodeExtensions.cs" />
     <Compile Include="Extensions\OmsGraphExtensions.cs" />
     <Compile Include="Extensions\TransformerNodeExtensions.cs" />
-    <Compile Include="Loggers\FileLogger.cs" />
     <Compile Include="Mappers\ConsumerMapper.cs" />
     <Compile Include="Mappers\EquipmentMapper.cs" />
     <Compile Include="Mappers\GraphMapper.cs" />

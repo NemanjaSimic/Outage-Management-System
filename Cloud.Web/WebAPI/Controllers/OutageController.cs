@@ -6,6 +6,7 @@ using Common.Web.Services.Queries;
 using Common.Web.Models.ViewModels;
 using MediatR;
 using Microsoft.AspNetCore.Mvc;
+using OMS.Common.Cloud.Logger;
 
 // For more information on enabling Web API for empty projects, visit https://go.microsoft.com/fwlink/?LinkID=397860
 
@@ -15,10 +16,21 @@ namespace WebAPI.Controllers
     [ApiController]
     public class OutageController : ControllerBase
     {
+        private readonly string baseLogString;
+
+        private ICloudLogger logger;
+        protected ICloudLogger Logger
+        {
+            get { return logger ?? (logger = CloudLoggerFactory.GetLogger()); }
+        }
+
         private readonly IMediator _mediator;
 
         public OutageController(IMediator mediator)
         {
+            this.baseLogString = $"{this.GetType()} [{this.GetHashCode()}] =>{Environment.NewLine}";
+            Logger.LogDebug($"{baseLogString} Ctor => Logger initialized");
+
             _mediator = mediator;
         }
 
@@ -46,8 +58,10 @@ namespace WebAPI.Controllers
             {
                 _ = await _mediator.Send(new IsolateOutageCommand(id));
             }
-            catch (Exception)
+            catch (Exception e)
             {
+                string errorMessage = $"{baseLogString} IsolateOutage => exception {e.Message}";
+                Logger.LogError(errorMessage, e);
                 return StatusCode(500);
             }
 
@@ -62,8 +76,10 @@ namespace WebAPI.Controllers
             {
                 await _mediator.Send(new SendOutageLocationIsolationCrewCommand(id));
             }
-            catch (Exception)
+            catch (Exception e)
             {
+                string errorMessage = $"{baseLogString} SendOutageLocationIsolationCrew => exception {e.Message}";
+                Logger.LogError(errorMessage, e);
                 return StatusCode(500);
             }
 
@@ -78,8 +94,10 @@ namespace WebAPI.Controllers
             {
                 await _mediator.Send(new SendOutageRepairCrewCommand(id));
             }
-            catch (Exception)
+            catch (Exception e)
             {
+                string errorMessage = $"{baseLogString} SendOutageRepairCrew => exception {e.Message}";
+                Logger.LogError(errorMessage, e);
                 return StatusCode(500);
             }
 
@@ -94,8 +112,10 @@ namespace WebAPI.Controllers
             {
                 await _mediator.Send(new ValidateResolveConditionsCommand(id));
             }
-            catch (Exception)
+            catch (Exception e)
             {
+                string errorMessage = $"{baseLogString} ValidateOutage => exception {e.Message}";
+                Logger.LogError(errorMessage, e);
                 return StatusCode(500);
             }
 
@@ -110,8 +130,10 @@ namespace WebAPI.Controllers
             {
                 await _mediator.Send(new ResolveOutageCommand(id));
             }
-            catch (Exception)
+            catch (Exception e)
             {
+                string errorMessage = $"{baseLogString} ResolveOutage => exception {e.Message}";
+                Logger.LogError(errorMessage, e);
                 return StatusCode(500);
             }
 

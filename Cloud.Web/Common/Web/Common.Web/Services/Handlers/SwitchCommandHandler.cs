@@ -1,28 +1,24 @@
-﻿using Common.CeContracts;
-using Common.Contracts.WebAdapterContracts;
-using Common.Web.Services.Commands;
+﻿using Common.Web.Services.Commands;
 using MediatR;
-using OMS.Common.Cloud.Names;
+using OMS.Common.Cloud.Logger;
 using OMS.Common.WcfClient.CE;
 using System;
 using System.Threading;
 using System.Threading.Tasks;
-using ILogger = OMS.Common.Cloud.Logger.ICloudLogger;
 
 namespace Common.Web.Services.Handlers
 {
     public class SwitchCommandHandler : IRequestHandler<OpenSwitchCommand>, IRequestHandler<CloseSwitchCommand>
     {
-        private readonly ILogger _logger;
-
-        public SwitchCommandHandler(ILogger logger)
+        private ICloudLogger logger;
+        protected ICloudLogger Logger
         {
-            _logger = logger;
+            get { return logger ?? (logger = CloudLoggerFactory.GetLogger()); }
         }
 
         public async Task<Unit> Handle(OpenSwitchCommand request, CancellationToken cancellationToken)
         {
-            _logger.LogInformation($"[SwitchCommandHandler::TurnOffSwitchCommand] Sending {request.Command.ToString()} command to {request.Gid}");
+            Logger.LogInformation($"[SwitchCommandHandler::TurnOffSwitchCommand] Sending {request.Command.ToString()} command to {request.Gid}");
 
             CeContracts.ISwitchStatusCommandingContract switchStatusCommandingClient = SwitchStatusCommandingClient.CreateClient();
             try
@@ -31,7 +27,7 @@ namespace Common.Web.Services.Handlers
             }
             catch (Exception ex)
             {
-                _logger.LogError("[SwitchCommandHandler::TurnOffSwitchCommand] SwitchCommandHandler failed on TurnOffSwitch handler.", ex);
+                Logger.LogError("[SwitchCommandHandler::TurnOffSwitchCommand] SwitchCommandHandler failed on TurnOffSwitch handler.", ex);
                 throw;
             }
 
@@ -41,7 +37,7 @@ namespace Common.Web.Services.Handlers
 
         public async Task<Unit> Handle(CloseSwitchCommand request, CancellationToken cancellationToken)
         {
-            _logger.LogDebug($"[SwitchCommandHandler::TurnOnSwitchCommand] Sending {request.Command.ToString()} command to {request.Gid}");
+            Logger.LogDebug($"[SwitchCommandHandler::TurnOnSwitchCommand] Sending {request.Command.ToString()} command to {request.Gid}");
 
             CeContracts.ISwitchStatusCommandingContract switchStatusCommandingClient = SwitchStatusCommandingClient.CreateClient();
 
@@ -52,7 +48,7 @@ namespace Common.Web.Services.Handlers
             }
             catch (Exception ex)
             {
-                _logger.LogError("[SwitchCommandHandler::TurnOnSwitchCommand] Failed on TurnOnSwitch handler.", ex);
+                Logger.LogError("[SwitchCommandHandler::TurnOnSwitchCommand] Failed on TurnOnSwitch handler.", ex);
                 throw;
             }
 

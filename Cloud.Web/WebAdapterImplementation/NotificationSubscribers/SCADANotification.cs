@@ -1,4 +1,5 @@
 ﻿using Common.PubSub;
+using OMS.Common.Cloud.Logger;
 using OMS.Common.PubSubContracts;
 using OMS.Common.PubSubContracts.DataContracts.SCADA;
 using System;
@@ -14,13 +15,23 @@ namespace WebAdapterImplementation.NotificationSubscribers
     [CallbackBehavior(ConcurrencyMode = ConcurrencyMode.Multiple)]
     class SCADANotification : INotifySubscriberContract
     {
+        private readonly string baseLogString;
+
+        private ICloudLogger logger;
+        protected ICloudLogger Logger
+        {
+            get { return logger ?? (logger = CloudLoggerFactory.GetLogger()); }
+        }
+
         private readonly string _subscriberName;
         private ScadaHubDispatcher _dispatcher;
 
         public SCADANotification(string subscriberName)
         {
-            _subscriberName = subscriberName;
+            this.baseLogString = $"{this.GetType()} [{this.GetHashCode()}] =>{Environment.NewLine}";
+            Logger.LogDebug($"{baseLogString} Ctor => Logger initialized");
 
+            _subscriberName = subscriberName;
         }
 
 
@@ -36,9 +47,10 @@ namespace WebAdapterImplementation.NotificationSubscribers
                 {
                     _dispatcher.NotifyScadaDataUpdate(analogModbusData);
                 }
-                catch (Exception)
+                catch (Exception e)
                 {
-                    // TODO: log error
+                    string errorMessage = $"{baseLogString} Notify => exception {e.Message}";
+                    Logger.LogError(errorMessage, e);
                 }
             }
         }

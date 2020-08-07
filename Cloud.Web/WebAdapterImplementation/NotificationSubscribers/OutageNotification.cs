@@ -1,6 +1,7 @@
 ﻿using Common.PubSub;
 using Common.PubSubContracts.DataContracts.OMS;
 using Common.Web.Mappers;
+using OMS.Common.Cloud.Logger;
 using OMS.Common.PubSubContracts;
 using System;
 using System.Runtime.Serialization;
@@ -14,14 +15,24 @@ namespace WebAdapterImplementation.NotificationSubscribers
     [CallbackBehavior(ConcurrencyMode = ConcurrencyMode.Multiple)]
     public class OutageNotification : INotifySubscriberContract
     {
+        private readonly string baseLogString;
+
+        private ICloudLogger logger;
+        protected ICloudLogger Logger
+        {
+            get { return logger ?? (logger = CloudLoggerFactory.GetLogger()); }
+        }
+
         private readonly string _subscriberName;
         private OutageHubDispatcher _dispatcher;
         private readonly IOutageMapper _mapper;
 
         public OutageNotification(string subscriberName, IOutageMapper mapper)
         {
-            _subscriberName = subscriberName;
+            this.baseLogString = $"{this.GetType()} [{this.GetHashCode()}] =>{Environment.NewLine}";
+            Logger.LogDebug($"{baseLogString} Ctor => Logger initialized");
 
+            _subscriberName = subscriberName;
             _mapper = mapper;
         }
 
@@ -36,9 +47,10 @@ namespace WebAdapterImplementation.NotificationSubscribers
                 {
                     _dispatcher.NotifyActiveOutageUpdate(activeOutage);
                 }
-                catch (Exception)
+                catch (Exception e)
                 {
-                    // TODO: log error
+                    string errorMessage = $"{baseLogString} Notify => exception {e.Message}";
+                    Logger.LogError(errorMessage, e);
                 }
             }
             else if (message is ArchivedOutageMessage archivedOutage)
@@ -49,9 +61,10 @@ namespace WebAdapterImplementation.NotificationSubscribers
                 {
                     _dispatcher.NotifyArchiveOutageUpdate(archivedOutage);
                 }
-                catch (Exception)
+                catch (Exception e)
                 {
-                    // TODO: log error
+                    string errorMessage = $"{baseLogString} Notify => exception {e.Message}";
+                    Logger.LogError(errorMessage, e);
                 }
             }
         }

@@ -338,10 +338,23 @@ namespace NMS.GdaImplementation
                 await Task.Delay(1000);
             }
 
-            if (!isTransactionInProgress)
-            {
-                await InitializeNetworkModel();
-            }
+            // TODO: RETHINK LOGIC
+            //if (!isTransactionInProgress)
+            //{
+            //    try
+            //    {
+            //        //LOGIC
+            //        await InitializeNetworkModel();
+
+            //        string infoMessage = $"{baseLogString} GetValues => NetworkModel initialized.";
+            //        Logger.LogInformation(infoMessage);
+            //    }
+            //    catch (Exception e)
+            //    {
+            //        string errMessage = $"{baseLogString} GetValues => Exception caught: {e.Message}.";
+            //        Logger.LogError(errMessage, e);
+            //    }
+            //}
 
             Logger.LogDebug($"Getting values for GID: 0x{globalId:X16}.");
 
@@ -386,10 +399,23 @@ namespace NMS.GdaImplementation
                 await Task.Delay(1000);
             }
 
-            if (!isTransactionInProgress)
-            {
-                await InitializeNetworkModel();
-            }
+            // TODO: RETHINK LOGIC
+            //if (!isTransactionInProgress)
+            //{
+            //    try
+            //    {
+            //        //LOGIC
+            //        await InitializeNetworkModel();
+
+            //        string infoMessage = $"{baseLogString} GetExtentValues => NetworkModel initialized.";
+            //        Logger.LogInformation(infoMessage);
+            //    }
+            //    catch (Exception e)
+            //    {
+            //        string errMessage = $"{baseLogString} GetExtentValues => Exception caught: {e.Message}.";
+            //        Logger.LogError(errMessage, e);
+            //    }
+            //}
 
             Logger.LogDebug($"Getting extent values for entity type: {entityType}.");
 
@@ -437,10 +463,23 @@ namespace NMS.GdaImplementation
                 await Task.Delay(1000);
             }
 
-            if (!isTransactionInProgress)
-            {
-                await InitializeNetworkModel();
-            }
+            // TODO: RETHINK LOGIC
+            //if (!isTransactionInProgress)
+            //{
+            //    try
+            //    {
+            //        //LOGIC
+            //        await InitializeNetworkModel();
+
+            //        string infoMessage = $"{baseLogString} GetRelatedValues => NetworkModel initialized.";
+            //        Logger.LogInformation(infoMessage);
+            //    }
+            //    catch (Exception e)
+            //    {
+            //        string errMessage = $"{baseLogString} GetRelatedValues => Exception caught: {e.Message}.";
+            //        Logger.LogError(errMessage, e);
+            //    }
+            //}
 
             Logger.LogDebug($"Getting related values for source: 0x{source:X16}.");
 
@@ -1027,7 +1066,7 @@ namespace NMS.GdaImplementation
 
                     long latestVersion = latestDeltaVersion > latestNetworkModelVersion ? latestDeltaVersion : latestNetworkModelVersion;
 
-                    currentDelta.Id = latestDeltaVersion + 1;
+                    currentDelta.Id = latestVersion + 1;
                     mongoDbAccess.SaveDelta(currentDelta);
 
                     CurrentVersion = currentDelta.Id;

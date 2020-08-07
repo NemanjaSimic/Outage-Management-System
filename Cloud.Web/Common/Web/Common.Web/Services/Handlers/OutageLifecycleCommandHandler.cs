@@ -1,12 +1,12 @@
 ﻿using Common.OmsContracts.OutageLifecycle;
 using Common.Web.Services.Commands;
 using MediatR;
+using OMS.Common.Cloud.Logger;
 using OMS.Common.WcfClient.OMS;
 using OMS.Common.WcfClient.OMS.Lifecycle;
 using System;
 using System.Threading;
 using System.Threading.Tasks;
-using ILogger = OMS.Common.Cloud.Logger.ICloudLogger;
 
 namespace Common.Web.Services.Handlers
 {
@@ -17,17 +17,15 @@ namespace Common.Web.Services.Handlers
           IRequestHandler<ValidateResolveConditionsCommand>,
           IRequestHandler<ResolveOutageCommand>
     {
-
-        private readonly ILogger _logger;
-
-        public OutageLifecycleCommandHandler(ILogger logger)
+        private ICloudLogger logger;
+        protected ICloudLogger Logger
         {
-            _logger = logger;
+            get { return logger ?? (logger = CloudLoggerFactory.GetLogger()); }
         }
 
         public async Task<Unit> Handle(IsolateOutageCommand request, CancellationToken cancellationToken)
         {
-            _logger.LogInformation($"[OutageLifecycleCommandHandler::IsolateOutageCommand] Sending isolate outage command for outage: {request.OutageId}");
+            Logger.LogInformation($"[OutageLifecycleCommandHandler::IsolateOutageCommand] Sending isolate outage command for outage: {request.OutageId}");
 
             IIsolateOutageContract isolateOutageClient = IsolateOutageClient.CreateClient();
             try
@@ -36,7 +34,7 @@ namespace Common.Web.Services.Handlers
             }
             catch (Exception ex)
             {
-                _logger.LogError("[OutageLifecycleCommandHandler::IsolateOutageCommand] OutageLifecycleCommandHandler failed on IsolateOutage handler.", ex);
+                Logger.LogError("[OutageLifecycleCommandHandler::IsolateOutageCommand] OutageLifecycleCommandHandler failed on IsolateOutage handler.", ex);
                 throw;
             }
 
@@ -45,7 +43,7 @@ namespace Common.Web.Services.Handlers
 
         public async Task<Unit> Handle(SendOutageLocationIsolationCrewCommand request, CancellationToken cancellationToken)
         {
-            _logger.LogInformation($"[OutageLifecycleCommandHandler::SendOutageLocationIsolationCrewCommand] Sending outage location isolation crew command for outage: {request.OutageId}");
+            Logger.LogInformation($"[OutageLifecycleCommandHandler::SendOutageLocationIsolationCrewCommand] Sending outage location isolation crew command for outage: {request.OutageId}");
 
             ISendLocationIsolationCrewContract sendLocationIsolationCrewClient = SendLocationIsolationCrewClient.CreateClient();
             try
@@ -54,7 +52,7 @@ namespace Common.Web.Services.Handlers
             }
             catch (Exception ex)
             {
-                _logger.LogError("[OutageLifecycleCommandHandler::SendOutageLocationIsolationCrewCommand] OutageLifecycleCommandHandler failed on SendOutageLocationIsolationCrew handler.", ex);
+                Logger.LogError("[OutageLifecycleCommandHandler::SendOutageLocationIsolationCrewCommand] OutageLifecycleCommandHandler failed on SendOutageLocationIsolationCrew handler.", ex);
                 throw;
             }
 
@@ -63,7 +61,7 @@ namespace Common.Web.Services.Handlers
 
         public async Task<Unit> Handle(SendOutageRepairCrewCommand request, CancellationToken cancellationToken)
         {
-            _logger.LogInformation($"[OutageLifecycleCommandHandler::SendOutageRepairCrewCommand] Sending outage repair crew command for outage: {request.OutageId}");
+            Logger.LogInformation($"[OutageLifecycleCommandHandler::SendOutageRepairCrewCommand] Sending outage repair crew command for outage: {request.OutageId}");
 
             ISendRepairCrewContract sendRepairCrewClient = SendRepairCrewClient.CreateClient();
             try
@@ -72,7 +70,7 @@ namespace Common.Web.Services.Handlers
             }
             catch (Exception ex)
             {
-                _logger.LogError("[OutageLifecycleCommandHandler::SendOutageRepairCrewCommand] OutageLifecycleCommandHandler failed on SendOutageRepairCrew handler.", ex);
+                Logger.LogError("[OutageLifecycleCommandHandler::SendOutageRepairCrewCommand] OutageLifecycleCommandHandler failed on SendOutageRepairCrew handler.", ex);
                 throw;
             }
 
@@ -81,7 +79,7 @@ namespace Common.Web.Services.Handlers
 
         public async Task<Unit> Handle(ValidateResolveConditionsCommand request, CancellationToken cancellationToken)
         {
-            _logger.LogInformation($"[OutageLifecycleCommandHandler::ValidateResolveConditionsCommand] Sending validate resolve conditions command for outage: {request.OutageId}");
+            Logger.LogInformation($"[OutageLifecycleCommandHandler::ValidateResolveConditionsCommand] Sending validate resolve conditions command for outage: {request.OutageId}");
 
             IValidateResolveConditionsContract validateResolveConditionsClient = ValidateResolveConditionsClient.CreateClient();
             try
@@ -90,7 +88,7 @@ namespace Common.Web.Services.Handlers
             }
             catch (Exception ex)
             {
-                _logger.LogError("[OutageLifecycleCommandHandler::ValidateResolveConditionsCommand] OutageLifecycleCommandHandler failed on ValidateResolveConditions handler.", ex);
+                Logger.LogError("[OutageLifecycleCommandHandler::ValidateResolveConditionsCommand] OutageLifecycleCommandHandler failed on ValidateResolveConditions handler.", ex);
                 throw;
             }
 
@@ -99,7 +97,7 @@ namespace Common.Web.Services.Handlers
 
         public async Task<Unit> Handle(ResolveOutageCommand request, CancellationToken cancellationToken)
         {
-            _logger.LogInformation($"[OutageLifecycleCommandHandler::IsolateOutageCommand] Sending isolate outage command for outage: {request.OutageId}");
+            Logger.LogInformation($"[OutageLifecycleCommandHandler::IsolateOutageCommand] Sending isolate outage command for outage: {request.OutageId}");
 
             IResolveOutageContract resolveOutageClient = ResolveOutageClient.CreateClient();
             try
@@ -108,7 +106,7 @@ namespace Common.Web.Services.Handlers
             }
             catch (Exception ex)
             {
-                _logger.LogError("[OutageLifecycleCommandHandler::IsolateOutageCommand] OutageLifecycleCommandHandler failed on IsolateOutage handler.", ex);
+                Logger.LogError("[OutageLifecycleCommandHandler::IsolateOutageCommand] OutageLifecycleCommandHandler failed on IsolateOutage handler.", ex);
                 throw;
             }
 

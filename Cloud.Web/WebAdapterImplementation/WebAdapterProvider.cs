@@ -1,5 +1,6 @@
 ﻿using Common.Contracts.WebAdapterContracts;
 using Common.Web.Models.ViewModels;
+using OMS.Common.Cloud.Logger;
 using System;
 using System.Collections.Generic;
 using System.Threading.Tasks;
@@ -9,11 +10,21 @@ namespace WebAdapterImplementation
 {
     public class WebAdapterProvider : IWebAdapterContract
     {
+        private readonly string baseLogString;
+
+        private ICloudLogger logger;
+        protected ICloudLogger Logger
+        {
+            get { return logger ?? (logger = CloudLoggerFactory.GetLogger()); }
+        }
+
         private GraphHubDispatcher _graphDispatcher = null;
         private ScadaHubDispatcher _scadaDipatcher = null;
 
         public WebAdapterProvider()
         {
+            this.baseLogString = $"{this.GetType()} [{this.GetHashCode()}] =>{Environment.NewLine}";
+            Logger.LogDebug($"{baseLogString} Ctor => Logger initialized");
         }
 
         public Task UpdateGraph(List<NodeViewModel> nodes, List<RelationViewModel> relations)
@@ -27,7 +38,8 @@ namespace WebAdapterImplementation
             }
             catch (Exception e)
             {
-                // retry ?
+                string errorMessage = $"{baseLogString} UpdateGraph => exception {e.Message}";
+                Logger.LogError(errorMessage, e);
             }
 
             return null;
@@ -44,7 +56,8 @@ namespace WebAdapterImplementation
             }
             catch (Exception e)
             {
-                // retry ?
+                string errorMessage = $"{baseLogString} UpdateScadaData => exception {e.Message}";
+                Logger.LogError(errorMessage, e);
             }
 
             return null;

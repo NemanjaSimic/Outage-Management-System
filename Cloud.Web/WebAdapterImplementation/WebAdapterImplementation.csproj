@@ -203,6 +203,10 @@
     <Compile Include="WebAdapterProvider.cs" />
   </ItemGroup>
   <ItemGroup>
+    <ProjectReference Include="..\..\OMS.Cloud\Common\Common.Cloud\Common.Cloud.csproj">
+      <Project>{FBEE1369-0F6C-41E6-8C62-8C1C5CDBB602}</Project>
+      <Name>Common.Cloud</Name>
+    </ProjectReference>
     <ProjectReference Include="..\..\OMS.Cloud\Common\Contracts\Common.PubSubContracts\Common.PubSubContracts.csproj">
       <Project>{AA75150D-EE56-49C0-9431-751F83CCC0CD}</Project>
       <Name>Common.PubSubContracts</Name>

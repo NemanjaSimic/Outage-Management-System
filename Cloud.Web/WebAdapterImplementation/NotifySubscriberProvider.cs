@@ -3,6 +3,7 @@ using Common.PubSub;
 using Common.PubSubContracts.DataContracts.OMS;
 using Common.Web.Mappers;
 using Common.Web.Models.ViewModels;
+using OMS.Common.Cloud.Logger;
 using OMS.Common.PubSubContracts;
 using OMS.Common.PubSubContracts.DataContracts.SCADA;
 using System;
@@ -14,6 +15,14 @@ namespace WebAdapterImplementation
 {
     public class NotifySubscriberProvider : INotifySubscriberContract
     {
+        private readonly string baseLogString;
+
+        private ICloudLogger logger;
+        protected ICloudLogger Logger
+        {
+            get { return logger ?? (logger = CloudLoggerFactory.GetLogger()); }
+        }
+
         private readonly string _subscriberName;
         private GraphHubDispatcher _graphDispatcher;
         private OutageHubDispatcher _outageDispatcher;
@@ -23,6 +32,9 @@ namespace WebAdapterImplementation
 
         public NotifySubscriberProvider(string subscriberName)
         {
+            this.baseLogString = $"{this.GetType()} [{this.GetHashCode()}] =>{Environment.NewLine}";
+            Logger.LogDebug($"{baseLogString} Ctor => Logger initialized");
+
             _subscriberName = subscriberName;
             _graphMapper = new GraphMapper();
             _outageMapper = new OutageMapper(new ConsumerMapper(), new EquipmentMapper());
@@ -39,9 +51,10 @@ namespace WebAdapterImplementation
                 {
                     _outageDispatcher.NotifyActiveOutageUpdate(activeOutage);
                 }
-                catch (Exception)
+                catch (Exception e)
                 {
-                    // TODO: log error
+                    string errorMessage = $"{baseLogString} Notify => exception {e.Message}";
+                    Logger.LogError(errorMessage, e);
                 }
             }
             else if (message is ArchivedOutageMessage archivedOutage)
@@ -52,9 +65,10 @@ namespace WebAdapterImplementation
                 {
                     _outageDispatcher.NotifyArchiveOutageUpdate(archivedOutage);
                 }
-                catch (Exception)
+                catch (Exception e)
                 {
-                    // TODO: log error
+                    string errorMessage = $"{baseLogString} Notify => exception {e.Message}";
+                    Logger.LogError(errorMessage, e);
                 }
             }
             else if (message is TopologyForUIMessage topologyMessage)
@@ -66,9 +80,10 @@ namespace WebAdapterImplementation
                 {
                     _graphDispatcher.NotifyGraphUpdate(graph.Nodes, graph.Relations);
                 }
-                catch (Exception)
+                catch (Exception e)
                 {
-                    // TODO: log error/retry
+                    string errorMessage = $"{baseLogString} Notify => exception {e.Message}";
+                    Logger.LogError(errorMessage, e);
                 }
 
             } else if (message is MultipleAnalogValueSCADAMessage analogValuesMessage)
@@ -81,9 +96,10 @@ namespace WebAdapterImplementation
                 {
                     _scadaDispatcher.NotifyScadaDataUpdate(analogModbusData);
                 }
-                catch (Exception)
+                catch (Exception e)
                 {
-                    // TODO: log error
+                    string errorMessage = $"{baseLogString} Notify => exception {e.Message}";
+                    Logger.LogError(errorMessage, e);
                 }
             }
         }

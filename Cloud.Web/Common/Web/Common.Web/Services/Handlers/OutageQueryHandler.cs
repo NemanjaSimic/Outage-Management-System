@@ -6,11 +6,10 @@ using System;
 using System.Collections.Generic;
 using System.Threading;
 using System.Threading.Tasks;
-using ILogger = OMS.Common.Cloud.Logger.ICloudLogger;
-using Common.Contracts.WebAdapterContracts;
 using Common.OmsContracts;
 using OMS.Common.WcfClient.OMS;
 using Common.PubSubContracts.DataContracts.OMS;
+using OMS.Common.Cloud.Logger;
 
 namespace Common.Web.Services.Handlers
 {
@@ -19,12 +18,16 @@ namespace Common.Web.Services.Handlers
         IRequestHandler<GetArchivedOutagesQuery, IEnumerable<ArchivedOutageViewModel>>
     //outageaccesssclient
     {
-        private readonly ILogger _logger;
+        private ICloudLogger logger;
+        protected ICloudLogger Logger
+        {
+            get { return logger ?? (logger = CloudLoggerFactory.GetLogger()); }
+        }
+
         private readonly IOutageMapper _mapper;
 
-        public OutageQueryHandler(ILogger logger, IOutageMapper mapper)
+        public OutageQueryHandler(IOutageMapper mapper)
         {
-            _logger = logger;
             _mapper = mapper;
         }
 
@@ -33,7 +36,7 @@ namespace Common.Web.Services.Handlers
             IOutageAccessContract outageAccessClient = OutageAccessClient.CreateClient();
             try
             {
-                _logger.LogInformation("[OutageQueryHandler::GetActiveOutages] Sending a GET query to Outage service for active outages.");
+                Logger.LogInformation("[OutageQueryHandler::GetActiveOutages] Sending a GET query to Outage service for active outages.");
                 // TODO: FIX
                 //IEnumerable<ActiveOutageMessage> activeOutages = await outageAccessClient.GetActiveOutages();
                 IEnumerable<ActiveOutageMessage> activeOutages = new List<ActiveOutageMessage>();
@@ -43,7 +46,7 @@ namespace Common.Web.Services.Handlers
             }
             catch (Exception ex)
             {
-                _logger.LogError("[OutageQueryHandler::GetActiveOutages] Failed to GET active outages from Outage service.", ex);
+                Logger.LogError("[OutageQueryHandler::GetActiveOutages] Failed to GET active outages from Outage service.", ex);
                 throw ex;
             }
         }
@@ -53,7 +56,7 @@ namespace Common.Web.Services.Handlers
             IOutageAccessContract outageAccessClient = OutageAccessClient.CreateClient();
             try
             {
-                _logger.LogInformation("[OutageQueryHandler::GetArchivedOutages] Sending a GET query to Outage service for archived outages.");
+                Logger.LogInformation("[OutageQueryHandler::GetArchivedOutages] Sending a GET query to Outage service for archived outages.");
                 // TODO: FIX
                 //IEnumerable<ArchivedOutageMessage> archivedOutages = await outageAccessClient.GetArchivedOutages();
                 IEnumerable<ArchivedOutageMessage> archivedOutages = new List<ArchivedOutageMessage>();
@@ -63,7 +66,7 @@ namespace Common.Web.Services.Handlers
             }
             catch (Exception ex)
             {
-                _logger.LogError("[OutageQueryHandler::GetArchivedOutages] Failed to GET archived outages from Outage service.", ex);
+                Logger.LogError("[OutageQueryHandler::GetArchivedOutages] Failed to GET archived outages from Outage service.", ex);
                 throw ex;
             }
         }

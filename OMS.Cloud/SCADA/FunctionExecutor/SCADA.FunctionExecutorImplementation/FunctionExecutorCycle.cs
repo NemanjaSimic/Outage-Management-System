@@ -87,41 +87,45 @@ namespace SCADA.FunctionExecutorImplementation
                     ConnectToModbusClient();
                 }
 
-                while (modelUpdateCommandQueue.PeekMessage() != null)
+                if (modbusClient.Connected)
                 {
-                    verboseMessage = $"{baseLogString} Start => Getting Command from model update command queue.";
-                    Logger.LogVerbose(verboseMessage);
-
-                    CloudQueueMessage message = modelUpdateCommandQueue.GetMessage();
-                    if(message!=null)
+                    while (modelUpdateCommandQueue.PeekMessage() != null)
                     {
-                        IModbusFunction currentCommand = (IModbusFunction)(Serialization.ByteArrayToObject(message.AsBytes));
-                        modelUpdateCommandQueue.DeleteMessage(message);
+                        verboseMessage = $"{baseLogString} Start => Getting Command from model update command queue.";
+                        Logger.LogVerbose(verboseMessage);
 
-                        string informationMessage = $"{baseLogString} Start => Command received from model update command queue about to be executed.";
-                        Logger.LogInformation(informationMessage);
-                        
-                        await ExecuteCommand(currentCommand);
+                        CloudQueueMessage message = modelUpdateCommandQueue.GetMessage();
+                        if (message != null)
+                        {
+                            IModbusFunction currentCommand = (IModbusFunction)(Serialization.ByteArrayToObject(message.AsBytes));
+                            modelUpdateCommandQueue.DeleteMessage(message);
+
+                            string informationMessage = $"{baseLogString} Start => Command received from model update command queue about to be executed.";
+                            Logger.LogInformation(informationMessage);
+
+                            await ExecuteCommand(currentCommand);
+                        }
+                    }
+
+                    while (writeCommandQueue.PeekMessage() != null)
+                    {
+                        verboseMessage = $"{baseLogString} Start => Getting Command from write command queue.";
+                        Logger.LogVerbose(verboseMessage);
+
+                        CloudQueueMessage message = writeCommandQueue.GetMessage();
+                        if (message != null)
+                        {
+                            IModbusFunction currentCommand = (IModbusFunction)(Serialization.ByteArrayToObject(message.AsBytes));
+                            writeCommandQueue.DeleteMessage(message);
+
+                            string informationMessage = $"{baseLogString} Start => Command received from write command queue about to be executed.";
+                            Logger.LogInformation(informationMessage);
+
+                            await ExecuteCommand(currentCommand);
+                        }
                     }
                 }
 
-                while (writeCommandQueue.PeekMessage() != null)
-                {
-                    verboseMessage = $"{baseLogString} Start => Getting Command from write command queue.";
-                    Logger.LogVerbose(verboseMessage);
-
-                    CloudQueueMessage message = writeCommandQueue.GetMessage();
-                    if(message!=null)
-                    {
-                        IModbusFunction currentCommand = (IModbusFunction)(Serialization.ByteArrayToObject(message.AsBytes));
-                        writeCommandQueue.DeleteMessage(message);
-
-                        string informationMessage = $"{baseLogString} Start => Command received from write command queue about to be executed.";
-                        Logger.LogInformation(informationMessage);
-
-                        await ExecuteCommand(currentCommand);
-                    }
-                }
 
                 while (readCommandQueue.PeekMessage() != null)
                 {
@@ -270,7 +274,7 @@ namespace SCADA.FunctionExecutorImplementation
                 throw new ArgumentException(message);
             }
 
-            if(functionCode == ModbusFunctionCode.READ_COILS || functionCode == ModbusFunctionCode.READ_DISCRETE_INPUTS)
+            if (functionCode == ModbusFunctionCode.READ_COILS || functionCode == ModbusFunctionCode.READ_DISCRETE_INPUTS)
             {
                 verboseMessage = $"{baseLogString} ExecuteReadCommand => ExecuteDiscreteReadCommand about to be called.";
                 Logger.LogVerbose(verboseMessage);
@@ -314,7 +318,7 @@ namespace SCADA.FunctionExecutorImplementation
                 verboseMessage = $"{baseLogString} ExecuteDiscreteReadCommand => ModbusClient.ReadCoils({startAddress - 1}, {quantity}) method SUCCESSFULLY executed. Resulting data count: {data.Length}.";
                 Logger.LogVerbose(verboseMessage);
             }
-            else if(functionCode == ModbusFunctionCode.READ_DISCRETE_INPUTS)
+            else if (functionCode == ModbusFunctionCode.READ_DISCRETE_INPUTS)
             {
                 verboseMessage = $"{baseLogString} ExecuteDiscreteReadCommand => about to call ModbusClient.ReadDiscreteInputs({startAddress - 1}, {quantity}) method.";
                 Logger.LogVerbose(verboseMessage);
@@ -395,10 +399,10 @@ namespace SCADA.FunctionExecutorImplementation
                 verboseMessage = $"{baseLogString} ExecuteDiscreteReadCommand => DiscreteModbusData added to measurementCache. MeasurementGid: {digitalData.MeasurementGid:X16}, Value: {digitalData.Value}, Alarm: {digitalData.Alarm}, CommandOrigin: {digitalData.CommandOrigin} .";
                 Logger.LogVerbose(verboseMessage);
             }
-            
+
             //LOGIC
             await modelUpdateAccessClient.MakeDiscreteEntryToMeasurementCache(this.discreteMeasurementCache, true);
-            
+
             verboseMessage = $"{baseLogString} ExecuteDiscreteReadCommand => MakeDiscreteEntryToMeasurementCache method called. measurementCache count: {this.discreteMeasurementCache.Count}.";
             Logger.LogVerbose(verboseMessage);
         }
@@ -567,7 +571,7 @@ namespace SCADA.FunctionExecutorImplementation
             }
 
             if (writeCommand.FunctionCode == ModbusFunctionCode.WRITE_SINGLE_COIL)
-            {                
+            {
                 bool booleanCommand;
                 if (commandValue == 0)
                 {
@@ -628,7 +632,7 @@ namespace SCADA.FunctionExecutorImplementation
                 throw new ArgumentException(message);
             }
 
-            if(writeCommand.CommandValues.Length == 0)
+            if (writeCommand.CommandValues.Length == 0)
             {
                 string message = $"{baseLogString} ExecuteWriteMultipleCommand => CommandValues array is empty.";
                 Logger.LogError(message);
@@ -681,7 +685,7 @@ namespace SCADA.FunctionExecutorImplementation
 
             this.modelReadAccessClient = ScadaModelReadAccessClient.CreateClient();
             this.modelUpdateAccessClient = ScadaModelUpdateAccessClient.CreateClient();
-            
+
             //LOGIC
             int quantity = commandValues.Length;
             var addressToGidMap = await modelReadAccessClient.GetAddressToGidMap();
@@ -716,8 +720,8 @@ namespace SCADA.FunctionExecutorImplementation
                 {
                     booleanCommands[index] = true;
                     booleanCommandsSB.Append(true);
-                    
-                    if(index < quantity - 1)
+
+                    if (index < quantity - 1)
                     {
                         booleanCommandsSB.Append(" ");
                     }
