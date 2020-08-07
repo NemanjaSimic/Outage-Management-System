@@ -1,6 +1,7 @@
 ﻿using Common.CE;
 using Common.OMS;
 using Common.OMS.OutageDatabaseModel;
+using Common.OmsContracts.ModelProvider;
 using Common.OmsContracts.OutageLifecycle;
 using OMS.Common.Cloud;
 using OMS.Common.Cloud.Logger;
@@ -29,7 +30,7 @@ namespace OMS.OutageLifecycleServiceImplementation
         private UnitOfWork dbContext;
         private OutageMessageMapper outageMessageMapper;
         private OutageLifecycleHelper outageLifecycleHelper;
-        private OutageModelReadAccessClient outageModelReadAccessClient;
+        private IOutageModelReadAccessContract outageModelReadAccessClient;
         public ValidateResolveConditionsService(UnitOfWork dbContext)
         {
             this.dbContext = dbContext;

@@ -19,13 +19,13 @@ namespace OMS.Common.WcfClient.TMS
         {
         }
 
-        public static TransactionCoordinatorClient CreateClient()
+        public static ITransactionCoordinatorContract CreateClient()
         {
             ClientFactory factory = new ClientFactory();
             return factory.CreateClient<TransactionCoordinatorClient, ITransactionCoordinatorContract>(microserviceName);
         }
 
-        public static TransactionCoordinatorClient CreateClient(Uri serviceUri, ServicePartitionKey servicePartitionKey)
+        public static ITransactionCoordinatorContract CreateClient(Uri serviceUri, ServicePartitionKey servicePartitionKey)
         {
             ClientFactory factory = new ClientFactory();
             return factory.CreateClient<TransactionCoordinatorClient, ITransactionCoordinatorContract>(serviceUri, servicePartitionKey);

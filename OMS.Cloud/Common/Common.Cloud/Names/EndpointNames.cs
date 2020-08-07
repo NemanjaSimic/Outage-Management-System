@@ -58,7 +58,8 @@ namespace OMS.Common.Cloud.Names
         public const string OutageSimulatorEndpoint = "OutageSimulatorEndpoint";
         public const string NotifySubscriberEndpoint = "NotifySubscriberEndpoint";
         public const string IsolateOutageEndpoint = "IsolateOutageEndpoint";
-        
+        public const string OmsOutageSimulatorEndpoint = "OmsOutageSimulatorEndpoint";
+
         //WEB - 6
         public const string WebAdapterEndpoint = "WebAdapterEndpoint";
     }

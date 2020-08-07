@@ -19,13 +19,13 @@ namespace OMS.Common.WcfClient.OMS
         {
 
         }
-        public static SendRepairCrewClient CreateClient()
+        public static ISendRepairCrewContract CreateClient()
         {
             ClientFactory factory = new ClientFactory();
             return factory.CreateClient<SendRepairCrewClient, ISendRepairCrewContract>(microserviceName);
         }
 
-        public static SendRepairCrewClient CreateClient(Uri serviceUri, ServicePartitionKey servicePartitionKey)
+        public static ISendRepairCrewContract CreateClient(Uri serviceUri, ServicePartitionKey servicePartitionKey)
         {
             ClientFactory factory = new ClientFactory();
             return factory.CreateClient<SendRepairCrewClient, ISendRepairCrewContract>(serviceUri, servicePartitionKey);

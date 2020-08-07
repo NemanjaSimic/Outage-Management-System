@@ -20,13 +20,13 @@ namespace OMS.Common.WcfClient.OMS
 
         }
 
-        public static ValidateResolveConditionsClient CreateClient()
+        public static IValidateResolveConditionsContract CreateClient()
         {
             ClientFactory factory = new ClientFactory();
             return factory.CreateClient<ValidateResolveConditionsClient, IValidateResolveConditionsContract>(microserviceName);
         }
 
-        public static ValidateResolveConditionsClient CreateClient(Uri serviceUri, ServicePartitionKey servicePartitionKey)
+        public static IValidateResolveConditionsContract CreateClient(Uri serviceUri, ServicePartitionKey servicePartitionKey)
         {
             ClientFactory factory = new ClientFactory();
             return factory.CreateClient<ValidateResolveConditionsClient, IValidateResolveConditionsContract>(serviceUri, servicePartitionKey);

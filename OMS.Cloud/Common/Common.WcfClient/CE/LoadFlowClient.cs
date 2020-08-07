@@ -18,13 +18,13 @@ namespace OMS.Common.WcfClient.CE
 
 		}
 
-		public static LoadFlowClient CreateClient()
+		public static ILoadFlowContract CreateClient()
 		{
 			ClientFactory factory = new ClientFactory();
 			return factory.CreateClient<LoadFlowClient, ILoadFlowContract>(microserviceName);
 		}
 
-		public static LoadFlowClient CreateClient(Uri serviceUri, ServicePartitionKey servicePartitionKey)
+		public static ILoadFlowContract CreateClient(Uri serviceUri, ServicePartitionKey servicePartitionKey)
 		{
 			ClientFactory factory = new ClientFactory();
 			return factory.CreateClient<LoadFlowClient, ILoadFlowContract>(serviceUri, servicePartitionKey);

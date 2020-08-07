@@ -1,4 +1,6 @@
 ﻿using Common.CE;
+using Common.OmsContracts.ModelProvider;
+using Common.OmsContracts.OutageLifecycle;
 using OMS.Common.Cloud;
 using OMS.Common.PubSub;
 using OMS.Common.WcfClient.OMS;
@@ -19,8 +21,8 @@ namespace OMS.CallTrackingServiceImplementation
         //TODO: Mozda reliable dic/queue
         private List<long> potentialOutages;
         private List<long> outages;
-        private ReportOutageClient reportOutageClient;
-        private OutageModelReadAccessClient outageModelReadAccessClient;
+        private IReportOutageContract reportOutageClient;
+        private IOutageModelReadAccessContract outageModelReadAccessClient;
 
         public TrackingAlgorithm()
 		{

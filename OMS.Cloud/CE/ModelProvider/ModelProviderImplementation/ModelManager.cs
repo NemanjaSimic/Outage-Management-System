@@ -68,7 +68,7 @@ namespace CE.ModelProviderImplementation
 		}
 
 		private readonly NetworkModelGDA networkModelGda;
-		private readonly MeasurementProviderClient measurementProviderClient;
+		private readonly IMeasurementProviderContract measurementProviderClient;
 
 		private static long noScadaGuid = 1;
 		private readonly ModelResourcesDesc modelResourcesDesc;

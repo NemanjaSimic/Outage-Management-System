@@ -21,13 +21,13 @@ namespace OMS.Common.WcfClient.OMS
 
         }
 
-        public static ReportingClient CreateClient()
+        public static IReportingContract CreateClient()
         {
             ClientFactory factory = new ClientFactory();
             return factory.CreateClient<ReportingClient, IReportingContract>(microserviceName);
         }
 
-        public static ReportingClient CreateClient(Uri serviceUri, ServicePartitionKey servicePartitionKey)
+        public static IReportingContract CreateClient(Uri serviceUri, ServicePartitionKey servicePartitionKey)
         {
             ClientFactory factory = new ClientFactory();
             return factory.CreateClient<ReportingClient, IReportingContract>(serviceUri, servicePartitionKey);

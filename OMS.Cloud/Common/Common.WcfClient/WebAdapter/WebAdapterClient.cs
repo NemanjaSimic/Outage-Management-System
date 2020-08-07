@@ -21,13 +21,13 @@ namespace OMS.Common.WcfClient.WebAdapter
         {
         }
 
-        public static WebAdapterClient CreateClient(string serviceName)
+        public static IWebAdapterContract CreateClient(string serviceName)
         {
             ClientFactory factory = new ClientFactory();
             return factory.CreateClient<WebAdapterClient, IWebAdapterContract>(serviceName);
         }
 
-        public static WebAdapterClient CreateClient(Uri serviceUri, ServicePartitionKey servicePartitionKey)
+        public static IWebAdapterContract CreateClient(Uri serviceUri, ServicePartitionKey servicePartitionKey)
         {
             ClientFactory factory = new ClientFactory();
             return factory.CreateClient<WebAdapterClient, IWebAdapterContract>(serviceUri, servicePartitionKey);

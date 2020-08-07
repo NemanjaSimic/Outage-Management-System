@@ -20,13 +20,13 @@ namespace OMS.Common.WcfClient.OMS.Lifecycle
 
 		}
 
-		public static IsolateOutageClient CreateClient()
+		public static IIsolateOutageContract CreateClient()
 		{
 			ClientFactory factory = new ClientFactory();
 			return factory.CreateClient<IsolateOutageClient, IIsolateOutageContract>(microserviceName);
 		}
 
-		public static IsolateOutageClient CreateClient(Uri serviceUri, ServicePartitionKey servicePartitionKey)
+		public static IIsolateOutageContract CreateClient(Uri serviceUri, ServicePartitionKey servicePartitionKey)
 		{
 			ClientFactory factory = new ClientFactory();
 			return factory.CreateClient<IsolateOutageClient, IIsolateOutageContract>(serviceUri, servicePartitionKey);

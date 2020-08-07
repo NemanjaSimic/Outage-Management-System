@@ -1,6 +1,8 @@
 ﻿using Common.CE;
+using Common.CeContracts;
 using Common.OMS;
 using Common.OMS.OutageDatabaseModel;
+using Common.OmsContracts.ModelProvider;
 using Common.OmsContracts.OutageLifecycle;
 using Common.OmsContracts.OutageSimulator;
 using OMS.Common.Cloud;
@@ -33,12 +35,10 @@ namespace OMS.OutageLifecycleServiceImplementation
         private UnitOfWork dbContext;
         private OutageMessageMapper outageMessageMapper;
         private OutageLifecycleHelper outageLifecycleHelper;
-        private OutageModelReadAccessClient outageModelReadAccessClient;
-        private OutageModelUpdateAccessClient outageModelUpdateAccessClient;
-        private MeasurementMapServiceClient measurementMapServiceClient;
-        private SwitchStatusCommandingClient switchStatusCommandingClient;
-        private ChannelFactory<IOutageSimulatorContract> channelFactory = new ChannelFactory<IOutageSimulatorContract>(EndpointNames.OutageSimulatorEndpoint);
-        private IOutageSimulatorContract proxy;
+        private IOutageModelReadAccessContract outageModelReadAccessClient;
+        private IOutageModelUpdateAccessContract outageModelUpdateAccessClient;
+        private IMeasurementMapContract measurementMapServiceClient;
+        private ISwitchStatusCommandingContract switchStatusCommandingClient;
         private Dictionary<long, long> CommandedElements;
         public SendLocationIsolationCrewService(UnitOfWork dbContext)
         {
@@ -48,7 +48,6 @@ namespace OMS.OutageLifecycleServiceImplementation
             this.outageModelUpdateAccessClient = OutageModelUpdateAccessClient.CreateClient();
             this.measurementMapServiceClient =  MeasurementMapServiceClient.CreateClient();
             this.switchStatusCommandingClient = SwitchStatusCommandingClient.CreateClient();
-            this.proxy = channelFactory.CreateChannel();
             this.CommandedElements = new Dictionary<long, long>();
         }
         public async Task InitAwaitableFields()
@@ -120,14 +119,9 @@ namespace OMS.OutageLifecycleServiceImplementation
             Task.Delay(5000).Wait();
 
 
-            if (proxy == null)
-            {
-                string message = "OutageModel::SendLocationIsolationCrew => OutageSimulatorProxy is null";
-                Logger.LogError(message);
-                throw new NullReferenceException(message);
-            }
+            IOutageSimulatorContract outageSimulatorClient = OutageSimulatorClient.CreateClient();
             //Da li je prijaveljen element OutageElement
-            if (proxy.IsOutageElement(reportedGid))
+            if (await outageSimulatorClient.IsOutageElement(reportedGid))
             {
                 outageElementId = reportedGid;
             }
@@ -140,7 +134,7 @@ namespace OMS.OutageLifecycleServiceImplementation
                     {
                         for (int i = 0; i < topologyElement.SecondEnd.Count; i++)
                         {
-                            if (proxy.IsOutageElement(topologyElement.SecondEnd[i]))
+                            if (await outageSimulatorClient.IsOutageElement(topologyElement.SecondEnd[i]))
                             {
                                 if (outageElementId == -1)
                                 {
@@ -165,7 +159,7 @@ namespace OMS.OutageLifecycleServiceImplementation
             //Tragamo za ACL-om gore ka source-u
             while (outageElementId == -1 && !topologyElement.IsRemote && topologyElement.DmsType != "ENERGYSOURCE")
             {
-                if (proxy.IsOutageElement(topologyElement.Id))
+                if (await outageSimulatorClient.IsOutageElement(topologyElement.Id))
                 {
                     outageElementId = topologyElement.Id;
                     outageEntity.OutageElementGid = outageElementId;

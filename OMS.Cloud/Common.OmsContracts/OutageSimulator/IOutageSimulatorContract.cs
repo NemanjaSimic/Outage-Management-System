@@ -1,4 +1,5 @@
-﻿using System;
+﻿using Microsoft.ServiceFabric.Services.Remoting;
+using System;
 using System.Collections.Generic;
 using System.Linq;
 using System.ServiceModel;
@@ -8,12 +9,12 @@ using System.Threading.Tasks;
 namespace Common.OmsContracts.OutageSimulator
 {
     [ServiceContract]
-    public interface IOutageSimulatorContract
+    public interface IOutageSimulatorContract : IService
     {
         [OperationContract]
-        bool StopOutageSimulation(long outageElementId);
+        Task<bool> StopOutageSimulation(long outageElementId);
 
         [OperationContract]
-        bool IsOutageElement(long outageElementId);
+        Task<bool> IsOutageElement(long outageElementId);
     }
 }

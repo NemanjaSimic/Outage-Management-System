@@ -20,13 +20,13 @@ namespace OMS.Common.WcfClient.SCADA
         {
         }
 
-        public static ScadaIntegrityUpdateClient CreateClient()
+        public static IScadaIntegrityUpdateContract CreateClient()
         {
             ClientFactory factory = new ClientFactory();
             return factory.CreateClient<ScadaIntegrityUpdateClient, IScadaIntegrityUpdateContract>(microserviceName);
         }
 
-        public static ScadaIntegrityUpdateClient CreateClient(Uri serviceUri, ServicePartitionKey servicePartitionKey)
+        public static IScadaIntegrityUpdateContract CreateClient(Uri serviceUri, ServicePartitionKey servicePartitionKey)
         {
             ClientFactory factory = new ClientFactory();
             return factory.CreateClient<ScadaIntegrityUpdateClient, IScadaIntegrityUpdateContract>(serviceUri, servicePartitionKey);

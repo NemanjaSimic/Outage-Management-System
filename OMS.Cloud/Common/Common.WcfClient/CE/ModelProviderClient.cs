@@ -19,13 +19,13 @@ namespace OMS.Common.WcfClient.CE
 
 		}
 
-		public static ModelProviderClient CreateClient()
+		public static IModelProviderContract CreateClient()
 		{
 			ClientFactory factory = new ClientFactory();
 			return factory.CreateClient<ModelProviderClient, IModelProviderContract>(microserviceName);
 		}
 
-		public static ModelProviderClient CreateClient(Uri serviceUri, ServicePartitionKey servicePartitionKey)
+		public static IModelProviderContract CreateClient(Uri serviceUri, ServicePartitionKey servicePartitionKey)
 		{
 			ClientFactory factory = new ClientFactory();
 			return factory.CreateClient<ModelProviderClient, IModelProviderContract>(serviceUri, servicePartitionKey);

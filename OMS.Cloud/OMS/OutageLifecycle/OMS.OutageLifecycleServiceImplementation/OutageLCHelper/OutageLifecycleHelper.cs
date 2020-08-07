@@ -5,6 +5,7 @@ using OMS.Common.Cloud.Logger;
 using OMS.Common.NmsContracts;
 using OMS.Common.NmsContracts.GDA;
 using OMS.Common.PubSub;
+using OMS.Common.PubSubContracts;
 using OMS.Common.WcfClient.NMS;
 using OMS.Common.WcfClient.PubSub;
 using OutageDatabase.Repository;
@@ -20,8 +21,8 @@ namespace OMS.OutageLifecycleServiceImplementation.OutageLCHelper
         private IOutageTopologyModel outageTopology;
         private ICloudLogger logger;
         public static ModelResourcesDesc modelResourcesDesc = new ModelResourcesDesc();
-        private NetworkModelGdaClient networkModelGdaClient;
-        private PublisherClient publisherClient;
+        private INetworkModelGDAContract networkModelGdaClient;
+        private IPublisherContract publisherClient;
         
         private ICloudLogger Logger
         {

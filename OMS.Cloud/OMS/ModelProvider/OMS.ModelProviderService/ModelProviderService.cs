@@ -27,7 +27,7 @@ namespace OMS.ModelProviderService
         private readonly OutageModel outageModel;
         private readonly OutageModelReadAccessProvider outageModelReadAccessProvider;
         private readonly OutageModelUpdateAccessProvider outageModelUpdateAccessProvider;
-        private readonly RegisterSubscriberClient registerSubscriberClient;
+        private readonly IRegisterSubscriberContract registerSubscriberClient;
 
         public ModelProviderService(StatefulServiceContext context)
             : base(context)

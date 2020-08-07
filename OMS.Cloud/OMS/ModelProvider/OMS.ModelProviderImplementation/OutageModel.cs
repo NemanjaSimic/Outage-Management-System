@@ -1,5 +1,8 @@
 ﻿using Common.CE;
 using Common.OMS;
+using Common.OmsContracts.HistoryDBManager;
+using Common.OmsContracts.ModelProvider;
+using Common.OmsContracts.OutageLifecycle;
 using Common.PubSub;
 using Common.PubSubContracts.DataContracts.CE;
 using Microsoft.ServiceFabric.Data;
@@ -28,10 +31,10 @@ namespace OMS.ModelProviderImplementation
 		{
 			get { return logger ?? (logger = CloudLoggerFactory.GetLogger()); }
 		}
-		private HistoryDBManagerClient historyDBManagerClient;
-		private OutageModelReadAccessClient outageModelReadAccessClient;
-		private OutageModelUpdateAccessClient outageModelUpdateAccessClient;
-		private ReportOutageClient reportOutageClient;
+		private IHistoryDBManagerContract historyDBManagerClient;
+		private IOutageModelReadAccessContract outageModelReadAccessClient;
+		private IOutageModelUpdateAccessContract outageModelUpdateAccessClient;
+		private IReportOutageContract reportOutageClient;
 		public OutageModel(IReliableStateManager stateManager)
 		{
 			this.stateManager = stateManager;

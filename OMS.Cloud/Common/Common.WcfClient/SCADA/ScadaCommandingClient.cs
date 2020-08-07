@@ -20,13 +20,13 @@ namespace OMS.Common.WcfClient.SCADA
         {
         }
 
-        public static ScadaCommandingClient CreateClient()
+        public static IScadaCommandingContract CreateClient()
         {
             ClientFactory factory = new ClientFactory();
             return factory.CreateClient<ScadaCommandingClient, IScadaCommandingContract>(microserviceName);
         }
 
-        public static ScadaCommandingClient CreateClient(Uri serviceUri, ServicePartitionKey servicePartitionKey)
+        public static IScadaCommandingContract CreateClient(Uri serviceUri, ServicePartitionKey servicePartitionKey)
         {
             ClientFactory factory = new ClientFactory();
             return factory.CreateClient<ScadaCommandingClient, IScadaCommandingContract>(serviceUri, servicePartitionKey);

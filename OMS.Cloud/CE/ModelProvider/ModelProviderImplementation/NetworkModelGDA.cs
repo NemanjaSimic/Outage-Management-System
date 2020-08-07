@@ -1,5 +1,6 @@
 ﻿using OMS.Common.Cloud;
 using OMS.Common.Cloud.Logger;
+using OMS.Common.NmsContracts;
 using OMS.Common.NmsContracts.GDA;
 using OMS.Common.WcfClient.NMS;
 using System;
@@ -10,7 +11,7 @@ namespace CE.ModelProviderImplementation
 {
 	public class NetworkModelGDA
 	{
-		private readonly NetworkModelGdaClient networkModelGdaClient;
+		private readonly INetworkModelGDAContract networkModelGdaClient;
 
 		private readonly string baseLogString;
 

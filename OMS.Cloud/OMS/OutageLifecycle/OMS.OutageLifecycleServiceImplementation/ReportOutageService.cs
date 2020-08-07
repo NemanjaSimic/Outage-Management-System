@@ -13,6 +13,8 @@ using Common.OMS.OutageDatabaseModel;
 using OMS.OutageLifecycleServiceImplementation.OutageLCHelper;
 using Common.CE;
 using OMS.Common.PubSub;
+using Common.OmsContracts.ModelProvider;
+using Common.OmsContracts.HistoryDBManager;
 
 namespace OMS.OutageLifecycleServiceImplementation
 {
@@ -25,8 +27,8 @@ namespace OMS.OutageLifecycleServiceImplementation
         private IOutageTopologyModel topologyModel;
         private Dictionary<long, long> CommandedElements;
         private Dictionary<long, long> OptimumIsolationPoints;
-		private OutageModelReadAccessClient outageModelReadAccessClient;
-        private HistoryDBManagerClient historyDBManagerClient;
+		private IOutageModelReadAccessContract outageModelReadAccessClient;
+        private IHistoryDBManagerContract historyDBManagerClient;
 		private ICloudLogger logger;
 
 		private ICloudLogger Logger

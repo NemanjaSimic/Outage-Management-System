@@ -19,13 +19,13 @@ namespace OMS.Common.WcfClient.SCADA
         {
         }
 
-        public static WriteCommandEnqueuerClient CreateClient()
+        public static IWriteCommandEnqueuerContract CreateClient()
         {
             ClientFactory factory = new ClientFactory();
             return factory.CreateClient<WriteCommandEnqueuerClient, IWriteCommandEnqueuerContract>(microserviceName);
         }
 
-        public static WriteCommandEnqueuerClient CreateClient(Uri serviceUri, ServicePartitionKey servicePartitionKey)
+        public static IWriteCommandEnqueuerContract CreateClient(Uri serviceUri, ServicePartitionKey servicePartitionKey)
         {
             ClientFactory factory = new ClientFactory();
             return factory.CreateClient<WriteCommandEnqueuerClient, IWriteCommandEnqueuerContract>(serviceUri, servicePartitionKey);

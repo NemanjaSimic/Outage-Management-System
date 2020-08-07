@@ -18,13 +18,13 @@ namespace OMS.Common.WcfClient.CE
 
 		}
 
-		public static SwitchStatusCommandingClient CreateClient()
+		public static ISwitchStatusCommandingContract CreateClient()
 		{
 			ClientFactory factory = new ClientFactory();
 			return factory.CreateClient<SwitchStatusCommandingClient, ISwitchStatusCommandingContract>(microserviceName);
 		}
 
-		public static SwitchStatusCommandingClient CreateClient(Uri serviceUri, ServicePartitionKey servicePartitionKey)
+		public static ISwitchStatusCommandingContract CreateClient(Uri serviceUri, ServicePartitionKey servicePartitionKey)
 		{
 			ClientFactory factory = new ClientFactory();
 			return factory.CreateClient<SwitchStatusCommandingClient, ISwitchStatusCommandingContract>(serviceUri, servicePartitionKey);

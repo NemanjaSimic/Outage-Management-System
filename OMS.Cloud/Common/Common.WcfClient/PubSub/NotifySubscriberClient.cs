@@ -17,13 +17,13 @@ namespace OMS.Common.WcfClient.PubSub
         {
         }
 
-        public static NotifySubscriberClient CreateClient(string serviceName)
+        public static INotifySubscriberContract CreateClient(string serviceName)
         {
             ClientFactory factory = new ClientFactory();
             return factory.CreateClient<NotifySubscriberClient, INotifySubscriberContract>(serviceName);
         }
 
-        public static NotifySubscriberClient CreateClient(Uri serviceUri, ServicePartitionKey servicePartitionKey)
+        public static INotifySubscriberContract CreateClient(Uri serviceUri, ServicePartitionKey servicePartitionKey)
         {
             ClientFactory factory = new ClientFactory();
             return factory.CreateClient<NotifySubscriberClient, INotifySubscriberContract>(serviceUri, servicePartitionKey);
