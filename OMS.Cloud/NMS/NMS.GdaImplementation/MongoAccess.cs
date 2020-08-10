@@ -74,22 +74,6 @@ namespace NMS.GdaImplementation
             }
         }
 
-        public long GetLatestVersion()
-        {
-            long latestNetworkModelVersion = GetLatestNetworkModelVersions();
-            long latestDeltaVersion = GetLatestDeltaVersions();
-
-            if (latestNetworkModelVersion < 0 || latestDeltaVersion < 0)
-            {
-                string errorMessage = $"{baseLogString} SaveNetworkModel => latest version has a negative value.";
-                Logger.LogError(errorMessage);
-                throw new Exception(errorMessage);
-            }
-
-            long latestVersion = latestDeltaVersion > latestNetworkModelVersion ? latestDeltaVersion : latestNetworkModelVersion;
-            return latestVersion;
-        }
-
         public void SaveNetworkModel(Dictionary<DMSType, Container> networkModel, long version)
         {
             long latestVersion = GetLatestVersion();
@@ -140,16 +124,7 @@ namespace NMS.GdaImplementation
 
         public void SaveDelta(Delta delta)
         {
-            long latestNetworkModelVersion = GetLatestNetworkModelVersions();
-            long latestDeltaVersion = GetLatestDeltaVersions();
-
-            if (latestNetworkModelVersion < 0 || latestDeltaVersion < 0)
-            {
-                string errorMessage = $"{baseLogString} SaveDelta => latest version has a negative value.";
-                throw new Exception(errorMessage);
-            }
-
-            long latestVersion = latestDeltaVersion > latestNetworkModelVersion ? latestDeltaVersion : latestNetworkModelVersion;
+            long latestVersion = GetLatestVersion();
 
             if (delta.Id <= latestVersion)
             {
@@ -173,20 +148,36 @@ namespace NMS.GdaImplementation
                 var latestVersionsCollection = db.GetCollection<LatestVersionsDocument>(MongoStrings.LatestVersionsCollection);
                 latestVersionsCollection.ReplaceOne(new BsonDocument("_id", MongoStrings.LatestVersions_DeltaVersion), newLatestDeltaVersionDocument, new ReplaceOptions { IsUpsert = true });
 
-                var deltasCollection = db.GetCollection<Delta>(MongoStrings.DeltasCollection);
                 delta.DeltaOrigin = DeltaOriginType.DatabaseDelta;
+                var deltasCollection = db.GetCollection<Delta>(MongoStrings.DeltasCollection);
                 deltasCollection.InsertOne(delta);
             }
             catch (MongoWriteException e)
             {
-                string errorMessage = $"{baseLogString} SaveDelta => Warn: {e.Message}.";
-                Logger.LogWarning(errorMessage, e);
+                string warnMessage = $"{baseLogString} SaveDelta => Warn: {e.Message}.";
+                Logger.LogWarning(warnMessage, e);
             }
             catch (Exception e)
             {
                 string errorMessage = $"{baseLogString} SaveDelta => Error: {e.Message}.";
                 Logger.LogError(errorMessage, e);
             }
+        }
+
+        public long GetLatestVersion()
+        {
+            long latestNetworkModelVersion = GetLatestNetworkModelVersions();
+            long latestDeltaVersion = GetLatestDeltaVersions();
+
+            if (latestNetworkModelVersion < 0 || latestDeltaVersion < 0)
+            {
+                string errorMessage = $"{baseLogString} SaveNetworkModel => latest version has a negative value.";
+                Logger.LogError(errorMessage);
+                throw new Exception(errorMessage);
+            }
+
+            long latestVersion = latestDeltaVersion > latestNetworkModelVersion ? latestDeltaVersion : latestNetworkModelVersion;
+            return latestVersion;
         }
 
         public long GetLatestNetworkModelVersions(bool isRetry = false)
