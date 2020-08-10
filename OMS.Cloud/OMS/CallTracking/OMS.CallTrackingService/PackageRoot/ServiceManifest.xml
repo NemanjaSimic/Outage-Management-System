@@ -24,8 +24,8 @@
   <ConfigPackage Name="Config" Version="1.0.0" />
 
   <Resources>
-    <!--<Endpoints>
-     
-    </Endpoints>-->
+    <Endpoints>
+			<Endpoint Name="OmsCallTrackingService" Protocol="tcp" Type="Input"/>
+    </Endpoints>
   </Resources>
 </ServiceManifest>

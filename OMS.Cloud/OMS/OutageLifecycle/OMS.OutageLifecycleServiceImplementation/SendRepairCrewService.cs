@@ -8,8 +8,8 @@ using OMS.Common.Cloud.Logger;
 using OMS.Common.Cloud.Names;
 using OMS.Common.PubSub;
 using OMS.Common.WcfClient.OMS;
+using OMS.Common.WcfClient.OMS.ModelAccess;
 using OMS.OutageLifecycleServiceImplementation.OutageLCHelper;
-using OutageDatabase.Repository;
 using System;
 using System.Collections.Generic;
 using System.Linq;
@@ -29,24 +29,28 @@ namespace OMS.OutageLifecycleServiceImplementation
             get { return logger ?? (logger = CloudLoggerFactory.GetLogger()); }
         }
 
-        private UnitOfWork dbContext;
         private OutageMessageMapper outageMessageMapper;
         private OutageLifecycleHelper outageLifecycleHelper;
-        private OutageModelReadAccessClient outageModelReadAccessClient;
-        private ChannelFactory<IOutageSimulatorContract> channelFactory = new ChannelFactory<IOutageSimulatorContract>(EndpointNames.OutageSimulatorEndpoint);
+
+		#region MyRegion
+		private OutageModelReadAccessClient outageModelReadAccessClient;
+        private OutageModelAccessClient outageModelAccessClient;
+		#endregion
+
+        private ChannelFactory<IOutageSimulatorContract> channelFactory = new ChannelFactory<IOutageSimulatorContract>(EndpointNames.OmsOutageSimulatorEndpoint);
         private IOutageSimulatorContract proxy;
-        public SendRepairCrewService(UnitOfWork dbContext)
+        public SendRepairCrewService()
         {
-            this.dbContext = dbContext;
             this.outageMessageMapper = new OutageMessageMapper();
             this.outageModelReadAccessClient = OutageModelReadAccessClient.CreateClient();
+            this.outageModelAccessClient = OutageModelAccessClient.CreateClient();
             this.proxy = channelFactory.CreateChannel();
 
         }
         public async Task InitAwaitableFields()
         {
             this.outageModel = await outageModelReadAccessClient.GetTopologyModel();
-            this.outageLifecycleHelper = new OutageLifecycleHelper(this.dbContext, this.outageModel);
+            this.outageLifecycleHelper = new OutageLifecycleHelper(this.outageModel);
         }
         public async Task<bool> SendRepairCrew(long outageId)
 		{
@@ -55,7 +59,7 @@ namespace OMS.OutageLifecycleServiceImplementation
 
             try
             {
-                outageDbEntity = dbContext.OutageRepository.Get(outageId);
+                outageDbEntity = await outageModelAccessClient.GetOutage(outageId);
             }
             catch (Exception e)
             {
@@ -92,11 +96,11 @@ namespace OMS.OutageLifecycleServiceImplementation
                 {
                     outageDbEntity.OutageState = OutageState.REPAIRED;
                     outageDbEntity.RepairedTime = DateTime.UtcNow;
-                    dbContext.OutageRepository.Update(outageDbEntity);
+                    
 
                     try
                     {
-                        dbContext.Complete();
+                        await outageModelAccessClient.UpdateOutage(outageDbEntity);
                         await outageLifecycleHelper.PublishOutage(Topic.ACTIVE_OUTAGE, outageMessageMapper.MapOutageEntity(outageDbEntity));
                     }
                     catch (Exception e)

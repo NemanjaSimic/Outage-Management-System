@@ -6,8 +6,8 @@ using OMS.Common.Cloud;
 using OMS.Common.Cloud.Logger;
 using OMS.Common.PubSub;
 using OMS.Common.WcfClient.OMS;
+using OMS.Common.WcfClient.OMS.ModelAccess;
 using OMS.OutageLifecycleServiceImplementation.OutageLCHelper;
-using OutageDatabase.Repository;
 using System;
 using System.Collections.Generic;
 using System.Linq;
@@ -26,21 +26,21 @@ namespace OMS.OutageLifecycleServiceImplementation
             get { return logger ?? (logger = CloudLoggerFactory.GetLogger()); }
         }
 
-        private UnitOfWork dbContext;
         private OutageMessageMapper outageMessageMapper;
         private OutageLifecycleHelper outageLifecycleHelper;
         private OutageModelReadAccessClient outageModelReadAccessClient;
-        public ValidateResolveConditionsService(UnitOfWork dbContext)
+        private OutageModelAccessClient outageModelAccessClient;
+        public ValidateResolveConditionsService()
         {
-            this.dbContext = dbContext;
             this.outageMessageMapper = new OutageMessageMapper();
             this.outageModelReadAccessClient = OutageModelReadAccessClient.CreateClient();
+            this.outageModelAccessClient = OutageModelAccessClient.CreateClient();
         }
 
         public async Task InitAwaitableFields()
         {
             this.outageModel = await outageModelReadAccessClient.GetTopologyModel();
-            this.outageLifecycleHelper = new OutageLifecycleHelper(this.dbContext, this.outageModel);
+            this.outageLifecycleHelper = new OutageLifecycleHelper(this.outageModel);
         }
         public async Task<bool> ValidateResolveConditions(long outageId)
 		{
@@ -49,7 +49,7 @@ namespace OMS.OutageLifecycleServiceImplementation
 
             try
             {
-                outageDbEntity = dbContext.OutageRepository.Get(outageId);
+                outageDbEntity = await outageModelAccessClient.GetOutage(outageId);
             }
             catch (Exception e)
             {
@@ -90,11 +90,9 @@ namespace OMS.OutageLifecycleServiceImplementation
 
             outageDbEntity.IsResolveConditionValidated = resolveCondition;
 
-            dbContext.OutageRepository.Update(outageDbEntity);
-
             try
             {
-                dbContext.Complete();
+                await outageModelAccessClient.UpdateOutage(outageDbEntity);
                 await outageLifecycleHelper.PublishOutage(Topic.ACTIVE_OUTAGE, outageMessageMapper.MapOutageEntity(outageDbEntity));
             }
             catch (Exception e)

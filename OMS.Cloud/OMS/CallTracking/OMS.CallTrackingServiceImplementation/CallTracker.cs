@@ -2,6 +2,8 @@
 using Common.PubSubContracts.DataContracts.EMAIL;
 using Microsoft.ServiceFabric.Data;
 using OMS.Common.Cloud;
+using OMS.Common.Cloud.Logger;
+using OMS.Common.Cloud.Names;
 using OMS.Common.Cloud.ReliableCollectionHelpers;
 using OMS.Common.NmsContracts;
 using OMS.Common.PubSubContracts;
@@ -30,6 +32,12 @@ namespace OMS.CallTrackingServiceImplementation
 			}
 		}
 
+		private ICloudLogger logger;
+		private ICloudLogger Logger
+		{
+			get { return logger ?? (logger = CloudLoggerFactory.GetLogger()); }
+		}
+
 		private Timer timer;
 		private readonly IReliableStateManager stateManager;
 		private int expectedCalls;
@@ -42,14 +50,13 @@ namespace OMS.CallTrackingServiceImplementation
 		private TrackingAlgorithm trackingAlgorithm;
 
 
-		public CallTracker(IReliableStateManager stateManager)
+		public CallTracker(IReliableStateManager stateManager, string subscriberName)
 		{
 			this.stateManager = stateManager;
 
 			trackingAlgorithm = new TrackingAlgorithm();
 
-			subscriberName = "CallTrackingService"; //TODO: ServiceDefines
-
+			this.subscriberName = subscriberName;
 			modelResourcesDesc = new ModelResourcesDesc();
 
 			outageModelReadAccessClient = OutageModelReadAccessClient.CreateClient();
@@ -64,23 +71,23 @@ namespace OMS.CallTrackingServiceImplementation
 			try
 			{
 				timerInterval = Int32.Parse(ConfigurationManager.AppSettings["TimerInterval"]);
-				//Logger.LogInfo($"TIme interval is set to: {timerInterval}.");
+				Logger.LogInformation($"TIme interval is set to: {timerInterval}.");
 
 			}
 			catch (Exception e)
 			{
-				//Logger.LogWarn("String in config file is not in valid format. Default values for timeInterval will be set.", e);
+				Logger.LogWarning("String in config file is not in valid format. Default values for timeInterval will be set.", e);
 				timerInterval = 60000;
 			}
 
 			try
 			{
 				expectedCalls = Int32.Parse(ConfigurationManager.AppSettings["ExpectedCalls"]);
-				//Logger.LogInfo($"Expected calls is set to: {expectedCalls}.");
+				Logger.LogInformation($"Expected calls is set to: {expectedCalls}.");
 			}
 			catch (Exception e)
 			{
-				//Logger.LogWarn("String in config file is not in valid format. Default values for expected calls will be set.", e);
+				Logger.LogWarning("String in config file is not in valid format. Default values for expected calls will be set.", e);
 				expectedCalls = 3;
 			}
 		}
@@ -97,19 +104,19 @@ namespace OMS.CallTrackingServiceImplementation
 			{
 				if (emailMessage.Gid == 0)
 				{
-					//Logger.LogError("Invalid email received.");
+					Logger.LogError("Invalid email received.");
 					return;
 				}
 
-				//Logger.LogInfo($"Received call from Energy Consumer with GID: 0x{emailMessage.Gid:X16}.");
+				Logger.LogInformation($"Received call from Energy Consumer with GID: 0x{emailMessage.Gid:X16}.");
 
 				if (!modelResourcesDesc.GetModelCodeFromId(emailMessage.Gid).Equals(ModelCode.ENERGYCONSUMER))
 				{
-					//Logger.LogWarn("Received GID is not id of energy consumer.");
+					Logger.LogWarning("Received GID is not id of energy consumer.");
 				}
 				else if (await outageModelReadAccessClient.GetElementById(emailMessage.Gid) == null/*!outageModel.TopologyModel.OutageTopology.ContainsKey(emailMessage.Gid) && outageModel.TopologyModel.FirstNode != emailMessage.Gid*/)
 				{
-					//Logger.LogWarn("Received GID is not part of topology");
+					Logger.LogWarning("Received GID is not part of topology");
 				}
 				else
 				{
@@ -119,8 +126,8 @@ namespace OMS.CallTrackingServiceImplementation
 					}
 
 					await Calls.SetAsync(emailMessage.Gid, emailMessage.Gid);
-					//Logger.LogInfo($"Current number of calls is: {Calls.Count}.");
-					
+					Logger.LogInformation($"Current number of calls is: {await Calls.GetCountAsync()}.");
+
 					if ((await Calls.GetCountAsync()) >= expectedCalls)
 					{
 						await trackingAlgorithm.Start((await Calls.GetDataCopyAsync()).Keys.ToList());
@@ -138,7 +145,7 @@ namespace OMS.CallTrackingServiceImplementation
 		{
 			if ((Calls.GetCountAsync().Result) < expectedCalls)
 			{
-				//Logger.LogInfo($"Timer elapsed (timer interval is {timerInterval}) and there is no enough calls to start tracing algorithm.");
+				Logger.LogInformation($"Timer elapsed (timer interval is {timerInterval}) and there is no enough calls to start tracing algorithm.");
 			}
 			else
 			{

@@ -2,16 +2,21 @@
 using System.Collections.Generic;
 using System.Fabric;
 using System.Linq;
+using System.Net;
+using System.Runtime.CompilerServices;
 using System.Threading;
 using System.Threading.Tasks;
 using Common.OmsContracts.HistoryDBManager;
-using HistoryDBManagerServiceImplementation;
+using Common.OmsContracts.ModelAccess;
+using Common.OmsContracts.Report;
 using Microsoft.ServiceFabric.Data.Collections;
 using Microsoft.ServiceFabric.Services.Communication.Runtime;
 using Microsoft.ServiceFabric.Services.Communication.Wcf;
 using Microsoft.ServiceFabric.Services.Communication.Wcf.Runtime;
 using Microsoft.ServiceFabric.Services.Runtime;
 using OMS.Common.Cloud.Names;
+using OMS.HistoryDBManagerServiceImplementation;
+using OMS.HistoryDBManagerServiceImplementation.ModelAccess;
 
 namespace OMS.HistoryDBManagerService
 {
@@ -21,10 +26,19 @@ namespace OMS.HistoryDBManagerService
     internal sealed class HistoryDBManagerService : StatefulService
     {
         private HistoryDBManager historyDBManager;
+        private ReportService reportService;
+        private OutageModelAccess outageModelAccess;
+        private ConsumerAccess consumerAccess;
+        private EquipmentAccess equipmentAccess;
+        
         public HistoryDBManagerService(StatefulServiceContext context)
             : base(context)
         {
             historyDBManager = new HistoryDBManager(this.StateManager);
+            reportService = new ReportService();
+            outageModelAccess = new OutageModelAccess();
+            consumerAccess = new ConsumerAccess();
+            equipmentAccess = new EquipmentAccess();
         }
 
         /// <summary>
@@ -43,44 +57,39 @@ namespace OMS.HistoryDBManagerService
                     return new WcfCommunicationListener<IHistoryDBManagerContract>(context,
                                                                                     historyDBManager,
                                                                                     WcfUtility.CreateTcpListenerBinding(),
-                                                                                    EndpointNames.HistoryDBManagerEndpoint);
-                },EndpointNames.HistoryDBManagerEndpoint),
+                                                                                    EndpointNames.OmsHistoryDBManagerEndpoint);
+                }, EndpointNames.OmsHistoryDBManagerEndpoint),
+                new ServiceReplicaListener(context =>
+				{
+                        return new WcfCommunicationListener<IReportingContract>(context,
+                                                                                reportService,
+                                                                                WcfUtility.CreateTcpClientBinding(),
+                                                                                EndpointNames.OmsReportingEndpoint);
+			    }, EndpointNames.OmsReportingEndpoint),
+                new ServiceReplicaListener(context =>
+                {
+                        return new WcfCommunicationListener<IOutageAccessContract>(context,
+                                                                                outageModelAccess,
+                                                                                WcfUtility.CreateTcpClientBinding(),
+                                                                                EndpointNames.OmsOutageAccessEndpoint);
+                }, EndpointNames.OmsOutageAccessEndpoint),
+                new ServiceReplicaListener(context =>
+                {
+                        return new WcfCommunicationListener<IConsumerAccessContract>(context,
+                                                                                consumerAccess,
+                                                                                WcfUtility.CreateTcpClientBinding(),
+                                                                                EndpointNames.OmsConsumerAccessEndpoint);
+                }, EndpointNames.OmsConsumerAccessEndpoint),
+                new ServiceReplicaListener(context =>
+                {
+                        return new WcfCommunicationListener<IEquipmentAccessContract>(context,
+                                                                                equipmentAccess,
+                                                                                WcfUtility.CreateTcpClientBinding(),
+                                                                                EndpointNames.OmsEquipmentAccessEndpoint);
+                }, EndpointNames.OmsEquipmentAccessEndpoint),
             };
             
         }
 
-        /// <summary>
-        /// This is the main entry point for your service replica.
-        /// This method executes when this replica of your service becomes primary and has write status.
-        /// </summary>
-        /// <param name="cancellationToken">Canceled when Service Fabric needs to shut down this service replica.</param>
-        protected override async Task RunAsync(CancellationToken cancellationToken)
-        {
-            // TODO: Replace the following sample code with your own logic 
-            //       or remove this RunAsync override if it's not needed in your service.
-
-            var myDictionary = await this.StateManager.GetOrAddAsync<IReliableDictionary<string, long>>("myDictionary");
-
-            while (true)
-            {
-                cancellationToken.ThrowIfCancellationRequested();
-
-                using (var tx = this.StateManager.CreateTransaction())
-                {
-                    var result = await myDictionary.TryGetValueAsync(tx, "Counter");
-
-                    ServiceEventSource.Current.ServiceMessage(this.Context, "Current Counter Value: {0}",
-                        result.HasValue ? result.Value.ToString() : "Value does not exist.");
-
-                    await myDictionary.AddOrUpdateAsync(tx, "Counter", 0, (key, value) => ++value);
-
-                    // If an exception is thrown before calling CommitAsync, the transaction aborts, all changes are 
-                    // discarded, and nothing is saved to the secondary replicas.
-                    await tx.CommitAsync();
-                }
-
-                await Task.Delay(TimeSpan.FromSeconds(1), cancellationToken);
-            }
-        }
     }
 }

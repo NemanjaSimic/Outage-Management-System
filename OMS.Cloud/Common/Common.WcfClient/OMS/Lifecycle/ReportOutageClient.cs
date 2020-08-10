@@ -14,7 +14,7 @@ namespace OMS.Common.WcfClient.OMS.Lifecycle
 	public class ReportOutageClient : WcfSeviceFabricClientBase<IReportOutageContract>, IReportOutageContract
 	{
 		private static readonly string microserviceName = MicroserviceNames.OmsOutageLifecycleService;
-		private static readonly string listenerName = EndpointNames.ReportOutageEndpoint;
+		private static readonly string listenerName = EndpointNames.OmsReportOutageEndpoint;
 		public ReportOutageClient(WcfCommunicationClientFactory<IReportOutageContract> clientFactory, Uri serviceUri, ServicePartitionKey servicePartition) 
 			: base (clientFactory, serviceUri, servicePartition, listenerName)
 		{

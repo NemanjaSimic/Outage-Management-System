@@ -11,6 +11,7 @@ using OMS.Common.PubSub;
 using OMS.Common.PubSubContracts;
 using OMS.Common.WcfClient.OMS;
 using OMS.Common.WcfClient.OMS.Lifecycle;
+using OMS.ModelProviderImplementation.ContractProviders;
 using System;
 using System.Collections.Generic;
 using System.Linq;
@@ -28,20 +29,24 @@ namespace OMS.ModelProviderImplementation
 		{
 			get { return logger ?? (logger = CloudLoggerFactory.GetLogger()); }
 		}
+		//Clients
 		private HistoryDBManagerClient historyDBManagerClient;
-		private OutageModelReadAccessClient outageModelReadAccessClient;
-		private OutageModelUpdateAccessClient outageModelUpdateAccessClient;
 		private ReportOutageClient reportOutageClient;
-		public OutageModel(IReliableStateManager stateManager)
+
+		private OutageModelReadAccessProvider outageModelReadAccessProvider;
+		private OutageModelUpdateAccessProvider outageModelUpdateAccessProvider;
+
+		public OutageModel(IReliableStateManager stateManager, OutageModelReadAccessProvider outageModelReadAccessProvider, OutageModelUpdateAccessProvider outageModelUpdateAccessProvider)
 		{
 			this.stateManager = stateManager;
 			this.stateManager.StateManagerChanged += this.OnStateManagerChangedHandler;
 			this.subscriberUri = "OutageModel"; //TODO: Service defines, name
 
 			this.historyDBManagerClient = HistoryDBManagerClient.CreateClient();
-			this.outageModelReadAccessClient = OutageModelReadAccessClient.CreateClient();
-			this.outageModelUpdateAccessClient = OutageModelUpdateAccessClient.CreateClient();
 			this.reportOutageClient = ReportOutageClient.CreateClient();
+
+			this.outageModelReadAccessProvider = outageModelReadAccessProvider;
+			this.outageModelUpdateAccessProvider = outageModelUpdateAccessProvider;
 		}
 		#region ReliableDictionaryAccess
 
@@ -109,7 +114,9 @@ namespace OMS.ModelProviderImplementation
 			//if OMSModelMessage
 			if (message is OMSModelMessage omsModelMessage)
 			{
-				var topology = outageModelReadAccessClient.GetTopologyModel().Result;
+				IOutageTopologyModel topology = omsModelMessage.OutageTopologyModel;
+				await outageModelUpdateAccessProvider.UpdateTopologyModel(topology);
+					//await outageModelReadAccessProvider.GetTopologyModel();
 				HashSet<long> energizedConsumers = new HashSet<long>();
 				foreach (var element in topology.OutageTopology.Values)
 				{
@@ -123,7 +130,7 @@ namespace OMS.ModelProviderImplementation
 				}
 
 				await historyDBManagerClient.OnConsumersEnergized(energizedConsumers);
-				Dictionary<long, CommandOriginType> potentialOutages = await outageModelReadAccessClient.GetPotentialOutage();
+				Dictionary<long, CommandOriginType> potentialOutages = await outageModelReadAccessProvider.GetPotentialOutage();
 
 				Task[] reportOutageTasks = new Task[potentialOutages.Count];
 				int index = 0;
@@ -133,8 +140,9 @@ namespace OMS.ModelProviderImplementation
 					reportOutageTasks[index].Start();
 					index++;
 				}
+				
 				Task.WaitAll(reportOutageTasks);
-				await outageModelUpdateAccessClient.UpdatePotentialOutage(0, 0, ModelUpdateOperationType.CLEAR);
+				await outageModelUpdateAccessProvider.UpdatePotentialOutage(0, 0, ModelUpdateOperationType.CLEAR);
 			}
 			else
 			{

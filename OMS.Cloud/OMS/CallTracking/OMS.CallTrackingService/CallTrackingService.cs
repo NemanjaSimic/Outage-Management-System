@@ -6,8 +6,15 @@ using System.Threading;
 using System.Threading.Tasks;
 using Microsoft.ServiceFabric.Data.Collections;
 using Microsoft.ServiceFabric.Services.Communication.Runtime;
+using Microsoft.ServiceFabric.Services.Communication.Wcf;
+using Microsoft.ServiceFabric.Services.Communication.Wcf.Runtime;
 using Microsoft.ServiceFabric.Services.Runtime;
 using OMS.CallTrackingServiceImplementation;
+using OMS.Common.Cloud;
+using OMS.Common.Cloud.Logger;
+using OMS.Common.Cloud.Names;
+using OMS.Common.PubSubContracts;
+using OMS.Common.WcfClient.PubSub;
 
 namespace OMS.CallTrackingService
 {
@@ -17,10 +24,21 @@ namespace OMS.CallTrackingService
 	internal sealed class CallTrackingService : StatefulService
 	{
 		private readonly CallTracker callTracker;
+
+		private readonly RegisterSubscriberClient registerSubscriberClient;
+
+		private ICloudLogger logger;
+		private ICloudLogger Logger
+		{
+			get { return logger ?? (logger = CloudLoggerFactory.GetLogger()); }
+		}
 		public CallTrackingService(StatefulServiceContext context)
 			: base(context)
 		{
-			callTracker = new CallTracker(this.StateManager);
+			callTracker = new CallTracker(this.StateManager, MicroserviceNames.OmsCallTrackingService);
+
+			this.registerSubscriberClient = RegisterSubscriberClient.CreateClient();
+			
 		}
 
 		/// <summary>
@@ -32,7 +50,16 @@ namespace OMS.CallTrackingService
 		/// <returns>A collection of listeners.</returns>
 		protected override IEnumerable<ServiceReplicaListener> CreateServiceReplicaListeners()
 		{
-			return new ServiceReplicaListener[0];
+			return new List<ServiceReplicaListener>()
+			{
+				new ServiceReplicaListener(context =>
+				{
+					return new WcfCommunicationListener<INotifySubscriberContract>(context,
+																				   this.callTracker,
+																				   WcfUtility.CreateTcpListenerBinding(),
+																				   EndpointNames.PubSubNotifySubscriberEndpoint);
+				})
+			};
 		}
 
 		/// <summary>
@@ -42,7 +69,14 @@ namespace OMS.CallTrackingService
 		/// <param name="cancellationToken">Canceled when Service Fabric needs to shut down this service replica.</param>
 		protected override async Task RunAsync(CancellationToken cancellationToken)
 		{
-			
+			try
+			{
+				await this.registerSubscriberClient.SubscribeToTopic(Topic.OUTAGE_EMAIL, MicroserviceNames.OmsCallTrackingService);
+			}
+			catch (Exception e)
+			{
+				Logger.LogError($"Subscribe to topic failed with error: {e.Message}");
+			}
 		}
 	}
 }

@@ -40,24 +40,25 @@ namespace OMS.Common.Cloud.Names
         public const string PubSubNotifySubscriberEndpoint = "PubSubNotifySubscriberEndpoint";
 
         //OMS - 5
-        public const string CallingEndpoint = "CallingEndpoint";
-        public const string OutageAccessEndpoint = "OutageAccessEndpoint";
-        public const string OutageLifecycleUICommandingEndpoint = "OutageLifecycleUICommandingEndpoint";
-        public const string ReportPotentialOutageEndpoint = "ReportPotentialOutageEndpoint";
-        public const string OutageSimulatorServiceEndpoint = "OutageSimulatorServiceEndpoint";
-        public const string HistoryDBManagerEndpoint = "HistoryDBManagerEndpoint";
-        public const string ReportingEndpoint = "ReportingEndpoint";
-        public const string OutageManagementServiceModelReadAccessEndpoint = "OutageManagementServiceModelReadAccessEndpoint";
-        public const string ReportOutageEndpoint = "ReportOutageEndpoint";
-        public const string ResolveOutageEndpoint = "ResolveOutageEndpoint";
-        public const string SendLocationIsolationCrewEndpoint = "SendLocationIsolationCrewEndpoint";
-        public const string SendRepairCrewEndpoint = "SendRepairCrewEndpoint";
-        public const string ValidateResolveConditionsEndpoint = "ValidateResolveConditionsEndpoint";
-        public const string TracingAlgorithmEndpoint = "TracingAlgorithmEndpoint";
-        public const string OutageManagmenetServiceModelUpdateAccessEndpoint = "OutageManagmenetServiceModelUpdateAccessEndpoint";
-        public const string OutageSimulatorEndpoint = "OutageSimulatorEndpoint";
-        public const string NotifySubscriberEndpoint = "NotifySubscriberEndpoint";
-        public const string IsolateOutageEndpoint = "IsolateOutageEndpoint";
+        public const string OmsCallingEndpoint = "OmsCallingEndpoint";
+        public const string OmsOutageAccessEndpoint = "OmsOutageAccessEndpoint";
+        public const string OmsEquipmentAccessEndpoint = "OmsEquipmentAccessEndpoint";
+        public const string OmsConsumerAccessEndpoint = "OmsConsumerAccessEndpoint";
+        public const string OmsOutageLifecycleUICommandingEndpoint = "OmsOutageLifecycleUICommandingEndpoint";
+        public const string OmsReportPotentialOutageEndpoint = "OmsReportPotentialOutageEndpoint";
+        public const string OmsOutageSimulatorServiceEndpoint = "OmsOutageSimulatorServiceEndpoint";
+        public const string OmsHistoryDBManagerEndpoint = "OmsHistoryDBManagerEndpoint";
+        public const string OmsReportingEndpoint = "OmsReportingEndpoint";
+        public const string OmsOutageManagementServiceModelReadAccessEndpoint = "OmsOutageManagementServiceModelReadAccessEndpoint";
+        public const string OmsReportOutageEndpoint = "OmsReportOutageEndpoint";
+        public const string OmsResolveOutageEndpoint = "OmsResolveOutageEndpoint";
+        public const string OmsSendLocationIsolationCrewEndpoint = "OmsSendLocationIsolationCrewEndpoint";
+        public const string OmsSendRepairCrewEndpoint = "OmsSendRepairCrewEndpoint";
+        public const string OmsValidateResolveConditionsEndpoint = "OmsValidateResolveConditionsEndpoint";
+        public const string OmsTracingAlgorithmEndpoint = "OmsTracingAlgorithmEndpoint";
+        public const string OmsOutageManagmenetServiceModelUpdateAccessEndpoint = "OmsOutageManagmenetServiceModelUpdateAccessEndpoint";
+        public const string OmsOutageSimulatorEndpoint = "OmsOutageSimulatorEndpoint";
+        public const string OmsIsolateOutageEndpoint = "OmsIsolateOutageEndpoint";
     }
 }
 

@@ -13,7 +13,7 @@ namespace OMS.Common.WcfClient.OMS
     public class HistoryDBManagerClient : WcfSeviceFabricClientBase<IHistoryDBManagerContract>, IHistoryDBManagerContract
     {
         private static readonly string microserviceName = MicroserviceNames.OmsHistoryDBManagerService;
-        private static readonly string listenerName = EndpointNames.HistoryDBManagerEndpoint;
+        private static readonly string listenerName = EndpointNames.OmsHistoryDBManagerEndpoint;
         public HistoryDBManagerClient(WcfCommunicationClientFactory<IHistoryDBManagerContract> clientFactory, Uri serviceUri, ServicePartitionKey servicePartition)
            : base(clientFactory, serviceUri, servicePartition, listenerName)
         {

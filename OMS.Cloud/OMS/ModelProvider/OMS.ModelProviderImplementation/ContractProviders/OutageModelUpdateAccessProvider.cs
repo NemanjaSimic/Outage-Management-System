@@ -4,11 +4,13 @@ using Microsoft.ServiceFabric.Data;
 using Microsoft.ServiceFabric.Data.Notifications;
 using OMS.Common.Cloud;
 using OMS.Common.Cloud.ReliableCollectionHelpers;
+using OMS.Common.PubSub;
 using System;
 using System.Collections.Generic;
 using System.Linq;
 using System.Text;
 using System.Threading.Tasks;
+using ReliableDictionaryNames = Common.OMS.ReliableDictionaryNames;
 
 namespace OMS.ModelProviderImplementation.ContractProviders
 {
@@ -39,6 +41,19 @@ namespace OMS.ModelProviderImplementation.ContractProviders
         public ReliableDictionaryAccess<long, CommandOriginType> PotentialOutage
         {
             get { return potentialOutage ?? (potentialOutage = ReliableDictionaryAccess<long, CommandOriginType>.Create(this.stateManager, ReliableDictionaryNames.PotentialOutage).Result); }
+        }
+
+        private ReliableDictionaryAccess<long, IOutageTopologyModel> topologyModel;
+
+        public ReliableDictionaryAccess<long, IOutageTopologyModel> TopologyModel
+        {
+            get
+            {
+
+                return topologyModel ?? (topologyModel = ReliableDictionaryAccess<long, IOutageTopologyModel>.Create(stateManager, ReliableDictionaryNames.OutageTopologyModel).Result);
+
+            }
+
         }
         public OutageModelUpdateAccessProvider(IReliableStateManager stateManager)
         {
@@ -145,6 +160,16 @@ namespace OMS.ModelProviderImplementation.ContractProviders
                 default:
                     break;
             }
+        }
+
+        public async Task UpdateTopologyModel(IOutageTopologyModel outageTopologyModel)
+		{
+            while (!ReliableDictionariesInitialized)
+            {
+                await Task.Delay(1000);
+            }
+
+            await TopologyModel.SetAsync(0, outageTopologyModel);
         }
     }
 }

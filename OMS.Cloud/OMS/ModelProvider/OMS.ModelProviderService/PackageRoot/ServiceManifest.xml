@@ -25,12 +25,9 @@
 
   <Resources>
     <Endpoints>
-  
-     
-
-			<Endpoint Name="OutageManagementServiceModelReadAccessEndpoint" Protocol="tcp" Type="Input"/>
-			<Endpoint Name="OutageManagmenetServiceModelUpdateAccessEndpoint" Protocol="tcp" Type="Input"/>
-			<Endpoint Name="NotifySubscriberEndpoint" Protocol="tcp" Type="Input"/>
+			<Endpoint Name="OmsOutageManagementServiceModelReadAccessEndpoint" Protocol="tcp" Type="Input"/>
+			<Endpoint Name="OmsOutageManagmenetServiceModelUpdateAccessEndpoint" Protocol="tcp" Type="Input"/>
+			<Endpoint Name="PubSubNotifySubscriberEndpoint" Protocol="tcp" Type="Input"/>
     </Endpoints>
   </Resources>
 </ServiceManifest>

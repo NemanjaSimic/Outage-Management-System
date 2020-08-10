@@ -3,7 +3,6 @@ using Common.OmsContracts.OutageLifecycle;
 using OMS.Common.Cloud;
 using OMS.Common.Cloud.Logger;
 using OMS.Common.WcfClient.OMS;
-using OutageDatabase.Repository;
 using System;
 using System.Collections.Generic;
 using System.Linq;
@@ -13,42 +12,48 @@ using Common.OMS.OutageDatabaseModel;
 using OMS.OutageLifecycleServiceImplementation.OutageLCHelper;
 using Common.CE;
 using OMS.Common.PubSub;
+using OMS.Common.WcfClient.OMS.ModelAccess;
 
 namespace OMS.OutageLifecycleServiceImplementation
 {
 	public class ReportOutageService : IReportOutageContract
 	{
-		private UnitOfWork dbContext;
         private OutageLifecycleHelper outageLifecycleHelper;
 		private Dictionary<long, Dictionary<long, List<long>>> recloserOutageMap;
         private OutageMessageMapper outageMessageMapper;
         private IOutageTopologyModel topologyModel;
         private Dictionary<long, long> CommandedElements;
         private Dictionary<long, long> OptimumIsolationPoints;
-		private OutageModelReadAccessClient outageModelReadAccessClient;
+
+        #region Clients
+        private OutageModelReadAccessClient outageModelReadAccessClient;
         private HistoryDBManagerClient historyDBManagerClient;
-		private ICloudLogger logger;
+        private OutageModelAccessClient outageModelAccessClient;
+        #endregion
+
+        private ICloudLogger logger;
 
 		private ICloudLogger Logger
 		{
 			get { return logger ?? (logger = CloudLoggerFactory.GetLogger()); }
 		}
-		public ReportOutageService(UnitOfWork dbContext)
+		public ReportOutageService()
 		{
-			this.dbContext = dbContext;
 			this.recloserOutageMap = new Dictionary<long, Dictionary<long, List<long>>>();
 			this.outageModelReadAccessClient = OutageModelReadAccessClient.CreateClient();
             this.historyDBManagerClient = HistoryDBManagerClient.CreateClient();
             this.outageMessageMapper = new OutageMessageMapper();
+            this.outageModelAccessClient = OutageModelAccessClient.CreateClient();
 
-          
-		}
+
+
+        }
         public async Task InitAwaitableFields()
         {
             this.topologyModel = await outageModelReadAccessClient.GetTopologyModel();
             this.CommandedElements = await outageModelReadAccessClient.GetCommandedElements();
             this.OptimumIsolationPoints = await outageModelReadAccessClient.GetOptimumIsolatioPoints();
-            this.outageLifecycleHelper = new OutageLifecycleHelper(this.dbContext, this.topologyModel);
+            this.outageLifecycleHelper = new OutageLifecycleHelper(this.topologyModel);
         }
         public async Task<bool> ReportPotentialOutage(long gid, CommandOriginType commandOriginType)
         {
@@ -90,7 +95,8 @@ namespace OMS.OutageLifecycleServiceImplementation
                 }
 
                 OutageEntity activeOutageDbEntity = null;
-                if(this.dbContext.OutageRepository.Find(o => o.OutageElementGid == gid && o.OutageState != OutageState.ARCHIVED).FirstOrDefault() != null)
+                
+                if(outageModelAccessClient.FindOutage(o => o.OutageElementGid == gid && o.OutageState != OutageState.ARCHIVED).Result.FirstOrDefault() != null) 
                 {
                     Logger.LogWarning($"Malfunction on element with gid: 0x{gid:x16} has already been reported.");
                     return false;
@@ -124,11 +130,11 @@ namespace OMS.OutageLifecycleServiceImplementation
                     DefaultIsolationPoints = defaultIsolationPoints,
                 };
 
-                activeOutageDbEntity = dbContext.OutageRepository.Add(createdActiveOutage);
+                
 
                 try
                 {
-                    dbContext.Complete();
+                    activeOutageDbEntity = outageModelAccessClient.AddOutage(createdActiveOutage).Result;
                     Logger.LogDebug($"Outage on element with gid: 0x{activeOutageDbEntity.OutageElementGid:x16} is successfully stored in database.");
                     success = true;
 
@@ -158,13 +164,13 @@ namespace OMS.OutageLifecycleServiceImplementation
                 }
                 catch (Exception e)
                 {
-                    string message = "OutageModel::ReportPotentialOutage method => exception on Complete()";
+                    string message = "OutageModel::ReportPotentialOutage method => exception on AddOutage()";
                     Logger.LogError(message, e);
                     Console.WriteLine($"{message}, Message: {e.Message}, Inner Message: {e.InnerException.Message})");
 
                     //TODO: da li je dobar handle?
-                    dbContext.Dispose();
-                    dbContext = new UnitOfWork();
+                    //dbContext.Dispose();
+                    //dbContext = new UnitOfWork();
                     success = false;
                 }
 

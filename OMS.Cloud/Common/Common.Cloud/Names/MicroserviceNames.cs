@@ -22,9 +22,9 @@
         public const string OmsCallTrackingService = "OmsCallTrackingService";
         public const string OmsHistoryDBManagerService = "OmsHistoryDBManagerService";
         public const string OmsOutageLifecycleService = "OmsOutageLifecycleService";
-        public const string OmsReportingService = "OmsReportingService";
+        public const string OmsEmailService = "OmsEmailService";
 
-        
+
         //CE
         public const string CeModelProviderService = "CeModelProviderService";
         public const string CeTopologyProviderService = "CeTopologyProviderService";

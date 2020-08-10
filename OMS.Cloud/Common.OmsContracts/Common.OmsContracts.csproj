@@ -90,6 +90,9 @@
   </ItemGroup>
   <ItemGroup>
     <Compile Include="HistoryDBManager\IHistoryDBManagerContract.cs" />
+    <Compile Include="ModelAccess\IConsumerAccessContract.cs" />
+    <Compile Include="ModelAccess\IEquipmentAccessContract.cs" />
+    <Compile Include="ModelAccess\IOutageAccessContract.cs" />
     <Compile Include="ModelProvider\IOutageModelReadAccessContract.cs" />
     <Compile Include="ModelProvider\IOutageModelUpdateAccessContract.cs" />
     <Compile Include="OutageLifecycle\IIsolateOutageContract.cs" />

@@ -1,5 +1,6 @@
 ﻿using Common.CE;
 using OMS.Common.Cloud;
+using OMS.Common.Cloud.Logger;
 using OMS.Common.PubSub;
 using OMS.Common.WcfClient.OMS;
 using OMS.Common.WcfClient.OMS.Lifecycle;
@@ -22,6 +23,12 @@ namespace OMS.CallTrackingServiceImplementation
         private ReportOutageClient reportOutageClient;
         private OutageModelReadAccessClient outageModelReadAccessClient;
 
+        private ICloudLogger logger;
+        private ICloudLogger Logger
+        {
+            get { return logger ?? (logger = CloudLoggerFactory.GetLogger()); }
+        }
+
         public TrackingAlgorithm()
 		{
             reportOutageClient = ReportOutageClient.CreateClient();
@@ -31,10 +38,10 @@ namespace OMS.CallTrackingServiceImplementation
 
         public async Task Start(List<long> calls)
         {
-            //Logger.LogDebug("Starting tracking algorithm.");
+			Logger.LogDebug("Starting tracking algorithm.");
 
-            //on every start tracking algorithm get up to date outage topology model
-            outageTopologyModel = await outageModelReadAccessClient.GetTopologyModel();
+			//on every start tracking algorithm get up to date outage topology model
+			outageTopologyModel = await outageModelReadAccessClient.GetTopologyModel();
 
             this.potentialOutages = LocateSwitchesUsingCalls(calls);
             this.outages = new List<long>();
@@ -70,7 +77,9 @@ namespace OMS.CallTrackingServiceImplementation
             }
             catch (Exception ex)
             {
-                Console.WriteLine("Tracing algorithm failed with error: {0}", ex.Message);
+                string message = $"Tracing algorithm failed with error: {ex.Message}";
+                Logger.LogError(message);
+                Console.WriteLine(message);
             }
 
             foreach (var item in this.outages)

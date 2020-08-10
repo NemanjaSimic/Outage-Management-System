@@ -6,33 +6,37 @@ using OMS.Common.NmsContracts;
 using OMS.Common.NmsContracts.GDA;
 using OMS.Common.PubSub;
 using OMS.Common.WcfClient.NMS;
+using OMS.Common.WcfClient.OMS.ModelAccess;
 using OMS.Common.WcfClient.PubSub;
 using OutageDatabase.Repository;
 using System;
 using System.Collections.Generic;
+using System.Fabric.Management.ServiceModel;
 using System.Threading.Tasks;
 
 namespace OMS.OutageLifecycleServiceImplementation.OutageLCHelper
 {
 	public class OutageLifecycleHelper
     {
-        private UnitOfWork dbContext;
         private IOutageTopologyModel outageTopology;
         private ICloudLogger logger;
         public static ModelResourcesDesc modelResourcesDesc = new ModelResourcesDesc();
         private NetworkModelGdaClient networkModelGdaClient;
+        private EquipmentAccessClient equipmentAccessClient;
+        private ConsumerAccessClient consumerAccessClient;
         private PublisherClient publisherClient;
         
         private ICloudLogger Logger
         {
             get { return logger ?? (logger = CloudLoggerFactory.GetLogger()); }
         }
-        public OutageLifecycleHelper(UnitOfWork unitOfWork, IOutageTopologyModel outageTopology)
+        public OutageLifecycleHelper(IOutageTopologyModel outageTopology)
         {
-            this.dbContext = unitOfWork;
             this.outageTopology = outageTopology;
             this.networkModelGdaClient = NetworkModelGdaClient.CreateClient();
             this.publisherClient = PublisherClient.CreateClient();
+            this.equipmentAccessClient = EquipmentAccessClient.CreateClient();
+            this.consumerAccessClient = ConsumerAccessClient.CreateClient();
         }
 
         public List<long> GetAffectedConsumers(long potentialOutageGid)
@@ -105,7 +109,7 @@ namespace OMS.OutageLifecycleServiceImplementation.OutageLCHelper
 
             foreach (long affectedConsumerId in affectedConsumersIds)
             {
-                Consumer affectedConsumer = this.dbContext.ConsumerRepository.Get(affectedConsumerId);
+                Consumer affectedConsumer = this.consumerAccessClient.GetConsumer(affectedConsumerId).Result;
 
                 if (affectedConsumer == null)
                 {
@@ -195,7 +199,7 @@ namespace OMS.OutageLifecycleServiceImplementation.OutageLCHelper
 
             foreach (long equipmentId in equipmentIds)
             {
-                Equipment equipmentDbEntity = dbContext.EquipmentRepository.Get(equipmentId);
+                Equipment equipmentDbEntity = this.equipmentAccessClient.GetEquipment(equipmentId).Result;
 
                 if (equipmentDbEntity == null)
                 {

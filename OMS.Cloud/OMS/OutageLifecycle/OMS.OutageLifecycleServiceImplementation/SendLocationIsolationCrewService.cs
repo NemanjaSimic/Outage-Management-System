@@ -7,9 +7,11 @@ using OMS.Common.Cloud;
 using OMS.Common.Cloud.Logger;
 using OMS.Common.Cloud.Names;
 using OMS.Common.PubSub;
+using OMS.Common.WcfClient.CE;
 using OMS.Common.WcfClient.OMS;
+using OMS.Common.WcfClient.OMS.ModelAccess;
+using OMS.Common.WcfClient.SCADA;
 using OMS.OutageLifecycleServiceImplementation.OutageLCHelper;
-using OutageDatabase.Repository;
 using System;
 using System.Collections.Generic;
 using System.Linq;
@@ -29,27 +31,38 @@ namespace OMS.OutageLifecycleServiceImplementation
             get { return logger ?? (logger = CloudLoggerFactory.GetLogger()); }
         }
 
-        private UnitOfWork dbContext;
         private OutageMessageMapper outageMessageMapper;
         private OutageLifecycleHelper outageLifecycleHelper;
+
+        #region MyRegion
         private OutageModelReadAccessClient outageModelReadAccessClient;
         private OutageModelUpdateAccessClient outageModelUpdateAccessClient;
-        private ChannelFactory<IOutageSimulatorContract> channelFactory = new ChannelFactory<IOutageSimulatorContract>(EndpointNames.OutageSimulatorEndpoint);
+        private OutageModelAccessClient outageModelAccessClient;
+        private MeasurementMapServiceClient measurementMapServiceClient;
+        private SwitchStatusCommandingClient switchStatusCommandingClient;
+        #endregion
+
+
+        private ChannelFactory<IOutageSimulatorContract> channelFactory = new ChannelFactory<IOutageSimulatorContract>(EndpointNames.OmsOutageSimulatorEndpoint);
         private IOutageSimulatorContract proxy;
         private Dictionary<long, long> CommandedElements;
-        public SendLocationIsolationCrewService(UnitOfWork dbContext)
+        public SendLocationIsolationCrewService()
         {
-            this.dbContext = dbContext;
             this.outageMessageMapper = new OutageMessageMapper();
+
             this.outageModelReadAccessClient = OutageModelReadAccessClient.CreateClient();
             this.outageModelUpdateAccessClient = OutageModelUpdateAccessClient.CreateClient();
+            this.outageModelAccessClient = OutageModelAccessClient.CreateClient();
+            this.measurementMapServiceClient = MeasurementMapServiceClient.CreateClient();
+            this.switchStatusCommandingClient = SwitchStatusCommandingClient.CreateClient();
+
             this.proxy = channelFactory.CreateChannel();
             this.CommandedElements = new Dictionary<long, long>();
         }
         public async Task InitAwaitableFields()
         {
             this.outageModel = await outageModelReadAccessClient.GetTopologyModel();
-            this.outageLifecycleHelper = new OutageLifecycleHelper(this.dbContext, this.outageModel);
+            this.outageLifecycleHelper = new OutageLifecycleHelper(this.outageModel);
         }
 
         public async Task<bool> SendLocationIsolationCrew(long outageId)
@@ -61,7 +74,7 @@ namespace OMS.OutageLifecycleServiceImplementation
             bool result = false;
             try
             {
-                outageEntity = dbContext.OutageRepository.Get(outageId);
+                outageEntity = await outageModelAccessClient.GetOutage(outageId);
             }
             catch (Exception ex)
             {
@@ -71,7 +84,7 @@ namespace OMS.OutageLifecycleServiceImplementation
 
             try
             {
-                activeOutages = dbContext.OutageRepository.GetAllActive().ToList();
+                activeOutages = (await outageModelAccessClient.GetAllActiveOutages()).ToList();
             }
             catch (Exception ex)
             {
@@ -90,10 +103,10 @@ namespace OMS.OutageLifecycleServiceImplementation
             Task algorithm = Task.Run(() => StartLocationAndIsolationAlgorithm(outageEntity)).ContinueWith(task =>
             {
                 result = task.Result;
-                if (task.IsCompleted)
-                {
-                    dbContext.Complete();
-                }
+                //if (task.IsCompleted)
+                //{
+                //    dbContext.Complete();
+                //}
             }, TaskContinuationOptions.OnlyOnRanToCompletion).ContinueWith(async task =>
             {
                 await outageLifecycleHelper.PublishOutage(Topic.ACTIVE_OUTAGE, outageMessageMapper.MapOutageEntity(outageEntity));
@@ -110,7 +123,7 @@ namespace OMS.OutageLifecycleServiceImplementation
 
             long reportedGid = outageEntity.DefaultIsolationPoints.First().EquipmentId;
             long outageElementId = -1;
-            long UpBreaker;
+            long upBreaker;
 
             Task.Delay(5000).Wait();
 
@@ -145,7 +158,7 @@ namespace OMS.OutageLifecycleServiceImplementation
                                 else
                                 {
                                     OutageEntity entity = new OutageEntity() { OutageElementGid = topologyElement.SecondEnd[i], ReportTime = DateTime.UtcNow };
-                                    dbContext.OutageRepository.Add(entity);
+                                    await outageModelAccessClient.AddOutage(entity);
                                 }
                             }
                         }
@@ -170,7 +183,7 @@ namespace OMS.OutageLifecycleServiceImplementation
             if (outageElementId == -1)
             {
                 outageEntity.OutageState = OutageState.REMOVED;
-                dbContext.OutageRepository.Remove(outageEntity);
+                await outageModelAccessClient.RemoveOutage(outageEntity);
                 Logger.LogError("End of feeder no outage detected.");
                 return false;
             }
@@ -179,7 +192,7 @@ namespace OMS.OutageLifecycleServiceImplementation
             {
                 outageModel.GetElementByGidFirstEnd(topologyElement.Id, out topologyElement);
             }
-            UpBreaker = topologyElement.Id;
+            upBreaker = topologyElement.Id;
             long nextBreaker = outageLifecycleHelper.GetNextBreaker(outageEntity.OutageElementGid);
 
             if (!outageModel.OutageTopology.ContainsKey(nextBreaker))
@@ -190,33 +203,35 @@ namespace OMS.OutageLifecycleServiceImplementation
             }
             long outageElement = outageModel.OutageTopology[nextBreaker].FirstEnd;
 
-            if (!outageModel.OutageTopology[UpBreaker].SecondEnd.Contains(outageElement))
+            if (!outageModel.OutageTopology[upBreaker].SecondEnd.Contains(outageElement))
             {
                 string message = $"Outage element with gid: 0x{outageElement:X16} is not on a second end of current breaker id";
                 Logger.LogError(message);
                 throw new Exception(message);
             }
-            outageEntity.OptimumIsolationPoints = await outageLifecycleHelper.GetEquipmentEntity(new List<long>() { UpBreaker, nextBreaker });
+            outageEntity.OptimumIsolationPoints = await outageLifecycleHelper.GetEquipmentEntity(new List<long>() { upBreaker, nextBreaker });
             outageEntity.IsolatedTime = DateTime.UtcNow;
             outageEntity.OutageState = OutageState.ISOLATED;
 
-            dbContext.OutageRepository.Update(outageEntity);
-            SendSCADACommand(UpBreaker, DiscreteCommandingType.OPEN);
-            SendSCADACommand(nextBreaker, DiscreteCommandingType.OPEN);
+            await outageModelAccessClient.UpdateOutage(outageEntity);
+            await SendSCADACommand(upBreaker, DiscreteCommandingType.OPEN);
+            await SendSCADACommand(nextBreaker, DiscreteCommandingType.OPEN);
 
 
 
             return true;
         }
         //TO DO use CE client
-        private async void SendSCADACommand(long currentBreakerId, DiscreteCommandingType discreteCommandingType)
+        private async Task SendSCADACommand(long currentBreakerId, DiscreteCommandingType discreteCommandingType)
         {
-            long measrement = -1;
+            long measurement = -1;
 
-            List<long> measuremnts = new List<long>();
+            List<long> measurements = new List<long>();
             try
             {
+                //TODO: see this??
                 //measuremnts = measurementMapProxy.GetMeasurementsOfElement(currentBreakerId);
+                measurements = await measurementMapServiceClient.GetMeasurementsOfElement(currentBreakerId);
 
             }
             catch (Exception e)
@@ -225,14 +240,14 @@ namespace OMS.OutageLifecycleServiceImplementation
                 throw e;
             }
 
-            if (measuremnts.Count > 0)
+            if (measurements.Count > 0)
             {
-                measrement = measuremnts[0];
+                measurement = measurements[0];
             }
 
             CommandedElements = await outageModelReadAccessClient.GetCommandedElements();
 
-            if (measrement != -1)
+            if (measurement != -1)
             {
                 if (discreteCommandingType == DiscreteCommandingType.OPEN && !CommandedElements.ContainsKey(currentBreakerId))
                 {
@@ -240,24 +255,40 @@ namespace OMS.OutageLifecycleServiceImplementation
                     await this.outageModelUpdateAccessClient.UpdateCommandedElements(currentBreakerId,ModelUpdateOperationType.INSERT);
                 }
 
-            
-               /* using (SwitchStatusCommandingProxy scadaCommandProxy = proxyFactory.CreateProxy<SwitchStatusCommandingProxy, ISwitchStatusCommandingContract>(EndpointNames.SwitchStatusCommandingEndpoint))
-                {
-                    try
+
+				try
+				{
+                    await switchStatusCommandingClient.SendOpenCommand(measurement);
+				}
+                catch (Exception e)
+				{
+                    Logger.LogError($"Error on SendOpenCommand method. Message: {e.Message}");
+
+                    if (discreteCommandingType == DiscreteCommandingType.OPEN && CommandedElements.ContainsKey(currentBreakerId))
                     {
-                        scadaCommandProxy.SendOpenCommand(measrement);
+                        await this.outageModelUpdateAccessClient.UpdateCommandedElements(currentBreakerId, ModelUpdateOperationType.DELETE);
                     }
-                    catch (Exception e)
-                    {
-                        if (discreteCommandingType == DiscreteCommandingType.OPEN && CommandedElements.ContainsKey(currentBreakerId))
-                        {
-                            await this.outageModelUpdateAccessClient.UpdateCommandedElements(currentBreakerId,ModelUpdateOperationType.DELETE);
-                        }
-                        throw e;
-                    }
-                }*/
+
+                    //throw e;
+                }
+
+                /* using (SwitchStatusCommandingProxy scadaCommandProxy = proxyFactory.CreateProxy<SwitchStatusCommandingProxy, ISwitchStatusCommandingContract>(EndpointNames.SwitchStatusCommandingEndpoint))
+                 {
+                     try
+                     {
+                         scadaCommandProxy.SendOpenCommand(measurement);
+                     }
+                     catch (Exception e)
+                     {
+                         if (discreteCommandingType == DiscreteCommandingType.OPEN && CommandedElements.ContainsKey(currentBreakerId))
+                         {
+                             await this.outageModelUpdateAccessClient.UpdateCommandedElements(currentBreakerId,ModelUpdateOperationType.DELETE);
+                         }
+                         throw e;
+                     }
+                 }*/
             }
-         
+
         }
     }
 }

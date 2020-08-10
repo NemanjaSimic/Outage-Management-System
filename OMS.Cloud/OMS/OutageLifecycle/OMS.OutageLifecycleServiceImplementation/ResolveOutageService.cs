@@ -3,8 +3,8 @@ using Common.OMS.OutageDatabaseModel;
 using Common.OmsContracts.OutageLifecycle;
 using OMS.Common.Cloud;
 using OMS.Common.Cloud.Logger;
+using OMS.Common.WcfClient.OMS.ModelAccess;
 using OMS.OutageLifecycleServiceImplementation.OutageLCHelper;
-using OutageDatabase.Repository;
 using System;
 using System.Collections.Generic;
 using System.Linq;
@@ -22,14 +22,14 @@ namespace OMS.OutageLifecycleServiceImplementation
 		{
 			get { return logger ?? (logger = CloudLoggerFactory.GetLogger()); }
 		}
-		private UnitOfWork dbContext;
 		private OutageLifecycleHelper lifecycleHelper;
         private OutageMessageMapper outageMessageMapper;
-        public ResolveOutageService(UnitOfWork dbContext)
+        private OutageModelAccessClient outageModelAccessClient;
+        public ResolveOutageService()
         {
-			this.dbContext = dbContext;
-			this.lifecycleHelper = new OutageLifecycleHelper(this.dbContext, null);
+			this.lifecycleHelper = new OutageLifecycleHelper(null);
             this.outageMessageMapper = new OutageMessageMapper();
+            this.outageModelAccessClient = OutageModelAccessClient.CreateClient();
         }
 
 		public async Task<bool> ResolveOutage(long outageId)
@@ -38,7 +38,7 @@ namespace OMS.OutageLifecycleServiceImplementation
 
             try
             {
-                activeOutageDbEntity = dbContext.OutageRepository.Get(outageId);
+                activeOutageDbEntity = await outageModelAccessClient.GetOutage(outageId);
             }
             catch (Exception e)
             {
@@ -82,12 +82,12 @@ namespace OMS.OutageLifecycleServiceImplementation
             };
 
             bool success;
-            dbContext.OutageRepository.Remove(activeOutageDbEntity);
-            OutageEntity archivedOutageDbEntity = dbContext.OutageRepository.Add(createdArchivedOutage);
+            await this.outageModelAccessClient.RemoveOutage(activeOutageDbEntity);
+            OutageEntity archivedOutageDbEntity = null;
 
             try
             {
-                dbContext.Complete();
+                archivedOutageDbEntity = await outageModelAccessClient.AddOutage(createdArchivedOutage);
                 Logger.LogDebug($"ArchivedOutage on element with gid: 0x{archivedOutageDbEntity.OutageElementGid:x16} is successfully stored in database.");
                 success = true;
             }
@@ -98,8 +98,8 @@ namespace OMS.OutageLifecycleServiceImplementation
                 Console.WriteLine($"{message}, Message: {e.Message})");
 
                 //TODO: da li je dobar handle?
-                dbContext.Dispose();
-                dbContext = new UnitOfWork();
+                //dbContext.Dispose();
+                //dbContext = new UnitOfWork();
                 success = false;
             }
 

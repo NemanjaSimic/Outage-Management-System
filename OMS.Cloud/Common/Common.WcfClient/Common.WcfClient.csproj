@@ -113,6 +113,9 @@
   </ItemGroup>
   <ItemGroup>
     <Compile Include="OMS\Lifecycle\ReportOutageClient.cs" />
+    <Compile Include="OMS\ModelAccess\ConsumerAccessClient.cs" />
+    <Compile Include="OMS\ModelAccess\EquipmentAccessClient.cs" />
+    <Compile Include="OMS\ModelAccess\OutageModelAccessClient.cs" />
     <Compile Include="OMS\OutageModelUpdateAccessClient.cs" />
     <Compile Include="OMS\HistoryDBManagerClient.cs" />
     <Compile Include="OMS\ReportingClient.cs" />

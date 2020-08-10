@@ -31,6 +31,7 @@ namespace Common.OmsContracts.ModelProvider
         Task<Dictionary<long, CommandOriginType>> GetPotentialOutage();
 
         [OperationContract]
+        [ServiceKnownType(typeof(OutageTopologyElement))]
         Task<IOutageTopologyElement> GetElementById(long gid);
     }
 }

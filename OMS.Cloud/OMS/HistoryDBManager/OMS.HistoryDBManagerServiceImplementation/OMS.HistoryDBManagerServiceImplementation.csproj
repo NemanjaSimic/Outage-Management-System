@@ -7,8 +7,8 @@
     <ProjectGuid>{3CA82365-7A48-4FAB-A74B-C70316A60163}</ProjectGuid>
     <OutputType>Library</OutputType>
     <AppDesignerFolder>Properties</AppDesignerFolder>
-    <RootNamespace>HistoryDBManagerServiceImplementation</RootNamespace>
-    <AssemblyName>HistoryDBManagerServiceImplementation</AssemblyName>
+    <RootNamespace>OMS.HistoryDBManagerServiceImplementation</RootNamespace>
+    <AssemblyName>OMS.HistoryDBManagerServiceImplementation</AssemblyName>
     <TargetFrameworkVersion>v4.8</TargetFrameworkVersion>
     <FileAlignment>512</FileAlignment>
     <Deterministic>true</Deterministic>
@@ -82,7 +82,28 @@
   </ItemGroup>
   <ItemGroup>
     <Compile Include="HistoryDBManager.cs" />
+    <Compile Include="ModelAccess\ConsumerAccess.cs" />
+    <Compile Include="ModelAccess\EquipmentAccess.cs" />
+    <Compile Include="ModelAccess\OutageModelAccess.cs" />
     <Compile Include="Properties\AssemblyInfo.cs" />
+    <Compile Include="Reporting\Queries\HistoricalConsumerElementIdQuery.cs" />
+    <Compile Include="Reporting\Queries\HistoricalConsumerEndDateQuery.cs" />
+    <Compile Include="Reporting\Queries\HistoricalConsumerIdQuery.cs" />
+    <Compile Include="Reporting\Queries\HistoricalConsumerOperationQuery.cs" />
+    <Compile Include="Reporting\Queries\HistoricalConsumerStartDateQuery.cs" />
+    <Compile Include="Reporting\Queries\OutageElementIdQuery.cs" />
+    <Compile Include="Reporting\Queries\OutageEndDateQuery.cs" />
+    <Compile Include="Reporting\Queries\OutageLifecycleQuery.cs" />
+    <Compile Include="Reporting\Queries\OutageStartDateQuery.cs" />
+    <Compile Include="Reporting\Queries\Specifications\AndSpecification.cs" />
+    <Compile Include="Reporting\Queries\Specifications\HistoricalConsumerSpecification.cs" />
+    <Compile Include="Reporting\Queries\Specifications\OutageSpecification.cs" />
+    <Compile Include="Reporting\Queries\Specifications\Specification.cs" />
+    <Compile Include="Reporting\ReportTypes\IReport.cs" />
+    <Compile Include="Reporting\ReportTypes\SaidiReport.cs" />
+    <Compile Include="Reporting\ReportTypes\SaifiReport.cs" />
+    <Compile Include="Reporting\ReportTypes\TotalReport.cs" />
+    <Compile Include="ReportService.cs" />
   </ItemGroup>
   <ItemGroup>
     <ProjectReference Include="..\..\..\Common.OmsContracts\Common.OmsContracts.csproj">
@@ -131,5 +152,6 @@
       <Version>4.1.417</Version>
     </PackageReference>
   </ItemGroup>
+  <ItemGroup />
   <Import Project="$(MSBuildToolsPath)\Microsoft.CSharp.targets" />
 </Project>

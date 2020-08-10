@@ -10,15 +10,15 @@ using OutageDatabase.Repository;
 using System;
 using System.Collections.Generic;
 using System.Linq;
-using System.Text;
 using System.Threading.Tasks;
 
-namespace HistoryDBManagerServiceImplementation
+namespace OMS.HistoryDBManagerServiceImplementation
 {
-    public class HistoryDBManager:IHistoryDBManagerContract
+	public class HistoryDBManager : IHistoryDBManagerContract
     {
         private readonly IReliableStateManager stateManager;
         private UnitOfWork dbContext;
+        //TODO: translate to ReliableDictionaryAccess<long, Consumer>
         private ReliableDictionaryAccess<long, long> unenergizedConsumers;
         public ReliableDictionaryAccess<long, long> UnenergizedConsumers
         {
@@ -36,6 +36,7 @@ namespace HistoryDBManagerServiceImplementation
             }
         }
 
+        //TODO: translate to ReliableDictionaryAccess<long, Switch>
         private ReliableDictionaryAccess<long, long> openedSwitches;
         public ReliableDictionaryAccess<long,long> OpenedSwitches
         {
@@ -74,7 +75,8 @@ namespace HistoryDBManagerServiceImplementation
                 if (reliableStateName == ReliableDictionaryNames.OpenedSwitches)
                 {
                     OpenedSwitches = await ReliableDictionaryAccess<long, long>.Create(this.stateManager, ReliableDictionaryNames.OpenedSwitches);
-                } else if (reliableStateName == ReliableDictionaryNames.UnenergizedConsumers)
+                }
+                else if (reliableStateName == ReliableDictionaryNames.UnenergizedConsumers)
                 {
                     UnenergizedConsumers = await ReliableDictionaryAccess<long, long>.Create(this.stateManager, ReliableDictionaryNames.UnenergizedConsumers);
                 }
@@ -85,15 +87,11 @@ namespace HistoryDBManagerServiceImplementation
         {
             try
             {
-                using(var tx = this.stateManager.CreateTransaction())
+                if(await OpenedSwitches.ContainsKeyAsync(elementGid))
                 {
-                    if(await OpenedSwitches.ContainsKeyAsync(elementGid))
-                    {
-                        dbContext.EquipmentHistoricalRepository.Add(new EquipmentHistorical() { EquipmentId = elementGid, OperationTime = DateTime.Now, DatabaseOperation = DatabaseOperation.DELETE });
-                        await OpenedSwitches.TryRemoveAsync(tx, elementGid);
-                        dbContext.Complete();
-                        await tx.CommitAsync();
-                    }
+                    dbContext.EquipmentHistoricalRepository.Add(new EquipmentHistorical() { EquipmentId = elementGid, OperationTime = DateTime.Now, DatabaseOperation = DatabaseOperation.DELETE });
+                    await OpenedSwitches.TryRemoveAsync(elementGid);
+                    dbContext.Complete();
                 }
             }
             catch (Exception ex)
@@ -109,21 +107,17 @@ namespace HistoryDBManagerServiceImplementation
             List<ConsumerHistorical> consumerHistoricals = new List<ConsumerHistorical>();
             try
             {
-                using (var tx = this.stateManager.CreateTransaction())
+                foreach (var consumer in consumers)
                 {
-                    foreach (var consumer in consumers)
+                    if (!await UnenergizedConsumers.ContainsKeyAsync(consumer))
                     {
-                        if (! await UnenergizedConsumers.ContainsKeyAsync(consumer))
-                        {
-
-                            consumerHistoricals.Add(new ConsumerHistorical() { OutageId = outageId, ConsumerId = consumer, OperationTime = DateTime.Now, DatabaseOperation = DatabaseOperation.INSERT });
-                            await UnenergizedConsumers.AddAsync(tx,consumer,0);
-                        }
+                        consumerHistoricals.Add(new ConsumerHistorical() { OutageId = outageId, ConsumerId = consumer, OperationTime = DateTime.Now, DatabaseOperation = DatabaseOperation.INSERT });
+                        await UnenergizedConsumers.SetAsync(consumer,0);
                     }
-                    dbContext.ConsumerHistoricalRepository.AddRange(consumerHistoricals);
-                    dbContext.Complete();
-                    await tx.CommitAsync();
                 }
+                dbContext.ConsumerHistoricalRepository.AddRange(consumerHistoricals);
+                dbContext.Complete();
+                
             }
             catch (Exception e)
             {
@@ -137,16 +131,12 @@ namespace HistoryDBManagerServiceImplementation
         {
             try
             {
-                using (var tx = this.stateManager.CreateTransaction())
+                if (!await OpenedSwitches.ContainsKeyAsync(elementGid))
                 {
-                    if (! await OpenedSwitches.ContainsKeyAsync(elementGid))
-                    {
-                        dbContext.EquipmentHistoricalRepository.Add(new EquipmentHistorical() { OutageId = outageId, EquipmentId = elementGid, OperationTime = DateTime.Now, DatabaseOperation = DatabaseOperation.INSERT });
-                        await OpenedSwitches.AddAsync(tx,elementGid,0);
-                        dbContext.Complete();
-                        await tx.CommitAsync();
-                    }
-                }
+                    dbContext.EquipmentHistoricalRepository.Add(new EquipmentHistorical() { OutageId = outageId, EquipmentId = elementGid, OperationTime = DateTime.Now, DatabaseOperation = DatabaseOperation.INSERT });
+                    await OpenedSwitches.SetAsync(elementGid,0);
+                    dbContext.Complete();
+                }   
             }
             catch (Exception e)
             {
@@ -169,21 +159,17 @@ namespace HistoryDBManagerServiceImplementation
 
             try
             {
-                using (var tx = this.stateManager.CreateTransaction())
+                foreach (var changed in changedConsumers)
                 {
-                    foreach (var changed in changedConsumers)
-                    {
-                        if (await UnenergizedConsumers.ContainsKeyAsync(changed))
-						{
-                            await UnenergizedConsumers.TryRemoveAsync(tx,changed);
-						}
-                    }
-
-                    dbContext.ConsumerHistoricalRepository.AddRange(consumerHistoricals);
-                    dbContext.Complete();
-                    //savechanges
-                    await tx.CommitAsync();
+                    if (await UnenergizedConsumers.ContainsKeyAsync(changed))
+					{
+                        await UnenergizedConsumers.TryRemoveAsync(changed);
+					}
                 }
+
+                dbContext.ConsumerHistoricalRepository.AddRange(consumerHistoricals);
+                dbContext.Complete();
+                
             }
             catch (Exception e)
             {

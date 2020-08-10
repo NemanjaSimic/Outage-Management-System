@@ -24,8 +24,12 @@
   <ConfigPackage Name="Config" Version="1.0.0" />
 
   <Resources>
-		<!--<Endpoints>
-     
-    </Endpoints>-->
+		<Endpoints>
+      <Endpoint Name="OmsHistoryDBManagerEndpoint" Protocol="tcp" Type="Input"/>
+      <Endpoint Name="OmsReportingEndpoint" Protocol="tcp" Type="Input"/>
+      <Endpoint Name="OmsOutageAccessEndpoint" Protocol="tcp" Type="Input"/>
+      <Endpoint Name="OmsConsumerAccessEndpoint" Protocol="tcp" Type="Input"/>
+      <Endpoint Name="OmsEquipmentAccessEndpoint" Protocol="tcp" Type="Input"/>
+    </Endpoints>
   </Resources>
 </ServiceManifest>

@@ -11,7 +11,7 @@ namespace Common.OmsContracts.Report
 {
 
     [ServiceContract]
-    public interface IReportingContract:IService
+    public interface IReportingContract : IService
     {
         [OperationContract]
         Task<OutageReport> GenerateReport(ReportOptions options);
