@@ -6,6 +6,7 @@ using OMS.Common.Cloud;
 using System;
 using System.Collections.Generic;
 using System.Configuration;
+using System.ServiceModel;
 
 namespace OMS.Common.WcfClient
 {
@@ -18,7 +19,7 @@ namespace OMS.Common.WcfClient
             this.baseLogString = $"{this.GetType()} [{this.GetHashCode()}] =>{Environment.NewLine}";
         }
 
-        public TClient CreateClient<TClient, TContract>(string serviceName) where TContract : class, IService
+        public TContract CreateClient<TClient, TContract>(string serviceName) where TContract : class, IService
                                                                             where TClient : WcfSeviceFabricClientBase<TContract>, TContract
         {
             var serviceNameToServiceUri = ServiceDefines.Instance.ServiceNameToServiceUri;
@@ -31,6 +32,16 @@ namespace OMS.Common.WcfClient
 
             ServicePartitionKey servicePartition;
             var serviceType = serviceNameToServiceType[serviceName];
+
+            //SPECIAL CASE
+            if (serviceType == ServiceType.STANDALONE_SERVICE)
+            {
+                var binding = new NetTcpBinding();
+                var externalEndpoint = new EndpointAddress(serviceNameToServiceUri[serviceName]);
+
+                var factory = new ChannelFactory<TContract>(binding, externalEndpoint);
+                return factory.CreateChannel();
+            }
 
             if (serviceType == ServiceType.STATEFUL_SERVICE)
             {

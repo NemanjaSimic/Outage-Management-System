@@ -1,5 +1,4 @@
-﻿using CECommon.Model;
-using Common.CeContracts;
+﻿using Common.CeContracts;
 using Microsoft.ServiceFabric.Services.Client;
 using Microsoft.ServiceFabric.Services.Communication.Wcf.Client;
 using OMS.Common.Cloud;
@@ -21,13 +20,13 @@ namespace OMS.Common.WcfClient.CE
 
 		}
 
-		public static MeasurementProviderClient CreateClient()
+		public static IMeasurementProviderContract CreateClient()
 		{
 			ClientFactory factory = new ClientFactory();
 			return factory.CreateClient<MeasurementProviderClient, IMeasurementProviderContract>(microserviceName);
 		}
 
-		public static MeasurementProviderClient CreateClient(Uri serviceUri, ServicePartitionKey servicePartitionKey)
+		public static IMeasurementProviderContract CreateClient(Uri serviceUri, ServicePartitionKey servicePartitionKey)
 		{
 			ClientFactory factory = new ClientFactory();
 			return factory.CreateClient<MeasurementProviderClient, IMeasurementProviderContract>(serviceUri, servicePartitionKey);

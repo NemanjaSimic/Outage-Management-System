@@ -1,4 +1,6 @@
-﻿namespace OMS.Common.Cloud.Names
+﻿using System.Fabric.Health;
+
+namespace OMS.Common.Cloud.Names
 {
     public static class EndpointNames
     {
@@ -42,8 +44,24 @@
         public const string OutageAccessEndpoint = "OutageAccessEndpoint";
         public const string OutageLifecycleUICommandingEndpoint = "OutageLifecycleUICommandingEndpoint";
         public const string ReportPotentialOutageEndpoint = "ReportPotentialOutageEndpoint";
-
         public const string OutageSimulatorServiceEndpoint = "OutageSimulatorServiceEndpoint";
+        public const string HistoryDBManagerEndpoint = "HistoryDBManagerEndpoint";
+        public const string ReportingEndpoint = "ReportingEndpoint";
+        public const string OutageManagementServiceModelReadAccessEndpoint = "OutageManagementServiceModelReadAccessEndpoint";
+        public const string ReportOutageEndpoint = "ReportOutageEndpoint";
+        public const string ResolveOutageEndpoint = "ResolveOutageEndpoint";
+        public const string SendLocationIsolationCrewEndpoint = "SendLocationIsolationCrewEndpoint";
+        public const string SendRepairCrewEndpoint = "SendRepairCrewEndpoint";
+        public const string ValidateResolveConditionsEndpoint = "ValidateResolveConditionsEndpoint";
+        public const string TracingAlgorithmEndpoint = "TracingAlgorithmEndpoint";
+        public const string OutageManagmenetServiceModelUpdateAccessEndpoint = "OutageManagmenetServiceModelUpdateAccessEndpoint";
+        public const string OutageSimulatorEndpoint = "OutageSimulatorEndpoint";
+        public const string NotifySubscriberEndpoint = "NotifySubscriberEndpoint";
+        public const string IsolateOutageEndpoint = "IsolateOutageEndpoint";
+        public const string OmsOutageSimulatorEndpoint = "OmsOutageSimulatorEndpoint";
+
+        //WEB - 6
+        public const string WebAdapterEndpoint = "WebAdapterEndpoint";
     }
 }
 

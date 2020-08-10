@@ -3,10 +3,8 @@ using System.Collections.Generic;
 using System.Fabric;
 using System.Threading;
 using System.Threading.Tasks;
-using CECommon;
-using CECommon.Interface;
-using CECommon.Interfaces;
 using Common.CE;
+using Common.CE.Interfaces;
 using Common.CeContracts;
 using Common.CeContracts.TopologyProvider;
 using Microsoft.ServiceFabric.Data;
@@ -17,6 +15,8 @@ using Microsoft.ServiceFabric.Services.Communication.Wcf.Runtime;
 using Microsoft.ServiceFabric.Services.Runtime;
 using OMS.Common.Cloud.Logger;
 using OMS.Common.Cloud.Names;
+using OMS.Common.PubSub;
+using ReliableDictionaryNames = Common.CE.ReliableDictionaryNames;
 using CE.TopologyProviderImplementation;
 
 namespace CE.TopologyProviderService

@@ -18,6 +18,14 @@ using UpdateResult = OMS.Common.NmsContracts.GDA.UpdateResult;
 
 namespace NMS.GdaImplementation
 {
+    enum NetworkModelState
+    {
+        NOT_INITIALIZED = 1,
+        CURRENTLY_INITIALIZING = 2,
+        INITIALIZED = 3,
+        IN_TRANSACTION = 4,
+    }
+
     public class NetworkModel : ITransactionActorContract
     {
         #region Fields
@@ -29,8 +37,9 @@ namespace NMS.GdaImplementation
         /// </summary>
         private readonly ModelResourcesDesc resourcesDescs;
 
-        private bool isModelInitialized; //todo: zameniti sa nekim semaforom ako neko bude imao vremena
-        private bool isTransactionInProgress;
+        private NetworkModelState networkModelState;
+        //private bool isModelInitialized; //todo: zameniti sa nekim semaforom ako neko bude imao vremena
+        //private bool isTransactionInProgress;
 
         private Delta currentDelta;
 
@@ -84,14 +93,16 @@ namespace NMS.GdaImplementation
 
             this.mongoDbAccess = new MongoAccess();
             this.resourcesDescs = new ModelResourcesDesc();
-            
-            this.isModelInitialized = false;
-            this.isTransactionInProgress = false;
+
+            this.networkModelState = NetworkModelState.NOT_INITIALIZED; 
+            //this.isModelInitialized = false;
+            //this.isTransactionInProgress = false;
     }
 
         public async Task InitializeNetworkModel()
         {
-            this.isModelInitialized = false;
+            //this.isModelInitialized = false;
+            this.networkModelState = NetworkModelState.CURRENTLY_INITIALIZING;
 
             long latestNetworkModelVersion = mongoDbAccess.GetLatestNetworkModelVersions();
             long latestDeltaVersion = mongoDbAccess.GetLatestDeltaVersions();
@@ -157,7 +168,8 @@ namespace NMS.GdaImplementation
                 throw new NotImplementedException($"{baseLogString} InitializeNetworkModel => Unknown scenario. LatestNetworkModelVersion: {latestNetworkModelVersion}, LatestDeltaVersion: {latestDeltaVersion}");
             }
 
-            this.isModelInitialized = true;
+            //this.isModelInitialized = true;
+            this.networkModelState = NetworkModelState.INITIALIZED;
         }
 
         #region Find
@@ -231,14 +243,20 @@ namespace NMS.GdaImplementation
         #region INetworkModelGDAContract Methods
         public async Task<UpdateResult> ApplyDelta(Delta delta)
         {
-            while (!isModelInitialized && delta.DeltaOrigin == DeltaOriginType.ImporterDelta)
+            UpdateResult updateResult = new UpdateResult();
+            
+            //DELTAS FROM IMPORTER WILL BE PROCCESSED ONLY IF MODEL IS IN INITIALIZED STATE
+            if (delta.DeltaOrigin == DeltaOriginType.ImporterDelta && networkModelState != NetworkModelState.INITIALIZED)
             {
-                await Task.Delay(1000);
+                updateResult.Result = ResultType.Failed;
+                string message = $"Delta is rejected. NetworkModel is currently in {networkModelState} state.";
+                updateResult.Message = message;
+                Logger.LogWarning(message);
+
+                return updateResult;
             }
 
             currentDelta = delta;
-
-            UpdateResult updateResult = new UpdateResult();
 
             //shallow copy 
             incomingNetworkDataModel = new Dictionary<DMSType, Container>(NetworkDataModel);
@@ -333,14 +351,9 @@ namespace NMS.GdaImplementation
         /// <returns>Resource description of the specified entity</returns>
         public async Task<ResourceDescription> GetValues(long globalId, List<ModelCode> properties)
         {
-            while (!isModelInitialized)
+            while (networkModelState == NetworkModelState.NOT_INITIALIZED || networkModelState == NetworkModelState.CURRENTLY_INITIALIZING)
             {
                 await Task.Delay(1000);
-            }
-
-            if (!isTransactionInProgress)
-            {
-                await InitializeNetworkModel();
             }
 
             Logger.LogDebug($"Getting values for GID: 0x{globalId:X16}.");
@@ -381,14 +394,9 @@ namespace NMS.GdaImplementation
         /// <returns>Resource iterator for the requested entities</returns>
         public async Task<ResourceIterator> GetExtentValues(ModelCode entityType, List<ModelCode> properties)
         {
-            while (!isModelInitialized)
+            while (networkModelState == NetworkModelState.NOT_INITIALIZED || networkModelState == NetworkModelState.CURRENTLY_INITIALIZING)
             {
                 await Task.Delay(1000);
-            }
-
-            if (!isTransactionInProgress)
-            {
-                await InitializeNetworkModel();
             }
 
             Logger.LogDebug($"Getting extent values for entity type: {entityType}.");
@@ -432,14 +440,9 @@ namespace NMS.GdaImplementation
         /// <returns>Resource iterator for the requested entities</returns>
         public async Task<ResourceIterator> GetRelatedValues(long source, List<ModelCode> properties, Association association)
         {
-            while (!isModelInitialized)
+            while (networkModelState == NetworkModelState.NOT_INITIALIZED || networkModelState == NetworkModelState.CURRENTLY_INITIALIZING)
             {
                 await Task.Delay(1000);
-            }
-
-            if (!isTransactionInProgress)
-            {
-                await InitializeNetworkModel();
             }
 
             Logger.LogDebug($"Getting related values for source: 0x{source:X16}.");
@@ -1012,22 +1015,14 @@ namespace NMS.GdaImplementation
         {
             return Task.Run(() =>
             {
-                this.isTransactionInProgress = false;
+                //this.isTransactionInProgress = false;
+                this.networkModelState = NetworkModelState.INITIALIZED;
 
                 if (currentDelta != null && currentDelta.DeltaOrigin == DeltaOriginType.ImporterDelta)
                 {
-                    long latestNetworkModelVersion = mongoDbAccess.GetLatestNetworkModelVersions();
-                    long latestDeltaVersion = mongoDbAccess.GetLatestDeltaVersions();
+                    long latestVersion = mongoDbAccess.GetLatestVersion();
 
-                    if (latestNetworkModelVersion < 0 || latestDeltaVersion < 0)
-                    {
-                        string errorMessage = $"{baseLogString} SaveDelta => latest version has a negative value.";
-                        throw new Exception(errorMessage);
-                    }
-
-                    long latestVersion = latestDeltaVersion > latestNetworkModelVersion ? latestDeltaVersion : latestNetworkModelVersion;
-
-                    currentDelta.Id = latestDeltaVersion + 1;
+                    currentDelta.Id = latestVersion + 1;
                     mongoDbAccess.SaveDelta(currentDelta);
 
                     CurrentVersion = currentDelta.Id;
@@ -1043,7 +1038,8 @@ namespace NMS.GdaImplementation
         {
             return Task.Run(() =>
             {
-                this.isTransactionInProgress = false;
+                //this.isTransactionInProgress = false;
+                this.networkModelState = NetworkModelState.INITIALIZED;
 
                 currentDelta = null;
                 networkDataModel = oldNetworkDataModel;
@@ -1054,7 +1050,8 @@ namespace NMS.GdaImplementation
         #region Private Members
         private async Task<bool> StartDistributedTransaction(Delta delta)
         {
-            this.isTransactionInProgress = true;
+            //this.isTransactionInProgress = true;
+            this.networkModelState = NetworkModelState.IN_TRANSACTION;
             var transactionActors = NetorkModelUpdateTransaction.Instance.TransactionActorsNames;
             var modelChanges = CreateModelChangesData(delta);
             

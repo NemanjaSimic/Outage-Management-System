@@ -19,13 +19,13 @@ namespace OMS.Common.WcfClient.PubSub
         {
         }
 
-        public static RegisterSubscriberClient CreateClient()
+        public static IRegisterSubscriberContract CreateClient()
         {
             ClientFactory factory = new ClientFactory();
             return factory.CreateClient<RegisterSubscriberClient, IRegisterSubscriberContract>(microserviceName);
         }
 
-        public static RegisterSubscriberClient CreateClient(Uri serviceUri, ServicePartitionKey servicePartitionKey)
+        public static IRegisterSubscriberContract CreateClient(Uri serviceUri, ServicePartitionKey servicePartitionKey)
         {
             ClientFactory factory = new ClientFactory();
             return factory.CreateClient<RegisterSubscriberClient, IRegisterSubscriberContract>(serviceUri, servicePartitionKey);

@@ -4,7 +4,7 @@
   <PropertyGroup>
     <Configuration Condition=" '$(Configuration)' == '' ">Debug</Configuration>
     <Platform Condition=" '$(Platform)' == '' ">AnyCPU</Platform>
-    <ProjectGuid>{2B5DAFD3-879B-4876-972F-0CC48463AC0C}</ProjectGuid>
+    <ProjectGuid>{4EAD0377-BD2D-4B7E-93A6-705DB815E8A7}</ProjectGuid>
     <OutputType>Library</OutputType>
     <AppDesignerFolder>Properties</AppDesignerFolder>
     <RootNamespace>Common.CE</RootNamespace>
@@ -80,10 +80,13 @@
   </ItemGroup>
   <ItemGroup>
     <Compile Include="Enums.cs" />
+    <Compile Include="Interfaces\IAnalogMeasurement.cs" />
+    <Compile Include="Interfaces\IDiscreteMeasurement.cs" />
     <Compile Include="Interfaces\IGraphElement.cs" />
     <Compile Include="Interfaces\ILoadFlow.cs" />
     <Compile Include="Interfaces\IMeasurement.cs" />
     <Compile Include="Interfaces\IMeasurementProvider.cs" />
+    <Compile Include="Interfaces\IModelDelta.cs" />
     <Compile Include="Interfaces\IModelManager.cs" />
     <Compile Include="Interfaces\IModelProvider.cs" />
     <Compile Include="Interfaces\IModelTopologyServis.cs" />
@@ -95,27 +98,11 @@
     <Compile Include="Interfaces\ITopologyConverterProvider.cs" />
     <Compile Include="Interfaces\ITopologyElement.cs" />
     <Compile Include="Interfaces\ITopologyProvider.cs" />
-    <Compile Include="Models\CalculationEngineMessage.cs" />
-    <Compile Include="Models\CalculationEnginePublication.cs" />
-    <Compile Include="Models\DailyCurve.cs" />
-    <Compile Include="Models\EnergyConsumer.cs" />
-    <Compile Include="Models\Feeder.cs" />
-    <Compile Include="Models\Field.cs" />
-    <Compile Include="Models\Measurement.cs" />
-    <Compile Include="Models\ModelDelta.cs" />
-    <Compile Include="Models\Recloser.cs" />
-    <Compile Include="Models\SynchronousMachine.cs" />
-    <Compile Include="Models\TopologyElement.cs" />
-    <Compile Include="Models\TopologyModel.cs" />
-    <Compile Include="OutageService\Interface\IOutageTopologyElement.cs" />
-    <Compile Include="OutageService\Interface\IOutageTopologyModel.cs" />
-    <Compile Include="OutageService\Model\OutageTopologyElement.cs" />
-    <Compile Include="OutageService\Model\OutageTopologyModel.cs" />
+    <Compile Include="Interfaces\IUIMeasurement.cs" />
+    <Compile Include="Interfaces\IUIModel.cs" />
+    <Compile Include="Interfaces\IUINode.cs" />
     <Compile Include="Properties\AssemblyInfo.cs" />
     <Compile Include="ReliableDictionaryNames.cs" />
-    <Compile Include="UIModels\UIMeasurement.cs" />
-    <Compile Include="UIModels\UIModel.cs" />
-    <Compile Include="UIModels\UINode.cs" />
   </ItemGroup>
   <ItemGroup>
     <ProjectReference Include="..\Common.Cloud\Common.Cloud.csproj">
@@ -135,5 +122,6 @@
     <None Include="app.config" />
     <None Include="packages.config" />
   </ItemGroup>
+  <ItemGroup />
   <Import Project="$(MSBuildToolsPath)\Microsoft.CSharp.targets" />
 </Project>

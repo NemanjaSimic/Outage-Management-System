@@ -1,7 +1,5 @@
-﻿using CECommon;
-using CECommon.Interfaces;
-using CECommon.Model;
-using CECommon.Models;
+﻿using Common.CE.Interfaces;
+using Common.CeContracts;
 using OMS.Common.Cloud;
 using OMS.Common.Cloud.Logger;
 using OMS.Common.NmsContracts;
@@ -70,7 +68,7 @@ namespace CE.ModelProviderImplementation
 		}
 
 		private readonly NetworkModelGDA networkModelGda;
-		private readonly MeasurementProviderClient measurementProviderClient;
+		private readonly IMeasurementProviderContract measurementProviderClient;
 
 		private static long noScadaGuid = 1;
 		private readonly ModelResourcesDesc modelResourcesDesc;
@@ -108,7 +106,7 @@ namespace CE.ModelProviderImplementation
 		}
 
 		#region Functions
-		public async Task<ModelDelta> TryGetAllModelEntitiesAsync()
+		public async Task<IModelDelta> TryGetAllModelEntitiesAsync()
 		{
 			string verboseMessage = $"{baseLogString} entering TryGetAllModelEntities method.";
 			Logger.LogVerbose(verboseMessage);

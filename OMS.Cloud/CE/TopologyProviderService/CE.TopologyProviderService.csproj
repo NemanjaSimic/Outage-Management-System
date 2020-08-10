@@ -107,6 +107,10 @@
       <Project>{FBEE1369-0F6C-41E6-8C62-8C1C5CDBB602}</Project>
       <Name>Common.Cloud</Name>
     </ProjectReference>
+    <ProjectReference Include="..\..\Common\Common.PubSub\Common.PubSub.csproj">
+      <Project>{5B775779-A5AE-4F94-90EC-59973FA80D4D}</Project>
+      <Name>Common.PubSub</Name>
+    </ProjectReference>
     <ProjectReference Include="..\..\Common\Contracts\Common.CeContracts\Common.CeContracts.csproj">
       <Project>{D8B669F1-9B73-4F6A-9AFC-53AF4B0272AC}</Project>
       <Name>Common.CeContracts</Name>

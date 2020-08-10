@@ -1,5 +1,5 @@
-﻿using CE.TopologyBuilderImplementation.Configuration;
-using CECommon;
+﻿using Common.CE;
+using CE.TopologyBuilderImplementation.Configuration;
 using OMS.Common.Cloud;
 using OMS.Common.Cloud.Logger;
 using OMS.Common.NmsContracts;

@@ -12,7 +12,7 @@ using System.Threading.Tasks;
 namespace OMS.Common.WcfClient.PubSub
 {
     public class PublisherClient : WcfSeviceFabricClientBase<IPublisherContract>, IPublisherContract
-    {
+	{
         private static readonly string microserviceName = MicroserviceNames.PubSubService;
         private static readonly string listenerName = EndpointNames.PubSubPublisherEndpoint;
 
@@ -21,13 +21,13 @@ namespace OMS.Common.WcfClient.PubSub
         {
         }
 
-        public static PublisherClient CreateClient()
+        public static IPublisherContract CreateClient()
         {
             ClientFactory factory = new ClientFactory();
             return factory.CreateClient<PublisherClient, IPublisherContract>(microserviceName);
         }
 
-        public static PublisherClient CreateClient(Uri serviceUri, ServicePartitionKey servicePartitionKey)
+        public static IPublisherContract CreateClient(Uri serviceUri, ServicePartitionKey servicePartitionKey)
         {
             ClientFactory factory = new ClientFactory();
             return factory.CreateClient<PublisherClient, IPublisherContract>(serviceUri, servicePartitionKey);

@@ -1,7 +1,6 @@
-﻿using CECommon;
-using CECommon.Interface;
-using CECommon.Interfaces;
+﻿using Common.CE.Interfaces;
 using Microsoft.ServiceFabric.Services.Remoting;
+using OMS.Common.PubSub;
 using System.ServiceModel;
 using System.Threading.Tasks;
 

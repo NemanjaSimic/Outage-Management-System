@@ -17,6 +17,17 @@
         //PUB_SUB
         public const string PubSubService = "PubSubService";
 
+        //OMS
+        public const string OmsModelProviderService = "OmsModelProviderService";
+        public const string OmsCallTrackingService = "OmsCallTrackingService";
+        public const string OmsHistoryDBManagerService = "OmsHistoryDBManagerService";
+        public const string OmsOutageLifecycleService = "OmsOutageLifecycleService";
+        public const string OmsReportingService = "OmsReportingService";
+        public const string OmsOutageSimulatorService = "OmsOutageSimulatorService";
+
+        //WEB
+        public const string WebAdapterService = "WebAdapterService";
+        
         //CE
         public const string CeModelProviderService = "CeModelProviderService";
         public const string CeTopologyProviderService = "CeTopologyProviderService";

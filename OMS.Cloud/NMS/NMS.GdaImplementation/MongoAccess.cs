@@ -76,67 +76,62 @@ namespace NMS.GdaImplementation
 
         public void SaveNetworkModel(Dictionary<DMSType, Container> networkModel, long version)
         {
-            long latestNetworkModelVersion = GetLatestNetworkModelVersions();
-            long latestDeltaVersion = GetLatestDeltaVersions();
-
-            if (latestNetworkModelVersion < 0 || latestDeltaVersion < 0)
-            {
-                string errorMessage = $"{baseLogString} SaveNetworkModel => latest version has a negative value.";
-                Logger.LogError(errorMessage);
-                throw new Exception(errorMessage);
-            }
-
-            long latestVersion = latestDeltaVersion > latestNetworkModelVersion ? latestDeltaVersion : latestNetworkModelVersion;
+            long latestVersion = GetLatestVersion();
 
             if (version <= latestVersion)
             {
                 string warnMessage = $"{baseLogString} SaveNetworkModel => NetworkModel version is lower then the latest version. NetworkModel version: {version}, LatestVersion: {latestVersion}";
                 Logger.LogWarning(warnMessage);
 
-                version = latestDeltaVersion + 1;
+                version = latestVersion + 1;
 
                 warnMessage = $"{baseLogString} SaveNetworkModel => NetworkModel version is set to a new value: {version}";
                 Logger.LogWarning(warnMessage);
             }
 
-            var latestNetworkModelVersionDocument = new LatestVersionsDocument 
+            var latestNetworkModelVersionDocument = new LatestVersionsDocument
             {
                 Id = MongoStrings.LatestVersions_NetworkModelVersion,
                 Version = version,
             };
 
-            var latestVersionsCollection = db.GetCollection<LatestVersionsDocument>(MongoStrings.LatestVersionsCollection);
-            latestVersionsCollection.ReplaceOne(new BsonDocument("_id", MongoStrings.LatestVersions_NetworkModelVersion), latestNetworkModelVersionDocument, new ReplaceOptions { IsUpsert = true });
-
-            var networkModelDocument = new NetworkModelsDocument()
+            try
             {
-                Id = version,
-                NetworkModel = networkModel,
-            };
+                var latestVersionsCollection = db.GetCollection<LatestVersionsDocument>(MongoStrings.LatestVersionsCollection);
+                latestVersionsCollection.ReplaceOne(new BsonDocument("_id", MongoStrings.LatestVersions_NetworkModelVersion), latestNetworkModelVersionDocument, new ReplaceOptions { IsUpsert = true });
 
-            var networkModelsCollection = db.GetCollection<NetworkModelsDocument>(MongoStrings.NetworkModelsCollection);
-            networkModelsCollection.InsertOne(networkModelDocument);
+                var networkModelDocument = new NetworkModelsDocument()
+                {
+                    Id = version,
+                    NetworkModel = networkModel,
+                };
+
+                var networkModelsCollection = db.GetCollection<NetworkModelsDocument>(MongoStrings.NetworkModelsCollection);
+                networkModelsCollection.InsertOne(networkModelDocument);
+            }
+            catch (MongoWriteException e)
+            {
+                string errorMessage = $"{baseLogString} SaveNetworkModel => Warn: {e.Message}.";
+                Logger.LogWarning(errorMessage, e);
+            }
+            catch (Exception e)
+            {
+                string errorMessage = $"{baseLogString} SaveNetworkModel => Error: {e.Message}.";
+                Logger.LogError(errorMessage, e);
+            }
+
         }
 
         public void SaveDelta(Delta delta)
         {
-            long latestNetworkModelVersion = GetLatestNetworkModelVersions();
-            long latestDeltaVersion = GetLatestDeltaVersions();
-
-            if (latestNetworkModelVersion < 0 || latestDeltaVersion < 0)
-            {
-                string errorMessage = $"{baseLogString} SaveDelta => latest version has a negative value.";
-                throw new Exception(errorMessage);
-            }
-
-            long latestVersion = latestDeltaVersion > latestNetworkModelVersion ? latestDeltaVersion : latestNetworkModelVersion;
+            long latestVersion = GetLatestVersion();
 
             if (delta.Id <= latestVersion)
             {
                 string warnMessage = $"{baseLogString} SaveDelta => Delta version is lower then the latest version. NetworkModel version: {delta.Id}, LatestVersion: {latestVersion}";
                 Logger.LogWarning(warnMessage);
 
-                delta.Id = latestDeltaVersion + 1;
+                delta.Id = latestVersion + 1;
 
                 warnMessage = $"{baseLogString} SaveDelta => Delta version is set to a new value: {delta.Id}";
                 Logger.LogWarning(warnMessage);
@@ -149,19 +144,40 @@ namespace NMS.GdaImplementation
             };
 
             try
-            { 
+            {
                 var latestVersionsCollection = db.GetCollection<LatestVersionsDocument>(MongoStrings.LatestVersionsCollection);
                 latestVersionsCollection.ReplaceOne(new BsonDocument("_id", MongoStrings.LatestVersions_DeltaVersion), newLatestDeltaVersionDocument, new ReplaceOptions { IsUpsert = true });
 
-                var deltasCollection = db.GetCollection<Delta>(MongoStrings.DeltasCollection);
                 delta.DeltaOrigin = DeltaOriginType.DatabaseDelta;
+                var deltasCollection = db.GetCollection<Delta>(MongoStrings.DeltasCollection);
                 deltasCollection.InsertOne(delta);
+            }
+            catch (MongoWriteException e)
+            {
+                string warnMessage = $"{baseLogString} SaveDelta => Warn: {e.Message}.";
+                Logger.LogWarning(warnMessage, e);
             }
             catch (Exception e)
             {
                 string errorMessage = $"{baseLogString} SaveDelta => Error: {e.Message}.";
                 Logger.LogError(errorMessage, e);
             }
+        }
+
+        public long GetLatestVersion()
+        {
+            long latestNetworkModelVersion = GetLatestNetworkModelVersions();
+            long latestDeltaVersion = GetLatestDeltaVersions();
+
+            if (latestNetworkModelVersion < 0 || latestDeltaVersion < 0)
+            {
+                string errorMessage = $"{baseLogString} SaveNetworkModel => latest version has a negative value.";
+                Logger.LogError(errorMessage);
+                throw new Exception(errorMessage);
+            }
+
+            long latestVersion = latestDeltaVersion > latestNetworkModelVersion ? latestDeltaVersion : latestNetworkModelVersion;
+            return latestVersion;
         }
 
         public long GetLatestNetworkModelVersions(bool isRetry = false)

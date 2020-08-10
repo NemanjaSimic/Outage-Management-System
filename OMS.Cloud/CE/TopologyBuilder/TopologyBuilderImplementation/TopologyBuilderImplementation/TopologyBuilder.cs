@@ -1,8 +1,7 @@
-﻿using CECommon;
-using CECommon.Interfaces;
-using CECommon.Model;
-using CECommon.Models;
+﻿using Common.CE;
+using Common.CE.Interfaces;
 using Common.CeContracts;
+using Common.CeContracts.ModelProvider;
 using OMS.Common.Cloud;
 using OMS.Common.Cloud.Logger;
 using OMS.Common.NmsContracts;
@@ -14,7 +13,7 @@ using System.Threading.Tasks;
 
 namespace CE.TopologyBuilderImplementation
 {
-    public class TopologyBuilder : ITopologyBuilderContract
+	public class TopologyBuilder : ITopologyBuilderContract
     {
         #region Fields
         private List<Field> fields;
@@ -27,7 +26,7 @@ namespace CE.TopologyBuilderImplementation
 
         private readonly string baseLogString;
 
-        private readonly ModelProviderClient modelProviderClient;
+        private readonly IModelProviderContract modelProviderClient;
 
         private ICloudLogger logger;
         private ICloudLogger Logger

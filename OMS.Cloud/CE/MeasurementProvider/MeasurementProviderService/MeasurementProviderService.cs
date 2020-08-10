@@ -4,7 +4,6 @@ using System.Fabric;
 using System.Threading;
 using System.Threading.Tasks;
 using CE.MeasurementProviderImplementation;
-using CECommon.Model;
 using Common.CE;
 using Common.CeContracts;
 using Microsoft.ServiceFabric.Data;

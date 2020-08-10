@@ -4,8 +4,8 @@ using System.Fabric;
 using System.Threading;
 using System.Threading.Tasks;
 using CE.ModelProviderImplementation;
-using CECommon.Interfaces;
 using Common.CE;
+using Common.CE.Interfaces;
 using Common.CeContracts.ModelProvider;
 using Microsoft.ServiceFabric.Data;
 using Microsoft.ServiceFabric.Data.Collections;
@@ -90,6 +90,7 @@ namespace CE.ModelProviderService
 				string debugMessage = $"{baseLogString} RunAsync => ReliableDictionaries initialized.";
 				Logger.LogDebug(debugMessage);
 				ServiceEventSource.Current.ServiceMessage(this.Context, $"[ModelProviderService | Information] {debugMessage}");
+				//await modelProvider.ImportDataInCache();
 			}
 			catch (Exception e)
 			{

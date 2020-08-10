@@ -1,4 +1,4 @@
-﻿using CECommon;
+﻿using Common.CE;
 using OMS.Common.Cloud;
 using System;
 

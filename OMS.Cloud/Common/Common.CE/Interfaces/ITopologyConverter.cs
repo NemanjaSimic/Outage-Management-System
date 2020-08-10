@@ -1,11 +1,10 @@
-﻿
-using CECommon.Interface;
+﻿using OMS.Common.PubSub;
 
-namespace CECommon.Interfaces
+namespace Common.CE.Interfaces
 {
-    public interface ITopologyConverter
+	public interface ITopologyConverter
     {
         IOutageTopologyModel ConvertTopologyToOMSModel(ITopology topology);
-        UIModel ConvertTopologyToUIModel(ITopology topology);
+        IUIModel ConvertTopologyToUIModel(ITopology topology);
     }
 }

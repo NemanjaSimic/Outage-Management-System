@@ -11,7 +11,7 @@ namespace CE.MeasurementProviderImplementation
 	{
         private readonly string baseLogString;
 
-        private readonly MeasurementProviderClient measurementProviderClient;
+        private readonly IMeasurementProviderContract measurementProviderClient;
 
         private ICloudLogger logger;
         private ICloudLogger Logger

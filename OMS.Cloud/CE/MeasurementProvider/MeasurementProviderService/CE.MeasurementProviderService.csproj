@@ -102,7 +102,6 @@
     <None Include="PackageRoot\Config\Settings.xml" />
     <None Include="PackageRoot\ServiceManifest.xml" />
     <None Include="App.config" />
-    <None Include="packages.config" />
   </ItemGroup>
   <ItemGroup>
     <ProjectReference Include="..\..\..\Common\Common.CE\Common.CE.csproj">
@@ -121,6 +120,32 @@
       <Project>{8FF00246-6BBF-4CCE-AE04-0325DCCF4444}</Project>
       <Name>CE.MeasurementProviderImplementation</Name>
     </ProjectReference>
+  </ItemGroup>
+  <ItemGroup>
+    <PackageReference Include="Microsoft.ServiceFabric">
+      <Version>7.1.417</Version>
+    </PackageReference>
+    <PackageReference Include="Microsoft.ServiceFabric.Data">
+      <Version>4.1.417</Version>
+    </PackageReference>
+    <PackageReference Include="Microsoft.ServiceFabric.Data.Extensions">
+      <Version>4.1.417</Version>
+    </PackageReference>
+    <PackageReference Include="Microsoft.ServiceFabric.Data.Interfaces">
+      <Version>4.1.417</Version>
+    </PackageReference>
+    <PackageReference Include="Microsoft.ServiceFabric.Diagnostics.Internal">
+      <Version>4.1.417</Version>
+    </PackageReference>
+    <PackageReference Include="Microsoft.ServiceFabric.FabricTransport.Internal">
+      <Version>4.1.417</Version>
+    </PackageReference>
+    <PackageReference Include="Microsoft.ServiceFabric.Services">
+      <Version>4.1.417</Version>
+    </PackageReference>
+    <PackageReference Include="Microsoft.ServiceFabric.Services.Remoting">
+      <Version>4.1.417</Version>
+    </PackageReference>
   </ItemGroup>
   <Import Project="$(MSBuildToolsPath)\Microsoft.CSharp.targets" />
   <!-- To modify your build process, add your task inside one of the targets below and uncomment it. 

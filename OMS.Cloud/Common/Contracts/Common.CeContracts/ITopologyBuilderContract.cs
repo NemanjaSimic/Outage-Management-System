@@ -1,4 +1,4 @@
-﻿using CECommon.Interfaces;
+﻿using Common.CE.Interfaces;
 using Microsoft.ServiceFabric.Services.Remoting;
 using System.ServiceModel;
 using System.Threading.Tasks;

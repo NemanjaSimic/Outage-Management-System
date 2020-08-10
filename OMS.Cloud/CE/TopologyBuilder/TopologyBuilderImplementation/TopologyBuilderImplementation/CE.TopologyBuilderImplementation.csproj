@@ -97,7 +97,7 @@
   </ItemGroup>
   <ItemGroup>
     <ProjectReference Include="..\..\..\..\Common\Common.CE\Common.CE.csproj">
-      <Project>{2B5DAFD3-879B-4876-972F-0CC48463AC0C}</Project>
+      <Project>{4ead0377-bd2d-4b7e-93a6-705db815e8a7}</Project>
       <Name>Common.CE</Name>
     </ProjectReference>
     <ProjectReference Include="..\..\..\..\Common\Common.Cloud\Common.Cloud.csproj">

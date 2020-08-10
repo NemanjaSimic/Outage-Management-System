@@ -69,6 +69,9 @@ namespace OMS.Common.Cloud
 
         [EnumMember]
         STATELESS_SERVICE = 2,
+
+        [EnumMember]
+        STANDALONE_SERVICE = 3,
     }
 
     //SCADA
@@ -131,6 +134,12 @@ namespace OMS.Common.Cloud
         OUTAGE_SIMULATOR,
 
         [EnumMember]
+        NON_SCADA_OUTAGE,
+
+        [EnumMember]
+        OTHER_COMMAND, //TODO: rethink of name, add others like CE ili tako nesto
+
+        [EnumMember]
         UNKNOWN_ORIGIN,
     }
 
@@ -149,6 +158,35 @@ namespace OMS.Common.Cloud
 
         [EnumMember]
         ARCHIVED = 4,
+
+        [EnumMember]
+        REMOVED = 5
+    }
+    [DataContract]
+    public enum DatabaseOperation : short
+    {
+        [EnumMember]
+        INSERT = 1,
+        [EnumMember]
+        DELETE = 2
+    }
+
+    [DataContract]
+    public enum ModelUpdateOperationType : short
+    {
+        [EnumMember]
+        INSERT = 1,
+        [EnumMember]
+        DELETE = 2,
+        [EnumMember]
+        CLEAR = 3
+    }
+
+    public enum ReportType
+    {
+        Total = 0,
+        SAIFI,
+        SAIDI
     }
 }
 

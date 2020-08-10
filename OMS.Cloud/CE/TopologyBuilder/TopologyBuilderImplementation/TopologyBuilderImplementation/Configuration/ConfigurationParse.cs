@@ -1,4 +1,4 @@
-﻿using CECommon;
+﻿using Common.CE;
 using OMS.Common.Cloud;
 using OMS.Common.Cloud.Logger;
 using System;

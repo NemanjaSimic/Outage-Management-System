@@ -17,13 +17,13 @@ namespace OMS.Common.WcfClient.TMS
         {
         }
 
-        public static TransactionActorClient CreateClient(string serviceName)
+        public static ITransactionActorContract CreateClient(string serviceName)
         {
             ClientFactory factory = new ClientFactory();
             return factory.CreateClient<TransactionActorClient, ITransactionActorContract>(serviceName);
         }
 
-        public static TransactionActorClient CreateClient(Uri serviceUri, ServicePartitionKey servicePartitionKey)
+        public static ITransactionActorContract CreateClient(Uri serviceUri, ServicePartitionKey servicePartitionKey)
         {
             ClientFactory factory = new ClientFactory();
             return factory.CreateClient<TransactionActorClient, ITransactionActorContract>(serviceUri, servicePartitionKey);

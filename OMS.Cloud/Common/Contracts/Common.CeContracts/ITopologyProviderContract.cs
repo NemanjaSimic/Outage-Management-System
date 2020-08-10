@@ -1,13 +1,12 @@
-﻿using CECommon;
-using CECommon.Interface;
-using CECommon.Interfaces;
+﻿using Common.CE.Interfaces;
 using Microsoft.ServiceFabric.Services.Remoting;
+using OMS.Common.PubSub;
 using System.ServiceModel;
 using System.Threading.Tasks;
 
 namespace Common.CeContracts.TopologyProvider
 {
-    [ServiceContract]
+	[ServiceContract]
 	public interface ITopologyProviderContract : IService
 	{
         [OperationContract]

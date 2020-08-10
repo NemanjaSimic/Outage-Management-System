@@ -94,6 +94,10 @@
     <Compile Include="TopologyProvider.cs" />
   </ItemGroup>
   <ItemGroup>
+    <ProjectReference Include="..\..\..\Common.OMS\Common.OMS.csproj">
+      <Project>{8F96A078-BE16-4363-9B89-0B313D2E0F5E}</Project>
+      <Name>Common.OMS</Name>
+    </ProjectReference>
     <ProjectReference Include="..\..\..\Common\Common.CE\Common.CE.csproj">
       <Project>{2B5DAFD3-879B-4876-972F-0CC48463AC0C}</Project>
       <Name>Common.CE</Name>

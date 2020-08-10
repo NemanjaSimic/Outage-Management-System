@@ -1,6 +1,12 @@
 ﻿<?xml version="1.0" encoding="utf-8"?>
 <ApplicationManifest xmlns:xsd="http://www.w3.org/2001/XMLSchema" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" ApplicationTypeName="OMS.CloudType" ApplicationTypeVersion="1.0.0" xmlns="http://schemas.microsoft.com/2011/01/fabric">
   <Parameters>
+    <!-- OMS -->
+    <Parameter Name="OMS.ReportingService_InstanceCount" DefaultValue="-1" />
+    <Parameter Name="OMS.OutageLifecycleService_InstanceCount" DefaultValue="-1" />
+    <Parameter Name="OMS.ModelProviderService_MinReplicaSetSize" DefaultValue="3" />
+    <Parameter Name="OMS.ModelProviderService_PartitionCount" DefaultValue="1" />
+    <Parameter Name="OMS.ModelProviderService_TargetReplicaSetSize" DefaultValue="3" />
     <!--CE-->
     <Parameter Name="CE.LoadFlowService_InstanceCount" DefaultValue="-1" />
     <Parameter Name="CE.MeasurementProviderService_MinReplicaSetSize" DefaultValue="3" />
@@ -36,6 +42,21 @@
        ServiceManifest.xml file. -->
   <!--CE-->
   <ServiceManifestImport>
+    <ServiceManifestRef ServiceManifestName="OMS.ReportingServicePkg" ServiceManifestVersion="1.0.0" />
+    <ConfigOverrides />
+  </ServiceManifestImport>
+  <!--TMS-->
+  <!--PubSub-->
+  <!--NMS-->
+  <!--SCADA-->
+  <ServiceManifestImport>
+    <ServiceManifestRef ServiceManifestName="OMS.OutageLifecycleServicePkg" ServiceManifestVersion="1.0.0" />
+    <ConfigOverrides />
+  </ServiceManifestImport>
+  <ServiceManifestImport>
+    <ServiceManifestRef ServiceManifestName="OMS.ModelProviderServicePkg" ServiceManifestVersion="1.0.0" />
+  </ServiceManifestImport>
+  <ServiceManifestImport>
     <ServiceManifestRef ServiceManifestName="CE.LoadFlowServicePkg" ServiceManifestVersion="1.0.0" />
     <ConfigOverrides />
   </ServiceManifestImport>
@@ -55,22 +76,18 @@
     <ServiceManifestRef ServiceManifestName="CE.TopologyProviderServicePkg" ServiceManifestVersion="1.0.0" />
     <ConfigOverrides />
   </ServiceManifestImport>
-  <!--TMS-->
   <ServiceManifestImport>
     <ServiceManifestRef ServiceManifestName="TMS.TransactionManagerServicePkg" ServiceManifestVersion="1.0.0" />
     <ConfigOverrides />
   </ServiceManifestImport>
-  <!--PubSub-->
   <ServiceManifestImport>
     <ServiceManifestRef ServiceManifestName="PubSubServicePkg" ServiceManifestVersion="1.0.0" />
     <ConfigOverrides />
   </ServiceManifestImport>
-  <!--NMS-->
   <ServiceManifestImport>
     <ServiceManifestRef ServiceManifestName="NMS.GdaServicePkg" ServiceManifestVersion="1.0.0" />
     <ConfigOverrides />
   </ServiceManifestImport>
-  <!--SCADA-->
   <ServiceManifestImport>
     <ServiceManifestRef ServiceManifestName="SCADA.CommandingServicePkg" ServiceManifestVersion="1.0.0" />
     <ConfigOverrides />
@@ -93,6 +110,21 @@
          ServiceFabric PowerShell module.
 
          The attribute ServiceTypeName below must match the name defined in the imported ServiceManifest.xml file. -->
+    <Service Name="OMS.ReportingService" ServicePackageActivationMode="ExclusiveProcess">
+      <StatelessService ServiceTypeName="OMS.ReportingServiceType" InstanceCount="[OMS.ReportingService_InstanceCount]">
+        <SingletonPartition />
+      </StatelessService>
+    </Service>
+    <Service Name="OMS.OutageLifecycleService" ServicePackageActivationMode="ExclusiveProcess">
+      <StatelessService ServiceTypeName="OMS.OutageLifecycleServiceType" InstanceCount="[OMS.OutageLifecycleService_InstanceCount]">
+        <SingletonPartition />
+      </StatelessService>
+    </Service>
+    <Service Name="OMS.ModelProviderService" ServicePackageActivationMode="ExclusiveProcess">
+      <StatefulService ServiceTypeName="OMS.ModelProviderServiceType" TargetReplicaSetSize="[OMS.ModelProviderService_TargetReplicaSetSize]" MinReplicaSetSize="[OMS.ModelProviderService_MinReplicaSetSize]">
+        <UniformInt64Partition PartitionCount="[OMS.ModelProviderService_PartitionCount]" LowKey="-9223372036854775808" HighKey="9223372036854775807" />
+      </StatefulService>
+    </Service>
     <!--CE-->
     <Service Name="CE.LoadFlowService" ServicePackageActivationMode="ExclusiveProcess">
       <StatelessService ServiceTypeName="CE.LoadFlowServiceType" InstanceCount="[CE.LoadFlowService_InstanceCount]">

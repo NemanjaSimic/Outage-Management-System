@@ -1,8 +1,8 @@
-﻿using CECommon;
-using CECommon.Interfaces;
-using CECommon.Model;
-using CECommon.Models;
+﻿using Common.CE;
+using Common.CE.Interfaces;
+using Common.CeContracts;
 using Common.CeContracts.LoadFlow;
+using Common.CeContracts.ModelProvider;
 using OMS.Common.Cloud;
 using OMS.Common.Cloud.Logger;
 using OMS.Common.NmsContracts;
@@ -16,7 +16,7 @@ using System.Threading.Tasks;
 
 namespace CE.LoadFlowImplementation
 {
-    public class LoadFlow : ILoadFlowContract
+	public class LoadFlow : ILoadFlowContract
     {
         #region Private fields
         private HashSet<long> reclosers;
@@ -27,8 +27,8 @@ namespace CE.LoadFlowImplementation
 
         private readonly string baseLogString;
 
-        private readonly MeasurementProviderClient measurementProviderClient;
-        private readonly ModelProviderClient modelProviderClient;
+        private readonly IMeasurementProviderContract measurementProviderClient;
+        private readonly IModelProviderContract modelProviderClient;
 
         private ICloudLogger logger;
         private ICloudLogger Logger

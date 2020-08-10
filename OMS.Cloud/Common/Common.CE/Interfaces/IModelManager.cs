@@ -1,11 +1,9 @@
-﻿
-using CECommon.Model;
-using System.Threading.Tasks;
+﻿using System.Threading.Tasks;
 
-namespace CECommon.Interfaces
+namespace Common.CE.Interfaces
 {
-    public interface IModelManager
+	public interface IModelManager
     {
-        Task<ModelDelta> TryGetAllModelEntitiesAsync();
+        Task<IModelDelta> TryGetAllModelEntitiesAsync();
     }
 }

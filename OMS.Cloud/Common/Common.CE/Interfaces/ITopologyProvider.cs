@@ -1,6 +1,6 @@
 ﻿using System.Collections.Generic;
 
-namespace CECommon.Interfaces
+namespace Common.CE.Interfaces
 {
     public delegate void ProviderTopologyDelegate(List<ITopology> topology);
     public delegate void ProviderTopologyConnectionDelegate(List<ITopology> topology);

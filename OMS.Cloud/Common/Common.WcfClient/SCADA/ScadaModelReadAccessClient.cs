@@ -22,13 +22,13 @@ namespace OMS.Common.WcfClient.SCADA
         {
         }
 
-        public static ScadaModelReadAccessClient CreateClient()
+        public static IScadaModelReadAccessContract CreateClient()
         {
             ClientFactory factory = new ClientFactory();
             return factory.CreateClient<ScadaModelReadAccessClient, IScadaModelReadAccessContract>(microserviceName);
         }
 
-        public static ScadaModelReadAccessClient CreateClient(Uri serviceUri, ServicePartitionKey servicePartitionKey)
+        public static IScadaModelReadAccessContract CreateClient(Uri serviceUri, ServicePartitionKey servicePartitionKey)
         {
             ClientFactory factory = new ClientFactory();
             return factory.CreateClient<ScadaModelReadAccessClient, IScadaModelReadAccessContract>(serviceUri, servicePartitionKey);

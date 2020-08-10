@@ -1,8 +1,8 @@
-﻿using CECommon;
-using CECommon.Interfaces;
-using CECommon.Model;
-using Common.CE;
+﻿using Common.CE;
+using Common.CE.Interfaces;
+using Common.CeContracts;
 using Common.CeContracts.ModelProvider;
+using Common.CeContracts.TopologyProvider;
 using Microsoft.ServiceFabric.Data;
 using Microsoft.ServiceFabric.Data.Notifications;
 using OMS.Common.Cloud.Logger;
@@ -14,7 +14,7 @@ using System.Threading.Tasks;
 
 namespace CE.ModelProviderImplementation
 {
-    public class ModelProvider : IModelProviderContract
+	public class ModelProvider : IModelProviderContract
     {
         #region Fields
         private TransactionFlag transactionFlag;
@@ -40,8 +40,8 @@ namespace CE.ModelProviderImplementation
         private bool isEnergySourceCacheInitialized = false;
         private bool isRecloserCacheInitialized = false;
 
-        private readonly TopologyProviderClient topologyProviderClient;
-        private readonly MeasurementProviderClient measurementProviderClient;
+        private readonly ITopologyProviderContract topologyProviderClient;
+        private readonly IMeasurementProviderContract measurementProviderClient;
 
 
         private readonly string baseLogString;
@@ -132,9 +132,14 @@ namespace CE.ModelProviderImplementation
             }
         }
 
-        private async Task<ModelDelta> ImportDataInCache()
+        public async Task<IModelDelta> ImportDataInCache()
         {
-            ModelDelta modelDelta = await modelManager.TryGetAllModelEntitiesAsync();
+            while (!AreReliableDictionariesInitialized)
+            {
+                await Task.Delay(1000);
+            }
+
+            IModelDelta modelDelta = await modelManager.TryGetAllModelEntitiesAsync();
 
             await ElementCache.SetAsync((short)TransactionFlag.NoTransaction, modelDelta.TopologyElements);
             await ElementConnectionCache.SetAsync((short)TransactionFlag.NoTransaction, modelDelta.ElementConnections);
@@ -204,7 +209,7 @@ namespace CE.ModelProviderImplementation
 
                 transactionFlag = TransactionFlag.InTransaction;
 
-                ModelDelta modelDelta = await modelManager.TryGetAllModelEntitiesAsync();
+                IModelDelta modelDelta = await modelManager.TryGetAllModelEntitiesAsync();
 
                 Logger.LogDebug($"{baseLogString} PrepareForTransaction => Writting new data in cache under InTransaction flag.");
                 await ElementCache.SetAsync((short)TransactionFlag.InTransaction, modelDelta.TopologyElements);
@@ -293,7 +298,7 @@ namespace CE.ModelProviderImplementation
             }
             else if (forTransactionType == TransactionFlag.NoTransaction)
             {
-                ModelDelta newModelDelta = await ImportDataInCache();
+                IModelDelta newModelDelta = await ImportDataInCache();
 
                 //await ElementCache.SetAsync((short)TransactionFlag.NoTransaction, newModelDelta.TopologyElements);
 
@@ -328,7 +333,7 @@ namespace CE.ModelProviderImplementation
             }
             else if (forTransactionType == TransactionFlag.NoTransaction)
             {
-                ModelDelta newModelDelta = await ImportDataInCache();
+                IModelDelta newModelDelta = await ImportDataInCache();
 
                 //await ElementConnectionCache.SetAsync((short)TransactionFlag.NoTransaction, newModelDelta.ElementConnections);
 
@@ -363,7 +368,7 @@ namespace CE.ModelProviderImplementation
             }
             else if (forTransactionType == TransactionFlag.NoTransaction)
             {
-                ModelDelta newModelDelta = await ImportDataInCache();
+                IModelDelta newModelDelta = await ImportDataInCache();
 
                 //await RecloserCache.SetAsync((short)TransactionFlag.NoTransaction, newModelDelta.Reclosers);
 
@@ -398,7 +403,7 @@ namespace CE.ModelProviderImplementation
             }
             else if (forTransactionType == TransactionFlag.NoTransaction)
             {
-                ModelDelta newModelDelta = await ImportDataInCache();
+                IModelDelta newModelDelta = await ImportDataInCache();
 
                 //await EnergySourceCache.SetAsync((short)TransactionFlag.NoTransaction, newModelDelta.EnergySources);
 

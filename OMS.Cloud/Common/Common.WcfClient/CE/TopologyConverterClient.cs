@@ -1,10 +1,9 @@
-﻿using CECommon;
-using CECommon.Interface;
-using CECommon.Interfaces;
+﻿using Common.CE.Interfaces;
 using Common.CeContracts;
 using Microsoft.ServiceFabric.Services.Client;
 using Microsoft.ServiceFabric.Services.Communication.Wcf.Client;
 using OMS.Common.Cloud.Names;
+using OMS.Common.PubSub;
 using System;
 using System.Threading.Tasks;
 
@@ -21,13 +20,13 @@ namespace OMS.Common.WcfClient.CE
 
 		}
 
-		public static TopologyConverterClient CreateClient()
+		public static ITopologyConverterContract CreateClient()
 		{
 			ClientFactory factory = new ClientFactory();
 			return factory.CreateClient<TopologyConverterClient, ITopologyConverterContract>(microserviceName);
 		}
 
-		public static TopologyConverterClient CreateClient(Uri serviceUri, ServicePartitionKey servicePartitionKey)
+		public static ITopologyConverterContract CreateClient(Uri serviceUri, ServicePartitionKey servicePartitionKey)
 		{
 			ClientFactory factory = new ClientFactory();
 			return factory.CreateClient<TopologyConverterClient, ITopologyConverterContract>(serviceUri, servicePartitionKey);

@@ -44,13 +44,21 @@
     <Compile Include="Properties\AssemblyInfo.cs" />
   </ItemGroup>
   <ItemGroup>
-    <ProjectReference Include="..\..\..\OutageManagementSystem\Common\Common.csproj">
-      <Project>{892CBE15-9ED7-4540-81FA-0EAABA592138}</Project>
-      <Name>Common</Name>
+    <ProjectReference Include="..\..\..\Cloud.Web\Common\Web\Common.Web.UI.Models\Common.Web.UI.Models.csproj">
+      <Project>{B30F060F-056F-40E3-9AF8-CBD9ADBC6F6E}</Project>
+      <Name>Common.Web.UI.Models</Name>
     </ProjectReference>
-    <ProjectReference Include="..\..\OMS.Web.UI.Models\OMS.Web.UI.Models.csproj">
-      <Project>{B4ED1DFF-BFC2-44B2-B98A-D985B1BC8179}</Project>
-      <Name>OMS.Web.UI.Models</Name>
+    <ProjectReference Include="..\..\..\OMS.Cloud\Common\Common.CE\Common.CE.csproj">
+      <Project>{2B5DAFD3-879B-4876-972F-0CC48463AC0C}</Project>
+      <Name>Common.CE</Name>
+    </ProjectReference>
+    <ProjectReference Include="..\..\..\OMS.Cloud\Common\Common.Cloud\Common.Cloud.csproj">
+      <Project>{fbee1369-0f6c-41e6-8c62-8c1c5cdbb602}</Project>
+      <Name>Common.Cloud</Name>
+    </ProjectReference>
+    <ProjectReference Include="..\..\..\OMS.Cloud\Common\Contracts\Common.PubSubContracts\Common.PubSubContracts.csproj">
+      <Project>{AA75150D-EE56-49C0-9431-751F83CCC0CD}</Project>
+      <Name>Common.PubSubContracts</Name>
     </ProjectReference>
   </ItemGroup>
   <Import Project="$(MSBuildToolsPath)\Microsoft.CSharp.targets" />
