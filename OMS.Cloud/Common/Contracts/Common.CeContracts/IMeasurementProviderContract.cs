@@ -1,4 +1,5 @@
-﻿using Microsoft.ServiceFabric.Services.Remoting;
+﻿using Common.CloudContracts;
+using Microsoft.ServiceFabric.Services.Remoting;
 using OMS.Common.Cloud;
 using OMS.Common.PubSubContracts.DataContracts.SCADA;
 using System.Collections.Generic;
@@ -8,8 +9,8 @@ using System.Threading.Tasks;
 namespace Common.CeContracts
 {
 	[ServiceContract]
-	public interface IMeasurementProviderContract : IService
-	{
+	public interface IMeasurementProviderContract : IService, IHealthChecker
+    {
         [OperationContract]
         Task AddAnalogMeasurement(AnalogMeasurement analogMeasurement);
         [OperationContract]

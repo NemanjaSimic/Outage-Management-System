@@ -329,7 +329,10 @@ namespace SCADA.CommandingImplementation
             }
         }
         #endregion IScadaCommandingContract
-
+        public Task<bool> IsAlive()
+        {
+            return Task.Run(() => { return true; });
+        }
         private async Task SendSingleCommand(IScadaModelPointItem pointItem, int commandingValue, CommandOriginType commandOriginType, bool isRetry = false)
         { 
             try

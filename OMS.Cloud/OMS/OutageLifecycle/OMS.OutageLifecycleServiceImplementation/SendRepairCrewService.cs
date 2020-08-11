@@ -41,6 +41,10 @@ namespace OMS.OutageLifecycleServiceImplementation
             this.outageMessageMapper = new OutageMessageMapper();
             this.outageModelReadAccessClient = OutageModelReadAccessClient.CreateClient();
         }
+        public Task<bool> IsAlive()
+        {
+            return Task.Run(() => { return true; });
+        }
         public async Task InitAwaitableFields()
         {
             this.outageModel = await outageModelReadAccessClient.GetTopologyModel();

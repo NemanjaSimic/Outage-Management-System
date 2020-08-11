@@ -52,5 +52,10 @@ namespace OMS.Common.WcfClient.PubSub
             return InvokeWithRetryAsync(client => client.Channel.Notify(message, publisherName));
         }
         #endregion INotifySubscriberContract
+
+        public Task<bool> IsAlive()
+        {
+            return InvokeWithRetryAsync(client => client.Channel.IsAlive());
+        }
     }
 }

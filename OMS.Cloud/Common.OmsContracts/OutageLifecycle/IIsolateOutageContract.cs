@@ -1,4 +1,5 @@
-﻿using Microsoft.ServiceFabric.Services.Remoting;
+﻿using Common.CloudContracts;
+using Microsoft.ServiceFabric.Services.Remoting;
 using System;
 using System.Collections.Generic;
 using System.Linq;
@@ -9,7 +10,7 @@ using System.Threading.Tasks;
 namespace Common.OmsContracts.OutageLifecycle
 {
 	[ServiceContract]
-	public interface IIsolateOutageContract : IService
+	public interface IIsolateOutageContract : IService, IHealthChecker
 	{
 		[OperationContract]
 		Task IsolateOutage(long outageId);

@@ -7,6 +7,7 @@ using Microsoft.ServiceFabric.Data;
 using Microsoft.ServiceFabric.Data.Notifications;
 using OMS.Common.Cloud.Logger;
 using OMS.Common.Cloud.ReliableCollectionHelpers;
+using OMS.Common.TmsContracts;
 using OMS.Common.WcfClient.CE;
 using System;
 using System.Collections.Generic;
@@ -83,6 +84,11 @@ namespace CE.ModelProviderImplementation
 
             string debugMessage = $"{baseLogString} Ctor => Clients initialized.";
             Logger.LogDebug(debugMessage);
+        }
+
+        public Task<bool> IsAlive()
+        {
+            return Task.Run(() => { return true; });
         }
 
         private async void OnStateManagerChangedHandler(object sender, NotifyStateManagerChangedEventArgs e)
@@ -190,7 +196,7 @@ namespace CE.ModelProviderImplementation
 		#endregion
 
 		#region Distributed Transaction
-		public async Task<bool> PrepareForTransaction()
+		public async Task<bool> Prepare()
         {
             string verboseMessage = $"{baseLogString} entering PrepareForTransaction method.";
             Logger.LogVerbose(verboseMessage);
@@ -219,8 +225,9 @@ namespace CE.ModelProviderImplementation
                 Logger.LogDebug($"{baseLogString} PrepareForTransaction => All new data have been written in cache under InTransaction flag.");
 
                 Logger.LogDebug($"{baseLogString} PrepareForTransaction => Calling PrepareForTransaction on topology provider.");
-                topologyProviderTransaction = await topologyProviderClient.PrepareForTransaction();
-                Logger.LogDebug($"{baseLogString} PrepareForTransaction => PrepareForTransaction from topology provider returned success = {measurementProviderTransaction}.");
+                //topologyProviderTransaction = await topologyProviderClient.PrepareForTransaction();
+                topologyProviderClient.PrepareForTransaction();
+                Logger.LogDebug($"{baseLogString} PrepareForTransaction => PrepareForTransaction from topology provider returned success = {topologyProviderTransaction}.");
 
             }
             catch (Exception e)
@@ -233,7 +240,7 @@ namespace CE.ModelProviderImplementation
 
             return (success == true) ? topologyProviderTransaction && measurementProviderTransaction : false;
         }
-        public async Task CommitTransaction()
+        public async Task Commit()
         {
             string verboseMessage = $"{baseLogString} entering CommitTransaction method.";
             Logger.LogVerbose(verboseMessage);
@@ -261,7 +268,7 @@ namespace CE.ModelProviderImplementation
             transactionFlag = TransactionFlag.NoTransaction;
             logger.LogDebug("Model provider commited transaction successfully.");
         }
-        public async Task RollbackTransaction()
+        public async Task Rollback()
         {
             string verboseMessage = $"{baseLogString} entering RollbackTransaction method.";
             Logger.LogVerbose(verboseMessage);
@@ -289,6 +296,11 @@ namespace CE.ModelProviderImplementation
         {
             string verboseMessage = $"{baseLogString} entering GetElementsFromCache method.";
             Logger.LogVerbose(verboseMessage);
+
+            while (!AreReliableDictionariesInitialized)
+            {
+                await Task.Delay(1000);
+            }
 
             ConditionalValue<Dictionary<long, ITopologyElement>> elements;
 
@@ -325,6 +337,11 @@ namespace CE.ModelProviderImplementation
             string verboseMessage = $"{baseLogString} entering GetConnectionsFromCache method.";
             Logger.LogVerbose(verboseMessage);
 
+            while (!AreReliableDictionariesInitialized)
+            {
+                await Task.Delay(1000);
+            }
+
             ConditionalValue<Dictionary<long, List<long>>> elementConnections;
 
             if (await ElementConnectionCache.ContainsKeyAsync((short)forTransactionType))
@@ -360,6 +377,11 @@ namespace CE.ModelProviderImplementation
             string verboseMessage = $"{baseLogString} entering GetReclosersFromCache method.";
             Logger.LogVerbose(verboseMessage);
 
+            while (!AreReliableDictionariesInitialized)
+            {
+                await Task.Delay(1000);
+            }
+
             ConditionalValue<HashSet<long>> reclosers;
 
             if (await RecloserCache.ContainsKeyAsync((short)forTransactionType))
@@ -394,6 +416,11 @@ namespace CE.ModelProviderImplementation
         {
             string verboseMessage = $"{baseLogString} entering GetEnergySourcesFromCache method.";
             Logger.LogVerbose(verboseMessage);
+
+            while (!AreReliableDictionariesInitialized)
+            {
+                await Task.Delay(1000);
+            }
 
             ConditionalValue<List<long>> energySources;
 

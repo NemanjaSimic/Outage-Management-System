@@ -30,6 +30,11 @@ namespace OMS.Common.WcfClient.CE
 			return factory.CreateClient<LoadFlowClient, ILoadFlowContract>(serviceUri, servicePartitionKey);
 		}
 
+		public Task<bool> IsAlive()
+		{
+			return Task.Run(() => { return true; });
+		}
+
 		public Task<ITopology> UpdateLoadFlow(ITopology topology)
 		{
 			return InvokeWithRetryAsync(client => client.Channel.UpdateLoadFlow(topology));

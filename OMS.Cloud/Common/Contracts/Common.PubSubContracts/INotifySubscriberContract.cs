@@ -5,11 +5,12 @@ using System;
 using System.ServiceModel;
 using System.Threading.Tasks;
 using Common.PubSubContracts.DataContracts.EMAIL;
+using Common.CloudContracts;
 
 namespace OMS.Common.PubSubContracts
 {
     [ServiceContract]
-    public interface INotifySubscriberContract: IService
+    public interface INotifySubscriberContract: IService, IHealthChecker
     {
         [OperationContract]
         //[ServiceKnownType(typeof(CalculationEngineMessage))]

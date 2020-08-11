@@ -479,6 +479,13 @@ namespace SCADA.ModelProviderImplementation.ContractProviders
 
             Logger.LogDebug(sb.ToString());
         }
+
+        public Task<bool> IsAlive()
+        {
+            return Task.Run(() => { return true; });
+        }
         #endregion Private Methods
+
+
     }
 }

@@ -41,7 +41,10 @@ namespace SCADA.FunctionExecutorImplementation.CommandEnqueuers
             string debugMessage = $"{baseLogString} Ctor => CloudQueues initialized.";
             Logger.LogDebug(debugMessage);
         }
-
+        public Task<bool> IsAlive()
+        {
+            return Task.Run(() => { return true; });
+        }
         #region Command Enqueuers
         public async Task<bool> EnqueueWriteCommand(IWriteModbusFunction modbusFunction)
         {

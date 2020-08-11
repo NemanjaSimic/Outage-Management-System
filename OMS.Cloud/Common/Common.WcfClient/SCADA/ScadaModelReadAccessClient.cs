@@ -71,5 +71,10 @@ namespace OMS.Common.WcfClient.SCADA
             return InvokeWithRetryAsync(client => client.Channel.GetScadaConfigData());
         }
         #endregion
+
+        public Task<bool> IsAlive()
+        {
+            return InvokeWithRetryAsync(client => client.Channel.IsAlive());
+        }
     }
 }

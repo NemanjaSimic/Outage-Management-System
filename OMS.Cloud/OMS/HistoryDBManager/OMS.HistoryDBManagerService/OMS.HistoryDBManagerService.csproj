@@ -103,6 +103,10 @@
       <Project>{FBEE1369-0F6C-41E6-8C62-8C1C5CDBB602}</Project>
       <Name>Common.Cloud</Name>
     </ProjectReference>
+    <ProjectReference Include="..\..\..\Common\Contracts\Common.CloudContracts\Common.CloudContracts.csproj">
+      <Project>{2307F7DC-6B87-4506-8365-6966712DD5FE}</Project>
+      <Name>Common.CloudContracts</Name>
+    </ProjectReference>
     <ProjectReference Include="..\OMS.HistoryDBManagerServiceImplementation\OMS.HistoryDBManagerServiceImplementation.csproj">
       <Project>{3CA82365-7A48-4FAB-A74B-C70316A60163}</Project>
       <Name>OMS.HistoryDBManagerServiceImplementation</Name>

@@ -20,6 +20,11 @@ namespace OMS.Common.WcfClient.CE
 
 		}
 
+		public Task<bool> IsAlive()
+		{
+			return Task.Run(() => { return true; });
+		}
+
 		public static IMeasurementProviderContract CreateClient()
 		{
 			ClientFactory factory = new ClientFactory();

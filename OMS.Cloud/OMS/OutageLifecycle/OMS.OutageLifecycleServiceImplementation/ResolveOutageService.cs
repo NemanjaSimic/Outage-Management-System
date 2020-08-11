@@ -31,8 +31,11 @@ namespace OMS.OutageLifecycleServiceImplementation
 			this.lifecycleHelper = new OutageLifecycleHelper(this.dbContext, null);
             this.outageMessageMapper = new OutageMessageMapper();
         }
-
-		public async Task<bool> ResolveOutage(long outageId)
+        public Task<bool> IsAlive()
+        {
+            return Task.Run(() => { return true; });
+        }
+        public async Task<bool> ResolveOutage(long outageId)
 		{
             OutageEntity activeOutageDbEntity = null;
 

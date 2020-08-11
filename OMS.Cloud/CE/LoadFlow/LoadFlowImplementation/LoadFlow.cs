@@ -720,6 +720,11 @@ namespace CE.LoadFlowImplementation
 
             }
         }
-		#endregion
-	}
+
+        public Task<bool> IsAlive()
+        {
+            return Task.Run(() => { return true; });
+        }
+        #endregion
+    }
 }

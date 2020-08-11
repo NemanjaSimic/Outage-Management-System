@@ -43,6 +43,10 @@ namespace OMS.OutageLifecycleServiceImplementation
             this.outageModel = await outageModelReadAccessClient.GetTopologyModel();
             this.outageLifecycleHelper = new OutageLifecycleHelper(this.dbContext, this.outageModel);
         }
+        public Task<bool> IsAlive()
+        {
+            return Task.Run(() => { return true; });
+        }
         public async Task<bool> ValidateResolveConditions(long outageId)
 		{
             await InitAwaitableFields();

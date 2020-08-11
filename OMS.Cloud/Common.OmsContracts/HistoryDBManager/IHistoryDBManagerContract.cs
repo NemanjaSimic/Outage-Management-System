@@ -1,4 +1,5 @@
-﻿using Microsoft.ServiceFabric.Services.Remoting;
+﻿using Common.CloudContracts;
+using Microsoft.ServiceFabric.Services.Remoting;
 using System;
 using System.Collections.Generic;
 using System.Linq;
@@ -9,7 +10,7 @@ using System.Threading.Tasks;
 namespace Common.OmsContracts.HistoryDBManager
 {
     [ServiceContract]
-    public interface IHistoryDBManagerContract : IService
+    public interface IHistoryDBManagerContract : IService, IHealthChecker
     {
         [OperationContract]
         Task OnSwitchClosed(long elementGid);

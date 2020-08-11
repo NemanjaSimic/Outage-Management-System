@@ -58,5 +58,10 @@ namespace OMS.Common.WcfClient.OMS
         }
 
         #endregion
+
+        public Task<bool> IsAlive()
+        {
+            return InvokeWithRetryAsync(client => client.Channel.IsAlive());
+        }
     }
 }

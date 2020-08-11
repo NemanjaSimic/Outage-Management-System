@@ -1,4 +1,5 @@
-﻿using Microsoft.ServiceFabric.Services.Remoting;
+﻿using Common.CloudContracts;
+using Microsoft.ServiceFabric.Services.Remoting;
 using OMS.Common.Cloud;
 using System;
 using System.Collections.Generic;
@@ -8,7 +9,7 @@ using System.Threading.Tasks;
 namespace OMS.Common.PubSubContracts
 {
     [ServiceContract]
-    public interface IRegisterSubscriberContract : IService
+    public interface IRegisterSubscriberContract : IService, IHealthChecker
     {
         [OperationContract]
         Task<bool> SubscribeToTopic(Topic topic, string subcriberServiceName);

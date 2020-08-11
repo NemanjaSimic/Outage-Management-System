@@ -36,5 +36,10 @@ namespace OMS.Common.WcfClient.OMS.Lifecycle
         {
 			return InvokeWithRetryAsync(client => client.Channel.IsolateOutage(outageId));
         }
-    }
+
+		public Task<bool> IsAlive()
+		{
+			return InvokeWithRetryAsync(client => client.Channel.IsAlive());
+		}
+	}
 }

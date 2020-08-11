@@ -48,5 +48,10 @@ namespace OMS.Common.WcfClient.CE
 		{
 			return InvokeWithRetryAsync(client => client.Channel.GetMeasurementToElementMap());
 		}
+
+		public Task<bool> IsAlive()
+		{
+			return Task.Run(() => { return true; });
+		}
 	}
 }

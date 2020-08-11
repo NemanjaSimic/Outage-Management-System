@@ -1,11 +1,12 @@
-﻿using Microsoft.ServiceFabric.Services.Remoting;
+﻿using Common.CloudContracts;
+using Microsoft.ServiceFabric.Services.Remoting;
 using System.ServiceModel;
 using System.Threading.Tasks;
 
 namespace OMS.Common.TmsContracts
 {
     [ServiceContract]
-    public interface ITransactionActorContract : IService
+    public interface ITransactionActorContract : IService, IHealthChecker
     {
         [OperationContract]
         Task<bool> Prepare();

@@ -49,6 +49,14 @@ namespace CE.TopologyProviderImplementation
         private bool isTopologyCacheUIInitialized;
         private bool isTopologyCacheOMSInitialized;
 
+        public bool AreDictionariesInitialized
+        {
+            get
+            {
+                return isTopologyCacheInitialized && isTopologyCacheOMSInitialized && isTopologyCacheUIInitialized;
+            }
+        }
+
         private ReliableDictionaryAccess<long, ITopology> topologyCache;
         public ReliableDictionaryAccess<long, ITopology> TopologyCache { get => topologyCache; }
 
@@ -117,6 +125,11 @@ namespace CE.TopologyProviderImplementation
         }
         private async Task<ITopology> GetTopologyFromCache(TopologyType type)
         {
+            while (!AreDictionariesInitialized)
+            {
+                await Task.Delay(1000);
+            }
+
             string verboseMessage = $"{baseLogString} entering GetTopologyFromCache method. Topology type {type}";
             Logger.LogVerbose(verboseMessage);
             ConditionalValue<ITopology> topology;
@@ -359,6 +372,11 @@ namespace CE.TopologyProviderImplementation
 
         public async Task<IOutageTopologyModel> GetOMSModel()
         {
+            while (!AreDictionariesInitialized)
+            {
+                await Task.Delay(1000);
+            }
+
             ConditionalValue<IOutageTopologyModel>  omsModel;
 
             if (await TopologyCacheOMS.ContainsKeyAsync(1))
@@ -381,6 +399,11 @@ namespace CE.TopologyProviderImplementation
         }
         public async Task<UIModel> GetUIModel()
         {
+            while (!AreDictionariesInitialized)
+            {
+                await Task.Delay(1000);
+            }
+
             ConditionalValue<UIModel> uiModel;
 
             if (await TopologyCacheUI.ContainsKeyAsync(1))
@@ -470,6 +493,11 @@ namespace CE.TopologyProviderImplementation
 
                 await PublishUIModel(uiTopologyModel);
             }
+        }
+
+        public Task<bool> IsAlive()
+        {
+            return Task.Run(() => { return true; });
         }
         #endregion
     }

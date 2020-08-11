@@ -24,5 +24,9 @@ namespace OMS.ReportingServiceImplementation
         {
             return  reports[options.Type]().Generate(options);
         }
+        public Task<bool> IsAlive()
+        {
+            return Task.Run(() => { return true; });
+        }
     }
 }

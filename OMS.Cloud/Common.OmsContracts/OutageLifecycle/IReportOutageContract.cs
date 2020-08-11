@@ -1,4 +1,5 @@
-﻿using Microsoft.ServiceFabric.Services.Remoting;
+﻿using Common.CloudContracts;
+using Microsoft.ServiceFabric.Services.Remoting;
 using OMS.Common.Cloud;
 using System;
 using System.Collections.Generic;
@@ -10,7 +11,7 @@ using System.Threading.Tasks;
 namespace Common.OmsContracts.OutageLifecycle
 {
 	[ServiceContract]
-	public interface IReportOutageContract : IService
+	public interface IReportOutageContract : IService, IHealthChecker
 	{
 		[OperationContract]
 		Task<bool> ReportPotentialOutage(long gid, CommandOriginType commandOriginType);

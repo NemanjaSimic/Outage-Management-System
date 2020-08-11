@@ -78,5 +78,10 @@ namespace OMS.Common.WcfClient.CE
 		{
             return InvokeWithRetryAsync(client => client.Channel.RollbackTransaction());
 		}
+
+		public Task<bool> IsAlive()
+		{
+			return InvokeWithRetryAsync(client => client.Channel.IsAlive());
+		}
 	}
 }

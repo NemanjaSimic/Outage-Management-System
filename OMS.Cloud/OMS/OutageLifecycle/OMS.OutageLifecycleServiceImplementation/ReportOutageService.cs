@@ -45,6 +45,11 @@ namespace OMS.OutageLifecycleServiceImplementation
 
           
 		}
+
+        public Task<bool> IsAlive()
+        {
+            return Task.Run(() => { return true; });
+        }
         public async Task InitAwaitableFields()
         {
             this.topologyModel = await outageModelReadAccessClient.GetTopologyModel();
@@ -190,7 +195,5 @@ namespace OMS.OutageLifecycleServiceImplementation
             }
             return success;
 		}
-
-      
     }
 }

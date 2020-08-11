@@ -71,7 +71,10 @@ namespace SCADA.ModelProviderImplementation.DistributedTransaction
         private ReliableDictionaryAccess<byte, List<long>> ModelChanges { get; set; }
         private ReliableDictionaryAccess<long, CommandDescription> CommandDescriptionCache { get; set; }
         private ReliableDictionaryAccess<long, ModbusData> MeasurementsCache { get; set; }
-
+        public Task<bool> IsAlive()
+        {
+            return Task.Run(() => { return true; });
+        }
         private async void OnStateManagerChangedHandler(object sender, NotifyStateManagerChangedEventArgs e)
         {
             if (e.Action == NotifyStateManagerChangedAction.Add)

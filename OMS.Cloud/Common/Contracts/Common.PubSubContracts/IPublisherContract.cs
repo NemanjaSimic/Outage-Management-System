@@ -5,11 +5,12 @@ using System.ServiceModel;
 using System.Threading.Tasks;
 using Common.PubSubContracts.DataContracts.OMS;
 using Common.PubSub;
+using Common.CloudContracts;
 
 namespace OMS.Common.PubSubContracts
 {
     [ServiceContract]
-    public interface IPublisherContract : IService
+    public interface IPublisherContract : IService, IHealthChecker
     {
         [OperationContract]
         //[ServiceKnownType(typeof(CalculationEngineMessage))]

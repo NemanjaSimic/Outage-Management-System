@@ -117,6 +117,10 @@
       <Project>{FBEE1369-0F6C-41E6-8C62-8C1C5CDBB602}</Project>
       <Name>Common.Cloud</Name>
     </ProjectReference>
+    <ProjectReference Include="..\..\..\..\OMS.Cloud\Common\Contracts\Common.CloudContracts\Common.CloudContracts.csproj">
+      <Project>{2307F7DC-6B87-4506-8365-6966712DD5FE}</Project>
+      <Name>Common.CloudContracts</Name>
+    </ProjectReference>
     <ProjectReference Include="..\..\..\..\OMS.Cloud\Common\Contracts\Common.PubSubContracts\Common.PubSubContracts.csproj">
       <Project>{AA75150D-EE56-49C0-9431-751F83CCC0CD}</Project>
       <Name>Common.PubSubContracts</Name>

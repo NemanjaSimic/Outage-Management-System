@@ -94,6 +94,11 @@ namespace SCADA.ModelProviderImplementation.DistributedTransaction
 
             return success;
         }
+
+        public Task<bool> IsAlive()
+        {
+            return Task.Run(() => { return true; });
+        }
         #endregion IModelUpdateNotificationContract
     }
 }

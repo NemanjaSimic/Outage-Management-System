@@ -13,5 +13,10 @@ namespace OMS.OutageLifecycleServiceImplementation
 		{
 			throw new NotImplementedException();
 		}
+
+		public Task<bool> IsAlive()
+		{
+			return Task.Run(() => { return true; });
+		}
 	}
 }

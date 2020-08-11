@@ -1,4 +1,5 @@
 ﻿using Common.CE.Interfaces;
+using Common.CloudContracts;
 using Microsoft.ServiceFabric.Services.Remoting;
 using OMS.Common.PubSub;
 using System.ServiceModel;
@@ -7,8 +8,8 @@ using System.Threading.Tasks;
 namespace Common.CeContracts.TopologyProvider
 {
 	[ServiceContract]
-	public interface ITopologyProviderContract : IService
-	{
+	public interface ITopologyProviderContract : IService, IHealthChecker
+    {
         [OperationContract]
         Task<ITopology> GetTopology();
         [OperationContract]

@@ -86,6 +86,11 @@ namespace OMS.Common.WcfClient.NMS
             //return MethodWrapperAsync<bool>("IteratorRewind", new object[1] { id });
             return InvokeWithRetryAsync(client => client.Channel.IteratorRewind(id));
         }
+
+        public Task<bool> IsAlive()
+        {
+            return InvokeWithRetryAsync(client => client.Channel.IsAlive());
+        }
         #endregion
     }
 }

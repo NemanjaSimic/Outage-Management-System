@@ -42,7 +42,10 @@ namespace OMS.CallTrackingServiceImplementation
 		private IOutageModelReadAccessContract outageModelReadAccessClient;
 		private TrackingAlgorithm trackingAlgorithm;
 
-
+		public Task<bool> IsAlive()
+		{
+			return Task.Run(() => { return true; });
+		}
 		public CallTracker(IReliableStateManager stateManager)
 		{
 			this.stateManager = stateManager;

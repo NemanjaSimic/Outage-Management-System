@@ -192,6 +192,11 @@ namespace HistoryDBManagerServiceImplementation
                 Console.WriteLine($"{message}, Message: {e.Message}, Inner Message: {e.InnerException.Message})");
             }
         }
-    
+
+        public Task<bool> IsAlive()
+        {
+            return Task.Run(() => { return true; });
+        }
+
     }
 }

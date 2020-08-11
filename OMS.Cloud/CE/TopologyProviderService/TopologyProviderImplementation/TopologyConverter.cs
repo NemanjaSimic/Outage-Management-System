@@ -255,5 +255,9 @@ namespace CE.TopologyProviderImplementation
             Logger.LogDebug($"{baseLogString} ConvertTopologyToOMSModel => Topology to OMSModel convert finished successfully.");
             return outageTopologyModel;
         }
+        public Task<bool> IsAlive()
+        {
+            return Task.Run(() => { return true; });
+        }
     }
 }

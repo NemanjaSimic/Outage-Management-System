@@ -30,7 +30,10 @@ namespace CE.MeasurementProviderImplementation
             string debugMessage = $"{baseLogString} Ctor => Clients initialized.";
             Logger.LogDebug(debugMessage);
         }
-
+        public Task<bool> IsAlive()
+        {
+            return Task.Run(() => { return true; });
+        }
         public async Task<Dictionary<long, List<long>>> GetElementToMeasurementMap()
         {
             string verboseMessage = $"{baseLogString} entering GetElementToMeasurementMap method.";

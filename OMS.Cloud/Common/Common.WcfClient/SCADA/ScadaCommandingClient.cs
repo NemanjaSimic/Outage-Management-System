@@ -57,5 +57,10 @@ namespace OMS.Common.WcfClient.SCADA
             return InvokeWithRetryAsync(client => client.Channel.SendMultipleDiscreteCommand(commandingValues, commandOriginType));
         }
         #endregion
+
+        public Task<bool> IsAlive()
+        {
+            return InvokeWithRetryAsync(client => client.Channel.IsAlive());
+        }
     }
 }

@@ -34,5 +34,10 @@ namespace OMS.Common.WcfClient.CE
 		{
             return InvokeWithRetryAsync(client => client.Channel.CreateGraphTopology(firstElementGid));
 		}
+
+		public Task<bool> IsAlive()
+		{
+			return InvokeWithRetryAsync(client => client.Channel.IsAlive());
+		}
 	}
 }

@@ -151,5 +151,10 @@ namespace OMS.ModelProviderImplementation
 			return this.subscriberUri;
 		}
 		#endregion
+
+		public Task<bool> IsAlive()
+		{
+			return Task.Run(() => { return true; });
+		}
 	}
 }

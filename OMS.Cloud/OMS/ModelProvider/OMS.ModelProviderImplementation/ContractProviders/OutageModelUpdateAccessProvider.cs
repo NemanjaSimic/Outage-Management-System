@@ -146,5 +146,10 @@ namespace OMS.ModelProviderImplementation.ContractProviders
                     break;
             }
         }
+
+        public Task<bool> IsAlive()
+        {
+            return Task.Run(() => { return true; });
+        }
     }
 }

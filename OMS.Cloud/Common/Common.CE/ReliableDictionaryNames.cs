@@ -18,6 +18,7 @@ namespace Common.CE
 		public static readonly string ElementConnectionCache = "ElementConnectionCache";
 		public static readonly string RecloserCache = "RecloserCache";
 		public static readonly string EnergySourceCache = "EnergySourceCache";
+		public static readonly string ModelChanges = "ModelChanges";
 
 		//Measurement provider
 		public static readonly string AnalogMeasurementsCache = "AnalogMeasurementsCache";

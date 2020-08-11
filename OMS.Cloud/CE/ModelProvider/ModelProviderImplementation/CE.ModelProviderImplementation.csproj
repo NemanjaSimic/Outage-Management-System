@@ -89,6 +89,8 @@
     <Reference Include="System.Xml" />
   </ItemGroup>
   <ItemGroup>
+    <Compile Include="CeNetworkNotifyModelUpdate.cs" />
+    <Compile Include="CeTransactionActor.cs" />
     <Compile Include="ModelManager.cs" />
     <Compile Include="ModelProvider.cs" />
     <Compile Include="NetworkModelGDA.cs" />
@@ -111,9 +113,17 @@
       <Project>{D8B669F1-9B73-4F6A-9AFC-53AF4B0272AC}</Project>
       <Name>Common.CeContracts</Name>
     </ProjectReference>
+    <ProjectReference Include="..\..\..\Common\Contracts\Common.CloudContracts\Common.CloudContracts.csproj">
+      <Project>{2307F7DC-6B87-4506-8365-6966712DD5FE}</Project>
+      <Name>Common.CloudContracts</Name>
+    </ProjectReference>
     <ProjectReference Include="..\..\..\Common\Contracts\Common.NmsContracts\Common.NmsContracts.csproj">
       <Project>{235804A8-9C8F-40EC-8786-5DAB24733977}</Project>
       <Name>Common.NmsContracts</Name>
+    </ProjectReference>
+    <ProjectReference Include="..\..\..\Common\Contracts\Common.TmsContracts\Common.TmsContracts.csproj">
+      <Project>{A07D94C2-40EF-48DB-B828-7E53E7F5A372}</Project>
+      <Name>Common.TmsContracts</Name>
     </ProjectReference>
   </ItemGroup>
   <ItemGroup>

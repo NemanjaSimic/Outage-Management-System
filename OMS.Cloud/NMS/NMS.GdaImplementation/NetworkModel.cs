@@ -1073,6 +1073,7 @@ namespace NMS.GdaImplementation
                     tasks.Add(Task.Run(async () =>
                     {
                         INotifyNetworkModelUpdateContract notifyNetworkModelUpdateClient = NotifyNetworkModelUpdateClient.CreateClient(transactionActorName);
+                        Logger.LogDebug($"{baseLogString} StartDistributedTransaction => calling Notify() method for '{transactionActorName}' Transaction actor.");
 
                         var taskSuccess = await notifyNetworkModelUpdateClient.Notify(modelChanges);
                         Logger.LogDebug($"{baseLogString} StartDistributedTransaction => Notify() method invoked on '{transactionActorName}' Transaction actor.");
@@ -1161,5 +1162,10 @@ namespace NMS.GdaImplementation
         #endregion Private Members
 
         #endregion ITransactionActorContract
+
+        public Task<bool> IsAlive()
+        {
+            return Task.Run(() => { return true; });
+        }
     }
 }

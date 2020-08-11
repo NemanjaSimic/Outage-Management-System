@@ -41,5 +41,10 @@ namespace OMS.Common.WcfClient.CE
 		{
             return InvokeWithRetryAsync(client => client.Channel.ConvertTopologyToUIModel(topology));
 		}
+
+		public Task<bool> IsAlive()
+		{
+			return InvokeWithRetryAsync(client => client.Channel.IsAlive());
+		}
 	}
 }

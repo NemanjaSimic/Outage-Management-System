@@ -48,5 +48,10 @@ namespace OMS.Common.WcfClient.TMS
             return InvokeWithRetryAsync(client => client.Channel.Rollback());
         }
         #endregion
+
+        public Task<bool> IsAlive()
+        {
+            return InvokeWithRetryAsync(client => client.Channel.IsAlive());
+        }
     }
 }

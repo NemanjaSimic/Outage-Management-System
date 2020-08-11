@@ -136,7 +136,15 @@ namespace CE.ModelProviderImplementation
 						var elements = await networkModelGda.GetExtentValuesAsync(model, properties);
 						foreach (var element in elements)
 						{
-							await TransformToTopologyElementAsync(element);
+							try
+							{
+								await TransformToTopologyElementAsync(element);
+							}
+							catch (Exception)
+							{
+
+								throw;
+							}
 						}
 					}
 				});
