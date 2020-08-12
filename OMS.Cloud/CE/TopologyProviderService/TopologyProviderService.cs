@@ -3,8 +3,6 @@ using System.Collections.Generic;
 using System.Fabric;
 using System.Threading;
 using System.Threading.Tasks;
-using Common.CE;
-using Common.CE.Interfaces;
 using Common.CeContracts;
 using Common.CeContracts.TopologyProvider;
 using Microsoft.ServiceFabric.Data;

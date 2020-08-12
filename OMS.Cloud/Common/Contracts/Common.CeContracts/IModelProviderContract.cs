@@ -1,5 +1,4 @@
-﻿using Common.CE.Interfaces;
-using Common.CloudContracts;
+﻿using Common.CloudContracts;
 using Microsoft.ServiceFabric.Services.Remoting;
 using System.Collections.Generic;
 using System.ServiceModel;
@@ -8,6 +7,12 @@ using System.Threading.Tasks;
 namespace Common.CeContracts.ModelProvider
 {
 	[ServiceContract]
+    [ServiceKnownType(typeof(EnergyConsumer))]
+    [ServiceKnownType(typeof(Feeder))]
+    [ServiceKnownType(typeof(Field))]
+    [ServiceKnownType(typeof(Recloser))]
+    [ServiceKnownType(typeof(SynchronousMachine))]
+    [ServiceKnownType(typeof(TopologyElement))]
     public interface IModelProviderContract : IService, IHealthChecker
     {
         [OperationContract]
@@ -15,7 +20,7 @@ namespace Common.CeContracts.ModelProvider
         [OperationContract]
         Task<Dictionary<long, List<long>>> GetConnections();
         [OperationContract]
-        Task<Dictionary<long, ITopologyElement>> GetElementModels();
+        Task<Dictionary<long, TopologyElement>> GetElementModels();
         [OperationContract]
         Task Commit();
         [OperationContract]

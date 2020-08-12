@@ -1,9 +1,13 @@
-﻿using Common.CE.Interfaces;
-using System.Collections.Generic;
+﻿using System.Collections.Generic;
 using System.Runtime.Serialization;
 
 namespace Common.CeContracts
 {
+	[KnownType(typeof(EnergyConsumer))]
+	[KnownType(typeof(Feeder))]
+	[KnownType(typeof(Field))]
+	[KnownType(typeof(Recloser))]
+	[KnownType(typeof(SynchronousMachine))]
 	[DataContract]
 	public class TopologyElement : ITopologyElement
 	{

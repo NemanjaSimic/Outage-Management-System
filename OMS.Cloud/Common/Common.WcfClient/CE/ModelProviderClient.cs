@@ -1,4 +1,4 @@
-﻿using Common.CE.Interfaces;
+﻿using Common.CeContracts;
 using Common.CeContracts.ModelProvider;
 using Microsoft.ServiceFabric.Services.Client;
 using Microsoft.ServiceFabric.Services.Communication.Wcf.Client;
@@ -41,7 +41,7 @@ namespace OMS.Common.WcfClient.CE
 			return InvokeWithRetryAsync(client => client.Channel.GetConnections());
 		}
 
-		public Task<Dictionary<long, ITopologyElement>> GetElementModels()
+		public Task<Dictionary<long, TopologyElement>> GetElementModels()
 		{
 			return InvokeWithRetryAsync(client => client.Channel.GetElementModels());
 		}

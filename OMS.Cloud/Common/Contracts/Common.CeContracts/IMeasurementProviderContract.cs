@@ -9,7 +9,9 @@ using System.Threading.Tasks;
 namespace Common.CeContracts
 {
 	[ServiceContract]
-	public interface IMeasurementProviderContract : IService, IHealthChecker
+	[ServiceKnownType(typeof(ArtificalDiscreteMeasurement))]
+	[ServiceKnownType(typeof(Measurement))]
+    public interface IMeasurementProviderContract : IService, IHealthChecker
     {
         [OperationContract]
         Task AddAnalogMeasurement(AnalogMeasurement analogMeasurement);

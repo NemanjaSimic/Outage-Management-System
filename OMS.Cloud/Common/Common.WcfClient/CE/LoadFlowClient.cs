@@ -1,4 +1,4 @@
-﻿using Common.CE.Interfaces;
+﻿using Common.CeContracts;
 using Common.CeContracts.LoadFlow;
 using Microsoft.ServiceFabric.Services.Client;
 using Microsoft.ServiceFabric.Services.Communication.Wcf.Client;

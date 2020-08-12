@@ -1,5 +1,4 @@
-﻿using Common.CE.Interfaces;
-using Common.CeContracts;
+﻿using Common.CeContracts;
 using Microsoft.ServiceFabric.Services.Client;
 using Microsoft.ServiceFabric.Services.Communication.Wcf.Client;
 using OMS.Common.Cloud.Names;
@@ -30,9 +29,9 @@ namespace OMS.Common.WcfClient.CE
 			return factory.CreateClient<TopologyBuilderClient, ITopologyBuilderContract>(serviceUri, servicePartitionKey);
 		}
 
-		public Task<ITopology> CreateGraphTopology(long firstElementGid)
+		public Task<ITopology> CreateGraphTopology(long firstElementGid, string whoIsCalling)
 		{
-            return InvokeWithRetryAsync(client => client.Channel.CreateGraphTopology(firstElementGid));
+            return InvokeWithRetryAsync(client => client.Channel.CreateGraphTopology(firstElementGid, whoIsCalling));
 		}
 
 		public Task<bool> IsAlive()

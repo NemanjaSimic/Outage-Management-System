@@ -1,5 +1,4 @@
-﻿using Common.CE.Interfaces;
-using Common.CeContracts;
+﻿using Common.CeContracts;
 using Common.Web.Extensions;
 using Common.Web.Models.ViewModels;
 using OMS.Common.Cloud;

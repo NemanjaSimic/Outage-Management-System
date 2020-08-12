@@ -1,5 +1,4 @@
 ﻿using Common.CE;
-using Common.CE.Interfaces;
 using Common.CeContracts;
 using Common.CeContracts.ModelProvider;
 using OMS.Common.Cloud;
@@ -49,14 +48,27 @@ namespace CE.TopologyBuilderImplementation
         {
             return Task.Run(() => { return true; });
         }
-        public async Task<ITopology> CreateGraphTopology(long firstElementGid)
+
+        private Dictionary<long, ITopologyElement> TransformDictionary(Dictionary<long, TopologyElement> dict)
         {
-            Logger.LogVerbose($"{baseLogString} CreateGraphTopology method called.");
+            Dictionary<long, ITopologyElement> retVal = new Dictionary<long, ITopologyElement>();
+
+            foreach (var item in dict)
+            {
+                retVal.Add(item.Key, item.Value as ITopologyElement);
+            }
+
+            return retVal;
+        }
+        public async Task<ITopology> CreateGraphTopology(long firstElementGid, string whoIsCalling)
+        {
+            Logger.LogVerbose($"{baseLogString} CreateGraphTopology method called, by {whoIsCalling}.");
 
             ITopologyElement currentFider = null;
 
             Logger.LogDebug($"{baseLogString} CreateGraphTopology => Calling GetElementModels method from model provider.");
-            elements = await modelProviderClient.GetElementModels();
+            var dict = await modelProviderClient.GetElementModels();
+            elements = TransformDictionary(dict);
             Logger.LogDebug($"{baseLogString} CreateGraphTopology => GetElementModels method from model provider has been called successfully.");
 
             Logger.LogDebug($"{baseLogString} CreateGraphTopology => Calling GetConnections method from model provider.");
@@ -77,75 +89,83 @@ namespace CE.TopologyBuilderImplementation
             {
                 FirstNode = firstElementGid
             };
-
-            stack.Push(firstElementGid);
-            ITopologyElement currentElement;
-            long currentElementId = 0;
-
-            while (stack.Count > 0)
+            try
             {
-                currentElementId = stack.Pop();
-                if (!visited.Contains(currentElementId))
-                {
-                    visited.Add(currentElementId);
-                }
+                stack.Push(firstElementGid);
+                ITopologyElement currentElement;
+                long currentElementId = 0;
 
-                if (!elements.TryGetValue(currentElementId, out currentElement))
+                while (stack.Count > 0)
                 {
-                    string message = $"{baseLogString} CreateGraphTopology => Failed to build topology.Topology does not contain element with GID {currentElementId:X16}.";
-                    Logger.LogError(message);
-                    return topology;
-                    //throw new Exception(message);
-                }
-
-                foreach (var element in GetReferencedElementsWithoutIgnorables(currentElementId))
-                {
-                    if (elements.TryGetValue(element, out ITopologyElement newNode))
+                    currentElementId = stack.Pop();
+                    if (!visited.Contains(currentElementId))
                     {
-                        if (!reclosers.Contains(element))
+                        visited.Add(currentElementId);
+                    }
+
+                    if (!elements.TryGetValue(currentElementId, out currentElement))
+                    {
+                        string message = $"{baseLogString} CreateGraphTopology => Failed to build topology.Topology does not contain element with GID {currentElementId:X16}.";
+                        Logger.LogError(message);
+                        return topology;
+                        //throw new Exception(message);
+                    }
+
+                    List<long> referencedElements = GetReferencedElementsWithoutIgnorables(currentElementId);
+
+                    foreach (var element in referencedElements)
+                    {
+                        if (elements.TryGetValue(element, out ITopologyElement newNode))
                         {
-                            ConnectTwoNodes(newNode, currentElement);
-                            stack.Push(element);
-                        }
-                        else
-                        {
-                            currentElement.SecondEnd.Add(newNode);
-                            if (newNode.FirstEnd == null)
+                            if (!reclosers.Contains(element))
                             {
-                                newNode.FirstEnd = currentElement;
+                                ConnectTwoNodes(newNode, currentElement);
+                                stack.Push(element);
                             }
                             else
                             {
-                                newNode.SecondEnd.Add(currentElement);
-                            }
+                                currentElement.SecondEnd.Add(newNode);
+                                if (newNode.FirstEnd == null)
+                                {
+                                    newNode.FirstEnd = currentElement;
+                                }
+                                else
+                                {
+                                    newNode.SecondEnd.Add(currentElement);
+                                }
 
-                            if (!topology.TopologyElements.ContainsKey(newNode.Id))
-                            {
-                                topology.AddElement(newNode);
+                                if (!topology.TopologyElements.ContainsKey(newNode.Id))
+                                {
+                                    topology.AddElement(newNode);
+                                }
                             }
                         }
+                        else
+                        {
+                            Logger.LogError($"{baseLogString} CreateGraphTopology => Element with GID {element:X16} does not exist in collection of elements.");
+                        }
+                    }
+
+                    if (currentElement is Feeder)
+                    {
+                        currentFider = currentElement;
                     }
                     else
                     {
-                        Logger.LogError($"{baseLogString} CreateGraphTopology => Element with GID {element:X16} does not exist in collection of elements.");
+                        currentElement.Feeder = currentFider;
                     }
+
+                    topology.AddElement(currentElement);
                 }
 
-                if (currentElement is Feeder)
+                foreach (var field in fields)
                 {
-                    currentFider = currentElement;
+                    topology.AddElement(field);
                 }
-                else
-                {
-                    currentElement.Feeder = currentFider;
-                }
-
-                topology.AddElement(currentElement);
             }
-
-            foreach (var field in fields)
+            catch (Exception e)
             {
-                topology.AddElement(field);
+                Logger.LogDebug($"{baseLogString} Uhvacen eksepsn. {e.Message} {e.StackTrace}");
             }
 
             Logger.LogDebug($"{baseLogString} CreateGraphTopology => Topology successfully created.");

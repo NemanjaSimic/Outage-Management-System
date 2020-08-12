@@ -1,5 +1,5 @@
-﻿using Common.CE.Interfaces;
-using Common.CloudContracts;
+﻿using Common.CloudContracts;
+using Common.OMS.OutageModel;
 using Microsoft.ServiceFabric.Services.Remoting;
 using OMS.Common.PubSub;
 using System.ServiceModel;
@@ -8,7 +8,9 @@ using System.Threading.Tasks;
 namespace Common.CeContracts.TopologyProvider
 {
 	[ServiceContract]
-	public interface ITopologyProviderContract : IService, IHealthChecker
+    [ServiceKnownType(typeof(TopologyModel))]
+    [ServiceKnownType(typeof(OutageTopologyModel))]
+    public interface ITopologyProviderContract : IService, IHealthChecker
     {
         [OperationContract]
         Task<ITopology> GetTopology();

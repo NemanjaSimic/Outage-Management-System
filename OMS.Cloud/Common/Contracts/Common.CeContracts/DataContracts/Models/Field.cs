@@ -1,5 +1,4 @@
-﻿using Common.CE.Interfaces;
-using System.Collections.Generic;
+﻿using System.Collections.Generic;
 using System.Runtime.Serialization;
 
 namespace Common.CeContracts

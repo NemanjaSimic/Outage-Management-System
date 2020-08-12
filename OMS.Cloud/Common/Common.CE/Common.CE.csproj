@@ -80,27 +80,6 @@
   </ItemGroup>
   <ItemGroup>
     <Compile Include="Enums.cs" />
-    <Compile Include="Interfaces\IAnalogMeasurement.cs" />
-    <Compile Include="Interfaces\IDiscreteMeasurement.cs" />
-    <Compile Include="Interfaces\IGraphElement.cs" />
-    <Compile Include="Interfaces\ILoadFlow.cs" />
-    <Compile Include="Interfaces\IMeasurement.cs" />
-    <Compile Include="Interfaces\IMeasurementProvider.cs" />
-    <Compile Include="Interfaces\IModelDelta.cs" />
-    <Compile Include="Interfaces\IModelManager.cs" />
-    <Compile Include="Interfaces\IModelProvider.cs" />
-    <Compile Include="Interfaces\IModelTopologyServis.cs" />
-    <Compile Include="Interfaces\ISCADACommanding.cs" />
-    <Compile Include="Interfaces\ISCADAResultProvider.cs" />
-    <Compile Include="Interfaces\ITopology.cs" />
-    <Compile Include="Interfaces\ITopologyBuilder.cs" />
-    <Compile Include="Interfaces\ITopologyConverter.cs" />
-    <Compile Include="Interfaces\ITopologyConverterProvider.cs" />
-    <Compile Include="Interfaces\ITopologyElement.cs" />
-    <Compile Include="Interfaces\ITopologyProvider.cs" />
-    <Compile Include="Interfaces\IUIMeasurement.cs" />
-    <Compile Include="Interfaces\IUIModel.cs" />
-    <Compile Include="Interfaces\IUINode.cs" />
     <Compile Include="Properties\AssemblyInfo.cs" />
     <Compile Include="ReliableDictionaryNames.cs" />
   </ItemGroup>

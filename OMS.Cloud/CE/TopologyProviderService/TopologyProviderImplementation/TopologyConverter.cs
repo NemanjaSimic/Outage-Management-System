@@ -1,5 +1,4 @@
-﻿using Common.CE.Interfaces;
-using Common.CeContracts;
+﻿using Common.CeContracts;
 using Common.CeContracts.ModelProvider;
 using Common.OMS.OutageModel;
 using OMS.Common.Cloud.Logger;

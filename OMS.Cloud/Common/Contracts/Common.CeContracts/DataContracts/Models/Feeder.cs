@@ -1,9 +1,8 @@
-﻿using Common.CE.Interfaces;
-using System.Runtime.Serialization;
+﻿using System.Runtime.Serialization;
 
 namespace Common.CeContracts
 {
-	[DataContract]
+    [DataContract]
     public class Feeder : TopologyElement
 	{
 		public Feeder(ITopologyElement element) : base(element.Id)

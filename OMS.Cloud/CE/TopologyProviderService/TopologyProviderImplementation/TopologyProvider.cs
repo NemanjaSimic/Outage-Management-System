@@ -1,5 +1,4 @@
 ﻿using Common.CE;
-using Common.CE.Interfaces;
 using Common.CeContracts;
 using Common.CeContracts.LoadFlow;
 using Common.CeContracts.ModelProvider;
@@ -29,6 +28,8 @@ namespace CE.TopologyProviderImplementation
         private readonly long transactionTopologyID = 2;
         private TransactionFlag transactionFlag;
         #endregion
+
+        private Task<bool> prepare;
 
         private readonly string baseLogString;
         private readonly IReliableStateManager stateManager;
@@ -158,11 +159,11 @@ namespace CE.TopologyProviderImplementation
             else if (topologyID == (long)TopologyType.NonTransactionTopology)
             {
                 Logger.LogDebug($"{baseLogString} GetTopologyFromCache => Initializing topology.");
-                ITopology newTopology = await CreateTopology();
+                ITopology newTopology = await CreateTopology("GetTopologyFromCache");
 
-                Logger.LogDebug($"{baseLogString} PrepareForTransaction => Calling UpdateLoadFlow method from load flow client.");
+                Logger.LogDebug($"{baseLogString} GetTopologyFromCache => Calling UpdateLoadFlow method from load flow client.");
                 newTopology = await loadFlowClient.UpdateLoadFlow(newTopology);
-                Logger.LogDebug($"{baseLogString} PrepareForTransaction => UpdateLoadFlow method from load flow client has been called successfully.");
+                Logger.LogDebug($"{baseLogString} GetTopologyFromCache => UpdateLoadFlow method from load flow client has been called successfully.");
 
                 await TopologyCache.SetAsync(topologyID, newTopology);
 
@@ -185,7 +186,7 @@ namespace CE.TopologyProviderImplementation
 
             return topology.Value as ITopology;
         }
-        private async Task<ITopology> CreateTopology()
+        private async Task<ITopology> CreateTopology(string whoCalled)
         {
             string verboseMessage = $"{baseLogString} CreateTopology method called.";
             Logger.LogVerbose(verboseMessage);
@@ -209,7 +210,7 @@ namespace CE.TopologyProviderImplementation
             long energySourceGid = roots.First();
 
             Logger.LogDebug($"{baseLogString} CreateTopology => Calling CreateGraphTopology method from topology builder client. Energy source with GID {energySourceGid:X16.}");
-            ITopology topology = await topologyBuilderClient.CreateGraphTopology(energySourceGid);
+            ITopology topology = await topologyBuilderClient.CreateGraphTopology(energySourceGid, $"Topology Provider => {whoCalled} => Create Topology");
             Logger.LogDebug($"{baseLogString} CreateTopology =>  CreateGraphTopology method from topology builder client has been successfully called.");
 
 
@@ -310,11 +311,14 @@ namespace CE.TopologyProviderImplementation
             string verboseMessage = $"{baseLogString} entering CommitTransaction method.";
             Logger.LogVerbose(verboseMessage);
 
+            Logger.LogDebug($"{baseLogString} CommitTransaction => Getting topology from cache.");
             ITopology topology = await GetTopologyFromCache(TopologyType.TransactionTopology);
+            Logger.LogDebug($"{baseLogString} CommitTransaction => Getting topology from cache successfully ended.");
 
-            Logger.LogDebug($"{baseLogString} PrepareForTransaction => Calling UpdateLoadFlow method from load flow client.");
+
+            Logger.LogDebug($"{baseLogString} CommitTransaction => Calling UpdateLoadFlow method from load flow client.");
             topology = await loadFlowClient.UpdateLoadFlow(topology);
-            Logger.LogDebug($"{baseLogString} PrepareForTransaction => UpdateLoadFlow method from load flow client has been called successfully.");
+            Logger.LogDebug($"{baseLogString} CommitTransaction => UpdateLoadFlow method from load flow client has been called successfully.");
 
             if (topology == null)
             {
@@ -342,7 +346,7 @@ namespace CE.TopologyProviderImplementation
             try
             {
                 Logger.LogDebug($"{baseLogString} PrepareForTransaction => Creating new transaction topology.");
-                ITopology newTopology = await CreateTopology();
+                ITopology newTopology = await CreateTopology("PrepareForTransaction");
 
                 Logger.LogDebug($"{baseLogString} PrepareForTransaction => Writting new transaction topology into cache.");
                 await TopologyCache.SetAsync(transactionTopologyID, newTopology);

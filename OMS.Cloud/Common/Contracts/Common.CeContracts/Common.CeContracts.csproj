@@ -91,6 +91,27 @@
     <Compile Include="ILoadFlowContract.cs" />
     <Compile Include="IMeasurementMapContract.cs" />
     <Compile Include="IMeasurementProviderContract.cs" />
+    <Compile Include="Interfaces\IAnalogMeasurement.cs" />
+    <Compile Include="Interfaces\IDiscreteMeasurement.cs" />
+    <Compile Include="Interfaces\IGraphElement.cs" />
+    <Compile Include="Interfaces\ILoadFlow.cs" />
+    <Compile Include="Interfaces\IMeasurement.cs" />
+    <Compile Include="Interfaces\IMeasurementProvider.cs" />
+    <Compile Include="Interfaces\IModelDelta.cs" />
+    <Compile Include="Interfaces\IModelManager.cs" />
+    <Compile Include="Interfaces\IModelProvider.cs" />
+    <Compile Include="Interfaces\IModelTopologyServis.cs" />
+    <Compile Include="Interfaces\ISCADACommanding.cs" />
+    <Compile Include="Interfaces\ISCADAResultProvider.cs" />
+    <Compile Include="Interfaces\ITopology.cs" />
+    <Compile Include="Interfaces\ITopologyBuilder.cs" />
+    <Compile Include="Interfaces\ITopologyConverter.cs" />
+    <Compile Include="Interfaces\ITopologyConverterProvider.cs" />
+    <Compile Include="Interfaces\ITopologyElement.cs" />
+    <Compile Include="Interfaces\ITopologyProvider.cs" />
+    <Compile Include="Interfaces\IUIMeasurement.cs" />
+    <Compile Include="Interfaces\IUIModel.cs" />
+    <Compile Include="Interfaces\IUINode.cs" />
     <Compile Include="ISwitchStatusCommandingContract.cs" />
     <Compile Include="ITopologyConverterContract.cs" />
     <Compile Include="ITopologyProviderContract.cs" />
@@ -103,6 +124,10 @@
     <None Include="packages.config" />
   </ItemGroup>
   <ItemGroup>
+    <ProjectReference Include="..\..\..\Common.OMS\Common.OMS.csproj">
+      <Project>{8F96A078-BE16-4363-9B89-0B313D2E0F5E}</Project>
+      <Name>Common.OMS</Name>
+    </ProjectReference>
     <ProjectReference Include="..\..\Common.CE\Common.CE.csproj">
       <Project>{4EAD0377-BD2D-4B7E-93A6-705DB815E8A7}</Project>
       <Name>Common.CE</Name>

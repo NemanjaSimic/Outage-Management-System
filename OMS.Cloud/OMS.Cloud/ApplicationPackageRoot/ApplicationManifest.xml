@@ -15,7 +15,7 @@
     <Parameter Name="CE.ModelProviderService_MinReplicaSetSize" DefaultValue="3" />
     <Parameter Name="CE.ModelProviderService_PartitionCount" DefaultValue="1" />
     <Parameter Name="CE.ModelProviderService_TargetReplicaSetSize" DefaultValue="3" />
-    <Parameter Name="CE.TopologyBuilderService_InstanceCount" DefaultValue="-1" />
+    <Parameter Name="CE.TopologyBuilderService_InstanceCount" DefaultValue="1" />
     <Parameter Name="CE.TopologyProviderService_MinReplicaSetSize" DefaultValue="3" />
     <Parameter Name="CE.TopologyProviderService_PartitionCount" DefaultValue="1" />
     <Parameter Name="CE.TopologyProviderService_TargetReplicaSetSize" DefaultValue="3" />
@@ -37,18 +37,18 @@
     <Parameter Name="SCADA.ModelProviderService_PartitionCount" DefaultValue="1" />
     <Parameter Name="SCADA.ModelProviderService_TargetReplicaSetSize" DefaultValue="3" />
   </Parameters>
-  <!--CE-->
   <!-- Import the ServiceManifest from the ServicePackage. The ServiceManifestName and ServiceManifestVersion
        should match the Name and Version attributes of the ServiceManifest element defined in the
        ServiceManifest.xml file. -->
+  <!--CE-->
   <ServiceManifestImport>
     <ServiceManifestRef ServiceManifestName="OMS.ReportingServicePkg" ServiceManifestVersion="1.0.0" />
     <ConfigOverrides />
   </ServiceManifestImport>
-  <!--SCADA-->
-  <!--NMS-->
-  <!--PubSub-->
   <!--TMS-->
+  <!--PubSub-->
+  <!--NMS-->
+  <!--SCADA-->
   <ServiceManifestImport>
     <ServiceManifestRef ServiceManifestName="OMS.OutageLifecycleServicePkg" ServiceManifestVersion="1.0.0" />
     <ConfigOverrides />

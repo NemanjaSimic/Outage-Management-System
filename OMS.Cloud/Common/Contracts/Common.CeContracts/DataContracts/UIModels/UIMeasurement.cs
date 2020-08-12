@@ -1,5 +1,4 @@
-﻿using Common.CE.Interfaces;
-using System.Runtime.Serialization;
+﻿using System.Runtime.Serialization;
 
 namespace Common.CeContracts
 {

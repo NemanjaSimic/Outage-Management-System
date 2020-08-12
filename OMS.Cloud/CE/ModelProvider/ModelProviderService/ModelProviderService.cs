@@ -5,7 +5,7 @@ using System.Threading;
 using System.Threading.Tasks;
 using CE.ModelProviderImplementation;
 using Common.CE;
-using Common.CE.Interfaces;
+using Common.CeContracts;
 using Common.CeContracts.ModelProvider;
 using Microsoft.ServiceFabric.Data;
 using Microsoft.ServiceFabric.Data.Collections;
@@ -147,7 +147,7 @@ namespace CE.ModelProviderService
 				{
 					using (ITransaction tx = this.StateManager.CreateTransaction())
 					{
-						var result = await StateManager.TryGetAsync<IReliableDictionary<short, Dictionary<long, ITopologyElement>>>(ReliableDictionaryNames.ElementCache);
+						var result = await StateManager.TryGetAsync<IReliableDictionary<short, Dictionary<long, TopologyElement>>>(ReliableDictionaryNames.ElementCache);
 						if(result.HasValue)
 						{
 							var topologyCacheUI = result.Value;
@@ -156,7 +156,7 @@ namespace CE.ModelProviderService
 						}
 						else
 						{
-							await StateManager.GetOrAddAsync<IReliableDictionary<short, Dictionary<long, ITopologyElement>>>(tx, ReliableDictionaryNames.ElementCache);
+							await StateManager.GetOrAddAsync<IReliableDictionary<short, Dictionary<long, TopologyElement>>>(tx, ReliableDictionaryNames.ElementCache);
 							await tx.CommitAsync();
 						}
 					}

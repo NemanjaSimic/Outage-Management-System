@@ -1,10 +1,13 @@
-﻿using Common.CE.Interfaces;
-using OMS.Common.Cloud;
+﻿using OMS.Common.Cloud;
 using System.Runtime.Serialization;
 
 namespace Common.CeContracts
 {
 	[DataContract]
+    [KnownType(typeof(ArtificalDiscreteMeasurement))]
+    [KnownType(typeof(DiscreteMeasurement))]
+    [KnownType(typeof(AnalogMeasurement))]
+
     public abstract class Measurement : IMeasurement
     {
 		[DataMember]
@@ -22,6 +25,7 @@ namespace Common.CeContracts
     }
 
 	[DataContract]
+    [KnownType(typeof(ArtificalDiscreteMeasurement))]
 	public class DiscreteMeasurement : Measurement, IDiscreteMeasurement
 	{
 		[DataMember]
