@@ -1,5 +1,6 @@
 ﻿using OMS.CallTrackingServiceImplementation.Interfaces;
 using OMS.CallTrackingServiceImplementation.Models;
+using OMS.Common.Cloud.Logger;
 using System;
 using System.Collections.Generic;
 using System.Globalization;
@@ -11,6 +12,11 @@ namespace OMS.CallTrackingServiceImplementation.EmailParsers
 {
     public class OutageEmailParser : IEmailParser
     {
+        private ICloudLogger logger;
+        private ICloudLogger Logger
+        {
+            get { return logger ?? (logger = CloudLoggerFactory.GetLogger()); }
+        }
         public OutageTracingModel Parse(OutageMailMessage message)
         {
             string searchQuery = "gid";
@@ -18,6 +24,7 @@ namespace OMS.CallTrackingServiceImplementation.EmailParsers
 
             if (gidIndex < 0)
             {
+               Logger.LogWarning("Gid Index is less than 0. Invalid model will be build.");
                return BuildInvalidModel();
             }
 
@@ -37,8 +44,9 @@ namespace OMS.CallTrackingServiceImplementation.EmailParsers
                     gid = long.Parse(gidText);
                 }
             }
-            catch (Exception)
+            catch (Exception e)
             {
+                Logger.LogError($"Exception on parsing outage email, invalid model will be build. Message: {e.Message}");
                 return BuildInvalidModel();
             }
 

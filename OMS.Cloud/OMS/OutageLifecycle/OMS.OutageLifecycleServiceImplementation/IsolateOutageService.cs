@@ -365,7 +365,7 @@ namespace OMS.OutageLifecycleServiceImplementation
             }
             catch (Exception e)
             {
-                //Logger.LogError("Error on GetMeasurementsForElement() method", e);
+                Logger.LogError("Error on GetMeasurementsForElement() method", e);
                 throw e;
             }
 

@@ -5,6 +5,7 @@ using Microsoft.ServiceFabric.Services.Remoting.Runtime;
 using OMS.CallTrackingServiceImplementation.Interfaces;
 using OMS.CallTrackingServiceImplementation.Models;
 using OMS.Common.Cloud;
+using OMS.Common.Cloud.Logger;
 using OMS.Common.PubSubContracts;
 using System;
 using System.Collections.Generic;
@@ -17,6 +18,12 @@ namespace OMS.CallTrackingServiceImplementation.Imap
 {
 	public class ImapEmailClient : IEmailClient
 	{
+		private ICloudLogger logger;
+		private ICloudLogger Logger
+		{
+			get { return logger ?? (logger = CloudLoggerFactory.GetLogger()); }
+		}
+
 		protected readonly ImapClient client;
 
 		protected readonly IImapEmailMapper mapper;
@@ -88,7 +95,8 @@ namespace OMS.CallTrackingServiceImplementation.Imap
  				}
 				catch (Exception)
 				{
-					Console.WriteLine("[ImapEmailClient::GetUnreadMessages] Sending to PubSub Engine failed.");
+					Logger.LogError("[ImapEmailClient::GetUnreadMessages] Sending to PubSub Engine failed.");
+					//Console.WriteLine("[ImapEmailClient::GetUnreadMessages] Sending to PubSub Engine failed.");
 				}
 			}
 			return outageMailMessages;

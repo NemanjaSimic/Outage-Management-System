@@ -109,10 +109,10 @@ namespace OMS.Common.Cloud
                 { MicroserviceNames.CeTopologyProviderService,      new Uri("fabric:/OMS.Cloud/TopologyProviderService")        },
 
                 //TODO: OMS
-                { MicroserviceNames.OmsModelProviderService,         new Uri("fabric:/OMS.Cloud/OMS.ModelProviderService")},
-                { MicroserviceNames.OmsCallTrackingService,          new Uri("fabric:/OMS.Cloud/OMS.CallTrackingService")},
-                { MicroserviceNames.OmsHistoryDBManagerService,      new Uri("fabric:/OMS.Cloud/OMS.HistoryDBManagerService")},
-                { MicroserviceNames.OmsOutageLifecycleService,       new Uri("fabric:/OMS.Cloud/OMS.OutageLifecycleService")},           
+                { MicroserviceNames.OmsModelProviderService,         new Uri("fabric:/OMS.Cloud/OMS.ModelProviderService")      },
+                { MicroserviceNames.OmsCallTrackingService,          new Uri("fabric:/OMS.Cloud/OMS.CallTrackingService")       },
+                { MicroserviceNames.OmsHistoryDBManagerService,      new Uri("fabric:/OMS.Cloud/OMS.HistoryDBManagerService")   },
+                { MicroserviceNames.OmsOutageLifecycleService,       new Uri("fabric:/OMS.Cloud/OMS.OutageLifecycleService")    },           
                 //TODO: WEB_ADAPTER
 
                 //{ MicroserviceNames.TestService,                    new Uri("fabric:/OMS.Cloud/TestService")                    },

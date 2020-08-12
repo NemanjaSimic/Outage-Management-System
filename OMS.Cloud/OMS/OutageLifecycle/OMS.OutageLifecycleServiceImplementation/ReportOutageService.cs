@@ -114,9 +114,9 @@ namespace OMS.OutageLifecycleServiceImplementation
                 {
                     recloserId = this.outageLifecycleHelper.GetRecloserForHeadBreaker(gid);
                 }
-                catch (Exception)
+                catch (Exception e)
                 {
-
+                    Logger.LogError($"Exeption on: outageLifecycleHelper.GetRecloserForHeadBreaker. Exception message: {e.Message}");
                     return false;
                 }
 

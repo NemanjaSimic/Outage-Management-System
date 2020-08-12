@@ -8,7 +8,6 @@ using OMS.Common.PubSub;
 using OMS.Common.WcfClient.NMS;
 using OMS.Common.WcfClient.OMS.ModelAccess;
 using OMS.Common.WcfClient.PubSub;
-using OutageDatabase.Repository;
 using System;
 using System.Collections.Generic;
 using System.Fabric.Management.ServiceModel;

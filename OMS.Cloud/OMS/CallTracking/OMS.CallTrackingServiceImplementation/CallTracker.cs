@@ -61,12 +61,6 @@ namespace OMS.CallTrackingServiceImplementation
 
 			outageModelReadAccessClient = OutageModelReadAccessClient.CreateClient();
 
-			//timer initialization
-			timer = new Timer();
-			timer.Interval = timerInterval;
-			timer.Elapsed += TimerElapsedMethod;
-			timer.AutoReset = false;
-
 			//timer interval and expected calls initialization
 			try
 			{
@@ -90,6 +84,12 @@ namespace OMS.CallTrackingServiceImplementation
 				Logger.LogWarning("String in config file is not in valid format. Default values for expected calls will be set.", e);
 				expectedCalls = 3;
 			}
+
+			//timer initialization
+			timer = new Timer();
+			timer.Interval = timerInterval;
+			timer.Elapsed += TimerElapsedMethod;
+			timer.AutoReset = false;
 		}
 
 		#region INotifySubscriberContract
