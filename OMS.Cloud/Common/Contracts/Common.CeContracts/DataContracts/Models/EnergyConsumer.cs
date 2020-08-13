@@ -1,4 +1,5 @@
 ﻿using OMS.Common.Cloud;
+using System;
 using System.Runtime.Serialization;
 
 namespace Common.CeContracts

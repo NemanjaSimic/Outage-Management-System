@@ -80,7 +80,7 @@ namespace SCADA.ModelProviderImplementation.DistributedTransaction
 
             Task.WaitAll(tasks.ToArray());
 
-            ITransactionEnlistmentContract transactionEnlistmentClient = TransactionEnlistmentClient.CreateClient();
+            var transactionEnlistmentClient = TransactionEnlistmentClient.CreateClient();
             bool success = await transactionEnlistmentClient.Enlist(DistributedTransactionNames.NetworkModelUpdateTransaction, MicroserviceNames.ScadaModelProviderService);
 
             if (success)

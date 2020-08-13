@@ -1055,7 +1055,7 @@ namespace NMS.GdaImplementation
             var transactionActors = NetorkModelUpdateTransaction.Instance.TransactionActorsNames;
             var modelChanges = CreateModelChangesData(delta);
             
-            ITransactionCoordinatorContract transactionCoordinatorClient = TransactionCoordinatorClient.CreateClient();
+            var transactionCoordinatorClient = TransactionCoordinatorClient.CreateClient();
             await transactionCoordinatorClient.StartDistributedTransaction(DistributedTransactionNames.NetworkModelUpdateTransaction, transactionActors);
             Logger.LogDebug($"{baseLogString} StartDistributedTransaction => StartDistributedTransaction('{DistributedTransactionNames.NetworkModelUpdateTransaction}', transactionActors count: {transactionActors.Count()}) called.");
 
@@ -1153,7 +1153,7 @@ namespace NMS.GdaImplementation
 
         private async Task<bool> EnlistNmsTransactionActor()
         {
-            ITransactionEnlistmentContract transactionEnlistmentClient = TransactionEnlistmentClient.CreateClient();
+            var transactionEnlistmentClient = TransactionEnlistmentClient.CreateClient();
             bool nmsEnlistSuccess = await transactionEnlistmentClient.Enlist(DistributedTransactionNames.NetworkModelUpdateTransaction, MicroserviceNames.NmsGdaService);
             Logger.LogDebug("{baseLogString} StartDistributedTransaction => Enlist() method invoked on Transaction Coordinator.");
 

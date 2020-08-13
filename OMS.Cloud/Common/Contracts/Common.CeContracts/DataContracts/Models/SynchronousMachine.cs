@@ -1,8 +1,9 @@
-﻿using System.Runtime.Serialization;
+﻿using System;
+using System.Runtime.Serialization;
 
 namespace Common.CeContracts
 {
-	[DataContract]
+    [DataContract]
     public class SynchronousMachine : TopologyElement
     {
 		public SynchronousMachine(ITopologyElement element) : base (element.Id)

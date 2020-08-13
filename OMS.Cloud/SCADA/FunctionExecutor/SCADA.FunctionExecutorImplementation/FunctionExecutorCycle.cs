@@ -34,9 +34,6 @@ namespace SCADA.FunctionExecutorImplementation
         private ModbusClient modbusClient;
         private IScadaConfigData configData;
 
-        private IScadaModelReadAccessContract modelReadAccessClient;
-        private IScadaModelUpdateAccessContract modelUpdateAccessClient;
-
         #region Private Properties
         private ICloudLogger logger;
         private ICloudLogger Logger
@@ -158,7 +155,7 @@ namespace SCADA.FunctionExecutorImplementation
         {
             try
             {
-                this.modelReadAccessClient = ScadaModelReadAccessClient.CreateClient();
+                var modelReadAccessClient = ScadaModelReadAccessClient.CreateClient();
                 this.configData = await modelReadAccessClient.GetScadaConfigData();
                 this.modbusClient = new ModbusClient(configData.IpAddress.ToString(), configData.TcpPort);
             }
@@ -340,8 +337,8 @@ namespace SCADA.FunctionExecutorImplementation
             //this.discreteMeasurementCache = new Dictionary<long, DiscreteModbusData>(data.Length);
             this.discreteMeasurementCache.Clear();
 
-            this.modelReadAccessClient = ScadaModelReadAccessClient.CreateClient();
-            this.modelUpdateAccessClient = ScadaModelUpdateAccessClient.CreateClient();
+            var modelReadAccessClient = ScadaModelReadAccessClient.CreateClient();
+            var modelUpdateAccessClient = ScadaModelUpdateAccessClient.CreateClient();
 
             var currentSCADAModel = await modelReadAccessClient.GetGidToPointItemMap();
             var currentAddressToGidMap = await modelReadAccessClient.GetAddressToGidMap();
@@ -449,8 +446,8 @@ namespace SCADA.FunctionExecutorImplementation
             //this.analogMeasurementCache = new Dictionary<long, AnalogModbusData>(data.Length);
             this.analogMeasurementCache.Clear();
 
-            this.modelReadAccessClient = ScadaModelReadAccessClient.CreateClient();
-            this.modelUpdateAccessClient = ScadaModelUpdateAccessClient.CreateClient();
+            var modelReadAccessClient = ScadaModelReadAccessClient.CreateClient();
+            var modelUpdateAccessClient = ScadaModelUpdateAccessClient.CreateClient();
 
             var gidToPointItemMap = await modelReadAccessClient.GetGidToPointItemMap();
             var addressToGidMap = await modelReadAccessClient.GetAddressToGidMap();
@@ -541,8 +538,8 @@ namespace SCADA.FunctionExecutorImplementation
                 throw new ArgumentException(errorMessage);
             }
 
-            this.modelReadAccessClient = ScadaModelReadAccessClient.CreateClient();
-            this.modelUpdateAccessClient = ScadaModelUpdateAccessClient.CreateClient();
+            var modelReadAccessClient = ScadaModelReadAccessClient.CreateClient();
+            var modelUpdateAccessClient = ScadaModelUpdateAccessClient.CreateClient();
 
             //LOGIC
             var addressToGidMap = await modelReadAccessClient.GetAddressToGidMap();
@@ -683,8 +680,8 @@ namespace SCADA.FunctionExecutorImplementation
             string verboseMessage = $"{baseLogString} entering ExecuteWriteMultipleDiscreteCommand method, command's startAddress: {startAddress}, commandValues: {commandValuesSB}, commandOrigin: {commandOrigin}.";
             Logger.LogVerbose(verboseMessage);
 
-            this.modelReadAccessClient = ScadaModelReadAccessClient.CreateClient();
-            this.modelUpdateAccessClient = ScadaModelUpdateAccessClient.CreateClient();
+            var modelReadAccessClient = ScadaModelReadAccessClient.CreateClient();
+            var modelUpdateAccessClient = ScadaModelUpdateAccessClient.CreateClient();
 
             //LOGIC
             int quantity = commandValues.Length;
@@ -788,8 +785,8 @@ namespace SCADA.FunctionExecutorImplementation
             Logger.LogVerbose(verboseMessage);
 
             //LOGIC
-            this.modelReadAccessClient = ScadaModelReadAccessClient.CreateClient();
-            this.modelUpdateAccessClient = ScadaModelUpdateAccessClient.CreateClient();
+            var modelReadAccessClient = ScadaModelReadAccessClient.CreateClient();
+            var modelUpdateAccessClient = ScadaModelUpdateAccessClient.CreateClient();
 
             int quantity = commandValues.Length;
             var addressToGidMap = await modelReadAccessClient.GetAddressToGidMap();

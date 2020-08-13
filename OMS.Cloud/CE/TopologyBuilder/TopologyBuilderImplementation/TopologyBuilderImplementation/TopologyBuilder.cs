@@ -7,7 +7,10 @@ using OMS.Common.NmsContracts;
 using OMS.Common.WcfClient.CE;
 using System;
 using System.Collections.Generic;
+using System.IO;
 using System.Linq;
+using System.Runtime.Serialization;
+using System.Runtime.Serialization.Formatters.Binary;
 using System.Threading.Tasks;
 
 namespace CE.TopologyBuilderImplementation
@@ -164,10 +167,24 @@ namespace CE.TopologyBuilderImplementation
                 {
                     topology.AddElement(field);
                 }
+
+                //long size = 0;
+                //using (Stream stream = new MemoryStream())
+                //{
+                //    BinaryFormatter formatter = new BinaryFormatter();
+                //    formatter.Serialize(stream, topology);
+                //    size = stream.Length;
+                //}
+
+                //using (FileStream writer = new FileStream(@"E:\LogFiles\Topology.txt", FileMode.OpenOrCreate))
+                //{
+                //    DataContractSerializer serializer = new DataContractSerializer(topology.GetType());
+                //    serializer.WriteObject(writer, topology);
+                //}
             }
             catch (Exception e)
             {
-                Logger.LogDebug($"{baseLogString} Uhvacen eksepsn. {e.Message} {e.StackTrace}");
+                Logger.LogError($"{baseLogString} Uhvacen eksepsn. {e.Message} {e.StackTrace}");
             }
 
             Logger.LogDebug($"{baseLogString} CreateGraphTopology => Topology successfully created.");

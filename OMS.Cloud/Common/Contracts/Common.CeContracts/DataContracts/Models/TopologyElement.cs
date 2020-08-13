@@ -1,14 +1,16 @@
-﻿using System.Collections.Generic;
+﻿using System;
+using System.Collections.Generic;
 using System.Runtime.Serialization;
 
 namespace Common.CeContracts
 {
-	[DataContract]
+	[DataContract(IsReference = true)]
 	[KnownType(typeof(EnergyConsumer))]
 	[KnownType(typeof(Feeder))]
 	[KnownType(typeof(Field))]
 	[KnownType(typeof(Recloser))]
 	[KnownType(typeof(SynchronousMachine))]
+	[KnownType(typeof(TopologyElement))]
 	public class TopologyElement : ITopologyElement
 	{
 		#region Properties

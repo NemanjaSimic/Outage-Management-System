@@ -85,8 +85,6 @@ namespace SCADA.ModelProviderImplementation.ContractProviders
 
             this.stateManager = stateManager;
             this.stateManager.StateManagerChanged += this.OnStateManagerChangedHandler;
-
-            //this.publisherClient = PublisherClient.CreateClient();
         }
 
         private async void OnStateManagerChangedHandler(object sender, NotifyStateManagerChangedEventArgs e)
@@ -435,17 +433,6 @@ namespace SCADA.ModelProviderImplementation.ContractProviders
                 await publisherClient.Publish(scadaPublication, MicroserviceNames.ScadaModelProviderService);
                 Logger.LogInformation($"{baseLogString} PublishScadaData => SCADA service published data of topic: {scadaPublication.Topic}, publisher name: {MicroserviceNames.ScadaModelProviderService}");
             }
-            //catch (CommunicationObjectFaultedException e)
-            //{
-            //    string message = $"{baseLogString} PublishScadaData => CommunicationObjectFaultedException caught.";
-            //    Logger.LogError(message, e);
-
-            //    await Task.Delay(2000);
-
-            //    this.publisherClient = PublisherClient.CreateClient();
-            //    await PublishScadaData(topic, scadaMessage);
-            //    //todo: different logic on multiple rety?
-            //}
             catch (Exception e)
             {
                 string errorMessage = $"{baseLogString} PublishScadaData => exception {e.Message}";

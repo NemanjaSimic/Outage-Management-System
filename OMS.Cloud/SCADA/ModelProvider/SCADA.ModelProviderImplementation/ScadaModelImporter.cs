@@ -111,9 +111,6 @@ namespace SCADA.ModelProviderImplementation
             this.modelResourceDesc = modelResourceDesc;
             this.enumDescs = enumDescs;
             this.pointItemHelper = new ScadaModelPointItemHelper();
-
-            //this.nmsGdaClient = NetworkModelGdaClient.CreateClient();
-            //this.scadaCommandingClient = ScadaCommandingClient.CreateClient();
         }
 
         public async Task InitializeScadaModel(bool isRetry = false)
@@ -146,18 +143,6 @@ namespace SCADA.ModelProviderImplementation
 
                 await SendModelUpdateCommands();
             }
-            //catch (CommunicationObjectFaultedException e)
-            //{
-            //    string errorMessage = $"{baseLogString} InitializeScadaModel => CommunicationObjectFaultedException caught.";
-            //    Logger.LogError(errorMessage, e);
-
-            //    await Task.Delay(2000);
-
-            //    this.nmsGdaClient = NetworkModelGdaClient.CreateClient();
-            //    this.scadaCommandingClient = ScadaCommandingClient.CreateClient();
-            //    await InitializeScadaModel(true);
-            //    //todo: different logic on multiple rety?
-            //}
             catch (Exception e)
             {
                 string errorMessage = $"{baseLogString} InitializeScadaModel => Exception caught.";
@@ -225,7 +210,7 @@ namespace SCADA.ModelProviderImplementation
 
             try
             {
-                INetworkModelGDAContract nmsGdaClient = NetworkModelGdaClient.CreateClient();
+                var nmsGdaClient = NetworkModelGdaClient.CreateClient();
                 int iteratorId = await nmsGdaClient.GetExtentValues(ModelCode.ANALOG, props);
                 int resourcesLeft = await nmsGdaClient.IteratorResourcesLeft(iteratorId);
 
@@ -313,18 +298,6 @@ namespace SCADA.ModelProviderImplementation
                 await nmsGdaClient.IteratorClose(iteratorId);
                 success = true;
             }
-            //catch (CommunicationObjectFaultedException e)
-            //{
-            //    success = false;
-            //    string message = $"{baseLogString} ImportAnalog => CommunicationObjectFaultedException caught.";
-            //    Logger.LogError(message, e);
-
-            //    await Task.Delay(2000);
-
-            //    this.nmsGdaClient = NetworkModelGdaClient.CreateClient();
-            //    this.scadaCommandingClient = ScadaCommandingClient.CreateClient();
-            //    //todo: different logic on multiple rety?
-            //}
             catch (Exception ex)
             {
                 success = false;
@@ -344,7 +317,7 @@ namespace SCADA.ModelProviderImplementation
 
             try
             {
-                INetworkModelGDAContract nmsGdaClient = NetworkModelGdaClient.CreateClient();
+                var nmsGdaClient = NetworkModelGdaClient.CreateClient();
                 int iteratorId = await nmsGdaClient.GetExtentValues(ModelCode.DISCRETE, props);
                 int resourcesLeft = await nmsGdaClient.IteratorResourcesLeft(iteratorId);
 
@@ -431,18 +404,6 @@ namespace SCADA.ModelProviderImplementation
                 await nmsGdaClient.IteratorClose(iteratorId);
                 success = true;
             }
-            //catch (CommunicationObjectFaultedException e)
-            //{
-            //    success = false;
-            //    string message = $"{baseLogString} ImportAnalog => CommunicationObjectFaultedException caught.";
-            //    Logger.LogError(message, e);
-
-            //    await Task.Delay(2000);
-
-            //    this.nmsGdaClient = NetworkModelGdaClient.CreateClient();
-            //    this.scadaCommandingClient = ScadaCommandingClient.CreateClient();
-            //    //todo: different logic on multiple rety?
-            //}
             catch (Exception ex)
             {
                 success = false;
@@ -458,7 +419,7 @@ namespace SCADA.ModelProviderImplementation
         #region Private Methods
         private async Task SendModelUpdateCommands()
         {
-            IScadaCommandingContract scadaCommandingClient = ScadaCommandingClient.CreateClient();
+            var scadaCommandingClient = ScadaCommandingClient.CreateClient();
             var enumerableAddressToGidMapResult = await AddressToGidMap.GetEnumerableDictionaryAsync();
 
             var tasks = new List<Task>()
