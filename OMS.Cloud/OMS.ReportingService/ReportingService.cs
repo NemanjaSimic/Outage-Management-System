@@ -3,20 +3,20 @@ using System.Collections.Generic;
 using System.Fabric;
 using System.Threading;
 using System.Threading.Tasks;
-using Common.OmsContracts.Report;
 using OMS.Common.Cloud.Names;
 using Microsoft.ServiceFabric.Services.Runtime;
 using OMS.ReportingServiceImplementation;
 using Microsoft.ServiceFabric.Services.Communication.Runtime;
 using Microsoft.ServiceFabric.Services.Communication.Wcf.Runtime;
 using Microsoft.ServiceFabric.Services.Communication.Wcf;
+using Common.OmsContracts.Report;
 
 namespace OMS.ReportingService
 {
-	/// <summary>
-	/// An instance of this class is created for each service instance by the Service Fabric runtime.
-	/// </summary>
-	internal sealed class ReportingService : StatelessService
+    /// <summary>
+    /// An instance of this class is created for each service instance by the Service Fabric runtime.
+    /// </summary>
+    internal sealed class ReportingService : StatelessService
     {
         private ReportService reportService;
         public ReportingService(StatelessServiceContext context)

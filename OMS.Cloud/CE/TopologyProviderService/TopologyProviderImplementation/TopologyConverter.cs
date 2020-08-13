@@ -1,9 +1,9 @@
 ﻿using Common.CeContracts;
 using Common.CeContracts.ModelProvider;
-using Common.OMS.OutageModel;
+using Common.PubSubContracts.DataContracts.CE;
 using OMS.Common.Cloud.Logger;
 using OMS.Common.NmsContracts;
-using OMS.Common.PubSub;
+using OMS.Common.PubSubContracts.Interfaces;
 using OMS.Common.WcfClient.CE;
 using System;
 using System.Collections.Generic;
@@ -12,7 +12,7 @@ using System.Threading.Tasks;
 
 namespace CE.TopologyProviderImplementation
 {
-	public class TopologyConverter : ITopologyConverterContract
+    public class TopologyConverter : ITopologyConverterContract
     {
         private readonly IMeasurementProviderContract measurementProviderClient;
         private readonly IModelProviderContract modelProviderClient;

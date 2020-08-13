@@ -1,18 +1,15 @@
-﻿using Common.CE;
-using Common.CloudContracts;
-using Common.OMS;
-using Common.OMS.OutageModel;
-
+﻿using Common.CloudContracts;
+using Common.PubSubContracts.DataContracts.CE;
 using Microsoft.ServiceFabric.Services.Remoting;
 using OMS.Common.Cloud;
-using OMS.Common.PubSub;
+using OMS.Common.PubSubContracts.Interfaces;
 using System.Collections.Generic;
 using System.ServiceModel;
 using System.Threading.Tasks;
 
 namespace Common.OmsContracts.ModelProvider
 {
-	[ServiceContract]
+    [ServiceContract]
     public interface IOutageModelReadAccessContract : IService, IHealthChecker
     {
 

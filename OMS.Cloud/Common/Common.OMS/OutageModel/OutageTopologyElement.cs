@@ -1,12 +1,6 @@
-﻿using Common.CE;
-using Common.OMS;
-using OMS.Common.PubSub;
-using System;
+﻿using OMS.Common.PubSubContracts.Interfaces;
 using System.Collections.Generic;
-using System.Linq;
 using System.Runtime.Serialization;
-using System.Text;
-using System.Threading.Tasks;
 
 namespace Common.OMS.OutageModel
 {

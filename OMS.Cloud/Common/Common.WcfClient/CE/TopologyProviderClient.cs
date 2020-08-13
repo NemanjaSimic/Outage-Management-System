@@ -3,13 +3,13 @@ using Common.CeContracts.TopologyProvider;
 using Microsoft.ServiceFabric.Services.Client;
 using Microsoft.ServiceFabric.Services.Communication.Wcf.Client;
 using OMS.Common.Cloud.Names;
-using OMS.Common.PubSub;
+using OMS.Common.PubSubContracts.Interfaces;
 using System;
 using System.Threading.Tasks;
 
 namespace OMS.Common.WcfClient.CE
 {
-	public class TopologyProviderClient : WcfSeviceFabricClientBase<ITopologyProviderContract>, ITopologyProviderContract
+    public class TopologyProviderClient : WcfSeviceFabricClientBase<ITopologyProviderContract>, ITopologyProviderContract
 	{
 		private static readonly string microserviceName = MicroserviceNames.CeTopologyProviderService;
 		private static readonly string listenerName = EndpointNames.CeTopologyProviderServiceEndpoint;

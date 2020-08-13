@@ -10,12 +10,11 @@ using OutageDatabase.Repository;
 using System;
 using System.Collections.Generic;
 using System.Linq;
-using System.Text;
 using System.Threading.Tasks;
 
 namespace HistoryDBManagerServiceImplementation
 {
-    public class HistoryDBManager:IHistoryDBManagerContract
+    public class HistoryDBManager : IHistoryDBManagerContract
     {
         private readonly IReliableStateManager stateManager;
         private UnitOfWork dbContext;

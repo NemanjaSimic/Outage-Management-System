@@ -1,6 +1,5 @@
 ﻿using Microsoft.ServiceFabric.Services.Client;
 using Microsoft.ServiceFabric.Services.Communication.Wcf.Client;
-using OMS.Common.Cloud;
 using OMS.Common.Cloud.Names;
 using OMS.Common.SCADA;
 using OMS.Common.ScadaContracts.DataContracts;

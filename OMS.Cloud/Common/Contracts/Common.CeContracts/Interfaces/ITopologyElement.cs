@@ -4,12 +4,6 @@ using System.ServiceModel;
 
 namespace Common.CeContracts
 {
-    [ServiceKnownType(typeof(EnergyConsumer))]
-    [ServiceKnownType(typeof(Feeder))]
-    [ServiceKnownType(typeof(Field))]
-    [ServiceKnownType(typeof(Recloser))]
-    [ServiceKnownType(typeof(SynchronousMachine))]
-    [ServiceKnownType(typeof(TopologyElement))]
     public interface ITopologyElement : IGraphElement
     {
         long Id { get; set; }

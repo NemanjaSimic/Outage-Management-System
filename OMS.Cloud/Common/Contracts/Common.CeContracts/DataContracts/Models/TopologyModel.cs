@@ -10,10 +10,12 @@ namespace Common.CeContracts
 		public long FirstNode { get; set; }
 		[DataMember]
 		public Dictionary<long, ITopologyElement> TopologyElements { get; set; }
+		
 		public TopologyModel()
 		{
 			TopologyElements = new Dictionary<long, ITopologyElement>();
 		}
+
 		public void AddElement(ITopologyElement newElement)
 		{
 			if (!TopologyElements.ContainsKey(newElement.Id))

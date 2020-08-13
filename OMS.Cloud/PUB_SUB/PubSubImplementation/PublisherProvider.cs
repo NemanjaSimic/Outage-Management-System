@@ -1,10 +1,10 @@
-﻿using Common.PubSub;
-using Microsoft.ServiceFabric.Data;
+﻿using Microsoft.ServiceFabric.Data;
 using Microsoft.ServiceFabric.Data.Notifications;
 using OMS.Common.Cloud.Logger;
 using OMS.Common.Cloud.ReliableCollectionHelpers;
 using OMS.Common.PubSub;
 using OMS.Common.PubSubContracts;
+using OMS.Common.PubSubContracts.Interfaces;
 using OMS.Common.WcfClient.PubSub;
 using System;
 using System.Collections.Generic;

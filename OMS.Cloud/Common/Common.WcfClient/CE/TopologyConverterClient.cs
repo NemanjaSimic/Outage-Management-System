@@ -2,13 +2,13 @@
 using Microsoft.ServiceFabric.Services.Client;
 using Microsoft.ServiceFabric.Services.Communication.Wcf.Client;
 using OMS.Common.Cloud.Names;
-using OMS.Common.PubSub;
+using OMS.Common.PubSubContracts.Interfaces;
 using System;
 using System.Threading.Tasks;
 
 namespace OMS.Common.WcfClient.CE
 {
-	public class TopologyConverterClient : WcfSeviceFabricClientBase<ITopologyConverterContract>, ITopologyConverterContract
+    public class TopologyConverterClient : WcfSeviceFabricClientBase<ITopologyConverterContract>, ITopologyConverterContract
 	{
 		private static readonly string microserviceName = MicroserviceNames.CeTopologyProviderService;
 		private static readonly string listenerName = EndpointNames.CeTopologyConverterServiceEndpoint;

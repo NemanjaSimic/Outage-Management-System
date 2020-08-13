@@ -1,10 +1,4 @@
-﻿using System;
-using System.Collections.Generic;
-using System.Linq;
-using System.Text;
-using System.Threading.Tasks;
-
-namespace Common.OMS
+﻿namespace Common.OMS
 {
     public static class ReliableDictionaryNames
     {
@@ -14,8 +8,5 @@ namespace Common.OMS
         public static readonly string CommandedElements = "CommandedElements";
         public static readonly string OptimumIsolatioPoints = "OptimumIsolatioPoints";
         public static readonly string PotentialOutage = "PotentialOutage";
-
-
-
     }
 }

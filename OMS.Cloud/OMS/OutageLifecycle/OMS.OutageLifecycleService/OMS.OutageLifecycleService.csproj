@@ -39,9 +39,6 @@
     <IsServiceFabricServiceProject>true</IsServiceFabricServiceProject>
   </PropertyGroup>
   <ItemGroup>
-    <Reference Include="Microsoft.ServiceFabric.Services.Wcf">
-      <HintPath>..\..\..\NMS\NMS.GdaService\bin\x64\Debug\Microsoft.ServiceFabric.Services.Wcf.dll</HintPath>
-    </Reference>
     <Reference Include="System" />
     <Reference Include="System.Core" />
     <Reference Include="System.Runtime.Serialization" />
@@ -59,10 +56,6 @@
     <None Include="App.config" />
   </ItemGroup>
   <ItemGroup>
-    <ProjectReference Include="..\..\..\Common.OmsContracts\Common.OmsContracts.csproj">
-      <Project>{7032AEF1-E55A-4D5C-90FF-E0B8B4C98BE0}</Project>
-      <Name>Common.OmsContracts</Name>
-    </ProjectReference>
     <ProjectReference Include="..\..\..\Common\Common.Cloud\Common.Cloud.csproj">
       <Project>{FBEE1369-0F6C-41E6-8C62-8C1C5CDBB602}</Project>
       <Name>Common.Cloud</Name>
@@ -70,6 +63,10 @@
     <ProjectReference Include="..\..\..\Common\Contracts\Common.CloudContracts\Common.CloudContracts.csproj">
       <Project>{2307F7DC-6B87-4506-8365-6966712DD5FE}</Project>
       <Name>Common.CloudContracts</Name>
+    </ProjectReference>
+    <ProjectReference Include="..\..\..\Common\Contracts\Common.OmsContracts\Common.OmsContracts.csproj">
+      <Project>{7032AEF1-E55A-4D5C-90FF-E0B8B4C98BE0}</Project>
+      <Name>Common.OmsContracts</Name>
     </ProjectReference>
     <ProjectReference Include="..\..\OutageDataAccess\OutageDatabase\OutageDatabase\OutageDatabase.csproj">
       <Project>{D4F63B28-12CA-4B86-8DC6-778AE40C79AE}</Project>

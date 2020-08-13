@@ -1,10 +1,10 @@
-﻿using OMS.Common.PubSub;
+﻿using OMS.Common.PubSubContracts.Interfaces;
 using System.Collections.Generic;
 using System.Runtime.Serialization;
 
 namespace Common.PubSubContracts.DataContracts.CE
 {
-	[DataContract]
+    [DataContract]
     public class OutageTopologyElement : IOutageTopologyElement
     {
         #region Fields

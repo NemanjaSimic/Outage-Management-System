@@ -32,7 +32,7 @@
   </PropertyGroup>
   <ItemGroup>
     <Reference Include="Microsoft.ServiceFabric.Services.Remoting">
-      <HintPath>..\..\..\..\Cloud.Web\Common\Contracts\Common.WebAdapterContracts\bin\Debug\Microsoft.ServiceFabric.Services.Remoting.dll</HintPath>
+      <HintPath>..\Common.OmsContracts\bin\Debug\Microsoft.ServiceFabric.Services.Remoting.dll</HintPath>
     </Reference>
     <Reference Include="System" />
     <Reference Include="System.Core" />

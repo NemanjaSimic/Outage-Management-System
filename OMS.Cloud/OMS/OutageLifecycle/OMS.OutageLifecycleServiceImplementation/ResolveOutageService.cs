@@ -7,13 +7,11 @@ using OMS.OutageLifecycleServiceImplementation.OutageLCHelper;
 using OutageDatabase.Repository;
 using System;
 using System.Collections.Generic;
-using System.Linq;
-using System.Text;
 using System.Threading.Tasks;
 
 namespace OMS.OutageLifecycleServiceImplementation
 {
-	public class ResolveOutageService : IResolveOutageContract
+    public class ResolveOutageService : IResolveOutageContract
 	{
 
 		private ICloudLogger logger;

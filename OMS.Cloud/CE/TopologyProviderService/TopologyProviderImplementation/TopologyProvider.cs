@@ -9,19 +9,18 @@ using OMS.Common.Cloud;
 using OMS.Common.Cloud.Logger;
 using OMS.Common.Cloud.Names;
 using OMS.Common.Cloud.ReliableCollectionHelpers;
-using OMS.Common.PubSub;
 using OMS.Common.PubSubContracts;
+using OMS.Common.PubSubContracts.Interfaces;
 using OMS.Common.WcfClient.CE;
 using OMS.Common.WcfClient.PubSub;
 using System;
 using System.Collections.Generic;
 using System.Linq;
 using System.Threading.Tasks;
-using ReliableDictionaryNames = Common.CE.ReliableDictionaryNames;
 
 namespace CE.TopologyProviderImplementation
 {
-	public class TopologyProvider : ITopologyProviderContract
+    public class TopologyProvider : ITopologyProviderContract
     {
         #region Fields
         private readonly long topologyID = 1;

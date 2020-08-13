@@ -1,14 +1,14 @@
 ﻿using Common.CloudContracts;
-using Common.OMS.OutageModel;
+using Common.PubSubContracts.DataContracts.CE;
 using Microsoft.ServiceFabric.Services.Remoting;
-using OMS.Common.PubSub;
+using OMS.Common.PubSubContracts.Interfaces;
 using System.ServiceModel;
 using System.Threading.Tasks;
 
 namespace Common.CeContracts
 {
-	[ServiceContract]
-	[ServiceKnownType(typeof(OutageTopologyModel))]
+    [ServiceContract]
+	[ServiceKnownType(typeof(OutageTopologyModel))] //REORGANIZOVATI! OutageTopologyModel je iz Common.OMS.dll
 	[ServiceKnownType(typeof(TopologyModel))]
 	public interface ITopologyConverterContract : IService, IHealthChecker
 	{

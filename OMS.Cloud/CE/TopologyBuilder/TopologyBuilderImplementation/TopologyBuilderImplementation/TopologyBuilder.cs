@@ -44,6 +44,7 @@ namespace CE.TopologyBuilderImplementation
             string debugMessage = $"{baseLogString} Ctor => Clients initialized.";
             Logger.LogDebug(debugMessage);
         }
+
         public Task<bool> IsAlive()
         {
             return Task.Run(() => { return true; });
@@ -60,6 +61,7 @@ namespace CE.TopologyBuilderImplementation
 
             return retVal;
         }
+
         public async Task<ITopology> CreateGraphTopology(long firstElementGid, string whoIsCalling)
         {
             Logger.LogVerbose($"{baseLogString} CreateGraphTopology method called, by {whoIsCalling}.");

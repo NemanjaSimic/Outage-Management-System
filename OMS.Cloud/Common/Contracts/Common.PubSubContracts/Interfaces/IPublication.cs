@@ -1,6 +1,6 @@
 ﻿using OMS.Common.Cloud;
 
-namespace Common.PubSub
+namespace OMS.Common.PubSubContracts.Interfaces
 {
     public interface IPublication
     {

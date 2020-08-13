@@ -1,12 +1,9 @@
-﻿using Common.PubSub;
-using Microsoft.ServiceFabric.Services.Client;
+﻿using Microsoft.ServiceFabric.Services.Client;
 using Microsoft.ServiceFabric.Services.Communication.Wcf.Client;
-using OMS.Common.Cloud;
 using OMS.Common.Cloud.Names;
 using OMS.Common.PubSubContracts;
+using OMS.Common.PubSubContracts.Interfaces;
 using System;
-using System.Collections.Generic;
-using System.Configuration;
 using System.Threading.Tasks;
 
 namespace OMS.Common.WcfClient.PubSub

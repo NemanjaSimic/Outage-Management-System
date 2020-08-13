@@ -1,5 +1,5 @@
 ﻿using OMS.Common.Cloud;
-using OMS.Common.PubSub;
+using OMS.Common.PubSubContracts.Interfaces;
 using System.Runtime.Serialization;
 
 namespace OMS.Common.PubSubContracts.DataContracts.SCADA

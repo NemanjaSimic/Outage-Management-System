@@ -7,7 +7,7 @@ using System.Threading.Tasks;
 
 namespace OMS.Common.WcfClient.CE
 {
-	public class TopologyBuilderClient : WcfSeviceFabricClientBase<ITopologyBuilderContract>, ITopologyBuilderContract
+    public class TopologyBuilderClient : WcfSeviceFabricClientBase<ITopologyBuilderContract>, ITopologyBuilderContract
 	{
 		private static readonly string microserviceName = MicroserviceNames.CeTopologyBuilderService;
 		private static readonly string listenerName = EndpointNames.CeTopologyBuilderServiceEndpoint;
@@ -31,7 +31,11 @@ namespace OMS.Common.WcfClient.CE
 
 		public Task<ITopology> CreateGraphTopology(long firstElementGid, string whoIsCalling)
 		{
-            return InvokeWithRetryAsync(client => client.Channel.CreateGraphTopology(firstElementGid, whoIsCalling));
+			//var retrySettings = new OperationRetrySettings(new TimeSpan(0,1,0));
+			//var client = await Factory.GetClientAsync(ServiceUri, PartitionKey, TargetReplicaSelector, ListenerName, retrySettings, new CancellationToken());
+			//return await client.Channel.CreateGraphTopology(firstElementGid, whoIsCalling);
+
+			return InvokeWithRetryAsync(client => client.Channel.CreateGraphTopology(firstElementGid, whoIsCalling));
 		}
 
 		public Task<bool> IsAlive()

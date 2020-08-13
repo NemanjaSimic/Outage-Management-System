@@ -5,7 +5,6 @@ using OMS.Common.Cloud.Exceptions.SCADA;
 using OMS.Common.Cloud.Logger;
 using OMS.Common.Cloud.Names;
 using OMS.Common.Cloud.ReliableCollectionHelpers;
-using OMS.Common.PubSub;
 using OMS.Common.PubSubContracts;
 using OMS.Common.PubSubContracts.DataContracts.SCADA;
 using OMS.Common.ScadaContracts.DataContracts;
@@ -14,7 +13,6 @@ using OMS.Common.ScadaContracts.ModelProvider;
 using OMS.Common.WcfClient.PubSub;
 using System;
 using System.Collections.Generic;
-using System.ServiceModel;
 using System.Text;
 using System.Threading.Tasks;
 using ReliableDictionaryNames = OMS.Common.SCADA.ReliableDictionaryNames;
@@ -461,7 +459,7 @@ namespace SCADA.ModelProviderImplementation.ContractProviders
             var enumerableMeasurementCache = await MeasurementsCache.GetEnumerableDictionaryAsync();
             foreach (long gid in enumerableMeasurementCache.Keys)
             {
-                IModbusData data = enumerableMeasurementCache[gid];
+                ModbusData data = enumerableMeasurementCache[gid];
 
                 if (data is AnalogModbusData analogModbusData)
                 {

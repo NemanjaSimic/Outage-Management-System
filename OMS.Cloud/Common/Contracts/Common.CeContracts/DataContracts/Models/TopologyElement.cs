@@ -3,12 +3,12 @@ using System.Runtime.Serialization;
 
 namespace Common.CeContracts
 {
+	[DataContract]
 	[KnownType(typeof(EnergyConsumer))]
 	[KnownType(typeof(Feeder))]
 	[KnownType(typeof(Field))]
 	[KnownType(typeof(Recloser))]
 	[KnownType(typeof(SynchronousMachine))]
-	[DataContract]
 	public class TopologyElement : ITopologyElement
 	{
 		#region Properties
@@ -38,8 +38,8 @@ namespace Common.CeContracts
 		public bool NoReclosing { get; set; }
 		[DataMember]
 		public ITopologyElement Feeder { get; set; }
-
 		#endregion
+
 		public TopologyElement(long gid)
 		{
 			Id = gid;

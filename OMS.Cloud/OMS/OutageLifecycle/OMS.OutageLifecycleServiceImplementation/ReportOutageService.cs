@@ -7,18 +7,16 @@ using OutageDatabase.Repository;
 using System;
 using System.Collections.Generic;
 using System.Linq;
-using System.Text;
 using System.Threading.Tasks;
 using Common.OMS.OutageDatabaseModel;
 using OMS.OutageLifecycleServiceImplementation.OutageLCHelper;
-using Common.CE;
-using OMS.Common.PubSub;
 using Common.OmsContracts.ModelProvider;
 using Common.OmsContracts.HistoryDBManager;
+using OMS.Common.PubSubContracts.Interfaces;
 
 namespace OMS.OutageLifecycleServiceImplementation
 {
-	public class ReportOutageService : IReportOutageContract
+    public class ReportOutageService : IReportOutageContract
 	{
 		private UnitOfWork dbContext;
         private OutageLifecycleHelper outageLifecycleHelper;

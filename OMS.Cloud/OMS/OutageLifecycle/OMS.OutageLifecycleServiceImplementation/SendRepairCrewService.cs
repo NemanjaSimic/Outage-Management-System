@@ -1,21 +1,15 @@
-﻿using Common.CE;
-using Common.OMS;
+﻿using Common.OMS;
 using Common.OMS.OutageDatabaseModel;
 using Common.OmsContracts.ModelProvider;
 using Common.OmsContracts.OutageLifecycle;
 using Common.OmsContracts.OutageSimulator;
 using OMS.Common.Cloud;
 using OMS.Common.Cloud.Logger;
-using OMS.Common.Cloud.Names;
-using OMS.Common.PubSub;
+using OMS.Common.PubSubContracts.Interfaces;
 using OMS.Common.WcfClient.OMS;
 using OMS.OutageLifecycleServiceImplementation.OutageLCHelper;
 using OutageDatabase.Repository;
 using System;
-using System.Collections.Generic;
-using System.Linq;
-using System.ServiceModel;
-using System.Text;
 using System.Threading.Tasks;
 
 namespace OMS.OutageLifecycleServiceImplementation

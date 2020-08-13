@@ -42,9 +42,6 @@
     <Reference Include="Microsoft.ServiceFabric.Data, Version=7.0.0.0, Culture=neutral, PublicKeyToken=31bf3856ad364e35, processorArchitecture=AMD64">
       <HintPath>..\..\..\packages\Microsoft.ServiceFabric.Data.4.1.428\lib\net472\Microsoft.ServiceFabric.Data.dll</HintPath>
     </Reference>
-    <Reference Include="Microsoft.ServiceFabric.Data.Extensions, Version=1.4.5.0, Culture=neutral, PublicKeyToken=31bf3856ad364e35, processorArchitecture=MSIL">
-      <HintPath>..\..\..\packages\Microsoft.ServiceFabric.Data.Extensions.4.1.428\lib\net472\Microsoft.ServiceFabric.Data.Extensions.dll</HintPath>
-    </Reference>
     <Reference Include="Microsoft.ServiceFabric.Data.Interfaces, Version=5.0.0.0, Culture=neutral, PublicKeyToken=31bf3856ad364e35, processorArchitecture=AMD64">
       <HintPath>..\..\..\packages\Microsoft.ServiceFabric.Data.Interfaces.4.1.428\lib\net472\Microsoft.ServiceFabric.Data.Interfaces.dll</HintPath>
     </Reference>
@@ -65,18 +62,6 @@
     </Reference>
     <Reference Include="Microsoft.ServiceFabric.Preview, Version=7.0.0.0, Culture=neutral, PublicKeyToken=31bf3856ad364e35, processorArchitecture=AMD64">
       <HintPath>..\..\..\packages\Microsoft.ServiceFabric.7.1.428\lib\net472\Microsoft.ServiceFabric.Preview.dll</HintPath>
-    </Reference>
-    <Reference Include="Microsoft.ServiceFabric.ReliableCollection.Interop, Version=1.0.0.0, Culture=neutral, PublicKeyToken=31bf3856ad364e35, processorArchitecture=MSIL">
-      <HintPath>..\..\..\packages\Microsoft.ServiceFabric.Data.Extensions.4.1.428\lib\net472\Microsoft.ServiceFabric.ReliableCollection.Interop.dll</HintPath>
-    </Reference>
-    <Reference Include="Microsoft.ServiceFabric.Services, Version=6.0.0.0, Culture=neutral, PublicKeyToken=31bf3856ad364e35, processorArchitecture=AMD64">
-      <HintPath>..\..\..\packages\Microsoft.ServiceFabric.Services.4.1.428\lib\net472\Microsoft.ServiceFabric.Services.dll</HintPath>
-    </Reference>
-    <Reference Include="Microsoft.ServiceFabric.Services.Remoting, Version=6.0.0.0, Culture=neutral, PublicKeyToken=31bf3856ad364e35, processorArchitecture=AMD64">
-      <HintPath>..\..\..\packages\Microsoft.ServiceFabric.Services.Remoting.4.1.428\lib\net472\Microsoft.ServiceFabric.Services.Remoting.dll</HintPath>
-    </Reference>
-    <Reference Include="Microsoft.ServiceFabric.Services.Wcf, Version=6.0.0.0, Culture=neutral, PublicKeyToken=31bf3856ad364e35, processorArchitecture=AMD64">
-      <HintPath>..\..\..\packages\Microsoft.ServiceFabric.Services.Wcf.4.1.428\lib\net45\Microsoft.ServiceFabric.Services.Wcf.dll</HintPath>
     </Reference>
     <Reference Include="System" />
     <Reference Include="System.Core" />
@@ -105,7 +90,7 @@
   </ItemGroup>
   <ItemGroup>
     <ProjectReference Include="..\..\..\Common\Common.CE\Common.CE.csproj">
-      <Project>{2B5DAFD3-879B-4876-972F-0CC48463AC0C}</Project>
+      <Project>{4ead0377-bd2d-4b7e-93a6-705db815e8a7}</Project>
       <Name>Common.CE</Name>
     </ProjectReference>
     <ProjectReference Include="..\..\..\Common\Common.Cloud\Common.Cloud.csproj">

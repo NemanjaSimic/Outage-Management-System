@@ -1,17 +1,12 @@
-﻿using Common.CE;
-using Common.OMS;
+﻿using Common.OMS;
 using Common.OmsContracts.ModelProvider;
 using Microsoft.ServiceFabric.Data;
 using Microsoft.ServiceFabric.Data.Notifications;
 using OMS.Common.Cloud;
 using OMS.Common.Cloud.ReliableCollectionHelpers;
-using OMS.Common.PubSub;
-using System;
+using OMS.Common.PubSubContracts.Interfaces;
 using System.Collections.Generic;
-using System.Linq;
-using System.Text;
 using System.Threading.Tasks;
-using ReliableDictionaryNames = Common.OMS.ReliableDictionaryNames;
 
 namespace OMS.ModelProviderImplementation.ContractProviders
 {

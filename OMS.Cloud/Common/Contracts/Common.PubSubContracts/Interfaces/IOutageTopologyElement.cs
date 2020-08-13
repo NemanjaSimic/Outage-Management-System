@@ -1,6 +1,6 @@
 ﻿using System.Collections.Generic;
 
-namespace OMS.Common.PubSub
+namespace OMS.Common.PubSubContracts.Interfaces
 {
     public interface IOutageTopologyElement
     {

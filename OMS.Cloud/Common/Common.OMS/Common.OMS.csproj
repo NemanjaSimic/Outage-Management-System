@@ -62,22 +62,17 @@
     <Compile Include="Report\ReportOptions.cs" />
   </ItemGroup>
   <ItemGroup>
-    <ProjectReference Include="..\Common\Common.CE\Common.CE.csproj">
-      <Project>{4EAD0377-BD2D-4B7E-93A6-705DB815E8A7}</Project>
-      <Name>Common.CE</Name>
-    </ProjectReference>
-    <ProjectReference Include="..\Common\Common.Cloud\Common.Cloud.csproj">
+    <ProjectReference Include="..\Common.Cloud\Common.Cloud.csproj">
       <Project>{FBEE1369-0F6C-41E6-8C62-8C1C5CDBB602}</Project>
       <Name>Common.Cloud</Name>
     </ProjectReference>
-    <ProjectReference Include="..\Common\Common.PubSub\Common.PubSub.csproj">
-      <Project>{5B775779-A5AE-4F94-90EC-59973FA80D4D}</Project>
-      <Name>Common.PubSub</Name>
-    </ProjectReference>
-    <ProjectReference Include="..\Common\Contracts\Common.PubSubContracts\Common.PubSubContracts.csproj">
+    <ProjectReference Include="..\Contracts\Common.PubSubContracts\Common.PubSubContracts.csproj">
       <Project>{AA75150D-EE56-49C0-9431-751F83CCC0CD}</Project>
       <Name>Common.PubSubContracts</Name>
     </ProjectReference>
+  </ItemGroup>
+  <ItemGroup>
+    <None Include="app.config" />
   </ItemGroup>
   <Import Project="$(MSBuildToolsPath)\Microsoft.CSharp.targets" />
 </Project>

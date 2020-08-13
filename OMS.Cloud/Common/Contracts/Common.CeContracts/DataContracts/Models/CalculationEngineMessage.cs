@@ -1,10 +1,9 @@
 ﻿using System.Runtime.Serialization;
-using Common.PubSub;
-using OMS.Common.PubSub;
+using OMS.Common.PubSubContracts.Interfaces;
 
 namespace Common.CeContracts
 {
-	[DataContract]
+    [DataContract]
     public abstract class CalculationEngineMessage : IPublishableMessage
     {
 

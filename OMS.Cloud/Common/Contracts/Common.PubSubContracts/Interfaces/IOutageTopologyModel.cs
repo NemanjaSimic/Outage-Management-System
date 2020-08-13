@@ -1,6 +1,6 @@
 ﻿using System.Collections.Generic;
 
-namespace OMS.Common.PubSub
+namespace OMS.Common.PubSubContracts.Interfaces
 {
     public delegate void SwitchClosed(long elementGid);
     public delegate void ConsumersBlackedOut(List<long> consumers, long? outageId);

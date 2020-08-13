@@ -4,8 +4,8 @@ using OMS.Common.Cloud;
 using OMS.Common.Cloud.Logger;
 using OMS.Common.NmsContracts;
 using OMS.Common.NmsContracts.GDA;
-using OMS.Common.PubSub;
 using OMS.Common.PubSubContracts;
+using OMS.Common.PubSubContracts.Interfaces;
 using OMS.Common.WcfClient.NMS;
 using OMS.Common.WcfClient.PubSub;
 using OutageDatabase.Repository;
@@ -15,7 +15,7 @@ using System.Threading.Tasks;
 
 namespace OMS.OutageLifecycleServiceImplementation.OutageLCHelper
 {
-	public class OutageLifecycleHelper
+    public class OutageLifecycleHelper
     {
         private UnitOfWork dbContext;
         private IOutageTopologyModel outageTopology;
