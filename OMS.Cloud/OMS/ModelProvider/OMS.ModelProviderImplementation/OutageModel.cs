@@ -1,5 +1,8 @@
 ﻿using Common.CE;
 using Common.OMS;
+using Common.OmsContracts.HistoryDBManager;
+using Common.OmsContracts.ModelProvider;
+using Common.OmsContracts.OutageLifecycle;
 using Common.PubSub;
 using Common.PubSubContracts.DataContracts.CE;
 using Microsoft.ServiceFabric.Data;
@@ -29,9 +32,11 @@ namespace OMS.ModelProviderImplementation
 		{
 			get { return logger ?? (logger = CloudLoggerFactory.GetLogger()); }
 		}
-		//Clients
-		private HistoryDBManagerClient historyDBManagerClient;
-		private ReportOutageClient reportOutageClient;
+		
+		private IHistoryDBManagerContract historyDBManagerClient;
+		private IOutageModelReadAccessContract outageModelReadAccessClient;
+		private IOutageModelUpdateAccessContract outageModelUpdateAccessClient;
+		private IReportOutageContract reportOutageClient;
 
 		private OutageModelReadAccessProvider outageModelReadAccessProvider;
 		private OutageModelUpdateAccessProvider outageModelUpdateAccessProvider;
@@ -116,7 +121,8 @@ namespace OMS.ModelProviderImplementation
 			{
 				IOutageTopologyModel topology = omsModelMessage.OutageTopologyModel;
 				await outageModelUpdateAccessProvider.UpdateTopologyModel(topology);
-					//await outageModelReadAccessProvider.GetTopologyModel();
+				await TopologyModel.SetAsync(0, topology);
+				
 				HashSet<long> energizedConsumers = new HashSet<long>();
 				foreach (var element in topology.OutageTopology.Values)
 				{

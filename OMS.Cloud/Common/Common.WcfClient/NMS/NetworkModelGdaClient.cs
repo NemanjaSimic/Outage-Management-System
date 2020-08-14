@@ -20,13 +20,13 @@ namespace OMS.Common.WcfClient.NMS
         {
         }
 
-        public static NetworkModelGdaClient CreateClient()
+        public static INetworkModelGDAContract CreateClient()
         {
             ClientFactory factory = new ClientFactory();
             return factory.CreateClient<NetworkModelGdaClient, INetworkModelGDAContract>(microserviceName);
         }
 
-        public static NetworkModelGdaClient CreateClient(Uri serviceUri, ServicePartitionKey servicePartitionKey)
+        public static INetworkModelGDAContract CreateClient(Uri serviceUri, ServicePartitionKey servicePartitionKey)
         {
             ClientFactory factory = new ClientFactory();
             return factory.CreateClient<NetworkModelGdaClient, INetworkModelGDAContract>(serviceUri, servicePartitionKey);

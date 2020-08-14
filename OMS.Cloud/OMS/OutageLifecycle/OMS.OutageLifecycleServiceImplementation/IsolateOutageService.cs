@@ -25,6 +25,9 @@ using OMS.OutageLifecycleServiceImplementation.ScadaSub;
 using System.Fabric.Management.ServiceModel;
 using OMS.Common.WcfClient.PubSub;
 using OMS.Common.Cloud.Names;
+using Common.OmsContracts.ModelProvider;
+using Common.OmsContracts.ModelAccess;
+using Common.CeContracts;
 
 namespace OMS.OutageLifecycleServiceImplementation
 {
@@ -46,14 +49,14 @@ namespace OMS.OutageLifecycleServiceImplementation
 		}
 
 		#region Clients
-		private OutageModelReadAccessClient outageModelReadAccessClient;
-        private OutageModelUpdateAccessClient outageModelUpdateAccessClient;
-        private OutageModelAccessClient outageModelAccessClient;
-        private MeasurementMapServiceClient measurementMapServiceClient;
-        private SwitchStatusCommandingClient switchStatusCommandingClient;
-        private NetworkModelGdaClient networkModelGdaClient;
-        private EquipmentAccessClient equipmentAccessClient;
-        private RegisterSubscriberClient registerSubscriberClient;
+		private IOutageModelReadAccessContract outageModelReadAccessClient;
+        private IOutageModelUpdateAccessContract outageModelUpdateAccessClient;
+        private IOutageAccessContract outageModelAccessClient;
+        private IMeasurementMapContract measurementMapServiceClient;
+        private ISwitchStatusCommandingContract switchStatusCommandingClient;
+        private INetworkModelGDAContract networkModelGdaClient;
+        private IEquipmentAccessContract equipmentAccessClient;
+        private IRegisterSubscriberContract registerSubscriberClient;
         #endregion
 
         public ScadaSubscriber scadaSubscriber;
@@ -88,6 +91,7 @@ namespace OMS.OutageLifecycleServiceImplementation
 
 		public async Task IsolateOutage(long outageId)
 		{
+            Logger.LogDebug("IsolateOutage method started.");
             OutageEntity outageToIsolate = await outageModelAccessClient.GetOutage(outageId);
 
             if (outageToIsolate != null)

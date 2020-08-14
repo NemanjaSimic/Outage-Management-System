@@ -21,13 +21,13 @@ namespace OMS.Common.WcfClient.OMS.ModelAccess
         {
 
         }
-        public static OutageModelAccessClient CreateClient()
+        public static IOutageAccessContract CreateClient()
         {
             ClientFactory factory = new ClientFactory();
             return factory.CreateClient<OutageModelAccessClient, IOutageAccessContract>(microserviceName);
         }
 
-        public static OutageModelAccessClient CreateClient(Uri serviceUri, ServicePartitionKey servicePartitionKey)
+        public static IOutageAccessContract CreateClient(Uri serviceUri, ServicePartitionKey servicePartitionKey)
         {
             ClientFactory factory = new ClientFactory();
             return factory.CreateClient<OutageModelAccessClient, IOutageAccessContract>(serviceUri, servicePartitionKey);

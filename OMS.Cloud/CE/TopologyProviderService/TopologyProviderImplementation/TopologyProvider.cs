@@ -1,6 +1,8 @@
 ﻿using Common.CE;
 using Common.CE.Interfaces;
 using Common.CeContracts;
+using Common.CeContracts.LoadFlow;
+using Common.CeContracts.ModelProvider;
 using Common.CeContracts.TopologyProvider;
 using Microsoft.ServiceFabric.Data;
 using Microsoft.ServiceFabric.Data.Notifications;
@@ -32,10 +34,10 @@ namespace CE.TopologyProviderImplementation
         private readonly IReliableStateManager stateManager;
 
         private readonly IPublisherContract publisherClient;
-        private readonly ModelProviderClient modelProviderClient;
-        private readonly LoadFlowClient loadFlowClient;
-        private readonly TopologyBuilderClient topologyBuilderClient;
-        private readonly TopologyConverterClient topologyConverterClient;
+        private readonly IModelProviderContract modelProviderClient;
+        private readonly ILoadFlowContract loadFlowClient;
+        private readonly ITopologyBuilderContract topologyBuilderClient;
+        private readonly ITopologyConverterContract topologyConverterClient;
 
         private ICloudLogger logger;
         private ICloudLogger Logger

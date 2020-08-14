@@ -2,6 +2,7 @@
 using Common.CE.Interfaces;
 using Common.CeContracts;
 using Common.CeContracts.LoadFlow;
+using Common.CeContracts.ModelProvider;
 using OMS.Common.Cloud;
 using OMS.Common.Cloud.Logger;
 using OMS.Common.NmsContracts;
@@ -26,8 +27,8 @@ namespace CE.LoadFlowImplementation
 
         private readonly string baseLogString;
 
-        private readonly MeasurementProviderClient measurementProviderClient;
-        private readonly ModelProviderClient modelProviderClient;
+        private readonly IMeasurementProviderContract measurementProviderClient;
+        private readonly IModelProviderContract modelProviderClient;
 
         private ICloudLogger logger;
         private ICloudLogger Logger

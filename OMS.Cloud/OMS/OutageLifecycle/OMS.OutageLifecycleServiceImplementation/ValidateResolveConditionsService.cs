@@ -1,6 +1,8 @@
 ﻿using Common.CE;
 using Common.OMS;
 using Common.OMS.OutageDatabaseModel;
+using Common.OmsContracts.ModelAccess;
+using Common.OmsContracts.ModelProvider;
 using Common.OmsContracts.OutageLifecycle;
 using OMS.Common.Cloud;
 using OMS.Common.Cloud.Logger;
@@ -28,8 +30,8 @@ namespace OMS.OutageLifecycleServiceImplementation
 
         private OutageMessageMapper outageMessageMapper;
         private OutageLifecycleHelper outageLifecycleHelper;
-        private OutageModelReadAccessClient outageModelReadAccessClient;
-        private OutageModelAccessClient outageModelAccessClient;
+        private IOutageModelReadAccessContract outageModelReadAccessClient;
+        private IOutageAccessContract outageModelAccessClient;
         public ValidateResolveConditionsService()
         {
             this.outageMessageMapper = new OutageMessageMapper();
@@ -44,6 +46,7 @@ namespace OMS.OutageLifecycleServiceImplementation
         }
         public async Task<bool> ValidateResolveConditions(long outageId)
 		{
+            Logger.LogDebug("ValidateResolveConditions method started.");
             await InitAwaitableFields();
             OutageEntity outageDbEntity = null;
 

@@ -128,6 +128,10 @@
       <Project>{5B775779-A5AE-4F94-90EC-59973FA80D4D}</Project>
       <Name>Common.PubSub</Name>
     </ProjectReference>
+    <ProjectReference Include="..\Common\Contracts\Common.PubSubContracts\Common.PubSubContracts.csproj">
+      <Project>{AA75150D-EE56-49C0-9431-751F83CCC0CD}</Project>
+      <Name>Common.PubSubContracts</Name>
+    </ProjectReference>
   </ItemGroup>
   <Import Project="$(MSBuildToolsPath)\Microsoft.CSharp.targets" />
 </Project>

@@ -21,13 +21,13 @@ namespace OMS.Common.WcfClient.OMS.ModelAccess
         {
 
         }
-        public static EquipmentAccessClient CreateClient()
+        public static IEquipmentAccessContract CreateClient()
         {
             ClientFactory factory = new ClientFactory();
             return factory.CreateClient<EquipmentAccessClient, IEquipmentAccessContract>(microserviceName);
         }
 
-        public static EquipmentAccessClient CreateClient(Uri serviceUri, ServicePartitionKey servicePartitionKey)
+        public static IEquipmentAccessContract CreateClient(Uri serviceUri, ServicePartitionKey servicePartitionKey)
         {
             ClientFactory factory = new ClientFactory();
             return factory.CreateClient<EquipmentAccessClient, IEquipmentAccessContract>(serviceUri, servicePartitionKey);

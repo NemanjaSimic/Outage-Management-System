@@ -1,4 +1,5 @@
-﻿using Common.PubSub;
+﻿using Common.OmsContracts.ModelProvider;
+using Common.PubSub;
 using Common.PubSubContracts.DataContracts.EMAIL;
 using Microsoft.ServiceFabric.Data;
 using OMS.Common.Cloud;
@@ -46,7 +47,7 @@ namespace OMS.CallTrackingServiceImplementation
 
 		private ModelResourcesDesc modelResourcesDesc;
 
-		private OutageModelReadAccessClient outageModelReadAccessClient;
+		private IOutageModelReadAccessContract outageModelReadAccessClient;
 		private TrackingAlgorithm trackingAlgorithm;
 
 

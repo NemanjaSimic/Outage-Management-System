@@ -1,6 +1,8 @@
 ﻿using Common.CE;
 using Common.OMS;
 using Common.OMS.OutageDatabaseModel;
+using Common.OmsContracts.ModelAccess;
+using Common.OmsContracts.ModelProvider;
 using Common.OmsContracts.OutageLifecycle;
 using Common.OmsContracts.OutageSimulator;
 using OMS.Common.Cloud;
@@ -19,8 +21,8 @@ using System.Threading.Tasks;
 
 namespace OMS.OutageLifecycleServiceImplementation
 {
-	public class SendRepairCrewService : ISendRepairCrewContract
-	{
+    public class SendRepairCrewService : ISendRepairCrewContract
+    {
         private IOutageTopologyModel outageModel;
         private ICloudLogger logger;
 
@@ -33,18 +35,16 @@ namespace OMS.OutageLifecycleServiceImplementation
         private OutageLifecycleHelper outageLifecycleHelper;
 
 		#region MyRegion
-		private OutageModelReadAccessClient outageModelReadAccessClient;
-        private OutageModelAccessClient outageModelAccessClient;
+		private IOutageModelReadAccessContract outageModelReadAccessClient;
+        private IOutageAccessContract outageModelAccessClient;
 		#endregion
 
-        private ChannelFactory<IOutageSimulatorContract> channelFactory = new ChannelFactory<IOutageSimulatorContract>(EndpointNames.OmsOutageSimulatorEndpoint);
-        private IOutageSimulatorContract proxy;
         public SendRepairCrewService()
         {
             this.outageMessageMapper = new OutageMessageMapper();
             this.outageModelReadAccessClient = OutageModelReadAccessClient.CreateClient();
             this.outageModelAccessClient = OutageModelAccessClient.CreateClient();
-            this.proxy = channelFactory.CreateChannel();
+            
 
         }
         public async Task InitAwaitableFields()
@@ -53,7 +53,8 @@ namespace OMS.OutageLifecycleServiceImplementation
             this.outageLifecycleHelper = new OutageLifecycleHelper(this.outageModel);
         }
         public async Task<bool> SendRepairCrew(long outageId)
-		{
+        {
+            Logger.LogDebug("SendRepairCrew method started.");
             await InitAwaitableFields();
             OutageEntity outageDbEntity = null;
 
@@ -79,45 +80,33 @@ namespace OMS.OutageLifecycleServiceImplementation
                 Logger.LogError($"Outage with id 0x{outageId:X16} is in state {outageDbEntity.OutageState}, and thus repair crew can not be sent. (Expected state: {OutageState.ISOLATED})");
                 return false;
             }
-       
-            Task task = Task.Run(async () =>
+
+            await Task.Delay(10000);
+
+            IOutageSimulatorContract outageSimulatorClient = OutageSimulatorClient.CreateClient();
+            if (await outageSimulatorClient.StopOutageSimulation(outageDbEntity.OutageElementGid))
             {
-                Task.Delay(10000).Wait();
+                outageDbEntity.OutageState = OutageState.REPAIRED;
+                outageDbEntity.RepairedTime = DateTime.UtcNow;
+                await outageModelAccessClient.UpdateOutage(outageDbEntity);
 
-                
-                    if (proxy == null)
-                    {
-                        string message = "OutageModel::SendRepairCrew => OutageSimulatorServiceProxy is null";
-                        Logger.LogError(message);
-                        throw new NullReferenceException(message);
-                    }
-
-                if (proxy.StopOutageSimulation(outageDbEntity.OutageElementGid))
+                try
                 {
-                    outageDbEntity.OutageState = OutageState.REPAIRED;
-                    outageDbEntity.RepairedTime = DateTime.UtcNow;
-                    
-
-                    try
-                    {
-                        await outageModelAccessClient.UpdateOutage(outageDbEntity);
-                        await outageLifecycleHelper.PublishOutage(Topic.ACTIVE_OUTAGE, outageMessageMapper.MapOutageEntity(outageDbEntity));
-                    }
-                    catch (Exception e)
-                    {
-                        string message = "OutageModel::SendRepairCrew => exception in Complete method.";
-                        Logger.LogError(message, e);
-                    }
+                    await outageLifecycleHelper.PublishOutage(Topic.ACTIVE_OUTAGE, outageMessageMapper.MapOutageEntity(outageDbEntity));
                 }
-                else
+                catch (Exception e)
                 {
-                    string message = "OutageModel::SendRepairCrew => ResolvedOutage() not finished with SUCCESS";
-                    Logger.LogError(message);
+                    string message = "OutageModel::SendRepairCrew => exception in Complete method.";
+                    Logger.LogError(message, e);
                 }
-                
-            });
+            }
+            else
+            {
+                string message = "OutageModel::SendRepairCrew => ResolvedOutage() not finished with SUCCESS";
+                Logger.LogError(message);
+            }
 
             return true;
         }
-	}
+    }
 }

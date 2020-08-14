@@ -165,7 +165,7 @@
       <Name>Common.NmsContracts</Name>
     </ProjectReference>
     <ProjectReference Include="..\CIMParser\CIMParser.csproj">
-      <Project>{3C03A41C-BE4C-40A8-97D5-5DBAC0C34102}</Project>
+      <Project>{3c03a41c-be4c-40a8-97d5-5dbac0c34102}</Project>
       <Name>CIMParser</Name>
     </ProjectReference>
   </ItemGroup>

@@ -1,5 +1,6 @@
 ﻿using Common.CE.Interfaces;
 using Common.CeContracts;
+using Common.CeContracts.ModelProvider;
 using Common.OMS.OutageModel;
 using OMS.Common.Cloud.Logger;
 using OMS.Common.NmsContracts;
@@ -14,8 +15,8 @@ namespace CE.TopologyProviderImplementation
 {
 	public class TopologyConverter : ITopologyConverterContract
     {
-        private readonly MeasurementProviderClient measurementProviderClient;
-        private readonly ModelProviderClient modelProviderClient;
+        private readonly IMeasurementProviderContract measurementProviderClient;
+        private readonly IModelProviderContract modelProviderClient;
 
         private readonly string baseLogString;
 

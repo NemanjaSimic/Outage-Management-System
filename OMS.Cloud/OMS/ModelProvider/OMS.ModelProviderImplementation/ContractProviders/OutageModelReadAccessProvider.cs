@@ -4,6 +4,7 @@ using Common.OmsContracts.ModelProvider;
 using Microsoft.ServiceFabric.Data;
 using Microsoft.ServiceFabric.Data.Notifications;
 using OMS.Common.Cloud;
+using OMS.Common.Cloud.Logger;
 using OMS.Common.Cloud.ReliableCollectionHelpers;
 using OMS.Common.PubSub;
 using System;
@@ -22,6 +23,12 @@ namespace OMS.ModelProviderImplementation.ContractProviders
         private bool isCommandedElementsInitialized = false;
         private bool isOptimumIsolatioPointsInitialized = false;
         private bool isPotentialOutageInitialized = false;
+        private ICloudLogger logger;
+
+        private ICloudLogger Logger
+        {
+            get { return logger ?? (logger = CloudLoggerFactory.GetLogger()); }
+        }
 
         private ReliableDictionaryAccess<long, IOutageTopologyModel> topologyModel;
 
@@ -98,6 +105,7 @@ namespace OMS.ModelProviderImplementation.ContractProviders
         #region IOutageModelReadAccessContract Implementation
         public async Task<Dictionary<long, long>> GetCommandedElements()
         {
+            Logger.LogDebug("GetCommandedElements method started.");
             while (!ReliableDictionariesInitialized)
             {
                 await Task.Delay(1000);
@@ -107,6 +115,7 @@ namespace OMS.ModelProviderImplementation.ContractProviders
 
         public async Task<Dictionary<long, long>> GetOptimumIsolatioPoints()
         {
+            Logger.LogDebug("GetOptimumIsolatioPoints method started.");
             while (!ReliableDictionariesInitialized)
             {
                 await Task.Delay(1000);
@@ -116,6 +125,7 @@ namespace OMS.ModelProviderImplementation.ContractProviders
 
         public async Task<Dictionary<long, CommandOriginType>> GetPotentialOutage()
         {
+            Logger.LogDebug("GetPotentialOutage method started.");
             while (!ReliableDictionariesInitialized)
             {
                 await Task.Delay(1000);
@@ -125,6 +135,7 @@ namespace OMS.ModelProviderImplementation.ContractProviders
 
         public async Task<IOutageTopologyModel> GetTopologyModel()
         {
+            Logger.LogDebug("GetTopologyModel method started.");
             while (!ReliableDictionariesInitialized)
             {
                 await Task.Delay(1000);
@@ -135,6 +146,7 @@ namespace OMS.ModelProviderImplementation.ContractProviders
 
         public async Task<IOutageTopologyElement> GetElementById(long gid)
         {
+            Logger.LogDebug("GetElementById method started.");
             while (!ReliableDictionariesInitialized)
 			{
                 await Task.Delay(1000);

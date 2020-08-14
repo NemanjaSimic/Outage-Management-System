@@ -25,7 +25,7 @@ namespace OMS.CallTrackingService
 	{
 		private readonly CallTracker callTracker;
 
-		private readonly RegisterSubscriberClient registerSubscriberClient;
+		private readonly IRegisterSubscriberContract registerSubscriberClient;
 
 		private ICloudLogger logger;
 		private ICloudLogger Logger

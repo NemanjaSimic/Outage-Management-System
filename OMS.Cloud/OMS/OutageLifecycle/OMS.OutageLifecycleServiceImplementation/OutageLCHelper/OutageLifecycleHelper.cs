@@ -1,10 +1,12 @@
 ﻿using Common.OMS.OutageDatabaseModel;
+using Common.OmsContracts.ModelAccess;
 using Common.PubSubContracts.DataContracts.OMS;
 using OMS.Common.Cloud;
 using OMS.Common.Cloud.Logger;
 using OMS.Common.NmsContracts;
 using OMS.Common.NmsContracts.GDA;
 using OMS.Common.PubSub;
+using OMS.Common.PubSubContracts;
 using OMS.Common.WcfClient.NMS;
 using OMS.Common.WcfClient.OMS.ModelAccess;
 using OMS.Common.WcfClient.PubSub;
@@ -18,13 +20,14 @@ namespace OMS.OutageLifecycleServiceImplementation.OutageLCHelper
 	public class OutageLifecycleHelper
     {
         private IOutageTopologyModel outageTopology;
-        private ICloudLogger logger;
-        public static ModelResourcesDesc modelResourcesDesc = new ModelResourcesDesc();
-        private NetworkModelGdaClient networkModelGdaClient;
-        private EquipmentAccessClient equipmentAccessClient;
-        private ConsumerAccessClient consumerAccessClient;
-        private PublisherClient publisherClient;
         
+        public static ModelResourcesDesc modelResourcesDesc = new ModelResourcesDesc();
+        private IEquipmentAccessContract equipmentAccessClient;
+        private IConsumerAccessContract consumerAccessClient;
+        private INetworkModelGDAContract networkModelGdaClient;
+        private IPublisherContract publisherClient;
+
+        private ICloudLogger logger;
         private ICloudLogger Logger
         {
             get { return logger ?? (logger = CloudLoggerFactory.GetLogger()); }

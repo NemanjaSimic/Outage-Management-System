@@ -20,13 +20,13 @@ namespace OMS.Common.WcfClient.CE
 
 		}
 
-		public static TopologyConverterClient CreateClient()
+		public static ITopologyConverterContract CreateClient()
 		{
 			ClientFactory factory = new ClientFactory();
 			return factory.CreateClient<TopologyConverterClient, ITopologyConverterContract>(microserviceName);
 		}
 
-		public static TopologyConverterClient CreateClient(Uri serviceUri, ServicePartitionKey servicePartitionKey)
+		public static ITopologyConverterContract CreateClient(Uri serviceUri, ServicePartitionKey servicePartitionKey)
 		{
 			ClientFactory factory = new ClientFactory();
 			return factory.CreateClient<TopologyConverterClient, ITopologyConverterContract>(serviceUri, servicePartitionKey);

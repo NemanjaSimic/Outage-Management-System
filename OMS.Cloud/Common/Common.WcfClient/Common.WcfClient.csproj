@@ -112,12 +112,14 @@
     <Reference Include="WindowsBase" />
   </ItemGroup>
   <ItemGroup>
+    <Compile Include="OMS\Lifecycle\IsolateOutageClient.cs" />
     <Compile Include="OMS\Lifecycle\ReportOutageClient.cs" />
     <Compile Include="OMS\ModelAccess\ConsumerAccessClient.cs" />
     <Compile Include="OMS\ModelAccess\EquipmentAccessClient.cs" />
     <Compile Include="OMS\ModelAccess\OutageModelAccessClient.cs" />
     <Compile Include="OMS\OutageModelUpdateAccessClient.cs" />
     <Compile Include="OMS\HistoryDBManagerClient.cs" />
+    <Compile Include="OMS\OutageSimulatorClient.cs" />
     <Compile Include="OMS\ReportingClient.cs" />
     <Compile Include="OMS\ResolveOutageClient.cs" />
     <Compile Include="OMS\SendLocationIsolationCrewClient.cs" />
@@ -150,12 +152,17 @@
     <Compile Include="TMS\TransactionCoordinatorClient.cs" />
     <Compile Include="TMS\TransactionEnlistmentClient.cs" />
     <Compile Include="WcfSeviceFabricClientBase.cs" />
+    <Compile Include="WebAdapter\WebAdapterClient.cs" />
   </ItemGroup>
   <ItemGroup>
     <None Include="app.config" />
     <None Include="packages.config" />
   </ItemGroup>
   <ItemGroup>
+    <ProjectReference Include="..\..\..\Cloud.Web\Common\Contracts\Common.WebAdapterContracts\Common.WebAdapterContracts.csproj">
+      <Project>{A726658E-55CA-4F1B-BFF8-0E69816DEDAC}</Project>
+      <Name>Common.WebAdapterContracts</Name>
+    </ProjectReference>
     <ProjectReference Include="..\..\Common.OmsContracts\Common.OmsContracts.csproj">
       <Project>{7032AEF1-E55A-4D5C-90FF-E0B8B4C98BE0}</Project>
       <Name>Common.OmsContracts</Name>

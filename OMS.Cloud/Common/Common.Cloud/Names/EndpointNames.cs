@@ -59,6 +59,8 @@ namespace OMS.Common.Cloud.Names
         public const string OmsOutageManagmenetServiceModelUpdateAccessEndpoint = "OmsOutageManagmenetServiceModelUpdateAccessEndpoint";
         public const string OmsOutageSimulatorEndpoint = "OmsOutageSimulatorEndpoint";
         public const string OmsIsolateOutageEndpoint = "OmsIsolateOutageEndpoint";
+
+        public const string WebAdapterEndpoint = "WebAdapterEndpoint";
     }
 }
 

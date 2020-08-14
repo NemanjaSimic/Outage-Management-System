@@ -146,11 +146,11 @@
         <UniformInt64Partition PartitionCount="[OMS.HistoryDBManagerService_PartitionCount]" LowKey="-9223372036854775808" HighKey="9223372036854775807" />
       </StatefulService>
     </Service>
-    <Service Name="OMS.EmailService" ServicePackageActivationMode="ExclusiveProcess">
+    <!--<Service Name="OMS.EmailService" ServicePackageActivationMode="ExclusiveProcess">
       <StatelessService ServiceTypeName="OMS.EmailServiceType" InstanceCount="[OMS.EmailService_InstanceCount]">
         <SingletonPartition />
       </StatelessService>
-    </Service>
+    </Service>-->
     <Service Name="OMS.CallTrackingService" ServicePackageActivationMode="ExclusiveProcess">
       <StatefulService ServiceTypeName="OMS.CallTrackingServiceType" TargetReplicaSetSize="[OMS.CallTrackingService_TargetReplicaSetSize]" MinReplicaSetSize="[OMS.CallTrackingService_MinReplicaSetSize]">
         <UniformInt64Partition PartitionCount="[OMS.CallTrackingService_PartitionCount]" LowKey="-9223372036854775808" HighKey="9223372036854775807" />

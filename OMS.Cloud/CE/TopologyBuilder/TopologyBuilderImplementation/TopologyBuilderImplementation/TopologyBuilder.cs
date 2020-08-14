@@ -1,6 +1,7 @@
 ﻿using Common.CE;
 using Common.CE.Interfaces;
 using Common.CeContracts;
+using Common.CeContracts.ModelProvider;
 using OMS.Common.Cloud;
 using OMS.Common.Cloud.Logger;
 using OMS.Common.NmsContracts;
@@ -25,7 +26,7 @@ namespace CE.TopologyBuilderImplementation
 
         private readonly string baseLogString;
 
-        private readonly ModelProviderClient modelProviderClient;
+        private readonly IModelProviderContract modelProviderClient;
 
         private ICloudLogger logger;
         private ICloudLogger Logger

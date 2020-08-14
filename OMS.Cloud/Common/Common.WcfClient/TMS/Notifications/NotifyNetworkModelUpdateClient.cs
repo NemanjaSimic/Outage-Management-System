@@ -20,13 +20,13 @@ namespace OMS.Common.WcfClient.TMS
         {
         }
 
-        public static NotifyNetworkModelUpdateClient CreateClient(string serviceName)
+        public static INotifyNetworkModelUpdateContract CreateClient(string serviceName)
         {
             ClientFactory factory = new ClientFactory();
             return factory.CreateClient<NotifyNetworkModelUpdateClient, INotifyNetworkModelUpdateContract>(serviceName);
         }
 
-        public static NotifyNetworkModelUpdateClient CreateClient(Uri serviceUri, ServicePartitionKey servicePartitionKey)
+        public static INotifyNetworkModelUpdateContract CreateClient(Uri serviceUri, ServicePartitionKey servicePartitionKey)
         {
             ClientFactory factory = new ClientFactory();
             return factory.CreateClient<NotifyNetworkModelUpdateClient, INotifyNetworkModelUpdateContract>(serviceUri, servicePartitionKey);

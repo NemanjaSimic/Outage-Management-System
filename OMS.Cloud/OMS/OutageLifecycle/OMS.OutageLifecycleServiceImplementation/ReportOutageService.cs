@@ -13,6 +13,9 @@ using OMS.OutageLifecycleServiceImplementation.OutageLCHelper;
 using Common.CE;
 using OMS.Common.PubSub;
 using OMS.Common.WcfClient.OMS.ModelAccess;
+using Common.OmsContracts.ModelProvider;
+using Common.OmsContracts.HistoryDBManager;
+using Common.OmsContracts.ModelAccess;
 
 namespace OMS.OutageLifecycleServiceImplementation
 {
@@ -26,9 +29,9 @@ namespace OMS.OutageLifecycleServiceImplementation
         private Dictionary<long, long> OptimumIsolationPoints;
 
         #region Clients
-        private OutageModelReadAccessClient outageModelReadAccessClient;
-        private HistoryDBManagerClient historyDBManagerClient;
-        private OutageModelAccessClient outageModelAccessClient;
+        private IOutageModelReadAccessContract outageModelReadAccessClient;
+        private IHistoryDBManagerContract historyDBManagerClient;
+        private IOutageAccessContract outageModelAccessClient;
         #endregion
 
         private ICloudLogger logger;
@@ -57,6 +60,7 @@ namespace OMS.OutageLifecycleServiceImplementation
         }
         public async Task<bool> ReportPotentialOutage(long gid, CommandOriginType commandOriginType)
         {
+            Logger.LogDebug("ReportPotentialOutage method started.");
             await InitAwaitableFields();
             bool success = false;
             List<long> affectedConsumersIds = new List<long>();

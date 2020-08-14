@@ -3,6 +3,7 @@ using Common.OmsContracts.ModelProvider;
 using Microsoft.ServiceFabric.Data;
 using Microsoft.ServiceFabric.Data.Notifications;
 using OMS.Common.Cloud;
+using OMS.Common.Cloud.Logger;
 using OMS.Common.Cloud.ReliableCollectionHelpers;
 using OMS.Common.PubSub;
 using System;
@@ -20,6 +21,13 @@ namespace OMS.ModelProviderImplementation.ContractProviders
         private bool isCommandedElementsInitialized = false;
         private bool isOptimumIsolatioPointsInitialized = false;
         private bool isPotentialOutageInitialized = false;
+
+        private ICloudLogger logger;
+
+        private ICloudLogger Logger
+        {
+            get { return logger ?? (logger = CloudLoggerFactory.GetLogger()); }
+        }
 
         private ReliableDictionaryAccess<long, long> commandedElements;
 
@@ -90,6 +98,7 @@ namespace OMS.ModelProviderImplementation.ContractProviders
 
         public async Task UpdateCommandedElements(long gid, ModelUpdateOperationType modelUpdateOperationType)
         {
+            Logger.LogDebug("UpdateCommandedElements method started.");
             while (!ReliableDictionariesInitialized)
             {
                 await Task.Delay(1000);
@@ -115,6 +124,7 @@ namespace OMS.ModelProviderImplementation.ContractProviders
 
         public async Task UpdateOptimumIsolationPoints(long gid, ModelUpdateOperationType modelUpdateOperationType)
         {
+            Logger.LogDebug("UpdateOptimumIsolationPoints method started.");
             while (!ReliableDictionariesInitialized)
             {
                 await Task.Delay(1000);
@@ -140,6 +150,7 @@ namespace OMS.ModelProviderImplementation.ContractProviders
 
         public async Task UpdatePotentialOutage(long gid , CommandOriginType commandOriginType, ModelUpdateOperationType modelUpdateOperationType)
         {
+            Logger.LogDebug("UpdatePotentialOutage method started.");
             while (!ReliableDictionariesInitialized)
             {
                 await Task.Delay(1000);
@@ -164,6 +175,7 @@ namespace OMS.ModelProviderImplementation.ContractProviders
 
         public async Task UpdateTopologyModel(IOutageTopologyModel outageTopologyModel)
 		{
+            Logger.LogDebug("UpdateTopologyModel method started.");
             while (!ReliableDictionariesInitialized)
             {
                 await Task.Delay(1000);

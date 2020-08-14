@@ -1,10 +1,10 @@
-﻿namespace OMS.Web.Adapter.Contracts
-{
-    using OMS.Web.UI.Models.ViewModels;
-    using Outage.Common.PubSub.SCADADataContract;
-    using System.Collections.Generic;
-    using System.ServiceModel;
+﻿using Common.Web.UI.Models.ViewModels;
+using OMS.Common.PubSubContracts.DataContracts.SCADA;
+using System.Collections.Generic;
+using System.ServiceModel;
 
+namespace OMS.Web.Adapter.Contracts
+{
     [ServiceContract]
     public interface IWebService
     {

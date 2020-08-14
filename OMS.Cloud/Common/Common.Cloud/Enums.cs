@@ -69,6 +69,9 @@ namespace OMS.Common.Cloud
 
         [EnumMember]
         STATELESS_SERVICE = 2,
+
+        [EnumMember]
+        STANDALONE_SERVICE = 3,
     }
 
     //SCADA

@@ -1,5 +1,6 @@
 ﻿using Common.OMS;
 using Common.OMS.OutageDatabaseModel;
+using Common.OmsContracts.ModelAccess;
 using Common.OmsContracts.OutageLifecycle;
 using OMS.Common.Cloud;
 using OMS.Common.Cloud.Logger;
@@ -24,7 +25,7 @@ namespace OMS.OutageLifecycleServiceImplementation
 		}
 		private OutageLifecycleHelper lifecycleHelper;
         private OutageMessageMapper outageMessageMapper;
-        private OutageModelAccessClient outageModelAccessClient;
+        private IOutageAccessContract outageModelAccessClient;
         public ResolveOutageService()
         {
 			this.lifecycleHelper = new OutageLifecycleHelper(null);
@@ -34,6 +35,7 @@ namespace OMS.OutageLifecycleServiceImplementation
 
 		public async Task<bool> ResolveOutage(long outageId)
 		{
+            Logger.LogDebug("ResolveOutage method started.");
             OutageEntity activeOutageDbEntity = null;
 
             try

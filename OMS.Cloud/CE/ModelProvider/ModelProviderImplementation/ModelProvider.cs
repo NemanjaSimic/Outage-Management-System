@@ -2,6 +2,7 @@
 using Common.CE.Interfaces;
 using Common.CeContracts;
 using Common.CeContracts.ModelProvider;
+using Common.CeContracts.TopologyProvider;
 using Microsoft.ServiceFabric.Data;
 using Microsoft.ServiceFabric.Data.Notifications;
 using OMS.Common.Cloud.Logger;
@@ -39,8 +40,8 @@ namespace CE.ModelProviderImplementation
         private bool isEnergySourceCacheInitialized = false;
         private bool isRecloserCacheInitialized = false;
 
-        private readonly TopologyProviderClient topologyProviderClient;
-        private readonly MeasurementProviderClient measurementProviderClient;
+        private readonly ITopologyProviderContract topologyProviderClient;
+        private readonly IMeasurementProviderContract measurementProviderClient;
 
 
         private readonly string baseLogString;
@@ -131,8 +132,13 @@ namespace CE.ModelProviderImplementation
             }
         }
 
-        private async Task<IModelDelta> ImportDataInCache()
+        public async Task<IModelDelta> ImportDataInCache()
         {
+            while (!AreReliableDictionariesInitialized)
+            {
+                await Task.Delay(1000);
+            }
+
             IModelDelta modelDelta = await modelManager.TryGetAllModelEntitiesAsync();
 
             await ElementCache.SetAsync((short)TransactionFlag.NoTransaction, modelDelta.TopologyElements);

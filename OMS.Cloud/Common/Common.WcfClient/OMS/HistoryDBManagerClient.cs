@@ -19,13 +19,13 @@ namespace OMS.Common.WcfClient.OMS
         {
 
         }
-        public static HistoryDBManagerClient CreateClient()
+        public static IHistoryDBManagerContract CreateClient()
         {
             ClientFactory factory = new ClientFactory();
             return factory.CreateClient<HistoryDBManagerClient, IHistoryDBManagerContract>(microserviceName);
         }
 
-        public static HistoryDBManagerClient CreateClient(Uri serviceUri, ServicePartitionKey servicePartitionKey)
+        public static IHistoryDBManagerContract CreateClient(Uri serviceUri, ServicePartitionKey servicePartitionKey)
         {
             ClientFactory factory = new ClientFactory();
             return factory.CreateClient<HistoryDBManagerClient, IHistoryDBManagerContract>(serviceUri, servicePartitionKey);

@@ -19,13 +19,13 @@ namespace OMS.Common.WcfClient.CE
 
 		}
 
-		public static MeasurementMapServiceClient CreateClient()
+		public static IMeasurementMapContract CreateClient()
 		{
 			ClientFactory factory = new ClientFactory();
 			return factory.CreateClient<MeasurementMapServiceClient, IMeasurementMapContract>(microserviceName);
 		}
 
-		public static MeasurementMapServiceClient CreateClient(Uri serviceUri, ServicePartitionKey servicePartitionKey)
+		public static IMeasurementMapContract CreateClient(Uri serviceUri, ServicePartitionKey servicePartitionKey)
 		{
 			ClientFactory factory = new ClientFactory();
 			return factory.CreateClient<MeasurementMapServiceClient, IMeasurementMapContract>(serviceUri, servicePartitionKey);

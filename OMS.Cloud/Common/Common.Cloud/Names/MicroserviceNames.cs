@@ -25,6 +25,12 @@
         public const string OmsEmailService = "OmsEmailService";
 
 
+        public const string OmsReportingService = "OmsReportingService";
+        public const string OmsOutageSimulatorService = "OmsOutageSimulatorService";
+
+        //WEB
+        public const string WebAdapterService = "WebAdapterService";
+        
         //CE
         public const string CeModelProviderService = "CeModelProviderService";
         public const string CeTopologyProviderService = "CeTopologyProviderService";

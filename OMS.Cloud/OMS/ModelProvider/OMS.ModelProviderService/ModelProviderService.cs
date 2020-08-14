@@ -35,7 +35,7 @@ namespace OMS.ModelProviderService
             get { return logger ?? (logger = CloudLoggerFactory.GetLogger()); }
         }
 
-        private readonly RegisterSubscriberClient registerSubscriberClient;
+        private readonly IRegisterSubscriberContract registerSubscriberClient;
 
         public ModelProviderService(StatefulServiceContext context)
             : base(context)

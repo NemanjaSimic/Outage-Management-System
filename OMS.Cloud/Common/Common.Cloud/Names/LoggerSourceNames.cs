@@ -27,12 +27,14 @@
         public const string OmsOutageLifecycleSerivice = "OMS.OutageLifecycleService";
         public const string OmsEmailService = "OMS.EmailService";
 
-
         //CE
         public const string CeLoadFlowService = "CE.LoadFlowService";
         public const string CeModelProviderService = "CE.ModelProviderService";
         public const string CeMeasurementProviderService = "CE.MeasurementProviderService";
         public const string CeTopologyProviderService = "CE.TopologyProviderService";
         public const string CeTopologyBuilderService = "CE.TopologyBuilderService";
+
+        //WEB
+        public const string WebAdapterService = "WebAdapterService";
     }
 }
