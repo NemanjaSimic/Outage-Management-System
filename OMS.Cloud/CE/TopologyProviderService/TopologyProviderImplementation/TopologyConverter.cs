@@ -123,7 +123,7 @@ namespace CE.TopologyProviderImplementation
                         }
                         else
                         {
-                            Logger.LogError($"{baseLogString} ConvertTopologyToUIModel => Measurement with GID {measurementGid:X16} does not exist.");
+                            Logger.LogWarning($"{baseLogString} ConvertTopologyToUIModel => Measurement with GID {measurementGid:X16} does not exist.");
                         }
                     }
 
@@ -228,7 +228,7 @@ namespace CE.TopologyProviderImplementation
                         }
                         else
                         {
-                            Logger.LogError($"{baseLogString} ConvertTopologyToOMSModel => Measurement provider client returned null.");
+                            Logger.LogWarning($"{baseLogString} ConvertTopologyToOMSModel => Measurement provider client returned null for measurement GID {measurementGid:X16}.");
                         }
                     }
 

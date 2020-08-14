@@ -5,7 +5,8 @@ using System.Runtime.Serialization;
 namespace Common.PubSubContracts.DataContracts.CE.UIModels
 {
 	//[Serializable]
-	[DataContract]
+	[DataContract(IsReference = true)]
+	[KnownType(typeof(UIMeasurement))]
 	public class UINode : IUINode
 	{
 		[DataMember]

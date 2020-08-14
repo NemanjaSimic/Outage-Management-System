@@ -5,6 +5,7 @@ using Common.CeContracts.ModelProvider;
 using Common.CeContracts.TopologyProvider;
 using Common.PubSubContracts.DataContracts.CE;
 using Common.PubSubContracts.DataContracts.CE.Interfaces;
+using Common.PubSubContracts.DataContracts.CE.UIModels;
 using Microsoft.ServiceFabric.Data;
 using Microsoft.ServiceFabric.Data.Notifications;
 using OMS.Common.Cloud;
@@ -62,11 +63,11 @@ namespace CE.TopologyProviderImplementation
         private ReliableDictionaryAccess<long, TopologyModel> topologyCache;
         public ReliableDictionaryAccess<long, TopologyModel> TopologyCache { get => topologyCache; }
 
-        private ReliableDictionaryAccess<long, IUIModel> topologyCacheUI;
-        public ReliableDictionaryAccess<long, IUIModel> TopologyCacheUI { get => topologyCacheUI; }
+        private ReliableDictionaryAccess<long, UIModel> topologyCacheUI;
+        public ReliableDictionaryAccess<long, UIModel> TopologyCacheUI { get => topologyCacheUI; }
 
-        private ReliableDictionaryAccess<long, IOutageTopologyModel> topologyCacheOMS;
-        public ReliableDictionaryAccess<long, IOutageTopologyModel> TopologyCacheOMS { get => topologyCacheOMS; }
+        private ReliableDictionaryAccess<long, OutageTopologyModel> topologyCacheOMS;
+        public ReliableDictionaryAccess<long, OutageTopologyModel> TopologyCacheOMS { get => topologyCacheOMS; }
 
         public TopologyProvider(IReliableStateManager stateManager)
         {
@@ -109,7 +110,7 @@ namespace CE.TopologyProviderImplementation
                 }
                 else if (reliableStateName == ReliableDictionaryNames.TopologyCacheUI)
                 {
-                    topologyCacheUI = await ReliableDictionaryAccess<long, IUIModel>.Create(stateManager, ReliableDictionaryNames.TopologyCacheUI);
+                    topologyCacheUI = await ReliableDictionaryAccess<long, UIModel>.Create(stateManager, ReliableDictionaryNames.TopologyCacheUI);
                     this.isTopologyCacheUIInitialized = true;
 
                     string debugMessage = $"{baseLogString} OnStateManagerChangedHandler => '{ReliableDictionaryNames.TopologyCacheUI}' ReliableDictionaryAccess initialized.";
@@ -117,7 +118,7 @@ namespace CE.TopologyProviderImplementation
                 }
                 else if (reliableStateName == ReliableDictionaryNames.TopologyCacheOMS)
                 {
-                    topologyCacheOMS = await ReliableDictionaryAccess<long, IOutageTopologyModel>.Create(stateManager, ReliableDictionaryNames.TopologyCacheOMS);
+                    topologyCacheOMS = await ReliableDictionaryAccess<long, OutageTopologyModel>.Create(stateManager, ReliableDictionaryNames.TopologyCacheOMS);
                     this.isTopologyCacheOMSInitialized = true;
 
                     string debugMessage = $"{baseLogString} OnStateManagerChangedHandler => '{ReliableDictionaryNames.TopologyCacheOMS}' ReliableDictionaryAccess initialized.";
@@ -199,13 +200,14 @@ namespace CE.TopologyProviderImplementation
             if (roots.Count == 0)
             {
                 string message = $"{baseLogString} CreateTopology => GetEnergySources returned 0 energy sources.";
-                Logger.LogError(message);
-                throw new Exception(message);
+                Logger.LogWarning(message);
+                //throw new Exception(message);
+                return new TopologyModel();
             }
             else if(roots.Count > 1)
             {
                 string message = $"{baseLogString} CreateTopology => GetEnergySources returned more then one energy sources. First will be considered.";
-                Logger.LogError(message);
+                Logger.LogWarning(message);
             }
 
             long energySourceGid = roots.First();
@@ -382,7 +384,7 @@ namespace CE.TopologyProviderImplementation
                 await Task.Delay(1000);
             }
 
-            ConditionalValue<IOutageTopologyModel>  omsModel;
+            ConditionalValue<OutageTopologyModel>  omsModel;
 
             if (await TopologyCacheOMS.ContainsKeyAsync(1))
             {
@@ -409,7 +411,7 @@ namespace CE.TopologyProviderImplementation
                 await Task.Delay(1000);
             }
 
-            ConditionalValue<IUIModel> uiModel;
+            ConditionalValue<UIModel> uiModel;
 
             if (await TopologyCacheUI.ContainsKeyAsync(1))
             {
@@ -433,7 +435,7 @@ namespace CE.TopologyProviderImplementation
         {
             ITopology topology = await GetTopologyFromCache(TopologyType.NoSpecific);
             IUIModel newUIModel = await topologyConverterClient.ConvertTopologyToUIModel(topology);
-            await TopologyCacheUI.SetAsync(1, newUIModel);
+            await TopologyCacheUI.SetAsync(1, (UIModel)newUIModel);
 
             await PublishUIModel(newUIModel);
 
@@ -443,7 +445,7 @@ namespace CE.TopologyProviderImplementation
         {
             ITopology topology = await GetTopologyFromCache(TopologyType.NoSpecific);
             IOutageTopologyModel newOmsModel = await topologyConverterClient.ConvertTopologyToOMSModel(topology);
-            await TopologyCacheOMS.SetAsync(1, newOmsModel);
+            await TopologyCacheOMS.SetAsync(1, (OutageTopologyModel)newOmsModel);
 
             await PublishOMSModel(newOmsModel);
 

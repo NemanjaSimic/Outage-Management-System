@@ -17,15 +17,17 @@ namespace Common.CeContracts
 	[ServiceKnownType(typeof(Recloser))]
 	[ServiceKnownType(typeof(SynchronousMachine))]
 	[ServiceKnownType(typeof(TopologyElement))]
+	[ServiceKnownType(typeof(OutageTopologyModel))]
+	[ServiceKnownType(typeof(OutageTopologyElement))]
+	[ServiceKnownType(typeof(UIModel))]
+	[ServiceKnownType(typeof(UIMeasurement))]
+	[ServiceKnownType(typeof(UINode))]
 	public interface ITopologyConverterContract : IService, IHealthChecker
 	{
 		[OperationContract]
-		[ServiceKnownType(typeof(OutageTopologyModel))]
-		[ServiceKnownType(typeof(OutageTopologyElement))]
 		Task<IOutageTopologyModel> ConvertTopologyToOMSModel(ITopology topology);
 
 		[OperationContract]
-		[ServiceKnownType(typeof(UIModel))]
 		Task<IUIModel> ConvertTopologyToUIModel(ITopology topology);
 	}
 }
