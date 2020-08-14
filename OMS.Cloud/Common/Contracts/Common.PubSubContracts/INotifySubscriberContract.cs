@@ -5,6 +5,7 @@ using System.Threading.Tasks;
 using Common.PubSubContracts.DataContracts.EMAIL;
 using Common.CloudContracts;
 using OMS.Common.PubSubContracts.Interfaces;
+using Common.PubSubContracts.DataContracts.CE;
 
 namespace OMS.Common.PubSubContracts
 {
@@ -12,16 +13,16 @@ namespace OMS.Common.PubSubContracts
     public interface INotifySubscriberContract: IService, IHealthChecker
     {
         [OperationContract]
-        //[ServiceKnownType(typeof(CalculationEngineMessage))]
-        //[ServiceKnownType(typeof(CalculationEnginePublication))]
-        //[ServiceKnownType(typeof(TopologyForUIMessage))]
+        [ServiceKnownType(typeof(CalculationEngineMessage))]
+        [ServiceKnownType(typeof(CalculationEnginePublication))]
+        [ServiceKnownType(typeof(TopologyForUIMessage))]
         [ServiceKnownType(typeof(EmailServiceMessage))]
         [ServiceKnownType(typeof(EmailToOutageMessage))]
         //[ServiceKnownType(typeof(OMSModelMessage))]
         //[ServiceKnownType(typeof(ActiveOutageMessage))]
         //[ServiceKnownType(typeof(ArchivedOutageMessage))]
-        //[ServiceKnownType(typeof(OutageTopologyModel))]
-        //[ServiceKnownType(typeof(OutageTopologyElement))]  
+        [ServiceKnownType(typeof(OutageTopologyModel))]
+        [ServiceKnownType(typeof(OutageTopologyElement))]
         [ServiceKnownType(typeof(SingleAnalogValueSCADAMessage))]
         [ServiceKnownType(typeof(MultipleAnalogValueSCADAMessage))]
         [ServiceKnownType(typeof(SingleDiscreteValueSCADAMessage))]

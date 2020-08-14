@@ -4,7 +4,7 @@ using System.Runtime.Serialization;
 
 namespace Common.PubSubContracts.DataContracts.CE
 {
-    [DataContract]
+    [DataContract(IsReference = true)]
     public class OutageTopologyElement : IOutageTopologyElement
     {
         #region Fields

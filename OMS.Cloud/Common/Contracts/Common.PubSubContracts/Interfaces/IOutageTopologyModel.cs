@@ -1,4 +1,6 @@
-﻿using System.Collections.Generic;
+﻿using Common.PubSubContracts.DataContracts.CE;
+using System.Collections.Generic;
+using System.ServiceModel;
 
 namespace OMS.Common.PubSubContracts.Interfaces
 {
@@ -7,6 +9,8 @@ namespace OMS.Common.PubSubContracts.Interfaces
     public delegate void SwitchOpened(long elementId, long? outageId);
     public delegate void ConsumersEnergized(HashSet<long> consumers);
 
+    [ServiceKnownType(typeof(OutageTopologyModel))]
+    [ServiceKnownType(typeof(OutageTopologyElement))]
     public interface IOutageTopologyModel
     {
         long FirstNode { get; set; }

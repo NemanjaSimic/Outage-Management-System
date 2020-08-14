@@ -69,8 +69,9 @@ namespace CE.LoadFlowImplementation
             if (topology == null)
             {
                 string message = $"{baseLogString} UpdateLoadFlow => Topology is null.";
-                Logger.LogError(message);
-                throw new Exception(message);
+                Logger.LogWarning(message);
+                //throw new Exception(message);
+                return topology;
             }
 
             await CalculateLoadFlow(topology, loadOfFeeders);
@@ -97,9 +98,9 @@ namespace CE.LoadFlowImplementation
 
                     if (signalGid != 0)
                     {
-                        Logger.LogDebug($"{baseLogString} UpdateLoadFlow => Calling SendDiscreteCommand method from measurement provider. Measurement GID {signalGid:X16}, Value {loadFeeder.Value}.");
+                        Logger.LogDebug($"{baseLogString} UpdateLoadFlow => Calling SendAnalogCommand method from measurement provider. Measurement GID {signalGid:X16}, Value {loadFeeder.Value}.");
                         await measurementProviderClient.SendAnalogCommand(signalGid, loadFeeder.Value, CommandOriginType.CE_COMMAND);
-                        Logger.LogDebug($"{baseLogString} UpdateLoadFlow => SendDiscreteCommand method from measurement provider successfully finished.");
+                        Logger.LogDebug($"{baseLogString} UpdateLoadFlow => SendAnalogCommand method from measurement provider successfully finished.");
 
                         AlarmType alarmType = (loadFeeder.Value >= 36) ? AlarmType.HIGH_ALARM : AlarmType.NO_ALARM;
 
@@ -646,7 +647,7 @@ namespace CE.LoadFlowImplementation
                 if (analogMeasurement == null)
                 {
                     string message = $"{baseLogString} GetMeasurements => GetAnalogMeasurement from measurement provider returned null for measurement GID {measurement.Key:X16}";
-                    Logger.LogError(message);
+                    Logger.LogWarning(message);
                     continue;
                 }
 

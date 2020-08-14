@@ -3,7 +3,7 @@ using System.Runtime.Serialization;
 
 namespace Common.PubSubContracts.DataContracts.CE.UIModels
 {
-	[DataContract]
+	[DataContract(IsReference = true)]
 	public class UIMeasurement : IUIMeasurement
 	{
 		[DataMember]

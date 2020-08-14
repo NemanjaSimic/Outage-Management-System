@@ -17,6 +17,8 @@ using ReliableDictionaryNames = Common.CE.ReliableDictionaryNames;
 using CE.TopologyProviderImplementation;
 using OMS.Common.PubSubContracts.Interfaces;
 using Common.PubSubContracts.DataContracts.CE.Interfaces;
+using Common.PubSubContracts.DataContracts.CE;
+using Common.PubSubContracts.DataContracts.CE.UIModels;
 
 namespace CE.TopologyProviderService
 {
@@ -138,7 +140,7 @@ namespace CE.TopologyProviderService
                 {
                     using (ITransaction tx = this.StateManager.CreateTransaction())
                     {
-                        var result = await StateManager.TryGetAsync<IReliableDictionary<long, IUIModel>>(ReliableDictionaryNames.TopologyCacheUI);
+                        var result = await StateManager.TryGetAsync<IReliableDictionary<long, UIModel>>(ReliableDictionaryNames.TopologyCacheUI);
                         if(result.HasValue)
                         {
                             var topologyCacheUI = result.Value;
@@ -147,7 +149,7 @@ namespace CE.TopologyProviderService
                         }
                         else
                         {
-                            await StateManager.GetOrAddAsync<IReliableDictionary<long, IUIModel>>(tx, ReliableDictionaryNames.TopologyCacheUI);
+                            await StateManager.GetOrAddAsync<IReliableDictionary<long, UIModel>>(tx, ReliableDictionaryNames.TopologyCacheUI);
                             await tx.CommitAsync();
                         }
                     }
@@ -156,7 +158,7 @@ namespace CE.TopologyProviderService
                 {
                     using (ITransaction tx = this.StateManager.CreateTransaction())
                     {
-                        var result = await StateManager.TryGetAsync<IReliableDictionary<long, IOutageTopologyModel>>(ReliableDictionaryNames.TopologyCacheOMS);
+                        var result = await StateManager.TryGetAsync<IReliableDictionary<long, OutageTopologyModel>>(ReliableDictionaryNames.TopologyCacheOMS);
                         if(result.HasValue)
                         {
                             var topologyCacheOMS = result.Value;
@@ -165,7 +167,7 @@ namespace CE.TopologyProviderService
                         }
                         else
                         {
-                            await StateManager.GetOrAddAsync<IReliableDictionary<long, IOutageTopologyModel>>(tx, ReliableDictionaryNames.TopologyCacheOMS);
+                            await StateManager.GetOrAddAsync<IReliableDictionary<long, OutageTopologyModel>>(tx, ReliableDictionaryNames.TopologyCacheOMS);
                             await tx.CommitAsync();
                         }
                     }

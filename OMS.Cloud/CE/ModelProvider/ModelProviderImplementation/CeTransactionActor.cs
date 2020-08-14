@@ -108,7 +108,9 @@ namespace CE.ModelProviderImplementation
             }
             catch (Exception ex)
             {
-                Logger.LogError($"{baseLogString} Commit => Exception: {ex.Message}", ex);
+                Logger.LogError($"{baseLogString} Commit => " +
+                    $"{Environment.NewLine} Exception: {ex.Message} " +
+                    $"{Environment.NewLine} Stack trace: {ex.StackTrace}", ex);
                 Logger.LogInformation($"{baseLogString} Commit => Commit on CE Transaction actor UNSUCCESSFULLY finished.");
             }
         }

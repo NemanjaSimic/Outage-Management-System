@@ -6,7 +6,8 @@ using System.Runtime.Serialization;
 namespace Common.PubSubContracts.DataContracts.CE.UIModels
 {
     [DataContract(IsReference = true)]
-    [KnownType(typeof(UIModel))]
+    [KnownType(typeof(UINode))]
+    [KnownType(typeof(UIMeasurement))]
     public class UIModel : IUIModel
     {
         [DataMember]

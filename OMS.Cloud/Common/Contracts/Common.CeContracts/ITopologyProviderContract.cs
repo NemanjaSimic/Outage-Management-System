@@ -10,6 +10,8 @@ using System.Threading.Tasks;
 namespace Common.CeContracts.TopologyProvider
 {
     [ServiceContract]
+    [ServiceKnownType(typeof(OutageTopologyModel))]
+    [ServiceKnownType(typeof(OutageTopologyElement))]
     public interface ITopologyProviderContract : IService, IHealthChecker
     {
         [OperationContract]
@@ -44,6 +46,8 @@ namespace Common.CeContracts.TopologyProvider
 
         [OperationContract]
         [ServiceKnownType(typeof(UIModel))]
+        [ServiceKnownType(typeof(UIMeasurement))]
+	    [ServiceKnownType(typeof(UINode))]
         Task<IUIModel> GetUIModel();
 
         [OperationContract]
