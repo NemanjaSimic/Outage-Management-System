@@ -1,4 +1,5 @@
-﻿using OMS.Common.PubSubContracts.Interfaces;
+﻿using Common.PubSubContracts.DataContracts.CE.Interfaces;
+using OMS.Common.PubSubContracts.Interfaces;
 using System.Collections.Generic;
 
 namespace Common.CeContracts

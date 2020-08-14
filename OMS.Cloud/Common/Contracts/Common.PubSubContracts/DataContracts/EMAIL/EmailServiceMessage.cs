@@ -7,6 +7,7 @@ namespace Common.PubSubContracts.DataContracts.EMAIL
     public abstract class EmailServiceMessage : IPublishableMessage
     {
     }
+
     [DataContract]
     public class EmailToOutageMessage : EmailServiceMessage
     {
@@ -15,6 +16,7 @@ namespace Common.PubSubContracts.DataContracts.EMAIL
         {
             this.Gid = Gid;
         }
+
         [DataMember]
         public long Gid { get; set; }
     }

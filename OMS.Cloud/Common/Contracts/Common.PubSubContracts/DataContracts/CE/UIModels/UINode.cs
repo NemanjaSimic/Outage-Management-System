@@ -1,7 +1,8 @@
-﻿using System.Collections.Generic;
+﻿using Common.PubSubContracts.DataContracts.CE.Interfaces;
+using System.Collections.Generic;
 using System.Runtime.Serialization;
 
-namespace Common.CeContracts
+namespace Common.PubSubContracts.DataContracts.CE.UIModels
 {
 	//[Serializable]
 	[DataContract]

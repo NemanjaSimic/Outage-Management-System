@@ -19,7 +19,6 @@ namespace Common.PubSubContracts.DataContracts.CE
         private bool isOpen;
         #endregion
 
-
         #region Properties
         [DataMember]
         public long Id { get { return id; } set { id = value; } }

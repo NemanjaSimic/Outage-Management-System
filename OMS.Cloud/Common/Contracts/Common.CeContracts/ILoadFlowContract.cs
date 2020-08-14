@@ -10,6 +10,12 @@ namespace Common.CeContracts.LoadFlow
 	{
 		[OperationContract]
 		[ServiceKnownType(typeof(TopologyModel))]
+		[ServiceKnownType(typeof(EnergyConsumer))]
+		[ServiceKnownType(typeof(Feeder))]
+		[ServiceKnownType(typeof(Field))]
+		[ServiceKnownType(typeof(Recloser))]
+		[ServiceKnownType(typeof(SynchronousMachine))]
+		[ServiceKnownType(typeof(TopologyElement))]
 		Task<ITopology> UpdateLoadFlow(ITopology topology);
 	}
 }

@@ -1,6 +1,8 @@
 ﻿using Common.CeContracts;
 using Common.CeContracts.ModelProvider;
 using Common.PubSubContracts.DataContracts.CE;
+using Common.PubSubContracts.DataContracts.CE.Interfaces;
+using Common.PubSubContracts.DataContracts.CE.UIModels;
 using OMS.Common.Cloud.Logger;
 using OMS.Common.NmsContracts;
 using OMS.Common.PubSubContracts.Interfaces;
@@ -38,7 +40,7 @@ namespace CE.TopologyProviderImplementation
             Logger.LogDebug(debugMessage);
         }
 
-        public async Task<UIModel> ConvertTopologyToUIModel(ITopology topology)
+        public async Task<IUIModel> ConvertTopologyToUIModel(ITopology topology)
         {
             string verboseMessage = $"{baseLogString} ConvertTopologyToUIModel method called.";
             Logger.LogVerbose(verboseMessage);
@@ -50,7 +52,7 @@ namespace CE.TopologyProviderImplementation
                 throw new Exception(message);
             }
 
-            UIModel uIModel = new UIModel();
+            IUIModel uIModel = new UIModel();
             Stack<long> stack = new Stack<long>();
 
             Logger.LogDebug($"{baseLogString} ConvertTopologyToUIModel => Calling GetReclosers method from model provider client.");

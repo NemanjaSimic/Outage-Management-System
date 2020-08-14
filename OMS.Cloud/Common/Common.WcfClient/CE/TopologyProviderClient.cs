@@ -1,5 +1,6 @@
 ﻿using Common.CeContracts;
 using Common.CeContracts.TopologyProvider;
+using Common.PubSubContracts.DataContracts.CE.Interfaces;
 using Microsoft.ServiceFabric.Services.Client;
 using Microsoft.ServiceFabric.Services.Communication.Wcf.Client;
 using OMS.Common.Cloud.Names;
@@ -53,7 +54,7 @@ namespace OMS.Common.WcfClient.CE
             return InvokeWithRetryAsync(client => client.Channel.GetTopology());
 		}
 
-		public Task<UIModel> GetUIModel()
+		public Task<IUIModel> GetUIModel()
 		{
             return InvokeWithRetryAsync(client => client.Channel.GetUIModel());
 		}

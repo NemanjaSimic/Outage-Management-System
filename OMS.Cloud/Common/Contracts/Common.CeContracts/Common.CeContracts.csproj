@@ -21,6 +21,7 @@
     <DefineConstants>DEBUG;TRACE</DefineConstants>
     <ErrorReport>prompt</ErrorReport>
     <WarningLevel>4</WarningLevel>
+    <PlatformTarget>x64</PlatformTarget>
   </PropertyGroup>
   <PropertyGroup Condition=" '$(Configuration)|$(Platform)' == 'Release|AnyCPU' ">
     <DebugType>pdbonly</DebugType>
@@ -73,8 +74,6 @@
     <Reference Include="System.Xml" />
   </ItemGroup>
   <ItemGroup>
-    <Compile Include="DataContracts\Models\CalculationEngineMessage.cs" />
-    <Compile Include="DataContracts\Models\CalculationEnginePublication.cs" />
     <Compile Include="DataContracts\Models\DailyCurve.cs" />
     <Compile Include="DataContracts\Models\EnergyConsumer.cs" />
     <Compile Include="DataContracts\Models\Feeder.cs" />
@@ -85,9 +84,6 @@
     <Compile Include="DataContracts\Models\SynchronousMachine.cs" />
     <Compile Include="DataContracts\Models\TopologyElement.cs" />
     <Compile Include="DataContracts\Models\TopologyModel.cs" />
-    <Compile Include="DataContracts\UIModels\UIMeasurement.cs" />
-    <Compile Include="DataContracts\UIModels\UIModel.cs" />
-    <Compile Include="DataContracts\UIModels\UINode.cs" />
     <Compile Include="ILoadFlowContract.cs" />
     <Compile Include="IMeasurementMapContract.cs" />
     <Compile Include="IMeasurementProviderContract.cs" />
@@ -109,9 +105,6 @@
     <Compile Include="Interfaces\ITopologyConverterProvider.cs" />
     <Compile Include="Interfaces\ITopologyElement.cs" />
     <Compile Include="Interfaces\ITopologyProvider.cs" />
-    <Compile Include="Interfaces\IUIMeasurement.cs" />
-    <Compile Include="Interfaces\IUIModel.cs" />
-    <Compile Include="Interfaces\IUINode.cs" />
     <Compile Include="ISwitchStatusCommandingContract.cs" />
     <Compile Include="ITopologyConverterContract.cs" />
     <Compile Include="ITopologyProviderContract.cs" />

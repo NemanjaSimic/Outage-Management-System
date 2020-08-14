@@ -1,6 +1,7 @@
-﻿using System.Runtime.Serialization;
+﻿using Common.PubSubContracts.DataContracts.CE.Interfaces;
+using System.Runtime.Serialization;
 
-namespace Common.CeContracts
+namespace Common.PubSubContracts.DataContracts.CE.UIModels
 {
 	[DataContract]
 	public class UIMeasurement : IUIMeasurement

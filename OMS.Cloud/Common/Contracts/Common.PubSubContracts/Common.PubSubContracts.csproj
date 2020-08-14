@@ -90,6 +90,13 @@
   </ItemGroup>
   <ItemGroup>
     <Compile Include="DataContracts\CE\CalculationEngineMessage.cs" />
+    <Compile Include="DataContracts\CE\CalculationEnginePublication.cs" />
+    <Compile Include="DataContracts\CE\Interfaces\IUIMeasurement.cs" />
+    <Compile Include="DataContracts\CE\Interfaces\IUIModel.cs" />
+    <Compile Include="DataContracts\CE\Interfaces\IUINode.cs" />
+    <Compile Include="DataContracts\CE\UIModels\UIMeasurement.cs" />
+    <Compile Include="DataContracts\CE\UIModels\UIModel.cs" />
+    <Compile Include="DataContracts\CE\UIModels\UINode.cs" />
     <Compile Include="DataContracts\EMAIL\EmailServiceMessage.cs" />
     <Compile Include="DataContracts\EMAIL\OutageEmailPublication.cs" />
     <Compile Include="DataContracts\OMS\OutageMessage.cs" />

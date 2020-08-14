@@ -2,7 +2,7 @@
 using OMS.Common.PubSubContracts.DataContracts;
 using System.Runtime.Serialization;
 
-namespace Common.CeContracts
+namespace Common.PubSubContracts.DataContracts.CE
 {
     [DataContract]
     public class CalculationEnginePublication : Publication

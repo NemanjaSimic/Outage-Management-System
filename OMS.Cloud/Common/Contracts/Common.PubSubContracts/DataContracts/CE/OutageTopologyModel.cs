@@ -5,6 +5,7 @@ using System.Runtime.Serialization;
 namespace Common.PubSubContracts.DataContracts.CE
 {
     [DataContract]
+    [KnownType(typeof(OutageTopologyElement))]
     public class OutageTopologyModel : IOutageTopologyModel
     {
         private long firstNode;
@@ -13,6 +14,7 @@ namespace Common.PubSubContracts.DataContracts.CE
         public long FirstNode { get { return firstNode; } set { firstNode = value; } }
         [DataMember]
         public Dictionary<long, IOutageTopologyElement> OutageTopology { get { return outageTopology; } set { outageTopology = value; } }
+
         public OutageTopologyModel()
         {
             OutageTopology = new Dictionary<long, IOutageTopologyElement>();

@@ -1,6 +1,6 @@
 ﻿using System.Collections.Generic;
 
-namespace Common.CeContracts
+namespace Common.PubSubContracts.DataContracts.CE.Interfaces
 {
 	public interface IUIModel
 	{

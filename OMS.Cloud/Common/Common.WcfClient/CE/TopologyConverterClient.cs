@@ -1,4 +1,5 @@
 ﻿using Common.CeContracts;
+using Common.PubSubContracts.DataContracts.CE.Interfaces;
 using Microsoft.ServiceFabric.Services.Client;
 using Microsoft.ServiceFabric.Services.Communication.Wcf.Client;
 using OMS.Common.Cloud.Names;
@@ -36,7 +37,7 @@ namespace OMS.Common.WcfClient.CE
             return InvokeWithRetryAsync(client => client.Channel.ConvertTopologyToOMSModel(topology));
 		}
 
-		public Task<UIModel> ConvertTopologyToUIModel(ITopology topology)
+		public Task<IUIModel> ConvertTopologyToUIModel(ITopology topology)
 		{
             return InvokeWithRetryAsync(client => client.Channel.ConvertTopologyToUIModel(topology));
 		}
