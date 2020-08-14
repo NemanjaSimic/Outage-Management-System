@@ -1,12 +1,10 @@
-﻿using Common.Web.Exceptions;
-using Common.Web.Mappers;
+﻿using Common.Web.Mappers;
 using MediatR;
 using Microsoft.AspNetCore.Builder;
 using Microsoft.AspNetCore.Hosting;
 using Microsoft.AspNetCore.Mvc;
 using Microsoft.Extensions.Configuration;
 using Microsoft.Extensions.DependencyInjection;
-using OMS.Common.Cloud.Logger;
 using WebAPI.Hubs;
 
 namespace WebAPI
@@ -37,7 +35,7 @@ namespace WebAPI
             });
 
             // Register types
-            services.AddScoped<ICustomExceptionHandler, TopologyException>();
+            //todo: srediti reference => services.AddScoped<ICustomExceptionHandler, TopologyException>();
             services.AddScoped<IGraphMapper, GraphMapper>();
             services.AddScoped<IConsumerMapper, ConsumerMapper>();
             services.AddScoped<IOutageMapper, OutageMapper>();

@@ -1,11 +1,11 @@
-﻿using Common.CeContracts;
-using Common.PubSub;
+﻿using Common.PubSubContracts.DataContracts.CE;
 using Common.PubSubContracts.DataContracts.OMS;
 using Common.Web.Mappers;
 using Common.Web.Models.ViewModels;
 using OMS.Common.Cloud.Logger;
 using OMS.Common.PubSubContracts;
 using OMS.Common.PubSubContracts.DataContracts.SCADA;
+using OMS.Common.PubSubContracts.Interfaces;
 using System;
 using System.Collections.Generic;
 using System.Threading.Tasks;
@@ -104,9 +104,14 @@ namespace WebAdapterImplementation
             }
         }
 
-        public async Task<string> GetSubscriberName()
+        public Task<string> GetSubscriberName()
         {
-            return _subscriberName;
+            return Task.Run(() => _subscriberName);
+        }
+
+        public Task<bool> IsAlive()
+        {
+            return Task.Run(() => true);
         }
     }
 }

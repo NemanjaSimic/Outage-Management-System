@@ -62,5 +62,10 @@ namespace WebAdapterImplementation
 
             return null;
         }
+
+        public Task<bool> IsAlive()
+        {
+            return Task.Run(() => true);
+        }
     }
 }
