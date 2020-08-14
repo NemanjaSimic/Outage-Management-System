@@ -11,7 +11,7 @@
     <Parameter Name="CE.ModelProviderService_PartitionCount" Value="1" />
     <Parameter Name="CE.ModelProviderService_MinReplicaSetSize" Value="3" />
     <Parameter Name="CE.ModelProviderService_TargetReplicaSetSize" Value="3" />
-    <Parameter Name="CE.TopologyBuilderService_InstanceCount" Value="-1" />
+    <Parameter Name="CE.TopologyBuilderService_InstanceCount" Value="1" />
     <Parameter Name="CE.TopologyProviderService_PartitionCount" Value="1" />
     <Parameter Name="CE.TopologyProviderService_MinReplicaSetSize" Value="3" />
     <Parameter Name="CE.TopologyProviderService_TargetReplicaSetSize" Value="3" />

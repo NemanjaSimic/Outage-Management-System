@@ -44,6 +44,11 @@ namespace OMS.HistoryDBManagerServiceImplementation.ModelAccess
 			return new Task<Equipment>(() => dbContext.EquipmentRepository.Get(gid));
 		}
 
+		public Task<bool> IsAlive()
+		{
+			return Task.Run(() => true);
+		}
+
 		public Task RemoveAllEquipments()
 		{
 			return new Task(() => 

@@ -1,5 +1,4 @@
 ﻿using OMS.Common.Cloud;
-using OMS.Common.Cloud.Logger;
 using OMS.Common.SCADA;
 using System;
 using System.Runtime.Serialization;

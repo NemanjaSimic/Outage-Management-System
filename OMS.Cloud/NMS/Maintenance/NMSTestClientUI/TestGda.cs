@@ -33,7 +33,7 @@ namespace TelventDMS.Services.NetworkModelService.TestClient.TestsUI
 
 			try
 			{
-				INetworkModelGDAContract nmsClient = NetworkModelGdaClient.CreateClient();
+				var nmsClient = NetworkModelGdaClient.CreateClient();
 
 				if (nmsClient == null)
 				{
@@ -68,7 +68,7 @@ namespace TelventDMS.Services.NetworkModelService.TestClient.TestsUI
 
 			try
 			{
-				INetworkModelGDAContract nmsClient = NetworkModelGdaClient.CreateClient();
+				var nmsClient = NetworkModelGdaClient.CreateClient();
 
 				if (nmsClient == null)
 				{
@@ -157,7 +157,7 @@ namespace TelventDMS.Services.NetworkModelService.TestClient.TestsUI
 
 			try
 			{
-				INetworkModelGDAContract nmsClient = NetworkModelGdaClient.CreateClient();
+				var nmsClient = NetworkModelGdaClient.CreateClient();
 
 				if (nmsClient == null)
 				{

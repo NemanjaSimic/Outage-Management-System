@@ -14,7 +14,7 @@ using System.Threading.Tasks;
 
 namespace OMS.HistoryDBManagerServiceImplementation
 {
-	public class HistoryDBManager : IHistoryDBManagerContract
+    public class HistoryDBManager : IHistoryDBManagerContract
     {
         private readonly IReliableStateManager stateManager;
         private UnitOfWork dbContext;
@@ -178,6 +178,11 @@ namespace OMS.HistoryDBManagerServiceImplementation
                 Console.WriteLine($"{message}, Message: {e.Message}, Inner Message: {e.InnerException.Message})");
             }
         }
-    
+
+        public Task<bool> IsAlive()
+        {
+            return Task.Run(() => { return true; });
+        }
+
     }
 }

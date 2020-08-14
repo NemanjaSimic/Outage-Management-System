@@ -1,5 +1,4 @@
-﻿using Common.CE;
-using Common.OMS;
+﻿using Common.OMS;
 using Common.OMS.OutageDatabaseModel;
 using Common.OmsContracts.ModelAccess;
 using Common.OmsContracts.ModelProvider;
@@ -7,16 +6,11 @@ using Common.OmsContracts.OutageLifecycle;
 using Common.OmsContracts.OutageSimulator;
 using OMS.Common.Cloud;
 using OMS.Common.Cloud.Logger;
-using OMS.Common.Cloud.Names;
-using OMS.Common.PubSub;
+using OMS.Common.PubSubContracts.Interfaces;
 using OMS.Common.WcfClient.OMS;
 using OMS.Common.WcfClient.OMS.ModelAccess;
 using OMS.OutageLifecycleServiceImplementation.OutageLCHelper;
 using System;
-using System.Collections.Generic;
-using System.Linq;
-using System.ServiceModel;
-using System.Text;
 using System.Threading.Tasks;
 
 namespace OMS.OutageLifecycleServiceImplementation
@@ -46,6 +40,10 @@ namespace OMS.OutageLifecycleServiceImplementation
             this.outageModelAccessClient = OutageModelAccessClient.CreateClient();
             
 
+        }
+        public Task<bool> IsAlive()
+        {
+            return Task.Run(() => { return true; });
         }
         public async Task InitAwaitableFields()
         {

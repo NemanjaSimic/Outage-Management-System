@@ -1,10 +1,11 @@
-﻿using Common.CE.Interfaces;
-using Common.CeContracts;
+﻿using Common.CeContracts;
 using Common.CeContracts.ModelProvider;
-using Common.OMS.OutageModel;
+using Common.PubSubContracts.DataContracts.CE;
+using Common.PubSubContracts.DataContracts.CE.Interfaces;
+using Common.PubSubContracts.DataContracts.CE.UIModels;
 using OMS.Common.Cloud.Logger;
 using OMS.Common.NmsContracts;
-using OMS.Common.PubSub;
+using OMS.Common.PubSubContracts.Interfaces;
 using OMS.Common.WcfClient.CE;
 using System;
 using System.Collections.Generic;
@@ -13,7 +14,7 @@ using System.Threading.Tasks;
 
 namespace CE.TopologyProviderImplementation
 {
-	public class TopologyConverter : ITopologyConverterContract
+    public class TopologyConverter : ITopologyConverterContract
     {
         private readonly IMeasurementProviderContract measurementProviderClient;
         private readonly IModelProviderContract modelProviderClient;
@@ -39,7 +40,7 @@ namespace CE.TopologyProviderImplementation
             Logger.LogDebug(debugMessage);
         }
 
-        public async Task<UIModel> ConvertTopologyToUIModel(ITopology topology)
+        public async Task<IUIModel> ConvertTopologyToUIModel(ITopology topology)
         {
             string verboseMessage = $"{baseLogString} ConvertTopologyToUIModel method called.";
             Logger.LogVerbose(verboseMessage);
@@ -51,7 +52,7 @@ namespace CE.TopologyProviderImplementation
                 throw new Exception(message);
             }
 
-            UIModel uIModel = new UIModel();
+            IUIModel uIModel = new UIModel();
             Stack<long> stack = new Stack<long>();
 
             Logger.LogDebug($"{baseLogString} ConvertTopologyToUIModel => Calling GetReclosers method from model provider client.");
@@ -254,6 +255,10 @@ namespace CE.TopologyProviderImplementation
 
             Logger.LogDebug($"{baseLogString} ConvertTopologyToOMSModel => Topology to OMSModel convert finished successfully.");
             return outageTopologyModel;
+        }
+        public Task<bool> IsAlive()
+        {
+            return Task.Run(() => { return true; });
         }
     }
 }

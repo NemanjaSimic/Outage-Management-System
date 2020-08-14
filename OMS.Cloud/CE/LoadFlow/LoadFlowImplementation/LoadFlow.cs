@@ -1,5 +1,4 @@
 ﻿using Common.CE;
-using Common.CE.Interfaces;
 using Common.CeContracts;
 using Common.CeContracts.LoadFlow;
 using Common.CeContracts.ModelProvider;
@@ -720,6 +719,11 @@ namespace CE.LoadFlowImplementation
 
             }
         }
-		#endregion
-	}
+
+        public Task<bool> IsAlive()
+        {
+            return Task.Run(() => { return true; });
+        }
+        #endregion
+    }
 }

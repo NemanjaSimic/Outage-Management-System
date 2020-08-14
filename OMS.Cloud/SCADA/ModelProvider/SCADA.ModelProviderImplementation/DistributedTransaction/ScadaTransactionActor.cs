@@ -71,7 +71,10 @@ namespace SCADA.ModelProviderImplementation.DistributedTransaction
         private ReliableDictionaryAccess<byte, List<long>> ModelChanges { get; set; }
         private ReliableDictionaryAccess<long, CommandDescription> CommandDescriptionCache { get; set; }
         private ReliableDictionaryAccess<long, ModbusData> MeasurementsCache { get; set; }
-
+        public Task<bool> IsAlive()
+        {
+            return Task.Run(() => { return true; });
+        }
         private async void OnStateManagerChangedHandler(object sender, NotifyStateManagerChangedEventArgs e)
         {
             if (e.Action == NotifyStateManagerChangedAction.Add)
@@ -335,9 +338,9 @@ namespace SCADA.ModelProviderImplementation.DistributedTransaction
 
         private async Task<Dictionary<long, IScadaModelPointItem>> CreatePointItemsFromNetworkModelMeasurements(Dictionary<byte, List<long>> modelChanges)
         {
-            INetworkModelGDAContract nmsGdaClient = NetworkModelGdaClient.CreateClient();
-
             Dictionary<long, IScadaModelPointItem> pointItems = new Dictionary<long, IScadaModelPointItem>();
+
+            INetworkModelGDAContract nmsGdaClient = NetworkModelGdaClient.CreateClient();
 
             int iteratorId;
             int resourcesLeft;
@@ -606,7 +609,7 @@ namespace SCADA.ModelProviderImplementation.DistributedTransaction
 
         private async Task SendModelUpdateCommands()
         {
-            IScadaCommandingContract scadaCommandingClient = ScadaCommandingClient.CreateClient();
+            var scadaCommandingClient = ScadaCommandingClient.CreateClient();
             var enumerableAddressToGidMapResult = await CurrentAddressToGidMap.GetEnumerableDictionaryAsync();
 
             var tasks = new List<Task>()

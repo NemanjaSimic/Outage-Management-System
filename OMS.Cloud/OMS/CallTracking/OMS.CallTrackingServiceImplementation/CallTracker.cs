@@ -1,5 +1,4 @@
 ﻿using Common.OmsContracts.ModelProvider;
-using Common.PubSub;
 using Common.PubSubContracts.DataContracts.EMAIL;
 using Microsoft.ServiceFabric.Data;
 using OMS.Common.Cloud;
@@ -8,19 +7,17 @@ using OMS.Common.Cloud.Names;
 using OMS.Common.Cloud.ReliableCollectionHelpers;
 using OMS.Common.NmsContracts;
 using OMS.Common.PubSubContracts;
+using OMS.Common.PubSubContracts.Interfaces;
 using OMS.Common.WcfClient.OMS;
 using System;
-using System.Collections.Generic;
 using System.Configuration;
 using System.Linq;
-using System.Runtime.CompilerServices;
-using System.Text;
 using System.Threading.Tasks;
 using System.Timers;
 
 namespace OMS.CallTrackingServiceImplementation
 {
-	public class CallTracker : INotifySubscriberContract
+    public class CallTracker : INotifySubscriberContract
 	{
 		//TODO: Queue, for now Dictionary (gid, gid)
 		private ReliableDictionaryAccess<long, long> calls;
@@ -50,7 +47,10 @@ namespace OMS.CallTrackingServiceImplementation
 		private IOutageModelReadAccessContract outageModelReadAccessClient;
 		private TrackingAlgorithm trackingAlgorithm;
 
-
+		public Task<bool> IsAlive()
+		{
+			return Task.Run(() => { return true; });
+		}
 		public CallTracker(IReliableStateManager stateManager, string subscriberName)
 		{
 			this.stateManager = stateManager;

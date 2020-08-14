@@ -1,15 +1,15 @@
-﻿using Common.PubSub;
-using OMS.Common.PubSubContracts.DataContracts.SCADA;
+﻿using OMS.Common.PubSubContracts.DataContracts.SCADA;
 using Microsoft.ServiceFabric.Services.Remoting;
-using System;
 using System.ServiceModel;
 using System.Threading.Tasks;
 using Common.PubSubContracts.DataContracts.EMAIL;
+using Common.CloudContracts;
+using OMS.Common.PubSubContracts.Interfaces;
 
 namespace OMS.Common.PubSubContracts
 {
     [ServiceContract]
-    public interface INotifySubscriberContract: IService
+    public interface INotifySubscriberContract: IService, IHealthChecker
     {
         [OperationContract]
         //[ServiceKnownType(typeof(CalculationEngineMessage))]

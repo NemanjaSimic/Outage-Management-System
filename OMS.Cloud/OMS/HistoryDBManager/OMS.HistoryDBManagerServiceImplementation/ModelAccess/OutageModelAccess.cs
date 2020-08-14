@@ -55,6 +55,11 @@ namespace OMS.HistoryDBManagerServiceImplementation.ModelAccess
 			return new Task<OutageEntity>(() => dbContext.OutageRepository.Get(gid));
 		}
 
+		public Task<bool> IsAlive()
+		{
+			return Task.Run(() => true);
+		}
+
 		public Task RemoveAllOutages()
 		{
 			return new Task(() =>

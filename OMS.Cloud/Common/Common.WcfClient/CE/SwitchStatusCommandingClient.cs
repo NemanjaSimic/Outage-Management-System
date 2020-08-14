@@ -39,5 +39,10 @@ namespace OMS.Common.WcfClient.CE
 		{
             return InvokeWithRetryAsync(client => client.Channel.SendOpenCommand(gid));
 		}
+
+		public Task<bool> IsAlive()
+		{
+			return InvokeWithRetryAsync(client => client.Channel.IsAlive());
+		}
 	}
 }

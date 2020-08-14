@@ -5,7 +5,7 @@ using System.Threading;
 using System.Threading.Tasks;
 using CE.ModelProviderImplementation;
 using Common.CE;
-using Common.CE.Interfaces;
+using Common.CeContracts;
 using Common.CeContracts.ModelProvider;
 using Microsoft.ServiceFabric.Data;
 using Microsoft.ServiceFabric.Data.Collections;
@@ -15,6 +15,8 @@ using Microsoft.ServiceFabric.Services.Communication.Wcf.Runtime;
 using Microsoft.ServiceFabric.Services.Runtime;
 using OMS.Common.Cloud.Logger;
 using OMS.Common.Cloud.Names;
+using OMS.Common.TmsContracts;
+using OMS.Common.TmsContracts.Notifications;
 
 namespace CE.ModelProviderService
 {
@@ -24,7 +26,8 @@ namespace CE.ModelProviderService
     internal sealed class ModelProviderService : StatefulService
 	{
 		private readonly string baseLogString;
-
+		private readonly CeTransactionActor ceTransactionActor;
+		private readonly CeNetworkNotifyModelUpdate ceNetworkNotifyModelUpdate;
 		private readonly ModelProvider modelProvider;
 
 		private ICloudLogger logger;
@@ -41,6 +44,8 @@ namespace CE.ModelProviderService
 			try
 			{
 				this.modelProvider = new ModelProvider(this.StateManager);
+				this.ceTransactionActor = new CeTransactionActor();
+				this.ceNetworkNotifyModelUpdate = new CeNetworkNotifyModelUpdate();
 
 				string infoMessage = $"{baseLogString} Ctor => Contract providers initialized.";
 				Logger.LogInformation(infoMessage);
@@ -71,7 +76,23 @@ namespace CE.ModelProviderService
 																			this.modelProvider,
 																			WcfUtility.CreateTcpListenerBinding(),
 																			EndpointNames.CeModelProviderServiceEndpoint);
-				}, EndpointNames.CeModelProviderServiceEndpoint)
+				}, EndpointNames.CeModelProviderServiceEndpoint),
+				
+				new ServiceReplicaListener(context =>
+				{
+					return new WcfCommunicationListener<ITransactionActorContract>(context,
+																			this.ceTransactionActor,
+																			WcfUtility.CreateTcpListenerBinding(),
+																			EndpointNames.TmsTransactionActorEndpoint);
+				}, EndpointNames.TmsTransactionActorEndpoint),
+
+				new ServiceReplicaListener(context =>
+				{
+					return new WcfCommunicationListener<INotifyNetworkModelUpdateContract>(context,
+																			this.ceNetworkNotifyModelUpdate,
+																			WcfUtility.CreateTcpListenerBinding(),
+																			EndpointNames.TmsNotifyNetworkModelUpdateEndpoint);
+				}, EndpointNames.TmsNotifyNetworkModelUpdateEndpoint),
 			};
 		}
 
@@ -126,7 +147,7 @@ namespace CE.ModelProviderService
 				{
 					using (ITransaction tx = this.StateManager.CreateTransaction())
 					{
-						var result = await StateManager.TryGetAsync<IReliableDictionary<short, Dictionary<long, ITopologyElement>>>(ReliableDictionaryNames.ElementCache);
+						var result = await StateManager.TryGetAsync<IReliableDictionary<short, Dictionary<long, TopologyElement>>>(ReliableDictionaryNames.ElementCache);
 						if(result.HasValue)
 						{
 							var topologyCacheUI = result.Value;
@@ -135,7 +156,7 @@ namespace CE.ModelProviderService
 						}
 						else
 						{
-							await StateManager.GetOrAddAsync<IReliableDictionary<short, Dictionary<long, ITopologyElement>>>(tx, ReliableDictionaryNames.ElementCache);
+							await StateManager.GetOrAddAsync<IReliableDictionary<short, Dictionary<long, TopologyElement>>>(tx, ReliableDictionaryNames.ElementCache);
 							await tx.CommitAsync();
 						}
 					}

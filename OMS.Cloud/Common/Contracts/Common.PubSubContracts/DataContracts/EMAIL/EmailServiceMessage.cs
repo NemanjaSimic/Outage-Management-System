@@ -1,10 +1,5 @@
-﻿using Common.PubSub;
-using System;
-using System.Collections.Generic;
-using System.Linq;
+﻿using OMS.Common.PubSubContracts.Interfaces;
 using System.Runtime.Serialization;
-using System.Text;
-using System.Threading.Tasks;
 
 namespace Common.PubSubContracts.DataContracts.EMAIL
 {
@@ -12,6 +7,7 @@ namespace Common.PubSubContracts.DataContracts.EMAIL
     public abstract class EmailServiceMessage : IPublishableMessage
     {
     }
+
     [DataContract]
     public class EmailToOutageMessage : EmailServiceMessage
     {
@@ -20,6 +16,7 @@ namespace Common.PubSubContracts.DataContracts.EMAIL
         {
             this.Gid = Gid;
         }
+
         [DataMember]
         public long Gid { get; set; }
     }

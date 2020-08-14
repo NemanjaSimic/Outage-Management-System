@@ -6,20 +6,18 @@ using OMS.Common.WcfClient.OMS;
 using System;
 using System.Collections.Generic;
 using System.Linq;
-using System.Text;
 using System.Threading.Tasks;
 using Common.OMS.OutageDatabaseModel;
 using OMS.OutageLifecycleServiceImplementation.OutageLCHelper;
-using Common.CE;
-using OMS.Common.PubSub;
-using OMS.Common.WcfClient.OMS.ModelAccess;
 using Common.OmsContracts.ModelProvider;
 using Common.OmsContracts.HistoryDBManager;
+using OMS.Common.PubSubContracts.Interfaces;
 using Common.OmsContracts.ModelAccess;
+using OMS.Common.WcfClient.OMS.ModelAccess;
 
 namespace OMS.OutageLifecycleServiceImplementation
 {
-	public class ReportOutageService : IReportOutageContract
+    public class ReportOutageService : IReportOutageContract
 	{
         private OutageLifecycleHelper outageLifecycleHelper;
 		private Dictionary<long, Dictionary<long, List<long>>> recloserOutageMap;
@@ -47,10 +45,13 @@ namespace OMS.OutageLifecycleServiceImplementation
             this.historyDBManagerClient = HistoryDBManagerClient.CreateClient();
             this.outageMessageMapper = new OutageMessageMapper();
             this.outageModelAccessClient = OutageModelAccessClient.CreateClient();
+		}
 
-
-
+        public Task<bool> IsAlive()
+        {
+            return Task.Run(() => { return true; });
         }
+
         public async Task InitAwaitableFields()
         {
             this.topologyModel = await outageModelReadAccessClient.GetTopologyModel();
@@ -58,6 +59,7 @@ namespace OMS.OutageLifecycleServiceImplementation
             this.OptimumIsolationPoints = await outageModelReadAccessClient.GetOptimumIsolatioPoints();
             this.outageLifecycleHelper = new OutageLifecycleHelper(this.topologyModel);
         }
+        
         public async Task<bool> ReportPotentialOutage(long gid, CommandOriginType commandOriginType)
         {
             Logger.LogDebug("ReportPotentialOutage method started.");
@@ -198,7 +200,5 @@ namespace OMS.OutageLifecycleServiceImplementation
             }
             return success;
 		}
-
-      
     }
 }

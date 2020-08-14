@@ -19,9 +19,6 @@ namespace SCADA.CommandingImplementation
     {
         private readonly string baseLogString;
 
-        //private IWriteCommandEnqueuerContract commandEnqueuerClient;
-        //private IScadaModelReadAccessContract scadaModelReadAccessClient;
-
         #region Private Properties
         private ICloudLogger logger;
         protected ICloudLogger Logger
@@ -36,9 +33,6 @@ namespace SCADA.CommandingImplementation
 
             string verboseMessage = $"{baseLogString} entering Ctor.";
             Logger.LogVerbose(verboseMessage);
-
-            //this.commandEnqueuerClient = WriteCommandEnqueuerClient.CreateClient();
-            //this.scadaModelReadAccessClient = ScadaModelReadAccessClient.CreateClient();
 
             string debugMessage = $"{baseLogString} Ctor => Clients initialized.";
             Logger.LogDebug(debugMessage);
@@ -329,7 +323,10 @@ namespace SCADA.CommandingImplementation
             }
         }
         #endregion IScadaCommandingContract
-
+        public Task<bool> IsAlive()
+        {
+            return Task.Run(() => { return true; });
+        }
         private async Task SendSingleCommand(IScadaModelPointItem pointItem, int commandingValue, CommandOriginType commandOriginType, bool isRetry = false)
         { 
             try
@@ -364,9 +361,6 @@ namespace SCADA.CommandingImplementation
                 if (!isRetry)
                 {
                     await Task.Delay(2000);
-
-                    //this.commandEnqueuerClient = WriteCommandEnqueuerClient.CreateClient();
-                    //this.scadaModelReadAccessClient = ScadaModelReadAccessClient.CreateClient();
                     await SendSingleCommand(pointItem, commandingValue, commandOriginType, true);
                 }
                 else
@@ -396,8 +390,6 @@ namespace SCADA.CommandingImplementation
                 if (!isRetry)
                 {
                     await Task.Delay(2000);
-
-                    //this.commandEnqueuerClient = WriteCommandEnqueuerClient.CreateClient();
                     await SendMultipleCommand(functionCode, startAddress, commandingValues, commandOriginType, true);
                 }
                 else

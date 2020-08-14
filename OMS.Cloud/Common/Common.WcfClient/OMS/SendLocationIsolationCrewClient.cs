@@ -35,5 +35,10 @@ namespace OMS.Common.WcfClient.OMS
         {
             return InvokeWithRetryAsync(client => client.Channel.SendLocationIsolationCrew(outageId));
         }
+
+        public Task<bool> IsAlive()
+        {
+            return InvokeWithRetryAsync(client => client.Channel.IsAlive());
+        }
     }
 }

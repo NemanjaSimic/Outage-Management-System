@@ -1,5 +1,4 @@
 ﻿using Common.CE;
-using Common.CE.Interfaces;
 using Common.CeContracts;
 using Common.CeContracts.ModelProvider;
 using Common.CeContracts.TopologyProvider;
@@ -33,9 +32,22 @@ namespace CE.MeasurementProviderImplementation
 		private ReliableDictionaryAccess<short, Dictionary<long, long>> measurementToElementMapCache;
 		public ReliableDictionaryAccess<short, Dictionary<long, long>> MeasurementToElementMapCache { get => measurementToElementMapCache; }
 
+		private bool isAnalogMeasurementInitialized = false;
+		private bool isDiscreteMeasurementInitialized = false;
+		private bool isElementToMeasurementInitialized = false;
+		private bool isMeasurementToElementInitialized = false;
 
+		private bool AreDictionariesInitialized
+		{
+			get
+			{
+				return isAnalogMeasurementInitialized
+				&& isDiscreteMeasurementInitialized
+				&& isElementToMeasurementInitialized
+				&& isMeasurementToElementInitialized;
+	}
+		}
 		private readonly HashSet<CommandOriginType> ignorableOriginTypes;
-		#endregion
 
 		private readonly string baseLogString;
 		private readonly IReliableStateManager stateManager;
@@ -49,6 +61,7 @@ namespace CE.MeasurementProviderImplementation
 		private readonly ITopologyProviderContract topologyProviderClient;
 		private readonly IModelProviderContract modelProviderClient;
 		private readonly IScadaCommandingContract scadaCommandingClient;
+		#endregion
 
 		public MeasurementProvider(IReliableStateManager stateManager)
 		{
@@ -83,7 +96,7 @@ namespace CE.MeasurementProviderImplementation
 				if (reliableStateName == ReliableDictionaryNames.AnalogMeasurementsCache)
 				{
 					analogMeasurementsCache = await ReliableDictionaryAccess<short, Dictionary<long, AnalogMeasurement>>.Create(stateManager, ReliableDictionaryNames.AnalogMeasurementsCache);
-					//this.isElementCacheInitialized = true;
+					this.isAnalogMeasurementInitialized = true;
 
 					string debugMessage = $"{baseLogString} OnStateManagerChangedHandler => '{ReliableDictionaryNames.AnalogMeasurementsCache}' ReliableDictionaryAccess initialized.";
 					Logger.LogDebug(debugMessage);
@@ -91,7 +104,7 @@ namespace CE.MeasurementProviderImplementation
 				else if (reliableStateName == ReliableDictionaryNames.DiscreteMeasurementsCache)
 				{
 					discreteMeasurementsCache = await ReliableDictionaryAccess<short, Dictionary<long, DiscreteMeasurement>>.Create(stateManager, ReliableDictionaryNames.DiscreteMeasurementsCache);
-					//this.isElementConnectionCacheInitialized = true;
+					this.isDiscreteMeasurementInitialized = true;
 
 					string debugMessage = $"{baseLogString} OnStateManagerChangedHandler => '{ReliableDictionaryNames.DiscreteMeasurementsCache}' ReliableDictionaryAccess initialized.";
 					Logger.LogDebug(debugMessage);
@@ -99,7 +112,7 @@ namespace CE.MeasurementProviderImplementation
 				else if (reliableStateName == ReliableDictionaryNames.ElementsToMeasurementMapCache)
 				{
 					elementToMeasurementMapCache = await ReliableDictionaryAccess<short, Dictionary<long, List<long>>>.Create(stateManager, ReliableDictionaryNames.ElementsToMeasurementMapCache);
-					//this.isEnergySourceCacheInitialized = true;
+					this.isElementToMeasurementInitialized = true;
 
 					string debugMessage = $"{baseLogString} OnStateManagerChangedHandler => '{ReliableDictionaryNames.ElementsToMeasurementMapCache}' ReliableDictionaryAccess initialized.";
 					Logger.LogDebug(debugMessage);
@@ -107,7 +120,7 @@ namespace CE.MeasurementProviderImplementation
 				else if (reliableStateName == ReliableDictionaryNames.MeasurementsToElementMapCache)
 				{
 					measurementToElementMapCache = await ReliableDictionaryAccess<short, Dictionary<long, long>>.Create(stateManager, ReliableDictionaryNames.MeasurementsToElementMapCache);
-					//this.isRecloserCacheInitialized = true;
+					this.isMeasurementToElementInitialized = true;
 
 					string debugMessage = $"{baseLogString} OnStateManagerChangedHandler => '{ReliableDictionaryNames.MeasurementsToElementMapCache}' ReliableDictionaryAccess initialized.";
 					Logger.LogDebug(debugMessage);
@@ -115,10 +128,19 @@ namespace CE.MeasurementProviderImplementation
 
 			}
 		}
+		public Task<bool> IsAlive()
+		{
+			return Task.Run(() => { return true; });
+		}
 		public async Task AddAnalogMeasurement(AnalogMeasurement analogMeasurement)
 		{
 			string verboseMessage = $"{baseLogString} entering AddAnalogMeasurement method.";
 			Logger.LogVerbose(verboseMessage);
+
+			while (!AreDictionariesInitialized)
+			{
+				await Task.Delay(1000);
+			}
 
 			if (analogMeasurement == null)
 			{
@@ -145,6 +167,11 @@ namespace CE.MeasurementProviderImplementation
 			string verboseMessage = $"{baseLogString} entering AddDiscreteMeasurement method.";
 			Logger.LogVerbose(verboseMessage);
 
+			while (!AreDictionariesInitialized)
+			{
+				await Task.Delay(1000);
+			}
+
 			if (discreteMeasurement == null)
 			{
 				string message = $"{baseLogString} AddDiscreteMeasurement => discrete measurement parameter is null.";
@@ -170,6 +197,11 @@ namespace CE.MeasurementProviderImplementation
 			string verboseMessage = $"{baseLogString} entering GetAnalogValue method for measurement GID {measurementGid:X16}.";
 			Logger.LogVerbose(verboseMessage);
 
+			while (!AreDictionariesInitialized)
+			{
+				await Task.Delay(1000);
+			}
+
 			var analogMeasurements = await GetAnalogMeasurementsFromCache();
 
 			float value = -1;
@@ -189,6 +221,11 @@ namespace CE.MeasurementProviderImplementation
 			string verboseMessage = $"{baseLogString} entering GetDiscreteValue method for measurement GID {measurementGid:X16}.";
 			Logger.LogVerbose(verboseMessage);
 
+			while (!AreDictionariesInitialized)
+			{
+				await Task.Delay(1000);
+			}
+
 			var discreteMeasurements = await GetDiscreteMeasurementsFromCache();
 
 			bool isOpen = false;
@@ -202,6 +239,11 @@ namespace CE.MeasurementProviderImplementation
 		{
 			string verboseMessage = $"{baseLogString} entering UpdateAnalogMeasurement method for measurement GID {measurementGid:X16}.";
 			Logger.LogVerbose(verboseMessage);
+
+			while (!AreDictionariesInitialized)
+			{
+				await Task.Delay(1000);
+			}
 
 			var analogMeasurements = await GetAnalogMeasurementsFromCache();
 
@@ -222,6 +264,11 @@ namespace CE.MeasurementProviderImplementation
 			string verboseMessage = $"{baseLogString} entering UpdateAnalogMeasurement method with dictionary parameter.";
 			Logger.LogVerbose(verboseMessage);
 
+			while (!AreDictionariesInitialized)
+			{
+				await Task.Delay(1000);
+			}
+
 			foreach (long gid in data.Keys)
 			{
 				AnalogModbusData measurementData = data[gid];
@@ -234,6 +281,11 @@ namespace CE.MeasurementProviderImplementation
 		{
 			string verboseMessage = $"{baseLogString} entering UpdateDiscreteMeasurement method for measurement GID {measurementGid:X16}.";
 			Logger.LogVerbose(verboseMessage);
+
+			while (!AreDictionariesInitialized)
+			{
+				await Task.Delay(1000);
+			}
 
 			bool success = true;
 			var discreteMeasurements = await GetDiscreteMeasurementsFromCache();
@@ -301,6 +353,11 @@ namespace CE.MeasurementProviderImplementation
 			string verboseMessage = $"{baseLogString} entering UpdateDiscreteMeasurement method with dictionary parameter.";
 			Logger.LogVerbose(verboseMessage);
 
+			while (!AreDictionariesInitialized)
+			{
+				await Task.Delay(1000);
+			}
+
 			List<long> signalGids = new List<long>();
 			foreach (long gid in data.Keys)
 			{
@@ -320,6 +377,11 @@ namespace CE.MeasurementProviderImplementation
 			string verboseMessage = $"{baseLogString} entering GetElementGidForMeasurement method for measurement GID {measurementGid:X16}.";
 			Logger.LogVerbose(verboseMessage);
 
+			while (!AreDictionariesInitialized)
+			{
+				await Task.Delay(1000);
+			}
+
 			long signalGid = 0;
 			var discreteMeasurements = await GetDiscreteMeasurementsFromCache();
 
@@ -333,6 +395,11 @@ namespace CE.MeasurementProviderImplementation
 		{
 			string verboseMessage = $"{baseLogString} entering GetDiscreteMeasurement method for measurement GID {measurementGid:X16}.";
 			Logger.LogVerbose(verboseMessage);
+
+			while (!AreDictionariesInitialized)
+			{
+				await Task.Delay(1000);
+			}
 
 			DiscreteMeasurement measurement;
 			bool success = false;
@@ -355,6 +422,11 @@ namespace CE.MeasurementProviderImplementation
 			string verboseMessage = $"{baseLogString} entering GetAnalogMeasurement method for measurement GID {measurementGid:X16}.";
 			Logger.LogVerbose(verboseMessage);
 
+			while (!AreDictionariesInitialized)
+			{
+				await Task.Delay(1000);
+			}
+
 			AnalogMeasurement measurement;
 			bool success = false;
 			var analogMeasurements = await GetAnalogMeasurementsFromCache();
@@ -375,6 +447,11 @@ namespace CE.MeasurementProviderImplementation
 		{
 			string verboseMessage = $"{baseLogString} entering AddMeasurementElementPair method for measurement GID {measurementId:X16}.";
 			Logger.LogVerbose(verboseMessage);
+
+			while (!AreDictionariesInitialized)
+			{
+				await Task.Delay(1000);
+			}
 
 			var measurementToElementMap = await GetMeasurementToElementMapFromCache();
 
@@ -518,6 +595,11 @@ namespace CE.MeasurementProviderImplementation
 			string verboseMessage = $"{baseLogString} entering GetAnalogMeasurementsFromCache method.";
 			Logger.LogVerbose(verboseMessage);
 
+			while (!AreDictionariesInitialized)
+			{
+				await Task.Delay(1000);
+			}
+
 			ConditionalValue<Dictionary<long, AnalogMeasurement>> analogMeasurements;
 
 			if (await AnalogMeasurementsCache.ContainsKeyAsync((short)cacheType))
@@ -550,6 +632,11 @@ namespace CE.MeasurementProviderImplementation
 		{
 			string verboseMessage = $"{baseLogString} entering GetDicreteMeasurementsFromCache method.";
 			Logger.LogVerbose(verboseMessage);
+
+			while (!AreDictionariesInitialized)
+			{
+				await Task.Delay(1000);
+			}
 
 			ConditionalValue<Dictionary<long, DiscreteMeasurement>> discreteMeasurements;
 
@@ -584,6 +671,11 @@ namespace CE.MeasurementProviderImplementation
 			string verboseMessage = $"{baseLogString} entering GetElementToMeasurementMapFromCache method.";
 			Logger.LogVerbose(verboseMessage);
 
+			while (!AreDictionariesInitialized)
+			{
+				await Task.Delay(1000);
+			}
+
 			ConditionalValue<Dictionary<long, List<long>>> elementToMeasurement;
 
 			if (await ElementToMeasurementMapCache.ContainsKeyAsync((short)cacheType))
@@ -616,6 +708,11 @@ namespace CE.MeasurementProviderImplementation
 		{
 			string verboseMessage = $"{baseLogString} entering GetMeasurementToElementMapFromCache method.";
 			Logger.LogVerbose(verboseMessage);
+
+			while (!AreDictionariesInitialized)
+			{
+				await Task.Delay(1000);
+			}
 
 			ConditionalValue<Dictionary<long, long>> measurementsToElement;
 

@@ -5,7 +5,7 @@ using Microsoft.ServiceFabric.Data.Notifications;
 using OMS.Common.Cloud;
 using OMS.Common.Cloud.Logger;
 using OMS.Common.Cloud.ReliableCollectionHelpers;
-using OMS.Common.PubSub;
+using OMS.Common.PubSubContracts.Interfaces;
 using System;
 using System.Collections.Generic;
 using System.Linq;
@@ -182,6 +182,11 @@ namespace OMS.ModelProviderImplementation.ContractProviders
             }
 
             await TopologyModel.SetAsync(0, outageTopologyModel);
+        }
+        
+        public Task<bool> IsAlive()
+        {
+            return Task.Run(() => { return true; });
         }
     }
 }

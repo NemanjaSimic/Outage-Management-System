@@ -4,9 +4,6 @@ using Microsoft.ServiceFabric.Services.Client;
 using Microsoft.ServiceFabric.Services.Communication.Wcf.Client;
 using OMS.Common.Cloud.Names;
 using System;
-using System.Collections.Generic;
-using System.Linq;
-using System.Text;
 using System.Threading.Tasks;
 
 namespace OMS.Common.WcfClient.OMS
@@ -35,6 +32,11 @@ namespace OMS.Common.WcfClient.OMS
         public Task<OutageReport> GenerateReport(ReportOptions options)
         {
             return InvokeWithRetryAsync(client => client.Channel.GenerateReport(options));
+        }
+
+        public Task<bool> IsAlive()
+        {
+            return InvokeWithRetryAsync(client => client.Channel.IsAlive());
         }
     }
 }

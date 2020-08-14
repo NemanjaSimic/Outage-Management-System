@@ -42,5 +42,10 @@ namespace OMS.Common.WcfClient.WebAdapter
         {
             throw new NotImplementedException();
         }
+
+        public Task<bool> IsAlive()
+        {
+            return InvokeWithRetryAsync(client => client.Channel.IsAlive());
+        }
     }
 }

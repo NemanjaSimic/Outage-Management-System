@@ -70,6 +70,11 @@ namespace OMS.Common.WcfClient.SCADA
             //return MethodWrapperAsync<bool>("RemoveCommandDescription", new object[1] { gid });
             return InvokeWithRetryAsync(client => client.Channel.RemoveCommandDescription(gid));
         }
+
+        public Task<bool> IsAlive()
+        {
+            return Task.Run(() => { return true; });
+        }
         #endregion
     }
 }

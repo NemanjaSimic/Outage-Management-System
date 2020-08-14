@@ -90,6 +90,13 @@
   </ItemGroup>
   <ItemGroup>
     <Compile Include="DataContracts\CE\CalculationEngineMessage.cs" />
+    <Compile Include="DataContracts\CE\CalculationEnginePublication.cs" />
+    <Compile Include="DataContracts\CE\Interfaces\IUIMeasurement.cs" />
+    <Compile Include="DataContracts\CE\Interfaces\IUIModel.cs" />
+    <Compile Include="DataContracts\CE\Interfaces\IUINode.cs" />
+    <Compile Include="DataContracts\CE\UIModels\UIMeasurement.cs" />
+    <Compile Include="DataContracts\CE\UIModels\UIModel.cs" />
+    <Compile Include="DataContracts\CE\UIModels\UINode.cs" />
     <Compile Include="DataContracts\EMAIL\EmailServiceMessage.cs" />
     <Compile Include="DataContracts\EMAIL\OutageEmailPublication.cs" />
     <Compile Include="DataContracts\OMS\OutageMessage.cs" />
@@ -99,6 +106,10 @@
     <Compile Include="DataContracts\SCADA\ScadaMessage.cs" />
     <Compile Include="DataContracts\SCADA\ScadaPublication.cs" />
     <Compile Include="INotifySubscriberContract.cs" />
+    <Compile Include="Interfaces\IModbusData.cs" />
+    <Compile Include="Interfaces\IOutageTopologyElement.cs" />
+    <Compile Include="Interfaces\IOutageTopologyModel.cs" />
+    <Compile Include="Interfaces\IPublication.cs" />
     <Compile Include="IPublisherContract.cs" />
     <Compile Include="IRegisterSubscriberContract.cs" />
     <Compile Include="DataContracts\CE\OutageTopologyElement.cs" />
@@ -110,9 +121,9 @@
       <Project>{FBEE1369-0F6C-41E6-8C62-8C1C5CDBB602}</Project>
       <Name>Common.Cloud</Name>
     </ProjectReference>
-    <ProjectReference Include="..\..\Common.PubSub\Common.PubSub.csproj">
-      <Project>{5B775779-A5AE-4F94-90EC-59973FA80D4D}</Project>
-      <Name>Common.PubSub</Name>
+    <ProjectReference Include="..\Common.CloudContracts\Common.CloudContracts.csproj">
+      <Project>{2307F7DC-6B87-4506-8365-6966712DD5FE}</Project>
+      <Name>Common.CloudContracts</Name>
     </ProjectReference>
   </ItemGroup>
   <ItemGroup>

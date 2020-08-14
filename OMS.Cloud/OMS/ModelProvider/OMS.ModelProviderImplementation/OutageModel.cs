@@ -1,24 +1,18 @@
-﻿using Common.CE;
-using Common.OMS;
-using Common.OmsContracts.HistoryDBManager;
+﻿using Common.OmsContracts.HistoryDBManager;
 using Common.OmsContracts.ModelProvider;
 using Common.OmsContracts.OutageLifecycle;
-using Common.PubSub;
 using Common.PubSubContracts.DataContracts.CE;
 using Microsoft.ServiceFabric.Data;
 using Microsoft.ServiceFabric.Data.Notifications;
 using OMS.Common.Cloud;
 using OMS.Common.Cloud.Logger;
 using OMS.Common.Cloud.ReliableCollectionHelpers;
-using OMS.Common.PubSub;
 using OMS.Common.PubSubContracts;
+using OMS.Common.PubSubContracts.Interfaces;
 using OMS.Common.WcfClient.OMS;
 using OMS.Common.WcfClient.OMS.Lifecycle;
 using OMS.ModelProviderImplementation.ContractProviders;
-using System;
 using System.Collections.Generic;
-using System.Linq;
-using System.Text;
 using System.Threading.Tasks;
 using ReliableDictionaryNames = Common.OMS.ReliableDictionaryNames;
 
@@ -161,5 +155,10 @@ namespace OMS.ModelProviderImplementation
 			return this.subscriberUri;
 		}
 		#endregion
+
+		public Task<bool> IsAlive()
+		{
+			return Task.Run(() => { return true; });
+		}
 	}
 }

@@ -3,14 +3,14 @@ using Microsoft.ServiceFabric.Services.Client;
 using Microsoft.ServiceFabric.Services.Communication.Wcf.Client;
 using OMS.Common.Cloud;
 using OMS.Common.Cloud.Names;
-using OMS.Common.PubSub;
+using OMS.Common.PubSubContracts.Interfaces;
 using System;
 using System.Collections.Generic;
 using System.Threading.Tasks;
 
 namespace OMS.Common.WcfClient.OMS
 {
-	public class OutageModelReadAccessClient : WcfSeviceFabricClientBase<IOutageModelReadAccessContract>, IOutageModelReadAccessContract
+    public class OutageModelReadAccessClient : WcfSeviceFabricClientBase<IOutageModelReadAccessContract>, IOutageModelReadAccessContract
     {
         private static readonly string microserviceName = MicroserviceNames.OmsModelProviderService;
         private static readonly string listenerName = EndpointNames.OmsOutageManagementServiceModelReadAccessEndpoint;
@@ -58,5 +58,10 @@ namespace OMS.Common.WcfClient.OMS
         }
 
         #endregion
+
+        public Task<bool> IsAlive()
+        {
+            return InvokeWithRetryAsync(client => client.Channel.IsAlive());
+        }
     }
 }

@@ -329,5 +329,10 @@ namespace PubSubImplementation
             return result;
         }
         #endregion IRegisterSubscriberContract
+
+        public Task<bool> IsAlive()
+        {
+            return Task.Run(() => { return true; });
+        }
     }
 }

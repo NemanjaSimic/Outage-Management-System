@@ -67,5 +67,10 @@ namespace OMS.Common.WcfClient.OMS.ModelAccess
 		{
 			return InvokeWithRetryAsync(client => client.Channel.UpdateConsumer(consumer));
 		}
+
+		public Task<bool> IsAlive()
+		{
+			return InvokeWithRetryAsync(client => client.Channel.IsAlive());
+		}
 	}
 }

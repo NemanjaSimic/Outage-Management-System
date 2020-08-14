@@ -45,5 +45,10 @@ namespace OMS.Common.WcfClient.OMS
         {
             return InvokeWithRetryAsync(client => client.Channel.UpdatePotentialOutage(gid, commandOriginType, modelUpdateOperationType));
         }
+
+        public Task<bool> IsAlive()
+        {
+            return InvokeWithRetryAsync(client => client.Channel.IsAlive());
+        }
     }
 }

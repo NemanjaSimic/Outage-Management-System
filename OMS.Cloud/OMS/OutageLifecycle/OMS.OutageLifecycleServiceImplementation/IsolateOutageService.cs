@@ -5,7 +5,6 @@ using OMS.Common.Cloud;
 using OMS.Common.Cloud.Logger;
 using OMS.Common.NmsContracts;
 using OMS.Common.NmsContracts.GDA;
-using OMS.Common.PubSub;
 using OMS.Common.PubSubContracts;
 using OMS.Common.WcfClient.CE;
 using OMS.Common.WcfClient.NMS;
@@ -13,10 +12,6 @@ using OMS.Common.WcfClient.OMS;
 using OMS.Common.WcfClient.OMS.ModelAccess;
 using OMS.OutageLifecycleServiceImplementation.OutageLCHelper;
 using System;
-using System.Collections.Generic;
-using System.Linq;
-using System.Text;
-using System.Threading;
 using System.Threading.Tasks;
 using System.Timers;
 using Timer = System.Timers.Timer;
@@ -28,10 +23,13 @@ using OMS.Common.Cloud.Names;
 using Common.OmsContracts.ModelProvider;
 using Common.OmsContracts.ModelAccess;
 using Common.CeContracts;
+using OMS.Common.PubSubContracts.Interfaces;
+using System.Collections.Generic;
+using System.Linq;
 
 namespace OMS.OutageLifecycleServiceImplementation
 {
-	public class IsolateOutageService : IIsolateOutageContract
+    public class IsolateOutageService : IIsolateOutageContract
 	{
 
 		private IOutageTopologyModel outageModel;
@@ -522,5 +520,10 @@ namespace OMS.OutageLifecycleServiceImplementation
             autoResetEvent.Set();
         }
 
-    }
+    
+		public Task<bool> IsAlive()
+		{
+			return Task.Run(() => { return true; });
+		}
+	}
 }

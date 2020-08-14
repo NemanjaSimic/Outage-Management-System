@@ -3,17 +3,18 @@ using OMS.Common.Cloud;
 using OMS.Common.Cloud.Logger;
 using System;
 using System.Collections.Generic;
+using System.Configuration;
 
 namespace CE.TopologyBuilderImplementation.Configuration
 {
 	public class ConfigurationParse
 	{
         #region ConfigurationFiles
-        private readonly string ignorableFilePath ="ignorable.txt";
-		private readonly string fieldFilePath ="field.txt";
-		private readonly string nodeFilePath = "node.txt";
-		private readonly string edgeFilePath = "edge.txt";
-		private readonly string measurementFilePath = "measurement.txt";
+        private readonly string ignorableFilePath ="ignorables";
+		private readonly string fieldFilePath ="fields";
+		private readonly string nodeFilePath = "nodes";
+		private readonly string edgeFilePath = "edges";
+		private readonly string measurementFilePath = "measurements";
 		#endregion
 
 		private readonly string baseLogString;
@@ -31,12 +32,38 @@ namespace CE.TopologyBuilderImplementation.Configuration
 			Logger.LogVerbose(verboseMessage);
 		}
 
+		//private List<DMSType> ParseConfigFile(string path)
+		//{
+		//	string verboseMessage = $"{baseLogString} ParseConfigFile method called for file {path}.";
+		//	Logger.LogVerbose(verboseMessage);
+
+		//	string[] elements = Config.Instance.ReadConfiguration(path).Split(';');
+		//	List<DMSType> retValue = new List<DMSType>();
+
+		//	foreach (var item in elements)
+		//	{
+		//		DMSType type;
+		//		try
+		//		{
+		//			type = (DMSType)Enum.Parse(typeof(DMSType), item);
+		//			retValue.Add(type);
+		//		}
+		//		catch (Exception)
+		//		{
+		//			string message = $"{baseLogString} ParseConfigFile => Failed to parse [{item}] from configuration file {path}.";
+		//			Logger.LogError(message);
+		//			throw new Exception(message);
+		//		}
+		//	}
+		//	return retValue;
+		//}
+
 		private List<DMSType> ParseConfigFile(string path)
 		{
 			string verboseMessage = $"{baseLogString} ParseConfigFile method called for file {path}.";
 			Logger.LogVerbose(verboseMessage);
 
-			string[] elements = Config.Instance.ReadConfiguration(path).Split(';');
+			List<string> elements = new List<string>(ConfigurationManager.AppSettings[path].Split(new char[] { ';' }));
 			List<DMSType> retValue = new List<DMSType>();
 
 			foreach (var item in elements)
@@ -56,6 +83,7 @@ namespace CE.TopologyBuilderImplementation.Configuration
 			}
 			return retValue;
 		}
+
 		public Dictionary<TopologyStatus, List<DMSType>> GetAllElementStatus()
 		{
 			string verboseMessage = $"{baseLogString} GetAllElementStatus method called.";

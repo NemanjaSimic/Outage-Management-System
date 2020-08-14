@@ -28,7 +28,7 @@
     <Parameter Name="CE.ModelProviderService_MinReplicaSetSize" DefaultValue="3" />
     <Parameter Name="CE.ModelProviderService_PartitionCount" DefaultValue="1" />
     <Parameter Name="CE.ModelProviderService_TargetReplicaSetSize" DefaultValue="3" />
-    <Parameter Name="CE.TopologyBuilderService_InstanceCount" DefaultValue="-1" />
+    <Parameter Name="CE.TopologyBuilderService_InstanceCount" DefaultValue="1" />
     <Parameter Name="CE.TopologyProviderService_MinReplicaSetSize" DefaultValue="3" />
     <Parameter Name="CE.TopologyProviderService_PartitionCount" DefaultValue="1" />
     <Parameter Name="CE.TopologyProviderService_TargetReplicaSetSize" DefaultValue="3" />
@@ -54,14 +54,14 @@
        should match the Name and Version attributes of the ServiceManifest element defined in the
        ServiceManifest.xml file. -->
   <!--CE-->
-  <!--TMS-->
-  <!--PubSub-->
-  <!--NMS-->
-  <!--SCADA-->
   <ServiceManifestImport>
     <ServiceManifestRef ServiceManifestName="OMS.OutageLifecycleServicePkg" ServiceManifestVersion="1.0.0" />
     <ConfigOverrides />
   </ServiceManifestImport>
+  <!--TMS-->
+  <!--PubSub-->
+  <!--NMS-->
+  <!--SCADA-->
   <ServiceManifestImport>
     <ServiceManifestRef ServiceManifestName="OMS.CallTrackingServicePkg" ServiceManifestVersion="1.0.0" />
     <ConfigOverrides />

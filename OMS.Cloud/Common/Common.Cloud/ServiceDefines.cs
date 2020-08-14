@@ -103,11 +103,11 @@ namespace OMS.Common.Cloud
                 { MicroserviceNames.TransactionManagerService,      new Uri("fabric:/OMS.Cloud/TMS.TransactionManagerService")  },
 
                 //TODO: CE
-                { MicroserviceNames.CeLoadFlowService,              new Uri("fabric:/OMS.Cloud/LoadFlowService")                },
-                { MicroserviceNames.CeMeasurementProviderService,   new Uri("fabric:/OMS.Cloud/MeasurementProviderService")     },
-                { MicroserviceNames.CeModelProviderService,         new Uri("fabric:/OMS.Cloud/ModelProviderService")           },
-                { MicroserviceNames.CeTopologyBuilderService,       new Uri("fabric:/OMS.Cloud/TopologyBuilderService")         },
-                { MicroserviceNames.CeTopologyProviderService,      new Uri("fabric:/OMS.Cloud/TopologyProviderService")        },
+                { MicroserviceNames.CeLoadFlowService,              new Uri("fabric:/OMS.Cloud/CE.LoadFlowService")                },
+                { MicroserviceNames.CeMeasurementProviderService,   new Uri("fabric:/OMS.Cloud/CE.MeasurementProviderService")     },
+                { MicroserviceNames.CeModelProviderService,         new Uri("fabric:/OMS.Cloud/CE.ModelProviderService")           },
+                { MicroserviceNames.CeTopologyBuilderService,       new Uri("fabric:/OMS.Cloud/CE.TopologyBuilderService")         },
+                { MicroserviceNames.CeTopologyProviderService,      new Uri("fabric:/OMS.Cloud/CE.TopologyProviderService")        },
 
                 //TODO: OMS
                 { MicroserviceNames.OmsModelProviderService,         new Uri("fabric:/OMS.Cloud/OMS.ModelProviderService")      },

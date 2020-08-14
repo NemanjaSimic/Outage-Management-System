@@ -1,4 +1,5 @@
-﻿using Common.OMS.OutageDatabaseModel;
+﻿using Common.CloudContracts;
+using Common.OMS.OutageDatabaseModel;
 using Common.OmsContracts.ModelAccess;
 using Microsoft.ServiceFabric.Services.Client;
 using Microsoft.ServiceFabric.Services.Communication.Wcf.Client;
@@ -66,6 +67,11 @@ namespace OMS.Common.WcfClient.OMS.ModelAccess
 		public Task UpdateEquipment(Equipment equipment)
 		{
 			return InvokeWithRetryAsync(client => client.Channel.UpdateEquipment(equipment));
+		}
+
+		public Task<bool> IsAlive()
+		{
+			return InvokeWithRetryAsync(client => client.Channel.IsAlive());
 		}
 	}
 }

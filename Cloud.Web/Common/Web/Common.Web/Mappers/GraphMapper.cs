@@ -1,5 +1,5 @@
-﻿using Common.CE.Interfaces;
-using Common.CeContracts;
+﻿using Common.CeContracts;
+using Common.PubSubContracts.DataContracts.CE.Interfaces;
 using Common.Web.Extensions;
 using Common.Web.Models.ViewModels;
 using OMS.Common.Cloud;
@@ -11,7 +11,7 @@ namespace Common.Web.Mappers
     {
         private const string PowerTransformerDmsTypeName = "POWERTRANSFORMER";
 
-        public OmsGraphViewModel Map(UIModel topologyModel)
+        public OmsGraphViewModel Map(IUIModel topologyModel)
         {
             OmsGraphViewModel graph = new OmsGraphViewModel();
             

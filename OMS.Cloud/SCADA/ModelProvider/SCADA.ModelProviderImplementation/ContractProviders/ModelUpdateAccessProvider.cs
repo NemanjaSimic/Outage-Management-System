@@ -5,7 +5,6 @@ using OMS.Common.Cloud.Exceptions.SCADA;
 using OMS.Common.Cloud.Logger;
 using OMS.Common.Cloud.Names;
 using OMS.Common.Cloud.ReliableCollectionHelpers;
-using OMS.Common.PubSub;
 using OMS.Common.PubSubContracts;
 using OMS.Common.PubSubContracts.DataContracts.SCADA;
 using OMS.Common.ScadaContracts.DataContracts;
@@ -14,7 +13,6 @@ using OMS.Common.ScadaContracts.ModelProvider;
 using OMS.Common.WcfClient.PubSub;
 using System;
 using System.Collections.Generic;
-using System.ServiceModel;
 using System.Text;
 using System.Threading.Tasks;
 using ReliableDictionaryNames = OMS.Common.SCADA.ReliableDictionaryNames;
@@ -87,8 +85,6 @@ namespace SCADA.ModelProviderImplementation.ContractProviders
 
             this.stateManager = stateManager;
             this.stateManager.StateManagerChanged += this.OnStateManagerChangedHandler;
-
-            //this.publisherClient = PublisherClient.CreateClient();
         }
 
         private async void OnStateManagerChangedHandler(object sender, NotifyStateManagerChangedEventArgs e)
@@ -437,17 +433,6 @@ namespace SCADA.ModelProviderImplementation.ContractProviders
                 await publisherClient.Publish(scadaPublication, MicroserviceNames.ScadaModelProviderService);
                 Logger.LogInformation($"{baseLogString} PublishScadaData => SCADA service published data of topic: {scadaPublication.Topic}, publisher name: {MicroserviceNames.ScadaModelProviderService}");
             }
-            //catch (CommunicationObjectFaultedException e)
-            //{
-            //    string message = $"{baseLogString} PublishScadaData => CommunicationObjectFaultedException caught.";
-            //    Logger.LogError(message, e);
-
-            //    await Task.Delay(2000);
-
-            //    this.publisherClient = PublisherClient.CreateClient();
-            //    await PublishScadaData(topic, scadaMessage);
-            //    //todo: different logic on multiple rety?
-            //}
             catch (Exception e)
             {
                 string errorMessage = $"{baseLogString} PublishScadaData => exception {e.Message}";
@@ -461,7 +446,7 @@ namespace SCADA.ModelProviderImplementation.ContractProviders
             var enumerableMeasurementCache = await MeasurementsCache.GetEnumerableDictionaryAsync();
             foreach (long gid in enumerableMeasurementCache.Keys)
             {
-                IModbusData data = enumerableMeasurementCache[gid];
+                ModbusData data = enumerableMeasurementCache[gid];
 
                 if (data is AnalogModbusData analogModbusData)
                 {
@@ -479,6 +464,13 @@ namespace SCADA.ModelProviderImplementation.ContractProviders
 
             Logger.LogDebug(sb.ToString());
         }
+
+        public Task<bool> IsAlive()
+        {
+            return Task.Run(() => { return true; });
+        }
         #endregion Private Methods
+
+
     }
 }

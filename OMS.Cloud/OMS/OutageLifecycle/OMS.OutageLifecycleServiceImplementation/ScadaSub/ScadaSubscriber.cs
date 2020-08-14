@@ -1,11 +1,12 @@
-﻿using Common.PubSub;
-using OMS.Common.Cloud;
+﻿using OMS.Common.Cloud;
 using OMS.Common.Cloud.Logger;
 using OMS.Common.PubSubContracts;
 using OMS.Common.PubSubContracts.DataContracts.SCADA;
+using OMS.Common.PubSubContracts.Interfaces;
 using System;
 using System.Collections.Generic;
 using System.Linq;
+using System.Runtime.Remoting.Messaging;
 using System.Text;
 using System.Threading;
 using System.Threading.Tasks;
@@ -62,6 +63,11 @@ namespace OMS.OutageLifecycleServiceImplementation.ScadaSub
 				AutoResetEvent = null;
 				HeadBreakerID = -1;
 			}
+		}
+
+		public Task<bool> IsAlive()
+		{
+			return Task.Run(() => true);
 		}
 	}
 }

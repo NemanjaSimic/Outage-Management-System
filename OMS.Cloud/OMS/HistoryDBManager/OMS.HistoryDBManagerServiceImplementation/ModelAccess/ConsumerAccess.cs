@@ -43,6 +43,11 @@ namespace OMS.HistoryDBManagerServiceImplementation.ModelAccess
 			return new Task<Consumer>(() => dbContext.ConsumerRepository.Get(gid));
 		}
 
+		public Task<bool> IsAlive()
+		{
+			return Task.Run(() => true);
+		}
+
 		public Task RemoveAllConsumers()
 		{
 			return new Task(() =>

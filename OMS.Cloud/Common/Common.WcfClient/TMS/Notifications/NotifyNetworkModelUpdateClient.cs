@@ -32,6 +32,11 @@ namespace OMS.Common.WcfClient.TMS
             return factory.CreateClient<NotifyNetworkModelUpdateClient, INotifyNetworkModelUpdateContract>(serviceUri, servicePartitionKey);
         }
 
+        public Task<bool> IsAlive()
+        {
+            return Task.Run(() => { return true; });
+        }
+
         #region IModelUpdateNotificationContract
         public Task<bool> Notify(Dictionary<DeltaOpType, List<long>> modelChanges)
         {

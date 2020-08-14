@@ -79,5 +79,10 @@ namespace SCADA.FunctionExecutorImplementation.CommandEnqueuers
             return success;
         }
         #endregion
+
+        public Task<bool> IsAlive()
+        {
+            return Task.Run(() => { return true; });
+        }
     }
 }

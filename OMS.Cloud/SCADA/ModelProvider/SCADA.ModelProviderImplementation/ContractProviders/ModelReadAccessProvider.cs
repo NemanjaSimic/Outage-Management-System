@@ -276,5 +276,10 @@ namespace SCADA.ModelProviderImplementation.ContractProviders
         }
 
         #endregion IScadaModelReadAccessContract
+
+        public Task<bool> IsAlive()
+        {
+            return Task.Run(() => { return true; });
+        }
     }
 }

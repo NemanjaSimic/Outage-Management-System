@@ -1,22 +1,37 @@
-﻿using Common.PubSub;
-using OMS.Common.PubSub;
-using System;
-using System.Collections.Generic;
-using System.Linq;
+﻿using Common.PubSubContracts.DataContracts.CE.Interfaces;
+using Common.PubSubContracts.DataContracts.CE.UIModels;
+using OMS.Common.PubSubContracts.Interfaces;
 using System.Runtime.Serialization;
-using System.Text;
-using System.Threading.Tasks;
 
 
 namespace Common.PubSubContracts.DataContracts.CE
 {
-	[DataContract]
-	public class CalculationEngineMessage : IPublishableMessage
-	{
-	}
-
+    [DataContract]
+    [KnownType(typeof(TopologyForUIMessage))]
+    [KnownType(typeof(OMSModelMessage))]
+    [KnownType(typeof(OutageTopologyModel))]
+    [KnownType(typeof(OutageTopologyElement))]
+    public abstract class CalculationEngineMessage : IPublishableMessage
+    {
+    }
 
     [DataContract]
+    [KnownType(typeof(UIModel))]
+    public class TopologyForUIMessage : CalculationEngineMessage
+    {
+        [DataMember]
+        public IUIModel UIModel { get; set; }
+
+        public TopologyForUIMessage(IUIModel uiModel)
+        {
+            UIModel = uiModel;
+        }
+
+    }
+
+    [DataContract]
+    [KnownType(typeof(OutageTopologyModel))]
+    [KnownType(typeof(OutageTopologyElement))]
     public class OMSModelMessage : CalculationEngineMessage
     {
         [DataMember]

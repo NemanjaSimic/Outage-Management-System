@@ -8,13 +8,11 @@ using OMS.Common.WcfClient.OMS.ModelAccess;
 using OMS.OutageLifecycleServiceImplementation.OutageLCHelper;
 using System;
 using System.Collections.Generic;
-using System.Linq;
-using System.Text;
 using System.Threading.Tasks;
 
 namespace OMS.OutageLifecycleServiceImplementation
 {
-	public class ResolveOutageService : IResolveOutageContract
+    public class ResolveOutageService : IResolveOutageContract
 	{
 
 		private ICloudLogger logger;
@@ -32,8 +30,11 @@ namespace OMS.OutageLifecycleServiceImplementation
             this.outageMessageMapper = new OutageMessageMapper();
             this.outageModelAccessClient = OutageModelAccessClient.CreateClient();
         }
-
-		public async Task<bool> ResolveOutage(long outageId)
+        public Task<bool> IsAlive()
+        {
+            return Task.Run(() => { return true; });
+        }
+        public async Task<bool> ResolveOutage(long outageId)
 		{
             Logger.LogDebug("ResolveOutage method started.");
             OutageEntity activeOutageDbEntity = null;
