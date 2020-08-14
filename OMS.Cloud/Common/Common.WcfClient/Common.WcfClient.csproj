@@ -33,43 +33,43 @@
   </PropertyGroup>
   <ItemGroup>
     <Reference Include="Microsoft.ServiceFabric.Data, Version=7.0.0.0, Culture=neutral, PublicKeyToken=31bf3856ad364e35, processorArchitecture=AMD64">
-      <HintPath>..\..\packages\Microsoft.ServiceFabric.Data.4.1.428\lib\net472\Microsoft.ServiceFabric.Data.dll</HintPath>
+      <HintPath>..\..\..\Cloud.Web\Cloud.Web\packages\Microsoft.ServiceFabric.Data.4.1.456\lib\net472\Microsoft.ServiceFabric.Data.dll</HintPath>
     </Reference>
     <Reference Include="Microsoft.ServiceFabric.Data.Extensions, Version=1.4.5.0, Culture=neutral, PublicKeyToken=31bf3856ad364e35, processorArchitecture=MSIL">
-      <HintPath>..\..\packages\Microsoft.ServiceFabric.Data.Extensions.4.1.428\lib\net472\Microsoft.ServiceFabric.Data.Extensions.dll</HintPath>
+      <HintPath>..\..\..\Cloud.Web\Cloud.Web\packages\Microsoft.ServiceFabric.Data.Extensions.4.1.456\lib\net472\Microsoft.ServiceFabric.Data.Extensions.dll</HintPath>
     </Reference>
     <Reference Include="Microsoft.ServiceFabric.Data.Interfaces, Version=5.0.0.0, Culture=neutral, PublicKeyToken=31bf3856ad364e35, processorArchitecture=AMD64">
-      <HintPath>..\..\packages\Microsoft.ServiceFabric.Data.Interfaces.4.1.428\lib\net472\Microsoft.ServiceFabric.Data.Interfaces.dll</HintPath>
+      <HintPath>..\..\..\Cloud.Web\Cloud.Web\packages\Microsoft.ServiceFabric.Data.Interfaces.4.1.456\lib\net472\Microsoft.ServiceFabric.Data.Interfaces.dll</HintPath>
     </Reference>
     <Reference Include="Microsoft.ServiceFabric.Diagnostics, Version=7.0.0.0, Culture=neutral, PublicKeyToken=31bf3856ad364e35, processorArchitecture=AMD64">
-      <HintPath>..\..\packages\Microsoft.ServiceFabric.Diagnostics.Internal.4.1.428\lib\net472\Microsoft.ServiceFabric.Diagnostics.dll</HintPath>
+      <HintPath>..\..\..\Cloud.Web\Cloud.Web\packages\Microsoft.ServiceFabric.Diagnostics.Internal.4.1.456\lib\net472\Microsoft.ServiceFabric.Diagnostics.dll</HintPath>
     </Reference>
     <Reference Include="Microsoft.ServiceFabric.FabricTransport, Version=7.0.0.0, Culture=neutral, PublicKeyToken=31bf3856ad364e35, processorArchitecture=AMD64">
-      <HintPath>..\..\packages\Microsoft.ServiceFabric.FabricTransport.Internal.4.1.428\lib\net472\Microsoft.ServiceFabric.FabricTransport.dll</HintPath>
+      <HintPath>..\..\..\Cloud.Web\Cloud.Web\packages\Microsoft.ServiceFabric.FabricTransport.Internal.4.1.456\lib\net472\Microsoft.ServiceFabric.FabricTransport.dll</HintPath>
     </Reference>
     <Reference Include="Microsoft.ServiceFabric.FabricTransport.V2, Version=7.0.0.0, Culture=neutral, PublicKeyToken=31bf3856ad364e35, processorArchitecture=AMD64">
-      <HintPath>..\..\packages\Microsoft.ServiceFabric.FabricTransport.Internal.4.1.428\lib\net472\Microsoft.ServiceFabric.FabricTransport.V2.dll</HintPath>
+      <HintPath>..\..\..\Cloud.Web\Cloud.Web\packages\Microsoft.ServiceFabric.FabricTransport.Internal.4.1.456\lib\net472\Microsoft.ServiceFabric.FabricTransport.V2.dll</HintPath>
     </Reference>
     <Reference Include="Microsoft.ServiceFabric.Internal, Version=7.0.0.0, Culture=neutral, PublicKeyToken=31bf3856ad364e35, processorArchitecture=AMD64">
-      <HintPath>..\..\packages\Microsoft.ServiceFabric.7.1.428\lib\net472\Microsoft.ServiceFabric.Internal.dll</HintPath>
+      <HintPath>..\..\..\Cloud.Web\Cloud.Web\packages\Microsoft.ServiceFabric.7.1.456\lib\net472\Microsoft.ServiceFabric.Internal.dll</HintPath>
     </Reference>
     <Reference Include="Microsoft.ServiceFabric.Internal.Strings, Version=7.0.0.0, Culture=neutral, PublicKeyToken=31bf3856ad364e35, processorArchitecture=AMD64">
-      <HintPath>..\..\packages\Microsoft.ServiceFabric.7.1.428\lib\net472\Microsoft.ServiceFabric.Internal.Strings.dll</HintPath>
+      <HintPath>..\..\..\Cloud.Web\Cloud.Web\packages\Microsoft.ServiceFabric.7.1.456\lib\net472\Microsoft.ServiceFabric.Internal.Strings.dll</HintPath>
     </Reference>
     <Reference Include="Microsoft.ServiceFabric.Preview, Version=7.0.0.0, Culture=neutral, PublicKeyToken=31bf3856ad364e35, processorArchitecture=AMD64">
-      <HintPath>..\..\packages\Microsoft.ServiceFabric.7.1.428\lib\net472\Microsoft.ServiceFabric.Preview.dll</HintPath>
+      <HintPath>..\..\..\Cloud.Web\Cloud.Web\packages\Microsoft.ServiceFabric.7.1.456\lib\net472\Microsoft.ServiceFabric.Preview.dll</HintPath>
     </Reference>
     <Reference Include="Microsoft.ServiceFabric.ReliableCollection.Interop, Version=1.0.0.0, Culture=neutral, PublicKeyToken=31bf3856ad364e35, processorArchitecture=MSIL">
-      <HintPath>..\..\packages\Microsoft.ServiceFabric.Data.Extensions.4.1.428\lib\net472\Microsoft.ServiceFabric.ReliableCollection.Interop.dll</HintPath>
+      <HintPath>..\..\..\Cloud.Web\Cloud.Web\packages\Microsoft.ServiceFabric.Data.Extensions.4.1.456\lib\net472\Microsoft.ServiceFabric.ReliableCollection.Interop.dll</HintPath>
     </Reference>
     <Reference Include="Microsoft.ServiceFabric.Services, Version=6.0.0.0, Culture=neutral, PublicKeyToken=31bf3856ad364e35, processorArchitecture=AMD64">
-      <HintPath>..\..\packages\Microsoft.ServiceFabric.Services.4.1.428\lib\net472\Microsoft.ServiceFabric.Services.dll</HintPath>
+      <HintPath>..\..\..\Cloud.Web\Cloud.Web\packages\Microsoft.ServiceFabric.Services.4.1.456\lib\net472\Microsoft.ServiceFabric.Services.dll</HintPath>
     </Reference>
     <Reference Include="Microsoft.ServiceFabric.Services.Remoting, Version=6.0.0.0, Culture=neutral, PublicKeyToken=31bf3856ad364e35, processorArchitecture=AMD64">
-      <HintPath>..\..\packages\Microsoft.ServiceFabric.Services.Remoting.4.1.428\lib\net472\Microsoft.ServiceFabric.Services.Remoting.dll</HintPath>
+      <HintPath>..\..\..\Cloud.Web\Cloud.Web\packages\Microsoft.ServiceFabric.Services.Remoting.4.1.456\lib\net472\Microsoft.ServiceFabric.Services.Remoting.dll</HintPath>
     </Reference>
     <Reference Include="Microsoft.ServiceFabric.Services.Wcf, Version=6.0.0.0, Culture=neutral, PublicKeyToken=31bf3856ad364e35, processorArchitecture=AMD64">
-      <HintPath>..\..\packages\Microsoft.ServiceFabric.Services.Wcf.4.1.428\lib\net45\Microsoft.ServiceFabric.Services.Wcf.dll</HintPath>
+      <HintPath>..\..\..\Cloud.Web\Cloud.Web\packages\Microsoft.ServiceFabric.Services.Wcf.4.1.456\lib\net45\Microsoft.ServiceFabric.Services.Wcf.dll</HintPath>
     </Reference>
     <Reference Include="Microsoft.WindowsAzure.Storage, Version=9.3.2.0, Culture=neutral, PublicKeyToken=31bf3856ad364e35, processorArchitecture=MSIL">
       <SpecificVersion>False</SpecificVersion>
@@ -84,13 +84,13 @@
     <Reference Include="System.Data.OracleClient" />
     <Reference Include="System.Drawing" />
     <Reference Include="System.Fabric, Version=7.0.0.0, Culture=neutral, PublicKeyToken=31bf3856ad364e35, processorArchitecture=AMD64">
-      <HintPath>..\..\packages\Microsoft.ServiceFabric.7.1.428\lib\net472\System.Fabric.dll</HintPath>
+      <HintPath>..\..\..\Cloud.Web\Cloud.Web\packages\Microsoft.ServiceFabric.7.1.456\lib\net472\System.Fabric.dll</HintPath>
     </Reference>
     <Reference Include="System.Fabric.Management.ServiceModel, Version=7.0.0.0, Culture=neutral, PublicKeyToken=31bf3856ad364e35, processorArchitecture=AMD64">
-      <HintPath>..\..\packages\Microsoft.ServiceFabric.7.1.428\lib\net472\System.Fabric.Management.ServiceModel.dll</HintPath>
+      <HintPath>..\..\..\Cloud.Web\Cloud.Web\packages\Microsoft.ServiceFabric.7.1.456\lib\net472\System.Fabric.Management.ServiceModel.dll</HintPath>
     </Reference>
     <Reference Include="System.Fabric.Strings, Version=7.0.0.0, Culture=neutral, PublicKeyToken=31bf3856ad364e35, processorArchitecture=AMD64">
-      <HintPath>..\..\packages\Microsoft.ServiceFabric.7.1.428\lib\net472\System.Fabric.Strings.dll</HintPath>
+      <HintPath>..\..\..\Cloud.Web\Cloud.Web\packages\Microsoft.ServiceFabric.7.1.456\lib\net472\System.Fabric.Strings.dll</HintPath>
     </Reference>
     <Reference Include="System.Net" />
     <Reference Include="System.Runtime.Serialization" />

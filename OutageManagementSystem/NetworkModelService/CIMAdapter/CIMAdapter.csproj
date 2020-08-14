@@ -39,7 +39,7 @@
       <HintPath>..\..\packages\Microsoft.ServiceFabric.Services.Remoting.4.0.470\lib\net472\Microsoft.ServiceFabric.Services.Remoting.dll</HintPath>
     </Reference>
     <Reference Include="OutageCIMProfile_NetworkModelService">
-      <HintPath>..\bin64\DLL\OutageCIMProfile_NetworkModelService.dll</HintPath>
+      <HintPath>..\OutageCIMProfile_NetworkModelService.dll</HintPath>
     </Reference>
     <Reference Include="System" />
     <Reference Include="System.Core" />
