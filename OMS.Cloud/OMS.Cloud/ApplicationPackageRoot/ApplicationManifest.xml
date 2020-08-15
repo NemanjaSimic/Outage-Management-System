@@ -50,18 +50,18 @@
     <Parameter Name="SCADA.ModelProviderService_PartitionCount" DefaultValue="1" />
     <Parameter Name="SCADA.ModelProviderService_TargetReplicaSetSize" DefaultValue="3" />
   </Parameters>
+  <!--CE-->
   <!-- Import the ServiceManifest from the ServicePackage. The ServiceManifestName and ServiceManifestVersion
        should match the Name and Version attributes of the ServiceManifest element defined in the
        ServiceManifest.xml file. -->
-  <!--CE-->
   <ServiceManifestImport>
     <ServiceManifestRef ServiceManifestName="OMS.OutageLifecycleServicePkg" ServiceManifestVersion="1.0.0" />
     <ConfigOverrides />
   </ServiceManifestImport>
-  <!--TMS-->
-  <!--PubSub-->
-  <!--NMS-->
   <!--SCADA-->
+  <!--NMS-->
+  <!--PubSub-->
+  <!--TMS-->
   <ServiceManifestImport>
     <ServiceManifestRef ServiceManifestName="OMS.CallTrackingServicePkg" ServiceManifestVersion="1.0.0" />
     <ConfigOverrides />

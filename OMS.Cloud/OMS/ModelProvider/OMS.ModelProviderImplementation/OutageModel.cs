@@ -47,8 +47,8 @@ namespace OMS.ModelProviderImplementation
 			this.outageModelReadAccessProvider = outageModelReadAccessProvider;
 			this.outageModelUpdateAccessProvider = outageModelUpdateAccessProvider;
 		}
-		#region ReliableDictionaryAccess
 
+		#region ReliableDictionaryAccess
 		private ReliableDictionaryAccess<long, IOutageTopologyModel> topologyModel;
 
 		public ReliableDictionaryAccess<long, IOutageTopologyModel> TopologyModel
@@ -81,30 +81,34 @@ namespace OMS.ModelProviderImplementation
 		{
 			get { return potentialOutage ?? (potentialOutage = ReliableDictionaryAccess<long,CommandOriginType>.Create(this.stateManager,ReliableDictionaryNames.PotentialOutage).Result); }
 		}
-		#endregion
 
 		private async void OnStateManagerChangedHandler(object sender, NotifyStateManagerChangedEventArgs e)
 		{
-			if(e.Action == NotifyStateManagerChangedAction.Add)
+			if (e.Action == NotifyStateManagerChangedAction.Add)
 			{
 				var operation = e as NotifyStateManagerSingleEntityChangedEventArgs;
 				string reliableStateName = operation.ReliableState.Name.AbsolutePath;
-				if(reliableStateName == ReliableDictionaryNames.OutageTopologyModel)
+				if (reliableStateName == ReliableDictionaryNames.OutageTopologyModel)
 				{
 					topologyModel = await ReliableDictionaryAccess<long, IOutageTopologyModel>.Create(this.stateManager, ReliableDictionaryNames.OutageTopologyModel);
-				}else if(reliableStateName == ReliableDictionaryNames.CommandedElements)
+				}
+				else if (reliableStateName == ReliableDictionaryNames.CommandedElements)
 				{
 					commandedElements = await ReliableDictionaryAccess<long, long>.Create(this.stateManager, ReliableDictionaryNames.CommandedElements);
-				}else if(reliableStateName == ReliableDictionaryNames.OptimumIsolatioPoints)
+				}
+				else if (reliableStateName == ReliableDictionaryNames.OptimumIsolatioPoints)
 				{
 					optimumIsloationPoints = await ReliableDictionaryAccess<long, long>.Create(this.stateManager, ReliableDictionaryNames.OptimumIsolatioPoints);
-				}else if(reliableStateName == ReliableDictionaryNames.PotentialOutage)
+				}
+				else if (reliableStateName == ReliableDictionaryNames.PotentialOutage)
 				{
 					potentialOutage = await ReliableDictionaryAccess<long, CommandOriginType>.Create(this.stateManager, ReliableDictionaryNames.PotentialOutage);
 				}
 
 			}
 		}
+		#endregion
+
 		#region INotifySubscriberContract
 		private readonly string subscriberUri;
 

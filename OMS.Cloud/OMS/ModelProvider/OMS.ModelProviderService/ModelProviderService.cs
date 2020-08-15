@@ -86,7 +86,6 @@ namespace OMS.ModelProviderService
         {   
             try
 			{
-                await this.registerSubscriberClient.SubscribeToTopic(Topic.TOPOLOGY, MicroserviceNames.OmsModelProviderService);
                 await this.registerSubscriberClient.SubscribeToTopic(Topic.OMS_MODEL, MicroserviceNames.OmsModelProviderService);
             }
             catch (Exception e)
