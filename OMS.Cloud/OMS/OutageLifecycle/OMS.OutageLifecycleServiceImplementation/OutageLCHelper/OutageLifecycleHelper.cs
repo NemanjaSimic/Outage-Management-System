@@ -242,6 +242,7 @@ namespace OMS.OutageLifecycleServiceImplementation.OutageLCHelper
                 }
                 catch (Exception e)
                 {
+                    //todo: log
                     //TODO: Kad prvi put ovde bude puklo, alarmirajte me. Dimitrije
                     throw e;
                 }

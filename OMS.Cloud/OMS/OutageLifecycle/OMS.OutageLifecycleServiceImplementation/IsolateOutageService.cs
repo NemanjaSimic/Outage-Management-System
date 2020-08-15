@@ -114,8 +114,8 @@ namespace OMS.OutageLifecycleServiceImplementation
                             }
                             catch (Exception e)
                             {
-                            //TODO: mozda publish neke greske??
-                            Logger.LogError("Error occured while trying to publish outage.", e);
+                                //TODO: mozda publish neke greske??
+                                Logger.LogError("Error occured while trying to publish outage.", e);
                             }
                         }, TaskContinuationOptions.OnlyOnRanToCompletion);
                 }
@@ -445,6 +445,7 @@ namespace OMS.OutageLifecycleServiceImplementation
             }
             catch (Exception e)
             {
+                //todo: log
                 throw e;
             }
 

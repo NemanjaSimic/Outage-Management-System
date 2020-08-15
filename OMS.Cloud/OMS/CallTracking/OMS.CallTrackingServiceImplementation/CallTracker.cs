@@ -51,6 +51,7 @@ namespace OMS.CallTrackingServiceImplementation
 		{
 			return Task.Run(() => { return true; });
 		}
+
 		public CallTracker(IReliableStateManager stateManager, string subscriberName)
 		{
 			this.stateManager = stateManager;

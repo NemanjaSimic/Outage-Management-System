@@ -25,20 +25,18 @@ namespace OMS.CallTrackingService
 	{
 		private readonly CallTracker callTracker;
 
-		private readonly IRegisterSubscriberContract registerSubscriberClient;
+		private IRegisterSubscriberContract registerSubscriberClient;
 
 		private ICloudLogger logger;
 		private ICloudLogger Logger
 		{
 			get { return logger ?? (logger = CloudLoggerFactory.GetLogger()); }
 		}
+
 		public CallTrackingService(StatefulServiceContext context)
 			: base(context)
 		{
 			callTracker = new CallTracker(this.StateManager, MicroserviceNames.OmsCallTrackingService);
-
-			this.registerSubscriberClient = RegisterSubscriberClient.CreateClient();
-			
 		}
 
 		/// <summary>
@@ -71,6 +69,7 @@ namespace OMS.CallTrackingService
 		{
 			try
 			{
+				this.registerSubscriberClient = RegisterSubscriberClient.CreateClient();
 				await this.registerSubscriberClient.SubscribeToTopic(Topic.OUTAGE_EMAIL, MicroserviceNames.OmsCallTrackingService);
 			}
 			catch (Exception e)
