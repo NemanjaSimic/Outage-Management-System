@@ -1,22 +1,16 @@
-﻿using System;
-using System.Collections.Generic;
-using System.Fabric;
-using System.Linq;
-using System.ServiceModel.Configuration;
+﻿using System.Fabric;
 using System.Threading;
 using System.Threading.Tasks;
-using Microsoft.ServiceFabric.Services.Communication.Runtime;
 using Microsoft.ServiceFabric.Services.Runtime;
-using OMS.CallTrackingServiceImplementation.Interfaces;
-using OMS.CallTrackingServiceImplementation.Models;
-using OMS.EmailServiceImplementation.Factories;
+using OMS.EmailImplementation.Interfaces;
+using OMS.EmailImplementation.Factories;
 
 namespace OMS.EmailService
 {
-	/// <summary>
-	/// An instance of this class is created for each service instance by the Service Fabric runtime.
-	/// </summary>
-	internal sealed class EmailService : StatelessService
+    /// <summary>
+    /// An instance of this class is created for each service instance by the Service Fabric runtime.
+    /// </summary>
+    internal sealed class EmailService : StatelessService
 	{
 		public EmailService(StatelessServiceContext context)
 			: base(context)

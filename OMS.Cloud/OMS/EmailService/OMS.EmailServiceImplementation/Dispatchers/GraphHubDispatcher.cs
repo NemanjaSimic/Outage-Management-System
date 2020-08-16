@@ -1,16 +1,12 @@
 ﻿using Microsoft.AspNet.SignalR.Client;
-using OMS.CallTrackingServiceImplementation.Interfaces;
+using OMS.EmailImplementation.Interfaces;
 using OMS.Common.Cloud.Logger;
 using System;
-using System.Collections.Generic;
 using System.Configuration;
-using System.Linq;
-using System.Text;
-using System.Threading.Tasks;
 
-namespace OMS.CallTrackingServiceImplementation.Dispatchers
+namespace OMS.EmailImplementation.Dispatchers
 {
-	public class GraphHubDispatcher : IDispatcher
+    public class GraphHubDispatcher : IDispatcher
     {
         private ICloudLogger logger;
         private ICloudLogger Logger

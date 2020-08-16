@@ -16,21 +16,38 @@ namespace Common.OmsContracts.ModelAccess
 	{
 		[OperationContract]
 		Task<IEnumerable<OutageEntity>> GetAllActiveOutages();
+
 		[OperationContract]
 		Task<IEnumerable<OutageEntity>> GetAllArchivedOutages();
+
 		[OperationContract]
 		Task<IEnumerable<OutageEntity>> GetAllOutages();
+
 		[OperationContract]
 		Task<OutageEntity> AddOutage(OutageEntity outage);
+
 		[OperationContract]
 		Task<OutageEntity> GetOutage(long gid);
+
 		[OperationContract]
 		Task RemoveOutage(OutageEntity outage);
+
 		[OperationContract]
 		Task RemoveAllOutages();
+
 		[OperationContract]
 		Task UpdateOutage(OutageEntity outage);
-		[OperationContract]
-		Task<IEnumerable<OutageEntity>> FindOutage(Expression<Func<OutageEntity, bool>> predicate);
+
+		//TODO: solve serialization of Expression<Func<OutageEntity, bool>>
+		//[OperationContract]
+		//Task<IEnumerable<OutageEntity>> FindOutage(Expression<Func<OutageEntity, bool>> predicate);
 	}
+
+	//TODO: probati
+	//[DataContract]
+	//public class Foo
+	//{
+	//	[DataMember]
+	//	public Expression<Func<Consumer, bool>> FooProp { get; set; }
+	//}
 }

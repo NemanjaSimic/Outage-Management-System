@@ -39,10 +39,11 @@ namespace OMS.Common.WcfClient.OMS.ModelAccess
 			return InvokeWithRetryAsync(client => client.Channel.AddEquipment(equipment));
 		}
 
-		public Task<IEnumerable<Equipment>> FindEquipment(Expression<Func<Equipment, bool>> predicate)
-		{
-			return InvokeWithRetryAsync(client => client.Channel.FindEquipment(predicate));
-		}
+		//TODO: solve serialization of Expression<Func<Equipment, bool>>
+		//public Task<IEnumerable<Equipment>> FindEquipment(Expression<Func<Equipment, bool>> predicate)
+		//{
+		//	return InvokeWithRetryAsync(client => client.Channel.FindEquipment(predicate));
+		//}
 
 		public Task<IEnumerable<Equipment>> GetAllEquipments()
 		{

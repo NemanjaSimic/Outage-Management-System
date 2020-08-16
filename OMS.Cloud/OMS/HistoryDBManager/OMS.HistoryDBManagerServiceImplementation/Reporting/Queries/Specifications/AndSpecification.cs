@@ -1,13 +1,10 @@
 ﻿using System;
 using System.Collections.Generic;
-using System.Linq;
 using System.Linq.Expressions;
-using System.Text;
-using System.Threading.Tasks;
 
-namespace OMS.HistoryDBManagerServiceImplementation.Reporting.Queries.Specifications
+namespace OMS.HistoryDBManagerImplementation.Reporting.Queries.Specifications
 {
-	public class AndSpecification<T> : Specification<T> where T : class
+    public class AndSpecification<T> : Specification<T> where T : class
 	{
 		private IList<Specification<T>> _specifications;
 

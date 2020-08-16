@@ -35,6 +35,7 @@ namespace Common.PubSubContracts.DataContracts.CE
     public class OMSModelMessage : CalculationEngineMessage
     {
         [DataMember]
+        //todo: try this instead =>        public IOutageTopologyModel OutageTopologyModel { get; set; }
         public IOutageTopologyModel OutageTopologyModel { get; set; }
 
         public OMSModelMessage(IOutageTopologyModel outageTopologyModel)

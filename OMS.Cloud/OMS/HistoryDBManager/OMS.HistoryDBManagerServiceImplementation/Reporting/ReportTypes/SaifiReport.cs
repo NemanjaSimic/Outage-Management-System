@@ -1,17 +1,14 @@
 ﻿using Common.OMS.OutageDatabaseModel;
 using Common.OMS.Report;
 using OMS.Common.Cloud;
-using OMS.HistoryDBManagerServiceImplementation.Reporting.Queries;
-using OMS.HistoryDBManagerServiceImplementation.Reporting.Queries.Specifications;
+using OMS.HistoryDBManagerImplementation.Reporting.Queries;
+using OMS.HistoryDBManagerImplementation.Reporting.Queries.Specifications;
 using OutageDatabase;
 using OutageDatabase.Repository;
-using System;
 using System.Collections.Generic;
 using System.Linq;
-using System.Text;
-using System.Threading.Tasks;
 
-namespace OMS.HistoryDBManagerServiceImplementation.Reporting.ReportTypes
+namespace OMS.HistoryDBManagerImplementation.Reporting.ReportTypes
 {
     public class SaifiReport : IReport
     {

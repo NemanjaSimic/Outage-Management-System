@@ -9,7 +9,7 @@ using System;
 using System.Collections.Generic;
 using System.Threading.Tasks;
 
-namespace OMS.CallTrackingServiceImplementation
+namespace OMS.CallTrackingImplementation
 {
     public class TrackingAlgorithm
 	{

@@ -38,10 +38,11 @@ namespace OMS.Common.WcfClient.OMS.ModelAccess
 			return InvokeWithRetryAsync(client => client.Channel.AddConsumer(consumer));
 		}
 
-		public Task<IEnumerable<Consumer>> FindConsumer(Expression<Func<Consumer, bool>> predicate)
-		{
-			return InvokeWithRetryAsync(client => client.Channel.FindConsumer(predicate));
-		}
+		//TODO: solve serialization of Expression<Func<Consumer, bool>>
+		//public Task<IEnumerable<Consumer>> FindConsumer(Expression<Func<Consumer, bool>> predicate)
+		//{
+		//	return InvokeWithRetryAsync(client => client.Channel.FindConsumer(predicate));
+		//}
 
 		public Task<IEnumerable<Consumer>> GetAllConsumers()
 		{

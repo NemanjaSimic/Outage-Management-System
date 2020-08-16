@@ -49,14 +49,14 @@ namespace OMS.Common.Cloud.Names
         public const string OmsOutageSimulatorServiceEndpoint = "OmsOutageSimulatorServiceEndpoint";
         public const string OmsHistoryDBManagerEndpoint = "OmsHistoryDBManagerEndpoint";
         public const string OmsReportingEndpoint = "OmsReportingEndpoint";
-        public const string OmsOutageManagementServiceModelReadAccessEndpoint = "OmsOutageManagementServiceModelReadAccessEndpoint";
+        public const string OmsModelReadAccessEndpoint = "OmsModelReadAccessEndpoint";
         public const string OmsReportOutageEndpoint = "OmsReportOutageEndpoint";
         public const string OmsResolveOutageEndpoint = "OmsResolveOutageEndpoint";
         public const string OmsSendLocationIsolationCrewEndpoint = "OmsSendLocationIsolationCrewEndpoint";
         public const string OmsSendRepairCrewEndpoint = "OmsSendRepairCrewEndpoint";
         public const string OmsValidateResolveConditionsEndpoint = "OmsValidateResolveConditionsEndpoint";
         public const string OmsTracingAlgorithmEndpoint = "OmsTracingAlgorithmEndpoint";
-        public const string OmsOutageManagmenetServiceModelUpdateAccessEndpoint = "OmsOutageManagmenetServiceModelUpdateAccessEndpoint";
+        public const string OmsModelUpdateAccessEndpoint = "OmsModelUpdateAccessEndpoint";
         public const string OmsOutageSimulatorEndpoint = "OmsOutageSimulatorEndpoint";
         public const string OmsIsolateOutageEndpoint = "OmsIsolateOutageEndpoint";
 

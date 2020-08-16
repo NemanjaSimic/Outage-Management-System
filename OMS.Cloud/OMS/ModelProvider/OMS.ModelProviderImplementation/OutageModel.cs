@@ -6,12 +6,14 @@ using Microsoft.ServiceFabric.Data;
 using Microsoft.ServiceFabric.Data.Notifications;
 using OMS.Common.Cloud;
 using OMS.Common.Cloud.Logger;
+using OMS.Common.Cloud.Names;
 using OMS.Common.Cloud.ReliableCollectionHelpers;
 using OMS.Common.PubSubContracts;
 using OMS.Common.PubSubContracts.Interfaces;
 using OMS.Common.WcfClient.OMS;
 using OMS.Common.WcfClient.OMS.Lifecycle;
 using OMS.ModelProviderImplementation.ContractProviders;
+using System;
 using System.Collections.Generic;
 using System.Threading.Tasks;
 using ReliableDictionaryNames = Common.OMS.ReliableDictionaryNames;
@@ -20,7 +22,9 @@ namespace OMS.ModelProviderImplementation
 {
     public class OutageModel: INotifySubscriberContract
 	{
+		private readonly string baseLogString;
 		private readonly IReliableStateManager stateManager;
+
 		private ICloudLogger logger;
 		private ICloudLogger Logger
 		{
@@ -35,22 +39,42 @@ namespace OMS.ModelProviderImplementation
 		private OutageModelReadAccessProvider outageModelReadAccessProvider;
 		private OutageModelUpdateAccessProvider outageModelUpdateAccessProvider;
 
-		public OutageModel(IReliableStateManager stateManager, OutageModelReadAccessProvider outageModelReadAccessProvider, OutageModelUpdateAccessProvider outageModelUpdateAccessProvider)
+		
+		public OutageModel(IReliableStateManager stateManager)
 		{
+			this.baseLogString = $"{this.GetType()} [{this.GetHashCode()}] =>{Environment.NewLine}";
+			Logger.LogDebug($"{baseLogString} Ctor => Logger initialized");
+
+			isTopologyModelInitialized = false;
+			isCommandedElementsInitialized = false;
+			isOptimumIsolatioPointsInitialized = false;
+			isPotentialOutageInitialized = false;
+
 			this.stateManager = stateManager;
 			this.stateManager.StateManagerChanged += this.OnStateManagerChangedHandler;
-			this.subscriberUri = "OutageModel"; //TODO: Service defines, name
 
-			this.historyDBManagerClient = HistoryDBManagerClient.CreateClient();
-			this.reportOutageClient = ReportOutageClient.CreateClient();
-
-			this.outageModelReadAccessProvider = outageModelReadAccessProvider;
-			this.outageModelUpdateAccessProvider = outageModelUpdateAccessProvider;
+			//TODO: OVO RAZRESITI NEKAKO, potencijalno uvesti rel dictionarije u ovu klasu
+			//this.outageModelReadAccessProvider = outageModelReadAccessProvider;
+			//this.outageModelUpdateAccessProvider = outageModelUpdateAccessProvider;
 		}
 
 		#region ReliableDictionaryAccess
-		private ReliableDictionaryAccess<long, IOutageTopologyModel> topologyModel;
+		private bool isTopologyModelInitialized;
+		private bool isCommandedElementsInitialized;
+		private bool isOptimumIsolatioPointsInitialized;
+		private bool isPotentialOutageInitialized;
+		public bool ReliableDictionariesInitialized
+		{
+			get
+			{
+				return isTopologyModelInitialized &&
+					   isCommandedElementsInitialized &&
+					   isOptimumIsolatioPointsInitialized &&
+					   isPotentialOutageInitialized;
+			}
+		}
 
+		private ReliableDictionaryAccess<long, IOutageTopologyModel> topologyModel;
 		public ReliableDictionaryAccess<long, IOutageTopologyModel> TopologyModel
 		{
 			get
@@ -61,25 +85,22 @@ namespace OMS.ModelProviderImplementation
 		}
 
 		private ReliableDictionaryAccess<long,long> commandedElements;
-
 		public ReliableDictionaryAccess<long,long> CommandedElements
 		{
-			get { return commandedElements ?? (commandedElements = ReliableDictionaryAccess<long, long>.Create(this.stateManager, ReliableDictionaryNames.CommandedElements).Result); }
+			get { return commandedElements; }
 		}
 
 		private ReliableDictionaryAccess<long,long> optimumIsloationPoints;
-
 		public ReliableDictionaryAccess<long,long> OptimumIsolatioPoints
 		{
-			get { return optimumIsloationPoints ?? (optimumIsloationPoints =  ReliableDictionaryAccess<long,long>.Create(this.stateManager,ReliableDictionaryNames.OptimumIsolatioPoints).Result); }
+			get { return optimumIsloationPoints; }
 		
 		}
 
 		private ReliableDictionaryAccess<long,CommandOriginType> potentialOutage;
-
 		public ReliableDictionaryAccess<long, CommandOriginType> PotentialOutage
 		{
-			get { return potentialOutage ?? (potentialOutage = ReliableDictionaryAccess<long,CommandOriginType>.Create(this.stateManager,ReliableDictionaryNames.PotentialOutage).Result); }
+			get { return potentialOutage; }
 		}
 
 		private async void OnStateManagerChangedHandler(object sender, NotifyStateManagerChangedEventArgs e)
@@ -88,37 +109,50 @@ namespace OMS.ModelProviderImplementation
 			{
 				var operation = e as NotifyStateManagerSingleEntityChangedEventArgs;
 				string reliableStateName = operation.ReliableState.Name.AbsolutePath;
+
 				if (reliableStateName == ReliableDictionaryNames.OutageTopologyModel)
 				{
 					topologyModel = await ReliableDictionaryAccess<long, IOutageTopologyModel>.Create(this.stateManager, ReliableDictionaryNames.OutageTopologyModel);
+					this.isTopologyModelInitialized = true;
 				}
 				else if (reliableStateName == ReliableDictionaryNames.CommandedElements)
 				{
 					commandedElements = await ReliableDictionaryAccess<long, long>.Create(this.stateManager, ReliableDictionaryNames.CommandedElements);
+					this.isCommandedElementsInitialized = true;
 				}
 				else if (reliableStateName == ReliableDictionaryNames.OptimumIsolatioPoints)
 				{
 					optimumIsloationPoints = await ReliableDictionaryAccess<long, long>.Create(this.stateManager, ReliableDictionaryNames.OptimumIsolatioPoints);
+					this.isOptimumIsolatioPointsInitialized = true;
 				}
 				else if (reliableStateName == ReliableDictionaryNames.PotentialOutage)
 				{
 					potentialOutage = await ReliableDictionaryAccess<long, CommandOriginType>.Create(this.stateManager, ReliableDictionaryNames.PotentialOutage);
+					this.isPotentialOutageInitialized = true;
 				}
-
 			}
 		}
 		#endregion
 
 		#region INotifySubscriberContract
-		private readonly string subscriberUri;
+		private readonly string subscriberUri = MicroserviceNames.OmsModelProviderService;
 
 		public async Task Notify(IPublishableMessage message, string publisherName)
 		{
+			while (!ReliableDictionariesInitialized)
+			{
+				await Task.Delay(1000);
+			}
+
 			//if OMSModelMessage
 			if (message is OMSModelMessage omsModelMessage)
 			{
+				this.historyDBManagerClient = HistoryDBManagerClient.CreateClient();
+				this.reportOutageClient = ReportOutageClient.CreateClient();
+
 				IOutageTopologyModel topology = omsModelMessage.OutageTopologyModel;
-				await outageModelUpdateAccessProvider.UpdateTopologyModel(topology);
+				//todo: direktno raditi sa rel dict, prisutan je...
+				//await outageModelUpdateAccessProvider.UpdateTopologyModel(topology); 
 				await TopologyModel.SetAsync(0, topology);
 				
 				HashSet<long> energizedConsumers = new HashSet<long>();
@@ -134,7 +168,8 @@ namespace OMS.ModelProviderImplementation
 				}
 
 				await historyDBManagerClient.OnConsumersEnergized(energizedConsumers);
-				Dictionary<long, CommandOriginType> potentialOutages = await outageModelReadAccessProvider.GetPotentialOutage();
+				//TOOD: uzeti iz rel dict, prisutan je....
+				Dictionary<long, CommandOriginType> potentialOutages = new Dictionary<long, CommandOriginType>();//await outageModelReadAccessProvider.GetPotentialOutage(); 
 
 				Task[] reportOutageTasks = new Task[potentialOutages.Count];
 				int index = 0;
@@ -146,7 +181,8 @@ namespace OMS.ModelProviderImplementation
 				}
 				
 				Task.WaitAll(reportOutageTasks);
-				await outageModelUpdateAccessProvider.UpdatePotentialOutage(0, 0, ModelUpdateOperationType.CLEAR);
+				//todo: direktno raditi sa rel dict, prisutan je...
+				//await outageModelUpdateAccessProvider.UpdatePotentialOutage(0, 0, ModelUpdateOperationType.CLEAR);
 			}
 			else
 			{
@@ -158,11 +194,11 @@ namespace OMS.ModelProviderImplementation
 		{
 			return this.subscriberUri;
 		}
-		#endregion
 
 		public Task<bool> IsAlive()
 		{
 			return Task.Run(() => { return true; });
 		}
+		#endregion
 	}
 }

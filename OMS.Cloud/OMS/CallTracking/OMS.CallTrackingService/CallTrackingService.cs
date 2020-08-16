@@ -1,28 +1,30 @@
 ﻿using System;
 using System.Collections.Generic;
 using System.Fabric;
-using System.Linq;
 using System.Threading;
 using System.Threading.Tasks;
-using Microsoft.ServiceFabric.Data.Collections;
 using Microsoft.ServiceFabric.Services.Communication.Runtime;
 using Microsoft.ServiceFabric.Services.Communication.Wcf;
 using Microsoft.ServiceFabric.Services.Communication.Wcf.Runtime;
 using Microsoft.ServiceFabric.Services.Runtime;
-using OMS.CallTrackingServiceImplementation;
 using OMS.Common.Cloud;
 using OMS.Common.Cloud.Logger;
 using OMS.Common.Cloud.Names;
 using OMS.Common.PubSubContracts;
 using OMS.Common.WcfClient.PubSub;
+using OMS.CallTrackingImplementation;
+using Microsoft.ServiceFabric.Data;
+using Common.OMS;
+using Microsoft.ServiceFabric.Data.Collections;
 
 namespace OMS.CallTrackingService
 {
-	/// <summary>
-	/// An instance of this class is created for each service replica by the Service Fabric runtime.
-	/// </summary>
-	internal sealed class CallTrackingService : StatefulService
+    /// <summary>
+    /// An instance of this class is created for each service replica by the Service Fabric runtime.
+    /// </summary>
+    internal sealed class CallTrackingService : StatefulService
 	{
+		private readonly string baseLogString;
 		private readonly CallTracker callTracker;
 
 		private IRegisterSubscriberContract registerSubscriberClient;
@@ -36,7 +38,23 @@ namespace OMS.CallTrackingService
 		public CallTrackingService(StatefulServiceContext context)
 			: base(context)
 		{
-			callTracker = new CallTracker(this.StateManager, MicroserviceNames.OmsCallTrackingService);
+			this.baseLogString = $"{this.GetType()} [{this.GetHashCode()}] =>{Environment.NewLine}";
+			Logger.LogDebug($"{baseLogString} Ctor => Logger initialized");
+
+			try
+			{
+				callTracker = new CallTracker(this.StateManager, MicroserviceNames.OmsCallTrackingService);
+
+				string infoMessage = $"{baseLogString} Ctor => Contract providers initialized.";
+				Logger.LogInformation(infoMessage);
+				ServiceEventSource.Current.ServiceMessage(this.Context, $"[CallTrackingService | Information] {infoMessage}");
+			}
+			catch (Exception e)
+			{
+				string errorMessage = $"{baseLogString} Ctor => Exception caught: {e.Message}.";
+				Logger.LogError(errorMessage, e);
+				ServiceEventSource.Current.ServiceMessage(this.Context, $"[CallTrackingService | Error] {errorMessage}");
+			}
 		}
 
 		/// <summary>
@@ -69,13 +87,45 @@ namespace OMS.CallTrackingService
 		{
 			try
 			{
+				InitializeReliableCollections();
+				string debugMessage = $"{baseLogString} RunAsync => ReliableDictionaries initialized.";
+				Logger.LogDebug(debugMessage);
+				ServiceEventSource.Current.ServiceMessage(this.Context, $"[CallTrackingService | Information] {debugMessage}");
+
 				this.registerSubscriberClient = RegisterSubscriberClient.CreateClient();
 				await this.registerSubscriberClient.SubscribeToTopic(Topic.OUTAGE_EMAIL, MicroserviceNames.OmsCallTrackingService);
 			}
 			catch (Exception e)
 			{
-				Logger.LogError($"Subscribe to topic failed with error: {e.Message}");
+				Logger.LogError($"{baseLogString} RunAsync => Exception: {e.Message}");
 			}
+		}
+
+		private void InitializeReliableCollections()
+		{
+			Task[] tasks = new Task[]
+			{
+				Task.Run(async() =>
+				{
+					using (ITransaction tx = this.StateManager.CreateTransaction())
+					{
+						var result = await StateManager.TryGetAsync<IReliableDictionary<long, long>>(ReliableDictionaryNames.CallsDictionary);
+						if(result.HasValue)
+						{
+							var gidToPointItemMap = result.Value;
+							await gidToPointItemMap.ClearAsync();
+							await tx.CommitAsync();
+						}
+						else
+						{
+							await StateManager.GetOrAddAsync<IReliableDictionary<long, long>>(tx, ReliableDictionaryNames.CallsDictionary);
+							await tx.CommitAsync();
+						}
+					}
+				}),
+			};
+
+			Task.WaitAll(tasks);
 		}
 	}
 }

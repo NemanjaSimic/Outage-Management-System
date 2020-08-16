@@ -3,7 +3,9 @@ using System.Collections.Generic;
 using System.Fabric;
 using System.Threading;
 using System.Threading.Tasks;
+using Common.OMS;
 using Common.OmsContracts.ModelProvider;
+using Microsoft.ServiceFabric.Data;
 using Microsoft.ServiceFabric.Data.Collections;
 using Microsoft.ServiceFabric.Services.Communication.Runtime;
 using Microsoft.ServiceFabric.Services.Communication.Wcf;
@@ -13,6 +15,7 @@ using OMS.Common.Cloud;
 using OMS.Common.Cloud.Logger;
 using OMS.Common.Cloud.Names;
 using OMS.Common.PubSubContracts;
+using OMS.Common.PubSubContracts.Interfaces;
 using OMS.Common.WcfClient.PubSub;
 using OMS.ModelProviderImplementation;
 using OMS.ModelProviderImplementation.ContractProviders;
@@ -24,6 +27,7 @@ namespace OMS.ModelProviderService
     /// </summary>
     internal sealed class ModelProviderService : StatefulService
     {
+        private readonly string baseLogString;
         private readonly OutageModel outageModel;
         private readonly OutageModelReadAccessProvider outageModelReadAccessProvider;
         private readonly OutageModelUpdateAccessProvider outageModelUpdateAccessProvider;
@@ -34,16 +38,30 @@ namespace OMS.ModelProviderService
             get { return logger ?? (logger = CloudLoggerFactory.GetLogger()); }
         }
 
-        private readonly IRegisterSubscriberContract registerSubscriberClient;
+        private IRegisterSubscriberContract registerSubscriberClient;
 
         public ModelProviderService(StatefulServiceContext context)
             : base(context)
         {
-            this.outageModel = new OutageModel(this.StateManager, this.outageModelReadAccessProvider, this.outageModelUpdateAccessProvider);
-            this.outageModelReadAccessProvider = new OutageModelReadAccessProvider(this.StateManager);
-            this.outageModelUpdateAccessProvider = new OutageModelUpdateAccessProvider(this.StateManager);
+            this.baseLogString = $"{this.GetType()} [{this.GetHashCode()}] =>{Environment.NewLine}";
+            Logger.LogDebug($"{baseLogString} Ctor => Logger initialized");
 
-            this.registerSubscriberClient = RegisterSubscriberClient.CreateClient();
+            try
+            {
+                this.outageModel = new OutageModel(this.StateManager);
+                this.outageModelReadAccessProvider = new OutageModelReadAccessProvider(this.StateManager);
+                this.outageModelUpdateAccessProvider = new OutageModelUpdateAccessProvider(this.StateManager);
+
+                string infoMessage = $"{baseLogString} Ctor => Contract providers initialized.";
+                Logger.LogInformation(infoMessage);
+                ServiceEventSource.Current.ServiceMessage(this.Context, $"[OMS.ModelProviderService | Information] {infoMessage}");
+            }
+            catch (Exception e)
+            {
+                string errorMessage = $"{baseLogString} Ctor => Exception caught: {e.Message}.";
+                Logger.LogError(errorMessage, e);
+                ServiceEventSource.Current.ServiceMessage(this.Context, $"[OMS.ModelProviderService | Error] {errorMessage}");
+            }
         }
 
         /// <summary>
@@ -62,15 +80,15 @@ namespace OMS.ModelProviderService
                     return new WcfCommunicationListener<IOutageModelReadAccessContract>(context,
                                                                             this.outageModelReadAccessProvider,
                                                                             WcfUtility.CreateTcpListenerBinding(),
-                                                                            EndpointNames.OmsOutageManagementServiceModelReadAccessEndpoint);
-                }, EndpointNames.OmsOutageManagementServiceModelReadAccessEndpoint),
+                                                                            EndpointNames.OmsModelReadAccessEndpoint);
+                }, EndpointNames.OmsModelReadAccessEndpoint),
                 new ServiceReplicaListener(context =>
                 {
                     return new WcfCommunicationListener<IOutageModelUpdateAccessContract>(context,
                                                                              this.outageModelUpdateAccessProvider,
                                                                              WcfUtility.CreateTcpListenerBinding(),
-                                                                             EndpointNames.OmsOutageManagmenetServiceModelUpdateAccessEndpoint);
-                }, EndpointNames.OmsOutageManagmenetServiceModelUpdateAccessEndpoint),
+                                                                             EndpointNames.OmsModelUpdateAccessEndpoint);
+                }, EndpointNames.OmsModelUpdateAccessEndpoint),
                 new ServiceReplicaListener(context =>
                 {
                     return new WcfCommunicationListener<INotifySubscriberContract>(context,
@@ -86,13 +104,102 @@ namespace OMS.ModelProviderService
         {   
             try
 			{
+                InitializeReliableCollections();
+                string debugMessage = $"{baseLogString} RunAsync => ReliableDictionaries initialized.";
+                Logger.LogDebug(debugMessage);
+                ServiceEventSource.Current.ServiceMessage(this.Context, $"[OMS.ModelProviderService | Information] {debugMessage}");
+
+                this.registerSubscriberClient = RegisterSubscriberClient.CreateClient();
                 await this.registerSubscriberClient.SubscribeToTopic(Topic.OMS_MODEL, MicroserviceNames.OmsModelProviderService);
             }
             catch (Exception e)
 			{
-                Logger.LogError($"Subscribe to topic failed with error: {e.Message}");
+                Logger.LogError($"{baseLogString} RunAsync => Exception: {e.Message}");
 			}
         }
 
+        private void InitializeReliableCollections()
+        {
+            Task[] tasks = new Task[]
+            {
+                Task.Run(async() =>
+                {
+                    using (ITransaction tx = this.StateManager.CreateTransaction())
+                    {
+                        var result = await StateManager.TryGetAsync<IReliableDictionary<long, IOutageTopologyModel>>(ReliableDictionaryNames.OutageTopologyModel);
+                        if(result.HasValue)
+                        {
+                            var gidToPointItemMap = result.Value;
+                            await gidToPointItemMap.ClearAsync();
+                            await tx.CommitAsync();
+                        }
+                        else
+                        {
+                            await StateManager.GetOrAddAsync<IReliableDictionary<long, IOutageTopologyModel>>(tx, ReliableDictionaryNames.OutageTopologyModel);
+                            await tx.CommitAsync();
+                        }
+                    }
+                }),
+
+                Task.Run(async() =>
+                {
+                    using (ITransaction tx = this.StateManager.CreateTransaction())
+                    {
+                        var result = await StateManager.TryGetAsync<IReliableDictionary<long, long>>(ReliableDictionaryNames.CommandedElements);
+                        if(result.HasValue)
+                        {
+                            var gidToPointItemMap = result.Value;
+                            await gidToPointItemMap.ClearAsync();
+                            await tx.CommitAsync();
+                        }
+                        else
+                        {
+                            await StateManager.GetOrAddAsync<IReliableDictionary<long, long>>(tx, ReliableDictionaryNames.CommandedElements);
+                            await tx.CommitAsync();
+                        }
+                    }
+                }),
+
+                Task.Run(async() =>
+                {
+                    using (ITransaction tx = this.StateManager.CreateTransaction())
+                    {
+                        var result = await StateManager.TryGetAsync<IReliableDictionary<long, long>>(ReliableDictionaryNames.OptimumIsolatioPoints);
+                        if(result.HasValue)
+                        {
+                            var addressToGidMap = result.Value;
+                            await addressToGidMap.ClearAsync();
+                            await tx.CommitAsync();
+                        }
+                        else
+                        {
+                            await StateManager.GetOrAddAsync<IReliableDictionary<long, long>>(tx, ReliableDictionaryNames.OptimumIsolatioPoints);
+                            await tx.CommitAsync();
+                        }
+                    }
+                }),
+
+                Task.Run(async() =>
+                {
+                    using (ITransaction tx = this.StateManager.CreateTransaction())
+                    {
+                        var result = await StateManager.TryGetAsync<IReliableDictionary<long, CommandOriginType>>(ReliableDictionaryNames.PotentialOutage);
+                        if(result.HasValue)
+                        {
+                            var addressToGidMap = result.Value;
+                            await addressToGidMap.ClearAsync();
+                            await tx.CommitAsync();
+                        }
+                        else
+                        {
+                            await StateManager.GetOrAddAsync<IReliableDictionary<long, CommandOriginType>>(tx, ReliableDictionaryNames.PotentialOutage);
+                            await tx.CommitAsync();
+                        }
+                    }
+                }),
+            };
+
+            Task.WaitAll(tasks);
+        }
     }
 }

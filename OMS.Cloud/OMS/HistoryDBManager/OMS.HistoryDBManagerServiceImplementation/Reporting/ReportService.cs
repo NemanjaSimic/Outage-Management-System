@@ -1,14 +1,12 @@
 ﻿using Common.OMS.Report;
 using Common.OmsContracts.Report;
 using OMS.Common.Cloud;
-using OMS.HistoryDBManagerServiceImplementation.Reporting.ReportTypes;
+using OMS.HistoryDBManagerImplementation.Reporting.ReportTypes;
 using System;
 using System.Collections.Generic;
-using System.Linq;
-using System.Text;
 using System.Threading.Tasks;
 
-namespace OMS.HistoryDBManagerServiceImplementation
+namespace OMS.HistoryDBManagerImplementation.Reporting
 {
     public class ReportService : IReportingContract
     {

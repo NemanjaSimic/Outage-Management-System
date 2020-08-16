@@ -1,9 +1,9 @@
-﻿using Common.OmsContracts.ModelProvider;
+﻿using Common.OMS;
 using Common.PubSubContracts.DataContracts.EMAIL;
 using Microsoft.ServiceFabric.Data;
+using Microsoft.ServiceFabric.Data.Notifications;
 using OMS.Common.Cloud;
 using OMS.Common.Cloud.Logger;
-using OMS.Common.Cloud.Names;
 using OMS.Common.Cloud.ReliableCollectionHelpers;
 using OMS.Common.NmsContracts;
 using OMS.Common.PubSubContracts;
@@ -15,147 +15,177 @@ using System.Linq;
 using System.Threading.Tasks;
 using System.Timers;
 
-namespace OMS.CallTrackingServiceImplementation
+namespace OMS.CallTrackingImplementation
 {
     public class CallTracker : INotifySubscriberContract
-	{
-		//TODO: Queue, for now Dictionary (gid, gid)
-		private ReliableDictionaryAccess<long, long> calls;
+    {
+        private readonly IReliableStateManager stateManager;
+        private readonly ModelResourcesDesc modelResourcesDesc;
+        private readonly TrackingAlgorithm trackingAlgorithm;
 
-		public ReliableDictionaryAccess<long, long> Calls
-		{
-			get
-			{
-				return calls ?? (calls = ReliableDictionaryAccess<long, long>.Create(stateManager, "CallsDictionary").Result);
-			}
-		}
+        private int expectedCalls;
+        private int timerInterval;
+        private string subscriberName;
+        private Timer timer;
 
-		private ICloudLogger logger;
-		private ICloudLogger Logger
-		{
-			get { return logger ?? (logger = CloudLoggerFactory.GetLogger()); }
-		}
+        #region Private Properties
+        private ICloudLogger logger;
+        private ICloudLogger Logger
+        {
+            get { return logger ?? (logger = CloudLoggerFactory.GetLogger()); }
+        }
+        #endregion Private Properties
 
-		private Timer timer;
-		private readonly IReliableStateManager stateManager;
-		private int expectedCalls;
-		private int timerInterval;
-		private string subscriberName;
+        #region Reliable Dictionaries
+        private bool isCallsDictionaryInitialized;
 
-		private ModelResourcesDesc modelResourcesDesc;
+        private bool ReliableDictionariesInitialized
+        {
+            get
+            {
+                return isCallsDictionaryInitialized;
+            }
+        }
 
-		private IOutageModelReadAccessContract outageModelReadAccessClient;
-		private TrackingAlgorithm trackingAlgorithm;
+        //TODO: Queue, for now Dictionary (gid, gid)
+        private ReliableDictionaryAccess<long, long> calls;
 
-		public Task<bool> IsAlive()
-		{
-			return Task.Run(() => { return true; });
-		}
+        private ReliableDictionaryAccess<long, long> Calls
+        {
+            get {   return calls;   }
+        }
 
-		public CallTracker(IReliableStateManager stateManager, string subscriberName)
-		{
-			this.stateManager = stateManager;
+        private async void OnStateManagerChangedHandler(object sender, NotifyStateManagerChangedEventArgs e)
+        {
+            if (e.Action == NotifyStateManagerChangedAction.Add)
+            {
+                var operation = e as NotifyStateManagerSingleEntityChangedEventArgs;
+                string reliableStateName = operation.ReliableState.Name.AbsolutePath;
 
-			trackingAlgorithm = new TrackingAlgorithm();
+                if (reliableStateName == ReliableDictionaryNames.CallsDictionary)
+                {
+                    calls = await ReliableDictionaryAccess<long, long>.Create(this.stateManager, ReliableDictionaryNames.CallsDictionary);
+                    this.isCallsDictionaryInitialized = true;
+                }
+            }
+        }
+        #endregion Reliable Dictionaries
 
-			this.subscriberName = subscriberName;
-			modelResourcesDesc = new ModelResourcesDesc();
+        public CallTracker(IReliableStateManager stateManager, string subscriberName)
+        {
+            this.stateManager = stateManager;
+            this.subscriberName = subscriberName;
 
-			outageModelReadAccessClient = OutageModelReadAccessClient.CreateClient();
+            modelResourcesDesc = new ModelResourcesDesc();
+            trackingAlgorithm = new TrackingAlgorithm();
 
-			//timer interval and expected calls initialization
-			try
-			{
-				timerInterval = Int32.Parse(ConfigurationManager.AppSettings["TimerInterval"]);
-				Logger.LogInformation($"TIme interval is set to: {timerInterval}.");
+            ImportFromConfig();
 
-			}
-			catch (Exception e)
-			{
-				Logger.LogWarning("String in config file is not in valid format. Default values for timeInterval will be set.", e);
-				timerInterval = 60000;
-			}
+            //timer initialization
+            timer = new Timer();
+            timer.Interval = timerInterval;
+            timer.Elapsed += TimerElapsedMethod;
+            timer.AutoReset = false;
+        }
 
-			try
-			{
-				expectedCalls = Int32.Parse(ConfigurationManager.AppSettings["ExpectedCalls"]);
-				Logger.LogInformation($"Expected calls is set to: {expectedCalls}.");
-			}
-			catch (Exception e)
-			{
-				Logger.LogWarning("String in config file is not in valid format. Default values for expected calls will be set.", e);
-				expectedCalls = 3;
-			}
+        private void ImportFromConfig()
+        {
+            //timer interval and expected calls initialization
+            try
+            {
+                timerInterval = int.Parse(ConfigurationManager.AppSettings["TimerInterval"]);
+                Logger.LogInformation($"TIme interval is set to: {timerInterval}.");
 
-			//timer initialization
-			timer = new Timer();
-			timer.Interval = timerInterval;
-			timer.Elapsed += TimerElapsedMethod;
-			timer.AutoReset = false;
-		}
+            }
+            catch (Exception e)
+            {
+                Logger.LogWarning("String in config file is not in valid format. Default values for timeInterval will be set.", e);
+                timerInterval = 60000;
+            }
 
-		#region INotifySubscriberContract
-		public async Task<string> GetSubscriberName()
-		{
-			return subscriberName;
-		}
+            try
+            {
+                expectedCalls = int.Parse(ConfigurationManager.AppSettings["ExpectedCalls"]);
+                Logger.LogInformation($"Expected calls is set to: {expectedCalls}.");
+            }
+            catch (Exception e)
+            {
+                Logger.LogWarning("String in config file is not in valid format. Default values for expected calls will be set.", e);
+                expectedCalls = 3;
+            }
+        }
 
-		public async Task Notify(IPublishableMessage message, string publisherName)
-		{
-			if (message is EmailToOutageMessage emailMessage)
-			{
-				if (emailMessage.Gid == 0)
-				{
-					Logger.LogError("Invalid email received.");
-					return;
-				}
+        #region INotifySubscriberContract
+        public async Task Notify(IPublishableMessage message, string publisherName)
+        {
+            while (!ReliableDictionariesInitialized)
+            {
+                await Task.Delay(1000);
+            }
 
-				Logger.LogInformation($"Received call from Energy Consumer with GID: 0x{emailMessage.Gid:X16}.");
+            if (message is EmailToOutageMessage emailMessage)
+            {
+                if (emailMessage.Gid == 0)
+                {
+                    Logger.LogError("Invalid email received.");
+                    return;
+                }
 
-				if (!modelResourcesDesc.GetModelCodeFromId(emailMessage.Gid).Equals(ModelCode.ENERGYCONSUMER))
-				{
-					Logger.LogWarning("Received GID is not id of energy consumer.");
-				}
-				else if (await outageModelReadAccessClient.GetElementById(emailMessage.Gid) == null/*!outageModel.TopologyModel.OutageTopology.ContainsKey(emailMessage.Gid) && outageModel.TopologyModel.FirstNode != emailMessage.Gid*/)
-				{
-					Logger.LogWarning("Received GID is not part of topology");
-				}
-				else
-				{
-					if (!timer.Enabled)
-					{
-						timer.Start();
-					}
+                Logger.LogInformation($"Received call from Energy Consumer with GID: 0x{emailMessage.Gid:X16}.");
+                var outageModelReadAccessClient = OutageModelReadAccessClient.CreateClient();
 
-					await Calls.SetAsync(emailMessage.Gid, emailMessage.Gid);
-					Logger.LogInformation($"Current number of calls is: {await Calls.GetCountAsync()}.");
+                if (!modelResourcesDesc.GetModelCodeFromId(emailMessage.Gid).Equals(ModelCode.ENERGYCONSUMER))
+                {
+                    Logger.LogWarning("Received GID is not id of energy consumer.");
+                }
+                else if (await outageModelReadAccessClient.GetElementById(emailMessage.Gid) == null/*!outageModel.TopologyModel.OutageTopology.ContainsKey(emailMessage.Gid) && outageModel.TopologyModel.FirstNode != emailMessage.Gid*/)
+                {
+                    Logger.LogWarning("Received GID is not part of topology");
+                }
+                else
+                {
+                    if (!timer.Enabled)
+                    {
+                        timer.Start();
+                    }
 
-					if ((await Calls.GetCountAsync()) >= expectedCalls)
-					{
-						await trackingAlgorithm.Start((await Calls.GetDataCopyAsync()).Keys.ToList());
+                    await Calls.SetAsync(emailMessage.Gid, emailMessage.Gid);
+                    Logger.LogInformation($"Current number of calls is: {await Calls.GetCountAsync()}.");
 
-						await Calls.ClearAsync();
-						timer.Stop();
-					}
-				}
-			}
-		}
-		#endregion
+                    if (await Calls.GetCountAsync() >= expectedCalls)
+                    {
+                        await trackingAlgorithm.Start((await Calls.GetDataCopyAsync()).Keys.ToList());
 
+                        await Calls.ClearAsync();
+                        timer.Stop();
+                    }
+                }
+            }
+        }
 
-		private void TimerElapsedMethod(object sender, ElapsedEventArgs e)
-		{
-			if ((Calls.GetCountAsync().Result) < expectedCalls)
-			{
-				Logger.LogInformation($"Timer elapsed (timer interval is {timerInterval}) and there is no enough calls to start tracing algorithm.");
-			}
-			else
-			{
-				trackingAlgorithm.Start((Calls.GetDataCopyAsync().Result).Keys.ToList()).Wait();
-			}
+        public async Task<string> GetSubscriberName()
+        {
+            return subscriberName;
+        }
 
-			Calls.ClearAsync().Wait();
-		}
+        public Task<bool> IsAlive()
+        {
+            return Task.Run(() => { return true; });
+        }
+        #endregion
 
-	}
+        private void TimerElapsedMethod(object sender, ElapsedEventArgs e)
+        {
+            if (Calls.GetCountAsync().Result < expectedCalls)
+            {
+                Logger.LogInformation($"Timer elapsed (timer interval is {timerInterval}) and there is no enough calls to start tracing algorithm.");
+            }
+            else
+            {
+                trackingAlgorithm.Start(Calls.GetDataCopyAsync().Result.Keys.ToList()).Wait();
+            }
+
+            Calls.ClearAsync().Wait();
+        }
+    }
 }

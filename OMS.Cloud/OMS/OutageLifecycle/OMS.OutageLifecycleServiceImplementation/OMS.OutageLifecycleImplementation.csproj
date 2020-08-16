@@ -7,8 +7,8 @@
     <ProjectGuid>{2980A776-F631-4AF7-A8CC-3FAF8D448C3B}</ProjectGuid>
     <OutputType>Library</OutputType>
     <AppDesignerFolder>Properties</AppDesignerFolder>
-    <RootNamespace>OMS.OutageLifecycleServiceImplementation</RootNamespace>
-    <AssemblyName>OMS.OutageLifecycleServiceImplementation</AssemblyName>
+    <RootNamespace>OMS.OutageLifecycleImplementation</RootNamespace>
+    <AssemblyName>OMS.OutageLifecycleImplementation</AssemblyName>
     <TargetFrameworkVersion>v4.8</TargetFrameworkVersion>
     <FileAlignment>512</FileAlignment>
     <Deterministic>true</Deterministic>

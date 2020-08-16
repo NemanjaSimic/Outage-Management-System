@@ -1,11 +1,6 @@
 ﻿using Common.OMS.Report;
-using System;
-using System.Collections.Generic;
-using System.Linq;
-using System.Text;
-using System.Threading.Tasks;
 
-namespace OMS.HistoryDBManagerServiceImplementation.Reporting.ReportTypes
+namespace OMS.HistoryDBManagerImplementation.Reporting.ReportTypes
 {
     public interface IReport
     {

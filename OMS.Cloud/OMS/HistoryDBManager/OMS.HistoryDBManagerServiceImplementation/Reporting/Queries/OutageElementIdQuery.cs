@@ -1,13 +1,9 @@
 ﻿using Common.OMS.OutageDatabaseModel;
-using OMS.HistoryDBManagerServiceImplementation.Reporting.Queries.Specifications;
+using OMS.HistoryDBManagerImplementation.Reporting.Queries.Specifications;
 using System;
-using System.Collections.Generic;
-using System.Linq;
 using System.Linq.Expressions;
-using System.Text;
-using System.Threading.Tasks;
 
-namespace OMS.HistoryDBManagerServiceImplementation.Reporting.Queries
+namespace OMS.HistoryDBManagerImplementation.Reporting.Queries
 {
     public class OutageElementIdQuery : OutageSpecification
     {

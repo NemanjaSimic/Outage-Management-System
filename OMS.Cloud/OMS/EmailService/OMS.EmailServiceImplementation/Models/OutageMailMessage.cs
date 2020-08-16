@@ -1,12 +1,6 @@
-﻿using System;
-using System.Collections.Generic;
-using System.Linq;
-using System.Text;
-using System.Threading.Tasks;
-
-namespace OMS.CallTrackingServiceImplementation.Models
+﻿namespace OMS.EmailImplementation.Models
 {
-	public class OutageMailMessage
+    public class OutageMailMessage
 	{
 		public string SenderDisplayName { get; set; }
 		public string SenderEmail { get; set; }

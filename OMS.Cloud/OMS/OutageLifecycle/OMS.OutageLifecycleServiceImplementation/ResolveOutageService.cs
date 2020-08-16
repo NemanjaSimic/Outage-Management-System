@@ -5,12 +5,12 @@ using Common.OmsContracts.OutageLifecycle;
 using OMS.Common.Cloud;
 using OMS.Common.Cloud.Logger;
 using OMS.Common.WcfClient.OMS.ModelAccess;
-using OMS.OutageLifecycleServiceImplementation.OutageLCHelper;
+using OMS.OutageLifecycleImplementation.OutageLCHelper;
 using System;
 using System.Collections.Generic;
 using System.Threading.Tasks;
 
-namespace OMS.OutageLifecycleServiceImplementation
+namespace OMS.OutageLifecycleImplementation
 {
     public class ResolveOutageService : IResolveOutageContract
 	{

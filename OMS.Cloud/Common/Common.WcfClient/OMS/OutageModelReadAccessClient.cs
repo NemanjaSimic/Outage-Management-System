@@ -13,7 +13,7 @@ namespace OMS.Common.WcfClient.OMS
     public class OutageModelReadAccessClient : WcfSeviceFabricClientBase<IOutageModelReadAccessContract>, IOutageModelReadAccessContract
     {
         private static readonly string microserviceName = MicroserviceNames.OmsModelProviderService;
-        private static readonly string listenerName = EndpointNames.OmsOutageManagementServiceModelReadAccessEndpoint;
+        private static readonly string listenerName = EndpointNames.OmsModelReadAccessEndpoint;
         public OutageModelReadAccessClient(WcfCommunicationClientFactory<IOutageModelReadAccessContract> clientFactory, Uri serviceUri, ServicePartitionKey servicePartition)
             : base(clientFactory, serviceUri,servicePartition, listenerName)
         {

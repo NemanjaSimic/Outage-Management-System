@@ -16,17 +16,32 @@ namespace Common.OmsContracts.ModelAccess
 	{
 		[OperationContract]
 		Task<IEnumerable<Equipment>> GetAllEquipments();
+
 		[OperationContract]
 		Task<Equipment> GetEquipment(long gid);
+
 		[OperationContract]
 		Task<Equipment> AddEquipment(Equipment equipment);
+
 		[OperationContract]
 		Task UpdateEquipment(Equipment equipment);
+
 		[OperationContract]
 		Task RemoveEquipment(Equipment equipment);
+
 		[OperationContract]
 		Task RemoveAllEquipments();
-		[OperationContract]
-		Task<IEnumerable<Equipment>> FindEquipment(Expression<Func<Equipment, bool>> predicate);
+
+		//TODO: solve serialization of Expression<Func<Equipment, bool>>
+		//[OperationContract]
+		//Task<IEnumerable<Equipment>> FindEquipment(Expression<Func<Equipment, bool>> predicate);
 	}
+
+	//TODO: probati
+	//[DataContract]
+	//public class Foo
+	//{
+	//	[DataMember]
+	//	public Expression<Func<Consumer, bool>> FooProp { get; set; }
+	//}
 }

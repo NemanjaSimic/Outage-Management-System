@@ -2,11 +2,12 @@
 {
     public static class ReliableDictionaryNames
     {
-        public static readonly string OutageTopologyModel = "OutageTopologyModel";
-        public static readonly string UnenergizedConsumers = "UnenergizedConsumers";
-        public static readonly string OpenedSwitches = "OpenedSwitches";
-        public static readonly string CommandedElements = "CommandedElements";
-        public static readonly string OptimumIsolatioPoints = "OptimumIsolatioPoints";
-        public static readonly string PotentialOutage = "PotentialOutage";
+        public const string OutageTopologyModel = "OutageTopologyModel";
+        public const string UnenergizedConsumers = "UnenergizedConsumers";
+        public const string OpenedSwitches = "OpenedSwitches";
+        public const string CommandedElements = "CommandedElements";
+        public const string OptimumIsolatioPoints = "OptimumIsolatioPoints";
+        public const string PotentialOutage = "PotentialOutage";
+        public const string CallsDictionary = "CallsDictionary";
     }
 }

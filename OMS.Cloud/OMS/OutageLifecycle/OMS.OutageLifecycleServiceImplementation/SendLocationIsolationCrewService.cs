@@ -11,14 +11,13 @@ using OMS.Common.PubSubContracts.Interfaces;
 using OMS.Common.WcfClient.CE;
 using OMS.Common.WcfClient.OMS;
 using OMS.Common.WcfClient.OMS.ModelAccess;
-using OMS.Common.WcfClient.SCADA;
-using OMS.OutageLifecycleServiceImplementation.OutageLCHelper;
+using OMS.OutageLifecycleImplementation.OutageLCHelper;
 using System;
 using System.Collections.Generic;
 using System.Linq;
 using System.Threading.Tasks;
 
-namespace OMS.OutageLifecycleServiceImplementation
+namespace OMS.OutageLifecycleImplementation
 {
     public class SendLocationIsolationCrewService : ISendLocationIsolationCrewContract
     {

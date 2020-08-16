@@ -7,8 +7,8 @@
     <ProjectGuid>{3CA82365-7A48-4FAB-A74B-C70316A60163}</ProjectGuid>
     <OutputType>Library</OutputType>
     <AppDesignerFolder>Properties</AppDesignerFolder>
-    <RootNamespace>OMS.HistoryDBManagerServiceImplementation</RootNamespace>
-    <AssemblyName>OMS.HistoryDBManagerServiceImplementation</AssemblyName>
+    <RootNamespace>OMS.HistoryDBManagerImplementation</RootNamespace>
+    <AssemblyName>OMS.HistoryDBManagerImplementation</AssemblyName>
     <TargetFrameworkVersion>v4.8</TargetFrameworkVersion>
     <FileAlignment>512</FileAlignment>
     <Deterministic>true</Deterministic>
@@ -66,7 +66,7 @@
     <Compile Include="Reporting\ReportTypes\SaidiReport.cs" />
     <Compile Include="Reporting\ReportTypes\SaifiReport.cs" />
     <Compile Include="Reporting\ReportTypes\TotalReport.cs" />
-    <Compile Include="ReportService.cs" />
+    <Compile Include="Reporting\ReportService.cs" />
   </ItemGroup>
   <ItemGroup>
     <ProjectReference Include="..\..\..\Common\Common.Cloud\Common.Cloud.csproj">

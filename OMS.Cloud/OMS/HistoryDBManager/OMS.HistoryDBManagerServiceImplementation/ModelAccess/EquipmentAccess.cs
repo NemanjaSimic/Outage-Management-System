@@ -1,79 +1,192 @@
 ﻿using Common.OMS.OutageDatabaseModel;
 using Common.OmsContracts.ModelAccess;
+using OMS.Common.Cloud.Logger;
 using OutageDatabase.Repository;
 using System;
 using System.Collections.Generic;
-using System.Linq;
 using System.Linq.Expressions;
-using System.Text;
 using System.Threading.Tasks;
 
-namespace OMS.HistoryDBManagerServiceImplementation.ModelAccess
+namespace OMS.HistoryDBManagerImplementation.ModelAccess
 {
-	public class EquipmentAccess : IEquipmentAccessContract
+    public class EquipmentAccess : IEquipmentAccessContract
 	{
-		private UnitOfWork dbContext;
+		private readonly string baseLogString;
+
+		#region Private Properties
+		private ICloudLogger logger;
+		private ICloudLogger Logger
+		{
+			get { return logger ?? (logger = CloudLoggerFactory.GetLogger()); }
+		}
+		#endregion Private Properties
 
 		public EquipmentAccess()
 		{
-			this.dbContext = new UnitOfWork();
-			
+			this.baseLogString = $"{this.GetType()} [{this.GetHashCode()}] =>{Environment.NewLine}";
+			Logger.LogDebug($"{baseLogString} Ctor => Logger initialized");
 		}
+
+		#region IEquipmentAccessContract
 		public Task<Equipment> AddEquipment(Equipment equipment)
 		{
-			return new Task<Equipment>(() =>
+			return Task.Run(() =>
 			{
-				Equipment equipmentDb = dbContext.EquipmentRepository.Add(equipment);
-				dbContext.Complete();
+				//todo: razmisliti o ConditonalValue<Equipment>
+				Equipment equipmentDb = null;
+
+				using (var unitOfWork = new UnitOfWork())
+				{
+					try
+					{
+						equipmentDb = unitOfWork.EquipmentRepository.Add(equipment);
+						unitOfWork.Complete();
+					}
+					catch (Exception e)
+					{
+						string message = $"{baseLogString} AddEquipment => Exception: {e.Message}";
+						Logger.LogError(message, e);
+					}
+				}
+
 				return equipmentDb;
 			});
 		}
 
 		public Task<IEnumerable<Equipment>> FindEquipment(Expression<Func<Equipment, bool>> predicate)
 		{
-			return new Task<IEnumerable<Equipment>>(() => dbContext.EquipmentRepository.Find(predicate));
+			return Task.Run(() =>
+			{
+				IEnumerable<Equipment> equipment = new List<Equipment>();
+
+				using (var unitOfWork = new UnitOfWork())
+				{
+					try
+					{
+						equipment = unitOfWork.EquipmentRepository.Find(predicate);
+					}
+					catch (Exception e)
+					{
+						string message = $"{baseLogString} FindEquipment => Exception: {e.Message}";
+						Logger.LogError(message, e);
+					}
+				}
+
+				return equipment;
+			});
 		}
 
 		public Task<IEnumerable<Equipment>> GetAllEquipments()
 		{
-			return new Task<IEnumerable<Equipment>>(() => dbContext.EquipmentRepository.GetAll());
+			return Task.Run(() =>
+			{
+				IEnumerable<Equipment> equipment = new List<Equipment>();
+
+				using (var unitOfWork = new UnitOfWork())
+				{
+					try
+					{
+						equipment = unitOfWork.EquipmentRepository.GetAll();
+					}
+					catch (Exception e)
+					{
+						string message = $"{baseLogString} GetAllEquipments => Exception: {e.Message}";
+						Logger.LogError(message, e);
+					}
+				}
+
+				return equipment;
+			});
 		}
 
 		public Task<Equipment> GetEquipment(long gid)
 		{
-			return new Task<Equipment>(() => dbContext.EquipmentRepository.Get(gid));
+			return Task.Run(() =>
+			{
+				//todo: razmisliti o ConditonalValue<Equipment>
+				Equipment equipment = null;
+
+				using (var unitOfWork = new UnitOfWork())
+				{
+					try
+					{
+						equipment = unitOfWork.EquipmentRepository.Get(gid);
+					}
+					catch (Exception e)
+					{
+						string message = $"{baseLogString} GetEquipment => Exception: {e.Message}";
+						Logger.LogError(message, e);
+					}
+				}
+
+				return equipment;
+			});
+		}
+
+		public Task RemoveAllEquipments()
+		{
+			return Task.Run(() =>
+			{
+				using (var unitOfWork = new UnitOfWork())
+				{
+					try
+					{
+						unitOfWork.EquipmentRepository.RemoveAll();
+						unitOfWork.Complete();
+					}
+					catch (Exception e)
+					{
+						string message = $"{baseLogString} RemoveAllEquipments => Exception: {e.Message}";
+						Logger.LogError(message, e);
+					}
+				}
+			});
+		}
+
+		public Task RemoveEquipment(Equipment equipment)
+		{
+			return Task.Run(() =>
+			{
+				using (var unitOfWork = new UnitOfWork())
+				{
+					try
+					{
+						unitOfWork.EquipmentRepository.Remove(equipment);
+						unitOfWork.Complete();
+					}
+					catch (Exception e)
+					{
+						string message = $"{baseLogString} RemoveEquipment => Exception: {e.Message}";
+						Logger.LogError(message, e);
+					}
+				}
+			});
+		}
+
+		public Task UpdateEquipment(Equipment equipment)
+		{
+			return Task.Run(() =>
+			{
+				using (var unitOfWork = new UnitOfWork())
+				{
+					try
+					{
+						unitOfWork.EquipmentRepository.Update(equipment);
+						unitOfWork.Complete();
+					}
+					catch (Exception e)
+					{
+						string message = $"{baseLogString} UpdateEquipment => Exception: {e.Message}";
+						Logger.LogError(message, e);
+					}
+				}
+			});
 		}
 
 		public Task<bool> IsAlive()
 		{
 			return Task.Run(() => true);
 		}
-
-		public Task RemoveAllEquipments()
-		{
-			return new Task(() => 
-			{
-				dbContext.EquipmentRepository.RemoveAll();
-				dbContext.Complete();
-			});
-		}
-
-		public Task RemoveEquipment(Equipment equipment)
-		{
-			return new Task(() =>
-			{
-				dbContext.EquipmentRepository.Remove(equipment);
-				dbContext.Complete();
-			});
-		}
-
-		public Task UpdateEquipment(Equipment equipment)
-		{
-			return new Task(() =>
-			{
-				dbContext.EquipmentRepository.Update(equipment);
-				dbContext.Complete();
-			});
-		}
+		#endregion IEquipmentAccessContract
 	}
 }

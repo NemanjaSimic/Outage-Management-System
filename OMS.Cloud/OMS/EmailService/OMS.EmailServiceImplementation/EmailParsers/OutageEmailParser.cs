@@ -1,14 +1,10 @@
-﻿using OMS.CallTrackingServiceImplementation.Interfaces;
-using OMS.CallTrackingServiceImplementation.Models;
+﻿using OMS.EmailImplementation.Interfaces;
+using OMS.EmailImplementation.Models;
 using OMS.Common.Cloud.Logger;
 using System;
-using System.Collections.Generic;
 using System.Globalization;
-using System.Linq;
-using System.Text;
-using System.Threading.Tasks;
 
-namespace OMS.CallTrackingServiceImplementation.EmailParsers
+namespace OMS.EmailImplementation.EmailParsers
 {
     public class OutageEmailParser : IEmailParser
     {

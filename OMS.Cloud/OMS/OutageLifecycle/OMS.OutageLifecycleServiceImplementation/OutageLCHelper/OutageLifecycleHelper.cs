@@ -12,10 +12,9 @@ using OMS.Common.WcfClient.OMS.ModelAccess;
 using OMS.Common.WcfClient.PubSub;
 using System;
 using System.Collections.Generic;
-using System.Fabric.Management.ServiceModel;
 using System.Threading.Tasks;
 
-namespace OMS.OutageLifecycleServiceImplementation.OutageLCHelper
+namespace OMS.OutageLifecycleImplementation.OutageLCHelper
 {
     public class OutageLifecycleHelper
     {

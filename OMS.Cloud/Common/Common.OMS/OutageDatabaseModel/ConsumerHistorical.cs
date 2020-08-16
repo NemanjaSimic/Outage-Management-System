@@ -17,12 +17,16 @@ namespace Common.OMS.OutageDatabaseModel
         [DatabaseGenerated(DatabaseGeneratedOption.Identity)]
         [DataMember]
         public long Id { get; set; }
+
         [DataMember]
         public long ConsumerId { get; set; }
+
         [DataMember]
         public long? OutageId { get; set; }
+
         [DataMember]
         public DateTime OperationTime { get; set; }
+
         [DataMember]
         public DatabaseOperation DatabaseOperation { get; set; }
 

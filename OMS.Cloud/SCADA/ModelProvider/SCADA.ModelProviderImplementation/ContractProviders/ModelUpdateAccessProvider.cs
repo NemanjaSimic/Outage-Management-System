@@ -24,8 +24,6 @@ namespace SCADA.ModelProviderImplementation.ContractProviders
         private readonly string baseLogString;
         private readonly IReliableStateManager stateManager;
 
-        //private IPublisherContract publisherClient;
-
         #region Private Propetires
         private bool isGidToPointItemMapInitialized;
         private bool isMeasurementsCacheInitialized;

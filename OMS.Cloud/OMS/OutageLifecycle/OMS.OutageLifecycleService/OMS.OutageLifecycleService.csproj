@@ -76,9 +76,9 @@
       <Project>{D4F63B28-12CA-4B86-8DC6-778AE40C79AE}</Project>
       <Name>OutageDatabase</Name>
     </ProjectReference>
-    <ProjectReference Include="..\OMS.OutageLifecycleServiceImplementation\OMS.OutageLifecycleServiceImplementation.csproj">
-      <Project>{2980A776-F631-4AF7-A8CC-3FAF8D448C3B}</Project>
-      <Name>OMS.OutageLifecycleServiceImplementation</Name>
+    <ProjectReference Include="..\OMS.OutageLifecycleServiceImplementation\OMS.OutageLifecycleImplementation.csproj">
+      <Project>{2980a776-f631-4af7-a8cc-3faf8d448c3b}</Project>
+      <Name>OMS.OutageLifecycleImplementation</Name>
     </ProjectReference>
   </ItemGroup>
   <ItemGroup>

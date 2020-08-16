@@ -8,12 +8,12 @@ using OMS.Common.Cloud.Logger;
 using OMS.Common.PubSubContracts.Interfaces;
 using OMS.Common.WcfClient.OMS;
 using OMS.Common.WcfClient.OMS.ModelAccess;
-using OMS.OutageLifecycleServiceImplementation.OutageLCHelper;
+using OMS.OutageLifecycleImplementation.OutageLCHelper;
 using System;
 using System.Collections.Generic;
 using System.Threading.Tasks;
 
-namespace OMS.OutageLifecycleServiceImplementation
+namespace OMS.OutageLifecycleImplementation
 {
     public class ValidateResolveConditionsService : IValidateResolveConditionsContract
 	{

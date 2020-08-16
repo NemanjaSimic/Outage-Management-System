@@ -7,9 +7,8 @@ using Microsoft.ServiceFabric.Services.Communication.Wcf.Runtime;
 using Microsoft.ServiceFabric.Services.Runtime;
 using OMS.Common.Cloud.Names;
 using OMS.Common.PubSubContracts;
-using OMS.OutageLifecycleServiceImplementation;
-using OMS.OutageLifecycleServiceImplementation.ScadaSub;
-using OutageDatabase.Repository;
+using OMS.OutageLifecycleImplementation;
+using OMS.OutageLifecycleImplementation.ScadaSub;
 
 namespace OMS.OutageLifecycleService
 {

@@ -10,14 +10,13 @@ using OMS.Common.WcfClient.CE;
 using OMS.Common.WcfClient.NMS;
 using OMS.Common.WcfClient.OMS;
 using OMS.Common.WcfClient.OMS.ModelAccess;
-using OMS.OutageLifecycleServiceImplementation.OutageLCHelper;
+using OMS.OutageLifecycleImplementation.OutageLCHelper;
 using System;
 using System.Threading.Tasks;
 using System.Timers;
 using Timer = System.Timers.Timer;
 using AutoResetEvent = System.Threading.AutoResetEvent;
-using OMS.OutageLifecycleServiceImplementation.ScadaSub;
-using System.Fabric.Management.ServiceModel;
+using OMS.OutageLifecycleImplementation.ScadaSub;
 using OMS.Common.WcfClient.PubSub;
 using OMS.Common.Cloud.Names;
 using Common.OmsContracts.ModelProvider;
@@ -27,7 +26,7 @@ using OMS.Common.PubSubContracts.Interfaces;
 using System.Collections.Generic;
 using System.Linq;
 
-namespace OMS.OutageLifecycleServiceImplementation
+namespace OMS.OutageLifecycleImplementation
 {
     public class IsolateOutageService : IIsolateOutageContract
 	{

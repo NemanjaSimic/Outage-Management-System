@@ -1,22 +1,18 @@
 ﻿using Common.PubSubContracts.DataContracts.EMAIL;
 using ImapX;
 using ImapX.Enums;
-using Microsoft.ServiceFabric.Services.Remoting.Runtime;
-using OMS.CallTrackingServiceImplementation.Interfaces;
-using OMS.CallTrackingServiceImplementation.Models;
+using OMS.EmailImplementation.Interfaces;
+using OMS.EmailImplementation.Models;
 using OMS.Common.Cloud;
 using OMS.Common.Cloud.Logger;
 using OMS.Common.PubSubContracts;
 using System;
 using System.Collections.Generic;
 using System.Configuration;
-using System.Linq;
-using System.Text;
-using System.Threading.Tasks;
 
-namespace OMS.CallTrackingServiceImplementation.Imap
+namespace OMS.EmailImplementation.Imap
 {
-	public class ImapEmailClient : IEmailClient
+    public class ImapEmailClient : IEmailClient
 	{
 		private ICloudLogger logger;
 		private ICloudLogger Logger
