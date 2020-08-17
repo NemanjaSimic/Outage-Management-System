@@ -1,5 +1,4 @@
-﻿using Common.CeContracts;
-using Common.PubSubContracts.DataContracts.CE.Interfaces;
+﻿using Common.PubSubContracts.DataContracts.CE.UIModels;
 using Common.Web.Extensions;
 using Common.Web.Models.ViewModels;
 using OMS.Common.Cloud;
@@ -11,12 +10,12 @@ namespace Common.Web.Mappers
     {
         private const string PowerTransformerDmsTypeName = "POWERTRANSFORMER";
 
-        public OmsGraphViewModel Map(IUIModel topologyModel)
+        public OmsGraphViewModel Map(UIModel topologyModel)
         {
             OmsGraphViewModel graph = new OmsGraphViewModel();
             
             // map nodes
-            foreach (KeyValuePair<long, IUINode> keyValue in topologyModel.Nodes)
+            foreach (KeyValuePair<long, UINode> keyValue in topologyModel.Nodes)
             {
                 NodeViewModel graphNode = new NodeViewModel
                 {
