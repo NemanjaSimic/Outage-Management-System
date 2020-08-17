@@ -134,10 +134,10 @@
     <Compile Include="Mappers\ConsumerMapper.cs" />
     <Compile Include="Mappers\EquipmentMapper.cs" />
     <Compile Include="Mappers\GraphMapper.cs" />
-    <Compile Include="Mappers\IConsumerMapper.cs" />
-    <Compile Include="Mappers\IEquipmentMapper.cs" />
-    <Compile Include="Mappers\IGraphMapper.cs" />
-    <Compile Include="Mappers\IOutageMapper.cs" />
+    <Compile Include="Mappers\Interfaces\IConsumerMapper.cs" />
+    <Compile Include="Mappers\Interfaces\IEquipmentMapper.cs" />
+    <Compile Include="Mappers\Interfaces\IGraphMapper.cs" />
+    <Compile Include="Mappers\Interfaces\IOutageMapper.cs" />
     <Compile Include="Mappers\OutageMapper.cs" />
     <Compile Include="Properties\AssemblyInfo.cs" />
     <Compile Include="Services\Commands\GenerateReportCommand.cs" />

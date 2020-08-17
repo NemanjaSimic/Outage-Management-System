@@ -18,9 +18,6 @@ namespace WebAdapterImplementation
             get { return logger ?? (logger = CloudLoggerFactory.GetLogger()); }
         }
 
-        private GraphHubDispatcher _graphDispatcher = null;
-        private ScadaHubDispatcher _scadaDipatcher = null;
-
         public WebAdapterProvider()
         {
             this.baseLogString = $"{this.GetType()} [{this.GetHashCode()}] =>{Environment.NewLine}";
@@ -29,12 +26,12 @@ namespace WebAdapterImplementation
 
         public Task UpdateGraph(List<NodeViewModel> nodes, List<RelationViewModel> relations)
         {
-            _graphDispatcher = new GraphHubDispatcher();
-            _graphDispatcher.Connect();
+            var graphDispatcher = new GraphHubDispatcher();
+            graphDispatcher.Connect();
 
             try
             {
-                _graphDispatcher.NotifyGraphUpdate(nodes, relations);
+                graphDispatcher.NotifyGraphUpdate(nodes, relations);
             }
             catch (Exception e)
             {
@@ -47,12 +44,12 @@ namespace WebAdapterImplementation
 
         public Task UpdateScadaData(Dictionary<long, OMS.Common.PubSubContracts.DataContracts.SCADA.AnalogModbusData> scadaData)
         {
-            _scadaDipatcher = new ScadaHubDispatcher();
-            _scadaDipatcher.Connect();
+            var scadaDipatcher = new ScadaHubDispatcher();
+            scadaDipatcher.Connect();
 
             try
             {
-                _scadaDipatcher.NotifyScadaDataUpdate(scadaData);
+                scadaDipatcher.NotifyScadaDataUpdate(scadaData);
             }
             catch (Exception e)
             {

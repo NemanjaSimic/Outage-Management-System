@@ -10,8 +10,7 @@ namespace Common.CeContracts
 	[KnownType(typeof(Recloser))]
 	[KnownType(typeof(SynchronousMachine))]
 	[KnownType(typeof(TopologyElement))]
-	//TODO: clean up
-	public class TopologyModel// : ITopology
+	public class TopologyModel
     {
 		[DataMember]
 		public long FirstNode { get; set; }

@@ -147,10 +147,27 @@ namespace SCADA.ModelProviderService
                 Logger.LogDebug(debugMessage);
                 ServiceEventSource.Current.ServiceMessage(this.Context, $"[SCADA.ModelProviderService | Information] {debugMessage}");
 
-                await scadaModelImporter.InitializeScadaModel();
-                string infoMessage = $"{baseLogString} RunAsync => ScadaModel initialized.";
-                Logger.LogInformation(infoMessage);
-                ServiceEventSource.Current.ServiceMessage(this.Context, $"[SCADA.ModelProviderService | Information] {infoMessage}");
+
+                while (true)
+                {
+                    var success = await scadaModelImporter.InitializeScadaModel();
+                    
+                    if(success)
+                    {
+                        string infoMessage = $"{baseLogString} RunAsync => ScadaModel initialized.";
+                        Logger.LogInformation(infoMessage);
+                        ServiceEventSource.Current.ServiceMessage(this.Context, $"[SCADA.ModelProviderService | Information] {infoMessage}");
+
+                        break;
+                    }
+                    else
+                    {
+                        string warnMessage = $"{baseLogString} RunAsync => ScadaModel failed to initialized. Entering 1000 ms sleep before retry";
+                        Logger.LogWarning(warnMessage);
+
+                        await Task.Delay(1000);
+                    }
+                }
             }
             catch (Exception e)
             {

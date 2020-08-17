@@ -1,4 +1,5 @@
-﻿using Common.PubSubContracts.DataContracts.OMS;
+﻿using Common.OMS.OutageDatabaseModel;
+using Common.PubSubContracts.DataContracts.OMS;
 using Common.Web.Models.ViewModels;
 using System.Collections.Generic;
 using System.Linq;
@@ -15,6 +16,15 @@ namespace Common.Web.Mappers
         //    //_outageMapper = outageMapper;
         //}
 
+        public EquipmentViewModel MapEquipment(Equipment equipment)
+            => new EquipmentViewModel
+            {
+                Id = equipment.EquipmentId,
+                Mrid = equipment.EquipmentMRID,
+                ActiveOutages = new List<ActiveOutageViewModel>(),      //TODO: _outageMapper.MapActiveOutages(equipment.ActiveOutages),
+                ArchivedOutages = new List<ArchivedOutageViewModel>(),  //TODO: _outageMapper.MapArchivedOutages(equipment.ArchivedOutages)
+            };
+
         public EquipmentViewModel MapEquipment(EquipmentMessage equipment)
             => new EquipmentViewModel
             {
@@ -24,8 +34,12 @@ namespace Common.Web.Mappers
                 ArchivedOutages = new List<ArchivedOutageViewModel>(),  //TODO: _outageMapper.MapArchivedOutages(equipment.ArchivedOutages)
             };
 
+        public IEnumerable<EquipmentViewModel> MapEquipments(IEnumerable<Equipment> equipments)
+        => equipments.Select(e => MapEquipment(e)).ToList();
 
         public IEnumerable<EquipmentViewModel> MapEquipments(IEnumerable<EquipmentMessage> equipments)
-        => equipments.Select(e => MapEquipment(e)).ToList();
+        {
+            throw new System.NotImplementedException();
+        }
     }
 }

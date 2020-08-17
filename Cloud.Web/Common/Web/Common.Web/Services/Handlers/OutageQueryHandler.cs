@@ -6,11 +6,8 @@ using System;
 using System.Collections.Generic;
 using System.Threading;
 using System.Threading.Tasks;
-using Common.OmsContracts;
-using OMS.Common.WcfClient.OMS;
 using Common.PubSubContracts.DataContracts.OMS;
 using OMS.Common.Cloud.Logger;
-using Common.OmsContracts.ModelAccess;
 using OMS.Common.WcfClient.OMS.ModelAccess;
 
 namespace Common.Web.Services.Handlers
@@ -35,15 +32,14 @@ namespace Common.Web.Services.Handlers
 
         public async Task<IEnumerable<ActiveOutageViewModel>> Handle(GetActiveOutagesQuery request, CancellationToken cancellationToken)
         {
-            IOutageAccessContract outageAccessClient = OutageModelAccessClient.CreateClient();
             try
             {
                 Logger.LogInformation("[OutageQueryHandler::GetActiveOutages] Sending a GET query to Outage service for active outages.");
-                // TODO: FIX
-                //IEnumerable<ActiveOutageMessage> activeOutages = await outageAccessClient.GetActiveOutages();
-                IEnumerable<ActiveOutageMessage> activeOutages = new List<ActiveOutageMessage>();
-
-                IEnumerable<ActiveOutageViewModel> activeOutageViewModels = _mapper.MapActiveOutages(activeOutages);
+                
+                var outageAccessClient = OutageModelAccessClient.CreateClient();
+                var activeOutages = await outageAccessClient.GetAllActiveOutages();
+                
+                var activeOutageViewModels = _mapper.MapActiveOutages(activeOutages);
                 return activeOutageViewModels;
             }
             catch (Exception ex)
@@ -55,15 +51,14 @@ namespace Common.Web.Services.Handlers
 
         public async Task<IEnumerable<ArchivedOutageViewModel>> Handle(GetArchivedOutagesQuery request, CancellationToken cancellationToken)
         {
-            IOutageAccessContract outageAccessClient = OutageModelAccessClient.CreateClient();
             try
             {
                 Logger.LogInformation("[OutageQueryHandler::GetArchivedOutages] Sending a GET query to Outage service for archived outages.");
-                // TODO: FIX
-                //IEnumerable<ArchivedOutageMessage> archivedOutages = await outageAccessClient.GetArchivedOutages();
-                IEnumerable<ArchivedOutageMessage> archivedOutages = new List<ArchivedOutageMessage>();
 
-                IEnumerable<ArchivedOutageViewModel> archivedOutageViewModels = _mapper.MapArchivedOutages(archivedOutages);
+                var outageAccessClient = OutageModelAccessClient.CreateClient();
+                var archivedOutages = await outageAccessClient.GetAllArchivedOutages();
+
+                var archivedOutageViewModels = _mapper.MapArchivedOutages(archivedOutages);
                 return archivedOutageViewModels;
             }
             catch (Exception ex)
