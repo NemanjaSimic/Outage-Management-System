@@ -7,6 +7,7 @@ using System.Runtime.Serialization;
 namespace Common.PubSubContracts.DataContracts.OMS
 {
     [DataContract(IsReference = true)]
+    //TODO: experiment with know type
     [KnownType(typeof(ActiveOutageMessage))]
     [KnownType(typeof(ArchivedOutageMessage))]
     [KnownType(typeof(ConsumerMessage))]

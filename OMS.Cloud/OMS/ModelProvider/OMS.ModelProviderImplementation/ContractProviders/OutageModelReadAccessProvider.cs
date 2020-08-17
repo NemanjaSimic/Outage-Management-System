@@ -1,5 +1,6 @@
 ﻿using Common.OMS;
 using Common.OmsContracts.ModelProvider;
+using Common.PubSubContracts.DataContracts.CE;
 using Microsoft.ServiceFabric.Data;
 using Microsoft.ServiceFabric.Data.Notifications;
 using OMS.Common.Cloud;
@@ -42,8 +43,8 @@ namespace OMS.ModelProviderImplementation.ContractProviders
             }
         }
 
-        private ReliableDictionaryAccess<long, IOutageTopologyModel> topologyModel;
-        private ReliableDictionaryAccess<long, IOutageTopologyModel> TopologyModel
+        private ReliableDictionaryAccess<long, OutageTopologyModel> topologyModel;
+        private ReliableDictionaryAccess<long, OutageTopologyModel> TopologyModel
         {
             get { return topologyModel; }
         }
@@ -75,7 +76,7 @@ namespace OMS.ModelProviderImplementation.ContractProviders
                 
                 if (reliableStateName == ReliableDictionaryNames.OutageTopologyModel)
                 {
-                    topologyModel = await ReliableDictionaryAccess<long, IOutageTopologyModel>.Create(this.stateManager, ReliableDictionaryNames.OutageTopologyModel);
+                    topologyModel = await ReliableDictionaryAccess<long, OutageTopologyModel>.Create(this.stateManager, ReliableDictionaryNames.OutageTopologyModel);
                     this.isTopologyModelInitialized = true;
                 }
                 else if (reliableStateName == ReliableDictionaryNames.CommandedElements)
@@ -181,7 +182,7 @@ namespace OMS.ModelProviderImplementation.ContractProviders
             return potentialOutage;
         }
 
-        public async Task<IOutageTopologyModel> GetTopologyModel()
+        public async Task<OutageTopologyModel> GetTopologyModel()
         {
             Logger.LogDebug("GetTopologyModel method started.");
             while (!ReliableDictionariesInitialized)
@@ -190,7 +191,7 @@ namespace OMS.ModelProviderImplementation.ContractProviders
             }
 
             //todo: conditionalValue...
-            IOutageTopologyModel topologyModel = null;
+            OutageTopologyModel topologyModel = null;
 
             try
             {
@@ -206,7 +207,7 @@ namespace OMS.ModelProviderImplementation.ContractProviders
             return topologyModel;
         }
 
-        public async Task<IOutageTopologyElement> GetElementById(long gid)
+        public async Task<OutageTopologyElement> GetElementById(long gid)
         {
             Logger.LogDebug("GetElementById method started.");
             while (!ReliableDictionariesInitialized)
@@ -215,7 +216,7 @@ namespace OMS.ModelProviderImplementation.ContractProviders
 			}
 
             //todo: conditionalValue...
-            IOutageTopologyElement topologyElement = null;
+            OutageTopologyElement topologyElement = null;
 
             try
             {

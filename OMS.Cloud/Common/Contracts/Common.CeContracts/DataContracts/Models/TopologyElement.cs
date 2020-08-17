@@ -1,10 +1,9 @@
-﻿using System;
-using System.Collections.Generic;
+﻿using System.Collections.Generic;
 using System.Runtime.Serialization;
 
 namespace Common.CeContracts
 {
-	[DataContract(IsReference = true)]
+    [DataContract(IsReference = true)]
 	[KnownType(typeof(EnergyConsumer))]
 	[KnownType(typeof(Feeder))]
 	[KnownType(typeof(Field))]

@@ -1,11 +1,9 @@
 ﻿using Common.CeContracts;
 using Common.CeContracts.ModelProvider;
 using Common.PubSubContracts.DataContracts.CE;
-using Common.PubSubContracts.DataContracts.CE.Interfaces;
 using Common.PubSubContracts.DataContracts.CE.UIModels;
 using OMS.Common.Cloud.Logger;
 using OMS.Common.NmsContracts;
-using OMS.Common.PubSubContracts.Interfaces;
 using OMS.Common.WcfClient.CE;
 using System;
 using System.Collections.Generic;
@@ -40,7 +38,7 @@ namespace CE.TopologyProviderImplementation
             Logger.LogDebug(debugMessage);
         }
 
-        public async Task<IUIModel> ConvertTopologyToUIModel(ITopology topology)
+        public async Task<UIModel> ConvertTopologyToUIModel(TopologyModel topology)
         {
             string verboseMessage = $"{baseLogString} ConvertTopologyToUIModel method called.";
             Logger.LogVerbose(verboseMessage);
@@ -52,7 +50,7 @@ namespace CE.TopologyProviderImplementation
                 throw new Exception(message);
             }
 
-            IUIModel uIModel = new UIModel();
+            UIModel uIModel = new UIModel();
             Stack<long> stack = new Stack<long>();
 
             Logger.LogDebug($"{baseLogString} ConvertTopologyToUIModel => Calling GetReclosers method from model provider client.");
@@ -92,7 +90,7 @@ namespace CE.TopologyProviderImplementation
                         }
                     }
 
-                    List<IUIMeasurement> measurements = new List<IUIMeasurement>();
+                    List<UIMeasurement> measurements = new List<UIMeasurement>();
                     foreach (var measurementGid in element.Measurements.Keys)
                     {
                         Logger.LogDebug($"{baseLogString} ConvertTopologyToUIModel => Calling GetDiscreteMeasurement method from measurement provider client for measurement GID {measurementGid:X16}.");
@@ -156,7 +154,7 @@ namespace CE.TopologyProviderImplementation
             return uIModel;
         }
 
-        public async Task<IOutageTopologyModel> ConvertTopologyToOMSModel(ITopology topology)
+        public async Task<OutageTopologyModel> ConvertTopologyToOMSModel(TopologyModel topology)
         {
             string verboseMessage = $"{baseLogString} ConvertTopologyToOMSModel method called.";
             Logger.LogVerbose(verboseMessage);
@@ -172,7 +170,7 @@ namespace CE.TopologyProviderImplementation
             var reclosers = await modelProviderClient.GetReclosers();
             Logger.LogDebug($"{baseLogString} ConvertTopologyToOMSModel => GetReclosers method from model provider client has been called successfully.");
 
-            IOutageTopologyModel outageTopologyModel = new OutageTopologyModel();
+            OutageTopologyModel outageTopologyModel = new OutageTopologyModel();
             Stack<long> stack = new Stack<long>();
             outageTopologyModel.FirstNode = topology.FirstNode;
             stack.Push(topology.FirstNode);

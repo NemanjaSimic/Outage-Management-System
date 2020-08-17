@@ -4,10 +4,11 @@ using System.Runtime.Serialization;
 
 namespace Common.PubSubContracts.DataContracts.CE.UIModels
 {
-	//[Serializable]
-	[DataContract(IsReference = true)]
-	[KnownType(typeof(UIMeasurement))]
-	public class UINode : IUINode
+	//[DataContract(IsReference = true)]
+	[DataContract]
+	//[KnownType(typeof(UIMeasurement))]
+	//TODO: clean up
+	public class UINode// : IUINode
 	{
 		[DataMember]
 		public long Id { get; set; }
@@ -20,7 +21,7 @@ namespace Common.PubSubContracts.DataContracts.CE.UIModels
 		[DataMember]
 		public bool IsActive { get; set; }
 		[DataMember]
-		public List<IUIMeasurement> Measurements { get; set; }
+		public List<UIMeasurement> Measurements { get; set; }
 		[DataMember]
 		public float NominalVoltage { get; set; }
 		[DataMember]

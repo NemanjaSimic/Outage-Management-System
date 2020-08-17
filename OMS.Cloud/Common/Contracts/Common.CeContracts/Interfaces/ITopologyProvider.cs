@@ -2,11 +2,12 @@
 
 namespace Common.CeContracts
 {
-    public delegate void ProviderTopologyDelegate(List<ITopology> topology);
-    public delegate void ProviderTopologyConnectionDelegate(List<ITopology> topology);
+    public delegate void ProviderTopologyDelegate(List<TopologyModel> topology);
+    public delegate void ProviderTopologyConnectionDelegate(List<TopologyModel> topology);
+
     public interface ITopologyProvider
     {
-        List<ITopology> GetTopologies();
+        List<TopologyModel> GetTopologies();
         void CommitTransaction();
         bool PrepareForTransaction();
         void RollbackTransaction();

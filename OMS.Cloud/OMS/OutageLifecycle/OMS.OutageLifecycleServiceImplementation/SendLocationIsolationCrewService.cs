@@ -5,6 +5,7 @@ using Common.OmsContracts.ModelAccess;
 using Common.OmsContracts.ModelProvider;
 using Common.OmsContracts.OutageLifecycle;
 using Common.OmsContracts.OutageSimulator;
+using Common.PubSubContracts.DataContracts.CE;
 using OMS.Common.Cloud;
 using OMS.Common.Cloud.Logger;
 using OMS.Common.PubSubContracts.Interfaces;
@@ -21,7 +22,7 @@ namespace OMS.OutageLifecycleImplementation
 {
     public class SendLocationIsolationCrewService : ISendLocationIsolationCrewContract
     {
-        private IOutageTopologyModel outageModel;
+        private OutageTopologyModel outageModel;
         private ICloudLogger logger;
 
         private ICloudLogger Logger
@@ -40,9 +41,6 @@ namespace OMS.OutageLifecycleImplementation
         private IOutageAccessContract outageModelAccessClient;
         #endregion
 
-
-        
-        
         private Dictionary<long, long> CommandedElements;
         public SendLocationIsolationCrewService()
         {
@@ -120,7 +118,7 @@ namespace OMS.OutageLifecycleImplementation
         public async Task<bool> StartLocationAndIsolationAlgorithm(OutageEntity outageEntity)
         {
 
-            IOutageTopologyElement topologyElement = null;
+            OutageTopologyElement topologyElement = null;
 
             long reportedGid = outageEntity.DefaultIsolationPoints.First().EquipmentId;
             long outageElementId = -1;

@@ -35,7 +35,7 @@ namespace OMS.Common.WcfClient.CE
 			return Task.Run(() => { return true; });
 		}
 
-		public Task<ITopology> UpdateLoadFlow(ITopology topology)
+		public Task<TopologyModel> UpdateLoadFlow(TopologyModel topology)
 		{
 			return InvokeWithRetryAsync(client => client.Channel.UpdateLoadFlow(topology));
 		}

@@ -74,12 +74,12 @@ namespace OMS.ModelProviderImplementation
 			}
 		}
 
-		private ReliableDictionaryAccess<long, IOutageTopologyModel> topologyModel;
-		public ReliableDictionaryAccess<long, IOutageTopologyModel> TopologyModel
+		private ReliableDictionaryAccess<long, OutageTopologyModel> topologyModel;
+		public ReliableDictionaryAccess<long, OutageTopologyModel> TopologyModel
 		{
 			get
 			{
-				return topologyModel ?? (ReliableDictionaryAccess<long, IOutageTopologyModel>.Create(stateManager, ReliableDictionaryNames.OutageTopologyModel).Result);
+				return topologyModel ?? (ReliableDictionaryAccess<long, OutageTopologyModel>.Create(stateManager, ReliableDictionaryNames.OutageTopologyModel).Result);
 			}
 
 		}
@@ -112,7 +112,7 @@ namespace OMS.ModelProviderImplementation
 
 				if (reliableStateName == ReliableDictionaryNames.OutageTopologyModel)
 				{
-					topologyModel = await ReliableDictionaryAccess<long, IOutageTopologyModel>.Create(this.stateManager, ReliableDictionaryNames.OutageTopologyModel);
+					topologyModel = await ReliableDictionaryAccess<long, OutageTopologyModel>.Create(this.stateManager, ReliableDictionaryNames.OutageTopologyModel);
 					this.isTopologyModelInitialized = true;
 				}
 				else if (reliableStateName == ReliableDictionaryNames.CommandedElements)
@@ -150,7 +150,7 @@ namespace OMS.ModelProviderImplementation
 				this.historyDBManagerClient = HistoryDBManagerClient.CreateClient();
 				this.reportOutageClient = ReportOutageClient.CreateClient();
 
-				IOutageTopologyModel topology = omsModelMessage.OutageTopologyModel;
+				OutageTopologyModel topology = omsModelMessage.OutageTopologyModel;
 				//todo: direktno raditi sa rel dict, prisutan je...
 				//await outageModelUpdateAccessProvider.UpdateTopologyModel(topology); 
 				await TopologyModel.SetAsync(0, topology);

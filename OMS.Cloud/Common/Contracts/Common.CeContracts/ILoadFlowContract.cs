@@ -9,13 +9,14 @@ namespace Common.CeContracts.LoadFlow
 	public interface ILoadFlowContract : IService, IHealthChecker
 	{
 		[OperationContract]
-		[ServiceKnownType(typeof(TopologyModel))]
+		//TODO: clean up
+		//[ServiceKnownType(typeof(TopologyModel))]
 		[ServiceKnownType(typeof(EnergyConsumer))]
 		[ServiceKnownType(typeof(Feeder))]
 		[ServiceKnownType(typeof(Field))]
 		[ServiceKnownType(typeof(Recloser))]
 		[ServiceKnownType(typeof(SynchronousMachine))]
 		[ServiceKnownType(typeof(TopologyElement))]
-		Task<ITopology> UpdateLoadFlow(ITopology topology);
+		Task<TopologyModel> UpdateLoadFlow(TopologyModel topology);
 	}
 }

@@ -1,9 +1,7 @@
 ﻿using Common.CloudContracts;
 using Common.PubSubContracts.DataContracts.CE;
-using Common.PubSubContracts.DataContracts.CE.Interfaces;
 using Common.PubSubContracts.DataContracts.CE.UIModels;
 using Microsoft.ServiceFabric.Services.Remoting;
-using OMS.Common.PubSubContracts.Interfaces;
 using System.ServiceModel;
 using System.Threading.Tasks;
 
@@ -15,14 +13,14 @@ namespace Common.CeContracts.TopologyProvider
     public interface ITopologyProviderContract : IService, IHealthChecker
     {
         [OperationContract]
-        [ServiceKnownType(typeof(TopologyModel))]
+        //[ServiceKnownType(typeof(TopologyModel))]
         [ServiceKnownType(typeof(EnergyConsumer))]
         [ServiceKnownType(typeof(Feeder))]
         [ServiceKnownType(typeof(Field))]
         [ServiceKnownType(typeof(Recloser))]
         [ServiceKnownType(typeof(SynchronousMachine))]
         [ServiceKnownType(typeof(TopologyElement))]
-        Task<ITopology> GetTopology();
+        Task<TopologyModel> GetTopology();
 
         [OperationContract]
         Task CommitTransaction();
@@ -40,15 +38,15 @@ namespace Common.CeContracts.TopologyProvider
         Task ResetRecloser(long recloserGid);
 
         [OperationContract]
-        [ServiceKnownType(typeof(OutageTopologyModel))]
-        [ServiceKnownType(typeof(OutageTopologyElement))]
-        Task<IOutageTopologyModel> GetOMSModel();
+        //[ServiceKnownType(typeof(OutageTopologyModel))]
+        //[ServiceKnownType(typeof(OutageTopologyElement))]
+        Task<OutageTopologyModel> GetOMSModel();
 
         [OperationContract]
-        [ServiceKnownType(typeof(UIModel))]
-        [ServiceKnownType(typeof(UIMeasurement))]
-	    [ServiceKnownType(typeof(UINode))]
-        Task<IUIModel> GetUIModel();
+        //[ServiceKnownType(typeof(UIModel))]
+        //[ServiceKnownType(typeof(UIMeasurement))]
+	    //[ServiceKnownType(typeof(UINode))]
+        Task<UIModel> GetUIModel();
 
         [OperationContract]
         Task DiscreteMeasurementDelegate();

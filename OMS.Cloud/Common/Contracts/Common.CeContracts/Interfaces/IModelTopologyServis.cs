@@ -4,6 +4,6 @@ namespace Common.CeContracts
 { 
     public interface IModelTopologyService
     {
-        List<ITopology> CreateTopology();
+        List<TopologyModel> CreateTopology();
     }
 }

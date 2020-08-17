@@ -2,7 +2,7 @@
 {
 	public interface ITopologyBuilder
     {
-        ITopology CreateGraphTopology(long firstElementGid);
+        TopologyModel CreateGraphTopology(long firstElementGid);
     }
 }
 

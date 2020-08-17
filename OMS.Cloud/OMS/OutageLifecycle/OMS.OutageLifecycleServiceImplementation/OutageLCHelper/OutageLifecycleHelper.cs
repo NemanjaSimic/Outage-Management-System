@@ -1,5 +1,6 @@
 ﻿using Common.OMS.OutageDatabaseModel;
 using Common.OmsContracts.ModelAccess;
+using Common.PubSubContracts.DataContracts.CE;
 using Common.PubSubContracts.DataContracts.OMS;
 using OMS.Common.Cloud;
 using OMS.Common.Cloud.Logger;
@@ -18,7 +19,7 @@ namespace OMS.OutageLifecycleImplementation.OutageLCHelper
 {
     public class OutageLifecycleHelper
     {
-        private IOutageTopologyModel outageTopology;
+        private OutageTopologyModel outageTopology;
         
         public static ModelResourcesDesc modelResourcesDesc = new ModelResourcesDesc();
         private IEquipmentAccessContract equipmentAccessClient;
@@ -31,7 +32,7 @@ namespace OMS.OutageLifecycleImplementation.OutageLCHelper
         {
             get { return logger ?? (logger = CloudLoggerFactory.GetLogger()); }
         }
-        public OutageLifecycleHelper(IOutageTopologyModel outageTopology)
+        public OutageLifecycleHelper(OutageTopologyModel outageTopology)
         {
             this.outageTopology = outageTopology;
             this.networkModelGdaClient = NetworkModelGdaClient.CreateClient();
@@ -47,8 +48,8 @@ namespace OMS.OutageLifecycleImplementation.OutageLCHelper
             HashSet<long> visited = new HashSet<long>();
             long startingSwitch = potentialOutageGid;
 
-            if (this.outageTopology.OutageTopology.TryGetValue(potentialOutageGid, out IOutageTopologyElement firstElement)
-                && this.outageTopology.OutageTopology.TryGetValue(firstElement.FirstEnd, out IOutageTopologyElement currentElementAbove))
+            if (this.outageTopology.OutageTopology.TryGetValue(potentialOutageGid, out OutageTopologyElement firstElement)
+                && this.outageTopology.OutageTopology.TryGetValue(firstElement.FirstEnd, out OutageTopologyElement currentElementAbove))
             {
                 while (!currentElementAbove.DmsType.Equals("ENERGYSOURCE"))
                 {
@@ -75,7 +76,7 @@ namespace OMS.OutageLifecycleImplementation.OutageLCHelper
                 {
                     visited.Add(currentNode);
 
-                    if (this.outageTopology.OutageTopology.TryGetValue(currentNode, out IOutageTopologyElement topologyElement))
+                    if (this.outageTopology.OutageTopology.TryGetValue(currentNode, out OutageTopologyElement topologyElement))
                     {
                         if (topologyElement.DmsType == "ENERGYCONSUMER" && !topologyElement.IsActive)
                         {

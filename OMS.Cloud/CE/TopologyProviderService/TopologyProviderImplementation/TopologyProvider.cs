@@ -4,7 +4,6 @@ using Common.CeContracts.LoadFlow;
 using Common.CeContracts.ModelProvider;
 using Common.CeContracts.TopologyProvider;
 using Common.PubSubContracts.DataContracts.CE;
-using Common.PubSubContracts.DataContracts.CE.Interfaces;
 using Common.PubSubContracts.DataContracts.CE.UIModels;
 using Microsoft.ServiceFabric.Data;
 using Microsoft.ServiceFabric.Data.Notifications;
@@ -13,7 +12,6 @@ using OMS.Common.Cloud.Logger;
 using OMS.Common.Cloud.Names;
 using OMS.Common.Cloud.ReliableCollectionHelpers;
 using OMS.Common.PubSubContracts;
-using OMS.Common.PubSubContracts.Interfaces;
 using OMS.Common.WcfClient.CE;
 using OMS.Common.WcfClient.PubSub;
 using System;
@@ -26,15 +24,11 @@ namespace CE.TopologyProviderImplementation
     public class TopologyProvider : ITopologyProviderContract
     {
         #region Fields
-        private readonly long topologyID = 1;
-        private readonly long transactionTopologyID = 2;
-        private TransactionFlag transactionFlag;
-        #endregion
-
-        private Task<bool> prepare;
-
         private readonly string baseLogString;
         private readonly IReliableStateManager stateManager;
+
+        private readonly long topologyID = 1;
+        private readonly long transactionTopologyID = 2;
 
         private readonly IPublisherContract publisherClient;
         private readonly IModelProviderContract modelProviderClient;
@@ -42,12 +36,17 @@ namespace CE.TopologyProviderImplementation
         private readonly ITopologyBuilderContract topologyBuilderClient;
         private readonly ITopologyConverterContract topologyConverterClient;
 
+        private TransactionFlag transactionFlag;
+        private Task<bool> prepare;
+        #endregion
+
         private ICloudLogger logger;
         private ICloudLogger Logger
         {
             get { return logger ?? (logger = CloudLoggerFactory.GetLogger()); }
         }
 
+        #region Reliable Dictionaries
         private bool isTopologyCacheInitialized;
         private bool isTopologyCacheUIInitialized;
         private bool isTopologyCacheOMSInitialized;
@@ -69,30 +68,6 @@ namespace CE.TopologyProviderImplementation
         private ReliableDictionaryAccess<long, OutageTopologyModel> topologyCacheOMS;
         public ReliableDictionaryAccess<long, OutageTopologyModel> TopologyCacheOMS { get => topologyCacheOMS; }
 
-        public TopologyProvider(IReliableStateManager stateManager)
-        {
-            this.baseLogString = $"{this.GetType()} [{this.GetHashCode()}] =>{Environment.NewLine}";
-            string verboseMessage = $"{baseLogString} entering Ctor.";
-            Logger.LogVerbose(verboseMessage);
-
-            this.modelProviderClient = ModelProviderClient.CreateClient();
-            this.loadFlowClient = LoadFlowClient.CreateClient();
-            this.topologyBuilderClient = TopologyBuilderClient.CreateClient();
-            this.topologyConverterClient = TopologyConverterClient.CreateClient();
-            this.publisherClient = PublisherClient.CreateClient();
-
-            this.stateManager = stateManager;
-            stateManager.StateManagerChanged += this.OnStateManagerChangedHandler;
-
-            this.isTopologyCacheInitialized = false;
-            this.isTopologyCacheUIInitialized = false;
-            this.isTopologyCacheOMSInitialized = false;
-
-            transactionFlag = TransactionFlag.NoTransaction;
-
-            string debugMessage = $"{baseLogString} Ctor => Clients initialized.";
-            Logger.LogDebug(debugMessage);
-        }
         private async void OnStateManagerChangedHandler(object sender, NotifyStateManagerChangedEventArgs e)
         {
             if (e.Action == NotifyStateManagerChangedAction.Add)
@@ -126,7 +101,34 @@ namespace CE.TopologyProviderImplementation
                 }
             }
         }
-        private async Task<ITopology> GetTopologyFromCache(TopologyType type)
+        #endregion Reliable Dictionaries
+
+        public TopologyProvider(IReliableStateManager stateManager)
+        {
+            this.baseLogString = $"{this.GetType()} [{this.GetHashCode()}] =>{Environment.NewLine}";
+            string verboseMessage = $"{baseLogString} entering Ctor.";
+            Logger.LogVerbose(verboseMessage);
+
+            this.modelProviderClient = ModelProviderClient.CreateClient();
+            this.loadFlowClient = LoadFlowClient.CreateClient();
+            this.topologyBuilderClient = TopologyBuilderClient.CreateClient();
+            this.topologyConverterClient = TopologyConverterClient.CreateClient();
+            this.publisherClient = PublisherClient.CreateClient();
+
+            this.stateManager = stateManager;
+            stateManager.StateManagerChanged += this.OnStateManagerChangedHandler;
+
+            this.isTopologyCacheInitialized = false;
+            this.isTopologyCacheUIInitialized = false;
+            this.isTopologyCacheOMSInitialized = false;
+
+            transactionFlag = TransactionFlag.NoTransaction;
+
+            string debugMessage = $"{baseLogString} Ctor => Clients initialized.";
+            Logger.LogDebug(debugMessage);
+        }
+
+        private async Task<TopologyModel> GetTopologyFromCache(TopologyType type)
         {
             while (!AreDictionariesInitialized)
             {
@@ -161,7 +163,7 @@ namespace CE.TopologyProviderImplementation
             else if (topologyID == (long)TopologyType.NonTransactionTopology)
             {
                 Logger.LogDebug($"{baseLogString} GetTopologyFromCache => Initializing topology.");
-                ITopology newTopology = await CreateTopology("GetTopologyFromCache");
+                var newTopology = await CreateTopology("GetTopologyFromCache");
 
                 Logger.LogDebug($"{baseLogString} GetTopologyFromCache => Calling UpdateLoadFlow method from load flow client.");
                 newTopology = await loadFlowClient.UpdateLoadFlow(newTopology);
@@ -186,9 +188,9 @@ namespace CE.TopologyProviderImplementation
                 throw new Exception(errorMessage);
             }
 
-            return topology.Value as ITopology;
+            return topology.Value as TopologyModel;
         }
-        private async Task<ITopology> CreateTopology(string whoCalled)
+        private async Task<TopologyModel> CreateTopology(string whoCalled)
         {
             string verboseMessage = $"{baseLogString} CreateTopology method called.";
             Logger.LogVerbose(verboseMessage);
@@ -213,7 +215,7 @@ namespace CE.TopologyProviderImplementation
             long energySourceGid = roots.First();
 
             Logger.LogDebug($"{baseLogString} CreateTopology => Calling CreateGraphTopology method from topology builder client. Energy source with GID {energySourceGid:X16.}");
-            ITopology topology = await topologyBuilderClient.CreateGraphTopology(energySourceGid, $"Topology Provider => {whoCalled} => Create Topology");
+            var topology = await topologyBuilderClient.CreateGraphTopology(energySourceGid, $"Topology Provider => {whoCalled} => Create Topology");
             Logger.LogDebug($"{baseLogString} CreateTopology =>  CreateGraphTopology method from topology builder client has been successfully called.");
 
 
@@ -239,7 +241,7 @@ namespace CE.TopologyProviderImplementation
             await RefreshUIModel();
             await RefreshOMSModel();
         }
-        public async Task<ITopology> GetTopology()
+        public async Task<TopologyModel> GetTopology()
         {
             string verboseMessage = $"{baseLogString} entering GetTopology method.";
             Logger.LogVerbose(verboseMessage);
@@ -252,7 +254,7 @@ namespace CE.TopologyProviderImplementation
             Logger.LogVerbose(verboseMessage);
 
             bool isRemote;
-            ITopology topology = await GetTopologyFromCache(TopologyType.NoSpecific);
+            var topology = await GetTopologyFromCache(TopologyType.NoSpecific);
 
             if (topology.GetElementByGid(elementGid, out ITopologyElement element))
             {
@@ -274,7 +276,7 @@ namespace CE.TopologyProviderImplementation
 
             try
             {
-                ITopology topology = await GetTopologyFromCache(TopologyType.NoSpecific);
+                var topology = await GetTopologyFromCache(TopologyType.NoSpecific);
 
                 if (topology.GetElementByGid(recloserGid, out ITopologyElement element))
                 {
@@ -315,7 +317,7 @@ namespace CE.TopologyProviderImplementation
             Logger.LogVerbose(verboseMessage);
 
             Logger.LogDebug($"{baseLogString} CommitTransaction => Getting topology from cache.");
-            ITopology topology = await GetTopologyFromCache(TopologyType.TransactionTopology);
+            var topology = await GetTopologyFromCache(TopologyType.TransactionTopology);
             Logger.LogDebug($"{baseLogString} CommitTransaction => Getting topology from cache successfully ended.");
 
 
@@ -349,7 +351,7 @@ namespace CE.TopologyProviderImplementation
             try
             {
                 Logger.LogDebug($"{baseLogString} PrepareForTransaction => Creating new transaction topology.");
-                ITopology newTopology = await CreateTopology("PrepareForTransaction");
+                var newTopology = await CreateTopology("PrepareForTransaction");
 
                 Logger.LogDebug($"{baseLogString} PrepareForTransaction => Writting new transaction topology into cache.");
                 await TopologyCache.SetAsync(transactionTopologyID, (TopologyModel)newTopology);
@@ -370,14 +372,14 @@ namespace CE.TopologyProviderImplementation
             string verboseMessage = $"{baseLogString} entering RollbackTransaction method.";
             Logger.LogVerbose(verboseMessage);
 
-            ITopology topology = await GetTopologyFromCache(TopologyType.NonTransactionTopology);
+            var topology = await GetTopologyFromCache(TopologyType.NonTransactionTopology);
             await TopologyCache.SetAsync((long)TopologyType.TransactionTopology, (TopologyModel)topology);
             
             transactionFlag = TransactionFlag.NoTransaction;
         }
         #endregion
 
-        public async Task<IOutageTopologyModel> GetOMSModel()
+        public async Task<OutageTopologyModel> GetOMSModel()
         {
             while (!AreDictionariesInitialized)
             {
@@ -402,9 +404,9 @@ namespace CE.TopologyProviderImplementation
                 throw new Exception(errorMessage);
             }
 
-            return omsModel.Value as IOutageTopologyModel;
+            return omsModel.Value as OutageTopologyModel;
         }
-        public async Task<IUIModel> GetUIModel()
+        public async Task<UIModel> GetUIModel()
         {
             while (!AreDictionariesInitialized)
             {
@@ -429,22 +431,22 @@ namespace CE.TopologyProviderImplementation
                 throw new Exception(errorMessage);
             }
 
-            return uiModel.Value as IUIModel;
+            return uiModel.Value as UIModel;
         }
-        private async Task<IUIModel> RefreshUIModel()
+        private async Task<UIModel> RefreshUIModel()
         {
-            ITopology topology = await GetTopologyFromCache(TopologyType.NoSpecific);
-            IUIModel newUIModel = await topologyConverterClient.ConvertTopologyToUIModel(topology);
+            var topology = await GetTopologyFromCache(TopologyType.NoSpecific);
+            UIModel newUIModel = await topologyConverterClient.ConvertTopologyToUIModel(topology);
             await TopologyCacheUI.SetAsync(1, (UIModel)newUIModel);
 
             await PublishUIModel(newUIModel);
 
             return newUIModel;
         }
-        private async Task<IOutageTopologyModel> RefreshOMSModel()
+        private async Task<OutageTopologyModel> RefreshOMSModel()
         {
-            ITopology topology = await GetTopologyFromCache(TopologyType.NoSpecific);
-            IOutageTopologyModel newOmsModel = await topologyConverterClient.ConvertTopologyToOMSModel(topology);
+            var topology = await GetTopologyFromCache(TopologyType.NoSpecific);
+            var newOmsModel = await topologyConverterClient.ConvertTopologyToOMSModel(topology);
             await TopologyCacheOMS.SetAsync(1, (OutageTopologyModel)newOmsModel);
 
             await PublishOMSModel(newOmsModel);
@@ -453,7 +455,7 @@ namespace CE.TopologyProviderImplementation
         }
 
         #region Publisher
-        public async Task PublishOMSModel(IOutageTopologyModel outageTopologyModel)
+        public async Task PublishOMSModel(OutageTopologyModel outageTopologyModel)
         {
             string verboseMessage = $"{baseLogString} entering PublishOMSModel method.";
             Logger.LogVerbose(verboseMessage);
@@ -477,7 +479,7 @@ namespace CE.TopologyProviderImplementation
                 await PublishOMSModel(outageTopologyModel);
             }
         }
-        public async Task PublishUIModel(IUIModel uiTopologyModel)
+        public async Task PublishUIModel(UIModel uiTopologyModel)
         {
             string verboseMessage = $"{baseLogString} entering PublishUIModel method.";
             Logger.LogVerbose(verboseMessage);

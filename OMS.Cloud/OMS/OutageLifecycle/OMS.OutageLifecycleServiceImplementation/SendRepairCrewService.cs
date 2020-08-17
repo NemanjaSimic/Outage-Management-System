@@ -4,9 +4,9 @@ using Common.OmsContracts.ModelAccess;
 using Common.OmsContracts.ModelProvider;
 using Common.OmsContracts.OutageLifecycle;
 using Common.OmsContracts.OutageSimulator;
+using Common.PubSubContracts.DataContracts.CE;
 using OMS.Common.Cloud;
 using OMS.Common.Cloud.Logger;
-using OMS.Common.PubSubContracts.Interfaces;
 using OMS.Common.WcfClient.OMS;
 using OMS.Common.WcfClient.OMS.ModelAccess;
 using OMS.OutageLifecycleImplementation.OutageLCHelper;
@@ -17,7 +17,8 @@ namespace OMS.OutageLifecycleImplementation
 {
     public class SendRepairCrewService : ISendRepairCrewContract
     {
-        private IOutageTopologyModel outageModel;
+        private OutageTopologyModel outageModel;
+        
         private ICloudLogger logger;
 
         private ICloudLogger Logger

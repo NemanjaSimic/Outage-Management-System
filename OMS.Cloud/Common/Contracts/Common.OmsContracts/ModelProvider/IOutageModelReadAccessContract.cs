@@ -2,7 +2,6 @@
 using Common.PubSubContracts.DataContracts.CE;
 using Microsoft.ServiceFabric.Services.Remoting;
 using OMS.Common.Cloud;
-using OMS.Common.PubSubContracts.Interfaces;
 using System.Collections.Generic;
 using System.ServiceModel;
 using System.Threading.Tasks;
@@ -15,7 +14,7 @@ namespace Common.OmsContracts.ModelProvider
 
         [OperationContract]
         [ServiceKnownType(typeof(OutageTopologyModel))]
-        Task<IOutageTopologyModel> GetTopologyModel();
+        Task<OutageTopologyModel> GetTopologyModel();
         
         [OperationContract]
         Task<Dictionary<long, long>> GetCommandedElements();
@@ -28,6 +27,6 @@ namespace Common.OmsContracts.ModelProvider
 
         [OperationContract]
         [ServiceKnownType(typeof(OutageTopologyElement))]
-        Task<IOutageTopologyElement> GetElementById(long gid);
+        Task<OutageTopologyElement> GetElementById(long gid);
     }
 }

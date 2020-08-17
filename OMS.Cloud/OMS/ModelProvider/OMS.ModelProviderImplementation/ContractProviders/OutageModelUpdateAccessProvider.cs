@@ -1,4 +1,5 @@
 ﻿using Common.OmsContracts.ModelProvider;
+using Common.PubSubContracts.DataContracts.CE;
 using Microsoft.ServiceFabric.Data;
 using Microsoft.ServiceFabric.Data.Notifications;
 using OMS.Common.Cloud;
@@ -56,8 +57,8 @@ namespace OMS.ModelProviderImplementation.ContractProviders
             get { return potentialOutage; }
         }
 
-        private ReliableDictionaryAccess<long, IOutageTopologyModel> topologyModel;
-        private ReliableDictionaryAccess<long, IOutageTopologyModel> TopologyModel
+        private ReliableDictionaryAccess<long, OutageTopologyModel> topologyModel;
+        private ReliableDictionaryAccess<long, OutageTopologyModel> TopologyModel
         {
             get { return topologyModel; }
         }
@@ -201,7 +202,7 @@ namespace OMS.ModelProviderImplementation.ContractProviders
             }
         }
 
-        public async Task UpdateTopologyModel(IOutageTopologyModel outageTopologyModel)
+        public async Task UpdateTopologyModel(OutageTopologyModel outageTopologyModel)
 		{
             Logger.LogDebug("UpdateTopologyModel method started.");
             while (!ReliableDictionariesInitialized)

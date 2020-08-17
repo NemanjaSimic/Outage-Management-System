@@ -1,5 +1,6 @@
 ﻿using Common.OmsContracts.ModelProvider;
 using Common.OmsContracts.OutageLifecycle;
+using Common.PubSubContracts.DataContracts.CE;
 using OMS.Common.Cloud;
 using OMS.Common.Cloud.Logger;
 using OMS.Common.PubSubContracts.Interfaces;
@@ -14,7 +15,7 @@ namespace OMS.CallTrackingImplementation
     public class TrackingAlgorithm
 	{
 
-        private IOutageTopologyModel outageTopologyModel;
+        private OutageTopologyModel outageTopologyModel;
 
         //TODO: Mozda reliable dic/queue
         private List<long> potentialOutages;
@@ -57,7 +58,7 @@ namespace OMS.CallTrackingImplementation
                     currentGid = this.potentialOutages[0];
                     previousGid = currentGid;
                     this.outages.Add(currentGid);
-                    outageTopologyModel.GetElementByGid(currentGid, out IOutageTopologyElement topologyElement);
+                    outageTopologyModel.GetElementByGid(currentGid, out OutageTopologyElement topologyElement);
                     this.potentialOutages.Remove(currentGid);
                     while (topologyElement.DmsType != "ENERGYSOURCE" && !topologyElement.IsRemote && this.potentialOutages.Count > 0)
                     {
@@ -105,9 +106,9 @@ namespace OMS.CallTrackingImplementation
             return retVal;
         }
 
-        private IOutageTopologyElement GetSwitch(long gid)
+        private OutageTopologyElement GetSwitch(long gid)
         {
-            IOutageTopologyElement element;
+            OutageTopologyElement element;
             if (outageTopologyModel.GetElementByGid(gid, out element))
             {
 
@@ -125,7 +126,7 @@ namespace OMS.CallTrackingImplementation
 
         private List<long> LocateSwitchesUsingCalls(List<long> registeredCalls)
         {
-            IOutageTopologyElement topologyElement;
+            OutageTopologyElement topologyElement;
             List<long> potentialSwitches = new List<long>();
             foreach (var call in registeredCalls)
             {
@@ -144,7 +145,7 @@ namespace OMS.CallTrackingImplementation
             return potentialSwitches;
         }
 
-        public bool TraceDFS(HashSet<long> visited, IOutageTopologyElement topologyElement, bool foundOutage)
+        public bool TraceDFS(HashSet<long> visited, OutageTopologyElement topologyElement, bool foundOutage)
         {
 
             if (this.potentialOutages.Count == 0)

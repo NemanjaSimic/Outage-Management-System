@@ -5,7 +5,8 @@ using System.Runtime.Serialization;
 namespace Common.PubSubContracts.DataContracts.CE
 {
     [DataContract(IsReference = true)]
-    public class OutageTopologyElement : IOutageTopologyElement
+    //TODO: clean up
+    public class OutageTopologyElement// : IOutageTopologyElement
     {
         #region Fields
         private long id;

@@ -3,8 +3,10 @@ using System.Runtime.Serialization;
 
 namespace Common.PubSubContracts.DataContracts.CE.UIModels
 {
-	[DataContract(IsReference = true)]
-	public class UIMeasurement : IUIMeasurement
+	//[DataContract(IsReference = true)]
+	[DataContract]
+	//TODO: clean up
+	public class UIMeasurement// : IUIMeasurement
 	{
 		[DataMember]
 		public long Gid { get; set; }

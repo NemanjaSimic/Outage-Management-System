@@ -5,6 +5,7 @@ using System.Threading;
 using System.Threading.Tasks;
 using Common.OMS;
 using Common.OmsContracts.ModelProvider;
+using Common.PubSubContracts.DataContracts.CE;
 using Microsoft.ServiceFabric.Data;
 using Microsoft.ServiceFabric.Data.Collections;
 using Microsoft.ServiceFabric.Services.Communication.Runtime;
@@ -15,7 +16,6 @@ using OMS.Common.Cloud;
 using OMS.Common.Cloud.Logger;
 using OMS.Common.Cloud.Names;
 using OMS.Common.PubSubContracts;
-using OMS.Common.PubSubContracts.Interfaces;
 using OMS.Common.WcfClient.PubSub;
 using OMS.ModelProviderImplementation;
 using OMS.ModelProviderImplementation.ContractProviders;
@@ -126,7 +126,7 @@ namespace OMS.ModelProviderService
                 {
                     using (ITransaction tx = this.StateManager.CreateTransaction())
                     {
-                        var result = await StateManager.TryGetAsync<IReliableDictionary<long, IOutageTopologyModel>>(ReliableDictionaryNames.OutageTopologyModel);
+                        var result = await StateManager.TryGetAsync<IReliableDictionary<long, OutageTopologyModel>>(ReliableDictionaryNames.OutageTopologyModel);
                         if(result.HasValue)
                         {
                             var gidToPointItemMap = result.Value;
@@ -135,7 +135,7 @@ namespace OMS.ModelProviderService
                         }
                         else
                         {
-                            await StateManager.GetOrAddAsync<IReliableDictionary<long, IOutageTopologyModel>>(tx, ReliableDictionaryNames.OutageTopologyModel);
+                            await StateManager.GetOrAddAsync<IReliableDictionary<long, OutageTopologyModel>>(tx, ReliableDictionaryNames.OutageTopologyModel);
                             await tx.CommitAsync();
                         }
                     }

@@ -25,13 +25,14 @@ using Common.CeContracts;
 using OMS.Common.PubSubContracts.Interfaces;
 using System.Collections.Generic;
 using System.Linq;
+using Common.PubSubContracts.DataContracts.CE;
 
 namespace OMS.OutageLifecycleImplementation
 {
     public class IsolateOutageService : IIsolateOutageContract
 	{
 
-		private IOutageTopologyModel outageModel;
+		private OutageTopologyModel outageModel;
 
 		private OutageLifecycleHelper outageLifecycleHelper;
         private ModelResourcesDesc modelResourcesDesc;

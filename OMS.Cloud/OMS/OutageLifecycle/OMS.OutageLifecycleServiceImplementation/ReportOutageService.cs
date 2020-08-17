@@ -3,17 +3,14 @@ using Common.OmsContracts.OutageLifecycle;
 using OMS.Common.Cloud;
 using OMS.Common.Cloud.Logger;
 using OMS.Common.WcfClient.OMS;
-using System;
 using System.Collections.Generic;
-using System.Linq;
 using System.Threading.Tasks;
-using Common.OMS.OutageDatabaseModel;
 using OMS.OutageLifecycleImplementation.OutageLCHelper;
 using Common.OmsContracts.ModelProvider;
 using Common.OmsContracts.HistoryDBManager;
-using OMS.Common.PubSubContracts.Interfaces;
 using Common.OmsContracts.ModelAccess;
 using OMS.Common.WcfClient.OMS.ModelAccess;
+using Common.PubSubContracts.DataContracts.CE;
 
 namespace OMS.OutageLifecycleImplementation
 {
@@ -22,7 +19,7 @@ namespace OMS.OutageLifecycleImplementation
         private OutageLifecycleHelper outageLifecycleHelper;
 		private Dictionary<long, Dictionary<long, List<long>>> recloserOutageMap;
         private OutageMessageMapper outageMessageMapper;
-        private IOutageTopologyModel topologyModel;
+        private OutageTopologyModel topologyModel;
         private Dictionary<long, long> CommandedElements;
         private Dictionary<long, long> OptimumIsolationPoints;
 

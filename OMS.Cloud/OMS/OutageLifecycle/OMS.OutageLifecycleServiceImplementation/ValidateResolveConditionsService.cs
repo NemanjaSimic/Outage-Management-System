@@ -3,9 +3,9 @@ using Common.OMS.OutageDatabaseModel;
 using Common.OmsContracts.ModelAccess;
 using Common.OmsContracts.ModelProvider;
 using Common.OmsContracts.OutageLifecycle;
+using Common.PubSubContracts.DataContracts.CE;
 using OMS.Common.Cloud;
 using OMS.Common.Cloud.Logger;
-using OMS.Common.PubSubContracts.Interfaces;
 using OMS.Common.WcfClient.OMS;
 using OMS.Common.WcfClient.OMS.ModelAccess;
 using OMS.OutageLifecycleImplementation.OutageLCHelper;
@@ -17,7 +17,7 @@ namespace OMS.OutageLifecycleImplementation
 {
     public class ValidateResolveConditionsService : IValidateResolveConditionsContract
 	{
-        private IOutageTopologyModel outageModel;
+        private OutageTopologyModel outageModel;
         private ICloudLogger logger;
 
         private ICloudLogger Logger
@@ -82,7 +82,7 @@ namespace OMS.OutageLifecycleImplementation
 
             foreach (Equipment isolationPoint in isolationPoints)
             {
-                if (outageModel.GetElementByGid(isolationPoint.EquipmentId, out IOutageTopologyElement element))
+                if (outageModel.GetElementByGid(isolationPoint.EquipmentId, out OutageTopologyElement element))
                 {
                     if (element.NoReclosing != element.IsActive)
                     {
