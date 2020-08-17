@@ -137,9 +137,6 @@ namespace OMS.Common.Cloud
         NON_SCADA_OUTAGE,
 
         [EnumMember]
-        OTHER_COMMAND, //TODO: rethink of name, add others like CE ili tako nesto
-
-        [EnumMember]
         UNKNOWN_ORIGIN,
     }
 

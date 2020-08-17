@@ -74,12 +74,6 @@ namespace SCADA.ModelProviderImplementation
                 else if (reliableStateName == ReliableDictionaryNames.AddressToGidMap)
                 {
                     AddressToGidMap = await ReliableDictionaryAccess<short, Dictionary<ushort, long>>.Create(stateManager, ReliableDictionaryNames.AddressToGidMap);
-                    //todo: see if below is necessary
-                    //await CurrentAddressToGidMap.SetAsync((short)PointType.ANALOG_INPUT, new Dictionary<ushort, long>());
-                    //await CurrentAddressToGidMap.SetAsync((short)PointType.ANALOG_OUTPUT, new Dictionary<ushort, long>());
-                    //await CurrentAddressToGidMap.SetAsync((short)PointType.DIGITAL_INPUT, new Dictionary<ushort, long>());
-                    //await CurrentAddressToGidMap.SetAsync((short)PointType.DIGITAL_OUTPUT, new Dictionary<ushort, long>());
-                    //await CurrentAddressToGidMap.SetAsync((short)PointType.HR_LONG, new Dictionary<ushort, long>());
                     this.isAddressToGidMapInitialized = true;
 
                     string debugMessage = $"{baseLogString} OnStateManagerChangedHandler => '{ReliableDictionaryNames.AddressToGidMap}' ReliableDictionaryAccess initialized.";
@@ -113,10 +107,11 @@ namespace SCADA.ModelProviderImplementation
             this.pointItemHelper = new ScadaModelPointItemHelper();
         }
 
-        public async Task InitializeScadaModel(bool isRetry = false)
+        public async Task<bool> InitializeScadaModel()
         {
-            string isRetryString = isRetry ? "yes" : "no";
-            string verboseMessage = $"{baseLogString} InitializeScadaModel method called, isRetry: {isRetryString}.";
+            bool success;
+
+            string verboseMessage = $"{baseLogString} InitializeScadaModel method called.";
             Logger.LogVerbose(verboseMessage);
 
             while (!ReliableDictionariesInitialized)
@@ -126,29 +121,28 @@ namespace SCADA.ModelProviderImplementation
 
             try
             {
-                var isModelImported = await ImportModel();
-                await InfoCache.SetAsync("IsScadaModelImported", isModelImported);
+                success = await ImportModel();
+                await InfoCache.SetAsync("IsScadaModelImported", success);
 
-                if (!isModelImported)
+                if (success)
+                {
+                    await SendModelUpdateCommands();
+                }
+                else
                 {
                     string message = $"{baseLogString} InitializeScadaModel => failed to import model";
                     Logger.LogWarning(message);
-
-                    await Task.Delay(2000);
-                    await InitializeScadaModel(true);
-
-                    //TODO: neka ozbiljnija retry logiga
-                    //throw new Exception($"{baseLogString} InitializeScadaModel => failed to import model");
                 }
 
-                await SendModelUpdateCommands();
             }
             catch (Exception e)
             {
+                success = false;
                 string errorMessage = $"{baseLogString} InitializeScadaModel => Exception caught.";
                 Logger.LogError(errorMessage, e);
-                throw e;
             }
+
+            return success;
         }
 
         #region ImportScadaModel

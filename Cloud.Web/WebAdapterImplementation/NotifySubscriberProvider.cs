@@ -16,19 +16,15 @@ namespace WebAdapterImplementation
     public class NotifySubscriberProvider : INotifySubscriberContract
     {
         private readonly string baseLogString;
+        private readonly string _subscriberName;
+        private readonly IGraphMapper _graphMapper;
+        private readonly IOutageMapper _outageMapper;
 
         private ICloudLogger logger;
         protected ICloudLogger Logger
         {
             get { return logger ?? (logger = CloudLoggerFactory.GetLogger()); }
         }
-
-        private readonly string _subscriberName;
-        private GraphHubDispatcher _graphDispatcher;
-        private OutageHubDispatcher _outageDispatcher;
-        private ScadaHubDispatcher _scadaDispatcher;
-        private readonly IGraphMapper _graphMapper;
-        private readonly IOutageMapper _outageMapper;
 
         public NotifySubscriberProvider(string subscriberName)
         {
@@ -44,12 +40,12 @@ namespace WebAdapterImplementation
         {
             if (message is ActiveOutageMessage activeOutage)
             {
-                _outageDispatcher = new OutageHubDispatcher(_outageMapper);
-                _outageDispatcher.Connect();
+                var outageDispatcher = new OutageHubDispatcher(_outageMapper);
+                outageDispatcher.Connect();
 
                 try
                 {
-                    _outageDispatcher.NotifyActiveOutageUpdate(activeOutage);
+                    outageDispatcher.NotifyActiveOutageUpdate(activeOutage);
                 }
                 catch (Exception e)
                 {
@@ -59,11 +55,12 @@ namespace WebAdapterImplementation
             }
             else if (message is ArchivedOutageMessage archivedOutage)
             {
-                _outageDispatcher.Connect();
+                var outageDispatcher = new OutageHubDispatcher(_outageMapper);
+                outageDispatcher.Connect();
 
                 try
                 {
-                    _outageDispatcher.NotifyArchiveOutageUpdate(archivedOutage);
+                    outageDispatcher.NotifyArchiveOutageUpdate(archivedOutage);
                 }
                 catch (Exception e)
                 {
@@ -75,10 +72,12 @@ namespace WebAdapterImplementation
             {
                 OmsGraphViewModel graph = _graphMapper.Map(topologyMessage.UIModel);
 
-                _graphDispatcher.Connect();
+                var graphDispatcher = new GraphHubDispatcher();
+                graphDispatcher.Connect();
+
                 try
                 {
-                    _graphDispatcher.NotifyGraphUpdate(graph.Nodes, graph.Relations);
+                    graphDispatcher.NotifyGraphUpdate(graph.Nodes, graph.Relations);
                 }
                 catch (Exception e)
                 {
@@ -89,12 +88,13 @@ namespace WebAdapterImplementation
             } else if (message is MultipleAnalogValueSCADAMessage analogValuesMessage)
             {
                 Dictionary<long, AnalogModbusData> analogModbusData = new Dictionary<long, AnalogModbusData>(analogValuesMessage.Data);
-                _scadaDispatcher = new ScadaHubDispatcher();
-                _scadaDispatcher.Connect();
+                
+                var scadaDispatcher = new ScadaHubDispatcher();
+                scadaDispatcher.Connect();
 
                 try
                 {
-                    _scadaDispatcher.NotifyScadaDataUpdate(analogModbusData);
+                    scadaDispatcher.NotifyScadaDataUpdate(analogModbusData);
                 }
                 catch (Exception e)
                 {

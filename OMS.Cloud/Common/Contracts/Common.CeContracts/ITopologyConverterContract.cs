@@ -7,20 +7,13 @@ using System.Threading.Tasks;
 
 namespace Common.CeContracts
 {
-    //todo: clean up
     [ServiceContract]
-	//[ServiceKnownType(typeof(TopologyModel))]
 	[ServiceKnownType(typeof(TopologyElement))]
 	[ServiceKnownType(typeof(EnergyConsumer))]
 	[ServiceKnownType(typeof(Feeder))]
 	[ServiceKnownType(typeof(Field))]
 	[ServiceKnownType(typeof(Recloser))]
 	[ServiceKnownType(typeof(SynchronousMachine))]
-	//[ServiceKnownType(typeof(OutageTopologyModel))]
-	//[ServiceKnownType(typeof(OutageTopologyElement))]
-	//[ServiceKnownType(typeof(UIModel))]
-	//[ServiceKnownType(typeof(UIMeasurement))]
-	//[ServiceKnownType(typeof(UINode))]
 	public interface ITopologyConverterContract : IService, IHealthChecker
 	{
 		[OperationContract]

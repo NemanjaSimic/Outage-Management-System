@@ -5,9 +5,7 @@ using System.Runtime.Serialization;
 namespace Common.PubSubContracts.DataContracts.CE
 {
     [DataContract(IsReference = true)]
-    //TODO: clean up
-    //[KnownType(typeof(OutageTopologyElement))]
-    public class OutageTopologyModel //: IOutageTopologyModel
+    public class OutageTopologyModel
     {
         private long firstNode;
         private Dictionary<long, OutageTopologyElement> outageTopology;
