@@ -7,6 +7,11 @@ using System.Runtime.Serialization;
 namespace Common.PubSubContracts.DataContracts.OMS
 {
     [DataContract(IsReference = true)]
+    //TODO: experiment with know type
+    [KnownType(typeof(ActiveOutageMessage))]
+    [KnownType(typeof(ArchivedOutageMessage))]
+    [KnownType(typeof(ConsumerMessage))]
+    [KnownType(typeof(EquipmentMessage))]
     public abstract class OutageMessage : IPublishableMessage
     {
         [DataMember]
@@ -68,7 +73,7 @@ namespace Common.PubSubContracts.DataContracts.OMS
     }
 
     [DataContract]
-    public class ConsumerMessage
+    public class ConsumerMessage : IPublishableMessage //todo: nije provereno da ovaj interfejs treba ovde
     {
         [DataMember]
         public long ConsumerId { get; set; }
@@ -96,7 +101,7 @@ namespace Common.PubSubContracts.DataContracts.OMS
     }
 
     [DataContract]
-    public class EquipmentMessage
+    public class EquipmentMessage : IPublishableMessage //todo: nije provereno da ovaj interfejs treba ovde
     {
         [DataMember]
         public long EquipmentId { get; set; }

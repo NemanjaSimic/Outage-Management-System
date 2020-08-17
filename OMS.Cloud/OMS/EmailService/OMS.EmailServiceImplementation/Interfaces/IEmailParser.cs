@@ -1,13 +1,8 @@
-﻿using OMS.CallTrackingServiceImplementation.Models;
-using System;
-using System.Collections.Generic;
-using System.Linq;
-using System.Text;
-using System.Threading.Tasks;
+﻿using OMS.EmailImplementation.Models;
 
-namespace OMS.CallTrackingServiceImplementation.Interfaces
+namespace OMS.EmailImplementation.Interfaces
 {
-	public interface IEmailParser
+    public interface IEmailParser
 	{
 		OutageTracingModel Parse(OutageMailMessage message);
 	}

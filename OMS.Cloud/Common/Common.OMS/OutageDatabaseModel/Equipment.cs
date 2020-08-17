@@ -1,21 +1,26 @@
-﻿using System;
-using System.Collections.Generic;
+﻿using System.Collections.Generic;
 using System.ComponentModel.DataAnnotations;
 using System.ComponentModel.DataAnnotations.Schema;
-using System.Linq;
-using System.Text;
-using System.Threading.Tasks;
+using System.Runtime.Serialization;
 
 namespace Common.OMS.OutageDatabaseModel
 {
+    [DataContract]
     public class Equipment
     {
         [Key]
         [DatabaseGenerated(DatabaseGeneratedOption.None)]
+        [DataMember]
         public long EquipmentId { get; set; }
+
+        [DataMember]
         public string EquipmentMRID { get; set; }
-        public ICollection<OutageEntity> OutagesAsOptimumIsolation { get; set; }
-        public ICollection<OutageEntity> OutagesAsDefaultIsolation { get; set; }
+
+        [DataMember]
+        public List<OutageEntity> OutagesAsOptimumIsolation { get; set; }
+
+        [DataMember]
+        public List<OutageEntity> OutagesAsDefaultIsolation { get; set; }
 
         public Equipment()
         {

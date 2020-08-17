@@ -7,15 +7,12 @@ using OMS.Common.NmsContracts;
 using OMS.Common.WcfClient.CE;
 using System;
 using System.Collections.Generic;
-using System.IO;
 using System.Linq;
-using System.Runtime.Serialization;
-using System.Runtime.Serialization.Formatters.Binary;
 using System.Threading.Tasks;
 
 namespace CE.TopologyBuilderImplementation
 {
-	public class TopologyBuilder : ITopologyBuilderContract
+    public class TopologyBuilder : ITopologyBuilderContract
     {
         #region Fields
         private List<Field> fields;
@@ -65,7 +62,7 @@ namespace CE.TopologyBuilderImplementation
             return retVal;
         }
 
-        public async Task<ITopology> CreateGraphTopology(long firstElementGid, string whoIsCalling)
+        public async Task<TopologyModel> CreateGraphTopology(long firstElementGid, string whoIsCalling)
         {
             Logger.LogVerbose($"{baseLogString} CreateGraphTopology method called, by {whoIsCalling}.");
 
@@ -90,7 +87,7 @@ namespace CE.TopologyBuilderImplementation
             stack = new Stack<long>();
             fields = new List<Field>();
 
-            ITopology topology = new TopologyModel
+            TopologyModel topology = new TopologyModel
             {
                 FirstNode = firstElementGid
             };

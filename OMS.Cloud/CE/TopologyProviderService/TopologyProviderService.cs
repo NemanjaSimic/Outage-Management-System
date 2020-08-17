@@ -15,8 +15,6 @@ using OMS.Common.Cloud.Logger;
 using OMS.Common.Cloud.Names;
 using ReliableDictionaryNames = Common.CE.ReliableDictionaryNames;
 using CE.TopologyProviderImplementation;
-using OMS.Common.PubSubContracts.Interfaces;
-using Common.PubSubContracts.DataContracts.CE.Interfaces;
 using Common.PubSubContracts.DataContracts.CE;
 using Common.PubSubContracts.DataContracts.CE.UIModels;
 

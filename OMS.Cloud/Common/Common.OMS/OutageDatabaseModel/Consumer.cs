@@ -1,25 +1,30 @@
-﻿using System;
-using System.Collections.Generic;
+﻿using System.Collections.Generic;
 using System.ComponentModel.DataAnnotations;
 using System.ComponentModel.DataAnnotations.Schema;
-using System.Linq;
-using System.Text;
-using System.Threading.Tasks;
+using System.Runtime.Serialization;
 
 namespace Common.OMS.OutageDatabaseModel
 {
+    [DataContract]
 	
     public class Consumer
     {
         [Key]
         [DatabaseGenerated(DatabaseGeneratedOption.None)]
+        [DataMember]
         public long ConsumerId { get; set; }
 
+        [DataMember]
         public string ConsumerMRID { get; set; }
+
+        [DataMember]
         public string FirstName { get; set; }
+
+        [DataMember]
         public string LastName { get; set; }
 
-        public ICollection<OutageEntity> Outages { get; set; }
+        [DataMember]
+        public List<OutageEntity> Outages { get; set; }
 
         public Consumer()
         {

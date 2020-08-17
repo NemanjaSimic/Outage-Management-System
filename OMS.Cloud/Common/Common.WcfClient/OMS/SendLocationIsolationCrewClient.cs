@@ -13,7 +13,7 @@ namespace OMS.Common.WcfClient.OMS
     public class SendLocationIsolationCrewClient : WcfSeviceFabricClientBase<ISendLocationIsolationCrewContract>, ISendLocationIsolationCrewContract
     {
         private static readonly string microserviceName = MicroserviceNames.OmsOutageLifecycleService;
-        private static readonly string listenerName = EndpointNames.SendLocationIsolationCrewEndpoint;
+        private static readonly string listenerName = EndpointNames.OmsSendLocationIsolationCrewEndpoint;
         public SendLocationIsolationCrewClient(WcfCommunicationClientFactory<ISendLocationIsolationCrewContract> clientFactory, Uri serviceUri, ServicePartitionKey servicePartition)
            : base(clientFactory, serviceUri, servicePartition, listenerName)
         {

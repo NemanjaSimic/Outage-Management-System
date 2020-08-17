@@ -31,6 +31,7 @@ namespace CE.LoadFlowService
 			}
 			catch (Exception e)
 			{
+				//TODO: log
 				ServiceEventSource.Current.ServiceHostInitializationFailed(e.ToString());
 				throw;
 			}

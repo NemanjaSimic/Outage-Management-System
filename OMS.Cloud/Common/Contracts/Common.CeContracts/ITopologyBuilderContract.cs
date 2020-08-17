@@ -16,6 +16,6 @@ namespace Common.CeContracts
 		[ServiceKnownType(typeof(Recloser))]
 		[ServiceKnownType(typeof(SynchronousMachine))]
 		[ServiceKnownType(typeof(TopologyElement))]
-		Task<ITopology> CreateGraphTopology(long firstElementGid, string whoIsCalling);
+		Task<TopologyModel> CreateGraphTopology(long firstElementGid, string whoIsCalling);
 	}
 }

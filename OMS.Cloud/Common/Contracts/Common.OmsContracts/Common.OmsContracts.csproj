@@ -38,9 +38,6 @@
     <Reference Include="Microsoft.ServiceFabric.Data.Extensions, Version=1.4.5.0, Culture=neutral, PublicKeyToken=31bf3856ad364e35, processorArchitecture=MSIL">
       <HintPath>..\packages\Microsoft.ServiceFabric.Data.Extensions.4.1.417\lib\net472\Microsoft.ServiceFabric.Data.Extensions.dll</HintPath>
     </Reference>
-    <Reference Include="Microsoft.ServiceFabric.Data.Interfaces, Version=5.0.0.0, Culture=neutral, PublicKeyToken=31bf3856ad364e35, processorArchitecture=AMD64">
-      <HintPath>..\packages\Microsoft.ServiceFabric.Data.Interfaces.4.1.417\lib\net472\Microsoft.ServiceFabric.Data.Interfaces.dll</HintPath>
-    </Reference>
     <Reference Include="Microsoft.ServiceFabric.Diagnostics, Version=7.0.0.0, Culture=neutral, PublicKeyToken=31bf3856ad364e35, processorArchitecture=AMD64">
       <HintPath>..\packages\Microsoft.ServiceFabric.Diagnostics.Internal.4.1.417\lib\net472\Microsoft.ServiceFabric.Diagnostics.dll</HintPath>
     </Reference>
@@ -65,19 +62,10 @@
     <Reference Include="Microsoft.ServiceFabric.Services, Version=6.0.0.0, Culture=neutral, PublicKeyToken=31bf3856ad364e35, processorArchitecture=AMD64">
       <HintPath>..\packages\Microsoft.ServiceFabric.Services.4.1.417\lib\net472\Microsoft.ServiceFabric.Services.dll</HintPath>
     </Reference>
-    <Reference Include="Microsoft.ServiceFabric.Services.Remoting, Version=6.0.0.0, Culture=neutral, PublicKeyToken=31bf3856ad364e35, processorArchitecture=AMD64">
-      <HintPath>..\packages\Microsoft.ServiceFabric.Services.Remoting.4.1.417\lib\net472\Microsoft.ServiceFabric.Services.Remoting.dll</HintPath>
-    </Reference>
     <Reference Include="System" />
     <Reference Include="System.Core" />
-    <Reference Include="System.Fabric, Version=7.0.0.0, Culture=neutral, PublicKeyToken=31bf3856ad364e35, processorArchitecture=AMD64">
-      <HintPath>..\packages\Microsoft.ServiceFabric.7.1.417\lib\net472\System.Fabric.dll</HintPath>
-    </Reference>
     <Reference Include="System.Fabric.Management.ServiceModel, Version=7.0.0.0, Culture=neutral, PublicKeyToken=31bf3856ad364e35, processorArchitecture=AMD64">
       <HintPath>..\packages\Microsoft.ServiceFabric.7.1.417\lib\net472\System.Fabric.Management.ServiceModel.dll</HintPath>
-    </Reference>
-    <Reference Include="System.Fabric.Strings, Version=7.0.0.0, Culture=neutral, PublicKeyToken=31bf3856ad364e35, processorArchitecture=AMD64">
-      <HintPath>..\packages\Microsoft.ServiceFabric.7.1.417\lib\net472\System.Fabric.Strings.dll</HintPath>
     </Reference>
     <Reference Include="System.Runtime.Serialization" />
     <Reference Include="System.ServiceModel" />
@@ -90,7 +78,9 @@
   </ItemGroup>
   <ItemGroup>
     <Compile Include="HistoryDBManager\IHistoryDBManagerContract.cs" />
-    <Compile Include="IOutageAccessContract.cs" />
+    <Compile Include="ModelAccess\IConsumerAccessContract.cs" />
+    <Compile Include="ModelAccess\IEquipmentAccessContract.cs" />
+    <Compile Include="ModelAccess\IOutageAccessContract.cs" />
     <Compile Include="ModelProvider\IOutageModelReadAccessContract.cs" />
     <Compile Include="ModelProvider\IOutageModelUpdateAccessContract.cs" />
     <Compile Include="OutageLifecycle\IIsolateOutageContract.cs" />
@@ -106,9 +96,33 @@
   </ItemGroup>
   <ItemGroup>
     <None Include="app.config" />
-    <None Include="packages.config" />
   </ItemGroup>
-  <ItemGroup />
+  <ItemGroup>
+    <PackageReference Include="Microsoft.ServiceFabric">
+      <Version>7.1.417</Version>
+    </PackageReference>
+    <PackageReference Include="Microsoft.ServiceFabric.Data">
+      <Version>4.1.417</Version>
+    </PackageReference>
+    <PackageReference Include="Microsoft.ServiceFabric.Data.Extensions">
+      <Version>4.1.417</Version>
+    </PackageReference>
+    <PackageReference Include="Microsoft.ServiceFabric.Data.Interfaces">
+      <Version>4.1.417</Version>
+    </PackageReference>
+    <PackageReference Include="Microsoft.ServiceFabric.Diagnostics.Internal">
+      <Version>4.1.417</Version>
+    </PackageReference>
+    <PackageReference Include="Microsoft.ServiceFabric.FabricTransport.Internal">
+      <Version>4.1.417</Version>
+    </PackageReference>
+    <PackageReference Include="Microsoft.ServiceFabric.Services">
+      <Version>4.1.417</Version>
+    </PackageReference>
+    <PackageReference Include="Microsoft.ServiceFabric.Services.Remoting">
+      <Version>4.1.417</Version>
+    </PackageReference>
+  </ItemGroup>
   <ItemGroup>
     <ProjectReference Include="..\..\Common.Cloud\Common.Cloud.csproj">
       <Project>{FBEE1369-0F6C-41E6-8C62-8C1C5CDBB602}</Project>

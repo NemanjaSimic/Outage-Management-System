@@ -95,13 +95,10 @@ namespace NMS.GdaImplementation
             this.resourcesDescs = new ModelResourcesDesc();
 
             this.networkModelState = NetworkModelState.NOT_INITIALIZED; 
-            //this.isModelInitialized = false;
-            //this.isTransactionInProgress = false;
-    }
+        }
 
         public async Task InitializeNetworkModel()
         {
-            //this.isModelInitialized = false;
             this.networkModelState = NetworkModelState.CURRENTLY_INITIALIZING;
 
             long latestNetworkModelVersion = mongoDbAccess.GetLatestNetworkModelVersions();
@@ -237,7 +234,6 @@ namespace NMS.GdaImplementation
                 throw new Exception(message);
             }
         }
-
         #endregion Find
 
         #region INetworkModelGDAContract Methods
@@ -1015,7 +1011,6 @@ namespace NMS.GdaImplementation
         {
             return Task.Run(() =>
             {
-                //this.isTransactionInProgress = false;
                 this.networkModelState = NetworkModelState.INITIALIZED;
 
                 if (currentDelta != null && currentDelta.DeltaOrigin == DeltaOriginType.ImporterDelta)
@@ -1038,7 +1033,6 @@ namespace NMS.GdaImplementation
         {
             return Task.Run(() =>
             {
-                //this.isTransactionInProgress = false;
                 this.networkModelState = NetworkModelState.INITIALIZED;
 
                 currentDelta = null;

@@ -4,6 +4,7 @@ using System.Runtime.Serialization;
 namespace Common.PubSubContracts.DataContracts.EMAIL
 {
     [DataContract]
+    [KnownType(typeof(EmailToOutageMessage))]
     public abstract class EmailServiceMessage : IPublishableMessage
     {
     }

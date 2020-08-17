@@ -12,183 +12,224 @@ using System.Collections.Generic;
 using System.Linq;
 using System.Threading.Tasks;
 
-namespace HistoryDBManagerServiceImplementation
+namespace OMS.HistoryDBManagerImplementation
 {
     public class HistoryDBManager : IHistoryDBManagerContract
     {
+        private readonly string baseLogString;
         private readonly IReliableStateManager stateManager;
-        private UnitOfWork dbContext;
-        private ReliableDictionaryAccess<long, long> unenergizedConsumers;
-        public ReliableDictionaryAccess<long, long> UnenergizedConsumers
-        {
-            get
-            {
-                if(unenergizedConsumers == null)
-                {
-                    unenergizedConsumers = ReliableDictionaryAccess<long, long>.Create(this.stateManager, ReliableDictionaryNames.UnenergizedConsumers).Result;
-                }
-                return unenergizedConsumers;
-            }
-            protected set
-            {
-                unenergizedConsumers = value;
-            }
-        }
 
-        private ReliableDictionaryAccess<long, long> openedSwitches;
-        public ReliableDictionaryAccess<long,long> OpenedSwitches
-        {
-            get
-            {
-                if(openedSwitches == null)
-                {
-                    openedSwitches = ReliableDictionaryAccess<long, long>.Create(this.stateManager, ReliableDictionaryNames.OpenedSwitches).Result;
-                }
-                return openedSwitches;
-            }
-            protected set
-            {
-                openedSwitches = value;
-            }
-        }
+        #region Private Properties
         private ICloudLogger logger;
         private ICloudLogger Logger
         {
             get { return logger ?? (logger = CloudLoggerFactory.GetLogger()); }
         }
+        #endregion Private Properties
 
-        public HistoryDBManager(IReliableStateManager stateManager)
+        #region Reliable Dictionaries
+        private bool isUnenergizedConsumersInitialized;
+        private bool isOpenedSwitchesInitialized;
+
+        private bool ReliableDictionariesInitialized
         {
-            this.stateManager = stateManager;
-            this.stateManager.StateManagerChanged += OnStateManagerChangedHandler;
-            this.dbContext = new UnitOfWork();
+            get
+            {
+                return isUnenergizedConsumersInitialized &&
+                       isOpenedSwitchesInitialized;
+            }
+        }
+
+        //TODO: translate to ReliableDictionaryAccess<long, Consumer>
+        private ReliableDictionaryAccess<long, long> unenergizedConsumers;
+        private ReliableDictionaryAccess<long, long> UnenergizedConsumers
+        {
+            get { return unenergizedConsumers; }
+        }
+
+        //TODO: translate to ReliableDictionaryAccess<long, Switch>
+        private ReliableDictionaryAccess<long, long> openedSwitches;
+        private ReliableDictionaryAccess<long, long> OpenedSwitches
+        {
+            get { return openedSwitches; }
         }
 
         private async void OnStateManagerChangedHandler(object sender, NotifyStateManagerChangedEventArgs e)
         {
-            if(e.Action == NotifyStateManagerChangedAction.Add)
+            if (e.Action == NotifyStateManagerChangedAction.Add)
             {
                 var operation = e as NotifyStateManagerSingleEntityChangedEventArgs;
                 string reliableStateName = operation.ReliableState.Name.AbsolutePath;
                 if (reliableStateName == ReliableDictionaryNames.OpenedSwitches)
                 {
-                    OpenedSwitches = await ReliableDictionaryAccess<long, long>.Create(this.stateManager, ReliableDictionaryNames.OpenedSwitches);
-                } else if (reliableStateName == ReliableDictionaryNames.UnenergizedConsumers)
+                    openedSwitches = await ReliableDictionaryAccess<long, long>.Create(this.stateManager, ReliableDictionaryNames.OpenedSwitches);
+                    this.isOpenedSwitchesInitialized = true;
+                }
+                else if (reliableStateName == ReliableDictionaryNames.UnenergizedConsumers)
                 {
-                    UnenergizedConsumers = await ReliableDictionaryAccess<long, long>.Create(this.stateManager, ReliableDictionaryNames.UnenergizedConsumers);
+                    unenergizedConsumers = await ReliableDictionaryAccess<long, long>.Create(this.stateManager, ReliableDictionaryNames.UnenergizedConsumers);
+                    this.isUnenergizedConsumersInitialized = true;
                 }
             }
         }
+        #endregion Reliable Dictionaries
 
+        public HistoryDBManager(IReliableStateManager stateManager)
+        {
+            this.baseLogString = $"{this.GetType()} [{this.GetHashCode()}] =>{Environment.NewLine}";
+            Logger.LogDebug($"{baseLogString} Ctor => Logger initialized");
+
+            this.isOpenedSwitchesInitialized = false;
+            this.isUnenergizedConsumersInitialized = false;
+
+            this.stateManager = stateManager;
+            this.stateManager.StateManagerChanged += OnStateManagerChangedHandler;
+        }
+
+        #region IHistoryDBManagerContract
         public async Task OnSwitchClosed(long elementGid)
         {
-            try
+            while (!ReliableDictionariesInitialized)
             {
-                using(var tx = this.stateManager.CreateTransaction())
+                await Task.Delay(1000);
+            }
+
+            using (var unitOfWork = new UnitOfWork())
+            {
+                try
                 {
-                    if(await OpenedSwitches.ContainsKeyAsync(elementGid))
+                    if (await OpenedSwitches.ContainsKeyAsync(elementGid))
                     {
-                        dbContext.EquipmentHistoricalRepository.Add(new EquipmentHistorical() { EquipmentId = elementGid, OperationTime = DateTime.Now, DatabaseOperation = DatabaseOperation.DELETE });
-                        await OpenedSwitches.TryRemoveAsync(tx, elementGid);
-                        dbContext.Complete();
-                        await tx.CommitAsync();
+                        var equipment = new EquipmentHistorical()
+                        {
+                            EquipmentId = elementGid,
+                            OperationTime = DateTime.Now,
+                            DatabaseOperation = DatabaseOperation.DELETE,
+                        };
+
+                        unitOfWork.EquipmentHistoricalRepository.Add(equipment);
+                        await OpenedSwitches.TryRemoveAsync(elementGid);
+                        unitOfWork.Complete();
                     }
                 }
-            }
-            catch (Exception ex)
-            {
-                string message = "HistoryDBManager::OnSwitchClosed method => exception on Complete()";
-                Logger.LogError(message, ex);
-                Console.WriteLine($"{message}, Message: {ex.Message}, Inner Message: {ex.InnerException.Message})");
+                catch (Exception e)
+                {
+                    string message = $"{baseLogString} OnSwitchClosed => Exception: {e.Message}";
+                    Logger.LogError(message, e);
+                }
             }
         }
 
         public async Task OnConsumerBlackedOut(List<long> consumers, long? outageId)
         {
-            List<ConsumerHistorical> consumerHistoricals = new List<ConsumerHistorical>();
-            try
+            while (!ReliableDictionariesInitialized)
             {
-                using (var tx = this.stateManager.CreateTransaction())
+                await Task.Delay(1000);
+            }
+
+            using (var unitOfWork = new UnitOfWork())
+            {
+                try
                 {
+                    var consumerHistoricals = new List<ConsumerHistorical>();
+                    
                     foreach (var consumer in consumers)
                     {
-                        if (! await UnenergizedConsumers.ContainsKeyAsync(consumer))
+                        if (!await UnenergizedConsumers.ContainsKeyAsync(consumer))
                         {
-
                             consumerHistoricals.Add(new ConsumerHistorical() { OutageId = outageId, ConsumerId = consumer, OperationTime = DateTime.Now, DatabaseOperation = DatabaseOperation.INSERT });
-                            await UnenergizedConsumers.AddAsync(tx,consumer,0);
+                            await UnenergizedConsumers.SetAsync(consumer, 0);
                         }
                     }
-                    dbContext.ConsumerHistoricalRepository.AddRange(consumerHistoricals);
-                    dbContext.Complete();
-                    await tx.CommitAsync();
+
+                    unitOfWork.ConsumerHistoricalRepository.AddRange(consumerHistoricals);
+                    unitOfWork.Complete();
                 }
-            }
-            catch (Exception e)
-            {
-                string message = "HistoryDBManager::OnConsumersBlackedOut method => exception on Complete()";
-                Logger.LogError(message, e);
-                Console.WriteLine($"{message}, Message: {e.Message}, Inner Message: {e.InnerException.Message})");
+                catch (Exception e)
+                {
+                    string message = $"{baseLogString} OnConsumersBlackedOut => Exception: {e.Message}";
+                    Logger.LogError(message, e);
+                }
             }
         }
 
         public async Task OnSwitchOpened(long elementGid, long? outageId)
         {
-            try
+            while (!ReliableDictionariesInitialized)
             {
-                using (var tx = this.stateManager.CreateTransaction())
+                await Task.Delay(1000);
+            }
+
+            using (var unitOfWork = new UnitOfWork())
+            {
+                try
                 {
-                    if (! await OpenedSwitches.ContainsKeyAsync(elementGid))
+                    if (!await OpenedSwitches.ContainsKeyAsync(elementGid))
                     {
-                        dbContext.EquipmentHistoricalRepository.Add(new EquipmentHistorical() { OutageId = outageId, EquipmentId = elementGid, OperationTime = DateTime.Now, DatabaseOperation = DatabaseOperation.INSERT });
-                        await OpenedSwitches.AddAsync(tx,elementGid,0);
-                        dbContext.Complete();
-                        await tx.CommitAsync();
+                        var equipment = new EquipmentHistorical()
+                        {
+                            OutageId = outageId,
+                            EquipmentId = elementGid,
+                            OperationTime = DateTime.Now,
+                            DatabaseOperation = DatabaseOperation.INSERT,
+                        };
+
+                        unitOfWork.EquipmentHistoricalRepository.Add(equipment);
+                        await OpenedSwitches.SetAsync(elementGid, 0);
+                        unitOfWork.Complete();
                     }
                 }
-            }
-            catch (Exception e)
-            {
-                string message = "HistoryDBManager::OnSwitchOpened method => exception on Complete()";
-                Logger.LogError(message, e);
-                Console.WriteLine($"{message}, Message: {e.Message}, Inner Message: {e.InnerException.Message})");
+                catch (Exception e)
+                {
+                    string message = $"{baseLogString} OnSwitchOpened => Exception: {e.Message}";
+                    Logger.LogError(message, e);
+                }
             }
         }
 
         public async Task OnConsumersEnergized(HashSet<long> consumers)
         {
-            List<ConsumerHistorical> consumerHistoricals = new List<ConsumerHistorical>();
-            var copy = (await UnenergizedConsumers.GetDataCopyAsync()).Keys.ToList();
-            var changedConsumers = copy.Intersect(consumers).ToList();
-
-            foreach (var consumer in changedConsumers)
+            while (!ReliableDictionariesInitialized)
             {
-                consumerHistoricals.Add(new ConsumerHistorical() { ConsumerId = consumer, OperationTime = DateTime.Now, DatabaseOperation = DatabaseOperation.DELETE });
+                await Task.Delay(1000);
             }
 
-            try
+            using (var unitOfWork = new UnitOfWork())
             {
-                using (var tx = this.stateManager.CreateTransaction())
+                try
                 {
+                    var consumerHistoricals = new List<ConsumerHistorical>();
+                    var copy = (await UnenergizedConsumers.GetDataCopyAsync()).Keys.ToList();
+                    var changedConsumers = copy.Intersect(consumers).ToList();
+
+                    foreach (var consumer in changedConsumers)
+                    {
+                        var consumerHistorical = new ConsumerHistorical()
+                        {
+                            ConsumerId = consumer,
+                            OperationTime = DateTime.Now,
+                            DatabaseOperation = DatabaseOperation.DELETE,
+                        };
+
+                        consumerHistoricals.Add(consumerHistorical);
+                    }
+
                     foreach (var changed in changedConsumers)
                     {
                         if (await UnenergizedConsumers.ContainsKeyAsync(changed))
-						{
-                            await UnenergizedConsumers.TryRemoveAsync(tx,changed);
-						}
+                        {
+                            await UnenergizedConsumers.TryRemoveAsync(changed);
+                        }
                     }
 
-                    dbContext.ConsumerHistoricalRepository.AddRange(consumerHistoricals);
-                    dbContext.Complete();
-                    //savechanges
-                    await tx.CommitAsync();
+                    unitOfWork.ConsumerHistoricalRepository.AddRange(consumerHistoricals);
+                    unitOfWork.Complete();
                 }
-            }
-            catch (Exception e)
-            {
-                string message = "HistoryDBManager::OnConsumersEnergized method => exception on Complete()";
-                Logger.LogError(message, e);
-                Console.WriteLine($"{message}, Message: {e.Message}, Inner Message: {e.InnerException.Message})");
+                catch (Exception e)
+                {
+                    string message = $"{baseLogString} OnConsumersEnergized => Exception: {e.Message}";
+                    Logger.LogError(message, e);
+                }
             }
         }
 
@@ -196,6 +237,6 @@ namespace HistoryDBManagerServiceImplementation
         {
             return Task.Run(() => { return true; });
         }
-
+        #endregion IHistoryDBManagerContract
     }
 }

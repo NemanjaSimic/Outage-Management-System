@@ -1,10 +1,10 @@
 ﻿using Common.CeContracts;
 using Common.CeContracts.TopologyProvider;
-using Common.PubSubContracts.DataContracts.CE.Interfaces;
+using Common.PubSubContracts.DataContracts.CE;
+using Common.PubSubContracts.DataContracts.CE.UIModels;
 using Microsoft.ServiceFabric.Services.Client;
 using Microsoft.ServiceFabric.Services.Communication.Wcf.Client;
 using OMS.Common.Cloud.Names;
-using OMS.Common.PubSubContracts.Interfaces;
 using System;
 using System.Threading.Tasks;
 
@@ -44,17 +44,17 @@ namespace OMS.Common.WcfClient.CE
             return InvokeWithRetryAsync(client => client.Channel.DiscreteMeasurementDelegate());
 		}
 
-		public Task<IOutageTopologyModel> GetOMSModel()
+		public Task<OutageTopologyModel> GetOMSModel()
 		{
             return InvokeWithRetryAsync(client => client.Channel.GetOMSModel());
 		}
 
-		public Task<ITopology> GetTopology()
+		public Task<TopologyModel> GetTopology()
 		{
             return InvokeWithRetryAsync(client => client.Channel.GetTopology());
 		}
 
-		public Task<IUIModel> GetUIModel()
+		public Task<UIModel> GetUIModel()
 		{
             return InvokeWithRetryAsync(client => client.Channel.GetUIModel());
 		}

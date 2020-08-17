@@ -93,31 +93,25 @@ Project("{2150E333-8FDC-42A3-9474-1A3956D46DE8}") = "HistoryDBManager", "History
 EndProject
 Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "OMS.HistoryDBManagerService", "OMS\HistoryDBManager\OMS.HistoryDBManagerService\OMS.HistoryDBManagerService.csproj", "{EB57945C-DD85-4C08-9A47-78BC3C53E3E8}"
 EndProject
-Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "OMS.HistoryDBManagerServiceImplementation", "OMS\HistoryDBManager\OMS.HistoryDBManagerServiceImplementation\OMS.HistoryDBManagerServiceImplementation.csproj", "{3CA82365-7A48-4FAB-A74B-C70316A60163}"
+Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "OMS.HistoryDBManagerImplementation", "OMS\HistoryDBManager\OMS.HistoryDBManagerServiceImplementation\OMS.HistoryDBManagerImplementation.csproj", "{3CA82365-7A48-4FAB-A74B-C70316A60163}"
 EndProject
 Project("{2150E333-8FDC-42A3-9474-1A3956D46DE8}") = "OutageLifecycle", "OutageLifecycle", "{B8C853BD-3884-40C9-9EDB-3A9854C078D8}"
 EndProject
 Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "OMS.OutageLifecycleService", "OMS\OutageLifecycle\OMS.OutageLifecycleService\OMS.OutageLifecycleService.csproj", "{63D9EEC4-F3FA-4E67-934C-0F38BF9D76CA}"
 EndProject
-Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "OMS.OutageLifecycleServiceImplementation", "OMS\OutageLifecycle\OMS.OutageLifecycleServiceImplementation\OMS.OutageLifecycleServiceImplementation.csproj", "{2980A776-F631-4AF7-A8CC-3FAF8D448C3B}"
+Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "OMS.OutageLifecycleImplementation", "OMS\OutageLifecycle\OMS.OutageLifecycleServiceImplementation\OMS.OutageLifecycleImplementation.csproj", "{2980A776-F631-4AF7-A8CC-3FAF8D448C3B}"
 EndProject
 Project("{2150E333-8FDC-42A3-9474-1A3956D46DE8}") = "CallTracking", "CallTracking", "{D579389E-05D5-4A9E-99D5-52436846B0A0}"
 EndProject
 Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "OMS.CallTrackingService", "OMS\CallTracking\OMS.CallTrackingService\OMS.CallTrackingService.csproj", "{9D879368-F34C-4014-8E6A-E09DB2FFF3F3}"
 EndProject
-Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "OMS.CallTrackingServiceImplementation", "OMS\CallTracking\OMS.CallTrackingServiceImplementation\OMS.CallTrackingServiceImplementation.csproj", "{5F0FD4E5-D37F-4C3E-B0B4-CFC6B57F8982}"
+Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "OMS.CallTrackingImplementation", "OMS\CallTracking\OMS.CallTrackingServiceImplementation\OMS.CallTrackingImplementation.csproj", "{5F0FD4E5-D37F-4C3E-B0B4-CFC6B57F8982}"
 EndProject
 Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "Common.CE", "Common\Common.CE\Common.CE.csproj", "{4EAD0377-BD2D-4B7E-93A6-705DB815E8A7}"
 EndProject
-Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "OMS.ReportingService", "OMS.ReportingService\OMS.ReportingService.csproj", "{0CCAB956-E417-4593-9988-B5B1DA743F5D}"
-EndProject
-Project("{2150E333-8FDC-42A3-9474-1A3956D46DE8}") = "Report", "Report", "{C40FD374-0FCF-4F53-9DF5-729559AEE215}"
-EndProject
-Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "OMS.ReportingServiceImplementation", "OMS.ReportingServiceImplementation\OMS.ReportingServiceImplementation.csproj", "{C5BEAB69-DFCC-4E81-9177-A69669FED2D4}"
-EndProject
 Project("{2150E333-8FDC-42A3-9474-1A3956D46DE8}") = "EmailService", "EmailService", "{9C818AA1-6BB9-4ECC-BB10-5669C7AE7348}"
 EndProject
-Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "OMS.EmailServiceImplementation", "OMS\EmailService\OMS.EmailServiceImplementation\OMS.EmailServiceImplementation.csproj", "{D39CBFCE-3D53-4AFC-98B5-29E9FF332D6E}"
+Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "OMS.EmailImplementation", "OMS\EmailService\OMS.EmailServiceImplementation\OMS.EmailImplementation.csproj", "{D39CBFCE-3D53-4AFC-98B5-29E9FF332D6E}"
 EndProject
 Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "OMS.EmailService", "OMS\EmailService\OMS.EmailService\OMS.EmailService.csproj", "{A1DE3E27-2E4F-4F28-A151-778F4E5020A6}"
 EndProject
@@ -579,26 +573,6 @@ Global
 		{4EAD0377-BD2D-4B7E-93A6-705DB815E8A7}.Release|x64.Build.0 = Release|Any CPU
 		{4EAD0377-BD2D-4B7E-93A6-705DB815E8A7}.Release|x86.ActiveCfg = Release|Any CPU
 		{4EAD0377-BD2D-4B7E-93A6-705DB815E8A7}.Release|x86.Build.0 = Release|Any CPU
-		{0CCAB956-E417-4593-9988-B5B1DA743F5D}.Debug|Any CPU.ActiveCfg = Debug|x64
-		{0CCAB956-E417-4593-9988-B5B1DA743F5D}.Debug|x64.ActiveCfg = Debug|x64
-		{0CCAB956-E417-4593-9988-B5B1DA743F5D}.Debug|x64.Build.0 = Debug|x64
-		{0CCAB956-E417-4593-9988-B5B1DA743F5D}.Debug|x86.ActiveCfg = Debug|x64
-		{0CCAB956-E417-4593-9988-B5B1DA743F5D}.Release|Any CPU.ActiveCfg = Release|x64
-		{0CCAB956-E417-4593-9988-B5B1DA743F5D}.Release|x64.ActiveCfg = Release|x64
-		{0CCAB956-E417-4593-9988-B5B1DA743F5D}.Release|x64.Build.0 = Release|x64
-		{0CCAB956-E417-4593-9988-B5B1DA743F5D}.Release|x86.ActiveCfg = Release|x64
-		{C5BEAB69-DFCC-4E81-9177-A69669FED2D4}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
-		{C5BEAB69-DFCC-4E81-9177-A69669FED2D4}.Debug|Any CPU.Build.0 = Debug|Any CPU
-		{C5BEAB69-DFCC-4E81-9177-A69669FED2D4}.Debug|x64.ActiveCfg = Debug|Any CPU
-		{C5BEAB69-DFCC-4E81-9177-A69669FED2D4}.Debug|x64.Build.0 = Debug|Any CPU
-		{C5BEAB69-DFCC-4E81-9177-A69669FED2D4}.Debug|x86.ActiveCfg = Debug|Any CPU
-		{C5BEAB69-DFCC-4E81-9177-A69669FED2D4}.Debug|x86.Build.0 = Debug|Any CPU
-		{C5BEAB69-DFCC-4E81-9177-A69669FED2D4}.Release|Any CPU.ActiveCfg = Release|Any CPU
-		{C5BEAB69-DFCC-4E81-9177-A69669FED2D4}.Release|Any CPU.Build.0 = Release|Any CPU
-		{C5BEAB69-DFCC-4E81-9177-A69669FED2D4}.Release|x64.ActiveCfg = Release|Any CPU
-		{C5BEAB69-DFCC-4E81-9177-A69669FED2D4}.Release|x64.Build.0 = Release|Any CPU
-		{C5BEAB69-DFCC-4E81-9177-A69669FED2D4}.Release|x86.ActiveCfg = Release|Any CPU
-		{C5BEAB69-DFCC-4E81-9177-A69669FED2D4}.Release|x86.Build.0 = Release|Any CPU
 		{D39CBFCE-3D53-4AFC-98B5-29E9FF332D6E}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
 		{D39CBFCE-3D53-4AFC-98B5-29E9FF332D6E}.Debug|Any CPU.Build.0 = Debug|Any CPU
 		{D39CBFCE-3D53-4AFC-98B5-29E9FF332D6E}.Debug|x64.ActiveCfg = Debug|Any CPU
@@ -875,9 +849,6 @@ Global
 		{9D879368-F34C-4014-8E6A-E09DB2FFF3F3} = {D579389E-05D5-4A9E-99D5-52436846B0A0}
 		{5F0FD4E5-D37F-4C3E-B0B4-CFC6B57F8982} = {D579389E-05D5-4A9E-99D5-52436846B0A0}
 		{4EAD0377-BD2D-4B7E-93A6-705DB815E8A7} = {1273566C-3127-47ED-987F-48FE148D53F9}
-		{0CCAB956-E417-4593-9988-B5B1DA743F5D} = {C40FD374-0FCF-4F53-9DF5-729559AEE215}
-		{C40FD374-0FCF-4F53-9DF5-729559AEE215} = {9714296F-0442-4365-80D7-35BAF473DAB1}
-		{C5BEAB69-DFCC-4E81-9177-A69669FED2D4} = {C40FD374-0FCF-4F53-9DF5-729559AEE215}
 		{9C818AA1-6BB9-4ECC-BB10-5669C7AE7348} = {9714296F-0442-4365-80D7-35BAF473DAB1}
 		{D39CBFCE-3D53-4AFC-98B5-29E9FF332D6E} = {9C818AA1-6BB9-4ECC-BB10-5669C7AE7348}
 		{A1DE3E27-2E4F-4F28-A151-778F4E5020A6} = {9C818AA1-6BB9-4ECC-BB10-5669C7AE7348}

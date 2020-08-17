@@ -1,13 +1,9 @@
-﻿using OMS.CallTrackingServiceImplementation.Models;
-using System;
+﻿using OMS.EmailImplementation.Models;
 using System.Collections.Generic;
-using System.Linq;
-using System.Text;
-using System.Threading.Tasks;
 
-namespace OMS.CallTrackingServiceImplementation.Interfaces
+namespace OMS.EmailImplementation.Interfaces
 {
-	public interface IEmailClient
+    public interface IEmailClient
 	{
 		bool Connect();
 		IEnumerable<OutageMailMessage> GetUnreadMessages();

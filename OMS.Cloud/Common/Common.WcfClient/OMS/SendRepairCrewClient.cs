@@ -13,7 +13,7 @@ namespace OMS.Common.WcfClient.OMS
     public class SendRepairCrewClient : WcfSeviceFabricClientBase<ISendRepairCrewContract>, ISendRepairCrewContract
     {
         private static readonly string microserviceName = MicroserviceNames.OmsOutageLifecycleService;
-        private static readonly string listenerName = EndpointNames.SendRepairCrewEndpoint;
+        private static readonly string listenerName = EndpointNames.OmsSendRepairCrewEndpoint;
         public SendRepairCrewClient(WcfCommunicationClientFactory<ISendRepairCrewContract> clientFactory, Uri serviceUri, ServicePartitionKey servicePartition)
            : base(clientFactory, serviceUri, servicePartition, listenerName)
         {

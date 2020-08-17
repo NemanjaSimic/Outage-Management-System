@@ -1,17 +1,17 @@
-﻿using System;
-using System.Collections.Generic;
+﻿using System.Collections.Generic;
 using System.Runtime.Serialization;
 
 namespace Common.CeContracts
 {
-	[DataContract]
+    [DataContract]
 	[KnownType(typeof(EnergyConsumer))]
 	[KnownType(typeof(Feeder))]
 	[KnownType(typeof(Field))]
 	[KnownType(typeof(Recloser))]
 	[KnownType(typeof(SynchronousMachine))]
 	[KnownType(typeof(TopologyElement))]
-	public class TopologyModel : ITopology
+	//TODO: clean up
+	public class TopologyModel// : ITopology
     {
 		[DataMember]
 		public long FirstNode { get; set; }

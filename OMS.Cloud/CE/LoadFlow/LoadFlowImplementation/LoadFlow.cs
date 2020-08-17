@@ -49,12 +49,12 @@ namespace CE.LoadFlowImplementation
         }
 
 		#region ILoadFlowService
-		public async Task<ITopology> UpdateLoadFlow(ITopology inputTopology)
+		public async Task<TopologyModel> UpdateLoadFlow(TopologyModel inputTopology)
         {
             string verboseMessage = $"{baseLogString} UpdateLoadFlow method called.";
             Logger.LogVerbose(verboseMessage);
 
-            ITopology topology = inputTopology;
+            TopologyModel topology = inputTopology;
 
             Dictionary<long, float> loadOfFeeders = new Dictionary<long, float>();
             feeders = new Dictionary<long, ITopologyElement>();
@@ -225,7 +225,7 @@ namespace CE.LoadFlowImplementation
                 Logger.LogError($"{baseLogString} UpdateLoadFlow => Synchronous machine with GID {element.Id:X16} does not belond to any feeder.");
             }
         }
-        private async Task CalculateLoadFlow(ITopology topology, Dictionary<long, float> loadOfFeeders)
+        private async Task CalculateLoadFlow(TopologyModel topology, Dictionary<long, float> loadOfFeeders)
         {
             string verboseMessage = $"{baseLogString} CalculateLoadFlow method called.";
             Logger.LogVerbose(verboseMessage);
@@ -414,7 +414,7 @@ namespace CE.LoadFlowImplementation
         }
 
         #region RecloserLogic
-        private async Task UpdateLoadFlowFromRecloser(ITopology topology, Dictionary<long, float> loadOfFeeders)
+        private async Task UpdateLoadFlowFromRecloser(TopologyModel topology, Dictionary<long, float> loadOfFeeders)
         {
             string verboseMessage = $"{baseLogString} UpdateLoadFlowFromRecloser method called.";
             Logger.LogVerbose(verboseMessage);
@@ -434,7 +434,7 @@ namespace CE.LoadFlowImplementation
                 }
             }
         }
-        private async Task<ITopology> CalculateLoadFlowFromRecloser(ITopologyElement recloser, ITopology topology, Dictionary<long, float> loadOfFeeders)
+        private async Task<TopologyModel> CalculateLoadFlowFromRecloser(ITopologyElement recloser, TopologyModel topology, Dictionary<long, float> loadOfFeeders)
         {
             string verboseMessage = $"{baseLogString} CalculateLoadFlowFromRecloser method called. Element with GID {recloser?.Id:X16}.";
             Logger.LogVerbose(verboseMessage);

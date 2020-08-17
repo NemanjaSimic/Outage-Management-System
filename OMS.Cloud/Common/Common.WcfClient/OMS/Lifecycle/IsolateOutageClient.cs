@@ -13,7 +13,7 @@ namespace OMS.Common.WcfClient.OMS.Lifecycle
     public class IsolateOutageClient : WcfSeviceFabricClientBase<IIsolateOutageContract>, IIsolateOutageContract
 	{
 		private static readonly string microserviceName = MicroserviceNames.OmsOutageLifecycleService;
-		private static readonly string listenerName = EndpointNames.IsolateOutageEndpoint;
+		private static readonly string listenerName = EndpointNames.OmsIsolateOutageEndpoint;
 		public IsolateOutageClient(WcfCommunicationClientFactory<IIsolateOutageContract> clientFactory, Uri serviceUri, ServicePartitionKey servicePartition)
 			: base(clientFactory, serviceUri, servicePartition, listenerName)
 		{

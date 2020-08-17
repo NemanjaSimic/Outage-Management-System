@@ -1,16 +1,19 @@
 ﻿using Microsoft.AspNet.SignalR.Client;
-using OMS.CallTrackingServiceImplementation.Interfaces;
+using OMS.EmailImplementation.Interfaces;
+using OMS.Common.Cloud.Logger;
 using System;
-using System.Collections.Generic;
 using System.Configuration;
-using System.Linq;
-using System.Text;
-using System.Threading.Tasks;
 
-namespace OMS.CallTrackingServiceImplementation.Dispatchers
+namespace OMS.EmailImplementation.Dispatchers
 {
-	public class GraphHubDispatcher : IDispatcher
+    public class GraphHubDispatcher : IDispatcher
     {
+        private ICloudLogger logger;
+        private ICloudLogger Logger
+        {
+            get { return logger ?? (logger = CloudLoggerFactory.GetLogger()); }
+        }
+
         private readonly string url;
         private readonly string hubName;
 
@@ -54,12 +57,14 @@ namespace OMS.CallTrackingServiceImplementation.Dispatchers
 
             try
             {
-                Console.WriteLine($"[GraphHubDispatcher::Dispatch] Sending graph outage call update to Graph Hub");
+                Logger.LogInformation($"[GraphHubDispatcher::Dispatch] Sending graph outage call update to Graph Hub");
+                //Console.WriteLine($"[GraphHubDispatcher::Dispatch] Sending graph outage call update to Graph Hub");
                 proxy.Invoke<string>("NotifyGraphOutageCall", gid)?.Wait();
             }
             catch (Exception)
             {
-                Console.WriteLine($"[GraphHubDispatcher::Dispatch] Sending graph outage call update failed.");
+                Logger.LogError($"[GraphHubDispatcher::Dispatch] Sending graph outage call update failed.");
+                //Console.WriteLine($"[GraphHubDispatcher::Dispatch] Sending graph outage call update failed.");
             }
         }
 

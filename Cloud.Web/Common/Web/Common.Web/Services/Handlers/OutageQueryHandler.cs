@@ -10,6 +10,8 @@ using Common.OmsContracts;
 using OMS.Common.WcfClient.OMS;
 using Common.PubSubContracts.DataContracts.OMS;
 using OMS.Common.Cloud.Logger;
+using Common.OmsContracts.ModelAccess;
+using OMS.Common.WcfClient.OMS.ModelAccess;
 
 namespace Common.Web.Services.Handlers
 {
@@ -33,7 +35,7 @@ namespace Common.Web.Services.Handlers
 
         public async Task<IEnumerable<ActiveOutageViewModel>> Handle(GetActiveOutagesQuery request, CancellationToken cancellationToken)
         {
-            IOutageAccessContract outageAccessClient = OutageAccessClient.CreateClient();
+            IOutageAccessContract outageAccessClient = OutageModelAccessClient.CreateClient();
             try
             {
                 Logger.LogInformation("[OutageQueryHandler::GetActiveOutages] Sending a GET query to Outage service for active outages.");
@@ -53,7 +55,7 @@ namespace Common.Web.Services.Handlers
 
         public async Task<IEnumerable<ArchivedOutageViewModel>> Handle(GetArchivedOutagesQuery request, CancellationToken cancellationToken)
         {
-            IOutageAccessContract outageAccessClient = OutageAccessClient.CreateClient();
+            IOutageAccessContract outageAccessClient = OutageModelAccessClient.CreateClient();
             try
             {
                 Logger.LogInformation("[OutageQueryHandler::GetArchivedOutages] Sending a GET query to Outage service for archived outages.");

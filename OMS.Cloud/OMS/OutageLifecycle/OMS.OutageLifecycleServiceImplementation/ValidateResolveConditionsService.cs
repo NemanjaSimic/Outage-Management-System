@@ -1,22 +1,23 @@
 ﻿using Common.OMS;
 using Common.OMS.OutageDatabaseModel;
+using Common.OmsContracts.ModelAccess;
 using Common.OmsContracts.ModelProvider;
 using Common.OmsContracts.OutageLifecycle;
+using Common.PubSubContracts.DataContracts.CE;
 using OMS.Common.Cloud;
 using OMS.Common.Cloud.Logger;
-using OMS.Common.PubSubContracts.Interfaces;
 using OMS.Common.WcfClient.OMS;
-using OMS.OutageLifecycleServiceImplementation.OutageLCHelper;
-using OutageDatabase.Repository;
+using OMS.Common.WcfClient.OMS.ModelAccess;
+using OMS.OutageLifecycleImplementation.OutageLCHelper;
 using System;
 using System.Collections.Generic;
 using System.Threading.Tasks;
 
-namespace OMS.OutageLifecycleServiceImplementation
+namespace OMS.OutageLifecycleImplementation
 {
     public class ValidateResolveConditionsService : IValidateResolveConditionsContract
 	{
-        private IOutageTopologyModel outageModel;
+        private OutageTopologyModel outageModel;
         private ICloudLogger logger;
 
         private ICloudLogger Logger
@@ -24,21 +25,21 @@ namespace OMS.OutageLifecycleServiceImplementation
             get { return logger ?? (logger = CloudLoggerFactory.GetLogger()); }
         }
 
-        private UnitOfWork dbContext;
         private OutageMessageMapper outageMessageMapper;
         private OutageLifecycleHelper outageLifecycleHelper;
         private IOutageModelReadAccessContract outageModelReadAccessClient;
-        public ValidateResolveConditionsService(UnitOfWork dbContext)
+        private IOutageAccessContract outageModelAccessClient;
+        public ValidateResolveConditionsService()
         {
-            this.dbContext = dbContext;
             this.outageMessageMapper = new OutageMessageMapper();
             this.outageModelReadAccessClient = OutageModelReadAccessClient.CreateClient();
+            this.outageModelAccessClient = OutageModelAccessClient.CreateClient();
         }
 
         public async Task InitAwaitableFields()
         {
             this.outageModel = await outageModelReadAccessClient.GetTopologyModel();
-            this.outageLifecycleHelper = new OutageLifecycleHelper(this.dbContext, this.outageModel);
+            this.outageLifecycleHelper = new OutageLifecycleHelper(this.outageModel);
         }
         public Task<bool> IsAlive()
         {
@@ -46,12 +47,13 @@ namespace OMS.OutageLifecycleServiceImplementation
         }
         public async Task<bool> ValidateResolveConditions(long outageId)
 		{
+            Logger.LogDebug("ValidateResolveConditions method started.");
             await InitAwaitableFields();
             OutageEntity outageDbEntity = null;
 
             try
             {
-                outageDbEntity = dbContext.OutageRepository.Get(outageId);
+                outageDbEntity = await outageModelAccessClient.GetOutage(outageId);
             }
             catch (Exception e)
             {
@@ -80,7 +82,7 @@ namespace OMS.OutageLifecycleServiceImplementation
 
             foreach (Equipment isolationPoint in isolationPoints)
             {
-                if (outageModel.GetElementByGid(isolationPoint.EquipmentId, out IOutageTopologyElement element))
+                if (outageModel.GetElementByGid(isolationPoint.EquipmentId, out OutageTopologyElement element))
                 {
                     if (element.NoReclosing != element.IsActive)
                     {
@@ -92,11 +94,9 @@ namespace OMS.OutageLifecycleServiceImplementation
 
             outageDbEntity.IsResolveConditionValidated = resolveCondition;
 
-            dbContext.OutageRepository.Update(outageDbEntity);
-
             try
             {
-                dbContext.Complete();
+                await outageModelAccessClient.UpdateOutage(outageDbEntity);
                 await outageLifecycleHelper.PublishOutage(Topic.ACTIVE_OUTAGE, outageMessageMapper.MapOutageEntity(outageDbEntity));
             }
             catch (Exception e)

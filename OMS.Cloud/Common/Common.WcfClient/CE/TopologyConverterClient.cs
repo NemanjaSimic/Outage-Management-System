@@ -1,9 +1,9 @@
 ﻿using Common.CeContracts;
-using Common.PubSubContracts.DataContracts.CE.Interfaces;
+using Common.PubSubContracts.DataContracts.CE;
+using Common.PubSubContracts.DataContracts.CE.UIModels;
 using Microsoft.ServiceFabric.Services.Client;
 using Microsoft.ServiceFabric.Services.Communication.Wcf.Client;
 using OMS.Common.Cloud.Names;
-using OMS.Common.PubSubContracts.Interfaces;
 using System;
 using System.Threading.Tasks;
 
@@ -32,12 +32,12 @@ namespace OMS.Common.WcfClient.CE
 			return factory.CreateClient<TopologyConverterClient, ITopologyConverterContract>(serviceUri, servicePartitionKey);
 		}
 
-		public Task<IOutageTopologyModel> ConvertTopologyToOMSModel(ITopology topology)
+		public Task<OutageTopologyModel> ConvertTopologyToOMSModel(TopologyModel topology)
 		{
             return InvokeWithRetryAsync(client => client.Channel.ConvertTopologyToOMSModel(topology));
 		}
 
-		public Task<IUIModel> ConvertTopologyToUIModel(ITopology topology)
+		public Task<UIModel> ConvertTopologyToUIModel(TopologyModel topology)
 		{
             return InvokeWithRetryAsync(client => client.Channel.ConvertTopologyToUIModel(topology));
 		}

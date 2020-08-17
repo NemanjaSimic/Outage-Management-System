@@ -1,17 +1,17 @@
-﻿using Common.PubSubContracts.DataContracts.CE.Interfaces;
-using OMS.Common.PubSubContracts.Interfaces;
+﻿using Common.PubSubContracts.DataContracts.CE;
+using Common.PubSubContracts.DataContracts.CE.UIModels;
 using System.Collections.Generic;
 
 namespace Common.CeContracts
 {
-    public delegate void TopologyConverterToUIModelProviderDelegate(List<IUIModel> uiModels);
-    public delegate void TopologyConverterToOMSModelProviderDelegate(List<IOutageTopologyModel> omsModels);
+    public delegate void TopologyConverterToUIModelProviderDelegate(List<UIModel> uiModels);
+    public delegate void TopologyConverterToOMSModelProviderDelegate(List<OutageTopologyModel> omsModels);
     public interface ITopologyConverterProvider
     {
         TopologyConverterToUIModelProviderDelegate TopologyConverterToUIModelProviderDelegate { get; set; }
         TopologyConverterToOMSModelProviderDelegate TopologyConverterToOMSModelProviderDelegate { get; set; }
 
-        List<IOutageTopologyModel> GetOMSModel();
-        List<IUIModel> GetUIModels();
+        List<OutageTopologyModel> GetOMSModel();
+        List<UIModel> GetUIModels();
     }
 }

@@ -5,21 +5,23 @@ using System.Runtime.Serialization;
 
 namespace Common.PubSubContracts.DataContracts.CE.UIModels
 {
-    [DataContract(IsReference = true)]
-    [KnownType(typeof(UINode))]
-    [KnownType(typeof(UIMeasurement))]
-    public class UIModel : IUIModel
+    //[DataContract(IsReference = true)]
+    [DataContract]
+    //[KnownType(typeof(UINode))]
+    //[KnownType(typeof(UIMeasurement))]
+    //TODO: clean up
+    public class UIModel// : IUIModel
     {
         [DataMember]
         public long FirstNode { get; set; }
         [DataMember]
-        public Dictionary<long, IUINode> Nodes { get; set; }
+        public Dictionary<long, UINode> Nodes { get; set; }
         [DataMember]
         public Dictionary<long, HashSet<long>> Relations { get; set; }
 
         public UIModel()
         {
-            Nodes = new Dictionary<long, IUINode>();
+            Nodes = new Dictionary<long, UINode>();
             Relations = new Dictionary<long, HashSet<long>>();
         }
 
@@ -42,7 +44,7 @@ namespace Common.PubSubContracts.DataContracts.CE.UIModels
                 Relations.Add(source, new HashSet<long>() { destination });
             }
         }
-        public void AddNode(IUINode newNode)
+        public void AddNode(UINode newNode)
         {
             if (!Nodes.ContainsKey(newNode.Id))
             {
