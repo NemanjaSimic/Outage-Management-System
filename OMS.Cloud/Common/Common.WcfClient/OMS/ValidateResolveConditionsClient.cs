@@ -13,7 +13,7 @@ namespace OMS.Common.WcfClient.OMS
     public class ValidateResolveConditionsClient : WcfSeviceFabricClientBase<IValidateResolveConditionsContract>, IValidateResolveConditionsContract
     {
         private static readonly string microserviceName = MicroserviceNames.OmsOutageLifecycleService;
-        private static readonly string listenerName = EndpointNames.ValidateResolveConditionsEndpoint;
+        private static readonly string listenerName = EndpointNames.OmsValidateResolveConditionsEndpoint;
         public ValidateResolveConditionsClient(WcfCommunicationClientFactory<IValidateResolveConditionsContract> clientFactory, Uri serviceUri, ServicePartitionKey servicePartition)
            : base(clientFactory, serviceUri, servicePartition, listenerName)
         {
@@ -34,6 +34,11 @@ namespace OMS.Common.WcfClient.OMS
         public Task<bool> ValidateResolveConditions(long outageId)
         {
             return InvokeWithRetryAsync(client => client.Channel.ValidateResolveConditions(outageId));
+        }
+
+        public Task<bool> IsAlive()
+        {
+            return InvokeWithRetryAsync(client => client.Channel.IsAlive());
         }
     }
 }

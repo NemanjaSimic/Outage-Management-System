@@ -1,6 +1,7 @@
 ﻿using System.Collections.Generic;
 using System.ServiceModel;
 using System.Threading.Tasks;
+using Common.CloudContracts;
 using Microsoft.ServiceFabric.Services.Remoting;
 using OMS.Common.Cloud;
 using OMS.Common.NmsContracts.GDA;
@@ -8,7 +9,7 @@ using OMS.Common.NmsContracts.GDA;
 namespace OMS.Common.NmsContracts
 {
 	[ServiceContract]
-	public interface INetworkModelGDAContract : IService
+	public interface INetworkModelGDAContract : IService, IHealthChecker
 	{
 		/// <summary>
 		/// Updates model by appluing reosoreces sent in delta

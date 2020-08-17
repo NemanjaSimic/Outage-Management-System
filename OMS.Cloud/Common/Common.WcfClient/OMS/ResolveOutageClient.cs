@@ -13,7 +13,7 @@ namespace OMS.Common.WcfClient.OMS
     public class ResolveOutageClient: WcfSeviceFabricClientBase<IResolveOutageContract>,IResolveOutageContract
     {
         private static readonly string microserviceName = MicroserviceNames.OmsOutageLifecycleService;
-        private static readonly string listenerName = EndpointNames.ResolveOutageEndpoint;
+        private static readonly string listenerName = EndpointNames.OmsResolveOutageEndpoint;
         public ResolveOutageClient(WcfCommunicationClientFactory<IResolveOutageContract> clientFactory, Uri serviceUri, ServicePartitionKey servicePartition)
            : base(clientFactory, serviceUri, servicePartition, listenerName)
         {
@@ -35,6 +35,11 @@ namespace OMS.Common.WcfClient.OMS
         public Task<bool> ResolveOutage(long outageId)
         {
             return InvokeWithRetryAsync(client => client.Channel.ResolveOutage(outageId));
+        }
+
+        public Task<bool> IsAlive()
+        {
+            return InvokeWithRetryAsync(client => client.Channel.IsAlive());
         }
     }
 }

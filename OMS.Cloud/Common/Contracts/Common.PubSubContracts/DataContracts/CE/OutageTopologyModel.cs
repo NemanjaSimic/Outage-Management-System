@@ -1,24 +1,27 @@
-﻿using OMS.Common.PubSub;
+﻿using OMS.Common.PubSubContracts.Interfaces;
 using System.Collections.Generic;
 using System.Runtime.Serialization;
 
 namespace Common.PubSubContracts.DataContracts.CE
 {
-	[DataContract]
-    public class OutageTopologyModel : IOutageTopologyModel
+    [DataContract(IsReference = true)]
+    //TODO: clean up
+    //[KnownType(typeof(OutageTopologyElement))]
+    public class OutageTopologyModel //: IOutageTopologyModel
     {
         private long firstNode;
-        private Dictionary<long, IOutageTopologyElement> outageTopology;
+        private Dictionary<long, OutageTopologyElement> outageTopology;
         [DataMember]
         public long FirstNode { get { return firstNode; } set { firstNode = value; } }
         [DataMember]
-        public Dictionary<long, IOutageTopologyElement> OutageTopology { get { return outageTopology; } set { outageTopology = value; } }
+        public Dictionary<long, OutageTopologyElement> OutageTopology { get { return outageTopology; } set { outageTopology = value; } }
+
         public OutageTopologyModel()
         {
-            OutageTopology = new Dictionary<long, IOutageTopologyElement>();
+            OutageTopology = new Dictionary<long, OutageTopologyElement>();
         }
 
-        public void AddElement(IOutageTopologyElement newElement)
+        public void AddElement(OutageTopologyElement newElement)
         {
             if (!OutageTopology.ContainsKey(newElement.Id))
             {
@@ -26,7 +29,7 @@ namespace Common.PubSubContracts.DataContracts.CE
             }
         }
 
-        public bool GetElementByGid(long gid, out IOutageTopologyElement topologyElement)
+        public bool GetElementByGid(long gid, out OutageTopologyElement topologyElement)
         {
             bool success = false;
             if (OutageTopology.TryGetValue(gid, out topologyElement))
@@ -40,7 +43,7 @@ namespace Common.PubSubContracts.DataContracts.CE
             return success;
         }
 
-        public bool GetElementByGidFirstEnd(long gid, out IOutageTopologyElement topologyElement)
+        public bool GetElementByGidFirstEnd(long gid, out OutageTopologyElement topologyElement)
         {
             bool success = GetElementByGid(gid, out topologyElement);
             if (success)

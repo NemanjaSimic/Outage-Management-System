@@ -1,4 +1,5 @@
-﻿using Microsoft.ServiceFabric.Services.Remoting;
+﻿using Common.CloudContracts;
+using Microsoft.ServiceFabric.Services.Remoting;
 using OMS.Common.SCADA;
 using OMS.Common.ScadaContracts.DataContracts;
 using OMS.Common.ScadaContracts.DataContracts.ScadaModelPointItems;
@@ -9,7 +10,7 @@ using System.Threading.Tasks;
 namespace OMS.Common.ScadaContracts.ModelProvider
 {
     [ServiceContract]
-    public interface IScadaModelReadAccessContract : IService
+    public interface IScadaModelReadAccessContract : IService, IHealthChecker
     {
         [OperationContract]
         Task<bool> GetIsScadaModelImportedIndicator();

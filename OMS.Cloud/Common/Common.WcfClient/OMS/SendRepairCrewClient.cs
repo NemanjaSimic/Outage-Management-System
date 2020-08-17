@@ -13,7 +13,7 @@ namespace OMS.Common.WcfClient.OMS
     public class SendRepairCrewClient : WcfSeviceFabricClientBase<ISendRepairCrewContract>, ISendRepairCrewContract
     {
         private static readonly string microserviceName = MicroserviceNames.OmsOutageLifecycleService;
-        private static readonly string listenerName = EndpointNames.SendRepairCrewEndpoint;
+        private static readonly string listenerName = EndpointNames.OmsSendRepairCrewEndpoint;
         public SendRepairCrewClient(WcfCommunicationClientFactory<ISendRepairCrewContract> clientFactory, Uri serviceUri, ServicePartitionKey servicePartition)
            : base(clientFactory, serviceUri, servicePartition, listenerName)
         {
@@ -33,6 +33,11 @@ namespace OMS.Common.WcfClient.OMS
         public Task<bool> SendRepairCrew(long outageId)
         {
             return InvokeWithRetryAsync(client => client.Channel.SendRepairCrew(outageId));
+        }
+
+        public Task<bool> IsAlive()
+        {
+            return InvokeWithRetryAsync(client => client.Channel.IsAlive());
         }
     }
 }

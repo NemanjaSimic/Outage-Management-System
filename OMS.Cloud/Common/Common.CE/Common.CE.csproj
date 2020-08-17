@@ -21,6 +21,7 @@
     <DefineConstants>DEBUG;TRACE</DefineConstants>
     <ErrorReport>prompt</ErrorReport>
     <WarningLevel>4</WarningLevel>
+    <PlatformTarget>x64</PlatformTarget>
   </PropertyGroup>
   <PropertyGroup Condition=" '$(Configuration)|$(Platform)' == 'Release|AnyCPU' ">
     <DebugType>pdbonly</DebugType>
@@ -80,27 +81,6 @@
   </ItemGroup>
   <ItemGroup>
     <Compile Include="Enums.cs" />
-    <Compile Include="Interfaces\IAnalogMeasurement.cs" />
-    <Compile Include="Interfaces\IDiscreteMeasurement.cs" />
-    <Compile Include="Interfaces\IGraphElement.cs" />
-    <Compile Include="Interfaces\ILoadFlow.cs" />
-    <Compile Include="Interfaces\IMeasurement.cs" />
-    <Compile Include="Interfaces\IMeasurementProvider.cs" />
-    <Compile Include="Interfaces\IModelDelta.cs" />
-    <Compile Include="Interfaces\IModelManager.cs" />
-    <Compile Include="Interfaces\IModelProvider.cs" />
-    <Compile Include="Interfaces\IModelTopologyServis.cs" />
-    <Compile Include="Interfaces\ISCADACommanding.cs" />
-    <Compile Include="Interfaces\ISCADAResultProvider.cs" />
-    <Compile Include="Interfaces\ITopology.cs" />
-    <Compile Include="Interfaces\ITopologyBuilder.cs" />
-    <Compile Include="Interfaces\ITopologyConverter.cs" />
-    <Compile Include="Interfaces\ITopologyConverterProvider.cs" />
-    <Compile Include="Interfaces\ITopologyElement.cs" />
-    <Compile Include="Interfaces\ITopologyProvider.cs" />
-    <Compile Include="Interfaces\IUIMeasurement.cs" />
-    <Compile Include="Interfaces\IUIModel.cs" />
-    <Compile Include="Interfaces\IUINode.cs" />
     <Compile Include="Properties\AssemblyInfo.cs" />
     <Compile Include="ReliableDictionaryNames.cs" />
   </ItemGroup>
@@ -108,10 +88,6 @@
     <ProjectReference Include="..\Common.Cloud\Common.Cloud.csproj">
       <Project>{FBEE1369-0F6C-41E6-8C62-8C1C5CDBB602}</Project>
       <Name>Common.Cloud</Name>
-    </ProjectReference>
-    <ProjectReference Include="..\Common.PubSub\Common.PubSub.csproj">
-      <Project>{5B775779-A5AE-4F94-90EC-59973FA80D4D}</Project>
-      <Name>Common.PubSub</Name>
     </ProjectReference>
     <ProjectReference Include="..\Contracts\Common.PubSubContracts\Common.PubSubContracts.csproj">
       <Project>{AA75150D-EE56-49C0-9431-751F83CCC0CD}</Project>

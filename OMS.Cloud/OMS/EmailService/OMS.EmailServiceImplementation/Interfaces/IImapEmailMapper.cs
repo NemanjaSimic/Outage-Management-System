@@ -1,7 +1,7 @@
 ﻿using ImapX;
-using OMS.CallTrackingServiceImplementation.Models;
+using OMS.EmailImplementation.Models;
 
-namespace OMS.CallTrackingServiceImplementation.Interfaces
+namespace OMS.EmailImplementation.Interfaces
 {
 	public interface IImapEmailMapper
 	{

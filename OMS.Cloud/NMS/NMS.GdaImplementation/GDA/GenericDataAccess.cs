@@ -190,5 +190,9 @@ namespace NMS.GdaImplementation.GDA
             }
         }
         #endregion INetworkModelGDAContract
+        public Task<bool> IsAlive()
+        {
+            return Task.Run(() => { return true; });
+        }
     }
 }

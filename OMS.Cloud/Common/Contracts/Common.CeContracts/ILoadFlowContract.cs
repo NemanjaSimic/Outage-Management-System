@@ -1,4 +1,4 @@
-﻿using Common.CE.Interfaces;
+﻿using Common.CloudContracts;
 using Microsoft.ServiceFabric.Services.Remoting;
 using System.ServiceModel;
 using System.Threading.Tasks;
@@ -6,9 +6,17 @@ using System.Threading.Tasks;
 namespace Common.CeContracts.LoadFlow
 {
 	[ServiceContract]
-	public interface ILoadFlowContract : IService
+	public interface ILoadFlowContract : IService, IHealthChecker
 	{
 		[OperationContract]
-		Task<ITopology> UpdateLoadFlow(ITopology topology);
+		//TODO: clean up
+		//[ServiceKnownType(typeof(TopologyModel))]
+		[ServiceKnownType(typeof(EnergyConsumer))]
+		[ServiceKnownType(typeof(Feeder))]
+		[ServiceKnownType(typeof(Field))]
+		[ServiceKnownType(typeof(Recloser))]
+		[ServiceKnownType(typeof(SynchronousMachine))]
+		[ServiceKnownType(typeof(TopologyElement))]
+		Task<TopologyModel> UpdateLoadFlow(TopologyModel topology);
 	}
 }

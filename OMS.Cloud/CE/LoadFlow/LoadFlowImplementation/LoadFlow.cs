@@ -1,5 +1,4 @@
 ﻿using Common.CE;
-using Common.CE.Interfaces;
 using Common.CeContracts;
 using Common.CeContracts.LoadFlow;
 using Common.CeContracts.ModelProvider;
@@ -50,12 +49,12 @@ namespace CE.LoadFlowImplementation
         }
 
 		#region ILoadFlowService
-		public async Task<ITopology> UpdateLoadFlow(ITopology inputTopology)
+		public async Task<TopologyModel> UpdateLoadFlow(TopologyModel inputTopology)
         {
             string verboseMessage = $"{baseLogString} UpdateLoadFlow method called.";
             Logger.LogVerbose(verboseMessage);
 
-            ITopology topology = inputTopology;
+            TopologyModel topology = inputTopology;
 
             Dictionary<long, float> loadOfFeeders = new Dictionary<long, float>();
             feeders = new Dictionary<long, ITopologyElement>();
@@ -70,8 +69,9 @@ namespace CE.LoadFlowImplementation
             if (topology == null)
             {
                 string message = $"{baseLogString} UpdateLoadFlow => Topology is null.";
-                Logger.LogError(message);
-                throw new Exception(message);
+                Logger.LogWarning(message);
+                //throw new Exception(message);
+                return topology;
             }
 
             await CalculateLoadFlow(topology, loadOfFeeders);
@@ -98,9 +98,9 @@ namespace CE.LoadFlowImplementation
 
                     if (signalGid != 0)
                     {
-                        Logger.LogDebug($"{baseLogString} UpdateLoadFlow => Calling SendDiscreteCommand method from measurement provider. Measurement GID {signalGid:X16}, Value {loadFeeder.Value}.");
+                        Logger.LogDebug($"{baseLogString} UpdateLoadFlow => Calling SendAnalogCommand method from measurement provider. Measurement GID {signalGid:X16}, Value {loadFeeder.Value}.");
                         await measurementProviderClient.SendAnalogCommand(signalGid, loadFeeder.Value, CommandOriginType.CE_COMMAND);
-                        Logger.LogDebug($"{baseLogString} UpdateLoadFlow => SendDiscreteCommand method from measurement provider successfully finished.");
+                        Logger.LogDebug($"{baseLogString} UpdateLoadFlow => SendAnalogCommand method from measurement provider successfully finished.");
 
                         AlarmType alarmType = (loadFeeder.Value >= 36) ? AlarmType.HIGH_ALARM : AlarmType.NO_ALARM;
 
@@ -225,7 +225,7 @@ namespace CE.LoadFlowImplementation
                 Logger.LogError($"{baseLogString} UpdateLoadFlow => Synchronous machine with GID {element.Id:X16} does not belond to any feeder.");
             }
         }
-        private async Task CalculateLoadFlow(ITopology topology, Dictionary<long, float> loadOfFeeders)
+        private async Task CalculateLoadFlow(TopologyModel topology, Dictionary<long, float> loadOfFeeders)
         {
             string verboseMessage = $"{baseLogString} CalculateLoadFlow method called.";
             Logger.LogVerbose(verboseMessage);
@@ -414,7 +414,7 @@ namespace CE.LoadFlowImplementation
         }
 
         #region RecloserLogic
-        private async Task UpdateLoadFlowFromRecloser(ITopology topology, Dictionary<long, float> loadOfFeeders)
+        private async Task UpdateLoadFlowFromRecloser(TopologyModel topology, Dictionary<long, float> loadOfFeeders)
         {
             string verboseMessage = $"{baseLogString} UpdateLoadFlowFromRecloser method called.";
             Logger.LogVerbose(verboseMessage);
@@ -434,7 +434,7 @@ namespace CE.LoadFlowImplementation
                 }
             }
         }
-        private async Task<ITopology> CalculateLoadFlowFromRecloser(ITopologyElement recloser, ITopology topology, Dictionary<long, float> loadOfFeeders)
+        private async Task<TopologyModel> CalculateLoadFlowFromRecloser(ITopologyElement recloser, TopologyModel topology, Dictionary<long, float> loadOfFeeders)
         {
             string verboseMessage = $"{baseLogString} CalculateLoadFlowFromRecloser method called. Element with GID {recloser?.Id:X16}.";
             Logger.LogVerbose(verboseMessage);
@@ -647,7 +647,7 @@ namespace CE.LoadFlowImplementation
                 if (analogMeasurement == null)
                 {
                     string message = $"{baseLogString} GetMeasurements => GetAnalogMeasurement from measurement provider returned null for measurement GID {measurement.Key:X16}";
-                    Logger.LogError(message);
+                    Logger.LogWarning(message);
                     continue;
                 }
 
@@ -720,6 +720,11 @@ namespace CE.LoadFlowImplementation
 
             }
         }
-		#endregion
-	}
+
+        public Task<bool> IsAlive()
+        {
+            return Task.Run(() => { return true; });
+        }
+        #endregion
+    }
 }

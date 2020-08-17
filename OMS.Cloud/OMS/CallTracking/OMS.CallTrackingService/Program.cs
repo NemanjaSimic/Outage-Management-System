@@ -30,6 +30,7 @@ namespace OMS.CallTrackingService
 			}
 			catch (Exception e)
 			{
+				//todo: log
 				ServiceEventSource.Current.ServiceHostInitializationFailed(e.ToString());
 				throw;
 			}

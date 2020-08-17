@@ -1,5 +1,4 @@
-﻿using Common.CE.Interfaces;
-using Common.CeContracts;
+﻿using Common.CeContracts;
 using OMS.Common.Cloud;
 using OMS.Common.Cloud.Logger;
 using OMS.Common.NmsContracts;
@@ -60,7 +59,7 @@ namespace CE.ModelProviderImplementation
 
 		#region Fields
 		private readonly string baseLogString;
-
+		private readonly object syncObj = new object();
 		private ICloudLogger logger;
 		private ICloudLogger Logger
 		{
@@ -127,19 +126,52 @@ namespace CE.ModelProviderImplementation
 				Logger.LogDebug($"{baseLogString} TryGetAllModelEntities => Getting all network model elements and converting them.");
 
 				await GetBaseVoltagesAsync();
-				Parallel.For(0, ConcreteModels.Count, async (i) =>
+
+				foreach (var model in ConcreteModels)
 				{
-					var model = ConcreteModels.ElementAt(i);
 					if (model != ModelCode.BASEVOLTAGE)
 					{
 						List<ModelCode> properties = modelResourcesDesc.GetAllPropertyIds(model);
 						var elements = await networkModelGda.GetExtentValuesAsync(model, properties);
 						foreach (var element in elements)
 						{
-							await TransformToTopologyElementAsync(element);
+							try
+							{
+								await TransformToTopologyElementAsync(element);
+							}
+							catch (Exception e)
+							{
+								Logger.LogError($"{baseLogString} TryGetAllModelEntitiesAsync failed." +
+									$" {Environment.NewLine} {e.Message} " +
+									$"{Environment.NewLine} {e.StackTrace}");
+							}
 						}
 					}
-				});
+				}
+
+
+				//Parallel.For(0, ConcreteModels.Count, async (i) =>
+				//{
+				//	var model = ConcreteModels.ElementAt(i);
+				//	if (model != ModelCode.BASEVOLTAGE)
+				//	{
+				//		List<ModelCode> properties = modelResourcesDesc.GetAllPropertyIds(model);
+				//		var elements = await networkModelGda.GetExtentValuesAsync(model, properties);
+				//		foreach (var element in elements)
+				//		{
+				//			try
+				//			{
+				//				await TransformToTopologyElementAsync(element);
+				//			}
+				//			catch (Exception e)
+				//			{
+				//				Logger.LogError($"{baseLogString} TryGetAllModelEntitiesAsync failed." +
+				//					$" {Environment.NewLine} {e.Message} " +
+				//					$"{Environment.NewLine} {e.StackTrace}");
+				//			}
+				//		}
+				//	}
+				//});
 
 				foreach (var measurement in Measurements.Values)
 				{
@@ -253,12 +285,36 @@ namespace CE.ModelProviderImplementation
 			else if (dmsType != DMSType.MASK_TYPE && dmsType != DMSType.BASEVOLTAGE)
 			{
 				ITopologyElement newElement = GetPopulatedElement(modelEntity);
-				TopologyElements.Add(newElement.Id, newElement);
+
+				lock (syncObj)
+				{
+					if (!TopologyElements.ContainsKey(newElement.Id))
+					{
+						TopologyElements.Add(newElement.Id, newElement);
+					}
+					else
+					{
+						Logger.LogDebug($"{baseLogString} TransformToTopologyElementAsync => TopologyElements contain key {newElement.Id:X16}");
+					}
+
+				}
+
+
 				if (dmsType == DMSType.ENERGYSOURCE)
 				{
 					EnergySources.Add(newElement.Id);
 				}
-				ElementConnections.Add(modelEntity.Id, (GetAllReferencedElements(modelEntity)));
+				lock (syncObj)
+				{
+					if (!ElementConnections.ContainsKey(modelEntity.Id))
+					{
+						ElementConnections.Add(modelEntity.Id, (GetAllReferencedElements(modelEntity)));
+					}
+					else
+					{
+						Logger.LogDebug($"{baseLogString} TransformToTopologyElementAsync => ElementConnections contain key {modelEntity.Id:X16}");
+					}
+				}
 			}
 		}
 		private List<long> GetAllReferencedElements(ResourceDescription element)

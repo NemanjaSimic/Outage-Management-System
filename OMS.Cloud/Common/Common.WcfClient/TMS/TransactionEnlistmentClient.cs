@@ -36,5 +36,10 @@ namespace OMS.Common.WcfClient.TMS
             return InvokeWithRetryAsync(client => client.Channel.Enlist(transactionName, transactionActorName));
         }
         #endregion
+
+        public Task<bool> IsAlive()
+        {
+            return InvokeWithRetryAsync(client => client.Channel.IsAlive());
+        }
     }
 }

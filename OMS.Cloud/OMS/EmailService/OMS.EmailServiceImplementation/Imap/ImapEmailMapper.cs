@@ -1,13 +1,8 @@
 ﻿using ImapX;
-using OMS.CallTrackingServiceImplementation.Interfaces;
-using OMS.CallTrackingServiceImplementation.Models;
-using System;
-using System.Collections.Generic;
-using System.Linq;
-using System.Text;
-using System.Threading.Tasks;
+using OMS.EmailImplementation.Interfaces;
+using OMS.EmailImplementation.Models;
 
-namespace OMS.CallTrackingServiceImplementation.Imap
+namespace OMS.EmailImplementation.Imap
 {
     public class ImapEmailMapper : IImapEmailMapper
     {

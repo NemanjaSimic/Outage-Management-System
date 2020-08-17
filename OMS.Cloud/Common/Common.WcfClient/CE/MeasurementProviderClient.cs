@@ -20,6 +20,11 @@ namespace OMS.Common.WcfClient.CE
 
 		}
 
+		public Task<bool> IsAlive()
+		{
+			return Task.Run(() => { return true; });
+		}
+
 		public static IMeasurementProviderContract CreateClient()
 		{
 			ClientFactory factory = new ClientFactory();
@@ -120,7 +125,7 @@ namespace OMS.Common.WcfClient.CE
 
 		public Task SendDiscreteCommand(long measurementGid, int value, CommandOriginType commandOrigin)
 		{
-			return InvokeWithRetryAsync(client => client.Channel.SendAnalogCommand(measurementGid, value, commandOrigin));
+			return InvokeWithRetryAsync(client => client.Channel.SendDiscreteCommand(measurementGid, value, commandOrigin));
 		}
 	}
 }

@@ -1,5 +1,4 @@
 ﻿using Common.CE;
-using Common.CE.Interfaces;
 using Common.CeContracts;
 using Common.CeContracts.ModelProvider;
 using Common.CeContracts.TopologyProvider;
@@ -7,6 +6,7 @@ using Microsoft.ServiceFabric.Data;
 using Microsoft.ServiceFabric.Data.Notifications;
 using OMS.Common.Cloud.Logger;
 using OMS.Common.Cloud.ReliableCollectionHelpers;
+using OMS.Common.TmsContracts;
 using OMS.Common.WcfClient.CE;
 using System;
 using System.Collections.Generic;
@@ -22,8 +22,8 @@ namespace CE.ModelProviderImplementation
         private ReliableDictionaryAccess<short, List<long>> energySourceCache;
         public ReliableDictionaryAccess<short, List<long>> EnergySourceCache { get => energySourceCache; }
 
-        private ReliableDictionaryAccess<short, Dictionary<long, ITopologyElement>> elementCache;
-        public ReliableDictionaryAccess<short, Dictionary<long, ITopologyElement>> ElementCache { get => elementCache; }
+        private ReliableDictionaryAccess<short, Dictionary<long, TopologyElement>> elementCache;
+        public ReliableDictionaryAccess<short, Dictionary<long, TopologyElement>> ElementCache { get => elementCache; }
 
         private ReliableDictionaryAccess<short, Dictionary<long, List<long>>> elementConnectionCache;
         public ReliableDictionaryAccess<short, Dictionary<long, List<long>>> ElementConnectionCache { get => elementConnectionCache; }
@@ -85,6 +85,11 @@ namespace CE.ModelProviderImplementation
             Logger.LogDebug(debugMessage);
         }
 
+        public Task<bool> IsAlive()
+        {
+            return Task.Run(() => { return true; });
+        }
+
         private async void OnStateManagerChangedHandler(object sender, NotifyStateManagerChangedEventArgs e)
         {
             if (e.Action == NotifyStateManagerChangedAction.Add)
@@ -94,7 +99,7 @@ namespace CE.ModelProviderImplementation
 
                 if (reliableStateName == ReliableDictionaryNames.ElementCache)
                 {
-                    elementCache = await ReliableDictionaryAccess<short, Dictionary<long, ITopologyElement>>.Create(stateManager, ReliableDictionaryNames.ElementCache);
+                    elementCache = await ReliableDictionaryAccess<short, Dictionary<long, TopologyElement>>.Create(stateManager, ReliableDictionaryNames.ElementCache);
                     this.isElementCacheInitialized = true;
 
                     string debugMessage = $"{baseLogString} OnStateManagerChangedHandler => '{ReliableDictionaryNames.ElementCache}' ReliableDictionaryAccess initialized.";
@@ -141,7 +146,7 @@ namespace CE.ModelProviderImplementation
 
             IModelDelta modelDelta = await modelManager.TryGetAllModelEntitiesAsync();
 
-            await ElementCache.SetAsync((short)TransactionFlag.NoTransaction, modelDelta.TopologyElements);
+            await ElementCache.SetAsync((short)TransactionFlag.NoTransaction, TransformDictionary(modelDelta.TopologyElements));
             await ElementConnectionCache.SetAsync((short)TransactionFlag.NoTransaction, modelDelta.ElementConnections);
             await EnergySourceCache.SetAsync((short)TransactionFlag.NoTransaction, modelDelta.EnergySources);
             await RecloserCache.SetAsync((short)TransactionFlag.NoTransaction, modelDelta.Reclosers);
@@ -150,7 +155,7 @@ namespace CE.ModelProviderImplementation
         }
 
 		#region Model Provider
-		public async Task<Dictionary<long, ITopologyElement>> GetElementModels()
+		public async Task<Dictionary<long, TopologyElement>> GetElementModels()
         {
             string verboseMessage = $"{baseLogString} entering GetElementModels method.";
             Logger.LogVerbose(verboseMessage);
@@ -190,7 +195,7 @@ namespace CE.ModelProviderImplementation
 		#endregion
 
 		#region Distributed Transaction
-		public async Task<bool> PrepareForTransaction()
+		public async Task<bool> Prepare()
         {
             string verboseMessage = $"{baseLogString} entering PrepareForTransaction method.";
             Logger.LogVerbose(verboseMessage);
@@ -212,15 +217,16 @@ namespace CE.ModelProviderImplementation
                 IModelDelta modelDelta = await modelManager.TryGetAllModelEntitiesAsync();
 
                 Logger.LogDebug($"{baseLogString} PrepareForTransaction => Writting new data in cache under InTransaction flag.");
-                await ElementCache.SetAsync((short)TransactionFlag.InTransaction, modelDelta.TopologyElements);
+                await ElementCache.SetAsync((short)TransactionFlag.InTransaction, TransformDictionary(modelDelta.TopologyElements));
                 await ElementConnectionCache.SetAsync((short)TransactionFlag.InTransaction, modelDelta.ElementConnections);
                 await EnergySourceCache.SetAsync((short)TransactionFlag.InTransaction, modelDelta.EnergySources);
                 await RecloserCache.SetAsync((short)TransactionFlag.InTransaction, modelDelta.Reclosers);
                 Logger.LogDebug($"{baseLogString} PrepareForTransaction => All new data have been written in cache under InTransaction flag.");
 
                 Logger.LogDebug($"{baseLogString} PrepareForTransaction => Calling PrepareForTransaction on topology provider.");
-                topologyProviderTransaction = await topologyProviderClient.PrepareForTransaction();
-                Logger.LogDebug($"{baseLogString} PrepareForTransaction => PrepareForTransaction from topology provider returned success = {measurementProviderTransaction}.");
+                //topologyProviderTransaction = await topologyProviderClient.PrepareForTransaction();
+                await topologyProviderClient.PrepareForTransaction();
+                Logger.LogDebug($"{baseLogString} PrepareForTransaction => PrepareForTransaction from topology provider returned success = {topologyProviderTransaction}.");
 
             }
             catch (Exception e)
@@ -233,7 +239,7 @@ namespace CE.ModelProviderImplementation
 
             return (success == true) ? topologyProviderTransaction && measurementProviderTransaction : false;
         }
-        public async Task CommitTransaction()
+        public async Task Commit()
         {
             string verboseMessage = $"{baseLogString} entering CommitTransaction method.";
             Logger.LogVerbose(verboseMessage);
@@ -261,7 +267,7 @@ namespace CE.ModelProviderImplementation
             transactionFlag = TransactionFlag.NoTransaction;
             logger.LogDebug("Model provider commited transaction successfully.");
         }
-        public async Task RollbackTransaction()
+        public async Task Rollback()
         {
             string verboseMessage = $"{baseLogString} entering RollbackTransaction method.";
             Logger.LogVerbose(verboseMessage);
@@ -285,12 +291,17 @@ namespace CE.ModelProviderImplementation
 		#endregion
 
 		#region CacheGetters
-		private async Task<Dictionary<long, ITopologyElement>> GetElementsFromCache(TransactionFlag forTransactionType)
+		private async Task<Dictionary<long, TopologyElement>> GetElementsFromCache(TransactionFlag forTransactionType)
         {
             string verboseMessage = $"{baseLogString} entering GetElementsFromCache method.";
             Logger.LogVerbose(verboseMessage);
 
-            ConditionalValue<Dictionary<long, ITopologyElement>> elements;
+            while (!AreReliableDictionariesInitialized)
+            {
+                await Task.Delay(1000);
+            }
+
+            ConditionalValue<Dictionary<long, TopologyElement>> elements;
 
             if (await ElementCache.ContainsKeyAsync((short)forTransactionType))
             {
@@ -302,7 +313,7 @@ namespace CE.ModelProviderImplementation
 
                 //await ElementCache.SetAsync((short)TransactionFlag.NoTransaction, newModelDelta.TopologyElements);
 
-                return newModelDelta.TopologyElements;
+                return TransformDictionary(newModelDelta.TopologyElements);
             }
             else
             {
@@ -324,6 +335,11 @@ namespace CE.ModelProviderImplementation
         {
             string verboseMessage = $"{baseLogString} entering GetConnectionsFromCache method.";
             Logger.LogVerbose(verboseMessage);
+
+            while (!AreReliableDictionariesInitialized)
+            {
+                await Task.Delay(1000);
+            }
 
             ConditionalValue<Dictionary<long, List<long>>> elementConnections;
 
@@ -360,6 +376,11 @@ namespace CE.ModelProviderImplementation
             string verboseMessage = $"{baseLogString} entering GetReclosersFromCache method.";
             Logger.LogVerbose(verboseMessage);
 
+            while (!AreReliableDictionariesInitialized)
+            {
+                await Task.Delay(1000);
+            }
+
             ConditionalValue<HashSet<long>> reclosers;
 
             if (await RecloserCache.ContainsKeyAsync((short)forTransactionType))
@@ -395,6 +416,11 @@ namespace CE.ModelProviderImplementation
             string verboseMessage = $"{baseLogString} entering GetEnergySourcesFromCache method.";
             Logger.LogVerbose(verboseMessage);
 
+            while (!AreReliableDictionariesInitialized)
+            {
+                await Task.Delay(1000);
+            }
+
             ConditionalValue<List<long>> energySources;
 
             if (await EnergySourceCache.ContainsKeyAsync((short)forTransactionType))
@@ -427,6 +453,17 @@ namespace CE.ModelProviderImplementation
         }
         #endregion
 
+        private Dictionary<long, TopologyElement> TransformDictionary(Dictionary<long, ITopologyElement> dict)
+        {
+            Dictionary<long, TopologyElement> retVal = new Dictionary<long, TopologyElement>();
+
+            foreach (var item in dict)
+            {
+                retVal.Add(item.Key, item.Value as TopologyElement);
+            }
+
+            return retVal;
+        }
 		//public void PrepareTopologyForTransaction()
 		//{
 		//    bool success;

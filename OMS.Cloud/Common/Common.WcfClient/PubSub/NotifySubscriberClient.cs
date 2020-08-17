@@ -1,8 +1,8 @@
-﻿using Common.PubSub;
-using Microsoft.ServiceFabric.Services.Client;
+﻿using Microsoft.ServiceFabric.Services.Client;
 using Microsoft.ServiceFabric.Services.Communication.Wcf.Client;
 using OMS.Common.Cloud.Names;
 using OMS.Common.PubSubContracts;
+using OMS.Common.PubSubContracts.Interfaces;
 using System;
 using System.Threading.Tasks;
 
@@ -52,5 +52,10 @@ namespace OMS.Common.WcfClient.PubSub
             return InvokeWithRetryAsync(client => client.Channel.Notify(message, publisherName));
         }
         #endregion INotifySubscriberContract
+
+        public Task<bool> IsAlive()
+        {
+            return InvokeWithRetryAsync(client => client.Channel.IsAlive());
+        }
     }
 }

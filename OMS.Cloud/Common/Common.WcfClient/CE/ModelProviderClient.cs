@@ -1,4 +1,4 @@
-﻿using Common.CE.Interfaces;
+﻿using Common.CeContracts;
 using Common.CeContracts.ModelProvider;
 using Microsoft.ServiceFabric.Services.Client;
 using Microsoft.ServiceFabric.Services.Communication.Wcf.Client;
@@ -31,9 +31,9 @@ namespace OMS.Common.WcfClient.CE
 			return factory.CreateClient<ModelProviderClient, IModelProviderContract>(serviceUri, servicePartitionKey);
 		}
 
-		public Task CommitTransaction()
+		public Task Commit()
 		{
-			return InvokeWithRetryAsync(client => client.Channel.CommitTransaction());
+			return InvokeWithRetryAsync(client => client.Channel.Commit());
 		}
 
 		public Task<Dictionary<long, List<long>>> GetConnections()
@@ -41,7 +41,7 @@ namespace OMS.Common.WcfClient.CE
 			return InvokeWithRetryAsync(client => client.Channel.GetConnections());
 		}
 
-		public Task<Dictionary<long, ITopologyElement>> GetElementModels()
+		public Task<Dictionary<long, TopologyElement>> GetElementModels()
 		{
 			return InvokeWithRetryAsync(client => client.Channel.GetElementModels());
 		}
@@ -56,19 +56,24 @@ namespace OMS.Common.WcfClient.CE
 			return InvokeWithRetryAsync(client => client.Channel.GetReclosers());
 		}
 
+		public Task<bool> IsAlive()
+		{
+			return InvokeWithRetryAsync(client => client.Channel.IsAlive());
+		}
+
 		public Task<bool> IsRecloser(long recloserGid)
 		{
 			return InvokeWithRetryAsync(client => client.Channel.IsRecloser(recloserGid));
 		}
 
-		public Task<bool> PrepareForTransaction()
+		public Task<bool> Prepare()
 		{
-			return InvokeWithRetryAsync(client => client.Channel.PrepareForTransaction());
+			return InvokeWithRetryAsync(client => client.Channel.Prepare());
 		}
 
-		public Task RollbackTransaction()
+		public Task Rollback()
 		{
-			return InvokeWithRetryAsync(client => client.Channel.RollbackTransaction());
+			return InvokeWithRetryAsync(client => client.Channel.Rollback());
 		}
 
 	}

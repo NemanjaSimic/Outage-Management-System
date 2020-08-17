@@ -80,7 +80,7 @@ namespace SCADA.ModelProviderImplementation.DistributedTransaction
 
             Task.WaitAll(tasks.ToArray());
 
-            ITransactionEnlistmentContract transactionEnlistmentClient = TransactionEnlistmentClient.CreateClient();
+            var transactionEnlistmentClient = TransactionEnlistmentClient.CreateClient();
             bool success = await transactionEnlistmentClient.Enlist(DistributedTransactionNames.NetworkModelUpdateTransaction, MicroserviceNames.ScadaModelProviderService);
 
             if (success)
@@ -93,6 +93,11 @@ namespace SCADA.ModelProviderImplementation.DistributedTransaction
             }
 
             return success;
+        }
+
+        public Task<bool> IsAlive()
+        {
+            return Task.Run(() => { return true; });
         }
         #endregion IModelUpdateNotificationContract
     }

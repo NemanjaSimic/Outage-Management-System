@@ -17,16 +17,18 @@ namespace PubSubImplementation
         private readonly IReliableStateManager stateManager;
 
         #region Private Properties
-        private bool isSubscriberCacheInitialized;
-        private bool ReliableDictionariesInitialized
-        {
-            get { return isSubscriberCacheInitialized; }
-        }
-
         private ICloudLogger logger;
         private ICloudLogger Logger
         {
             get { return logger ?? (logger = CloudLoggerFactory.GetLogger()); }
+        }
+        #endregion Properties
+
+        #region Reliable Dictionary
+        private bool isSubscriberCacheInitialized;
+        private bool ReliableDictionariesInitialized
+        {
+            get { return isSubscriberCacheInitialized; }
         }
 
         private ReliableDictionaryAccess<short, HashSet<string>> registeredSubscribersCache;
@@ -37,17 +39,6 @@ namespace PubSubImplementation
         private ReliableDictionaryAccess<short, HashSet<string>> RegisteredSubscribersCache
         {
             get { return registeredSubscribersCache; }
-        }
-        #endregion Properties
-
-        public RegisterSubscriberProvider(IReliableStateManager stateManager)
-        {
-            this.baseLogString = $"{this.GetType()} [{this.GetHashCode()}] =>{Environment.NewLine}";
-
-            this.isSubscriberCacheInitialized = false;
-
-            this.stateManager = stateManager;
-            this.stateManager.StateManagerChanged += this.OnStateManagerChangedHandler;
         }
 
         private async void OnStateManagerChangedHandler(object sender, NotifyStateManagerChangedEventArgs e)
@@ -65,6 +56,17 @@ namespace PubSubImplementation
                 }
             }
         }
+        #endregion Reliable Dictionary
+
+        public RegisterSubscriberProvider(IReliableStateManager stateManager)
+        {
+            this.baseLogString = $"{this.GetType()} [{this.GetHashCode()}] =>{Environment.NewLine}";
+
+            this.isSubscriberCacheInitialized = false;
+
+            this.stateManager = stateManager;
+            this.stateManager.StateManagerChanged += this.OnStateManagerChangedHandler;
+        }
 
         #region IRegisterSubscriberContract
         public async Task<bool> SubscribeToTopic(Topic topic, string subscriberServiceName)
@@ -78,20 +80,20 @@ namespace PubSubImplementation
 
             try
             {
-                short key = (short)topic;
-                if (!(await RegisteredSubscribersCache.ContainsKeyAsync(key)))
-                {
-                    await RegisteredSubscribersCache.SetAsync(key, new HashSet<string>());
-                }
 
+                HashSet<string> subscribers;
+                short key = (short)topic;
                 var result = await RegisteredSubscribersCache.TryGetValueAsync(key);
 
-                if(!result.HasValue)
+                if (!result.HasValue)
                 {
-                    return false;
+                    await RegisteredSubscribersCache.SetAsync(key, new HashSet<string>());
+                    subscribers = new HashSet<string>();
                 }
-                
-                var subscribers = result.Value;
+                else
+                {
+                    subscribers = result.Value;
+                }
 
                 if(subscribers.Contains(subscriberServiceName))
                 {
@@ -329,5 +331,10 @@ namespace PubSubImplementation
             return result;
         }
         #endregion IRegisterSubscriberContract
+
+        public Task<bool> IsAlive()
+        {
+            return Task.Run(() => { return true; });
+        }
     }
 }

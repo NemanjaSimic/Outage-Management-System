@@ -3,8 +3,6 @@ using System.Collections.Generic;
 using System.Fabric;
 using System.Threading;
 using System.Threading.Tasks;
-using Common.CE;
-using Common.CE.Interfaces;
 using Common.CeContracts;
 using Common.CeContracts.TopologyProvider;
 using Microsoft.ServiceFabric.Data;
@@ -15,16 +13,17 @@ using Microsoft.ServiceFabric.Services.Communication.Wcf.Runtime;
 using Microsoft.ServiceFabric.Services.Runtime;
 using OMS.Common.Cloud.Logger;
 using OMS.Common.Cloud.Names;
-using OMS.Common.PubSub;
 using ReliableDictionaryNames = Common.CE.ReliableDictionaryNames;
 using CE.TopologyProviderImplementation;
+using Common.PubSubContracts.DataContracts.CE;
+using Common.PubSubContracts.DataContracts.CE.UIModels;
 
 namespace CE.TopologyProviderService
 {
-	/// <summary>
-	/// An instance of this class is created for each service replica by the Service Fabric runtime.
-	/// </summary>
-	internal sealed class TopologyProviderService : StatefulService
+    /// <summary>
+    /// An instance of this class is created for each service replica by the Service Fabric runtime.
+    /// </summary>
+    internal sealed class TopologyProviderService : StatefulService
 	{
 		private readonly string baseLogString;
 
@@ -121,7 +120,7 @@ namespace CE.TopologyProviderService
                 {
                     using (ITransaction tx = this.StateManager.CreateTransaction())
                     {
-                        var result = await StateManager.TryGetAsync<IReliableDictionary<long, ITopology>>(ReliableDictionaryNames.TopologyCache);
+                        var result = await StateManager.TryGetAsync<IReliableDictionary<long, TopologyModel>>(ReliableDictionaryNames.TopologyCache);
                         if(result.HasValue)
                         {
                             var topologyCache = result.Value;
@@ -130,7 +129,7 @@ namespace CE.TopologyProviderService
                         }
                         else
                         {
-                            await StateManager.GetOrAddAsync<IReliableDictionary<long, ITopology>>(tx, ReliableDictionaryNames.TopologyCache);
+                            await StateManager.GetOrAddAsync<IReliableDictionary<long, TopologyModel>>(tx, ReliableDictionaryNames.TopologyCache);
                             await tx.CommitAsync();
                         }
                     }
@@ -157,7 +156,7 @@ namespace CE.TopologyProviderService
                 {
                     using (ITransaction tx = this.StateManager.CreateTransaction())
                     {
-                        var result = await StateManager.TryGetAsync<IReliableDictionary<long, IOutageTopologyModel>>(ReliableDictionaryNames.TopologyCacheOMS);
+                        var result = await StateManager.TryGetAsync<IReliableDictionary<long, OutageTopologyModel>>(ReliableDictionaryNames.TopologyCacheOMS);
                         if(result.HasValue)
                         {
                             var topologyCacheOMS = result.Value;
@@ -166,7 +165,7 @@ namespace CE.TopologyProviderService
                         }
                         else
                         {
-                            await StateManager.GetOrAddAsync<IReliableDictionary<long, IOutageTopologyModel>>(tx, ReliableDictionaryNames.TopologyCacheOMS);
+                            await StateManager.GetOrAddAsync<IReliableDictionary<long, OutageTopologyModel>>(tx, ReliableDictionaryNames.TopologyCacheOMS);
                             await tx.CommitAsync();
                         }
                     }

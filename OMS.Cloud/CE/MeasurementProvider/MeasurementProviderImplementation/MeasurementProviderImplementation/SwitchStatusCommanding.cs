@@ -48,7 +48,10 @@ namespace CE.MeasurementProviderImplementation
 				throw;
 			}
 		}
-
+		public Task<bool> IsAlive()
+		{
+			return Task.Run(() => { return true; });
+		}
 		public async Task SendOpenCommand(long gid)
 		{
 			string verboseMessage = $"{baseLogString} entering SendOpenCommand method for GID {gid:X16}.";

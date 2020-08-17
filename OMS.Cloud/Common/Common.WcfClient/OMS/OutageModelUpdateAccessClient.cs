@@ -14,7 +14,7 @@ namespace OMS.Common.WcfClient.OMS
     public class OutageModelUpdateAccessClient : WcfSeviceFabricClientBase<IOutageModelUpdateAccessContract>, IOutageModelUpdateAccessContract
     {
         private static readonly string microserviceName = MicroserviceNames.OmsModelProviderService;
-        private static readonly string listenerName = EndpointNames.OutageManagmenetServiceModelUpdateAccessEndpoint;
+        private static readonly string listenerName = EndpointNames.OmsModelUpdateAccessEndpoint;
         public OutageModelUpdateAccessClient(WcfCommunicationClientFactory<IOutageModelUpdateAccessContract> clientFactory, Uri serviceUri, ServicePartitionKey servicePartition)
             : base(clientFactory, serviceUri, servicePartition, listenerName)
         {
@@ -44,6 +44,11 @@ namespace OMS.Common.WcfClient.OMS
         public Task UpdatePotentialOutage(long gid, CommandOriginType commandOriginType, ModelUpdateOperationType modelUpdateOperationType)
         {
             return InvokeWithRetryAsync(client => client.Channel.UpdatePotentialOutage(gid, commandOriginType, modelUpdateOperationType));
+        }
+
+        public Task<bool> IsAlive()
+        {
+            return InvokeWithRetryAsync(client => client.Channel.IsAlive());
         }
     }
 }

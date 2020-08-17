@@ -56,7 +56,7 @@ namespace SCADA.AcquisitionService
             try
             {
                 acquisitionCycle = new AcquisitionCycle();
-                IScadaModelReadAccessContract readAccessClient = ScadaModelReadAccessClient.CreateClient();
+                var readAccessClient = ScadaModelReadAccessClient.CreateClient();
                 configData = await readAccessClient.GetScadaConfigData();
 
                 string message = $"{baseLogString} RunAsync => AcquisitionCycle initialized.";

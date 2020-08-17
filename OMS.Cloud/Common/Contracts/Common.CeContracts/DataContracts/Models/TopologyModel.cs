@@ -1,20 +1,28 @@
-﻿using Common.CE.Interfaces;
-using System.Collections.Generic;
+﻿using System.Collections.Generic;
 using System.Runtime.Serialization;
 
 namespace Common.CeContracts
 {
-	[DataContract]
-	public class TopologyModel : ITopology
+    [DataContract]
+	[KnownType(typeof(EnergyConsumer))]
+	[KnownType(typeof(Feeder))]
+	[KnownType(typeof(Field))]
+	[KnownType(typeof(Recloser))]
+	[KnownType(typeof(SynchronousMachine))]
+	[KnownType(typeof(TopologyElement))]
+	//TODO: clean up
+	public class TopologyModel// : ITopology
     {
 		[DataMember]
 		public long FirstNode { get; set; }
 		[DataMember]
 		public Dictionary<long, ITopologyElement> TopologyElements { get; set; }
+		
 		public TopologyModel()
 		{
 			TopologyElements = new Dictionary<long, ITopologyElement>();
 		}
+
 		public void AddElement(ITopologyElement newElement)
 		{
 			if (!TopologyElements.ContainsKey(newElement.Id))

@@ -79,5 +79,10 @@ namespace NMS.GdaImplementation.DistributedTransaction
             }
         }
         #endregion ITransactionActorContract
+
+        public Task<bool> IsAlive()
+        {
+            return Task.Run(() => { return true; });
+        }
     }
 }

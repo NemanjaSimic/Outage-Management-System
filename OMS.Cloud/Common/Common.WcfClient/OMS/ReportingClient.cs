@@ -4,17 +4,14 @@ using Microsoft.ServiceFabric.Services.Client;
 using Microsoft.ServiceFabric.Services.Communication.Wcf.Client;
 using OMS.Common.Cloud.Names;
 using System;
-using System.Collections.Generic;
-using System.Linq;
-using System.Text;
 using System.Threading.Tasks;
 
 namespace OMS.Common.WcfClient.OMS
 {
     public class ReportingClient : WcfSeviceFabricClientBase<IReportingContract>, IReportingContract
     {
-        private static readonly string microserviceName = MicroserviceNames.OmsOutageLifecycleService;
-        private static readonly string listenerName = EndpointNames.ReportingEndpoint;
+        private static readonly string microserviceName = MicroserviceNames.OmsHistoryDBManagerService;
+        private static readonly string listenerName = EndpointNames.OmsReportingEndpoint;
         public ReportingClient(WcfCommunicationClientFactory<IReportingContract> clientFactory, Uri serviceUri, ServicePartitionKey servicePartition)
            : base(clientFactory, serviceUri, servicePartition, listenerName)
         {
@@ -35,6 +32,11 @@ namespace OMS.Common.WcfClient.OMS
         public Task<OutageReport> GenerateReport(ReportOptions options)
         {
             return InvokeWithRetryAsync(client => client.Channel.GenerateReport(options));
+        }
+
+        public Task<bool> IsAlive()
+        {
+            return InvokeWithRetryAsync(client => client.Channel.IsAlive());
         }
     }
 }

@@ -45,8 +45,8 @@ namespace OMS.Common.NMS
             {
                 { MicroserviceNames.NmsGdaService               },
                 { MicroserviceNames.ScadaModelProviderService   },
-                //TODO: CE Transaction Actor
-                //TODO: OMS Transaction Actor
+                { MicroserviceNames.CeModelProviderService      },
+                //todo: otkomentarisati za transakciju { MicroserviceNames.OmsModelProviderService     },
             };
         }
     }

@@ -1,16 +1,16 @@
-﻿using Common.CE.Interfaces;
-using Common.CeContracts;
+﻿using Common.CeContracts;
 using Common.CeContracts.TopologyProvider;
+using Common.PubSubContracts.DataContracts.CE;
+using Common.PubSubContracts.DataContracts.CE.UIModels;
 using Microsoft.ServiceFabric.Services.Client;
 using Microsoft.ServiceFabric.Services.Communication.Wcf.Client;
 using OMS.Common.Cloud.Names;
-using OMS.Common.PubSub;
 using System;
 using System.Threading.Tasks;
 
 namespace OMS.Common.WcfClient.CE
 {
-	public class TopologyProviderClient : WcfSeviceFabricClientBase<ITopologyProviderContract>, ITopologyProviderContract
+    public class TopologyProviderClient : WcfSeviceFabricClientBase<ITopologyProviderContract>, ITopologyProviderContract
 	{
 		private static readonly string microserviceName = MicroserviceNames.CeTopologyProviderService;
 		private static readonly string listenerName = EndpointNames.CeTopologyProviderServiceEndpoint;
@@ -44,12 +44,12 @@ namespace OMS.Common.WcfClient.CE
             return InvokeWithRetryAsync(client => client.Channel.DiscreteMeasurementDelegate());
 		}
 
-		public Task<IOutageTopologyModel> GetOMSModel()
+		public Task<OutageTopologyModel> GetOMSModel()
 		{
             return InvokeWithRetryAsync(client => client.Channel.GetOMSModel());
 		}
 
-		public Task<ITopology> GetTopology()
+		public Task<TopologyModel> GetTopology()
 		{
             return InvokeWithRetryAsync(client => client.Channel.GetTopology());
 		}
@@ -77,6 +77,11 @@ namespace OMS.Common.WcfClient.CE
 		public Task RollbackTransaction()
 		{
             return InvokeWithRetryAsync(client => client.Channel.RollbackTransaction());
+		}
+
+		public Task<bool> IsAlive()
+		{
+			return InvokeWithRetryAsync(client => client.Channel.IsAlive());
 		}
 	}
 }

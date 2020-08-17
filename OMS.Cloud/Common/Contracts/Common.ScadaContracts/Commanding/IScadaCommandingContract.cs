@@ -1,4 +1,5 @@
-﻿using Microsoft.ServiceFabric.Services.Remoting;
+﻿using Common.CloudContracts;
+using Microsoft.ServiceFabric.Services.Remoting;
 using OMS.Common.Cloud;
 using OMS.Common.Cloud.Exceptions.SCADA;
 using System;
@@ -9,7 +10,7 @@ using System.Threading.Tasks;
 namespace OMS.Common.ScadaContracts.Commanding
 {
     [ServiceContract]
-    public interface IScadaCommandingContract : IService
+    public interface IScadaCommandingContract : IService, IHealthChecker
     {
         [OperationContract]
         [FaultContract(typeof(ArgumentException))]

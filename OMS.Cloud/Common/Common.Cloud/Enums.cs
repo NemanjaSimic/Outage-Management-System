@@ -162,11 +162,13 @@ namespace OMS.Common.Cloud
         [EnumMember]
         REMOVED = 5
     }
+
     [DataContract]
     public enum DatabaseOperation : short
     {
         [EnumMember]
         INSERT = 1,
+
         [EnumMember]
         DELETE = 2
     }
@@ -176,16 +178,24 @@ namespace OMS.Common.Cloud
     {
         [EnumMember]
         INSERT = 1,
+
         [EnumMember]
         DELETE = 2,
+
         [EnumMember]
         CLEAR = 3
     }
 
+    [DataContract]
     public enum ReportType
     {
+        [EnumMember]
         Total = 0,
+
+        [EnumMember]
         SAIFI,
+
+        [EnumMember]
         SAIDI
     }
 }

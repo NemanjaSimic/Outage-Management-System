@@ -71,7 +71,7 @@ namespace SCADA.ModelProviderImplementation.ContractProviders
             this.stateManager = stateManager;
             this.stateManager.StateManagerChanged += this.OnStateManagerChangedHandler;
         }
-
+        
         private async void OnStateManagerChangedHandler(object sender, NotifyStateManagerChangedEventArgs e)
         {
             if (e.Action == NotifyStateManagerChangedAction.Add)
@@ -280,6 +280,11 @@ namespace SCADA.ModelProviderImplementation.ContractProviders
             }
 
             return scadaPublication;
+        }
+
+        public Task<bool> IsAlive()
+        {
+            return Task.Run(() => { return true; });
         }
         #endregion IScadaIntegrityUpdateContract
     }

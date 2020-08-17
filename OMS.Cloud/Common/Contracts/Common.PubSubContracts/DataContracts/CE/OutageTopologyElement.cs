@@ -1,11 +1,12 @@
-﻿using OMS.Common.PubSub;
+﻿using OMS.Common.PubSubContracts.Interfaces;
 using System.Collections.Generic;
 using System.Runtime.Serialization;
 
 namespace Common.PubSubContracts.DataContracts.CE
 {
-	[DataContract]
-    public class OutageTopologyElement : IOutageTopologyElement
+    [DataContract(IsReference = true)]
+    //TODO: clean up
+    public class OutageTopologyElement// : IOutageTopologyElement
     {
         #region Fields
         private long id;
@@ -18,7 +19,6 @@ namespace Common.PubSubContracts.DataContracts.CE
         private bool noReclosing;
         private bool isOpen;
         #endregion
-
 
         #region Properties
         [DataMember]

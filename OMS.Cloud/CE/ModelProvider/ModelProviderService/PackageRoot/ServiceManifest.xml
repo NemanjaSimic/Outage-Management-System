@@ -26,6 +26,8 @@
   <Resources>
     <Endpoints>
       <Endpoint Name="CeModelProviderServiceEndpoint" Protocol="tcp" Type="Input" />
+      <Endpoint Name="TmsNotifyNetworkModelUpdateEndpoint" Protocol="tcp" Type="Input"/>
+      <Endpoint Name="TmsTransactionActorEndpoint" Protocol="tcp" Type="Input"/>
     </Endpoints>
   </Resources>
 </ServiceManifest>

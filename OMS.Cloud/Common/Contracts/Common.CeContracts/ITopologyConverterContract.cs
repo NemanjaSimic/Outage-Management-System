@@ -1,17 +1,32 @@
-﻿using Common.CE.Interfaces;
+﻿using Common.CloudContracts;
+using Common.PubSubContracts.DataContracts.CE;
+using Common.PubSubContracts.DataContracts.CE.UIModels;
 using Microsoft.ServiceFabric.Services.Remoting;
-using OMS.Common.PubSub;
 using System.ServiceModel;
 using System.Threading.Tasks;
 
 namespace Common.CeContracts
 {
-	[ServiceContract]
-	public interface ITopologyConverterContract : IService
+    //todo: clean up
+    [ServiceContract]
+	//[ServiceKnownType(typeof(TopologyModel))]
+	[ServiceKnownType(typeof(TopologyElement))]
+	[ServiceKnownType(typeof(EnergyConsumer))]
+	[ServiceKnownType(typeof(Feeder))]
+	[ServiceKnownType(typeof(Field))]
+	[ServiceKnownType(typeof(Recloser))]
+	[ServiceKnownType(typeof(SynchronousMachine))]
+	//[ServiceKnownType(typeof(OutageTopologyModel))]
+	//[ServiceKnownType(typeof(OutageTopologyElement))]
+	//[ServiceKnownType(typeof(UIModel))]
+	//[ServiceKnownType(typeof(UIMeasurement))]
+	//[ServiceKnownType(typeof(UINode))]
+	public interface ITopologyConverterContract : IService, IHealthChecker
 	{
 		[OperationContract]
-		Task<IOutageTopologyModel> ConvertTopologyToOMSModel(ITopology topology);
+		Task<OutageTopologyModel> ConvertTopologyToOMSModel(TopologyModel topology);
+
 		[OperationContract]
-		Task<UIModel> ConvertTopologyToUIModel(ITopology topology);
+		Task<UIModel> ConvertTopologyToUIModel(TopologyModel topology);
 	}
 }

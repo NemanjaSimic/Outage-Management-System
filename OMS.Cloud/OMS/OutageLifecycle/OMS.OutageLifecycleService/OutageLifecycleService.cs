@@ -1,30 +1,41 @@
-﻿using System;
-using System.Collections.Generic;
+﻿using System.Collections.Generic;
 using System.Fabric;
-using System.Linq;
-using System.Threading;
-using System.Threading.Tasks;
 using Common.OmsContracts.OutageLifecycle;
 using Microsoft.ServiceFabric.Services.Communication.Runtime;
 using Microsoft.ServiceFabric.Services.Communication.Wcf;
 using Microsoft.ServiceFabric.Services.Communication.Wcf.Runtime;
 using Microsoft.ServiceFabric.Services.Runtime;
 using OMS.Common.Cloud.Names;
-using OMS.OutageLifecycleServiceImplementation;
-using OutageDatabase.Repository;
+using OMS.Common.PubSubContracts;
+using OMS.OutageLifecycleImplementation;
+using OMS.OutageLifecycleImplementation.ScadaSub;
 
 namespace OMS.OutageLifecycleService
 {
-	/// <summary>
-	/// An instance of this class is created for each service instance by the Service Fabric runtime.
-	/// </summary>
-	internal sealed class OutageLifecycleService : StatelessService
+    /// <summary>
+    /// An instance of this class is created for each service instance by the Service Fabric runtime.
+    /// </summary>
+    internal sealed class OutageLifecycleService : StatelessService
 	{
-		private UnitOfWork dbContext;
+		
+		private ReportOutageService reportOutageService;
+		private IsolateOutageService isolateOutageService;
+		private ResolveOutageService resolveOutageService;
+		private SendLocationIsolationCrewService sendLocationIsolationCrewService;
+		private SendRepairCrewService sendRepairCrewService;
+		private ValidateResolveConditionsService validateResolveConditionsService;
+		private ScadaSubscriber scadaSubscriber;
+
 		public OutageLifecycleService(StatelessServiceContext context)
 			: base(context)
 		{
-			this.dbContext = new UnitOfWork();
+			scadaSubscriber = new ScadaSubscriber(MicroserviceNames.OmsOutageLifecycleService);
+			reportOutageService = new ReportOutageService();
+			isolateOutageService = new IsolateOutageService(scadaSubscriber);
+			resolveOutageService = new ResolveOutageService();
+			sendLocationIsolationCrewService = new SendLocationIsolationCrewService();
+			sendRepairCrewService = new SendRepairCrewService();
+			validateResolveConditionsService = new ValidateResolveConditionsService();
 		}
 
 		/// <summary>
@@ -38,45 +49,52 @@ namespace OMS.OutageLifecycleService
 				new ServiceInstanceListener (context =>
 				{
 					return new WcfCommunicationListener<IIsolateOutageContract>(context,
-																				new IsolateOutageService(),
+																				isolateOutageService,
 																				WcfUtility.CreateTcpListenerBinding(),
-																				EndpointNames.IsolateOutageEndpoint);
-				}, EndpointNames.IsolateOutageEndpoint),
+																				EndpointNames.OmsIsolateOutageEndpoint);
+				}, EndpointNames.OmsIsolateOutageEndpoint),
 				new ServiceInstanceListener (context =>
 				{
 					return new WcfCommunicationListener<IReportOutageContract>(context,
-																			   new ReportOutageService(this.dbContext),
+																			   reportOutageService,
 																			   WcfUtility.CreateTcpListenerBinding(),
-																			   EndpointNames.ReportOutageEndpoint);
-				}, EndpointNames.ReportOutageEndpoint),
+																			   EndpointNames.OmsReportOutageEndpoint);
+				}, EndpointNames.OmsReportOutageEndpoint),
 				new ServiceInstanceListener (context =>
 				{
 					return new WcfCommunicationListener<IResolveOutageContract>(context,
-																			   new ResolveOutageService(this.dbContext),
+																			   resolveOutageService,
 																			   WcfUtility.CreateTcpListenerBinding(),
-																			   EndpointNames.ResolveOutageEndpoint);
-				}, EndpointNames.ResolveOutageEndpoint),
+																			   EndpointNames.OmsResolveOutageEndpoint);
+				}, EndpointNames.OmsResolveOutageEndpoint),
 				new ServiceInstanceListener (context =>
 				{
 					return new WcfCommunicationListener<ISendLocationIsolationCrewContract>(context,
-																			   new SendLocationIsolationCrewService(this.dbContext),
+																			   sendLocationIsolationCrewService,
 																			   WcfUtility.CreateTcpListenerBinding(),
-																			   EndpointNames.SendLocationIsolationCrewEndpoint);
-				}, EndpointNames.SendLocationIsolationCrewEndpoint),
+																			   EndpointNames.OmsSendLocationIsolationCrewEndpoint);
+				}, EndpointNames.OmsSendLocationIsolationCrewEndpoint),
 				new ServiceInstanceListener (context =>
 				{
 					return new WcfCommunicationListener<ISendRepairCrewContract>(context,
-																			   new SendRepairCrewService(this.dbContext),
+																			   sendRepairCrewService,
 																			   WcfUtility.CreateTcpListenerBinding(),
-																			   EndpointNames.SendRepairCrewEndpoint);
-				}, EndpointNames.SendRepairCrewEndpoint),
+																			   EndpointNames.OmsSendRepairCrewEndpoint);
+				}, EndpointNames.OmsSendRepairCrewEndpoint),
 				new ServiceInstanceListener (context =>
 				{
 					return new WcfCommunicationListener<IValidateResolveConditionsContract>(context,
-																			   new ValidateResolveConditionsService(this.dbContext),
+																			   validateResolveConditionsService,
 																			   WcfUtility.CreateTcpListenerBinding(),
-																			   EndpointNames.ValidateResolveConditionsEndpoint);
-				}, EndpointNames.ValidateResolveConditionsEndpoint),
+																			   EndpointNames.OmsValidateResolveConditionsEndpoint);
+				}, EndpointNames.OmsValidateResolveConditionsEndpoint),
+				new ServiceInstanceListener (context =>
+				{
+					return new WcfCommunicationListener<INotifySubscriberContract>(context,
+																			   scadaSubscriber,
+																			   WcfUtility.CreateTcpListenerBinding(),
+																			   EndpointNames.PubSubNotifySubscriberEndpoint);
+				}, EndpointNames.PubSubNotifySubscriberEndpoint),
 			};
 		}
 

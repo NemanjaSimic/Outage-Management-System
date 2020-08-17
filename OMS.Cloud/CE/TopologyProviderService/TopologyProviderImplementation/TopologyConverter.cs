@@ -1,10 +1,9 @@
-﻿using Common.CE.Interfaces;
-using Common.CeContracts;
+﻿using Common.CeContracts;
 using Common.CeContracts.ModelProvider;
-using Common.OMS.OutageModel;
+using Common.PubSubContracts.DataContracts.CE;
+using Common.PubSubContracts.DataContracts.CE.UIModels;
 using OMS.Common.Cloud.Logger;
 using OMS.Common.NmsContracts;
-using OMS.Common.PubSub;
 using OMS.Common.WcfClient.CE;
 using System;
 using System.Collections.Generic;
@@ -13,7 +12,7 @@ using System.Threading.Tasks;
 
 namespace CE.TopologyProviderImplementation
 {
-	public class TopologyConverter : ITopologyConverterContract
+    public class TopologyConverter : ITopologyConverterContract
     {
         private readonly IMeasurementProviderContract measurementProviderClient;
         private readonly IModelProviderContract modelProviderClient;
@@ -39,7 +38,7 @@ namespace CE.TopologyProviderImplementation
             Logger.LogDebug(debugMessage);
         }
 
-        public async Task<UIModel> ConvertTopologyToUIModel(ITopology topology)
+        public async Task<UIModel> ConvertTopologyToUIModel(TopologyModel topology)
         {
             string verboseMessage = $"{baseLogString} ConvertTopologyToUIModel method called.";
             Logger.LogVerbose(verboseMessage);
@@ -91,7 +90,7 @@ namespace CE.TopologyProviderImplementation
                         }
                     }
 
-                    List<IUIMeasurement> measurements = new List<IUIMeasurement>();
+                    List<UIMeasurement> measurements = new List<UIMeasurement>();
                     foreach (var measurementGid in element.Measurements.Keys)
                     {
                         Logger.LogDebug($"{baseLogString} ConvertTopologyToUIModel => Calling GetDiscreteMeasurement method from measurement provider client for measurement GID {measurementGid:X16}.");
@@ -122,7 +121,7 @@ namespace CE.TopologyProviderImplementation
                         }
                         else
                         {
-                            Logger.LogError($"{baseLogString} ConvertTopologyToUIModel => Measurement with GID {measurementGid:X16} does not exist.");
+                            Logger.LogWarning($"{baseLogString} ConvertTopologyToUIModel => Measurement with GID {measurementGid:X16} does not exist.");
                         }
                     }
 
@@ -155,7 +154,7 @@ namespace CE.TopologyProviderImplementation
             return uIModel;
         }
 
-        public async Task<IOutageTopologyModel> ConvertTopologyToOMSModel(ITopology topology)
+        public async Task<OutageTopologyModel> ConvertTopologyToOMSModel(TopologyModel topology)
         {
             string verboseMessage = $"{baseLogString} ConvertTopologyToOMSModel method called.";
             Logger.LogVerbose(verboseMessage);
@@ -171,7 +170,7 @@ namespace CE.TopologyProviderImplementation
             var reclosers = await modelProviderClient.GetReclosers();
             Logger.LogDebug($"{baseLogString} ConvertTopologyToOMSModel => GetReclosers method from model provider client has been called successfully.");
 
-            IOutageTopologyModel outageTopologyModel = new OutageTopologyModel();
+            OutageTopologyModel outageTopologyModel = new OutageTopologyModel();
             Stack<long> stack = new Stack<long>();
             outageTopologyModel.FirstNode = topology.FirstNode;
             stack.Push(topology.FirstNode);
@@ -227,7 +226,7 @@ namespace CE.TopologyProviderImplementation
                         }
                         else
                         {
-                            Logger.LogError($"{baseLogString} ConvertTopologyToOMSModel => Measurement provider client returned null.");
+                            Logger.LogWarning($"{baseLogString} ConvertTopologyToOMSModel => Measurement provider client returned null for measurement GID {measurementGid:X16}.");
                         }
                     }
 
@@ -254,6 +253,10 @@ namespace CE.TopologyProviderImplementation
 
             Logger.LogDebug($"{baseLogString} ConvertTopologyToOMSModel => Topology to OMSModel convert finished successfully.");
             return outageTopologyModel;
+        }
+        public Task<bool> IsAlive()
+        {
+            return Task.Run(() => { return true; });
         }
     }
 }

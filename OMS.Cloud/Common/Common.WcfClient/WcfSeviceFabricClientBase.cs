@@ -1,4 +1,5 @@
-﻿using Microsoft.ServiceFabric.Services.Client;
+﻿using Common.CloudContracts;
+using Microsoft.ServiceFabric.Services.Client;
 using Microsoft.ServiceFabric.Services.Communication.Client;
 using Microsoft.ServiceFabric.Services.Communication.Wcf.Client;
 using Microsoft.ServiceFabric.Services.Remoting;
@@ -12,7 +13,7 @@ using System.Threading.Tasks;
 
 namespace OMS.Common.WcfClient
 {
-    public class WcfSeviceFabricClientBase<TContract> : ServicePartitionClient<WcfCommunicationClient<TContract>> where TContract : class, IService
+    public class WcfSeviceFabricClientBase<TContract> : ServicePartitionClient<WcfCommunicationClient<TContract>> where TContract : class, IService, IHealthChecker
     {
         private const int maxTryCount = 30;
         private readonly string baseLogString;

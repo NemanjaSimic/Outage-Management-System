@@ -1,10 +1,10 @@
-﻿using Common.CE.Interfaces;
-using OMS.Common.Cloud;
+﻿using OMS.Common.Cloud;
+using System;
 using System.Runtime.Serialization;
 
 namespace Common.CeContracts
 {
-	[DataContract]
+    [DataContract]
     public class EnergyConsumer : TopologyElement
 	{
 		public EnergyConsumer(ITopologyElement element) : base (element.Id)

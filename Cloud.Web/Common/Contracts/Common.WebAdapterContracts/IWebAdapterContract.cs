@@ -1,4 +1,5 @@
-﻿using Common.Web.Models.ViewModels;
+﻿using Common.CloudContracts;
+using Common.Web.Models.ViewModels;
 using Microsoft.ServiceFabric.Services.Remoting;
 using OMS.Common.PubSubContracts.DataContracts.SCADA;
 using System.Collections.Generic;
@@ -8,7 +9,7 @@ using System.Threading.Tasks;
 namespace Common.Contracts.WebAdapterContracts
 {
     [ServiceContract]
-    public interface IWebAdapterContract: IService
+    public interface IWebAdapterContract: IService, IHealthChecker
     {
         [OperationContract]
         Task UpdateGraph(List<NodeViewModel> nodes, List<RelationViewModel> relations);

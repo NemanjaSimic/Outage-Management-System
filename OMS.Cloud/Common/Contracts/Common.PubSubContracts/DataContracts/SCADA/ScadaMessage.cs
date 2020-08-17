@@ -1,15 +1,14 @@
-﻿using Common.PubSub;
+﻿using OMS.Common.PubSubContracts.Interfaces;
 using System.Collections.Generic;
 using System.Runtime.Serialization;
-using System.ServiceModel;
 
 namespace OMS.Common.PubSubContracts.DataContracts.SCADA
 {
     [DataContract]
-    [ServiceKnownType(typeof(SingleAnalogValueSCADAMessage))]
-    [ServiceKnownType(typeof(MultipleAnalogValueSCADAMessage))]
-    [ServiceKnownType(typeof(SingleDiscreteValueSCADAMessage))]
-    [ServiceKnownType(typeof(MultipleDiscreteValueSCADAMessage))]
+    [KnownType(typeof(SingleAnalogValueSCADAMessage))]
+    [KnownType(typeof(MultipleAnalogValueSCADAMessage))]
+    [KnownType(typeof(SingleDiscreteValueSCADAMessage))]
+    [KnownType(typeof(MultipleDiscreteValueSCADAMessage))]
     public abstract class ScadaMessage : IPublishableMessage
     {
     }

@@ -1,4 +1,4 @@
-﻿using Common.CE.Interfaces;
+﻿using Common.CeContracts;
 using Common.CeContracts.LoadFlow;
 using Microsoft.ServiceFabric.Services.Client;
 using Microsoft.ServiceFabric.Services.Communication.Wcf.Client;
@@ -30,7 +30,12 @@ namespace OMS.Common.WcfClient.CE
 			return factory.CreateClient<LoadFlowClient, ILoadFlowContract>(serviceUri, servicePartitionKey);
 		}
 
-		public Task<ITopology> UpdateLoadFlow(ITopology topology)
+		public Task<bool> IsAlive()
+		{
+			return Task.Run(() => { return true; });
+		}
+
+		public Task<TopologyModel> UpdateLoadFlow(TopologyModel topology)
 		{
 			return InvokeWithRetryAsync(client => client.Channel.UpdateLoadFlow(topology));
 		}

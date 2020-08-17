@@ -14,7 +14,7 @@ namespace OMS.Common.WcfClient.OMS.Lifecycle
 	public class ReportOutageClient : WcfSeviceFabricClientBase<IReportOutageContract>, IReportOutageContract
 	{
 		private static readonly string microserviceName = MicroserviceNames.OmsOutageLifecycleService;
-		private static readonly string listenerName = EndpointNames.ReportOutageEndpoint;
+		private static readonly string listenerName = EndpointNames.OmsReportOutageEndpoint;
 		public ReportOutageClient(WcfCommunicationClientFactory<IReportOutageContract> clientFactory, Uri serviceUri, ServicePartitionKey servicePartition) 
 			: base (clientFactory, serviceUri, servicePartition, listenerName)
 		{
@@ -36,6 +36,11 @@ namespace OMS.Common.WcfClient.OMS.Lifecycle
 		public Task<bool> ReportPotentialOutage(long gid, CommandOriginType commandOriginType)
 		{
 			return InvokeWithRetryAsync(client => client.Channel.ReportPotentialOutage(gid, commandOriginType));
+		}
+
+		public Task<bool> IsAlive()
+		{
+			return InvokeWithRetryAsync(client => client.Channel.IsAlive());
 		}
 	}
 }

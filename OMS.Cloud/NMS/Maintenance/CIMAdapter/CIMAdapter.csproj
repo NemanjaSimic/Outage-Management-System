@@ -160,6 +160,10 @@
       <Project>{AE91CEB5-378A-4EEF-AEBF-C40ED1EF23CF}</Project>
       <Name>Common.WcfClient</Name>
     </ProjectReference>
+    <ProjectReference Include="..\..\..\Common\Contracts\Common.CloudContracts\Common.CloudContracts.csproj">
+      <Project>{2307F7DC-6B87-4506-8365-6966712DD5FE}</Project>
+      <Name>Common.CloudContracts</Name>
+    </ProjectReference>
     <ProjectReference Include="..\..\..\Common\Contracts\Common.NmsContracts\Common.NmsContracts.csproj">
       <Project>{235804A8-9C8F-40EC-8786-5DAB24733977}</Project>
       <Name>Common.NmsContracts</Name>

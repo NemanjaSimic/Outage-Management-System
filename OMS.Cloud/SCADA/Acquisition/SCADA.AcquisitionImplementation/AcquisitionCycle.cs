@@ -15,8 +15,6 @@ namespace SCADA.AcquisitionImplementation
     {
         private readonly string baseLogString;
 
-        private IReadCommandEnqueuerContract commandEnqueuerClient;
-        private IScadaModelReadAccessContract readAccessClient;
         Dictionary<short, Dictionary<ushort, long>> addressToGidMap;
 
         #region Private Properties
@@ -40,8 +38,8 @@ namespace SCADA.AcquisitionImplementation
 
             try
             {
-                commandEnqueuerClient = ReadCommandEnqueuerClient.CreateClient();
-                readAccessClient = ScadaModelReadAccessClient.CreateClient();
+                var commandEnqueuerClient = ReadCommandEnqueuerClient.CreateClient();
+                var readAccessClient = ScadaModelReadAccessClient.CreateClient();
 
                 verboseMessage = $"{baseLogString} Start => Trying to get AddressToGidMap.";
                 Logger.LogVerbose(verboseMessage);

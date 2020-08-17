@@ -67,13 +67,13 @@ namespace SCADA.ModelProviderService
 
                 string infoMessage = $"{baseLogString} Ctor => Contract providers initialized.";
                 Logger.LogInformation(infoMessage);
-                ServiceEventSource.Current.ServiceMessage(this.Context, $"[ModelProviderService | Information] {infoMessage}");
+                ServiceEventSource.Current.ServiceMessage(this.Context, $"[SCADA.ModelProviderService | Information] {infoMessage}");
             }
             catch (Exception e)
             {
                 string errorMessage = $"{baseLogString} Ctor => Exception caught: {e.Message}.";
                 Logger.LogError(errorMessage, e);
-                ServiceEventSource.Current.ServiceMessage(this.Context, $"[ModelProviderService | Error] {errorMessage}");
+                ServiceEventSource.Current.ServiceMessage(this.Context, $"[SCADA.ModelProviderService | Error] {errorMessage}");
             }
         }
 
@@ -145,18 +145,18 @@ namespace SCADA.ModelProviderService
                 InitializeReliableCollections();
                 string debugMessage = $"{baseLogString} RunAsync => ReliableDictionaries initialized.";
                 Logger.LogDebug(debugMessage);
-                ServiceEventSource.Current.ServiceMessage(this.Context, $"[ModelProviderService | Information] {debugMessage}");
+                ServiceEventSource.Current.ServiceMessage(this.Context, $"[SCADA.ModelProviderService | Information] {debugMessage}");
 
                 await scadaModelImporter.InitializeScadaModel();
                 string infoMessage = $"{baseLogString} RunAsync => ScadaModel initialized.";
                 Logger.LogInformation(infoMessage);
-                ServiceEventSource.Current.ServiceMessage(this.Context, $"[ModelProviderService | Information] {infoMessage}");
+                ServiceEventSource.Current.ServiceMessage(this.Context, $"[SCADA.ModelProviderService | Information] {infoMessage}");
             }
             catch (Exception e)
             {
                 string errorMessage = $"{baseLogString} RunAsync => Exception caught: {e.Message}.";
                 Logger.LogInformation(errorMessage, e);
-                ServiceEventSource.Current.ServiceMessage(this.Context, $"[ModelProviderService | Error] {errorMessage}");
+                ServiceEventSource.Current.ServiceMessage(this.Context, $"[SCADA.ModelProviderService | Error] {errorMessage}");
             }
         }
 

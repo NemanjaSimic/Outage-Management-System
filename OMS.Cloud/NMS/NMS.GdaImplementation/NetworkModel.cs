@@ -95,13 +95,10 @@ namespace NMS.GdaImplementation
             this.resourcesDescs = new ModelResourcesDesc();
 
             this.networkModelState = NetworkModelState.NOT_INITIALIZED; 
-            //this.isModelInitialized = false;
-            //this.isTransactionInProgress = false;
-    }
+        }
 
         public async Task InitializeNetworkModel()
         {
-            //this.isModelInitialized = false;
             this.networkModelState = NetworkModelState.CURRENTLY_INITIALIZING;
 
             long latestNetworkModelVersion = mongoDbAccess.GetLatestNetworkModelVersions();
@@ -237,7 +234,6 @@ namespace NMS.GdaImplementation
                 throw new Exception(message);
             }
         }
-
         #endregion Find
 
         #region INetworkModelGDAContract Methods
@@ -1015,7 +1011,6 @@ namespace NMS.GdaImplementation
         {
             return Task.Run(() =>
             {
-                //this.isTransactionInProgress = false;
                 this.networkModelState = NetworkModelState.INITIALIZED;
 
                 if (currentDelta != null && currentDelta.DeltaOrigin == DeltaOriginType.ImporterDelta)
@@ -1038,7 +1033,6 @@ namespace NMS.GdaImplementation
         {
             return Task.Run(() =>
             {
-                //this.isTransactionInProgress = false;
                 this.networkModelState = NetworkModelState.INITIALIZED;
 
                 currentDelta = null;
@@ -1055,7 +1049,7 @@ namespace NMS.GdaImplementation
             var transactionActors = NetorkModelUpdateTransaction.Instance.TransactionActorsNames;
             var modelChanges = CreateModelChangesData(delta);
             
-            ITransactionCoordinatorContract transactionCoordinatorClient = TransactionCoordinatorClient.CreateClient();
+            var transactionCoordinatorClient = TransactionCoordinatorClient.CreateClient();
             await transactionCoordinatorClient.StartDistributedTransaction(DistributedTransactionNames.NetworkModelUpdateTransaction, transactionActors);
             Logger.LogDebug($"{baseLogString} StartDistributedTransaction => StartDistributedTransaction('{DistributedTransactionNames.NetworkModelUpdateTransaction}', transactionActors count: {transactionActors.Count()}) called.");
 
@@ -1073,6 +1067,7 @@ namespace NMS.GdaImplementation
                     tasks.Add(Task.Run(async () =>
                     {
                         INotifyNetworkModelUpdateContract notifyNetworkModelUpdateClient = NotifyNetworkModelUpdateClient.CreateClient(transactionActorName);
+                        Logger.LogDebug($"{baseLogString} StartDistributedTransaction => calling Notify() method for '{transactionActorName}' Transaction actor.");
 
                         var taskSuccess = await notifyNetworkModelUpdateClient.Notify(modelChanges);
                         Logger.LogDebug($"{baseLogString} StartDistributedTransaction => Notify() method invoked on '{transactionActorName}' Transaction actor.");
@@ -1152,7 +1147,7 @@ namespace NMS.GdaImplementation
 
         private async Task<bool> EnlistNmsTransactionActor()
         {
-            ITransactionEnlistmentContract transactionEnlistmentClient = TransactionEnlistmentClient.CreateClient();
+            var transactionEnlistmentClient = TransactionEnlistmentClient.CreateClient();
             bool nmsEnlistSuccess = await transactionEnlistmentClient.Enlist(DistributedTransactionNames.NetworkModelUpdateTransaction, MicroserviceNames.NmsGdaService);
             Logger.LogDebug("{baseLogString} StartDistributedTransaction => Enlist() method invoked on Transaction Coordinator.");
 
@@ -1161,5 +1156,10 @@ namespace NMS.GdaImplementation
         #endregion Private Members
 
         #endregion ITransactionActorContract
+
+        public Task<bool> IsAlive()
+        {
+            return Task.Run(() => { return true; });
+        }
     }
 }

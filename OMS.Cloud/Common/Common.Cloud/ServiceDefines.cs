@@ -76,7 +76,6 @@ namespace OMS.Common.Cloud
                 { MicroserviceNames.OmsOutageLifecycleService,      ServiceType.STATELESS_SERVICE},
                 { MicroserviceNames.OmsCallTrackingService,         ServiceType.STATELESS_SERVICE},
                 { MicroserviceNames.OmsHistoryDBManagerService,     ServiceType.STATEFUL_SERVICE},
-                { MicroserviceNames.OmsReportingService,            ServiceType.STATELESS_SERVICE},
                 { MicroserviceNames.OmsOutageSimulatorService,      ServiceType.STANDALONE_SERVICE},
 
                 //TODO: WEB_ADAPTER
@@ -104,19 +103,18 @@ namespace OMS.Common.Cloud
                 { MicroserviceNames.TransactionManagerService,      new Uri("fabric:/OMS.Cloud/TMS.TransactionManagerService")  },
 
                 //TODO: CE
-                { MicroserviceNames.CeLoadFlowService,              new Uri("fabric:/OMS.Cloud/LoadFlowService")                },
-                { MicroserviceNames.CeMeasurementProviderService,   new Uri("fabric:/OMS.Cloud/MeasurementProviderService")     },
-                { MicroserviceNames.CeModelProviderService,         new Uri("fabric:/OMS.Cloud/ModelProviderService")           },
-                { MicroserviceNames.CeTopologyBuilderService,       new Uri("fabric:/OMS.Cloud/TopologyBuilderService")         },
-                { MicroserviceNames.CeTopologyProviderService,      new Uri("fabric:/OMS.Cloud/TopologyProviderService")        },
+                { MicroserviceNames.CeLoadFlowService,              new Uri("fabric:/OMS.Cloud/CE.LoadFlowService")                },
+                { MicroserviceNames.CeMeasurementProviderService,   new Uri("fabric:/OMS.Cloud/CE.MeasurementProviderService")     },
+                { MicroserviceNames.CeModelProviderService,         new Uri("fabric:/OMS.Cloud/CE.ModelProviderService")           },
+                { MicroserviceNames.CeTopologyBuilderService,       new Uri("fabric:/OMS.Cloud/CE.TopologyBuilderService")         },
+                { MicroserviceNames.CeTopologyProviderService,      new Uri("fabric:/OMS.Cloud/CE.TopologyProviderService")        },
 
                 //TODO: OMS
-                { MicroserviceNames.OmsModelProviderService,         new Uri("fabric:/OMS.Cloud/OMS.ModelProviderService")},
-                { MicroserviceNames.OmsCallTrackingService,          new Uri("fabric:/OMS.Cloud/OMS.CallTrackingService")},
-                { MicroserviceNames.OmsHistoryDBManagerService,      new Uri("fabric:/OMS.Cloud/OMS.HistoryDBManagerService")},
-                { MicroserviceNames.OmsOutageLifecycleService,       new Uri("fabric:/OMS.Cloud/OMS.OutageLifecycleService")},
-                { MicroserviceNames.OmsReportingService,             new Uri("fabric:/OMS.Cloud/OMS.ReportingService")},
-                { MicroserviceNames.OmsOutageSimulatorService,       new Uri("net.tcp://localhost:10009/OutageSimulator/")},
+                { MicroserviceNames.OmsModelProviderService,         new Uri("fabric:/OMS.Cloud/OMS.ModelProviderService")      },
+                { MicroserviceNames.OmsCallTrackingService,          new Uri("fabric:/OMS.Cloud/OMS.CallTrackingService")       },
+                { MicroserviceNames.OmsHistoryDBManagerService,      new Uri("fabric:/OMS.Cloud/OMS.HistoryDBManagerService")   },
+                { MicroserviceNames.OmsOutageLifecycleService,       new Uri("fabric:/OMS.Cloud/OMS.OutageLifecycleService")    },
+                { MicroserviceNames.OmsOutageSimulatorService,       new Uri("net.tcp://localhost:10009/OutageSimulator/")      },
                 //TODO: WEB_ADAPTER
                 { MicroserviceNames.WebAdapterService,               new Uri("fabric:/Cloud.Web/WebAdapterService")},
 

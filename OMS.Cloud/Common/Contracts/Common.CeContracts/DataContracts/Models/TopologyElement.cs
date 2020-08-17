@@ -1,10 +1,15 @@
-﻿using Common.CE.Interfaces;
-using System.Collections.Generic;
+﻿using System.Collections.Generic;
 using System.Runtime.Serialization;
 
 namespace Common.CeContracts
 {
-	[DataContract]
+    [DataContract(IsReference = true)]
+	[KnownType(typeof(EnergyConsumer))]
+	[KnownType(typeof(Feeder))]
+	[KnownType(typeof(Field))]
+	[KnownType(typeof(Recloser))]
+	[KnownType(typeof(SynchronousMachine))]
+	[KnownType(typeof(TopologyElement))]
 	public class TopologyElement : ITopologyElement
 	{
 		#region Properties
@@ -34,8 +39,8 @@ namespace Common.CeContracts
 		public bool NoReclosing { get; set; }
 		[DataMember]
 		public ITopologyElement Feeder { get; set; }
-
 		#endregion
+
 		public TopologyElement(long gid)
 		{
 			Id = gid;

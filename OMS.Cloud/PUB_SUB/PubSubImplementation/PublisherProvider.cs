@@ -1,10 +1,10 @@
-﻿using Common.PubSub;
-using Microsoft.ServiceFabric.Data;
+﻿using Microsoft.ServiceFabric.Data;
 using Microsoft.ServiceFabric.Data.Notifications;
 using OMS.Common.Cloud.Logger;
 using OMS.Common.Cloud.ReliableCollectionHelpers;
 using OMS.Common.PubSub;
 using OMS.Common.PubSubContracts;
+using OMS.Common.PubSubContracts.Interfaces;
 using OMS.Common.WcfClient.PubSub;
 using System;
 using System.Collections.Generic;
@@ -23,7 +23,9 @@ namespace PubSubImplementation
         {
             get { return logger ?? (logger = CloudLoggerFactory.GetLogger()); }
         }
+        #endregion Private Properties
 
+        #region ReliableDictionary
         private bool isSubscriberCacheInitialized;
         private bool ReliableDictionariesInitialized
         {
@@ -34,17 +36,6 @@ namespace PubSubImplementation
         private ReliableDictionaryAccess<short, HashSet<string>> RegisteredSubscribersCache
         {
             get { return registeredSubscribersCache; }
-        }
-        #endregion Private Properties
-
-        public PublisherProvider(IReliableStateManager stateManager)
-        {
-            this.baseLogString = $"{this.GetType()} [{this.GetHashCode()}] =>{Environment.NewLine}";
-
-            this.isSubscriberCacheInitialized = false;
-
-            this.stateManager = stateManager;
-            this.stateManager.StateManagerChanged += this.OnStateManagerChangedHandler;
         }
 
         private async void OnStateManagerChangedHandler(object sender, NotifyStateManagerChangedEventArgs e)
@@ -65,6 +56,17 @@ namespace PubSubImplementation
                 }
             }
         }
+        #endregion
+
+        public PublisherProvider(IReliableStateManager stateManager)
+        {
+            this.baseLogString = $"{this.GetType()} [{this.GetHashCode()}] =>{Environment.NewLine}";
+
+            this.isSubscriberCacheInitialized = false;
+
+            this.stateManager = stateManager;
+            this.stateManager.StateManagerChanged += this.OnStateManagerChangedHandler;
+        }
 
         #region IPublisherContract
         public async Task<bool> Publish(IPublication publication, string publisherName)
@@ -74,28 +76,45 @@ namespace PubSubImplementation
                 await Task.Delay(1000);
             }
 
-            ///Could be sole Task running in RunAsync, while reading from a queue...
-            List<Task> tasks = new List<Task>();
-            short key = (short)publication.Topic;
+            bool success;
 
-            var enumerableSubscribersCache = await RegisteredSubscribersCache.GetEnumerableDictionaryAsync();
-
-            if (enumerableSubscribersCache.ContainsKey(key))
+            try
             {
-                var registeredSubscribers = enumerableSubscribersCache[key];
-                
-                foreach(var subscriberName in registeredSubscribers)
+                ///Could be sole Task running in RunAsync, while reading from a queue...
+                List<Task> tasks = new List<Task>();
+                short key = (short)publication.Topic;
+
+                var enumerableSubscribersCache = await RegisteredSubscribersCache.GetEnumerableDictionaryAsync();
+
+                if (enumerableSubscribersCache.ContainsKey(key))
                 {
-                    INotifySubscriberContract notifySubscriberClient = NotifySubscriberClient.CreateClient(subscriberName);
-                    var task = notifySubscriberClient.Notify(publication.Message, publisherName); 
-                    tasks.Add(task);
+                    var registeredSubscribers = enumerableSubscribersCache[key];
+
+                    foreach (var subscriberName in registeredSubscribers)
+                    {
+                        var notifySubscriberClient = NotifySubscriberClient.CreateClient(subscriberName);
+                        var task = notifySubscriberClient.Notify(publication.Message, publisherName);
+                        tasks.Add(task);
+                    }
                 }
+                ///////////
+
+                Task.WaitAll(tasks.ToArray());
+                success = true;
             }
-            ///////////
+            catch (Exception e)
+            {
+                string errorMessage = $"{baseLogString} InitializeScadaModel => Exception caught.";
+                Logger.LogError(errorMessage, e);
+                success = false;
+            }
 
-            Task.WaitAll(tasks.ToArray());
+            return success;
+        }
 
-            return true;
+        public Task<bool> IsAlive()
+        {
+            return Task.Run(() => { return true; });
         }
         #endregion IPublisherContract
     }

@@ -34,9 +34,6 @@ namespace SCADA.FunctionExecutorImplementation
         private ModbusClient modbusClient;
         private IScadaConfigData configData;
 
-        private IScadaModelReadAccessContract modelReadAccessClient;
-        private IScadaModelUpdateAccessContract modelUpdateAccessClient;
-
         #region Private Properties
         private ICloudLogger logger;
         private ICloudLogger Logger
@@ -126,7 +123,6 @@ namespace SCADA.FunctionExecutorImplementation
                     }
                 }
 
-
                 while (readCommandQueue.PeekMessage() != null)
                 {
                     verboseMessage = $"{baseLogString} Start => Getting Command from read command queue.";
@@ -158,7 +154,7 @@ namespace SCADA.FunctionExecutorImplementation
         {
             try
             {
-                this.modelReadAccessClient = ScadaModelReadAccessClient.CreateClient();
+                var modelReadAccessClient = ScadaModelReadAccessClient.CreateClient();
                 this.configData = await modelReadAccessClient.GetScadaConfigData();
                 this.modbusClient = new ModbusClient(configData.IpAddress.ToString(), configData.TcpPort);
             }
@@ -340,8 +336,8 @@ namespace SCADA.FunctionExecutorImplementation
             //this.discreteMeasurementCache = new Dictionary<long, DiscreteModbusData>(data.Length);
             this.discreteMeasurementCache.Clear();
 
-            this.modelReadAccessClient = ScadaModelReadAccessClient.CreateClient();
-            this.modelUpdateAccessClient = ScadaModelUpdateAccessClient.CreateClient();
+            var modelReadAccessClient = ScadaModelReadAccessClient.CreateClient();
+            var modelUpdateAccessClient = ScadaModelUpdateAccessClient.CreateClient();
 
             var currentSCADAModel = await modelReadAccessClient.GetGidToPointItemMap();
             var currentAddressToGidMap = await modelReadAccessClient.GetAddressToGidMap();
@@ -351,6 +347,12 @@ namespace SCADA.FunctionExecutorImplementation
             {
                 ushort address = (ushort)(startAddress + i);
                 ushort value = (ushort)(data[i] ? 1 : 0);
+
+                if (!currentAddressToGidMap.ContainsKey((short)pointType))
+                {
+                    Logger.LogWarning($"{baseLogString} ExecuteDiscreteReadCommand => Point type: {pointType} is not in the current addressToGidMap.");
+                    continue;
+                }
 
                 //for commands enqueued during model update, that are not valid
                 if (!currentAddressToGidMap[(short)pointType].ContainsKey(address))
@@ -449,8 +451,8 @@ namespace SCADA.FunctionExecutorImplementation
             //this.analogMeasurementCache = new Dictionary<long, AnalogModbusData>(data.Length);
             this.analogMeasurementCache.Clear();
 
-            this.modelReadAccessClient = ScadaModelReadAccessClient.CreateClient();
-            this.modelUpdateAccessClient = ScadaModelUpdateAccessClient.CreateClient();
+            var modelReadAccessClient = ScadaModelReadAccessClient.CreateClient();
+            var modelUpdateAccessClient = ScadaModelUpdateAccessClient.CreateClient();
 
             var gidToPointItemMap = await modelReadAccessClient.GetGidToPointItemMap();
             var addressToGidMap = await modelReadAccessClient.GetAddressToGidMap();
@@ -461,10 +463,16 @@ namespace SCADA.FunctionExecutorImplementation
                 ushort address = (ushort)(startAddress + i);
                 int rawValue = data[i];
 
+                if(!addressToGidMap.ContainsKey((short)pointType))
+                {
+                    Logger.LogWarning($"{baseLogString} ExecuteAnalogReadCommand => Point type: {pointType} is not in the current addressToGidMap.");
+                    continue;
+                }
+
                 //for commands enqueued during model update, that are not valid
                 if (!addressToGidMap[(short)pointType].ContainsKey(address))
                 {
-                    Logger.LogWarning($"{baseLogString} ExecuteAnalogReadCommand => trying to read value on address {address}, Point type: {pointType}, which is not in the current SCADA Model.");
+                    Logger.LogWarning($"{baseLogString} ExecuteAnalogReadCommand => trying to read value on address {address}, Point type: {pointType}, which is not in the current addressToGidMap.");
                     continue;
                 }
 
@@ -541,12 +549,18 @@ namespace SCADA.FunctionExecutorImplementation
                 throw new ArgumentException(errorMessage);
             }
 
-            this.modelReadAccessClient = ScadaModelReadAccessClient.CreateClient();
-            this.modelUpdateAccessClient = ScadaModelUpdateAccessClient.CreateClient();
+            var modelReadAccessClient = ScadaModelReadAccessClient.CreateClient();
+            var modelUpdateAccessClient = ScadaModelUpdateAccessClient.CreateClient();
 
             //LOGIC
             var addressToGidMap = await modelReadAccessClient.GetAddressToGidMap();
             var pointType = writeCommand.FunctionCode == ModbusFunctionCode.WRITE_SINGLE_COIL ? PointType.DIGITAL_OUTPUT : PointType.ANALOG_OUTPUT;
+
+            if (!addressToGidMap.ContainsKey((short)pointType))
+            {
+                Logger.LogWarning($"{baseLogString} ExecuteAnalogReadCommand => Point type: {pointType} is not in the current addressToGidMap.");
+                return;
+            }
 
             if (addressToGidMap[(short)pointType].ContainsKey(outputAddress))
             {
@@ -683,8 +697,8 @@ namespace SCADA.FunctionExecutorImplementation
             string verboseMessage = $"{baseLogString} entering ExecuteWriteMultipleDiscreteCommand method, command's startAddress: {startAddress}, commandValues: {commandValuesSB}, commandOrigin: {commandOrigin}.";
             Logger.LogVerbose(verboseMessage);
 
-            this.modelReadAccessClient = ScadaModelReadAccessClient.CreateClient();
-            this.modelUpdateAccessClient = ScadaModelUpdateAccessClient.CreateClient();
+            var modelReadAccessClient = ScadaModelReadAccessClient.CreateClient();
+            var modelUpdateAccessClient = ScadaModelUpdateAccessClient.CreateClient();
 
             //LOGIC
             int quantity = commandValues.Length;
@@ -737,9 +751,17 @@ namespace SCADA.FunctionExecutorImplementation
                     throw new ArgumentException();
                 }
 
-                if (addressToGidMap[(short)PointType.DIGITAL_OUTPUT].ContainsKey(address))
+                var pointType = (short)PointType.DIGITAL_OUTPUT;
+
+                if (!addressToGidMap.ContainsKey(pointType))
                 {
-                    long gid = addressToGidMap[(short)PointType.DIGITAL_OUTPUT][address];
+                    Logger.LogWarning($"{baseLogString} ExecuteWriteMultipleDiscreteCommand => Point type: {pointType} is not in the current addressToGidMap.");
+                    continue;
+                }
+
+                if (addressToGidMap[pointType].ContainsKey(address))
+                {
+                    long gid = addressToGidMap[pointType][address];
 
                     CommandDescription commandDescription = new CommandDescription()
                     {
@@ -788,8 +810,8 @@ namespace SCADA.FunctionExecutorImplementation
             Logger.LogVerbose(verboseMessage);
 
             //LOGIC
-            this.modelReadAccessClient = ScadaModelReadAccessClient.CreateClient();
-            this.modelUpdateAccessClient = ScadaModelUpdateAccessClient.CreateClient();
+            var modelReadAccessClient = ScadaModelReadAccessClient.CreateClient();
+            var modelUpdateAccessClient = ScadaModelUpdateAccessClient.CreateClient();
 
             int quantity = commandValues.Length;
             var addressToGidMap = await modelReadAccessClient.GetAddressToGidMap();
@@ -802,9 +824,17 @@ namespace SCADA.FunctionExecutorImplementation
             {
                 ushort address = (ushort)(startAddress + index);
 
-                if (addressToGidMap[(short)PointType.ANALOG_OUTPUT].ContainsKey(address))
+                var pointType = (short)PointType.ANALOG_OUTPUT;
+
+                if (!addressToGidMap.ContainsKey(pointType))
                 {
-                    long gid = addressToGidMap[(short)PointType.ANALOG_OUTPUT][address];
+                    Logger.LogWarning($"{baseLogString} ExecuteWriteMultipleAnalogCommand => Point type: {pointType} is not in the current addressToGidMap.");
+                    continue;
+                }
+
+                if (addressToGidMap[pointType].ContainsKey(address))
+                {
+                    long gid = addressToGidMap[pointType][address];
 
                     CommandDescription commandDescription = new CommandDescription()
                     {

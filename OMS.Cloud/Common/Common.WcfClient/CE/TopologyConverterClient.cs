@@ -1,15 +1,15 @@
-﻿using Common.CE.Interfaces;
-using Common.CeContracts;
+﻿using Common.CeContracts;
+using Common.PubSubContracts.DataContracts.CE;
+using Common.PubSubContracts.DataContracts.CE.UIModels;
 using Microsoft.ServiceFabric.Services.Client;
 using Microsoft.ServiceFabric.Services.Communication.Wcf.Client;
 using OMS.Common.Cloud.Names;
-using OMS.Common.PubSub;
 using System;
 using System.Threading.Tasks;
 
 namespace OMS.Common.WcfClient.CE
 {
-	public class TopologyConverterClient : WcfSeviceFabricClientBase<ITopologyConverterContract>, ITopologyConverterContract
+    public class TopologyConverterClient : WcfSeviceFabricClientBase<ITopologyConverterContract>, ITopologyConverterContract
 	{
 		private static readonly string microserviceName = MicroserviceNames.CeTopologyProviderService;
 		private static readonly string listenerName = EndpointNames.CeTopologyConverterServiceEndpoint;
@@ -32,14 +32,19 @@ namespace OMS.Common.WcfClient.CE
 			return factory.CreateClient<TopologyConverterClient, ITopologyConverterContract>(serviceUri, servicePartitionKey);
 		}
 
-		public Task<IOutageTopologyModel> ConvertTopologyToOMSModel(ITopology topology)
+		public Task<OutageTopologyModel> ConvertTopologyToOMSModel(TopologyModel topology)
 		{
             return InvokeWithRetryAsync(client => client.Channel.ConvertTopologyToOMSModel(topology));
 		}
 
-		public Task<UIModel> ConvertTopologyToUIModel(ITopology topology)
+		public Task<UIModel> ConvertTopologyToUIModel(TopologyModel topology)
 		{
             return InvokeWithRetryAsync(client => client.Channel.ConvertTopologyToUIModel(topology));
+		}
+
+		public Task<bool> IsAlive()
+		{
+			return InvokeWithRetryAsync(client => client.Channel.IsAlive());
 		}
 	}
 }

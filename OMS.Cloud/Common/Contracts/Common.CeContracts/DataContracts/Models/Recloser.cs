@@ -1,9 +1,9 @@
-﻿using Common.CE.Interfaces;
+﻿using System;
 using System.Runtime.Serialization;
 
 namespace Common.CeContracts
 {
-	[DataContract]
+    [DataContract]
     public class Recloser : TopologyElement
     {
         private readonly int maxNumberOfTries = 3;

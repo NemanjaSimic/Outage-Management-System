@@ -31,6 +31,7 @@ namespace CE.TopologyBuilderService
 			}
 			catch (Exception e)
 			{
+				//todo: log
 				ServiceEventSource.Current.ServiceHostInitializationFailed(e.ToString());
 				throw;
 			}
