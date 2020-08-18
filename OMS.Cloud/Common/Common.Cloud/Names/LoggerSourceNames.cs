@@ -36,5 +36,6 @@
 
         //WEB
         public const string WebAdapterService = "WebAdapterService";
+        public const string WebAPI = "WebAPI";
     }
 }
