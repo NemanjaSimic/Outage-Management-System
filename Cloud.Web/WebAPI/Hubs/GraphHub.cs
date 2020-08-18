@@ -24,13 +24,12 @@ namespace WebAPI.Hubs
             this.baseLogString = $"{this.GetType()} [{this.GetHashCode()}] =>{Environment.NewLine}";
         }
 
-        //public void NotifyGraphUpdate(List<NodeViewModel> nodes, List<RelationViewModel> relations)
+
+        //TODO: OPTION 1 - promeniti poziv medtode u GraphHubDispatcher kada se koristi (isto je obelezeno sa option 1 i option 2)
         public async Task NotifyGraphUpdate(string omsGraphJson)
         {
             try
             {
-                //Clients.All.SendAsync("updateGraph", new OmsGraphViewModel { Nodes = nodes, Relations = relations });
-
                 Logger.LogDebug($"{baseLogString} NotifyGraphUpdate => About to call Clients.All.SendAsync().");
                 await Clients.All.SendAsync("updateGraph", omsGraphJson);
                 Logger.LogDebug($"{baseLogString} NotifyGraphUpdate => oms graph data [json format] sent to front-end: {omsGraphJson}");
@@ -40,6 +39,21 @@ namespace WebAPI.Hubs
                 Logger.LogError($"{baseLogString} NotifyGraphUpdate => Exception: {e.Message}", e);
             }
         }
+
+        //TODO: OPTION 2 - promeniti poziv medtode u GraphHubDispatcher kada se koristi (isto je obelezeno sa option 1 i option 2)
+        //public void NotifyGraphUpdate(List<NodeViewModel> nodes, List<RelationViewModel> relations)
+        //{
+        //    try
+        //    {
+        //        Logger.LogDebug($"{baseLogString} NotifyGraphUpdate => About to call Clients.All.SendAsync().");
+        //        Clients.All.SendAsync("updateGraph", new OmsGraphViewModel { Nodes = nodes, Relations = relations });
+        //        Logger.LogDebug($"{baseLogString} NotifyGraphUpdate => oms graph data sent to front-end => nodes count: {nodes.Count}, relations count: {relations.Count}");
+        //    }
+        //    catch (Exception e)
+        //    {
+        //        Logger.LogError($"{baseLogString} NotifyGraphUpdate => Exception: {e.Message}", e);
+        //    }
+        //}
 
         public void NotifyGraphOutageCall(long gid)
         {

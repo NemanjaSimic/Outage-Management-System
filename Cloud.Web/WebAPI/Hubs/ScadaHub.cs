@@ -24,13 +24,10 @@ namespace WebAPI.Hubs
             this.baseLogString = $"{this.GetType()} [{this.GetHashCode()}] =>{Environment.NewLine}";
         }
 
-        //public void NotifyScadaDataUpdate(Dictionary<long, AnalogModbusData> scadaData)
         public void NotifyScadaDataUpdate(string scadaDataJson)
         {
             try
             {
-                //Clients.All.SendAsync("updateScadaData", scadaData);
-
                 Logger.LogDebug($"{baseLogString} NotifyScadaDataUpdate => About to call Clients.All.SendAsync().");
                 Clients.All.SendAsync("updateScadaData", scadaDataJson);
                 Logger.LogDebug($"{baseLogString} NotifyScadaDataUpdate => scada data in json format sent to front-end: {scadaDataJson}");

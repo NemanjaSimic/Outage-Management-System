@@ -64,10 +64,5 @@ namespace WebAdapterImplementation.HubDispatchers
                 Logger.LogError($"{baseLogString} NotifyScadaDataUpdate => Exception: {e.Message}", e);
             }
         }
-
-        //public void NotifyScadaDataUpdate(Dictionary<long, AnalogModbusData> scadaData)
-        //{
-        //    this.connection.InvokeAsync("NotifyScadaDataUpdate", scadaData).Wait();
-        //}
     }
 }
