@@ -146,7 +146,7 @@ namespace CE.MeasurementProviderImplementation
 			{
 				string message = $"{baseLogString} AddAnalogMeasurement => analog measurement parameter is null.";
 				Logger.LogError(message);
-				throw new Exception(message);
+				//throw new Exception(message);
 			}
 
 			var analogMeasurements = await GetAnalogMeasurementsFromCache();
@@ -176,7 +176,7 @@ namespace CE.MeasurementProviderImplementation
 			{
 				string message = $"{baseLogString} AddDiscreteMeasurement => discrete measurement parameter is null.";
 				Logger.LogError(message);
-				throw new Exception(message);
+				//throw new Exception(message);
 			}
 
 			var discreteMeasurements = await GetDiscreteMeasurementsFromCache();
@@ -459,7 +459,7 @@ namespace CE.MeasurementProviderImplementation
 			{
 				string message = $"Measurement with GID {measurementId:X16} already exists in measurement-element mapping.";
 				Logger.LogError(message);
-				throw new ArgumentException(message);
+				//throw new ArgumentException(message);
 			}
 
 			measurementToElementMap.Add(measurementId, elementId);
@@ -759,7 +759,7 @@ namespace CE.MeasurementProviderImplementation
 			{
 				string message = $"{baseLogString} SendAnalogCommand => Failed. Exception message: {e.Message}.";
 				Logger.LogError(message);
-				throw new Exception(message);
+				//throw new Exception(message);
 			}
 		}
 
@@ -791,7 +791,7 @@ namespace CE.MeasurementProviderImplementation
 			{
 				string message = $"{baseLogString} SendDiscreteCommand => Failed. Exception message: {e.Message}.";
 				Logger.LogError(message);
-				throw;
+				//throw;
 			}
 		}
 	}

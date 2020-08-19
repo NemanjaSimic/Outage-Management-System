@@ -45,7 +45,7 @@ namespace WebAdapterImplementation
 
                 try
                 {
-                    outageDispatcher.NotifyActiveOutageUpdate(activeOutage);
+                    await outageDispatcher.NotifyActiveOutageUpdate(activeOutage);
                 }
                 catch (Exception e)
                 {
@@ -60,7 +60,7 @@ namespace WebAdapterImplementation
 
                 try
                 {
-                    outageDispatcher.NotifyArchiveOutageUpdate(archivedOutage);
+                    await outageDispatcher.NotifyArchiveOutageUpdate(archivedOutage);
                 }
                 catch (Exception e)
                 {
@@ -77,7 +77,7 @@ namespace WebAdapterImplementation
 
                 try
                 {
-                    graphDispatcher.NotifyGraphUpdate(graph.Nodes, graph.Relations);
+                    await graphDispatcher.NotifyGraphUpdate(graph.Nodes, graph.Relations);
                 }
                 catch (Exception e)
                 {
@@ -85,7 +85,8 @@ namespace WebAdapterImplementation
                     Logger.LogError(errorMessage, e);
                 }
 
-            } else if (message is MultipleAnalogValueSCADAMessage analogValuesMessage)
+            } 
+            else if (message is MultipleAnalogValueSCADAMessage analogValuesMessage)
             {
                 Dictionary<long, AnalogModbusData> analogModbusData = new Dictionary<long, AnalogModbusData>(analogValuesMessage.Data);
                 
@@ -94,7 +95,7 @@ namespace WebAdapterImplementation
 
                 try
                 {
-                    scadaDispatcher.NotifyScadaDataUpdate(analogModbusData);
+                    await scadaDispatcher.NotifyScadaDataUpdate(analogModbusData);
                 }
                 catch (Exception e)
                 {

@@ -8,10 +8,10 @@ namespace Common.Web.Models.ViewModels
     /// </summary>
     public class RelationViewModel : IEquatable<RelationViewModel>
     {
-        public string SourceNodeId;
-        public string TargetNodeId;
-        public bool IsActive;
-        public bool IsAclLine;
+        public string SourceNodeId { get; set; }
+        public string TargetNodeId { get; set; }
+        public bool IsActive { get; set; }
+        public bool IsAclLine { get; set; }
 
         public bool Equals(RelationViewModel other)
             => SourceNodeId == other.SourceNodeId

@@ -321,7 +321,7 @@ namespace CE.LoadFlowImplementation
                     Logger.LogDebug($"{baseLogString} IsElementEnergized => Discrete value of {measurement.Key:X16} has been delivered successfully. Result is [{isOpen}].");
                     
                     // Value je true ako je prekidac otvoren, tada je element neaktivan
-                    element.IsActive = isOpen;
+                    element.IsActive = !isOpen;
                     break;
                 }
             }

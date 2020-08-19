@@ -335,6 +335,9 @@ export class GraphComponent implements OnInit, OnDestroy {
   }
 
   public onNotification(data: OmsGraph): void {
+    console.log("onNotification => omsGraph data:");
+    console.log(data);
+
     this.ngZone.run(() => {
       this.graphData.nodes = data.Nodes.map(mapper.mapNode);
       this.graphData.edges = data.Relations.map(mapper.mapRelation);
@@ -343,6 +346,9 @@ export class GraphComponent implements OnInit, OnDestroy {
   }
 
   public onScadaNotification(data: ScadaData): void {
+    console.log("onScadaNotification => scada data:");
+    console.log(data);
+
     this.ngZone.run(() => {
       let gids = Object.keys(data);
       gids.forEach(gid => {
@@ -363,7 +369,9 @@ export class GraphComponent implements OnInit, OnDestroy {
   }
 
   public onActiveOutageNotification(outage: ActiveOutage): void {
+    console.log("onActiveOutageNotification => ActiveOutage data:");
     console.log(outage);
+
     let message;
     if (outage.State == OutageLifeCycleState.Removed)
     {
@@ -469,6 +477,7 @@ export class GraphComponent implements OnInit, OnDestroy {
   public onArchivedOutageNotification(data: ArchivedOutage): void {
     console.log('onArchivedOutageNotification');
     console.log(data);
+    
   }
 
   public onSearch(): void {
