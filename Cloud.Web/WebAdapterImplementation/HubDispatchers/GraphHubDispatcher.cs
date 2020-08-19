@@ -29,11 +29,10 @@ namespace WebAdapterImplementation.HubDispatchers
         {
             this.baseLogString = $"{this.GetType()} [{this.GetHashCode()}] =>{Environment.NewLine}";
 
-            //this.connection = new HubConnectionBuilder().WithUrl(graphHubUrl)
-                                                        //.Build();
-
-            this.connection = new HubConnectionBuilder().WithUrl(graphHubUrl).AddJsonProtocol(options => {
+            this.connection = new HubConnectionBuilder().WithUrl(graphHubUrl).AddJsonProtocol(options =>
+            {
                 options.PayloadSerializerOptions.PropertyNamingPolicy = null;
+                options.PayloadSerializerOptions.PropertyNameCaseInsensitive = false;
             })
             .Build();
         }
@@ -62,16 +61,8 @@ namespace WebAdapterImplementation.HubDispatchers
             {
                 Logger.LogDebug($"{baseLogString} NotifyGraphUpdate => nodes count: {nodes.Count}, relations count: {relations.Count}");
 
-                //var omsGraphViewModel = new OmsGraphViewModel()
-                //{
-                //    Nodes = nodes,
-                //    Relations = relations,
-                //};
+                await this.connection.InvokeAsync("NotifyGraphUpdate", relations, nodes);
 
-                //var jsonOutput = JsonConvert.SerializeObject(omsGraphViewModel);
-                await this.connection.InvokeAsync("NotifyGraphUpdate", nodes, relations);
-
-                //Logger.LogDebug($"{baseLogString} NotifyGraphUpdate => json output sent to graph hub: {jsonOutput}");
                 Logger.LogDebug($"{baseLogString} NotifyGraphUpdate => Graph sent to UI.");
             }
             catch (Exception e)

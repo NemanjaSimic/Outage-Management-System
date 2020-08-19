@@ -57,14 +57,6 @@ namespace WebAPI
                     typeof(GetArchivedOutagesQuery).GetTypeInfo().Assembly
             });
 
-            //services.AddSignalR();
-
-            //services.AddSignalR(o =>
-            //{
-            //    o.EnableDetailedErrors = true;
-            //    o.JsonSerializerSettings.ContractResolver = new DefaultContractResolver();
-            //});
-
             services.AddSignalR(o =>
             {
                 o.EnableDetailedErrors = true;
@@ -73,9 +65,6 @@ namespace WebAPI
             {
                 options.PayloadSerializerSettings.ContractResolver = new DefaultContractResolver();
             });
-            //var assembly = AppDomain.CurrentDomain.Load("Data");
-            //services.AddMediatR(assembly);
-            //GlobalHost.Configuration.MaxIncomingWebSocketMessageSize = null;
 
         }
 
