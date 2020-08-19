@@ -8,16 +8,11 @@ namespace Common.PubSubContracts.DataContracts.CE
     [DataContract]
     [KnownType(typeof(TopologyForUIMessage))]
     [KnownType(typeof(OMSModelMessage))]
-    //[KnownType(typeof(OutageTopologyModel))]
-    //[KnownType(typeof(OutageTopologyElement))]
-    //TODO: clean up
     public abstract class CalculationEngineMessage : IPublishableMessage
     {
     }
 
     [DataContract]
-    //[KnownType(typeof(UIModel))]
-    //TODO: clean up
     public class TopologyForUIMessage : CalculationEngineMessage
     {
         [DataMember]
@@ -31,9 +26,6 @@ namespace Common.PubSubContracts.DataContracts.CE
     }
 
     [DataContract]
-    //TODO: clean up
-    //[KnownType(typeof(OutageTopologyModel))]
-    //[KnownType(typeof(OutageTopologyElement))]
     public class OMSModelMessage : CalculationEngineMessage
     {
         [DataMember]

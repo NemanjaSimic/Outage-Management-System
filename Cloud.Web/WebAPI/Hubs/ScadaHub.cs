@@ -1,5 +1,7 @@
 ﻿using Microsoft.AspNetCore.SignalR;
+using OMS.Common.Cloud.Logger;
 using OMS.Common.PubSubContracts.DataContracts.SCADA;
+using System;
 using System.Collections.Generic;
 using System.Threading.Tasks;
 
@@ -7,9 +9,33 @@ namespace WebAPI.Hubs
 {
     public class ScadaHub : Hub
     {
-        public void NotifyScadaDataUpdate(Dictionary<long, AnalogModbusData> scadaData)
+        private readonly string baseLogString;
+
+        #region Private Properties
+        private ICloudLogger logger;
+        private ICloudLogger Logger
         {
-            Clients.All.SendAsync("updateScadaData", scadaData);
+            get { return logger ?? (logger = CloudLoggerFactory.GetLogger()); }
+        }
+        #endregion Private Properties
+
+        public ScadaHub()
+        {
+            this.baseLogString = $"{this.GetType()} [{this.GetHashCode()}] =>{Environment.NewLine}";
+        }
+
+        public void NotifyScadaDataUpdate(string scadaDataJson)
+        {
+            try
+            {
+                Logger.LogDebug($"{baseLogString} NotifyScadaDataUpdate => About to call Clients.All.SendAsync().");
+                Clients.All.SendAsync("updateScadaData", scadaDataJson);
+                Logger.LogDebug($"{baseLogString} NotifyScadaDataUpdate => scada data in json format sent to front-end: {scadaDataJson}");
+            }
+            catch (Exception e)
+            {
+                Logger.LogError($"{baseLogString} NotifyScadaDataUpdate => Exception: {e.Message}", e);
+            }
         }
 
         public void Join()

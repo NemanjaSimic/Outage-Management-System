@@ -8,7 +8,7 @@ using System.Threading.Tasks;
 using OMS.Common.WcfClient.CE;
 using Common.CeContracts.TopologyProvider;
 using OMS.Common.Cloud.Logger;
-using Common.PubSubContracts.DataContracts.CE.Interfaces;
+using Common.PubSubContracts.DataContracts.CE.UIModels;
 
 namespace Common.Web.Services.Handlers
 {
@@ -33,7 +33,7 @@ namespace Common.Web.Services.Handlers
             try
             {
                 Logger.LogInformation("[TopologyQueryHandler::GetTopologyQuery] Sending GET query to topology client.");
-                IUIModel topologyModel = await topologyServiceClient.GetUIModel();
+                UIModel topologyModel = await topologyServiceClient.GetUIModel();
                 OmsGraphViewModel graph = _mapper.Map(topologyModel);
                 return graph;
             }

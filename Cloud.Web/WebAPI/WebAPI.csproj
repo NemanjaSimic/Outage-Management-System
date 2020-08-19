@@ -19,15 +19,13 @@
   <ItemGroup>
     <PackageReference Include="MediatR" Version="8.1.0" />
     <PackageReference Include="MediatR.Extensions.Microsoft.DependencyInjection" Version="8.1.0" />
+    <PackageReference Include="Microsoft.AspNet.SignalR.Core" Version="2.4.1" />
     <PackageReference Include="Microsoft.AspNet.WebApi.Core" Version="5.2.7" />
     <PackageReference Include="Microsoft.AspNet.WebApi.WebHost" Version="5.2.7" />
     <PackageReference Include="Microsoft.AspNetCore" Version="2.2.0" />
     <PackageReference Include="Microsoft.AspNetCore.Mvc" Version="2.2.0" />
     <PackageReference Include="Microsoft.AspNetCore.SignalR" Version="1.1.0" />
-    <PackageReference Include="Microsoft.ServiceFabric" Version="7.0.470" />
-    <PackageReference Include="Microsoft.ServiceFabric.AspNetCore.Kestrel" Version="4.0.470" />
-    <PackageReference Include="Microsoft.ServiceFabric.Data" Version="4.0.470" />
-    <PackageReference Include="Microsoft.ServiceFabric.Services" Version="4.0.470" />
+    <PackageReference Include="Microsoft.ServiceFabric.AspNetCore.Kestrel" Version="4.1.456" />
     <PackageReference Include="Unity" Version="5.11.7" />
     <PackageReference Include="Unity.Mvc" Version="5.11.1" />
     <PackageReference Include="Unity.WebAPI" Version="5.4.0" />

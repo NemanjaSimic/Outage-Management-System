@@ -1,16 +1,11 @@
-﻿using Common.PubSubContracts.DataContracts.CE.Interfaces;
-using System;
+﻿using System;
 using System.Collections.Generic;
 using System.Runtime.Serialization;
 
 namespace Common.PubSubContracts.DataContracts.CE.UIModels
 {
-    //[DataContract(IsReference = true)]
     [DataContract]
-    //[KnownType(typeof(UINode))]
-    //[KnownType(typeof(UIMeasurement))]
-    //TODO: clean up
-    public class UIModel// : IUIModel
+    public class UIModel
     {
         [DataMember]
         public long FirstNode { get; set; }

@@ -38,9 +38,6 @@ namespace NMS.GdaImplementation
         private readonly ModelResourcesDesc resourcesDescs;
 
         private NetworkModelState networkModelState;
-        //private bool isModelInitialized; //todo: zameniti sa nekim semaforom ako neko bude imao vremena
-        //private bool isTransactionInProgress;
-
         private Delta currentDelta;
 
         /// <summary>

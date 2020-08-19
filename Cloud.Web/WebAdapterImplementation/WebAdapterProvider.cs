@@ -1,6 +1,7 @@
 ﻿using Common.Contracts.WebAdapterContracts;
 using Common.Web.Models.ViewModels;
 using OMS.Common.Cloud.Logger;
+using OMS.Common.PubSubContracts.DataContracts.SCADA;
 using System;
 using System.Collections.Generic;
 using System.Threading.Tasks;
@@ -18,49 +19,47 @@ namespace WebAdapterImplementation
             get { return logger ?? (logger = CloudLoggerFactory.GetLogger()); }
         }
 
-        private GraphHubDispatcher _graphDispatcher = null;
-        private ScadaHubDispatcher _scadaDipatcher = null;
-
         public WebAdapterProvider()
         {
             this.baseLogString = $"{this.GetType()} [{this.GetHashCode()}] =>{Environment.NewLine}";
             Logger.LogDebug($"{baseLogString} Ctor => Logger initialized");
         }
 
-        public Task UpdateGraph(List<NodeViewModel> nodes, List<RelationViewModel> relations)
+        public async Task UpdateGraph(List<NodeViewModel> nodes, List<RelationViewModel> relations)
         {
-            _graphDispatcher = new GraphHubDispatcher();
-            _graphDispatcher.Connect();
+            var graphDispatcher = new GraphHubDispatcher();
+            graphDispatcher.Connect();
 
             try
             {
-                _graphDispatcher.NotifyGraphUpdate(nodes, relations);
+                await graphDispatcher.NotifyGraphUpdate(nodes, relations);
             }
             catch (Exception e)
             {
                 string errorMessage = $"{baseLogString} UpdateGraph => exception {e.Message}";
                 Logger.LogError(errorMessage, e);
             }
-
-            return null;
         }
 
-        public Task UpdateScadaData(Dictionary<long, OMS.Common.PubSubContracts.DataContracts.SCADA.AnalogModbusData> scadaData)
+        public async Task UpdateScadaData(Dictionary<long, AnalogModbusData> scadaData)
         {
-            _scadaDipatcher = new ScadaHubDispatcher();
-            _scadaDipatcher.Connect();
+            var scadaDipatcher = new ScadaHubDispatcher();
+            scadaDipatcher.Connect();
 
             try
             {
-                _scadaDipatcher.NotifyScadaDataUpdate(scadaData);
+                await scadaDipatcher.NotifyScadaDataUpdate(scadaData);
             }
             catch (Exception e)
             {
                 string errorMessage = $"{baseLogString} UpdateScadaData => exception {e.Message}";
                 Logger.LogError(errorMessage, e);
             }
+        }
 
-            return null;
+        public Task<bool> IsAlive()
+        {
+            return Task.Run(() => true);
         }
     }
 }

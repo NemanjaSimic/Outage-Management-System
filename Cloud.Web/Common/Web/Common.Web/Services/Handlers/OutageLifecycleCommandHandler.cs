@@ -27,9 +27,9 @@ namespace Common.Web.Services.Handlers
         {
             Logger.LogInformation($"[OutageLifecycleCommandHandler::IsolateOutageCommand] Sending isolate outage command for outage: {request.OutageId}");
 
-            IIsolateOutageContract isolateOutageClient = IsolateOutageClient.CreateClient();
             try
             {
+                var isolateOutageClient = IsolateOutageClient.CreateClient();
                 await isolateOutageClient.IsolateOutage(request.OutageId);
             }
             catch (Exception ex)
@@ -45,9 +45,9 @@ namespace Common.Web.Services.Handlers
         {
             Logger.LogInformation($"[OutageLifecycleCommandHandler::SendOutageLocationIsolationCrewCommand] Sending outage location isolation crew command for outage: {request.OutageId}");
 
-            ISendLocationIsolationCrewContract sendLocationIsolationCrewClient = SendLocationIsolationCrewClient.CreateClient();
             try
             {
+                var sendLocationIsolationCrewClient = SendLocationIsolationCrewClient.CreateClient();
                 await sendLocationIsolationCrewClient.SendLocationIsolationCrew(request.OutageId);
             }
             catch (Exception ex)
@@ -63,9 +63,9 @@ namespace Common.Web.Services.Handlers
         {
             Logger.LogInformation($"[OutageLifecycleCommandHandler::SendOutageRepairCrewCommand] Sending outage repair crew command for outage: {request.OutageId}");
 
-            ISendRepairCrewContract sendRepairCrewClient = SendRepairCrewClient.CreateClient();
             try
             {
+                var sendRepairCrewClient = SendRepairCrewClient.CreateClient();
                 await sendRepairCrewClient.SendRepairCrew(request.OutageId);
             }
             catch (Exception ex)
@@ -81,9 +81,9 @@ namespace Common.Web.Services.Handlers
         {
             Logger.LogInformation($"[OutageLifecycleCommandHandler::ValidateResolveConditionsCommand] Sending validate resolve conditions command for outage: {request.OutageId}");
 
-            IValidateResolveConditionsContract validateResolveConditionsClient = ValidateResolveConditionsClient.CreateClient();
             try
             {
+                var validateResolveConditionsClient = ValidateResolveConditionsClient.CreateClient();
                 await validateResolveConditionsClient.ValidateResolveConditions(request.OutageId);
             }
             catch (Exception ex)
@@ -99,9 +99,9 @@ namespace Common.Web.Services.Handlers
         {
             Logger.LogInformation($"[OutageLifecycleCommandHandler::IsolateOutageCommand] Sending isolate outage command for outage: {request.OutageId}");
 
-            IResolveOutageContract resolveOutageClient = ResolveOutageClient.CreateClient();
             try
             {
+                var resolveOutageClient = ResolveOutageClient.CreateClient();
                 await resolveOutageClient.ResolveOutage(request.OutageId);
             }
             catch (Exception ex)

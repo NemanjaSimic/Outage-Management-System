@@ -19,6 +19,8 @@ namespace OMS.Common.PubSubContracts
         [ServiceKnownType(typeof(MultipleAnalogValueSCADAMessage))]
         [ServiceKnownType(typeof(SingleDiscreteValueSCADAMessage))]
         [ServiceKnownType(typeof(MultipleDiscreteValueSCADAMessage))]
+        [ServiceKnownType(typeof(AnalogModbusData))]
+        [ServiceKnownType(typeof(DiscreteModbusData))]
         //OMS
         [ServiceKnownType(typeof(ActiveOutageMessage))]
         [ServiceKnownType(typeof(ArchivedOutageMessage))]

@@ -114,7 +114,6 @@
     <Compile Include="Interfaces\IModelTopologyServis.cs" />
     <Compile Include="Interfaces\ISCADACommanding.cs" />
     <Compile Include="Interfaces\ISCADAResultProvider.cs" />
-    <Compile Include="Interfaces\ITopology.cs" />
     <Compile Include="Interfaces\ITopologyBuilder.cs" />
     <Compile Include="Interfaces\ITopologyConverter.cs" />
     <Compile Include="Interfaces\ITopologyConverterProvider.cs" />

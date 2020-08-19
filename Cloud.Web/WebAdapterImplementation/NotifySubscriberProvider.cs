@@ -1,11 +1,11 @@
-﻿using Common.CeContracts;
-using Common.PubSub;
+﻿using Common.PubSubContracts.DataContracts.CE;
 using Common.PubSubContracts.DataContracts.OMS;
 using Common.Web.Mappers;
 using Common.Web.Models.ViewModels;
 using OMS.Common.Cloud.Logger;
 using OMS.Common.PubSubContracts;
 using OMS.Common.PubSubContracts.DataContracts.SCADA;
+using OMS.Common.PubSubContracts.Interfaces;
 using System;
 using System.Collections.Generic;
 using System.Threading.Tasks;
@@ -16,19 +16,15 @@ namespace WebAdapterImplementation
     public class NotifySubscriberProvider : INotifySubscriberContract
     {
         private readonly string baseLogString;
+        private readonly string _subscriberName;
+        private readonly IGraphMapper _graphMapper;
+        private readonly IOutageMapper _outageMapper;
 
         private ICloudLogger logger;
         protected ICloudLogger Logger
         {
             get { return logger ?? (logger = CloudLoggerFactory.GetLogger()); }
         }
-
-        private readonly string _subscriberName;
-        private GraphHubDispatcher _graphDispatcher;
-        private OutageHubDispatcher _outageDispatcher;
-        private ScadaHubDispatcher _scadaDispatcher;
-        private readonly IGraphMapper _graphMapper;
-        private readonly IOutageMapper _outageMapper;
 
         public NotifySubscriberProvider(string subscriberName)
         {
@@ -44,12 +40,12 @@ namespace WebAdapterImplementation
         {
             if (message is ActiveOutageMessage activeOutage)
             {
-                _outageDispatcher = new OutageHubDispatcher(_outageMapper);
-                _outageDispatcher.Connect();
+                var outageDispatcher = new OutageHubDispatcher(_outageMapper);
+                outageDispatcher.Connect();
 
                 try
                 {
-                    _outageDispatcher.NotifyActiveOutageUpdate(activeOutage);
+                    await outageDispatcher.NotifyActiveOutageUpdate(activeOutage);
                 }
                 catch (Exception e)
                 {
@@ -59,11 +55,12 @@ namespace WebAdapterImplementation
             }
             else if (message is ArchivedOutageMessage archivedOutage)
             {
-                _outageDispatcher.Connect();
+                var outageDispatcher = new OutageHubDispatcher(_outageMapper);
+                outageDispatcher.Connect();
 
                 try
                 {
-                    _outageDispatcher.NotifyArchiveOutageUpdate(archivedOutage);
+                    await outageDispatcher.NotifyArchiveOutageUpdate(archivedOutage);
                 }
                 catch (Exception e)
                 {
@@ -75,10 +72,12 @@ namespace WebAdapterImplementation
             {
                 OmsGraphViewModel graph = _graphMapper.Map(topologyMessage.UIModel);
 
-                _graphDispatcher.Connect();
+                var graphDispatcher = new GraphHubDispatcher();
+                graphDispatcher.Connect();
+
                 try
                 {
-                    _graphDispatcher.NotifyGraphUpdate(graph.Nodes, graph.Relations);
+                    await graphDispatcher.NotifyGraphUpdate(graph.Nodes, graph.Relations);
                 }
                 catch (Exception e)
                 {
@@ -86,15 +85,17 @@ namespace WebAdapterImplementation
                     Logger.LogError(errorMessage, e);
                 }
 
-            } else if (message is MultipleAnalogValueSCADAMessage analogValuesMessage)
+            } 
+            else if (message is MultipleAnalogValueSCADAMessage analogValuesMessage)
             {
                 Dictionary<long, AnalogModbusData> analogModbusData = new Dictionary<long, AnalogModbusData>(analogValuesMessage.Data);
-                _scadaDispatcher = new ScadaHubDispatcher();
-                _scadaDispatcher.Connect();
+                
+                var scadaDispatcher = new ScadaHubDispatcher();
+                scadaDispatcher.Connect();
 
                 try
                 {
-                    _scadaDispatcher.NotifyScadaDataUpdate(analogModbusData);
+                    await scadaDispatcher.NotifyScadaDataUpdate(analogModbusData);
                 }
                 catch (Exception e)
                 {
@@ -104,9 +105,14 @@ namespace WebAdapterImplementation
             }
         }
 
-        public async Task<string> GetSubscriberName()
+        public Task<string> GetSubscriberName()
         {
-            return _subscriberName;
+            return Task.Run(() => _subscriberName);
+        }
+
+        public Task<bool> IsAlive()
+        {
+            return Task.Run(() => true);
         }
     }
 }
