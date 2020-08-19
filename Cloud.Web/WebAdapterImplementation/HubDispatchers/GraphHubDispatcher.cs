@@ -1,6 +1,8 @@
 ﻿using Common.Web.Models.ViewModels;
 using Microsoft.AspNetCore.SignalR.Client;
+using Microsoft.Extensions.DependencyInjection;
 using Newtonsoft.Json;
+using Newtonsoft.Json.Serialization;
 using OMS.Common.Cloud.Logger;
 using System;
 using System.Collections.Generic;
@@ -27,8 +29,13 @@ namespace WebAdapterImplementation.HubDispatchers
         {
             this.baseLogString = $"{this.GetType()} [{this.GetHashCode()}] =>{Environment.NewLine}";
 
-            this.connection = new HubConnectionBuilder().WithUrl(graphHubUrl)
-                                                        .Build();
+            //this.connection = new HubConnectionBuilder().WithUrl(graphHubUrl)
+                                                        //.Build();
+
+            this.connection = new HubConnectionBuilder().WithUrl(graphHubUrl).AddJsonProtocol(options => {
+                options.PayloadSerializerOptions.PropertyNamingPolicy = null;
+            })
+            .Build();
         }
 
         public void Connect()
@@ -55,16 +62,17 @@ namespace WebAdapterImplementation.HubDispatchers
             {
                 Logger.LogDebug($"{baseLogString} NotifyGraphUpdate => nodes count: {nodes.Count}, relations count: {relations.Count}");
 
-                var omsGraphViewModel = new OmsGraphViewModel()
-                {
-                    Nodes = nodes,
-                    Relations = relations,
-                };
+                //var omsGraphViewModel = new OmsGraphViewModel()
+                //{
+                //    Nodes = nodes,
+                //    Relations = relations,
+                //};
 
-                var jsonOutput = JsonConvert.SerializeObject(omsGraphViewModel);
-                await this.connection.InvokeAsync("NotifyGraphUpdate", jsonOutput);
+                //var jsonOutput = JsonConvert.SerializeObject(omsGraphViewModel);
+                await this.connection.InvokeAsync("NotifyGraphUpdate", nodes, relations);
 
-                Logger.LogDebug($"{baseLogString} NotifyGraphUpdate => json output sent to graph hub: {jsonOutput}");
+                //Logger.LogDebug($"{baseLogString} NotifyGraphUpdate => json output sent to graph hub: {jsonOutput}");
+                Logger.LogDebug($"{baseLogString} NotifyGraphUpdate => Graph sent to UI.");
             }
             catch (Exception e)
             {

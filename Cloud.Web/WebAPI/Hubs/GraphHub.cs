@@ -26,13 +26,14 @@ namespace WebAPI.Hubs
 
 
         //TODO: OPTION 1 - promeniti poziv medtode u GraphHubDispatcher kada se koristi (isto je obelezeno sa option 1 i option 2)
-        public async Task NotifyGraphUpdate(string omsGraphJson)
+        public async Task NotifyGraphUpdate(List<NodeViewModel> nodes, List<RelationViewModel> relations)
         {
             try
             {
                 Logger.LogDebug($"{baseLogString} NotifyGraphUpdate => About to call Clients.All.SendAsync().");
-                await Clients.All.SendAsync("updateGraph", omsGraphJson);
-                Logger.LogDebug($"{baseLogString} NotifyGraphUpdate => oms graph data [json format] sent to front-end: {omsGraphJson}");
+                await Clients.All.SendAsync("updateGraph", new OmsGraphViewModel { Nodes = nodes, Relations = relations });
+                //Logger.LogDebug($"{baseLogString} NotifyGraphUpdate => oms graph data [json format] sent to front-end: {omsGraphJson}");
+                Logger.LogDebug($"{baseLogString} NotifyGraphUpdate => oms graph sent to UI.");
             }
             catch (Exception e)
             {

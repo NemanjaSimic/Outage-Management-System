@@ -45,7 +45,7 @@ namespace CE.MeasurementProviderImplementation
 					$"Failed to call send discrete command method measurement provider client." +
 					$"{Environment.NewLine} Exception message: {e.Message}";
 				Logger.LogError(message);
-				throw;
+				//throw;
 			}
 		}
 		public Task<bool> IsAlive()
@@ -67,7 +67,7 @@ namespace CE.MeasurementProviderImplementation
 						$"Failed to Failed to call send discrete command method from measurement provider client." +
 						$"{Environment.NewLine} Exception message: {e.Message}";
 				Logger.LogError(message);
-				throw;
+				//throw;
 			}
 		}
 	}
