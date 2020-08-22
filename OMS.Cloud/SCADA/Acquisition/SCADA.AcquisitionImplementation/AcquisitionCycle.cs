@@ -1,12 +1,9 @@
 ﻿using OMS.Common.Cloud.Logger;
 using OMS.Common.SCADA;
 using OMS.Common.ScadaContracts.DataContracts.ModbusFunctions;
-using OMS.Common.ScadaContracts.FunctionExecutior;
-using OMS.Common.ScadaContracts.ModelProvider;
 using OMS.Common.WcfClient.SCADA;
 using System;
 using System.Collections.Generic;
-using System.Fabric;
 using System.Threading.Tasks;
 
 namespace SCADA.AcquisitionImplementation

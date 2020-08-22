@@ -26,12 +26,10 @@ namespace WebAdapterImplementation.HubDispatchers
 
         public OutageHubDispatcher(IOutageMapper mapper)
         {
-            this.baseLogString = $"{this.GetType()} [{this.GetHashCode()}] =>{Environment.NewLine}";
             this.mapper = mapper;
-
+            this.baseLogString = $"{this.GetType()} [{this.GetHashCode()}] =>{Environment.NewLine}";
             this.connection = new HubConnectionBuilder().WithUrl(outageHubUrl)
                                                         .Build();
-
         }
 
         public void Connect()
@@ -55,7 +53,7 @@ namespace WebAdapterImplementation.HubDispatchers
         {
             try
             {
-                Logger.LogDebug($"{baseLogString} NotifyActiveOutageUpdate => active outage id: {activeOutage.OutageId}");
+                Logger.LogDebug($"{baseLogString} NotifyActiveOutageUpdate => active outage data => gid: 0x{activeOutage.OutageElementGid:X16}");
 
                 var jsonOutput = JsonConvert.SerializeObject(this.mapper.MapActiveOutage(activeOutage));
                 await this.connection.InvokeAsync("NotifyActiveOutageUpdate", jsonOutput);
@@ -68,17 +66,11 @@ namespace WebAdapterImplementation.HubDispatchers
             }
         }
 
-        //public void NotifyActiveOutageUpdate(ActiveOutageMessage activeOutage)
-        //{
-        //    connection.InvokeAsync("NotifyActiveOutageUpdate", mapper.MapActiveOutage(activeOutage)).Wait();
-        //}
-
-
         public async Task NotifyArchiveOutageUpdate(ArchivedOutageMessage archivedOutage)
         {
             try
             {
-                Logger.LogDebug($"{baseLogString} NotifyArchiveOutageUpdate => archived outage id: {archivedOutage.OutageId}");
+                Logger.LogDebug($"{baseLogString} NotifyArchiveOutageUpdate => archived outage data => gid: 0x{archivedOutage.OutageElementGid:X16}");
 
                 var jsonOutput = JsonConvert.SerializeObject(this.mapper.MapArchivedOutage(archivedOutage));
                 await this.connection.InvokeAsync("NotifyArchiveOutageUpdate", jsonOutput);
@@ -90,10 +82,5 @@ namespace WebAdapterImplementation.HubDispatchers
                 Logger.LogError($"{baseLogString} NotifyArchiveOutageUpdate => Exception: {e.Message}", e);
             }
         }
-
-        //public void NotifyArchiveOutageUpdate(ArchivedOutageMessage archivedOutage)
-        //{
-        //    connection.InvokeAsync("NotifyArchiveOutageUpdate", mapper.MapArchivedOutage(archivedOutage)).Wait();
-        //}
     }
 }

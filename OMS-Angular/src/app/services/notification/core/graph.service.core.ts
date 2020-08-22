@@ -36,8 +36,9 @@ export class GraphCoreService {
   }
  
   public registerGraphUpdateListener = () => {
-    this.hubConnection.on('updateGraph', (data: OmsGraph) => {
-      this.updateRecieved.emit(data);
+    this.hubConnection.on('updateGraph', (jsonData: string) => {
+      let omsGraphData : OmsGraph = JSON.parse(jsonData); 
+      this.updateRecieved.emit(omsGraphData);
     });
   }
 

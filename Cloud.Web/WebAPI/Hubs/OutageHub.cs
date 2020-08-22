@@ -23,15 +23,14 @@ namespace WebAPI.Hubs
             this.baseLogString = $"{this.GetType()} [{this.GetHashCode()}] =>{Environment.NewLine}";
         }
 
-        //public void NotifyActiveOutageUpdate(ActiveOutageViewModel activeOutage)
         public async Task NotifyActiveOutageUpdate(string activeOutageJson)
         {
             try
             {
-                //Clients.All.SendAsync("activeOutageUpdate", activeOutage);
-
                 Logger.LogDebug($"{baseLogString} NotifyActiveOutageUpdate => About to call Clients.All.SendAsync().");
+
                 await Clients.All.SendAsync("activeOutageUpdate", activeOutageJson);
+
                 Logger.LogDebug($"{baseLogString} NotifyActiveOutageUpdate => active outage data [json format] sent to front-end: {activeOutageJson}");
             }
             catch (Exception e)
@@ -40,15 +39,14 @@ namespace WebAPI.Hubs
             }
         }
 
-        //public void NotifyArchivedOutageUpdate(ArchivedOutageViewModel archivedOutage)
         public async Task NotifyArchivedOutageUpdate(string archivedOutageJson)
         {
             try
             {
-                //Clients.All.SendAsync("archivedOutage", archivedOutage);
-
                 Logger.LogDebug($"{baseLogString} NotifyArchivedOutageUpdate => About to call Clients.All.SendAsync().");
+
                 await Clients.All.SendAsync("archivedOutage", archivedOutageJson);
+
                 Logger.LogDebug($"{baseLogString} NotifyArchivedOutageUpdate => archived outage data [json format] sent to front-end: {archivedOutageJson}");
             }
             catch (Exception e)

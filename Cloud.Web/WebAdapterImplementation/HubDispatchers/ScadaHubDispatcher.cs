@@ -26,7 +26,6 @@ namespace WebAdapterImplementation.HubDispatchers
         public ScadaHubDispatcher()
         {
             this.baseLogString = $"{this.GetType()} [{this.GetHashCode()}] =>{Environment.NewLine}";
-
             this.connection = new HubConnectionBuilder().WithUrl(scadaHubUrl)
                                                         .Build();
         }
@@ -57,7 +56,7 @@ namespace WebAdapterImplementation.HubDispatchers
                 var jsonOutput = JsonConvert.SerializeObject(scadaData);
                 await this.connection.InvokeAsync("NotifyScadaDataUpdate", jsonOutput);
 
-                Logger.LogDebug($"{baseLogString} NotifyScadaDataUpdate => json output sent to outage hub: {jsonOutput}");
+                Logger.LogDebug($"{baseLogString} NotifyScadaDataUpdate => json output sent to scada hub: {jsonOutput}");
             }
             catch (Exception e)
             {

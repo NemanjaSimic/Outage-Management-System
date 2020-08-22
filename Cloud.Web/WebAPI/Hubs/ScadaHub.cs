@@ -24,13 +24,15 @@ namespace WebAPI.Hubs
             this.baseLogString = $"{this.GetType()} [{this.GetHashCode()}] =>{Environment.NewLine}";
         }
 
-        public void NotifyScadaDataUpdate(string scadaDataJson)
+        public async Task NotifyScadaDataUpdate(string scadaJsonData)
         {
             try
             {
                 Logger.LogDebug($"{baseLogString} NotifyScadaDataUpdate => About to call Clients.All.SendAsync().");
-                Clients.All.SendAsync("updateScadaData", scadaDataJson);
-                Logger.LogDebug($"{baseLogString} NotifyScadaDataUpdate => scada data in json format sent to front-end: {scadaDataJson}");
+
+                await Clients.All.SendAsync("updateScadaData", scadaJsonData);
+
+                Logger.LogDebug($"{baseLogString} NotifyScadaDataUpdate => scada data in json format sent to front-end: {scadaJsonData}");
             }
             catch (Exception e)
             {

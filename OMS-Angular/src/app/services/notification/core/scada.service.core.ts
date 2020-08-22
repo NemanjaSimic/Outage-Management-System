@@ -31,8 +31,9 @@ export class ScadaCoreService {
     }
 
     public registerScadaDataUpdateListener = () => {
-        this.hubConnection.on('updateScadaData', (data: ScadaData) => {
-            this.updateRecieved.emit(data);
+        this.hubConnection.on('updateScadaData', (jsonData: string) => {
+            let scadaData : ScadaData = JSON.parse(jsonData); 
+            this.updateRecieved.emit(scadaData);
         });
     }
 }
