@@ -34,14 +34,16 @@ export class OutageNotificationCoreService {
     }
 
     public registerActiveOutageUpdateListener = () => {
-    this.hubConnection.on('activeOutageUpdate', (data: ActiveOutage) => {
-      this.activeOutageUpdateRecieved.emit(data);
+    this.hubConnection.on('activeOutageUpdate', (jsonData: string) => {
+      let activeOutageData : ActiveOutage = JSON.parse(jsonData); 
+      this.activeOutageUpdateRecieved.emit(activeOutageData);
     });
   }
   
     public registerArchivedOutageUpdateListener = () => {
-      this.hubConnection.on('archivedOutageUpdate', (data: ArchivedOutage) => {
-        this.archivedOutageUpdateRecieved.emit(data);
+      this.hubConnection.on('archivedOutageUpdate', (jsonData: string) => {
+        let archivedOutageData : ArchivedOutage = JSON.parse(jsonData); 
+        this.archivedOutageUpdateRecieved.emit(archivedOutageData);
       });
     }
 }
