@@ -38,51 +38,57 @@ namespace OMS.HistoryDBManagerImplementation.ModelAccess
 
 		private async Task InitializeEnergyConsumers()
 		{
+            try
+            {
+				UnitOfWork dbContext = new UnitOfWork();
+				int resourcesLeft;
+				int numberOfResources = 10000;
 
-			UnitOfWork dbContext = new UnitOfWork();
-			int resourcesLeft;
-			int numberOfResources = 10000;
+				networkModelGDAClient = NetworkModelGdaClient.CreateClient();
+				int iteratorId = await networkModelGDAClient.GetExtentValues(ModelCode.ENERGYCONSUMER, modelResourcesDesc.GetAllPropertyIds(ModelCode.ENERGYCONSUMER));
 
-			networkModelGDAClient = NetworkModelGdaClient.CreateClient();
-			int iteratorId = await networkModelGDAClient.GetExtentValues(ModelCode.ENERGYCONSUMER, modelResourcesDesc.GetAllPropertyIds(ModelCode.ENERGYCONSUMER));
+				resourcesLeft = await networkModelGDAClient.IteratorResourcesTotal(iteratorId);
 
-			resourcesLeft = await networkModelGDAClient.IteratorResourcesTotal(iteratorId);
+				List<ResourceDescription> energyConsumers = new List<ResourceDescription>();
 
-			List<ResourceDescription> energyConsumers = new List<ResourceDescription>();
-
-			while(resourcesLeft > 0)
-			{
-				List<ResourceDescription> rds = await networkModelGDAClient.IteratorNext(numberOfResources, iteratorId);
-				energyConsumers.AddRange(rds);
-
-				resourcesLeft = await networkModelGDAClient.IteratorResourcesLeft(iteratorId);
-			}
-
-			await networkModelGDAClient.IteratorClose(iteratorId);
-
-			int i = 0;
-
-			foreach(ResourceDescription energyConsumer in energyConsumers)
-			{
-				Consumer consumer = new Consumer()
+				while (resourcesLeft > 0)
 				{
-					ConsumerId = energyConsumer.GetProperty(ModelCode.IDOBJ_GID).AsLong(),
-					ConsumerMRID = energyConsumer.GetProperty(ModelCode.IDOBJ_MRID).AsString(),
-					FirstName = $"FirstName{i}", //TODO: energyConsumer.GetProperty(ModelCode.ENERGYCONSUMER_FIRSTNAME).AsString();
-					LastName = $"LastName{i}"   //TODO: energyConsumer.GetProperty(ModelCode.ENERGYCONSUMER_LASTNAME).AsString();
-				};
+					List<ResourceDescription> rds = await networkModelGDAClient.IteratorNext(numberOfResources, iteratorId);
+					energyConsumers.AddRange(rds);
 
-				i++;
-
-
-				if (dbContext.ConsumerRepository.Get(consumer.ConsumerId) == null)
-				{
-					dbContext.ConsumerRepository.Add(consumer);
+					resourcesLeft = await networkModelGDAClient.IteratorResourcesLeft(iteratorId);
 				}
-			}
 
-			dbContext.Complete();
-			dbContext.Dispose();
+				await networkModelGDAClient.IteratorClose(iteratorId);
+
+				int i = 0;
+
+				foreach (ResourceDescription energyConsumer in energyConsumers)
+				{
+					Consumer consumer = new Consumer()
+					{
+						ConsumerId = energyConsumer.GetProperty(ModelCode.IDOBJ_GID).AsLong(),
+						ConsumerMRID = energyConsumer.GetProperty(ModelCode.IDOBJ_MRID).AsString(),
+						FirstName = $"FirstName{i}", //TODO: energyConsumer.GetProperty(ModelCode.ENERGYCONSUMER_FIRSTNAME).AsString();
+						LastName = $"LastName{i}"   //TODO: energyConsumer.GetProperty(ModelCode.ENERGYCONSUMER_LASTNAME).AsString();
+					};
+
+					i++;
+
+
+					if (dbContext.ConsumerRepository.Get(consumer.ConsumerId) == null)
+					{
+						dbContext.ConsumerRepository.Add(consumer);
+					}
+				}
+
+				dbContext.Complete();
+				dbContext.Dispose();
+			}
+            catch (Exception e)
+            {
+				Logger.LogError($"{baseLogString} InitializeEnergyConsumers => Exception: {e.Message}", e);
+            }
 		}
 
 		#region IConsumerAccessContract
