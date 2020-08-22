@@ -4,6 +4,13 @@ using Newtonsoft.Json;
 using OMS.Common.Cloud.Logger;
 using System;
 using System.Collections.Generic;
+using Microsoft.Extensions.DependencyInjection;
+using Newtonsoft.Json;
+using Newtonsoft.Json.Serialization;
+using OMS.Common.Cloud.Logger;
+using System;
+using System.Collections.Generic;
+using System.Fabric.Query;
 using System.Threading.Tasks;
 
 namespace WebAdapterImplementation.HubDispatchers
@@ -26,8 +33,13 @@ namespace WebAdapterImplementation.HubDispatchers
         public GraphHubDispatcher()
         {
             this.baseLogString = $"{this.GetType()} [{this.GetHashCode()}] =>{Environment.NewLine}";
-            this.connection = new HubConnectionBuilder().WithUrl(graphHubUrl)
-                                                        .Build();
+
+            this.connection = new HubConnectionBuilder().WithUrl(graphHubUrl).AddJsonProtocol(options =>
+            {
+                options.PayloadSerializerOptions.PropertyNamingPolicy = null;
+                options.PayloadSerializerOptions.PropertyNameCaseInsensitive = false;
+            })
+            .Build();
         }
 
         public void Connect()
@@ -36,11 +48,13 @@ namespace WebAdapterImplementation.HubDispatchers
             {
                 if (task.IsFaulted)
                 {
-                    Logger.LogDebug($"{baseLogString} Connect => successfuly connected to hub.");
+                    string message = $"{baseLogString} Connect => Fault on connection.";
+                    Logger.LogError(message);
                 }
                 else
                 {
-                    Logger.LogWarning($"{baseLogString} Connect => connection failed.");
+                    string message = $"{baseLogString} Connect => Hub Successfully connected. url: {graphHubUrl}";
+                    Logger.LogDebug(message);
                 }
             }).Wait();
         }

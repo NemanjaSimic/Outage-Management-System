@@ -36,11 +36,13 @@ namespace WebAdapterImplementation.HubDispatchers
             {
                 if (task.IsFaulted)
                 {
-                    Logger.LogDebug($"{baseLogString} Connect => successfuly connected to hub.");
+                    string message = $"{baseLogString} Connect => Fault on connection.";
+                    Logger.LogError(message);
                 }
                 else
                 {
-                    Logger.LogWarning($"{baseLogString} Connect => connection failed.");
+                    string message = $"{baseLogString} Connect => Hub Successfully connected. url: {scadaHubUrl}";
+                    Logger.LogDebug(message);
                 }
             }).Wait();
         }
@@ -49,7 +51,7 @@ namespace WebAdapterImplementation.HubDispatchers
         {
             try
             {
-                Logger.LogDebug($"{baseLogString} NotifyScadaDataUpdate => scada data count: {scadaData.Count}");
+                Logger.LogDebug($"{baseLogString} NotifyScadaDataUpdate => scadaData count: {scadaData.Count}");
 
                 var jsonOutput = JsonConvert.SerializeObject(scadaData);
                 await this.connection.InvokeAsync("NotifyScadaDataUpdate", jsonOutput);

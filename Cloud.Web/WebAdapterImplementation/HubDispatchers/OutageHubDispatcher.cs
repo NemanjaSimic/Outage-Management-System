@@ -24,13 +24,12 @@ namespace WebAdapterImplementation.HubDispatchers
         }
         #endregion Private Properties
 
-
         public OutageHubDispatcher(IOutageMapper mapper)
         {
+            this.mapper = mapper;
             this.baseLogString = $"{this.GetType()} [{this.GetHashCode()}] =>{Environment.NewLine}";
             this.connection = new HubConnectionBuilder().WithUrl(outageHubUrl)
                                                         .Build();
-            this.mapper = mapper;
         }
 
         public void Connect()
@@ -39,15 +38,16 @@ namespace WebAdapterImplementation.HubDispatchers
             {
                 if (task.IsFaulted)
                 {
-                    Logger.LogDebug($"{baseLogString} Connect => successfuly connected to hub.");
+                    string message = $"{baseLogString} Connect => Fault on connection.";
+                    Logger.LogError(message);
                 }
                 else
                 {
-                    Logger.LogWarning($"{baseLogString} Connect => connection failed.");
+                    string message = $"{baseLogString} Connect => Hub Successfully connected. url: {outageHubUrl}";
+                    Logger.LogDebug(message);
                 }
             }).Wait();
         }
-
 
         public async Task NotifyActiveOutageUpdate(ActiveOutageMessage activeOutage)
         {
@@ -55,10 +55,10 @@ namespace WebAdapterImplementation.HubDispatchers
             {
                 Logger.LogDebug($"{baseLogString} NotifyActiveOutageUpdate => active outage data => gid: 0x{activeOutage.OutageElementGid:X16}");
 
-                var jsonOutput = JsonConvert.SerializeObject(activeOutage);
+                var jsonOutput = JsonConvert.SerializeObject(this.mapper.MapActiveOutage(activeOutage));
                 await this.connection.InvokeAsync("NotifyActiveOutageUpdate", jsonOutput);
 
-                Logger.LogDebug($"{baseLogString} NotifyActiveOutageUpdate => json output sent to scada hub: {jsonOutput}");
+                Logger.LogDebug($"{baseLogString} NotifyActiveOutageUpdate => json output sent to outage hub: {jsonOutput}");
             }
             catch (Exception e)
             {
@@ -72,10 +72,10 @@ namespace WebAdapterImplementation.HubDispatchers
             {
                 Logger.LogDebug($"{baseLogString} NotifyArchiveOutageUpdate => archived outage data => gid: 0x{archivedOutage.OutageElementGid:X16}");
 
-                var jsonOutput = JsonConvert.SerializeObject(archivedOutage);
+                var jsonOutput = JsonConvert.SerializeObject(this.mapper.MapArchivedOutage(archivedOutage));
                 await this.connection.InvokeAsync("NotifyArchiveOutageUpdate", jsonOutput);
 
-                Logger.LogDebug($"{baseLogString} NotifyArchiveOutageUpdate => json output sent to scada hub: {jsonOutput}");
+                Logger.LogDebug($"{baseLogString} NotifyArchiveOutageUpdate => json output sent to outage hub: {jsonOutput}");
             }
             catch (Exception e)
             {
