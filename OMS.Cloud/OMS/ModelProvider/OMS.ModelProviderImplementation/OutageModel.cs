@@ -36,8 +36,8 @@ namespace OMS.ModelProviderImplementation
 		private IOutageModelUpdateAccessContract outageModelUpdateAccessClient;
 		private IReportOutageContract reportOutageClient;
 
-		private OutageModelReadAccessProvider outageModelReadAccessProvider;
-		private OutageModelUpdateAccessProvider outageModelUpdateAccessProvider;
+		//private OutageModelReadAccessProvider outageModelReadAccessProvider;
+		//private OutageModelUpdateAccessProvider outageModelUpdateAccessProvider;
 
 		
 		public OutageModel(IReliableStateManager stateManager)

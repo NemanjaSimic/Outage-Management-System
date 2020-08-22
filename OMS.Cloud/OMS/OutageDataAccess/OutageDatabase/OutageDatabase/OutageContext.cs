@@ -2,6 +2,7 @@
 using OutageDatabase.Initializers;
 using System;
 using System.Collections.Generic;
+using System.Configuration;
 using System.Data.Entity;
 using System.Linq;
 using System.Text;
@@ -11,8 +12,9 @@ namespace OutageDatabase
 {
     public class OutageContext : DbContext
     {
-        public OutageContext() : base("OutageContext")
+        public OutageContext() : base("name=OutageContext")
         {
+            var connstrings = ConfigurationManager.ConnectionStrings;
             Database.SetInitializer(new OutageInitializer());
         }
 
