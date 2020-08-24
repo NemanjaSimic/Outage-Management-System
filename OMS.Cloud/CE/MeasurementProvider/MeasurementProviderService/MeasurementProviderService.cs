@@ -12,8 +12,11 @@ using Microsoft.ServiceFabric.Services.Communication.Runtime;
 using Microsoft.ServiceFabric.Services.Communication.Wcf;
 using Microsoft.ServiceFabric.Services.Communication.Wcf.Runtime;
 using Microsoft.ServiceFabric.Services.Runtime;
+using OMS.Common.Cloud;
 using OMS.Common.Cloud.Logger;
 using OMS.Common.Cloud.Names;
+using OMS.Common.PubSubContracts;
+using OMS.Common.WcfClient.PubSub;
 
 namespace CE.MeasurementProviderService
 {
@@ -27,6 +30,9 @@ namespace CE.MeasurementProviderService
 		private readonly MeasurementProvider measurementProvider;
 		private readonly MeasurementMap measurementMap;
 		private readonly SwitchStatusCommanding switchStatusCommanding;
+		private readonly ScadaSubscriber scadaSubscriber;
+
+		private IRegisterSubscriberContract registerSubscriberClient;
 
 		private ICloudLogger logger;
 		private ICloudLogger Logger
@@ -44,6 +50,7 @@ namespace CE.MeasurementProviderService
 				this.measurementProvider = new MeasurementProvider(this.StateManager);
 				this.measurementMap = new MeasurementMap();
 				this.switchStatusCommanding = new SwitchStatusCommanding();
+				this.scadaSubscriber = new ScadaSubscriber();
 
 				string infoMessage = $"{baseLogString} Ctor => Contract providers initialized.";
 				Logger.LogInformation(infoMessage);
@@ -91,6 +98,13 @@ namespace CE.MeasurementProviderService
 																			WcfUtility.CreateTcpListenerBinding(),
 																			EndpointNames.CeSwitchStatusCommandingEndpoint);
 				}, EndpointNames.CeSwitchStatusCommandingEndpoint),
+				new ServiceReplicaListener(context =>
+				{
+					return new WcfCommunicationListener<INotifySubscriberContract>(context,
+																			 this.scadaSubscriber,
+																			 WcfUtility.CreateTcpListenerBinding(),
+																			 EndpointNames.PubSubNotifySubscriberEndpoint);
+				}, EndpointNames.PubSubNotifySubscriberEndpoint)
 			};
 		}
 
@@ -109,6 +123,10 @@ namespace CE.MeasurementProviderService
 				string debugMessage = $"{baseLogString} RunAsync => ReliableDictionaries initialized.";
 				Logger.LogDebug(debugMessage);
 				ServiceEventSource.Current.ServiceMessage(this.Context, $"[MeasurementProviderService | Information] {debugMessage}");
+
+				this.registerSubscriberClient = RegisterSubscriberClient.CreateClient();
+				await this.registerSubscriberClient.SubscribeToTopic(Topic.MEASUREMENT, MicroserviceNames.CeMeasurementProviderService);
+				await this.registerSubscriberClient.SubscribeToTopic(Topic.SWITCH_STATUS, MicroserviceNames.CeMeasurementProviderService);
 			}
 			catch (Exception e)
 			{

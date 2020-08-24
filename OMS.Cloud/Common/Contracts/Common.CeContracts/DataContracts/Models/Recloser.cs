@@ -6,7 +6,8 @@ namespace Common.CeContracts
     [DataContract]
     public class Recloser : TopologyElement
     {
-        private readonly int maxNumberOfTries = 3;
+        [DataMember]
+        public int MaxNumberOfTries { get; set; }
         public Recloser(ITopologyElement element) : base(element.Id)
         {
             Id = element.Id;
@@ -22,12 +23,13 @@ namespace Common.CeContracts
             IsActive = element.IsActive;
             NoReclosing = element.NoReclosing;
             NumberOfTry = 0;
+            MaxNumberOfTries = 3;
         }
         [DataMember]
         public int NumberOfTry { get; set; }
         public bool IsReachedMaximumOfTries()
         {
-            return (NumberOfTry >= maxNumberOfTries);
+            return (NumberOfTry >= MaxNumberOfTries);
         }
 
 
