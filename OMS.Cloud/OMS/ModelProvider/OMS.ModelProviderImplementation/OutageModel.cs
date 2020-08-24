@@ -1,5 +1,4 @@
 ﻿using Common.OmsContracts.HistoryDBManager;
-using Common.OmsContracts.ModelProvider;
 using Common.OmsContracts.OutageLifecycle;
 using Common.PubSubContracts.DataContracts.CE;
 using Microsoft.ServiceFabric.Data;
@@ -12,7 +11,6 @@ using OMS.Common.PubSubContracts;
 using OMS.Common.PubSubContracts.Interfaces;
 using OMS.Common.WcfClient.OMS;
 using OMS.Common.WcfClient.OMS.Lifecycle;
-using OMS.ModelProviderImplementation.ContractProviders;
 using System;
 using System.Collections.Generic;
 using System.Threading.Tasks;
@@ -32,12 +30,7 @@ namespace OMS.ModelProviderImplementation
 		}
 		
 		private IHistoryDBManagerContract historyDBManagerClient;
-		private IOutageModelReadAccessContract outageModelReadAccessClient;
-		private IOutageModelUpdateAccessContract outageModelUpdateAccessClient;
 		private IReportOutageContract reportOutageClient;
-
-		//private OutageModelReadAccessProvider outageModelReadAccessProvider;
-		//private OutageModelUpdateAccessProvider outageModelUpdateAccessProvider;
 
 		
 		public OutageModel(IReliableStateManager stateManager)
@@ -52,10 +45,6 @@ namespace OMS.ModelProviderImplementation
 
 			this.stateManager = stateManager;
 			this.stateManager.StateManagerChanged += this.OnStateManagerChangedHandler;
-
-			//TODO: OVO RAZRESITI NEKAKO, potencijalno uvesti rel dictionarije u ovu klasu
-			//this.outageModelReadAccessProvider = outageModelReadAccessProvider;
-			//this.outageModelUpdateAccessProvider = outageModelUpdateAccessProvider;
 		}
 
 		#region ReliableDictionaryAccess
@@ -151,8 +140,6 @@ namespace OMS.ModelProviderImplementation
 				this.reportOutageClient = ReportOutageClient.CreateClient();
 
 				OutageTopologyModel topology = omsModelMessage.OutageTopologyModel;
-				//todo: direktno raditi sa rel dict, prisutan je...
-				//await outageModelUpdateAccessProvider.UpdateTopologyModel(topology); 
 				await TopologyModel.SetAsync(0, topology);
 				
 				HashSet<long> energizedConsumers = new HashSet<long>();
@@ -168,8 +155,7 @@ namespace OMS.ModelProviderImplementation
 				}
 
 				await historyDBManagerClient.OnConsumersEnergized(energizedConsumers);
-				//TOOD: uzeti iz rel dict, prisutan je....
-				Dictionary<long, CommandOriginType> potentialOutages = new Dictionary<long, CommandOriginType>();//await outageModelReadAccessProvider.GetPotentialOutage(); 
+				var potentialOutages = await PotentialOutage.GetEnumerableDictionaryAsync(); 
 
 				Task[] reportOutageTasks = new Task[potentialOutages.Count];
 				int index = 0;
@@ -181,8 +167,7 @@ namespace OMS.ModelProviderImplementation
 				}
 				
 				Task.WaitAll(reportOutageTasks);
-				//todo: direktno raditi sa rel dict, prisutan je...
-				//await outageModelUpdateAccessProvider.UpdatePotentialOutage(0, 0, ModelUpdateOperationType.CLEAR);
+				await PotentialOutage.ClearAsync();
 			}
 			else
 			{

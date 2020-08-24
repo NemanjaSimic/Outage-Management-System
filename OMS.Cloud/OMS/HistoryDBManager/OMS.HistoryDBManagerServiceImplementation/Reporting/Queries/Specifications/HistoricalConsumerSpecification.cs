@@ -1,4 +1,4 @@
-﻿using Common.OMS.OutageDatabaseModel;
+﻿using Common.OmsContracts.DataContracts.OutageDatabaseModel;
 using System;
 using System.Linq.Expressions;
 

@@ -1,4 +1,4 @@
-﻿using Common.OMS.OutageDatabaseModel;
+﻿using Common.OmsContracts.DataContracts.OutageDatabaseModel;
 using OMS.HistoryDBManagerImplementation.Reporting.Queries.Specifications;
 using System;
 using System.Linq.Expressions;

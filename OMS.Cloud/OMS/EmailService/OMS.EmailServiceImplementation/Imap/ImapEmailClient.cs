@@ -92,7 +92,6 @@ namespace OMS.EmailImplementation.Imap
 				catch (Exception)
 				{
 					Logger.LogError("[ImapEmailClient::GetUnreadMessages] Sending to PubSub Engine failed.");
-					//Console.WriteLine("[ImapEmailClient::GetUnreadMessages] Sending to PubSub Engine failed.");
 				}
 			}
 			return outageMailMessages;

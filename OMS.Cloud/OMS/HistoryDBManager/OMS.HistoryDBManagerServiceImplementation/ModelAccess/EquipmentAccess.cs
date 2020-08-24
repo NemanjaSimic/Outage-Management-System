@@ -1,10 +1,9 @@
-﻿using Common.OMS.OutageDatabaseModel;
+﻿using Common.OmsContracts.DataContracts.OutageDatabaseModel;
 using Common.OmsContracts.ModelAccess;
 using OMS.Common.Cloud.Logger;
 using OutageDatabase.Repository;
 using System;
 using System.Collections.Generic;
-using System.Linq.Expressions;
 using System.Threading.Tasks;
 
 namespace OMS.HistoryDBManagerImplementation.ModelAccess
@@ -32,7 +31,7 @@ namespace OMS.HistoryDBManagerImplementation.ModelAccess
 		{
 			return Task.Run(() =>
 			{
-				//todo: razmisliti o ConditonalValue<Equipment>
+				//MODO: razmisliti o ConditonalValue<Equipment>
 				Equipment equipmentDb = null;
 
 				using (var unitOfWork = new UnitOfWork())
@@ -53,7 +52,7 @@ namespace OMS.HistoryDBManagerImplementation.ModelAccess
 			});
 		}
 
-		public Task<IEnumerable<Equipment>> FindEquipment(Expression<Func<Equipment, bool>> predicate)
+		public Task<IEnumerable<Equipment>> FindEquipment(EquipmentExpression expression)
 		{
 			return Task.Run(() =>
 			{
@@ -63,7 +62,7 @@ namespace OMS.HistoryDBManagerImplementation.ModelAccess
 				{
 					try
 					{
-						equipment = unitOfWork.EquipmentRepository.Find(predicate);
+						equipment = unitOfWork.EquipmentRepository.Find(expression.Predicate);
 					}
 					catch (Exception e)
 					{
@@ -103,7 +102,7 @@ namespace OMS.HistoryDBManagerImplementation.ModelAccess
 		{
 			return Task.Run(() =>
 			{
-				//todo: razmisliti o ConditonalValue<Equipment>
+				//MODO: razmisliti o ConditonalValue<Equipment>
 				Equipment equipment = null;
 
 				using (var unitOfWork = new UnitOfWork())

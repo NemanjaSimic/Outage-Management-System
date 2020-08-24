@@ -1,5 +1,4 @@
 ﻿using Common.OMS;
-using Common.OMS.OutageDatabaseModel;
 using Common.OmsContracts.OutageLifecycle;
 using OMS.Common.Cloud;
 using OMS.Common.Cloud.Logger;
@@ -22,10 +21,10 @@ using OMS.Common.Cloud.Names;
 using Common.OmsContracts.ModelProvider;
 using Common.OmsContracts.ModelAccess;
 using Common.CeContracts;
-using OMS.Common.PubSubContracts.Interfaces;
 using System.Collections.Generic;
 using System.Linq;
 using Common.PubSubContracts.DataContracts.CE;
+using Common.OmsContracts.DataContracts.OutageDatabaseModel;
 
 namespace OMS.OutageLifecycleImplementation
 {
@@ -114,7 +113,6 @@ namespace OMS.OutageLifecycleImplementation
                             }
                             catch (Exception e)
                             {
-                                //TODO: mozda publish neke greske??
                                 Logger.LogError("Error occured while trying to publish outage.", e);
                             }
                         }, TaskContinuationOptions.OnlyOnRanToCompletion);
@@ -210,17 +208,15 @@ namespace OMS.OutageLifecycleImplementation
 
                                 if (currentBreakerId == -1 || currentBreakerId == recloser)
                                 {
-                                    //TODO: planned outage
                                     string message = "End of the feeder, no outage detected.";
                                     Logger.LogWarning(message);
                                     isIsolated = false;
-                                    //subscriberProxy.Close();
                                     await registerSubscriberClient.UnsubscribeFromAllTopics(MicroserviceNames.OmsOutageLifecycleService);
                                     await outageModelUpdateAccessClient.UpdateCommandedElements(0, ModelUpdateOperationType.CLEAR);
                                     //outageModel.commandedElements.Clear();
                                     throw new Exception(message);
                                 }
-                                //TODO: SCADACommand
+
                                 await SendSCADACommand(currentBreakerId, DiscreteCommandingType.OPEN);
                                 await SendSCADACommand(headBreaker, DiscreteCommandingType.CLOSE);
 
@@ -358,12 +354,10 @@ namespace OMS.OutageLifecycleImplementation
             long measurement = -1;
 
             List<long> measurements = new List<long>();
+            
             try
             {
-                //TODO: see this??
-                //measuremnts = measurementMapProxy.GetMeasurementsOfElement(currentBreakerId);
                 measurements = await measurementMapServiceClient.GetMeasurementsOfElement(currentBreakerId);
-
             }
             catch (Exception e)
             {
@@ -382,7 +376,6 @@ namespace OMS.OutageLifecycleImplementation
             {
                 if (discreteCommandingType == DiscreteCommandingType.OPEN && !CommandedElements.ContainsKey(currentBreakerId))
                 {
-                    //TODO: add at list
                     await this.outageModelUpdateAccessClient.UpdateCommandedElements(currentBreakerId, ModelUpdateOperationType.INSERT);
                 }
 

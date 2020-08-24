@@ -46,7 +46,6 @@ namespace OutageDatabase.Repository
             var modified = context.ChangeTracker.Entries().Where(e => e.State == EntityState.Modified);
 
             return context.SaveChanges();
-            //todo: dispose?
         }
 
         public void Dispose()

@@ -104,5 +104,8 @@
       <Version>4.1.417</Version>
     </PackageReference>
   </ItemGroup>
+  <ItemGroup>
+    <Folder Include="DistributedTransaction\" />
+  </ItemGroup>
   <Import Project="$(MSBuildToolsPath)\Microsoft.CSharp.targets" />
 </Project>

@@ -5,7 +5,7 @@ using System.ComponentModel.DataAnnotations;
 using System.ComponentModel.DataAnnotations.Schema;
 using System.Runtime.Serialization;
 
-namespace Common.OMS.OutageDatabaseModel
+namespace Common.OmsContracts.DataContracts.OutageDatabaseModel
 {
     //dodato radi testa 16/8/2020
     //[DataContract(IsReference = true)]

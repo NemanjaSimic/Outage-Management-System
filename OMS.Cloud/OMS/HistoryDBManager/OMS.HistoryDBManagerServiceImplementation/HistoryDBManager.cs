@@ -1,5 +1,5 @@
 ﻿using Common.OMS;
-using Common.OMS.OutageDatabaseModel;
+using Common.OmsContracts.DataContracts.OutageDatabaseModel;
 using Common.OmsContracts.HistoryDBManager;
 using Microsoft.ServiceFabric.Data;
 using Microsoft.ServiceFabric.Data.Notifications;
@@ -40,14 +40,14 @@ namespace OMS.HistoryDBManagerImplementation
             }
         }
 
-        //TODO: translate to ReliableDictionaryAccess<long, Consumer>
+        //MODO: translate to ReliableDictionaryAccess<long, Consumer>
         private ReliableDictionaryAccess<long, long> unenergizedConsumers;
         private ReliableDictionaryAccess<long, long> UnenergizedConsumers
         {
             get { return unenergizedConsumers; }
         }
 
-        //TODO: translate to ReliableDictionaryAccess<long, Switch>
+        //MODO: translate to ReliableDictionaryAccess<long, Switch>
         private ReliableDictionaryAccess<long, long> openedSwitches;
         private ReliableDictionaryAccess<long, long> OpenedSwitches
         {

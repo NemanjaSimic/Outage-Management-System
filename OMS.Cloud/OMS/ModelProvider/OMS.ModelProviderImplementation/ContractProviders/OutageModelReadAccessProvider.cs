@@ -190,12 +190,11 @@ namespace OMS.ModelProviderImplementation.ContractProviders
                 await Task.Delay(1000);
             }
 
-            //todo: conditionalValue...
+            //MODO: conditionalValue...
             OutageTopologyModel topologyModel = null;
 
             try
             {
-                //todo: zasto je ovaj tekst stajao tu: "Get topologyModel from CE service"?
                 topologyModel = (await TopologyModel.GetDataCopyAsync())[0];
             }
             catch (Exception e)
@@ -215,7 +214,7 @@ namespace OMS.ModelProviderImplementation.ContractProviders
                 await Task.Delay(1000);
 			}
 
-            //todo: conditionalValue...
+            //MODO: conditionalValue...
             OutageTopologyElement topologyElement = null;
 
             try

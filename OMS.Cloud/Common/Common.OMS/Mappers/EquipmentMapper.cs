@@ -1,10 +1,7 @@
-﻿using Common.OMS.OutageDatabaseModel;
+﻿using Common.OmsContracts.DataContracts.OutageDatabaseModel;
 using Common.PubSubContracts.DataContracts.OMS;
-using System;
 using System.Collections.Generic;
 using System.Linq;
-using System.Text;
-using System.Threading.Tasks;
 
 namespace Common.OMS.Mappers
 {
@@ -23,8 +20,8 @@ namespace Common.OMS.Mappers
             {
                 EquipmentId = equipment.EquipmentId,
                 EquipmentMRID = equipment.EquipmentMRID,
-                ActiveOutages = new List<ActiveOutageMessage>(), //TODO: outageMapper.MapActiveOutages(consumer.ActiveOutages),
-                ArchivedOutages = new List<ArchivedOutageMessage>(), //TODO: outageMapper.MapArchivedOutages(consumer.ArchivedOutages)
+                ActiveOutages = new List<ActiveOutageMessage>(), //MODO: outageMapper.MapActiveOutages(consumer.ActiveOutages),
+                ArchivedOutages = new List<ArchivedOutageMessage>(), //MODO: outageMapper.MapArchivedOutages(consumer.ArchivedOutages)
             };
 
             return equipmentMessage;

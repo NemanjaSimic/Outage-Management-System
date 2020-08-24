@@ -79,14 +79,14 @@ namespace OMS.Common.Cloud
                 { MicroserviceNames.OmsHistoryDBManagerService,     ServiceType.STATEFUL_SERVICE    },
                 { MicroserviceNames.OmsOutageSimulatorService,      ServiceType.STANDALONE_SERVICE  },
 
-                //TODO: WEB_ADAPTER
+                //WEB_ADAPTER
                 { MicroserviceNames.WebAdapterService,              ServiceType.STATELESS_SERVICE   },
                 
                 //TEST
                 //{ MicroserviceNames.TestService,                    ServiceType.STATELESS_SERVICE   },
             };
 
-            //TODO: moguce ucitavanje iz konfiguracije
+            //moguce ucitavanje iz konfiguracije
             serviceNameToServiceUri = new Dictionary<string, Uri>
             {
                 //NMS

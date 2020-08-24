@@ -93,6 +93,10 @@
     <None Include="packages.config" />
   </ItemGroup>
   <ItemGroup>
+    <ProjectReference Include="..\..\..\Common\Common.Cloud\Common.Cloud.csproj">
+      <Project>{FBEE1369-0F6C-41E6-8C62-8C1C5CDBB602}</Project>
+      <Name>Common.Cloud</Name>
+    </ProjectReference>
     <ProjectReference Include="..\OMS.EmailServiceImplementation\OMS.EmailImplementation.csproj">
       <Project>{d39cbfce-3d53-4afc-98b5-29e9ff332d6e}</Project>
       <Name>OMS.EmailImplementation</Name>
