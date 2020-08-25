@@ -1,19 +1,28 @@
 ﻿using System;
 using System.Diagnostics;
-using System.Fabric;
 using System.Threading;
-using System.Threading.Tasks;
 using Microsoft.ServiceFabric.Services.Runtime;
+using OMS.Common.Cloud.Logger;
 
 namespace CE.TopologyBuilderService
 {
-	internal static class Program
+    internal static class Program
 	{
+		private const string serviceTypeName = "CE.TopologyBuilderServiceType";
+
+		private static ICloudLogger logger;
+		private static ICloudLogger Logger
+		{
+			get { return logger ?? (logger = CloudLoggerFactory.GetLogger()); }
+		}
+
 		/// <summary>
 		/// This is the entry point of the service host process.
 		/// </summary>
 		private static void Main()
 		{
+			string baseLogString = $"{typeof(Program)} [static] =>";
+
 			try
 			{
 				// The ServiceManifest.XML file defines one or more service type names.
@@ -21,9 +30,10 @@ namespace CE.TopologyBuilderService
 				// When Service Fabric creates an instance of this service type,
 				// an instance of the class is created in this host process.
 
-				ServiceRuntime.RegisterServiceAsync("CE.TopologyBuilderServiceType",
-					context => new TopologyBuilderService(context)).GetAwaiter().GetResult();
+				Logger.LogDebug($"{baseLogString} Main => Calling RegisterServiceAsync for type '{serviceTypeName}'.");
+				ServiceRuntime.RegisterServiceAsync(serviceTypeName, context => new TopologyBuilderService(context)).GetAwaiter().GetResult();
 
+				Logger.LogInformation($"{baseLogString} Main => '{serviceTypeName}' type registered.");
 				ServiceEventSource.Current.ServiceTypeRegistered(Process.GetCurrentProcess().Id, typeof(TopologyBuilderService).Name);
 
 				// Prevents this host process from terminating so services keep running.
@@ -31,7 +41,7 @@ namespace CE.TopologyBuilderService
 			}
 			catch (Exception e)
 			{
-				//todo: log
+				Logger.LogError($"{baseLogString} Main => Exception: {e.Message}.", e);
 				ServiceEventSource.Current.ServiceHostInitializationFailed(e.ToString());
 				throw;
 			}

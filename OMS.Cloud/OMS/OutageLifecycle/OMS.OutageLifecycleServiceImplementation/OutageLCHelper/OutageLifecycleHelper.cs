@@ -1,13 +1,13 @@
-﻿using Common.OMS.OutageDatabaseModel;
+﻿using Common.OmsContracts.DataContracts.OutageDatabaseModel;
 using Common.OmsContracts.ModelAccess;
 using Common.PubSubContracts.DataContracts.CE;
 using Common.PubSubContracts.DataContracts.OMS;
 using OMS.Common.Cloud;
 using OMS.Common.Cloud.Logger;
+using OMS.Common.Cloud.Names;
 using OMS.Common.NmsContracts;
 using OMS.Common.NmsContracts.GDA;
 using OMS.Common.PubSubContracts;
-using OMS.Common.PubSubContracts.Interfaces;
 using OMS.Common.WcfClient.NMS;
 using OMS.Common.WcfClient.OMS.ModelAccess;
 using OMS.Common.WcfClient.PubSub;
@@ -196,7 +196,7 @@ namespace OMS.OutageLifecycleImplementation.OutageLCHelper
 
         public async Task<List<Equipment>> GetEquipmentEntity(List<long> equipmentIds)
         {
-            List<long> equipementIdsNotFoundInDb = new List<long>();
+            List<long> equipmentIdsNotFoundInDb = new List<long>();
             List<Equipment> equipmentList = new List<Equipment>();
 
             foreach (long equipmentId in equipmentIds)
@@ -205,7 +205,7 @@ namespace OMS.OutageLifecycleImplementation.OutageLCHelper
 
                 if (equipmentDbEntity == null)
                 {
-                    equipementIdsNotFoundInDb.Add(equipmentId);
+                    equipmentIdsNotFoundInDb.Add(equipmentId);
                 }
                 else
                 {
@@ -213,21 +213,21 @@ namespace OMS.OutageLifecycleImplementation.OutageLCHelper
                 }
             }
 
-            equipmentList.AddRange(await CreateEquipementEntitiesFromNmsData(equipementIdsNotFoundInDb));
+            equipmentList.AddRange(await CreateEquipmentEntitiesFromNmsData(equipmentIdsNotFoundInDb));
 
             return equipmentList;
         }
 
-        public async Task<List<Equipment>> CreateEquipementEntitiesFromNmsData(List<long> entityIds)
+        public async Task<List<Equipment>> CreateEquipmentEntitiesFromNmsData(List<long> entityIds)
         {
-            List<Equipment> equipements = new List<Equipment>();
+            List<Equipment> equipments = new List<Equipment>();
 
             List<ModelCode> propIds = new List<ModelCode>() { ModelCode.IDOBJ_MRID };
 
 
             if (networkModelGdaClient == null)
             {
-                string message = "OutageModel::CreateEquipementEntitiesFromNmsData => NetworkModelGDAProxy is null";
+                string message = "OutageModel::CreateEquipmentEntitiesFromNmsData => NetworkModelGDAProxy is null";
                 Logger.LogError(message);
                 throw new NullReferenceException();
             }
@@ -252,17 +252,17 @@ namespace OMS.OutageLifecycleImplementation.OutageLCHelper
                     continue;
                 }
 
-                Equipment createdEquipement = new Equipment()
+                Equipment createdEquipment = new Equipment()
                 {
                     EquipmentId = rd.Id,
                     EquipmentMRID = rd.Properties[0].AsString(),
                 };
 
-                equipements.Add(createdEquipement);
+                equipments.Add(createdEquipment);
             }
             
 
-            return equipements;
+            return equipments;
         }
 
         public async Task<bool> PublishOutage(Topic topic, OutageMessage outageMessage)
@@ -281,7 +281,7 @@ namespace OMS.OutageLifecycleImplementation.OutageLCHelper
 
                 try
                 {
-                    await publisherClient.Publish(outagePublication, "OutagePublisher"); //TODO: Service defines
+                    await publisherClient.Publish(outagePublication, MicroserviceNames.OmsOutageLifecycleService);
                     Logger.LogWarning($"Outage service published data from topic: {outagePublication.Topic}");
                     success = true;
                 }

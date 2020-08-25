@@ -1,6 +1,6 @@
 ﻿using Common.CeContracts;
 using Common.OMS;
-using Common.OMS.OutageDatabaseModel;
+using Common.OmsContracts.DataContracts.OutageDatabaseModel;
 using Common.OmsContracts.ModelAccess;
 using Common.OmsContracts.ModelProvider;
 using Common.OmsContracts.OutageLifecycle;
@@ -8,7 +8,6 @@ using Common.OmsContracts.OutageSimulator;
 using Common.PubSubContracts.DataContracts.CE;
 using OMS.Common.Cloud;
 using OMS.Common.Cloud.Logger;
-using OMS.Common.PubSubContracts.Interfaces;
 using OMS.Common.WcfClient.CE;
 using OMS.Common.WcfClient.OMS;
 using OMS.Common.WcfClient.OMS.ModelAccess;
@@ -221,10 +220,9 @@ namespace OMS.OutageLifecycleImplementation
             long measurement = -1;
 
             List<long> measurements = new List<long>();
+
             try
             {
-                //TODO: see this??
-                //measuremnts = measurementMapProxy.GetMeasurementsOfElement(currentBreakerId);
                 measurements = await measurementMapServiceClient.GetMeasurementsOfElement(currentBreakerId);
 
             }
@@ -245,7 +243,6 @@ namespace OMS.OutageLifecycleImplementation
             {
                 if (discreteCommandingType == DiscreteCommandingType.OPEN && !CommandedElements.ContainsKey(currentBreakerId))
                 {
-                    //TODO: add at list
                     await this.outageModelUpdateAccessClient.UpdateCommandedElements(currentBreakerId,ModelUpdateOperationType.INSERT);
                 }
 

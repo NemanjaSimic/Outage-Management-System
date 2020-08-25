@@ -1,14 +1,10 @@
 ﻿using OMS.Common.Cloud;
 using System;
-using System.Collections.Generic;
 using System.ComponentModel.DataAnnotations;
 using System.ComponentModel.DataAnnotations.Schema;
-using System.Linq;
 using System.Runtime.Serialization;
-using System.Text;
-using System.Threading.Tasks;
 
-namespace Common.OMS.OutageDatabaseModel
+namespace Common.OmsContracts.DataContracts.OutageDatabaseModel
 {
     [DataContract]
     public class ConsumerHistorical
@@ -29,6 +25,5 @@ namespace Common.OMS.OutageDatabaseModel
 
         [DataMember]
         public DatabaseOperation DatabaseOperation { get; set; }
-
     }
 }

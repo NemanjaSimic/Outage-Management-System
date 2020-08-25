@@ -32,10 +32,6 @@
     <WarningLevel>4</WarningLevel>
   </PropertyGroup>
   <ItemGroup>
-    <Reference Include="Common.CeContracts, Version=1.0.0.0, Culture=neutral, processorArchitecture=MSIL">
-      <SpecificVersion>False</SpecificVersion>
-      <HintPath>..\..\OMS.Cloud\Common\Contracts\Common.CeContracts\bin\Debug\Common.CeContracts.dll</HintPath>
-    </Reference>
     <Reference Include="Microsoft.AspNet.SignalR.Client, Version=2.4.1.0, Culture=neutral, PublicKeyToken=31bf3856ad364e35, processorArchitecture=MSIL">
       <HintPath>..\Cloud.Web\packages\Microsoft.AspNet.SignalR.Client.2.4.1\lib\net45\Microsoft.AspNet.SignalR.Client.dll</HintPath>
     </Reference>
@@ -212,6 +208,10 @@
     <ProjectReference Include="..\..\OMS.Cloud\Common\Contracts\Common.CloudContracts\Common.CloudContracts.csproj">
       <Project>{2307F7DC-6B87-4506-8365-6966712DD5FE}</Project>
       <Name>Common.CloudContracts</Name>
+    </ProjectReference>
+    <ProjectReference Include="..\..\OMS.Cloud\Common\Contracts\Common.OmsContracts\Common.OmsContracts.csproj">
+      <Project>{7032AEF1-E55A-4D5C-90FF-E0B8B4C98BE0}</Project>
+      <Name>Common.OmsContracts</Name>
     </ProjectReference>
     <ProjectReference Include="..\..\OMS.Cloud\Common\Contracts\Common.PubSubContracts\Common.PubSubContracts.csproj">
       <Project>{AA75150D-EE56-49C0-9431-751F83CCC0CD}</Project>

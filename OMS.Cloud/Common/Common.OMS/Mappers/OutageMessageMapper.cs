@@ -1,5 +1,5 @@
 ﻿using Common.OMS.Mappers;
-using Common.OMS.OutageDatabaseModel;
+using Common.OmsContracts.DataContracts.OutageDatabaseModel;
 using Common.PubSubContracts.DataContracts.OMS;
 using OMS.Common.Cloud;
 using OMS.Common.Cloud.Logger;

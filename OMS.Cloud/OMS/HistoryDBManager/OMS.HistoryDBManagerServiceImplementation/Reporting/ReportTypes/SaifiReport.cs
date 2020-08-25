@@ -1,5 +1,6 @@
-﻿using Common.OMS.OutageDatabaseModel;
-using Common.OMS.Report;
+﻿using Common.OMS.Report;
+using Common.OmsContracts.DataContracts.OutageDatabaseModel;
+using Common.OmsContracts.DataContracts.Report;
 using OMS.Common.Cloud;
 using OMS.HistoryDBManagerImplementation.Reporting.Queries;
 using OMS.HistoryDBManagerImplementation.Reporting.Queries.Specifications;

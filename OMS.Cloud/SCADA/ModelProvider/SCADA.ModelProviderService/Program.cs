@@ -32,7 +32,6 @@ namespace SCADA.ModelProviderService
                 // an instance of the class is created in this host process.
 
                 Logger.LogDebug($"{baseLogString} Main => Calling RegisterServiceAsync for type '{serviceTypeName}'.");
-
                 ServiceRuntime.RegisterServiceAsync(serviceTypeName, context => new ModelProviderService(context)).GetAwaiter().GetResult();
 
                 Logger.LogInformation($"{baseLogString} Main => '{serviceTypeName}' type registered.");

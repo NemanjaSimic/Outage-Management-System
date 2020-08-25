@@ -1,19 +1,15 @@
-﻿using Common.CloudContracts;
-using Common.OMS.OutageDatabaseModel;
+﻿using Common.OmsContracts.DataContracts.OutageDatabaseModel;
 using Common.OmsContracts.ModelAccess;
 using Microsoft.ServiceFabric.Services.Client;
 using Microsoft.ServiceFabric.Services.Communication.Wcf.Client;
 using OMS.Common.Cloud.Names;
 using System;
 using System.Collections.Generic;
-using System.Linq;
-using System.Linq.Expressions;
-using System.Text;
 using System.Threading.Tasks;
 
 namespace OMS.Common.WcfClient.OMS.ModelAccess
 {
-	public class EquipmentAccessClient : WcfSeviceFabricClientBase<IEquipmentAccessContract>, IEquipmentAccessContract
+    public class EquipmentAccessClient : WcfSeviceFabricClientBase<IEquipmentAccessContract>, IEquipmentAccessContract
 	{
         private static readonly string microserviceName = MicroserviceNames.OmsHistoryDBManagerService;
         private static readonly string listenerName = EndpointNames.OmsEquipmentAccessEndpoint;
@@ -39,13 +35,12 @@ namespace OMS.Common.WcfClient.OMS.ModelAccess
 			return InvokeWithRetryAsync(client => client.Channel.AddEquipment(equipment));
 		}
 
-		//TODO: solve serialization of Expression<Func<Equipment, bool>>
-		//public Task<IEnumerable<Equipment>> FindEquipment(Expression<Func<Equipment, bool>> predicate)
-		//{
-		//	return InvokeWithRetryAsync(client => client.Channel.FindEquipment(predicate));
-		//}
+        public Task<IEnumerable<Equipment>> FindEquipment(EquipmentExpression expression)
+        {
+            return InvokeWithRetryAsync(client => client.Channel.FindEquipment(expression));
+        }
 
-		public Task<IEnumerable<Equipment>> GetAllEquipments()
+        public Task<IEnumerable<Equipment>> GetAllEquipments()
 		{
 			return InvokeWithRetryAsync(client => client.Channel.GetAllEquipments());
 		}

@@ -8,6 +8,7 @@ using OMS.Common.WcfClient.OMS;
 using Common.OmsContracts.Report;
 using ReportType = OMS.Common.Cloud.ReportType;
 using OMS.Common.Cloud.Logger;
+using Common.OmsContracts.DataContracts.Report;
 
 namespace Common.Web.Services.Handlers
 {
@@ -26,7 +27,7 @@ namespace Common.Web.Services.Handlers
             {
                 Logger.LogInformation("[ReportCommandHandler::GenerateReport] Sending a Generate command to Outage service.");
 
-                var options = new OMS.Report.ReportOptions
+                var options = new ReportOptions
                 {
                     Type = (ReportType)request.Options.Type,
                     ElementId = request.Options.ElementId,

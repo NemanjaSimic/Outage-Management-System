@@ -1,5 +1,5 @@
 ﻿using Common.CloudContracts;
-using Common.OMS.Report;
+using Common.OmsContracts.DataContracts.Report;
 using Microsoft.ServiceFabric.Services.Remoting;
 using System.ServiceModel;
 using System.Threading.Tasks;

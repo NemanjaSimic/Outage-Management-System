@@ -1,18 +1,15 @@
-﻿using Common.OMS.OutageDatabaseModel;
+﻿using Common.OmsContracts.DataContracts.OutageDatabaseModel;
 using Common.OmsContracts.ModelAccess;
 using Microsoft.ServiceFabric.Services.Client;
 using Microsoft.ServiceFabric.Services.Communication.Wcf.Client;
 using OMS.Common.Cloud.Names;
 using System;
 using System.Collections.Generic;
-using System.Linq;
-using System.Linq.Expressions;
-using System.Text;
 using System.Threading.Tasks;
 
 namespace OMS.Common.WcfClient.OMS.ModelAccess
 {
-	public class OutageModelAccessClient : WcfSeviceFabricClientBase<IOutageAccessContract>, IOutageAccessContract
+    public class OutageModelAccessClient : WcfSeviceFabricClientBase<IOutageAccessContract>, IOutageAccessContract
     {
         private static readonly string microserviceName = MicroserviceNames.OmsHistoryDBManagerService;
         private static readonly string listenerName = EndpointNames.OmsOutageAccessEndpoint;
@@ -38,13 +35,12 @@ namespace OMS.Common.WcfClient.OMS.ModelAccess
 			return InvokeWithRetryAsync(client => client.Channel.AddOutage(outage));
 		}
 
-		//TODO: solve serialization of Expression<Func<OutageEntity, bool>>
-		//public Task<IEnumerable<OutageEntity>> FindOutage(Expression<Func<OutageEntity, bool>> predicate)
-		//{
-		//	return InvokeWithRetryAsync(client => client.Channel.FindOutage(predicate));
-		//}
+        public Task<IEnumerable<OutageEntity>> FindOutage(OutageExpression expression)
+        {
+            return InvokeWithRetryAsync(client => client.Channel.FindOutage(expression));
+        }
 
-		public Task<IEnumerable<OutageEntity>> GetAllActiveOutages()
+        public Task<IEnumerable<OutageEntity>> GetAllActiveOutages()
 		{
 			return InvokeWithRetryAsync(client => client.Channel.GetAllActiveOutages());
 		}
