@@ -72,6 +72,10 @@
       <Project>{7032AEF1-E55A-4D5C-90FF-E0B8B4C98BE0}</Project>
       <Name>Common.OmsContracts</Name>
     </ProjectReference>
+    <ProjectReference Include="..\..\..\Common\Contracts\Common.TmsContracts\Common.TmsContracts.csproj">
+      <Project>{A07D94C2-40EF-48DB-B828-7E53E7F5A372}</Project>
+      <Name>Common.TmsContracts</Name>
+    </ProjectReference>
     <ProjectReference Include="..\OMS.HistoryDBManagerServiceImplementation\OMS.HistoryDBManagerImplementation.csproj">
       <Project>{3ca82365-7a48-4fab-a74b-c70316a60163}</Project>
       <Name>OMS.HistoryDBManagerImplementation</Name>

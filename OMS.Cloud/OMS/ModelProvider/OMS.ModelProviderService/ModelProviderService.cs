@@ -16,9 +16,12 @@ using OMS.Common.Cloud;
 using OMS.Common.Cloud.Logger;
 using OMS.Common.Cloud.Names;
 using OMS.Common.PubSubContracts;
+using OMS.Common.TmsContracts;
+using OMS.Common.TmsContracts.Notifications;
 using OMS.Common.WcfClient.PubSub;
 using OMS.ModelProviderImplementation;
 using OMS.ModelProviderImplementation.ContractProviders;
+using OMS.ModelProviderImplementation.DistributedTransaction;
 
 namespace OMS.ModelProviderService
 {
@@ -29,8 +32,11 @@ namespace OMS.ModelProviderService
     {
         private readonly string baseLogString;
         private readonly OutageModel outageModel;
-        private readonly OutageModelReadAccessProvider outageModelReadAccessProvider;
-        private readonly OutageModelUpdateAccessProvider outageModelUpdateAccessProvider;
+
+        private readonly IOutageModelReadAccessContract outageModelReadAccessProvider;
+        private readonly IOutageModelUpdateAccessContract outageModelUpdateAccessProvider;
+        private readonly INotifyNetworkModelUpdateContract notifyNetworkModelUpdateProvider;
+        private readonly ITransactionActorContract transactionActorProvider;
 
         private ICloudLogger logger;
         private ICloudLogger Logger
@@ -49,8 +55,11 @@ namespace OMS.ModelProviderService
             try
             {
                 this.outageModel = new OutageModel(this.StateManager);
+
                 this.outageModelReadAccessProvider = new OutageModelReadAccessProvider(this.StateManager);
                 this.outageModelUpdateAccessProvider = new OutageModelUpdateAccessProvider(this.StateManager);
+                this.notifyNetworkModelUpdateProvider = new OmsModelProviderNotifyNetworkModelUpdate(this.StateManager);
+                this.transactionActorProvider = new OmsModelProviderTransactionActor(this.StateManager);
 
                 string infoMessage = $"{baseLogString} Ctor => Contract providers initialized.";
                 Logger.LogInformation(infoMessage);
@@ -78,25 +87,42 @@ namespace OMS.ModelProviderService
                 new ServiceReplicaListener(context =>
                 {
                     return new WcfCommunicationListener<IOutageModelReadAccessContract>(context,
-                                                                            this.outageModelReadAccessProvider,
-                                                                            WcfUtility.CreateTcpListenerBinding(),
-                                                                            EndpointNames.OmsModelReadAccessEndpoint);
+                                                                                        this.outageModelReadAccessProvider,
+                                                                                        WcfUtility.CreateTcpListenerBinding(),
+                                                                                        EndpointNames.OmsModelReadAccessEndpoint);
                 }, EndpointNames.OmsModelReadAccessEndpoint),
+
                 new ServiceReplicaListener(context =>
                 {
                     return new WcfCommunicationListener<IOutageModelUpdateAccessContract>(context,
-                                                                             this.outageModelUpdateAccessProvider,
-                                                                             WcfUtility.CreateTcpListenerBinding(),
-                                                                             EndpointNames.OmsModelUpdateAccessEndpoint);
+                                                                                          this.outageModelUpdateAccessProvider,
+                                                                                          WcfUtility.CreateTcpListenerBinding(),
+                                                                                          EndpointNames.OmsModelUpdateAccessEndpoint);
                 }, EndpointNames.OmsModelUpdateAccessEndpoint),
+
                 new ServiceReplicaListener(context =>
                 {
                     return new WcfCommunicationListener<INotifySubscriberContract>(context,
-                                                                             this.outageModel,
-                                                                             WcfUtility.CreateTcpListenerBinding(),
-                                                                             EndpointNames.PubSubNotifySubscriberEndpoint);
-                }, EndpointNames.PubSubNotifySubscriberEndpoint)
+                                                                                   this.outageModel,
+                                                                                   WcfUtility.CreateTcpListenerBinding(),
+                                                                                   EndpointNames.PubSubNotifySubscriberEndpoint);
+                }, EndpointNames.PubSubNotifySubscriberEndpoint),
 
+                new ServiceReplicaListener(context =>
+                {
+                        return new WcfCommunicationListener<INotifyNetworkModelUpdateContract>(context,
+                                                                                               this.notifyNetworkModelUpdateProvider,
+                                                                                               WcfUtility.CreateTcpClientBinding(),
+                                                                                               EndpointNames.TmsNotifyNetworkModelUpdateEndpoint);
+                }, EndpointNames.TmsNotifyNetworkModelUpdateEndpoint),
+
+                new ServiceReplicaListener(context =>
+                {
+                        return new WcfCommunicationListener<ITransactionActorContract>(context,
+                                                                                       this.transactionActorProvider,
+                                                                                       WcfUtility.CreateTcpClientBinding(),
+                                                                                       EndpointNames.TmsTransactionActorEndpoint);
+                }, EndpointNames.TmsTransactionActorEndpoint),
             };
         }
 

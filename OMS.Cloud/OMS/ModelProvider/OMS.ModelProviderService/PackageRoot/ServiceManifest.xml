@@ -28,6 +28,8 @@
 			<Endpoint Name="OmsModelReadAccessEndpoint" Protocol="tcp" Type="Input"/>
 			<Endpoint Name="OmsModelUpdateAccessEndpoint" Protocol="tcp" Type="Input"/>
 			<Endpoint Name="PubSubNotifySubscriberEndpoint" Protocol="tcp" Type="Input"/>
+      <Endpoint Name="TmsNotifyNetworkModelUpdateEndpoint" Protocol="tcp" Type="Input"/>
+      <Endpoint Name="TmsTransactionActorEndpoint" Protocol="tcp" Type="Input"/>
     </Endpoints>
   </Resources>
 </ServiceManifest>
