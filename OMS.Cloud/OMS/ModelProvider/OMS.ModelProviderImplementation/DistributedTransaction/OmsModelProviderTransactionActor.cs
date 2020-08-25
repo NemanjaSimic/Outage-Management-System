@@ -121,7 +121,7 @@ namespace OMS.ModelProviderImplementation.DistributedTransaction
 
             try
             {
-                //MODO: await OutageTopologyModel.ClearAsync();
+                await OutageTopologyModel.ClearAsync();
                 await CommandedElements.ClearAsync();
                 await OptimumIsolatioPoints.ClearAsync();
                 await PotentialOutage.ClearAsync();
