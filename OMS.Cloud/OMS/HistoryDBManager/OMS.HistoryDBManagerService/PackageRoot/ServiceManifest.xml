@@ -30,6 +30,8 @@
       <Endpoint Name="OmsOutageAccessEndpoint" Protocol="tcp" Type="Input"/>
       <Endpoint Name="OmsConsumerAccessEndpoint" Protocol="tcp" Type="Input"/>
       <Endpoint Name="OmsEquipmentAccessEndpoint" Protocol="tcp" Type="Input"/>
+      <Endpoint Name="TmsNotifyNetworkModelUpdateEndpoint" Protocol="tcp" Type="Input"/>
+      <Endpoint Name="TmsTransactionActorEndpoint" Protocol="tcp" Type="Input"/>
     </Endpoints>
   </Resources>
 </ServiceManifest>

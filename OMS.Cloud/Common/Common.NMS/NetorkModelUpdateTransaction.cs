@@ -46,7 +46,8 @@ namespace OMS.Common.NMS
                 { MicroserviceNames.NmsGdaService               },
                 { MicroserviceNames.ScadaModelProviderService   },
                 { MicroserviceNames.CeModelProviderService      },
-                //todo: otkomentarisati za transakciju { MicroserviceNames.OmsModelProviderService     },
+                { MicroserviceNames.OmsHistoryDBManagerService  },
+                { MicroserviceNames.OmsModelProviderService     },
             };
         }
     }

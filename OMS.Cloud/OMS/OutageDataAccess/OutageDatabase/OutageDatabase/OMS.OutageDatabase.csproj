@@ -8,8 +8,8 @@
     <ProjectGuid>{D4F63B28-12CA-4B86-8DC6-778AE40C79AE}</ProjectGuid>
     <OutputType>Library</OutputType>
     <AppDesignerFolder>Properties</AppDesignerFolder>
-    <RootNamespace>OutageDatabase</RootNamespace>
-    <AssemblyName>OutageDatabase</AssemblyName>
+    <RootNamespace>OMS.OutageDatabase</RootNamespace>
+    <AssemblyName>OMS.OutageDatabase</AssemblyName>
     <TargetFrameworkVersion>v4.8</TargetFrameworkVersion>
     <FileAlignment>512</FileAlignment>
     <Deterministic>true</Deterministic>

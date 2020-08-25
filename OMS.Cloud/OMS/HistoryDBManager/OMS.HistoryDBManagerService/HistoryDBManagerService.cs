@@ -15,7 +15,10 @@ using Microsoft.ServiceFabric.Services.Communication.Wcf.Runtime;
 using Microsoft.ServiceFabric.Services.Runtime;
 using OMS.Common.Cloud.Logger;
 using OMS.Common.Cloud.Names;
+using OMS.Common.TmsContracts;
+using OMS.Common.TmsContracts.Notifications;
 using OMS.HistoryDBManagerImplementation;
+using OMS.HistoryDBManagerImplementation.DistributedTransaction;
 using OMS.HistoryDBManagerImplementation.ModelAccess;
 using OMS.HistoryDBManagerImplementation.Reporting;
 
@@ -28,11 +31,13 @@ namespace OMS.HistoryDBManagerService
     {
         private readonly string baseLogString;
      
-        private HistoryDBManager historyDBManager;
-        private ReportService reportService;
-        private OutageModelAccess outageModelAccess;
-        private ConsumerAccess consumerAccess;
-        private EquipmentAccess equipmentAccess;
+        private readonly IHistoryDBManagerContract historyDBManagerProvider;
+        private readonly IReportingContract reportServiceProvider;
+        private readonly IOutageAccessContract outageModelAccessProvider;
+        private readonly IConsumerAccessContract consumerAccessProvider;
+        private readonly IEquipmentAccessContract equipmentAccessProvider;
+        private readonly INotifyNetworkModelUpdateContract notifyNetworkModelUpdateProvider;
+        private readonly ITransactionActorContract transactionActorProvider;
 
         private ICloudLogger logger;
         private ICloudLogger Logger
@@ -48,11 +53,13 @@ namespace OMS.HistoryDBManagerService
 
             try
             {
-                historyDBManager = new HistoryDBManager(this.StateManager);
-                reportService = new ReportService();
-                outageModelAccess = new OutageModelAccess();
-                consumerAccess = new ConsumerAccess();
-                equipmentAccess = new EquipmentAccess();
+                this.historyDBManagerProvider = new HistoryDBManager(this.StateManager);
+                this.reportServiceProvider = new ReportService();
+                this.outageModelAccessProvider = new OutageModelAccess();
+                this.consumerAccessProvider = new ConsumerAccess();
+                this.equipmentAccessProvider = new EquipmentAccess();
+                this.notifyNetworkModelUpdateProvider = new OmsHistoryNotifyNetworkModelUpdate(this.StateManager);
+                this.transactionActorProvider = new OmsHistoryTransactionActor(this.StateManager);
 
                 string infoMessage = $"{baseLogString} Ctor => Contract providers initialized.";
                 Logger.LogInformation(infoMessage);
@@ -80,15 +87,15 @@ namespace OMS.HistoryDBManagerService
                 new ServiceReplicaListener(context =>
                 {
                     return new WcfCommunicationListener<IHistoryDBManagerContract>(context,
-                                                                                    historyDBManager,
-                                                                                    WcfUtility.CreateTcpListenerBinding(),
-                                                                                    EndpointNames.OmsHistoryDBManagerEndpoint);
+                                                                                   this.historyDBManagerProvider,
+                                                                                   WcfUtility.CreateTcpListenerBinding(),
+                                                                                   EndpointNames.OmsHistoryDBManagerEndpoint);
                 }, EndpointNames.OmsHistoryDBManagerEndpoint),
 
                 new ServiceReplicaListener(context =>
                 {
                     return new WcfCommunicationListener<IReportingContract>(context,
-                                                                            reportService,
+                                                                            this.reportServiceProvider,
                                                                             WcfUtility.CreateTcpClientBinding(),
                                                                             EndpointNames.OmsReportingEndpoint);
                 }, EndpointNames.OmsReportingEndpoint),
@@ -96,26 +103,42 @@ namespace OMS.HistoryDBManagerService
                 new ServiceReplicaListener(context =>
                 {
                         return new WcfCommunicationListener<IOutageAccessContract>(context,
-                                                                                outageModelAccess,
-                                                                                WcfUtility.CreateTcpClientBinding(),
-                                                                                EndpointNames.OmsOutageAccessEndpoint);
+                                                                                   this.outageModelAccessProvider,
+                                                                                   WcfUtility.CreateTcpClientBinding(),
+                                                                                   EndpointNames.OmsOutageAccessEndpoint);
                 }, EndpointNames.OmsOutageAccessEndpoint),
                 
                 new ServiceReplicaListener(context =>
                 {
                             return new WcfCommunicationListener<IConsumerAccessContract>(context,
-                                                                                    consumerAccess,
-                                                                                    WcfUtility.CreateTcpClientBinding(),
-                                                                                    EndpointNames.OmsConsumerAccessEndpoint);
+                                                                                         this.consumerAccessProvider,
+                                                                                         WcfUtility.CreateTcpClientBinding(),
+                                                                                         EndpointNames.OmsConsumerAccessEndpoint);
                 }, EndpointNames.OmsConsumerAccessEndpoint),
                 
                 new ServiceReplicaListener(context =>
                 {
                         return new WcfCommunicationListener<IEquipmentAccessContract>(context,
-                                                                                equipmentAccess,
-                                                                                WcfUtility.CreateTcpClientBinding(),
-                                                                                EndpointNames.OmsEquipmentAccessEndpoint);
+                                                                                      this.equipmentAccessProvider,
+                                                                                      WcfUtility.CreateTcpClientBinding(),
+                                                                                      EndpointNames.OmsEquipmentAccessEndpoint);
                 }, EndpointNames.OmsEquipmentAccessEndpoint),
+
+                new ServiceReplicaListener(context =>
+                {
+                        return new WcfCommunicationListener<INotifyNetworkModelUpdateContract>(context,
+                                                                                               this.notifyNetworkModelUpdateProvider,
+                                                                                               WcfUtility.CreateTcpClientBinding(),
+                                                                                               EndpointNames.TmsNotifyNetworkModelUpdateEndpoint);
+                }, EndpointNames.TmsNotifyNetworkModelUpdateEndpoint),
+
+                new ServiceReplicaListener(context =>
+                {
+                        return new WcfCommunicationListener<ITransactionActorContract>(context,
+                                                                                       this.transactionActorProvider,
+                                                                                       WcfUtility.CreateTcpClientBinding(),
+                                                                                       EndpointNames.TmsTransactionActorEndpoint);
+                }, EndpointNames.TmsTransactionActorEndpoint),
             };
         }
 
@@ -171,6 +194,25 @@ namespace OMS.HistoryDBManagerService
                         else
                         {
                             await StateManager.GetOrAddAsync<IReliableDictionary<long, long>>(tx, ReliableDictionaryNames.UnenergizedConsumers);
+                            await tx.CommitAsync();
+                        }
+                    }
+                }),
+
+                Task.Run(async() =>
+                {
+                    using (ITransaction tx = this.StateManager.CreateTransaction())
+                    {
+                        var result = await StateManager.TryGetAsync<IReliableDictionary<byte, List<long>>>(ReliableDictionaryNames.HistoryModelChanges);
+                        if(result.HasValue)
+                        {
+                            var modelChanges = result.Value;
+                            await modelChanges.ClearAsync();
+                            await tx.CommitAsync();
+                        }
+                        else
+                        {
+                            await StateManager.GetOrAddAsync<IReliableDictionary<byte, List<long>>>(tx, ReliableDictionaryNames.HistoryModelChanges);
                             await tx.CommitAsync();
                         }
                     }

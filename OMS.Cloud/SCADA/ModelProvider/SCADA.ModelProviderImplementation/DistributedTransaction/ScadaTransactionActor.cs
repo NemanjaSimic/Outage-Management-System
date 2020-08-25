@@ -8,7 +8,6 @@ using OMS.Common.NmsContracts;
 using OMS.Common.NmsContracts.GDA;
 using OMS.Common.PubSubContracts.DataContracts.SCADA;
 using OMS.Common.SCADA;
-using OMS.Common.ScadaContracts.Commanding;
 using OMS.Common.ScadaContracts.DataContracts;
 using OMS.Common.ScadaContracts.DataContracts.ScadaModelPointItems;
 using OMS.Common.TmsContracts;

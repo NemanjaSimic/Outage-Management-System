@@ -44,6 +44,8 @@
     <Reference Include="System.Xml" />
   </ItemGroup>
   <ItemGroup>
+    <Compile Include="DistributedTransaction\OmsHistoryNotifyNetworkModelUpdate.cs" />
+    <Compile Include="DistributedTransaction\OmsHistoryTransactionActor.cs" />
     <Compile Include="HistoryDBManager.cs" />
     <Compile Include="ModelAccess\ConsumerAccess.cs" />
     <Compile Include="ModelAccess\EquipmentAccess.cs" />
@@ -93,6 +95,10 @@
       <Project>{7032AEF1-E55A-4D5C-90FF-E0B8B4C98BE0}</Project>
       <Name>Common.OmsContracts</Name>
     </ProjectReference>
+    <ProjectReference Include="..\..\..\Common\Contracts\Common.TmsContracts\Common.TmsContracts.csproj">
+      <Project>{A07D94C2-40EF-48DB-B828-7E53E7F5A372}</Project>
+      <Name>Common.TmsContracts</Name>
+    </ProjectReference>
     <ProjectReference Include="..\..\OutageDataAccess\OutageDatabase\OutageDatabase\OMS.OutageDatabase.csproj">
       <Project>{D4F63B28-12CA-4B86-8DC6-778AE40C79AE}</Project>
       <Name>OMS.OutageDatabase</Name>
@@ -130,8 +136,6 @@
       <Version>4.1.417</Version>
     </PackageReference>
   </ItemGroup>
-  <ItemGroup>
-    <Folder Include="DistributedTransaction\" />
-  </ItemGroup>
+  <ItemGroup />
   <Import Project="$(MSBuildToolsPath)\Microsoft.CSharp.targets" />
 </Project>
