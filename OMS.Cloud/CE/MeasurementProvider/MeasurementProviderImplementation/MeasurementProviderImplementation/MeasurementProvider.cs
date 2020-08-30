@@ -459,6 +459,7 @@ namespace CE.MeasurementProviderImplementation
 			{
 				string message = $"Measurement with GID {measurementId:X16} already exists in measurement-element mapping.";
 				Logger.LogError(message);
+				return;
 				//throw new ArgumentException(message);
 			}
 

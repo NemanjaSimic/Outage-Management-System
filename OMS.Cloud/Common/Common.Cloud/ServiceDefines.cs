@@ -75,8 +75,9 @@ namespace OMS.Common.Cloud
                 //OMS
                 { MicroserviceNames.OmsModelProviderService,        ServiceType.STATEFUL_SERVICE    },
                 { MicroserviceNames.OmsOutageLifecycleService,      ServiceType.STATELESS_SERVICE   },
-                { MicroserviceNames.OmsCallTrackingService,         ServiceType.STATELESS_SERVICE   },
+                { MicroserviceNames.OmsCallTrackingService,         ServiceType.STATEFUL_SERVICE    },
                 { MicroserviceNames.OmsHistoryDBManagerService,     ServiceType.STATEFUL_SERVICE    },
+                { MicroserviceNames.OmsEmailService,                ServiceType.STATELESS_SERVICE   },  
                 { MicroserviceNames.OmsOutageSimulatorService,      ServiceType.STANDALONE_SERVICE  },
 
                 //WEB_ADAPTER
@@ -116,6 +117,7 @@ namespace OMS.Common.Cloud
                 { MicroserviceNames.OmsCallTrackingService,          new Uri("fabric:/OMS.Cloud/OMS.CallTrackingService")           },
                 { MicroserviceNames.OmsHistoryDBManagerService,      new Uri("fabric:/OMS.Cloud/OMS.HistoryDBManagerService")       },
                 { MicroserviceNames.OmsOutageLifecycleService,       new Uri("fabric:/OMS.Cloud/OMS.OutageLifecycleService")        },
+                { MicroserviceNames.OmsEmailService,                 new Uri("fabric:/OMS.Cloud/OMS.EmailService")                  },
                 { MicroserviceNames.OmsOutageSimulatorService,       new Uri("net.tcp://localhost:10009/OutageSimulator/")          },
                 
                 //WEB_ADAPTER

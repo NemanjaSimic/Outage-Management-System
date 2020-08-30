@@ -273,13 +273,19 @@ namespace CE.ModelProviderImplementation
 			if (dmsType == DMSType.DISCRETE)
 			{
 				Measurement newDiscrete = GetPopulatedDiscreteMeasurement(modelEntity);
-				Measurements.Add(newDiscrete.Id, newDiscrete);
+				if (!Measurements.ContainsKey(newDiscrete.Id))
+				{
+					Measurements.Add(newDiscrete.Id, newDiscrete);
+				}
 				await measurementProviderClient.AddDiscreteMeasurement(newDiscrete as DiscreteMeasurement);
 			}
 			else if (dmsType == DMSType.ANALOG)
 			{
 				Measurement newAnalog = GetPopulatedAnalogMeasurement(modelEntity);
-				Measurements.Add(newAnalog.Id, newAnalog);
+				if (!Measurements.ContainsKey(newAnalog.Id))
+				{
+					Measurements.Add(newAnalog.Id, newAnalog);
+				}
 				await measurementProviderClient.AddAnalogMeasurement(newAnalog as AnalogMeasurement);
 			}
 			else if (dmsType != DMSType.MASK_TYPE && dmsType != DMSType.BASEVOLTAGE)
@@ -483,11 +489,18 @@ namespace CE.ModelProviderImplementation
 				else if (connection.Count > 1)
 				{
 					Logger.LogWarning($"{baseLogString} GetPopulatedAnalogMeasurement => Analog measurement with GID: {rs.Id:X16} is connected to more then one element.");
-					MeasurementToConnectedTerminalMap.Add(rs.Id, connection.First());
+					if (!MeasurementToConnectedTerminalMap.ContainsKey(rs.Id))
+					{
+						MeasurementToConnectedTerminalMap.Add(rs.Id, connection.First());
+					}
+
 				}
 				else
 				{
-					MeasurementToConnectedTerminalMap.Add(rs.Id, connection.First());
+					if (!MeasurementToConnectedTerminalMap.ContainsKey(rs.Id))
+					{
+						MeasurementToConnectedTerminalMap.Add(rs.Id, connection.First());
+					}
 				}
 			}
 			catch (Exception e)
@@ -524,11 +537,17 @@ namespace CE.ModelProviderImplementation
 				else if (connection.Count > 1)
 				{
 					Logger.LogWarning($"{baseLogString} GetPopulatedDiscreteMeasurement => Discrete measurement with GID {rs.Id:X16} is connected to more then one element.");
-					MeasurementToConnectedTerminalMap.Add(rs.Id, connection.First());
+					if (!MeasurementToConnectedTerminalMap.ContainsKey(rs.Id))
+					{
+						MeasurementToConnectedTerminalMap.Add(rs.Id, connection.First());
+					}
 				}
 				else
 				{
-					MeasurementToConnectedTerminalMap.Add(rs.Id, connection.First());
+					if (!MeasurementToConnectedTerminalMap.ContainsKey(rs.Id))
+					{
+						MeasurementToConnectedTerminalMap.Add(rs.Id, connection.First());
+					}
 				}
 			}
 			catch (Exception e)

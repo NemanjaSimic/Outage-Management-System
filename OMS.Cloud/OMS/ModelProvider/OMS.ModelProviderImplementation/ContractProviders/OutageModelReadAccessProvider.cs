@@ -219,6 +219,7 @@ namespace OMS.ModelProviderImplementation.ContractProviders
 
             try
             {
+                var outageTopologyModelDictionary = await TopologyModel.GetDataCopyAsync();
                 var outageTopologyModel = (await TopologyModel.GetDataCopyAsync())[0];
                 outageTopologyModel.GetElementByGid(gid, out topologyElement);
             }

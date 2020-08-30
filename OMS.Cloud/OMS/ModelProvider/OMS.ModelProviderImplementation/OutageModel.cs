@@ -1,4 +1,6 @@
-﻿using Common.OmsContracts.HistoryDBManager;
+﻿using Common.CeContracts;
+using Common.CeContracts.TopologyProvider;
+using Common.OmsContracts.HistoryDBManager;
 using Common.OmsContracts.OutageLifecycle;
 using Common.PubSubContracts.DataContracts.CE;
 using Microsoft.ServiceFabric.Data;
@@ -9,6 +11,7 @@ using OMS.Common.Cloud.Names;
 using OMS.Common.Cloud.ReliableCollectionHelpers;
 using OMS.Common.PubSubContracts;
 using OMS.Common.PubSubContracts.Interfaces;
+using OMS.Common.WcfClient.CE;
 using OMS.Common.WcfClient.OMS;
 using OMS.Common.WcfClient.OMS.Lifecycle;
 using System;
@@ -31,6 +34,7 @@ namespace OMS.ModelProviderImplementation
 		
 		private IHistoryDBManagerContract historyDBManagerClient;
 		private IReportOutageContract reportOutageClient;
+		private ITopologyProviderContract topologyProviderClient;
 
 		
 		public OutageModel(IReliableStateManager stateManager)
@@ -45,6 +49,7 @@ namespace OMS.ModelProviderImplementation
 
 			this.stateManager = stateManager;
 			this.stateManager.StateManagerChanged += this.OnStateManagerChangedHandler;
+
 		}
 
 		#region ReliableDictionaryAccess
@@ -122,6 +127,15 @@ namespace OMS.ModelProviderImplementation
 			}
 		}
 		#endregion
+
+		public async Task InitializeOutageModel()
+		{
+			topologyProviderClient = TopologyProviderClient.CreateClient();
+			OutageTopologyModel topologyModel = await topologyProviderClient.GetOMSModel();
+
+			await TopologyModel.SetAsync(0, topologyModel);
+		}
+		
 
 		#region INotifySubscriberContract
 		private readonly string subscriberUri = MicroserviceNames.OmsModelProviderService;

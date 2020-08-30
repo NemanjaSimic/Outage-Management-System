@@ -137,6 +137,7 @@ namespace OMS.ModelProviderService
 
                 this.registerSubscriberClient = RegisterSubscriberClient.CreateClient();
                 await this.registerSubscriberClient.SubscribeToTopic(Topic.OMS_MODEL, MicroserviceNames.OmsModelProviderService);
+                await outageModel.InitializeOutageModel();
             }
             catch (Exception e)
 			{
