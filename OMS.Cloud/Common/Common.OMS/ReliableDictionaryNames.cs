@@ -10,5 +10,8 @@
         public const string PotentialOutage = "PotentialOutage";
         public const string CallsDictionary = "CallsDictionary";
         public const string HistoryModelChanges = "HistoryModelChanges";
+
+        public const string SimulatedOutages = "SimulatedOutages";
+        public const string MonitoredIsolationPoints = "MonitoredIsolationPoints";
     }
 }

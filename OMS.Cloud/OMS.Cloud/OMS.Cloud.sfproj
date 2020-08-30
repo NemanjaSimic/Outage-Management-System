@@ -43,6 +43,7 @@
     <ProjectReference Include="..\OMS\HistoryDBManager\OMS.HistoryDBManagerService\OMS.HistoryDBManagerService.csproj" />
     <ProjectReference Include="..\OMS\ModelProvider\OMS.ModelProviderService\OMS.ModelProviderService.csproj" />
     <ProjectReference Include="..\OMS\OutageLifecycle\OMS.OutageLifecycleService\OMS.OutageLifecycleService.csproj" />
+    <ProjectReference Include="..\OMS\OutageSimulator\OMS.OutageSimulatorService\OMS.OutageSimulatorService.csproj" />
     <ProjectReference Include="..\PUB_SUB\PubSubService\PubSubService.csproj" />
     <ProjectReference Include="..\SCADA\Acquisition\SCADA.AcquisitionService\SCADA.AcquisitionService.csproj" />
     <ProjectReference Include="..\SCADA\Commanding\SCADA.CommandingService\SCADA.CommandingService.csproj" />

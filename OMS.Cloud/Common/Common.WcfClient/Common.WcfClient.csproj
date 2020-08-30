@@ -60,6 +60,7 @@
     <Compile Include="OMS\OutageModelUpdateAccessClient.cs" />
     <Compile Include="OMS\HistoryDBManagerClient.cs" />
     <Compile Include="OMS\OutageSimulatorClient.cs" />
+    <Compile Include="OMS\OutageSimulatorUIClient.cs" />
     <Compile Include="OMS\ReportingClient.cs" />
     <Compile Include="OMS\ResolveOutageClient.cs" />
     <Compile Include="OMS\SendLocationIsolationCrewClient.cs" />

@@ -48,7 +48,7 @@ namespace OMS.OutageLifecycleImplementation
             this.outageModelReadAccessClient = OutageModelReadAccessClient.CreateClient();
             this.outageModelUpdateAccessClient = OutageModelUpdateAccessClient.CreateClient();
             this.outageModelAccessClient = OutageModelAccessClient.CreateClient();
-            this.measurementMapServiceClient = MeasurementMapServiceClient.CreateClient();
+            this.measurementMapServiceClient = MeasurementMapClient.CreateClient();
             this.switchStatusCommandingClient = SwitchStatusCommandingClient.CreateClient();
 
             this.CommandedElements = new Dictionary<long, long>();

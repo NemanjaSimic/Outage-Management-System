@@ -46,7 +46,6 @@ namespace OMS.Common.Cloud.Names
         public const string OmsConsumerAccessEndpoint = "OmsConsumerAccessEndpoint";
         public const string OmsOutageLifecycleUICommandingEndpoint = "OmsOutageLifecycleUICommandingEndpoint";
         public const string OmsReportPotentialOutageEndpoint = "OmsReportPotentialOutageEndpoint";
-        public const string OmsOutageSimulatorServiceEndpoint = "OmsOutageSimulatorServiceEndpoint";
         public const string OmsHistoryDBManagerEndpoint = "OmsHistoryDBManagerEndpoint";
         public const string OmsReportingEndpoint = "OmsReportingEndpoint";
         public const string OmsModelReadAccessEndpoint = "OmsModelReadAccessEndpoint";
@@ -57,8 +56,9 @@ namespace OMS.Common.Cloud.Names
         public const string OmsValidateResolveConditionsEndpoint = "OmsValidateResolveConditionsEndpoint";
         public const string OmsTracingAlgorithmEndpoint = "OmsTracingAlgorithmEndpoint";
         public const string OmsModelUpdateAccessEndpoint = "OmsModelUpdateAccessEndpoint";
-        public const string OmsOutageSimulatorEndpoint = "OmsOutageSimulatorEndpoint";
         public const string OmsIsolateOutageEndpoint = "OmsIsolateOutageEndpoint";
+        public const string OmsOutageSimulatorEndpoint = "OmsOutageSimulatorEndpoint";
+        public const string OmsOutageSimulatorUIEndpoint = "OmsOutageSimulatorUIEndpoint";
 
         public const string WebAdapterEndpoint = "WebAdapterEndpoint";
     }
