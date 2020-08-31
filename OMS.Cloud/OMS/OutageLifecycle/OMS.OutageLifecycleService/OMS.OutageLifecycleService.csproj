@@ -72,9 +72,9 @@
       <Project>{AA75150D-EE56-49C0-9431-751F83CCC0CD}</Project>
       <Name>Common.PubSubContracts</Name>
     </ProjectReference>
-    <ProjectReference Include="..\..\OutageDataAccess\OutageDatabase\OutageDatabase\OutageDatabase.csproj">
+    <ProjectReference Include="..\..\OutageDataAccess\OutageDatabase\OutageDatabase\OMS.OutageDatabase.csproj">
       <Project>{D4F63B28-12CA-4B86-8DC6-778AE40C79AE}</Project>
-      <Name>OutageDatabase</Name>
+      <Name>OMS.OutageDatabase</Name>
     </ProjectReference>
     <ProjectReference Include="..\OMS.OutageLifecycleServiceImplementation\OMS.OutageLifecycleImplementation.csproj">
       <Project>{2980a776-f631-4af7-a8cc-3faf8d448c3b}</Project>

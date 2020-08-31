@@ -205,7 +205,7 @@ namespace Outage.DataImporter.CIMAdapter.Importer
 			{
 				int iteratorId = 0;
 				int resourcesLeft = 0;
-				int numberOfResources = 10000; //TODO: connfigurabilno
+				int numberOfResources = 10000; //potencijalno connfigurabilno
 
 				try
 				{

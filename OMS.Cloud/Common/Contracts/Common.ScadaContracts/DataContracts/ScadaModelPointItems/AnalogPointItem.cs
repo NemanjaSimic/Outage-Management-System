@@ -174,7 +174,7 @@ namespace OMS.Common.ScadaContracts.DataContracts.ScadaModelPointItems
                 return 0;
             }
 
-            //TODO: veoma cudno ponasanje - conditional breakpoint sa uslovom 'ScalingFactor == 0', po zaustavljanju ScalingFactor ima vrednost 1, odustajem razumevanja baga dok ne ispolji zacajnije posledice - donji fix resava slucaj
+            //veoma cudno ponasanje - conditional breakpoint sa uslovom 'ScalingFactor == 0', po zaustavljanju ScalingFactor ima vrednost 1, odustajem razumevanja baga dok ne ispolji zacajnije posledice - donji fix resava slucaj
             if (ScalingFactor == 0)
             {
                 ScalingFactor = 1;

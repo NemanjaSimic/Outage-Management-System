@@ -1,4 +1,4 @@
-﻿using Common.OMS.OutageDatabaseModel;
+﻿using Common.OmsContracts.DataContracts.OutageDatabaseModel;
 using Common.OmsContracts.ModelAccess;
 using OMS.Common.Cloud;
 using OMS.Common.Cloud.Logger;
@@ -8,7 +8,6 @@ using OMS.Common.WcfClient.NMS;
 using OutageDatabase.Repository;
 using System;
 using System.Collections.Generic;
-using System.Linq.Expressions;
 using System.Threading.Tasks;
 
 namespace OMS.HistoryDBManagerImplementation.ModelAccess
@@ -96,7 +95,7 @@ namespace OMS.HistoryDBManagerImplementation.ModelAccess
 		{
 			return Task.Run(() =>
 			{
-				//todo: razmisliti o ConditonalValue<Consumer>
+				//MODO: razmisliti o ConditonalValue<Consumer>
 				Consumer consumerDb = null;
 
 				using (var unitOfWork = new UnitOfWork())
@@ -117,7 +116,7 @@ namespace OMS.HistoryDBManagerImplementation.ModelAccess
 			});
 		}
 
-		public Task<IEnumerable<Consumer>> FindConsumer(Expression<Func<Consumer, bool>> predicate)
+		public Task<IEnumerable<Consumer>> FindConsumer(ConsumerExpression expression)
 		{
 			return Task.Run(() =>
 			{
@@ -127,7 +126,7 @@ namespace OMS.HistoryDBManagerImplementation.ModelAccess
 				{
 					try
 					{
-						consumers = unitOfWork.ConsumerRepository.Find(predicate);
+						consumers = unitOfWork.ConsumerRepository.Find(expression.Predicate);
 					}
 					catch (Exception e)
 					{
@@ -167,7 +166,7 @@ namespace OMS.HistoryDBManagerImplementation.ModelAccess
 		{
 			return Task.Run(() =>
 			{
-				//todo: razmisliti o ConditonalValue<Consumer>
+				//MODO: razmisliti o ConditonalValue<Consumer>
 				Consumer consumer = null;
 
 				using (var unitOfWork = new UnitOfWork())

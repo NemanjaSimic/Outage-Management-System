@@ -66,12 +66,14 @@ namespace OMS.Common.Cloud.ReliableCollectionHelpers
             {
                 await reliableDictionary.ClearAsync();
 
+                var tasks = new List<Task>();
+
                 foreach (var kvp in source)
                 {
-                    //TODO: do not await one by one but await all
-                    await reliableDictionary.SetAsync(tx, kvp.Key, kvp.Value);
+                    tasks.Add(reliableDictionary.SetAsync(tx, kvp.Key, kvp.Value));
                 }
 
+                Task.WaitAll(tasks.ToArray());
                 await tx.CommitAsync();
             }
 
@@ -106,13 +108,15 @@ namespace OMS.Common.Cloud.ReliableCollectionHelpers
                 var asyncEnumerator = asyncEnumerable.GetAsyncEnumerator();
                 CancellationTokenSource tokenSource = new CancellationTokenSource();
 
-                while(await asyncEnumerator.MoveNextAsync(tokenSource.Token))
+                var tasks = new List<Task>();
+
+                while (await asyncEnumerator.MoveNextAsync(tokenSource.Token))
                 {
                     var currentEntry = asyncEnumerator.Current;
-                    //TODO: do not await one by one but await all
-                    await target.SetAsync(tx, currentEntry.Key, currentEntry.Value);
+                    tasks.Add(target.SetAsync(tx, currentEntry.Key, currentEntry.Value));
                 }
 
+                Task.WaitAll(tasks.ToArray());
                 await tx.CommitAsync();
             }
 

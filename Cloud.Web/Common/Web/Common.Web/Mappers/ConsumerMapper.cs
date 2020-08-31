@@ -1,4 +1,4 @@
-﻿using Common.OMS.OutageDatabaseModel;
+﻿using Common.OmsContracts.DataContracts.OutageDatabaseModel;
 using Common.PubSubContracts.DataContracts.OMS;
 using Common.Web.Models.ViewModels;
 using System.Collections.Generic;
@@ -8,7 +8,7 @@ namespace Common.Web.Mappers
 {
     public class ConsumerMapper : IConsumerMapper
     {
-        //TODO:
+        //MODO:
         //private IOutageMapper _outageMapper;
 
         //public ConsumerMapper(IOutageMapper outageMapper)
@@ -23,8 +23,8 @@ namespace Common.Web.Mappers
                 Mrid = consumer.ConsumerMRID,
                 FirstName = consumer.FirstName,
                 LastName = consumer.LastName,
-                ActiveOutages = new List<ActiveOutageViewModel>(),      //TODO: _outageMapper.MapActiveOutages(consumer.ActiveOutages),
-                ArchivedOutages = new List<ArchivedOutageViewModel>(),  //TODO: _outageMapper.MapArchivedOutages(consumer.ArchivedOutages)
+                ActiveOutages = new List<ActiveOutageViewModel>(),      //MODO: _outageMapper.MapActiveOutages(consumer.ActiveOutages),
+                ArchivedOutages = new List<ArchivedOutageViewModel>(),  //MODO: _outageMapper.MapArchivedOutages(consumer.ArchivedOutages)
             };
 
         public ConsumerViewModel MapConsumer(ConsumerMessage consumer)
@@ -34,8 +34,8 @@ namespace Common.Web.Mappers
                 Mrid = consumer.ConsumerMRID,
                 FirstName = consumer.FirstName,
                 LastName = consumer.LastName,
-                ActiveOutages = new List<ActiveOutageViewModel>(),      //TODO: _outageMapper.MapActiveOutages(consumer.ActiveOutages),
-                ArchivedOutages = new List<ArchivedOutageViewModel>(),  //TODO: _outageMapper.MapArchivedOutages(consumer.ArchivedOutages)
+                ActiveOutages = new List<ActiveOutageViewModel>(),      //MODO: _outageMapper.MapActiveOutages(consumer.ActiveOutages),
+                ArchivedOutages = new List<ArchivedOutageViewModel>(),  //MODO: _outageMapper.MapArchivedOutages(consumer.ArchivedOutages)
             };
 
         public IEnumerable<ConsumerViewModel> MapConsumers(IEnumerable<Consumer> consumers)

@@ -80,6 +80,10 @@
       <Project>{AA75150D-EE56-49C0-9431-751F83CCC0CD}</Project>
       <Name>Common.PubSubContracts</Name>
     </ProjectReference>
+    <ProjectReference Include="..\..\..\Common\Contracts\Common.TmsContracts\Common.TmsContracts.csproj">
+      <Project>{A07D94C2-40EF-48DB-B828-7E53E7F5A372}</Project>
+      <Name>Common.TmsContracts</Name>
+    </ProjectReference>
     <ProjectReference Include="..\OMS.ModelProviderImplementation\OMS.ModelProviderImplementation.csproj">
       <Project>{B303E897-EE70-44FC-AF4F-D21600498A91}</Project>
       <Name>OMS.ModelProviderImplementation</Name>

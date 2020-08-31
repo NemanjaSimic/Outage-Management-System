@@ -8,7 +8,7 @@ using System.Runtime.Serialization;
 using System.Text;
 using System.Threading.Tasks;
 
-namespace Common.OMS.OutageDatabaseModel
+namespace Common.OmsContracts.DataContracts.OutageDatabaseModel
 {
     [DataContract]
     public class EquipmentHistorical

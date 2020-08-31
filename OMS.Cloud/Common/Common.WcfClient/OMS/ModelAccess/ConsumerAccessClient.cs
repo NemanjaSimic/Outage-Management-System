@@ -1,18 +1,15 @@
-﻿using Common.OMS.OutageDatabaseModel;
+﻿using Common.OmsContracts.DataContracts.OutageDatabaseModel;
 using Common.OmsContracts.ModelAccess;
 using Microsoft.ServiceFabric.Services.Client;
 using Microsoft.ServiceFabric.Services.Communication.Wcf.Client;
 using OMS.Common.Cloud.Names;
 using System;
 using System.Collections.Generic;
-using System.Linq;
-using System.Linq.Expressions;
-using System.Text;
 using System.Threading.Tasks;
 
 namespace OMS.Common.WcfClient.OMS.ModelAccess
 {
-	public class ConsumerAccessClient : WcfSeviceFabricClientBase<IConsumerAccessContract>, IConsumerAccessContract
+    public class ConsumerAccessClient : WcfSeviceFabricClientBase<IConsumerAccessContract>, IConsumerAccessContract
 	{
         private static readonly string microserviceName = MicroserviceNames.OmsHistoryDBManagerService;
         private static readonly string listenerName = EndpointNames.OmsConsumerAccessEndpoint;
@@ -38,11 +35,10 @@ namespace OMS.Common.WcfClient.OMS.ModelAccess
 			return InvokeWithRetryAsync(client => client.Channel.AddConsumer(consumer));
 		}
 
-		//TODO: solve serialization of Expression<Func<Consumer, bool>>
-		//public Task<IEnumerable<Consumer>> FindConsumer(Expression<Func<Consumer, bool>> predicate)
-		//{
-		//	return InvokeWithRetryAsync(client => client.Channel.FindConsumer(predicate));
-		//}
+		public Task<IEnumerable<Consumer>> FindConsumer(ConsumerExpression expression)
+		{
+			return InvokeWithRetryAsync(client => client.Channel.FindConsumer(expression));
+		}
 
 		public Task<IEnumerable<Consumer>> GetAllConsumers()
 		{

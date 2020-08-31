@@ -46,6 +46,8 @@
   <ItemGroup>
     <Compile Include="ContractProviders\OutageModelReadAccessProvider.cs" />
     <Compile Include="ContractProviders\OutageModelUpdateAccessProvider.cs" />
+    <Compile Include="DistributedTransaction\OmsModelProviderNotifyNetworkModelUpdate.cs" />
+    <Compile Include="DistributedTransaction\OmsModelProviderTransactionActor.cs" />
     <Compile Include="OutageModel.cs" />
     <Compile Include="Properties\AssemblyInfo.cs" />
   </ItemGroup>
@@ -66,6 +68,10 @@
       <Project>{2307F7DC-6B87-4506-8365-6966712DD5FE}</Project>
       <Name>Common.CloudContracts</Name>
     </ProjectReference>
+    <ProjectReference Include="..\..\..\Common\Contracts\Common.NmsContracts\Common.NmsContracts.csproj">
+      <Project>{235804A8-9C8F-40EC-8786-5DAB24733977}</Project>
+      <Name>Common.NmsContracts</Name>
+    </ProjectReference>
     <ProjectReference Include="..\..\..\Common\Contracts\Common.OmsContracts\Common.OmsContracts.csproj">
       <Project>{7032AEF1-E55A-4D5C-90FF-E0B8B4C98BE0}</Project>
       <Name>Common.OmsContracts</Name>
@@ -73,6 +79,10 @@
     <ProjectReference Include="..\..\..\Common\Contracts\Common.PubSubContracts\Common.PubSubContracts.csproj">
       <Project>{AA75150D-EE56-49C0-9431-751F83CCC0CD}</Project>
       <Name>Common.PubSubContracts</Name>
+    </ProjectReference>
+    <ProjectReference Include="..\..\..\Common\Contracts\Common.TmsContracts\Common.TmsContracts.csproj">
+      <Project>{A07D94C2-40EF-48DB-B828-7E53E7F5A372}</Project>
+      <Name>Common.TmsContracts</Name>
     </ProjectReference>
   </ItemGroup>
   <ItemGroup>
@@ -104,5 +114,6 @@
       <Version>4.1.417</Version>
     </PackageReference>
   </ItemGroup>
+  <ItemGroup />
   <Import Project="$(MSBuildToolsPath)\Microsoft.CSharp.targets" />
 </Project>

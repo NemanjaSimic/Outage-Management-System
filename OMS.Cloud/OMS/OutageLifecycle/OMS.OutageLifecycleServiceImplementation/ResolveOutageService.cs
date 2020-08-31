@@ -1,5 +1,5 @@
 ﻿using Common.OMS;
-using Common.OMS.OutageDatabaseModel;
+using Common.OmsContracts.DataContracts.OutageDatabaseModel;
 using Common.OmsContracts.ModelAccess;
 using Common.OmsContracts.OutageLifecycle;
 using OMS.Common.Cloud;
@@ -64,7 +64,7 @@ namespace OMS.OutageLifecycleImplementation
 
             if (!activeOutageDbEntity.IsResolveConditionValidated)
             {
-                //TODO: mozda i ovde odraditi proveru uslova?
+                //MODO: mozda i ovde odraditi proveru uslova? ako je IsResolveConditionValidated == false, a po svemu sudeci ne bi smeo biti na ovom mestu onda ponovo pokrenuti rutinu provere za setovanje tog "isValid" - egde case, ako se cackaju entiteti u bazi...
                 Logger.LogWarning("ResolveOutage => resolve conditions not validated.");
                 return false;
             }
@@ -117,7 +117,7 @@ namespace OMS.OutageLifecycleImplementation
                         Logger.LogInformation($"ArchivedOutage on element with gid: 0x{archivedOutageDbEntity.OutageElementGid:x16} is successfully published");
                     }
                 }
-                catch (Exception e) //TODO: Exception over proxy or enum...
+                catch (Exception e)
                 {
                     Logger.LogError("OutageModel::ResolveOutage => exception on PublishActiveOutage()", e);
                     success = false;

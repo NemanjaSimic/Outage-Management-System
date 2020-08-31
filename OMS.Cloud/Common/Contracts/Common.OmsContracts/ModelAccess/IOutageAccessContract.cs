@@ -1,17 +1,16 @@
 ﻿using Common.CloudContracts;
-using Common.OMS.OutageDatabaseModel;
+using Common.OmsContracts.DataContracts.OutageDatabaseModel;
 using Microsoft.ServiceFabric.Services.Remoting;
 using System;
 using System.Collections.Generic;
-using System.Linq;
 using System.Linq.Expressions;
+using System.Runtime.Serialization;
 using System.ServiceModel;
-using System.Text;
 using System.Threading.Tasks;
 
 namespace Common.OmsContracts.ModelAccess
 {
-	[ServiceContract]
+    [ServiceContract]
 	public interface IOutageAccessContract : IService, IHealthChecker
 	{
 		[OperationContract]
@@ -38,16 +37,14 @@ namespace Common.OmsContracts.ModelAccess
 		[OperationContract]
 		Task UpdateOutage(OutageEntity outage);
 
-		//TODO: solve serialization of Expression<Func<OutageEntity, bool>>
-		//[OperationContract]
-		//Task<IEnumerable<OutageEntity>> FindOutage(Expression<Func<OutageEntity, bool>> predicate);
-	}
+        [OperationContract]
+        Task<IEnumerable<OutageEntity>> FindOutage(OutageExpression expression);
+    }
 
-	//TODO: probati
-	//[DataContract]
-	//public class Foo
-	//{
-	//	[DataMember]
-	//	public Expression<Func<Consumer, bool>> FooProp { get; set; }
-	//}
+    [DataContract]
+    public class OutageExpression
+    {
+		[DataMember]
+        public Expression<Func<OutageEntity, bool>> Predicate { get; set; }
+    }
 }

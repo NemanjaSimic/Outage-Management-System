@@ -1,4 +1,4 @@
-﻿using Common.OMS.OutageDatabaseModel;
+﻿using Common.OmsContracts.DataContracts.OutageDatabaseModel;
 using Common.PubSubContracts.DataContracts.OMS;
 using Common.Web.Models;
 using Common.Web.Models.ViewModels;

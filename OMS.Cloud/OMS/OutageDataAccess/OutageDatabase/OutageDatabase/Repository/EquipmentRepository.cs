@@ -1,11 +1,11 @@
-﻿using Common.OMS.OutageDatabaseModel;
-using System.Collections.Generic;
+﻿using System.Collections.Generic;
 using System.Linq;
 using System.Data.Entity;
+using Common.OmsContracts.DataContracts.OutageDatabaseModel;
 
 namespace OutageDatabase.Repository
 {
-	public class EquipmentRepository : Repository<Equipment, long>
+    public class EquipmentRepository : Repository<Equipment, long>
     {
         public EquipmentRepository(OutageContext context)
             : base(context)

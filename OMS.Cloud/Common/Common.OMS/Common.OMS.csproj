@@ -47,22 +47,19 @@
     <Compile Include="CloudQueueNames.cs" />
     <Compile Include="Mappers\ConsumerMessageMapper.cs" />
     <Compile Include="Mappers\EquipmentMapper.cs" />
-    <Compile Include="OutageDatabaseModel\Consumer.cs" />
-    <Compile Include="OutageDatabaseModel\ConsumerHistorical.cs" />
-    <Compile Include="OutageDatabaseModel\Equipment.cs" />
-    <Compile Include="OutageDatabaseModel\EquipmentHistorical.cs" />
-    <Compile Include="OutageDatabaseModel\OutageEntity.cs" />
     <Compile Include="Mappers\OutageMessageMapper.cs" />
     <Compile Include="ReliableDictionaryNames.cs" />
     <Compile Include="Properties\AssemblyInfo.cs" />
     <Compile Include="Report\DateHelpers.cs" />
-    <Compile Include="Report\OutageReport.cs" />
-    <Compile Include="Report\ReportOptions.cs" />
   </ItemGroup>
   <ItemGroup>
     <ProjectReference Include="..\Common.Cloud\Common.Cloud.csproj">
       <Project>{FBEE1369-0F6C-41E6-8C62-8C1C5CDBB602}</Project>
       <Name>Common.Cloud</Name>
+    </ProjectReference>
+    <ProjectReference Include="..\Contracts\Common.OmsContracts\Common.OmsContracts.csproj">
+      <Project>{7032AEF1-E55A-4D5C-90FF-E0B8B4C98BE0}</Project>
+      <Name>Common.OmsContracts</Name>
     </ProjectReference>
     <ProjectReference Include="..\Contracts\Common.PubSubContracts\Common.PubSubContracts.csproj">
       <Project>{AA75150D-EE56-49C0-9431-751F83CCC0CD}</Project>

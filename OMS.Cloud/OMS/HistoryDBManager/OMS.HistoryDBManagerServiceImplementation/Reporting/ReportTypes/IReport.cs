@@ -1,4 +1,4 @@
-﻿using Common.OMS.Report;
+﻿using Common.OmsContracts.DataContracts.Report;
 
 namespace OMS.HistoryDBManagerImplementation.Reporting.ReportTypes
 {

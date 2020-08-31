@@ -1,19 +1,19 @@
-﻿using Microsoft.ServiceFabric.Data;
+﻿using Common.OMS;
+using Microsoft.ServiceFabric.Data;
 using Microsoft.ServiceFabric.Data.Notifications;
 using OMS.Common.Cloud.Logger;
 using OMS.Common.Cloud.Names;
 using OMS.Common.Cloud.ReliableCollectionHelpers;
 using OMS.Common.NmsContracts.GDA;
-using OMS.Common.SCADA;
 using OMS.Common.TmsContracts.Notifications;
 using OMS.Common.WcfClient.TMS;
 using System;
 using System.Collections.Generic;
 using System.Threading.Tasks;
 
-namespace SCADA.ModelProviderImplementation.DistributedTransaction
+namespace OMS.HistoryDBManagerImplementation.DistributedTransaction
 {
-    public class ScadaNotifyNetworkModelUpdate : INotifyNetworkModelUpdateContract
+    public class OmsHistoryNotifyNetworkModelUpdate : INotifyNetworkModelUpdateContract
     {
         private readonly string baseLogString;
         private readonly IReliableStateManager stateManager;
@@ -25,13 +25,16 @@ namespace SCADA.ModelProviderImplementation.DistributedTransaction
         }
 
         #region Reliable Dictionaries
-        private bool isModelChangesInitialized;
+        private bool isHistoryModelChangesInitialized;
         private bool ReliableDictionariesInitialized
         {
-            get { return isModelChangesInitialized; }
+            get 
+            { 
+                return isHistoryModelChangesInitialized; 
+            }
         }
 
-        private ReliableDictionaryAccess<byte, List<long>> ModelChanges { get; set; }
+        private ReliableDictionaryAccess<byte, List<long>> HistoryModelChanges { get; set; }
 
         private async void OnStateManagerChangedHandler(object sender, NotifyStateManagerChangedEventArgs e)
         {
@@ -40,29 +43,29 @@ namespace SCADA.ModelProviderImplementation.DistributedTransaction
                 var operation = e as NotifyStateManagerSingleEntityChangedEventArgs;
                 string reliableStateName = operation.ReliableState.Name.AbsolutePath;
 
-                if (reliableStateName == ReliableDictionaryNames.ModelChanges)
+                if (reliableStateName == ReliableDictionaryNames.HistoryModelChanges)
                 {
-                    ModelChanges = await ReliableDictionaryAccess<byte, List<long>>.Create(stateManager, ReliableDictionaryNames.ModelChanges);
-                    this.isModelChangesInitialized = true;
+                    HistoryModelChanges = await ReliableDictionaryAccess<byte, List<long>>.Create(stateManager, ReliableDictionaryNames.HistoryModelChanges);
+                    this.isHistoryModelChangesInitialized = true;
 
-                    string debugMessage = $"{baseLogString} OnStateManagerChangedHandler => '{ReliableDictionaryNames.ModelChanges}' ReliableDictionaryAccess initialized.";
+                    string debugMessage = $"{baseLogString} OnStateManagerChangedHandler => '{ReliableDictionaryNames.HistoryModelChanges}' ReliableDictionaryAccess initialized.";
                     Logger.LogDebug(debugMessage);
                 }
             }
         }
         #endregion Reliable Dictionaries
 
-        public ScadaNotifyNetworkModelUpdate(IReliableStateManager stateManager)
+        public OmsHistoryNotifyNetworkModelUpdate(IReliableStateManager stateManager)
         {
             this.baseLogString = $"{this.GetType()} [{this.GetHashCode()}] =>{Environment.NewLine}";
 
-            this.isModelChangesInitialized = false;
+            this.isHistoryModelChangesInitialized = false;
 
             this.stateManager = stateManager;
             this.stateManager.StateManagerChanged += this.OnStateManagerChangedHandler;
         }
 
-        #region IModelUpdateNotificationContract
+        #region INotifyNetworkModelUpdateContract
         public async Task<bool> Notify(Dictionary<DeltaOpType, List<long>> modelChanges)
         {
             while (!ReliableDictionariesInitialized)
@@ -73,25 +76,25 @@ namespace SCADA.ModelProviderImplementation.DistributedTransaction
             StashChanges(modelChanges);
 
             var transactionEnlistmentClient = TransactionEnlistmentClient.CreateClient();
-            bool success = await transactionEnlistmentClient.Enlist(DistributedTransactionNames.NetworkModelUpdateTransaction, MicroserviceNames.ScadaModelProviderService);
+            bool success = await transactionEnlistmentClient.Enlist(DistributedTransactionNames.NetworkModelUpdateTransaction, MicroserviceNames.OmsHistoryDBManagerService);
 
             if (success)
             {
-                Logger.LogInformation($"{baseLogString} Notify => SCADA SUCCESSFULLY notified about network model update.");
+                Logger.LogInformation($"{baseLogString} Notify => {MicroserviceNames.OmsHistoryDBManagerService} SUCCESSFULLY notified about network model update.");
             }
             else
             {
-                Logger.LogInformation($"{baseLogString} Notify => SCADA UNSUCCESSFULLY notified about network model update.");
+                Logger.LogInformation($"{baseLogString} Notify => {MicroserviceNames.OmsHistoryDBManagerService} UNSUCCESSFULLY notified about network model update.");
             }
 
             return success;
         }
-
+        
         public Task<bool> IsAlive()
         {
-            return Task.Run(() => { return true; });
+            return Task.Run(() => true);
         }
-        #endregion IModelUpdateNotificationContract
+        #endregion INotifyNetworkModelUpdateContract
     
         private void StashChanges(Dictionary<DeltaOpType, List<long>> modelChanges)
         {
@@ -99,7 +102,7 @@ namespace SCADA.ModelProviderImplementation.DistributedTransaction
 
             foreach (var element in modelChanges)
             {
-                tasks.Add(ModelChanges.SetAsync((byte)element.Key, element.Value));
+                tasks.Add(HistoryModelChanges.SetAsync((byte)element.Key, element.Value));
             }
 
             Task.WaitAll(tasks.ToArray());

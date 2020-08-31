@@ -1,4 +1,4 @@
-﻿using Common.OMS.Report;
+﻿using Common.OmsContracts.DataContracts.Report;
 using Common.OmsContracts.Report;
 using Microsoft.ServiceFabric.Services.Client;
 using Microsoft.ServiceFabric.Services.Communication.Wcf.Client;

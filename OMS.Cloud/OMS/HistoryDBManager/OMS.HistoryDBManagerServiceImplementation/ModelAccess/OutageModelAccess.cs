@@ -1,10 +1,9 @@
-﻿using Common.OMS.OutageDatabaseModel;
+﻿using Common.OmsContracts.DataContracts.OutageDatabaseModel;
 using Common.OmsContracts.ModelAccess;
 using OMS.Common.Cloud.Logger;
 using OutageDatabase.Repository;
 using System;
 using System.Collections.Generic;
-using System.Linq.Expressions;
 using System.Threading.Tasks;
 
 namespace OMS.HistoryDBManagerImplementation.ModelAccess
@@ -32,7 +31,7 @@ namespace OMS.HistoryDBManagerImplementation.ModelAccess
 		{
 			return Task.Run(() =>
 			{
-				//todo: razmisliti o ConditonalValue<OutageEntity>
+				//MODO: razmisliti o ConditonalValue<OutageEntity>
 				OutageEntity outageEntityDb = null;
 
 				using (var unitOfWork = new UnitOfWork())
@@ -53,7 +52,7 @@ namespace OMS.HistoryDBManagerImplementation.ModelAccess
 			});
 		}
 
-		public Task<IEnumerable<OutageEntity>> FindOutage(Expression<Func<OutageEntity, bool>> predicate)
+		public Task<IEnumerable<OutageEntity>> FindOutage(OutageExpression expression)
 		{
 			return Task.Run(() =>
 			{
@@ -63,7 +62,7 @@ namespace OMS.HistoryDBManagerImplementation.ModelAccess
 				{
 					try
 					{
-						outageEntities = unitOfWork.OutageRepository.Find(predicate);
+						outageEntities = unitOfWork.OutageRepository.Find(expression.Predicate);
 					}
 					catch (Exception e)
 					{
@@ -149,7 +148,7 @@ namespace OMS.HistoryDBManagerImplementation.ModelAccess
 		{
 			return Task.Run(() =>
 			{
-				//todo: razmisliti o ConditonalValue<OutageEntity>
+				//MODO: razmisliti o ConditonalValue<OutageEntity>
 				OutageEntity outageEntityDb = null;
 
 				using (var unitOfWork = new UnitOfWork())

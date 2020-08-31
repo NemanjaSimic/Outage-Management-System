@@ -1,4 +1,4 @@
-﻿using Common.OMS.Report;
+﻿using Common.OmsContracts.DataContracts.Report;
 using OutageDatabase;
 using OutageDatabase.Repository;
 using System;

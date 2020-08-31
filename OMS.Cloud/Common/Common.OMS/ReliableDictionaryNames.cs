@@ -9,5 +9,6 @@
         public const string OptimumIsolatioPoints = "OptimumIsolatioPoints";
         public const string PotentialOutage = "PotentialOutage";
         public const string CallsDictionary = "CallsDictionary";
+        public const string HistoryModelChanges = "HistoryModelChanges";
     }
 }
