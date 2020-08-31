@@ -19,11 +19,8 @@ namespace OMS.OutageSimulator.UI
     /// </summary>
     public partial class MainWindow : Window
     {
-        //private readonly Overview overview;
-        //private readonly GenerateOutage generateOutage;
-
-        private TabItem overviewTab;
-        private TabItem generateOutageTab;
+        private readonly Overview overview;
+        private readonly GenerateOutage generateOutage;
 
         public MainWindow()
         {
@@ -31,56 +28,47 @@ namespace OMS.OutageSimulator.UI
             DataContext = this;
             
             this.ResizeMode = ResizeMode.NoResize;
-            //this.overview = new Overview(this);
-            //this.generateOutage = new GenerateOutage(this);
+            this.overview = new Overview(this);
+            this.generateOutage = new GenerateOutage(this);
 
             InitializeTabControl();
         }
 
         internal async Task ChangeTab(TabType tabType)
         {
-            if(tabType == TabType.OVERVIEW)
+            if (tabType == TabType.OVERVIEW)
             {
                 await Dispatcher.BeginInvoke((Action)(async () =>
                 {
-                    await OverviewSelection();
+                    //await OverviewSelection();
                     TabControl.SelectedIndex = (int)TabType.OVERVIEW;
                 }));
             }
-            else if(tabType == TabType.GENERATE_OUTAGE)
+            else if (tabType == TabType.GENERATE_OUTAGE)
             {
-                await Dispatcher.BeginInvoke((Action)(() => TabControl.SelectedIndex = (int)TabType.GENERATE_OUTAGE));
+                await Dispatcher.BeginInvoke((Action)(() =>
+                {
+                    TabControl.SelectedIndex = (int)TabType.GENERATE_OUTAGE;
+                }));
             }
         }
 
         private void InitializeTabControl()
         {
-            this.overviewTab = new TabItem()
+            var overviewTab = new TabItem()
             {
                 Header = "Overview",
                 Content = new Overview(this),
             };
-            this.overviewTab.MouseLeftButtonUp += OverviewTabControl_MouseLeftButtonUp;
 
-            this.generateOutageTab = new TabItem()
+            var generateOutageTab = new TabItem()
             {
                 Header = "Generate Outage",
                 Content = new GenerateOutage(this),
             };
 
-            TabControl.Items.Add(this.overviewTab);
-            TabControl.Items.Add(this.generateOutageTab);
-        }
-
-        private void OverviewTabControl_MouseLeftButtonUp(object sender, MouseButtonEventArgs e)
-        {
-            if (overviewTab.IsSelected)
-            {
-                Dispatcher.BeginInvoke((Action)(async () =>
-                {
-                    await OverviewSelection();
-                }));
-            }
+            TabControl.Items.Add(overviewTab);
+            TabControl.Items.Add(generateOutageTab);
         }
 
         private async Task OverviewSelection()
@@ -88,7 +76,31 @@ namespace OMS.OutageSimulator.UI
             var outageSimulatorUIClient = OutageSimulatorUIClient.CreateClient();
             var simulatedOutages = await outageSimulatorUIClient.GetAllSimulatedOutages();
 
-            ((Overview)this.overviewTab.Content).SetOutages(simulatedOutages);
+            this.overview.SetOutages(simulatedOutages);
+        }
+
+        private void TabControl_SelectionChanged(object sender, SelectionChangedEventArgs e)
+        {
+            int tabItem = ((sender as TabControl)).SelectedIndex;
+            
+            if (e.Source is TabControl)
+            {
+                switch (tabItem)
+                {
+                    case (int)TabType.OVERVIEW:
+                        Dispatcher.BeginInvoke((Action)(async () =>
+                        {
+                            await OverviewSelection();
+                        }));
+                        break;
+
+                    case (int)TabType.GENERATE_OUTAGE:
+                        break;
+
+                    default:
+                        break;
+                }
+            }
         }
     }
 }

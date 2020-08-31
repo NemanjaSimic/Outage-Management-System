@@ -20,7 +20,7 @@ namespace Common.OmsContracts.DataContracts.OutageSimulator
         public Dictionary<long, long> DefaultToOptimumIsolationPointMap { get; set; }
 
         [IgnoreDataMember]
-        public HashSet<long> PointsOfInteres
+        public HashSet<long> ElementsOfInteres
         {
             get
             {

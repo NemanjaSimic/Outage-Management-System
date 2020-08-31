@@ -7,9 +7,11 @@ using OMS.Common.Cloud;
 using OMS.Common.Cloud.Logger;
 using OMS.Common.Cloud.ReliableCollectionHelpers;
 using OMS.Common.PubSubContracts.DataContracts.SCADA;
+using OMS.Common.WcfClient.CE;
 using OMS.Common.WcfClient.SCADA;
 using System;
 using System.Collections.Generic;
+using System.Linq;
 using System.Threading.Tasks;
 
 namespace OMS.OutageSimulatorImplementation
@@ -94,31 +96,48 @@ namespace OMS.OutageSimulatorImplementation
                 await Task.Delay(1000);
             }
 
+            var measurementMapClient = MeasurementMapClient.CreateClient();
+            var elementToMeasurementMap = await measurementMapClient.GetElementToMeasurementMap();
+
             var defaultIsolationPointsToBeOpened = new Dictionary<long, DiscreteModbusData>();
             var enumerableOutages = await SimulatedOutages.GetEnumerableDictionaryAsync();
             var enumerableMonitoredPoints = await MonitoredIsolationPoints.GetEnumerableDictionaryAsync();
 
             foreach(var outage in enumerableOutages.Values)
             {
-                foreach (long defaultPointGid in outage.DefaultIsolationPointGids)
+                foreach (long defaultPointElementGid in outage.DefaultIsolationPointGids)
                 {
-                    if (!outage.DefaultToOptimumIsolationPointMap.ContainsKey(defaultPointGid))
+                    if (!elementToMeasurementMap.ContainsKey(defaultPointElementGid))
                     {
                         continue;
                     }
 
-                    long optimumPointGid = outage.DefaultToOptimumIsolationPointMap[defaultPointGid];
+                    var defaultPointMeasurementGid = elementToMeasurementMap[defaultPointElementGid].FirstOrDefault();
 
-                    if (!enumerableMonitoredPoints.ContainsKey(optimumPointGid) || !enumerableMonitoredPoints.ContainsKey(defaultPointGid))
+                    if (!outage.DefaultToOptimumIsolationPointMap.ContainsKey(defaultPointElementGid))
                     {
                         continue;
                     }
 
-                    ushort optimumIsolationPointValue = enumerableMonitoredPoints[optimumPointGid].DiscreteModbusData.Value;
+                    long optimumPointElementGid = outage.DefaultToOptimumIsolationPointMap[defaultPointElementGid];
+
+                    if(!elementToMeasurementMap.ContainsKey(optimumPointElementGid))
+                    {
+                        continue;
+                    }
+
+                    long optimumPointMeasurementGid = elementToMeasurementMap[optimumPointElementGid].FirstOrDefault();
+
+                    if (!enumerableMonitoredPoints.ContainsKey(optimumPointMeasurementGid) || !enumerableMonitoredPoints.ContainsKey(defaultPointMeasurementGid))
+                    {
+                        continue;
+                    }
+
+                    ushort optimumIsolationPointValue = enumerableMonitoredPoints[optimumPointMeasurementGid].DiscreteModbusData.Value;
 
                     if (optimumIsolationPointValue == (ushort)DiscreteCommandingType.CLOSE)
                     {
-                        defaultIsolationPointsToBeOpened.Add(defaultPointGid, enumerableMonitoredPoints[defaultPointGid].DiscreteModbusData);
+                        defaultIsolationPointsToBeOpened.Add(defaultPointMeasurementGid, enumerableMonitoredPoints[defaultPointMeasurementGid].DiscreteModbusData);
                     }
                 }
             }
@@ -131,11 +150,11 @@ namespace OMS.OutageSimulatorImplementation
         {
             var scadaCommandingClient = ScadaCommandingClient.CreateClient();
 
-            foreach (long gid in isolationPoints.Keys)
+            foreach (long measurementGid in isolationPoints.Keys)
             {
-                if (isolationPoints[gid].Value != (ushort)DiscreteCommandingType.OPEN)
+                if (isolationPoints[measurementGid].Value != (ushort)DiscreteCommandingType.OPEN)
                 {
-                    await scadaCommandingClient.SendSingleDiscreteCommand(gid, 
+                    await scadaCommandingClient.SendSingleDiscreteCommand(measurementGid, 
                                                                           (ushort)DiscreteCommandingType.OPEN,
                                                                           CommandOriginType.OUTAGE_SIMULATOR);
                 }

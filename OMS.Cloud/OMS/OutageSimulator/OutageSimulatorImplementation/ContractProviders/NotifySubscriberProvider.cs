@@ -106,15 +106,15 @@ namespace OMS.OutageSimulatorImplementation.ContractProviders
 
             var enumerableMonitoredPoints = await MonitoredIsolationPoints.GetEnumerableDictionaryAsync();
 
-            foreach(long gid in multipleDiscreteValueSCADAMessage.Data.Keys)
+            foreach(long measurementGid in multipleDiscreteValueSCADAMessage.Data.Keys)
             {
-                if(!enumerableMonitoredPoints.ContainsKey(gid))
+                if(!enumerableMonitoredPoints.ContainsKey(measurementGid))
                 {
                     continue;
                 }
 
-                var scadaDataValue = multipleDiscreteValueSCADAMessage.Data[gid].Value;
-                var monitoredPoint = enumerableMonitoredPoints[gid];
+                var scadaDataValue = multipleDiscreteValueSCADAMessage.Data[measurementGid].Value;
+                var monitoredPoint = enumerableMonitoredPoints[measurementGid];
                 var monitoredPointData = monitoredPoint.DiscreteModbusData;
 
                 if (scadaDataValue != monitoredPointData.Value)
@@ -125,7 +125,7 @@ namespace OMS.OutageSimulatorImplementation.ContractProviders
                                                                        monitoredPointData.CommandOrigin);
 
                     monitoredPoint.DiscreteModbusData = newDiscreteModbusData;
-                    await MonitoredIsolationPoints.SetAsync(gid, monitoredPoint);
+                    await MonitoredIsolationPoints.SetAsync(measurementGid, monitoredPoint);
                 }
             }
         }

@@ -22,7 +22,9 @@ namespace Common.OMS.OutageSimulator
     public class MonitoredIsolationPoint
     {
         [DataMember]
-        public long IsolationPointGid { get; set; }
+        public long IsolationElementGid { get; set; }
+
+        public long DiscreteMeasurementGid { get; set; }
 
         [DataMember]
         public DiscreteModbusData DiscreteModbusData { get; set; }

@@ -71,30 +71,30 @@ namespace SCADA.AcquisitionService
                 throw e;
             }
 
-            int acquisitionCycleCount = 1;
+            int acquisitionCycleCount = 0;
 
-            while (!cancellationToken.IsCancellationRequested)
+            while (true)
             {
-                //string message = $"{baseLogString} RunAsync => AcquisitionCycleCount: {acquisitionCycleCount}";
+                string message = $"{baseLogString} RunAsync => AcquisitionCycleCount: {acquisitionCycleCount}";
 
-                //if(acquisitionCycleCount % 100 == 0)
-                //{
-                //    Logger.LogInformation(message);
-                //}
-                //else if(acquisitionCycleCount % 10 == 0)
-                //{
-                //    Logger.LogDebug(message);
-                //}
-                //else
-                //{
-                //    Logger.LogVerbose(message);
-                //}
+                if (acquisitionCycleCount % 100 == 0)
+                {
+                    Logger.LogInformation(message);
+                }
+                else if (acquisitionCycleCount % 10 == 0)
+                {
+                    Logger.LogDebug(message);
+                }
+                else
+                {
+                    Logger.LogVerbose(message);
+                }
 
                 try
                 {
                     await acquisitionCycle.Start();
 
-                    var message = $"{baseLogString} RunAsync => AcquisitionCycle executed.";
+                    message = $"{baseLogString} RunAsync => AcquisitionCycle executed.";
                     Logger.LogVerbose(message);
                     //ServiceEventSource.Current.ServiceMessage(this.Context, $"[AcquisitionService | Verbose] {message}");
                 }

@@ -4,6 +4,7 @@ using System.Fabric;
 using System.Threading;
 using System.Threading.Tasks;
 using Common.OMS;
+using Common.OMS.OutageSimulator;
 using Common.OmsContracts.DataContracts.OutageSimulator;
 using Common.OmsContracts.OutageSimulator;
 using Microsoft.ServiceFabric.Data;
@@ -127,14 +128,14 @@ namespace OMS.OutageSimulatorService
                 Logger.LogDebug(debugMessage);
                 ServiceEventSource.Current.ServiceMessage(this.Context, $"[OMS.OutageSimulatorService | Information] {debugMessage}");
 
-                while (!cancellationToken.IsCancellationRequested)
+                while (true)
                 {
                     await controlCycle.Start();
 
                     var message = $"{baseLogString} RunAsync => ControlCycle executed.";
                     Logger.LogVerbose(message);
 
-                    await Task.Delay(TimeSpan.FromMilliseconds(1000), cancellationToken);
+                    await Task.Delay(TimeSpan.FromMilliseconds(2000), cancellationToken);
                 }
 
             }
@@ -164,6 +165,25 @@ namespace OMS.OutageSimulatorService
                         else
                         {
                             await StateManager.GetOrAddAsync<IReliableDictionary<long, SimulatedOutage>>(tx, ReliableDictionaryNames.SimulatedOutages);
+                            await tx.CommitAsync();
+                        }
+                    }
+                }),
+
+                Task.Run(async() =>
+                {
+                    using (ITransaction tx = this.StateManager.CreateTransaction())
+                    {
+                        var result = await StateManager.TryGetAsync<IReliableDictionary<long, MonitoredIsolationPoint>>(ReliableDictionaryNames.MonitoredIsolationPoints);
+                        if(result.HasValue)
+                        {
+                            var gidToPointItemMap = result.Value;
+                            await gidToPointItemMap.ClearAsync();
+                            await tx.CommitAsync();
+                        }
+                        else
+                        {
+                            await StateManager.GetOrAddAsync<IReliableDictionary<long, MonitoredIsolationPoint>>(tx, ReliableDictionaryNames.MonitoredIsolationPoints);
                             await tx.CommitAsync();
                         }
                     }

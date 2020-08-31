@@ -139,7 +139,7 @@ namespace SCADA.FunctionExecutorService
 
             var functionExecutionCycleCount = 0;
 
-            while (!cancellationToken.IsCancellationRequested)
+            while (true)
             {
                 string message = $"{baseLogString} RunAsync => FunctionExecutionCycleCount: {functionExecutionCycleCount}";
 

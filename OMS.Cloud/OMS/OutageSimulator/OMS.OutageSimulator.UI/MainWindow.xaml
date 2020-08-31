@@ -18,6 +18,6 @@
             <ColumnDefinition Width="10"/>
         </Grid.ColumnDefinitions>
 
-        <TabControl x:Name="TabControl" Grid.Row="1" Grid.Column="1"/>
+        <TabControl x:Name="TabControl" SelectionChanged="TabControl_SelectionChanged"  Grid.Row="1" Grid.Column="1"/>
     </Grid>
 </Window>

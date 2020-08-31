@@ -67,7 +67,7 @@
     <Compile Include="OMS\SendRepairCrewClient.cs" />
     <Compile Include="OMS\ValidateResolveConditionsClient.cs" />
     <Compile Include="CE\LoadFlowClient.cs" />
-    <Compile Include="CE\MeasurementMapServiceClient.cs" />
+    <Compile Include="CE\MeasurementMapClient.cs" />
     <Compile Include="CE\MeasurementProviderClient.cs" />
     <Compile Include="CE\ModelProviderClient.cs" />
     <Compile Include="CE\SwitchStatusCommandingClient.cs" />

@@ -7,6 +7,7 @@ using Microsoft.ServiceFabric.Data.Notifications;
 using OMS.Common.Cloud.Logger;
 using OMS.Common.Cloud.ReliableCollectionHelpers;
 using OMS.Common.PubSubContracts.DataContracts.SCADA;
+using OMS.Common.WcfClient.CE;
 using OMS.Common.WcfClient.SCADA;
 using System;
 using System.Collections.Generic;
@@ -145,6 +146,9 @@ namespace OMS.OutageSimulatorImplementation.ContractProviders
     
         private async Task InitializeMonitoredPoints(SimulatedOutage outage)
         {
+            var measurementMapClient = MeasurementMapClient.CreateClient();
+            var measurementToElementGid = await measurementMapClient.GetMeasurementToElementMap();
+
             var scadaClient = ScadaIntegrityUpdateClient.CreateClient();
             var publication = await scadaClient.GetIntegrityUpdateForSpecificTopic(Common.Cloud.Topic.SWITCH_STATUS);
 
@@ -155,27 +159,36 @@ namespace OMS.OutageSimulatorImplementation.ContractProviders
                 throw new Exception(errorMessage);
             }
 
-            foreach (long gid in multipleDiscreteValueSCADAMessage.Data.Keys)
+            foreach (var measurementGid in multipleDiscreteValueSCADAMessage.Data.Keys)
             {
-                if (!outage.PointsOfInteres.Contains(gid))
+                if(!measurementToElementGid.ContainsKey(measurementGid))
                 {
                     continue;
                 }
 
-                var scadaPointData = multipleDiscreteValueSCADAMessage.Data[gid];
+                var elementGid = measurementToElementGid[measurementGid];
+
+                if (!outage.ElementsOfInteres.Contains(elementGid))
+                {
+                    continue;
+                }
+
+                var modbusData = multipleDiscreteValueSCADAMessage.Data[measurementGid];
+                
                 var monitoredPoint = new MonitoredIsolationPoint()
                 {
-                    IsolationPointGid = gid,
+                    IsolationElementGid = elementGid,
+                    DiscreteMeasurementGid = measurementGid,
                     SimulatedOutageElementGid = outage.OutageElementGid,
-                    DiscreteModbusData = scadaPointData,
-                    IsolationPointType = outage.OptimumIsolationPointGids.Contains(gid) ?
+                    DiscreteModbusData = modbusData,
+                    IsolationPointType = outage.OptimumIsolationPointGids.Contains(elementGid) ?
                                                                          IsolationPointType.OPTIMUM :
-                                                                         outage.DefaultIsolationPointGids.Contains(gid) ?
+                                                                         outage.DefaultIsolationPointGids.Contains(elementGid) ?
                                                                                                          IsolationPointType.DEFAULT :
                                                                                                          0,
                 };
 
-                await MonitoredIsolationPoints.SetAsync(gid, monitoredPoint);
+                await MonitoredIsolationPoints.SetAsync(measurementGid, monitoredPoint);
             }
         }
 
@@ -190,22 +203,28 @@ namespace OMS.OutageSimulatorImplementation.ContractProviders
 
             var removeOutage = enumerableSimulatedOutages[outageElementGid];
 
-            foreach (var monitoredPoint in removeOutage.PointsOfInteres)
+            var measurementMapClient = MeasurementMapClient.CreateClient();
+            var elementToMeasurementsMap = await measurementMapClient.GetElementToMeasurementMap();
+
+            foreach (var monitoredElementGid in removeOutage.ElementsOfInteres)
             {
                 bool stillNeeded = false;
 
                 foreach (var outage in enumerableSimulatedOutages.Values)
                 {
-                    if (outage.OutageElementGid != removeOutage.OutageElementGid && outage.PointsOfInteres.Contains(monitoredPoint))
+                    if (outage.OutageElementGid != removeOutage.OutageElementGid && outage.ElementsOfInteres.Contains(monitoredElementGid))
                     {
                         stillNeeded = true;
                         break;
                     }
                 }
-                
-                if(!stillNeeded)
+
+                if (!stillNeeded && elementToMeasurementsMap.ContainsKey(monitoredElementGid))
                 {
-                    await MonitoredIsolationPoints.TryRemoveAsync(monitoredPoint);
+                    var measurementGids = elementToMeasurementsMap[monitoredElementGid];
+                    var measurementGid = measurementGids.FirstOrDefault();
+
+                    await MonitoredIsolationPoints.TryRemoveAsync(measurementGid);
                 }
             }
         }

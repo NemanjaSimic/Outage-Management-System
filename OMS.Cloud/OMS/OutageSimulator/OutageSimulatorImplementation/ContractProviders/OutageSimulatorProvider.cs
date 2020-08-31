@@ -6,7 +6,9 @@ using Microsoft.ServiceFabric.Data;
 using Microsoft.ServiceFabric.Data.Notifications;
 using OMS.Common.Cloud.Logger;
 using OMS.Common.Cloud.ReliableCollectionHelpers;
+using OMS.Common.WcfClient.CE;
 using System;
+using System.Linq;
 using System.Threading.Tasks;
 
 namespace OMS.OutageSimulatorImplementation.ContractProviders
@@ -130,22 +132,28 @@ namespace OMS.OutageSimulatorImplementation.ContractProviders
 
             var removeOutage = enumerableSimulatedOutages[outageElementGid];
 
-            foreach (var monitoredPoint in removeOutage.PointsOfInteres)
+            var measurementMapClient = MeasurementMapClient.CreateClient();
+            var elementToMeasurementsMap = await measurementMapClient.GetElementToMeasurementMap();
+
+            foreach (var monitoredElementGid in removeOutage.ElementsOfInteres)
             {
                 bool stillNeeded = false;
 
                 foreach (var outage in enumerableSimulatedOutages.Values)
                 {
-                    if (outage.OutageElementGid != removeOutage.OutageElementGid && outage.PointsOfInteres.Contains(monitoredPoint))
+                    if (outage.OutageElementGid != removeOutage.OutageElementGid && outage.ElementsOfInteres.Contains(monitoredElementGid))
                     {
                         stillNeeded = true;
                         break;
                     }
                 }
 
-                if (!stillNeeded)
+                if (!stillNeeded && elementToMeasurementsMap.ContainsKey(monitoredElementGid))
                 {
-                    await MonitoredIsolationPoints.TryRemoveAsync(monitoredPoint);
+                    var measurementGids = elementToMeasurementsMap[monitoredElementGid];
+                    var measurementGid = measurementGids.FirstOrDefault();
+
+                    await MonitoredIsolationPoints.TryRemoveAsync(measurementGid);
                 }
             }
         }
