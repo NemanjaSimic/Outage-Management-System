@@ -24,7 +24,13 @@ namespace SCADA.ModelProviderImplementation.ContractProviders
         private readonly string baseLogString;
         private readonly IReliableStateManager stateManager;
 
-        #region Private Propetires
+        private ICloudLogger logger;
+        private ICloudLogger Logger
+        {
+            get { return logger ?? (logger = CloudLoggerFactory.GetLogger()); }
+        }
+
+        #region Reliable Dictionaries
         private bool isGidToPointItemMapInitialized;
         private bool isMeasurementsCacheInitialized;
         private bool isCommandDescriptionCacheInitialized;
@@ -39,12 +45,6 @@ namespace SCADA.ModelProviderImplementation.ContractProviders
                        isCommandDescriptionCacheInitialized && 
                        isInfoCacheInitialized; 
             }
-        }
-
-        private ICloudLogger logger;
-        private ICloudLogger Logger
-        {
-            get { return logger ?? (logger = CloudLoggerFactory.GetLogger()); }
         }
 
         private ReliableDictionaryAccess<long, IScadaModelPointItem> gidToPointItemMap;
@@ -69,20 +69,6 @@ namespace SCADA.ModelProviderImplementation.ContractProviders
         private ReliableDictionaryAccess<string, bool> InfoCache
         {
             get { return infoCache; }
-        }
-        #endregion Private Propetires
-
-        public ModelUpdateAccessProvider(IReliableStateManager stateManager)
-        {
-            this.baseLogString = $"{this.GetType()} [{this.GetHashCode()}] =>{Environment.NewLine}";
-
-            this.isGidToPointItemMapInitialized = false;
-            this.isMeasurementsCacheInitialized = false;
-            this.isCommandDescriptionCacheInitialized = false;
-            this.isInfoCacheInitialized = false;
-
-            this.stateManager = stateManager;
-            this.stateManager.StateManagerChanged += this.OnStateManagerChangedHandler;
         }
 
         private async void OnStateManagerChangedHandler(object sender, NotifyStateManagerChangedEventArgs e)
@@ -129,6 +115,20 @@ namespace SCADA.ModelProviderImplementation.ContractProviders
                     Logger.LogDebug(debugMessage);
                 }
             }
+        }
+        #endregion Private Propetires
+
+        public ModelUpdateAccessProvider(IReliableStateManager stateManager)
+        {
+            this.baseLogString = $"{this.GetType()} [{this.GetHashCode()}] =>{Environment.NewLine}";
+
+            this.isGidToPointItemMapInitialized = false;
+            this.isMeasurementsCacheInitialized = false;
+            this.isCommandDescriptionCacheInitialized = false;
+            this.isInfoCacheInitialized = false;
+
+            this.stateManager = stateManager;
+            this.stateManager.StateManagerChanged += this.OnStateManagerChangedHandler;
         }
 
         private async Task<bool> GetIsScadaModelImportedIndicator()
