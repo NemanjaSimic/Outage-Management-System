@@ -457,9 +457,10 @@ namespace CE.MeasurementProviderImplementation
 
 			if (measurementToElementMap.ContainsKey(measurementId))
 			{
-				string message = $"Measurement with GID {measurementId:X16} already exists in measurement-element mapping.";
-				Logger.LogError(message);
+				//string message = $"Measurement with GID {measurementId:X16} already exists in measurement-element mapping.";
+				//Logger.LogWarning(message);
 				//throw new ArgumentException(message);
+				return;
 			}
 
 			measurementToElementMap.Add(measurementId, elementId);
