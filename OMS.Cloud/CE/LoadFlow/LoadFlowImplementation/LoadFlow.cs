@@ -478,7 +478,7 @@ namespace CE.LoadFlowImplementation
                     {
                         await CalculateLoadFlowUpsideDown(recloser.SecondEnd.First(), recloser.Id, recloser.FirstEnd.Feeder, loadOfFeeders);
                     }
-                    else
+                    else if(!recloser.IsActive)
                     {
                         Thread thread = new Thread(async () => await CommandToRecloser(measurementGid, 0, CommandOriginType.CE_COMMAND, recloser));
                         thread.Start();
@@ -494,13 +494,13 @@ namespace CE.LoadFlowImplementation
                     {
                         await CalculateLoadFlowUpsideDown(recloser.FirstEnd, recloser.Id, recloser.SecondEnd.First().Feeder, loadOfFeeders);
                     }
-                    else
+                    else if(!recloser.IsActive)
                     {
                         Thread thread = new Thread(async () => await CommandToRecloser(measurementGid, 0, CommandOriginType.CE_COMMAND, recloser));
                         thread.Start();
                     }
                 }
-                else
+                else if(recloser.IsActive)
                 {
                     Logger.LogDebug($"{baseLogString} TurnOnAllMeasurement => Calling SendDiscreteCommand method from measurement provider. Measurement GID {measurementGid:X16}, Value 1.");
                     await measurementProviderClient.SendDiscreteCommand(measurementGid, 1, CommandOriginType.CE_COMMAND);

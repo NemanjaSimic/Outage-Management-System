@@ -48,6 +48,7 @@
     <Compile Include="Mappers\ConsumerMessageMapper.cs" />
     <Compile Include="Mappers\EquipmentMapper.cs" />
     <Compile Include="Mappers\OutageMessageMapper.cs" />
+    <Compile Include="OutageSimulator\MonitoredIsolationPoint.cs" />
     <Compile Include="ReliableDictionaryNames.cs" />
     <Compile Include="Properties\AssemblyInfo.cs" />
     <Compile Include="Report\DateHelpers.cs" />

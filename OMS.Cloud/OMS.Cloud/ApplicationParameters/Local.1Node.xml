@@ -2,6 +2,9 @@
 <Application xmlns:xsd="http://www.w3.org/2001/XMLSchema" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" Name="fabric:/OMS.Cloud" xmlns="http://schemas.microsoft.com/2011/01/fabric">
   <Parameters>
     <!--<Parameter Name="OMS.EmailService_InstanceCount" Value="1" />-->
+    <Parameter Name="OMS.OutageSimulatorService_PartitionCount" Value="1" />
+    <Parameter Name="OMS.OutageSimulatorService_MinReplicaSetSize" Value="1" />
+    <Parameter Name="OMS.OutageSimulatorService_TargetReplicaSetSize" Value="1" />
     <Parameter Name="OMS.OutageLifecycleService_InstanceCount" Value="1" />
     <Parameter Name="OMS.ModelProviderService_PartitionCount" Value="1" />
     <Parameter Name="OMS.ModelProviderService_MinReplicaSetSize" Value="1" />
