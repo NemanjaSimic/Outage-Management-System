@@ -21,7 +21,7 @@
         <StackPanel Grid.Row="1" Grid.Column="1">
             <Label>Active outages</Label>
             <DataGrid ItemsSource="{Binding ActiveOutages, UpdateSourceTrigger=PropertyChanged}" 
-                      SelectedItem="{Binding SelectedOutege, Mode=OneWayToSource}" 
+                      SelectedItem="{Binding SelectedOutage, Mode=OneWayToSource}" 
                       IsReadOnly="True" 
                       SelectionMode="Single" 
                       AutoGenerateColumns="False"

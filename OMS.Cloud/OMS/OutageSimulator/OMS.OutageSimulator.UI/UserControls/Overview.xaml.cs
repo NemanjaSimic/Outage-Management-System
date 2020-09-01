@@ -43,21 +43,21 @@ namespace OMS.OutageSimulator.UI.UserControls
         #region Bindings
         public List<GlobalIDBindingModel> OptimumIsolationPoints
         {
-            get { return SelectedOutege?.OptimumIsolationPoints; }
+            get { return SelectedOutage?.OptimumIsolationPoints; }
         }
 
         public List<GlobalIDBindingModel> DefaultIsolationPoints
         {
-            get { return SelectedOutege?.DefaultIsolationPoints; }
+            get { return SelectedOutage?.DefaultIsolationPoints; }
         }
 
-        public ActiveOutageBindingModel SelectedOutege { get; set; }
+        public ActiveOutageBindingModel SelectedOutage { get; set; }
 
         public ObservableCollection<ActiveOutageBindingModel> ActiveOutages { get; set; }
 
         public Visibility IsSelectedOutageGridVisible
         {
-            get { return SelectedOutege != null ? Visibility.Visible : Visibility.Hidden; }
+            get { return SelectedOutage != null ? Visibility.Visible : Visibility.Hidden; }
         }
         #endregion
 
@@ -94,6 +94,8 @@ namespace OMS.OutageSimulator.UI.UserControls
 
         private void DataGrid_SelectionChanged(object sender, SelectionChangedEventArgs e)
         {
+            OnPropertyChanged("ActiveOutages");
+            OnPropertyChanged("SelectedOutage");
             OnPropertyChanged("IsSelectedOutageGridVisible");
             OnPropertyChanged("OutageElement");
             OnPropertyChanged("OptimumIsolationPoints");
@@ -110,7 +112,7 @@ namespace OMS.OutageSimulator.UI.UserControls
 
         private async Task EndOutage()
         {
-            var outageElementId = SelectedOutege.OutageElement.GID;
+            var outageElementId = SelectedOutage.OutageElement.GID;
 
             var outageSimulatorUIClient = OutageSimulatorUIClient.CreateClient();
             if (await outageSimulatorUIClient.EndOutage(outageElementId))
@@ -124,6 +126,8 @@ namespace OMS.OutageSimulator.UI.UserControls
                 ActiveOutages.Remove(outage);
                 activeOutagesMap.Remove(outageElementId);
 
+                OnPropertyChanged("ActiveOutages");
+                OnPropertyChanged("SelectedOutage");
                 OnPropertyChanged("IsSelectedOutageGridVisible");
                 OnPropertyChanged("OutageElement");
                 OnPropertyChanged("OptimumIsolationPoints");
