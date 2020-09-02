@@ -137,9 +137,24 @@ namespace SCADA.FunctionExecutorService
                 throw e;
             }
 
+            var functionExecutionCycleCount = 0;
+
             while (true)
             {
-                cancellationToken.ThrowIfCancellationRequested();
+                string message = $"{baseLogString} RunAsync => FunctionExecutionCycleCount: {functionExecutionCycleCount}";
+
+                if (functionExecutionCycleCount % 100 == 0)
+                {
+                    Logger.LogInformation(message);
+                }
+                else if (functionExecutionCycleCount % 10 == 0)
+                {
+                    Logger.LogDebug(message);
+                }
+                else
+                {
+                    Logger.LogVerbose(message);
+                }
 
                 try
                 {
@@ -157,6 +172,7 @@ namespace SCADA.FunctionExecutorService
                 }
 
                 await Task.Delay(TimeSpan.FromMilliseconds(configData.FunctionExecutionInterval), cancellationToken);
+                functionExecutionCycleCount++;
             }
         }
     }

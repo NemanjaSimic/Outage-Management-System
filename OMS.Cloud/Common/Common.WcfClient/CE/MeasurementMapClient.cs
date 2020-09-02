@@ -8,12 +8,12 @@ using System.Threading.Tasks;
 
 namespace OMS.Common.WcfClient.CE
 {
-	public class MeasurementMapServiceClient : WcfSeviceFabricClientBase<IMeasurementMapContract>, IMeasurementMapContract
+	public class MeasurementMapClient : WcfSeviceFabricClientBase<IMeasurementMapContract>, IMeasurementMapContract
 	{
 		private static readonly string microserviceName = MicroserviceNames.CeMeasurementProviderService;
 		private static readonly string listenerName = EndpointNames.CeMeasurementMapEndpoint;
 
-		public MeasurementMapServiceClient(WcfCommunicationClientFactory<IMeasurementMapContract> clientFactory, Uri serviceUri, ServicePartitionKey servicePartition)
+		public MeasurementMapClient(WcfCommunicationClientFactory<IMeasurementMapContract> clientFactory, Uri serviceUri, ServicePartitionKey servicePartition)
 			: base(clientFactory, serviceUri, servicePartition, listenerName)
 		{
 
@@ -22,13 +22,13 @@ namespace OMS.Common.WcfClient.CE
 		public static IMeasurementMapContract CreateClient()
 		{
 			ClientFactory factory = new ClientFactory();
-			return factory.CreateClient<MeasurementMapServiceClient, IMeasurementMapContract>(microserviceName);
+			return factory.CreateClient<MeasurementMapClient, IMeasurementMapContract>(microserviceName);
 		}
 
 		public static IMeasurementMapContract CreateClient(Uri serviceUri, ServicePartitionKey servicePartitionKey)
 		{
 			ClientFactory factory = new ClientFactory();
-			return factory.CreateClient<MeasurementMapServiceClient, IMeasurementMapContract>(serviceUri, servicePartitionKey);
+			return factory.CreateClient<MeasurementMapClient, IMeasurementMapContract>(serviceUri, servicePartitionKey);
 		}
 
 

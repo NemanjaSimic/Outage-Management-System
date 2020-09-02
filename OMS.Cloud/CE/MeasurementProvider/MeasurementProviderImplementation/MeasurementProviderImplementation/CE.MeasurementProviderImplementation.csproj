@@ -93,6 +93,7 @@
     <Compile Include="MeasurementMap.cs" />
     <Compile Include="MeasurementProvider.cs" />
     <Compile Include="Properties\AssemblyInfo.cs" />
+    <Compile Include="ScadaSubscriber.cs" />
     <Compile Include="SwitchStatusCommanding.cs" />
   </ItemGroup>
   <ItemGroup>

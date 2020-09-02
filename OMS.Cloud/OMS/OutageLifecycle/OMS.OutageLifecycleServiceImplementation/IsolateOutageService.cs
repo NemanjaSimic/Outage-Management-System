@@ -64,7 +64,7 @@ namespace OMS.OutageLifecycleImplementation
 			this.outageModelReadAccessClient = OutageModelReadAccessClient.CreateClient();
             this.outageModelUpdateAccessClient = OutageModelUpdateAccessClient.CreateClient();
             this.outageModelAccessClient = OutageModelAccessClient.CreateClient();
-            this.measurementMapServiceClient = MeasurementMapServiceClient.CreateClient();
+            this.measurementMapServiceClient = MeasurementMapClient.CreateClient();
             this.switchStatusCommandingClient = SwitchStatusCommandingClient.CreateClient();
             this.networkModelGdaClient = NetworkModelGdaClient.CreateClient();
             this.equipmentAccessClient = EquipmentAccessClient.CreateClient();
@@ -195,6 +195,8 @@ namespace OMS.OutageLifecycleImplementation
                         //ScadaNotification scadaNotification = new ScadaNotification("OutageModel_SCADA_Subscriber", new OutageIsolationAlgorithm.OutageIsolationAlgorithmParameters(headBreakerMeasurementId, recloserMeasurementId, autoResetEvent));
                         //SubscriberProxy subscriberProxy = proxyFactory.CreateProxy<SubscriberProxy, ISubscriber>(scadaNotification, EndpointNames.SubscriberEndpoint);
                         //subscriberProxy.Subscribe(Topic.SWITCH_STATUS);
+
+                        //MODO: potencijalni problemi, moguce da treba promeniti pristup kao i na Outage Simulatoru
                         await registerSubscriberClient.SubscribeToTopic(Topic.SWITCH_STATUS, MicroserviceNames.OmsOutageLifecycleService);
 
                         long currentBreakerId = headBreaker;

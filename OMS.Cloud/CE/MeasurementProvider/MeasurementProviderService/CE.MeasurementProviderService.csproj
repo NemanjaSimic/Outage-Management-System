@@ -97,6 +97,10 @@
       <Project>{FBEE1369-0F6C-41E6-8C62-8C1C5CDBB602}</Project>
       <Name>Common.Cloud</Name>
     </ProjectReference>
+    <ProjectReference Include="..\..\..\Common\Common.WcfClient\Common.WcfClient.csproj">
+      <Project>{AE91CEB5-378A-4EEF-AEBF-C40ED1EF23CF}</Project>
+      <Name>Common.WcfClient</Name>
+    </ProjectReference>
     <ProjectReference Include="..\..\..\Common\Contracts\Common.CeContracts\Common.CeContracts.csproj">
       <Project>{D8B669F1-9B73-4F6A-9AFC-53AF4B0272AC}</Project>
       <Name>Common.CeContracts</Name>
@@ -104,6 +108,10 @@
     <ProjectReference Include="..\..\..\Common\Contracts\Common.CloudContracts\Common.CloudContracts.csproj">
       <Project>{2307F7DC-6B87-4506-8365-6966712DD5FE}</Project>
       <Name>Common.CloudContracts</Name>
+    </ProjectReference>
+    <ProjectReference Include="..\..\..\Common\Contracts\Common.PubSubContracts\Common.PubSubContracts.csproj">
+      <Project>{AA75150D-EE56-49C0-9431-751F83CCC0CD}</Project>
+      <Name>Common.PubSubContracts</Name>
     </ProjectReference>
     <ProjectReference Include="..\MeasurementProviderImplementation\MeasurementProviderImplementation\CE.MeasurementProviderImplementation.csproj">
       <Project>{8FF00246-6BBF-4CCE-AE04-0325DCCF4444}</Project>

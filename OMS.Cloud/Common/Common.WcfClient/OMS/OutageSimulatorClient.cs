@@ -3,9 +3,6 @@ using Microsoft.ServiceFabric.Services.Client;
 using Microsoft.ServiceFabric.Services.Communication.Wcf.Client;
 using OMS.Common.Cloud.Names;
 using System;
-using System.Collections.Generic;
-using System.Linq;
-using System.Text;
 using System.Threading.Tasks;
 
 namespace OMS.Common.WcfClient.OMS
@@ -33,6 +30,7 @@ namespace OMS.Common.WcfClient.OMS
             return factory.CreateClient<OutageSimulatorClient, IOutageSimulatorContract>(serviceUri, servicePartitionKey);
         }
 
+        #region IOutageSimulatorContract
         public Task<bool> IsOutageElement(long outageElementId)
         {
             return InvokeWithRetryAsync(client => client.Channel.IsOutageElement(outageElementId));
@@ -47,5 +45,6 @@ namespace OMS.Common.WcfClient.OMS
         {
             return InvokeWithRetryAsync(client => client.Channel.IsAlive());
         }
+        #endregion IOutageSimulatorContract
     }
 }

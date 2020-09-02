@@ -25,6 +25,8 @@
         public const string OmsCallTrackingService = "OMS.CallTrackingService";
         public const string OmsHistoryDBManagerService = "OMS.HistoryDBManagerService";
         public const string OmsOutageLifecycleSerivice = "OMS.OutageLifecycleService";
+        public const string OmsOutageSimulatorService = "OMS.OutageSimulatorService";
+        public const string OmsOutageSimulatorServiceUI = "OMS.OutageSimulatorService.UI";
         public const string OmsEmailService = "OMS.EmailService";
 
         //CE
