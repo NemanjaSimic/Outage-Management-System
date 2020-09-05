@@ -147,6 +147,7 @@ namespace CE.MeasurementProviderImplementation
 				string message = $"{baseLogString} AddAnalogMeasurement => analog measurement parameter is null.";
 				Logger.LogError(message);
 				//throw new Exception(message);
+				return;
 			}
 
 			var analogMeasurements = await GetAnalogMeasurementsFromCache();
@@ -177,6 +178,7 @@ namespace CE.MeasurementProviderImplementation
 				string message = $"{baseLogString} AddDiscreteMeasurement => discrete measurement parameter is null.";
 				Logger.LogError(message);
 				//throw new Exception(message);
+				return;
 			}
 
 			var discreteMeasurements = await GetDiscreteMeasurementsFromCache();
