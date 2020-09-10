@@ -36,22 +36,6 @@ namespace OMS.ModelProviderImplementation
 		private IHistoryDBManagerContract historyDBManagerClient;
 		private ITopologyProviderContract topologyProviderClient;
 
-		
-		public OutageModel(IReliableStateManager stateManager)
-		{
-			this.baseLogString = $"{this.GetType()} [{this.GetHashCode()}] =>{Environment.NewLine}";
-			Logger.LogDebug($"{baseLogString} Ctor => Logger initialized");
-
-			isTopologyModelInitialized = false;
-			isCommandedElementsInitialized = false;
-			isOptimumIsolatioPointsInitialized = false;
-			isPotentialOutageInitialized = false;
-
-			this.stateManager = stateManager;
-			this.stateManager.StateManagerChanged += this.OnStateManagerChangedHandler;
-
-		}
-
 		#region ReliableDictionaryAccess
 		private bool isTopologyModelInitialized;
 		private bool isCommandedElementsInitialized;

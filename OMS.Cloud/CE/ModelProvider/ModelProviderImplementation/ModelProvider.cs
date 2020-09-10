@@ -130,10 +130,10 @@ namespace CE.ModelProviderImplementation
                     Logger.LogDebug(debugMessage);
                 }
 
-                if (AreReliableDictionariesInitialized)
-                {
-                    await ImportDataInCache();
-                }
+                //if (AreReliableDictionariesInitialized)
+                //{
+                //    await ImportDataInCache();
+                //}
             }
         }
 
@@ -144,7 +144,7 @@ namespace CE.ModelProviderImplementation
                 await Task.Delay(1000);
             }
 
-			//Logger.LogVerbose($"{baseLogString} enter in ImportDataInCache.");
+			Logger.LogVerbose($"{baseLogString} enter in ImportDataInCache.");
 
 			IModelDelta modelDelta = await modelManager.TryGetAllModelEntitiesAsync();
 
