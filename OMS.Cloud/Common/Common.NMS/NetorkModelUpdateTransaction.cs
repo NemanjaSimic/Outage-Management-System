@@ -1,5 +1,4 @@
-﻿using OMS.Common.Cloud;
-using OMS.Common.Cloud.Names;
+﻿using OMS.Common.Cloud.Names;
 using System.Collections.Generic;
 
 namespace OMS.Common.NMS

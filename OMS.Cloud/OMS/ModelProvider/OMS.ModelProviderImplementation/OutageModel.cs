@@ -32,9 +32,6 @@ namespace OMS.ModelProviderImplementation
 		{
 			get { return logger ?? (logger = CloudLoggerFactory.GetLogger()); }
 		}
-		
-		private IHistoryDBManagerContract historyDBManagerClient;
-		private ITopologyProviderContract topologyProviderClient;
 
 		#region ReliableDictionaryAccess
 		private bool isTopologyModelInitialized;
@@ -124,13 +121,12 @@ namespace OMS.ModelProviderImplementation
 		
 		public async Task InitializeOutageModel()
 		{
-			topologyProviderClient = TopologyProviderClient.CreateClient();
+			var topologyProviderClient = TopologyProviderClient.CreateClient();
 			OutageTopologyModel topologyModel = await topologyProviderClient.GetOMSModel();
 
 			await TopologyModel.SetAsync(0, topologyModel);
 		}
 		
-
 		#region INotifySubscriberContract
 		private readonly string subscriberUri = MicroserviceNames.OmsModelProviderService;
 

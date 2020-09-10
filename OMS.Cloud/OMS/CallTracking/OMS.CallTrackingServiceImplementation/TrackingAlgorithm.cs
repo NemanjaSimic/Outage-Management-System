@@ -14,14 +14,11 @@ namespace OMS.CallTrackingImplementation
 {
     public class TrackingAlgorithm
 	{
-
         private OutageTopologyModel outageTopologyModel;
 
         //TODO: Mozda reliable dic/queue
         private List<long> potentialOutages;
         private List<long> outages;
-        private IPotentialOutageReportingContract reportOutageClient;
-        private IOutageModelReadAccessContract outageModelReadAccessClient;
 
         private ICloudLogger logger;
         private ICloudLogger Logger
@@ -29,19 +26,13 @@ namespace OMS.CallTrackingImplementation
             get { return logger ?? (logger = CloudLoggerFactory.GetLogger()); }
         }
 
-        public TrackingAlgorithm()
-		{
-            reportOutageClient = PotentialOutageReportingClient.CreateClient();
-            outageModelReadAccessClient = OutageModelReadAccessClient.CreateClient();
-		}
-
-
         public async Task Start(List<long> calls)
         {
 			Logger.LogDebug("Starting tracking algorithm.");
 
-			//on every start tracking algorithm get up to date outage topology model
-			outageTopologyModel = await outageModelReadAccessClient.GetTopologyModel();
+            //on every start tracking algorithm get up to date outage topology model
+            var outageModelReadAccessClient = OutageModelReadAccessClient.CreateClient();
+            outageTopologyModel = await outageModelReadAccessClient.GetTopologyModel();
 
             this.potentialOutages = LocateSwitchesUsingCalls(calls);
             this.outages = new List<long>();
@@ -50,6 +41,7 @@ namespace OMS.CallTrackingImplementation
             long currentGid, previousGid;
 
             currentGid = this.potentialOutages[0];
+
             try
             {
 
@@ -81,6 +73,8 @@ namespace OMS.CallTrackingImplementation
                 Logger.LogError(message);
                 Console.WriteLine(message);
             }
+
+            var reportOutageClient = PotentialOutageReportingClient.CreateClient();
 
             foreach (var item in this.outages)
             {
