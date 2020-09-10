@@ -129,10 +129,6 @@ namespace OMS.OutageLifecycleImplementation.ContractProviders
             {
                 Logger.LogInformation($"{baseLogString} IsolateOutage => IsolationAlgorthm successfully started. OutageId: {outageId}");
             }
-
-            //todo: PUBLUISH IN CYCLE
-            //await lifecycleHelper.PublishOutageAsync(Topic.ACTIVE_OUTAGE, outageMessageMapper.MapOutageEntity(outageToIsolate));
-            //Logger.LogInformation($"Outage with id: 0x{outageToIsolate.OutageId:x16} is successfully published.");
         }
 
         public Task<bool> IsAlive()
@@ -411,7 +407,7 @@ namespace OMS.OutageLifecycleImplementation.ContractProviders
             await outageModelUpdateAccessClient.UpdateCommandedElements(0, ModelUpdateOperationType.CLEAR);
             #endregion
 
-            return isIsolated;
+            return true;
         }
         #endregion Private Methods
     }

@@ -64,7 +64,7 @@ namespace OMS.OutageLifecycleService
                 this.notifySubscriberProvider = new NotifySubscriberProvider(StateManager);
 
                 this.isolationAlgorithmCycleInterval = 1000;
-                this.isolationAlgorithmCycle = new IsolationAlgorithmCycle(StateManager, this.isolationAlgorithmCycleInterval);
+                this.isolationAlgorithmCycle = new IsolationAlgorithmCycle(StateManager, lifecycleHelper, this.isolationAlgorithmCycleInterval);
 
                 string infoMessage = $"{baseLogString} Ctor => Contract providers initialized.";
                 Logger.LogInformation(infoMessage);

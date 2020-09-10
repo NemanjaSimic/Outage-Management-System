@@ -210,6 +210,7 @@ namespace OutageManagementService.LifeCycleServices
                                 Logger.LogError(message);
                                 throw new Exception(message);
                             }
+
                             //TODO: SCADA Command
                             subscriberProxy.Close();
                             outageModel.optimumIsolationPoints.Add(currentBreakerId);

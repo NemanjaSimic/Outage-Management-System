@@ -10,6 +10,8 @@ using OMS.Common.Cloud.ReliableCollectionHelpers;
 using OMS.Common.PubSubContracts.DataContracts.SCADA;
 using OMS.Common.ScadaContracts.Commanding;
 using OMS.Common.WcfClient.CE;
+using OMS.Common.WcfClient.OMS.HistoryDBManager;
+using OMS.Common.WcfClient.OMS.OutageLifecycle;
 using OMS.Common.WcfClient.SCADA;
 using System;
 using System.Collections.Generic;
@@ -301,32 +303,16 @@ namespace CE.MeasurementProviderImplementation
 					measurement.CurrentOpen = true;
 				}
 
-				//using (ReportPotentialOutageProxy reportPotentialOutageProxy = proxyFactory.CreateProxy<ReportPotentialOutageProxy, IReportPotentialOutageContract>(EndpointNames.ReportPotentialOutageEndpoint))
-				//{
-				//	if (reportPotentialOutageProxy == null)
-				//	{
-				//		string message = "UpdateDiscreteMeasurement => ReportPotentialOutageProxy is null.";
-				//		logger.LogError(message);
-				//		throw new NullReferenceException(message);
-				//	}
-
-				//	try
-				//	{
-				//		if (measurement.CurrentOpen)
-				//		{
-				//			reportPotentialOutageProxy.ReportPotentialOutage(measurement.ElementId, commandOrigin);
-				//		}
-				//		else
-				//		{
-				//			reportPotentialOutageProxy.OnSwitchClose(measurement.ElementId);
-				//		}
-				//	}
-				//	catch (Exception e)
-				//	{
-				//		logger.LogError("Failed to report potential outage.", e);
-				//	}
-				//}
-
+				if (measurement.CurrentOpen)
+				{
+					var potentialOutageReportingClient = PotentialOutageReportingClient.CreateClient();
+					await potentialOutageReportingClient.ReportPotentialOutage(measurement.ElementId, commandOrigin);
+				}
+				else
+				{
+					var historyDBManagerClient = HistoryDBManagerClient.CreateClient();
+					await historyDBManagerClient.OnSwitchClosed(measurement.ElementId);
+				}
 			}
 			else
 			{
