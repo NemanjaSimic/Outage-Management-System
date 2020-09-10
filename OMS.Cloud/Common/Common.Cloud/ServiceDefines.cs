@@ -75,7 +75,7 @@ namespace OMS.Common.Cloud
                 
                 //OMS
                 { MicroserviceNames.OmsModelProviderService,        ServiceType.STATEFUL_SERVICE    },
-                { MicroserviceNames.OmsOutageLifecycleService,      ServiceType.STATELESS_SERVICE   },
+                { MicroserviceNames.OmsOutageLifecycleService,      ServiceType.STATEFUL_SERVICE   },
                 { MicroserviceNames.OmsCallTrackingService,         ServiceType.STATEFUL_SERVICE    },
                 { MicroserviceNames.OmsHistoryDBManagerService,     ServiceType.STATEFUL_SERVICE    },
                 { MicroserviceNames.OmsEmailService,                ServiceType.STATELESS_SERVICE   },  

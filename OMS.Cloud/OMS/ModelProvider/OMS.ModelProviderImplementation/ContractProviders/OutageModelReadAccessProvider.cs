@@ -195,7 +195,12 @@ namespace OMS.ModelProviderImplementation.ContractProviders
 
             try
             {
-                topologyModel = (await TopologyModel.GetDataCopyAsync())[0];
+                var result = await TopologyModel.GetDataCopyAsync();
+
+                if(result.ContainsKey(0))
+                {
+                    topologyModel = result[0];
+                }
             }
             catch (Exception e)
             {

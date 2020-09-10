@@ -44,8 +44,6 @@ namespace OMS.ModelProviderService
             get { return logger ?? (logger = CloudLoggerFactory.GetLogger()); }
         }
 
-        private IRegisterSubscriberContract registerSubscriberClient;
-
         public ModelProviderService(StatefulServiceContext context)
             : base(context)
         {
@@ -135,13 +133,15 @@ namespace OMS.ModelProviderService
                 Logger.LogDebug(debugMessage);
                 ServiceEventSource.Current.ServiceMessage(this.Context, $"[OMS.ModelProviderService | Information] {debugMessage}");
 
-                this.registerSubscriberClient = RegisterSubscriberClient.CreateClient();
-                await this.registerSubscriberClient.SubscribeToTopic(Topic.OMS_MODEL, MicroserviceNames.OmsModelProviderService);
+                var registerSubscriberClient = RegisterSubscriberClient.CreateClient();
+                await registerSubscriberClient.SubscribeToTopic(Topic.OMS_MODEL, MicroserviceNames.OmsModelProviderService);
                 debugMessage = $"{baseLogString} RunAsync => Successfully subscribed to topics.";
                 Logger.LogDebug(debugMessage);
                 ServiceEventSource.Current.ServiceMessage(this.Context, $"[OMS.ModelProviderService | Information] {debugMessage}");
 
                 await outageModel.InitializeOutageModel();
+                debugMessage = $"{baseLogString} RunAsync => outageModel.InitializeOutageModel() done.";
+                Logger.LogDebug(debugMessage);
             }
             catch (Exception e)
 			{
