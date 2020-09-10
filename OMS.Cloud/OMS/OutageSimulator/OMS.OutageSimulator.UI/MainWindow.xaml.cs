@@ -58,13 +58,13 @@ namespace OMS.OutageSimulator.UI
             var overviewTab = new TabItem()
             {
                 Header = "Overview",
-                Content = new Overview(this),
+                Content = overview,
             };
 
             var generateOutageTab = new TabItem()
             {
                 Header = "Generate Outage",
-                Content = new GenerateOutage(this),
+                Content = generateOutage,
             };
 
             TabControl.Items.Add(overviewTab);
@@ -79,7 +79,7 @@ namespace OMS.OutageSimulator.UI
             this.overview.SetOutages(simulatedOutages);
         }
 
-        private void TabControl_SelectionChanged(object sender, SelectionChangedEventArgs e)
+        private async void TabControl_SelectionChanged(object sender, SelectionChangedEventArgs e)
         {
             int tabItem = ((sender as TabControl)).SelectedIndex;
             
@@ -88,10 +88,16 @@ namespace OMS.OutageSimulator.UI
                 switch (tabItem)
                 {
                     case (int)TabType.OVERVIEW:
-                        Dispatcher.BeginInvoke((Action)(async () =>
-                        {
-                            await OverviewSelection();
-                        }));
+                        await OverviewSelection();
+
+                        //Dispatcher.Invoke(new Action(async () => 
+                        //{
+                        //    await OverviewSelection();
+                        //}));
+                        //Dispatcher.BeginInvoke((Action)(async () =>
+                        //{
+                        //    await OverviewSelection();
+                        //}));
                         break;
 
                     case (int)TabType.GENERATE_OUTAGE:

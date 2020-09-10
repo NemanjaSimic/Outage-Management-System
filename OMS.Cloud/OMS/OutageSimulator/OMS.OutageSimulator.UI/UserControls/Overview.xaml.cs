@@ -18,7 +18,7 @@ namespace OMS.OutageSimulator.UI.UserControls
     /// <summary>
     /// Interaction logic for Overview.xaml
     /// </summary>
-    public partial class Overview : UserControl
+    public partial class Overview : UserControl, INotifyPropertyChanged
     {
         #region INotifyPropertyChanged
         public event PropertyChangedEventHandler PropertyChanged;
@@ -41,12 +41,12 @@ namespace OMS.OutageSimulator.UI.UserControls
 
 
         #region Bindings
-        public List<GlobalIDBindingModel> OptimumIsolationPoints
+        public ObservableCollection<GlobalIDBindingModel> OptimumIsolationPoints
         {
             get { return SelectedOutage?.OptimumIsolationPoints; }
         }
 
-        public List<GlobalIDBindingModel> DefaultIsolationPoints
+        public ObservableCollection<GlobalIDBindingModel> DefaultIsolationPoints
         {
             get { return SelectedOutage?.DefaultIsolationPoints; }
         }
@@ -75,18 +75,19 @@ namespace OMS.OutageSimulator.UI.UserControls
         public void SetOutages(IEnumerable<SimulatedOutage> simulatedOutages)
         {
             activeOutagesMap.Clear();
+            //Dispatcher.Invoke(new Action(() => ActiveOutages.Clear()));
             ActiveOutages.Clear();
-
             foreach (var simulatedOutage in simulatedOutages)
             {
                 var outage = new ActiveOutageBindingModel()
                 {
                     OutageElement = new GlobalIDBindingModel(simulatedOutage.OutageElementGid),
-                    OptimumIsolationPoints = new List<GlobalIDBindingModel>(simulatedOutage.OptimumIsolationPointGids.Select(gid => new GlobalIDBindingModel(gid))),
-                    DefaultIsolationPoints = new List<GlobalIDBindingModel>(simulatedOutage.DefaultIsolationPointGids.Select(gid => new GlobalIDBindingModel(gid))),
+                    OptimumIsolationPoints = new ObservableCollection<GlobalIDBindingModel>(simulatedOutage.OptimumIsolationPointGids.Select(gid => new GlobalIDBindingModel(gid))),
+                    DefaultIsolationPoints = new ObservableCollection<GlobalIDBindingModel>(simulatedOutage.DefaultIsolationPointGids.Select(gid => new GlobalIDBindingModel(gid))),
                     DefaultToOptimumIsolationPointMap = new Dictionary<long, long>(simulatedOutage.DefaultToOptimumIsolationPointMap),
                 };
 
+                //Dispatcher.Invoke(new Action(() => ActiveOutages.Add(outage)));
                 ActiveOutages.Add(outage);
                 activeOutagesMap.Add(simulatedOutage.OutageElementGid, outage);
             }

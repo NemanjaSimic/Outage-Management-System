@@ -20,7 +20,7 @@
         </Grid.ColumnDefinitions>
         <StackPanel Grid.Row="1" Grid.Column="1">
             <Label>Active outages</Label>
-            <DataGrid ItemsSource="{Binding ActiveOutages, UpdateSourceTrigger=PropertyChanged}" 
+            <DataGrid ItemsSource="{Binding ActiveOutages, UpdateSourceTrigger=PropertyChanged, Mode=OneWay}" 
                       SelectedItem="{Binding SelectedOutage, Mode=OneWayToSource}" 
                       IsReadOnly="True" 
                       SelectionMode="Single" 
@@ -28,8 +28,8 @@
                       MaxHeight="550"
                       SelectionChanged="DataGrid_SelectionChanged">
                 <DataGrid.Columns>
-                    <DataGridTextColumn Binding="{Binding OutageElement.GID, StringFormat={}0x{0:X16}}" Header="Outage ID" Width="auto"/>
-                    <DataGridTextColumn Binding="{Binding OutageElement.Type}" Header="Type" Width="*"/>
+                    <DataGridTextColumn Binding="{Binding Path=OutageElement.GID, StringFormat={}0x{0:X16}}" Header="Outage ID" Width="auto"/>
+					<DataGridTextColumn Binding="{Binding Path=OutageElement.Type}" Header="Type" Width="*"/>
                 </DataGrid.Columns>
             </DataGrid>
         </StackPanel>
