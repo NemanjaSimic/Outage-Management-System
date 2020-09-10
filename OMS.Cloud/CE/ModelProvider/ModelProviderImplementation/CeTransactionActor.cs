@@ -12,7 +12,6 @@ namespace CE.ModelProviderImplementation
     public class CeTransactionActor : ITransactionActorContract
     {
         private readonly string baseLogString;
-        private readonly IModelProviderContract modelProviderClient;
         //private readonly IReliableStateManager stateManager;
 
         #region Private Properties
@@ -31,8 +30,6 @@ namespace CE.ModelProviderImplementation
 		public CeTransactionActor()
         {
             this.baseLogString = $"{this.GetType()} [{this.GetHashCode()}] =>{Environment.NewLine}";
-
-            modelProviderClient = ModelProviderClient.CreateClient();
 
             Logger.LogDebug($"{baseLogString} ctor initialized.");
         }
@@ -72,6 +69,7 @@ namespace CE.ModelProviderImplementation
 
             try
             {
+                var modelProviderClient = ModelProviderClient.CreateClient();
                 success = await modelProviderClient.Prepare();
             }
             catch (Exception ex)
@@ -103,6 +101,7 @@ namespace CE.ModelProviderImplementation
 
             try
             {
+                var modelProviderClient = ModelProviderClient.CreateClient();
                 await modelProviderClient.Commit();
                 Logger.LogInformation($"{baseLogString} Commit => Commit on CE Transaction actor SUCCESSFULLY finished.");
             }
@@ -126,6 +125,7 @@ namespace CE.ModelProviderImplementation
 
             try
             {
+                var modelProviderClient = ModelProviderClient.CreateClient();
                 await modelProviderClient.Rollback();
                 Logger.LogInformation($"{baseLogString} Rollback => Rollback on CE Transaction actor SUCCESSFULLY finished.");
             }

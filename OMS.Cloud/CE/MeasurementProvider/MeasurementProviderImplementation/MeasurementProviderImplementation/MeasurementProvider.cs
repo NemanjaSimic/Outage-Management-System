@@ -60,9 +60,6 @@ namespace CE.MeasurementProviderImplementation
 			get { return logger ?? (logger = CloudLoggerFactory.GetLogger()); }
 		}
 
-		private readonly ITopologyProviderContract topologyProviderClient;
-		private readonly IModelProviderContract modelProviderClient;
-		private readonly IScadaCommandingContract scadaCommandingClient;
 		#endregion
 
 		public MeasurementProvider(IReliableStateManager stateManager)
@@ -70,10 +67,6 @@ namespace CE.MeasurementProviderImplementation
 			this.baseLogString = $"{this.GetType()} [{this.GetHashCode()}] =>{Environment.NewLine}";
 			string verboseMessage = $"{baseLogString} entering Ctor.";
 			Logger.LogVerbose(verboseMessage);
-
-			topologyProviderClient = TopologyProviderClient.CreateClient();
-			modelProviderClient = ModelProviderClient.CreateClient();
-			scadaCommandingClient = ScadaCommandingClient.CreateClient();
 
 			this.stateManager = stateManager;
 			stateManager.StateManagerChanged += this.OnStateManagerChangedHandler;
@@ -324,12 +317,15 @@ namespace CE.MeasurementProviderImplementation
 
 			var measurementToElementMap = await GetMeasurementToElementMapFromCache();
 
+			var modelProviderClient = ModelProviderClient.CreateClient();
+
 			if (measurementToElementMap.TryGetValue(measurementGid, out long recloserGid) 
 				&& await modelProviderClient.IsRecloser(recloserGid)
 				&& commandOrigin != CommandOriginType.CE_COMMAND
 				&& commandOrigin != CommandOriginType.OUTAGE_SIMULATOR)
 			{
 				Logger.LogDebug($"{baseLogString} UpdateDiscreteMeasurement => Calling ResetRecloser on topology provider.");
+				var topologyProviderClient = TopologyProviderClient.CreateClient();
 				await topologyProviderClient.ResetRecloser(recloserGid);
 				Logger.LogDebug($"{baseLogString} UpdateDiscreteMeasurement => ResetRecloser from topology provider returned success.");
 
@@ -358,6 +354,7 @@ namespace CE.MeasurementProviderImplementation
 			}
 
 			Logger.LogDebug($"{baseLogString} UpdateDiscreteMeasurement => Invoking Discrete Measurement Delegate in topology provider service.");
+			var topologyProviderClient = TopologyProviderClient.CreateClient();
 			topologyProviderClient.DiscreteMeasurementDelegate();
 		}
 		public async Task<long> GetElementGidForMeasurement(long measurementGid)
@@ -741,6 +738,7 @@ namespace CE.MeasurementProviderImplementation
 			try
 			{
 				Logger.LogDebug($"{baseLogString} SendAnalogCommand => Calling Send single analog command from scada commanding client.");
+				var scadaCommandingClient = ScadaCommandingClient.CreateClient();
 				await scadaCommandingClient.SendSingleAnalogCommand(measurementGid, commandingValue, commandOrigin);
 				Logger.LogDebug($"{baseLogString} SendAnalogCommand => Send single analog command from scada commanding client successfully called.");
 			}
@@ -764,6 +762,7 @@ namespace CE.MeasurementProviderImplementation
 				if ( measurement != null && !(measurement is ArtificalDiscreteMeasurement))
 				{
 					Logger.LogDebug($"{baseLogString} SendDiscreteCommand => Calling Send single discrete command from scada commanding client.");
+					var scadaCommandingClient = ScadaCommandingClient.CreateClient();
 					await scadaCommandingClient.SendSingleDiscreteCommand(measurementGid, (ushort)value, commandOrigin);
 					Logger.LogDebug($"{baseLogString} SendDiscreteCommand => Send single discrete command from scada commanding client successfully called.");
 				}

@@ -67,7 +67,6 @@ namespace CE.ModelProviderImplementation
 		}
 
 		private readonly NetworkModelGDA networkModelGda;
-		private readonly IMeasurementProviderContract measurementProviderClient;
 
 		private static long noScadaGuid = 1;
 		private readonly ModelResourcesDesc modelResourcesDesc;
@@ -88,7 +87,6 @@ namespace CE.ModelProviderImplementation
 			Logger.LogVerbose(verboseMessage);
 
 			networkModelGda = new NetworkModelGDA();
-			measurementProviderClient = MeasurementProviderClient.CreateClient();
 
 			modelResourcesDesc = new ModelResourcesDesc();
 			TopologyElements = new Dictionary<long, ITopologyElement>();
@@ -176,6 +174,7 @@ namespace CE.ModelProviderImplementation
 				foreach (var measurement in Measurements.Values)
 				{
 					PutMeasurementsInElements(measurement);
+					var measurementProviderClient = MeasurementProviderClient.CreateClient();
 					await measurementProviderClient.AddMeasurementElementPair(measurement.Id, measurement.ElementId);
 				}
 
@@ -277,6 +276,7 @@ namespace CE.ModelProviderImplementation
 				{
 					Measurements.Add(newDiscrete.Id, newDiscrete);
 				}
+				var measurementProviderClient = MeasurementProviderClient.CreateClient();
 				await measurementProviderClient.AddDiscreteMeasurement(newDiscrete as DiscreteMeasurement);
 			}
 			else if (dmsType == DMSType.ANALOG)
@@ -286,6 +286,7 @@ namespace CE.ModelProviderImplementation
 				{
 					Measurements.Add(newAnalog.Id, newAnalog);
 				}
+				var measurementProviderClient = MeasurementProviderClient.CreateClient();
 				await measurementProviderClient.AddAnalogMeasurement(newAnalog as AnalogMeasurement);
 			}
 			else if (dmsType != DMSType.MASK_TYPE && dmsType != DMSType.BASEVOLTAGE)
@@ -597,7 +598,10 @@ namespace CE.ModelProviderImplementation
 				ArtificalDiscreteMeasurement measurement = GetNoScadaDiscreteMeasurement();
 				element.Measurements.Add(measurement.Id, "SWITCH_STATUS");
 				measurement.ElementId = element.Id;
+				var measurementProviderClient = MeasurementProviderClient.CreateClient();
 				await measurementProviderClient.AddDiscreteMeasurement(measurement);
+
+				measurementProviderClient = MeasurementProviderClient.CreateClient();
 				await measurementProviderClient.AddMeasurementElementPair(measurement.Id, element.Id);
 			}
 		}

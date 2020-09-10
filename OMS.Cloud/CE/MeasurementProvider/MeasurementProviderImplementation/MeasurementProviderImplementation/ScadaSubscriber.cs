@@ -1,5 +1,4 @@
-﻿using Common.CeContracts;
-using OMS.Common.Cloud.Logger;
+﻿using OMS.Common.Cloud.Logger;
 using OMS.Common.Cloud.Names;
 using OMS.Common.PubSubContracts;
 using OMS.Common.PubSubContracts.DataContracts.SCADA;
@@ -7,8 +6,6 @@ using OMS.Common.PubSubContracts.Interfaces;
 using OMS.Common.WcfClient.CE;
 using System;
 using System.Collections.Generic;
-using System.Linq;
-using System.Text;
 using System.Threading.Tasks;
 
 namespace CE.MeasurementProviderImplementation
@@ -16,8 +13,6 @@ namespace CE.MeasurementProviderImplementation
 	public class ScadaSubscriber : INotifySubscriberContract
 	{
 		private readonly string baseLogString;
-
-		private readonly IMeasurementProviderContract measurementProviderClient;
 
 		private ICloudLogger logger;
 		private ICloudLogger Logger
@@ -30,8 +25,6 @@ namespace CE.MeasurementProviderImplementation
 			this.baseLogString = $"{this.GetType()} [{this.GetHashCode()}] =>{Environment.NewLine}";
 			string verboseMessage = $"{baseLogString} entering Ctor.";
 			Logger.LogVerbose(verboseMessage);
-
-			measurementProviderClient = MeasurementProviderClient.CreateClient();
 
 			string debugMessage = $"{baseLogString} Ctor => Clients initialized.";
 			Logger.LogDebug(debugMessage);
@@ -59,11 +52,13 @@ namespace CE.MeasurementProviderImplementation
 				};
 
 				Logger.LogDebug($"{baseLogString} Calling Update analog measurement from measurement provider.");
+				var measurementProviderClient = MeasurementProviderClient.CreateClient();
 				await measurementProviderClient.UpdateAnalogMeasurement(data);
 			}
 			else if (message is MultipleAnalogValueSCADAMessage multipleAnalog)
 			{
 				Logger.LogDebug($"{baseLogString} Calling Update analog measurement from measurement provider.");
+				var measurementProviderClient = MeasurementProviderClient.CreateClient();
 				await measurementProviderClient.UpdateAnalogMeasurement(multipleAnalog.Data);
 			}
 			else if (message is SingleDiscreteValueSCADAMessage singleDiscrete)
@@ -74,11 +69,13 @@ namespace CE.MeasurementProviderImplementation
 				};
 
 				Logger.LogDebug($"{baseLogString} Calling Update discrete measurement from measurement provider.");
+				var measurementProviderClient = MeasurementProviderClient.CreateClient();
 				await measurementProviderClient.UpdateDiscreteMeasurement(data);
 			}
 			else if (message is MultipleDiscreteValueSCADAMessage multipleDiscrete)
 			{
 				Logger.LogDebug($"{baseLogString} Calling Update discrete measurement from measurement provider.");
+				var measurementProviderClient = MeasurementProviderClient.CreateClient();
 				await measurementProviderClient.UpdateDiscreteMeasurement(multipleDiscrete.Data);
 			}
 			else

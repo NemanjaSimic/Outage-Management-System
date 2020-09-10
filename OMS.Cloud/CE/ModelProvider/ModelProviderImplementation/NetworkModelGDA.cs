@@ -11,8 +11,6 @@ namespace CE.ModelProviderImplementation
 {
 	public class NetworkModelGDA
 	{
-		private readonly INetworkModelGDAContract networkModelGdaClient;
-
 		private readonly string baseLogString;
 
 		private ICloudLogger logger;
@@ -27,8 +25,6 @@ namespace CE.ModelProviderImplementation
 			string verboseMessage = $"{baseLogString} entering Ctor.";
 			Logger.LogVerbose(verboseMessage);
 
-			networkModelGdaClient = NetworkModelGdaClient.CreateClient();
-
 			string debugMessage = $"{baseLogString} Ctor => Clients initialized.";
 			Logger.LogDebug(debugMessage);
 		}
@@ -42,6 +38,7 @@ namespace CE.ModelProviderImplementation
 
 			try
 			{
+				var networkModelGdaClient = NetworkModelGdaClient.CreateClient();
 				iteratorId = await networkModelGdaClient.GetExtentValues(entityType, propIds);
 			}
 			catch (Exception e)
@@ -64,6 +61,7 @@ namespace CE.ModelProviderImplementation
 
 			try
 			{
+				var networkModelGdaClient = NetworkModelGdaClient.CreateClient();
 				iteratorId = await networkModelGdaClient.GetRelatedValues(source, propIds, association);
 			}
 			catch (Exception e)
@@ -86,6 +84,7 @@ namespace CE.ModelProviderImplementation
 
 			try
 			{
+				var networkModelGdaClient = NetworkModelGdaClient.CreateClient();
 				resource = await networkModelGdaClient.GetValues(resourceId, propIds);
 			}
 			catch (Exception e)
@@ -110,6 +109,7 @@ namespace CE.ModelProviderImplementation
 
 			try
 			{
+				var networkModelGdaClient = NetworkModelGdaClient.CreateClient();
 				resourcesLeft = await networkModelGdaClient.IteratorResourcesTotal(iteratorId);
 				resourceDescriptions = new List<ResourceDescription>(resourcesLeft);
 

@@ -14,9 +14,6 @@ namespace CE.TopologyProviderImplementation
 {
     public class TopologyConverter : ITopologyConverterContract
     {
-        private readonly IMeasurementProviderContract measurementProviderClient;
-        private readonly IModelProviderContract modelProviderClient;
-
         private readonly string baseLogString;
 
         private ICloudLogger logger;
@@ -30,9 +27,6 @@ namespace CE.TopologyProviderImplementation
             this.baseLogString = $"{this.GetType()} [{this.GetHashCode()}] =>{Environment.NewLine}";
             string verboseMessage = $"{baseLogString} entering Ctor.";
             Logger.LogVerbose(verboseMessage);
-
-            measurementProviderClient = MeasurementProviderClient.CreateClient();
-            modelProviderClient = ModelProviderClient.CreateClient();
 
             string debugMessage = $"{baseLogString} Ctor => Clients initialized.";
             Logger.LogDebug(debugMessage);
@@ -54,6 +48,7 @@ namespace CE.TopologyProviderImplementation
             Stack<long> stack = new Stack<long>();
 
             Logger.LogDebug($"{baseLogString} ConvertTopologyToUIModel => Calling GetReclosers method from model provider client.");
+            var modelProviderClient = ModelProviderClient.CreateClient();
             var reclosers = await modelProviderClient.GetReclosers();
             Logger.LogDebug($"{baseLogString} ConvertTopologyToUIModel => GetReclosers method from model provider client has been called successfully.");
 
@@ -94,10 +89,12 @@ namespace CE.TopologyProviderImplementation
                     foreach (var measurementGid in element.Measurements.Keys)
                     {
                         Logger.LogDebug($"{baseLogString} ConvertTopologyToUIModel => Calling GetDiscreteMeasurement method from measurement provider client for measurement GID {measurementGid:X16}.");
+                        var measurementProviderClient = MeasurementProviderClient.CreateClient();
                         DiscreteMeasurement discreteMeasurement = await measurementProviderClient.GetDiscreteMeasurement(measurementGid);
                         Logger.LogDebug($"{baseLogString} ConvertTopologyToUIModel => GetDiscreteMeasurement method from measurement provider client has been called successfully.");
 
                         Logger.LogDebug($"{baseLogString} ConvertTopologyToUIModel => Calling GetAnalogMeasurement method from measurement provider client for measurement GID {measurementGid:X16}.");
+                        measurementProviderClient = MeasurementProviderClient.CreateClient();
                         AnalogMeasurement analogMeasurement = await measurementProviderClient.GetAnalogMeasurement(measurementGid);
                         Logger.LogDebug($"{baseLogString} ConvertTopologyToUIModel => GetAnalogMeasurement method from measurement provider client has been called successfully.");
 
@@ -167,6 +164,7 @@ namespace CE.TopologyProviderImplementation
             }
 
             Logger.LogDebug($"{baseLogString} ConvertTopologyToOMSModel => Calling GetReclosers method from model provider client.");
+            var modelProviderClient = ModelProviderClient.CreateClient();
             var reclosers = await modelProviderClient.GetReclosers();
             Logger.LogDebug($"{baseLogString} ConvertTopologyToOMSModel => GetReclosers method from model provider client has been called successfully.");
 
@@ -217,6 +215,7 @@ namespace CE.TopologyProviderImplementation
                     foreach (var measurementGid in element.Measurements.Keys)
                     {
                         Logger.LogDebug($"{baseLogString} ConvertTopologyToOMSModel => Calling GetDiscreteMeasurement method from measurement provider client for measurement GID {measurementGid:X16}.");
+                        var measurementProviderClient = MeasurementProviderClient.CreateClient();
                         discreteMeasurement = await measurementProviderClient.GetDiscreteMeasurement(measurementGid);
                         Logger.LogDebug($"{baseLogString} ConvertTopologyToOMSModel => GetDiscreteMeasurement method from measurement provider client has been called successfully.");
 

@@ -11,8 +11,6 @@ namespace CE.MeasurementProviderImplementation
 	{
         private readonly string baseLogString;
 
-        private readonly IMeasurementProviderContract measurementProviderClient;
-
         private ICloudLogger logger;
         private ICloudLogger Logger
         {
@@ -24,8 +22,6 @@ namespace CE.MeasurementProviderImplementation
             this.baseLogString = $"{this.GetType()} [{this.GetHashCode()}] =>{Environment.NewLine}";
             string verboseMessage = $"{baseLogString} entering Ctor.";
             Logger.LogVerbose(verboseMessage);
-
-            measurementProviderClient = MeasurementProviderClient.CreateClient();
 
             string debugMessage = $"{baseLogString} Ctor => Clients initialized.";
             Logger.LogDebug(debugMessage);
@@ -41,6 +37,7 @@ namespace CE.MeasurementProviderImplementation
 
             try
             {
+                var measurementProviderClient = MeasurementProviderClient.CreateClient();
                 return await measurementProviderClient.GetElementToMeasurementMap();
             }
             catch (Exception e)
@@ -60,6 +57,7 @@ namespace CE.MeasurementProviderImplementation
 
             try
             {
+                var measurementProviderClient = MeasurementProviderClient.CreateClient();
                 return await measurementProviderClient.GetMeasurementsOfElement(elementId);
             }
             catch (Exception e)
@@ -79,6 +77,7 @@ namespace CE.MeasurementProviderImplementation
 
             try
             {
+                var measurementProviderClient = MeasurementProviderClient.CreateClient();
                 return await measurementProviderClient.GetMeasurementToElementMap();
             }
             catch (Exception e)
