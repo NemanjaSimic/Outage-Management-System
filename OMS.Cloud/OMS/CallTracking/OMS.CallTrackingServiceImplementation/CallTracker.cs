@@ -4,6 +4,7 @@ using Microsoft.ServiceFabric.Data;
 using Microsoft.ServiceFabric.Data.Notifications;
 using OMS.Common.Cloud;
 using OMS.Common.Cloud.Logger;
+using OMS.Common.Cloud.Names;
 using OMS.Common.Cloud.ReliableCollectionHelpers;
 using OMS.Common.NmsContracts;
 using OMS.Common.PubSubContracts;
@@ -75,6 +76,7 @@ namespace OMS.CallTrackingImplementation
         public CallTracker(IReliableStateManager stateManager, string subscriberName)
         {
             this.stateManager = stateManager;
+            this.stateManager.StateManagerChanged += OnStateManagerChangedHandler;
             this.subscriberName = subscriberName;
 
             modelResourcesDesc = new ModelResourcesDesc();

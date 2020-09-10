@@ -5,6 +5,7 @@ using OMS.EmailImplementation.Models;
 using OMS.Common.Cloud;
 using OMS.Common.PubSubContracts;
 using System;
+using OMS.Common.Cloud.Names;
 
 namespace OMS.EmailImplementation.Imap
 {
@@ -59,11 +60,11 @@ namespace OMS.EmailImplementation.Imap
 
                 try
                 {
-                    publisher.Publish(new OutageEmailPublication(Topic.OUTAGE_EMAIL, new EmailToOutageMessage(tracingModel.Gid)), "EmailService"); //TODO: Service defines
+                    publisher.Publish(new OutageEmailPublication(Topic.OUTAGE_EMAIL, new EmailToOutageMessage(tracingModel.Gid)), MicroserviceNames.OmsEmailService).Wait(); //TODO: Service defines
                 }
-                catch (Exception)
+                catch (Exception e)
                 {
-                    Console.WriteLine("[ImapIdleEmailClient::OnMessageArrived] Sending to PubSub Engine failed.");
+                    Console.WriteLine($"[ImapIdleEmailClient::OnMessageArrived] Sending to PubSub Engine failed. Exception message: {e.Message}");
                 }
             }
 

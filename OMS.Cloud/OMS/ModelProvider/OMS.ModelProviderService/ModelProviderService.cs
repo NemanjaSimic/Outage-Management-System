@@ -141,6 +141,7 @@ namespace OMS.ModelProviderService
                 Logger.LogDebug(debugMessage);
                 ServiceEventSource.Current.ServiceMessage(this.Context, $"[OMS.ModelProviderService | Information] {debugMessage}");
 
+                await outageModel.InitializeOutageModel();
             }
             catch (Exception e)
 			{

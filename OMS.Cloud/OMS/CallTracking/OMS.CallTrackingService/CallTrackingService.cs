@@ -74,7 +74,7 @@ namespace OMS.CallTrackingService
 																				   this.callTracker,
 																				   WcfUtility.CreateTcpListenerBinding(),
 																				   EndpointNames.PubSubNotifySubscriberEndpoint);
-				})
+				}, EndpointNames.PubSubNotifySubscriberEndpoint)
 			};
 		}
 

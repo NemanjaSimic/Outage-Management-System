@@ -9,6 +9,7 @@ using OMS.Common.PubSubContracts;
 using System;
 using System.Collections.Generic;
 using System.Configuration;
+using OMS.Common.Cloud.Names;
 
 namespace OMS.EmailImplementation.Imap
 {
@@ -44,7 +45,7 @@ namespace OMS.EmailImplementation.Imap
 			this.publisher = publisher;
 			this.dispatcher = dispatcher;
 
-			client = new ImapClient();
+			client = new ImapClient(server, port, true);
 		}
 
 		public bool Connect()
@@ -87,7 +88,7 @@ namespace OMS.EmailImplementation.Imap
 
 				try
 				{
-					publisher.Publish(new OutageEmailPublication(Topic.OUTAGE_EMAIL, new EmailToOutageMessage(tracingModel.Gid)), "EmailService"); //TODO: SErvice defines
+					publisher.Publish(new OutageEmailPublication(Topic.OUTAGE_EMAIL, new EmailToOutageMessage(tracingModel.Gid)), MicroserviceNames.OmsEmailService).Wait(); //TODO: SErvice defines
  				}
 				catch (Exception)
 				{

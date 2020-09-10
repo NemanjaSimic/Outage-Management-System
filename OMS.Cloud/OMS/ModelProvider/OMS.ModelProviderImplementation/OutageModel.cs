@@ -1,4 +1,6 @@
-﻿using Common.OmsContracts.HistoryDBManager;
+﻿using Common.CeContracts;
+using Common.CeContracts.TopologyProvider;
+using Common.OmsContracts.HistoryDBManager;
 using Common.OmsContracts.OutageLifecycle;
 using Common.PubSubContracts.DataContracts.CE;
 using Microsoft.ServiceFabric.Data;
@@ -9,6 +11,7 @@ using OMS.Common.Cloud.Names;
 using OMS.Common.Cloud.ReliableCollectionHelpers;
 using OMS.Common.PubSubContracts;
 using OMS.Common.PubSubContracts.Interfaces;
+using OMS.Common.WcfClient.CE;
 using OMS.Common.WcfClient.OMS;
 using OMS.Common.WcfClient.OMS.HistoryDBManager;
 using OMS.Common.WcfClient.OMS.OutageLifecycle;
@@ -31,7 +34,23 @@ namespace OMS.ModelProviderImplementation
 		}
 		
 		private IHistoryDBManagerContract historyDBManagerClient;
-		private IPotentialOutageReportingContract reportOutageClient;
+		private ITopologyProviderContract topologyProviderClient;
+
+		
+		public OutageModel(IReliableStateManager stateManager)
+		{
+			this.baseLogString = $"{this.GetType()} [{this.GetHashCode()}] =>{Environment.NewLine}";
+			Logger.LogDebug($"{baseLogString} Ctor => Logger initialized");
+
+			isTopologyModelInitialized = false;
+			isCommandedElementsInitialized = false;
+			isOptimumIsolatioPointsInitialized = false;
+			isPotentialOutageInitialized = false;
+
+			this.stateManager = stateManager;
+			this.stateManager.StateManagerChanged += this.OnStateManagerChangedHandler;
+
+		}
 
 		#region ReliableDictionaryAccess
 		private bool isTopologyModelInitialized;
@@ -118,6 +137,15 @@ namespace OMS.ModelProviderImplementation
 			this.stateManager = stateManager;
 			this.stateManager.StateManagerChanged += this.OnStateManagerChangedHandler;
 		}
+		
+		public async Task InitializeOutageModel()
+		{
+			topologyProviderClient = TopologyProviderClient.CreateClient();
+			OutageTopologyModel topologyModel = await topologyProviderClient.GetOMSModel();
+
+			await TopologyModel.SetAsync(0, topologyModel);
+		}
+		
 
 		#region INotifySubscriberContract
 		private readonly string subscriberUri = MicroserviceNames.OmsModelProviderService;

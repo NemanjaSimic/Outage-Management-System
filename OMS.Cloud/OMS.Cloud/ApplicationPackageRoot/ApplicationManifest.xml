@@ -124,6 +124,11 @@
     <ConfigOverrides />
   </ServiceManifestImport>
   <DefaultServices>
+    <Service Name="OMS.EmailService" ServicePackageActivationMode="ExclusiveProcess">
+      <StatelessService ServiceTypeName="OMS.EmailServiceType" InstanceCount="[OMS.EmailService_InstanceCount]">
+        <SingletonPartition />
+      </StatelessService>
+    </Service>
     <!-- The section below creates instances of service types, when an instance of this
          application type is created. You can also create one or more instances of service type using the
          ServiceFabric PowerShell module.

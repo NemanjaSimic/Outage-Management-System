@@ -144,7 +144,9 @@ namespace CE.ModelProviderImplementation
                 await Task.Delay(1000);
             }
 
-            IModelDelta modelDelta = await modelManager.TryGetAllModelEntitiesAsync();
+			//Logger.LogVerbose($"{baseLogString} enter in ImportDataInCache.");
+
+			IModelDelta modelDelta = await modelManager.TryGetAllModelEntitiesAsync();
 
             await ElementCache.SetAsync((short)TransactionFlag.NoTransaction, TransformDictionary(modelDelta.TopologyElements));
             await ElementConnectionCache.SetAsync((short)TransactionFlag.NoTransaction, modelDelta.ElementConnections);

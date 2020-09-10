@@ -104,7 +104,7 @@ namespace PubSubImplementation
             }
             catch (Exception e)
             {
-                string errorMessage = $"{baseLogString} InitializeScadaModel => Exception caught.";
+                string errorMessage = $"{baseLogString} Publish => Exception caught.";
                 Logger.LogError(errorMessage, e);
                 success = false;
             }
