@@ -1,6 +1,7 @@
 ﻿using Common.OmsContracts.DataContracts.OutageSimulator;
 using OMS.Common.Cloud.Logger;
 using OMS.Common.WcfClient.OMS;
+using OMS.Common.WcfClient.OMS.OutageSimulator;
 using OMS.OutageSimulator.UI.BindingModels;
 using System;
 using System.Collections.Generic;

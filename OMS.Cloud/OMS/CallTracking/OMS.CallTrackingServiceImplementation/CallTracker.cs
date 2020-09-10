@@ -9,6 +9,7 @@ using OMS.Common.NmsContracts;
 using OMS.Common.PubSubContracts;
 using OMS.Common.PubSubContracts.Interfaces;
 using OMS.Common.WcfClient.OMS;
+using OMS.Common.WcfClient.OMS.ModelProvider;
 using System;
 using System.Configuration;
 using System.Linq;
@@ -163,14 +164,14 @@ namespace OMS.CallTrackingImplementation
             }
         }
 
-        public async Task<string> GetSubscriberName()
+        public Task<string> GetSubscriberName()
         {
-            return subscriberName;
+            return Task.Run(() => subscriberName);
         }
 
         public Task<bool> IsAlive()
         {
-            return Task.Run(() => { return true; });
+            return Task.Run(() => true);
         }
         #endregion
 

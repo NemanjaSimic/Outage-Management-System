@@ -5,6 +5,7 @@ using OMS.Common.NmsContracts;
 using OMS.Common.NmsContracts.GDA;
 using OMS.Common.WcfClient.NMS;
 using OMS.Common.WcfClient.OMS;
+using OMS.Common.WcfClient.OMS.OutageSimulator;
 using OMS.OutageSimulator.UI.BindingModels;
 using System;
 using System.Collections.Generic;

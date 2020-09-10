@@ -3,9 +3,9 @@ using Common.OmsContracts.OutageLifecycle;
 using Common.PubSubContracts.DataContracts.CE;
 using OMS.Common.Cloud;
 using OMS.Common.Cloud.Logger;
-using OMS.Common.PubSubContracts.Interfaces;
 using OMS.Common.WcfClient.OMS;
-using OMS.Common.WcfClient.OMS.Lifecycle;
+using OMS.Common.WcfClient.OMS.ModelProvider;
+using OMS.Common.WcfClient.OMS.OutageLifecycle;
 using System;
 using System.Collections.Generic;
 using System.Threading.Tasks;
@@ -20,7 +20,7 @@ namespace OMS.CallTrackingImplementation
         //TODO: Mozda reliable dic/queue
         private List<long> potentialOutages;
         private List<long> outages;
-        private IReportOutageContract reportOutageClient;
+        private IPotentialOutageReportingContract reportOutageClient;
         private IOutageModelReadAccessContract outageModelReadAccessClient;
 
         private ICloudLogger logger;
@@ -31,7 +31,7 @@ namespace OMS.CallTrackingImplementation
 
         public TrackingAlgorithm()
 		{
-            reportOutageClient = ReportOutageClient.CreateClient();
+            reportOutageClient = PotentialOutageReportingClient.CreateClient();
             outageModelReadAccessClient = OutageModelReadAccessClient.CreateClient();
 		}
 

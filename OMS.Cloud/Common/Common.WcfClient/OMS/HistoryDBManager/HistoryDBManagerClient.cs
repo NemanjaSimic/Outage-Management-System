@@ -4,11 +4,9 @@ using Microsoft.ServiceFabric.Services.Communication.Wcf.Client;
 using OMS.Common.Cloud.Names;
 using System;
 using System.Collections.Generic;
-using System.Linq;
-using System.Text;
 using System.Threading.Tasks;
 
-namespace OMS.Common.WcfClient.OMS
+namespace OMS.Common.WcfClient.OMS.HistoryDBManager
 {
     public class HistoryDBManagerClient : WcfSeviceFabricClientBase<IHistoryDBManagerContract>, IHistoryDBManagerContract
     {
@@ -30,6 +28,8 @@ namespace OMS.Common.WcfClient.OMS
             ClientFactory factory = new ClientFactory();
             return factory.CreateClient<HistoryDBManagerClient, IHistoryDBManagerContract>(serviceUri, servicePartitionKey);
         }
+
+        #region IHistoryDBManagerContract
         public Task OnConsumerBlackedOut(List<long> consumers, long? outageId)
         {
             return InvokeWithRetryAsync(client => client.Channel.OnConsumerBlackedOut(consumers, outageId));
@@ -54,5 +54,6 @@ namespace OMS.Common.WcfClient.OMS
         {
             return InvokeWithRetryAsync(client => client.Channel.IsAlive());
         }
+        #endregion IHistoryDBManagerContract
     }
 }

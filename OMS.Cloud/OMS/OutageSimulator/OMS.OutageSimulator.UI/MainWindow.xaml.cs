@@ -1,4 +1,5 @@
 ﻿using OMS.Common.WcfClient.OMS;
+using OMS.Common.WcfClient.OMS.OutageSimulator;
 using OMS.OutageSimulator.UI.UserControls;
 using System;
 using System.Threading.Tasks;

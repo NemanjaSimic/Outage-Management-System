@@ -16,8 +16,8 @@ namespace OMS.Common.WcfClient.OMS.ModelAccess
         public EquipmentAccessClient(WcfCommunicationClientFactory<IEquipmentAccessContract> clientFactory, Uri serviceUri, ServicePartitionKey servicePartition)
            : base(clientFactory, serviceUri, servicePartition, listenerName)
         {
-
         }
+
         public static IEquipmentAccessContract CreateClient()
         {
             ClientFactory factory = new ClientFactory();
@@ -30,6 +30,7 @@ namespace OMS.Common.WcfClient.OMS.ModelAccess
             return factory.CreateClient<EquipmentAccessClient, IEquipmentAccessContract>(serviceUri, servicePartitionKey);
         }
 
+		#region IEquipmentAccessContract
 		public Task<Equipment> AddEquipment(Equipment equipment)
 		{
 			return InvokeWithRetryAsync(client => client.Channel.AddEquipment(equipment));
@@ -69,5 +70,6 @@ namespace OMS.Common.WcfClient.OMS.ModelAccess
 		{
 			return InvokeWithRetryAsync(client => client.Channel.IsAlive());
 		}
+		#endregion IEquipmentAccessContract
 	}
 }

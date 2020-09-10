@@ -1,9 +1,7 @@
-﻿using Common.OmsContracts.OutageLifecycle;
-using Common.Web.Services.Commands;
+﻿using Common.Web.Services.Commands;
 using MediatR;
 using OMS.Common.Cloud.Logger;
-using OMS.Common.WcfClient.OMS;
-using OMS.Common.WcfClient.OMS.Lifecycle;
+using OMS.Common.WcfClient.OMS.OutageLifecycle;
 using System;
 using System.Threading;
 using System.Threading.Tasks;
@@ -29,7 +27,7 @@ namespace Common.Web.Services.Handlers
 
             try
             {
-                var isolateOutageClient = IsolateOutageClient.CreateClient();
+                var isolateOutageClient = OutageIsolationClient.CreateClient();
                 await isolateOutageClient.IsolateOutage(request.OutageId);
             }
             catch (Exception ex)
@@ -47,7 +45,7 @@ namespace Common.Web.Services.Handlers
 
             try
             {
-                var sendLocationIsolationCrewClient = SendLocationIsolationCrewClient.CreateClient();
+                var sendLocationIsolationCrewClient = CrewSendingClient.CreateClient();
                 await sendLocationIsolationCrewClient.SendLocationIsolationCrew(request.OutageId);
             }
             catch (Exception ex)
@@ -65,7 +63,7 @@ namespace Common.Web.Services.Handlers
 
             try
             {
-                var sendRepairCrewClient = SendRepairCrewClient.CreateClient();
+                var sendRepairCrewClient = CrewSendingClient.CreateClient();
                 await sendRepairCrewClient.SendRepairCrew(request.OutageId);
             }
             catch (Exception ex)
@@ -83,7 +81,7 @@ namespace Common.Web.Services.Handlers
 
             try
             {
-                var validateResolveConditionsClient = ValidateResolveConditionsClient.CreateClient();
+                var validateResolveConditionsClient = OutageResolutionClient.CreateClient();
                 await validateResolveConditionsClient.ValidateResolveConditions(request.OutageId);
             }
             catch (Exception ex)
@@ -101,7 +99,7 @@ namespace Common.Web.Services.Handlers
 
             try
             {
-                var resolveOutageClient = ResolveOutageClient.CreateClient();
+                var resolveOutageClient = OutageResolutionClient.CreateClient();
                 await resolveOutageClient.ResolveOutage(request.OutageId);
             }
             catch (Exception ex)

@@ -7,7 +7,7 @@ using System;
 using System.Collections.Generic;
 using System.Threading.Tasks;
 
-namespace OMS.Common.WcfClient.OMS
+namespace OMS.Common.WcfClient.OMS.OutageSimulator
 {
     public class OutageSimulatorUIClient : WcfSeviceFabricClientBase<IOutageSimulatorUIContract>, IOutageSimulatorUIContract
     {

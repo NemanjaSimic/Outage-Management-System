@@ -106,6 +106,7 @@ namespace OMS.ModelProviderImplementation.ContractProviders
         public async Task UpdateCommandedElements(long gid, ModelUpdateOperationType modelUpdateOperationType)
         {
             Logger.LogDebug("UpdateCommandedElements method started.");
+
             while (!ReliableDictionariesInitialized)
             {
                 await Task.Delay(1000);

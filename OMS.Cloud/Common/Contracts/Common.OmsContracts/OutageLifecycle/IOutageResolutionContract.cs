@@ -10,9 +10,12 @@ using System.Threading.Tasks;
 namespace Common.OmsContracts.OutageLifecycle
 {
 	[ServiceContract]
-	public interface IIsolateOutageContract : IService, IHealthChecker
+	public interface IOutageResolutionContract : IService, IHealthChecker
 	{
 		[OperationContract]
-		Task IsolateOutage(long outageId);
+		Task<bool> ResolveOutage(long outageId);
+
+		[OperationContract]
+		Task<bool> ValidateResolveConditions(long outageId);
 	}
 }

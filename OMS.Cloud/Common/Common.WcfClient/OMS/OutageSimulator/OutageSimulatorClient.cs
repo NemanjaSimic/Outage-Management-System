@@ -5,7 +5,7 @@ using OMS.Common.Cloud.Names;
 using System;
 using System.Threading.Tasks;
 
-namespace OMS.Common.WcfClient.OMS
+namespace OMS.Common.WcfClient.OMS.OutageSimulator
 {
     public class OutageSimulatorClient : WcfSeviceFabricClientBase<IOutageSimulatorContract>, IOutageSimulatorContract
     {

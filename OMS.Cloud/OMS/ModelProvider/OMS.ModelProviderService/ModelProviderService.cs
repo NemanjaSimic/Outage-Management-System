@@ -137,6 +137,10 @@ namespace OMS.ModelProviderService
 
                 this.registerSubscriberClient = RegisterSubscriberClient.CreateClient();
                 await this.registerSubscriberClient.SubscribeToTopic(Topic.OMS_MODEL, MicroserviceNames.OmsModelProviderService);
+                debugMessage = $"{baseLogString} RunAsync => Successfully subscribed to topics.";
+                Logger.LogDebug(debugMessage);
+                ServiceEventSource.Current.ServiceMessage(this.Context, $"[OMS.ModelProviderService | Information] {debugMessage}");
+
             }
             catch (Exception e)
 			{

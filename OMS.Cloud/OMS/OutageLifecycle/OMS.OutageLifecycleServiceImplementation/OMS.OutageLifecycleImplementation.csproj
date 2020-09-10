@@ -89,16 +89,13 @@
     <Reference Include="System.Xml" />
   </ItemGroup>
   <ItemGroup>
-    <Compile Include="CancelationObject.cs" />
-    <Compile Include="IsolateOutageService.cs" />
-    <Compile Include="OutageLCHelper\OutageLifecycleHelper.cs" />
+    <Compile Include="ContractProviders\OutageResolutionProvider.cs" />
+    <Compile Include="ContractProviders\OutageIsolationProvider.cs" />
+    <Compile Include="ContractProviders\CrewSendingProvider.cs" />
+    <Compile Include="ContractProviders\PotentialOutageReportingProvider.cs" />
+    <Compile Include="Helpers\OutageLifecycleHelper.cs" />
     <Compile Include="Properties\AssemblyInfo.cs" />
-    <Compile Include="ReportOutageService.cs" />
-    <Compile Include="ResolveOutageService.cs" />
-    <Compile Include="ScadaSub\ScadaSubscriber.cs" />
-    <Compile Include="SendLocationIsolationCrewService.cs" />
-    <Compile Include="SendRepairCrewService.cs" />
-    <Compile Include="ValidateResolveConditionsService.cs" />
+    <Compile Include="ContractProviders\NotifySubscriberProvider.cs" />
   </ItemGroup>
   <ItemGroup>
     <ProjectReference Include="..\..\..\Common\Common.Cloud\Common.Cloud.csproj">

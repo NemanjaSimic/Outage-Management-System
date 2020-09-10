@@ -2,15 +2,26 @@
 {
     public static class ReliableDictionaryNames
     {
-        public const string OutageTopologyModel = "OutageTopologyModel";
-        public const string UnenergizedConsumers = "UnenergizedConsumers";
+        //OMS.CallTrackingService
+        public const string CallsDictionary = "CallsDictionary";
+
+        //OMS.HistoryDBManagerService
         public const string OpenedSwitches = "OpenedSwitches";
+        public const string UnenergizedConsumers = "UnenergizedConsumers";
+        public const string HistoryModelChanges = "HistoryModelChanges";
+
+        //OMS.ModelProviderService
+        public const string OutageTopologyModel = "OutageTopologyModel";
         public const string CommandedElements = "CommandedElements";
         public const string OptimumIsolatioPoints = "OptimumIsolatioPoints";
         public const string PotentialOutage = "PotentialOutage";
-        public const string CallsDictionary = "CallsDictionary";
-        public const string HistoryModelChanges = "HistoryModelChanges";
 
+        //OMS.OutageLifecycleService
+        public const string StartedIsolationAlgorithms = "StartedIsolationAlgorithms";
+        public const string MonitoredHeadBreakerMeasurements = "MonitoredHeadBreakerMeasurements";
+        public const string RecloserOutageMap = "RecloserOutageMap";
+
+        //OMS.OutageSimulatorService
         public const string SimulatedOutages = "SimulatedOutages";
         public const string MonitoredIsolationPoints = "MonitoredIsolationPoints";
     }
