@@ -30,6 +30,7 @@ namespace OMS.Common.WcfClient.OMS.ModelAccess
             return factory.CreateClient<OutageModelAccessClient, IOutageAccessContract>(serviceUri, servicePartitionKey);
         }
 
+		#region IOutageAccessContract
 		public Task<OutageEntity> AddOutage(OutageEntity outage)
 		{
 			return InvokeWithRetryAsync(client => client.Channel.AddOutage(outage));
@@ -79,5 +80,6 @@ namespace OMS.Common.WcfClient.OMS.ModelAccess
 		{
 			return InvokeWithRetryAsync(client => client.Channel.IsAlive());
 		}
+		#endregion IOutageAccessContract
 	}
 }

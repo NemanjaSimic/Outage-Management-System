@@ -4,11 +4,13 @@ using Microsoft.ServiceFabric.Data;
 using Microsoft.ServiceFabric.Data.Notifications;
 using OMS.Common.Cloud;
 using OMS.Common.Cloud.Logger;
+using OMS.Common.Cloud.Names;
 using OMS.Common.Cloud.ReliableCollectionHelpers;
 using OMS.Common.NmsContracts;
 using OMS.Common.PubSubContracts;
 using OMS.Common.PubSubContracts.Interfaces;
 using OMS.Common.WcfClient.OMS;
+using OMS.Common.WcfClient.OMS.ModelProvider;
 using System;
 using System.Configuration;
 using System.Linq;
@@ -74,6 +76,7 @@ namespace OMS.CallTrackingImplementation
         public CallTracker(IReliableStateManager stateManager, string subscriberName)
         {
             this.stateManager = stateManager;
+            this.stateManager.StateManagerChanged += OnStateManagerChangedHandler;
             this.subscriberName = subscriberName;
 
             modelResourcesDesc = new ModelResourcesDesc();
@@ -163,14 +166,14 @@ namespace OMS.CallTrackingImplementation
             }
         }
 
-        public async Task<string> GetSubscriberName()
+        public Task<string> GetSubscriberName()
         {
-            return subscriberName;
+            return Task.Run(() => subscriberName);
         }
 
         public Task<bool> IsAlive()
         {
-            return Task.Run(() => { return true; });
+            return Task.Run(() => true);
         }
         #endregion
 

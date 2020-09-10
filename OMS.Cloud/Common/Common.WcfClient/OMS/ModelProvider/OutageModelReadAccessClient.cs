@@ -4,12 +4,11 @@ using Microsoft.ServiceFabric.Services.Client;
 using Microsoft.ServiceFabric.Services.Communication.Wcf.Client;
 using OMS.Common.Cloud;
 using OMS.Common.Cloud.Names;
-using OMS.Common.PubSubContracts.Interfaces;
 using System;
 using System.Collections.Generic;
 using System.Threading.Tasks;
 
-namespace OMS.Common.WcfClient.OMS
+namespace OMS.Common.WcfClient.OMS.ModelProvider
 {
     public class OutageModelReadAccessClient : WcfSeviceFabricClientBase<IOutageModelReadAccessContract>, IOutageModelReadAccessContract
     {
@@ -64,8 +63,6 @@ namespace OMS.Common.WcfClient.OMS
         {
             return InvokeWithRetryAsync(client => client.Channel.IsAlive());
         }
-        #endregion
-
-
+        #endregion IOutageModelReadAccessContract
     }
 }

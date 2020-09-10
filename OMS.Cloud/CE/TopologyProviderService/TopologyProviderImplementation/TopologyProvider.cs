@@ -30,12 +30,6 @@ namespace CE.TopologyProviderImplementation
         private readonly long topologyID = 1;
         private readonly long transactionTopologyID = 2;
 
-        private readonly IPublisherContract publisherClient;
-        private readonly IModelProviderContract modelProviderClient;
-        private readonly ILoadFlowContract loadFlowClient;
-        private readonly ITopologyBuilderContract topologyBuilderClient;
-        private readonly ITopologyConverterContract topologyConverterClient;
-
         private TransactionFlag transactionFlag;
         private Task<bool> prepare;
         #endregion
@@ -109,12 +103,6 @@ namespace CE.TopologyProviderImplementation
             string verboseMessage = $"{baseLogString} entering Ctor.";
             Logger.LogVerbose(verboseMessage);
 
-            this.modelProviderClient = ModelProviderClient.CreateClient();
-            this.loadFlowClient = LoadFlowClient.CreateClient();
-            this.topologyBuilderClient = TopologyBuilderClient.CreateClient();
-            this.topologyConverterClient = TopologyConverterClient.CreateClient();
-            this.publisherClient = PublisherClient.CreateClient();
-
             this.stateManager = stateManager;
             stateManager.StateManagerChanged += this.OnStateManagerChangedHandler;
 
@@ -166,6 +154,7 @@ namespace CE.TopologyProviderImplementation
                 var newTopology = await CreateTopology("GetTopologyFromCache");
 
                 Logger.LogDebug($"{baseLogString} GetTopologyFromCache => Calling UpdateLoadFlow method from load flow client.");
+                var loadFlowClient = LoadFlowClient.CreateClient();
                 newTopology = await loadFlowClient.UpdateLoadFlow(newTopology);
                 Logger.LogDebug($"{baseLogString} GetTopologyFromCache => UpdateLoadFlow method from load flow client has been called successfully.");
 
@@ -196,6 +185,7 @@ namespace CE.TopologyProviderImplementation
             Logger.LogVerbose(verboseMessage);
 
             Logger.LogDebug($"{baseLogString} CreateTopology => Calling GetEnergySources method from model provider client.");
+            var modelProviderClient = ModelProviderClient.CreateClient();
             List<long> roots = await modelProviderClient.GetEnergySources();
             Logger.LogDebug($"{baseLogString} CreateTopology => GetEnergySources method from model provider client has been successfully called.");
 
@@ -215,6 +205,7 @@ namespace CE.TopologyProviderImplementation
             long energySourceGid = roots.First();
 
             Logger.LogDebug($"{baseLogString} CreateTopology => Calling CreateGraphTopology method from topology builder client. Energy source with GID {energySourceGid:X16.}");
+            var topologyBuilderClient = TopologyBuilderClient.CreateClient();
             var topology = await topologyBuilderClient.CreateGraphTopology(energySourceGid, $"Topology Provider => {whoCalled} => Create Topology");
             Logger.LogDebug($"{baseLogString} CreateTopology =>  CreateGraphTopology method from topology builder client has been successfully called.");
 
@@ -234,6 +225,7 @@ namespace CE.TopologyProviderImplementation
             Logger.LogVerbose(verboseMessage);
 
             var topology = await GetTopologyFromCache(TopologyType.NonTransactionTopology);
+            var loadFlowClient = LoadFlowClient.CreateClient();
             topology = await loadFlowClient.UpdateLoadFlow(topology);
 
             await TopologyCache.SetAsync((short)TopologyType.NonTransactionTopology, (TopologyModel)topology);
@@ -322,6 +314,7 @@ namespace CE.TopologyProviderImplementation
 
 
             Logger.LogDebug($"{baseLogString} CommitTransaction => Calling UpdateLoadFlow method from load flow client.");
+            var loadFlowClient = LoadFlowClient.CreateClient();
             topology = await loadFlowClient.UpdateLoadFlow(topology);
             Logger.LogDebug($"{baseLogString} CommitTransaction => UpdateLoadFlow method from load flow client has been called successfully.");
 
@@ -436,6 +429,7 @@ namespace CE.TopologyProviderImplementation
         private async Task<UIModel> RefreshUIModel()
         {
             var topology = await GetTopologyFromCache(TopologyType.NoSpecific);
+            var topologyConverterClient = TopologyConverterClient.CreateClient();
             UIModel newUIModel = await topologyConverterClient.ConvertTopologyToUIModel(topology);
             await TopologyCacheUI.SetAsync(1, (UIModel)newUIModel);
 
@@ -446,6 +440,7 @@ namespace CE.TopologyProviderImplementation
         private async Task<OutageTopologyModel> RefreshOMSModel()
         {
             var topology = await GetTopologyFromCache(TopologyType.NoSpecific);
+            var topologyConverterClient = TopologyConverterClient.CreateClient();
             var newOmsModel = await topologyConverterClient.ConvertTopologyToOMSModel(topology);
             await TopologyCacheOMS.SetAsync(1, (OutageTopologyModel)newOmsModel);
 
@@ -464,6 +459,7 @@ namespace CE.TopologyProviderImplementation
             CalculationEnginePublication publication = new CalculationEnginePublication(Topic.OMS_MODEL, message);
             try
             {
+                var publisherClient = PublisherClient.CreateClient();
                 await publisherClient.Publish(publication, MicroserviceNames.CeTopologyProviderService);
                 Logger.LogInformation($"{baseLogString} PublishOMSModel => Topology provider service published data of topic: {publication.Topic}");
             }
@@ -488,6 +484,7 @@ namespace CE.TopologyProviderImplementation
             CalculationEnginePublication publication = new CalculationEnginePublication(Topic.TOPOLOGY, message);
             try
             {
+                var publisherClient = PublisherClient.CreateClient();
                 await publisherClient.Publish(publication, MicroserviceNames.CeTopologyProviderService);
                 Logger.LogInformation($"{baseLogString} PublishUIModel => Topology provider service published data of topic: {publication.Topic}");
             }

@@ -26,9 +26,6 @@ namespace CE.LoadFlowImplementation
 
         private readonly string baseLogString;
 
-        private readonly IMeasurementProviderContract measurementProviderClient;
-        private readonly IModelProviderContract modelProviderClient;
-
         private ICloudLogger logger;
         private ICloudLogger Logger
         {
@@ -40,9 +37,6 @@ namespace CE.LoadFlowImplementation
             this.baseLogString = $"{this.GetType()} [{this.GetHashCode()}] =>{Environment.NewLine}";
             string verboseMessage = $"{baseLogString} entering Ctor.";
             Logger.LogVerbose(verboseMessage);
-
-            measurementProviderClient = MeasurementProviderClient.CreateClient();
-            modelProviderClient = ModelProviderClient.CreateClient();
 
             string debugMessage = $"{baseLogString} Ctor => Clients initialized.";
             Logger.LogDebug(debugMessage);
@@ -62,6 +56,7 @@ namespace CE.LoadFlowImplementation
             dailyCurves = DailyCurveReader.ReadDailyCurves();
 
             Logger.LogDebug($"{baseLogString} UpdateLoadFlow => Getting reclosers from model provider.");
+            var modelProviderClient = ModelProviderClient.CreateClient();
             reclosers = await modelProviderClient.GetReclosers();
             Logger.LogDebug($"{baseLogString} UpdateLoadFlow => Reclosers were delivered successfully.");
 
@@ -99,6 +94,8 @@ namespace CE.LoadFlowImplementation
                     if (signalGid != 0)
                     {
                         Logger.LogDebug($"{baseLogString} UpdateLoadFlow => Calling SendAnalogCommand method from measurement provider. Measurement GID {signalGid:X16}, Value {loadFeeder.Value}.");
+                        var measurementProviderClient = MeasurementProviderClient.CreateClient();
+
                         await measurementProviderClient.SendAnalogCommand(signalGid, loadFeeder.Value, CommandOriginType.CE_COMMAND);
                         Logger.LogDebug($"{baseLogString} UpdateLoadFlow => SendAnalogCommand method from measurement provider successfully finished.");
 
@@ -110,6 +107,7 @@ namespace CE.LoadFlowImplementation
                         };
 
                         Logger.LogDebug($"{baseLogString} UpdateLoadFlow => Calling update analog measurement method from measurement provider.");
+                        measurementProviderClient = MeasurementProviderClient.CreateClient();
                         await measurementProviderClient.UpdateAnalogMeasurement(data);
                         Logger.LogDebug($"{baseLogString} UpdateLoadFlow => Update analog measurement method from measurement provider successfully finished.");
                     }
@@ -170,6 +168,7 @@ namespace CE.LoadFlowImplementation
                         if (meas.Value.Equals(AnalogMeasurementType.POWER.ToString()))
                         {
                             Logger.LogDebug($"{baseLogString} UpdateLoadFlow => Calling GetAnalogMeasurement method from measurement provider. Measurement GID {meas.Key:X16}.");
+                            var measurementProviderClient = MeasurementProviderClient.CreateClient();
                             powerMeasurement = await measurementProviderClient.GetAnalogMeasurement(meas.Key);
                             Logger.LogDebug($"{baseLogString} UpdateLoadFlow => GetAnalogMeasurement method called successfully.");
 
@@ -182,6 +181,7 @@ namespace CE.LoadFlowImplementation
                         if (meas.Value.Equals(AnalogMeasurementType.VOLTAGE.ToString()))
                         {
                             Logger.LogDebug($"{baseLogString} UpdateLoadFlow => Calling GetAnalogMeasurement method from measurement provider. Measurement GID {meas.Key:X16}.");
+                            var measurementProviderClient = MeasurementProviderClient.CreateClient();
                             voltageMeasurement = await measurementProviderClient.GetAnalogMeasurement(meas.Key);
                             Logger.LogDebug($"{baseLogString} UpdateLoadFlow => GetAnalogMeasurement method called successfully.");
 
@@ -200,6 +200,7 @@ namespace CE.LoadFlowImplementation
                                                     : ((SynchronousMachine)element).Capacity;
 
                         Logger.LogDebug($"{baseLogString} UpdateLoadFlow => Calling SendAnalogCommand method from measurement provider. Measurement GID {powerMeasurement.Id:X16}, Value {newSMPower}.");
+                        var measurementProviderClient = MeasurementProviderClient.CreateClient();
                         await measurementProviderClient.SendAnalogCommand(powerMeasurement.Id, newSMPower, CommandOriginType.CE_COMMAND);
                         Logger.LogDebug($"{baseLogString} UpdateLoadFlow => SendAnalogCommand method called successfully.");
 
@@ -209,6 +210,7 @@ namespace CE.LoadFlowImplementation
                         };
 
                         Logger.LogDebug($"{baseLogString} UpdateLoadFlow => Calling UpdateAnalogMeasurement method from measurement provider.");
+                        measurementProviderClient = MeasurementProviderClient.CreateClient();
                         await measurementProviderClient.UpdateAnalogMeasurement(data);
                         Logger.LogDebug($"{baseLogString} UpdateLoadFlow => UpdateAnalogMeasurement method called successfully.");
 
@@ -317,6 +319,7 @@ namespace CE.LoadFlowImplementation
                     || measurement.Key < 10000)
                 {
                     Logger.LogDebug($"{baseLogString} IsElementEnergized => Getting discrete value of {measurement.Key:X16} from measurement provider.");
+                    var measurementProviderClient = MeasurementProviderClient.CreateClient();
                     bool isOpen = await measurementProviderClient.GetDiscreteValue(measurement.Key);
                     Logger.LogDebug($"{baseLogString} IsElementEnergized => Discrete value of {measurement.Key:X16} has been delivered successfully. Result is [{isOpen}].");
                     
@@ -503,6 +506,7 @@ namespace CE.LoadFlowImplementation
                 else if(recloser.IsActive)
                 {
                     Logger.LogDebug($"{baseLogString} TurnOnAllMeasurement => Calling SendDiscreteCommand method from measurement provider. Measurement GID {measurementGid:X16}, Value 1.");
+                    var measurementProviderClient = MeasurementProviderClient.CreateClient();
                     await measurementProviderClient.SendDiscreteCommand(measurementGid, 1, CommandOriginType.CE_COMMAND);
                     Logger.LogDebug($"{baseLogString} TurnOnAllMeasurement => SendDiscreteCommand method from measurement provider successfully finished.");
                     recloser.IsActive = false;
@@ -623,6 +627,7 @@ namespace CE.LoadFlowImplementation
             if (!((Recloser)recloser).IsReachedMaximumOfTries())
             {
                 Logger.LogDebug($"{baseLogString} CommandToRecloser => Calling SendDiscreteCommand method from measurement provider. Measurement GID: {measurementGid:X16}, Value: {value}, OriginType {originType}.");
+                var measurementProviderClient = MeasurementProviderClient.CreateClient();
                 await measurementProviderClient.SendDiscreteCommand(measurementGid, value, originType);
                 Logger.LogDebug($"{baseLogString} CommandToRecloser => SendDiscreteCommand method has been successfully called.");
                 
@@ -641,6 +646,7 @@ namespace CE.LoadFlowImplementation
             foreach (var measurement in measurements)
             {
                 Logger.LogDebug($"{baseLogString} GetMeasurements => Calling GetAnalogMeasurement for GID {measurement.Key:X16} from measurement provider.");
+                var measurementProviderClient = MeasurementProviderClient.CreateClient();
                 AnalogMeasurement analogMeasurement = await measurementProviderClient.GetAnalogMeasurement(measurement.Key);
                 Logger.LogDebug($"{baseLogString} GetMeasurements => GetAnalogMeasurement method from measurement provider has been called successfully.");
 
@@ -685,6 +691,7 @@ namespace CE.LoadFlowImplementation
             foreach (var meas in analogMeasurements)
             {
                 Logger.LogDebug($"{baseLogString} TurnOffAllMeasurement => Calling SendAnalogCommand method from measurement provider. Measurement GID {meas.Id:X16}.");
+                var measurementProviderClient = MeasurementProviderClient.CreateClient();
                 await measurementProviderClient.SendAnalogCommand(meas.Id, 0, CommandOriginType.CE_COMMAND);
                 Logger.LogDebug($"{baseLogString} TurnOffAllMeasurement => SendAnalogCommand method from measurement provider has been called successfully.");
 
@@ -694,6 +701,7 @@ namespace CE.LoadFlowImplementation
                 };
 
                 Logger.LogDebug($"{baseLogString} TurnOffAllMeasurement => Calling UpdateAnalogMeasurement method from measurement provider.");
+                measurementProviderClient = MeasurementProviderClient.CreateClient();
                 await measurementProviderClient.UpdateAnalogMeasurement(data);
                 Logger.LogDebug($"{baseLogString} TurnOffAllMeasurement => UpdateAnalogMeasurement method from measurement provider has been called successfully.");
             }
@@ -707,6 +715,7 @@ namespace CE.LoadFlowImplementation
 
             foreach (var meas in analogMeasurements)
             {
+                var measurementProviderClient = MeasurementProviderClient.CreateClient();
                 await measurementProviderClient.SendAnalogCommand(meas.Id, meas.NormalValue, CommandOriginType.CE_COMMAND);
 
                 Dictionary<long, AnalogModbusData> data = new Dictionary<long, AnalogModbusData>(1)

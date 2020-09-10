@@ -9,6 +9,7 @@ using Common.OmsContracts.Report;
 using ReportType = OMS.Common.Cloud.ReportType;
 using OMS.Common.Cloud.Logger;
 using Common.OmsContracts.DataContracts.Report;
+using OMS.Common.WcfClient.OMS.HistoryDBManager;
 
 namespace Common.Web.Services.Handlers
 {
@@ -23,6 +24,7 @@ namespace Common.Web.Services.Handlers
         public async Task<ReportViewModel> Handle(GenerateReportCommand request, CancellationToken cancellationToken)
         {
             IReportingContract reportingClient = ReportingClient.CreateClient();
+
             try
             {
                 Logger.LogInformation("[ReportCommandHandler::GenerateReport] Sending a Generate command to Outage service.");

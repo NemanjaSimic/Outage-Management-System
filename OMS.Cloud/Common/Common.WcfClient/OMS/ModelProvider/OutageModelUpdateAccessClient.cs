@@ -4,12 +4,9 @@ using Microsoft.ServiceFabric.Services.Communication.Wcf.Client;
 using OMS.Common.Cloud;
 using OMS.Common.Cloud.Names;
 using System;
-using System.Collections.Generic;
-using System.Linq;
-using System.Text;
 using System.Threading.Tasks;
 
-namespace OMS.Common.WcfClient.OMS
+namespace OMS.Common.WcfClient.OMS.ModelProvider
 {
     public class OutageModelUpdateAccessClient : WcfSeviceFabricClientBase<IOutageModelUpdateAccessContract>, IOutageModelUpdateAccessContract
     {
@@ -20,6 +17,7 @@ namespace OMS.Common.WcfClient.OMS
         {
 
         }
+
         public static IOutageModelUpdateAccessContract CreateClient()
         {
             ClientFactory factory = new ClientFactory();
@@ -31,6 +29,8 @@ namespace OMS.Common.WcfClient.OMS
             ClientFactory factory = new ClientFactory();
             return factory.CreateClient<OutageModelUpdateAccessClient, IOutageModelUpdateAccessContract>(serviceUri, servicePartitionKey);
         }
+
+        #region IOutageModelUpdateAccessContract
         public Task UpdateCommandedElements(long gid, ModelUpdateOperationType modelUpdateOperationType)
         {
             return InvokeWithRetryAsync(client => client.Channel.UpdateCommandedElements(gid, modelUpdateOperationType));
@@ -50,5 +50,6 @@ namespace OMS.Common.WcfClient.OMS
         {
             return InvokeWithRetryAsync(client => client.Channel.IsAlive());
         }
+        #endregion IOutageModelUpdateAccessContract
     }
 }

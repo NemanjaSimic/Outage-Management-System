@@ -30,6 +30,7 @@ namespace OMS.Common.WcfClient.OMS.ModelAccess
             return factory.CreateClient<ConsumerAccessClient, IConsumerAccessContract>(serviceUri, servicePartitionKey);
         }
 
+		#region IConsumerAccessContract
 		public Task<Consumer> AddConsumer(Consumer consumer)
 		{
 			return InvokeWithRetryAsync(client => client.Channel.AddConsumer(consumer));
@@ -69,5 +70,6 @@ namespace OMS.Common.WcfClient.OMS.ModelAccess
 		{
 			return InvokeWithRetryAsync(client => client.Channel.IsAlive());
 		}
+		#endregion IConsumerAccessContract
 	}
 }

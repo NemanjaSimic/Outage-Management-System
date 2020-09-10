@@ -10,6 +10,8 @@ using OMS.Common.Cloud.ReliableCollectionHelpers;
 using OMS.Common.PubSubContracts.DataContracts.SCADA;
 using OMS.Common.ScadaContracts.Commanding;
 using OMS.Common.WcfClient.CE;
+using OMS.Common.WcfClient.OMS.HistoryDBManager;
+using OMS.Common.WcfClient.OMS.OutageLifecycle;
 using OMS.Common.WcfClient.SCADA;
 using System;
 using System.Collections.Generic;
@@ -58,9 +60,6 @@ namespace CE.MeasurementProviderImplementation
 			get { return logger ?? (logger = CloudLoggerFactory.GetLogger()); }
 		}
 
-		private readonly ITopologyProviderContract topologyProviderClient;
-		private readonly IModelProviderContract modelProviderClient;
-		private readonly IScadaCommandingContract scadaCommandingClient;
 		#endregion
 
 		public MeasurementProvider(IReliableStateManager stateManager)
@@ -68,10 +67,6 @@ namespace CE.MeasurementProviderImplementation
 			this.baseLogString = $"{this.GetType()} [{this.GetHashCode()}] =>{Environment.NewLine}";
 			string verboseMessage = $"{baseLogString} entering Ctor.";
 			Logger.LogVerbose(verboseMessage);
-
-			topologyProviderClient = TopologyProviderClient.CreateClient();
-			modelProviderClient = ModelProviderClient.CreateClient();
-			scadaCommandingClient = ScadaCommandingClient.CreateClient();
 
 			this.stateManager = stateManager;
 			stateManager.StateManagerChanged += this.OnStateManagerChangedHandler;
@@ -147,6 +142,7 @@ namespace CE.MeasurementProviderImplementation
 				string message = $"{baseLogString} AddAnalogMeasurement => analog measurement parameter is null.";
 				Logger.LogError(message);
 				//throw new Exception(message);
+				return;
 			}
 
 			var analogMeasurements = await GetAnalogMeasurementsFromCache();
@@ -177,6 +173,7 @@ namespace CE.MeasurementProviderImplementation
 				string message = $"{baseLogString} AddDiscreteMeasurement => discrete measurement parameter is null.";
 				Logger.LogError(message);
 				//throw new Exception(message);
+				return;
 			}
 
 			var discreteMeasurements = await GetDiscreteMeasurementsFromCache();
@@ -301,32 +298,16 @@ namespace CE.MeasurementProviderImplementation
 					measurement.CurrentOpen = true;
 				}
 
-				//using (ReportPotentialOutageProxy reportPotentialOutageProxy = proxyFactory.CreateProxy<ReportPotentialOutageProxy, IReportPotentialOutageContract>(EndpointNames.ReportPotentialOutageEndpoint))
-				//{
-				//	if (reportPotentialOutageProxy == null)
-				//	{
-				//		string message = "UpdateDiscreteMeasurement => ReportPotentialOutageProxy is null.";
-				//		logger.LogError(message);
-				//		throw new NullReferenceException(message);
-				//	}
-
-				//	try
-				//	{
-				//		if (measurement.CurrentOpen)
-				//		{
-				//			reportPotentialOutageProxy.ReportPotentialOutage(measurement.ElementId, commandOrigin);
-				//		}
-				//		else
-				//		{
-				//			reportPotentialOutageProxy.OnSwitchClose(measurement.ElementId);
-				//		}
-				//	}
-				//	catch (Exception e)
-				//	{
-				//		logger.LogError("Failed to report potential outage.", e);
-				//	}
-				//}
-
+				if (measurement.CurrentOpen)
+				{
+					var potentialOutageReportingClient = PotentialOutageReportingClient.CreateClient();
+					await potentialOutageReportingClient.ReportPotentialOutage(measurement.ElementId, commandOrigin);
+				}
+				else
+				{
+					var historyDBManagerClient = HistoryDBManagerClient.CreateClient();
+					await historyDBManagerClient.OnSwitchClosed(measurement.ElementId);
+				}
 			}
 			else
 			{
@@ -336,12 +317,15 @@ namespace CE.MeasurementProviderImplementation
 
 			var measurementToElementMap = await GetMeasurementToElementMapFromCache();
 
+			var modelProviderClient = ModelProviderClient.CreateClient();
+
 			if (measurementToElementMap.TryGetValue(measurementGid, out long recloserGid) 
 				&& await modelProviderClient.IsRecloser(recloserGid)
 				&& commandOrigin != CommandOriginType.CE_COMMAND
 				&& commandOrigin != CommandOriginType.OUTAGE_SIMULATOR)
 			{
 				Logger.LogDebug($"{baseLogString} UpdateDiscreteMeasurement => Calling ResetRecloser on topology provider.");
+				var topologyProviderClient = TopologyProviderClient.CreateClient();
 				await topologyProviderClient.ResetRecloser(recloserGid);
 				Logger.LogDebug($"{baseLogString} UpdateDiscreteMeasurement => ResetRecloser from topology provider returned success.");
 
@@ -370,6 +354,7 @@ namespace CE.MeasurementProviderImplementation
 			}
 
 			Logger.LogDebug($"{baseLogString} UpdateDiscreteMeasurement => Invoking Discrete Measurement Delegate in topology provider service.");
+			var topologyProviderClient = TopologyProviderClient.CreateClient();
 			topologyProviderClient.DiscreteMeasurementDelegate();
 		}
 		public async Task<long> GetElementGidForMeasurement(long measurementGid)
@@ -753,6 +738,7 @@ namespace CE.MeasurementProviderImplementation
 			try
 			{
 				Logger.LogDebug($"{baseLogString} SendAnalogCommand => Calling Send single analog command from scada commanding client.");
+				var scadaCommandingClient = ScadaCommandingClient.CreateClient();
 				await scadaCommandingClient.SendSingleAnalogCommand(measurementGid, commandingValue, commandOrigin);
 				Logger.LogDebug($"{baseLogString} SendAnalogCommand => Send single analog command from scada commanding client successfully called.");
 			}
@@ -776,6 +762,7 @@ namespace CE.MeasurementProviderImplementation
 				if ( measurement != null && !(measurement is ArtificalDiscreteMeasurement))
 				{
 					Logger.LogDebug($"{baseLogString} SendDiscreteCommand => Calling Send single discrete command from scada commanding client.");
+					var scadaCommandingClient = ScadaCommandingClient.CreateClient();
 					await scadaCommandingClient.SendSingleDiscreteCommand(measurementGid, (ushort)value, commandOrigin);
 					Logger.LogDebug($"{baseLogString} SendDiscreteCommand => Send single discrete command from scada commanding client successfully called.");
 				}

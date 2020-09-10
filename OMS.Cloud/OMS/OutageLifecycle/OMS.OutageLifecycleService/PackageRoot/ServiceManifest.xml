@@ -7,7 +7,7 @@
   <ServiceTypes>
     <!-- This is the name of your ServiceType. 
          This name must match the string used in RegisterServiceType call in Program.cs. -->
-    <StatelessServiceType ServiceTypeName="OMS.OutageLifecycleServiceType" />
+    <StatefulServiceType ServiceTypeName="OMS.OutageLifecycleServiceType" HasPersistedState="true" />
   </ServiceTypes>
 
   <!-- Code package is your service executable. -->
@@ -25,12 +25,10 @@
 
   <Resources>
     <Endpoints>
-      <Endpoint Name="OmsIsolateOutageEndpoint" Protocol="tcp" Type="Input"/>
-      <Endpoint Name="OmsReportOutageEndpoint" Protocol="tcp" Type="Input"/>
-      <Endpoint Name="OmsResolveOutageEndpoint" Protocol="tcp" Type="Input"/>
-      <Endpoint Name="OmsSendLocationIsolationCrewEndpoint" Protocol="tcp" Type="Input"/>
-      <Endpoint Name="OmsSendRepairCrewEndpoint" Protocol="tcp" Type="Input"/>
-      <Endpoint Name="OmsValidateResolveConditionsEndpoint" Protocol="tcp" Type="Input"/>
+      <Endpoint Name="OmsPotentialOutageReportingEndpoint" Protocol="tcp" Type="Input"/>
+      <Endpoint Name="OmsOutageIsolationEndpoint" Protocol="tcp" Type="Input"/>
+      <Endpoint Name="OmsCrewSendingEndpoint" Protocol="tcp" Type="Input"/>
+      <Endpoint Name="OmsOutageResolutionEndpoint" Protocol="tcp" Type="Input"/>
       <Endpoint Name="PubSubNotifySubscriberEndpoint" Protocol="tcp" Type="Input"/>
     </Endpoints>
   </Resources>

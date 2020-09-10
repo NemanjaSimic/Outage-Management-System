@@ -40,10 +40,6 @@ namespace CE.ModelProviderImplementation
         private bool isEnergySourceCacheInitialized = false;
         private bool isRecloserCacheInitialized = false;
 
-        private readonly ITopologyProviderContract topologyProviderClient;
-        private readonly IMeasurementProviderContract measurementProviderClient;
-
-
         private readonly string baseLogString;
         private readonly IReliableStateManager stateManager;
 
@@ -66,9 +62,6 @@ namespace CE.ModelProviderImplementation
             this.baseLogString = $"{this.GetType()} [{this.GetHashCode()}] =>{Environment.NewLine}";
             string verboseMessage = $"{baseLogString} entering Ctor.";
             Logger.LogVerbose(verboseMessage);
-
-            this.topologyProviderClient = TopologyProviderClient.CreateClient();
-            this.measurementProviderClient = MeasurementProviderClient.CreateClient();
 
             this.stateManager = stateManager;
             stateManager.StateManagerChanged += this.OnStateManagerChangedHandler;
@@ -130,10 +123,10 @@ namespace CE.ModelProviderImplementation
                     Logger.LogDebug(debugMessage);
                 }
 
-                if (AreReliableDictionariesInitialized)
-                {
-                    await ImportDataInCache();
-                }
+                //if (AreReliableDictionariesInitialized)
+                //{
+                //    await ImportDataInCache();
+                //}
             }
         }
 
@@ -144,7 +137,9 @@ namespace CE.ModelProviderImplementation
                 await Task.Delay(1000);
             }
 
-            IModelDelta modelDelta = await modelManager.TryGetAllModelEntitiesAsync();
+			Logger.LogVerbose($"{baseLogString} enter in ImportDataInCache.");
+
+			IModelDelta modelDelta = await modelManager.TryGetAllModelEntitiesAsync();
 
             await ElementCache.SetAsync((short)TransactionFlag.NoTransaction, TransformDictionary(modelDelta.TopologyElements));
             await ElementConnectionCache.SetAsync((short)TransactionFlag.NoTransaction, modelDelta.ElementConnections);
@@ -209,6 +204,7 @@ namespace CE.ModelProviderImplementation
                 Logger.LogDebug($"{baseLogString} PrepareForTransaction => Topology provider preparing for transaction.");
 
                 Logger.LogDebug($"{baseLogString} PrepareForTransaction => Calling PrepareForTransaction on measurement provider.");
+                var measurementProviderClient = MeasurementProviderClient.CreateClient();
                 measurementProviderTransaction = await measurementProviderClient.PrepareForTransaction();
                 Logger.LogDebug($"{baseLogString} PrepareForTransaction => PrepareForTransaction from measurement provider returned success = {measurementProviderTransaction}.");
 
@@ -225,6 +221,7 @@ namespace CE.ModelProviderImplementation
 
                 Logger.LogDebug($"{baseLogString} PrepareForTransaction => Calling PrepareForTransaction on topology provider.");
                 //topologyProviderTransaction = await topologyProviderClient.PrepareForTransaction();
+                var topologyProviderClient = TopologyProviderClient.CreateClient();
                 await topologyProviderClient.PrepareForTransaction();
                 Logger.LogDebug($"{baseLogString} PrepareForTransaction => PrepareForTransaction from topology provider returned success = {topologyProviderTransaction}.");
 
@@ -259,9 +256,11 @@ namespace CE.ModelProviderImplementation
             Logger.LogDebug($"{baseLogString} CommitTransaction => All new data have been written in cache under NoTransaction flag.");
 
             Logger.LogDebug($"{baseLogString} CommitTransaction => Calling CommitTransaction on measurement provider.");
+            var measurementProviderClient = MeasurementProviderClient.CreateClient();
             await measurementProviderClient.CommitTransaction();
 
             Logger.LogDebug($"{baseLogString} CommitTransaction => Calling CommitTransaction on topology provider.");
+            var topologyProviderClient = TopologyProviderClient.CreateClient();
             await topologyProviderClient.CommitTransaction();
 
             transactionFlag = TransactionFlag.NoTransaction;
@@ -280,9 +279,11 @@ namespace CE.ModelProviderImplementation
             Logger.LogDebug($"{baseLogString} RollbackTransaction => All data from cache under NoTransaction flag have been removed.");
 
             Logger.LogDebug($"{baseLogString} RollbackTransaction => Calling RollbackTransaction on measurement provider.");
+            var measurementProviderClient = MeasurementProviderClient.CreateClient();
             await measurementProviderClient.RollbackTransaction();
 
             Logger.LogDebug($"{baseLogString} RollbackTransaction => Calling RollbackTransaction on topology provider.");
+            var topologyProviderClient = TopologyProviderClient.CreateClient();
             await topologyProviderClient.RollbackTransaction();
 
             transactionFlag = TransactionFlag.NoTransaction;

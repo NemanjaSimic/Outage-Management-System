@@ -25,8 +25,6 @@ namespace CE.TopologyBuilderImplementation
 
         private readonly string baseLogString;
 
-        private readonly IModelProviderContract modelProviderClient;
-
         private ICloudLogger logger;
         private ICloudLogger Logger
         {
@@ -38,8 +36,6 @@ namespace CE.TopologyBuilderImplementation
             this.baseLogString = $"{this.GetType()} [{this.GetHashCode()}] =>{Environment.NewLine}";
             string verboseMessage = $"{baseLogString} entering Ctor.";
             Logger.LogVerbose(verboseMessage);
-
-            modelProviderClient = ModelProviderClient.CreateClient();
 
             string debugMessage = $"{baseLogString} Ctor => Clients initialized.";
             Logger.LogDebug(debugMessage);
@@ -69,15 +65,18 @@ namespace CE.TopologyBuilderImplementation
             ITopologyElement currentFider = null;
 
             Logger.LogDebug($"{baseLogString} CreateGraphTopology => Calling GetElementModels method from model provider.");
+            var modelProviderClient = ModelProviderClient.CreateClient();
             var dict = await modelProviderClient.GetElementModels();
             elements = TransformDictionary(dict);
             Logger.LogDebug($"{baseLogString} CreateGraphTopology => GetElementModels method from model provider has been called successfully.");
 
             Logger.LogDebug($"{baseLogString} CreateGraphTopology => Calling GetConnections method from model provider.");
+            modelProviderClient = ModelProviderClient.CreateClient();
             connections = await modelProviderClient.GetConnections();
             Logger.LogDebug($"{baseLogString} CreateGraphTopology => GetConnections method from model provider has been called successfully.");
 
             Logger.LogDebug($"{baseLogString} CreateGraphTopology => Calling GetReclosers method from model provider.");
+            modelProviderClient = ModelProviderClient.CreateClient();
             reclosers = await modelProviderClient.GetReclosers();
             Logger.LogDebug($"{baseLogString} CreateGraphTopology => GetReclosers method from model provider has been called successfully.");
 

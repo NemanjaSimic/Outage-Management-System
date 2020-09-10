@@ -27,8 +27,6 @@ namespace OMS.CallTrackingService
 		private readonly string baseLogString;
 		private readonly CallTracker callTracker;
 
-		private IRegisterSubscriberContract registerSubscriberClient;
-
 		private ICloudLogger logger;
 		private ICloudLogger Logger
 		{
@@ -74,7 +72,7 @@ namespace OMS.CallTrackingService
 																				   this.callTracker,
 																				   WcfUtility.CreateTcpListenerBinding(),
 																				   EndpointNames.PubSubNotifySubscriberEndpoint);
-				})
+				}, EndpointNames.PubSubNotifySubscriberEndpoint)
 			};
 		}
 
@@ -92,8 +90,8 @@ namespace OMS.CallTrackingService
 				Logger.LogDebug(debugMessage);
 				ServiceEventSource.Current.ServiceMessage(this.Context, $"[CallTrackingService | Information] {debugMessage}");
 
-				this.registerSubscriberClient = RegisterSubscriberClient.CreateClient();
-				await this.registerSubscriberClient.SubscribeToTopic(Topic.OUTAGE_EMAIL, MicroserviceNames.OmsCallTrackingService);
+				var registerSubscriberClient = RegisterSubscriberClient.CreateClient();
+				await registerSubscriberClient.SubscribeToTopic(Topic.OUTAGE_EMAIL, MicroserviceNames.OmsCallTrackingService);
 			}
 			catch (Exception e)
 			{

@@ -3,9 +3,9 @@ using Common.OmsContracts.OutageLifecycle;
 using Common.PubSubContracts.DataContracts.CE;
 using OMS.Common.Cloud;
 using OMS.Common.Cloud.Logger;
-using OMS.Common.PubSubContracts.Interfaces;
 using OMS.Common.WcfClient.OMS;
-using OMS.Common.WcfClient.OMS.Lifecycle;
+using OMS.Common.WcfClient.OMS.ModelProvider;
+using OMS.Common.WcfClient.OMS.OutageLifecycle;
 using System;
 using System.Collections.Generic;
 using System.Threading.Tasks;
@@ -14,14 +14,11 @@ namespace OMS.CallTrackingImplementation
 {
     public class TrackingAlgorithm
 	{
-
         private OutageTopologyModel outageTopologyModel;
 
         //TODO: Mozda reliable dic/queue
         private List<long> potentialOutages;
         private List<long> outages;
-        private IReportOutageContract reportOutageClient;
-        private IOutageModelReadAccessContract outageModelReadAccessClient;
 
         private ICloudLogger logger;
         private ICloudLogger Logger
@@ -29,19 +26,13 @@ namespace OMS.CallTrackingImplementation
             get { return logger ?? (logger = CloudLoggerFactory.GetLogger()); }
         }
 
-        public TrackingAlgorithm()
-		{
-            reportOutageClient = ReportOutageClient.CreateClient();
-            outageModelReadAccessClient = OutageModelReadAccessClient.CreateClient();
-		}
-
-
         public async Task Start(List<long> calls)
         {
 			Logger.LogDebug("Starting tracking algorithm.");
 
-			//on every start tracking algorithm get up to date outage topology model
-			outageTopologyModel = await outageModelReadAccessClient.GetTopologyModel();
+            //on every start tracking algorithm get up to date outage topology model
+            var outageModelReadAccessClient = OutageModelReadAccessClient.CreateClient();
+            outageTopologyModel = await outageModelReadAccessClient.GetTopologyModel();
 
             this.potentialOutages = LocateSwitchesUsingCalls(calls);
             this.outages = new List<long>();
@@ -50,6 +41,7 @@ namespace OMS.CallTrackingImplementation
             long currentGid, previousGid;
 
             currentGid = this.potentialOutages[0];
+
             try
             {
 
@@ -81,6 +73,8 @@ namespace OMS.CallTrackingImplementation
                 Logger.LogError(message);
                 Console.WriteLine(message);
             }
+
+            var reportOutageClient = PotentialOutageReportingClient.CreateClient();
 
             foreach (var item in this.outages)
             {

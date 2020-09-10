@@ -59,16 +59,14 @@
     <Compile Include="ModelAccess\IOutageAccessContract.cs" />
     <Compile Include="ModelProvider\IOutageModelReadAccessContract.cs" />
     <Compile Include="ModelProvider\IOutageModelUpdateAccessContract.cs" />
-    <Compile Include="OutageLifecycle\IIsolateOutageContract.cs" />
-    <Compile Include="OutageLifecycle\IReportOutageContract.cs" />
-    <Compile Include="OutageLifecycle\IResolveOutageContract.cs" />
-    <Compile Include="OutageLifecycle\ISendLocationIsolationCrewContract.cs" />
-    <Compile Include="OutageLifecycle\ISendRepairCrewContract.cs" />
-    <Compile Include="OutageLifecycle\IValidateResolveConditionsContract.cs" />
+    <Compile Include="OutageLifecycle\IOutageIsolationContract.cs" />
+    <Compile Include="OutageLifecycle\IPotentialOutageReportingContract.cs" />
+    <Compile Include="OutageLifecycle\IOutageResolutionContract.cs" />
+    <Compile Include="OutageLifecycle\ICrewSendingContract.cs" />
     <Compile Include="OutageSimulator\IOutageSimulatorContract.cs" />
     <Compile Include="OutageSimulator\IOutageSimulatorUIContract.cs" />
     <Compile Include="Properties\AssemblyInfo.cs" />
-    <Compile Include="Report\IReportingContract.cs" />
+    <Compile Include="HistoryDBManager\IReportingContract.cs" />
     <Compile Include="TracingAlgorithm\ITracingAlgorithmContract.cs" />
   </ItemGroup>
   <ItemGroup>

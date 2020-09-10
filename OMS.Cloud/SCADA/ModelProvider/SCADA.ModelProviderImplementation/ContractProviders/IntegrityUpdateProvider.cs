@@ -20,6 +20,12 @@ namespace SCADA.ModelProviderImplementation.ContractProviders
         private readonly string baseLogString;
         private readonly IReliableStateManager stateManager;
 
+        private ICloudLogger logger;
+        private ICloudLogger Logger
+        {
+            get { return logger ?? (logger = CloudLoggerFactory.GetLogger()); }
+        }
+
         #region Private Properties
         private bool isGidToPointItemMapInitialized;
         private bool isCommandDescriptionCacheInitialized;
@@ -33,12 +39,6 @@ namespace SCADA.ModelProviderImplementation.ContractProviders
                        isCommandDescriptionCacheInitialized && 
                        isInfoCacheInitialized;
             }
-        }
-
-        private ICloudLogger logger;
-        private ICloudLogger Logger
-        {
-            get { return logger ?? (logger = CloudLoggerFactory.GetLogger()); }
         }
 
         private ReliableDictionaryAccess<long, IScadaModelPointItem> gidToPointItemMap;
@@ -58,6 +58,40 @@ namespace SCADA.ModelProviderImplementation.ContractProviders
         {
             get { return infoCache; }
         }
+
+        private async void OnStateManagerChangedHandler(object sender, NotifyStateManagerChangedEventArgs e)
+        {
+            if (e.Action == NotifyStateManagerChangedAction.Add)
+            {
+                var operation = e as NotifyStateManagerSingleEntityChangedEventArgs;
+                string reliableStateName = operation.ReliableState.Name.AbsolutePath;
+
+                if (reliableStateName == ReliableDictionaryNames.GidToPointItemMap)
+                {
+                    gidToPointItemMap = await ReliableDictionaryAccess<long, IScadaModelPointItem>.Create(stateManager, ReliableDictionaryNames.GidToPointItemMap);
+                    this.isGidToPointItemMapInitialized = true;
+
+                    string debugMessage = $"{baseLogString} OnStateManagerChangedHandler => '{ReliableDictionaryNames.GidToPointItemMap}' ReliableDictionaryAccess initialized.";
+                    Logger.LogDebug(debugMessage);
+                }
+                else if (reliableStateName == ReliableDictionaryNames.CommandDescriptionCache)
+                {
+                    commandDescriptionCache = await ReliableDictionaryAccess<long, CommandDescription>.Create(stateManager, ReliableDictionaryNames.CommandDescriptionCache);
+                    this.isCommandDescriptionCacheInitialized = true;
+
+                    string debugMessage = $"{baseLogString} OnStateManagerChangedHandler => '{ReliableDictionaryNames.CommandDescriptionCache}' ReliableDictionaryAccess initialized.";
+                    Logger.LogDebug(debugMessage);
+                }
+                else if (reliableStateName == ReliableDictionaryNames.InfoCache)
+                {
+                    infoCache = await ReliableDictionaryAccess<string, bool>.Create(stateManager, ReliableDictionaryNames.InfoCache);
+                    isInfoCacheInitialized = true;
+
+                    string debugMessage = $"{baseLogString} OnStateManagerChangedHandler => '{ReliableDictionaryNames.InfoCache}' ReliableDictionaryAccess initialized.";
+                    Logger.LogDebug(debugMessage);
+                }
+            }
+        }
         #endregion Private Properties
 
         public IntegrityUpdateProvider(IReliableStateManager stateManager)
@@ -72,43 +106,7 @@ namespace SCADA.ModelProviderImplementation.ContractProviders
             this.stateManager.StateManagerChanged += this.OnStateManagerChangedHandler;
         }
         
-        private async void OnStateManagerChangedHandler(object sender, NotifyStateManagerChangedEventArgs e)
-        {
-            if (e.Action == NotifyStateManagerChangedAction.Add)
-            {
-                var operation = e as NotifyStateManagerSingleEntityChangedEventArgs;
-                string reliableStateName = operation.ReliableState.Name.AbsolutePath;
-
-                if (reliableStateName == ReliableDictionaryNames.GidToPointItemMap)
-                {
-                    //_ = GidToPointItemMap;
-                    gidToPointItemMap = await ReliableDictionaryAccess<long, IScadaModelPointItem>.Create(stateManager, ReliableDictionaryNames.GidToPointItemMap);
-                    this.isGidToPointItemMapInitialized = true;
-
-                    string debugMessage = $"{baseLogString} OnStateManagerChangedHandler => '{ReliableDictionaryNames.GidToPointItemMap}' ReliableDictionaryAccess initialized.";
-                    Logger.LogDebug(debugMessage);
-                }
-                else if (reliableStateName == ReliableDictionaryNames.CommandDescriptionCache)
-                {
-                    //_ = CommandDescriptionCache;
-                    commandDescriptionCache = await ReliableDictionaryAccess<long, CommandDescription>.Create(stateManager, ReliableDictionaryNames.CommandDescriptionCache);
-                    this.isCommandDescriptionCacheInitialized = true;
-
-                    string debugMessage = $"{baseLogString} OnStateManagerChangedHandler => '{ReliableDictionaryNames.CommandDescriptionCache}' ReliableDictionaryAccess initialized.";
-                    Logger.LogDebug(debugMessage);
-                }
-                else if (reliableStateName == ReliableDictionaryNames.InfoCache)
-                {
-                    //_ = InfoCache;
-                    infoCache = await ReliableDictionaryAccess<string, bool>.Create(stateManager, ReliableDictionaryNames.InfoCache);
-                    isInfoCacheInitialized = true;
-
-                    string debugMessage = $"{baseLogString} OnStateManagerChangedHandler => '{ReliableDictionaryNames.InfoCache}' ReliableDictionaryAccess initialized.";
-                    Logger.LogDebug(debugMessage);
-                }
-            }
-        }
-
+        
         private async Task<bool> GetIsScadaModelImportedIndicator()
         {
             string verboseMessage = $"{baseLogString} entering GetIsScadaModelImportedIndicator method.";

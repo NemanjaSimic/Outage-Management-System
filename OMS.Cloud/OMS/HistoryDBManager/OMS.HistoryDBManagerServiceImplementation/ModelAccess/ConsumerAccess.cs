@@ -23,7 +23,6 @@ namespace OMS.HistoryDBManagerImplementation.ModelAccess
 			get { return logger ?? (logger = CloudLoggerFactory.GetLogger()); }
 		}
 
-		private INetworkModelGDAContract networkModelGDAClient;
 		private ModelResourcesDesc modelResourcesDesc;
 		#endregion Private Properties
 
@@ -43,7 +42,7 @@ namespace OMS.HistoryDBManagerImplementation.ModelAccess
 				int resourcesLeft;
 				int numberOfResources = 10000;
 
-				networkModelGDAClient = NetworkModelGdaClient.CreateClient();
+				var networkModelGDAClient = NetworkModelGdaClient.CreateClient();
 				int iteratorId = await networkModelGDAClient.GetExtentValues(ModelCode.ENERGYCONSUMER, modelResourcesDesc.GetAllPropertyIds(ModelCode.ENERGYCONSUMER));
 
 				resourcesLeft = await networkModelGDAClient.IteratorResourcesTotal(iteratorId);

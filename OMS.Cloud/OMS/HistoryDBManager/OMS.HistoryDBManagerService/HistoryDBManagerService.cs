@@ -3,10 +3,12 @@ using System.Collections.Generic;
 using System.Fabric;
 using System.Threading;
 using System.Threading.Tasks;
+using Common.CeContracts.TopologyProvider;
 using Common.OMS;
 using Common.OmsContracts.HistoryDBManager;
 using Common.OmsContracts.ModelAccess;
 using Common.OmsContracts.Report;
+using Common.PubSubContracts.DataContracts.CE;
 using Microsoft.ServiceFabric.Data;
 using Microsoft.ServiceFabric.Data.Collections;
 using Microsoft.ServiceFabric.Services.Communication.Runtime;
@@ -17,6 +19,7 @@ using OMS.Common.Cloud.Logger;
 using OMS.Common.Cloud.Names;
 using OMS.Common.TmsContracts;
 using OMS.Common.TmsContracts.Notifications;
+using OMS.Common.WcfClient.CE;
 using OMS.HistoryDBManagerImplementation;
 using OMS.HistoryDBManagerImplementation.DistributedTransaction;
 using OMS.HistoryDBManagerImplementation.ModelAccess;
@@ -150,6 +153,7 @@ namespace OMS.HistoryDBManagerService
                 string debugMessage = $"{baseLogString} RunAsync => ReliableDictionaries initialized.";
                 Logger.LogDebug(debugMessage);
                 ServiceEventSource.Current.ServiceMessage(this.Context, $"[HistoryDBManagerService | Information] {debugMessage}");
+
             }
             catch (Exception e)
             {
@@ -199,6 +203,7 @@ namespace OMS.HistoryDBManagerService
                     }
                 }),
 
+
                 Task.Run(async() =>
                 {
                     using (ITransaction tx = this.StateManager.CreateTransaction())
@@ -217,6 +222,7 @@ namespace OMS.HistoryDBManagerService
                         }
                     }
                 }),
+
             };
 
             Task.WaitAll(tasks);
