@@ -328,20 +328,34 @@ namespace CE.ModelProviderImplementation
 				//});
 
 				var enumerableMeasurements = await Measurements.GetEnumerableDictionaryAsync();
+				List<IMeasurement> updatedMeasurements = new List<IMeasurement>(enumerableMeasurements.Count);
 				foreach (var measurement in enumerableMeasurements.Values)
 				{
 					await PutMeasurementsInElements(measurement);
 					var measurementProviderClient = MeasurementProviderClient.CreateClient();
 					await measurementProviderClient.AddMeasurementElementPair(measurement.Id, measurement.ElementId);
+					updatedMeasurements.Add(measurement);
+				}
+
+				foreach (var updatedMeas in updatedMeasurements)
+				{
+					await Measurements.SetAsync(updatedMeas.Id, updatedMeas);
 				}
 
 				var enumerableTopologyElements = await TopologyElements.GetEnumerableDictionaryAsync();
+				List<ITopologyElement> updatedElements = new List<ITopologyElement>(enumerableTopologyElements.Count);
 				foreach (var element in enumerableTopologyElements.Values)
 				{
 					if (element.Measurements.Count == 0)
 					{
 						await CreateNoScadaMeasurementAsync(element);
+						updatedElements.Add(element);
 					}
+				}
+
+				foreach (var updatedEl in updatedElements)
+				{
+					await TopologyElements.SetAsync(updatedEl.Id, updatedEl);
 				}
 
 				modelDelta.TopologyElements = enumerableTopologyElements;
