@@ -275,6 +275,10 @@ namespace CE.ModelProviderImplementation
 
             Task.WaitAll(clearTasks.ToArray());
 
+			await energySources.SetAsync(ReliableDictionaryNames.EnergySources, new List<long>());
+
+			await reclosers.SetAsync( ReliableDictionaryNames.Reclosers, new HashSet<long>());
+
 			try
 			{
 				Logger.LogDebug($"{baseLogString} TryGetAllModelEntities => Getting all network model elements and converting them.");
@@ -331,9 +335,9 @@ namespace CE.ModelProviderImplementation
 				List<IMeasurement> updatedMeasurements = new List<IMeasurement>(enumerableMeasurements.Count);
 				foreach (var measurement in enumerableMeasurements.Values)
 				{
-					await PutMeasurementsInElements(measurement);
+					var elementId = await PutMeasurementsInElements(measurement);
 					var measurementProviderClient = MeasurementProviderClient.CreateClient();
-					await measurementProviderClient.AddMeasurementElementPair(measurement.Id, measurement.ElementId);
+					await measurementProviderClient.AddMeasurementElementPair(measurement.Id, elementId);
 					updatedMeasurements.Add(measurement);
 				}
 
@@ -412,7 +416,7 @@ namespace CE.ModelProviderImplementation
 				await TransformToTopologyElementAsync(element);
 			}
 		}
-		private async Task PutMeasurementsInElements(IMeasurement measurement)
+		private async Task<long> PutMeasurementsInElements(IMeasurement measurement)
 		{
 			string verboseMessage = $"{baseLogString} entering PutMeasurementsInElements method. Measurement GID {measurement?.Id:X16}.";
 			Logger.LogVerbose(verboseMessage);
@@ -434,6 +438,17 @@ namespace CE.ModelProviderImplementation
 						{
 							element.Measurements.Add(measurement.Id, measurement.GetMeasurementType());
 							measurement.ElementId = elementId;
+
+							if (measurement is DiscreteMeasurement)
+							{
+								var measurementProviderClient = MeasurementProviderClient.CreateClient();
+								await measurementProviderClient.AddDiscreteMeasurement((DiscreteMeasurement)measurement);
+							}
+							else if (measurement is AnalogMeasurement)
+							{
+								var measurementProviderClient = MeasurementProviderClient.CreateClient();
+								await measurementProviderClient.AddAnalogMeasurement((AnalogMeasurement)measurement);
+							}
 
 							if (measurement.GetMeasurementType().Equals(AnalogMeasurementType.FEEDER_CURRENT.ToString()))
 							{
@@ -459,6 +474,7 @@ namespace CE.ModelProviderImplementation
 			{
 				Logger.LogError($"{baseLogString} PutMeasurementsInElement => Measurement with GID {measurement.Id:X16} does not exist in mesurement to terminal map.");
 			}
+			return measurement.ElementId;
 		}
 		private async Task TransformToTopologyElementAsync(ResourceDescription modelEntity)
 		{

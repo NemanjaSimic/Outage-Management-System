@@ -209,13 +209,13 @@ namespace CE.ModelProviderService
 						{
 							var energySources = result.Value;
 							await energySources.ClearAsync();
-							await energySources.SetAsync(tx, ReliableDictionaryNames.EnergySources, new List<long>());
+							//await energySources.SetAsync(tx, ReliableDictionaryNames.EnergySources, new List<long>());
 							await tx.CommitAsync();
 						}
 						else
 						{
 							var energySources = await StateManager.GetOrAddAsync<IReliableDictionary<string, List<long>>>(tx, ReliableDictionaryNames.EnergySources);
-							await energySources.SetAsync(tx, ReliableDictionaryNames.EnergySources, new List<long>());
+							//await energySources.SetAsync(tx, ReliableDictionaryNames.EnergySources, new List<long>());
 							await tx.CommitAsync();
 						}
 					}
@@ -229,13 +229,13 @@ namespace CE.ModelProviderService
 						{
 							var reclosers = result.Value;
 							await reclosers.ClearAsync();
-							await reclosers.SetAsync(tx, ReliableDictionaryNames.Reclosers, new HashSet<long>());
+							//await reclosers.SetAsync(tx, ReliableDictionaryNames.Reclosers, new HashSet<long>());
 							await tx.CommitAsync();
 						}
 						else
 						{
 							var reclosers = await StateManager.GetOrAddAsync<IReliableDictionary<string, HashSet<long>>>(tx, ReliableDictionaryNames.Reclosers);
-							await reclosers.SetAsync(tx, ReliableDictionaryNames.Reclosers, new HashSet<long>());
+							//await reclosers.SetAsync(tx, ReliableDictionaryNames.Reclosers, new HashSet<long>());
 							await tx.CommitAsync();
 						}
 					}

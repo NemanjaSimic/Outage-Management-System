@@ -143,7 +143,7 @@ namespace CE.TopologyProviderImplementation
                 }
                 else
                 {
-                    Logger.LogError($"{baseLogString} ConvertTopologyToUIModel => Error while getting topology element with GID {nextElementGid:X16} from topology. It does not exist in topology.");
+                    Logger.LogDebug($"{baseLogString} ConvertTopologyToUIModel =>  Topology does not exist.");
                 }
             }
 
@@ -246,7 +246,7 @@ namespace CE.TopologyProviderImplementation
                 }
                 else
                 {
-                    Logger.LogError($"{baseLogString} ConvertTopologyToOMSModel => Error while getting topology element from topology. It does not exist in topology.");
+                    Logger.LogDebug($"{baseLogString} ConvertTopologyToOMSModel =>  Topology does not exist.");
                 }
             }
 
