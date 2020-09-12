@@ -1,6 +1,10 @@
-﻿using Common.CeContracts;
+﻿using Common.CE;
+using Common.CeContracts;
+using Microsoft.ServiceFabric.Data;
+using Microsoft.ServiceFabric.Data.Notifications;
 using OMS.Common.Cloud;
 using OMS.Common.Cloud.Logger;
+using OMS.Common.Cloud.ReliableCollectionHelpers;
 using OMS.Common.NmsContracts;
 using OMS.Common.NmsContracts.GDA;
 using OMS.Common.WcfClient.CE;
@@ -58,48 +62,190 @@ namespace CE.ModelProviderImplementation
 		#endregion
 
 		#region Fields
+		private static long noScadaGuid = 1;
+
 		private readonly string baseLogString;
 		private readonly object syncObj = new object();
+		private readonly IReliableStateManager stateManager;
+
+		private readonly NetworkModelGDA networkModelGda;
+		private readonly ModelResourcesDesc modelResourcesDesc;
+
 		private ICloudLogger logger;
 		private ICloudLogger Logger
 		{
 			get { return logger ?? (logger = CloudLoggerFactory.GetLogger()); }
 		}
-
-		private readonly NetworkModelGDA networkModelGda;
-
-		private static long noScadaGuid = 1;
-		private readonly ModelResourcesDesc modelResourcesDesc;
-		private Dictionary<long, IMeasurement> Measurements { get; set; }
-		private Dictionary<long, ITopologyElement> TopologyElements { get; set; }
-		private List<long> EnergySources { get; set; }
-		private Dictionary<long, float> BaseVoltages { get; set; }
-		private HashSet<long> Reclosers { get; set; }
-		private Dictionary<long, List<long>> ElementConnections { get; set; }
-		private Dictionary<long, long> MeasurementToConnectedTerminalMap { get; set; }
-		private Dictionary<long, List<long>> TerminalToConnectedElementsMap { get; set; }
 		#endregion
 
-		public ModelManager()
+		#region Reliable Dictionaries
+		private bool isEnergySourcesInitialized;
+		private bool isReclosersInitialized;
+		private bool isMeasurementsInitialized;
+		private bool isTopologyElementsInitialized;
+		private bool isBaseVoltagesInitialized;
+		private bool isElementConnectionsInitialized; 
+		private bool isMeasurementToConnectedTerminalMapInitialized;
+		private bool isTerminalToConnectedElementsMapInitialized;
+
+		private bool ReliableDictionariesInitialized
+		{
+			get
+			{
+				return	isEnergySourcesInitialized &&
+						isReclosersInitialized &&
+						isMeasurementsInitialized &&
+						isTopologyElementsInitialized &&
+						isBaseVoltagesInitialized &&
+						isElementConnectionsInitialized &&
+						isMeasurementToConnectedTerminalMapInitialized &&
+						isTerminalToConnectedElementsMapInitialized;
+			}
+		}
+
+		private ReliableDictionaryAccess<string, List<long>> energySources;
+		private ReliableDictionaryAccess<string, List<long>> EnergySources
+		{
+			get { return energySources; }
+		}
+
+		private ReliableDictionaryAccess<string, HashSet<long>> reclosers;
+		private ReliableDictionaryAccess<string, HashSet<long>> Reclosers
+	{
+			get { return reclosers; }
+		}
+
+		private ReliableDictionaryAccess<long, IMeasurement> measurements;
+		private ReliableDictionaryAccess<long, IMeasurement> Measurements
+		{
+			get { return measurements; }
+		}
+
+		private ReliableDictionaryAccess<long, ITopologyElement> topologyElements;
+		private ReliableDictionaryAccess<long, ITopologyElement> TopologyElements
+		{
+			get { return topologyElements; }
+		}
+
+		private ReliableDictionaryAccess<long, float> baseVoltages;
+		private ReliableDictionaryAccess<long, float> BaseVoltages
+		{
+			get { return baseVoltages; }
+		}
+
+		private ReliableDictionaryAccess<long, List<long>> elementConnections;
+		private ReliableDictionaryAccess<long, List<long>> ElementConnections
+		{
+			get { return elementConnections; }
+		}
+
+		private ReliableDictionaryAccess<long, long> measurementToConnectedTerminalMap;
+		private ReliableDictionaryAccess<long, long> MeasurementToConnectedTerminalMap
+		{
+			get { return measurementToConnectedTerminalMap; }
+		}
+
+		private ReliableDictionaryAccess<long, List<long>> terminalToConnectedElementsMap;
+		private ReliableDictionaryAccess<long, List<long>> TerminalToConnectedElementsMap
+		{
+			get { return terminalToConnectedElementsMap; }
+		}
+
+		private async void OnStateManagerChangedHandler(object sender, NotifyStateManagerChangedEventArgs e)
+		{
+			if (e.Action == NotifyStateManagerChangedAction.Add)
+			{
+				var operation = e as NotifyStateManagerSingleEntityChangedEventArgs;
+				string reliableStateName = operation.ReliableState.Name.AbsolutePath;
+
+				if (reliableStateName == ReliableDictionaryNames.EnergySources)
+				{
+					this.energySources = await ReliableDictionaryAccess<string, List<long>>.Create(stateManager, ReliableDictionaryNames.EnergySources);
+					this.isEnergySourcesInitialized = true;
+
+					string debugMessage = $"{baseLogString} OnStateManagerChangedHandler => '{ReliableDictionaryNames.EnergySources}' ReliableDictionaryAccess initialized.";
+					Logger.LogDebug(debugMessage);
+				}
+				else if (reliableStateName == ReliableDictionaryNames.Reclosers)
+				{
+					this.reclosers = await ReliableDictionaryAccess<string, HashSet<long>>.Create(stateManager, ReliableDictionaryNames.Reclosers);
+					this.isReclosersInitialized = true;
+
+					string debugMessage = $"{baseLogString} OnStateManagerChangedHandler => '{ReliableDictionaryNames.Reclosers}' ReliableDictionaryAccess initialized.";
+					Logger.LogDebug(debugMessage);
+				}
+				else if (reliableStateName == ReliableDictionaryNames.Measurements)
+				{
+					this.measurements = await ReliableDictionaryAccess<long, IMeasurement>.Create(stateManager, ReliableDictionaryNames.Measurements);
+					this.isMeasurementsInitialized = true;
+
+					string debugMessage = $"{baseLogString} OnStateManagerChangedHandler => '{ReliableDictionaryNames.Measurements}' ReliableDictionaryAccess initialized.";
+					Logger.LogDebug(debugMessage);
+				}
+				else if (reliableStateName == ReliableDictionaryNames.TopologyElements)
+				{
+					this.topologyElements = await ReliableDictionaryAccess<long, ITopologyElement>.Create(stateManager, ReliableDictionaryNames.TopologyElements);
+					this.isTopologyElementsInitialized = true;
+
+					string debugMessage = $"{baseLogString} OnStateManagerChangedHandler => '{ReliableDictionaryNames.TopologyElements}' ReliableDictionaryAccess initialized.";
+					Logger.LogDebug(debugMessage);
+				}
+				else if (reliableStateName == ReliableDictionaryNames.BaseVoltages)
+				{
+					this.baseVoltages = await ReliableDictionaryAccess<long, float>.Create(stateManager, ReliableDictionaryNames.BaseVoltages);
+					this.isBaseVoltagesInitialized = true;
+
+					string debugMessage = $"{baseLogString} OnStateManagerChangedHandler => '{ReliableDictionaryNames.BaseVoltages}' ReliableDictionaryAccess initialized.";
+					Logger.LogDebug(debugMessage);
+				}
+				else if (reliableStateName == ReliableDictionaryNames.ElementConnections)
+				{
+					this.elementConnections = await ReliableDictionaryAccess<long, List<long>>.Create(stateManager, ReliableDictionaryNames.ElementConnections);
+					this.isElementConnectionsInitialized = true;
+
+					string debugMessage = $"{baseLogString} OnStateManagerChangedHandler => '{ReliableDictionaryNames.ElementConnections}' ReliableDictionaryAccess initialized.";
+					Logger.LogDebug(debugMessage);
+				}
+				else if (reliableStateName == ReliableDictionaryNames.MeasurementToConnectedTerminalMap)
+				{
+					this.measurementToConnectedTerminalMap = await ReliableDictionaryAccess<long, long>.Create(stateManager, ReliableDictionaryNames.MeasurementToConnectedTerminalMap);
+					this.isMeasurementToConnectedTerminalMapInitialized = true;
+
+					string debugMessage = $"{baseLogString} OnStateManagerChangedHandler => '{ReliableDictionaryNames.MeasurementToConnectedTerminalMap}' ReliableDictionaryAccess initialized.";
+					Logger.LogDebug(debugMessage);
+				}
+				else if (reliableStateName == ReliableDictionaryNames.TerminalToConnectedElementsMap)
+				{
+					this.terminalToConnectedElementsMap = await ReliableDictionaryAccess<long, List<long>>.Create(stateManager, ReliableDictionaryNames.TerminalToConnectedElementsMap);
+					this.isTerminalToConnectedElementsMapInitialized = true;
+
+					string debugMessage = $"{baseLogString} OnStateManagerChangedHandler => '{ReliableDictionaryNames.TerminalToConnectedElementsMap}' ReliableDictionaryAccess initialized.";
+					Logger.LogDebug(debugMessage);
+				}
+			}
+		}
+		#endregion Reliable Dictionaries
+
+		public ModelManager(IReliableStateManager stateManager)
 		{
 			this.baseLogString = $"{this.GetType()} [{this.GetHashCode()}] =>{Environment.NewLine}";
 			string verboseMessage = $"{baseLogString} entering Ctor.";
 			Logger.LogVerbose(verboseMessage);
 
 			networkModelGda = new NetworkModelGDA();
-
 			modelResourcesDesc = new ModelResourcesDesc();
-			TopologyElements = new Dictionary<long, ITopologyElement>();
-			Measurements = new Dictionary<long, IMeasurement>();
-			EnergySources = new List<long>();
-			ElementConnections = new Dictionary<long, List<long>>();
-			MeasurementToConnectedTerminalMap = new Dictionary<long, long>();
-			TerminalToConnectedElementsMap = new Dictionary<long, List<long>>();
-			BaseVoltages = new Dictionary<long, float>();
-			Reclosers = new HashSet<long>();
 
-			string debugMessage = $"{baseLogString} Ctor => Clients initialized.";
-			Logger.LogDebug(debugMessage);
+			this.isEnergySourcesInitialized = false;
+			this.isReclosersInitialized = false;
+			this.isMeasurementsInitialized = false;
+			this.isTopologyElementsInitialized = false;
+			this.isBaseVoltagesInitialized = false;
+			this.isElementConnectionsInitialized = false;
+			this.isMeasurementToConnectedTerminalMapInitialized = false;
+			this.isTerminalToConnectedElementsMapInitialized = false;
+
+			this.stateManager = stateManager;
+			this.stateManager.StateManagerChanged += this.OnStateManagerChangedHandler;
 		}
 
 		#region Functions
@@ -108,16 +254,30 @@ namespace CE.ModelProviderImplementation
 			string verboseMessage = $"{baseLogString} entering TryGetAllModelEntities method.";
 			Logger.LogVerbose(verboseMessage);
 
+			while(!ReliableDictionariesInitialized)
+            {
+				await Task.Delay(1000);
+            }
+
 			ModelDelta modelDelta = new ModelDelta();
 
-			TopologyElements.Clear();
-			Measurements.Clear();
-			EnergySources.Clear();
-			ElementConnections.Clear();
-			MeasurementToConnectedTerminalMap.Clear();
-			TerminalToConnectedElementsMap.Clear();
-			BaseVoltages.Clear();
-			Reclosers.Clear();
+            var clearTasks = new List<Task>
+            {
+                TopologyElements.ClearAsync(),
+                Measurements.ClearAsync(),
+                EnergySources.ClearAsync(),
+                ElementConnections.ClearAsync(),
+                MeasurementToConnectedTerminalMap.ClearAsync(),
+                TerminalToConnectedElementsMap.ClearAsync(),
+                BaseVoltages.ClearAsync(),
+                Reclosers.ClearAsync()
+            };
+
+            Task.WaitAll(clearTasks.ToArray());
+
+			await energySources.SetAsync(ReliableDictionaryNames.EnergySources, new List<long>());
+
+			await reclosers.SetAsync( ReliableDictionaryNames.Reclosers, new HashSet<long>());
 
 			try
 			{
@@ -171,25 +331,65 @@ namespace CE.ModelProviderImplementation
 				//	}
 				//});
 
-				foreach (var measurement in Measurements.Values)
+				var enumerableMeasurements = await Measurements.GetEnumerableDictionaryAsync();
+				List<IMeasurement> updatedMeasurements = new List<IMeasurement>(enumerableMeasurements.Count);
+				foreach (var measurement in enumerableMeasurements.Values)
 				{
-					PutMeasurementsInElements(measurement);
+					var elementId = await PutMeasurementsInElements(measurement);
 					var measurementProviderClient = MeasurementProviderClient.CreateClient();
-					await measurementProviderClient.AddMeasurementElementPair(measurement.Id, measurement.ElementId);
+					await measurementProviderClient.AddMeasurementElementPair(measurement.Id, elementId);
+					updatedMeasurements.Add(measurement);
 				}
 
-				foreach (var element in TopologyElements.Values)
+				foreach (var updatedMeas in updatedMeasurements)
+				{
+					await Measurements.SetAsync(updatedMeas.Id, updatedMeas);
+				}
+
+				var enumerableTopologyElements = await TopologyElements.GetEnumerableDictionaryAsync();
+				List<ITopologyElement> updatedElements = new List<ITopologyElement>(enumerableTopologyElements.Count);
+				foreach (var element in enumerableTopologyElements.Values)
 				{
 					if (element.Measurements.Count == 0)
 					{
 						await CreateNoScadaMeasurementAsync(element);
+						updatedElements.Add(element);
 					}
 				}
 
-				modelDelta.TopologyElements = TopologyElements;
-				modelDelta.ElementConnections = ElementConnections;
-				modelDelta.Reclosers = Reclosers;
-				modelDelta.EnergySources = EnergySources;
+				foreach (var updatedEl in updatedElements)
+				{
+					await TopologyElements.SetAsync(updatedEl.Id, updatedEl);
+				}
+
+				modelDelta.TopologyElements = enumerableTopologyElements;
+				modelDelta.ElementConnections = await ElementConnections.GetEnumerableDictionaryAsync();
+
+				var reclosersResult = await Reclosers.TryGetValueAsync(ReliableDictionaryNames.Reclosers);
+				if (reclosersResult.HasValue)
+                {
+					modelDelta.Reclosers = reclosersResult.Value;
+				}
+				else
+                {
+					Logger.LogWarning($"{baseLogString} Reliable collection '{ReliableDictionaryNames.Reclosers}' was not defined yet. Handling...");
+					await Reclosers.SetAsync(ReliableDictionaryNames.Reclosers, new HashSet<long>());
+
+					modelDelta.Reclosers = new HashSet<long>();
+                }
+				
+				var enegySourcesResult = await EnergySources.TryGetValueAsync(ReliableDictionaryNames.EnergySources);
+				if (reclosersResult.HasValue)
+				{
+					modelDelta.EnergySources = enegySourcesResult.Value;
+				}
+				else
+                {
+					Logger.LogWarning($"{baseLogString} Reliable collection '{ReliableDictionaryNames.EnergySources}' was not defined yet. Handling...");
+					await EnergySources.SetAsync(ReliableDictionaryNames.EnergySources, new List<long>());
+
+					modelDelta.EnergySources = new List<long>();
+				}
 			}
 			catch (Exception e)
 			{
@@ -216,14 +416,16 @@ namespace CE.ModelProviderImplementation
 				await TransformToTopologyElementAsync(element);
 			}
 		}
-		private void PutMeasurementsInElements(IMeasurement measurement)
+		private async Task<long> PutMeasurementsInElements(IMeasurement measurement)
 		{
 			string verboseMessage = $"{baseLogString} entering PutMeasurementsInElements method. Measurement GID {measurement?.Id:X16}.";
 			Logger.LogVerbose(verboseMessage);
 
-			if (MeasurementToConnectedTerminalMap.TryGetValue(measurement.Id, out long terminalId))
+			var enumerableMeasurementToConnectedTerminalMap = await MeasurementToConnectedTerminalMap.GetEnumerableDictionaryAsync();
+			if (enumerableMeasurementToConnectedTerminalMap.TryGetValue(measurement.Id, out long terminalId))
 			{
-				if (TerminalToConnectedElementsMap.TryGetValue(terminalId, out List<long> connectedElements))
+				var enumerableTerminalToConnectedElementsMap = await TerminalToConnectedElementsMap.GetEnumerableDictionaryAsync();
+				if (enumerableTerminalToConnectedElementsMap.TryGetValue(terminalId, out List<long> connectedElements))
 				{
 					try
 					{
@@ -231,14 +433,26 @@ namespace CE.ModelProviderImplementation
 							e => GetDMSTypeOfTopologyElement(e) != DMSType.CONNECTIVITYNODE
 							&& GetDMSTypeOfTopologyElement(e) != DMSType.ANALOG);
 
-						if (TopologyElements.TryGetValue(elementId, out ITopologyElement element))
+						var enumerableTopologyElements = await TopologyElements.GetEnumerableDictionaryAsync();
+						if (enumerableTopologyElements.TryGetValue(elementId, out ITopologyElement element))
 						{
 							element.Measurements.Add(measurement.Id, measurement.GetMeasurementType());
 							measurement.ElementId = elementId;
 
+							if (measurement is DiscreteMeasurement)
+							{
+								var measurementProviderClient = MeasurementProviderClient.CreateClient();
+								await measurementProviderClient.AddDiscreteMeasurement((DiscreteMeasurement)measurement);
+							}
+							else if (measurement is AnalogMeasurement)
+							{
+								var measurementProviderClient = MeasurementProviderClient.CreateClient();
+								await measurementProviderClient.AddAnalogMeasurement((AnalogMeasurement)measurement);
+							}
+
 							if (measurement.GetMeasurementType().Equals(AnalogMeasurementType.FEEDER_CURRENT.ToString()))
 							{
-								TopologyElements[elementId] = new Feeder(element);
+								await TopologyElements.SetAsync(elementId, new Feeder(element));
 							}
 						}
 						else
@@ -260,6 +474,7 @@ namespace CE.ModelProviderImplementation
 			{
 				Logger.LogError($"{baseLogString} PutMeasurementsInElement => Measurement with GID {measurement.Id:X16} does not exist in mesurement to terminal map.");
 			}
+			return measurement.ElementId;
 		}
 		private async Task TransformToTopologyElementAsync(ResourceDescription modelEntity)
 		{
@@ -271,60 +486,72 @@ namespace CE.ModelProviderImplementation
 
 			if (dmsType == DMSType.DISCRETE)
 			{
-				Measurement newDiscrete = GetPopulatedDiscreteMeasurement(modelEntity);
-				if (!Measurements.ContainsKey(newDiscrete.Id))
+				Measurement newDiscrete = await GetPopulatedDiscreteMeasurement(modelEntity);
+				if (!await Measurements.ContainsKeyAsync(newDiscrete.Id))
 				{
-					Measurements.Add(newDiscrete.Id, newDiscrete);
+					await Measurements.SetAsync(newDiscrete.Id, newDiscrete); //contains moze da bude false, a da kad doje ova linija na red, da vrednost bude popunjena, zato SetAsync, ali onda je sam if suvisan (ne znam da li je kljucan za neku logiku...)
 				}
 				var measurementProviderClient = MeasurementProviderClient.CreateClient();
 				await measurementProviderClient.AddDiscreteMeasurement(newDiscrete as DiscreteMeasurement);
 			}
 			else if (dmsType == DMSType.ANALOG)
 			{
-				Measurement newAnalog = GetPopulatedAnalogMeasurement(modelEntity);
-				if (!Measurements.ContainsKey(newAnalog.Id))
+				Measurement newAnalog = await GetPopulatedAnalogMeasurement(modelEntity);
+				if (!await Measurements.ContainsKeyAsync(newAnalog.Id))
 				{
-					Measurements.Add(newAnalog.Id, newAnalog);
+					await Measurements.SetAsync(newAnalog.Id, newAnalog); //contains moze da bude false, a da kad doje ova linija na red, da vrednost bude popunjena, zato SetAsync, ali onda je sam if suvisan (ne znam da li je kljucan za neku logiku...)
 				}
 				var measurementProviderClient = MeasurementProviderClient.CreateClient();
 				await measurementProviderClient.AddAnalogMeasurement(newAnalog as AnalogMeasurement);
 			}
 			else if (dmsType != DMSType.MASK_TYPE && dmsType != DMSType.BASEVOLTAGE)
 			{
-				ITopologyElement newElement = GetPopulatedElement(modelEntity);
+				ITopologyElement newElement = await GetPopulatedElement(modelEntity);
 
-				lock (syncObj)
+				//lock (syncObj)
+				//{
+				if (!await TopologyElements.ContainsKeyAsync(newElement.Id))
 				{
-					if (!TopologyElements.ContainsKey(newElement.Id))
-					{
-						TopologyElements.Add(newElement.Id, newElement);
-					}
-					else
-					{
-						Logger.LogDebug($"{baseLogString} TransformToTopologyElementAsync => TopologyElements contain key {newElement.Id:X16}");
-					}
-
+					await TopologyElements.SetAsync(newElement.Id, newElement); //contains moze da bude false, a da kad doje ova linija na red, da vrednost bude popunjena, zato SetAsync, ali onda je sam if suvisan (ne znam da li je kljucan za neku logiku...)
 				}
-
+				else
+				{
+					Logger.LogDebug($"{baseLogString} TransformToTopologyElementAsync => TopologyElements contain key {newElement.Id:X16}");
+				}
+				//}
 
 				if (dmsType == DMSType.ENERGYSOURCE)
 				{
-					EnergySources.Add(newElement.Id);
-				}
-				lock (syncObj)
-				{
-					if (!ElementConnections.ContainsKey(modelEntity.Id))
-					{
-						ElementConnections.Add(modelEntity.Id, (GetAllReferencedElements(modelEntity)));
+					var energySourcesResult = await EnergySources.TryGetValueAsync(ReliableDictionaryNames.EnergySources);
+					
+					if(energySourcesResult.HasValue)
+                    {
+						var energySources = energySourcesResult.Value;
+						energySources.Add(newElement.Id);
+
+						await EnergySources.SetAsync(ReliableDictionaryNames.EnergySources, energySources);
 					}
 					else
-					{
-						Logger.LogDebug($"{baseLogString} TransformToTopologyElementAsync => ElementConnections contain key {modelEntity.Id:X16}");
+                    {
+						Logger.LogWarning($"{baseLogString} Reliable collection '{ReliableDictionaryNames.EnergySources}' was not defined yet. Handling...");
+						await EnergySources.SetAsync(ReliableDictionaryNames.EnergySources, new List<long>() { newElement.Id });
 					}
 				}
+
+				//lock (syncObj)
+				//{
+				if (!await ElementConnections.ContainsKeyAsync(modelEntity.Id))
+				{
+					await ElementConnections.SetAsync(modelEntity.Id, await GetAllReferencedElements(modelEntity)); //contains moze da bude false, a da kad doje ova linija na red, da vrednost bude popunjena, zato SetAsync, ali onda je sam if suvisan (ne znam da li je kljucan za neku logiku...)
+				}
+				else
+				{
+					Logger.LogDebug($"{baseLogString} TransformToTopologyElementAsync => ElementConnections contain key {modelEntity.Id:X16}");
+				}
+				//}
 			}
 		}
-		private List<long> GetAllReferencedElements(ResourceDescription element)
+		private async Task<List<long>> GetAllReferencedElements(ResourceDescription element)
 		{
 			string verboseMessage = $"{baseLogString} entering GetAllReferencedElements method.";
 			Logger.LogVerbose(verboseMessage);
@@ -355,7 +582,7 @@ namespace CE.ModelProviderImplementation
 
 			if (type == DMSType.TERMINAL)
 			{
-				TerminalToConnectedElementsMap.Add(element.Id, new List<long>(elements));
+				await TerminalToConnectedElementsMap.SetAsync(element.Id, new List<long>(elements));
 			}
 			return elements;
 		}
@@ -372,7 +599,7 @@ namespace CE.ModelProviderImplementation
 
 			return properties;
 		}
-		private ITopologyElement GetPopulatedElement(ResourceDescription rs)
+		private async Task<ITopologyElement> GetPopulatedElement(ResourceDescription rs)
 		{
 			string verboseMessage = $"{baseLogString} entering GetPopulatedElement method.";
 			Logger.LogVerbose(verboseMessage);
@@ -411,9 +638,11 @@ namespace CE.ModelProviderImplementation
 				if (rs.ContainsProperty(ModelCode.CONDUCTINGEQUIPMENT_BASEVOLTAGE))
 				{
 					long baseVoltageGid = rs.GetProperty(ModelCode.CONDUCTINGEQUIPMENT_BASEVOLTAGE).AsLong();
-					if (BaseVoltages.TryGetValue(baseVoltageGid, out float voltage))
+
+					var voltageResult = await BaseVoltages.TryGetValueAsync(baseVoltageGid);
+					if (voltageResult.HasValue)
 					{
-						topologyElement.NominalVoltage = voltage;
+						topologyElement.NominalVoltage = voltageResult.Value;
 					}
 					else if (baseVoltageGid == 0)
 					{
@@ -427,7 +656,20 @@ namespace CE.ModelProviderImplementation
 
 				if (rs.ContainsProperty(ModelCode.BREAKER_NORECLOSING) && !rs.GetProperty(ModelCode.BREAKER_NORECLOSING).AsBool())
 				{
-					Reclosers.Add(topologyElement.Id);
+					var reclosersResult = await Reclosers.TryGetValueAsync(ReliableDictionaryNames.Reclosers);
+
+					if (reclosersResult.HasValue)
+					{
+						var reclosers = reclosersResult.Value;
+						reclosers.Add(topologyElement.Id);
+
+						await Reclosers.SetAsync(ReliableDictionaryNames.Reclosers, reclosers);
+					}
+					else
+					{
+						Logger.LogWarning($"{baseLogString} Reliable collection '{ReliableDictionaryNames.Reclosers}' was not defined yet. Handling...");
+						await Reclosers.SetAsync(ReliableDictionaryNames.Reclosers, new HashSet<long>() { topologyElement.Id });
+					}
 				}
 
 				if (rs.ContainsProperty(ModelCode.ENERGYCONSUMER_TYPE))
@@ -462,7 +704,7 @@ namespace CE.ModelProviderImplementation
 			}
 			return topologyElement;
 		}
-		private AnalogMeasurement GetPopulatedAnalogMeasurement(ResourceDescription rs)
+		private async Task<AnalogMeasurement> GetPopulatedAnalogMeasurement(ResourceDescription rs)
 		{
 			string verboseMessage = $"{baseLogString} entering GetPopulatedAnalogMeasurement method.";
 			Logger.LogVerbose(verboseMessage);
@@ -481,7 +723,7 @@ namespace CE.ModelProviderImplementation
 				measurement.ScalingFactor = rs.GetProperty(ModelCode.ANALOG_SCALINGFACTOR).AsFloat();
 				measurement.SignalType = (AnalogMeasurementType)rs.GetProperty(ModelCode.ANALOG_SIGNALTYPE).AsEnum();
 
-				var connection = GetAllReferencedElements(rs);
+				var connection = await GetAllReferencedElements(rs);
 				if (connection.Count < 0)
 				{
 					Logger.LogError($"{baseLogString} GetPopulatedAnalogMeasurement => Analog measurement with GID: {rs.Id:X16} is not connected to any element.");
@@ -490,17 +732,18 @@ namespace CE.ModelProviderImplementation
 				else if (connection.Count > 1)
 				{
 					Logger.LogWarning($"{baseLogString} GetPopulatedAnalogMeasurement => Analog measurement with GID: {rs.Id:X16} is connected to more then one element.");
-					if (!MeasurementToConnectedTerminalMap.ContainsKey(rs.Id))
+
+					if (!await MeasurementToConnectedTerminalMap.ContainsKeyAsync(rs.Id))
 					{
-						MeasurementToConnectedTerminalMap.Add(rs.Id, connection.First());
+						await MeasurementToConnectedTerminalMap.SetAsync(rs.Id, connection.First());
 					}
 
 				}
 				else
 				{
-					if (!MeasurementToConnectedTerminalMap.ContainsKey(rs.Id))
+					if (!await MeasurementToConnectedTerminalMap.ContainsKeyAsync(rs.Id))
 					{
-						MeasurementToConnectedTerminalMap.Add(rs.Id, connection.First());
+						await MeasurementToConnectedTerminalMap.SetAsync(rs.Id, connection.First());
 					}
 				}
 			}
@@ -512,7 +755,7 @@ namespace CE.ModelProviderImplementation
 			}
 			return measurement;
 		}
-		private DiscreteMeasurement GetPopulatedDiscreteMeasurement(ResourceDescription rs)
+		private async Task<DiscreteMeasurement> GetPopulatedDiscreteMeasurement(ResourceDescription rs)
 		{
 			string verboseMessage = $"{baseLogString} entering GetPopulatedDiscreteMeasurement method.";
 			Logger.LogVerbose(verboseMessage);
@@ -529,7 +772,7 @@ namespace CE.ModelProviderImplementation
 				measurement.NormalValue = rs.GetProperty(ModelCode.DISCRETE_NORMALVALUE).AsInt();
 				measurement.MeasurementType = (DiscreteMeasurementType)rs.GetProperty(ModelCode.DISCRETE_MEASUREMENTTYPE).AsEnum();
 
-				var connection = GetAllReferencedElements(rs);
+				var connection = await GetAllReferencedElements(rs);
 				if (connection.Count < 0)
 				{
 					Logger.LogError($"{baseLogString} GetPopulatedDiscreteMeasurement => Discrete measurement with GID {rs.Id:X16} is not connected to any element.");
@@ -538,16 +781,16 @@ namespace CE.ModelProviderImplementation
 				else if (connection.Count > 1)
 				{
 					Logger.LogWarning($"{baseLogString} GetPopulatedDiscreteMeasurement => Discrete measurement with GID {rs.Id:X16} is connected to more then one element.");
-					if (!MeasurementToConnectedTerminalMap.ContainsKey(rs.Id))
+					if (!await MeasurementToConnectedTerminalMap.ContainsKeyAsync(rs.Id))
 					{
-						MeasurementToConnectedTerminalMap.Add(rs.Id, connection.First());
+						await MeasurementToConnectedTerminalMap.SetAsync(rs.Id, connection.First());
 					}
 				}
 				else
 				{
-					if (!MeasurementToConnectedTerminalMap.ContainsKey(rs.Id))
+					if (!await MeasurementToConnectedTerminalMap.ContainsKeyAsync(rs.Id))
 					{
-						MeasurementToConnectedTerminalMap.Add(rs.Id, connection.First());
+						await MeasurementToConnectedTerminalMap.SetAsync(rs.Id, connection.First());
 					}
 				}
 			}

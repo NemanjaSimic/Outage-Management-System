@@ -57,7 +57,7 @@ namespace CE.ModelProviderImplementation
                 && isEnergySourceCacheInitialized;
         }
 
-        public ModelProvider(IReliableStateManager stateManager)
+        public ModelProvider(IReliableStateManager stateManager, ModelManager modelManager)
         {
             this.baseLogString = $"{this.GetType()} [{this.GetHashCode()}] =>{Environment.NewLine}";
             string verboseMessage = $"{baseLogString} entering Ctor.";
@@ -67,7 +67,7 @@ namespace CE.ModelProviderImplementation
             stateManager.StateManagerChanged += this.OnStateManagerChangedHandler;
 
             transactionFlag = TransactionFlag.NoTransaction;
-            modelManager = new ModelManager();
+            this.modelManager = modelManager;
 
             this.isElementCacheInitialized = false;
             this.isElementConnectionCacheInitialized = false;

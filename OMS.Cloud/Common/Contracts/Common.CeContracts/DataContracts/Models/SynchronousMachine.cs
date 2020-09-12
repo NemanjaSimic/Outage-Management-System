@@ -19,6 +19,7 @@ namespace Common.CeContracts
             Measurements = element.Measurements;
             IsRemote = element.IsRemote;
             IsActive = element.IsActive;
+            Feeder = element.Feeder;
         }
 
         [DataMember]

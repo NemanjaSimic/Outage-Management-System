@@ -153,7 +153,9 @@ namespace CE.MeasurementProviderImplementation
 			}
 			else
 			{
-				Logger.LogWarning($"{baseLogString} AddAnalogMeasurement => analog measurement with GID {analogMeasurement.Id:X16} is already in collection.");
+				Logger.LogDebug($"{baseLogString} AddDiscreteMeasurement => Updating analog measurement with GID {analogMeasurement.Id:X16}.");
+				analogMeasurements.Remove(analogMeasurement.Id);
+				analogMeasurements.Add(analogMeasurement.Id, analogMeasurement);
 			}
 
 			await AnalogMeasurementsCache.SetAsync((short)MeasurementPorviderCacheType.Origin, analogMeasurements);
@@ -184,7 +186,9 @@ namespace CE.MeasurementProviderImplementation
 			}
 			else
 			{
-				Logger.LogWarning($"{baseLogString} AddDiscreteMeasurement => discrete measurement with GID {discreteMeasurement.Id:X16} is already in collection.");
+				Logger.LogDebug($"{baseLogString} AddDiscreteMeasurement => Updating discrete measurement with GID {discreteMeasurement.Id:X16}.");
+				discreteMeasurements.Remove(discreteMeasurement.Id);
+				discreteMeasurements.Add(discreteMeasurement.Id, discreteMeasurement);
 			}
 
 			await DiscreteMeasurementsCache.SetAsync((short)MeasurementPorviderCacheType.Origin, discreteMeasurements);
