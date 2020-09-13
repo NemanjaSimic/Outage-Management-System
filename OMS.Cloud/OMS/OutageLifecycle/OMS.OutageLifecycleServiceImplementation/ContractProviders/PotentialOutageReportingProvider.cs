@@ -10,6 +10,7 @@ using Microsoft.ServiceFabric.Data.Notifications;
 using OMS.Common.Cloud;
 using OMS.Common.Cloud.Logger;
 using OMS.Common.Cloud.ReliableCollectionHelpers;
+using OMS.Common.WcfClient.CE;
 using OMS.Common.WcfClient.OMS.HistoryDBManager;
 using OMS.Common.WcfClient.OMS.ModelAccess;
 using OMS.Common.WcfClient.OMS.ModelProvider;
@@ -102,30 +103,31 @@ namespace OMS.OutageLifecycleImplementation.ContractProviders
                 await Task.Delay(1000);
             }
 
-            var historyDBManagerClient = HistoryDBManagerClient.CreateClient();
-            var outageModelReadAccessClient = OutageModelReadAccessClient.CreateClient();
-
-            var topology = await outageModelReadAccessClient.GetTopologyModel();
-            var affectedConsumersGids = lifecycleHelper.GetAffectedConsumers(elementGid, topology);
-
-            if(!(await CheckPreconditions(elementGid, commandOriginType, affectedConsumersGids, outageModelReadAccessClient, historyDBManagerClient)))
-            {
-                Logger.LogError($"{baseLogString} ReportPotentialOutage => Parameters do not satisfy required preconditions. OutageId: {elementGid}, CommandOriginType: {commandOriginType}");
-                return false;
-            }
-
-            Logger.LogInformation($"{baseLogString} ReportPotentialOutage => Reporting outage for gid: 0x{elementGid:X16}, CommandOriginType: {commandOriginType}");
-
-            if (affectedConsumersGids.Count == 0)
-            {
-                await OnZeroAffectedConsumersCase(elementGid, historyDBManagerClient);
-
-                Logger.LogError($"{baseLogString} ReportPotentialOutage => There is no affected consumers => outage report is not valid. ElementGid: 0x{elementGid:X16}, CommandOriginType: {commandOriginType}");
-                return false;
-            }
-
             try
             {
+                #region Preconditions
+                var ceModelProviderClient = CeModelProviderClient.CreateClient();
+                if (await ceModelProviderClient.IsRecloser(elementGid))
+                {
+                    Logger.LogWarning($"{baseLogString} ReportPotentialOutage => Element with gid 0x{elementGid:X16} is a Recloser. Call to ReportPotentialOutage aborted.");
+                    return false;
+                }
+
+                var historyDBManagerClient = HistoryDBManagerClient.CreateClient();
+                var outageModelReadAccessClient = OutageModelReadAccessClient.CreateClient();
+
+                var topology = await outageModelReadAccessClient.GetTopologyModel();
+                var affectedConsumersGids = lifecycleHelper.GetAffectedConsumers(elementGid, topology);
+
+                if(!(await CheckPreconditions(elementGid, commandOriginType, affectedConsumersGids, outageModelReadAccessClient, historyDBManagerClient)))
+                {
+                    Logger.LogError($"{baseLogString} ReportPotentialOutage => Parameters do not satisfy required preconditions. OutageId: {elementGid}, CommandOriginType: {commandOriginType}");
+                    return false;
+                }
+                #endregion Preconditions
+
+                Logger.LogInformation($"{baseLogString} ReportPotentialOutage => Reporting outage for gid: 0x{elementGid:X16}, CommandOriginType: {commandOriginType}");
+
                 var result = await StoreActiveOutage(elementGid, affectedConsumersGids, topology);
 
                 if (!result.HasValue)
@@ -196,6 +198,14 @@ namespace OMS.OutageLifecycleImplementation.ContractProviders
                 await historyDBManagerClient.OnConsumerBlackedOut(affectedConsumersGids, null);
 
                 Logger.LogWarning($"{baseLogString} CheckPreconditions => ElementGid 0x{elementGid:X16} not found in commandedElements or optimumIsolationPoints.");
+                return false;
+            }
+
+            if (affectedConsumersGids.Count == 0)
+            {
+                await OnZeroAffectedConsumersCase(elementGid, historyDBManagerClient);
+
+                Logger.LogError($"{baseLogString} ReportPotentialOutage => There is no affected consumers => outage report is not valid. ElementGid: 0x{elementGid:X16}, CommandOriginType: {commandOriginType}");
                 return false;
             }
 

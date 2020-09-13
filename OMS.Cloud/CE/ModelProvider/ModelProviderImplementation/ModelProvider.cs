@@ -14,34 +14,15 @@ using System.Threading.Tasks;
 
 namespace CE.ModelProviderImplementation
 {
-	public class ModelProvider : IModelProviderContract
+	public class ModelProvider : ICeModelProviderContract
     {
         #region Fields
-        private TransactionFlag transactionFlag;
-
-        private ReliableDictionaryAccess<short, List<long>> energySourceCache;
-        public ReliableDictionaryAccess<short, List<long>> EnergySourceCache { get => energySourceCache; }
-
-        private ReliableDictionaryAccess<short, Dictionary<long, TopologyElement>> elementCache;
-        public ReliableDictionaryAccess<short, Dictionary<long, TopologyElement>> ElementCache { get => elementCache; }
-
-        private ReliableDictionaryAccess<short, Dictionary<long, List<long>>> elementConnectionCache;
-        public ReliableDictionaryAccess<short, Dictionary<long, List<long>>> ElementConnectionCache { get => elementConnectionCache; }
-
-        private ReliableDictionaryAccess<short, HashSet<long>> recloserCache;
-        public ReliableDictionaryAccess<short, HashSet<long>> RecloserCache { get => recloserCache; }
-
-        #endregion
-
-        private ModelManager modelManager;
-
-        private bool isElementCacheInitialized = false;
-        private bool isElementConnectionCacheInitialized = false;
-        private bool isEnergySourceCacheInitialized = false;
-        private bool isRecloserCacheInitialized = false;
-
         private readonly string baseLogString;
         private readonly IReliableStateManager stateManager;
+
+        private TransactionFlag transactionFlag;
+        private ModelManager modelManager;
+        #endregion
 
         private ICloudLogger logger;
         private ICloudLogger Logger
@@ -49,39 +30,31 @@ namespace CE.ModelProviderImplementation
             get { return logger ?? (logger = CloudLoggerFactory.GetLogger()); }
         }
 
+        #region Reliable Dictionaries
+        private bool isElementCacheInitialized = false;
+        private bool isElementConnectionCacheInitialized = false;
+        private bool isEnergySourceCacheInitialized = false;
+        private bool isRecloserCacheInitialized = false;
+
         private bool AreReliableDictionariesInitialized
         {
-            get => isElementCacheInitialized 
-                && isElementConnectionCacheInitialized 
-                && isRecloserCacheInitialized 
+            get => isElementCacheInitialized
+                && isElementConnectionCacheInitialized
+                && isRecloserCacheInitialized
                 && isEnergySourceCacheInitialized;
         }
 
-        public ModelProvider(IReliableStateManager stateManager, ModelManager modelManager)
-        {
-            this.baseLogString = $"{this.GetType()} [{this.GetHashCode()}] =>{Environment.NewLine}";
-            string verboseMessage = $"{baseLogString} entering Ctor.";
-            Logger.LogVerbose(verboseMessage);
+        private ReliableDictionaryAccess<short, List<long>> energySourceCache;
+        private ReliableDictionaryAccess<short, List<long>> EnergySourceCache { get => energySourceCache; }
 
-            this.stateManager = stateManager;
-            stateManager.StateManagerChanged += this.OnStateManagerChangedHandler;
+        private ReliableDictionaryAccess<short, Dictionary<long, TopologyElement>> elementCache;
+        private ReliableDictionaryAccess<short, Dictionary<long, TopologyElement>> ElementCache { get => elementCache; }
 
-            transactionFlag = TransactionFlag.NoTransaction;
-            this.modelManager = modelManager;
+        private ReliableDictionaryAccess<short, Dictionary<long, List<long>>> elementConnectionCache;
+        private ReliableDictionaryAccess<short, Dictionary<long, List<long>>> ElementConnectionCache { get => elementConnectionCache; }
 
-            this.isElementCacheInitialized = false;
-            this.isElementConnectionCacheInitialized = false;
-            this.isEnergySourceCacheInitialized = false;
-            this.isRecloserCacheInitialized = false;
-
-            string debugMessage = $"{baseLogString} Ctor => Clients initialized.";
-            Logger.LogDebug(debugMessage);
-        }
-
-        public Task<bool> IsAlive()
-        {
-            return Task.Run(() => { return true; });
-        }
+        private ReliableDictionaryAccess<short, HashSet<long>> recloserCache;
+        private ReliableDictionaryAccess<short, HashSet<long>> RecloserCache { get => recloserCache; }
 
         private async void OnStateManagerChangedHandler(object sender, NotifyStateManagerChangedEventArgs e)
         {
@@ -129,6 +102,28 @@ namespace CE.ModelProviderImplementation
                 //}
             }
         }
+        #endregion Reliable Dictionaries
+
+        public ModelProvider(IReliableStateManager stateManager, ModelManager modelManager)
+        {
+            this.baseLogString = $"{this.GetType()} [{this.GetHashCode()}] =>{Environment.NewLine}";
+            string verboseMessage = $"{baseLogString} entering Ctor.";
+            Logger.LogVerbose(verboseMessage);
+
+            this.stateManager = stateManager;
+            stateManager.StateManagerChanged += this.OnStateManagerChangedHandler;
+
+            transactionFlag = TransactionFlag.NoTransaction;
+            this.modelManager = modelManager;
+
+            this.isElementCacheInitialized = false;
+            this.isElementConnectionCacheInitialized = false;
+            this.isEnergySourceCacheInitialized = false;
+            this.isRecloserCacheInitialized = false;
+
+            string debugMessage = $"{baseLogString} Ctor => Clients initialized.";
+            Logger.LogDebug(debugMessage);
+        }
 
         public async Task<IModelDelta> ImportDataInCache()
         {
@@ -155,42 +150,116 @@ namespace CE.ModelProviderImplementation
             string verboseMessage = $"{baseLogString} entering GetElementModels method.";
             Logger.LogVerbose(verboseMessage);
 
-            return await GetElementsFromCache(transactionFlag);
+            Dictionary<long, TopologyElement> result;
+
+            try
+            {
+                result = await GetElementsFromCache(transactionFlag);
+            }
+            catch (Exception e)
+            {
+                string errorMessage = $"{baseLogString} GetElementModels => Exception: {e.Message}";
+                Logger.LogError(errorMessage, e);
+
+                result = new Dictionary<long, TopologyElement>();
+            }
+
+            return result;
         }
+
         public async Task<Dictionary<long, List<long>>> GetConnections()
         {
             string verboseMessage = $"{baseLogString} entering GetConnections method.";
             Logger.LogVerbose(verboseMessage);
 
-            return await GetConnectionsFromCache(transactionFlag);
+            Dictionary<long, List<long>> result;
+
+            try
+            {
+                result = await GetConnectionsFromCache(transactionFlag);
+            }
+            catch (Exception e)
+            {
+                string errorMessage = $"{baseLogString} GetConnections => Exception: {e.Message}";
+                Logger.LogError(errorMessage, e);
+
+                result = new Dictionary<long, List<long>>();
+            }
+
+            return result;
         }
+
         public async Task<HashSet<long>> GetReclosers()
         {
             string verboseMessage = $"{baseLogString} entering GetReclosers method.";
             Logger.LogVerbose(verboseMessage);
 
-            return await GetReclosersFromCache(transactionFlag);
+            HashSet<long> result;
+
+            try
+            {
+                result = await GetReclosersFromCache(transactionFlag);
+            }
+            catch (Exception e)
+            {
+                string errorMessage = $"{baseLogString} GetReclosers => Exception: {e.Message}";
+                Logger.LogError(errorMessage, e);
+
+                result = new HashSet<long>();
+            }
+
+            return result;
         }
+
         public async Task<List<long>> GetEnergySources()
         {
             string verboseMessage = $"{baseLogString} entering GetEnergySources method.";
             Logger.LogVerbose(verboseMessage);
 
-            return await GetEnergySourcesFromCache(transactionFlag);
+            List<long> result;
+
+            try
+            {
+                result = await GetEnergySourcesFromCache(transactionFlag);
+            }
+            catch (Exception e)
+            {
+                string errorMessage = $"{baseLogString} GetEnergySources => Exception: {e.Message}";
+                Logger.LogError(errorMessage, e);
+
+                result = new List<long>();
+            }
+
+            return result;
         }
+
         public async Task<bool> IsRecloser(long recloserGid)
         {
             string verboseMessage = $"{baseLogString} entering IsRecloser method for element GID {recloserGid:X16}.";
             Logger.LogVerbose(verboseMessage);
 
-            HashSet<long> reclosers = await GetReclosersFromCache(transactionFlag);
+            try
+            {
+                HashSet<long> reclosers = await GetReclosersFromCache(transactionFlag);
+                return reclosers.Contains(recloserGid);
+            }
+            catch (Exception e)
+            {
+                string errorMessage = $"{baseLogString} IsRecloser => Exception: {e.Message}";
+                Logger.LogError(errorMessage, e);
 
-            return reclosers.Contains(recloserGid);
+                return false;
+            }
         }
-		#endregion
 
-		#region Distributed Transaction
-		public async Task<bool> Prepare()
+        public Task<bool> IsAlive()
+        {
+            return Task.Run(() => { return true; });
+        }
+        #endregion
+
+        #region Distributed Transaction
+        public async Task<bool> Prepare()
         {
             string verboseMessage = $"{baseLogString} entering PrepareForTransaction method.";
             Logger.LogVerbose(verboseMessage);
@@ -236,58 +305,76 @@ namespace CE.ModelProviderImplementation
 
             return (success == true) ? topologyProviderTransaction && measurementProviderTransaction : false;
         }
+
         public async Task Commit()
         {
             string verboseMessage = $"{baseLogString} entering CommitTransaction method.";
             Logger.LogVerbose(verboseMessage);
 
-            Logger.LogDebug($"{baseLogString} CommitTransaction => Getting InTransaction data from cache.");
-            var elementModels = await GetElementsFromCache(TransactionFlag.InTransaction);
-            var allElementConnections = await GetConnectionsFromCache(TransactionFlag.InTransaction);
-            var energySources = await GetEnergySourcesFromCache(TransactionFlag.InTransaction);
-            var reclosers = await GetReclosersFromCache(TransactionFlag.InTransaction);
-            Logger.LogDebug($"{baseLogString} CommitTransaction => All InTransaction data have been retrieved from cache.");
+            try
+            {
+                Logger.LogDebug($"{baseLogString} CommitTransaction => Getting InTransaction data from cache.");
+                var elementModels = await GetElementsFromCache(TransactionFlag.InTransaction);
+                var allElementConnections = await GetConnectionsFromCache(TransactionFlag.InTransaction);
+                var energySources = await GetEnergySourcesFromCache(TransactionFlag.InTransaction);
+                var reclosers = await GetReclosersFromCache(TransactionFlag.InTransaction);
+                Logger.LogDebug($"{baseLogString} CommitTransaction => All InTransaction data have been retrieved from cache.");
 
-            Logger.LogDebug($"{baseLogString} CommitTransaction => Writting new data in cache under NoTransaction flag.");
-            await ElementCache.SetAsync((short)TransactionFlag.NoTransaction, elementModels);
-            await ElementConnectionCache.SetAsync((short)TransactionFlag.NoTransaction, allElementConnections);
-            await EnergySourceCache.SetAsync((short)TransactionFlag.NoTransaction, energySources);
-            await RecloserCache.SetAsync((short)TransactionFlag.NoTransaction, reclosers);
-            Logger.LogDebug($"{baseLogString} CommitTransaction => All new data have been written in cache under NoTransaction flag.");
+                Logger.LogDebug($"{baseLogString} CommitTransaction => Writting new data in cache under NoTransaction flag.");
+                await ElementCache.SetAsync((short)TransactionFlag.NoTransaction, elementModels);
+                await ElementConnectionCache.SetAsync((short)TransactionFlag.NoTransaction, allElementConnections);
+                await EnergySourceCache.SetAsync((short)TransactionFlag.NoTransaction, energySources);
+                await RecloserCache.SetAsync((short)TransactionFlag.NoTransaction, reclosers);
+                Logger.LogDebug($"{baseLogString} CommitTransaction => All new data have been written in cache under NoTransaction flag.");
 
-            Logger.LogDebug($"{baseLogString} CommitTransaction => Calling CommitTransaction on measurement provider.");
-            var measurementProviderClient = MeasurementProviderClient.CreateClient();
-            await measurementProviderClient.CommitTransaction();
+                Logger.LogDebug($"{baseLogString} CommitTransaction => Calling CommitTransaction on measurement provider.");
+                var measurementProviderClient = MeasurementProviderClient.CreateClient();
+                await measurementProviderClient.CommitTransaction();
 
-            Logger.LogDebug($"{baseLogString} CommitTransaction => Calling CommitTransaction on topology provider.");
-            var topologyProviderClient = TopologyProviderClient.CreateClient();
-            await topologyProviderClient.CommitTransaction();
+                Logger.LogDebug($"{baseLogString} CommitTransaction => Calling CommitTransaction on topology provider.");
+                var topologyProviderClient = TopologyProviderClient.CreateClient();
+                await topologyProviderClient.CommitTransaction();
 
-            transactionFlag = TransactionFlag.NoTransaction;
-            logger.LogDebug("Model provider commited transaction successfully.");
+                transactionFlag = TransactionFlag.NoTransaction;
+                logger.LogDebug("Model provider commited transaction successfully.");
+            }
+            catch (Exception e)
+            {
+                string errorMessage = $"{baseLogString} Commit => Exception: {e.Message}";
+                Logger.LogFatal(errorMessage, e);
+            }
         }
+
         public async Task Rollback()
         {
             string verboseMessage = $"{baseLogString} entering RollbackTransaction method.";
             Logger.LogVerbose(verboseMessage);
 
-            Logger.LogDebug($"{baseLogString} RollbackTransaction => Removing data from cache under NoTransaction flag.");
-            await ElementCache.TryRemoveAsync((short)TransactionFlag.InTransaction);
-            await ElementConnectionCache.TryRemoveAsync((short)TransactionFlag.InTransaction);
-            await EnergySourceCache.TryRemoveAsync((short)TransactionFlag.InTransaction);
-            await RecloserCache.TryRemoveAsync((short)TransactionFlag.InTransaction);
-            Logger.LogDebug($"{baseLogString} RollbackTransaction => All data from cache under NoTransaction flag have been removed.");
+            try
+            {
+                Logger.LogDebug($"{baseLogString} RollbackTransaction => Removing data from cache under NoTransaction flag.");
+                await ElementCache.TryRemoveAsync((short)TransactionFlag.InTransaction);
+                await ElementConnectionCache.TryRemoveAsync((short)TransactionFlag.InTransaction);
+                await EnergySourceCache.TryRemoveAsync((short)TransactionFlag.InTransaction);
+                await RecloserCache.TryRemoveAsync((short)TransactionFlag.InTransaction);
+                Logger.LogDebug($"{baseLogString} RollbackTransaction => All data from cache under NoTransaction flag have been removed.");
 
-            Logger.LogDebug($"{baseLogString} RollbackTransaction => Calling RollbackTransaction on measurement provider.");
-            var measurementProviderClient = MeasurementProviderClient.CreateClient();
-            await measurementProviderClient.RollbackTransaction();
+                Logger.LogDebug($"{baseLogString} RollbackTransaction => Calling RollbackTransaction on measurement provider.");
+                var measurementProviderClient = MeasurementProviderClient.CreateClient();
+                await measurementProviderClient.RollbackTransaction();
 
-            Logger.LogDebug($"{baseLogString} RollbackTransaction => Calling RollbackTransaction on topology provider.");
-            var topologyProviderClient = TopologyProviderClient.CreateClient();
-            await topologyProviderClient.RollbackTransaction();
+                Logger.LogDebug($"{baseLogString} RollbackTransaction => Calling RollbackTransaction on topology provider.");
+                var topologyProviderClient = TopologyProviderClient.CreateClient();
+                await topologyProviderClient.RollbackTransaction();
 
-            transactionFlag = TransactionFlag.NoTransaction;
-            logger.LogDebug("Model provider rolled back successfully.");
+                transactionFlag = TransactionFlag.NoTransaction;
+                logger.LogDebug("Model provider rolled back successfully.");
+            }
+            catch (Exception e)
+            {
+                string errorMessage = $"{baseLogString} Rollback => Exception: {e.Message}";
+                Logger.LogFatal(errorMessage, e);
+            }
         }
 		#endregion
 
@@ -465,7 +552,8 @@ namespace CE.ModelProviderImplementation
 
             return retVal;
         }
-		//public void PrepareTopologyForTransaction()
+		
+        //public void PrepareTopologyForTransaction()
 		//{
 		//    bool success;
 		//    int numberOfTries = 0;
@@ -487,6 +575,5 @@ namespace CE.ModelProviderImplementation
 		//        success = Provider.Instance.MeasurementProvider.PrepareForTransaction();
 		//    } while (!success && numberOfTries < 3);
 		//}
-
     }
 }

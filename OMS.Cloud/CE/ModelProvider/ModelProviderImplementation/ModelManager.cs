@@ -261,26 +261,26 @@ namespace CE.ModelProviderImplementation
 
 			ModelDelta modelDelta = new ModelDelta();
 
-            var clearTasks = new List<Task>
-            {
-                TopologyElements.ClearAsync(),
-                Measurements.ClearAsync(),
-                EnergySources.ClearAsync(),
-                ElementConnections.ClearAsync(),
-                MeasurementToConnectedTerminalMap.ClearAsync(),
-                TerminalToConnectedElementsMap.ClearAsync(),
-                BaseVoltages.ClearAsync(),
-                Reclosers.ClearAsync()
-            };
-
-            Task.WaitAll(clearTasks.ToArray());
-
-			await energySources.SetAsync(ReliableDictionaryNames.EnergySources, new List<long>());
-
-			await reclosers.SetAsync( ReliableDictionaryNames.Reclosers, new HashSet<long>());
-
 			try
 			{
+				var clearTasks = new List<Task>
+				{
+					TopologyElements.ClearAsync(),
+					Measurements.ClearAsync(),
+					EnergySources.ClearAsync(),
+					ElementConnections.ClearAsync(),
+					MeasurementToConnectedTerminalMap.ClearAsync(),
+					TerminalToConnectedElementsMap.ClearAsync(),
+					BaseVoltages.ClearAsync(),
+					Reclosers.ClearAsync()
+				};
+
+				Task.WaitAll(clearTasks.ToArray());
+
+				await energySources.SetAsync(ReliableDictionaryNames.EnergySources, new List<long>());
+
+				await reclosers.SetAsync( ReliableDictionaryNames.Reclosers, new HashSet<long>());
+
 				Logger.LogDebug($"{baseLogString} TryGetAllModelEntities => Getting all network model elements and converting them.");
 
 				await GetBaseVoltagesAsync();
@@ -402,6 +402,7 @@ namespace CE.ModelProviderImplementation
 
 			return modelDelta;
 		}
+		
 		private async Task GetBaseVoltagesAsync()
 		{
 			string verboseMessage = $"{baseLogString} entering GetBaseVoltagesAsync method.";

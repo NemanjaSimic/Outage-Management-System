@@ -21,12 +21,10 @@ namespace OMS.OutageLifecycleImplementation.Algorithm
     public class IsolationAlgorithmCycle
     {
         private readonly string baseLogString;
-        private readonly int isolationAlgorithmCycleInterval;
         private readonly IReliableStateManager stateManager;
-
         private readonly OutageLifecycleHelper lifecycleHelper;
         private readonly OutageMessageMapper outageMessageMapper;
-
+        
         private ICloudLogger logger;
 
         private ICloudLogger Logger
@@ -86,13 +84,26 @@ namespace OMS.OutageLifecycleImplementation.Algorithm
         }
         #endregion Reliable Dictionaries
 
-        public IsolationAlgorithmCycle(IReliableStateManager stateManager, OutageLifecycleHelper lifecycleHelper, int isolationAlgorithmCycleInterval)
+        private readonly int cycleInterval;
+        public int CycleInterval 
+        { 
+            get { return cycleInterval; }
+        }
+
+        private readonly int cycleUpperLimit;
+        public int CycleUpperLimit
+        {
+            get { return cycleUpperLimit; }
+        }
+
+        public IsolationAlgorithmCycle(IReliableStateManager stateManager, OutageLifecycleHelper lifecycleHelper, int cycleInterval, int cycleUpperLimit)
         {
             this.baseLogString = $"{this.GetType()} [{this.GetHashCode()}] =>{Environment.NewLine}";
 
             this.lifecycleHelper = lifecycleHelper;
             this.outageMessageMapper = new OutageMessageMapper();
-            this.isolationAlgorithmCycleInterval = isolationAlgorithmCycleInterval;
+            this.cycleInterval = cycleInterval;
+            this.cycleUpperLimit = cycleUpperLimit;
 
             this.isStartedIsolationAlgorithmsInitialized = false;
             this.isMonitoredHeadBreakerMeasurementsInitialized = false;
@@ -125,7 +136,8 @@ namespace OMS.OutageLifecycleImplementation.Algorithm
 
         private async Task StartIndividualAlgorithmCycle(IsolationAlgorithm algorithm, OutageTopologyModel topology)
         {
-            if (algorithm.CycleCounter * isolationAlgorithmCycleInterval > 10000)
+            //END CONDITION - poslednji otvoren brejker se nije otvorio vise od 'cycleUpperLimit' milisekundi => on predstavlja prvu optimalnu izolacionu tacku
+            if (algorithm.CycleCounter * CycleInterval > CycleUpperLimit)
             {
                 await FinishIndividualAlgorithmCycle(algorithm, topology);
                 return;

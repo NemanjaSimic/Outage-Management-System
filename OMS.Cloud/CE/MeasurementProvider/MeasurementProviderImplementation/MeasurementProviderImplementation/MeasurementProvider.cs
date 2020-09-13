@@ -22,18 +22,19 @@ namespace CE.MeasurementProviderImplementation
 	public class MeasurementProvider : IMeasurementProviderContract
 	{
 		#region Fields
-		private ReliableDictionaryAccess<short, Dictionary<long, AnalogMeasurement>> analogMeasurementsCache;
-		public ReliableDictionaryAccess<short, Dictionary<long, AnalogMeasurement>> AnalogMeasurementsCache { get => analogMeasurementsCache; }
+		private readonly HashSet<CommandOriginType> ignorableOriginTypes;
 
-		private ReliableDictionaryAccess<short, Dictionary<long, DiscreteMeasurement>> discreteMeasurementsCache;
-		public ReliableDictionaryAccess<short, Dictionary<long, DiscreteMeasurement>> DiscreteMeasurementsCache { get => discreteMeasurementsCache; }
+		private readonly string baseLogString;
+		private readonly IReliableStateManager stateManager;
+		#endregion
 
-		private ReliableDictionaryAccess<short, Dictionary<long, List<long>>> elementToMeasurementMapCache;
-		public ReliableDictionaryAccess<short, Dictionary<long, List<long>>> ElementToMeasurementMapCache { get => elementToMeasurementMapCache; }
+		private ICloudLogger logger;
+		private ICloudLogger Logger
+		{
+			get { return logger ?? (logger = CloudLoggerFactory.GetLogger()); }
+		}
 
-		private ReliableDictionaryAccess<short, Dictionary<long, long>> measurementToElementMapCache;
-		public ReliableDictionaryAccess<short, Dictionary<long, long>> MeasurementToElementMapCache { get => measurementToElementMapCache; }
-
+		#region ReliableDictionaries
 		private bool isAnalogMeasurementInitialized = false;
 		private bool isDiscreteMeasurementInitialized = false;
 		private bool isElementToMeasurementInitialized = false;
@@ -47,39 +48,20 @@ namespace CE.MeasurementProviderImplementation
 				&& isDiscreteMeasurementInitialized
 				&& isElementToMeasurementInitialized
 				&& isMeasurementToElementInitialized;
-	}
-		}
-		private readonly HashSet<CommandOriginType> ignorableOriginTypes;
-
-		private readonly string baseLogString;
-		private readonly IReliableStateManager stateManager;
-
-		private ICloudLogger logger;
-		private ICloudLogger Logger
-		{
-			get { return logger ?? (logger = CloudLoggerFactory.GetLogger()); }
+			}
 		}
 
-		#endregion
+		private ReliableDictionaryAccess<short, Dictionary<long, AnalogMeasurement>> analogMeasurementsCache;
+		private ReliableDictionaryAccess<short, Dictionary<long, AnalogMeasurement>> AnalogMeasurementsCache { get => analogMeasurementsCache; }
 
-		public MeasurementProvider(IReliableStateManager stateManager)
-		{
-			this.baseLogString = $"{this.GetType()} [{this.GetHashCode()}] =>{Environment.NewLine}";
-			string verboseMessage = $"{baseLogString} entering Ctor.";
-			Logger.LogVerbose(verboseMessage);
+		private ReliableDictionaryAccess<short, Dictionary<long, DiscreteMeasurement>> discreteMeasurementsCache;
+		private ReliableDictionaryAccess<short, Dictionary<long, DiscreteMeasurement>> DiscreteMeasurementsCache { get => discreteMeasurementsCache; }
 
-			this.stateManager = stateManager;
-			stateManager.StateManagerChanged += this.OnStateManagerChangedHandler;
+		private ReliableDictionaryAccess<short, Dictionary<long, List<long>>> elementToMeasurementMapCache;
+		private ReliableDictionaryAccess<short, Dictionary<long, List<long>>> ElementToMeasurementMapCache { get => elementToMeasurementMapCache; }
 
-			ignorableOriginTypes = new HashSet<CommandOriginType>() 
-			{ 
-				/*CommandOriginType.USER_COMMAND,*/ 
-				CommandOriginType.ISOLATING_ALGORITHM_COMMAND 
-			};
-
-			string debugMessage = $"{baseLogString} Ctor => Clients initialized.";
-			Logger.LogDebug(debugMessage);
-		}
+		private ReliableDictionaryAccess<short, Dictionary<long, long>> measurementToElementMapCache;
+		private ReliableDictionaryAccess<short, Dictionary<long, long>> MeasurementToElementMapCache { get => measurementToElementMapCache; }
 
 		private async void OnStateManagerChangedHandler(object sender, NotifyStateManagerChangedEventArgs e)
 		{
@@ -123,10 +105,28 @@ namespace CE.MeasurementProviderImplementation
 
 			}
 		}
-		public Task<bool> IsAlive()
+		#endregion ReliableDictionaries
+
+		public MeasurementProvider(IReliableStateManager stateManager)
 		{
-			return Task.Run(() => { return true; });
+			this.baseLogString = $"{this.GetType()} [{this.GetHashCode()}] =>{Environment.NewLine}";
+			string verboseMessage = $"{baseLogString} entering Ctor.";
+			Logger.LogVerbose(verboseMessage);
+
+			this.stateManager = stateManager;
+			stateManager.StateManagerChanged += this.OnStateManagerChangedHandler;
+
+			ignorableOriginTypes = new HashSet<CommandOriginType>() 
+			{ 
+				/*CommandOriginType.USER_COMMAND,*/ 
+				CommandOriginType.ISOLATING_ALGORITHM_COMMAND 
+			};
+
+			string debugMessage = $"{baseLogString} Ctor => Clients initialized.";
+			Logger.LogDebug(debugMessage);
 		}
+
+		#region IMeasurementMapContract
 		public async Task AddAnalogMeasurement(AnalogMeasurement analogMeasurement)
 		{
 			string verboseMessage = $"{baseLogString} entering AddAnalogMeasurement method.";
@@ -137,29 +137,38 @@ namespace CE.MeasurementProviderImplementation
 				await Task.Delay(1000);
 			}
 
-			if (analogMeasurement == null)
-			{
-				string message = $"{baseLogString} AddAnalogMeasurement => analog measurement parameter is null.";
-				Logger.LogError(message);
-				//throw new Exception(message);
-				return;
-			}
+			try
+            {
+				if (analogMeasurement == null)
+				{
+					string message = $"{baseLogString} AddAnalogMeasurement => analog measurement parameter is null.";
+					Logger.LogError(message);
+					//throw new Exception(message);
+					return;
+				}
 
-			var analogMeasurements = await GetAnalogMeasurementsFromCache();
+				var analogMeasurements = await GetAnalogMeasurementsFromCache();
 
-			if (!analogMeasurements.ContainsKey(analogMeasurement.Id))
-			{
-				analogMeasurements.Add(analogMeasurement.Id, analogMeasurement);
-			}
-			else
-			{
-				Logger.LogDebug($"{baseLogString} AddDiscreteMeasurement => Updating analog measurement with GID {analogMeasurement.Id:X16}.");
-				analogMeasurements.Remove(analogMeasurement.Id);
-				analogMeasurements.Add(analogMeasurement.Id, analogMeasurement);
-			}
+				if (!analogMeasurements.ContainsKey(analogMeasurement.Id))
+				{
+					analogMeasurements.Add(analogMeasurement.Id, analogMeasurement);
+				}
+				else
+				{
+					Logger.LogDebug($"{baseLogString} AddDiscreteMeasurement => Updating analog measurement with GID {analogMeasurement.Id:X16}.");
+					analogMeasurements.Remove(analogMeasurement.Id);
+					analogMeasurements.Add(analogMeasurement.Id, analogMeasurement);
+				}
 
-			await AnalogMeasurementsCache.SetAsync((short)MeasurementPorviderCacheType.Origin, analogMeasurements);
+				await AnalogMeasurementsCache.SetAsync((short)MeasurementPorviderCacheType.Origin, analogMeasurements);
+			}
+            catch (Exception e)
+            {
+				string errorMessage = $"{baseLogString} AddAnalogMeasurement => Exception: {e.Message}";
+				Logger.LogError(errorMessage, e);
+            }
 		}
+
 		public async Task AddDiscreteMeasurement(DiscreteMeasurement discreteMeasurement)
 		{
 			string verboseMessage = $"{baseLogString} entering AddDiscreteMeasurement method.";
@@ -170,96 +179,38 @@ namespace CE.MeasurementProviderImplementation
 				await Task.Delay(1000);
 			}
 
-			if (discreteMeasurement == null)
-			{
-				string message = $"{baseLogString} AddDiscreteMeasurement => discrete measurement parameter is null.";
-				Logger.LogError(message);
-				//throw new Exception(message);
-				return;
-			}
+            try
+            {
+				if (discreteMeasurement == null)
+				{
+					string message = $"{baseLogString} AddDiscreteMeasurement => discrete measurement parameter is null.";
+					Logger.LogError(message);
+					//throw new Exception(message);
+					return;
+				}
 
-			var discreteMeasurements = await GetDiscreteMeasurementsFromCache();
+				var discreteMeasurements = await GetDiscreteMeasurementsFromCache();
 
-			if (!discreteMeasurements.ContainsKey(discreteMeasurement.Id))
-			{
-				discreteMeasurements.Add(discreteMeasurement.Id, discreteMeasurement);
-			}
-			else
-			{
-				Logger.LogDebug($"{baseLogString} AddDiscreteMeasurement => Updating discrete measurement with GID {discreteMeasurement.Id:X16}.");
-				discreteMeasurements.Remove(discreteMeasurement.Id);
-				discreteMeasurements.Add(discreteMeasurement.Id, discreteMeasurement);
-			}
+				if (!discreteMeasurements.ContainsKey(discreteMeasurement.Id))
+				{
+					discreteMeasurements.Add(discreteMeasurement.Id, discreteMeasurement);
+				}
+				else
+				{
+					Logger.LogDebug($"{baseLogString} AddDiscreteMeasurement => Updating discrete measurement with GID {discreteMeasurement.Id:X16}.");
+					discreteMeasurements.Remove(discreteMeasurement.Id);
+					discreteMeasurements.Add(discreteMeasurement.Id, discreteMeasurement);
+				}
 
-			await DiscreteMeasurementsCache.SetAsync((short)MeasurementPorviderCacheType.Origin, discreteMeasurements);
+				await DiscreteMeasurementsCache.SetAsync((short)MeasurementPorviderCacheType.Origin, discreteMeasurements);
+			}
+            catch (Exception e)
+            {
+				string errorMessage = $"{baseLogString} AddDiscreteMeasurement => Exception: {e.Message}";
+				Logger.LogError(errorMessage, e);
+			}
 		}
-		public async Task<float> GetAnalogValue(long measurementGid)
-		{
-			string verboseMessage = $"{baseLogString} entering GetAnalogValue method for measurement GID {measurementGid:X16}.";
-			Logger.LogVerbose(verboseMessage);
 
-			while (!AreDictionariesInitialized)
-			{
-				await Task.Delay(1000);
-			}
-
-			var analogMeasurements = await GetAnalogMeasurementsFromCache();
-
-			float value = -1;
-			if (analogMeasurements.ContainsKey(measurementGid))
-			{
-				value = analogMeasurements[measurementGid].CurrentValue;
-			}
-			else
-			{ 
-				Logger.LogWarning($"{baseLogString} GetAnalogValue => analog measurement with GID {measurementGid:X16} does not exist in collection.");
-			}
-
-			return value;
-		}
-		public async Task<bool> GetDiscreteValue(long measurementGid)
-		{
-			string verboseMessage = $"{baseLogString} entering GetDiscreteValue method for measurement GID {measurementGid:X16}.";
-			Logger.LogVerbose(verboseMessage);
-
-			while (!AreDictionariesInitialized)
-			{
-				await Task.Delay(1000);
-			}
-
-			var discreteMeasurements = await GetDiscreteMeasurementsFromCache();
-
-			bool isOpen = false;
-			if (discreteMeasurements.ContainsKey(measurementGid))
-			{
-				isOpen = discreteMeasurements[measurementGid].CurrentOpen;
-			}
-			return isOpen;
-		}
-		private async Task UpdateAnalogMeasurement(long measurementGid, float value, CommandOriginType commandOrigin, AlarmType alarmType)
-		{
-			string verboseMessage = $"{baseLogString} entering UpdateAnalogMeasurement method for measurement GID {measurementGid:X16}.";
-			Logger.LogVerbose(verboseMessage);
-
-			while (!AreDictionariesInitialized)
-			{
-				await Task.Delay(1000);
-			}
-
-			var analogMeasurements = await GetAnalogMeasurementsFromCache();
-
-			if (analogMeasurements.TryGetValue(measurementGid, out AnalogMeasurement measurement))
-			{
-				measurement.CurrentValue = value;
-				measurement.Alarm = alarmType;
-			}
-			else
-			{
-				Logger.LogWarning($"{baseLogString} UpdateAnalogMeasurement => Failed to update analog measurement with GID {measurementGid:X16}. There is no such a measurement.");
-			}
-
-			await AnalogMeasurementsCache.SetAsync((short)MeasurementPorviderCacheType.Origin, analogMeasurements);
-		}
 		public async Task UpdateAnalogMeasurement(Dictionary<long, AnalogModbusData> data)
 		{
 			string verboseMessage = $"{baseLogString} entering UpdateAnalogMeasurement method with dictionary parameter.";
@@ -270,72 +221,23 @@ namespace CE.MeasurementProviderImplementation
 				await Task.Delay(1000);
 			}
 
-			foreach (long gid in data.Keys)
-			{
-				AnalogModbusData measurementData = data[gid];
+            try
+            {
+				foreach (long gid in data.Keys)
+				{
+					AnalogModbusData measurementData = data[gid];
 
-				await UpdateAnalogMeasurement(gid, (float)measurementData.Value, measurementData.CommandOrigin, measurementData.Alarm);
+					await UpdateAnalogMeasurement(gid, (float)measurementData.Value, measurementData.CommandOrigin, measurementData.Alarm);
+				}
+				//DiscreteMeasurementDelegate?.Invoke(); //MODO: bilo je zakomentarisano?
 			}
-			//DiscreteMeasurementDelegate?.Invoke();
+			catch (Exception e)
+			{
+				string errorMessage = $"{baseLogString} UpdateAnalogMeasurement => Exception: {e.Message}";
+				Logger.LogError(errorMessage, e);
+			}
 		}
-		private async Task<bool> UpdateDiscreteMeasurement(long measurementGid, int value, CommandOriginType commandOrigin)
-		{
-			string verboseMessage = $"{baseLogString} entering UpdateDiscreteMeasurement method for measurement GID {measurementGid:X16}.";
-			Logger.LogVerbose(verboseMessage);
-
-			while (!AreDictionariesInitialized)
-			{
-				await Task.Delay(1000);
-			}
-
-			bool success = true;
-			var discreteMeasurements = await GetDiscreteMeasurementsFromCache();
-
-			if (discreteMeasurements.TryGetValue(measurementGid, out DiscreteMeasurement measurement))
-			{
-				if (value == (ushort)DiscreteCommandingType.CLOSE)
-				{
-					measurement.CurrentOpen = false;
-				}
-				else
-				{
-					measurement.CurrentOpen = true;
-				}
-
-				if (measurement.CurrentOpen)
-				{
-					var potentialOutageReportingClient = PotentialOutageReportingClient.CreateClient();
-					await potentialOutageReportingClient.ReportPotentialOutage(measurement.ElementId, commandOrigin);
-				}
-				else
-				{
-					var historyDBManagerClient = HistoryDBManagerClient.CreateClient();
-					await historyDBManagerClient.OnSwitchClosed(measurement.ElementId);
-				}
-			}
-			else
-			{
-				Logger.LogWarning($"{baseLogString} Failed to update discrete measurement with GID {measurementGid:X16}. There is no such a measurement.");
-				success = false;
-			}
-
-			var measurementToElementMap = await GetMeasurementToElementMapFromCache();
-
-			var modelProviderClient = ModelProviderClient.CreateClient();
-
-			if (measurementToElementMap.TryGetValue(measurementGid, out long recloserGid) 
-				&& await modelProviderClient.IsRecloser(recloserGid)
-				&& commandOrigin != CommandOriginType.CE_COMMAND
-				&& commandOrigin != CommandOriginType.OUTAGE_SIMULATOR)
-			{
-				Logger.LogDebug($"{baseLogString} UpdateDiscreteMeasurement => Calling ResetRecloser on topology provider.");
-				var topologyProviderClient = TopologyProviderClient.CreateClient();
-				await topologyProviderClient.ResetRecloser(recloserGid);
-				Logger.LogDebug($"{baseLogString} UpdateDiscreteMeasurement => ResetRecloser from topology provider returned success.");
-
-			}
-			return success;
-		}
+		
 		public async Task UpdateDiscreteMeasurement(Dictionary<long, DiscreteModbusData> data)
 		{
 			string verboseMessage = $"{baseLogString} entering UpdateDiscreteMeasurement method with dictionary parameter.";
@@ -346,66 +248,30 @@ namespace CE.MeasurementProviderImplementation
 				await Task.Delay(1000);
 			}
 
-			List<long> signalGids = new List<long>();
-			foreach (long gid in data.Keys)
-			{
-				DiscreteModbusData measurementData = data[gid];
-
-				if (await UpdateDiscreteMeasurement(measurementData.MeasurementGid, measurementData.Value, measurementData.CommandOrigin))
+            try
+            {
+				List<long> signalGids = new List<long>();
+				foreach (long gid in data.Keys)
 				{
-					signalGids.Add(gid);
+					DiscreteModbusData measurementData = data[gid];
+
+					if (await UpdateDiscreteMeasurement(measurementData.MeasurementGid, measurementData.Value, measurementData.CommandOrigin))
+					{
+						signalGids.Add(gid);
+					}
 				}
-			}
 
-			Logger.LogDebug($"{baseLogString} UpdateDiscreteMeasurement => Invoking Discrete Measurement Delegate in topology provider service.");
-			var topologyProviderClient = TopologyProviderClient.CreateClient();
-			topologyProviderClient.DiscreteMeasurementDelegate();
+				Logger.LogDebug($"{baseLogString} UpdateDiscreteMeasurement => Invoking Discrete Measurement Delegate in topology provider service.");
+				var topologyProviderClient = TopologyProviderClient.CreateClient();
+				topologyProviderClient.DiscreteMeasurementDelegate();
+			}
+			catch (Exception e)
+			{
+				string errorMessage = $"{baseLogString} UpdateDiscreteMeasurement => Exception: {e.Message}";
+				Logger.LogError(errorMessage, e);
+			}
 		}
-		public async Task<long> GetElementGidForMeasurement(long measurementGid)
-		{
-			string verboseMessage = $"{baseLogString} entering GetElementGidForMeasurement method for measurement GID {measurementGid:X16}.";
-			Logger.LogVerbose(verboseMessage);
 
-			while (!AreDictionariesInitialized)
-			{
-				await Task.Delay(1000);
-			}
-
-			long signalGid = 0;
-			var discreteMeasurements = await GetDiscreteMeasurementsFromCache();
-
-			if (discreteMeasurements.TryGetValue(measurementGid, out DiscreteMeasurement measurement))
-			{
-				signalGid = measurement.ElementId;
-			}
-			return signalGid;
-		}
-        public async Task<DiscreteMeasurement> GetDiscreteMeasurement(long measurementGid)
-		{
-			string verboseMessage = $"{baseLogString} entering GetDiscreteMeasurement method for measurement GID {measurementGid:X16}.";
-			Logger.LogVerbose(verboseMessage);
-
-			while (!AreDictionariesInitialized)
-			{
-				await Task.Delay(1000);
-			}
-
-			DiscreteMeasurement measurement;
-			bool success = false;
-			var discreteMeasurements = await GetDiscreteMeasurementsFromCache();
-
-			if (discreteMeasurements.TryGetValue(measurementGid, out measurement))
-			{
-				success = true;
-			}
-			else
-			{
-				measurement = null;
-			}
-
-			Logger.LogDebug($"{baseLogString} GetDiscreteMeasurement => method returned success: {success} for measurement GID {measurementGid:X16}.");
-			return measurement;
-		}
 		public async Task<AnalogMeasurement> GetAnalogMeasurement(long measurementGid)
 		{
 			string verboseMessage = $"{baseLogString} entering GetAnalogMeasurement method for measurement GID {measurementGid:X16}.";
@@ -417,21 +283,136 @@ namespace CE.MeasurementProviderImplementation
 			}
 
 			AnalogMeasurement measurement;
-			bool success = false;
-			var analogMeasurements = await GetAnalogMeasurementsFromCache();
 
-			if (analogMeasurements.TryGetValue(measurementGid, out measurement))
-			{
-				success = true;
+			try
+            {
+				bool success = false;
+				var analogMeasurements = await GetAnalogMeasurementsFromCache();
+
+				if (analogMeasurements.TryGetValue(measurementGid, out measurement))
+				{
+					success = true;
+				}
+				else
+				{
+					measurement = null;
+				}
+
+				Logger.LogDebug($"{baseLogString} GetAnalogMeasurement => method returned success: {success} for measurement GID {measurementGid:X16}.");
 			}
-			else
-			{
+            catch (Exception e)
+            {
+				string errorMessage = $"{baseLogString} GetAnalogMeasurement => Exception: {e.Message}";
+				Logger.LogError(errorMessage, e);
 				measurement = null;
 			}
 
-			Logger.LogDebug($"{baseLogString} GetAnalogMeasurement => method returned success: {success} for measurement GID {measurementGid:X16}.");
 			return measurement;
 		}
+
+		public async Task<DiscreteMeasurement> GetDiscreteMeasurement(long measurementGid)
+		{
+			string verboseMessage = $"{baseLogString} entering GetDiscreteMeasurement method for measurement GID {measurementGid:X16}.";
+			Logger.LogVerbose(verboseMessage);
+
+			while (!AreDictionariesInitialized)
+			{
+				await Task.Delay(1000);
+			}
+
+			DiscreteMeasurement measurement;
+
+            try
+            {
+				bool success = false;
+				var discreteMeasurements = await GetDiscreteMeasurementsFromCache();
+
+				if (discreteMeasurements.TryGetValue(measurementGid, out measurement))
+				{
+					success = true;
+				}
+				else
+				{
+					measurement = null;
+				}
+
+				Logger.LogDebug($"{baseLogString} GetDiscreteMeasurement => method returned success: {success} for measurement GID {measurementGid:X16}.");
+			}
+			catch (Exception e)
+			{
+				string errorMessage = $"{baseLogString} GetDiscreteMeasurement => Exception: {e.Message}";
+				Logger.LogError(errorMessage, e);
+				measurement = null;
+			}
+
+			return measurement;
+		}
+
+		public async Task<float> GetAnalogValue(long measurementGid)
+		{
+			string verboseMessage = $"{baseLogString} entering GetAnalogValue method for measurement GID {measurementGid:X16}.";
+			Logger.LogVerbose(verboseMessage);
+
+			while (!AreDictionariesInitialized)
+			{
+				await Task.Delay(1000);
+			}
+
+			float value = -1;
+            
+			try
+            {
+				var analogMeasurements = await GetAnalogMeasurementsFromCache();
+
+				if (analogMeasurements.ContainsKey(measurementGid))
+				{
+					value = analogMeasurements[measurementGid].CurrentValue;
+				}
+				else
+				{
+					Logger.LogWarning($"{baseLogString} GetAnalogValue => analog measurement with GID {measurementGid:X16} does not exist in collection.");
+				}
+			}
+			catch (Exception e)
+			{
+				string errorMessage = $"{baseLogString} GetAnalogValue => Exception: {e.Message}";
+				Logger.LogError(errorMessage, e);
+			}
+
+			return value;
+		}
+
+		public async Task<bool> GetDiscreteValue(long measurementGid)
+		{
+			string verboseMessage = $"{baseLogString} entering GetDiscreteValue method for measurement GID {measurementGid:X16}.";
+			Logger.LogVerbose(verboseMessage);
+
+			while (!AreDictionariesInitialized)
+			{
+				await Task.Delay(1000);
+			}
+
+			bool isOpen = false; //MODO: mozda vracati Contional value kako bi postaojala i indikacija da li je metoda uspesno izvrsena i vrednost 'isOpen'
+
+			try
+            {
+				var discreteMeasurements = await GetDiscreteMeasurementsFromCache();
+
+				if (discreteMeasurements.ContainsKey(measurementGid))
+				{
+					isOpen = discreteMeasurements[measurementGid].CurrentOpen;
+				}
+			}
+			catch (Exception e)
+			{
+				string errorMessage = $"{baseLogString} GetDiscreteValue => Exception: {e.Message}";
+				Logger.LogError(errorMessage, e);
+			}
+
+			return isOpen;
+		}
+
+		#region Measurement-Element Mapping
 		public async Task AddMeasurementElementPair(long measurementId, long elementId)
 		{
 			string verboseMessage = $"{baseLogString} entering AddMeasurementElementPair method for measurement GID {measurementId:X16}.";
@@ -442,78 +423,217 @@ namespace CE.MeasurementProviderImplementation
 				await Task.Delay(1000);
 			}
 
-			var measurementToElementMap = await GetMeasurementToElementMapFromCache();
+            try
+            {
+				var measurementToElementMap = await GetMeasurementToElementMapFromCache();
 
-			if (measurementToElementMap.ContainsKey(measurementId))
-			{
-				//string message = $"Measurement with GID {measurementId:X16} already exists in measurement-element mapping.";
-				//Logger.LogWarning(message);
-				//throw new ArgumentException(message);
-				return;
+				if (measurementToElementMap.ContainsKey(measurementId))
+				{
+					//string message = $"Measurement with GID {measurementId:X16} already exists in measurement-element mapping.";
+					//Logger.LogWarning(message);
+					//throw new ArgumentException(message);
+					return;
+				}
+
+				measurementToElementMap.Add(measurementId, elementId);
+
+				var elementToMeasurementMap = await GetElementToMeasurementMapFromCache();
+
+				if (elementToMeasurementMap.TryGetValue(elementId, out List<long> measurements))
+				{
+					measurements.Add(measurementId);
+				}
+				else
+				{
+					elementToMeasurementMap.Add(elementId, new List<long>() { measurementId });
+				}
+
+				await MeasurementToElementMapCache.SetAsync((short)MeasurementPorviderCacheType.Origin, measurementToElementMap);
+				await ElementToMeasurementMapCache.SetAsync((short)MeasurementPorviderCacheType.Origin, elementToMeasurementMap);
+
+				Logger.LogDebug($"{baseLogString} AddMeasurementElementPair => method finished for measurement GID {measurementId} and element GID {elementId}.");
 			}
-
-			measurementToElementMap.Add(measurementId, elementId);
-
-			var elementToMeasurementMap = await GetElementToMeasurementMapFromCache();
-
-			if (elementToMeasurementMap.TryGetValue(elementId, out List<long> measurements))
+			catch (Exception e)
 			{
-				measurements.Add(measurementId);
+				string errorMessage = $"{baseLogString} AddMeasurementElementPair => Exception: {e.Message}";
+				Logger.LogError(errorMessage, e);
 			}
-			else
-			{
-				elementToMeasurementMap.Add(elementId, new List<long>() { measurementId });
-			}
-
-			await MeasurementToElementMapCache.SetAsync((short)MeasurementPorviderCacheType.Origin, measurementToElementMap);
-			await ElementToMeasurementMapCache.SetAsync((short)MeasurementPorviderCacheType.Origin, elementToMeasurementMap);
-
-			Logger.LogDebug($"{baseLogString} AddMeasurementElementPair => method finished for measurement GID {measurementId} and element GID {elementId}.");
 		}
 
-		#region IMeasurementMapContract
-		public async Task<List<long>> GetMeasurementsOfElement(long elementGid)
-		{
-			string verboseMessage = $"{baseLogString} entering GetMeasurementsOfElement method for element GID {elementGid:X16}.";
-			Logger.LogVerbose(verboseMessage);
-
-			var elementToMeasurementMap = await GetElementToMeasurementMapFromCache();
-
-			if (elementToMeasurementMap.TryGetValue(elementGid, out var measurements))
-			{
-				Logger.LogDebug($"{baseLogString} GetMeasurementsOfElement => method finished for element GID {elementGid}.");
-				return measurements;
-			}
-			else
-			{
-				Logger.LogDebug($"{baseLogString} GetMeasurementsOfElement => method finished for element GID {elementGid} and returned no measurements.");
-				return new List<long>();
-			}
-
-		}
 		public async Task<Dictionary<long, List<long>>> GetElementToMeasurementMap()
 		{
 			string verboseMessage = $"{baseLogString} entering GetElementToMeasurementMap method.";
 			Logger.LogVerbose(verboseMessage);
 
-			return await GetElementToMeasurementMapFromCache();
+			Dictionary<long, List<long>> result;
+
+			try
+            {
+				result = await GetElementToMeasurementMapFromCache();
+			}
+			catch (Exception e)
+			{
+				string errorMessage = $"{baseLogString} GetElementToMeasurementMap => Exception: {e.Message}";
+				Logger.LogError(errorMessage, e);
+
+				result = new Dictionary<long, List<long>>();
+			}
+
+			return result;
 		}
+
+		public async Task<long> GetElementGidForMeasurement(long measurementGid)
+		{
+			string verboseMessage = $"{baseLogString} entering GetElementGidForMeasurement method for measurement GID {measurementGid:X16}.";
+			Logger.LogVerbose(verboseMessage);
+
+			while (!AreDictionariesInitialized)
+			{
+				await Task.Delay(1000);
+			}
+
+			long signalGid = 0;
+
+            try
+            {
+				var discreteMeasurements = await GetDiscreteMeasurementsFromCache();
+
+				if (discreteMeasurements.TryGetValue(measurementGid, out DiscreteMeasurement measurement))
+				{
+					signalGid = measurement.ElementId;
+				}
+			}
+            catch (Exception e)
+            {
+				string errorMessage = $"{baseLogString} GetElementGidForMeasurement => Exception: {e.Message}";
+				Logger.LogError(errorMessage, e);
+			}
+
+			return signalGid;
+		}
+
 		public async Task<Dictionary<long, long>> GetMeasurementToElementMap()
 		{
 			string verboseMessage = $"{baseLogString} entering GetMeasurementToElementMap method.";
 			Logger.LogVerbose(verboseMessage);
-			
-			return await GetMeasurementToElementMapFromCache();
-		}
-        #endregion
 
-        #region Transaction Manager
+			Dictionary<long, long> result;
+
+			try
+			{
+				result = await GetMeasurementToElementMapFromCache();
+			}
+			catch (Exception e)
+			{
+				string errorMessage = $"{baseLogString} GetMeasurementToElementMap => Exception: {e.Message}";
+				Logger.LogError(errorMessage, e);
+
+				result = new Dictionary<long, long>();
+			}
+
+			return result;
+		}
+
+		public async Task<List<long>> GetMeasurementsOfElement(long elementGid)
+		{
+			string verboseMessage = $"{baseLogString} entering GetMeasurementsOfElement method for element GID {elementGid:X16}.";
+			Logger.LogVerbose(verboseMessage);
+
+			List<long> measurements;
+
+            try
+            {
+				var elementToMeasurementMap = await GetElementToMeasurementMapFromCache();
+
+				if (elementToMeasurementMap.TryGetValue(elementGid, out measurements))
+				{
+					Logger.LogDebug($"{baseLogString} GetMeasurementsOfElement => method finished for element GID {elementGid}.");
+				}
+				else
+				{
+					Logger.LogDebug($"{baseLogString} GetMeasurementsOfElement => method finished for element GID {elementGid} and returned no measurements.");
+					measurements = new List<long>();
+				}
+			}
+			catch (Exception e)
+			{
+				string errorMessage = $"{baseLogString} GetMeasurementsOfElement => Exception: {e.Message}";
+				Logger.LogError(errorMessage, e);
+
+				measurements = new List<long>();
+			}
+
+			return measurements;
+		}
+		#endregion
+
+		#region Commanding
+		public async Task SendAnalogCommand(long measurementGid, float commandingValue, CommandOriginType commandOrigin)
+		{
+			string verboseMessage = $"{baseLogString} entering SendAnalogCommand method. Measurement GID {measurementGid:X16}; Commanding value {commandingValue}; Command Origin {commandOrigin}";
+			Logger.LogVerbose(verboseMessage);
+
+			try
+			{
+				Logger.LogDebug($"{baseLogString} SendAnalogCommand => Calling Send single analog command from scada commanding client.");
+				var scadaCommandingClient = ScadaCommandingClient.CreateClient();
+				await scadaCommandingClient.SendSingleAnalogCommand(measurementGid, commandingValue, commandOrigin);
+				Logger.LogDebug($"{baseLogString} SendAnalogCommand => Send single analog command from scada commanding client successfully called.");
+			}
+			catch (Exception e)
+			{
+				string message = $"{baseLogString} SendAnalogCommand => Failed. Exception message: {e.Message}.";
+				Logger.LogError(message, e);
+			}
+		}
+
+		public async Task SendDiscreteCommand(long measurementGid, int value, CommandOriginType commandOrigin)
+		{
+			string verboseMessage = $"{baseLogString} entering SendDiscreteCommand method. Measurement GID {measurementGid:X16}; Commanding value {value}; Command Origin {commandOrigin}";
+			Logger.LogVerbose(verboseMessage);
+
+			try
+			{
+				DiscreteMeasurement measurement = await GetDiscreteMeasurement(measurementGid);
+
+				if (measurement != null && !(measurement is ArtificalDiscreteMeasurement))
+				{
+					Logger.LogDebug($"{baseLogString} SendDiscreteCommand => Calling Send single discrete command from scada commanding client.");
+					var scadaCommandingClient = ScadaCommandingClient.CreateClient();
+					await scadaCommandingClient.SendSingleDiscreteCommand(measurementGid, (ushort)value, commandOrigin);
+					Logger.LogDebug($"{baseLogString} SendDiscreteCommand => Send single discrete command from scada commanding client successfully called.");
+				}
+				else
+				{
+					Dictionary<long, DiscreteModbusData> data = new Dictionary<long, DiscreteModbusData>(1)
+					{
+						{ measurementGid, new DiscreteModbusData((ushort)value, AlarmType.NO_ALARM, measurementGid, commandOrigin) }
+					};
+					await UpdateDiscreteMeasurement(data);
+				}
+			}
+			catch (Exception e)
+			{
+				string message = $"{baseLogString} SendDiscreteCommand => Failed. Exception message: {e.Message}.";
+				Logger.LogError(message, e);
+			}
+		}
+		#endregion Commanding
+
+		public Task<bool> IsAlive()
+		{
+			return Task.Run(() => { return true; });
+		}
+		#endregion IMeasurementMapContract
+
+		#region Transaction Manager
 		public async Task<bool> PrepareForTransaction()
 		{
 			string verboseMessage = $"{baseLogString} entering PrepareForTransaction method.";
 			Logger.LogVerbose(verboseMessage);
 
 			bool success = true;
+
 			try
 			{
 				Logger.LogDebug($"{baseLogString} PrepareForTransaction => Measurement provider preparing for transaction.");
@@ -552,12 +672,20 @@ namespace CE.MeasurementProviderImplementation
 			string verboseMessage = $"{baseLogString} entering CommitTransaction method.";
 			Logger.LogVerbose(verboseMessage);
 
-			await AnalogMeasurementsCache.TryRemoveAsync((short)MeasurementPorviderCacheType.Copy);
-			await DiscreteMeasurementsCache.TryRemoveAsync((short)MeasurementPorviderCacheType.Copy);
-			await ElementToMeasurementMapCache.TryRemoveAsync((short)MeasurementPorviderCacheType.Copy);
-			await MeasurementToElementMapCache.TryRemoveAsync((short)MeasurementPorviderCacheType.Copy);
+            try
+            {
+				await AnalogMeasurementsCache.TryRemoveAsync((short)MeasurementPorviderCacheType.Copy);
+				await DiscreteMeasurementsCache.TryRemoveAsync((short)MeasurementPorviderCacheType.Copy);
+				await ElementToMeasurementMapCache.TryRemoveAsync((short)MeasurementPorviderCacheType.Copy);
+				await MeasurementToElementMapCache.TryRemoveAsync((short)MeasurementPorviderCacheType.Copy);
 
-			logger.LogDebug("Measurement provider commited transaction successfully.");
+				logger.LogDebug("Measurement provider commited transaction successfully.");
+			}
+			catch (Exception e)
+			{
+				string message = $"{baseLogString} CommitTransaction => Failed. Exception message: {e.Message}.";
+				Logger.LogError(message, e);
+			}
 		}
 
 		public async Task RollbackTransaction()
@@ -565,19 +693,122 @@ namespace CE.MeasurementProviderImplementation
 			string verboseMessage = $"{baseLogString} entering RollbackTransaction method.";
 			Logger.LogVerbose(verboseMessage);
 
-			var tempAnalogMeasurements = await GetAnalogMeasurementsFromCache(MeasurementPorviderCacheType.Copy);
-			var tempDiscreteMeasurements = await GetDiscreteMeasurementsFromCache(MeasurementPorviderCacheType.Copy);
-			var tempElementToMeasurementMap = await GetElementToMeasurementMapFromCache(MeasurementPorviderCacheType.Copy);
-			var tempMeasurementToElementMap = await GetMeasurementToElementMapFromCache(MeasurementPorviderCacheType.Copy);
+            try
+            {
+				var tempAnalogMeasurements = await GetAnalogMeasurementsFromCache(MeasurementPorviderCacheType.Copy);
+				var tempDiscreteMeasurements = await GetDiscreteMeasurementsFromCache(MeasurementPorviderCacheType.Copy);
+				var tempElementToMeasurementMap = await GetElementToMeasurementMapFromCache(MeasurementPorviderCacheType.Copy);
+				var tempMeasurementToElementMap = await GetMeasurementToElementMapFromCache(MeasurementPorviderCacheType.Copy);
 
-			await AnalogMeasurementsCache.SetAsync((short)MeasurementPorviderCacheType.Origin, tempAnalogMeasurements);
-			await DiscreteMeasurementsCache.SetAsync((short)MeasurementPorviderCacheType.Origin, tempDiscreteMeasurements);
-			await ElementToMeasurementMapCache.SetAsync((short)MeasurementPorviderCacheType.Origin, tempElementToMeasurementMap);
-			await MeasurementToElementMapCache.SetAsync((short)MeasurementPorviderCacheType.Origin, tempMeasurementToElementMap);
+				await AnalogMeasurementsCache.SetAsync((short)MeasurementPorviderCacheType.Origin, tempAnalogMeasurements);
+				await DiscreteMeasurementsCache.SetAsync((short)MeasurementPorviderCacheType.Origin, tempDiscreteMeasurements);
+				await ElementToMeasurementMapCache.SetAsync((short)MeasurementPorviderCacheType.Origin, tempElementToMeasurementMap);
+				await MeasurementToElementMapCache.SetAsync((short)MeasurementPorviderCacheType.Origin, tempMeasurementToElementMap);
 
-			logger.LogDebug("Measurement provider rolled back successfully.");
+				logger.LogDebug("Measurement provider rolled back successfully.");
+			}
+            catch (Exception e)
+            {
+				string message = $"{baseLogString} RollbackTransaction => Failed. Exception message: {e.Message}.";
+				Logger.LogError(message, e);
+			}
+
+			
 		}
 		#endregion
+
+		#region Private Methods
+		private async Task UpdateAnalogMeasurement(long measurementGid, float value, CommandOriginType commandOrigin, AlarmType alarmType)
+		{
+			string verboseMessage = $"{baseLogString} entering UpdateAnalogMeasurement method for measurement GID {measurementGid:X16}.";
+			Logger.LogVerbose(verboseMessage);
+
+			while (!AreDictionariesInitialized)
+			{
+				await Task.Delay(1000);
+			}
+
+			var analogMeasurements = await GetAnalogMeasurementsFromCache();
+
+			if (analogMeasurements.TryGetValue(measurementGid, out AnalogMeasurement measurement))
+			{
+				measurement.CurrentValue = value;
+				measurement.Alarm = alarmType;
+			}
+			else
+			{
+				Logger.LogWarning($"{baseLogString} UpdateAnalogMeasurement => Failed to update analog measurement with GID {measurementGid:X16}. There is no such a measurement.");
+			}
+
+			await AnalogMeasurementsCache.SetAsync((short)MeasurementPorviderCacheType.Origin, analogMeasurements);
+		}
+
+		private async Task<bool> UpdateDiscreteMeasurement(long measurementGid, int value, CommandOriginType commandOrigin)
+		{
+			string verboseMessage = $"{baseLogString} entering UpdateDiscreteMeasurement method for measurement GID {measurementGid:X16}.";
+			Logger.LogVerbose(verboseMessage);
+
+			while (!AreDictionariesInitialized)
+			{
+				await Task.Delay(1000);
+			}
+
+			bool success = true;
+			var discreteMeasurements = await GetDiscreteMeasurementsFromCache();
+
+			if (discreteMeasurements.TryGetValue(measurementGid, out DiscreteMeasurement measurement))
+			{
+				if (value == (ushort)DiscreteCommandingType.CLOSE)
+				{
+					measurement.CurrentOpen = false;
+				}
+				else
+				{
+					measurement.CurrentOpen = true;
+				}
+
+				if (measurement.CurrentOpen)
+				{
+					var ceModelProviderClient = CeModelProviderClient.CreateClient();
+					if (!await ceModelProviderClient.IsRecloser(measurement.ElementId))
+					{
+						var potentialOutageReportingClient = PotentialOutageReportingClient.CreateClient();
+						await potentialOutageReportingClient.ReportPotentialOutage(measurement.ElementId, commandOrigin);
+					}
+					else
+					{
+						Logger.LogDebug($"{baseLogString} UpdateDiscreteMeasurement => Element with gid 0x{measurement.ElementId:X16} is a Recloser. ReportPotentialOutage call is not required.");
+					}
+				}
+				else
+				{
+					var historyDBManagerClient = HistoryDBManagerClient.CreateClient();
+					await historyDBManagerClient.OnSwitchClosed(measurement.ElementId);
+				}
+			}
+			else
+			{
+				Logger.LogWarning($"{baseLogString} Failed to update discrete measurement with GID {measurementGid:X16}. There is no such a measurement.");
+				success = false;
+			}
+
+			var measurementToElementMap = await GetMeasurementToElementMapFromCache();
+
+			var modelProviderClient = CeModelProviderClient.CreateClient();
+
+			if (measurementToElementMap.TryGetValue(measurementGid, out long recloserGid)
+				&& await modelProviderClient.IsRecloser(recloserGid)
+				&& commandOrigin != CommandOriginType.CE_COMMAND
+				&& commandOrigin != CommandOriginType.OUTAGE_SIMULATOR)
+			{
+				Logger.LogDebug($"{baseLogString} UpdateDiscreteMeasurement => Calling ResetRecloser on topology provider.");
+				var topologyProviderClient = TopologyProviderClient.CreateClient();
+				await topologyProviderClient.ResetRecloser(recloserGid);
+				Logger.LogDebug($"{baseLogString} UpdateDiscreteMeasurement => ResetRecloser from topology provider returned success.");
+
+			}
+			return success;
+		}
 
 		#region CacheGetter
 		private async Task<Dictionary<long, AnalogMeasurement>> GetAnalogMeasurementsFromCache(MeasurementPorviderCacheType cacheType = MeasurementPorviderCacheType.Origin)
@@ -618,6 +849,7 @@ namespace CE.MeasurementProviderImplementation
 
 			return analogMeasurements.Value;
 		}
+
 		private async Task<Dictionary<long, DiscreteMeasurement>> GetDiscreteMeasurementsFromCache(MeasurementPorviderCacheType cacheType = MeasurementPorviderCacheType.Origin)
 		{
 			string verboseMessage = $"{baseLogString} entering GetDicreteMeasurementsFromCache method.";
@@ -656,6 +888,7 @@ namespace CE.MeasurementProviderImplementation
 
 			return discreteMeasurements.Value;
 		}
+
 		private async Task<Dictionary<long, List<long>>> GetElementToMeasurementMapFromCache(MeasurementPorviderCacheType cacheType = MeasurementPorviderCacheType.Origin)
 		{
 			string verboseMessage = $"{baseLogString} entering GetElementToMeasurementMapFromCache method.";
@@ -694,6 +927,7 @@ namespace CE.MeasurementProviderImplementation
 
 			return elementToMeasurement.Value;
 		}
+
 		private async Task<Dictionary<long, long>> GetMeasurementToElementMapFromCache(MeasurementPorviderCacheType cacheType = MeasurementPorviderCacheType.Origin)
 		{
 			string verboseMessage = $"{baseLogString} entering GetMeasurementToElementMapFromCache method.";
@@ -732,59 +966,7 @@ namespace CE.MeasurementProviderImplementation
 
 			return measurementsToElement.Value;
 		}
-		#endregion
-
-		public async Task SendAnalogCommand(long measurementGid, float commandingValue, CommandOriginType commandOrigin)
-		{
-			string verboseMessage = $"{baseLogString} entering SendAnalogCommand method. Measurement GID {measurementGid:X16}; Commanding value {commandingValue}; Command Origin {commandOrigin}";
-			Logger.LogVerbose(verboseMessage);
-
-			try
-			{
-				Logger.LogDebug($"{baseLogString} SendAnalogCommand => Calling Send single analog command from scada commanding client.");
-				var scadaCommandingClient = ScadaCommandingClient.CreateClient();
-				await scadaCommandingClient.SendSingleAnalogCommand(measurementGid, commandingValue, commandOrigin);
-				Logger.LogDebug($"{baseLogString} SendAnalogCommand => Send single analog command from scada commanding client successfully called.");
-			}
-			catch (Exception e)
-			{
-				string message = $"{baseLogString} SendAnalogCommand => Failed. Exception message: {e.Message}.";
-				Logger.LogError(message);
-				//throw new Exception(message);
-			}
-		}
-
-		public async Task SendDiscreteCommand(long measurementGid, int value, CommandOriginType commandOrigin)
-		{
-			string verboseMessage = $"{baseLogString} entering SendDiscreteCommand method. Measurement GID {measurementGid:X16}; Commanding value {value}; Command Origin {commandOrigin}";
-			Logger.LogVerbose(verboseMessage);
-
-			try
-			{
-				DiscreteMeasurement measurement = await GetDiscreteMeasurement(measurementGid);
-
-				if ( measurement != null && !(measurement is ArtificalDiscreteMeasurement))
-				{
-					Logger.LogDebug($"{baseLogString} SendDiscreteCommand => Calling Send single discrete command from scada commanding client.");
-					var scadaCommandingClient = ScadaCommandingClient.CreateClient();
-					await scadaCommandingClient.SendSingleDiscreteCommand(measurementGid, (ushort)value, commandOrigin);
-					Logger.LogDebug($"{baseLogString} SendDiscreteCommand => Send single discrete command from scada commanding client successfully called.");
-				}
-				else
-				{
-					Dictionary<long, DiscreteModbusData> data = new Dictionary<long, DiscreteModbusData>(1)
-					{
-						{ measurementGid, new DiscreteModbusData((ushort)value, AlarmType.NO_ALARM, measurementGid, commandOrigin) }
-					};
-					await UpdateDiscreteMeasurement(data);
-				}
-			}
-			catch (Exception e)
-			{
-				string message = $"{baseLogString} SendDiscreteCommand => Failed. Exception message: {e.Message}.";
-				Logger.LogError(message);
-				//throw;
-			}
-		}
+		#endregion CacheGetter
+		#endregion Private Methods
 	}
 }

@@ -9,26 +9,26 @@ using System.Threading.Tasks;
 
 namespace OMS.Common.WcfClient.CE
 {
-	public class ModelProviderClient : WcfSeviceFabricClientBase<IModelProviderContract>, IModelProviderContract
+	public class CeModelProviderClient : WcfSeviceFabricClientBase<ICeModelProviderContract>, ICeModelProviderContract
 	{
 		private static readonly string microserviceName = MicroserviceNames.CeModelProviderService;
 		private static readonly string listenerName = EndpointNames.CeModelProviderServiceEndpoint;
-		public ModelProviderClient(WcfCommunicationClientFactory<IModelProviderContract> clientFactory, Uri serviceUri, ServicePartitionKey servicePartition) 
+		public CeModelProviderClient(WcfCommunicationClientFactory<ICeModelProviderContract> clientFactory, Uri serviceUri, ServicePartitionKey servicePartition) 
             : base(clientFactory, serviceUri, servicePartition, listenerName)
 		{
 
 		}
 
-		public static IModelProviderContract CreateClient()
+		public static ICeModelProviderContract CreateClient()
 		{
 			ClientFactory factory = new ClientFactory();
-			return factory.CreateClient<ModelProviderClient, IModelProviderContract>(microserviceName);
+			return factory.CreateClient<CeModelProviderClient, ICeModelProviderContract>(microserviceName);
 		}
 
-		public static IModelProviderContract CreateClient(Uri serviceUri, ServicePartitionKey servicePartitionKey)
+		public static ICeModelProviderContract CreateClient(Uri serviceUri, ServicePartitionKey servicePartitionKey)
 		{
 			ClientFactory factory = new ClientFactory();
-			return factory.CreateClient<ModelProviderClient, IModelProviderContract>(serviceUri, servicePartitionKey);
+			return factory.CreateClient<CeModelProviderClient, ICeModelProviderContract>(serviceUri, servicePartitionKey);
 		}
 
 		public Task Commit()

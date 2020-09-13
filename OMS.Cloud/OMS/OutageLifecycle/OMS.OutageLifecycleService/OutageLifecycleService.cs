@@ -37,7 +37,8 @@ namespace OMS.OutageLifecycleService
 		private readonly IOutageResolutionContract outageResolutionProvider;
 		private readonly INotifySubscriberContract notifySubscriberProvider;
 
-        private readonly int isolationAlgorithmCycleInterval;
+        private const int isolationAlgorithmCycleInterval = 5000;
+        private const int isolationAlgorithmUpperLimit = 30000;
         private readonly IsolationAlgorithmCycle isolationAlgorithmCycle;
 
         private ICloudLogger logger;
@@ -63,8 +64,7 @@ namespace OMS.OutageLifecycleService
                 this.outageResolutionProvider = new OutageResolutionProvider(lifecycleHelper);
                 this.notifySubscriberProvider = new NotifySubscriberProvider(StateManager);
 
-                this.isolationAlgorithmCycleInterval = 1000;
-                this.isolationAlgorithmCycle = new IsolationAlgorithmCycle(StateManager, lifecycleHelper, this.isolationAlgorithmCycleInterval);
+                this.isolationAlgorithmCycle = new IsolationAlgorithmCycle(StateManager, lifecycleHelper, isolationAlgorithmCycleInterval, isolationAlgorithmUpperLimit);
 
                 string infoMessage = $"{baseLogString} Ctor => Contract providers initialized.";
                 Logger.LogInformation(infoMessage);
@@ -151,7 +151,7 @@ namespace OMS.OutageLifecycleService
                     Logger.LogError($"{baseLogString} RunAsync => Exception: {e.Message}");
                 }
 
-                await Task.Delay(this.isolationAlgorithmCycleInterval);
+                await Task.Delay(this.isolationAlgorithmCycle.CycleInterval);
             }
         }
 

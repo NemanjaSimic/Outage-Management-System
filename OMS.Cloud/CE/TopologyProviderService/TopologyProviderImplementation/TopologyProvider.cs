@@ -185,7 +185,7 @@ namespace CE.TopologyProviderImplementation
             Logger.LogVerbose(verboseMessage);
 
             Logger.LogDebug($"{baseLogString} CreateTopology => Calling GetEnergySources method from model provider client.");
-            var modelProviderClient = ModelProviderClient.CreateClient();
+            var modelProviderClient = CeModelProviderClient.CreateClient();
             List<long> roots = await modelProviderClient.GetEnergySources();
             Logger.LogDebug($"{baseLogString} CreateTopology => GetEnergySources method from model provider client has been successfully called.");
 
