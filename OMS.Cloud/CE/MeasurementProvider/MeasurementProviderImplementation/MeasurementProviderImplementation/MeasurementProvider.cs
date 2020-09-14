@@ -26,6 +26,7 @@ namespace CE.MeasurementProviderImplementation
 
 		private readonly string baseLogString;
 		private readonly IReliableStateManager stateManager;
+		private object syncObj;
 		#endregion
 
 		private ICloudLogger logger;
@@ -115,6 +116,7 @@ namespace CE.MeasurementProviderImplementation
 
 			this.stateManager = stateManager;
 			stateManager.StateManagerChanged += this.OnStateManagerChangedHandler;
+			syncObj = new object();
 
 			ignorableOriginTypes = new HashSet<CommandOriginType>() 
 			{ 
@@ -153,12 +155,6 @@ namespace CE.MeasurementProviderImplementation
 				{
 					analogMeasurements.Add(analogMeasurement.Id, analogMeasurement);
 				}
-				else
-				{
-					Logger.LogDebug($"{baseLogString} AddDiscreteMeasurement => Updating analog measurement with GID {analogMeasurement.Id:X16}.");
-					analogMeasurements.Remove(analogMeasurement.Id);
-					analogMeasurements.Add(analogMeasurement.Id, analogMeasurement);
-				}
 
 				await AnalogMeasurementsCache.SetAsync((short)MeasurementPorviderCacheType.Origin, analogMeasurements);
 			}
@@ -189,7 +185,9 @@ namespace CE.MeasurementProviderImplementation
 					return;
 				}
 
-				var discreteMeasurements = await GetDiscreteMeasurementsFromCache();
+
+				var discreteMeasurementsChe = await DiscreteMeasurementsCache.GetEnumerableDictionaryAsync();
+				var discreteMeasurements = discreteMeasurementsChe[(short)MeasurementPorviderCacheType.Origin];
 
 				if (!discreteMeasurements.ContainsKey(discreteMeasurement.Id))
 				{

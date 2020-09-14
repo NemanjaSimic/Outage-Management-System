@@ -445,11 +445,6 @@ namespace CE.ModelProviderImplementation
 								var measurementProviderClient = MeasurementProviderClient.CreateClient();
 								await measurementProviderClient.AddDiscreteMeasurement((DiscreteMeasurement)measurement);
 							}
-							else if (measurement is AnalogMeasurement)
-							{
-								var measurementProviderClient = MeasurementProviderClient.CreateClient();
-								await measurementProviderClient.AddAnalogMeasurement((AnalogMeasurement)measurement);
-							}
 
 							if (measurement.GetMeasurementType().Equals(AnalogMeasurementType.FEEDER_CURRENT.ToString()))
 							{
@@ -461,9 +456,10 @@ namespace CE.ModelProviderImplementation
 							Logger.LogError($"{baseLogString} PutMeasurementsInElement => Element with GID {elementId:16X} does not exist in elements dictionary.");
 						}
 					}
-					catch (Exception)
+					catch (Exception e)
 					{
-						Logger.LogError($"{baseLogString} PutMeasurementsInElement =>  Failed to find appropriate element for mesuremnt with GID {measurement.Id:16X}. There is no conducting equipment connected to common terminal.");
+						Logger.LogError($"{baseLogString} PutMeasurementsInElement =>  {e.Message} {Environment.NewLine} {e.StackTrace}");
+						//Logger.LogError($"{baseLogString} PutMeasurementsInElement =>  Failed to find appropriate element for mesuremnt with GID {measurement.Id:16X}. There is no conducting equipment connected to common terminal.");
 					}
 				}
 				else

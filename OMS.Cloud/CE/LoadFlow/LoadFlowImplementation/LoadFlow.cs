@@ -307,7 +307,7 @@ namespace CE.LoadFlowImplementation
             }
             else
             {
-                Logger.LogFatal($"{baseLogString} CalculateLoadFlowFirst => Element with GID {topology?.FirstNode:X16} does not exist in collection.");
+                Logger.LogDebug($"{baseLogString} CalculateLoadFlowFirst => Element with GID {topology?.FirstNode:X16} does not exist in collection.");
             }
 
             Logger.LogVerbose($"{baseLogString} CalculateLoadFlowFirst => Calulate load flow finished.");
