@@ -98,6 +98,7 @@ namespace CE.MeasurementProviderImplementation
 				else if (reliableStateName == ReliableDictionaryNames.MeasurementsToElementMapCache)
 				{
 					measurementToElementMapCache = await ReliableDictionaryAccess<short, Dictionary<long, long>>.Create(stateManager, ReliableDictionaryNames.MeasurementsToElementMapCache);
+					await measurementToElementMapCache.SetAsync((short)MeasurementPorviderCacheType.Origin, new Dictionary<long, long>());
 					this.isMeasurementToElementInitialized = true;
 
 					string debugMessage = $"{baseLogString} OnStateManagerChangedHandler => '{ReliableDictionaryNames.MeasurementsToElementMapCache}' ReliableDictionaryAccess initialized.";
@@ -118,10 +119,10 @@ namespace CE.MeasurementProviderImplementation
 			stateManager.StateManagerChanged += this.OnStateManagerChangedHandler;
 			syncObj = new object();
 
-			ignorableOriginTypes = new HashSet<CommandOriginType>() 
+			ignorableOriginTypes = new HashSet<CommandOriginType>()
 			{ 
 				/*CommandOriginType.USER_COMMAND,*/ 
-				CommandOriginType.ISOLATING_ALGORITHM_COMMAND 
+				CommandOriginType.ISOLATING_ALGORITHM_COMMAND
 			};
 
 			string debugMessage = $"{baseLogString} Ctor => Clients initialized.";
@@ -140,7 +141,7 @@ namespace CE.MeasurementProviderImplementation
 			}
 
 			try
-            {
+			{
 				if (analogMeasurement == null)
 				{
 					string message = $"{baseLogString} AddAnalogMeasurement => analog measurement parameter is null.";
@@ -158,11 +159,11 @@ namespace CE.MeasurementProviderImplementation
 
 				await AnalogMeasurementsCache.SetAsync((short)MeasurementPorviderCacheType.Origin, analogMeasurements);
 			}
-            catch (Exception e)
-            {
+			catch (Exception e)
+			{
 				string errorMessage = $"{baseLogString} AddAnalogMeasurement => Exception: {e.Message}";
 				Logger.LogError(errorMessage, e);
-            }
+			}
 		}
 
 		public async Task AddDiscreteMeasurement(DiscreteMeasurement discreteMeasurement)
@@ -175,8 +176,8 @@ namespace CE.MeasurementProviderImplementation
 				await Task.Delay(1000);
 			}
 
-            try
-            {
+			try
+			{
 				if (discreteMeasurement == null)
 				{
 					string message = $"{baseLogString} AddDiscreteMeasurement => discrete measurement parameter is null.";
@@ -202,8 +203,8 @@ namespace CE.MeasurementProviderImplementation
 
 				await DiscreteMeasurementsCache.SetAsync((short)MeasurementPorviderCacheType.Origin, discreteMeasurements);
 			}
-            catch (Exception e)
-            {
+			catch (Exception e)
+			{
 				string errorMessage = $"{baseLogString} AddDiscreteMeasurement => Exception: {e.Message}";
 				Logger.LogError(errorMessage, e);
 			}
@@ -219,8 +220,8 @@ namespace CE.MeasurementProviderImplementation
 				await Task.Delay(1000);
 			}
 
-            try
-            {
+			try
+			{
 				foreach (long gid in data.Keys)
 				{
 					AnalogModbusData measurementData = data[gid];
@@ -235,7 +236,7 @@ namespace CE.MeasurementProviderImplementation
 				Logger.LogError(errorMessage, e);
 			}
 		}
-		
+
 		public async Task UpdateDiscreteMeasurement(Dictionary<long, DiscreteModbusData> data)
 		{
 			string verboseMessage = $"{baseLogString} entering UpdateDiscreteMeasurement method with dictionary parameter.";
@@ -246,8 +247,8 @@ namespace CE.MeasurementProviderImplementation
 				await Task.Delay(1000);
 			}
 
-            try
-            {
+			try
+			{
 				List<long> signalGids = new List<long>();
 				foreach (long gid in data.Keys)
 				{
@@ -283,7 +284,7 @@ namespace CE.MeasurementProviderImplementation
 			AnalogMeasurement measurement;
 
 			try
-            {
+			{
 				bool success = false;
 				var analogMeasurements = await GetAnalogMeasurementsFromCache();
 
@@ -298,8 +299,8 @@ namespace CE.MeasurementProviderImplementation
 
 				Logger.LogDebug($"{baseLogString} GetAnalogMeasurement => method returned success: {success} for measurement GID {measurementGid:X16}.");
 			}
-            catch (Exception e)
-            {
+			catch (Exception e)
+			{
 				string errorMessage = $"{baseLogString} GetAnalogMeasurement => Exception: {e.Message}";
 				Logger.LogError(errorMessage, e);
 				measurement = null;
@@ -320,8 +321,8 @@ namespace CE.MeasurementProviderImplementation
 
 			DiscreteMeasurement measurement;
 
-            try
-            {
+			try
+			{
 				bool success = false;
 				var discreteMeasurements = await GetDiscreteMeasurementsFromCache();
 
@@ -357,9 +358,9 @@ namespace CE.MeasurementProviderImplementation
 			}
 
 			float value = -1;
-            
+
 			try
-            {
+			{
 				var analogMeasurements = await GetAnalogMeasurementsFromCache();
 
 				if (analogMeasurements.ContainsKey(measurementGid))
@@ -393,7 +394,7 @@ namespace CE.MeasurementProviderImplementation
 			bool isOpen = false; //MODO: mozda vracati Contional value kako bi postaojala i indikacija da li je metoda uspesno izvrsena i vrednost 'isOpen'
 
 			try
-            {
+			{
 				var discreteMeasurements = await GetDiscreteMeasurementsFromCache();
 
 				if (discreteMeasurements.ContainsKey(measurementGid))
@@ -421,9 +422,17 @@ namespace CE.MeasurementProviderImplementation
 				await Task.Delay(1000);
 			}
 
-            try
+			if (measurementId == 0 || elementId == 0)
+			{
+				//string message = $"Measurement with GID {measurementId:X16} already exists in measurement-element mapping.";
+				Logger.LogWarning($"{baseLogString} AddMeasurementElementPair => Error. mesurementID : {measurementId} | elementID : {elementId}");
+			}
+
+			try
             {
-				var measurementToElementMap = await GetMeasurementToElementMapFromCache();
+				var measurementToElementMapChe = await MeasurementToElementMapCache.GetEnumerableDictionaryAsync();
+				var measurementToElementMap = measurementToElementMapChe[(short)MeasurementPorviderCacheType.Origin];
+				//var measurementToElementMap = await GetMeasurementToElementMapFromCache();
 
 				if (measurementToElementMap.ContainsKey(measurementId))
 				{
@@ -434,6 +443,7 @@ namespace CE.MeasurementProviderImplementation
 				}
 
 				measurementToElementMap.Add(measurementId, elementId);
+				await MeasurementToElementMapCache.SetAsync((short)MeasurementPorviderCacheType.Origin, measurementToElementMap);
 
 				var elementToMeasurementMap = await GetElementToMeasurementMapFromCache();
 
@@ -446,7 +456,6 @@ namespace CE.MeasurementProviderImplementation
 					elementToMeasurementMap.Add(elementId, new List<long>() { measurementId });
 				}
 
-				await MeasurementToElementMapCache.SetAsync((short)MeasurementPorviderCacheType.Origin, measurementToElementMap);
 				await ElementToMeasurementMapCache.SetAsync((short)MeasurementPorviderCacheType.Origin, elementToMeasurementMap);
 
 				Logger.LogDebug($"{baseLogString} AddMeasurementElementPair => method finished for measurement GID {measurementId} and element GID {elementId}.");
@@ -519,7 +528,9 @@ namespace CE.MeasurementProviderImplementation
 
 			try
 			{
-				result = await GetMeasurementToElementMapFromCache();
+				var measurementToElementMapChe = await MeasurementToElementMapCache.GetEnumerableDictionaryAsync();
+				result = measurementToElementMapChe[(short)MeasurementPorviderCacheType.Origin];
+				//result = await GetMeasurementToElementMapFromCache();
 			}
 			catch (Exception e)
 			{
@@ -790,7 +801,8 @@ namespace CE.MeasurementProviderImplementation
 				success = false;
 			}
 
-			var measurementToElementMap = await GetMeasurementToElementMapFromCache();
+			var measurementToElementMapChe = await MeasurementToElementMapCache.GetEnumerableDictionaryAsync();
+			var measurementToElementMap = measurementToElementMapChe[(short)MeasurementPorviderCacheType.Origin];
 
 			var modelProviderClient = CeModelProviderClient.CreateClient();
 
