@@ -52,28 +52,28 @@ namespace OMS.HistoryDBManagerImplementation.ModelAccess
 			});
 		}
 
-		public Task<IEnumerable<OutageEntity>> FindOutage(OutageExpression expression)
-		{
-			return Task.Run(() =>
-			{
-				IEnumerable<OutageEntity> outageEntities = new List<OutageEntity>();
+		//public Task<IEnumerable<OutageEntity>> FindOutage(OutageExpression expression)
+		//{
+		//	return Task.Run(() =>
+		//	{
+		//		IEnumerable<OutageEntity> outageEntities = new List<OutageEntity>();
 
-				using (var unitOfWork = new UnitOfWork())
-				{
-					try
-					{
-						outageEntities = unitOfWork.OutageRepository.Find(expression.Predicate);
-					}
-					catch (Exception e)
-					{
-						string message = $"{baseLogString} FindOutage => Exception: {e.Message}";
-						Logger.LogError(message, e);
-					}
-				}
+		//		using (var unitOfWork = new UnitOfWork())
+		//		{
+		//			try
+		//			{
+		//				outageEntities = unitOfWork.OutageRepository.Find(expression.Predicate);
+		//			}
+		//			catch (Exception e)
+		//			{
+		//				string message = $"{baseLogString} FindOutage => Exception: {e.Message}";
+		//				Logger.LogError(message, e);
+		//			}
+		//		}
 
-				return outageEntities;
-			});
-		}
+		//		return outageEntities;
+		//	});
+		//}
 
 		public Task<IEnumerable<OutageEntity>> GetAllActiveOutages()
 		{

@@ -214,16 +214,18 @@ namespace OMS.OutageLifecycleImplementation.ContractProviders
 
         private async Task<ConditionalValue<OutageEntity>> StoreActiveOutage(long elementGid, List<long> affectedConsumersGids, OutageTopologyModel topology)
         {
+            //var expression = new OutageExpression()
+            //{
+            //    Predicate = o => o.OutageElementGid == elementGid && o.OutageState != OutageState.ARCHIVED,
+            //};
+
+            //var outages = await outageModelAccessClient.FindOutage(expression);
+
             var outageModelAccessClient = OutageModelAccessClient.CreateClient();
+            var allOutages = await outageModelAccessClient.GetAllOutages();
+            var targetedOutages = allOutages.Where(outage => outage.OutageElementGid == elementGid && outage.OutageState != OutageState.ARCHIVED);
 
-            var expression = new OutageExpression()
-            {
-                Predicate = o => o.OutageElementGid == elementGid && o.OutageState != OutageState.ARCHIVED,
-            };
-
-            var outages = await outageModelAccessClient.FindOutage(expression);
-
-            if (outages.FirstOrDefault() != null)
+            if (targetedOutages.FirstOrDefault() != null)
             {
                 Logger.LogWarning($"{baseLogString} StoreActiveOutage => Malfunction on element with gid: 0x{elementGid:x16} has already been reported.");
                 return new ConditionalValue<OutageEntity>(false, null);

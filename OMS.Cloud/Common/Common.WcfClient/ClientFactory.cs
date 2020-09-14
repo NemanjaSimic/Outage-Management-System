@@ -88,7 +88,7 @@ namespace OMS.Common.WcfClient
                                                                                 servicePartitionResolver: partitionResolver);
 
             TContract client = (TContract)Activator.CreateInstance(typeof(TClient), new object[] { wcfClientFactory, serviceUri, servicePartition });
-            CheckIsAlive(client, serviceUri);
+            //CheckIsAlive(client, serviceUri);
 
             return client;
         }
@@ -102,7 +102,7 @@ namespace OMS.Common.WcfClient
 
             var factory = new ChannelFactory<TContract>(binding, externalEndpoint);
             TContract client = factory.CreateChannel();
-            CheckIsAlive(client, serviceUri);
+            //CheckIsAlive(client, serviceUri);
 
             return client;
         }
@@ -110,6 +110,7 @@ namespace OMS.Common.WcfClient
         private void CheckIsAlive<TContract>(TContract client, Uri serviceUri) where TContract : class, IService, IHealthChecker
         {
             int counter = 1;
+
             while (true)
             {
                 try
@@ -120,7 +121,7 @@ namespace OMS.Common.WcfClient
                 }
                 catch (FabricServiceNotFoundException)
                 {
-                    Logger.LogDebug($"{baseLogString} CheckIsAlive => FabricServiceNotFoundException caught, service uri: {serviceUri}, number of tries: {counter}.");
+                    Logger.LogWarning($"{baseLogString} CheckIsAlive => FabricServiceNotFoundException caught, service uri: {serviceUri}, number of tries: {counter}.");
                     Task.Delay(200);
 
                     if (++counter > 150) //=> 30 sec window

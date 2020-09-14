@@ -104,9 +104,9 @@ namespace CE.LoadFlowImplementation
                             AlarmType alarmType = (loadFeeder.Value >= 36) ? AlarmType.HIGH_ALARM : AlarmType.NO_ALARM;
 
                             Dictionary<long, AnalogModbusData> data = new Dictionary<long, AnalogModbusData>(1)
-                        {
-                            { signalGid, new AnalogModbusData(loadFeeder.Value, alarmType, signalGid, CommandOriginType.CE_COMMAND)}
-                        };
+                            {
+                                { signalGid, new AnalogModbusData(loadFeeder.Value, alarmType, signalGid, CommandOriginType.CE_COMMAND)}
+                            };
 
                             Logger.LogDebug($"{baseLogString} UpdateLoadFlow => Calling update analog measurement method from measurement provider.");
                             measurementProviderClient = MeasurementProviderClient.CreateClient();

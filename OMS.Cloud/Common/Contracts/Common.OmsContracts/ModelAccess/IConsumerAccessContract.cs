@@ -31,14 +31,14 @@ namespace Common.OmsContracts.ModelAccess
 		[OperationContract]
 		Task RemoveAllConsumers();
 
-        [OperationContract]
-        Task<IEnumerable<Consumer>> FindConsumer(ConsumerExpression expression);
+        //[OperationContract]
+        //Task<IEnumerable<Consumer>> FindConsumer(ConsumerExpression expression);
     }
 
-    [DataContract]
-    public class ConsumerExpression
-	{
-        [DataMember]
-        public Expression<Func<Consumer, bool>> Predicate { get; set; }
-    }
+ //   [DataContract]
+ //   public class ConsumerExpression
+	//{
+ //       [DataMember]
+ //       public Expression<Func<Consumer, bool>> Predicate { get; set; }
+ //   }
 }

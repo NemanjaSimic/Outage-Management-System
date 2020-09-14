@@ -37,14 +37,14 @@ namespace Common.OmsContracts.ModelAccess
 		[OperationContract]
 		Task UpdateOutage(OutageEntity outage);
 
-        [OperationContract]
-        Task<IEnumerable<OutageEntity>> FindOutage(OutageExpression expression);
+        //[OperationContract]
+        //Task<IEnumerable<OutageEntity>> FindOutage(OutageExpression expression);
     }
 
-    [DataContract]
-    public class OutageExpression
-    {
-		[DataMember]
-        public Expression<Func<OutageEntity, bool>> Predicate { get; set; }
-    }
+  //  [DataContract]
+  //  public class OutageExpression
+  //  {
+		//[DataMember]
+  //      public Expression<Func<OutageEntity, bool>> Predicate { get; set; }
+  //  }
 }

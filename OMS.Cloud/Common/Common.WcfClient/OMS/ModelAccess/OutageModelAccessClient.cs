@@ -36,10 +36,10 @@ namespace OMS.Common.WcfClient.OMS.ModelAccess
 			return InvokeWithRetryAsync(client => client.Channel.AddOutage(outage));
 		}
 
-        public Task<IEnumerable<OutageEntity>> FindOutage(OutageExpression expression)
-        {
-            return InvokeWithRetryAsync(client => client.Channel.FindOutage(expression));
-        }
+        //public Task<IEnumerable<OutageEntity>> FindOutage(OutageExpression expression)
+        //{
+        //    return InvokeWithRetryAsync(client => client.Channel.FindOutage(expression));
+        //}
 
         public Task<IEnumerable<OutageEntity>> GetAllActiveOutages()
 		{
