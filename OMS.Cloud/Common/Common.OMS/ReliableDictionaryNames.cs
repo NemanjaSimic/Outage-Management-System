@@ -17,6 +17,7 @@
         public const string PotentialOutage = "PotentialOutage";
 
         //OMS.OutageLifecycleService
+        //public const string OutageTopologyModel = "OutageTopologyModel";
         public const string StartedIsolationAlgorithms = "StartedIsolationAlgorithms";
         public const string MonitoredHeadBreakerMeasurements = "MonitoredHeadBreakerMeasurements";
         public const string RecloserOutageMap = "RecloserOutageMap";

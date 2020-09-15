@@ -39,12 +39,14 @@ namespace OMS.OutageLifecycleImplementation.ContractProviders
 
 		#region Reliable Dictionaries
 		private bool isRecloserOutageMapInitialized;
+        private bool isOutageTopologyModelInitialized;
 
-		private bool ReliableDictionariesInitialized
+        private bool ReliableDictionariesInitialized
 		{
 			get
 			{
-				return isRecloserOutageMapInitialized;
+				return isRecloserOutageMapInitialized &&
+                       isOutageTopologyModelInitialized;
 			}
 		}
 
@@ -52,6 +54,12 @@ namespace OMS.OutageLifecycleImplementation.ContractProviders
         private ReliableDictionaryAccess<long, Dictionary<long, List<long>>> RecloserOutageMap
         {
             get { return recloserOutageMap; }
+        }
+
+        private ReliableDictionaryAccess<string, OutageTopologyModel> outageTopologyModel;
+        private ReliableDictionaryAccess<string, OutageTopologyModel> OutageTopologyModel
+        {
+            get { return outageTopologyModel; }
         }
 
         private async void OnStateManagerChangedHandler(object sender, NotifyStateManagerChangedEventArgs e)
@@ -67,6 +75,14 @@ namespace OMS.OutageLifecycleImplementation.ContractProviders
                     this.isRecloserOutageMapInitialized = true;
 
                     string debugMessage = $"{baseLogString} OnStateManagerChangedHandler => '{ReliableDictionaryNames.RecloserOutageMap}' ReliableDictionaryAccess initialized.";
+                    Logger.LogDebug(debugMessage);
+                }
+                else if (reliableStateName == ReliableDictionaryNames.OutageTopologyModel)
+                {
+                    this.outageTopologyModel = await ReliableDictionaryAccess<string, OutageTopologyModel>.Create(stateManager, ReliableDictionaryNames.OutageTopologyModel);
+                    this.isOutageTopologyModelInitialized = true;
+
+                    string debugMessage = $"{baseLogString} OnStateManagerChangedHandler => '{ReliableDictionaryNames.OutageTopologyModel}' ReliableDictionaryAccess initialized.";
                     Logger.LogDebug(debugMessage);
                 }
             }
@@ -88,8 +104,9 @@ namespace OMS.OutageLifecycleImplementation.ContractProviders
             };
 
 			this.isRecloserOutageMapInitialized = false;
+            this.isOutageTopologyModelInitialized = false;
 
-			this.stateManager = stateManager;
+            this.stateManager = stateManager;
 			this.stateManager.StateManagerChanged += this.OnStateManagerChangedHandler;
 		}
 
@@ -113,13 +130,21 @@ namespace OMS.OutageLifecycleImplementation.ContractProviders
                     return false;
                 }
 
+                var enumerableTopology = await OutageTopologyModel.GetEnumerableDictionaryAsync();
+
+                if (!enumerableTopology.ContainsKey(ReliableDictionaryNames.OutageTopologyModel))
+                {
+                    Logger.LogError($"{baseLogString} Start => Topology not found in Rel Dictionary: {ReliableDictionaryNames.OutageTopologyModel}.");
+                    return false;
+                }
+
+                var topology = enumerableTopology[ReliableDictionaryNames.OutageTopologyModel];
+                var affectedConsumersGids = lifecycleHelper.GetAffectedConsumers(elementGid, topology);
+
                 var historyDBManagerClient = HistoryDBManagerClient.CreateClient();
                 var outageModelReadAccessClient = OutageModelReadAccessClient.CreateClient();
 
-                var topology = await outageModelReadAccessClient.GetTopologyModel();
-                var affectedConsumersGids = lifecycleHelper.GetAffectedConsumers(elementGid, topology);
-
-                if(!(await CheckPreconditions(elementGid, commandOriginType, affectedConsumersGids, outageModelReadAccessClient, historyDBManagerClient)))
+                if (!(await CheckPreconditions(elementGid, commandOriginType, affectedConsumersGids, outageModelReadAccessClient, historyDBManagerClient)))
                 {
                     Logger.LogError($"{baseLogString} ReportPotentialOutage => Parameters do not satisfy required preconditions. OutageId: {elementGid}, CommandOriginType: {commandOriginType}");
                     return false;

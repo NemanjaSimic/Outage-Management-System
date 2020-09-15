@@ -263,19 +263,19 @@ namespace CE.ModelProviderImplementation
 
 			try
 			{
-				var clearTasks = new List<Task>
-				{
-					TopologyElements.ClearAsync(),
-					Measurements.ClearAsync(),
-					EnergySources.ClearAsync(),
-					ElementConnections.ClearAsync(),
-					MeasurementToConnectedTerminalMap.ClearAsync(),
-					TerminalToConnectedElementsMap.ClearAsync(),
-					BaseVoltages.ClearAsync(),
-					Reclosers.ClearAsync()
-				};
+				//var clearTasks = new List<Task>
+				//{
+				await TopologyElements.ClearAsync();
+				await Measurements.ClearAsync();
+				await EnergySources.ClearAsync();
+				await ElementConnections.ClearAsync();
+				await MeasurementToConnectedTerminalMap.ClearAsync();
+				await TerminalToConnectedElementsMap.ClearAsync();
+				await BaseVoltages.ClearAsync();
+				await Reclosers.ClearAsync();
+				//};
 
-				Task.WaitAll(clearTasks.ToArray());
+				//Task.WaitAll(clearTasks.ToArray());
 
 				await energySources.SetAsync(ReliableDictionaryNames.EnergySources, new List<long>());
 

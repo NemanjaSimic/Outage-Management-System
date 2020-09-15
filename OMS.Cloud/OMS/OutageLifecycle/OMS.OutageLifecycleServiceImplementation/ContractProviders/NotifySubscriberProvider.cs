@@ -1,4 +1,5 @@
 ﻿using Common.OMS;
+using Common.PubSubContracts.DataContracts.CE;
 using Microsoft.ServiceFabric.Data;
 using Microsoft.ServiceFabric.Data.Notifications;
 using OMS.Common.Cloud.Logger;
@@ -27,12 +28,14 @@ namespace OMS.OutageLifecycleImplementation.ContractProviders
 
 		#region Reliable Dictionaries
 		private bool isMonitoredHeadBreakerMeasurementsInitialized;
+		private bool isOutageTopologyModelInitialized;
 
 		private bool ReliableDictionariesInitialized
 		{
 			get
 			{
-				return isMonitoredHeadBreakerMeasurementsInitialized;
+				return isMonitoredHeadBreakerMeasurementsInitialized &&
+					   isOutageTopologyModelInitialized;
 			}
 		}
 
@@ -40,6 +43,12 @@ namespace OMS.OutageLifecycleImplementation.ContractProviders
 		private ReliableDictionaryAccess<long, DiscreteModbusData> MonitoredHeadBreakerMeasurements
 		{
 			get { return monitoredHeadBreakerMeasurements; }
+		}
+
+		private ReliableDictionaryAccess<string, OutageTopologyModel> outageTopologyModel;
+		private ReliableDictionaryAccess<string, OutageTopologyModel> OutageTopologyModel
+		{
+			get { return outageTopologyModel; }
 		}
 
 		private async void OnStateManagerChangedHandler(object sender, NotifyStateManagerChangedEventArgs e)
@@ -57,6 +66,14 @@ namespace OMS.OutageLifecycleImplementation.ContractProviders
 					string debugMessage = $"{baseLogString} OnStateManagerChangedHandler => '{ReliableDictionaryNames.MonitoredHeadBreakerMeasurements}' ReliableDictionaryAccess initialized.";
 					Logger.LogDebug(debugMessage);
 				}
+				else if (reliableStateName == ReliableDictionaryNames.OutageTopologyModel)
+				{
+					this.outageTopologyModel = await ReliableDictionaryAccess<string, OutageTopologyModel>.Create(stateManager, ReliableDictionaryNames.OutageTopologyModel);
+					this.isOutageTopologyModelInitialized = true;
+
+					string debugMessage = $"{baseLogString} OnStateManagerChangedHandler => '{ReliableDictionaryNames.OutageTopologyModel}' ReliableDictionaryAccess initialized.";
+					Logger.LogDebug(debugMessage);
+				}
 			}
 		}
         #endregion Reliable Dictionaries
@@ -66,6 +83,7 @@ namespace OMS.OutageLifecycleImplementation.ContractProviders
 			this.baseLogString = $"{this.GetType()} [{this.GetHashCode()}] =>{Environment.NewLine}";
 
 			this.isMonitoredHeadBreakerMeasurementsInitialized = false;
+			this.isOutageTopologyModelInitialized = false;
 
 			this.stateManager = stateManager;
 			this.stateManager.StateManagerChanged += this.OnStateManagerChangedHandler;
@@ -86,26 +104,33 @@ namespace OMS.OutageLifecycleImplementation.ContractProviders
 				await Task.Delay(1000);
             }
 
-			if (!(message is MultipleDiscreteValueSCADAMessage multipleDiscreteValueSCADAMessage))
-            {
-				Logger.LogWarning($"{baseLogString} Notify => unexpected type of message: {message.GetType()}");
-				return;
-            }
-
             try
             {
-				var discreteData = multipleDiscreteValueSCADAMessage.Data;
+				if (message is MultipleDiscreteValueSCADAMessage multipleDiscreteValueSCADAMessage)
+                {
+					var discreteData = multipleDiscreteValueSCADAMessage.Data;
 
-				var enumerableHeadBreakerMeasurements = await MonitoredHeadBreakerMeasurements.GetEnumerableDictionaryAsync();
+					var enumerableHeadBreakerMeasurements = await MonitoredHeadBreakerMeasurements.GetEnumerableDictionaryAsync();
 
-				foreach (var headMeasurementGid in enumerableHeadBreakerMeasurements.Keys)
-				{
-					if (!discreteData.ContainsKey(headMeasurementGid))
+					foreach (var headMeasurementGid in enumerableHeadBreakerMeasurements.Keys)
 					{
-						continue;
-					}
+						if (!discreteData.ContainsKey(headMeasurementGid))
+						{
+							continue;
+						}
 
-					await MonitoredHeadBreakerMeasurements.SetAsync(headMeasurementGid, discreteData[headMeasurementGid]);
+						await MonitoredHeadBreakerMeasurements.SetAsync(headMeasurementGid, discreteData[headMeasurementGid]);
+					}
+				}
+				else if(message is OMSModelMessage omsModelMessage)
+                {
+					OutageTopologyModel topology = omsModelMessage.OutageTopologyModel;
+					await OutageTopologyModel.SetAsync(ReliableDictionaryNames.OutageTopologyModel, topology);
+				}
+				else
+                {
+					Logger.LogWarning($"{baseLogString} Notify => unexpected type of message: {message.GetType()}");
+					return;
 				}
 			}
             catch (Exception e)

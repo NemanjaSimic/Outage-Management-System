@@ -54,8 +54,6 @@ namespace OMS.Common.Cloud.ReliableCollectionHelpers
                     {
                         throw e;
                     }
-
-                    //return await Create(stateManager, reliableDictioanryName);
                 }
             }
         }
@@ -86,26 +84,10 @@ namespace OMS.Common.Cloud.ReliableCollectionHelpers
                     {
                         throw e;
                     }
-
-                    //return await Create(stateManager, reliableDictionary);
                 }
             }
         }
         #endregion Static Members
-
-        #region Private Properties
-        //private IDictionary<TKey, TValue> localDictionary;
-        //private IDictionary<TKey, TValue> LocalDictionary
-        //{
-        //    get { return localDictionary ?? (localDictionary = new Dictionary<TKey, TValue>()); }
-        //}
-        
-        //private IDictionary<TKey, TValue> enumerableDictionary;
-        //private IDictionary<TKey, TValue> EnumerableDictionary
-        //{
-        //    get { return enumerableDictionary ?? (enumerableDictionary = new Dictionary<TKey, TValue>()); }
-        //}
-        #endregion Private Properties
 
         #region Constructors
         internal ReliableDictionaryAccess(IReliableStateManager stateManager, string reliableDictioanryName)
@@ -134,14 +116,10 @@ namespace OMS.Common.Cloud.ReliableCollectionHelpers
             using (ITransaction tx = this.stateManager.CreateTransaction())
             {
                 var result = await reliableStateManagerHelper.TryGetAsync<IReliableDictionary<TKey, TValue>>(this.stateManager, reliableDictioanryName);
-                //var result = await this.stateManager.TryGetAsync<IReliableDictionary<TKey, TValue>>(reliableDictioanryName);
 
                 if (result.HasValue)
                 {
-                    //cast is necessary
                     this.reliableDictionary = result.Value;
-                    //this.reliableDictionary.RebuildNotificationAsyncCallback = this.OnDictionaryRebuildNotificationHandlerAsync;
-                    //this.reliableDictionary.DictionaryChanged += this.OnDictionaryChangedHandler;
                     await tx.CommitAsync();
                 }
                 else

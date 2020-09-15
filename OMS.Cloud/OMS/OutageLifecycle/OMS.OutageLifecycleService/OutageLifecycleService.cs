@@ -5,6 +5,7 @@ using System.Threading;
 using System.Threading.Tasks;
 using Common.OMS;
 using Common.OmsContracts.OutageLifecycle;
+using Common.PubSubContracts.DataContracts.CE;
 using Microsoft.ServiceFabric.Data;
 using Microsoft.ServiceFabric.Data.Collections;
 using Microsoft.ServiceFabric.Services.Communication.Runtime;
@@ -60,8 +61,8 @@ namespace OMS.OutageLifecycleService
 
                 this.potentialOutageReportingProvider = new PotentialOutageReportingProvider(StateManager, lifecycleHelper);
                 this.outageIsolationProvider = new OutageIsolationProvider(StateManager, lifecycleHelper, modelResourcesDesc);
-                this.crewSendingProvider = new CrewSendingProvider(lifecycleHelper);
-                this.outageResolutionProvider = new OutageResolutionProvider(lifecycleHelper);
+                this.crewSendingProvider = new CrewSendingProvider(StateManager, lifecycleHelper);
+                this.outageResolutionProvider = new OutageResolutionProvider(StateManager, lifecycleHelper);
                 this.notifySubscriberProvider = new NotifySubscriberProvider(StateManager);
 
                 this.isolationAlgorithmCycle = new IsolationAlgorithmCycle(StateManager, lifecycleHelper, isolationAlgorithmCycleInterval, isolationAlgorithmUpperLimit);
@@ -145,6 +146,9 @@ namespace OMS.OutageLifecycleService
                 try
                 {
                     await this.isolationAlgorithmCycle.Start();
+
+                    var message = $"{baseLogString} RunAsync => IsolationAlgorithmCycle executed.";
+                    Logger.LogVerbose(message);
                 }
                 catch (Exception e)
                 {
@@ -228,6 +232,25 @@ namespace OMS.OutageLifecycleService
                         else
                         {
                             await StateManager.GetOrAddAsync<IReliableDictionary<long, Dictionary<long, List<long>>>>(tx, ReliableDictionaryNames.RecloserOutageMap);
+                            await tx.CommitAsync();
+                        }
+                    }
+                }),
+
+                Task.Run(async() =>
+                {
+                    using (ITransaction tx = this.StateManager.CreateTransaction())
+                    {
+                        var result = await StateManager.TryGetAsync<IReliableDictionary<string, OutageTopologyModel>>(ReliableDictionaryNames.OutageTopologyModel);
+                        if(result.HasValue)
+                        {
+                            var gidToPointItemMap = result.Value;
+                            await gidToPointItemMap.ClearAsync();
+                            await tx.CommitAsync();
+                        }
+                        else
+                        {
+                            await StateManager.GetOrAddAsync<IReliableDictionary<string, OutageTopologyModel>>(tx, ReliableDictionaryNames.OutageTopologyModel);
                             await tx.CommitAsync();
                         }
                     }

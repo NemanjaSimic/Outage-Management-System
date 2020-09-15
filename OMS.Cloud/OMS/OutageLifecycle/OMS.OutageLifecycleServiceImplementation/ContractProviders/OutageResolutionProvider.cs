@@ -3,8 +3,10 @@ using Common.OmsContracts.DataContracts.OutageDatabaseModel;
 using Common.OmsContracts.OutageLifecycle;
 using Common.PubSubContracts.DataContracts.CE;
 using Microsoft.ServiceFabric.Data;
+using Microsoft.ServiceFabric.Data.Notifications;
 using OMS.Common.Cloud;
 using OMS.Common.Cloud.Logger;
+using OMS.Common.Cloud.ReliableCollectionHelpers;
 using OMS.Common.WcfClient.OMS.ModelAccess;
 using OMS.Common.WcfClient.OMS.ModelProvider;
 using OMS.OutageLifecycleImplementation.Helpers;
@@ -17,6 +19,7 @@ namespace OMS.OutageLifecycleImplementation.ContractProviders
     public class OutageResolutionProvider : IOutageResolutionContract
     {
         private readonly string baseLogString;
+        private readonly IReliableStateManager stateManager;
         private readonly OutageLifecycleHelper lifecycleHelper;
         private readonly OutageMessageMapper outageMessageMapper;
 
@@ -27,18 +30,64 @@ namespace OMS.OutageLifecycleImplementation.ContractProviders
             get { return logger ?? (logger = CloudLoggerFactory.GetLogger()); }
         }
 
-        public OutageResolutionProvider(OutageLifecycleHelper lifecycleHelper)
+        #region Reliable Dictionaries
+        private bool isOutageTopologyModelInitialized;
+
+        private bool ReliableDictionariesInitialized
+        {
+            get
+            {
+                return isOutageTopologyModelInitialized;
+            }
+        }
+
+        private ReliableDictionaryAccess<string, OutageTopologyModel> outageTopologyModel;
+        private ReliableDictionaryAccess<string, OutageTopologyModel> OutageTopologyModel
+        {
+            get { return outageTopologyModel; }
+        }
+
+        private async void OnStateManagerChangedHandler(object sender, NotifyStateManagerChangedEventArgs e)
+        {
+            if (e.Action == NotifyStateManagerChangedAction.Add)
+            {
+                var operation = e as NotifyStateManagerSingleEntityChangedEventArgs;
+                string reliableStateName = operation.ReliableState.Name.AbsolutePath;
+
+                if (reliableStateName == ReliableDictionaryNames.OutageTopologyModel)
+                {
+                    this.outageTopologyModel = await ReliableDictionaryAccess<string, OutageTopologyModel>.Create(stateManager, ReliableDictionaryNames.OutageTopologyModel);
+                    this.isOutageTopologyModelInitialized = true;
+
+                    string debugMessage = $"{baseLogString} OnStateManagerChangedHandler => '{ReliableDictionaryNames.OutageTopologyModel}' ReliableDictionaryAccess initialized.";
+                    Logger.LogDebug(debugMessage);
+                }
+            }
+        }
+        #endregion Reliable Dictionaries
+
+        public OutageResolutionProvider(IReliableStateManager stateManager, OutageLifecycleHelper lifecycleHelper)
         {
             this.baseLogString = $"{this.GetType()} [{this.GetHashCode()}] =>{Environment.NewLine}";
 
             this.lifecycleHelper = lifecycleHelper;
             this.outageMessageMapper = new OutageMessageMapper();
+
+            this.isOutageTopologyModelInitialized = false;
+
+            this.stateManager = stateManager;
+            this.stateManager.StateManagerChanged += this.OnStateManagerChangedHandler;
         }
 
         #region IOutageResolutionContract
         public async Task<bool> ResolveOutage(long outageId)
         {
             Logger.LogVerbose($"{baseLogString} ResolveOutage method started. OutageId: {outageId}");
+
+            while (!ReliableDictionariesInitialized)
+            {
+                await Task.Delay(1000);
+            }
 
             try
             {
@@ -73,6 +122,11 @@ namespace OMS.OutageLifecycleImplementation.ContractProviders
         {
             Logger.LogVerbose($"{baseLogString} ValidateResolveConditions method started.  OutageId: {outageId}");
 
+            while (!ReliableDictionariesInitialized)
+            {
+                await Task.Delay(1000);
+            }
+
             try
             {
                 var result = await lifecycleHelper.GetRepairedOutage(outageId);
@@ -89,8 +143,15 @@ namespace OMS.OutageLifecycleImplementation.ContractProviders
                 isolationPoints.AddRange(outageDbEntity.DefaultIsolationPoints);
                 isolationPoints.AddRange(outageDbEntity.OptimumIsolationPoints);
 
-                var outageModelReadAccessClient = OutageModelReadAccessClient.CreateClient();
-                var topology = await outageModelReadAccessClient.GetTopologyModel();
+                var enumerableTopology = await OutageTopologyModel.GetEnumerableDictionaryAsync();
+
+                if (!enumerableTopology.ContainsKey(ReliableDictionaryNames.OutageTopologyModel))
+                {
+                    Logger.LogError($"{baseLogString} Start => Topology not found in Rel Dictionary: {ReliableDictionaryNames.OutageTopologyModel}.");
+                    return false;
+                }
+
+                var topology = enumerableTopology[ReliableDictionaryNames.OutageTopologyModel];
 
                 bool resolveCondition = true;
 

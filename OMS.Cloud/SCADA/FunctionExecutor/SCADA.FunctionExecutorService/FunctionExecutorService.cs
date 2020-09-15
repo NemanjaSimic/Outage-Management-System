@@ -3,12 +3,12 @@ using System.Collections.Generic;
 using System.Fabric;
 using System.Threading;
 using System.Threading.Tasks;
+using Microsoft.ServiceFabric.Data;
+using Microsoft.ServiceFabric.Data.Collections;
 using Microsoft.ServiceFabric.Services.Communication.Runtime;
 using Microsoft.ServiceFabric.Services.Communication.Wcf;
 using Microsoft.ServiceFabric.Services.Communication.Wcf.Runtime;
 using Microsoft.ServiceFabric.Services.Runtime;
-using Microsoft.WindowsAzure.Storage.Queue;
-using OMS.Common.Cloud.AzureStorageHelpers;
 using OMS.Common.Cloud.Logger;
 using OMS.Common.Cloud.Names;
 using OMS.Common.SCADA;
@@ -24,9 +24,10 @@ namespace SCADA.FunctionExecutorService
     /// <summary>
     /// An instance of this class is created for each service instance by the Service Fabric runtime.
     /// </summary>
-    internal sealed class FunctionExecutorService : StatelessService
+    internal sealed class FunctionExecutorService : StatefulService
     {
         private readonly string baseLogString;
+        private readonly FunctionExecutorCycle functionExecutorCycle;
         private readonly ReadCommandEnqueuer readCommandEnqueuer;
         private readonly WriteCommandEnqueuer writeCommandEnqueuer;
         private readonly ModelUpdateCommandEnqueuer modelUpdateCommandEnqueuer;
@@ -37,7 +38,7 @@ namespace SCADA.FunctionExecutorService
             get { return logger ?? (logger = CloudLoggerFactory.GetLogger()); }
         }
 
-        public FunctionExecutorService(StatelessServiceContext context)
+        public FunctionExecutorService(StatefulServiceContext context)
             : base(context)
         {
             this.baseLogString = $"{this.GetType()} [{this.GetHashCode()}] =>{Environment.NewLine}";
@@ -45,17 +46,10 @@ namespace SCADA.FunctionExecutorService
 
             try
             {
-                //CloudQueueHelper.TryGetQueue(CloudStorageQueueNames.ReadCommandQueue, out CloudQueue readCommandQueue);
-                //CloudQueueHelper.TryGetQueue(CloudStorageQueueNames.WriteCommandQueue, out CloudQueue writeCommandQueue);
-                //CloudQueueHelper.TryGetQueue(CloudStorageQueueNames.ModelUpdateCommandQueue, out CloudQueue modelUpdateCommandQueue);
-
-                //this.readCommandEnqueuer = new ReadCommandEnqueuer(readCommandQueue, writeCommandQueue, modelUpdateCommandQueue);
-                //this.writeCommandEnqueuer = new WriteCommandEnqueuer(readCommandQueue, writeCommandQueue, modelUpdateCommandQueue);
-                //this.modelUpdateCommandEnqueuer = new ModelUpdateCommandEnqueuer(readCommandQueue, writeCommandQueue, modelUpdateCommandQueue);
-
-                this.readCommandEnqueuer = new ReadCommandEnqueuer();
-                this.writeCommandEnqueuer = new WriteCommandEnqueuer();
-                this.modelUpdateCommandEnqueuer = new ModelUpdateCommandEnqueuer();
+                this.functionExecutorCycle = new FunctionExecutorCycle(StateManager);
+                this.readCommandEnqueuer = new ReadCommandEnqueuer(StateManager);
+                this.writeCommandEnqueuer = new WriteCommandEnqueuer(StateManager);
+                this.modelUpdateCommandEnqueuer = new ModelUpdateCommandEnqueuer(StateManager);
 
                 string infoMessage = $"{baseLogString} Ctor => Contract providers initialized.";
                 Logger.LogInformation(infoMessage);
@@ -73,13 +67,13 @@ namespace SCADA.FunctionExecutorService
         /// Optional override to create listeners (e.g., TCP, HTTP) for this service replica to handle client or user requests.
         /// </summary>
         /// <returns>A collection of listeners.</returns>
-        protected override IEnumerable<ServiceInstanceListener> CreateServiceInstanceListeners()
+        protected override IEnumerable<ServiceReplicaListener> CreateServiceReplicaListeners()
         {
             //return new ServiceInstanceListener[0];
-            return new List<ServiceInstanceListener>()
+            return new List<ServiceReplicaListener>()
             {
                 //ScadaReadCommandEnqueuerEndpoint
-                new ServiceInstanceListener(context =>
+                new ServiceReplicaListener(context =>
                 {
                     return new WcfCommunicationListener<IReadCommandEnqueuerContract>(context,
                                                                               this.readCommandEnqueuer,
@@ -88,7 +82,7 @@ namespace SCADA.FunctionExecutorService
                 }, EndpointNames.ScadaReadCommandEnqueuerEndpoint),
 
                 //ScadaWriteCommandEnqueuerEndpoint
-                new ServiceInstanceListener(context =>
+                new ServiceReplicaListener(context =>
                 {
                     return new WcfCommunicationListener<IWriteCommandEnqueuerContract>(context,
                                                                                this.writeCommandEnqueuer,
@@ -97,14 +91,13 @@ namespace SCADA.FunctionExecutorService
                 }, EndpointNames.ScadaWriteCommandEnqueuerEndpoint),
 
                 //ScadaModelUpdateCommandEnqueueurEndpoint
-                new ServiceInstanceListener(context =>
+                new ServiceReplicaListener(context =>
                 {
                     return new WcfCommunicationListener<IModelUpdateCommandEnqueuerContract>(context,
                                                                                      this.modelUpdateCommandEnqueuer,
                                                                                      WcfUtility.CreateTcpListenerBinding(),
                                                                                      EndpointNames.ScadaModelUpdateCommandEnqueueurEndpoint);
                 }, EndpointNames.ScadaModelUpdateCommandEnqueueurEndpoint)
-
             };
         }
 
@@ -114,26 +107,27 @@ namespace SCADA.FunctionExecutorService
         /// <param name="cancellationToken">Canceled when Service Fabric needs to shut down this service instance.</param>
         protected override async Task RunAsync(CancellationToken cancellationToken)
         {
-            cancellationToken.ThrowIfCancellationRequested();
-
-            FunctionExecutorCycle functionExecutorCycle;
             IScadaConfigData configData;
 
             try
             {
-                functionExecutorCycle = new FunctionExecutorCycle();
+                InitializeReliableCollections();
+                string debugMessage = $"{baseLogString} RunAsync => ReliableDictionaries initialized.";
+                Logger.LogDebug(debugMessage);
+                ServiceEventSource.Current.ServiceMessage(this.Context, $"[SCADA.FunctionExecutorService | Information] {debugMessage}");
+
                 IScadaModelReadAccessContract readAccessClient = ScadaModelReadAccessClient.CreateClient();
                 configData = await readAccessClient.GetScadaConfigData();
 
                 string infoMessage = $"{baseLogString} RunAsync => FunctionExecutorCycle initialized.";
                 Logger.LogInformation(infoMessage);
-                ServiceEventSource.Current.ServiceMessage(this.Context, $"[FunctionExecutorService | Information] {infoMessage}");
+                ServiceEventSource.Current.ServiceMessage(this.Context, $"[SCADA.FunctionExecutorService | Information] {infoMessage}");
             }
             catch (Exception e)
             {
                 string errorMessage = $"{baseLogString} RunAsync => exception {e.Message}";
                 Logger.LogError(errorMessage, e);
-                ServiceEventSource.Current.ServiceMessage(this.Context, $"[FunctionExecutorService | Error] {errorMessage}");
+                ServiceEventSource.Current.ServiceMessage(this.Context, $"[SCADA.FunctionExecutorService | Error] {errorMessage}");
                 throw e;
             }
 
@@ -162,18 +156,82 @@ namespace SCADA.FunctionExecutorService
 
                     string verboseMessage = $"{baseLogString} RunAsync => FunctionExecutorCycle executed.";
                     Logger.LogVerbose(verboseMessage);
-                    //ServiceEventSource.Current.ServiceMessage(this.Context, $"[FunctionExecutorService | Information] {message}");
                 }
                 catch (Exception e)
                 {
                     string errorMessage = $"{baseLogString} RunAsync => exception {e.Message}";
                     Logger.LogError(errorMessage, e);
-                    ServiceEventSource.Current.ServiceMessage(this.Context, $"[FunctionExecutorService | Error] {errorMessage}");
+                    ServiceEventSource.Current.ServiceMessage(this.Context, $"[SCADA.FunctionExecutorService | Error] {errorMessage}");
                 }
 
                 await Task.Delay(TimeSpan.FromMilliseconds(configData.FunctionExecutionInterval), cancellationToken);
                 functionExecutionCycleCount++;
             }
+        }
+
+        private void InitializeReliableCollections()
+        {
+            Task[] tasks = new Task[]
+            {
+                Task.Run(async() =>
+                {
+                    using (ITransaction tx = this.StateManager.CreateTransaction())
+                    {
+                        var result = await StateManager.TryGetAsync<IReliableQueue<IReadModbusFunction>>(ReliableQueueNames.ReadCommandQueue);
+                        if(result.HasValue)
+                        {
+                            var gidToPointItemMap = result.Value;
+                            await gidToPointItemMap.ClearAsync();
+                            await tx.CommitAsync();
+                        }
+                        else
+                        {
+                            await StateManager.GetOrAddAsync<IReliableQueue<IReadModbusFunction>>(tx, ReliableQueueNames.ReadCommandQueue);
+                            await tx.CommitAsync();
+                        }
+                    }
+                }),
+
+                Task.Run(async() =>
+                {
+                    using (ITransaction tx = this.StateManager.CreateTransaction())
+                    {
+                        var result = await StateManager.TryGetAsync<IReliableQueue<IWriteModbusFunction>>(ReliableQueueNames.WriteCommandQueue);
+                        if(result.HasValue)
+                        {
+                            var gidToPointItemMap = result.Value;
+                            await gidToPointItemMap.ClearAsync();
+                            await tx.CommitAsync();
+                        }
+                        else
+                        {
+                            await StateManager.GetOrAddAsync<IReliableQueue<IWriteModbusFunction>>(tx, ReliableQueueNames.WriteCommandQueue);
+                            await tx.CommitAsync();
+                        }
+                    }
+                }),
+
+                Task.Run(async() =>
+                {
+                    using (ITransaction tx = this.StateManager.CreateTransaction())
+                    {
+                        var result = await StateManager.TryGetAsync<IReliableQueue<IWriteModbusFunction>>(ReliableQueueNames.ModelUpdateCommandQueue);
+                        if(result.HasValue)
+                        {
+                            var addressToGidMap = result.Value;
+                            await addressToGidMap.ClearAsync();
+                            await tx.CommitAsync();
+                        }
+                        else
+                        {
+                            await StateManager.GetOrAddAsync<IReliableQueue<IWriteModbusFunction>>(tx, ReliableQueueNames.ModelUpdateCommandQueue);
+                            await tx.CommitAsync();
+                        }
+                    }
+                }),
+            };
+
+            Task.WaitAll(tasks);
         }
     }
 }

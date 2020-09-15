@@ -9,8 +9,6 @@ using OMS.Common.Cloud.ReliableCollectionHelpers;
 using OMS.Common.NmsContracts;
 using OMS.Common.PubSubContracts.DataContracts.SCADA;
 using OMS.Common.WcfClient.CE;
-using OMS.Common.WcfClient.OMS.ModelAccess;
-using OMS.Common.WcfClient.OMS.ModelProvider;
 using OMS.Common.WcfClient.SCADA;
 using OMS.OutageLifecycleImplementation.Algorithm;
 using OMS.OutageLifecycleImplementation.Helpers;
