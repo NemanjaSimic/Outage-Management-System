@@ -12,6 +12,7 @@ using Microsoft.ServiceFabric.Services.Runtime;
 using OMS.Common.Cloud.Logger;
 using OMS.Common.Cloud.Names;
 using OMS.Common.SCADA;
+using OMS.Common.ScadaContracts.DataContracts.ModbusFunctions;
 using OMS.Common.ScadaContracts.FunctionExecutior;
 using OMS.Common.ScadaContracts.ModelProvider;
 using OMS.Common.WcfClient.SCADA;
@@ -177,16 +178,17 @@ namespace SCADA.FunctionExecutorService
                 {
                     using (ITransaction tx = this.StateManager.CreateTransaction())
                     {
-                        var result = await StateManager.TryGetAsync<IReliableQueue<IReadModbusFunction>>(ReliableQueueNames.ReadCommandQueue);
+                        var result = await StateManager.TryGetAsync<IReliableConcurrentQueue<ModbusFunction>>(ReliableQueueNames.ReadCommandQueue);
                         if(result.HasValue)
                         {
                             var gidToPointItemMap = result.Value;
-                            await gidToPointItemMap.ClearAsync();
+                            while ((await result.Value.TryDequeueAsync(tx)).HasValue) ;
+                            //await gidToPointItemMap.ClearAsync();
                             await tx.CommitAsync();
                         }
                         else
                         {
-                            await StateManager.GetOrAddAsync<IReliableQueue<IReadModbusFunction>>(tx, ReliableQueueNames.ReadCommandQueue);
+                            await StateManager.GetOrAddAsync<IReliableConcurrentQueue<ModbusFunction>>(tx, ReliableQueueNames.ReadCommandQueue);
                             await tx.CommitAsync();
                         }
                     }
@@ -196,16 +198,17 @@ namespace SCADA.FunctionExecutorService
                 {
                     using (ITransaction tx = this.StateManager.CreateTransaction())
                     {
-                        var result = await StateManager.TryGetAsync<IReliableQueue<IWriteModbusFunction>>(ReliableQueueNames.WriteCommandQueue);
+                        var result = await StateManager.TryGetAsync<IReliableConcurrentQueue<ModbusFunction>>(ReliableQueueNames.WriteCommandQueue);
                         if(result.HasValue)
                         {
                             var gidToPointItemMap = result.Value;
-                            await gidToPointItemMap.ClearAsync();
+                            while ((await result.Value.TryDequeueAsync(tx)).HasValue) ;
+                            //await gidToPointItemMap.ClearAsync();
                             await tx.CommitAsync();
                         }
                         else
                         {
-                            await StateManager.GetOrAddAsync<IReliableQueue<IWriteModbusFunction>>(tx, ReliableQueueNames.WriteCommandQueue);
+                            await StateManager.GetOrAddAsync<IReliableConcurrentQueue<ModbusFunction>>(tx, ReliableQueueNames.WriteCommandQueue);
                             await tx.CommitAsync();
                         }
                     }
@@ -215,16 +218,17 @@ namespace SCADA.FunctionExecutorService
                 {
                     using (ITransaction tx = this.StateManager.CreateTransaction())
                     {
-                        var result = await StateManager.TryGetAsync<IReliableQueue<IWriteModbusFunction>>(ReliableQueueNames.ModelUpdateCommandQueue);
+                        var result = await StateManager.TryGetAsync<IReliableConcurrentQueue<ModbusFunction>>(ReliableQueueNames.ModelUpdateCommandQueue);
                         if(result.HasValue)
                         {
                             var addressToGidMap = result.Value;
-                            await addressToGidMap.ClearAsync();
+                            while ((await result.Value.TryDequeueAsync(tx)).HasValue) ;
+                            //await addressToGidMap.ClearAsync();
                             await tx.CommitAsync();
                         }
                         else
                         {
-                            await StateManager.GetOrAddAsync<IReliableQueue<IWriteModbusFunction>>(tx, ReliableQueueNames.ModelUpdateCommandQueue);
+                            await StateManager.GetOrAddAsync<IReliableConcurrentQueue<ModbusFunction>>(tx, ReliableQueueNames.ModelUpdateCommandQueue);
                             await tx.CommitAsync();
                         }
                     }

@@ -10,13 +10,13 @@ using System.Threading.Tasks;
 
 namespace OMS.Common.Cloud.ReliableCollectionHelpers
 {
-    public sealed class ReliableQueueAccess<TValue> : IReliableQueue<TValue>
+    public sealed class ReliableQueueAccess<TValue> : IReliableConcurrentQueue<TValue>
     {
         private readonly string reliableQueueName;
         private readonly IReliableStateManager stateManager;
         private readonly ReliableStateManagerHelper reliableStateManagerHelper;
 
-        private IReliableQueue<TValue> reliableQueue;
+        private IReliableConcurrentQueue<TValue> reliableConcurrentQueue;
 
         #region Static Members
         private static ICloudLogger logger;
@@ -25,7 +25,11 @@ namespace OMS.Common.Cloud.ReliableCollectionHelpers
             get { return logger ?? (logger = CloudLoggerFactory.GetLogger()); }
         }
 
-        public static async Task<ReliableQueueAccess<TValue>> Create(IReliableStateManager stateManager, string reliableQueueName)
+		public long Count => throw new NotImplementedException();
+
+		public Uri Name => throw new NotImplementedException();
+
+		public static async Task<ReliableQueueAccess<TValue>> Create(IReliableStateManager stateManager, string reliableQueueName)
         {
             int numOfTriesLeft = 30;
 
@@ -74,148 +78,93 @@ namespace OMS.Common.Cloud.ReliableCollectionHelpers
 
             using (ITransaction tx = this.stateManager.CreateTransaction())
             {
-                var result = await reliableStateManagerHelper.TryGetAsync<IReliableQueue<TValue>>(this.stateManager, reliableQueueName);
+                var result = await reliableStateManagerHelper.TryGetAsync<IReliableConcurrentQueue<TValue>>(this.stateManager, reliableQueueName);
 
                 if (result.HasValue)
                 {
-                    this.reliableQueue = result.Value;
+                    this.reliableConcurrentQueue = result.Value;
                     await tx.CommitAsync();
                 }
                 else
                 {
-                    string message = $"ReliableCollection Key: {reliableQueueName}, Type: {typeof(IReliableQueue<TValue>)} was not initialized.";
+                    string message = $"ReliableCollection Key: {reliableQueueName}, Type: {typeof(IReliableConcurrentQueue<TValue>)} was not initialized.";
                     throw new Exception(message);
                 }
             }
         }
 
-        #region IReliableQueue
-        public Uri Name 
+        #region IReliableConcurentQueue
+        public async Task EnqueueAsync(ITransaction tx, TValue value, CancellationToken cancellationToken = default, TimeSpan? timeout = null)
         {
-            get { return reliableQueue.Name; }
-        }
-
-        public async Task ClearAsync()
-        {
-            await reliableQueue.ClearAsync();
-        }
-
-        public async Task<IAsyncEnumerable<TValue>> CreateEnumerableAsync(ITransaction tx)
-        {
-            return await reliableQueue.CreateEnumerableAsync(tx);
-        }
-
-        public async Task EnqueueAsync(ITransaction tx, TValue item)
-        {
-            await reliableQueue.EnqueueAsync(tx, item);
-        }
-
-        public async Task EnqueueAsync(ITransaction tx, TValue item, TimeSpan timeout, CancellationToken cancellationToken)
-        {
-            await reliableQueue.EnqueueAsync(tx, item, timeout, cancellationToken);
-        }
-
-        public async Task<long> GetCountAsync(ITransaction tx)
-        {
-            return await reliableQueue.GetCountAsync(tx);
-        }
-
-        public async Task<ConditionalValue<TValue>> TryDequeueAsync(ITransaction tx)
-        {
-            return await reliableQueue.TryDequeueAsync(tx);
-        }
-
-        public async Task<ConditionalValue<TValue>> TryDequeueAsync(ITransaction tx, TimeSpan timeout, CancellationToken cancellationToken)
-        {
-            return await reliableQueue.TryDequeueAsync(tx, timeout, cancellationToken);
-        }
-
-        public async Task<ConditionalValue<TValue>> TryPeekAsync(ITransaction tx)
-        {
-            return await reliableQueue.TryPeekAsync(tx);
-        }
-
-        public async Task<ConditionalValue<TValue>> TryPeekAsync(ITransaction tx, TimeSpan timeout, CancellationToken cancellationToken)
-        {
-            return await reliableQueue.TryPeekAsync(tx, timeout, cancellationToken);
-        }
-
-        public async Task<ConditionalValue<TValue>> TryPeekAsync(ITransaction tx, LockMode lockMode)
-        {
-            return await reliableQueue.TryPeekAsync(tx, lockMode);
-        }
-
-        public async Task<ConditionalValue<TValue>> TryPeekAsync(ITransaction tx, LockMode lockMode, TimeSpan timeout, CancellationToken cancellationToken)
-        {
-            return await reliableQueue.TryPeekAsync(tx, lockMode, timeout, cancellationToken);
-        }
-        #endregion IReliableQueue
-
-        #region Async Wrapper
-        public async Task<IAsyncEnumerable<TValue>> CreateEnumerableAsync()
-        {
-            if (reliableQueue == null)
+            if (reliableConcurrentQueue == null)
             {
                 await InitializeReliableQueue();
             }
 
-            using (ITransaction tx = stateManager.CreateTransaction())
+            await reliableConcurrentQueue.EnqueueAsync(tx, value, cancellationToken, timeout);
+        }
+
+        public async Task<ConditionalValue<TValue>> TryDequeueAsync(ITransaction tx, CancellationToken cancellationToken = default, TimeSpan? timeout = null)
+        {
+            if (reliableConcurrentQueue == null)
             {
-                return await reliableQueue.CreateEnumerableAsync(tx);
+                await InitializeReliableQueue();
             }
+
+            return await reliableConcurrentQueue.TryDequeueAsync(tx, cancellationToken, timeout);
+        }
+        #endregion IReliableConcurentQueue
+
+        #region Async Wrapper
+        public async Task ClearAsync()
+		{
+            if (reliableConcurrentQueue == null)
+            {
+                await InitializeReliableQueue();
+            }
+
+            while ((await TryDequeueAsync()).HasValue) ;
         }
 
         public async Task EnqueueAsync(TValue item)
         {
-            if (reliableQueue == null)
+            if (reliableConcurrentQueue == null)
             {
                 await InitializeReliableQueue();
             }
 
             using (ITransaction tx = stateManager.CreateTransaction())
             {
-                await reliableQueue.EnqueueAsync(tx, item);
+                await reliableConcurrentQueue.EnqueueAsync(tx, item);
+                await tx.CommitAsync();
             }
         }
 
         public async Task<long> GetCountAsync()
         {
-            if (reliableQueue == null)
+            if (reliableConcurrentQueue == null)
             {
                 await InitializeReliableQueue();
             }
-
-            using (ITransaction tx = stateManager.CreateTransaction())
-            {
-                return await reliableQueue.GetCountAsync(tx);
-            }
+            return reliableConcurrentQueue.Count;   
         }
 
         public async Task<ConditionalValue<TValue>> TryDequeueAsync()
         {
-            if (reliableQueue == null)
+            if (reliableConcurrentQueue == null)
             {
                 await InitializeReliableQueue();
             }
 
             using (ITransaction tx = stateManager.CreateTransaction())
             {
-                return await reliableQueue.TryDequeueAsync(tx);
+                ConditionalValue<TValue> result = await reliableConcurrentQueue.TryDequeueAsync(tx);
+
+                await tx.CommitAsync();
+
+                return result;
             }   
         }
-
-        public async Task<ConditionalValue<TValue>> TryPeekAsync()
-        {
-            if (reliableQueue == null)
-            {
-                await InitializeReliableQueue();
-            }
-
-            using (ITransaction tx = stateManager.CreateTransaction())
-            {
-                return await reliableQueue.TryPeekAsync(tx);
-            }
-        }
-        #endregion Async Wrapper
-    }
+		#endregion Async Wrapper
+	}
 }
