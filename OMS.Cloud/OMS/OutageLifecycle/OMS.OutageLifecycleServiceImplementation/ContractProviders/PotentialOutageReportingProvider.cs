@@ -134,7 +134,7 @@ namespace OMS.OutageLifecycleImplementation.ContractProviders
 
                 if (!enumerableTopology.ContainsKey(ReliableDictionaryNames.OutageTopologyModel))
                 {
-                    Logger.LogError($"{baseLogString} Start => Topology not found in Rel Dictionary: {ReliableDictionaryNames.OutageTopologyModel}.");
+                    Logger.LogError($"{baseLogString} ReportPotentialOutage => Topology not found in Rel Dictionary: {ReliableDictionaryNames.OutageTopologyModel}.");
                     return false;
                 }
 

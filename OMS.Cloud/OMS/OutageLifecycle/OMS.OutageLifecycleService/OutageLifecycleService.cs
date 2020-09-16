@@ -18,6 +18,7 @@ using OMS.Common.Cloud.Names;
 using OMS.Common.NmsContracts;
 using OMS.Common.PubSubContracts;
 using OMS.Common.PubSubContracts.DataContracts.SCADA;
+using OMS.Common.WcfClient.OMS.ModelProvider;
 using OMS.Common.WcfClient.PubSub;
 using OMS.OutageLifecycleImplementation.Algorithm;
 using OMS.OutageLifecycleImplementation.ContractProviders;
@@ -165,6 +166,20 @@ namespace OMS.OutageLifecycleService
             {
                 InitializeReliableCollections();
                 Logger.LogDebug($"{baseLogString} Initialize => ReliableDictionaries initialized.");
+                var modelProviderClient = OutageModelReadAccessClient.CreateClient();
+                using (ITransaction tx = this.StateManager.CreateTransaction())
+				{
+                    var result = await StateManager.TryGetAsync<IReliableDictionary<string, OutageTopologyModel>>(ReliableDictionaryNames.OutageTopologyModel);
+                    if (result.HasValue)
+					{
+                        await result.Value.SetAsync(tx, ReliableDictionaryNames.OutageTopologyModel, await modelProviderClient.GetTopologyModel());
+                        await tx.CommitAsync();
+					}
+                    else
+					{
+                        Logger.LogError($"{baseLogString} Initialize => Reliable dictionary {ReliableDictionaryNames.OutageTopologyModel} was not found.");
+					}
+                }
 
                 var registerSubscriberClient = RegisterSubscriberClient.CreateClient();
                 await registerSubscriberClient.SubscribeToTopic(Topic.SWITCH_STATUS, MicroserviceNames.OmsOutageLifecycleService);

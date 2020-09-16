@@ -187,9 +187,14 @@ namespace CE.MeasurementProviderImplementation
 				}
 
 
-				var discreteMeasurementsChe = await DiscreteMeasurementsCache.GetEnumerableDictionaryAsync();
-				var discreteMeasurements = discreteMeasurementsChe[(short)MeasurementPorviderCacheType.Origin];
+				var discreteMeasurementsCache = await DiscreteMeasurementsCache.GetEnumerableDictionaryAsync();
+				if(!discreteMeasurementsCache.ContainsKey((short)MeasurementPorviderCacheType.Origin))
+				{
+					Logger.LogWarning($"{baseLogString} AddDiscreteMeasurement => {MeasurementPorviderCacheType.Origin} was not present in discreteMeasurementsCache");
+					return;
+				}
 
+				var discreteMeasurements = discreteMeasurementsCache[(short)MeasurementPorviderCacheType.Origin];
 				if (!discreteMeasurements.ContainsKey(discreteMeasurement.Id))
 				{
 					discreteMeasurements.Add(discreteMeasurement.Id, discreteMeasurement);
