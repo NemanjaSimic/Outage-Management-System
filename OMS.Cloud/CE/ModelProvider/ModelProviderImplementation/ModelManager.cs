@@ -437,7 +437,15 @@ namespace CE.ModelProviderImplementation
 						var enumerableTopologyElements = await TopologyElements.GetEnumerableDictionaryAsync();
 						if (enumerableTopologyElements.TryGetValue(elementId, out ITopologyElement element))
 						{
-							element.Measurements.Add(measurement.Id, measurement.GetMeasurementType());
+							if(!element.Measurements.ContainsKey(measurement.Id))
+                            {
+								element.Measurements.Add(measurement.Id, measurement.GetMeasurementType());
+                            }
+							else
+                            {
+								Logger.LogWarning($"{baseLogString} PutMeasurementsInElements => element.Measurements contains key: 0x{measurement.Id:X16}");
+                            }
+
 							measurement.ElementId = elementId;
 
 							if (measurement is DiscreteMeasurement)
@@ -450,10 +458,14 @@ namespace CE.ModelProviderImplementation
 							{
 								await TopologyElements.SetAsync(elementId, new Feeder(element));
 							}
+							else
+                            {
+								await TopologyElements.SetAsync(elementId, element);
+							}
 						}
 						else
 						{
-							Logger.LogError($"{baseLogString} PutMeasurementsInElement => Element with GID {elementId:16X} does not exist in elements dictionary.");
+							Logger.LogError($"{baseLogString} PutMeasurementsInElement => Element with GID 0x{elementId:16X} does not exist in elements dictionary.");
 						}
 					}
 					catch (Exception e)
@@ -464,7 +476,7 @@ namespace CE.ModelProviderImplementation
 				}
 				else
 				{
-					Logger.LogError($"{baseLogString} PutMeasurementsInElement => Terminal with GID {terminalId:X16} does not exist in terminal to element map.");
+					Logger.LogError($"{baseLogString} PutMeasurementsInElement => Terminal with GID 0x{terminalId:X16} does not exist in terminal to element map.");
 				}
 			}
 			else
