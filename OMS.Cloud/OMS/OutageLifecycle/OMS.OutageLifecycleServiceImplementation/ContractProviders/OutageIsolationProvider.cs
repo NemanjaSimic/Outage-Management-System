@@ -183,6 +183,7 @@ namespace OMS.OutageLifecycleImplementation.ContractProviders
             }
 
             var measurementMapClient = MeasurementMapClient.CreateClient();
+            //MODO: pokupiti if recloser podatak sa CE
             bool isFirstBreakerRecloser = await lifecycleHelper.CheckIfBreakerIsRecloserAsync(defaultIsolationPoints[0]);
 
             #region HeadBreaker

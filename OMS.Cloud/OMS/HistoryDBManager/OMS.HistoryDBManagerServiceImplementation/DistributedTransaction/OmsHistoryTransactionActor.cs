@@ -162,6 +162,12 @@ namespace OMS.HistoryDBManagerImplementation.DistributedTransaction
                         //TODO: Type = resourceDescriptions[consumer.ConsumerId].GetProperty(ModelCode.ENERGYCONSUMER_TYPE).AsEnum(),
                     };
 
+                    if(this.unitOfWork.ConsumerRepository.Get(consumer.ConsumerId) != null)
+                    {
+                        Logger.LogError($"{baseLogString} Prepare => Consumer with gid 0x{consumer.ConsumerId:X16} already exists in DB. Delta Operation: {DeltaOpType.Insert}. Potential fix: Delte rows from Consumer SqlDB.");
+                        return false;
+                    }
+                    
                     this.unitOfWork.ConsumerRepository.Add(consumer);
                 }
 

@@ -291,22 +291,32 @@ namespace NMS.GdaImplementation
                 networkDataModel = incomingNetworkDataModel;
                 Logger.LogDebug($"Current model [HashCode: 0x{networkDataModel.GetHashCode():X16}] becomes Incoming model [HashCode: 0x{incomingNetworkDataModel.GetHashCode():X16}].");
 
-                if (delta.DeltaOrigin == DeltaOriginType.DatabaseDelta)
+
+                if (await StartDistributedTransaction(delta))
                 {
-                    await Commit();
                     updateResult.Result = ResultType.Succeeded;
                 }
-                else if(delta.DeltaOrigin == DeltaOriginType.ImporterDelta)
+                else
                 {
-                    if(await StartDistributedTransaction(delta))
-                    {
-                        updateResult.Result = ResultType.Succeeded;
-                    }
-                    else
-                    {
-                        updateResult.Result = ResultType.Failed;
-                    }
+                    updateResult.Result = ResultType.Failed;
                 }
+
+                //if (delta.DeltaOrigin == DeltaOriginType.DatabaseDelta)
+                //{
+                //    await Commit();
+                //    updateResult.Result = ResultType.Succeeded;
+                //}
+                //else if(delta.DeltaOrigin == DeltaOriginType.ImporterDelta)
+                //{
+                //    if(await StartDistributedTransaction(delta))
+                //    {
+                //        updateResult.Result = ResultType.Succeeded;
+                //    }
+                //    else
+                //    {
+                //        updateResult.Result = ResultType.Failed;
+                //    }
+                //}
             }
             catch (Exception ex)
             {

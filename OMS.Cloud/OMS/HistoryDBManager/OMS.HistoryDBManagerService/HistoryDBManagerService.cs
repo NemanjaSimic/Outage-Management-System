@@ -153,7 +153,6 @@ namespace OMS.HistoryDBManagerService
                 string debugMessage = $"{baseLogString} RunAsync => ReliableDictionaries initialized.";
                 Logger.LogDebug(debugMessage);
                 ServiceEventSource.Current.ServiceMessage(this.Context, $"[HistoryDBManagerService | Information] {debugMessage}");
-
             }
             catch (Exception e)
             {
