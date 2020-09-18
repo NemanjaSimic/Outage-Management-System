@@ -1,11 +1,7 @@
 ﻿using System;
-using System.Collections.Generic;
 using System.Diagnostics.Tracing;
 using System.Fabric;
-using System.Linq;
-using System.Text;
 using System.Threading.Tasks;
-using Microsoft.ServiceFabric.Services.Runtime;
 
 namespace SCADA.FunctionExecutorService
 {
@@ -65,7 +61,7 @@ namespace SCADA.FunctionExecutorService
         }
 
         [NonEvent]
-        public void ServiceMessage(StatelessServiceContext serviceContext, string message, params object[] args)
+        public void ServiceMessage(StatefulServiceContext serviceContext, string message, params object[] args)
         {
             if (this.IsEnabled())
             {
@@ -73,7 +69,7 @@ namespace SCADA.FunctionExecutorService
                 ServiceMessage(
                     serviceContext.ServiceName.ToString(),
                     serviceContext.ServiceTypeName,
-                    serviceContext.InstanceId,
+                    serviceContext.ReplicaId,
                     serviceContext.PartitionId,
                     serviceContext.CodePackageActivationContext.ApplicationName,
                     serviceContext.CodePackageActivationContext.ApplicationTypeName,

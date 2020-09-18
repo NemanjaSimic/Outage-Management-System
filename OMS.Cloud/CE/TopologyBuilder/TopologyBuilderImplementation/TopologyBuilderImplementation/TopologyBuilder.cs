@@ -15,6 +15,8 @@ namespace CE.TopologyBuilderImplementation
     public class TopologyBuilder : ITopologyBuilderContract
     {
         #region Fields
+        private readonly string baseLogString;
+
         private List<Field> fields;
         private HashSet<long> visited;
         private HashSet<long> reclosers;
@@ -22,8 +24,6 @@ namespace CE.TopologyBuilderImplementation
         private Dictionary<long, ITopologyElement> elements;
         private Dictionary<long, List<long>> connections;
         #endregion
-
-        private readonly string baseLogString;
 
         private ICloudLogger logger;
         private ICloudLogger Logger
@@ -39,11 +39,6 @@ namespace CE.TopologyBuilderImplementation
 
             string debugMessage = $"{baseLogString} Ctor => Clients initialized.";
             Logger.LogDebug(debugMessage);
-        }
-
-        public Task<bool> IsAlive()
-        {
-            return Task.Run(() => { return true; });
         }
 
         private Dictionary<long, ITopologyElement> TransformDictionary(Dictionary<long, TopologyElement> dict)
@@ -65,18 +60,18 @@ namespace CE.TopologyBuilderImplementation
             ITopologyElement currentFider = null;
 
             Logger.LogDebug($"{baseLogString} CreateGraphTopology => Calling GetElementModels method from model provider.");
-            var modelProviderClient = ModelProviderClient.CreateClient();
+            var modelProviderClient = CeModelProviderClient.CreateClient();
             var dict = await modelProviderClient.GetElementModels();
             elements = TransformDictionary(dict);
             Logger.LogDebug($"{baseLogString} CreateGraphTopology => GetElementModels method from model provider has been called successfully.");
 
             Logger.LogDebug($"{baseLogString} CreateGraphTopology => Calling GetConnections method from model provider.");
-            modelProviderClient = ModelProviderClient.CreateClient();
+            modelProviderClient = CeModelProviderClient.CreateClient();
             connections = await modelProviderClient.GetConnections();
             Logger.LogDebug($"{baseLogString} CreateGraphTopology => GetConnections method from model provider has been called successfully.");
 
             Logger.LogDebug($"{baseLogString} CreateGraphTopology => Calling GetReclosers method from model provider.");
-            modelProviderClient = ModelProviderClient.CreateClient();
+            modelProviderClient = CeModelProviderClient.CreateClient();
             reclosers = await modelProviderClient.GetReclosers();
             Logger.LogDebug($"{baseLogString} CreateGraphTopology => GetReclosers method from model provider has been called successfully.");
 
@@ -185,6 +180,11 @@ namespace CE.TopologyBuilderImplementation
 
             Logger.LogDebug($"{baseLogString} CreateGraphTopology => Topology successfully created.");
             return topology;
+        }
+
+        public Task<bool> IsAlive()
+        {
+            return Task.Run(() => { return true; });
         }
 
         #region HelperFunctions

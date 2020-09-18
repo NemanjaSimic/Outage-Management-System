@@ -73,7 +73,7 @@ namespace CE.ModelProviderService
 			{
 				new ServiceReplicaListener(context =>
 				{
-					return new WcfCommunicationListener<IModelProviderContract>(context,
+					return new WcfCommunicationListener<ICeModelProviderContract>(context,
 																			this.modelProvider,
 																			WcfUtility.CreateTcpListenerBinding(),
 																			EndpointNames.CeModelProviderServiceEndpoint);

@@ -7,7 +7,6 @@ using Microsoft.ServiceFabric.Services.Communication.Runtime;
 using Microsoft.ServiceFabric.Services.Runtime;
 using OMS.Common.Cloud.Logger;
 using OMS.Common.SCADA;
-using OMS.Common.ScadaContracts.ModelProvider;
 using OMS.Common.WcfClient.SCADA;
 using SCADA.AcquisitionImplementation;
 
@@ -96,7 +95,6 @@ namespace SCADA.AcquisitionService
 
                     message = $"{baseLogString} RunAsync => AcquisitionCycle executed.";
                     Logger.LogVerbose(message);
-                    //ServiceEventSource.Current.ServiceMessage(this.Context, $"[AcquisitionService | Verbose] {message}");
                 }
                 catch (Exception e)
                 {

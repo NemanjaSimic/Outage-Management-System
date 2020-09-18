@@ -127,23 +127,31 @@ namespace OMS.OutageSimulatorService
                 debugMessage = $"{baseLogString} RunAsync => Subscribed to {Topic.SWITCH_STATUS} topic.";
                 Logger.LogDebug(debugMessage);
                 ServiceEventSource.Current.ServiceMessage(this.Context, $"[OMS.OutageSimulatorService | Information] {debugMessage}");
-
-                while (true)
-                {
-                    await controlCycle.Start();
-
-                    var message = $"{baseLogString} RunAsync => ControlCycle executed.";
-                    Logger.LogVerbose(message);
-
-                    await Task.Delay(TimeSpan.FromMilliseconds(2000), cancellationToken);
-                }
-
             }
             catch (Exception e)
             {
                 string errorMessage = $"{baseLogString} RunAsync => Exception caught: {e.Message}.";
                 Logger.LogInformation(errorMessage, e);
                 ServiceEventSource.Current.ServiceMessage(this.Context, $"[OMS.OutageSimulatorService | Error] {errorMessage}");
+            }
+            
+            while (true)
+            {
+                try
+                {
+                    await controlCycle.Start();
+
+                    var message = $"{baseLogString} RunAsync => ControlCycle executed.";
+                    Logger.LogVerbose(message);
+                }
+                catch (Exception e)
+                {
+                    string errorMessage = $"{baseLogString} RunAsync (while) => Exception caught: {e.Message}.";
+                    Logger.LogInformation(errorMessage, e);
+                    ServiceEventSource.Current.ServiceMessage(this.Context, $"[OMS.OutageSimulatorService | Error] {errorMessage}");
+                }
+
+                await Task.Delay(TimeSpan.FromMilliseconds(2000), cancellationToken);
             }
         }
 

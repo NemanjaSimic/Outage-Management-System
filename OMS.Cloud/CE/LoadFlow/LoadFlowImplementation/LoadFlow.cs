@@ -18,13 +18,13 @@ namespace CE.LoadFlowImplementation
 	public class LoadFlow : ILoadFlowContract
     {
         #region Private fields
+        private readonly string baseLogString;
+
         private HashSet<long> reclosers;
         private Dictionary<long, ITopologyElement> feeders;
         private Dictionary<long, ITopologyElement> syncMachines;
         private Dictionary<DailyCurveType, DailyCurve> dailyCurves;
         #endregion
-
-        private readonly string baseLogString;
 
         private ICloudLogger logger;
         private ICloudLogger Logger
@@ -50,79 +50,87 @@ namespace CE.LoadFlowImplementation
 
             TopologyModel topology = inputTopology;
 
-            Dictionary<long, float> loadOfFeeders = new Dictionary<long, float>();
-            feeders = new Dictionary<long, ITopologyElement>();
-            syncMachines = new Dictionary<long, ITopologyElement>();
-            dailyCurves = DailyCurveReader.ReadDailyCurves();
-
-            Logger.LogDebug($"{baseLogString} UpdateLoadFlow => Getting reclosers from model provider.");
-            var modelProviderClient = ModelProviderClient.CreateClient();
-            reclosers = await modelProviderClient.GetReclosers();
-            Logger.LogDebug($"{baseLogString} UpdateLoadFlow => Reclosers were delivered successfully.");
-
-
-            if (topology == null)
+            try
             {
-                string message = $"{baseLogString} UpdateLoadFlow => Topology is null.";
-                Logger.LogWarning(message);
-                //throw new Exception(message);
-                return topology;
-            }
+                Dictionary<long, float> loadOfFeeders = new Dictionary<long, float>();
+                feeders = new Dictionary<long, ITopologyElement>();
+                syncMachines = new Dictionary<long, ITopologyElement>();
+                dailyCurves = DailyCurveReader.ReadDailyCurves();
 
-            await CalculateLoadFlow(topology, loadOfFeeders);
+                Logger.LogDebug($"{baseLogString} UpdateLoadFlow => Getting reclosers from model provider.");
+                var modelProviderClient = CeModelProviderClient.CreateClient();
+                reclosers = await modelProviderClient.GetReclosers();
+                Logger.LogDebug($"{baseLogString} UpdateLoadFlow => Reclosers were delivered successfully.");
 
-            await UpdateLoadFlowFromRecloser(topology, loadOfFeeders);
 
-            foreach (var syncMachine in syncMachines.Values)
-            {
-                await SyncMachine(syncMachine, loadOfFeeders);
-            }
-
-            foreach (var loadFeeder in loadOfFeeders)
-            {
-                if (feeders.TryGetValue(loadFeeder.Key, out ITopologyElement feeder))
+                if (topology == null)
                 {
-                    long signalGid = 0;
-                    foreach (var measurement in feeder.Measurements)
+                    string message = $"{baseLogString} UpdateLoadFlow => Topology is null.";
+                    Logger.LogWarning(message);
+                    //throw new Exception(message);
+                    return topology;
+                }
+
+                await CalculateLoadFlow(topology, loadOfFeeders);
+
+                await UpdateLoadFlowFromRecloser(topology, loadOfFeeders);
+
+                foreach (var syncMachine in syncMachines.Values)
+                {
+                    await SyncMachine(syncMachine, loadOfFeeders);
+                }
+
+                foreach (var loadFeeder in loadOfFeeders)
+                {
+                    if (feeders.TryGetValue(loadFeeder.Key, out ITopologyElement feeder))
                     {
-                        if (measurement.Value.Equals(AnalogMeasurementType.FEEDER_CURRENT.ToString()))
+                        long signalGid = 0;
+                        foreach (var measurement in feeder.Measurements)
                         {
-                            signalGid = measurement.Key;
+                            if (measurement.Value.Equals(AnalogMeasurementType.FEEDER_CURRENT.ToString()))
+                            {
+                                signalGid = measurement.Key;
+                            }
+                        }
+
+                        if (signalGid != 0)
+                        {
+                            Logger.LogDebug($"{baseLogString} UpdateLoadFlow => Calling SendAnalogCommand method from measurement provider. Measurement GID {signalGid:X16}, Value {loadFeeder.Value}.");
+                            var measurementProviderClient = MeasurementProviderClient.CreateClient();
+
+                            await measurementProviderClient.SendAnalogCommand(signalGid, loadFeeder.Value, CommandOriginType.CE_COMMAND);
+                            Logger.LogDebug($"{baseLogString} UpdateLoadFlow => SendAnalogCommand method from measurement provider successfully finished.");
+
+                            AlarmType alarmType = (loadFeeder.Value >= 36) ? AlarmType.HIGH_ALARM : AlarmType.NO_ALARM;
+
+                            Dictionary<long, AnalogModbusData> data = new Dictionary<long, AnalogModbusData>(1)
+                            {
+                                { signalGid, new AnalogModbusData(loadFeeder.Value, alarmType, signalGid, CommandOriginType.CE_COMMAND)}
+                            };
+
+                            Logger.LogDebug($"{baseLogString} UpdateLoadFlow => Calling update analog measurement method from measurement provider.");
+                            measurementProviderClient = MeasurementProviderClient.CreateClient();
+                            await measurementProviderClient.UpdateAnalogMeasurement(data);
+                            Logger.LogDebug($"{baseLogString} UpdateLoadFlow => Update analog measurement method from measurement provider successfully finished.");
+                        }
+                        else
+                        {
+                            Logger.LogWarning($"{baseLogString} UpdateLoadFlow => Feeder with GID 0x{feeder.Id:X16} does not have FEEDER_CURRENT measurement.");
                         }
                     }
-
-                    if (signalGid != 0)
-                    {
-                        Logger.LogDebug($"{baseLogString} UpdateLoadFlow => Calling SendAnalogCommand method from measurement provider. Measurement GID {signalGid:X16}, Value {loadFeeder.Value}.");
-                        var measurementProviderClient = MeasurementProviderClient.CreateClient();
-
-                        await measurementProviderClient.SendAnalogCommand(signalGid, loadFeeder.Value, CommandOriginType.CE_COMMAND);
-                        Logger.LogDebug($"{baseLogString} UpdateLoadFlow => SendAnalogCommand method from measurement provider successfully finished.");
-
-                        AlarmType alarmType = (loadFeeder.Value >= 36) ? AlarmType.HIGH_ALARM : AlarmType.NO_ALARM;
-
-                        Dictionary<long, AnalogModbusData> data = new Dictionary<long, AnalogModbusData>(1)
-                        {
-                            { signalGid, new AnalogModbusData(loadFeeder.Value, alarmType, signalGid, CommandOriginType.CE_COMMAND)}
-                        };
-
-                        Logger.LogDebug($"{baseLogString} UpdateLoadFlow => Calling update analog measurement method from measurement provider.");
-                        measurementProviderClient = MeasurementProviderClient.CreateClient();
-                        await measurementProviderClient.UpdateAnalogMeasurement(data);
-                        Logger.LogDebug($"{baseLogString} UpdateLoadFlow => Update analog measurement method from measurement provider successfully finished.");
-                    }
-                    else
-                    {
-                        Logger.LogWarning($"{baseLogString} UpdateLoadFlow => Feeder with GID 0x{feeder.Id:X16} does not have FEEDER_CURRENT measurement.");
-                    }
                 }
+            }
+            catch (Exception e)
+            {
+                string errorMessage = $"{baseLogString} UpdateLoadFlow => Exception: {e.Message}";
+                Logger.LogError(errorMessage, e);
             }
 
             return topology;
         }
 		#endregion
 
-		#region PrivateMethods
+		#region Private Methods
 		private async Task SyncMachine(ITopologyElement element, Dictionary<long, float> loadOfFeeders)
         {
             string verboseMessage = $"{baseLogString} SyncMachine method called. Element with GID {element?.Id:X16}";
@@ -299,7 +307,7 @@ namespace CE.LoadFlowImplementation
             }
             else
             {
-                Logger.LogFatal($"{baseLogString} CalculateLoadFlowFirst => Element with GID {topology?.FirstNode:X16} does not exist in collection.");
+                Logger.LogDebug($"{baseLogString} CalculateLoadFlowFirst => Element with GID {topology?.FirstNode:X16} does not exist in collection.");
             }
 
             Logger.LogVerbose($"{baseLogString} CalculateLoadFlowFirst => Calulate load flow finished.");

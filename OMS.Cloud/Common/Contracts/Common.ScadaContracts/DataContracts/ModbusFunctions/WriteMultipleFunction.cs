@@ -5,16 +5,15 @@ using OMS.Common.Cloud;
 
 namespace OMS.Common.ScadaContracts.DataContracts.ModbusFunctions
 {
-    [Serializable]
     [DataContract]
     public class WriteMultipleFunction : ModbusFunction, IWriteMultipleFunction
     {
         [DataMember]
-        public ushort StartAddress { get; protected set; }
+        public ushort StartAddress { get; set; }
         [DataMember]
-        public int[] CommandValues { get; protected set; }
+        public int[] CommandValues { get; set; }
         [DataMember]
-        public CommandOriginType CommandOrigin { get; protected set; }
+        public CommandOriginType CommandOrigin { get; set; }
 
         public WriteMultipleFunction(ModbusFunctionCode functionCode, ushort startAddress, int[] commandValues, CommandOriginType commandOrigin)
             : base(functionCode)

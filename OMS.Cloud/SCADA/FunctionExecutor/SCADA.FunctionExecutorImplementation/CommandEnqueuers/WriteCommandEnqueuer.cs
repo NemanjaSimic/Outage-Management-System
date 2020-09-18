@@ -1,12 +1,13 @@
-﻿using Microsoft.WindowsAzure.Storage.Queue;
+﻿using Microsoft.ServiceFabric.Data;
+using Microsoft.ServiceFabric.Data.Notifications;
+using Microsoft.WindowsAzure.Storage.Queue;
 using OMS.Common.Cloud;
-using OMS.Common.Cloud.AzureStorageHelpers;
 using OMS.Common.Cloud.Logger;
 using OMS.Common.Cloud.ReliableCollectionHelpers;
 using OMS.Common.SCADA;
+using OMS.Common.ScadaContracts.DataContracts.ModbusFunctions;
 using OMS.Common.ScadaContracts.FunctionExecutior;
 using System;
-using System.Linq;
 using System.Text;
 using System.Threading.Tasks;
 
@@ -15,9 +16,7 @@ namespace SCADA.FunctionExecutorImplementation.CommandEnqueuers
     public class WriteCommandEnqueuer : IWriteCommandEnqueuerContract
     {
         private readonly string baseLogString;
-        private readonly CloudQueue readCommandQueue;
-        private readonly CloudQueue writeCommandQueue;
-        private readonly CloudQueue modelUpdateCommandQueue;
+        private readonly IReliableStateManager stateManager;
 
         #region Private Properties
         private ICloudLogger logger;
@@ -27,24 +26,89 @@ namespace SCADA.FunctionExecutorImplementation.CommandEnqueuers
         }
         #endregion Private Properties
 
-        public WriteCommandEnqueuer()
+        #region ReliableQueues
+        private bool isReadCommandQueueInitialized;
+        private bool isWriteCommandQueueInitialized;
+        private bool isModelUpdateCommandQueueInitialized;
+
+        private bool ReliableQueuesInitialized
+        {
+            get
+            {
+                return isReadCommandQueueInitialized &&
+                       isWriteCommandQueueInitialized &&
+                       isModelUpdateCommandQueueInitialized;
+            }
+        }
+
+        private ReliableQueueAccess<ModbusFunction> readCommandQueue;
+        private ReliableQueueAccess<ModbusFunction> ReadCommandQueue
+        {
+            get { return readCommandQueue; }
+        }
+
+        private ReliableQueueAccess<ModbusFunction> writeCommandQueue;
+        private ReliableQueueAccess<ModbusFunction> WriteCommandQueue
+        {
+            get { return writeCommandQueue; }
+        }
+
+        private ReliableQueueAccess<ModbusFunction> modelUpdateCommandQueue;
+        private ReliableQueueAccess<ModbusFunction> ModelUpdateCommandQueue
+        {
+            get { return modelUpdateCommandQueue; }
+        }
+
+        private async void OnStateManagerChangedHandler(object sender, NotifyStateManagerChangedEventArgs e)
+        {
+            if (e.Action == NotifyStateManagerChangedAction.Add)
+            {
+                var operation = e as NotifyStateManagerSingleEntityChangedEventArgs;
+                string reliableStateName = operation.ReliableState.Name.AbsolutePath;
+
+                if (reliableStateName == ReliableQueueNames.ReadCommandQueue)
+                {
+                    this.readCommandQueue = await ReliableQueueAccess<ModbusFunction>.Create(stateManager, ReliableQueueNames.ReadCommandQueue);
+                    this.isReadCommandQueueInitialized = true;
+
+                    string debugMessage = $"{baseLogString} OnStateManagerChangedHandler => '{ReliableQueueNames.ReadCommandQueue}' ReliableQueueAccess initialized.";
+                    Logger.LogDebug(debugMessage);
+                }
+                else if (reliableStateName == ReliableQueueNames.WriteCommandQueue)
+                {
+                    this.writeCommandQueue = await ReliableQueueAccess<ModbusFunction>.Create(stateManager, ReliableQueueNames.WriteCommandQueue);
+                    this.isWriteCommandQueueInitialized = true;
+
+                    string debugMessage = $"{baseLogString} OnStateManagerChangedHandler => '{ReliableQueueNames.WriteCommandQueue}' ReliableQueueAccess initialized.";
+                    Logger.LogDebug(debugMessage);
+                }
+                else if (reliableStateName == ReliableQueueNames.ModelUpdateCommandQueue)
+                {
+                    this.modelUpdateCommandQueue = await ReliableQueueAccess<ModbusFunction>.Create(stateManager, ReliableQueueNames.ModelUpdateCommandQueue);
+                    this.isModelUpdateCommandQueueInitialized = true;
+
+                    string debugMessage = $"{baseLogString} OnStateManagerChangedHandler => '{ReliableQueueNames.ModelUpdateCommandQueue}' ReliableQueueAccess initialized.";
+                    Logger.LogDebug(debugMessage);
+                }
+            }
+        }
+        #endregion
+
+        public WriteCommandEnqueuer(IReliableStateManager stateManager)
         {
             this.baseLogString = $"{this.GetType()} [{this.GetHashCode()}] =>{Environment.NewLine}";
 
             string verboseMessage = $"{baseLogString} entering Ctor.";
             Logger.LogVerbose(verboseMessage);
 
-            CloudQueueHelper.TryGetQueue(CloudStorageQueueNames.ReadCommandQueue, out this.readCommandQueue);
-            CloudQueueHelper.TryGetQueue(CloudStorageQueueNames.WriteCommandQueue, out this.writeCommandQueue);
-            CloudQueueHelper.TryGetQueue(CloudStorageQueueNames.ModelUpdateCommandQueue, out this.modelUpdateCommandQueue);
+            this.isReadCommandQueueInitialized = false;
+            this.isWriteCommandQueueInitialized = false;
+            this.isModelUpdateCommandQueueInitialized = false;
 
-            string debugMessage = $"{baseLogString} Ctor => CloudQueues initialized.";
-            Logger.LogDebug(debugMessage);
+            this.stateManager = stateManager;
+            this.stateManager.StateManagerChanged += this.OnStateManagerChangedHandler;
         }
-        public Task<bool> IsAlive()
-        {
-            return Task.Run(() => { return true; });
-        }
+
         #region Command Enqueuers
         public async Task<bool> EnqueueWriteCommand(IWriteModbusFunction modbusFunction)
         {
@@ -53,31 +117,36 @@ namespace SCADA.FunctionExecutorImplementation.CommandEnqueuers
 
             bool success;
 
-            if (!(modbusFunction is IWriteModbusFunction writeModbusFunction))
+            while (!ReliableQueuesInitialized)
             {
-                string message = $"{baseLogString} EnqueueWriteCommand => trying to enqueue modbus function that does not implement IWriteModbusFunction interface.";
-                Logger.LogError(message);
-                throw new ArgumentException(message);
-            }
-
-            if (modelUpdateCommandQueue.PeekMessage() != null)
-            {
-                verboseMessage = $"{baseLogString} EnqueueWriteCommand => '{CloudStorageQueueNames.ModelUpdateCommandQueue}' queue is not empty.";
-                Logger.LogDebug(verboseMessage);
-
-                return false;
+                await Task.Delay(1000);
             }
 
             try
-            {
+            { 
+                if (!(modbusFunction is IWriteModbusFunction writeModbusFunction))
+                {
+                    string message = $"{baseLogString} EnqueueWriteCommand => trying to enqueue modbus function that does not implement IWriteModbusFunction interface.";
+                    Logger.LogError(message);
+                    throw new ArgumentException(message);
+                }
+
+                if ((await modelUpdateCommandQueue.GetCountAsync()) > 0)
+                {
+                    verboseMessage = $"{baseLogString} EnqueueWriteCommand => '{CloudStorageQueueNames.ModelUpdateCommandQueue}' queue is not empty.";
+                    Logger.LogDebug(verboseMessage);
+
+                    return false;
+                }
+
                 //KEY LOGIC
                 if (modbusFunction.CommandOrigin == CommandOriginType.MODEL_UPDATE_COMMAND)
                 {
-                    await this.modelUpdateCommandQueue.AddMessageAsync(new CloudQueueMessage(Serialization.ObjectToByteArray(modbusFunction)));
+                    await this.modelUpdateCommandQueue.EnqueueAsync((ModbusFunction)modbusFunction);
                 }
                 else
                 {
-                    await this.writeCommandQueue.AddMessageAsync(new CloudQueueMessage(Serialization.ObjectToByteArray(modbusFunction)));
+                    await this.writeCommandQueue.EnqueueAsync((ModbusFunction)modbusFunction);
                 }
 
                 success = true;
@@ -102,7 +171,7 @@ namespace SCADA.FunctionExecutorImplementation.CommandEnqueuers
                     Logger.LogInformation(informationMessage);
                 }
                 
-                this.readCommandQueue.Clear();
+                await this.readCommandQueue.ClearAsync();
                 
                 string debugMessage = $"{baseLogString} EnqueueModelUpdateCommands => cloud storage queues that were cleared: '{CloudStorageQueueNames.ReadCommandQueue}'";
                 Logger.LogDebug(debugMessage);
@@ -115,6 +184,11 @@ namespace SCADA.FunctionExecutorImplementation.CommandEnqueuers
             }
 
             return success;
+        }
+
+        public Task<bool> IsAlive()
+        {
+            return Task.Run(() => { return true; });
         }
         #endregion
     }

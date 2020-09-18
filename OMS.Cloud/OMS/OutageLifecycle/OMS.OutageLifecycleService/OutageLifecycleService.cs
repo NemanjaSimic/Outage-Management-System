@@ -5,6 +5,7 @@ using System.Threading;
 using System.Threading.Tasks;
 using Common.OMS;
 using Common.OmsContracts.OutageLifecycle;
+using Common.PubSubContracts.DataContracts.CE;
 using Microsoft.ServiceFabric.Data;
 using Microsoft.ServiceFabric.Data.Collections;
 using Microsoft.ServiceFabric.Services.Communication.Runtime;
@@ -17,6 +18,7 @@ using OMS.Common.Cloud.Names;
 using OMS.Common.NmsContracts;
 using OMS.Common.PubSubContracts;
 using OMS.Common.PubSubContracts.DataContracts.SCADA;
+using OMS.Common.WcfClient.OMS.ModelProvider;
 using OMS.Common.WcfClient.PubSub;
 using OMS.OutageLifecycleImplementation.Algorithm;
 using OMS.OutageLifecycleImplementation.ContractProviders;
@@ -37,7 +39,8 @@ namespace OMS.OutageLifecycleService
 		private readonly IOutageResolutionContract outageResolutionProvider;
 		private readonly INotifySubscriberContract notifySubscriberProvider;
 
-        private readonly int isolationAlgorithmCycleInterval;
+        private const int isolationAlgorithmCycleInterval = 5000;
+        private const int isolationAlgorithmUpperLimit = 30000;
         private readonly IsolationAlgorithmCycle isolationAlgorithmCycle;
 
         private ICloudLogger logger;
@@ -59,12 +62,11 @@ namespace OMS.OutageLifecycleService
 
                 this.potentialOutageReportingProvider = new PotentialOutageReportingProvider(StateManager, lifecycleHelper);
                 this.outageIsolationProvider = new OutageIsolationProvider(StateManager, lifecycleHelper, modelResourcesDesc);
-                this.crewSendingProvider = new CrewSendingProvider(lifecycleHelper);
-                this.outageResolutionProvider = new OutageResolutionProvider(lifecycleHelper);
+                this.crewSendingProvider = new CrewSendingProvider(StateManager, lifecycleHelper);
+                this.outageResolutionProvider = new OutageResolutionProvider(StateManager, lifecycleHelper);
                 this.notifySubscriberProvider = new NotifySubscriberProvider(StateManager);
 
-                this.isolationAlgorithmCycleInterval = 1000;
-                this.isolationAlgorithmCycle = new IsolationAlgorithmCycle(StateManager, lifecycleHelper, this.isolationAlgorithmCycleInterval);
+                this.isolationAlgorithmCycle = new IsolationAlgorithmCycle(StateManager, lifecycleHelper, isolationAlgorithmCycleInterval, isolationAlgorithmUpperLimit);
 
                 string infoMessage = $"{baseLogString} Ctor => Contract providers initialized.";
                 Logger.LogInformation(infoMessage);
@@ -145,13 +147,16 @@ namespace OMS.OutageLifecycleService
                 try
                 {
                     await this.isolationAlgorithmCycle.Start();
+
+                    var message = $"{baseLogString} RunAsync => IsolationAlgorithmCycle executed.";
+                    Logger.LogVerbose(message);
                 }
                 catch (Exception e)
                 {
                     Logger.LogError($"{baseLogString} RunAsync => Exception: {e.Message}");
                 }
 
-                await Task.Delay(this.isolationAlgorithmCycleInterval);
+                await Task.Delay(this.isolationAlgorithmCycle.CycleInterval);
             }
         }
 
@@ -161,6 +166,20 @@ namespace OMS.OutageLifecycleService
             {
                 InitializeReliableCollections();
                 Logger.LogDebug($"{baseLogString} Initialize => ReliableDictionaries initialized.");
+                var modelProviderClient = OutageModelReadAccessClient.CreateClient();
+                using (ITransaction tx = this.StateManager.CreateTransaction())
+				{
+                    var result = await StateManager.TryGetAsync<IReliableDictionary<string, OutageTopologyModel>>(ReliableDictionaryNames.OutageTopologyModel);
+                    if (result.HasValue)
+					{
+                        await result.Value.SetAsync(tx, ReliableDictionaryNames.OutageTopologyModel, await modelProviderClient.GetTopologyModel());
+                        await tx.CommitAsync();
+					}
+                    else
+					{
+                        Logger.LogError($"{baseLogString} Initialize => Reliable dictionary {ReliableDictionaryNames.OutageTopologyModel} was not found.");
+					}
+                }
 
                 var registerSubscriberClient = RegisterSubscriberClient.CreateClient();
                 await registerSubscriberClient.SubscribeToTopic(Topic.SWITCH_STATUS, MicroserviceNames.OmsOutageLifecycleService);
@@ -228,6 +247,25 @@ namespace OMS.OutageLifecycleService
                         else
                         {
                             await StateManager.GetOrAddAsync<IReliableDictionary<long, Dictionary<long, List<long>>>>(tx, ReliableDictionaryNames.RecloserOutageMap);
+                            await tx.CommitAsync();
+                        }
+                    }
+                }),
+
+                Task.Run(async() =>
+                {
+                    using (ITransaction tx = this.StateManager.CreateTransaction())
+                    {
+                        var result = await StateManager.TryGetAsync<IReliableDictionary<string, OutageTopologyModel>>(ReliableDictionaryNames.OutageTopologyModel);
+                        if(result.HasValue)
+                        {
+                            var gidToPointItemMap = result.Value;
+                            await gidToPointItemMap.ClearAsync();
+                            await tx.CommitAsync();
+                        }
+                        else
+                        {
+                            await StateManager.GetOrAddAsync<IReliableDictionary<string, OutageTopologyModel>>(tx, ReliableDictionaryNames.OutageTopologyModel);
                             await tx.CommitAsync();
                         }
                     }

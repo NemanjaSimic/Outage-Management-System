@@ -31,15 +31,15 @@ namespace Common.OmsContracts.ModelAccess
 		[OperationContract]
 		Task RemoveAllEquipments();
 
-        [OperationContract]
-        Task<IEnumerable<Equipment>> FindEquipment(EquipmentExpression expression);
+        //[OperationContract]
+        //Task<IEnumerable<Equipment>> FindEquipment(EquipmentExpression expression);
     }
 
     
-    [DataContract]
-    public class EquipmentExpression
-	{
-        [DataMember]
-        public Expression<Func<Equipment, bool>> Predicate { get; set; }
-    }
+ //   [DataContract]
+ //   public class EquipmentExpression
+	//{
+ //       [DataMember]
+ //       public Expression<Func<Equipment, bool>> Predicate { get; set; }
+ //   }
 }

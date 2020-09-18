@@ -10,6 +10,7 @@ using Microsoft.ServiceFabric.Data.Notifications;
 using OMS.Common.Cloud;
 using OMS.Common.Cloud.Logger;
 using OMS.Common.Cloud.ReliableCollectionHelpers;
+using OMS.Common.WcfClient.CE;
 using OMS.Common.WcfClient.OMS.HistoryDBManager;
 using OMS.Common.WcfClient.OMS.ModelAccess;
 using OMS.Common.WcfClient.OMS.ModelProvider;
@@ -38,12 +39,14 @@ namespace OMS.OutageLifecycleImplementation.ContractProviders
 
 		#region Reliable Dictionaries
 		private bool isRecloserOutageMapInitialized;
+        private bool isOutageTopologyModelInitialized;
 
-		private bool ReliableDictionariesInitialized
+        private bool ReliableDictionariesInitialized
 		{
 			get
 			{
-				return isRecloserOutageMapInitialized;
+				return isRecloserOutageMapInitialized &&
+                       isOutageTopologyModelInitialized;
 			}
 		}
 
@@ -51,6 +54,12 @@ namespace OMS.OutageLifecycleImplementation.ContractProviders
         private ReliableDictionaryAccess<long, Dictionary<long, List<long>>> RecloserOutageMap
         {
             get { return recloserOutageMap; }
+        }
+
+        private ReliableDictionaryAccess<string, OutageTopologyModel> outageTopologyModel;
+        private ReliableDictionaryAccess<string, OutageTopologyModel> OutageTopologyModel
+        {
+            get { return outageTopologyModel; }
         }
 
         private async void OnStateManagerChangedHandler(object sender, NotifyStateManagerChangedEventArgs e)
@@ -66,6 +75,14 @@ namespace OMS.OutageLifecycleImplementation.ContractProviders
                     this.isRecloserOutageMapInitialized = true;
 
                     string debugMessage = $"{baseLogString} OnStateManagerChangedHandler => '{ReliableDictionaryNames.RecloserOutageMap}' ReliableDictionaryAccess initialized.";
+                    Logger.LogDebug(debugMessage);
+                }
+                else if (reliableStateName == ReliableDictionaryNames.OutageTopologyModel)
+                {
+                    this.outageTopologyModel = await ReliableDictionaryAccess<string, OutageTopologyModel>.Create(stateManager, ReliableDictionaryNames.OutageTopologyModel);
+                    this.isOutageTopologyModelInitialized = true;
+
+                    string debugMessage = $"{baseLogString} OnStateManagerChangedHandler => '{ReliableDictionaryNames.OutageTopologyModel}' ReliableDictionaryAccess initialized.";
                     Logger.LogDebug(debugMessage);
                 }
             }
@@ -87,8 +104,9 @@ namespace OMS.OutageLifecycleImplementation.ContractProviders
             };
 
 			this.isRecloserOutageMapInitialized = false;
+            this.isOutageTopologyModelInitialized = false;
 
-			this.stateManager = stateManager;
+            this.stateManager = stateManager;
 			this.stateManager.StateManagerChanged += this.OnStateManagerChangedHandler;
 		}
 
@@ -102,30 +120,39 @@ namespace OMS.OutageLifecycleImplementation.ContractProviders
                 await Task.Delay(1000);
             }
 
-            var historyDBManagerClient = HistoryDBManagerClient.CreateClient();
-            var outageModelReadAccessClient = OutageModelReadAccessClient.CreateClient();
-
-            var topology = await outageModelReadAccessClient.GetTopologyModel();
-            var affectedConsumersGids = lifecycleHelper.GetAffectedConsumers(elementGid, topology);
-
-            if(!(await CheckPreconditions(elementGid, commandOriginType, affectedConsumersGids, outageModelReadAccessClient, historyDBManagerClient)))
-            {
-                Logger.LogError($"{baseLogString} ReportPotentialOutage => Parameters do not satisfy required preconditions. OutageId: {elementGid}, CommandOriginType: {commandOriginType}");
-                return false;
-            }
-
-            Logger.LogInformation($"{baseLogString} ReportPotentialOutage => Reporting outage for gid: 0x{elementGid:X16}, CommandOriginType: {commandOriginType}");
-
-            if (affectedConsumersGids.Count == 0)
-            {
-                await OnZeroAffectedConsumersCase(elementGid, historyDBManagerClient);
-
-                Logger.LogError($"{baseLogString} ReportPotentialOutage => There is no affected consumers => outage report is not valid. ElementGid: 0x{elementGid:X16}, CommandOriginType: {commandOriginType}");
-                return false;
-            }
-
             try
             {
+                #region Preconditions
+                var ceModelProviderClient = CeModelProviderClient.CreateClient();
+                if (await ceModelProviderClient.IsRecloser(elementGid))
+                {
+                    Logger.LogWarning($"{baseLogString} ReportPotentialOutage => Element with gid 0x{elementGid:X16} is a Recloser. Call to ReportPotentialOutage aborted.");
+                    return false;
+                }
+
+                var enumerableTopology = await OutageTopologyModel.GetEnumerableDictionaryAsync();
+
+                if (!enumerableTopology.ContainsKey(ReliableDictionaryNames.OutageTopologyModel))
+                {
+                    Logger.LogError($"{baseLogString} ReportPotentialOutage => Topology not found in Rel Dictionary: {ReliableDictionaryNames.OutageTopologyModel}.");
+                    return false;
+                }
+
+                var topology = enumerableTopology[ReliableDictionaryNames.OutageTopologyModel];
+                var affectedConsumersGids = lifecycleHelper.GetAffectedConsumers(elementGid, topology);
+
+                var historyDBManagerClient = HistoryDBManagerClient.CreateClient();
+                var outageModelReadAccessClient = OutageModelReadAccessClient.CreateClient();
+
+                if (!(await CheckPreconditions(elementGid, commandOriginType, affectedConsumersGids, outageModelReadAccessClient, historyDBManagerClient)))
+                {
+                    Logger.LogError($"{baseLogString} ReportPotentialOutage => Parameters do not satisfy required preconditions. OutageId: {elementGid}, CommandOriginType: {commandOriginType}");
+                    return false;
+                }
+                #endregion Preconditions
+
+                Logger.LogInformation($"{baseLogString} ReportPotentialOutage => Reporting outage for gid: 0x{elementGid:X16}, CommandOriginType: {commandOriginType}");
+
                 var result = await StoreActiveOutage(elementGid, affectedConsumersGids, topology);
 
                 if (!result.HasValue)
@@ -199,21 +226,31 @@ namespace OMS.OutageLifecycleImplementation.ContractProviders
                 return false;
             }
 
+            if (affectedConsumersGids.Count == 0)
+            {
+                await OnZeroAffectedConsumersCase(elementGid, historyDBManagerClient);
+
+                Logger.LogError($"{baseLogString} ReportPotentialOutage => There is no affected consumers => outage report is not valid. ElementGid: 0x{elementGid:X16}, CommandOriginType: {commandOriginType}");
+                return false;
+            }
+
             return true;
         }
 
         private async Task<ConditionalValue<OutageEntity>> StoreActiveOutage(long elementGid, List<long> affectedConsumersGids, OutageTopologyModel topology)
         {
+            //var expression = new OutageExpression()
+            //{
+            //    Predicate = o => o.OutageElementGid == elementGid && o.OutageState != OutageState.ARCHIVED,
+            //};
+
+            //var outages = await outageModelAccessClient.FindOutage(expression);
+
             var outageModelAccessClient = OutageModelAccessClient.CreateClient();
+            var allOutages = await outageModelAccessClient.GetAllOutages();
+            var targetedOutages = allOutages.Where(outage => outage.OutageElementGid == elementGid && outage.OutageState != OutageState.ARCHIVED);
 
-            var expression = new OutageExpression()
-            {
-                Predicate = o => o.OutageElementGid == elementGid && o.OutageState != OutageState.ARCHIVED,
-            };
-
-            var outages = await outageModelAccessClient.FindOutage(expression);
-
-            if (outages.FirstOrDefault() != null)
+            if (targetedOutages.FirstOrDefault() != null)
             {
                 Logger.LogWarning($"{baseLogString} StoreActiveOutage => Malfunction on element with gid: 0x{elementGid:x16} has already been reported.");
                 return new ConditionalValue<OutageEntity>(false, null);

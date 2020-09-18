@@ -3,6 +3,7 @@ using Common.OmsContracts.OutageLifecycle;
 using Common.PubSubContracts.DataContracts.CE;
 using OMS.Common.Cloud;
 using OMS.Common.Cloud.Logger;
+using OMS.Common.WcfClient.CE;
 using OMS.Common.WcfClient.OMS;
 using OMS.Common.WcfClient.OMS.ModelProvider;
 using OMS.Common.WcfClient.OMS.OutageLifecycle;
@@ -14,6 +15,8 @@ namespace OMS.CallTrackingImplementation
 {
     public class TrackingAlgorithm
 	{
+        private readonly string baseLogString;
+
         private OutageTopologyModel outageTopologyModel;
 
         //TODO: Mozda reliable dic/queue
@@ -24,6 +27,11 @@ namespace OMS.CallTrackingImplementation
         private ICloudLogger Logger
         {
             get { return logger ?? (logger = CloudLoggerFactory.GetLogger()); }
+        }
+
+        public TrackingAlgorithm()
+        {
+            this.baseLogString = $"{this.GetType()} [{this.GetHashCode()}] =>{Environment.NewLine}";
         }
 
         public async Task Start(List<long> calls)
@@ -76,9 +84,17 @@ namespace OMS.CallTrackingImplementation
 
             var reportOutageClient = PotentialOutageReportingClient.CreateClient();
 
-            foreach (var item in this.outages)
+            foreach (var potentialOutageElementGid in this.outages)
             {
-                await reportOutageClient.ReportPotentialOutage(item, CommandOriginType.NON_SCADA_OUTAGE);
+                var ceModelProviderClient = CeModelProviderClient.CreateClient();
+                if (!await ceModelProviderClient.IsRecloser(potentialOutageElementGid))
+                {
+                    await reportOutageClient.ReportPotentialOutage(potentialOutageElementGid, CommandOriginType.NON_SCADA_OUTAGE);
+                }
+                else
+                {
+                    Logger.LogDebug($"{baseLogString} Start => Element with gid 0x{potentialOutageElementGid:X16} is a Recloser. ReportPotentialOutage call is not required.");
+                }
             }
         }
 

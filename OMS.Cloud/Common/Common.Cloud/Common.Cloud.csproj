@@ -62,6 +62,7 @@
     <Compile Include="Properties\AssemblyInfo.cs" />
     <Compile Include="ReliableCollectionHelpers\ReliableDictionaryAccess.cs" />
     <Compile Include="ReliableCollectionHelpers\ReliableDictionaryHelper.cs" />
+    <Compile Include="ReliableCollectionHelpers\ReliableQueueAccess.cs" />
     <Compile Include="ReliableCollectionHelpers\ReliableStateManagerHelper.cs" />
     <Compile Include="ReliableCollectionHelpers\Serialization.cs" />
     <Compile Include="ServiceDefines.cs" />

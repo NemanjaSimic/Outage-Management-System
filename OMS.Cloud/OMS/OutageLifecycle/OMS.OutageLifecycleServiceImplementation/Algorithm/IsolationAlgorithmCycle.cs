@@ -12,8 +12,6 @@ using OMS.Common.WcfClient.OMS.ModelProvider;
 using OMS.OutageLifecycleImplementation.Helpers;
 using System;
 using System.Collections.Generic;
-using System.Linq;
-using System.Text;
 using System.Threading.Tasks;
 
 namespace OMS.OutageLifecycleImplementation.Algorithm
@@ -21,12 +19,10 @@ namespace OMS.OutageLifecycleImplementation.Algorithm
     public class IsolationAlgorithmCycle
     {
         private readonly string baseLogString;
-        private readonly int isolationAlgorithmCycleInterval;
         private readonly IReliableStateManager stateManager;
-
         private readonly OutageLifecycleHelper lifecycleHelper;
         private readonly OutageMessageMapper outageMessageMapper;
-
+        
         private ICloudLogger logger;
 
         private ICloudLogger Logger
@@ -37,13 +33,15 @@ namespace OMS.OutageLifecycleImplementation.Algorithm
         #region Reliable Dictionaries
         private bool isStartedIsolationAlgorithmsInitialized;
         private bool isMonitoredHeadBreakerMeasurementsInitialized;
+        private bool isOutageTopologyModelInitialized;
 
         private bool ReliableDictionariesInitialized
         {
             get
             {
                 return isStartedIsolationAlgorithmsInitialized &&
-                       isMonitoredHeadBreakerMeasurementsInitialized;
+                       isMonitoredHeadBreakerMeasurementsInitialized &&
+                       isOutageTopologyModelInitialized;
             }
         }
 
@@ -57,6 +55,12 @@ namespace OMS.OutageLifecycleImplementation.Algorithm
         private ReliableDictionaryAccess<long, DiscreteModbusData> MonitoredHeadBreakerMeasurements
         {
             get { return monitoredHeadBreakerMeasurements; }
+        }
+
+        private ReliableDictionaryAccess<string, OutageTopologyModel> outageTopologyModel;
+        private ReliableDictionaryAccess<string, OutageTopologyModel> OutageTopologyModel
+        {
+            get { return outageTopologyModel; }
         }
 
         private async void OnStateManagerChangedHandler(object sender, NotifyStateManagerChangedEventArgs e)
@@ -82,20 +86,42 @@ namespace OMS.OutageLifecycleImplementation.Algorithm
                     string debugMessage = $"{baseLogString} OnStateManagerChangedHandler => '{ReliableDictionaryNames.MonitoredHeadBreakerMeasurements}' ReliableDictionaryAccess initialized.";
                     Logger.LogDebug(debugMessage);
                 }
+                else if (reliableStateName == ReliableDictionaryNames.OutageTopologyModel)
+                {
+                    this.outageTopologyModel = await ReliableDictionaryAccess<string, OutageTopologyModel>.Create(stateManager, ReliableDictionaryNames.OutageTopologyModel);
+                    this.isOutageTopologyModelInitialized = true;
+
+                    string debugMessage = $"{baseLogString} OnStateManagerChangedHandler => '{ReliableDictionaryNames.OutageTopologyModel}' ReliableDictionaryAccess initialized.";
+                    Logger.LogDebug(debugMessage);
+                }
             }
         }
         #endregion Reliable Dictionaries
 
-        public IsolationAlgorithmCycle(IReliableStateManager stateManager, OutageLifecycleHelper lifecycleHelper, int isolationAlgorithmCycleInterval)
+        private readonly int cycleInterval;
+        public int CycleInterval 
+        { 
+            get { return cycleInterval; }
+        }
+
+        private readonly int cycleUpperLimit;
+        public int CycleUpperLimit
+        {
+            get { return cycleUpperLimit; }
+        }
+
+        public IsolationAlgorithmCycle(IReliableStateManager stateManager, OutageLifecycleHelper lifecycleHelper, int cycleInterval, int cycleUpperLimit)
         {
             this.baseLogString = $"{this.GetType()} [{this.GetHashCode()}] =>{Environment.NewLine}";
 
             this.lifecycleHelper = lifecycleHelper;
             this.outageMessageMapper = new OutageMessageMapper();
-            this.isolationAlgorithmCycleInterval = isolationAlgorithmCycleInterval;
+            this.cycleInterval = cycleInterval;
+            this.cycleUpperLimit = cycleUpperLimit;
 
             this.isStartedIsolationAlgorithmsInitialized = false;
             this.isMonitoredHeadBreakerMeasurementsInitialized = false;
+            this.isOutageTopologyModelInitialized = false;
 
             this.stateManager = stateManager;
             this.stateManager.StateManagerChanged += this.OnStateManagerChangedHandler;
@@ -108,11 +134,24 @@ namespace OMS.OutageLifecycleImplementation.Algorithm
                 await Task.Delay(1000);
             }
 
-            var outageModelReadAccessClient = OutageModelReadAccessClient.CreateClient();
-            var topology = await outageModelReadAccessClient.GetTopologyModel();
-
-            var tasks = new List<Task>();
             var enumerableStartedAlgorithms = await StartedIsolationAlgorithms.GetEnumerableDictionaryAsync();
+
+            if(enumerableStartedAlgorithms.Count == 0)
+            {
+                Logger.LogVerbose($"{baseLogString} Start => No started algorithms.");
+                return;
+            }
+
+            var enumerableTopology = await OutageTopologyModel.GetEnumerableDictionaryAsync();
+
+            if (!enumerableTopology.ContainsKey(ReliableDictionaryNames.OutageTopologyModel))
+            {
+                Logger.LogError($"{baseLogString} Start => Topology not found in Rel Dictionary: {ReliableDictionaryNames.OutageTopologyModel}.");
+                return;
+            }
+
+            var topology = enumerableTopology[ReliableDictionaryNames.OutageTopologyModel];
+            var tasks = new List<Task>();
             
             foreach(var algorithm in enumerableStartedAlgorithms.Values)
             {
@@ -125,7 +164,8 @@ namespace OMS.OutageLifecycleImplementation.Algorithm
 
         private async Task StartIndividualAlgorithmCycle(IsolationAlgorithm algorithm, OutageTopologyModel topology)
         {
-            if (algorithm.CycleCounter * isolationAlgorithmCycleInterval > 10000)
+            //END CONDITION - poslednji otvoren brejker se nije otvorio vise od 'cycleUpperLimit' milisekundi => on predstavlja prvu optimalnu izolacionu tacku
+            if (algorithm.CycleCounter * CycleInterval > CycleUpperLimit)
             {
                 await FinishIndividualAlgorithmCycle(algorithm, topology);
                 return;

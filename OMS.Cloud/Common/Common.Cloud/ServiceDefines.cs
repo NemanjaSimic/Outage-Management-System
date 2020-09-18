@@ -56,7 +56,7 @@ namespace OMS.Common.Cloud
                 
                 //SCADA
                 { MicroserviceNames.ScadaModelProviderService,      ServiceType.STATEFUL_SERVICE    },
-                { MicroserviceNames.ScadaFunctionExecutorService,   ServiceType.STATELESS_SERVICE   },
+                { MicroserviceNames.ScadaFunctionExecutorService,   ServiceType.STATEFUL_SERVICE    },
                 { MicroserviceNames.ScadaCommandingService,         ServiceType.STATELESS_SERVICE   },
                 { MicroserviceNames.ScadaAcquisitionService,        ServiceType.STATELESS_SERVICE   },
                 
@@ -75,7 +75,7 @@ namespace OMS.Common.Cloud
                 
                 //OMS
                 { MicroserviceNames.OmsModelProviderService,        ServiceType.STATEFUL_SERVICE    },
-                { MicroserviceNames.OmsOutageLifecycleService,      ServiceType.STATEFUL_SERVICE   },
+                { MicroserviceNames.OmsOutageLifecycleService,      ServiceType.STATEFUL_SERVICE    },
                 { MicroserviceNames.OmsCallTrackingService,         ServiceType.STATEFUL_SERVICE    },
                 { MicroserviceNames.OmsHistoryDBManagerService,     ServiceType.STATEFUL_SERVICE    },
                 { MicroserviceNames.OmsEmailService,                ServiceType.STATELESS_SERVICE   },  

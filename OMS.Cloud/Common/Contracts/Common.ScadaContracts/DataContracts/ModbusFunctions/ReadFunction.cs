@@ -4,14 +4,13 @@ using System.Runtime.Serialization;
 
 namespace OMS.Common.ScadaContracts.DataContracts.ModbusFunctions
 {
-    [Serializable]
     [DataContract]
     public class ReadFunction : ModbusFunction, IReadModbusFunction
     {
         [DataMember]
-        public ushort StartAddress { get; protected set; }
+        public ushort StartAddress { get; set; }
         [DataMember]
-        public ushort Quantity { get; protected set; }
+        public ushort Quantity { get; set; }
         
         public ReadFunction(ModbusFunctionCode functionCode, ushort startAddress, ushort quantity)
             : base(functionCode)

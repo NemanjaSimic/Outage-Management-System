@@ -48,7 +48,7 @@ namespace CE.TopologyProviderImplementation
             Stack<long> stack = new Stack<long>();
 
             Logger.LogDebug($"{baseLogString} ConvertTopologyToUIModel => Calling GetReclosers method from model provider client.");
-            var modelProviderClient = ModelProviderClient.CreateClient();
+            var modelProviderClient = CeModelProviderClient.CreateClient();
             var reclosers = await modelProviderClient.GetReclosers();
             Logger.LogDebug($"{baseLogString} ConvertTopologyToUIModel => GetReclosers method from model provider client has been called successfully.");
 
@@ -164,7 +164,7 @@ namespace CE.TopologyProviderImplementation
             }
 
             Logger.LogDebug($"{baseLogString} ConvertTopologyToOMSModel => Calling GetReclosers method from model provider client.");
-            var modelProviderClient = ModelProviderClient.CreateClient();
+            var modelProviderClient = CeModelProviderClient.CreateClient();
             var reclosers = await modelProviderClient.GetReclosers();
             Logger.LogDebug($"{baseLogString} ConvertTopologyToOMSModel => GetReclosers method from model provider client has been called successfully.");
 

@@ -52,28 +52,28 @@ namespace OMS.HistoryDBManagerImplementation.ModelAccess
 			});
 		}
 
-		public Task<IEnumerable<Equipment>> FindEquipment(EquipmentExpression expression)
-		{
-			return Task.Run(() =>
-			{
-				IEnumerable<Equipment> equipment = new List<Equipment>();
+		//public Task<IEnumerable<Equipment>> FindEquipment(EquipmentExpression expression)
+		//{
+		//	return Task.Run(() =>
+		//	{
+		//		IEnumerable<Equipment> equipment = new List<Equipment>();
 
-				using (var unitOfWork = new UnitOfWork())
-				{
-					try
-					{
-						equipment = unitOfWork.EquipmentRepository.Find(expression.Predicate);
-					}
-					catch (Exception e)
-					{
-						string message = $"{baseLogString} FindEquipment => Exception: {e.Message}";
-						Logger.LogError(message, e);
-					}
-				}
+		//		using (var unitOfWork = new UnitOfWork())
+		//		{
+		//			try
+		//			{
+		//				equipment = unitOfWork.EquipmentRepository.Find(expression.Predicate);
+		//			}
+		//			catch (Exception e)
+		//			{
+		//				string message = $"{baseLogString} FindEquipment => Exception: {e.Message}";
+		//				Logger.LogError(message, e);
+		//			}
+		//		}
 
-				return equipment;
-			});
-		}
+		//		return equipment;
+		//	});
+		//}
 
 		public Task<IEnumerable<Equipment>> GetAllEquipments()
 		{

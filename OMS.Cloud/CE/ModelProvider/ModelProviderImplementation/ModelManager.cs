@@ -261,26 +261,26 @@ namespace CE.ModelProviderImplementation
 
 			ModelDelta modelDelta = new ModelDelta();
 
-            var clearTasks = new List<Task>
-            {
-                TopologyElements.ClearAsync(),
-                Measurements.ClearAsync(),
-                EnergySources.ClearAsync(),
-                ElementConnections.ClearAsync(),
-                MeasurementToConnectedTerminalMap.ClearAsync(),
-                TerminalToConnectedElementsMap.ClearAsync(),
-                BaseVoltages.ClearAsync(),
-                Reclosers.ClearAsync()
-            };
-
-            Task.WaitAll(clearTasks.ToArray());
-
-			await energySources.SetAsync(ReliableDictionaryNames.EnergySources, new List<long>());
-
-			await reclosers.SetAsync( ReliableDictionaryNames.Reclosers, new HashSet<long>());
-
 			try
 			{
+				//var clearTasks = new List<Task>
+				//{
+				await TopologyElements.ClearAsync();
+				await Measurements.ClearAsync();
+				await EnergySources.ClearAsync();
+				await ElementConnections.ClearAsync();
+				await MeasurementToConnectedTerminalMap.ClearAsync();
+				await TerminalToConnectedElementsMap.ClearAsync();
+				await BaseVoltages.ClearAsync();
+				await Reclosers.ClearAsync();
+				//};
+
+				//Task.WaitAll(clearTasks.ToArray());
+
+				await energySources.SetAsync(ReliableDictionaryNames.EnergySources, new List<long>());
+
+				await reclosers.SetAsync( ReliableDictionaryNames.Reclosers, new HashSet<long>());
+
 				Logger.LogDebug($"{baseLogString} TryGetAllModelEntities => Getting all network model elements and converting them.");
 
 				await GetBaseVoltagesAsync();
@@ -402,6 +402,7 @@ namespace CE.ModelProviderImplementation
 
 			return modelDelta;
 		}
+		
 		private async Task GetBaseVoltagesAsync()
 		{
 			string verboseMessage = $"{baseLogString} entering GetBaseVoltagesAsync method.";
@@ -436,7 +437,15 @@ namespace CE.ModelProviderImplementation
 						var enumerableTopologyElements = await TopologyElements.GetEnumerableDictionaryAsync();
 						if (enumerableTopologyElements.TryGetValue(elementId, out ITopologyElement element))
 						{
-							element.Measurements.Add(measurement.Id, measurement.GetMeasurementType());
+							if(!element.Measurements.ContainsKey(measurement.Id))
+                            {
+								element.Measurements.Add(measurement.Id, measurement.GetMeasurementType());
+                            }
+							else
+                            {
+								Logger.LogWarning($"{baseLogString} PutMeasurementsInElements => element.Measurements contains key: 0x{measurement.Id:X16}");
+                            }
+
 							measurement.ElementId = elementId;
 
 							if (measurement is DiscreteMeasurement)
@@ -444,30 +453,30 @@ namespace CE.ModelProviderImplementation
 								var measurementProviderClient = MeasurementProviderClient.CreateClient();
 								await measurementProviderClient.AddDiscreteMeasurement((DiscreteMeasurement)measurement);
 							}
-							else if (measurement is AnalogMeasurement)
-							{
-								var measurementProviderClient = MeasurementProviderClient.CreateClient();
-								await measurementProviderClient.AddAnalogMeasurement((AnalogMeasurement)measurement);
-							}
 
 							if (measurement.GetMeasurementType().Equals(AnalogMeasurementType.FEEDER_CURRENT.ToString()))
 							{
 								await TopologyElements.SetAsync(elementId, new Feeder(element));
 							}
+							else
+                            {
+								await TopologyElements.SetAsync(elementId, element);
+							}
 						}
 						else
 						{
-							Logger.LogError($"{baseLogString} PutMeasurementsInElement => Element with GID {elementId:16X} does not exist in elements dictionary.");
+							Logger.LogError($"{baseLogString} PutMeasurementsInElement => Element with GID 0x{elementId:16X} does not exist in elements dictionary.");
 						}
 					}
-					catch (Exception)
+					catch (Exception e)
 					{
-						Logger.LogError($"{baseLogString} PutMeasurementsInElement =>  Failed to find appropriate element for mesuremnt with GID {measurement.Id:16X}. There is no conducting equipment connected to common terminal.");
+						Logger.LogError($"{baseLogString} PutMeasurementsInElement =>  {e.Message} {Environment.NewLine} {e.StackTrace}");
+						//Logger.LogError($"{baseLogString} PutMeasurementsInElement =>  Failed to find appropriate element for mesuremnt with GID {measurement.Id:16X}. There is no conducting equipment connected to common terminal.");
 					}
 				}
 				else
 				{
-					Logger.LogError($"{baseLogString} PutMeasurementsInElement => Terminal with GID {terminalId:X16} does not exist in terminal to element map.");
+					Logger.LogError($"{baseLogString} PutMeasurementsInElement => Terminal with GID 0x{terminalId:X16} does not exist in terminal to element map.");
 				}
 			}
 			else

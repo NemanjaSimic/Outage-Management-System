@@ -36,10 +36,10 @@ namespace OMS.Common.WcfClient.OMS.ModelAccess
 			return InvokeWithRetryAsync(client => client.Channel.AddEquipment(equipment));
 		}
 
-        public Task<IEnumerable<Equipment>> FindEquipment(EquipmentExpression expression)
-        {
-            return InvokeWithRetryAsync(client => client.Channel.FindEquipment(expression));
-        }
+        //public Task<IEnumerable<Equipment>> FindEquipment(EquipmentExpression expression)
+        //{
+        //    return InvokeWithRetryAsync(client => client.Channel.FindEquipment(expression));
+        //}
 
         public Task<IEnumerable<Equipment>> GetAllEquipments()
 		{

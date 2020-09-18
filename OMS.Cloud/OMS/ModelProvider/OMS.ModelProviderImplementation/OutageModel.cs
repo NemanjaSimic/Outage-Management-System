@@ -1,8 +1,4 @@
-﻿using Common.CeContracts;
-using Common.CeContracts.TopologyProvider;
-using Common.OmsContracts.HistoryDBManager;
-using Common.OmsContracts.OutageLifecycle;
-using Common.PubSubContracts.DataContracts.CE;
+﻿using Common.PubSubContracts.DataContracts.CE;
 using Microsoft.ServiceFabric.Data;
 using Microsoft.ServiceFabric.Data.Notifications;
 using OMS.Common.Cloud;
@@ -12,7 +8,6 @@ using OMS.Common.Cloud.ReliableCollectionHelpers;
 using OMS.Common.PubSubContracts;
 using OMS.Common.PubSubContracts.Interfaces;
 using OMS.Common.WcfClient.CE;
-using OMS.Common.WcfClient.OMS;
 using OMS.Common.WcfClient.OMS.HistoryDBManager;
 using OMS.Common.WcfClient.OMS.OutageLifecycle;
 using System;

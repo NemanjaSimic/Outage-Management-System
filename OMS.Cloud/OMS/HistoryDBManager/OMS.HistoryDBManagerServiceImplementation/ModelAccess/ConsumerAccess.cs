@@ -115,28 +115,28 @@ namespace OMS.HistoryDBManagerImplementation.ModelAccess
 			});
 		}
 
-		public Task<IEnumerable<Consumer>> FindConsumer(ConsumerExpression expression)
-		{
-			return Task.Run(() =>
-			{
-				IEnumerable<Consumer> consumers = new List<Consumer>();
+		//public Task<IEnumerable<Consumer>> FindConsumer(ConsumerExpression expression)
+		//{
+		//	return Task.Run(() =>
+		//	{
+		//		IEnumerable<Consumer> consumers = new List<Consumer>();
 
-				using (var unitOfWork = new UnitOfWork())
-				{
-					try
-					{
-						consumers = unitOfWork.ConsumerRepository.Find(expression.Predicate);
-					}
-					catch (Exception e)
-					{
-						string message = $"{baseLogString} FindConsumer => Exception: {e.Message}";
-						Logger.LogError(message, e);
-					}
-				}
+		//		using (var unitOfWork = new UnitOfWork())
+		//		{
+		//			try
+		//			{
+		//				consumers = unitOfWork.ConsumerRepository.Find(expression.Predicate);
+		//			}
+		//			catch (Exception e)
+		//			{
+		//				string message = $"{baseLogString} FindConsumer => Exception: {e.Message}";
+		//				Logger.LogError(message, e);
+		//			}
+		//		}
 
-				return consumers;
-			});
-		}
+		//		return consumers;
+		//	});
+		//}
 
 		public Task<IEnumerable<Consumer>> GetAllConsumers()
 		{

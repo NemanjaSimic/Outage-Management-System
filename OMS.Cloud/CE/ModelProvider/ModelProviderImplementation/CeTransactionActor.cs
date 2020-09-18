@@ -69,7 +69,7 @@ namespace CE.ModelProviderImplementation
 
             try
             {
-                var modelProviderClient = ModelProviderClient.CreateClient();
+                var modelProviderClient = CeModelProviderClient.CreateClient();
                 success = await modelProviderClient.Prepare();
             }
             catch (Exception ex)
@@ -101,7 +101,7 @@ namespace CE.ModelProviderImplementation
 
             try
             {
-                var modelProviderClient = ModelProviderClient.CreateClient();
+                var modelProviderClient = CeModelProviderClient.CreateClient();
                 await modelProviderClient.Commit();
                 Logger.LogInformation($"{baseLogString} Commit => Commit on CE Transaction actor SUCCESSFULLY finished.");
             }
@@ -125,7 +125,7 @@ namespace CE.ModelProviderImplementation
 
             try
             {
-                var modelProviderClient = ModelProviderClient.CreateClient();
+                var modelProviderClient = CeModelProviderClient.CreateClient();
                 await modelProviderClient.Rollback();
                 Logger.LogInformation($"{baseLogString} Rollback => Rollback on CE Transaction actor SUCCESSFULLY finished.");
             }

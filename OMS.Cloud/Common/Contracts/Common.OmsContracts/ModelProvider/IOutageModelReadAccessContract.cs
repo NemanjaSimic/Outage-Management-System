@@ -11,11 +11,10 @@ namespace Common.OmsContracts.ModelProvider
     [ServiceContract]
     public interface IOutageModelReadAccessContract : IService, IHealthChecker
     {
-
         [OperationContract]
         [ServiceKnownType(typeof(OutageTopologyModel))]
         Task<OutageTopologyModel> GetTopologyModel();
-        
+
         [OperationContract]
         Task<Dictionary<long, long>> GetCommandedElements();
         

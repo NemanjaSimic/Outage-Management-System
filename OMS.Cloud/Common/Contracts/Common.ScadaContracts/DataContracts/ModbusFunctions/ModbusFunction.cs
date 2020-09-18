@@ -4,12 +4,14 @@ using System.Runtime.Serialization;
 
 namespace OMS.Common.ScadaContracts.DataContracts.ModbusFunctions
 {
-    [Serializable]
     [DataContract]
+    [KnownType(typeof(ReadFunction))]
+    [KnownType(typeof(WriteSingleFunction))]
+    [KnownType(typeof(WriteMultipleFunction))]
     public abstract class ModbusFunction : IModbusFunction
     {
         [DataMember]
-        public ModbusFunctionCode FunctionCode { get; protected set; }
+        public ModbusFunctionCode FunctionCode { get; set; }
 
         protected ModbusFunction(ModbusFunctionCode functionCode)
         {
