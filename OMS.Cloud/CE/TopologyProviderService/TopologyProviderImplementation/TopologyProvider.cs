@@ -351,7 +351,7 @@ namespace CE.TopologyProviderImplementation
 
                 Logger.LogDebug($"{baseLogString} CommitTransaction => Calling UpdateLoadFlow method from load flow client.");
                 var loadFlowClient = LoadFlowClient.CreateClient();
-                topology = await loadFlowClient.UpdateLoadFlow(newTopology);
+                var topology = await loadFlowClient.UpdateLoadFlow(newTopology);
                 Logger.LogDebug($"{baseLogString} CommitTransaction => UpdateLoadFlow method from load flow client has been called successfully.");
 
                 Logger.LogDebug($"{baseLogString} PrepareForTransaction => Writting new transaction topology into cache.");
