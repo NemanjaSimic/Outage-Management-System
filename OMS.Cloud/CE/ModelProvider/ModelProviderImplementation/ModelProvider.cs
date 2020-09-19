@@ -152,17 +152,17 @@ namespace CE.ModelProviderImplementation
 
             Dictionary<long, TopologyElement> result = new Dictionary<long, TopologyElement>();
 
-            //try
-            //{
-            //    result = await GetElementsFromCache(transactionFlag);
-            //}
-            //catch (Exception e)
-            //{
-            //    string errorMessage = $"{baseLogString} GetElementModels => Exception: {e.Message}";
-            //    Logger.LogError(errorMessage, e);
+            try
+            {
+                result = await GetElementsFromCache(transactionFlag);
+            }
+            catch (Exception e)
+            {
+                string errorMessage = $"{baseLogString} GetElementModels => Exception: {e.Message}";
+                Logger.LogError(errorMessage, e);
 
-            //    result = new Dictionary<long, TopologyElement>();
-            //}
+                result = new Dictionary<long, TopologyElement>();
+            }
 
             return result;
         }
@@ -174,17 +174,17 @@ namespace CE.ModelProviderImplementation
 
             Dictionary<long, List<long>> result = new Dictionary<long, List<long>>();
 
-            //try
-            //{
-            //    result = await GetConnectionsFromCache(transactionFlag);
-            //}
-            //catch (Exception e)
-            //{
-            //    string errorMessage = $"{baseLogString} GetConnections => Exception: {e.Message}";
-            //    Logger.LogError(errorMessage, e);
+            try
+            {
+                result = await GetConnectionsFromCache(transactionFlag);
+            }
+            catch (Exception e)
+            {
+                string errorMessage = $"{baseLogString} GetConnections => Exception: {e.Message}";
+                Logger.LogError(errorMessage, e);
 
-            //    result = new Dictionary<long, List<long>>();
-            //}
+                result = new Dictionary<long, List<long>>();
+            }
 
             return result;
         }
@@ -196,17 +196,17 @@ namespace CE.ModelProviderImplementation
 
             HashSet<long> result = new HashSet<long>();
 
-            //try
-            //{
-            //    result = await GetReclosersFromCache(transactionFlag);
-            //}
-            //catch (Exception e)
-            //{
-            //    string errorMessage = $"{baseLogString} GetReclosers => Exception: {e.Message}";
-            //    Logger.LogError(errorMessage, e);
+            try
+            {
+                result = await GetReclosersFromCache(transactionFlag);
+            }
+            catch (Exception e)
+            {
+                string errorMessage = $"{baseLogString} GetReclosers => Exception: {e.Message}";
+                Logger.LogError(errorMessage, e);
 
-            //    result = new HashSet<long>();
-            //}
+                result = new HashSet<long>();
+            }
 
             return result;
         }
@@ -218,17 +218,17 @@ namespace CE.ModelProviderImplementation
 
             List<long> result = new List<long>();
 
-            //try
-            //{
-            //    result = await GetEnergySourcesFromCache(transactionFlag);
-            //}
-            //catch (Exception e)
-            //{
-            //    string errorMessage = $"{baseLogString} GetEnergySources => Exception: {e.Message}";
-            //    Logger.LogError(errorMessage, e);
+            try
+            {
+                result = await GetEnergySourcesFromCache(transactionFlag);
+            }
+            catch (Exception e)
+            {
+                string errorMessage = $"{baseLogString} GetEnergySources => Exception: {e.Message}";
+                Logger.LogError(errorMessage, e);
 
-            //    result = new List<long>();
-            //}
+                result = new List<long>();
+            }
 
             return result;
         }
@@ -397,11 +397,11 @@ namespace CE.ModelProviderImplementation
             }
             else if (forTransactionType == TransactionFlag.NoTransaction)
             {
-                IModelDelta newModelDelta = await ImportDataInCache();
+                //IModelDelta newModelDelta = await ImportDataInCache();
 
                 //await ElementCache.SetAsync((short)TransactionFlag.NoTransaction, newModelDelta.TopologyElements);
 
-                return TransformDictionary(newModelDelta.TopologyElements);
+                return new Dictionary<long, TopologyElement>();
             }
             else
             {
@@ -437,11 +437,11 @@ namespace CE.ModelProviderImplementation
             }
             else if (forTransactionType == TransactionFlag.NoTransaction)
             {
-                IModelDelta newModelDelta = await ImportDataInCache();
+                //IModelDelta newModelDelta = await ImportDataInCache();
 
                 //await ElementConnectionCache.SetAsync((short)TransactionFlag.NoTransaction, newModelDelta.ElementConnections);
 
-                return newModelDelta.ElementConnections;
+                return new Dictionary<long, List<long>>();
             }
             else
             {
@@ -477,11 +477,11 @@ namespace CE.ModelProviderImplementation
             }
             else if (forTransactionType == TransactionFlag.NoTransaction)
             {
-                IModelDelta newModelDelta = await ImportDataInCache();
+                //IModelDelta newModelDelta = await ImportDataInCache();
 
                 //await RecloserCache.SetAsync((short)TransactionFlag.NoTransaction, newModelDelta.Reclosers);
 
-                return newModelDelta.Reclosers;
+                return new HashSet<long>();
             }
             else
             {
@@ -517,11 +517,11 @@ namespace CE.ModelProviderImplementation
             }
             else if (forTransactionType == TransactionFlag.NoTransaction)
             {
-                IModelDelta newModelDelta = await ImportDataInCache();
+                //IModelDelta newModelDelta = await ImportDataInCache();
 
                 //await EnergySourceCache.SetAsync((short)TransactionFlag.NoTransaction, newModelDelta.EnergySources);
 
-                return newModelDelta.EnergySources;
+                return new List<long>();
             }
             else
             {

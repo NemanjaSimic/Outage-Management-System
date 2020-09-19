@@ -150,20 +150,19 @@ namespace CE.TopologyProviderImplementation
             }
             else if (topologyID == (long)TopologyType.NonTransactionTopology)
             {
-                Logger.LogDebug($"{baseLogString} GetTopologyFromCache => Initializing topology.");
-                var newTopology = await CreateTopology("GetTopologyFromCache");
+                //Logger.LogDebug($"{baseLogString} GetTopologyFromCache => Initializing topology.");
+                //var newTopology = await CreateTopology("GetTopologyFromCache");
+                //Logger.LogDebug($"{baseLogString} GetTopologyFromCache => Calling UpdateLoadFlow method from load flow client.");
 
-                Logger.LogDebug($"{baseLogString} GetTopologyFromCache => Calling UpdateLoadFlow method from load flow client.");
-                var loadFlowClient = LoadFlowClient.CreateClient();
-                newTopology = await loadFlowClient.UpdateLoadFlow(newTopology);
-                Logger.LogDebug($"{baseLogString} GetTopologyFromCache => UpdateLoadFlow method from load flow client has been called successfully.");
+                
+                //Logger.LogDebug($"{baseLogString} GetTopologyFromCache => UpdateLoadFlow method from load flow client has been called successfully.");
 
-                await TopologyCache.SetAsync(topologyID, (TopologyModel)newTopology);
+                //await TopologyCache.SetAsync(topologyID, (TopologyModel)newTopology);
+               
+                //await RefreshOMSModel();
+                //await RefreshUIModel();
 
-                await RefreshOMSModel();
-                await RefreshUIModel();
-
-                return newTopology;
+                return new TopologyModel();
             }
             else
             {
@@ -311,12 +310,14 @@ namespace CE.TopologyProviderImplementation
             Logger.LogDebug($"{baseLogString} CommitTransaction => Getting topology from cache.");
             var topology = await GetTopologyFromCache(TopologyType.TransactionTopology);
             Logger.LogDebug($"{baseLogString} CommitTransaction => Getting topology from cache successfully ended.");
+           
+            await TopologyCache.SetAsync(topologyID, (TopologyModel)topology);
 
 
-            Logger.LogDebug($"{baseLogString} CommitTransaction => Calling UpdateLoadFlow method from load flow client.");
-            var loadFlowClient = LoadFlowClient.CreateClient();
-            topology = await loadFlowClient.UpdateLoadFlow(topology);
-            Logger.LogDebug($"{baseLogString} CommitTransaction => UpdateLoadFlow method from load flow client has been called successfully.");
+            //Logger.LogDebug($"{baseLogString} CommitTransaction => Calling UpdateLoadFlow method from load flow client.");
+            //var loadFlowClient = LoadFlowClient.CreateClient();
+            //topology = await loadFlowClient.UpdateLoadFlow(topology);
+            //Logger.LogDebug($"{baseLogString} CommitTransaction => UpdateLoadFlow method from load flow client has been called successfully.");
 
             if (topology == null)
             {
@@ -325,8 +326,10 @@ namespace CE.TopologyProviderImplementation
                 throw new Exception(errorMessage);
             }
 
-            await TopologyCache.SetAsync(topologyID, (TopologyModel)topology);
-            await TopologyCache.SetAsync(transactionTopologyID, (TopologyModel)topology);
+            //await TopologyCache.SetAsync(topologyID, (TopologyModel)topology);
+
+            //await TopologyCache.SetAsync(topologyID, (TopologyModel)topology);
+            //await TopologyCache.SetAsync(transactionTopologyID, (TopologyModel)topology);
 
             await RefreshOMSModel();
             await RefreshUIModel();
@@ -346,10 +349,17 @@ namespace CE.TopologyProviderImplementation
                 Logger.LogDebug($"{baseLogString} PrepareForTransaction => Creating new transaction topology.");
                 var newTopology = await CreateTopology("PrepareForTransaction");
 
+                Logger.LogDebug($"{baseLogString} CommitTransaction => Calling UpdateLoadFlow method from load flow client.");
+                var loadFlowClient = LoadFlowClient.CreateClient();
+                topology = await loadFlowClient.UpdateLoadFlow(newTopology);
+                Logger.LogDebug($"{baseLogString} CommitTransaction => UpdateLoadFlow method from load flow client has been called successfully.");
+
                 Logger.LogDebug($"{baseLogString} PrepareForTransaction => Writting new transaction topology into cache.");
                 await TopologyCache.SetAsync(transactionTopologyID, (TopologyModel)newTopology);
 
                 transactionFlag = TransactionFlag.InTransaction;
+
+                await TopologyCache.SetAsync(transactionTopologyID, (TopologyModel)topology);
             }
             catch (Exception e)
             {
