@@ -88,7 +88,7 @@ namespace OMS.EmailImplementation.Imap
 
 				try
 				{
-					publisher.Publish(new OutageEmailPublication(Topic.OUTAGE_EMAIL, new EmailToOutageMessage(tracingModel.Gid)), MicroserviceNames.OmsEmailService).Wait(); //TODO: SErvice defines
+					publisher.Publish(new OutageEmailPublication(Topic.OUTAGE_EMAIL, new EmailToOutageMessage(tracingModel.Gid)), MicroserviceNames.OmsEmailService).Wait();
  				}
 				catch (Exception)
 				{

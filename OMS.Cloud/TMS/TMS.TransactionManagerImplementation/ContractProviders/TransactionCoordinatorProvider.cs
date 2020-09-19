@@ -126,56 +126,75 @@ namespace TMS.TransactionManagerImplementation.ContractProviders
             Logger.LogInformation($"{baseLogString} StartDistributedUpdate => Distributed transaction '{transactionName}' SUCCESSFULLY started. Waiting for transaction actors [{actorsSb}] to enlist.");
         }
 
-        public async Task FinishDistributedTransaction(string transactionName, bool success)
+        public async Task<bool> FinishDistributedTransaction(string transactionName, bool success)
         {
             while (!ReliableDictionariesInitialized)
             {
                 await Task.Delay(1000);
             }
 
-            if (success)
+            bool result;
+
+            try
             {
-                bool prepareSuccess = false;
-                int retryCount = 30;
-
-                while(--retryCount > 0)
+                if (success)
                 {
-                    try
-                    {
-                        prepareSuccess = await InvokePreparationOnActors(transactionName);
-                        break;
-                    }
-                    catch(NotAllActorsEnlistedException)
-                    {
-                        await Task.Delay(2000);
-                        continue;
-                    }
-                    catch (Exception e)
-                    {
-                        string errorMessage = $"{baseLogString} FinishDistributedTransaction => Exception in InvokePreparationOnActors: {e.Message}";
-                        Logger.LogError(errorMessage);
-                        break;
-                    }
-                }
+                    bool prepareSuccess = false;
+                    int retryCount = 30;
 
-                if(prepareSuccess)
-                {
-                    await InvokeCommitOnActors(transactionName);
+                    while (--retryCount > 0)
+                    {
+                        try
+                        {
+                            prepareSuccess = await InvokePreparationOnActors(transactionName);
+                            break;
+                        }
+                        catch (NotAllActorsEnlistedException)
+                        {
+                            prepareSuccess = false;
+                            await Task.Delay(2000);
+                            continue;
+                        }
+                        catch (Exception e)
+                        {
+                            prepareSuccess = false;
+
+                            string errorMessage = $"{baseLogString} FinishDistributedTransaction => Exception in InvokePreparationOnActors: {e.Message}";
+                            Logger.LogError(errorMessage);
+                            break;
+                        }
+                    }
+
+                    if (prepareSuccess)
+                    {
+                        await InvokeCommitOnActors(transactionName);
+                    }
+                    else
+                    {
+                        await InvokeRollbackOnActors(transactionName);
+                    }
+
+                    Logger.LogInformation($"{baseLogString} FinishDistributedUpdate => Distributed transaction finsihed SUCCESSFULLY.");
+                    result = prepareSuccess;
                 }
                 else
                 {
-                    await InvokeRollbackOnActors(transactionName);
+                    Logger.LogInformation($"{baseLogString} FinishDistributedUpdate => Distributed transaction finsihed UNSUCCESSFULLY.");
+                    result = false;
                 }
-
-                Logger.LogInformation($"{baseLogString} FinishDistributedUpdate => Distributed transaction finsihed SUCCESSFULLY.");
             }
-            else
+            catch (Exception e)
             {
-                Logger.LogInformation($"{baseLogString} FinishDistributedUpdate => Distributed transaction finsihed UNSUCCESSFULLY.");
+                Logger.LogError($"{baseLogString} FinishDistributedUpdate => Exception: {e.Message}");
+                result = false;
             }
-
-            await ActiveTransactions.TryRemoveAsync(transactionName);
-            await TransactionEnlistmentLedger.TryRemoveAsync(transactionName);
+            finally
+            {
+                await ActiveTransactions.TryRemoveAsync(transactionName);
+                await TransactionEnlistmentLedger.TryRemoveAsync(transactionName);
+            }
+            
+            return result;
         }
         #endregion ITransactionCoordinatorContract
 

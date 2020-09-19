@@ -160,7 +160,7 @@ namespace SCADA.ModelProviderImplementation.ContractProviders
             string verboseMessage = $"{baseLogString} entering MakeAnalogEntryToMeasurementCache method.";
             Logger.LogVerbose(verboseMessage);
 
-            while (!ReliableDictionariesInitialized || !(await GetIsScadaModelImportedIndicator()))
+            while (!ReliableDictionariesInitialized)
             {
                 await Task.Delay(1000);
             }
@@ -230,7 +230,7 @@ namespace SCADA.ModelProviderImplementation.ContractProviders
             string verboseMessage = $"{baseLogString} entering MakeDiscreteEntryToMeasurementCache method.";
             Logger.LogVerbose(verboseMessage);
 
-            while (!ReliableDictionariesInitialized || !(await GetIsScadaModelImportedIndicator()))
+            while (!ReliableDictionariesInitialized)
             {
                 await Task.Delay(1000);
             }
@@ -300,7 +300,7 @@ namespace SCADA.ModelProviderImplementation.ContractProviders
             string verboseMessage = $"{baseLogString} entering UpdatePointItemRawValue method.";
             Logger.LogVerbose(verboseMessage);
 
-            while (!ReliableDictionariesInitialized || !(await GetIsScadaModelImportedIndicator()))
+            while (!ReliableDictionariesInitialized)
             {
                 await Task.Delay(1000);
             }
@@ -367,7 +367,7 @@ namespace SCADA.ModelProviderImplementation.ContractProviders
             string verboseMessage = $"{baseLogString} entering AddOrUpdateCommandDescription method.";
             Logger.LogVerbose(verboseMessage);
 
-            while (!ReliableDictionariesInitialized || !(await GetIsScadaModelImportedIndicator()))
+            while (!ReliableDictionariesInitialized)
             {
                 await Task.Delay(1000);
             }
@@ -380,7 +380,7 @@ namespace SCADA.ModelProviderImplementation.ContractProviders
             string verboseMessage = $"{baseLogString} entering AddOrUpdateMultipleCommandDescriptions method.";
             Logger.LogVerbose(verboseMessage);
 
-            while (!ReliableDictionariesInitialized || !(await GetIsScadaModelImportedIndicator()))
+            while (!ReliableDictionariesInitialized)
             {
                 await Task.Delay(1000);
             }
@@ -409,7 +409,7 @@ namespace SCADA.ModelProviderImplementation.ContractProviders
             string verboseMessage = $"{baseLogString} entering RemoveCommandDescription method.";
             Logger.LogVerbose(verboseMessage);
 
-            while (!ReliableDictionariesInitialized || !(await GetIsScadaModelImportedIndicator()))
+            while (!ReliableDictionariesInitialized)
             {
                 await Task.Delay(1000);
             }

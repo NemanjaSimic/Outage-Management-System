@@ -155,7 +155,7 @@ namespace SCADA.ModelProviderImplementation.ContractProviders
             string verboseMessage = $"{baseLogString} entering GetScadaConfigData method.";
             Logger.LogVerbose(verboseMessage);
 
-            while (!ReliableDictionariesInitialized || !(await GetIsScadaModelImportedIndicator()))
+            while (!ReliableDictionariesInitialized)
             {
                 await Task.Delay(1000);
             }
@@ -176,7 +176,7 @@ namespace SCADA.ModelProviderImplementation.ContractProviders
             string verboseMessage = $"{baseLogString} entering GetGidToPointItemMap method.";
             Logger.LogVerbose(verboseMessage);
 
-            while (!ReliableDictionariesInitialized || !(await GetIsScadaModelImportedIndicator()))
+            while (!ReliableDictionariesInitialized)
             {
                 await Task.Delay(1000);
             }
@@ -197,7 +197,7 @@ namespace SCADA.ModelProviderImplementation.ContractProviders
             string verboseMessage = $"{baseLogString} entering GetAddressToPointItemMap method.";
             Logger.LogVerbose(verboseMessage);
 
-            while (!ReliableDictionariesInitialized || !(await GetIsScadaModelImportedIndicator()))
+            while (!ReliableDictionariesInitialized)
             {
                 await Task.Delay(1000);
             }
@@ -225,7 +225,7 @@ namespace SCADA.ModelProviderImplementation.ContractProviders
             string verboseMessage = $"{baseLogString} entering GetAddressToGidMap method.";
             Logger.LogVerbose(verboseMessage);
 
-            while (!ReliableDictionariesInitialized || !(await GetIsScadaModelImportedIndicator()))
+            while (!ReliableDictionariesInitialized)
             {
                 await Task.Delay(1000);
             }
@@ -246,7 +246,7 @@ namespace SCADA.ModelProviderImplementation.ContractProviders
             string verboseMessage = $"{baseLogString} entering GetCommandDescriptionCache method.";
             Logger.LogVerbose(verboseMessage);
 
-            while (!ReliableDictionariesInitialized || !(await GetIsScadaModelImportedIndicator()))
+            while (!ReliableDictionariesInitialized)
             {
                 await Task.Delay(1000);
             }

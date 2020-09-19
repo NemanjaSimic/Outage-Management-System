@@ -219,7 +219,7 @@ namespace OMS.OutageLifecycleImplementation.Helpers
             }
             catch (Exception e)
             {
-                //todo: log
+                Logger.LogError($"{baseLogString} CheckIfBreakerIsRecloserAsync => Exception: {e.Message}");
                 throw e;
             }
 
@@ -325,8 +325,7 @@ namespace OMS.OutageLifecycleImplementation.Helpers
                 }
                 catch (Exception e)
                 {
-                    //todo: log
-                    //TODO: Kad prvi put ovde bude puklo, alarmirajte me. Dimitrije
+                    Logger.LogError($"{baseLogString} CreateEquipmentEntitiesFromNmsDataAsync => Exception: {e.Message}");
                     throw e;
                 }
 

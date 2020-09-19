@@ -14,6 +14,6 @@ namespace OMS.Common.TmsContracts
         Task StartDistributedTransaction(string transactionName, IEnumerable<string> transactionActors);
 
         [OperationContract]
-        Task FinishDistributedTransaction(string transactionName, bool success);
+        Task<bool> FinishDistributedTransaction(string transactionName, bool success);
     }
 }

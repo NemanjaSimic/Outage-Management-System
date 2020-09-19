@@ -229,7 +229,7 @@ namespace OMS.OutageLifecycleImplementation.ContractProviders
                     }
                     else
                     {
-                        //TODO: KAKO SE ULAZI U OVAJ ELSE?
+                        //KAKO SE ULAZI U OVAJ ELSE? => u else se ulazi tako sto se ide kroz for i prvi element se oznaci kao outage element, zatim se pronaje jos neki... znaci ovo je nacin da se kreira drugi, treci outage, na racvanju ispod elementa, po for-u....
                         var entity = new OutageEntity()
                         {
                             OutageElementGid = potentialOutageElementGid,

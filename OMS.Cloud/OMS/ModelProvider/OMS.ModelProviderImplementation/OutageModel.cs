@@ -184,7 +184,7 @@ namespace OMS.ModelProviderImplementation
 		private async Task ReEvaluetePotentialOutages()
         {
 			var potentialOutages = await PotentialOutage.GetEnumerableDictionaryAsync();
-			await PotentialOutage.ClearAsync(); //MODO: ovo tek nakon await all
+			await PotentialOutage.ClearAsync(); //MODO: ovo tek nakon await all, mozda i ne mora jer se na liniji iznad pravi kopija tog rel dict
 			
 			var reportOutageTasks = new List<Task>();
 			var reportOutageClient = PotentialOutageReportingClient.CreateClient();

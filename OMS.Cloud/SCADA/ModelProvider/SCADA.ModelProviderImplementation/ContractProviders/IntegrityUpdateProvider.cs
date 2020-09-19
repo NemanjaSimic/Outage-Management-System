@@ -133,7 +133,7 @@ namespace SCADA.ModelProviderImplementation.ContractProviders
         #region IScadaIntegrityUpdateContract
         public async Task<Dictionary<Topic, ScadaPublication>> GetIntegrityUpdate()
         {
-            while (!ReliableDictionariesInitialized || !(await GetIsScadaModelImportedIndicator()))
+            while (!ReliableDictionariesInitialized)
             {
                 await Task.Delay(1000);
             }
@@ -203,7 +203,7 @@ namespace SCADA.ModelProviderImplementation.ContractProviders
 
         public async Task<ScadaPublication> GetIntegrityUpdateForSpecificTopic(Topic topic)
         {
-            while (!ReliableDictionariesInitialized || !(await GetIsScadaModelImportedIndicator()))
+            while (!ReliableDictionariesInitialized)
             {
                 await Task.Delay(1000);
             }

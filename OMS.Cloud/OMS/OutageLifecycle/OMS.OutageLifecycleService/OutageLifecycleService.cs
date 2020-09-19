@@ -156,7 +156,7 @@ namespace OMS.OutageLifecycleService
                     Logger.LogError($"{baseLogString} RunAsync => Exception: {e.Message}");
                 }
 
-                await Task.Delay(this.isolationAlgorithmCycle.CycleInterval);
+                await Task.Delay(TimeSpan.FromMilliseconds(this.isolationAlgorithmCycle.CycleInterval), cancellationToken);
             }
         }
 

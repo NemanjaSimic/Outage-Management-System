@@ -28,7 +28,7 @@ namespace OMS.ModelProviderImplementation.DistributedTransaction
         #region INotifyNetworkModelUpdateContract
         public async Task<bool> Notify(Dictionary<DeltaOpType, List<long>> modelChanges)
         {
-            //MODO: logic of Notify for MicroserviceNames.OmsModelProviderService, if one should be required, would go here
+            //MODO: (ovaj servis nema nista u prepare pa zbog toga sledi komentar) logic of Notify for MicroserviceNames.OmsModelProviderService, if one should be required, would go here
 
             var transactionEnlistmentClient = TransactionEnlistmentClient.CreateClient();
             bool success = await transactionEnlistmentClient.Enlist(DistributedTransactionNames.NetworkModelUpdateTransaction, MicroserviceNames.OmsModelProviderService);

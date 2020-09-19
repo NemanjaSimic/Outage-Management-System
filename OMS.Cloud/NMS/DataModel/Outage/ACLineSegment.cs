@@ -80,7 +80,6 @@ namespace NMS.DataModel
                     break;
             }
         }
-
         #endregion IAccess implementation
 
         #region IClonable

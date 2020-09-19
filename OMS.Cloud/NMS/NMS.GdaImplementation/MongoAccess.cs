@@ -124,6 +124,12 @@ namespace NMS.GdaImplementation
 
         public void SaveDelta(Delta delta)
         {
+            if(delta.DeltaOrigin == DeltaOriginType.ArtificialDelta)
+            {
+                Logger.LogInformation($"{baseLogString} SaveDelta => delta.DeltaOrigin: {delta.DeltaOrigin}, delta.Id: {delta.Id}");
+                return;
+            }
+
             long latestVersion = GetLatestVersion();
 
             if (delta.Id <= latestVersion)
@@ -187,7 +193,7 @@ namespace NMS.GdaImplementation
             try
             {
                 var latestVersionsCollection = db.GetCollection<LatestVersionsDocument>(MongoStrings.LatestVersionsCollection);
-                var networkModelVersionFilter = Builders<LatestVersionsDocument>.Filter.Eq("_id", "networkModelVersion");
+                var networkModelVersionFilter = Builders<LatestVersionsDocument>.Filter.Eq("_id", MongoStrings.LatestVersions_NetworkModelVersion);
 
                 var findNetworkModelVersionResult = latestVersionsCollection.Find(networkModelVersionFilter);
                 if (findNetworkModelVersionResult.CountDocuments() > 0)

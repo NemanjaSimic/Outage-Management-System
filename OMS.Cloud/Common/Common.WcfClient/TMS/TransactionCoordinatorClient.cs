@@ -38,16 +38,16 @@ namespace OMS.Common.WcfClient.TMS
             return InvokeWithRetryAsync(client => client.Channel.StartDistributedTransaction(transactionName, transactionActors));
         }
 
-        public Task FinishDistributedTransaction(string transactionName, bool success)
+        public Task<bool> FinishDistributedTransaction(string transactionName, bool success)
         {
             //return MethodWrapperAsync("FinishDistributedTransaction", new object[2] { transactionName, success });
             return InvokeWithRetryAsync(client => client.Channel.FinishDistributedTransaction(transactionName, success));
         }
-        #endregion
 
         public Task<bool> IsAlive()
         {
             return InvokeWithRetryAsync(client => client.Channel.IsAlive());
         }
+        #endregion
     }
 }

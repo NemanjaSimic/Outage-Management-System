@@ -14,7 +14,6 @@ using System.Collections.Generic;
 using System.Linq;
 using System.Text;
 using System.Threading.Tasks;
-using UpdateResult = OMS.Common.NmsContracts.GDA.UpdateResult;
 
 namespace NMS.GdaImplementation
 {
@@ -117,19 +116,32 @@ namespace NMS.GdaImplementation
 
             if(latestVersion == CurrentVersion)
             {
-                //no need to do anything
+                Logger.LogDebug($"{baseLogString} InitializeNetworkModel => LatestVersion is equal to CurrentVersion.");
+
+                if (NetworkDataModel.Count > 0)
+                {
+                    var artificialDelta = CreateArtificialDelta(NetworkDataModel);
+                    await ApplyDelta(artificialDelta);
+                }
             }
             else if (latestNetworkModelVersion == 0 && latestDeltaVersion == 0)
             {
+                Logger.LogDebug($"{baseLogString} InitializeNetworkModel => LatestNetworkModelVersion  and LatestDeltaVersion are equal to 0.");
                 CurrentVersion = 0;
             }
             else if (latestNetworkModelVersion < latestDeltaVersion)
             {
-                Logger.LogDebug($"{baseLogString} InitializeNetworkModel => Delta version is higher then network model version.");
+                Logger.LogDebug($"{baseLogString} InitializeNetworkModel => LatestDeltaVersion is higher then LatestNetworkModelVersion.");
+                this.networkDataModel = mongoDbAccess.GetNetworkModel(latestNetworkModelVersion);
+                
+                if (NetworkDataModel.Count > 0)
+                {
+                    var artificialDelta = CreateArtificialDelta(NetworkDataModel);
+                    await ApplyDelta(artificialDelta);
+                }
 
-                networkDataModel = mongoDbAccess.GetNetworkModel(latestNetworkModelVersion);
                 List<Delta> deltas = mongoDbAccess.GetAllDeltasFromVersionRange(latestNetworkModelVersion + 1, latestDeltaVersion);
-
+                
                 foreach (Delta delta in deltas)
                 {
                     try
@@ -149,6 +161,12 @@ namespace NMS.GdaImplementation
             {
                 this.networkDataModel = mongoDbAccess.GetNetworkModel(latestNetworkModelVersion);
                 CurrentVersion = latestNetworkModelVersion;
+
+                if (NetworkDataModel.Count > 0)
+                {
+                    var artificialDelta = CreateArtificialDelta(NetworkDataModel);
+                    await ApplyDelta(artificialDelta);
+                }
             }
             else
             {
@@ -162,12 +180,39 @@ namespace NMS.GdaImplementation
                 throw new NotImplementedException($"{baseLogString} InitializeNetworkModel => Unknown scenario. LatestNetworkModelVersion: {latestNetworkModelVersion}, LatestDeltaVersion: {latestDeltaVersion}");
             }
 
-            //this.isModelInitialized = true;
             this.networkModelState = NetworkModelState.INITIALIZED;
         }
 
-        #region Find
+        /// <summary>
+        /// Delta with UpdateOperations based on CurrentNetworkModel.
+        /// </summary>
+        /// <param name="networkDataModel"></param>
+        /// <returns></returns>
+        private Delta CreateArtificialDelta(Dictionary<DMSType, Container> networkDataModel)
+        {
+            Delta artificialDelta = new Delta
+            {
+                Id = CurrentVersion,
+                InsertOperations = new List<ResourceDescription>(),
+                UpdateOperations = new List<ResourceDescription>(),
+                DeleteOperations = new List<ResourceDescription>(),
+                PositiveIdsAllowed = true,
+                DeltaOrigin = DeltaOriginType.ArtificialDelta,
+            };
 
+            foreach (var container in networkDataModel.Values)
+            {
+                foreach (var entity in container.Entities.Values)
+                {
+                    var rd = entity.GetAsResourceDescription(true);
+                    artificialDelta.InsertOperations.Add(rd);
+                }
+            }
+
+            return artificialDelta;
+        }
+
+        #region Find
         public bool EntityExists(long globalId)
         {
             DMSType type = (DMSType)ModelCodeHelper.ExtractTypeFromGlobalId(globalId);
@@ -249,48 +294,18 @@ namespace NMS.GdaImplementation
                 return updateResult;
             }
 
-            currentDelta = delta;
-
-            //shallow copy 
-            incomingNetworkDataModel = new Dictionary<DMSType, Container>(NetworkDataModel);
-            Logger.LogDebug($"Incoming model [HashCode: 0x{incomingNetworkDataModel.GetHashCode():X16}] is shallow copy of Current model [HashCode: 0x{networkDataModel.GetHashCode():X16}].");
-
             try
             {
-                Logger.LogInformation("Applying delta to network model.");
+                this.currentDelta = delta;
 
-                Dictionary<short, int> typesCounters = GetCounters();
-                Dictionary<long, long> globalIdPairs = new Dictionary<long, long>();
+                //shallow copy 
+                this.incomingNetworkDataModel = new Dictionary<DMSType, Container>(NetworkDataModel);
+                Logger.LogDebug($"Incoming model [HashCode: 0x{incomingNetworkDataModel.GetHashCode():X16}] is shallow copy of Current model [HashCode: 0x{networkDataModel.GetHashCode():X16}].");
 
-                if (delta.DeltaOrigin != DeltaOriginType.DatabaseDelta)
+                if (delta.DeltaOrigin != DeltaOriginType.ArtificialDelta)
                 {
-                    delta.FixNegativeToPositiveIds(ref typesCounters, ref globalIdPairs);
+                    ApplyRegularDelta(delta, updateResult);
                 }
-
-                updateResult.GlobalIdPairs = globalIdPairs;
-                delta.SortOperations();
-
-                foreach (ResourceDescription rd in delta.InsertOperations)
-                {
-                    InsertEntity(rd);
-                }
-
-                foreach (ResourceDescription rd in delta.UpdateOperations)
-                {
-                    UpdateEntity(rd);
-                }
-
-                foreach (ResourceDescription rd in delta.DeleteOperations)
-                {
-                    DeleteEntity(rd);
-                }
-
-                oldNetworkDataModel = networkDataModel;
-                Logger.LogDebug($"Old model [HashCode: 0x{networkDataModel.GetHashCode():X16}] becomes Current model [HashCode: 0x{incomingNetworkDataModel.GetHashCode():X16}].");
-
-                networkDataModel = incomingNetworkDataModel;
-                Logger.LogDebug($"Current model [HashCode: 0x{networkDataModel.GetHashCode():X16}] becomes Incoming model [HashCode: 0x{incomingNetworkDataModel.GetHashCode():X16}].");
-
 
                 if (await StartDistributedTransaction(delta))
                 {
@@ -300,23 +315,6 @@ namespace NMS.GdaImplementation
                 {
                     updateResult.Result = ResultType.Failed;
                 }
-
-                //if (delta.DeltaOrigin == DeltaOriginType.DatabaseDelta)
-                //{
-                //    await Commit();
-                //    updateResult.Result = ResultType.Succeeded;
-                //}
-                //else if(delta.DeltaOrigin == DeltaOriginType.ImporterDelta)
-                //{
-                //    if(await StartDistributedTransaction(delta))
-                //    {
-                //        updateResult.Result = ResultType.Succeeded;
-                //    }
-                //    else
-                //    {
-                //        updateResult.Result = ResultType.Failed;
-                //    }
-                //}
             }
             catch (Exception ex)
             {
@@ -481,6 +479,43 @@ namespace NMS.GdaImplementation
         }
 
         #region Private Methods
+        private void ApplyRegularDelta(Delta delta, UpdateResult updateResult)
+        {
+            Logger.LogInformation("Applying delta to network model.");
+
+            Dictionary<short, int> typesCounters = GetCounters();
+            Dictionary<long, long> globalIdPairs = new Dictionary<long, long>();
+
+            if (delta.DeltaOrigin != DeltaOriginType.DatabaseDelta)
+            {
+                delta.FixNegativeToPositiveIds(ref typesCounters, ref globalIdPairs);
+            }
+
+            updateResult.GlobalIdPairs = globalIdPairs;
+            delta.SortOperations();
+
+            foreach (ResourceDescription rd in delta.InsertOperations)
+            {
+                InsertEntity(rd);
+            }
+
+            foreach (ResourceDescription rd in delta.UpdateOperations)
+            {
+                UpdateEntity(rd);
+            }
+
+            foreach (ResourceDescription rd in delta.DeleteOperations)
+            {
+                DeleteEntity(rd);
+            }
+
+            this.oldNetworkDataModel = this.networkDataModel;
+            Logger.LogDebug($"Old model [HashCode: 0x{networkDataModel.GetHashCode():X16}] becomes Current model [HashCode: 0x{incomingNetworkDataModel.GetHashCode():X16}].");
+
+            this.networkDataModel = this.incomingNetworkDataModel;
+            Logger.LogDebug($"Current model [HashCode: 0x{networkDataModel.GetHashCode():X16}] becomes Incoming model [HashCode: 0x{incomingNetworkDataModel.GetHashCode():X16}].");
+        }
+
         private Dictionary<short, int> GetCounters()
         {
             Dictionary<short, int> typesCounters = new Dictionary<short, int>();
@@ -1005,34 +1040,45 @@ namespace NMS.GdaImplementation
         {
             return Task.Run(() =>
             {
+                if (currentDelta != null && currentDelta.DeltaOrigin == DeltaOriginType.ArtificialDelta)
+                {
+                    return true;
+                }
+
                 return oldNetworkDataModel != null && networkDataModel != null && oldNetworkDataModel.GetHashCode() != networkDataModel.GetHashCode();
             });
         }
 
-        /// <summary>
-        /// 2PhaseCommitProtocol - Commit Phase
-        /// </summary>
-        /// <param name="isInitialization">Indicates if changes are commited in initialization step, after the Network Model service has started.</param>
-        /// <returns></returns>
         public Task Commit()
         {
             return Task.Run(() =>
             {
-                this.networkModelState = NetworkModelState.INITIALIZED;
-
-                if (currentDelta != null && currentDelta.DeltaOrigin == DeltaOriginType.ImporterDelta)
+                try
                 {
-                    long latestVersion = mongoDbAccess.GetLatestVersion();
+                    this.networkModelState = NetworkModelState.INITIALIZED;
 
-                    currentDelta.Id = latestVersion + 1;
-                    mongoDbAccess.SaveDelta(currentDelta);
+                    if (currentDelta != null && currentDelta.DeltaOrigin == DeltaOriginType.ImporterDelta)
+                    {
+                        long latestVersion = mongoDbAccess.GetLatestVersion();
 
-                    CurrentVersion = currentDelta.Id;
+                        currentDelta.Id = latestVersion + 1;
+                        mongoDbAccess.SaveDelta(currentDelta);
+
+                        CurrentVersion = currentDelta.Id;
+                    }
+
+                    currentDelta = null;
+                    oldNetworkDataModel = null;
+
+                    if (currentDelta != null && currentDelta.DeltaOrigin != DeltaOriginType.ArtificialDelta)
+                    {
+                        Logger.LogDebug($"{baseLogString} Commit => Current model [HashCode: 0x{incomingNetworkDataModel.GetHashCode():X16}] commited. Old model is set to null.");
+                    }
                 }
-
-                currentDelta = null;
-                oldNetworkDataModel = null;
-                Logger.LogDebug($"{baseLogString} Commit => Current model [HashCode: 0x{incomingNetworkDataModel.GetHashCode():X16}] commited. Old model is set to null.");
+                catch (Exception e)
+                {
+                    Logger.LogError($"{baseLogString} Commit => Exception: {e.Message}");
+                }
             });
         }
 
@@ -1040,11 +1086,23 @@ namespace NMS.GdaImplementation
         {
             return Task.Run(() =>
             {
-                this.networkModelState = NetworkModelState.INITIALIZED;
+                try
+                {
+                    this.networkModelState = NetworkModelState.INITIALIZED;
 
-                currentDelta = null;
-                networkDataModel = oldNetworkDataModel;
-                Logger.LogDebug($"{baseLogString} Rollback => Current model [HashCode: 0x{networkDataModel.GetHashCode():X16}] rollbacked to Old model [HashCode: 0x{oldNetworkDataModel.GetHashCode():X16}].");
+                    if (currentDelta != null && currentDelta.DeltaOrigin != DeltaOriginType.ArtificialDelta)
+                    {
+                        this.currentDelta = null;
+                        this.networkDataModel = this.oldNetworkDataModel;
+                        Logger.LogDebug($"{baseLogString} Rollback => Current model [HashCode: 0x{networkDataModel.GetHashCode():X16}] rollbacked to Old model [HashCode: 0x{oldNetworkDataModel.GetHashCode():X16}].");
+                    }
+
+                    this.currentDelta = null;
+                }
+                catch (Exception e)
+                {
+                    Logger.LogError($"{baseLogString} Rollback => Exception: {e.Message}");
+                }
             });
         }
 
@@ -1106,23 +1164,19 @@ namespace NMS.GdaImplementation
                 }
             }
 
-            bool nmsEnlistSuccess;
+            //NO need to enlist NMS if ANY of notify taks failed
+            bool nmsEnlistSuccess = false;
 
-            //IF ALL notify tasks return true
+            //IF ALL notify tasks return true enlist NMS
             if (notifyPhaseSuccess)
             {
                 nmsEnlistSuccess = await EnlistNmsTransactionActor();
             }
-            else
-            {
-                //NO need to enlist nms if any of notify taks failed
-                nmsEnlistSuccess = false;
-            }
 
-            await transactionCoordinatorClient.FinishDistributedTransaction(DistributedTransactionNames.NetworkModelUpdateTransaction, nmsEnlistSuccess);
+            var finishSuccess = await transactionCoordinatorClient.FinishDistributedTransaction(DistributedTransactionNames.NetworkModelUpdateTransaction, nmsEnlistSuccess);
             Logger.LogDebug($"FinishDistributedUpdate() invoked on Transaction Coordinator with parameter 'success' value: {nmsEnlistSuccess}.");
 
-            return nmsEnlistSuccess;
+            return notifyPhaseSuccess && nmsEnlistSuccess && finishSuccess;
         }
 
         private Dictionary<DeltaOpType, List<long>> CreateModelChangesData(Delta delta)
@@ -1156,7 +1210,7 @@ namespace NMS.GdaImplementation
         {
             var transactionEnlistmentClient = TransactionEnlistmentClient.CreateClient();
             bool nmsEnlistSuccess = await transactionEnlistmentClient.Enlist(DistributedTransactionNames.NetworkModelUpdateTransaction, MicroserviceNames.NmsGdaService);
-            Logger.LogDebug("{baseLogString} StartDistributedTransaction => Enlist() method invoked on Transaction Coordinator.");
+            Logger.LogDebug($"{baseLogString} StartDistributedTransaction => Enlist() method invoked on Transaction Coordinator.");
 
             return nmsEnlistSuccess;
         }

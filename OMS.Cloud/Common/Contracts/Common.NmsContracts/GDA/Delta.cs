@@ -18,7 +18,10 @@ namespace OMS.Common.NmsContracts.GDA
 
 		[EnumMember]
 		DatabaseDelta = 2,
-    }
+
+		[EnumMember]
+		ArtificialDelta = 3,
+	}
 
 	[DataContract]
 	public enum DeltaOpType : byte 
@@ -68,9 +71,10 @@ namespace OMS.Common.NmsContracts.GDA
 			{ 
 				Delta.resDesc = value; 
 			}
-		}				
-	
-		public Delta()
+		}
+
+        #region Ctors
+        public Delta()
 		{
 			this.positiveIdsAllowed = false;
 		}
@@ -126,6 +130,8 @@ namespace OMS.Common.NmsContracts.GDA
 			this.deleteOps = delta.deleteOps;
 			this.positiveIdsAllowed = delta.positiveIdsAllowed;
 		}
+		#endregion Ctors
+
 
 		[DataMember]		
 		public long Id

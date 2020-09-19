@@ -271,8 +271,8 @@ namespace NMS.DataModel
 
 		public ResourceDescription GetAsResourceDescription(bool onlySettableAttributes)
 		{
-			ResourceDescription rd = new ResourceDescription(globalId);
-			List<ModelCode> props = new List<ModelCode>();
+			List<ModelCode> props;
+			
 
 			if (onlySettableAttributes == true)
 			{
@@ -283,7 +283,7 @@ namespace NMS.DataModel
 				props = resourcesDescs.GetAllPropertyIdsForEntityId(globalId);
 			}
 
-			return rd;
+			return GetAsResourceDescription(props);
 		}
 
 		public ResourceDescription GetAsResourceDescription(List<ModelCode> propIds)

@@ -255,7 +255,6 @@ namespace SCADA.ModelProviderImplementation.DistributedTransaction
                 Logger.LogInformation(message);
 
                 await SendModelUpdateCommands();
-
                 await LogAllReliableCollections();
             }
             catch (Exception e)

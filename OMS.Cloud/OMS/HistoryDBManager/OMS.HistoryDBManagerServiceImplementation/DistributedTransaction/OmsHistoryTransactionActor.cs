@@ -162,13 +162,16 @@ namespace OMS.HistoryDBManagerImplementation.DistributedTransaction
                         //TODO: Type = resourceDescriptions[consumer.ConsumerId].GetProperty(ModelCode.ENERGYCONSUMER_TYPE).AsEnum(),
                     };
 
-                    if(this.unitOfWork.ConsumerRepository.Get(consumer.ConsumerId) != null)
+                    if(this.unitOfWork.ConsumerRepository.Get(consumer.ConsumerId) == null)
                     {
-                        Logger.LogError($"{baseLogString} Prepare => Consumer with gid 0x{consumer.ConsumerId:X16} already exists in DB. Delta Operation: {DeltaOpType.Insert}. Potential fix: Delte rows from Consumer SqlDB.");
-                        return false;
+                        this.unitOfWork.ConsumerRepository.Add(consumer);
                     }
-                    
-                    this.unitOfWork.ConsumerRepository.Add(consumer);
+                    else
+                    {
+                        Logger.LogWarning($"{baseLogString} Prepare => Consumer with gid 0x{consumer.ConsumerId:X16} already exists in DB. Delta Operation: {DeltaOpType.Insert}. Potential fixes: " +
+                            $"{Environment.NewLine}If MongoDB is empty => Delte rows from Consumer Table. " +
+                            $"{Environment.NewLine}If Mongo contains stored NetworkModel => Ignore this warn as it is part of initialization (part of the first distributed transaction).");
+                    }
                 }
 
                 success = true;

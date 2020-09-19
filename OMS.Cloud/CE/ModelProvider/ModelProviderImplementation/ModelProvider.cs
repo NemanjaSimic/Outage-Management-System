@@ -150,19 +150,19 @@ namespace CE.ModelProviderImplementation
             string verboseMessage = $"{baseLogString} entering GetElementModels method.";
             Logger.LogVerbose(verboseMessage);
 
-            Dictionary<long, TopologyElement> result;
+            Dictionary<long, TopologyElement> result = new Dictionary<long, TopologyElement>();
 
-            try
-            {
-                result = await GetElementsFromCache(transactionFlag);
-            }
-            catch (Exception e)
-            {
-                string errorMessage = $"{baseLogString} GetElementModels => Exception: {e.Message}";
-                Logger.LogError(errorMessage, e);
+            //try
+            //{
+            //    result = await GetElementsFromCache(transactionFlag);
+            //}
+            //catch (Exception e)
+            //{
+            //    string errorMessage = $"{baseLogString} GetElementModels => Exception: {e.Message}";
+            //    Logger.LogError(errorMessage, e);
 
-                result = new Dictionary<long, TopologyElement>();
-            }
+            //    result = new Dictionary<long, TopologyElement>();
+            //}
 
             return result;
         }
@@ -172,19 +172,19 @@ namespace CE.ModelProviderImplementation
             string verboseMessage = $"{baseLogString} entering GetConnections method.";
             Logger.LogVerbose(verboseMessage);
 
-            Dictionary<long, List<long>> result;
+            Dictionary<long, List<long>> result = new Dictionary<long, List<long>>();
 
-            try
-            {
-                result = await GetConnectionsFromCache(transactionFlag);
-            }
-            catch (Exception e)
-            {
-                string errorMessage = $"{baseLogString} GetConnections => Exception: {e.Message}";
-                Logger.LogError(errorMessage, e);
+            //try
+            //{
+            //    result = await GetConnectionsFromCache(transactionFlag);
+            //}
+            //catch (Exception e)
+            //{
+            //    string errorMessage = $"{baseLogString} GetConnections => Exception: {e.Message}";
+            //    Logger.LogError(errorMessage, e);
 
-                result = new Dictionary<long, List<long>>();
-            }
+            //    result = new Dictionary<long, List<long>>();
+            //}
 
             return result;
         }
@@ -194,19 +194,19 @@ namespace CE.ModelProviderImplementation
             string verboseMessage = $"{baseLogString} entering GetReclosers method.";
             Logger.LogVerbose(verboseMessage);
 
-            HashSet<long> result;
+            HashSet<long> result = new HashSet<long>();
 
-            try
-            {
-                result = await GetReclosersFromCache(transactionFlag);
-            }
-            catch (Exception e)
-            {
-                string errorMessage = $"{baseLogString} GetReclosers => Exception: {e.Message}";
-                Logger.LogError(errorMessage, e);
+            //try
+            //{
+            //    result = await GetReclosersFromCache(transactionFlag);
+            //}
+            //catch (Exception e)
+            //{
+            //    string errorMessage = $"{baseLogString} GetReclosers => Exception: {e.Message}";
+            //    Logger.LogError(errorMessage, e);
 
-                result = new HashSet<long>();
-            }
+            //    result = new HashSet<long>();
+            //}
 
             return result;
         }
@@ -216,19 +216,19 @@ namespace CE.ModelProviderImplementation
             string verboseMessage = $"{baseLogString} entering GetEnergySources method.";
             Logger.LogVerbose(verboseMessage);
 
-            List<long> result;
+            List<long> result = new List<long>();
 
-            try
-            {
-                result = await GetEnergySourcesFromCache(transactionFlag);
-            }
-            catch (Exception e)
-            {
-                string errorMessage = $"{baseLogString} GetEnergySources => Exception: {e.Message}";
-                Logger.LogError(errorMessage, e);
+            //try
+            //{
+            //    result = await GetEnergySourcesFromCache(transactionFlag);
+            //}
+            //catch (Exception e)
+            //{
+            //    string errorMessage = $"{baseLogString} GetEnergySources => Exception: {e.Message}";
+            //    Logger.LogError(errorMessage, e);
 
-                result = new List<long>();
-            }
+            //    result = new List<long>();
+            //}
 
             return result;
         }
