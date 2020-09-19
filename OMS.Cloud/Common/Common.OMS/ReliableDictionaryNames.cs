@@ -25,5 +25,6 @@
         //OMS.OutageSimulatorService
         public const string SimulatedOutages = "SimulatedOutages";
         public const string MonitoredIsolationPoints = "MonitoredIsolationPoints";
+        public const string CommandedValues = "CommandedValues";
     }
 }

@@ -60,6 +60,7 @@
     <Compile Include="ContractProviders\NotifySubscriberProvider.cs" />
     <Compile Include="ContractProviders\OutageSimulatorProvider.cs" />
     <Compile Include="ContractProviders\OutageSimulatorUIProvider.cs" />
+    <Compile Include="DataContracts\CommandedValue.cs" />
     <Compile Include="Properties\AssemblyInfo.cs" />
     <Compile Include="SimulationControlCycle.cs" />
   </ItemGroup>

@@ -20,6 +20,7 @@ using OMS.Common.PubSubContracts;
 using OMS.Common.WcfClient.PubSub;
 using OMS.OutageSimulatorImplementation;
 using OMS.OutageSimulatorImplementation.ContractProviders;
+using OMS.OutageSimulatorImplementation.DataContracts;
 
 namespace OMS.OutageSimulatorService
 {
@@ -28,6 +29,8 @@ namespace OMS.OutageSimulatorService
     /// </summary>
     internal sealed class OutageSimulatorService : StatefulService
     {
+        private const int commandedValueIntervalUpperLimit = 30_000;
+
         private readonly string baseLogString;
 
         private readonly IOutageSimulatorContract outageSimulatorProvider;
@@ -50,7 +53,7 @@ namespace OMS.OutageSimulatorService
 
             try
             {
-                this.controlCycle = new SimulationControlCycle(StateManager);
+                this.controlCycle = new SimulationControlCycle(StateManager, commandedValueIntervalUpperLimit);
 
                 this.outageSimulatorProvider = new OutageSimulatorProvider(StateManager);
                 this.outageSimulatorUIProvider = new OutageSimulatorUIProvider(StateManager);
@@ -192,6 +195,25 @@ namespace OMS.OutageSimulatorService
                         else
                         {
                             await StateManager.GetOrAddAsync<IReliableDictionary<long, MonitoredIsolationPoint>>(tx, ReliableDictionaryNames.MonitoredIsolationPoints);
+                            await tx.CommitAsync();
+                        }
+                    }
+                }),
+
+                Task.Run(async() =>
+                {
+                    using (ITransaction tx = this.StateManager.CreateTransaction())
+                    {
+                        var result = await StateManager.TryGetAsync<IReliableDictionary<long, CommandedValue>>(ReliableDictionaryNames.CommandedValues);
+                        if(result.HasValue)
+                        {
+                            var gidToPointItemMap = result.Value;
+                            await gidToPointItemMap.ClearAsync();
+                            await tx.CommitAsync();
+                        }
+                        else
+                        {
+                            await StateManager.GetOrAddAsync<IReliableDictionary<long, CommandedValue>>(tx, ReliableDictionaryNames.CommandedValues);
                             await tx.CommitAsync();
                         }
                     }

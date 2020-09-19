@@ -8,7 +8,9 @@ using OMS.Common.Cloud.ReliableCollectionHelpers;
 using OMS.Common.PubSubContracts;
 using OMS.Common.PubSubContracts.DataContracts.SCADA;
 using OMS.Common.PubSubContracts.Interfaces;
+using OMS.OutageSimulatorImplementation.DataContracts;
 using System;
+using System.Collections.Generic;
 using System.Threading.Tasks;
 
 namespace OMS.OutageSimulatorImplementation.ContractProviders
@@ -28,12 +30,15 @@ namespace OMS.OutageSimulatorImplementation.ContractProviders
         #region Reliable Dictionaries
         private bool isSimulatedOutagesInitialized;
         private bool isMonitoredIsolationPointsInitialized;
+        private bool isCommandedValuesInitialized;
+
         private bool ReliableDictionariesInitialized
         {
             get
             {
                 return isSimulatedOutagesInitialized &&
-                       isMonitoredIsolationPointsInitialized;
+                       isMonitoredIsolationPointsInitialized &&
+                       isCommandedValuesInitialized;
             }
         }
 
@@ -47,6 +52,12 @@ namespace OMS.OutageSimulatorImplementation.ContractProviders
         private ReliableDictionaryAccess<long, MonitoredIsolationPoint> MonitoredIsolationPoints
         {
             get { return monitoredIsolationPoints; }
+        }
+
+        private ReliableDictionaryAccess<long, CommandedValue> commandedValues;
+        private ReliableDictionaryAccess<long, CommandedValue> CommandedValues
+        {
+            get { return commandedValues; }
         }
 
         private async void OnStateManagerChangedHandler(object sender, NotifyStateManagerChangedEventArgs e)
@@ -70,6 +81,14 @@ namespace OMS.OutageSimulatorImplementation.ContractProviders
                     this.isMonitoredIsolationPointsInitialized = true;
 
                     string debugMessage = $"{baseLogString} OnStateManagerChangedHandler => '{ReliableDictionaryNames.MonitoredIsolationPoints}' ReliableDictionaryAccess initialized.";
+                    Logger.LogDebug(debugMessage);
+                }
+                else if (reliableStateName == ReliableDictionaryNames.CommandedValues)
+                {
+                    commandedValues = await ReliableDictionaryAccess<long, CommandedValue>.Create(stateManager, ReliableDictionaryNames.CommandedValues);
+                    this.isCommandedValuesInitialized = true;
+
+                    string debugMessage = $"{baseLogString} OnStateManagerChangedHandler => '{ReliableDictionaryNames.CommandedValues}' ReliableDictionaryAccess initialized.";
                     Logger.LogDebug(debugMessage);
                 }
             }
@@ -105,6 +124,7 @@ namespace OMS.OutageSimulatorImplementation.ContractProviders
             }
 
             var enumerableMonitoredPoints = await MonitoredIsolationPoints.GetEnumerableDictionaryAsync();
+            var enumerableCommandedValues = await CommandedValues.GetEnumerableDictionaryAsync();
 
             foreach(long measurementGid in multipleDiscreteValueSCADAMessage.Data.Keys)
             {
@@ -114,19 +134,10 @@ namespace OMS.OutageSimulatorImplementation.ContractProviders
                 }
 
                 var scadaDataValue = multipleDiscreteValueSCADAMessage.Data[measurementGid].Value;
-                var monitoredPoint = enumerableMonitoredPoints[measurementGid];
-                var monitoredPointData = monitoredPoint.DiscreteModbusData;
 
-                if (scadaDataValue != monitoredPointData.Value)
-                {
-                    var newDiscreteModbusData = new DiscreteModbusData(scadaDataValue,
-                                                                       monitoredPointData.Alarm,
-                                                                       monitoredPointData.MeasurementGid,
-                                                                       monitoredPointData.CommandOrigin);
+                await UpdateMonitoredPoints(measurementGid, enumerableMonitoredPoints, scadaDataValue);
 
-                    monitoredPoint.DiscreteModbusData = newDiscreteModbusData;
-                    await MonitoredIsolationPoints.SetAsync(measurementGid, monitoredPoint);
-                }
+                await UpdateCommandedValues(measurementGid, enumerableCommandedValues, scadaDataValue);
             }
         }
 
@@ -140,5 +151,38 @@ namespace OMS.OutageSimulatorImplementation.ContractProviders
             return Task.Run(() => true);
         }
         #endregion INotifySubscriberContract
+
+        private async Task UpdateMonitoredPoints(long measurementGid, Dictionary<long, MonitoredIsolationPoint> enumerableMonitoredPoints, ushort scadaDataValue)
+        {
+            var monitoredPoint = enumerableMonitoredPoints[measurementGid];
+            var monitoredPointData = monitoredPoint.DiscreteModbusData;
+
+            if (scadaDataValue != monitoredPointData.Value)
+            {
+                var newDiscreteModbusData = new DiscreteModbusData(scadaDataValue,
+                                                                   monitoredPointData.Alarm,
+                                                                   monitoredPointData.MeasurementGid,
+                                                                   monitoredPointData.CommandOrigin);
+
+                monitoredPoint.DiscreteModbusData = newDiscreteModbusData;
+                await MonitoredIsolationPoints.SetAsync(measurementGid, monitoredPoint);
+            }
+        }
+
+        private async Task UpdateCommandedValues(long measurementGid, Dictionary<long, CommandedValue> enumerableCommandedValues, ushort scadaDataValue)
+        {
+            if (!enumerableCommandedValues.ContainsKey(measurementGid))
+            {
+                return;
+            }
+
+            if (enumerableCommandedValues[measurementGid].Value == scadaDataValue)
+            {
+                if ((await CommandedValues.TryRemoveAsync(measurementGid)).HasValue)
+                {
+                    Logger.LogDebug($"{baseLogString} Notify =>  Value succesfully set to scadaDataValue. Commanded value for gid 0x{measurementGid:X16} removed from rel dictionary '{ReliableDictionaryNames.CommandedValues}'.");
+                }
+            }
+        }
     }
 }
