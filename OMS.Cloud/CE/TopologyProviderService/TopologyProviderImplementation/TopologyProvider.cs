@@ -27,8 +27,8 @@ namespace CE.TopologyProviderImplementation
         private readonly string baseLogString;
         private readonly IReliableStateManager stateManager;
 
-        private readonly long topologyID = 1;
-        private readonly long transactionTopologyID = 2;
+        private const long topologyID = 1;
+        private const long transactionTopologyID = 2;
 
         private TransactionFlag transactionFlag;
         private Task<bool> prepare;
@@ -302,41 +302,6 @@ namespace CE.TopologyProviderImplementation
         }
 
         #region Distributed Transaction
-        public async Task CommitTransaction()
-        {
-            string verboseMessage = $"{baseLogString} entering CommitTransaction method.";
-            Logger.LogVerbose(verboseMessage);
-
-            Logger.LogDebug($"{baseLogString} CommitTransaction => Getting topology from cache.");
-            var topology = await GetTopologyFromCache(TopologyType.TransactionTopology);
-            Logger.LogDebug($"{baseLogString} CommitTransaction => Getting topology from cache successfully ended.");
-           
-            await TopologyCache.SetAsync(topologyID, (TopologyModel)topology);
-
-
-            //Logger.LogDebug($"{baseLogString} CommitTransaction => Calling UpdateLoadFlow method from load flow client.");
-            //var loadFlowClient = LoadFlowClient.CreateClient();
-            //topology = await loadFlowClient.UpdateLoadFlow(topology);
-            //Logger.LogDebug($"{baseLogString} CommitTransaction => UpdateLoadFlow method from load flow client has been called successfully.");
-
-            if (topology == null)
-            {
-                string errorMessage = $"{baseLogString} CommitTransaction => Load flow returned null.";
-                Logger.LogError(errorMessage);
-                throw new Exception(errorMessage);
-            }
-
-            //await TopologyCache.SetAsync(topologyID, (TopologyModel)topology);
-
-            //await TopologyCache.SetAsync(topologyID, (TopologyModel)topology);
-            //await TopologyCache.SetAsync(transactionTopologyID, (TopologyModel)topology);
-
-            await RefreshOMSModel();
-            await RefreshUIModel();
-
-           //ProviderTopologyConnectionDelegate?.Invoke(Topology);
-            transactionFlag = TransactionFlag.NoTransaction;
-        }
         public async Task<bool> PrepareForTransaction()
         {
             string verboseMessage = $"{baseLogString} entering PrepareForTransaction method.";
@@ -349,17 +314,19 @@ namespace CE.TopologyProviderImplementation
                 Logger.LogDebug($"{baseLogString} PrepareForTransaction => Creating new transaction topology.");
                 var newTopology = await CreateTopology("PrepareForTransaction");
 
-                Logger.LogDebug($"{baseLogString} CommitTransaction => Calling UpdateLoadFlow method from load flow client.");
-                var loadFlowClient = LoadFlowClient.CreateClient();
-                var topology = await loadFlowClient.UpdateLoadFlow(newTopology);
-                Logger.LogDebug($"{baseLogString} CommitTransaction => UpdateLoadFlow method from load flow client has been called successfully.");
+                //TODO: (look) prebaceno u commit
+                //Logger.LogDebug($"{baseLogString} CommitTransaction => Calling UpdateLoadFlow method from load flow client.");
+                //var loadFlowClient = LoadFlowClient.CreateClient();
+                //var topology = await loadFlowClient.UpdateLoadFlow(newTopology);
+                //Logger.LogDebug($"{baseLogString} CommitTransaction => UpdateLoadFlow method from load flow client has been called successfully.");
 
                 Logger.LogDebug($"{baseLogString} PrepareForTransaction => Writting new transaction topology into cache.");
                 await TopologyCache.SetAsync(transactionTopologyID, (TopologyModel)newTopology);
 
                 transactionFlag = TransactionFlag.InTransaction;
 
-                await TopologyCache.SetAsync(transactionTopologyID, (TopologyModel)topology);
+                //TODO: (look) u vezi prebacivanja u commit
+                //await TopologyCache.SetAsync(transactionTopologyID, (TopologyModel)topology); //inace, sadrzaj topology bi uvek bio prepisan preko newTopology, jer idu na isti kljuc
             }
             catch (Exception e)
             {
@@ -370,6 +337,45 @@ namespace CE.TopologyProviderImplementation
 
             return success;
         }
+
+        public async Task CommitTransaction()
+        {
+            string verboseMessage = $"{baseLogString} entering CommitTransaction method.";
+            Logger.LogVerbose(verboseMessage);
+
+            Logger.LogDebug($"{baseLogString} CommitTransaction => Getting topology from cache.");
+            var topology = await GetTopologyFromCache(TopologyType.TransactionTopology);
+            Logger.LogDebug($"{baseLogString} CommitTransaction => Getting topology from cache successfully ended.");
+
+            await TopologyCache.SetAsync(topologyID, (TopologyModel)topology);
+
+            //TODO: Daje se vremena skadi da zavrsi svoj commit. FIND a better solution!
+            await Task.Delay(10_000);
+
+            Logger.LogDebug($"{baseLogString} CommitTransaction => Calling UpdateLoadFlow method from load flow client.");
+            var loadFlowClient = LoadFlowClient.CreateClient();
+            topology = await loadFlowClient.UpdateLoadFlow(topology);
+            Logger.LogDebug($"{baseLogString} CommitTransaction => UpdateLoadFlow method from load flow client has been called successfully.");
+
+            if (topology == null)
+            {
+                string errorMessage = $"{baseLogString} CommitTransaction => Load flow returned null.";
+                Logger.LogError(errorMessage);
+                throw new Exception(errorMessage);
+            }
+
+            await TopologyCache.SetAsync(topologyID, (TopologyModel)topology); //sadrzaj topology, ce zameniti prethodno uneti (takodje u ovoj metodi)
+
+            //await TopologyCache.SetAsync(topologyID, (TopologyModel)topology);
+            //await TopologyCache.SetAsync(transactionTopologyID, (TopologyModel)topology);
+
+            await RefreshOMSModel();
+            await RefreshUIModel();
+
+            //ProviderTopologyConnectionDelegate?.Invoke(Topology);
+            transactionFlag = TransactionFlag.NoTransaction;
+        }
+
         public async Task RollbackTransaction()
         {
             string verboseMessage = $"{baseLogString} entering RollbackTransaction method.";
