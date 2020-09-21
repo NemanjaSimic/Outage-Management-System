@@ -17,9 +17,10 @@ namespace SubscriberTester
         {
             Console.WriteLine($"Hello from {MicroserviceNames.SubscriberTester}");
 
-            Initialize().Wait();
-            Console.ReadLine();
-            UnsubscribeAll().Wait();
+            //PRODUCES ERRORS WITH PORTS, CAN BE USEFULL WHILE IN WORKING STATE
+            //Initialize().Wait();
+            //Console.ReadLine();
+            //UnsubscribeAll().Wait();
 
             Console.WriteLine($"Goodbye from {MicroserviceNames.SubscriberTester}");
             Console.ReadLine();
