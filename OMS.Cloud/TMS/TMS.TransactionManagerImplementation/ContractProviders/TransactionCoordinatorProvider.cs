@@ -168,13 +168,14 @@ namespace TMS.TransactionManagerImplementation.ContractProviders
                     if (prepareSuccess)
                     {
                         await InvokeCommitOnActors(transactionName);
+                        Logger.LogInformation($"{baseLogString} FinishDistributedUpdate => Distributed transaction finsihed SUCCESSFULLY.");
                     }
                     else
                     {
                         await InvokeRollbackOnActors(transactionName);
+                        Logger.LogInformation($"{baseLogString} FinishDistributedUpdate => Distributed transaction finsihed UNSUCCESSFULLY.");
                     }
 
-                    Logger.LogInformation($"{baseLogString} FinishDistributedUpdate => Distributed transaction finsihed SUCCESSFULLY.");
                     result = prepareSuccess;
                 }
                 else
