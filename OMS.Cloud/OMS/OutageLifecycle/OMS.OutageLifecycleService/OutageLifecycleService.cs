@@ -183,6 +183,7 @@ namespace OMS.OutageLifecycleService
 
                 var registerSubscriberClient = RegisterSubscriberClient.CreateClient();
                 await registerSubscriberClient.SubscribeToTopic(Topic.SWITCH_STATUS, MicroserviceNames.OmsOutageLifecycleService);
+                await registerSubscriberClient.SubscribeToTopic(Topic.OMS_MODEL, MicroserviceNames.OmsOutageLifecycleService);
                 Logger.LogDebug($"{baseLogString} Initialize => Successfully subscribed to topics.");
             }
             catch (Exception e)

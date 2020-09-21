@@ -143,8 +143,11 @@ namespace OMS.ModelProviderImplementation
 
 			var energizedConsumers = FindEnergizedConsumers(topology);
 
-			var historyDBManagerClient = HistoryDBManagerClient.CreateClient();
-			await historyDBManagerClient.OnConsumersEnergized(energizedConsumers);
+			if (energizedConsumers != null && energizedConsumers.Count > 0)
+			{
+				var historyDBManagerClient = HistoryDBManagerClient.CreateClient();
+				await historyDBManagerClient.OnConsumersEnergized(energizedConsumers);
+			}
 
 			await ReEvaluetePotentialOutages();
 		}

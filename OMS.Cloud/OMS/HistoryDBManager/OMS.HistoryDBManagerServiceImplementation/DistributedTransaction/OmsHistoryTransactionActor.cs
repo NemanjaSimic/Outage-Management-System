@@ -107,6 +107,7 @@ namespace OMS.HistoryDBManagerImplementation.DistributedTransaction
 
             try
             {
+                Logger.LogDebug("Enter prepare method");
                 this.unitOfWork = new UnitOfWork();
                 List<Consumer> consumerDbEntities = this.unitOfWork.ConsumerRepository.GetAll().ToList();
 
@@ -181,6 +182,7 @@ namespace OMS.HistoryDBManagerImplementation.DistributedTransaction
                 string message = $"{baseLogString} Prepare => Exception: {e.Message}";
                 Logger.LogError(message, e);
                 success = false;
+                this.unitOfWork.Dispose();
             }
 
             return success;
