@@ -27,6 +27,7 @@ namespace CE.MeasurementProviderImplementation
 		private readonly string baseLogString;
 		private readonly IReliableStateManager stateManager;
 		private object syncObj;
+		private TransactionMode transactionMode;
 		#endregion
 
 		private ICloudLogger logger;
@@ -118,6 +119,7 @@ namespace CE.MeasurementProviderImplementation
 			this.stateManager = stateManager;
 			stateManager.StateManagerChanged += this.OnStateManagerChangedHandler;
 			syncObj = new object();
+			transactionMode = TransactionMode.NoTransaction;
 
 			ignorableOriginTypes = new HashSet<CommandOriginType>()
 			{ 
@@ -651,6 +653,8 @@ namespace CE.MeasurementProviderImplementation
 			try
 			{
 				Logger.LogDebug($"{baseLogString} PrepareForTransaction => Measurement provider preparing for transaction.");
+
+				transactionMode = TransactionMode.InTransaction;
 
 				var tempAnalogMeasurements = await GetAnalogMeasurementsFromCache(MeasurementPorviderCacheType.Origin);
 				var tempDiscreteMeasurements = await GetDiscreteMeasurementsFromCache(MeasurementPorviderCacheType.Origin);
