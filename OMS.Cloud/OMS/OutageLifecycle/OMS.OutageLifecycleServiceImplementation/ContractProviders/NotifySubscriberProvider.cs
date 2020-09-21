@@ -108,6 +108,7 @@ namespace OMS.OutageLifecycleImplementation.ContractProviders
             {
 				if (message is MultipleDiscreteValueSCADAMessage multipleDiscreteValueSCADAMessage)
                 {
+					Logger.LogDebug($"{baseLogString} MultipleDiscreteValueSCADAMessage received.");
 					var discreteData = multipleDiscreteValueSCADAMessage.Data;
 
 					var enumerableHeadBreakerMeasurements = await MonitoredHeadBreakerMeasurements.GetEnumerableDictionaryAsync();
@@ -124,6 +125,7 @@ namespace OMS.OutageLifecycleImplementation.ContractProviders
 				}
 				else if(message is OMSModelMessage omsModelMessage)
                 {
+					Logger.LogDebug($"{baseLogString} OMSModelMessage received. Count {omsModelMessage.OutageTopologyModel.OutageTopology.Count}");
 					OutageTopologyModel topology = omsModelMessage.OutageTopologyModel;
 					await OutageTopologyModel.SetAsync(ReliableDictionaryNames.OutageTopologyModel, topology);
 				}
