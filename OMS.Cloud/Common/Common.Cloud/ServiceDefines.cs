@@ -127,7 +127,7 @@ namespace OMS.Common.Cloud
                 { MicroserviceNames.WebAdapterService,              new Uri("fabric:/Cloud.Web/WebAdapterService")                      },
 
                 //TEST
-                { MicroserviceNames.SubscriberTester,              new Uri("net.tcp://localhost:9001/SubscriberTester")                 },
+                { MicroserviceNames.SubscriberTester,              new Uri("net.tcp://localhost:9999/SubscriberTester")                 },
             };
         }
     }

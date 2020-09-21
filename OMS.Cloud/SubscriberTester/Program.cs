@@ -74,19 +74,19 @@ namespace SubscriberTester
         {
             Console.WriteLine($"Message received. Message Type: {message.GetType()}, PublisherName: {publisherName}");
 
-            if(message is TopologyForUIMessage uiTopology)
+            if(message is TopologyForUIMessage uiTopologyMessage)
             {
 
-                string uiTopologyMessage = $"FirstNode: 0x{uiTopology.UIModel.FirstNode:X16}{Environment.NewLine}" +
-                                   $"Count of Nodes: {uiTopology.UIModel.Nodes.Count}{Environment.NewLine}" +
-                                   $"Count of Relations: {uiTopology.UIModel.Relations.Count}{Environment.NewLine}";
-                Console.WriteLine(uiTopologyMessage);
+                string uiTopologyString = $"FirstNode: 0x{uiTopologyMessage.UIModel.FirstNode:X16}{Environment.NewLine}" +
+                                   $"Count of Nodes: {uiTopologyMessage.UIModel.Nodes.Count}{Environment.NewLine}" +
+                                   $"Count of Relations: {uiTopologyMessage.UIModel.Relations.Count}{Environment.NewLine}";
+                Console.WriteLine(uiTopologyString);
             }
-            else if(message is OutageTopologyModel outageTopologyModel)
+            else if(message is OMSModelMessage omsModelMessage)
             {
-                string topologyMessage = $"FirstNode: 0x{outageTopologyModel.FirstNode:X16}{Environment.NewLine}" +
-                                         $"Count of Elements: {outageTopologyModel.OutageTopology.Count}{Environment.NewLine}";
-                Console.WriteLine(topologyMessage);
+                string omsModelString = $"FirstNode: 0x{omsModelMessage.OutageTopologyModel.FirstNode:X16}{Environment.NewLine}" +
+                                         $"Count of Elements: {omsModelMessage.OutageTopologyModel.OutageTopology.Count}{Environment.NewLine}";
+                Console.WriteLine(omsModelString);
             }
         }
     }
