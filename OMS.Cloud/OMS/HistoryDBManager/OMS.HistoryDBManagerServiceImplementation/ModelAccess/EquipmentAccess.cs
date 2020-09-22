@@ -75,17 +75,17 @@ namespace OMS.HistoryDBManagerImplementation.ModelAccess
 		//	});
 		//}
 
-		public Task<IEnumerable<Equipment>> GetAllEquipments()
+		public Task<List<Equipment>> GetAllEquipments()
 		{
 			return Task.Run(() =>
 			{
-				IEnumerable<Equipment> equipment = new List<Equipment>();
+				List<Equipment> equipment = new List<Equipment>();
 
 				using (var unitOfWork = new UnitOfWork())
 				{
 					try
 					{
-						equipment = unitOfWork.EquipmentRepository.GetAll();
+						equipment = new List<Equipment>(unitOfWork.EquipmentRepository.GetAll());
 					}
 					catch (Exception e)
 					{

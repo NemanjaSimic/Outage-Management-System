@@ -14,7 +14,7 @@ namespace Common.OmsContracts.ModelAccess
 	public interface IConsumerAccessContract : IService, IHealthChecker
 	{
 		[OperationContract]
-		Task<IEnumerable<Consumer>> GetAllConsumers();
+		Task<List<Consumer>> GetAllConsumers();
 
 		[OperationContract]
 		Task<Consumer> GetConsumer(long gid);

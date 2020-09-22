@@ -41,17 +41,17 @@ namespace OMS.Common.WcfClient.OMS.ModelAccess
         //    return InvokeWithRetryAsync(client => client.Channel.FindOutage(expression));
         //}
 
-        public Task<IEnumerable<OutageEntity>> GetAllActiveOutages()
+        public Task<List<OutageEntity>> GetAllActiveOutages()
 		{
 			return InvokeWithRetryAsync(client => client.Channel.GetAllActiveOutages());
 		}
 
-		public Task<IEnumerable<OutageEntity>> GetAllArchivedOutages()
+		public Task<List<OutageEntity>> GetAllArchivedOutages()
 		{
 			return InvokeWithRetryAsync(client => client.Channel.GetAllArchivedOutages());
 		}
 
-		public Task<IEnumerable<OutageEntity>> GetAllOutages()
+		public Task<List<OutageEntity>> GetAllOutages()
 		{
 			return InvokeWithRetryAsync(client => client.Channel.GetAllOutages());
 		}

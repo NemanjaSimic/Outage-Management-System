@@ -304,7 +304,21 @@ namespace OMS.OutageLifecycleImplementation.Helpers
                 }
             }
 
-            equipmentList.AddRange(await CreateEquipmentEntitiesFromNmsDataAsync(equipmentIdsNotFoundInDb));
+            if (equipmentIdsNotFoundInDb.Count > 0)
+			{
+                List<Equipment> createdEquipments = await CreateEquipmentEntitiesFromNmsDataAsync(equipmentIdsNotFoundInDb);
+
+                var equipmentAccess = EquipmentAccessClient.CreateClient();
+
+                List<Task> addingEquipmentTasks = new List<Task>();
+                foreach (var createdEquipment in createdEquipments)
+                {
+                    addingEquipmentTasks.Add(Task.Run(() => equipmentAccess.AddEquipment(createdEquipment)));
+                }
+
+                Task.WaitAll(addingEquipmentTasks.ToArray());
+                equipmentList.AddRange(createdEquipments);
+            }
 
             return equipmentList;
         }

@@ -41,7 +41,7 @@ namespace OMS.Common.WcfClient.OMS.ModelAccess
 		//	return InvokeWithRetryAsync(client => client.Channel.FindConsumer(expression));
 		//}
 
-		public Task<IEnumerable<Consumer>> GetAllConsumers()
+		public Task<List<Consumer>> GetAllConsumers()
 		{
 			return InvokeWithRetryAsync(client => client.Channel.GetAllConsumers());
 		}
