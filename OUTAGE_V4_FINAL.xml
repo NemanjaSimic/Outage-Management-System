@@ -4474,6 +4474,7 @@
 	
 	<cim:EnergyConsumer rdf:ID="EC_2">
 		<cim:ConductingEquipment.BaseVoltage rdf:resource="#BV_2"/>
+		<cim:ConductingEquipment.isRemote>true</cim:ConductingEquipment.isRemote>
 		<cim:IdentifiedObject.description> </cim:IdentifiedObject.description>
 		<cim:IdentifiedObject.mRID>EC_2</cim:IdentifiedObject.mRID>
 		<ftn:IdentifiedObject.name>EC_2</ftn:IdentifiedObject.name>
@@ -4485,6 +4486,7 @@
 	
 	<cim:EnergyConsumer rdf:ID="EC_3">
 		<cim:ConductingEquipment.BaseVoltage rdf:resource="#BV_2"/>
+		<cim:ConductingEquipment.isRemote>true</cim:ConductingEquipment.isRemote>
 		<cim:IdentifiedObject.description> </cim:IdentifiedObject.description>
 		<cim:IdentifiedObject.mRID>EC_3</cim:IdentifiedObject.mRID>
 		<ftn:IdentifiedObject.name>EC_3</ftn:IdentifiedObject.name>
