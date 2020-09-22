@@ -146,7 +146,7 @@ namespace OMS.OutageLifecycleImplementation.ContractProviders
 
                 if (!(await CheckPreconditions(elementGid, commandOriginType, affectedConsumersGids, outageModelReadAccessClient, historyDBManagerClient)))
                 {
-                    Logger.LogWarning($"{baseLogString} ReportPotentialOutage => Parameters do not satisfy required preconditions. OutageId: {elementGid}, CommandOriginType: {commandOriginType}");
+                    Logger.LogWarning($"{baseLogString} ReportPotentialOutage => Parameters do not satisfy required preconditions. ElementId: 0x{elementGid:X16}, CommandOriginType: {commandOriginType}");
                     return false;
                 }
                 #endregion Preconditions
