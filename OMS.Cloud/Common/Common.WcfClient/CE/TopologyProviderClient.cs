@@ -69,6 +69,8 @@ namespace OMS.Common.WcfClient.CE
             return InvokeWithRetryAsync(client => client.Channel.PrepareForTransaction());
 		}
 
+		
+
 		public Task ResetRecloser(long recloserGid)
 		{
             return InvokeWithRetryAsync(client => client.Channel.ResetRecloser(recloserGid));
@@ -82,6 +84,12 @@ namespace OMS.Common.WcfClient.CE
 		public Task<bool> IsAlive()
 		{
 			return InvokeWithRetryAsync(client => client.Channel.IsAlive());
+		}
+
+		public Task RecloserOpened(long recloserGid)
+		{
+			return InvokeWithRetryAsync(client => client.Channel.RecloserOpened(recloserGid));
+
 		}
 	}
 }

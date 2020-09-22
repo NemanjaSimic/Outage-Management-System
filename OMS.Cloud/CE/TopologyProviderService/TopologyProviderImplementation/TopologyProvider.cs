@@ -276,6 +276,7 @@ namespace CE.TopologyProviderImplementation
                     if (element is Recloser recloser)
                     {
                         recloser.NumberOfTry = 0;
+                        await TopologyCache.SetAsync(topologyID, topology);
                     }
                     else
                     {
@@ -301,6 +302,47 @@ namespace CE.TopologyProviderImplementation
                 throw;
             }
 
+        }
+
+        public async Task RecloserOpened(long recloserGid)
+        {
+            string verboseMessage = $"{baseLogString} entering ResetRecloser method. Recloser GID {recloserGid:X16}.";
+            Logger.LogVerbose(verboseMessage);
+
+            try
+            {
+                var topology = await GetTopologyFromCache(TopologyType.NoSpecific);
+
+                if (topology.GetElementByGid(recloserGid, out ITopologyElement element))
+                {
+                    if (element is Recloser recloser)
+                    {
+                        recloser.NumberOfTry++;
+                        await TopologyCache.SetAsync(topologyID, topology);
+                    }
+                    else
+                    {
+                        string errorMessage = $"{baseLogString} ResetRecloser => Element with GID {recloserGid:X16} is not a recloser.";
+                        Logger.LogError(errorMessage);
+                        throw new Exception(errorMessage);
+                    }
+                }
+                else
+                {
+                    string errorMessage = $"{baseLogString} ResetRecloser => Element with GID {recloserGid:X16} does not exist in Topology.";
+                    Logger.LogError(errorMessage);
+                    throw new Exception(errorMessage);
+                }
+
+            }
+            catch (Exception e)
+            {
+                string errorMessage = $"{baseLogString} ResetRecloser =>" +
+                    $"{Environment.NewLine} Exception message: {e.Message} " +
+                    $"{Environment.NewLine} Stack Trace: {e.StackTrace}";
+                Logger.LogError(errorMessage);
+                throw;
+            }
         }
 
         #region Distributed Transaction

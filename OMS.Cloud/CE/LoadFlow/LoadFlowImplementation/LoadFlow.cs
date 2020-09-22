@@ -629,17 +629,19 @@ namespace CE.LoadFlowImplementation
             }
 
             Logger.LogDebug($"{baseLogString} CommandToRecloser => Enetring in sleep for 10 seconds.");
-            Thread.Sleep(10000);
+            Thread.Sleep(30000);
             Logger.LogDebug($"{baseLogString} CommandToRecloser => Waking up after 10 seconds.");
 
             if (!((Recloser)recloser).IsReachedMaximumOfTries())
             {
+                var topologyProviderClient = TopologyProviderClient.CreateClient();
+                await topologyProviderClient.RecloserOpened(recloser.Id);
+
                 Logger.LogDebug($"{baseLogString} CommandToRecloser => Calling SendDiscreteCommand method from measurement provider. Measurement GID: {measurementGid:X16}, Value: {value}, OriginType {originType}.");
                 var measurementProviderClient = MeasurementProviderClient.CreateClient();
                 await measurementProviderClient.SendDiscreteCommand(measurementGid, value, originType);
                 Logger.LogDebug($"{baseLogString} CommandToRecloser => SendDiscreteCommand method has been successfully called.");
-                
-                ((Recloser)recloser).NumberOfTry++;
+
             }
         }
         #endregion
