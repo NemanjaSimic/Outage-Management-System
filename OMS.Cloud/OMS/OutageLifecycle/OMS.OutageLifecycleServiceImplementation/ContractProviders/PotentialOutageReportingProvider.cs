@@ -191,6 +191,7 @@ namespace OMS.OutageLifecycleImplementation.ContractProviders
             HashSet<long> visited = new HashSet<long>();
             long startingSwitch = potentialOutageGid;
 
+            //TODO: cemu sluzi ova logika?
             if (topology.OutageTopology.TryGetValue(potentialOutageGid, out OutageTopologyElement firstElement)
                 && topology.OutageTopology.TryGetValue(firstElement.FirstEnd, out OutageTopologyElement currentElementAbove))
             {
