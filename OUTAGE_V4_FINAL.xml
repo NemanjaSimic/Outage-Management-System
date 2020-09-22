@@ -4468,6 +4468,8 @@
 		<cim:IdentifiedObject.mRID>EC_1</cim:IdentifiedObject.mRID>
 		<ftn:IdentifiedObject.name>EC_1</ftn:IdentifiedObject.name>
 		<cim:EnergyConsumer.type>Household</cim:EnergyConsumer.type>
+		<cim:EnergyConsumer.firstName>Petar1</cim:EnergyConsumer.firstName>
+		<cim:EnergyConsumer.lastName>Petrovic1</cim:EnergyConsumer.lastName>
 	</cim:EnergyConsumer>
 	
 	<cim:EnergyConsumer rdf:ID="EC_2">
@@ -4476,6 +4478,9 @@
 		<cim:IdentifiedObject.mRID>EC_2</cim:IdentifiedObject.mRID>
 		<ftn:IdentifiedObject.name>EC_2</ftn:IdentifiedObject.name>
 		<cim:EnergyConsumer.type>Household</cim:EnergyConsumer.type>
+		<cim:EnergyConsumer.firstName>Petar2</cim:EnergyConsumer.firstName>
+		<cim:EnergyConsumer.lastName>Petrovic2</cim:EnergyConsumer.lastName>
+		
 	</cim:EnergyConsumer>
 	
 	<cim:EnergyConsumer rdf:ID="EC_3">
@@ -4484,6 +4489,8 @@
 		<cim:IdentifiedObject.mRID>EC_3</cim:IdentifiedObject.mRID>
 		<ftn:IdentifiedObject.name>EC_3</ftn:IdentifiedObject.name>
 		<cim:EnergyConsumer.type>Household</cim:EnergyConsumer.type>
+		<cim:EnergyConsumer.firstName>Petar3</cim:EnergyConsumer.firstName>
+		<cim:EnergyConsumer.lastName>Petrovic3</cim:EnergyConsumer.lastName>
 	</cim:EnergyConsumer>
 	
 	<cim:EnergyConsumer rdf:ID="EC_4">
@@ -4493,6 +4500,8 @@
 		<cim:IdentifiedObject.mRID>EC_4</cim:IdentifiedObject.mRID>
 		<ftn:IdentifiedObject.name>EC_4</ftn:IdentifiedObject.name>
 		<cim:EnergyConsumer.type>Household</cim:EnergyConsumer.type>
+		<cim:EnergyConsumer.firstName>Petar4</cim:EnergyConsumer.firstName>
+		<cim:EnergyConsumer.lastName>Petrovic4</cim:EnergyConsumer.lastName>
 	</cim:EnergyConsumer>
 	
 	<cim:EnergyConsumer rdf:ID="EC_5">
@@ -4502,6 +4511,8 @@
 		<cim:IdentifiedObject.mRID>EC_5</cim:IdentifiedObject.mRID>
 		<ftn:IdentifiedObject.name>EC_5</ftn:IdentifiedObject.name>
 		<cim:EnergyConsumer.type>Household</cim:EnergyConsumer.type>
+		<cim:EnergyConsumer.firstName>Petar5</cim:EnergyConsumer.firstName>
+		<cim:EnergyConsumer.lastName>Petrovic5</cim:EnergyConsumer.lastName>
 	</cim:EnergyConsumer>
 	
 	<cim:EnergyConsumer rdf:ID="EC_6">
@@ -4511,6 +4522,8 @@
 		<cim:IdentifiedObject.mRID>EC_6</cim:IdentifiedObject.mRID>
 		<ftn:IdentifiedObject.name>EC_6</ftn:IdentifiedObject.name>
 		<cim:EnergyConsumer.type>Household</cim:EnergyConsumer.type>
+		<cim:EnergyConsumer.firstName>Petar6</cim:EnergyConsumer.firstName>
+		<cim:EnergyConsumer.lastName>Petrovic6</cim:EnergyConsumer.lastName>
 	</cim:EnergyConsumer>
 	
 	<cim:EnergyConsumer rdf:ID="EC_7">
@@ -4520,6 +4533,8 @@
 		<cim:IdentifiedObject.mRID>EC_7</cim:IdentifiedObject.mRID>
 		<ftn:IdentifiedObject.name>EC_7</ftn:IdentifiedObject.name>
 		<cim:EnergyConsumer.type>Household</cim:EnergyConsumer.type>
+		<cim:EnergyConsumer.firstName>Petar7</cim:EnergyConsumer.firstName>
+		<cim:EnergyConsumer.lastName>Petrovic7</cim:EnergyConsumer.lastName>
 	</cim:EnergyConsumer>
 	
 	<cim:EnergyConsumer rdf:ID="EC_8">
@@ -4529,6 +4544,8 @@
 		<cim:IdentifiedObject.mRID>EC_8</cim:IdentifiedObject.mRID>
 		<ftn:IdentifiedObject.name>EC_8</ftn:IdentifiedObject.name>
 		<cim:EnergyConsumer.type>Household</cim:EnergyConsumer.type>
+		<cim:EnergyConsumer.firstName>Petar8</cim:EnergyConsumer.firstName>
+		<cim:EnergyConsumer.lastName>Petrovic8</cim:EnergyConsumer.lastName>
 	</cim:EnergyConsumer>
 	
 	<cim:EnergyConsumer rdf:ID="EC_9">
@@ -4538,6 +4555,8 @@
 		<cim:IdentifiedObject.mRID>EC_9</cim:IdentifiedObject.mRID>
 		<ftn:IdentifiedObject.name>EC_9</ftn:IdentifiedObject.name>
 		<cim:EnergyConsumer.type>Household</cim:EnergyConsumer.type>
+		<cim:EnergyConsumer.firstName>Petar9</cim:EnergyConsumer.firstName>
+		<cim:EnergyConsumer.lastName>Petrovic9</cim:EnergyConsumer.lastName>
 	</cim:EnergyConsumer>
 	
 	<cim:EnergyConsumer rdf:ID="EC_10">
@@ -4547,6 +4566,8 @@
 		<cim:IdentifiedObject.mRID>EC_10</cim:IdentifiedObject.mRID>
 		<ftn:IdentifiedObject.name>EC_10</ftn:IdentifiedObject.name>
 		<cim:EnergyConsumer.type>Household</cim:EnergyConsumer.type>
+		<cim:EnergyConsumer.firstName>Petar10</cim:EnergyConsumer.firstName>
+		<cim:EnergyConsumer.lastName>Petrovic10</cim:EnergyConsumer.lastName>
 	</cim:EnergyConsumer>
 	
 	<cim:EnergyConsumer rdf:ID="EC_11">
@@ -4556,6 +4577,8 @@
 		<cim:IdentifiedObject.mRID>EC_11</cim:IdentifiedObject.mRID>
 		<ftn:IdentifiedObject.name>EC_11</ftn:IdentifiedObject.name>
 		<cim:EnergyConsumer.type>Household</cim:EnergyConsumer.type>
+		<cim:EnergyConsumer.firstName>Petar11</cim:EnergyConsumer.firstName>
+		<cim:EnergyConsumer.lastName>Petrovic11</cim:EnergyConsumer.lastName>
 	</cim:EnergyConsumer>
 	
 	<cim:EnergyConsumer rdf:ID="EC_12">
@@ -4565,6 +4588,8 @@
 		<cim:IdentifiedObject.mRID>EC_12</cim:IdentifiedObject.mRID>
 		<ftn:IdentifiedObject.name>EC_12</ftn:IdentifiedObject.name>
 		<cim:EnergyConsumer.type>Household</cim:EnergyConsumer.type>
+		<cim:EnergyConsumer.firstName>Petar12</cim:EnergyConsumer.firstName>
+		<cim:EnergyConsumer.lastName>Petrovic12</cim:EnergyConsumer.lastName>
 	</cim:EnergyConsumer>
 	
 	<cim:EnergyConsumer rdf:ID="EC_13">
@@ -4574,6 +4599,8 @@
 		<cim:IdentifiedObject.mRID>EC_13</cim:IdentifiedObject.mRID>
 		<ftn:IdentifiedObject.name>EC_13</ftn:IdentifiedObject.name>
 		<cim:EnergyConsumer.type>Household</cim:EnergyConsumer.type>
+		<cim:EnergyConsumer.firstName>Petar13</cim:EnergyConsumer.firstName>
+		<cim:EnergyConsumer.lastName>Petrovic13</cim:EnergyConsumer.lastName>
 	</cim:EnergyConsumer>
 	
 	<cim:EnergyConsumer rdf:ID="EC_14">
@@ -4583,6 +4610,8 @@
 		<cim:IdentifiedObject.mRID>EC_14</cim:IdentifiedObject.mRID>
 		<ftn:IdentifiedObject.name>EC_14</ftn:IdentifiedObject.name>
 		<cim:EnergyConsumer.type>Household</cim:EnergyConsumer.type>
+		<cim:EnergyConsumer.firstName>Petar14</cim:EnergyConsumer.firstName>
+		<cim:EnergyConsumer.lastName>Petrovic14</cim:EnergyConsumer.lastName>
 	</cim:EnergyConsumer>
 	
 	<cim:EnergyConsumer rdf:ID="EC_15">
@@ -4592,6 +4621,8 @@
 		<cim:IdentifiedObject.mRID>EC_15</cim:IdentifiedObject.mRID>
 		<ftn:IdentifiedObject.name>EC_15</ftn:IdentifiedObject.name>
 		<cim:EnergyConsumer.type>Household</cim:EnergyConsumer.type>
+		<cim:EnergyConsumer.firstName>Petar15</cim:EnergyConsumer.firstName>
+		<cim:EnergyConsumer.lastName>Petrovic15</cim:EnergyConsumer.lastName>
 	</cim:EnergyConsumer>
 	
 	<cim:EnergyConsumer rdf:ID="EC_16">
@@ -4601,6 +4632,8 @@
 		<cim:IdentifiedObject.mRID>EC_16</cim:IdentifiedObject.mRID>
 		<ftn:IdentifiedObject.name>EC_16</ftn:IdentifiedObject.name>
 		<cim:EnergyConsumer.type>Household</cim:EnergyConsumer.type>
+		<cim:EnergyConsumer.firstName>Petar16</cim:EnergyConsumer.firstName>
+		<cim:EnergyConsumer.lastName>Petrovic16</cim:EnergyConsumer.lastName>
 	</cim:EnergyConsumer>
 	
 	<cim:EnergyConsumer rdf:ID="EC_17">
@@ -4610,6 +4643,8 @@
 		<cim:IdentifiedObject.mRID>EC_17</cim:IdentifiedObject.mRID>
 		<ftn:IdentifiedObject.name>EC_17</ftn:IdentifiedObject.name>
 		<cim:EnergyConsumer.type>Household</cim:EnergyConsumer.type>
+		<cim:EnergyConsumer.firstName>Petar17</cim:EnergyConsumer.firstName>
+		<cim:EnergyConsumer.lastName>Petrovic17</cim:EnergyConsumer.lastName>
 	</cim:EnergyConsumer>
 	
 	<cim:EnergyConsumer rdf:ID="EC_18">
@@ -4619,6 +4654,8 @@
 		<cim:IdentifiedObject.mRID>EC_18</cim:IdentifiedObject.mRID>
 		<ftn:IdentifiedObject.name>EC_18</ftn:IdentifiedObject.name>
 		<cim:EnergyConsumer.type>Household</cim:EnergyConsumer.type>
+		<cim:EnergyConsumer.firstName>Petar18</cim:EnergyConsumer.firstName>
+		<cim:EnergyConsumer.lastName>Petrovic18</cim:EnergyConsumer.lastName>
 	</cim:EnergyConsumer>
 	
 	<cim:EnergyConsumer rdf:ID="EC_19">
@@ -4628,6 +4665,8 @@
 		<cim:IdentifiedObject.mRID>EC_19</cim:IdentifiedObject.mRID>
 		<ftn:IdentifiedObject.name>EC_19</ftn:IdentifiedObject.name>
 		<cim:EnergyConsumer.type>Household</cim:EnergyConsumer.type>
+		<cim:EnergyConsumer.firstName>Petar19</cim:EnergyConsumer.firstName>
+		<cim:EnergyConsumer.lastName>Petrovic19</cim:EnergyConsumer.lastName>
 	</cim:EnergyConsumer>
 	
 	<cim:EnergyConsumer rdf:ID="EC_20">
@@ -4637,6 +4676,8 @@
 		<cim:IdentifiedObject.mRID>EC_20</cim:IdentifiedObject.mRID>
 		<ftn:IdentifiedObject.name>EC_20</ftn:IdentifiedObject.name>
 		<cim:EnergyConsumer.type>Household</cim:EnergyConsumer.type>
+		<cim:EnergyConsumer.firstName>Petar20</cim:EnergyConsumer.firstName>
+		<cim:EnergyConsumer.lastName>Petrovic20</cim:EnergyConsumer.lastName>
 	</cim:EnergyConsumer>
 	
 	<cim:EnergyConsumer rdf:ID="EC_21">
@@ -4646,6 +4687,8 @@
 		<cim:IdentifiedObject.mRID>EC_21</cim:IdentifiedObject.mRID>
 		<ftn:IdentifiedObject.name>EC_21</ftn:IdentifiedObject.name>
 		<cim:EnergyConsumer.type>Household</cim:EnergyConsumer.type>
+		<cim:EnergyConsumer.firstName>Petar21</cim:EnergyConsumer.firstName>
+		<cim:EnergyConsumer.lastName>Petrovic21</cim:EnergyConsumer.lastName>
 	</cim:EnergyConsumer>
 	
 	<cim:EnergyConsumer rdf:ID="EC_22">
@@ -4655,6 +4698,8 @@
 		<cim:IdentifiedObject.mRID>EC_22</cim:IdentifiedObject.mRID>
 		<ftn:IdentifiedObject.name>EC_22</ftn:IdentifiedObject.name>
 		<cim:EnergyConsumer.type>Household</cim:EnergyConsumer.type>
+		<cim:EnergyConsumer.firstName>Petar22</cim:EnergyConsumer.firstName>
+		<cim:EnergyConsumer.lastName>Petrovic22</cim:EnergyConsumer.lastName>
 	</cim:EnergyConsumer>
 	<cim:EnergyConsumer rdf:ID="EC_23">
 		<cim:ConductingEquipment.BaseVoltage rdf:resource="#BV_2"/>
@@ -4663,6 +4708,8 @@
 		<cim:IdentifiedObject.mRID>EC_23</cim:IdentifiedObject.mRID>
 		<ftn:IdentifiedObject.name>EC_23</ftn:IdentifiedObject.name>
 		<cim:EnergyConsumer.type>Household</cim:EnergyConsumer.type>
+		<cim:EnergyConsumer.firstName>Petar23</cim:EnergyConsumer.firstName>
+		<cim:EnergyConsumer.lastName>Petrovic23</cim:EnergyConsumer.lastName>
 	</cim:EnergyConsumer>
 	<cim:EnergyConsumer rdf:ID="EC_24">
 		<cim:ConductingEquipment.BaseVoltage rdf:resource="#BV_2"/>
@@ -4671,6 +4718,8 @@
 		<cim:IdentifiedObject.mRID>EC_24</cim:IdentifiedObject.mRID>
 		<ftn:IdentifiedObject.name>EC_24</ftn:IdentifiedObject.name>
 		<cim:EnergyConsumer.type>Household</cim:EnergyConsumer.type>
+		<cim:EnergyConsumer.firstName>Petar24</cim:EnergyConsumer.firstName>
+		<cim:EnergyConsumer.lastName>Petrovic24</cim:EnergyConsumer.lastName>
 	</cim:EnergyConsumer>
 	<cim:EnergyConsumer rdf:ID="EC_25">
 		<cim:ConductingEquipment.BaseVoltage rdf:resource="#BV_2"/>
@@ -4679,6 +4728,8 @@
 		<cim:IdentifiedObject.mRID>EC_25</cim:IdentifiedObject.mRID>
 		<ftn:IdentifiedObject.name>EC_25</ftn:IdentifiedObject.name>
 		<cim:EnergyConsumer.type>Household</cim:EnergyConsumer.type>
+		<cim:EnergyConsumer.firstName>Petar25</cim:EnergyConsumer.firstName>
+		<cim:EnergyConsumer.lastName>Petrovic25</cim:EnergyConsumer.lastName>
 	</cim:EnergyConsumer>
 	<cim:EnergyConsumer rdf:ID="EC_26">
 		<cim:ConductingEquipment.BaseVoltage rdf:resource="#BV_2"/>
@@ -4687,6 +4738,8 @@
 		<cim:IdentifiedObject.mRID>EC_26</cim:IdentifiedObject.mRID>
 		<ftn:IdentifiedObject.name>EC_26</ftn:IdentifiedObject.name>
 		<cim:EnergyConsumer.type>Household</cim:EnergyConsumer.type>
+		<cim:EnergyConsumer.firstName>Petar26</cim:EnergyConsumer.firstName>
+		<cim:EnergyConsumer.lastName>Petrovic26</cim:EnergyConsumer.lastName>
 	</cim:EnergyConsumer>
 	<cim:EnergyConsumer rdf:ID="EC_27">
 		<cim:ConductingEquipment.BaseVoltage rdf:resource="#BV_2"/>
@@ -4695,6 +4748,8 @@
 		<cim:IdentifiedObject.mRID>EC_27</cim:IdentifiedObject.mRID>
 		<ftn:IdentifiedObject.name>EC_27</ftn:IdentifiedObject.name>
 		<cim:EnergyConsumer.type>Household</cim:EnergyConsumer.type>
+		<cim:EnergyConsumer.firstName>Petar27</cim:EnergyConsumer.firstName>
+		<cim:EnergyConsumer.lastName>Petrovic27</cim:EnergyConsumer.lastName>
 	</cim:EnergyConsumer>
 	<cim:EnergyConsumer rdf:ID="EC_28">
 		<cim:ConductingEquipment.BaseVoltage rdf:resource="#BV_2"/>
@@ -4703,6 +4758,8 @@
 		<cim:IdentifiedObject.mRID>EC_28</cim:IdentifiedObject.mRID>
 		<ftn:IdentifiedObject.name>EC_28</ftn:IdentifiedObject.name>
 		<cim:EnergyConsumer.type>Household</cim:EnergyConsumer.type>
+		<cim:EnergyConsumer.firstName>Petar28</cim:EnergyConsumer.firstName>
+		<cim:EnergyConsumer.lastName>Petrovic28</cim:EnergyConsumer.lastName>
 	</cim:EnergyConsumer>
 	<cim:EnergyConsumer rdf:ID="EC_29">
 		<cim:ConductingEquipment.BaseVoltage rdf:resource="#BV_2"/>
@@ -4711,6 +4768,8 @@
 		<cim:IdentifiedObject.mRID>EC_29</cim:IdentifiedObject.mRID>
 		<ftn:IdentifiedObject.name>EC_29</ftn:IdentifiedObject.name>
 		<cim:EnergyConsumer.type>Household</cim:EnergyConsumer.type>
+		<cim:EnergyConsumer.firstName>Petar29</cim:EnergyConsumer.firstName>
+		<cim:EnergyConsumer.lastName>Petrovic29</cim:EnergyConsumer.lastName>
 	</cim:EnergyConsumer>
 	<cim:EnergyConsumer rdf:ID="EC_30">
 		<cim:ConductingEquipment.BaseVoltage rdf:resource="#BV_2"/>
@@ -4719,6 +4778,8 @@
 		<cim:IdentifiedObject.mRID>EC_30</cim:IdentifiedObject.mRID>
 		<ftn:IdentifiedObject.name>EC_30</ftn:IdentifiedObject.name>
 		<cim:EnergyConsumer.type>Household</cim:EnergyConsumer.type>
+		<cim:EnergyConsumer.firstName>Petar30</cim:EnergyConsumer.firstName>
+		<cim:EnergyConsumer.lastName>Petrovic30</cim:EnergyConsumer.lastName>
 	</cim:EnergyConsumer>
 	<cim:EnergyConsumer rdf:ID="EC_31">
 		<cim:ConductingEquipment.BaseVoltage rdf:resource="#BV_2"/>
@@ -4727,6 +4788,8 @@
 		<cim:IdentifiedObject.mRID>EC_31</cim:IdentifiedObject.mRID>
 		<ftn:IdentifiedObject.name>EC_31</ftn:IdentifiedObject.name>
 		<cim:EnergyConsumer.type>Household</cim:EnergyConsumer.type>
+		<cim:EnergyConsumer.firstName>Petar31</cim:EnergyConsumer.firstName>
+		<cim:EnergyConsumer.lastName>Petrovic31</cim:EnergyConsumer.lastName>
 	</cim:EnergyConsumer>
 	<cim:EnergyConsumer rdf:ID="EC_32">
 		<cim:ConductingEquipment.BaseVoltage rdf:resource="#BV_2"/>
@@ -4735,6 +4798,8 @@
 		<cim:IdentifiedObject.mRID>EC_32</cim:IdentifiedObject.mRID>
 		<ftn:IdentifiedObject.name>EC_32</ftn:IdentifiedObject.name>
 		<cim:EnergyConsumer.type>Household</cim:EnergyConsumer.type>
+		<cim:EnergyConsumer.firstName>Petar32</cim:EnergyConsumer.firstName>
+		<cim:EnergyConsumer.lastName>Petrovic32</cim:EnergyConsumer.lastName>
 	</cim:EnergyConsumer>
 	<cim:EnergyConsumer rdf:ID="EC_33">
 		<cim:ConductingEquipment.BaseVoltage rdf:resource="#BV_2"/>
@@ -4743,6 +4808,8 @@
 		<cim:IdentifiedObject.mRID>EC_33</cim:IdentifiedObject.mRID>
 		<ftn:IdentifiedObject.name>EC_33</ftn:IdentifiedObject.name>
 		<cim:EnergyConsumer.type>Household</cim:EnergyConsumer.type>
+		<cim:EnergyConsumer.firstName>Petar33</cim:EnergyConsumer.firstName>
+		<cim:EnergyConsumer.lastName>Petrovic33</cim:EnergyConsumer.lastName>
 	</cim:EnergyConsumer>
 	<cim:EnergyConsumer rdf:ID="EC_34">
 		<cim:ConductingEquipment.BaseVoltage rdf:resource="#BV_2"/>
@@ -4751,6 +4818,8 @@
 		<cim:IdentifiedObject.mRID>EC_34</cim:IdentifiedObject.mRID>
 		<ftn:IdentifiedObject.name>EC_34</ftn:IdentifiedObject.name>
 		<cim:EnergyConsumer.type>Household</cim:EnergyConsumer.type>
+		<cim:EnergyConsumer.firstName>Petar34</cim:EnergyConsumer.firstName>
+		<cim:EnergyConsumer.lastName>Petrovic34</cim:EnergyConsumer.lastName>
 	</cim:EnergyConsumer>
 	<cim:EnergyConsumer rdf:ID="EC_35">
 		<cim:ConductingEquipment.BaseVoltage rdf:resource="#BV_2"/>
@@ -4759,6 +4828,8 @@
 		<cim:IdentifiedObject.mRID>EC_35</cim:IdentifiedObject.mRID>
 		<ftn:IdentifiedObject.name>EC_35</ftn:IdentifiedObject.name>
 		<cim:EnergyConsumer.type>Household</cim:EnergyConsumer.type>
+		<cim:EnergyConsumer.firstName>Petar35</cim:EnergyConsumer.firstName>
+		<cim:EnergyConsumer.lastName>Petrovic35</cim:EnergyConsumer.lastName>
 	</cim:EnergyConsumer>
 	<cim:EnergyConsumer rdf:ID="EC_36">
 		<cim:ConductingEquipment.BaseVoltage rdf:resource="#BV_2"/>
@@ -4767,6 +4838,8 @@
 		<cim:IdentifiedObject.mRID>EC_36</cim:IdentifiedObject.mRID>
 		<ftn:IdentifiedObject.name>EC_36</ftn:IdentifiedObject.name>
 		<cim:EnergyConsumer.type>Household</cim:EnergyConsumer.type>
+		<cim:EnergyConsumer.firstName>Petar36</cim:EnergyConsumer.firstName>
+		<cim:EnergyConsumer.lastName>Petrovic36</cim:EnergyConsumer.lastName>
 	</cim:EnergyConsumer>
 	<cim:EnergyConsumer rdf:ID="EC_37">
 		<cim:ConductingEquipment.BaseVoltage rdf:resource="#BV_2"/>
@@ -4775,6 +4848,8 @@
 		<cim:IdentifiedObject.mRID>EC_37</cim:IdentifiedObject.mRID>
 		<ftn:IdentifiedObject.name>EC_37</ftn:IdentifiedObject.name>
 		<cim:EnergyConsumer.type>Household</cim:EnergyConsumer.type>
+		<cim:EnergyConsumer.firstName>Petar37</cim:EnergyConsumer.firstName>
+		<cim:EnergyConsumer.lastName>Petrovic37</cim:EnergyConsumer.lastName>
 	</cim:EnergyConsumer>
 	<cim:EnergyConsumer rdf:ID="EC_38">
 		<cim:ConductingEquipment.BaseVoltage rdf:resource="#BV_2"/>
@@ -4783,6 +4858,8 @@
 		<cim:IdentifiedObject.mRID>EC_38</cim:IdentifiedObject.mRID>
 		<ftn:IdentifiedObject.name>EC_38</ftn:IdentifiedObject.name>
 		<cim:EnergyConsumer.type>Household</cim:EnergyConsumer.type>
+		<cim:EnergyConsumer.firstName>Petar38</cim:EnergyConsumer.firstName>
+		<cim:EnergyConsumer.lastName>Petrovic38</cim:EnergyConsumer.lastName>
 	</cim:EnergyConsumer>
 	<cim:EnergyConsumer rdf:ID="EC_39">
 		<cim:ConductingEquipment.BaseVoltage rdf:resource="#BV_2"/>
@@ -4791,6 +4868,8 @@
 		<cim:IdentifiedObject.mRID>EC_39</cim:IdentifiedObject.mRID>
 		<ftn:IdentifiedObject.name>EC_39</ftn:IdentifiedObject.name>
 		<cim:EnergyConsumer.type>Household</cim:EnergyConsumer.type>
+		<cim:EnergyConsumer.firstName>Petar39</cim:EnergyConsumer.firstName>
+		<cim:EnergyConsumer.lastName>Petrovic39</cim:EnergyConsumer.lastName>
 	</cim:EnergyConsumer>
 	<cim:EnergyConsumer rdf:ID="EC_40">
 		<cim:ConductingEquipment.BaseVoltage rdf:resource="#BV_2"/>
@@ -4799,6 +4878,8 @@
 		<cim:IdentifiedObject.mRID>EC_40</cim:IdentifiedObject.mRID>
 		<ftn:IdentifiedObject.name>EC_40</ftn:IdentifiedObject.name>
 		<cim:EnergyConsumer.type>Household</cim:EnergyConsumer.type>
+		<cim:EnergyConsumer.firstName>Petar40</cim:EnergyConsumer.firstName>
+		<cim:EnergyConsumer.lastName>Petrovic40</cim:EnergyConsumer.lastName>
 	</cim:EnergyConsumer>
 	<cim:EnergyConsumer rdf:ID="EC_41">
 		<cim:ConductingEquipment.BaseVoltage rdf:resource="#BV_2"/>
@@ -4807,6 +4888,8 @@
 		<cim:IdentifiedObject.mRID>EC_41</cim:IdentifiedObject.mRID>
 		<ftn:IdentifiedObject.name>EC_41</ftn:IdentifiedObject.name>
 		<cim:EnergyConsumer.type>Household</cim:EnergyConsumer.type>
+		<cim:EnergyConsumer.firstName>Petar41</cim:EnergyConsumer.firstName>
+		<cim:EnergyConsumer.lastName>Petrovic41</cim:EnergyConsumer.lastName>
 	</cim:EnergyConsumer>
 	<cim:EnergyConsumer rdf:ID="EC_42">
 		<cim:ConductingEquipment.BaseVoltage rdf:resource="#BV_2"/>
@@ -4815,6 +4898,8 @@
 		<cim:IdentifiedObject.mRID>EC_42</cim:IdentifiedObject.mRID>
 		<ftn:IdentifiedObject.name>EC_42</ftn:IdentifiedObject.name>
 		<cim:EnergyConsumer.type>Household</cim:EnergyConsumer.type>
+		<cim:EnergyConsumer.firstName>Petar42</cim:EnergyConsumer.firstName>
+		<cim:EnergyConsumer.lastName>Petrovic42</cim:EnergyConsumer.lastName>
 	</cim:EnergyConsumer>
 	<cim:EnergyConsumer rdf:ID="EC_43">
 		<cim:ConductingEquipment.BaseVoltage rdf:resource="#BV_2"/>
@@ -4823,6 +4908,8 @@
 		<cim:IdentifiedObject.mRID>EC_43</cim:IdentifiedObject.mRID>
 		<ftn:IdentifiedObject.name>EC_43</ftn:IdentifiedObject.name>
 		<cim:EnergyConsumer.type>Household</cim:EnergyConsumer.type>
+		<cim:EnergyConsumer.firstName>Petar43</cim:EnergyConsumer.firstName>
+		<cim:EnergyConsumer.lastName>Petrovic43</cim:EnergyConsumer.lastName>
 	</cim:EnergyConsumer>
 	<cim:EnergyConsumer rdf:ID="EC_44">
 		<cim:ConductingEquipment.BaseVoltage rdf:resource="#BV_2"/>
@@ -4831,6 +4918,8 @@
 		<cim:IdentifiedObject.mRID>EC_44</cim:IdentifiedObject.mRID>
 		<ftn:IdentifiedObject.name>EC_44</ftn:IdentifiedObject.name>
 		<cim:EnergyConsumer.type>Household</cim:EnergyConsumer.type>
+		<cim:EnergyConsumer.firstName>Petar44</cim:EnergyConsumer.firstName>
+		<cim:EnergyConsumer.lastName>Petrovic44</cim:EnergyConsumer.lastName>
 	</cim:EnergyConsumer>
 	
 	<!--END EnergyConsumer-->
