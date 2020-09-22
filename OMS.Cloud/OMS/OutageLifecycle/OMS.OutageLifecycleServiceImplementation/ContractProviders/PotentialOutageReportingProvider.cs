@@ -139,14 +139,14 @@ namespace OMS.OutageLifecycleImplementation.ContractProviders
                 }
 
                 var topology = enumerableTopology[ReliableDictionaryNames.OutageTopologyModel];
-                var affectedConsumersGids = lifecycleHelper.GetAffectedConsumers(elementGid, topology);
+                var affectedConsumersGids = GetAffectedConsumers(elementGid, topology);
 
                 var historyDBManagerClient = HistoryDBManagerClient.CreateClient();
                 var outageModelReadAccessClient = OutageModelReadAccessClient.CreateClient();
 
                 if (!(await CheckPreconditions(elementGid, commandOriginType, affectedConsumersGids, outageModelReadAccessClient, historyDBManagerClient)))
                 {
-                    Logger.LogError($"{baseLogString} ReportPotentialOutage => Parameters do not satisfy required preconditions. OutageId: {elementGid}, CommandOriginType: {commandOriginType}");
+                    Logger.LogWarning($"{baseLogString} ReportPotentialOutage => Parameters do not satisfy required preconditions. OutageId: {elementGid}, CommandOriginType: {commandOriginType}");
                     return false;
                 }
                 #endregion Preconditions
@@ -184,6 +184,90 @@ namespace OMS.OutageLifecycleImplementation.ContractProviders
         #endregion IPotentialOutageReportingContract
 
         #region Private Methods
+        private List<long> GetAffectedConsumers(long potentialOutageGid, OutageTopologyModel topology)
+        {
+            List<long> affectedConsumers = new List<long>();
+            Stack<long> nodesToBeVisited = new Stack<long>();
+            HashSet<long> visited = new HashSet<long>();
+            long startingSwitch = potentialOutageGid;
+
+            if (topology.OutageTopology.TryGetValue(potentialOutageGid, out OutageTopologyElement firstElement)
+                && topology.OutageTopology.TryGetValue(firstElement.FirstEnd, out OutageTopologyElement currentElementAbove))
+            {
+                while (!currentElementAbove.DmsType.Equals("ENERGYSOURCE"))
+                {
+                    if (currentElementAbove.IsOpen)
+                    {
+                        startingSwitch = currentElementAbove.Id;
+                        break;
+                    }
+
+                    if (!topology.OutageTopology.TryGetValue(currentElementAbove.FirstEnd, out currentElementAbove))
+                    {
+                        break;
+                    }
+                }
+            }
+
+            nodesToBeVisited.Push(startingSwitch);
+
+            while (nodesToBeVisited.Count > 0)
+            {
+                long currentNode = nodesToBeVisited.Pop();
+
+                if (!visited.Contains(currentNode))
+                {
+                    visited.Add(currentNode);
+
+                    if (topology.OutageTopology.TryGetValue(currentNode, out OutageTopologyElement topologyElement))
+                    {
+                        if (topologyElement.DmsType == "ENERGYCONSUMER" && !topologyElement.IsActive)
+                        {
+                            affectedConsumers.Add(currentNode);
+                        }
+                        else if (topologyElement.DmsType == "ENERGYCONSUMER" && !topologyElement.IsRemote)
+                        {
+                            affectedConsumers.Add(currentNode);
+
+                        }
+
+                        foreach (long adjNode in topologyElement.SecondEnd)
+                        {
+                            nodesToBeVisited.Push(adjNode);
+                        }
+                    }
+                    else
+                    {
+                        //TOOD
+                        string message = $"GID: 0x{currentNode:X16} not found in topologyModel.OutageTopology dictionary....";
+                        Logger.LogError(message);
+                    }
+                }
+            }
+
+            return affectedConsumers;
+        }
+
+        private List<Consumer> GetAffectedConsumersFromDatabase(List<long> affectedConsumersIds)
+        {
+            var consumerAccessClient = ConsumerAccessClient.CreateClient();
+            List<Consumer> affectedConsumers = new List<Consumer>();
+
+            foreach (long affectedConsumerId in affectedConsumersIds)
+            {
+                Consumer affectedConsumer = consumerAccessClient.GetConsumer(affectedConsumerId).Result;
+
+                if (affectedConsumer == null)
+                {
+                    break;
+                }
+
+                affectedConsumers.Add(affectedConsumer);
+            }
+
+            return affectedConsumers;
+        }
+
         private async Task OnZeroAffectedConsumersCase(long elementGid, IHistoryDBManagerContract historyDBManagerClient)
         {
             bool isSwitchInvoked = false;
@@ -239,13 +323,6 @@ namespace OMS.OutageLifecycleImplementation.ContractProviders
 
         private async Task<ConditionalValue<OutageEntity>> StoreActiveOutage(long elementGid, List<long> affectedConsumersGids, OutageTopologyModel topology)
         {
-            //var expression = new OutageExpression()
-            //{
-            //    Predicate = o => o.OutageElementGid == elementGid && o.OutageState != OutageState.ARCHIVED,
-            //};
-
-            //var outages = await outageModelAccessClient.FindOutage(expression);
-
             var outageModelAccessClient = OutageModelAccessClient.CreateClient();
             var allOutages = await outageModelAccessClient.GetAllOutages();
             var targetedOutages = allOutages.Where(outage => outage.OutageElementGid == elementGid && outage.OutageState != OutageState.ARCHIVED);
@@ -256,7 +333,7 @@ namespace OMS.OutageLifecycleImplementation.ContractProviders
                 return new ConditionalValue<OutageEntity>(false, null);
             }
 
-            List<Consumer> consumerDbEntities = lifecycleHelper.GetAffectedConsumersFromDatabase(affectedConsumersGids);
+            List<Consumer> consumerDbEntities = GetAffectedConsumersFromDatabase(affectedConsumersGids);
 
             if (consumerDbEntities.Count != affectedConsumersGids.Count)
             {
@@ -264,7 +341,7 @@ namespace OMS.OutageLifecycleImplementation.ContractProviders
                 return new ConditionalValue<OutageEntity>(false, null);
             }
 
-            long recloserId = lifecycleHelper.GetRecloserForHeadBreaker(elementGid, topology);
+            long recloserId = GetRecloserForHeadBreaker(elementGid, topology);
 
             List<Equipment> defaultIsolationPoints = await lifecycleHelper.GetEquipmentEntityAsync(new List<long> { elementGid, recloserId });
 
@@ -315,6 +392,43 @@ namespace OMS.OutageLifecycleImplementation.ContractProviders
 
                 await RecloserOutageMap.SetAsync(recloserId, outageIdToAffectedConsumersMap);
             }
+        }
+
+        private long GetRecloserForHeadBreaker(long headBreakerId, OutageTopologyModel topology)
+        {
+            long recolserId = -1;
+
+            if (!topology.OutageTopology.ContainsKey(headBreakerId))
+            {
+                string message = $"Head switch with gid: {headBreakerId} is not in a topology model.";
+                Logger.LogError(message);
+                throw new Exception(message);
+            }
+            long currentBreakerId = headBreakerId;
+            while (currentBreakerId != 0)
+            {
+                //currentBreakerId = TopologyModel.OutageTopology[currentBreakerId].SecondEnd.Where(element => modelResourcesDesc.GetModelCodeFromId(element) == ModelCode.BREAKER).FirstOrDefault();
+                currentBreakerId = lifecycleHelper.GetNextBreaker(currentBreakerId, topology);
+                if (currentBreakerId == 0)
+                {
+                    continue;
+                }
+
+                if (!topology.OutageTopology.ContainsKey(currentBreakerId))
+                {
+                    string message = $"Switch with gid: 0X{currentBreakerId:X16} is not in a topology model.";
+                    Logger.LogError(message);
+                    throw new Exception(message);
+                }
+
+                if (!topology.OutageTopology[currentBreakerId].NoReclosing)
+                {
+                    recolserId = currentBreakerId;
+                    break;
+                }
+            }
+
+            return recolserId;
         }
         #endregion Private Methods
     }

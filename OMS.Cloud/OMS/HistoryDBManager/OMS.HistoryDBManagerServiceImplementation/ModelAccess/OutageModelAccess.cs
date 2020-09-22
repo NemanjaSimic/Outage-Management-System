@@ -52,40 +52,17 @@ namespace OMS.HistoryDBManagerImplementation.ModelAccess
 			});
 		}
 
-		//public Task<IEnumerable<OutageEntity>> FindOutage(OutageExpression expression)
-		//{
-		//	return Task.Run(() =>
-		//	{
-		//		IEnumerable<OutageEntity> outageEntities = new List<OutageEntity>();
-
-		//		using (var unitOfWork = new UnitOfWork())
-		//		{
-		//			try
-		//			{
-		//				outageEntities = unitOfWork.OutageRepository.Find(expression.Predicate);
-		//			}
-		//			catch (Exception e)
-		//			{
-		//				string message = $"{baseLogString} FindOutage => Exception: {e.Message}";
-		//				Logger.LogError(message, e);
-		//			}
-		//		}
-
-		//		return outageEntities;
-		//	});
-		//}
-
-		public Task<IEnumerable<OutageEntity>> GetAllActiveOutages()
+		public Task<List<OutageEntity>> GetAllActiveOutages()
 		{
 			return Task.Run(() =>
 			{
-				IEnumerable<OutageEntity> outageEntities = new List<OutageEntity>();
+				List<OutageEntity> outageEntities = new List<OutageEntity>();
 
 				using (var unitOfWork = new UnitOfWork())
 				{
 					try
 					{
-						outageEntities = unitOfWork.OutageRepository.GetAllActive();
+						outageEntities.AddRange(unitOfWork.OutageRepository.GetAllActive());
 					}
 					catch (Exception e)
 					{
@@ -98,17 +75,17 @@ namespace OMS.HistoryDBManagerImplementation.ModelAccess
 			});
 		}
 
-		public Task<IEnumerable<OutageEntity>> GetAllArchivedOutages()
+		public Task<List<OutageEntity>> GetAllArchivedOutages()
 		{
 			return Task.Run(() =>
 			{
-				IEnumerable<OutageEntity> outageEntities = new List<OutageEntity>();
+				List<OutageEntity> outageEntities = new List<OutageEntity>();
 
 				using (var unitOfWork = new UnitOfWork())
 				{
 					try
 					{
-						outageEntities = unitOfWork.OutageRepository.GetAllArchived();
+						outageEntities.AddRange(unitOfWork.OutageRepository.GetAllArchived());
 					}
 					catch (Exception e)
 					{
@@ -121,17 +98,17 @@ namespace OMS.HistoryDBManagerImplementation.ModelAccess
 			});
 		}
 
-		public Task<IEnumerable<OutageEntity>> GetAllOutages()
+		public Task<List<OutageEntity>> GetAllOutages()
 		{
 			return Task.Run(() =>
 			{
-				IEnumerable<OutageEntity> outageEntities = new List<OutageEntity>();
+				List<OutageEntity> outageEntities = new List<OutageEntity>();
 
 				using (var unitOfWork = new UnitOfWork())
 				{
 					try
 					{
-						outageEntities = unitOfWork.OutageRepository.GetAll();
+						outageEntities.AddRange(unitOfWork.OutageRepository.GetAll());
 					}
 					catch (Exception e)
 					{
