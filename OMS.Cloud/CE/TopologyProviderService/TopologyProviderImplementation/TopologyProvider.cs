@@ -166,7 +166,9 @@ namespace CE.TopologyProviderImplementation
             }
             else
             {
-                return null;
+                string errorMessage = $"{baseLogString} GetTopologyFromCache => TryGetValueAsync() There is no inTransaction topology.";
+                Logger.LogError(errorMessage);
+                throw new Exception(errorMessage);
             }
 
             if (!topology.HasValue)
@@ -368,12 +370,12 @@ namespace CE.TopologyProviderImplementation
 
             //await TopologyCache.SetAsync(topologyID, (TopologyModel)topology);
             //await TopologyCache.SetAsync(transactionTopologyID, (TopologyModel)topology);
+            transactionFlag = TransactionFlag.NoTransaction;
 
             await RefreshOMSModel();
             await RefreshUIModel();
 
             //ProviderTopologyConnectionDelegate?.Invoke(Topology);
-            transactionFlag = TransactionFlag.NoTransaction;
         }
 
         public async Task RollbackTransaction()

@@ -84,6 +84,9 @@ namespace OMS.Common.Cloud
 
                 //WEB_ADAPTER
                 { MicroserviceNames.WebAdapterService,              ServiceType.STATELESS_SERVICE   },
+
+                //TEST
+                { MicroserviceNames.SubscriberTester,               ServiceType.STANDALONE_SERVICE  },
             };
 
             //MODO: moguce ucitavanje iz konfiguracije
@@ -118,9 +121,13 @@ namespace OMS.Common.Cloud
                 { MicroserviceNames.OmsOutageLifecycleService,      new Uri("fabric:/OMS.Cloud/OMS.OutageLifecycleService")             },
                 { MicroserviceNames.OmsOutageSimulatorService,      new Uri("fabric:/OMS.Cloud/OMS.OutageSimulatorService")             },
                 { MicroserviceNames.OmsOutageSimulatorServiceUI,    new Uri("net.tcp://localhost:9000/OMS.OutageSimulatorServiceUI")    },
-                { MicroserviceNames.OmsEmailService,                 new Uri("fabric:/OMS.Cloud/OMS.EmailService")                  },
+                { MicroserviceNames.OmsEmailService,                 new Uri("fabric:/OMS.Cloud/OMS.EmailService")                      },
+                
                 //WEB_ADAPTER
                 { MicroserviceNames.WebAdapterService,              new Uri("fabric:/Cloud.Web/WebAdapterService")                      },
+
+                //TEST
+                { MicroserviceNames.SubscriberTester,              new Uri("net.tcp://localhost:9999/SubscriberTester")                 },
             };
         }
     }

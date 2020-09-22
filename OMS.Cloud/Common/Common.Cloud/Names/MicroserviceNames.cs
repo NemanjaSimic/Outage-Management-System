@@ -36,5 +36,8 @@
         public const string CeMeasurementProviderService = "CeMeasurementProviderService";
         public const string CeLoadFlowService = "CeLoadFlowService";
         public const string CeTopologyBuilderService = "CeTopologyBuilderService";
+
+        //TEST
+        public const string SubscriberTester = "SubscriberTester";
     }
 }

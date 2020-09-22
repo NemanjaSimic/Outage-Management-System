@@ -5,4 +5,10 @@
 		Origin = 1,
 		Copy
 	}
+
+	public enum TransactionMode
+	{
+		NoTransaction = 1,
+		InTransaction
+	}
 }

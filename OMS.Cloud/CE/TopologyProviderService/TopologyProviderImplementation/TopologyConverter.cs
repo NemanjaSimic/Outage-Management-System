@@ -2,6 +2,7 @@
 using Common.CeContracts.ModelProvider;
 using Common.PubSubContracts.DataContracts.CE;
 using Common.PubSubContracts.DataContracts.CE.UIModels;
+using OMS.Common.Cloud;
 using OMS.Common.Cloud.Logger;
 using OMS.Common.NmsContracts;
 using OMS.Common.WcfClient.CE;
@@ -88,37 +89,37 @@ namespace CE.TopologyProviderImplementation
                     List<UIMeasurement> measurements = new List<UIMeasurement>();
                     foreach (var measurementGid in element.Measurements.Keys)
                     {
-                        Logger.LogDebug($"{baseLogString} ConvertTopologyToUIModel => Calling GetDiscreteMeasurement method from measurement provider client for measurement GID {measurementGid:X16}.");
-                        var measurementProviderClient = MeasurementProviderClient.CreateClient();
-                        DiscreteMeasurement discreteMeasurement = await measurementProviderClient.GetDiscreteMeasurement(measurementGid);
-                        Logger.LogDebug($"{baseLogString} ConvertTopologyToUIModel => GetDiscreteMeasurement method from measurement provider client has been called successfully.");
 
-                        Logger.LogDebug($"{baseLogString} ConvertTopologyToUIModel => Calling GetAnalogMeasurement method from measurement provider client for measurement GID {measurementGid:X16}.");
-                        measurementProviderClient = MeasurementProviderClient.CreateClient();
-                        AnalogMeasurement analogMeasurement = await measurementProviderClient.GetAnalogMeasurement(measurementGid);
-                        Logger.LogDebug($"{baseLogString} ConvertTopologyToUIModel => GetAnalogMeasurement method from measurement provider client has been called successfully.");
+		            	DMSType type = (DMSType)ModelCodeHelper.ExtractTypeFromGlobalId(measurementGid);
 
-                        if (discreteMeasurement != null)
+                        if (type == DMSType.ANALOG)
                         {
-                            measurements.Add(new UIMeasurement()
-                            {
-                                Gid = discreteMeasurement.Id,
-                                Type = discreteMeasurement.GetMeasurementType(),
-                                Value = discreteMeasurement.GetCurrentValue()
-                            });
-                        }
-                        else if (analogMeasurement != null)
-                        {
+                            Logger.LogDebug($"{baseLogString} ConvertTopologyToUIModel => Calling GetAnalogMeasurement method from measurement provider client for measurement GID {measurementGid:X16}.");
+                            var measurementProviderClient = MeasurementProviderClient.CreateClient();
+                            AnalogMeasurement analogMeasurement = await measurementProviderClient.GetAnalogMeasurement(measurementGid);
+                            Logger.LogDebug($"{baseLogString} ConvertTopologyToUIModel => GetAnalogMeasurement method from measurement provider client has been called successfully.");
+
                             measurements.Add(new UIMeasurement()
                             {
                                 Gid = analogMeasurement.Id,
                                 Type = analogMeasurement.GetMeasurementType(),
                                 Value = analogMeasurement.GetCurrentValue()
                             });
+
                         }
-                        else
+                        else if (type == DMSType.DISCRETE)
                         {
-                            Logger.LogWarning($"{baseLogString} ConvertTopologyToUIModel => Measurement with GID {measurementGid:X16} does not exist.");
+                            Logger.LogDebug($"{baseLogString} ConvertTopologyToUIModel => Calling GetDiscreteMeasurement method from measurement provider client for measurement GID {measurementGid:X16}.");
+                            var measurementProviderClient = MeasurementProviderClient.CreateClient();
+                            DiscreteMeasurement discreteMeasurement = await measurementProviderClient.GetDiscreteMeasurement(measurementGid);
+                            Logger.LogDebug($"{baseLogString} ConvertTopologyToUIModel => GetDiscreteMeasurement method from measurement provider client has been called successfully.");
+
+                            measurements.Add(new UIMeasurement()
+                            {
+                                Gid = discreteMeasurement.Id,
+                                Type = discreteMeasurement.GetMeasurementType(),
+                                Value = discreteMeasurement.GetCurrentValue()
+                            });
                         }
                     }
 
@@ -214,18 +215,24 @@ namespace CE.TopologyProviderImplementation
                     DiscreteMeasurement discreteMeasurement;
                     foreach (var measurementGid in element.Measurements.Keys)
                     {
-                        Logger.LogDebug($"{baseLogString} ConvertTopologyToOMSModel => Calling GetDiscreteMeasurement method from measurement provider client for measurement GID {measurementGid:X16}.");
-                        var measurementProviderClient = MeasurementProviderClient.CreateClient();
-                        discreteMeasurement = await measurementProviderClient.GetDiscreteMeasurement(measurementGid);
-                        Logger.LogDebug($"{baseLogString} ConvertTopologyToOMSModel => GetDiscreteMeasurement method from measurement provider client has been called successfully.");
+                        DMSType type = (DMSType)ModelCodeHelper.ExtractTypeFromGlobalId(measurementGid);
 
-                        if (discreteMeasurement != null)
+                        if (type == DMSType.DISCRETE)
                         {
-                            isOpen = discreteMeasurement.CurrentOpen;
-                        }
-                        else
-                        {
-                            Logger.LogWarning($"{baseLogString} ConvertTopologyToOMSModel => Measurement provider client returned null for measurement GID {measurementGid:X16}.");
+
+                            Logger.LogDebug($"{baseLogString} ConvertTopologyToOMSModel => Calling GetDiscreteMeasurement method from measurement provider client for measurement GID {measurementGid:X16}.");
+                            var measurementProviderClient = MeasurementProviderClient.CreateClient();
+                            discreteMeasurement = await measurementProviderClient.GetDiscreteMeasurement(measurementGid);
+                            Logger.LogDebug($"{baseLogString} ConvertTopologyToOMSModel => GetDiscreteMeasurement method from measurement provider client has been called successfully.");
+
+                            if (discreteMeasurement != null)
+                            {
+                                isOpen = discreteMeasurement.CurrentOpen;
+                            }
+                            else
+                            {
+                                Logger.LogWarning($"{baseLogString} ConvertTopologyToOMSModel => Measurement provider client returned null for measurement GID {measurementGid:X16}.");
+                            }
                         }
                     }
 

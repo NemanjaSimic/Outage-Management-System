@@ -653,37 +653,42 @@ namespace CE.LoadFlowImplementation
 
             foreach (var measurement in measurements)
             {
-                Logger.LogDebug($"{baseLogString} GetMeasurements => Calling GetAnalogMeasurement for GID {measurement.Key:X16} from measurement provider.");
-                var measurementProviderClient = MeasurementProviderClient.CreateClient();
-                AnalogMeasurement analogMeasurement = await measurementProviderClient.GetAnalogMeasurement(measurement.Key);
-                Logger.LogDebug($"{baseLogString} GetMeasurements => GetAnalogMeasurement method from measurement provider has been called successfully.");
+                DMSType type = (DMSType)ModelCodeHelper.ExtractTypeFromGlobalId(measurement.Key);
 
-                if (analogMeasurement == null)
+                if (type == DMSType.ANALOG)
                 {
-                    string message = $"{baseLogString} GetMeasurements => GetAnalogMeasurement from measurement provider returned null for measurement GID {measurement.Key:X16}";
-                    Logger.LogWarning(message);
-                    continue;
-                }
+                    Logger.LogDebug($"{baseLogString} GetMeasurements => Calling GetAnalogMeasurement for GID {measurement.Key:X16} from measurement provider.");
+                    var measurementProviderClient = MeasurementProviderClient.CreateClient();
+                    AnalogMeasurement analogMeasurement = await measurementProviderClient.GetAnalogMeasurement(measurement.Key);
+                    Logger.LogDebug($"{baseLogString} GetMeasurements => GetAnalogMeasurement method from measurement provider has been called successfully.");
 
-                if (measurement.Value.Equals(AnalogMeasurementType.POWER.ToString()))
-                {
-                    analogMeasurements.Add(analogMeasurement);
-                }
-                else if (measurement.Value.Equals(AnalogMeasurementType.VOLTAGE.ToString()))
-                {
-                    analogMeasurements.Add(analogMeasurement);
-                }
-                else if (measurement.Value.Equals(AnalogMeasurementType.CURRENT.ToString()))
-                {
-                    analogMeasurements.Add(analogMeasurement);
-                }
-                else if (measurement.Value.Equals(AnalogMeasurementType.FEEDER_CURRENT.ToString()))
-                {
-                    analogMeasurements.Add(analogMeasurement);
-                }
-                else
-                {
-                    Logger.LogWarning($"{baseLogString} GetMeasurements => Unknown type [{measurement.Value}] of measurement with GID {measurement.Key:X16}.");
+                    if (analogMeasurement == null)
+                    {
+                        string message = $"{baseLogString} GetMeasurements => GetAnalogMeasurement from measurement provider returned null for measurement GID {measurement.Key:X16}";
+                        Logger.LogWarning(message);
+                        continue;
+                    }
+
+                    if (measurement.Value.Equals(AnalogMeasurementType.POWER.ToString()))
+                    {
+                        analogMeasurements.Add(analogMeasurement);
+                    }
+                    else if (measurement.Value.Equals(AnalogMeasurementType.VOLTAGE.ToString()))
+                    {
+                        analogMeasurements.Add(analogMeasurement);
+                    }
+                    else if (measurement.Value.Equals(AnalogMeasurementType.CURRENT.ToString()))
+                    {
+                        analogMeasurements.Add(analogMeasurement);
+                    }
+                    else if (measurement.Value.Equals(AnalogMeasurementType.FEEDER_CURRENT.ToString()))
+                    {
+                        analogMeasurements.Add(analogMeasurement);
+                    }
+                    else
+                    {
+                        Logger.LogWarning($"{baseLogString} GetMeasurements => Unknown type [{measurement.Value}] of measurement with GID {measurement.Key:X16}.");
+                    }
                 }
             }
 

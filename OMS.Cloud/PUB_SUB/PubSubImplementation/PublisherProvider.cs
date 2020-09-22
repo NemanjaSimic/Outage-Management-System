@@ -101,6 +101,8 @@ namespace PubSubImplementation
 
                 Task.WaitAll(tasks.ToArray());
                 success = true;
+
+                Logger.LogInformation($"{baseLogString} Publish => SUCCESSFULL publication. PublicationType: {publication.GetType()}, MessageType: {publication.Message.GetType()}, Topic: {publication.Topic}");
             }
             catch (Exception e)
             {
