@@ -14,13 +14,13 @@ namespace Common.OmsContracts.ModelAccess
 	public interface IOutageAccessContract : IService, IHealthChecker
 	{
 		[OperationContract]
-		Task<IEnumerable<OutageEntity>> GetAllActiveOutages();
+		Task<List<OutageEntity>> GetAllActiveOutages();
 
 		[OperationContract]
-		Task<IEnumerable<OutageEntity>> GetAllArchivedOutages();
+		Task<List<OutageEntity>> GetAllArchivedOutages();
 
 		[OperationContract]
-		Task<IEnumerable<OutageEntity>> GetAllOutages();
+		Task<List<OutageEntity>> GetAllOutages();
 
 		[OperationContract]
 		Task<OutageEntity> AddOutage(OutageEntity outage);

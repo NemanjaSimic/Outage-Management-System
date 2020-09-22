@@ -14,7 +14,7 @@ namespace Common.OmsContracts.ModelAccess
 	public interface IEquipmentAccessContract : IService, IHealthChecker
 	{
 		[OperationContract]
-		Task<IEnumerable<Equipment>> GetAllEquipments();
+		Task<List<Equipment>> GetAllEquipments();
 
 		[OperationContract]
 		Task<Equipment> GetEquipment(long gid);

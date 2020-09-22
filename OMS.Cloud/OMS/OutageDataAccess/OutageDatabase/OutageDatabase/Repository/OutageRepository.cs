@@ -43,5 +43,7 @@ namespace OutageDatabase.Repository
                                               .Include(o => o.DefaultIsolationPoints)
                                               .Include(o => o.OptimumIsolationPoints);
         }
+
+        
     }
 }

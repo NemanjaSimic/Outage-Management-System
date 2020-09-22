@@ -41,7 +41,7 @@ namespace OMS.Common.WcfClient.OMS.ModelAccess
         //    return InvokeWithRetryAsync(client => client.Channel.FindEquipment(expression));
         //}
 
-        public Task<IEnumerable<Equipment>> GetAllEquipments()
+        public Task<List<Equipment>> GetAllEquipments()
 		{
 			return InvokeWithRetryAsync(client => client.Channel.GetAllEquipments());
 		}

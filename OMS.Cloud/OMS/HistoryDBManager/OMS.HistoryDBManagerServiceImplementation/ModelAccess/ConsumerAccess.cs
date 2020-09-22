@@ -135,17 +135,17 @@ namespace OMS.HistoryDBManagerImplementation.ModelAccess
 		//	});
 		//}
 
-		public Task<IEnumerable<Consumer>> GetAllConsumers()
+		public Task<List<Consumer>> GetAllConsumers()
 		{
 			return Task.Run(() =>
 			{
-				IEnumerable<Consumer> consumers = new List<Consumer>();
+				List<Consumer> consumers = new List<Consumer>();
 
 				using (var unitOfWork = new UnitOfWork())
 				{
 					try
 					{
-						consumers = unitOfWork.ConsumerRepository.GetAll();
+						consumers = new List<Consumer>(unitOfWork.ConsumerRepository.GetAll());
 					}
 					catch (Exception e)
 					{

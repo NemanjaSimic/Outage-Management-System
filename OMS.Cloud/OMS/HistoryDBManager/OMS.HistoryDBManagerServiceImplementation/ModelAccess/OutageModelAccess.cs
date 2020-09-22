@@ -4,7 +4,9 @@ using OMS.Common.Cloud.Logger;
 using OutageDatabase.Repository;
 using System;
 using System.Collections.Generic;
+using System.IO;
 using System.Threading.Tasks;
+using System.Xml.Serialization;
 
 namespace OMS.HistoryDBManagerImplementation.ModelAccess
 {
@@ -38,6 +40,36 @@ namespace OMS.HistoryDBManagerImplementation.ModelAccess
 				{
 					try
 					{
+						List<Consumer> consumersFromDb = GetConsumersFromDb(outage.AffectedConsumers, unitOfWork);
+						if (consumersFromDb.Count != outage.AffectedConsumers.Count)
+						{
+							Logger.LogError($"{baseLogString} AddOutage => Some of AffectedConsumers are not present in database.");
+							return outageEntityDb;
+						}
+
+						List<Equipment> defaultIsolationPointsFromDb = GetEquipmentFromDb(outage.DefaultIsolationPoints, unitOfWork);
+						if (defaultIsolationPointsFromDb.Count != outage.DefaultIsolationPoints.Count)
+						{
+							Logger.LogError($"{baseLogString} AddOutage => Some of DefaultIsolationPoints are not present in database.");
+							return outageEntityDb;
+						}
+
+						List<Equipment> optimumIsolationPointsFromDb = GetEquipmentFromDb(outage.OptimumIsolationPoints, unitOfWork);
+						if (optimumIsolationPointsFromDb.Count != outage.OptimumIsolationPoints.Count)
+						{
+							Logger.LogError($"{baseLogString} AddOutage => Some of OptimumIsolationPoints are not present in database.");
+							return outageEntityDb;
+						}
+
+						outage.AffectedConsumers.Clear();
+						outage.AffectedConsumers.AddRange(consumersFromDb);
+
+						outage.DefaultIsolationPoints.Clear();
+						outage.DefaultIsolationPoints.AddRange(defaultIsolationPointsFromDb);
+
+						outage.OptimumIsolationPoints.Clear();
+						outage.OptimumIsolationPoints.AddRange(optimumIsolationPointsFromDb);
+
 						outageEntityDb = unitOfWork.OutageRepository.Add(outage);
 						unitOfWork.Complete();
 					}
@@ -51,6 +83,8 @@ namespace OMS.HistoryDBManagerImplementation.ModelAccess
 				return outageEntityDb;
 			});
 		}
+
+		
 
 		//public Task<IEnumerable<OutageEntity>> FindOutage(OutageExpression expression)
 		//{
@@ -75,17 +109,17 @@ namespace OMS.HistoryDBManagerImplementation.ModelAccess
 		//	});
 		//}
 
-		public Task<IEnumerable<OutageEntity>> GetAllActiveOutages()
+		public Task<List<OutageEntity>> GetAllActiveOutages()
 		{
 			return Task.Run(() =>
 			{
-				IEnumerable<OutageEntity> outageEntities = new List<OutageEntity>();
+				List<OutageEntity> outageEntities = new List<OutageEntity>();
 
 				using (var unitOfWork = new UnitOfWork())
 				{
 					try
 					{
-						outageEntities = unitOfWork.OutageRepository.GetAllActive();
+						outageEntities = new List<OutageEntity>(unitOfWork.OutageRepository.GetAllActive());
 					}
 					catch (Exception e)
 					{
@@ -98,17 +132,17 @@ namespace OMS.HistoryDBManagerImplementation.ModelAccess
 			});
 		}
 
-		public Task<IEnumerable<OutageEntity>> GetAllArchivedOutages()
+		public Task<List<OutageEntity>> GetAllArchivedOutages()
 		{
 			return Task.Run(() =>
 			{
-				IEnumerable<OutageEntity> outageEntities = new List<OutageEntity>();
+				List<OutageEntity> outageEntities = new List<OutageEntity>();
 
 				using (var unitOfWork = new UnitOfWork())
 				{
 					try
 					{
-						outageEntities = unitOfWork.OutageRepository.GetAllArchived();
+						outageEntities = new List<OutageEntity>(unitOfWork.OutageRepository.GetAllArchived());
 					}
 					catch (Exception e)
 					{
@@ -121,17 +155,17 @@ namespace OMS.HistoryDBManagerImplementation.ModelAccess
 			});
 		}
 
-		public Task<IEnumerable<OutageEntity>> GetAllOutages()
+		public Task<List<OutageEntity>> GetAllOutages()
 		{
 			return Task.Run(() =>
 			{
-				IEnumerable<OutageEntity> outageEntities = new List<OutageEntity>();
+				List<OutageEntity> outageEntities = new List<OutageEntity>();
 
 				using (var unitOfWork = new UnitOfWork())
 				{
 					try
 					{
-						outageEntities = unitOfWork.OutageRepository.GetAll();
+						outageEntities = new List<OutageEntity>(unitOfWork.OutageRepository.GetAll());
 					}
 					catch (Exception e)
 					{
@@ -215,7 +249,7 @@ namespace OMS.HistoryDBManagerImplementation.ModelAccess
 				using (var unitOfWork = new UnitOfWork())
 				{
 					try
-					{
+					{	
 						unitOfWork.OutageRepository.Update(outage);
 						unitOfWork.Complete();
 					}
@@ -233,5 +267,41 @@ namespace OMS.HistoryDBManagerImplementation.ModelAccess
 			return Task.Run(() => true);
 		}
 		#endregion IOutageAccessContract
+
+		#region Private methods
+		private List<Consumer> GetConsumersFromDb(List<Consumer> consumers, UnitOfWork unitOfWork)
+		{
+			List<Consumer> consumersFromDb = new List<Consumer>();
+			foreach (var consumer in consumers)
+			{
+				Consumer consumerFromDb = null;
+				if ((consumerFromDb = unitOfWork.ConsumerRepository.Get(consumer.ConsumerId)) == null)
+				{
+					break;
+				}
+				consumersFromDb.Add(consumerFromDb);
+			}
+
+			return consumersFromDb;
+		}
+
+		private List<Equipment> GetEquipmentFromDb(List<Equipment> equipments, UnitOfWork unitOfWork)
+		{
+			List<Equipment> equipmentsFromDb = new List<Equipment>();
+
+			foreach (var eqipment in equipments)
+			{
+				Equipment equipmentFromDb = null;
+				if ((equipmentFromDb = unitOfWork.EquipmentRepository.Get(eqipment.EquipmentId)) == null)
+				{
+					break;
+				}
+				equipmentsFromDb.Add(equipmentFromDb);
+			}
+
+			return equipmentsFromDb;
+
+		}
+		#endregion
 	}
 }
