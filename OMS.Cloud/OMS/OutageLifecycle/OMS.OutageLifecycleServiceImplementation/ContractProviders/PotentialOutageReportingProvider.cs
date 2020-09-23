@@ -128,7 +128,7 @@ namespace OMS.OutageLifecycleImplementation.ContractProviders
 		}
 
         #region IPotentialOutageReportingContract
-        public async Task<bool> EnqueuePotentialOutageCommand(long elementGid, CommandOriginType commandOriginType)
+        public async Task<bool> EnqueuePotentialOutageCommand(long elementGid, CommandOriginType commandOriginType, NetworkType networkType)
         {
             Logger.LogDebug($"{baseLogString} EnqueuePotentialOutageCommand method started.");
 
@@ -143,7 +143,7 @@ namespace OMS.OutageLifecycleImplementation.ContractProviders
                 {
                     ElementGid = elementGid,
                     CommandOriginType = commandOriginType,
-                    NetworkType = NetworkType.SCADA_NETWORK, //TODO:
+                    NetworkType = networkType,
                 };
 
                 await PotentialOutagesQueue.EnqueueAsync(command);
@@ -157,9 +157,9 @@ namespace OMS.OutageLifecycleImplementation.ContractProviders
             }
         }
 
-        public async Task<bool> ReportPotentialOutage(long elementGid, CommandOriginType commandOriginType)
+        public async Task<bool> ReportPotentialOutage(long elementGid, CommandOriginType commandOriginType, NetworkType networkType)
         {
-            Logger.LogVerbose($"{baseLogString} ReportPotentialOutage method started. ElementGid: 0x{elementGid:X16}, CommandOriginType: {commandOriginType}");
+            Logger.LogVerbose($"{baseLogString} ReportPotentialOutage method started. ElementGid: 0x{elementGid:X16}, CommandOriginType: {commandOriginType}, NetworkType: {networkType}");
 
             while(!ReliableDictionariesInitialized)
             {
@@ -185,7 +185,7 @@ namespace OMS.OutageLifecycleImplementation.ContractProviders
                 }
 
                 var topology = enumerableTopology[ReliableDictionaryNames.OutageTopologyModel];
-                var affectedConsumersGids = GetAffectedConsumers(elementGid, topology);
+                var affectedConsumersGids = GetAffectedConsumers(elementGid, topology, networkType);
 
                 var historyDBManagerClient = HistoryDBManagerClient.CreateClient();
                 var outageModelReadAccessClient = OutageModelReadAccessClient.CreateClient();
@@ -230,31 +230,35 @@ namespace OMS.OutageLifecycleImplementation.ContractProviders
         #endregion IPotentialOutageReportingContract
 
         #region Private Methods
-        private List<long> GetAffectedConsumers(long potentialOutageGid, OutageTopologyModel topology)
+        private List<long> GetAffectedConsumers(long potentialOutageGid, OutageTopologyModel topology, NetworkType networkType)
         {
             List<long> affectedConsumers = new List<long>();
             Stack<long> nodesToBeVisited = new Stack<long>();
             HashSet<long> visited = new HashSet<long>();
             long startingSwitch = potentialOutageGid;
 
-            //TODO: cemu sluzi ova logika? -deluje da podize starter ka gore.... a cemu to sluzi boga pitaj, eventualno za neSkada deo, bolje razdvojiti metode...
-            if (topology.OutageTopology.TryGetValue(potentialOutageGid, out OutageTopologyElement firstElement)
-                && topology.OutageTopology.TryGetValue(firstElement.FirstEnd, out OutageTopologyElement currentElementAbove))
-            {
-                while (!currentElementAbove.DmsType.Equals("ENERGYSOURCE"))
+            //if(networkType == NetworkType.NON_SCADA_NETWORK)
+            //{
+                //TODO: cemu sluzi ova logika? -deluje da podize starter ka gore.... a cemu to sluzi boga pitaj, eventualno za neSkada deo, bolje razdvojiti metode...
+                if (topology.OutageTopology.TryGetValue(potentialOutageGid, out OutageTopologyElement firstElement)
+                    && topology.OutageTopology.TryGetValue(firstElement.FirstEnd, out OutageTopologyElement currentElementAbove))
                 {
-                    if (currentElementAbove.IsOpen)
+                    while (!currentElementAbove.DmsType.Equals("ENERGYSOURCE"))
                     {
-                        startingSwitch = currentElementAbove.Id;
-                        break;
-                    }
+                        if (currentElementAbove.IsOpen)
+                        {
+                            startingSwitch = currentElementAbove.Id;
+                            break;
+                        }
 
-                    if (!topology.OutageTopology.TryGetValue(currentElementAbove.FirstEnd, out currentElementAbove))
-                    {
-                        break;
+                        if (!topology.OutageTopology.TryGetValue(currentElementAbove.FirstEnd, out currentElementAbove))
+                        {
+                            break;
+                        }
                     }
                 }
-            }
+            //}
+
 
             nodesToBeVisited.Push(startingSwitch);
 
@@ -266,28 +270,32 @@ namespace OMS.OutageLifecycleImplementation.ContractProviders
                 {
                     visited.Add(currentNode);
 
-                    if (topology.OutageTopology.TryGetValue(currentNode, out OutageTopologyElement topologyElement))
-                    {
-                        if (topologyElement.DmsType == "ENERGYCONSUMER" && !topologyElement.IsActive)
-                        {
-                            affectedConsumers.Add(currentNode);
-                        }
-                        else if (topologyElement.DmsType == "ENERGYCONSUMER" && !topologyElement.IsRemote)
-                        {
-                            affectedConsumers.Add(currentNode);
-
-                        }
-
-                        foreach (long adjNode in topologyElement.SecondEnd)
-                        {
-                            nodesToBeVisited.Push(adjNode);
-                        }
-                    }
-                    else
+                    if (!topology.OutageTopology.TryGetValue(currentNode, out OutageTopologyElement topologyElement))
                     {
                         //TOOD
                         string message = $"GID: 0x{currentNode:X16} not found in topologyModel.OutageTopology dictionary....";
                         Logger.LogError(message);
+
+                        continue; //or throw? //break
+                    }
+
+                    foreach (long adjNode in topologyElement.SecondEnd)
+                    {
+                        nodesToBeVisited.Push(adjNode);
+                    }
+
+                    if (topologyElement.DmsType != "ENERGYCONSUMER")
+                    {
+                        continue;
+                    }
+
+                    if(networkType == NetworkType.SCADA_NETWORK && !topologyElement.IsActive)
+                    {
+                        affectedConsumers.Add(currentNode);
+                    }
+                    else if (networkType == NetworkType.SCADA_NETWORK && !topologyElement.IsRemote)
+                    {
+                        affectedConsumers.Add(currentNode);
                     }
                 }
             }
@@ -345,7 +353,7 @@ namespace OMS.OutageLifecycleImplementation.ContractProviders
                 return false;
             }
 
-            var commandedElements = await outageModelReadAccessClient.GetCommandedElements();
+            var commandedElements = await outageModelReadAccessClient.GetCommandedElements(); //TODO; naglasiti da li je samo ono sto je komandovano tokom IsolatingAlgorithma
             var optimumIsolationPoints = await outageModelReadAccessClient.GetOptimumIsolatioPoints();
 
             if (commandedElements.ContainsKey(elementGid) || optimumIsolationPoints.ContainsKey(elementGid))
@@ -361,7 +369,17 @@ namespace OMS.OutageLifecycleImplementation.ContractProviders
             {
                 await OnZeroAffectedConsumersCase(elementGid, historyDBManagerClient);
 
-                Logger.LogError($"{baseLogString} ReportPotentialOutage => There is no affected consumers => outage report is not valid. ElementGid: 0x{elementGid:X16}, CommandOriginType: {commandOriginType}");
+                Logger.LogWarning($"{baseLogString} ReportPotentialOutage => There is no affected consumers => outage report is not valid. ElementGid: 0x{elementGid:X16}, CommandOriginType: {commandOriginType}");
+                return false;
+            }
+
+            var outageModelAccessClient = OutageModelAccessClient.CreateClient();
+            var activeOutages = await outageModelAccessClient.GetAllActiveOutages();
+            
+            if(activeOutages.Any(active => (active.OutageState == OutageState.CREATED && active.OutageElementGid == elementGid) ||
+                                           (active.OutageState != OutageState.CREATED && active.DefaultIsolationPoints.Any(point => point.EquipmentId == elementGid))))
+            {
+                Logger.LogWarning($"{baseLogString} ReportPotentialOutage => duplicate... ElementGID: 0x{elementGid:X16}");
                 return false;
             }
 
@@ -394,6 +412,7 @@ namespace OMS.OutageLifecycleImplementation.ContractProviders
 
             OutageEntity createdActiveOutage = new OutageEntity
             {
+                OutageElementGid = elementGid,
                 AffectedConsumers = consumerDbEntities,
                 OutageState = OutageState.CREATED,
                 ReportTime = DateTime.UtcNow,
