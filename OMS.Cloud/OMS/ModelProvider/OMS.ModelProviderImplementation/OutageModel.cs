@@ -32,15 +32,15 @@ namespace OMS.ModelProviderImplementation
 		private bool isTopologyModelInitialized;
 		private bool isCommandedElementsInitialized;
 		private bool isOptimumIsolatioPointsInitialized;
-		private bool isPotentialOutageInitialized;
+		//private bool isPotentialOutageInitialized;
 		public bool ReliableDictionariesInitialized
 		{
 			get
 			{
 				return isTopologyModelInitialized &&
 					   isCommandedElementsInitialized &&
-					   isOptimumIsolatioPointsInitialized &&
-					   isPotentialOutageInitialized;
+					   isOptimumIsolatioPointsInitialized;
+					   //isPotentialOutageInitialized;
 			}
 		}
 
@@ -61,12 +61,6 @@ namespace OMS.ModelProviderImplementation
 		{
 			get { return optimumIsloationPoints; }
 
-		}
-
-		private ReliableDictionaryAccess<long, CommandOriginType> potentialOutage;
-		public ReliableDictionaryAccess<long, CommandOriginType> PotentialOutage
-		{
-			get { return potentialOutage; }
 		}
 
 		private async void OnStateManagerChangedHandler(object sender, NotifyStateManagerChangedEventArgs e)
@@ -91,11 +85,6 @@ namespace OMS.ModelProviderImplementation
 					optimumIsloationPoints = await ReliableDictionaryAccess<long, long>.Create(this.stateManager, ReliableDictionaryNames.OptimumIsolatioPoints);
 					this.isOptimumIsolatioPointsInitialized = true;
 				}
-				else if (reliableStateName == ReliableDictionaryNames.PotentialOutage)
-				{
-					potentialOutage = await ReliableDictionaryAccess<long, CommandOriginType>.Create(this.stateManager, ReliableDictionaryNames.PotentialOutage);
-					this.isPotentialOutageInitialized = true;
-				}
 			}
 		}
 		#endregion
@@ -108,7 +97,6 @@ namespace OMS.ModelProviderImplementation
 			isTopologyModelInitialized = false;
 			isCommandedElementsInitialized = false;
 			isOptimumIsolatioPointsInitialized = false;
-			isPotentialOutageInitialized = false;
 
 			this.stateManager = stateManager;
 			this.stateManager.StateManagerChanged += this.OnStateManagerChangedHandler;
@@ -148,8 +136,6 @@ namespace OMS.ModelProviderImplementation
 				var historyDBManagerClient = HistoryDBManagerClient.CreateClient();
 				await historyDBManagerClient.OnConsumersEnergized(energizedConsumers);
 			}
-
-			await ReEvaluetePotentialOutages();
 		}
 
         public Task<string> GetSubscriberName()
@@ -182,22 +168,6 @@ namespace OMS.ModelProviderImplementation
 			}
 
 			return energizedConsumers;
-		}
-
-		private async Task ReEvaluetePotentialOutages()
-        {
-			var potentialOutages = await PotentialOutage.GetEnumerableDictionaryAsync();
-			await PotentialOutage.ClearAsync(); //MODO: ovo tek nakon await all, mozda i ne mora jer se na liniji iznad pravi kopija tog rel dict
-			
-			var reportOutageTasks = new List<Task>();
-			var reportOutageClient = PotentialOutageReportingClient.CreateClient();
-
-			foreach (var item in potentialOutages)
-			{
-				reportOutageTasks.Add(reportOutageClient.ReportPotentialOutage(item.Key, item.Value));
-			}
-
-			Task.WaitAll(reportOutageTasks.ToArray());
 		}
 		#endregion Private Methods
 	}

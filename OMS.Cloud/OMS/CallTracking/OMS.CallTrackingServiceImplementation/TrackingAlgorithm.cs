@@ -89,6 +89,7 @@ namespace OMS.CallTrackingImplementation
                 var ceModelProviderClient = CeModelProviderClient.CreateClient();
                 if (!await ceModelProviderClient.IsRecloser(potentialOutageElementGid))
                 {
+                    //TODO: razdvojiti metode scada, noScada
                     await reportOutageClient.ReportPotentialOutage(potentialOutageElementGid, CommandOriginType.NON_SCADA_OUTAGE);
                 }
                 else

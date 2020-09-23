@@ -5,7 +5,6 @@ using Microsoft.ServiceFabric.Data.Notifications;
 using OMS.Common.Cloud;
 using OMS.Common.Cloud.Logger;
 using OMS.Common.Cloud.ReliableCollectionHelpers;
-using OMS.Common.PubSubContracts.Interfaces;
 using System;
 using System.Threading.Tasks;
 using ReliableDictionaryNames = Common.OMS.ReliableDictionaryNames;
@@ -28,14 +27,13 @@ namespace OMS.ModelProviderImplementation.ContractProviders
         #region Reliable Dictionaries
         private bool isCommandedElementsInitialized;
         private bool isOptimumIsolatioPointsInitialized;
-        private bool isPotentialOutageInitialized;
+
         private bool ReliableDictionariesInitialized
         {
             get
             {
                 return isCommandedElementsInitialized &&
-                       isOptimumIsolatioPointsInitialized &&
-                       isPotentialOutageInitialized;
+                       isOptimumIsolatioPointsInitialized;
             }
         }
 
@@ -49,12 +47,6 @@ namespace OMS.ModelProviderImplementation.ContractProviders
         private ReliableDictionaryAccess<long, long> OptimumIsolatioPoints
         {
             get { return optimumIsloationPoints; }
-        }
-
-        private ReliableDictionaryAccess<long, CommandOriginType> potentialOutage;
-        private ReliableDictionaryAccess<long, CommandOriginType> PotentialOutage
-        {
-            get { return potentialOutage; }
         }
 
         private ReliableDictionaryAccess<long, OutageTopologyModel> topologyModel;
@@ -80,11 +72,6 @@ namespace OMS.ModelProviderImplementation.ContractProviders
                     optimumIsloationPoints = await ReliableDictionaryAccess<long, long>.Create(this.stateManager, ReliableDictionaryNames.OptimumIsolatioPoints);
                     this.isOptimumIsolatioPointsInitialized = true;
                 }
-                else if (reliableStateName == ReliableDictionaryNames.PotentialOutage)
-                {
-                    potentialOutage = await ReliableDictionaryAccess<long, CommandOriginType>.Create(this.stateManager, ReliableDictionaryNames.PotentialOutage);
-                    this.isPotentialOutageInitialized = true;
-                }
             }
         }
         #endregion Reliable Dictionaries
@@ -96,7 +83,6 @@ namespace OMS.ModelProviderImplementation.ContractProviders
 
             isCommandedElementsInitialized = false;
             isOptimumIsolatioPointsInitialized = false;
-            isPotentialOutageInitialized = false;
 
             this.stateManager = stateManager;
             this.stateManager.StateManagerChanged += this.OnStateManagerChangedHandler;
@@ -166,39 +152,6 @@ namespace OMS.ModelProviderImplementation.ContractProviders
             catch (Exception e)
             {
                 string message = $"{baseLogString} UpdateOptimumIsolationPoints => Exception: {e.Message}";
-                Logger.LogError(message, e);
-            }
-        }
-
-        public async Task UpdatePotentialOutage(long gid , CommandOriginType commandOriginType, ModelUpdateOperationType modelUpdateOperationType)
-        {
-            Logger.LogDebug("UpdatePotentialOutage method started.");
-            while (!ReliableDictionariesInitialized)
-            {
-                await Task.Delay(1000);
-            }
-
-            try
-            {
-                if (modelUpdateOperationType == ModelUpdateOperationType.INSERT)
-                {
-                    if (!await PotentialOutage.ContainsKeyAsync(gid))
-                    {
-                        await PotentialOutage.SetAsync(gid, commandOriginType);
-                    }
-                }
-                else if (modelUpdateOperationType == ModelUpdateOperationType.DELETE)
-                {
-                    await PotentialOutage.TryRemoveAsync(gid);
-                }
-                else if (modelUpdateOperationType == ModelUpdateOperationType.CLEAR)
-                {
-                    await PotentialOutage.ClearAsync();
-                }
-            }
-            catch (Exception e)
-            {
-                string message = $"{baseLogString} UpdatePotentialOutage => Exception: {e.Message}";
                 Logger.LogError(message, e);
             }
         }

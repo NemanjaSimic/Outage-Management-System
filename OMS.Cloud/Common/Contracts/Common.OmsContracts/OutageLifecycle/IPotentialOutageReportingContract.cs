@@ -10,6 +10,9 @@ namespace Common.OmsContracts.OutageLifecycle
 	public interface IPotentialOutageReportingContract : IService, IHealthChecker
 	{
 		[OperationContract]
+		Task<bool> EnqueuePotentialOutageCommand(long elementGid, CommandOriginType commandOriginType);
+
+		[OperationContract]
 		Task<bool> ReportPotentialOutage(long gid, CommandOriginType commandOriginType);
 	}
 }

@@ -13,8 +13,5 @@ namespace Common.OmsContracts.ModelProvider
         Task UpdateCommandedElements(long gid, ModelUpdateOperationType modelUpdateOperationType);
         [OperationContract]
         Task UpdateOptimumIsolationPoints(long gid, ModelUpdateOperationType modelUpdateOperationType);
-        [OperationContract]
-        Task UpdatePotentialOutage(long gid, CommandOriginType commandOriginType, ModelUpdateOperationType modelUpdateOperationType);
-
     }
 }

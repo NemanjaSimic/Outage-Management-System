@@ -22,9 +22,6 @@ namespace Common.OmsContracts.ModelProvider
         Task<Dictionary<long, long>> GetOptimumIsolatioPoints();
 
         [OperationContract]
-        Task<Dictionary<long, CommandOriginType>> GetPotentialOutage();
-
-        [OperationContract]
         [ServiceKnownType(typeof(OutageTopologyElement))]
         Task<OutageTopologyElement> GetElementById(long gid);
     }

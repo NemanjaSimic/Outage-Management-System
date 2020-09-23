@@ -2,13 +2,16 @@
 using Common.PubSubContracts.DataContracts.CE;
 using Microsoft.ServiceFabric.Data;
 using Microsoft.ServiceFabric.Data.Notifications;
+using OMS.Common.Cloud;
 using OMS.Common.Cloud.Logger;
 using OMS.Common.Cloud.Names;
 using OMS.Common.Cloud.ReliableCollectionHelpers;
 using OMS.Common.PubSubContracts;
 using OMS.Common.PubSubContracts.DataContracts.SCADA;
 using OMS.Common.PubSubContracts.Interfaces;
+using OMS.Common.WcfClient.OMS.OutageLifecycle;
 using System;
+using System.Collections.Generic;
 using System.Threading.Tasks;
 
 namespace OMS.OutageLifecycleImplementation.ContractProviders
@@ -29,13 +32,15 @@ namespace OMS.OutageLifecycleImplementation.ContractProviders
 		#region Reliable Dictionaries
 		private bool isMonitoredHeadBreakerMeasurementsInitialized;
 		private bool isOutageTopologyModelInitialized;
+		private bool isPotentialOutagesQueueInitialized;
 
 		private bool ReliableDictionariesInitialized
 		{
 			get
 			{
 				return isMonitoredHeadBreakerMeasurementsInitialized &&
-					   isOutageTopologyModelInitialized;
+					   isOutageTopologyModelInitialized &&
+					   isPotentialOutagesQueueInitialized;
 			}
 		}
 
@@ -49,6 +54,12 @@ namespace OMS.OutageLifecycleImplementation.ContractProviders
 		private ReliableDictionaryAccess<string, OutageTopologyModel> OutageTopologyModel
 		{
 			get { return outageTopologyModel; }
+		}
+
+		private ReliableQueueAccess<PotentialOutageCommand> potentialOutagesQueue;
+		private ReliableQueueAccess<PotentialOutageCommand> PotentialOutagesQueue
+		{
+			get { return potentialOutagesQueue; }
 		}
 
 		private async void OnStateManagerChangedHandler(object sender, NotifyStateManagerChangedEventArgs e)
@@ -74,6 +85,14 @@ namespace OMS.OutageLifecycleImplementation.ContractProviders
 					string debugMessage = $"{baseLogString} OnStateManagerChangedHandler => '{ReliableDictionaryNames.OutageTopologyModel}' ReliableDictionaryAccess initialized.";
 					Logger.LogDebug(debugMessage);
 				}
+				else if (reliableStateName == ReliableQueueNames.PotentialOutages)
+				{
+					this.potentialOutagesQueue = await ReliableQueueAccess<PotentialOutageCommand>.Create(stateManager, ReliableQueueNames.PotentialOutages);
+					this.isPotentialOutagesQueueInitialized = true;
+
+					string debugMessage = $"{baseLogString} OnStateManagerChangedHandler => '{ReliableQueueNames.PotentialOutages}' ReliableDictionaryAccess initialized.";
+					Logger.LogDebug(debugMessage);
+				}
 			}
 		}
         #endregion Reliable Dictionaries
@@ -84,6 +103,7 @@ namespace OMS.OutageLifecycleImplementation.ContractProviders
 
 			this.isMonitoredHeadBreakerMeasurementsInitialized = false;
 			this.isOutageTopologyModelInitialized = false;
+			this.isPotentialOutagesQueueInitialized = false;
 
 			this.stateManager = stateManager;
 			this.stateManager.StateManagerChanged += this.OnStateManagerChangedHandler;
@@ -126,9 +146,27 @@ namespace OMS.OutageLifecycleImplementation.ContractProviders
 				else if(message is OMSModelMessage omsModelMessage)
                 {
 					Logger.LogDebug($"{baseLogString} OMSModelMessage received. Count {omsModelMessage.OutageTopologyModel.OutageTopology.Count}");
+					
 					OutageTopologyModel topology = omsModelMessage.OutageTopologyModel;
 					await OutageTopologyModel.SetAsync(ReliableDictionaryNames.OutageTopologyModel, topology);
-				}
+
+					var reportingOutageClient = PotentialOutageReportingClient.CreateClient();
+
+					while(true)
+                    {
+						var result = await PotentialOutagesQueue.TryDequeueAsync();
+
+						if(!result.HasValue)
+                        {
+							break;
+                        }
+
+						var command = result.Value;
+
+						await reportingOutageClient.ReportPotentialOutage(command.ElementGid, command.CommandOriginType);
+						Logger.LogInformation($"{baseLogString} PotentianOutageCommand executed. ElementGid: 0x{command.ElementGid:X16}, OriginType: {command.CommandOriginType}");
+					}
+                }
 				else
                 {
 					Logger.LogWarning($"{baseLogString} Notify => unexpected type of message: {message.GetType()}");

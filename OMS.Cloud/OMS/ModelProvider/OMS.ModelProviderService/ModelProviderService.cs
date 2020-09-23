@@ -209,25 +209,6 @@ namespace OMS.ModelProviderService
                         }
                     }
                 }),
-
-                Task.Run(async() =>
-                {
-                    using (ITransaction tx = this.StateManager.CreateTransaction())
-                    {
-                        var result = await StateManager.TryGetAsync<IReliableDictionary<long, CommandOriginType>>(ReliableDictionaryNames.PotentialOutage);
-                        if(result.HasValue)
-                        {
-                            var addressToGidMap = result.Value;
-                            await addressToGidMap.ClearAsync();
-                            await tx.CommitAsync();
-                        }
-                        else
-                        {
-                            await StateManager.GetOrAddAsync<IReliableDictionary<long, CommandOriginType>>(tx, ReliableDictionaryNames.PotentialOutage);
-                            await tx.CommitAsync();
-                        }
-                    }
-                }),
             };
 
             Task.WaitAll(tasks);

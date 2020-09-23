@@ -40,13 +40,15 @@ namespace OMS.OutageLifecycleImplementation.ContractProviders
 		#region Reliable Dictionaries
 		private bool isRecloserOutageMapInitialized;
         private bool isOutageTopologyModelInitialized;
+        private bool isPotentialOutagesQueueInitialized;
 
         private bool ReliableDictionariesInitialized
 		{
 			get
 			{
 				return isRecloserOutageMapInitialized &&
-                       isOutageTopologyModelInitialized;
+                       isOutageTopologyModelInitialized && 
+                       isPotentialOutagesQueueInitialized;
 			}
 		}
 
@@ -60,6 +62,12 @@ namespace OMS.OutageLifecycleImplementation.ContractProviders
         private ReliableDictionaryAccess<string, OutageTopologyModel> OutageTopologyModel
         {
             get { return outageTopologyModel; }
+        }
+
+        private ReliableQueueAccess<PotentialOutageCommand> potentialOutagesQueue;
+        private ReliableQueueAccess<PotentialOutageCommand> PotentialOutagesQueue
+        {
+            get { return potentialOutagesQueue; }
         }
 
         private async void OnStateManagerChangedHandler(object sender, NotifyStateManagerChangedEventArgs e)
@@ -85,6 +93,14 @@ namespace OMS.OutageLifecycleImplementation.ContractProviders
                     string debugMessage = $"{baseLogString} OnStateManagerChangedHandler => '{ReliableDictionaryNames.OutageTopologyModel}' ReliableDictionaryAccess initialized.";
                     Logger.LogDebug(debugMessage);
                 }
+                else if (reliableStateName == ReliableQueueNames.PotentialOutages)
+                {
+                    this.potentialOutagesQueue = await ReliableQueueAccess<PotentialOutageCommand>.Create(stateManager, ReliableQueueNames.PotentialOutages);
+                    this.isPotentialOutagesQueueInitialized = true;
+
+                    string debugMessage = $"{baseLogString} OnStateManagerChangedHandler => '{ReliableQueueNames.PotentialOutages}' ReliableDictionaryAccess initialized.";
+                    Logger.LogDebug(debugMessage);
+                }
             }
 		}
 		#endregion Reliable Dictionaries
@@ -105,12 +121,42 @@ namespace OMS.OutageLifecycleImplementation.ContractProviders
 
 			this.isRecloserOutageMapInitialized = false;
             this.isOutageTopologyModelInitialized = false;
+            this.isPotentialOutagesQueueInitialized = false;
 
             this.stateManager = stateManager;
 			this.stateManager.StateManagerChanged += this.OnStateManagerChangedHandler;
 		}
 
         #region IPotentialOutageReportingContract
+        public async Task<bool> EnqueuePotentialOutageCommand(long elementGid, CommandOriginType commandOriginType)
+        {
+            Logger.LogDebug($"{baseLogString} EnqueuePotentialOutageCommand method started.");
+
+            while (!ReliableDictionariesInitialized)
+            {
+                await Task.Delay(1000);
+            }
+
+            try
+            {
+                var command = new PotentialOutageCommand()
+                {
+                    ElementGid = elementGid,
+                    CommandOriginType = commandOriginType,
+                    NetworkType = NetworkType.SCADA_NETWORK, //TODO:
+                };
+
+                await PotentialOutagesQueue.EnqueueAsync(command);
+                return true;
+            }
+            catch (Exception e)
+            {
+                string message = "EnqueuePotentialOutageCommand => exception caught";
+                Logger.LogError(message, e);
+                return false;
+            }
+        }
+
         public async Task<bool> ReportPotentialOutage(long elementGid, CommandOriginType commandOriginType)
         {
             Logger.LogVerbose($"{baseLogString} ReportPotentialOutage method started. ElementGid: 0x{elementGid:X16}, CommandOriginType: {commandOriginType}");
@@ -191,7 +237,7 @@ namespace OMS.OutageLifecycleImplementation.ContractProviders
             HashSet<long> visited = new HashSet<long>();
             long startingSwitch = potentialOutageGid;
 
-            //TODO: cemu sluzi ova logika?
+            //TODO: cemu sluzi ova logika? -deluje da podize starter ka gore.... a cemu to sluzi boga pitaj, eventualno za neSkada deo, bolje razdvojiti metode...
             if (topology.OutageTopology.TryGetValue(potentialOutageGid, out OutageTopologyElement firstElement)
                 && topology.OutageTopology.TryGetValue(firstElement.FirstEnd, out OutageTopologyElement currentElementAbove))
             {

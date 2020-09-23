@@ -275,8 +275,11 @@ namespace CE.TopologyProviderImplementation
                 {
                     if (element is Recloser recloser)
                     {
+                        var oldNumberOfTry = recloser.NumberOfTry;
                         recloser.NumberOfTry = 0;
                         await TopologyCache.SetAsync(topologyID, topology);
+
+                        Logger.LogDebug($"{baseLogString} ResetRecloser => RecloserGid: 0x{recloser.Id:X16}, IsActive: {recloser.IsActive}, NumberOfTry[OLD]: {oldNumberOfTry}, NumberOfTry[NEW]:{recloser.NumberOfTry}");
                     }
                     else
                     {
@@ -317,19 +320,22 @@ namespace CE.TopologyProviderImplementation
                 {
                     if (element is Recloser recloser)
                     {
+                        var oldNumberOfTry = recloser.NumberOfTry;
                         recloser.NumberOfTry++;
                         await TopologyCache.SetAsync(topologyID, topology);
+
+                        Logger.LogDebug($"{baseLogString} RecloserOpened => RecloserGid: 0x{recloser.Id:X16}, IsActive: {recloser.IsActive}, NumberOfTry[OLD]: {oldNumberOfTry}, NumberOfTry[NEW]:{recloser.NumberOfTry}");
                     }
                     else
                     {
-                        string errorMessage = $"{baseLogString} ResetRecloser => Element with GID {recloserGid:X16} is not a recloser.";
+                        string errorMessage = $"{baseLogString} RecloserOpened => Element with GID {recloserGid:X16} is not a recloser.";
                         Logger.LogError(errorMessage);
                         throw new Exception(errorMessage);
                     }
                 }
                 else
                 {
-                    string errorMessage = $"{baseLogString} ResetRecloser => Element with GID {recloserGid:X16} does not exist in Topology.";
+                    string errorMessage = $"{baseLogString} RecloserOpened => Element with GID {recloserGid:X16} does not exist in Topology.";
                     Logger.LogError(errorMessage);
                     throw new Exception(errorMessage);
                 }
@@ -337,7 +343,7 @@ namespace CE.TopologyProviderImplementation
             }
             catch (Exception e)
             {
-                string errorMessage = $"{baseLogString} ResetRecloser =>" +
+                string errorMessage = $"{baseLogString} RecloserOpened =>" +
                     $"{Environment.NewLine} Exception message: {e.Message} " +
                     $"{Environment.NewLine} Stack Trace: {e.StackTrace}";
                 Logger.LogError(errorMessage);
