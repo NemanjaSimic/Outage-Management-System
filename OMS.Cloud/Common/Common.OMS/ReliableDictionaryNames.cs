@@ -14,7 +14,6 @@
         public const string OutageTopologyModel = "OutageTopologyModel";
         public const string CommandedElements = "CommandedElements";
         public const string OptimumIsolatioPoints = "OptimumIsolatioPoints";
-        public const string PotentialOutage = "PotentialOutage";
 
         //OMS.OutageLifecycleService
         //public const string OutageTopologyModel = "OutageTopologyModel";

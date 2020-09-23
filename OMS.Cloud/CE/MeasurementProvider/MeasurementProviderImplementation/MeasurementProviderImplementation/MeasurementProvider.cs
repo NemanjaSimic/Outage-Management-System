@@ -791,11 +791,11 @@ namespace CE.MeasurementProviderImplementation
 					if (!await ceModelProviderClient.IsRecloser(measurement.ElementId))
 					{
 						var potentialOutageReportingClient = PotentialOutageReportingClient.CreateClient();
-						await potentialOutageReportingClient.ReportPotentialOutage(measurement.ElementId, commandOrigin);
+						await potentialOutageReportingClient.EnqueuePotentialOutageCommand(measurement.ElementId, commandOrigin);
 					}
 					else
 					{
-						Logger.LogDebug($"{baseLogString} UpdateDiscreteMeasurement => Element with gid 0x{measurement.ElementId:X16} is a Recloser. ReportPotentialOutage call is not required.");
+						Logger.LogDebug($"{baseLogString} UpdateDiscreteMeasurement => Element with gid 0x{measurement.ElementId:X16} is a Recloser. EnqueuePotentialOutageCommand call is not required.");
 					}
 				}
 				else

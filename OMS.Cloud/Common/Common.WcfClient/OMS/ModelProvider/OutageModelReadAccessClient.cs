@@ -49,11 +49,6 @@ namespace OMS.Common.WcfClient.OMS.ModelProvider
             return InvokeWithRetryAsync(client => client.Channel.GetOptimumIsolatioPoints());
         }
 
-        public Task<Dictionary<long, CommandOriginType>> GetPotentialOutage()
-        {
-            return InvokeWithRetryAsync(client => client.Channel.GetPotentialOutage());
-        }
-
         public Task<OutageTopologyModel> GetTopologyModel()
         {
             return InvokeWithRetryAsync(client => client.Channel.GetTopologyModel());

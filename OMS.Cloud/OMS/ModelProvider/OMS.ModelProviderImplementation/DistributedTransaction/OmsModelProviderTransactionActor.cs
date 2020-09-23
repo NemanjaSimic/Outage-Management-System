@@ -28,22 +28,19 @@ namespace OMS.ModelProviderImplementation.DistributedTransaction
         private bool isOutageTopologyModelInitialized;
         private bool isCommandedElementsInitialized;
         private bool isOptimumIsolatioPointsInitialized;
-        private bool isPotentialOutageInitialized;
         private bool ReliableDictionariesInitialized
         {
             get
             {
                 return isOutageTopologyModelInitialized &&
                        isCommandedElementsInitialized &&
-                       isOptimumIsolatioPointsInitialized &&
-                       isPotentialOutageInitialized;
+                       isOptimumIsolatioPointsInitialized;
             }
         }
 
         private ReliableDictionaryAccess<long, OutageTopologyModel> OutageTopologyModel { get; set; }
         private ReliableDictionaryAccess<long, long> CommandedElements { get; set; }
         private ReliableDictionaryAccess<long, long> OptimumIsolatioPoints { get; set; }
-        private ReliableDictionaryAccess<long, CommandOriginType> PotentialOutage { get; set; }
 
         private async void OnStateManagerChangedHandler(object sender, NotifyStateManagerChangedEventArgs e)
         {
@@ -76,14 +73,6 @@ namespace OMS.ModelProviderImplementation.DistributedTransaction
                     string debugMessage = $"{baseLogString} OnStateManagerChangedHandler => '{ReliableDictionaryNames.OptimumIsolatioPoints}' ReliableDictionaryAccess initialized.";
                     Logger.LogDebug(debugMessage);
                 }
-                else if (reliableStateName == ReliableDictionaryNames.PotentialOutage)
-                {
-                    PotentialOutage = await ReliableDictionaryAccess<long, CommandOriginType>.Create(stateManager, ReliableDictionaryNames.PotentialOutage);
-                    this.isPotentialOutageInitialized = true;
-
-                    string debugMessage = $"{baseLogString} OnStateManagerChangedHandler => '{ReliableDictionaryNames.PotentialOutage}' ReliableDictionaryAccess initialized.";
-                    Logger.LogDebug(debugMessage);
-                }
             }
         }
         #endregion Reliable Dictionaries
@@ -95,7 +84,6 @@ namespace OMS.ModelProviderImplementation.DistributedTransaction
             this.isOutageTopologyModelInitialized = false;
             this.isCommandedElementsInitialized = false;
             this.isOptimumIsolatioPointsInitialized = false;
-            this.isPotentialOutageInitialized = false;
 
             this.stateManager = stateManager;
             this.stateManager.StateManagerChanged += this.OnStateManagerChangedHandler;
@@ -124,7 +112,6 @@ namespace OMS.ModelProviderImplementation.DistributedTransaction
                 await OutageTopologyModel.ClearAsync();
                 await CommandedElements.ClearAsync();
                 await OptimumIsolatioPoints.ClearAsync();
-                await PotentialOutage.ClearAsync();
 
                 string message = $"{baseLogString} Commit => {MicroserviceNames.OmsModelProviderService} confirmed model changes.";
                 Logger.LogInformation(message);
@@ -197,14 +184,6 @@ namespace OMS.ModelProviderImplementation.DistributedTransaction
             foreach (var element in optimumIsolatioPoints)
             {
                 sb.AppendLine($"Key => 0x{element.Key:X16}, Value => 0x{element.Value:X16}");
-            }
-            sb.AppendLine();
-
-            sb.AppendLine("PotentialOutage =>");
-            var potentialOutage = await PotentialOutage.GetEnumerableDictionaryAsync();
-            foreach (var element in potentialOutage)
-            {
-                sb.AppendLine($"Key => 0x{element.Key:X16}, Value => {element.Value}");
             }
             sb.AppendLine();
 

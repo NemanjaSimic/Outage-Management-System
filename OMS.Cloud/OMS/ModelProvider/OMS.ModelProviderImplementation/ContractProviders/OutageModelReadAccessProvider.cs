@@ -31,15 +31,14 @@ namespace OMS.ModelProviderImplementation.ContractProviders
         private bool isTopologyModelInitialized;
         private bool isCommandedElementsInitialized;
         private bool isOptimumIsolatioPointsInitialized;
-        private bool isPotentialOutageInitialized;
+
         public bool ReliableDictionariesInitialized
         {
             get
             {
                 return isTopologyModelInitialized &&
                        isCommandedElementsInitialized &&
-                       isOptimumIsolatioPointsInitialized &&
-                       isPotentialOutageInitialized;
+                       isOptimumIsolatioPointsInitialized;
             }
         }
 
@@ -59,12 +58,6 @@ namespace OMS.ModelProviderImplementation.ContractProviders
         private ReliableDictionaryAccess<long, long> OptimumIsolatioPoints
         {
             get { return optimumIsloationPoints; }
-        }
-
-        private ReliableDictionaryAccess<long, CommandOriginType> potentialOutage;
-        private ReliableDictionaryAccess<long, CommandOriginType> PotentialOutage
-        {
-            get { return potentialOutage; }
         }
 
         private async void OnStateManagerChangedHandler(object sender, NotifyStateManagerChangedEventArgs e)
@@ -89,11 +82,6 @@ namespace OMS.ModelProviderImplementation.ContractProviders
                     optimumIsloationPoints = await ReliableDictionaryAccess<long, long>.Create(this.stateManager, ReliableDictionaryNames.OptimumIsolatioPoints);
                     this.isOptimumIsolatioPointsInitialized = true;
                 }
-                else if (reliableStateName == ReliableDictionaryNames.PotentialOutage)
-                {
-                    potentialOutage = await ReliableDictionaryAccess<long, CommandOriginType>.Create(this.stateManager, ReliableDictionaryNames.PotentialOutage);
-                    this.isPotentialOutageInitialized = true;
-                }
             }
         }
         #endregion Reliable Dictionaries
@@ -106,7 +94,6 @@ namespace OMS.ModelProviderImplementation.ContractProviders
             isTopologyModelInitialized = false;
             isCommandedElementsInitialized = false;
             isOptimumIsolatioPointsInitialized = false;
-            isPotentialOutageInitialized = false;
 
             this.stateManager = stateManager;
             this.stateManager.StateManagerChanged += this.OnStateManagerChangedHandler;
@@ -157,29 +144,6 @@ namespace OMS.ModelProviderImplementation.ContractProviders
             }
 
             return optimumIsolatioPoints;
-        }
-
-        public async Task<Dictionary<long, CommandOriginType>> GetPotentialOutage()
-        {
-            Logger.LogDebug("GetPotentialOutage method started.");
-            while (!ReliableDictionariesInitialized)
-            {
-                await Task.Delay(1000);
-            }
-
-            var potentialOutage = new Dictionary<long, CommandOriginType>();
-
-            try
-            {
-                potentialOutage = await PotentialOutage.GetDataCopyAsync();
-            }
-            catch (Exception e)
-            {
-                string message = $"{baseLogString} GetPotentialOutage => Exception: {e.Message}";
-                Logger.LogError(message, e);
-            }
-
-            return potentialOutage;
         }
 
         public async Task<OutageTopologyModel> GetTopologyModel()

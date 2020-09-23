@@ -96,6 +96,7 @@
     <Compile Include="ContractProviders\PotentialOutageReportingProvider.cs" />
     <Compile Include="Helpers\OutageLifecycleHelper.cs" />
     <Compile Include="Algorithm\IsolationAlgorithmCycle.cs" />
+    <Compile Include="PotentialOutageCommand.cs" />
     <Compile Include="Properties\AssemblyInfo.cs" />
     <Compile Include="ContractProviders\NotifySubscriberProvider.cs" />
   </ItemGroup>

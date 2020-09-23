@@ -41,11 +41,6 @@ namespace OMS.Common.WcfClient.OMS.ModelProvider
             return InvokeWithRetryAsync(client => client.Channel.UpdateOptimumIsolationPoints(gid, modelUpdateOperationType));
         }
 
-        public Task UpdatePotentialOutage(long gid, CommandOriginType commandOriginType, ModelUpdateOperationType modelUpdateOperationType)
-        {
-            return InvokeWithRetryAsync(client => client.Channel.UpdatePotentialOutage(gid, commandOriginType, modelUpdateOperationType));
-        }
-
         public Task<bool> IsAlive()
         {
             return InvokeWithRetryAsync(client => client.Channel.IsAlive());

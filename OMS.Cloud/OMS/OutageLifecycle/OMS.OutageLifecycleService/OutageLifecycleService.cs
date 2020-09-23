@@ -20,6 +20,7 @@ using OMS.Common.PubSubContracts;
 using OMS.Common.PubSubContracts.DataContracts.SCADA;
 using OMS.Common.WcfClient.OMS.ModelProvider;
 using OMS.Common.WcfClient.PubSub;
+using OMS.OutageLifecycleImplementation;
 using OMS.OutageLifecycleImplementation.Algorithm;
 using OMS.OutageLifecycleImplementation.ContractProviders;
 using OMS.OutageLifecycleImplementation.Helpers;
@@ -267,6 +268,25 @@ namespace OMS.OutageLifecycleService
                         else
                         {
                             await StateManager.GetOrAddAsync<IReliableDictionary<string, OutageTopologyModel>>(tx, ReliableDictionaryNames.OutageTopologyModel);
+                            await tx.CommitAsync();
+                        }
+                    }
+                }),
+
+                Task.Run(async() =>
+                {
+                    using (ITransaction tx = this.StateManager.CreateTransaction())
+                    {
+                        var result = await StateManager.TryGetAsync<IReliableConcurrentQueue<PotentialOutageCommand>>(ReliableQueueNames.PotentialOutages);
+                        if(result.HasValue)
+                        {
+                            var gidToPointItemMap = result.Value;
+                            while ((await result.Value.TryDequeueAsync(tx)).HasValue);
+                            await tx.CommitAsync();
+                        }
+                        else
+                        {
+                            await StateManager.GetOrAddAsync<IReliableConcurrentQueue<PotentialOutageCommand>>(tx, ReliableQueueNames.PotentialOutages);
                             await tx.CommitAsync();
                         }
                     }

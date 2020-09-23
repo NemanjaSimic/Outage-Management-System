@@ -51,6 +51,7 @@
     <Compile Include="OutageSimulator\MonitoredIsolationPoint.cs" />
     <Compile Include="ReliableDictionaryNames.cs" />
     <Compile Include="Properties\AssemblyInfo.cs" />
+    <Compile Include="ReliableQueueNames.cs" />
     <Compile Include="Report\DateHelpers.cs" />
   </ItemGroup>
   <ItemGroup>
