@@ -62,7 +62,7 @@ namespace OMS.HistoryDBManagerImplementation.ModelAccess
 				{
 					try
 					{
-						equipment.AddRange(unitOfWork.EquipmentRepository.GetAll());
+						equipment = new List<Equipment>(unitOfWork.EquipmentRepository.GetAll());
 					}
 					catch (Exception e)
 					{
