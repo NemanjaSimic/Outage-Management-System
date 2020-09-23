@@ -5,8 +5,9 @@ using System.Runtime.Serialization;
 
 namespace Common.OmsContracts.DataContracts.OutageDatabaseModel
 {
-    [DataContract]
-	
+    [DataContract(IsReference = true)]
+    //[DataContract]
+
     public class Consumer
     {
         [Key]

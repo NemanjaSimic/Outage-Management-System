@@ -66,7 +66,7 @@ namespace OMS.HistoryDBManagerImplementation.ModelAccess
 				{
 					try
 					{
-						consumers.AddRange(unitOfWork.ConsumerRepository.GetAll());
+						consumers = new List<Consumer>(unitOfWork.ConsumerRepository.GetAll());
 					}
 					catch (Exception e)
 					{
