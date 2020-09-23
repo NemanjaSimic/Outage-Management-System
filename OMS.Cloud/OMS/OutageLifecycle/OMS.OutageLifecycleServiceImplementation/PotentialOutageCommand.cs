@@ -13,13 +13,4 @@ namespace OMS.OutageLifecycleImplementation
         [DataMember]
         public NetworkType NetworkType { get; set; }
     }
-
-    [DataContract]
-    public enum NetworkType : short
-    {
-        [EnumMember]
-        SCADA_NETWORK = 1,
-        [EnumMember]
-        NON_SCADA_NETWORK = 2,
-    }
 }

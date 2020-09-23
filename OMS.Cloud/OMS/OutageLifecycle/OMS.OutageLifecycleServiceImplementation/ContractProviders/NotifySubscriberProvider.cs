@@ -163,7 +163,7 @@ namespace OMS.OutageLifecycleImplementation.ContractProviders
 
 						var command = result.Value;
 
-						await reportingOutageClient.ReportPotentialOutage(command.ElementGid, command.CommandOriginType);
+						await reportingOutageClient.ReportPotentialOutage(command.ElementGid, command.CommandOriginType, command.NetworkType);
 						Logger.LogInformation($"{baseLogString} PotentianOutageCommand executed. ElementGid: 0x{command.ElementGid:X16}, OriginType: {command.CommandOriginType}");
 					}
                 }

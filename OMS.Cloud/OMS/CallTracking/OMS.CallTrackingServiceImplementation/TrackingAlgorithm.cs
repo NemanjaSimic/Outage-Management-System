@@ -90,7 +90,7 @@ namespace OMS.CallTrackingImplementation
                 if (!await ceModelProviderClient.IsRecloser(potentialOutageElementGid))
                 {
                     //TODO: razdvojiti metode scada, noScada
-                    await reportOutageClient.ReportPotentialOutage(potentialOutageElementGid, CommandOriginType.NON_SCADA_OUTAGE);
+                    await reportOutageClient.ReportPotentialOutage(potentialOutageElementGid, CommandOriginType.NON_SCADA_OUTAGE, NetworkType.NON_SCADA_NETWORK);
                 }
                 else
                 {

@@ -31,14 +31,14 @@ namespace OMS.Common.WcfClient.OMS.OutageLifecycle
 		}
 
 		#region IPotentialOutageReportingContract
-		public Task<bool> EnqueuePotentialOutageCommand(long elementGid, CommandOriginType commandOriginType)
+		public Task<bool> EnqueuePotentialOutageCommand(long elementGid, CommandOriginType commandOriginType, NetworkType networkType)
 		{
-			return InvokeWithRetryAsync(client => client.Channel.EnqueuePotentialOutageCommand(elementGid, commandOriginType));
+			return InvokeWithRetryAsync(client => client.Channel.EnqueuePotentialOutageCommand(elementGid, commandOriginType, networkType));
 		}
 
-		public Task<bool> ReportPotentialOutage(long elementGid, CommandOriginType commandOriginType)
+		public Task<bool> ReportPotentialOutage(long elementGid, CommandOriginType commandOriginType, NetworkType networkType)
 		{
-			return InvokeWithRetryAsync(client => client.Channel.ReportPotentialOutage(elementGid, commandOriginType));
+			return InvokeWithRetryAsync(client => client.Channel.ReportPotentialOutage(elementGid, commandOriginType, networkType));
 		}
 
 		public Task<bool> IsAlive()

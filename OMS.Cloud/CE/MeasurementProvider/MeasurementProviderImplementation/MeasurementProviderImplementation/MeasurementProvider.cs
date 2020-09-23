@@ -791,7 +791,7 @@ namespace CE.MeasurementProviderImplementation
 					if (!await ceModelProviderClient.IsRecloser(measurement.ElementId))
 					{
 						var potentialOutageReportingClient = PotentialOutageReportingClient.CreateClient();
-						await potentialOutageReportingClient.EnqueuePotentialOutageCommand(measurement.ElementId, commandOrigin);
+						await potentialOutageReportingClient.EnqueuePotentialOutageCommand(measurement.ElementId, commandOrigin, NetworkType.SCADA_NETWORK); //TODO: proveriti da li ce ovde uvek biti skada deo mreze....
 					}
 					else
 					{
