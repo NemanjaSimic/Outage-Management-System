@@ -224,7 +224,38 @@ namespace OMS.HistoryDBManagerImplementation.ModelAccess
 				using (var unitOfWork = new UnitOfWork())
 				{
 					try
-					{	
+					{
+						List<Consumer> consumersFromDb = GetConsumersFromDb(outage.AffectedConsumers, unitOfWork);
+						if (consumersFromDb.Count != outage.AffectedConsumers.Count)
+						{
+							Logger.LogError($"{baseLogString} AddOutage => Some of AffectedConsumers are not present in database.");
+							return;
+						}
+
+						List<Equipment> defaultIsolationPointsFromDb = GetEquipmentFromDb(outage.DefaultIsolationPoints, unitOfWork);
+						if (defaultIsolationPointsFromDb.Count != outage.DefaultIsolationPoints.Count)
+						{
+							Logger.LogError($"{baseLogString} AddOutage => Some of DefaultIsolationPoints are not present in database.");
+							return;
+						}
+
+						List<Equipment> optimumIsolationPointsFromDb = GetEquipmentFromDb(outage.OptimumIsolationPoints, unitOfWork);
+						if (optimumIsolationPointsFromDb.Count != outage.OptimumIsolationPoints.Count)
+						{
+							Logger.LogError($"{baseLogString} AddOutage => Some of OptimumIsolationPoints are not present in database.");
+							return;
+						}
+
+						outage.AffectedConsumers.Clear();
+						outage.AffectedConsumers.AddRange(consumersFromDb);
+
+						outage.DefaultIsolationPoints.Clear();
+						outage.DefaultIsolationPoints.AddRange(defaultIsolationPointsFromDb);
+
+						outage.OptimumIsolationPoints.Clear();
+						outage.OptimumIsolationPoints.AddRange(optimumIsolationPointsFromDb);
+
+
 						unitOfWork.OutageRepository.Update(outage);
 						unitOfWork.Complete();
 					}

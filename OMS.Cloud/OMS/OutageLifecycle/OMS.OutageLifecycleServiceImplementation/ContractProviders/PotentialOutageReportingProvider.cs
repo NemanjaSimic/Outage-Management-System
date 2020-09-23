@@ -348,6 +348,7 @@ namespace OMS.OutageLifecycleImplementation.ContractProviders
 
             OutageEntity createdActiveOutage = new OutageEntity
             {
+                OutageElementGid = elementGid,
                 AffectedConsumers = consumerDbEntities,
                 OutageState = OutageState.CREATED,
                 ReportTime = DateTime.UtcNow,
