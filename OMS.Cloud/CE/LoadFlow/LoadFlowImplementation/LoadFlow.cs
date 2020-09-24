@@ -632,9 +632,12 @@ namespace CE.LoadFlowImplementation
             Thread.Sleep(30000);
             Logger.LogDebug($"{baseLogString} CommandToRecloser => Waking up after 10 seconds.");
 
-            if (!((Recloser)recloser).IsReachedMaximumOfTries())
+            var topologyProviderClient = TopologyProviderClient.CreateClient();
+            int counter = await topologyProviderClient.GetRecloserCount(recloser.Id);
+
+            if (((Recloser)recloser).MaxNumberOfTries > counter)
             {
-                var topologyProviderClient = TopologyProviderClient.CreateClient();
+                topologyProviderClient = TopologyProviderClient.CreateClient();
                 await topologyProviderClient.RecloserOpened(recloser.Id);
 
                 Logger.LogDebug($"{baseLogString} CommandToRecloser => Calling SendDiscreteCommand method from measurement provider. Measurement GID: {measurementGid:X16}, Value: {value}, OriginType {originType}.");

@@ -41,6 +41,9 @@ namespace Common.CeContracts.TopologyProvider
         Task RecloserOpened(long recloserGid);
 
         [OperationContract]
+        Task<int> GetRecloserCount(long recloserGid);
+
+        [OperationContract]
         //[ServiceKnownType(typeof(OutageTopologyModel))]
         //[ServiceKnownType(typeof(OutageTopologyElement))]
         Task<OutageTopologyModel> GetOMSModel();

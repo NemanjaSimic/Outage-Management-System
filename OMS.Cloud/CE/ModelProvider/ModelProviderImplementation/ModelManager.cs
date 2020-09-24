@@ -835,7 +835,7 @@ namespace CE.ModelProviderImplementation
 			};
 			return discreteMeasurement;
 		}
-		private async Task CreateNoScadaMeasurementAsync(ITopologyElement element)
+		private async Task<ITopologyElement> CreateNoScadaMeasurementAsync(ITopologyElement element)
 		{
 			string verboseMessage = $"{baseLogString} entering CreateNoScadaMeasurement method.";
 			Logger.LogVerbose(verboseMessage);
@@ -856,6 +856,8 @@ namespace CE.ModelProviderImplementation
 				measurementProviderClient = MeasurementProviderClient.CreateClient();
 				await measurementProviderClient.AddMeasurementElementPair(measurement.Id, element.Id);
 			}
+
+			return element;
 		}
         #endregion
     }
