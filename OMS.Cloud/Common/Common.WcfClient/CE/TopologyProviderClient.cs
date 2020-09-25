@@ -91,5 +91,10 @@ namespace OMS.Common.WcfClient.CE
 			return InvokeWithRetryAsync(client => client.Channel.RecloserOpened(recloserGid));
 
 		}
+
+		public Task<int> GetRecloserCount(long recloserGid)
+		{
+			return InvokeWithRetryAsync(client => client.Channel.GetRecloserCount(recloserGid));
+		}
 	}
 }

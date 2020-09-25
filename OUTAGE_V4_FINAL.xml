@@ -7645,6 +7645,34 @@
 		<cim:IdentifiedObject.mRID>DS_22</cim:IdentifiedObject.mRID>
 		<ftn:IdentifiedObject.name>DS_22</ftn:IdentifiedObject.name>
 	</cim:Discrete>
+	
+	<cim:Discrete rdf:ID="DS_23">
+		<cim:Discrete.currentOpen>false</cim:Discrete.currentOpen>
+		<cim:Discrete.maxValue>1</cim:Discrete.maxValue>
+		<cim:Discrete.measurementType>SwitchStatus</cim:Discrete.measurementType>
+		<cim:Discrete.minValue>0</cim:Discrete.minValue>
+		<cim:Discrete.normalValue>1</cim:Discrete.normalValue>
+		<cim:Measurement.address>23</cim:Measurement.address>
+		<cim:Measurement.isInput>false</cim:Measurement.isInput>
+		<cim:Measurement.Terminal rdf:resource="#TM_435"/>
+		<cim:IdentifiedObject.description> </cim:IdentifiedObject.description>
+		<cim:IdentifiedObject.mRID>DS_23</cim:IdentifiedObject.mRID>
+		<ftn:IdentifiedObject.name>DS_23</ftn:IdentifiedObject.name>
+	</cim:Discrete>
+	
+	<cim:Discrete rdf:ID="DS_24">
+		<cim:Discrete.currentOpen>false</cim:Discrete.currentOpen>
+		<cim:Discrete.maxValue>1</cim:Discrete.maxValue>
+		<cim:Discrete.measurementType>SwitchStatus</cim:Discrete.measurementType>
+		<cim:Discrete.minValue>0</cim:Discrete.minValue>
+		<cim:Discrete.normalValue>1</cim:Discrete.normalValue>
+		<cim:Measurement.address>24</cim:Measurement.address>
+		<cim:Measurement.isInput>false</cim:Measurement.isInput>
+		<cim:Measurement.Terminal rdf:resource="#TM_439"/>
+		<cim:IdentifiedObject.description> </cim:IdentifiedObject.description>
+		<cim:IdentifiedObject.mRID>DS_24</cim:IdentifiedObject.mRID>
+		<ftn:IdentifiedObject.name>DS_24</ftn:IdentifiedObject.name>
+	</cim:Discrete>
 	<!--END Discrete-->
 <!--[END Package_Meas ]-->	
 </rdf:RDF>
