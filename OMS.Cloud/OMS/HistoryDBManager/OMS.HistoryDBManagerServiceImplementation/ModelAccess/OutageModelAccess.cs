@@ -225,38 +225,54 @@ namespace OMS.HistoryDBManagerImplementation.ModelAccess
 				{
 					try
 					{
+						OutageEntity outageFromDb = unitOfWork.OutageRepository.Get(outage.OutageId);
+
+						if(outageFromDb == null)
+						{
+							Logger.LogError($"{baseLogString} UpdateOutage => Outage with id {outage.OutageId} is not present in database.");
+							return;
+						}
+
+
 						List<Consumer> consumersFromDb = GetConsumersFromDb(outage.AffectedConsumers, unitOfWork);
 						if (consumersFromDb.Count != outage.AffectedConsumers.Count)
 						{
-							Logger.LogError($"{baseLogString} AddOutage => Some of AffectedConsumers are not present in database.");
+							Logger.LogError($"{baseLogString} UpdateOutage => Some of AffectedConsumers are not present in database.");
 							return;
 						}
 
 						List<Equipment> defaultIsolationPointsFromDb = GetEquipmentFromDb(outage.DefaultIsolationPoints, unitOfWork);
 						if (defaultIsolationPointsFromDb.Count != outage.DefaultIsolationPoints.Count)
 						{
-							Logger.LogError($"{baseLogString} AddOutage => Some of DefaultIsolationPoints are not present in database.");
+							Logger.LogError($"{baseLogString} UpdateOutage => Some of DefaultIsolationPoints are not present in database.");
 							return;
 						}
 
 						List<Equipment> optimumIsolationPointsFromDb = GetEquipmentFromDb(outage.OptimumIsolationPoints, unitOfWork);
 						if (optimumIsolationPointsFromDb.Count != outage.OptimumIsolationPoints.Count)
 						{
-							Logger.LogError($"{baseLogString} AddOutage => Some of OptimumIsolationPoints are not present in database.");
+							Logger.LogError($"{baseLogString} UpdateOutage => Some of OptimumIsolationPoints are not present in database.");
 							return;
 						}
 
-						outage.AffectedConsumers.Clear();
-						outage.AffectedConsumers.AddRange(consumersFromDb);
+						outageFromDb.AffectedConsumers.Clear();
+						outageFromDb.AffectedConsumers.AddRange(consumersFromDb);
 
-						outage.DefaultIsolationPoints.Clear();
-						outage.DefaultIsolationPoints.AddRange(defaultIsolationPointsFromDb);
+						outageFromDb.DefaultIsolationPoints.Clear();
+						outageFromDb.DefaultIsolationPoints.AddRange(defaultIsolationPointsFromDb);
 
-						outage.OptimumIsolationPoints.Clear();
-						outage.OptimumIsolationPoints.AddRange(optimumIsolationPointsFromDb);
+						outageFromDb.OptimumIsolationPoints.Clear();
+						outageFromDb.OptimumIsolationPoints.AddRange(optimumIsolationPointsFromDb);
 
+						outageFromDb.OutageState = outage.OutageState;
+						outageFromDb.ArchivedTime = outage.ArchivedTime;
+						outageFromDb.IsolatedTime = outage.IsolatedTime;
+						outageFromDb.IsResolveConditionValidated = outage.IsResolveConditionValidated;
+						outageFromDb.OutageElementGid = outage.OutageElementGid;
+						outageFromDb.RepairedTime = outage.RepairedTime;
+						outageFromDb.ReportTime = outage.ReportTime;
 
-						unitOfWork.OutageRepository.Update(outage);
+						unitOfWork.OutageRepository.Update(outageFromDb);
 						unitOfWork.Complete();
 					}
 					catch (Exception e)
