@@ -172,6 +172,8 @@ namespace OMS.OutageLifecycleImplementation.ContractProviders
 					Logger.LogWarning($"{baseLogString} Notify => unexpected type of message: {message.GetType()}");
 					return;
 				}
+
+				//TODO: EMPTY COMMANDED ELEMENTS!!!!!!
 			}
             catch (Exception e)
             {

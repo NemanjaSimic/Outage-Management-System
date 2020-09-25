@@ -228,10 +228,11 @@ namespace OMS.OutageLifecycleImplementation.Algorithm
             #endregion
 
             //Closing current breaker, before moving to the next breaker
-            var commands = new Dictionary<long, DiscreteCommandingType>
+            var commands = new Dictionary<long, DiscreteCommandingType>();
+            if(algorithm.CurrentBreakerGid != algorithm.HeadBreakerGid)
             {
-                { algorithm.CurrentBreakerGid, DiscreteCommandingType.CLOSE },
-            };
+                commands.Add(algorithm.CurrentBreakerGid, DiscreteCommandingType.CLOSE);
+            }
 
             algorithm.CycleCounter = 0;
 
@@ -261,9 +262,13 @@ namespace OMS.OutageLifecycleImplementation.Algorithm
                 return false;
             }
 
-            commands.Add(algorithm.CurrentBreakerGid, DiscreteCommandingType.OPEN);
-            commands.Add(algorithm.HeadBreakerGid, DiscreteCommandingType.CLOSE);
             var enumerableCommandedElements = await CommandedElements.GetEnumerableDictionaryAsync();
+
+            if(!commands.ContainsKey(algorithm.CurrentBreakerGid) && !commands.ContainsKey(algorithm.HeadBreakerGid))
+            {
+                commands.Add(algorithm.CurrentBreakerGid, DiscreteCommandingType.OPEN);
+                commands.Add(algorithm.HeadBreakerGid, DiscreteCommandingType.CLOSE);
+            }
 
             if (!await lifecycleHelper.SendMultipleScadaCommandAsync(commands, enumerableCommandedElements, CommandOriginType.ISOLATING_ALGORITHM_COMMAND))
             {
