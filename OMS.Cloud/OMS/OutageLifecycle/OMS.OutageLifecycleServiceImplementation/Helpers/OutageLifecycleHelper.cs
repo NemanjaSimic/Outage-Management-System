@@ -153,9 +153,9 @@ namespace OMS.OutageLifecycleImplementation.Helpers
         #endregion Equipment Helpers
 
         #region Commanding Helpers
-        public async Task<bool> SendSingleScadaCommandAsync(long breakerGid, DiscreteCommandingType discreteCommandingType, Dictionary<long, DiscreteCommandingType> commandedElements, CommandOriginType commandOriginType)
+        public async Task<bool> SendSingleScadaCommandAsync(long breakerGid, DiscreteCommandingType discreteCommandingType, Dictionary<long, CommandedElement> commandedElements, CommandOriginType commandOriginType)
         {
-            if (commandedElements.ContainsKey(breakerGid) && commandedElements[breakerGid] == discreteCommandingType)
+            if (commandedElements.ContainsKey(breakerGid) && commandedElements[breakerGid].CommandingType == discreteCommandingType)
             {
                 Logger.LogDebug($"{baseLogString} SendSingleScadaCommandAsync => Trying to send duplicate command. Aborting call.");
                 return false;
@@ -193,7 +193,7 @@ namespace OMS.OutageLifecycleImplementation.Helpers
             return sendCommandSuccess;
         }
 
-        public async Task<bool> SendMultipleScadaCommandAsync(Dictionary<long, DiscreteCommandingType> elementGidCommandMap, Dictionary<long, DiscreteCommandingType> commandedElements, CommandOriginType commandOriginType)
+        public async Task<bool> SendMultipleScadaCommandAsync(Dictionary<long, DiscreteCommandingType> elementGidCommandMap, Dictionary<long, CommandedElement> commandedElements, CommandOriginType commandOriginType)
         {
             var measurementMapClient = MeasurementMapClient.CreateClient();
             var elementToMeasurementMap = await measurementMapClient.GetElementToMeasurementMap();
@@ -204,10 +204,18 @@ namespace OMS.OutageLifecycleImplementation.Helpers
             {
                 var discreteCommandingType = elementGidCommandMap[elementGid];
 
-                if (commandedElements.ContainsKey(elementGid) && commandedElements[elementGid] == discreteCommandingType)
+                int reTryCount = 60;
+                while (commandedElements.ContainsKey(elementGid) && commandedElements[elementGid].CommandingType == discreteCommandingType)
                 {
-                    Logger.LogDebug($"{baseLogString} SendMultipleScadaCommandAsync => Trying to send duplicate command. Aborting call.");
-                    return false;
+                    Logger.LogDebug($"{baseLogString} SendMultipleScadaCommandAsync => Trying to send duplicate command. Entering delay for 1000 ms and retrying the call.");
+
+                    await Task.Delay(1000);
+
+                    if(--reTryCount <= 0)
+                    {
+                        Logger.LogError($"{baseLogString} SendMultipleScadaCommandAsync => Trying to send duplicate command. ReTryCount reached 60 calls.");
+                        return false;
+                    }
                 }
 
                 if(!elementToMeasurementMap.TryGetValue(elementGid, out List<long> measurementGids) || measurementGids.Count == 0)
@@ -223,7 +231,7 @@ namespace OMS.OutageLifecycleImplementation.Helpers
                     return false;
                 }
 
-                commands.Add(elementGid, (int)elementGidCommandMap[elementGid]);
+                commands.Add(measurementGid, (int)elementGidCommandMap[elementGid]);
             }
 
             var measurementProviderClient = MeasurementProviderClient.CreateClient();

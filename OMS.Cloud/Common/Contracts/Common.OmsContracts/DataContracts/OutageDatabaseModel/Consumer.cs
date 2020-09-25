@@ -1,4 +1,5 @@
-﻿using System.Collections.Generic;
+﻿using OMS.Common.Cloud;
+using System.Collections.Generic;
 using System.ComponentModel.DataAnnotations;
 using System.ComponentModel.DataAnnotations.Schema;
 using System.Runtime.Serialization;
@@ -6,8 +7,6 @@ using System.Runtime.Serialization;
 namespace Common.OmsContracts.DataContracts.OutageDatabaseModel
 {
     [DataContract(IsReference = true)]
-    //[DataContract]
-
     public class Consumer
     {
         [Key]
@@ -23,6 +22,9 @@ namespace Common.OmsContracts.DataContracts.OutageDatabaseModel
 
         [DataMember]
         public string LastName { get; set; }
+
+        [DataMember]
+        public EnergyConsumerType Type { get; set; }
 
         [DataMember]
         public List<OutageEntity> Outages { get; set; }

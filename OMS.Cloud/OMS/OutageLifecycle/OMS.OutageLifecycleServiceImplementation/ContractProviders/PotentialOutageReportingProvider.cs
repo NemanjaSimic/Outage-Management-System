@@ -11,6 +11,7 @@ using OMS.Common.Cloud.ReliableCollectionHelpers;
 using OMS.Common.WcfClient.CE;
 using OMS.Common.WcfClient.OMS.HistoryDBManager;
 using OMS.Common.WcfClient.OMS.ModelAccess;
+using OMS.OutageLifecycleImplementation.Algorithm;
 using OMS.OutageLifecycleImplementation.Helpers;
 using System;
 using System.Collections.Generic;
@@ -34,8 +35,9 @@ namespace OMS.OutageLifecycleImplementation.ContractProviders
             get { return logger ?? (logger = CloudLoggerFactory.GetLogger()); }
         }
 
-		#region Reliable Dictionaries
-		private bool isRecloserOutageMapInitialized;
+        #region Reliable Dictionaries
+        private bool isStartedIsolationAlgorithmsInitialized;
+        private bool isRecloserOutageMapInitialized;
         private bool isOutageTopologyModelInitialized;
         private bool isOptimumIsolationPointsInitialized;
         private bool isCommandedElementsInitialized;
@@ -45,13 +47,20 @@ namespace OMS.OutageLifecycleImplementation.ContractProviders
 		{
 			get
 			{
-				return isRecloserOutageMapInitialized &&
+				return isStartedIsolationAlgorithmsInitialized &&
+                       isRecloserOutageMapInitialized &&
                        isOutageTopologyModelInitialized &&
                        isOptimumIsolationPointsInitialized &&
                        isCommandedElementsInitialized &&
                        isPotentialOutagesQueueInitialized;
 			}
 		}
+
+        private ReliableDictionaryAccess<long, IsolationAlgorithm> startedIsolationAlgorithms;
+        private ReliableDictionaryAccess<long, IsolationAlgorithm> StartedIsolationAlgorithms
+        {
+            get { return startedIsolationAlgorithms; }
+        }
 
         private ReliableDictionaryAccess<long, Dictionary<long, List<long>>> recloserOutageMap;
         private ReliableDictionaryAccess<long, Dictionary<long, List<long>>> RecloserOutageMap
@@ -65,15 +74,18 @@ namespace OMS.OutageLifecycleImplementation.ContractProviders
             get { return outageTopologyModel; }
         }
 
-        //TODO: for now value is allways 0
+        /// <summary>
+        /// KEY - element gid of optimum isolation point
+        /// VALUE - element gid of head switch (to identify the corresponding algorithm)
+        /// </summary>
         private ReliableDictionaryAccess<long, long> optimumIsolationPoints;
         private ReliableDictionaryAccess<long, long> OptimumIsolationPoints
         {
             get { return optimumIsolationPoints; }
         }
 
-        private ReliableDictionaryAccess<long, DiscreteCommandingType> commandedElements;
-        private ReliableDictionaryAccess<long, DiscreteCommandingType> CommandedElements
+        private ReliableDictionaryAccess<long, CommandedElement> commandedElements;
+        private ReliableDictionaryAccess<long, CommandedElement> CommandedElements
         {
             get { return commandedElements; }
         }
@@ -90,8 +102,16 @@ namespace OMS.OutageLifecycleImplementation.ContractProviders
 			{
 				var operation = e as NotifyStateManagerSingleEntityChangedEventArgs;
 				string reliableStateName = operation.ReliableState.Name.AbsolutePath;
+                
+                if (reliableStateName == ReliableDictionaryNames.StartedIsolationAlgorithms)
+                {
+                    this.startedIsolationAlgorithms = await ReliableDictionaryAccess<long, IsolationAlgorithm>.Create(stateManager, ReliableDictionaryNames.StartedIsolationAlgorithms);
+                    this.isStartedIsolationAlgorithmsInitialized = true;
 
-                if (reliableStateName == ReliableDictionaryNames.RecloserOutageMap)
+                    string debugMessage = $"{baseLogString} OnStateManagerChangedHandler => '{ReliableDictionaryNames.StartedIsolationAlgorithms}' ReliableDictionaryAccess initialized.";
+                    Logger.LogDebug(debugMessage);
+                }
+                else if (reliableStateName == ReliableDictionaryNames.RecloserOutageMap)
                 {
                     this.recloserOutageMap = await ReliableDictionaryAccess<long, Dictionary<long, List<long>>>.Create(stateManager, ReliableDictionaryNames.RecloserOutageMap);
                     this.isRecloserOutageMapInitialized = true;
@@ -117,7 +137,7 @@ namespace OMS.OutageLifecycleImplementation.ContractProviders
                 }
                 else if (reliableStateName == ReliableDictionaryNames.CommandedElements)
                 {
-                    this.commandedElements = await ReliableDictionaryAccess<long, DiscreteCommandingType>.Create(stateManager, ReliableDictionaryNames.CommandedElements);
+                    this.commandedElements = await ReliableDictionaryAccess<long, CommandedElement>.Create(stateManager, ReliableDictionaryNames.CommandedElements);
                     this.isCommandedElementsInitialized = true;
 
                     string debugMessage = $"{baseLogString} OnStateManagerChangedHandler => '{ReliableDictionaryNames.CommandedElements}' ReliableDictionaryAccess initialized.";
@@ -149,7 +169,8 @@ namespace OMS.OutageLifecycleImplementation.ContractProviders
                 CommandOriginType.UNKNOWN_ORIGIN,
             };
 
-			this.isRecloserOutageMapInitialized = false;
+            this.isStartedIsolationAlgorithmsInitialized = false;
+            this.isRecloserOutageMapInitialized = false;
             this.isOutageTopologyModelInitialized = false;
             this.isPotentialOutagesQueueInitialized = false;
             this.isCommandedElementsInitialized = false;
@@ -268,6 +289,7 @@ namespace OMS.OutageLifecycleImplementation.ContractProviders
             HashSet<long> visited = new HashSet<long>();
             long startingSwitch = potentialOutageGid;
 
+            //TODO: pogledati kad se bude testirala NoScada
             //if(networkType == NetworkType.NON_SCADA_NETWORK)
             //{
                 //TODO: cemu sluzi ova logika? -deluje da podize starter ka gore.... a cemu to sluzi boga pitaj, eventualno za neSkada deo, bolje razdvojiti metode...
@@ -384,15 +406,12 @@ namespace OMS.OutageLifecycleImplementation.ContractProviders
                 return false;
             }
 
-            var enumerableCommandedElements = await CommandedElements.GetEnumerableDictionaryAsync(); //TODO; naglasiti da li je samo ono sto je komandovano tokom IsolatingAlgorithma
+            var enumerableStartedAlgorithms = await StartedIsolationAlgorithms.GetEnumerableDictionaryAsync();
             var enumerableOptimumIsolationPoints = await OptimumIsolationPoints.GetEnumerableDictionaryAsync();
 
-            if (enumerableCommandedElements.ContainsKey(elementGid) || enumerableOptimumIsolationPoints.ContainsKey(elementGid))
+            if (enumerableStartedAlgorithms.Values.Any(algorithm => algorithm.ElementsCommandedInCurrentCycle.Contains(elementGid)) || enumerableOptimumIsolationPoints.ContainsKey(elementGid))
             {
-                await historyDBManagerClient.OnSwitchOpened(elementGid, null); //TODO: zar se ovo ne resava na samom historiju?
-                await historyDBManagerClient.OnConsumerBlackedOut(affectedConsumersGids, null); //TODO: zar se ovo ne resava na samom historiju?
-
-                Logger.LogWarning($"{baseLogString} CheckPreconditions => ElementGid 0x{elementGid:X16} not found in commandedElements or optimumIsolationPoints."); //TODO: DA LI JE USLOV DOBRO POSTAVLJEN??
+                Logger.LogWarning($"{baseLogString} CheckPreconditions => ElementGid 0x{elementGid:X16} found in elements commanded in current isolating algorithm cycle or in optimumIsolationPoints.");
                 return false;
             }
 

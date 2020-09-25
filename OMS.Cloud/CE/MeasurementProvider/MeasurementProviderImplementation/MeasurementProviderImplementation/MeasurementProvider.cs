@@ -1,14 +1,11 @@
 ﻿using Common.CE;
 using Common.CeContracts;
-using Common.CeContracts.ModelProvider;
-using Common.CeContracts.TopologyProvider;
 using Microsoft.ServiceFabric.Data;
 using Microsoft.ServiceFabric.Data.Notifications;
 using OMS.Common.Cloud;
 using OMS.Common.Cloud.Logger;
 using OMS.Common.Cloud.ReliableCollectionHelpers;
 using OMS.Common.PubSubContracts.DataContracts.SCADA;
-using OMS.Common.ScadaContracts.Commanding;
 using OMS.Common.WcfClient.CE;
 using OMS.Common.WcfClient.OMS.HistoryDBManager;
 using OMS.Common.WcfClient.OMS.OutageLifecycle;
@@ -19,7 +16,7 @@ using System.Threading.Tasks;
 
 namespace CE.MeasurementProviderImplementation
 {
-	public class MeasurementProvider : IMeasurementProviderContract
+    public class MeasurementProvider : IMeasurementProviderContract
 	{
 		#region Fields
 		private readonly HashSet<CommandOriginType> ignorableOriginTypes;
@@ -235,7 +232,7 @@ namespace CE.MeasurementProviderImplementation
 
 					await UpdateAnalogMeasurement(gid, (float)measurementData.Value, measurementData.CommandOrigin, measurementData.Alarm);
 				}
-				//DiscreteMeasurementDelegate?.Invoke(); //MODO: bilo je zakomentarisano?
+				//DiscreteMeasurementDelegate?.Invoke(); //MODO: vec bilo je zakomentarisano, da li je potrebno...?
 			}
 			catch (Exception e)
 			{
@@ -680,11 +677,13 @@ namespace CE.MeasurementProviderImplementation
 					ushort value = (ushort)commands[measurementGid];
 					DiscreteMeasurement measurement = await GetDiscreteMeasurement(measurementGid);
 
-					if (measurement != null && !(measurement is ArtificalDiscreteMeasurement))
-					{
-						nonArtificalCommands.Add(measurementGid, value);
+					if(measurement == null)
+                    {
+						Logger.LogError($"{baseLogString} SendMultipleDiscreteCommand => Measurement for measurementGid: 0x{measurementGid:X16} is null");
+						return false;
 					}
-					else
+
+					if (measurement is ArtificalDiscreteMeasurement)
 					{
 						Dictionary<long, DiscreteModbusData> data = new Dictionary<long, DiscreteModbusData>(1)
 						{
@@ -692,6 +691,10 @@ namespace CE.MeasurementProviderImplementation
 						};
 
 						await UpdateDiscreteMeasurement(data);
+					}
+					else
+					{
+						nonArtificalCommands.Add(measurementGid, value);
 					}
 				}
 

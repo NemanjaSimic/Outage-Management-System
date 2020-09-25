@@ -76,6 +76,10 @@
     <Compile Include="Migrations\202008191215060_Cloud migration.designer.cs">
       <DependentUpon>202008191215060_Cloud migration.cs</DependentUpon>
     </Compile>
+    <Compile Include="Migrations\202009251723289_add consumer type.cs" />
+    <Compile Include="Migrations\202009251723289_add consumer type.designer.cs">
+      <DependentUpon>202009251723289_add consumer type.cs</DependentUpon>
+    </Compile>
     <Compile Include="Migrations\Configuration.cs" />
     <Compile Include="OutageContext.cs" />
     <Compile Include="Properties\AssemblyInfo.cs" />
@@ -120,6 +124,9 @@
   <ItemGroup>
     <EmbeddedResource Include="Migrations\202008191215060_Cloud migration.resx">
       <DependentUpon>202008191215060_Cloud migration.cs</DependentUpon>
+    </EmbeddedResource>
+    <EmbeddedResource Include="Migrations\202009251723289_add consumer type.resx">
+      <DependentUpon>202009251723289_add consumer type.cs</DependentUpon>
     </EmbeddedResource>
   </ItemGroup>
   <Import Project="$(MSBuildToolsPath)\Microsoft.CSharp.targets" />

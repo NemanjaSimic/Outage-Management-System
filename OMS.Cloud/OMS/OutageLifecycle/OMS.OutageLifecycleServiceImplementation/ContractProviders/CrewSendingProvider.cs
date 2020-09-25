@@ -50,8 +50,8 @@ namespace OMS.OutageLifecycleImplementation.ContractProviders
             get { return outageTopologyModel; }
         }
 
-        private ReliableDictionaryAccess<long, DiscreteCommandingType> commandedElements;
-        private ReliableDictionaryAccess<long, DiscreteCommandingType> CommandedElements
+        private ReliableDictionaryAccess<long, CommandedElement> commandedElements;
+        private ReliableDictionaryAccess<long, CommandedElement> CommandedElements
         {
             get { return commandedElements; }
         }
@@ -73,7 +73,7 @@ namespace OMS.OutageLifecycleImplementation.ContractProviders
                 }
                 else if (reliableStateName == ReliableDictionaryNames.CommandedElements)
                 {
-                    this.commandedElements = await ReliableDictionaryAccess<long, DiscreteCommandingType>.Create(stateManager, ReliableDictionaryNames.CommandedElements);
+                    this.commandedElements = await ReliableDictionaryAccess<long, CommandedElement>.Create(stateManager, ReliableDictionaryNames.CommandedElements);
                     this.isCommandedElementsInitialized = true;
 
                     string debugMessage = $"{baseLogString} OnStateManagerChangedHandler => '{ReliableDictionaryNames.CommandedElements}' ReliableDictionaryAccess initialized.";
@@ -166,7 +166,7 @@ namespace OMS.OutageLifecycleImplementation.ContractProviders
 
                 var outageEntity = result.Value;
 
-                //TODO: WHY???
+                //TODO: videti performanse, pa da li treba da cekamo uopste xD
                 //await Task.Delay(10000);
 
                 var outageSimulatorClient = OutageSimulatorClient.CreateClient();
@@ -215,7 +215,7 @@ namespace OMS.OutageLifecycleImplementation.ContractProviders
             long upBreaker;
             long outageElementGid = -1;
 
-            //MODO: tu je vec bio ovaj delay... zasto?
+            //Todo: pratiti performanse pa videti da li nam je potrebno usporenje
             //await Task.Delay(5000);
 
             var outageSimulatorClient = OutageSimulatorClient.CreateClient();

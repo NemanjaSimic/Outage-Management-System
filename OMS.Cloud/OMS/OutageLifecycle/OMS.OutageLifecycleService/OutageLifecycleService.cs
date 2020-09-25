@@ -277,7 +277,7 @@ namespace OMS.OutageLifecycleService
                 {
                     using (ITransaction tx = this.StateManager.CreateTransaction())
                     {
-                        var result = await StateManager.TryGetAsync<IReliableDictionary<long, DiscreteCommandingType>>(ReliableDictionaryNames.CommandedElements);
+                        var result = await StateManager.TryGetAsync<IReliableDictionary<long, CommandedElement>>(ReliableDictionaryNames.CommandedElements);
                         if(result.HasValue)
                         {
                             var gidToPointItemMap = result.Value;
@@ -286,7 +286,7 @@ namespace OMS.OutageLifecycleService
                         }
                         else
                         {
-                            await StateManager.GetOrAddAsync<IReliableDictionary<long, DiscreteCommandingType>>(tx, ReliableDictionaryNames.CommandedElements);
+                            await StateManager.GetOrAddAsync<IReliableDictionary<long, CommandedElement>>(tx, ReliableDictionaryNames.CommandedElements);
                             await tx.CommitAsync();
                         }
                     }
@@ -296,6 +296,10 @@ namespace OMS.OutageLifecycleService
                 {
                     using (ITransaction tx = this.StateManager.CreateTransaction())
                     {
+                        /// <summary>
+                        /// KEY - element gid of optimum isolation point
+                        /// VALUE - element gid of head switch (to identify the corresponding algorithm)
+                        /// </summary>
                         var result = await StateManager.TryGetAsync<IReliableDictionary<long, long>>(ReliableDictionaryNames.OptimumIsolationPoints);
                         if(result.HasValue)
                         {

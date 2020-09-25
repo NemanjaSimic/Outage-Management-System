@@ -90,6 +90,7 @@
   </ItemGroup>
   <ItemGroup>
     <Compile Include="Algorithm\IsolationAlgorithm.cs" />
+    <Compile Include="CommandedElement.cs" />
     <Compile Include="ContractProviders\OutageResolutionProvider.cs" />
     <Compile Include="ContractProviders\OutageIsolationProvider.cs" />
     <Compile Include="ContractProviders\CrewSendingProvider.cs" />

@@ -297,7 +297,7 @@ namespace SCADA.ModelProviderImplementation.DistributedTransaction
 
             foreach (long gid in enumerableCurrentGidToPointItemMap.Keys)
             {
-                //MODO: to tasks, await all (performanse)
+                //NODO: to tasks, await all (performanse)
 
                 IScadaModelPointItem pointItem = enumerableCurrentGidToPointItemMap[gid].Clone();
 

@@ -130,7 +130,7 @@ namespace OMS.HistoryDBManagerImplementation.DistributedTransaction
                         consumer.ConsumerMRID = resourceDescriptions[consumer.ConsumerId].GetProperty(ModelCode.IDOBJ_MRID).AsString();
                         consumer.FirstName = resourceDescriptions[consumer.ConsumerId].GetProperty(ModelCode.ENERGYCONSUMER_FIRSTNAME).AsString();
                         consumer.LastName = resourceDescriptions[consumer.ConsumerId].GetProperty(ModelCode.ENERGYCONSUMER_LASTNAME).AsString();
-                        //TODO: consumer.Type = resourceDescriptions[consumer.ConsumerId].GetProperty(ModelCode.ENERGYCONSUMER_TYPE).AsEnum();
+                        consumer.Type = (EnergyConsumerType)resourceDescriptions[consumer.ConsumerId].GetProperty(ModelCode.ENERGYCONSUMER_TYPE).AsEnum();
                         consumer.Outages.Clear();
 
                         this.unitOfWork.ConsumerRepository.Update(consumer);
@@ -160,7 +160,7 @@ namespace OMS.HistoryDBManagerImplementation.DistributedTransaction
                         ConsumerMRID = resourceDescription.GetProperty(ModelCode.IDOBJ_MRID).AsString(),
                         FirstName = resourceDescription.GetProperty(ModelCode.ENERGYCONSUMER_FIRSTNAME).AsString(),
                         LastName = resourceDescription.GetProperty(ModelCode.ENERGYCONSUMER_LASTNAME).AsString(),
-                        //TODO: Type = resourceDescriptions[consumer.ConsumerId].GetProperty(ModelCode.ENERGYCONSUMER_TYPE).AsEnum(),
+                        Type = (EnergyConsumerType)resourceDescriptions[resourceDescription.Id].GetProperty(ModelCode.ENERGYCONSUMER_TYPE).AsEnum(),
                     };
 
                     if(this.unitOfWork.ConsumerRepository.Get(consumer.ConsumerId) == null)
