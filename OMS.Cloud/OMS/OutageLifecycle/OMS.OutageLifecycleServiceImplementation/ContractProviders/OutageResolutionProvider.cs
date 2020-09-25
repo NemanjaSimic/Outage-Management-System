@@ -8,7 +8,6 @@ using OMS.Common.Cloud;
 using OMS.Common.Cloud.Logger;
 using OMS.Common.Cloud.ReliableCollectionHelpers;
 using OMS.Common.WcfClient.OMS.ModelAccess;
-using OMS.Common.WcfClient.OMS.ModelProvider;
 using OMS.OutageLifecycleImplementation.Helpers;
 using System;
 using System.Collections.Generic;

@@ -18,7 +18,7 @@ using OMS.Common.Cloud.Names;
 using OMS.Common.NmsContracts;
 using OMS.Common.PubSubContracts;
 using OMS.Common.PubSubContracts.DataContracts.SCADA;
-using OMS.Common.WcfClient.OMS.ModelProvider;
+using OMS.Common.WcfClient.CE;
 using OMS.Common.WcfClient.PubSub;
 using OMS.OutageLifecycleImplementation;
 using OMS.OutageLifecycleImplementation.Algorithm;
@@ -40,8 +40,8 @@ namespace OMS.OutageLifecycleService
 		private readonly IOutageResolutionContract outageResolutionProvider;
 		private readonly INotifySubscriberContract notifySubscriberProvider;
 
-        private const int isolationAlgorithmCycleInterval = 5000;
-        private const int isolationAlgorithmUpperLimit = 30000;
+        private const int isolationAlgorithmCycleInterval = 15_000;
+        private const int isolationAlgorithmUpperLimit = 60_000;
         private readonly IsolationAlgorithmCycle isolationAlgorithmCycle;
 
         private ICloudLogger logger;
@@ -167,13 +167,13 @@ namespace OMS.OutageLifecycleService
             {
                 InitializeReliableCollections();
                 Logger.LogDebug($"{baseLogString} Initialize => ReliableDictionaries initialized.");
-                var modelProviderClient = OutageModelReadAccessClient.CreateClient();
+                var topologyProviderClient = TopologyProviderClient.CreateClient();
                 using (ITransaction tx = this.StateManager.CreateTransaction())
 				{
                     var result = await StateManager.TryGetAsync<IReliableDictionary<string, OutageTopologyModel>>(ReliableDictionaryNames.OutageTopologyModel);
                     if (result.HasValue)
 					{
-                        await result.Value.SetAsync(tx, ReliableDictionaryNames.OutageTopologyModel, await modelProviderClient.GetTopologyModel());
+                        await result.Value.SetAsync(tx, ReliableDictionaryNames.OutageTopologyModel, await topologyProviderClient.GetOMSModel());
                         await tx.CommitAsync();
 					}
                     else
@@ -268,6 +268,44 @@ namespace OMS.OutageLifecycleService
                         else
                         {
                             await StateManager.GetOrAddAsync<IReliableDictionary<string, OutageTopologyModel>>(tx, ReliableDictionaryNames.OutageTopologyModel);
+                            await tx.CommitAsync();
+                        }
+                    }
+                }),
+
+                Task.Run(async() =>
+                {
+                    using (ITransaction tx = this.StateManager.CreateTransaction())
+                    {
+                        var result = await StateManager.TryGetAsync<IReliableDictionary<long, DiscreteCommandingType>>(ReliableDictionaryNames.CommandedElements);
+                        if(result.HasValue)
+                        {
+                            var gidToPointItemMap = result.Value;
+                            await gidToPointItemMap.ClearAsync();
+                            await tx.CommitAsync();
+                        }
+                        else
+                        {
+                            await StateManager.GetOrAddAsync<IReliableDictionary<long, DiscreteCommandingType>>(tx, ReliableDictionaryNames.CommandedElements);
+                            await tx.CommitAsync();
+                        }
+                    }
+                }),
+
+                Task.Run(async() =>
+                {
+                    using (ITransaction tx = this.StateManager.CreateTransaction())
+                    {
+                        var result = await StateManager.TryGetAsync<IReliableDictionary<long, long>>(ReliableDictionaryNames.OptimumIsolationPoints);
+                        if(result.HasValue)
+                        {
+                            var gidToPointItemMap = result.Value;
+                            await gidToPointItemMap.ClearAsync();
+                            await tx.CommitAsync();
+                        }
+                        else
+                        {
+                            await StateManager.GetOrAddAsync<IReliableDictionary<long, long>>(tx, ReliableDictionaryNames.OptimumIsolationPoints);
                             await tx.CommitAsync();
                         }
                     }

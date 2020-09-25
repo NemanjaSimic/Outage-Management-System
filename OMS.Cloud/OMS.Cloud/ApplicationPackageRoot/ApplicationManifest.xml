@@ -6,9 +6,6 @@
     <Parameter Name="OMS.OutageLifecycleService_MinReplicaSetSize" DefaultValue="3" />
     <Parameter Name="OMS.OutageLifecycleService_PartitionCount" DefaultValue="1" />
     <Parameter Name="OMS.OutageLifecycleService_TargetReplicaSetSize" DefaultValue="3" />
-    <Parameter Name="OMS.ModelProviderService_MinReplicaSetSize" DefaultValue="3" />
-    <Parameter Name="OMS.ModelProviderService_PartitionCount" DefaultValue="1" />
-    <Parameter Name="OMS.ModelProviderService_TargetReplicaSetSize" DefaultValue="3" />
     <Parameter Name="OMS.OutageSimulatorService_PartitionCount" DefaultValue="1" />
     <Parameter Name="OMS.OutageSimulatorService_MinReplicaSetSize" DefaultValue="3" />
     <Parameter Name="OMS.OutageSimulatorService_TargetReplicaSetSize" DefaultValue="3" />
@@ -59,10 +56,6 @@
        ServiceManifest.xml file. -->
   <ServiceManifestImport>
     <ServiceManifestRef ServiceManifestName="OMS.OutageLifecycleServicePkg" ServiceManifestVersion="1.0.0" />
-    <ConfigOverrides />
-  </ServiceManifestImport>
-  <ServiceManifestImport>
-    <ServiceManifestRef ServiceManifestName="OMS.ModelProviderServicePkg" ServiceManifestVersion="1.0.0" />
     <ConfigOverrides />
   </ServiceManifestImport>
   <ServiceManifestImport>
@@ -139,11 +132,6 @@
     <Service Name="OMS.OutageLifecycleService" ServicePackageActivationMode="ExclusiveProcess">
       <StatefulService ServiceTypeName="OMS.OutageLifecycleServiceType" TargetReplicaSetSize="[OMS.OutageLifecycleService_TargetReplicaSetSize]" MinReplicaSetSize="[OMS.OutageLifecycleService_MinReplicaSetSize]">
         <UniformInt64Partition PartitionCount="[OMS.OutageLifecycleService_PartitionCount]" LowKey="-9223372036854775808" HighKey="9223372036854775807" />
-      </StatefulService>
-    </Service>
-    <Service Name="OMS.ModelProviderService" ServicePackageActivationMode="ExclusiveProcess">
-      <StatefulService ServiceTypeName="OMS.ModelProviderServiceType" TargetReplicaSetSize="[OMS.ModelProviderService_TargetReplicaSetSize]" MinReplicaSetSize="[OMS.ModelProviderService_MinReplicaSetSize]">
-        <UniformInt64Partition PartitionCount="[OMS.ModelProviderService_PartitionCount]" LowKey="-9223372036854775808" HighKey="9223372036854775807" />
       </StatefulService>
     </Service>
     <Service Name="OMS.OutageSimulatorService" ServicePackageActivationMode="ExclusiveProcess">

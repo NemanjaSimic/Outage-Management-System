@@ -118,14 +118,24 @@ namespace OMS.Common.WcfClient.CE
 			return InvokeWithRetryAsync(client => client.Channel.UpdateDiscreteMeasurement(data));
 		}
 
-		public Task SendAnalogCommand(long measurementGid, float commandingValue, CommandOriginType commandOrigin)
-		{
-			return InvokeWithRetryAsync(client => client.Channel.SendAnalogCommand(measurementGid, commandingValue, commandOrigin));
+        public Task<bool> SendSingleAnalogCommand(long measurementGid, float commandingValue, CommandOriginType commandOrigin)
+        {
+			return InvokeWithRetryAsync(client => client.Channel.SendSingleAnalogCommand(measurementGid, commandingValue, commandOrigin));
 		}
 
-		public Task SendDiscreteCommand(long measurementGid, int value, CommandOriginType commandOrigin)
-		{
-			return InvokeWithRetryAsync(client => client.Channel.SendDiscreteCommand(measurementGid, value, commandOrigin));
+        public Task<bool> SendMultipleAnalogCommand(Dictionary<long, float> commands, CommandOriginType commandOrigin)
+        {
+			return InvokeWithRetryAsync(client => client.Channel.SendMultipleAnalogCommand(commands, commandOrigin));
 		}
-	}
+
+        public Task<bool> SendSingleDiscreteCommand(long measurementGid, int value, CommandOriginType commandOrigin)
+        {
+			return InvokeWithRetryAsync(client => client.Channel.SendSingleDiscreteCommand(measurementGid, value, commandOrigin));
+		}
+
+        public Task<bool> SendMultipleDiscreteCommand(Dictionary<long, int> commands, CommandOriginType commandOrigin)
+        {
+			return InvokeWithRetryAsync(client => client.Channel.SendMultipleDiscreteCommand(commands, commandOrigin));
+		}
+    }
 }

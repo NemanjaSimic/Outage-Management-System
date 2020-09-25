@@ -61,9 +61,15 @@ namespace Common.CeContracts
         Task RollbackTransaction();
 
         [OperationContract]
-        Task SendAnalogCommand(long measurementGid, float commandingValue, CommandOriginType commandOrigin);
+        Task<bool> SendSingleAnalogCommand(long measurementGid, float commandingValue, CommandOriginType commandOrigin);
 
         [OperationContract]
-        Task SendDiscreteCommand(long measurementGid, int value, CommandOriginType commandOrigin);
+        Task<bool> SendMultipleAnalogCommand(Dictionary<long, float> commands, CommandOriginType commandOrigin);
+
+        [OperationContract]
+        Task<bool> SendSingleDiscreteCommand(long measurementGid, int value, CommandOriginType commandOrigin);
+
+        [OperationContract]
+        Task<bool> SendMultipleDiscreteCommand(Dictionary<long,int> commands, CommandOriginType commandOrigin);
     }
 }

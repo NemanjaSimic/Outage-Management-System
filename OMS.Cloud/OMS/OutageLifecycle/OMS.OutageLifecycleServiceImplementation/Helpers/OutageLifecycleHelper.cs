@@ -10,7 +10,6 @@ using OMS.Common.NmsContracts.GDA;
 using OMS.Common.WcfClient.CE;
 using OMS.Common.WcfClient.NMS;
 using OMS.Common.WcfClient.OMS.ModelAccess;
-using OMS.Common.WcfClient.OMS.ModelProvider;
 using OMS.Common.WcfClient.PubSub;
 using System;
 using System.Collections.Generic;
@@ -154,47 +153,81 @@ namespace OMS.OutageLifecycleImplementation.Helpers
         #endregion Equipment Helpers
 
         #region Commanding Helpers
-        public async Task SendScadaCommandAsync(long breakerGid, DiscreteCommandingType discreteCommandingType)
+        public async Task<bool> SendSingleScadaCommandAsync(long breakerGid, DiscreteCommandingType discreteCommandingType, Dictionary<long, DiscreteCommandingType> commandedElements, CommandOriginType commandOriginType)
+        {
+            if (commandedElements.ContainsKey(breakerGid) && commandedElements[breakerGid] == discreteCommandingType)
+            {
+                Logger.LogDebug($"{baseLogString} SendSingleScadaCommandAsync => Trying to send duplicate command. Aborting call.");
+                return false;
+            }
+
+            var measurementMapClient = MeasurementMapClient.CreateClient();
+            List<long> measurementGids = await measurementMapClient.GetMeasurementsOfElement(breakerGid);
+
+            if (measurementGids.Count == 0)
+            {
+                Logger.LogWarning($"{baseLogString} SendSingleScadaCommandAsync => Element with gid: 0x{breakerGid:X16} has no measurements.");
+                return false;
+            }
+
+            var measurementGid = measurementGids.FirstOrDefault();
+            if (measurementGid == 0)
+            {
+                Logger.LogWarning($"{baseLogString} SendSingleScadaCommandAsync => Measurement gid is 0.");
+                return false;
+            }
+
+            var switchStatusCommandingClient = SwitchStatusCommandingClient.CreateClient();
+
+            bool sendCommandSuccess = false;
+
+            if(discreteCommandingType == DiscreteCommandingType.OPEN)
+            {
+                sendCommandSuccess = await switchStatusCommandingClient.SendOpenCommand(measurementGid);
+            }
+            else if(discreteCommandingType == DiscreteCommandingType.CLOSE)
+            {
+                sendCommandSuccess = await switchStatusCommandingClient.SendCloseCommand(measurementGid);
+            }
+
+            return sendCommandSuccess;
+        }
+
+        public async Task<bool> SendMultipleScadaCommandAsync(Dictionary<long, DiscreteCommandingType> elementGidCommandMap, Dictionary<long, DiscreteCommandingType> commandedElements, CommandOriginType commandOriginType)
         {
             var measurementMapClient = MeasurementMapClient.CreateClient();
-            List<long> measurements = await measurementMapClient.GetMeasurementsOfElement(breakerGid);
+            var elementToMeasurementMap = await measurementMapClient.GetElementToMeasurementMap();
 
-            if (measurements.Count == 0)
+            var commands = new Dictionary<long, int>();
+
+            foreach (var elementGid in elementGidCommandMap.Keys)
             {
-                Logger.LogWarning($"{baseLogString} SendSCADACommand => Element with gid: 0x{breakerGid:X16} has no measurements.");
-                return;
+                var discreteCommandingType = elementGidCommandMap[elementGid];
+
+                if (commandedElements.ContainsKey(elementGid) && commandedElements[elementGid] == discreteCommandingType)
+                {
+                    Logger.LogDebug($"{baseLogString} SendMultipleScadaCommandAsync => Trying to send duplicate command. Aborting call.");
+                    return false;
+                }
+
+                if(!elementToMeasurementMap.TryGetValue(elementGid, out List<long> measurementGids) || measurementGids.Count == 0)
+                {
+                    Logger.LogWarning($"{baseLogString} SendMultipleScadaCommandAsync => Element with gid: 0x{elementGid:X16} has no measurements.");
+                    return false;
+                }
+
+                var measurementGid = measurementGids.FirstOrDefault();
+                if (measurementGid == 0)
+                {
+                    Logger.LogWarning($"{baseLogString} SendMultipleScadaCommandAsync => Measurement gid is 0.");
+                    return false;
+                }
+
+                commands.Add(elementGid, (int)elementGidCommandMap[elementGid]);
             }
 
-            var measurement = measurements.FirstOrDefault();
-
-            if (measurement == 0)
-            {
-                Logger.LogWarning($"{baseLogString} SendSCADACommand => Measurement gid is 0.");
-                return;
-            }
-
-            var outageModelReadAccessClient = OutageModelReadAccessClient.CreateClient();
-            var commandedElements = await outageModelReadAccessClient.GetCommandedElements();
-
-            if (discreteCommandingType == DiscreteCommandingType.OPEN && !commandedElements.ContainsKey(breakerGid))
-            {
-                var outageModelUpdateAccessClient = OutageModelUpdateAccessClient.CreateClient();
-                await outageModelUpdateAccessClient.UpdateCommandedElements(breakerGid, ModelUpdateOperationType.INSERT);
-            }
-
-            //todo: SendOpenCommand da vraca bool pa onda provera
-            var switchStatusCommandingClient = SwitchStatusCommandingClient.CreateClient();
-            await switchStatusCommandingClient.SendOpenCommand(measurement);
-
-            //todo: u vezi gornjeg todo
-            //if(fail)
-            //{
-            //    if (discreteCommandingType == DiscreteCommandingType.OPEN && commandedElements.ContainsKey(currentBreakerId))
-            //    {
-            //        var outageModelUpdateAccessClient = OutageModelUpdateAccessClient.CreateClient();
-            //        await outageModelUpdateAccessClient.UpdateCommandedElements(currentBreakerId, ModelUpdateOperationType.DELETE);
-            //    }
-            //}
+            var measurementProviderClient = MeasurementProviderClient.CreateClient();
+            return await measurementProviderClient.SendMultipleDiscreteCommand(commands, commandOriginType);
         }
         #endregion Commanding Helpers
 

@@ -46,7 +46,6 @@ namespace OMS.Common.NMS
                 { MicroserviceNames.ScadaModelProviderService   },
                 { MicroserviceNames.CeModelProviderService      },
                 { MicroserviceNames.OmsHistoryDBManagerService  },
-                { MicroserviceNames.OmsModelProviderService     },
             };
         }
     }

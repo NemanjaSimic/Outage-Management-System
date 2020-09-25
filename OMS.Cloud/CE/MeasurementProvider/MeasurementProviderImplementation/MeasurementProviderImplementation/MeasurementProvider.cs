@@ -584,40 +584,44 @@ namespace CE.MeasurementProviderImplementation
 		#endregion
 
 		#region Commanding
-		public async Task SendAnalogCommand(long measurementGid, float commandingValue, CommandOriginType commandOrigin)
+		public async Task<bool> SendSingleAnalogCommand(long measurementGid, float commandingValue, CommandOriginType commandOrigin)
 		{
-			string verboseMessage = $"{baseLogString} entering SendAnalogCommand method. Measurement GID {measurementGid:X16}; Commanding value {commandingValue}; Command Origin {commandOrigin}";
+			string verboseMessage = $"{baseLogString} entering SendSingleAnalogCommand method. Measurement GID {measurementGid:X16}; Commanding value {commandingValue}; Command Origin {commandOrigin}";
 			Logger.LogVerbose(verboseMessage);
 
 			try
 			{
-				Logger.LogDebug($"{baseLogString} SendAnalogCommand => Calling Send single analog command from scada commanding client.");
+				Logger.LogDebug($"{baseLogString} SendSingleAnalogCommand => Calling Send single analog command from scada commanding client.");
 				var scadaCommandingClient = ScadaCommandingClient.CreateClient();
-				await scadaCommandingClient.SendSingleAnalogCommand(measurementGid, commandingValue, commandOrigin);
-				Logger.LogDebug($"{baseLogString} SendAnalogCommand => Send single analog command from scada commanding client successfully called.");
+				var success = await scadaCommandingClient.SendSingleAnalogCommand(measurementGid, commandingValue, commandOrigin);
+				Logger.LogDebug($"{baseLogString} SendSingleAnalogCommand => Send single analog command from scada commanding client called.");
+
+				return success;
 			}
 			catch (Exception e)
 			{
-				string message = $"{baseLogString} SendAnalogCommand => Failed. Exception message: {e.Message}.";
+				string message = $"{baseLogString} SendSingleAnalogCommand => Failed. Exception message: {e.Message}.";
 				Logger.LogError(message, e);
+				return false;
 			}
 		}
 
-		public async Task SendDiscreteCommand(long measurementGid, int value, CommandOriginType commandOrigin)
+		public async Task<bool> SendSingleDiscreteCommand(long measurementGid, int value, CommandOriginType commandOrigin)
 		{
-			string verboseMessage = $"{baseLogString} entering SendDiscreteCommand method. Measurement GID {measurementGid:X16}; Commanding value {value}; Command Origin {commandOrigin}";
+			string verboseMessage = $"{baseLogString} entering SendSingleDiscreteCommand method. Measurement GID {measurementGid:X16}; Commanding value {value}; Command Origin {commandOrigin}";
 			Logger.LogVerbose(verboseMessage);
 
 			try
 			{
+				bool success;
 				DiscreteMeasurement measurement = await GetDiscreteMeasurement(measurementGid);
 
 				if (measurement != null && !(measurement is ArtificalDiscreteMeasurement))
 				{
-					Logger.LogDebug($"{baseLogString} SendDiscreteCommand => Calling Send single discrete command from scada commanding client.");
+					Logger.LogDebug($"{baseLogString} SendSingleDiscreteCommand => Calling Send single discrete command from scada commanding client.");
 					var scadaCommandingClient = ScadaCommandingClient.CreateClient();
-					await scadaCommandingClient.SendSingleDiscreteCommand(measurementGid, (ushort)value, commandOrigin);
-					Logger.LogDebug($"{baseLogString} SendDiscreteCommand => Send single discrete command from scada commanding client successfully called.");
+					success = await scadaCommandingClient.SendSingleDiscreteCommand(measurementGid, (ushort)value, commandOrigin);
+					Logger.LogDebug($"{baseLogString} SendSingleDiscreteCommand => Send single discrete command from scada commanding client called.");
 				}
 				else
 				{
@@ -625,13 +629,84 @@ namespace CE.MeasurementProviderImplementation
 					{
 						{ measurementGid, new DiscreteModbusData((ushort)value, AlarmType.NO_ALARM, measurementGid, commandOrigin) }
 					};
+
 					await UpdateDiscreteMeasurement(data);
+					success = true;
 				}
+
+				return success;
 			}
 			catch (Exception e)
 			{
-				string message = $"{baseLogString} SendDiscreteCommand => Failed. Exception message: {e.Message}.";
+				string message = $"{baseLogString} SendSingleDiscreteCommand => Failed. Exception message: {e.Message}.";
 				Logger.LogError(message, e);
+				return false;
+			}
+		}
+
+		public async Task<bool> SendMultipleAnalogCommand(Dictionary<long, float> commands, CommandOriginType commandOrigin)
+		{
+			string verboseMessage = $"{baseLogString} entering SendMultipleAnalogCommand method. Commands count: {commands.Count}, Command Origin: {commandOrigin}";
+			Logger.LogVerbose(verboseMessage);
+
+			try
+			{
+				Logger.LogDebug($"{baseLogString} SendMultipleAnalogCommand => Calling Send Multiple analog command from scada commanding client.");
+				var scadaCommandingClient = ScadaCommandingClient.CreateClient();
+				var success = await scadaCommandingClient.SendMultipleAnalogCommand(commands, commandOrigin);
+				Logger.LogDebug($"{baseLogString} SendMultipleAnalogCommand => Send Multiple analog command from scada commanding client called.");
+
+				return success;
+			}
+			catch (Exception e)
+			{
+				string message = $"{baseLogString} SendMultipleAnalogCommand => Failed. Exception message: {e.Message}.";
+				Logger.LogError(message, e);
+				return false;
+			}
+		}
+
+		public async Task<bool> SendMultipleDiscreteCommand(Dictionary<long, int> commands, CommandOriginType commandOrigin)
+		{
+			string verboseMessage = $"{baseLogString} entering SendMultipleDiscreteCommand method. Commands count: {commands.Count}, Command Origin: {commandOrigin}";
+			Logger.LogVerbose(verboseMessage);
+
+			try
+			{
+				var nonArtificalCommands = new Dictionary<long, ushort>();
+
+				foreach (var measurementGid in commands.Keys)
+                {
+					ushort value = (ushort)commands[measurementGid];
+					DiscreteMeasurement measurement = await GetDiscreteMeasurement(measurementGid);
+
+					if (measurement != null && !(measurement is ArtificalDiscreteMeasurement))
+					{
+						nonArtificalCommands.Add(measurementGid, value);
+					}
+					else
+					{
+						Dictionary<long, DiscreteModbusData> data = new Dictionary<long, DiscreteModbusData>(1)
+						{
+							{ measurementGid, new DiscreteModbusData(value, AlarmType.NO_ALARM, measurementGid, commandOrigin) }
+						};
+
+						await UpdateDiscreteMeasurement(data);
+					}
+				}
+
+				Logger.LogDebug($"{baseLogString} SendMultipleDiscreteCommand => Calling Send multiple discrete command from scada commanding client.");
+				var scadaCommandingClient = ScadaCommandingClient.CreateClient();
+				var success = await scadaCommandingClient.SendMultipleDiscreteCommand(nonArtificalCommands, commandOrigin);
+				Logger.LogDebug($"{baseLogString} SendMultipleDiscreteCommand => Send multiple discrete command from scada commanding client called.");
+
+				return success;
+			}
+			catch (Exception e)
+			{
+				string message = $"{baseLogString} SendMultipleDiscreteCommand => Failed. Exception message: {e.Message}.";
+				Logger.LogError(message, e);
+				return false;
 			}
 		}
 		#endregion Commanding
@@ -985,7 +1060,7 @@ namespace CE.MeasurementProviderImplementation
 
 			return measurementsToElement.Value;
 		}
-		#endregion CacheGetter
-		#endregion Private Methods
-	}
+        #endregion CacheGetter
+        #endregion Private Methods
+    }
 }

@@ -49,8 +49,8 @@ namespace OMS.Common.Cloud.Names
         public const string OmsEquipmentAccessEndpoint = "OmsEquipmentAccessEndpoint";
         public const string OmsConsumerAccessEndpoint = "OmsConsumerAccessEndpoint";
         
-        public const string OmsModelReadAccessEndpoint = "OmsModelReadAccessEndpoint";
-        public const string OmsModelUpdateAccessEndpoint = "OmsModelUpdateAccessEndpoint";
+        //public const string OmsModelReadAccessEndpoint = "OmsModelReadAccessEndpoint";
+        //public const string OmsModelUpdateAccessEndpoint = "OmsModelUpdateAccessEndpoint";
 
         public const string OmsTracingAlgorithmEndpoint = "OmsTracingAlgorithmEndpoint";
 

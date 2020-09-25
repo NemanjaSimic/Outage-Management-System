@@ -21,7 +21,7 @@
         public const string PubSubService = "PubSubService";
 
         //OMS
-        public const string OmsModelProviderService = "OMS.ModelProviderService";
+        //public const string OmsModelProviderService = "OMS.ModelProviderService";
         public const string OmsCallTrackingService = "OMS.CallTrackingService";
         public const string OmsHistoryDBManagerService = "OMS.HistoryDBManagerService";
         public const string OmsOutageLifecycleSerivice = "OMS.OutageLifecycleService";

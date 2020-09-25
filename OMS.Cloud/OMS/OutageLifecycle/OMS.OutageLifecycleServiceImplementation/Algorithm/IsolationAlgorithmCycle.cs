@@ -8,7 +8,6 @@ using OMS.Common.Cloud.Logger;
 using OMS.Common.Cloud.ReliableCollectionHelpers;
 using OMS.Common.PubSubContracts.DataContracts.SCADA;
 using OMS.Common.WcfClient.OMS.ModelAccess;
-using OMS.Common.WcfClient.OMS.ModelProvider;
 using OMS.OutageLifecycleImplementation.Helpers;
 using System;
 using System.Collections.Generic;
@@ -34,6 +33,8 @@ namespace OMS.OutageLifecycleImplementation.Algorithm
         private bool isStartedIsolationAlgorithmsInitialized;
         private bool isMonitoredHeadBreakerMeasurementsInitialized;
         private bool isOutageTopologyModelInitialized;
+        private bool isOptimumIsolationPointsInitialized;
+        private bool isCommandedElementsInitialized;
 
         private bool ReliableDictionariesInitialized
         {
@@ -41,7 +42,9 @@ namespace OMS.OutageLifecycleImplementation.Algorithm
             {
                 return isStartedIsolationAlgorithmsInitialized &&
                        isMonitoredHeadBreakerMeasurementsInitialized &&
-                       isOutageTopologyModelInitialized;
+                       isOutageTopologyModelInitialized &&
+                       isOptimumIsolationPointsInitialized &&
+                       isCommandedElementsInitialized;
             }
         }
 
@@ -61,6 +64,19 @@ namespace OMS.OutageLifecycleImplementation.Algorithm
         private ReliableDictionaryAccess<string, OutageTopologyModel> OutageTopologyModel
         {
             get { return outageTopologyModel; }
+        }
+
+        //TODO: for now value is allways 0
+        private ReliableDictionaryAccess<long, long> optimumIsolationPoints;
+        private ReliableDictionaryAccess<long, long> OptimumIsolationPoints
+        {
+            get { return optimumIsolationPoints; }
+        }
+
+        private ReliableDictionaryAccess<long, DiscreteCommandingType> commandedElements;
+        private ReliableDictionaryAccess<long, DiscreteCommandingType> CommandedElements
+        {
+            get { return commandedElements; }
         }
 
         private async void OnStateManagerChangedHandler(object sender, NotifyStateManagerChangedEventArgs e)
@@ -94,6 +110,22 @@ namespace OMS.OutageLifecycleImplementation.Algorithm
                     string debugMessage = $"{baseLogString} OnStateManagerChangedHandler => '{ReliableDictionaryNames.OutageTopologyModel}' ReliableDictionaryAccess initialized.";
                     Logger.LogDebug(debugMessage);
                 }
+                else if (reliableStateName == ReliableDictionaryNames.OptimumIsolationPoints)
+                {
+                    this.optimumIsolationPoints = await ReliableDictionaryAccess<long, long>.Create(stateManager, ReliableDictionaryNames.OptimumIsolationPoints);
+                    this.isOptimumIsolationPointsInitialized = true;
+
+                    string debugMessage = $"{baseLogString} OnStateManagerChangedHandler => '{ReliableDictionaryNames.OptimumIsolationPoints}' ReliableDictionaryAccess initialized.";
+                    Logger.LogDebug(debugMessage);
+                }
+                else if (reliableStateName == ReliableDictionaryNames.CommandedElements)
+                {
+                    this.commandedElements = await ReliableDictionaryAccess<long, DiscreteCommandingType>.Create(stateManager, ReliableDictionaryNames.CommandedElements);
+                    this.isCommandedElementsInitialized = true;
+
+                    string debugMessage = $"{baseLogString} OnStateManagerChangedHandler => '{ReliableDictionaryNames.CommandedElements}' ReliableDictionaryAccess initialized.";
+                    Logger.LogDebug(debugMessage);
+                }
             }
         }
         #endregion Reliable Dictionaries
@@ -122,6 +154,8 @@ namespace OMS.OutageLifecycleImplementation.Algorithm
             this.isStartedIsolationAlgorithmsInitialized = false;
             this.isMonitoredHeadBreakerMeasurementsInitialized = false;
             this.isOutageTopologyModelInitialized = false;
+            this.isOptimumIsolationPointsInitialized = false;
+            this.isCommandedElementsInitialized = false;
 
             this.stateManager = stateManager;
             this.stateManager.StateManagerChanged += this.OnStateManagerChangedHandler;
@@ -135,7 +169,6 @@ namespace OMS.OutageLifecycleImplementation.Algorithm
             }
 
             var enumerableStartedAlgorithms = await StartedIsolationAlgorithms.GetEnumerableDictionaryAsync();
-
             if(enumerableStartedAlgorithms.Count == 0)
             {
                 Logger.LogVerbose($"{baseLogString} Start => No started algorithms.");
@@ -143,7 +176,6 @@ namespace OMS.OutageLifecycleImplementation.Algorithm
             }
 
             var enumerableTopology = await OutageTopologyModel.GetEnumerableDictionaryAsync();
-
             if (!enumerableTopology.ContainsKey(ReliableDictionaryNames.OutageTopologyModel))
             {
                 Logger.LogError($"{baseLogString} Start => Topology not found in Rel Dictionary: {ReliableDictionaryNames.OutageTopologyModel}.");
@@ -162,13 +194,13 @@ namespace OMS.OutageLifecycleImplementation.Algorithm
         }
 
 
-        private async Task StartIndividualAlgorithmCycle(IsolationAlgorithm algorithm, OutageTopologyModel topology)
+        private async Task<bool> StartIndividualAlgorithmCycle(IsolationAlgorithm algorithm, OutageTopologyModel topology)
         {
             //END CONDITION - poslednji otvoren brejker se nije otvorio vise od 'cycleUpperLimit' milisekundi => on predstavlja prvu optimalnu izolacionu tacku
             if (algorithm.CycleCounter * CycleInterval > CycleUpperLimit)
             {
                 await FinishIndividualAlgorithmCycle(algorithm, topology);
-                return;
+                return true;
             }
 
             #region Check if HeadBreaker has OPENED after the last cycle
@@ -177,7 +209,7 @@ namespace OMS.OutageLifecycleImplementation.Algorithm
             if(!result.HasValue)
             {
                 Logger.LogError($"{baseLogString} StartIndividualAlgorithmCycle => HeadBreakerMeasurement with gid: 0x{algorithm.HeadBreakerMeasurementGid:X16} not found in {ReliableDictionaryNames.MonitoredHeadBreakerMeasurements}.");
-                return;
+                return false;
             }
 
             var headMeasurementData = result.Value;
@@ -187,44 +219,61 @@ namespace OMS.OutageLifecycleImplementation.Algorithm
                 //by exiting now we apply the logical WAITING (cycle mechanism in RunAsync):
                 //1) For HeadBreaker to open => moving to next breaker
                 //2) For "time" to run up => FinishIndividualAlgorithmCycle
+                
+                //TODO: otvoriti commanded elmenetn kolekciju, ako komanda heda nije prosla - ne uvecavati counter, meri se vreme od izvrsene komande...
+                
                 algorithm.CycleCounter++;
-                return;
+                return true;
             }
             #endregion
-            
-            //Closing current breaker, before moving to the next breaker
-            await lifecycleHelper.SendScadaCommandAsync(algorithm.CurrentBreakerGid, DiscreteCommandingType.CLOSE);
-            algorithm.CycleCounter = 0;
 
-            var outageModelReadAccessClient = OutageModelReadAccessClient.CreateClient();
-            if ((await outageModelReadAccessClient.GetElementById(algorithm.CurrentBreakerGid)) == null) //todo: cemu ovaj uslov?
+            //Closing current breaker, before moving to the next breaker
+            var commands = new Dictionary<long, DiscreteCommandingType>
             {
-                Logger.LogError($"{baseLogString} StartIndividualAlgorithmCycle => HeadBreakerMeasurement with gid: 0x{algorithm.HeadBreakerMeasurementGid:X16} not found in {ReliableDictionaryNames.MonitoredHeadBreakerMeasurements}.");
-                return;
-            }
+                { algorithm.CurrentBreakerGid, DiscreteCommandingType.CLOSE },
+            };
+
+            algorithm.CycleCounter = 0;
 
             //moving to the next breaker
             algorithm.CurrentBreakerGid = lifecycleHelper.GetNextBreaker(algorithm.CurrentBreakerGid, topology);
             Logger.LogDebug($"{baseLogString} StartIndividualAlgorithmCycle => Next breaker gid is 0x{algorithm.CurrentBreakerGid:X16}.");
 
+            if (algorithm.CurrentBreakerGid <= 0 || !topology.GetElementByGid(algorithm.CurrentBreakerGid, out OutageTopologyElement elment))
+            {
+                Logger.LogError($"{baseLogString} StartIndividualAlgorithmCycle => HeadBreakerMeasurement with gid: 0x{algorithm.HeadBreakerMeasurementGid:X16} not found in {ReliableDictionaryNames.MonitoredHeadBreakerMeasurements}.");
+                return false;
+            }
+
             //reaching the end of the feeder - ending the algorithm
             //TODO: see if algorithm is ended well for this case...
-            if (algorithm.CurrentBreakerGid <= 0 || algorithm.CurrentBreakerGid == algorithm.RecloserGid)
+            if (algorithm.CurrentBreakerGid == algorithm.RecloserGid)
             {
+                //todo: iz ovog ifa prebaciti na mesto poziva ove metode, pa ako ona vrati false, primeniti ono sto je u ovom ifu 
                 await StartedIsolationAlgorithms.TryRemoveAsync(algorithm.HeadBreakerGid);
                 await MonitoredHeadBreakerMeasurements.TryRemoveAsync(algorithm.HeadBreakerMeasurementGid);
 
-                var outageModelUpdateAccessClient = OutageModelUpdateAccessClient.CreateClient();
-                await outageModelUpdateAccessClient.UpdateCommandedElements(0, ModelUpdateOperationType.CLEAR); //TODO: zasto uvek skrnava resenja (ova 0 kao prvi parametar)? - treba izdvojiti posebnu metodu za clear...
+                //TODO: remove from new REL DICT 
 
                 string message = $"{baseLogString} StartIndividualAlgorithmCycle => End of the feeder, no outage detected.";
                 Logger.LogWarning(message);
-                throw new Exception(message);
+                //throw new Exception(message);
+                return false;
             }
 
-            await lifecycleHelper.SendScadaCommandAsync(algorithm.CurrentBreakerGid, DiscreteCommandingType.OPEN);
-            await lifecycleHelper.SendScadaCommandAsync(algorithm.HeadBreakerGid, DiscreteCommandingType.CLOSE);
+            commands.Add(algorithm.CurrentBreakerGid, DiscreteCommandingType.OPEN);
+            commands.Add(algorithm.HeadBreakerGid, DiscreteCommandingType.CLOSE);
+            var enumerableCommandedElements = await CommandedElements.GetEnumerableDictionaryAsync();
+
+            if (!await lifecycleHelper.SendMultipleScadaCommandAsync(commands, enumerableCommandedElements, CommandOriginType.ISOLATING_ALGORITHM_COMMAND))
+            {
+                string message = $"{baseLogString} StartIndividualAlgorithmCycle => Sending multiple command failed.";
+                return false;
+            }
+
             await StartedIsolationAlgorithms.SetAsync(algorithm.HeadBreakerGid, algorithm);
+
+            return true;
         }
 
         private async Task SetDefaultIsolationPoints(OutageEntity outageEntity, IsolationAlgorithm algorithm)
@@ -243,6 +292,7 @@ namespace OMS.OutageLifecycleImplementation.Algorithm
             outageEntity.DefaultIsolationPoints = new List<Equipment>() { headBreakerEquipment, recloserEquipment };
         }
 
+        //TODO: da li ovo radi ovako po referenci?
         private async Task SetOptimumIsolationPoints(OutageEntity outageEntity, IsolationAlgorithm algorithm, OutageTopologyModel topology)
         {
             long firstOptimumIsolationPointGid = algorithm.CurrentBreakerGid;
@@ -276,9 +326,8 @@ namespace OMS.OutageLifecycleImplementation.Algorithm
             }
 
             //TODO: end of - remove head id... await registerSubscriberClient.UnsubscribeFromAllTopics(MicroserviceNames.OmsOutageLifecycleService);
-            var outageModelUpdateAccessClient = OutageModelUpdateAccessClient.CreateClient();
-            await outageModelUpdateAccessClient.UpdateOptimumIsolationPoints(firstOptimumIsolationPointGid, ModelUpdateOperationType.INSERT);
-            await outageModelUpdateAccessClient.UpdateOptimumIsolationPoints(secondOptimumIsolationPointGid, ModelUpdateOperationType.INSERT);
+            await OptimumIsolationPoints.SetAsync(firstOptimumIsolationPointGid, 0);
+            await OptimumIsolationPoints.SetAsync(secondOptimumIsolationPointGid, 0);
 
             outageEntity.OptimumIsolationPoints = new List<Equipment>() { firstOptimumIsolationPointEquipment, secondOptimumIsolationPointEquipment };
         }
@@ -290,8 +339,10 @@ namespace OMS.OutageLifecycleImplementation.Algorithm
                 await StartedIsolationAlgorithms.TryRemoveAsync(algorithm.HeadBreakerGid);
                 await MonitoredHeadBreakerMeasurements.TryRemoveAsync(algorithm.HeadBreakerMeasurementGid);
 
-                var outageModelUpdateAccessClientOnError = OutageModelUpdateAccessClient.CreateClient();
-                await outageModelUpdateAccessClientOnError.UpdateCommandedElements(0, ModelUpdateOperationType.CLEAR); //TODO: zasto uvek skrnava resenja (ova 0 kao prvi parametar)? - treba izdvojiti posebnu metodu za clear...
+                //var outageModelUpdateAccessClientOnError = OutageModelUpdateAccessClient.CreateClient();
+                //await outageModelUpdateAccessClientOnError.UpdateCommandedElements(0, ModelUpdateOperationType.CLEAR); //TODO: zasto uvek skrnava resenja (ova 0 kao prvi parametar)? - treba izdvojiti posebnu metodu za clear...
+                //TODO: koje komandovane vrednosti pripadaju kojem algoritmu? i da li je moguce da neke preteknu? - GRUPISATI KOMANDOVANE VREDNOSTI PREMA 'VLASNICIMA'
+                //TODO: isto raditi i sa optimaalnim tackama - napraviti mapu gidElementa optimalne tacke, sa gidom necega cemu pripadaju.... recimo...
 
                 string message = $"{baseLogString} FinishIndividualAlgorithmCycle => End of the feeder, no outage detected.";
                 Logger.LogWarning(message);
@@ -313,14 +364,26 @@ namespace OMS.OutageLifecycleImplementation.Algorithm
             //ISOLATE on optimum points
             var firstOptimumPoint = outageToIsolate.OptimumIsolationPoints[0];
             var secondOptimumPoint = outageToIsolate.OptimumIsolationPoints[1];
-            await lifecycleHelper.SendScadaCommandAsync(firstOptimumPoint.EquipmentId, DiscreteCommandingType.OPEN);
-            await lifecycleHelper.SendScadaCommandAsync(secondOptimumPoint.EquipmentId, DiscreteCommandingType.OPEN);
+
+            var commands = new Dictionary<long, DiscreteCommandingType>
+            {
+                { firstOptimumPoint.EquipmentId, DiscreteCommandingType.OPEN },
+                { secondOptimumPoint.EquipmentId, DiscreteCommandingType.OPEN },
+            };
+
+            var enumerableCommandedElements = await CommandedElements.GetEnumerableDictionaryAsync();
+            if(!await lifecycleHelper.SendMultipleScadaCommandAsync(commands, enumerableCommandedElements, CommandOriginType.ISOLATING_ALGORITHM_COMMAND))
+            {
+                string message = $"{baseLogString} FinishIndividualAlgorithmCycle => ";
+                Logger.LogError(message);
+                throw new Exception(message);
+            }
 
             long outageElementGid = topology.OutageTopology[secondOptimumPoint.EquipmentId].FirstEnd;
 
             if (!topology.OutageTopology[firstOptimumPoint.EquipmentId].SecondEnd.Contains(outageElementGid))
             {
-                string message = $"Outage element with gid: 0x{outageElementGid:X16} is not on a second end of current breaker id";
+                string message = $"{baseLogString} FinishIndividualAlgorithmCycle => Outage element with gid: 0x{outageElementGid:X16} is not on a second end of current breaker id";
                 Logger.LogError(message);
                 throw new Exception(message);
             }
@@ -331,74 +394,12 @@ namespace OMS.OutageLifecycleImplementation.Algorithm
 
             Logger.LogInformation($"{baseLogString} FinishIndividualAlgorithmCycle => Isolation of outage with id: {outageToIsolate.OutageId}. Optimum isolation points: 0x{outageToIsolate.OptimumIsolationPoints[0].EquipmentId:X16} and 0x{outageToIsolate.OptimumIsolationPoints[1].EquipmentId:X16}, and outage element id is 0x{outageElementGid:X16}");
 
-            var outageModelUpdateAccessClient = OutageModelUpdateAccessClient.CreateClient();
-            await outageModelUpdateAccessClient.UpdateCommandedElements(0, ModelUpdateOperationType.CLEAR);
+            //var outageModelUpdateAccessClient = OutageModelUpdateAccessClient.CreateClient();
+            //await outageModelUpdateAccessClient.UpdateCommandedElements(0, ModelUpdateOperationType.CLEAR);
+            //TODO ponovo, koja komandovana vrednost pripada kome...
 
             await lifecycleHelper.PublishOutageAsync(Topic.ACTIVE_OUTAGE, outageMessageMapper.MapOutageEntity(outageToIsolate));
             Logger.LogInformation($"{baseLogString} FinishIndividualAlgorithmCycle => Outage with id: 0x{outageToIsolate.OutageId:x16} is successfully published.");
         }
-
-        //void Foo()
-        //{
-        //    long nextBreakerId = lifecycleHelper.GetNextBreaker(currentBreakerGid, topology);
-
-        //    if (currentBreakerGid == 0 || currentBreakerGid == recloserGid)
-        //    {
-        //        string message = "End of the feeder, no outage detected.";
-        //        Logger.LogWarning(message);
-        //        //TODO: end of - remove head id... await registerSubscriberClient.UnsubscribeFromAllTopics(MicroserviceNames.OmsOutageLifecycleService);
-        //        //var outageModelUpdateAccessClient = OutageModelUpdateAccessClient.CreateClient();
-        //        await outageModelUpdateAccessClient.UpdateCommandedElements(0, ModelUpdateOperationType.CLEAR);
-        //        //outageModel.commandedElements.Clear();
-        //        throw new Exception(message);
-        //    }
-
-        //    var equipmentAccessClient = EquipmentAccessClient.CreateClient();
-        //    Equipment headBreakerEquipment = await equipmentAccessClient.GetEquipment(headBreakerGid);
-        //    Equipment recloserEquipment = await equipmentAccessClient.GetEquipment(recloserGid);
-
-        //    if (recloserEquipment == null || headBreakerEquipment == null)
-        //    {
-        //        string message = "Recloser or HeadBreaker were not found in database";
-        //        Logger.LogError(message);
-        //        throw new Exception(message);
-        //    }
-
-        //    outageToIsolate.OptimumIsolationPoints = new List<Equipment>() { headBreakerEquipment, recloserEquipment };
-
-        //    if (!topology.OutageTopology.ContainsKey(nextBreakerId))
-        //    {
-        //        string message = $"Breaker (next breaker) with id: 0x{nextBreakerId:X16} is not in topology";
-        //        Logger.LogError(message);
-        //        throw new Exception(message);
-        //    }
-
-        //    long outageElement = topology.OutageTopology[nextBreakerId].FirstEnd;
-
-        //    if (!topology.OutageTopology[currentBreakerGid].SecondEnd.Contains(outageElement))
-        //    {
-        //        string message = $"Outage element with gid: 0x{outageElement:X16} is not on a second end of current breaker id";
-        //        Logger.LogError(message);
-        //        throw new Exception(message);
-        //    }
-
-        //    //TODO: end of - remove head id... await registerSubscriberClient.UnsubscribeFromAllTopics(MicroserviceNames.OmsOutageLifecycleService);
-        //    //var outageModelUpdateAccessClient = OutageModelUpdateAccessClient.CreateClient();
-        //    await outageModelUpdateAccessClient.UpdateOptimumIsolationPoints(currentBreakerGid, ModelUpdateOperationType.INSERT);
-        //    await outageModelUpdateAccessClient.UpdateOptimumIsolationPoints(nextBreakerId, ModelUpdateOperationType.INSERT);
-
-        //    await lifecycleHelper.SendScadaCommandAsync(currentBreakerGid, DiscreteCommandingType.OPEN);
-        //    await lifecycleHelper.SendScadaCommandAsync(nextBreakerId, DiscreteCommandingType.OPEN);
-
-        //    outageToIsolate.IsolatedTime = DateTime.UtcNow;
-        //    outageToIsolate.OutageElementGid = outageElement;
-        //    outageToIsolate.OutageState = OutageState.ISOLATED;
-
-        //    Logger.LogInformation($"Isolation of outage with id {outageToIsolate.OutageId}. Optimum isolation points: 0x{currentBreakerGid:X16} and 0x{nextBreakerId:X16}, and outage element id is 0x{outageElement:X16}");
-
-        //    //todo: this line goes after return TRUE from code above...
-        //    //var outageModelUpdateAccessClient = OutageModelUpdateAccessClient.CreateClient();
-        //    await outageModelUpdateAccessClient.UpdateCommandedElements(0, ModelUpdateOperationType.CLEAR);
-        //}
     }
 }

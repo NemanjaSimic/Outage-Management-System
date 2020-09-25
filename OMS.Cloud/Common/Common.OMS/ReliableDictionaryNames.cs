@@ -13,7 +13,7 @@
         //OMS.ModelProviderService
         public const string OutageTopologyModel = "OutageTopologyModel";
         public const string CommandedElements = "CommandedElements";
-        public const string OptimumIsolatioPoints = "OptimumIsolatioPoints";
+        public const string OptimumIsolationPoints = "OptimumIsolatioPoints";
 
         //OMS.OutageLifecycleService
         //public const string OutageTopologyModel = "OutageTopologyModel";

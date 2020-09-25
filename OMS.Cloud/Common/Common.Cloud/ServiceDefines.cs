@@ -74,7 +74,7 @@ namespace OMS.Common.Cloud
                 { MicroserviceNames.CeTopologyProviderService,      ServiceType.STATEFUL_SERVICE    },
                 
                 //OMS
-                { MicroserviceNames.OmsModelProviderService,        ServiceType.STATEFUL_SERVICE    },
+                //{ MicroserviceNames.OmsModelProviderService,        ServiceType.STATEFUL_SERVICE    },
                 { MicroserviceNames.OmsOutageLifecycleService,      ServiceType.STATEFUL_SERVICE    },
                 { MicroserviceNames.OmsCallTrackingService,         ServiceType.STATEFUL_SERVICE    },
                 { MicroserviceNames.OmsHistoryDBManagerService,     ServiceType.STATEFUL_SERVICE    },
@@ -115,7 +115,7 @@ namespace OMS.Common.Cloud
                 { MicroserviceNames.CeTopologyProviderService,      new Uri("fabric:/OMS.Cloud/CE.TopologyProviderService")             },
 
                 //OMS
-                { MicroserviceNames.OmsModelProviderService,        new Uri("fabric:/OMS.Cloud/OMS.ModelProviderService")               },
+                //{ MicroserviceNames.OmsModelProviderService,        new Uri("fabric:/OMS.Cloud/OMS.ModelProviderService")               },
                 { MicroserviceNames.OmsCallTrackingService,         new Uri("fabric:/OMS.Cloud/OMS.CallTrackingService")                },
                 { MicroserviceNames.OmsHistoryDBManagerService,     new Uri("fabric:/OMS.Cloud/OMS.HistoryDBManagerService")            },
                 { MicroserviceNames.OmsOutageLifecycleService,      new Uri("fabric:/OMS.Cloud/OMS.OutageLifecycleService")             },

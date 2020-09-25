@@ -38,8 +38,6 @@ namespace Common.Web.Mappers
         => equipments.Select(e => MapEquipment(e)).ToList();
 
         public IEnumerable<EquipmentViewModel> MapEquipments(IEnumerable<EquipmentMessage> equipments)
-        {
-            throw new System.NotImplementedException();
-        }
+        => equipments.Select(e => MapEquipment(e)).ToList();
     }
 }

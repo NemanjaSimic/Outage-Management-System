@@ -9,9 +9,9 @@ namespace Common.CeContracts
 	public interface ISwitchStatusCommandingContract : IService, IHealthChecker
 	{
 		[OperationContract]
-		Task SendOpenCommand(long gid);
+		Task<bool> SendOpenCommand(long gid);
 
 		[OperationContract]
-		Task SendCloseCommand(long gid);
+		Task<bool> SendCloseCommand(long gid);
 	}
 }

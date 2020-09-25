@@ -125,6 +125,9 @@ namespace OMS.Common.Cloud
         ISOLATING_ALGORITHM_COMMAND,
 
         [EnumMember]
+        LOCATION_AND_ISOLATING_ALGORITHM_COMMAND,
+
+        [EnumMember]
         CE_COMMAND,
 
         [EnumMember]

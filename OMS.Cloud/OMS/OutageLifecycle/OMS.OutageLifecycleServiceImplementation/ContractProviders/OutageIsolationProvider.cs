@@ -9,7 +9,6 @@ using OMS.Common.Cloud.ReliableCollectionHelpers;
 using OMS.Common.NmsContracts;
 using OMS.Common.PubSubContracts.DataContracts.SCADA;
 using OMS.Common.WcfClient.CE;
-using OMS.Common.WcfClient.OMS.ModelProvider;
 using OMS.Common.WcfClient.SCADA;
 using OMS.OutageLifecycleImplementation.Algorithm;
 using OMS.OutageLifecycleImplementation.Helpers;
@@ -272,17 +271,12 @@ namespace OMS.OutageLifecycleImplementation.ContractProviders
                 {
                     headBreaker = defaultIsolationPoints[0];
                 }
-
-                var outageModelUpdateAccessClient = OutageModelUpdateAccessClient.CreateClient();
-                await outageModelUpdateAccessClient.UpdateCommandedElements(headBreaker, ModelUpdateOperationType.INSERT);
             }
             else
             {
                 if (!isFirstBreakerRecloser)
                 {
                     headBreaker = defaultIsolationPoints[0];
-                    var outageModelUpdateAccessClient = OutageModelUpdateAccessClient.CreateClient();
-                    await outageModelUpdateAccessClient.UpdateCommandedElements(headBreaker, ModelUpdateOperationType.INSERT);
                 }
                 else
                 {
@@ -307,9 +301,6 @@ namespace OMS.OutageLifecycleImplementation.ContractProviders
                 {
                     recloser = defaultIsolationPoints[1];
                 }
-
-                var outageModelUpdateAccessClient = OutageModelUpdateAccessClient.CreateClient();
-                await outageModelUpdateAccessClient.UpdateCommandedElements(recloser, ModelUpdateOperationType.INSERT);
             }
 
             return recloser;

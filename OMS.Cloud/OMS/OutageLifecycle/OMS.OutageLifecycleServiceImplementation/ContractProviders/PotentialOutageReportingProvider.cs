@@ -1,8 +1,6 @@
 ﻿using Common.OMS;
 using Common.OmsContracts.DataContracts.OutageDatabaseModel;
 using Common.OmsContracts.HistoryDBManager;
-using Common.OmsContracts.ModelAccess;
-using Common.OmsContracts.ModelProvider;
 using Common.OmsContracts.OutageLifecycle;
 using Common.PubSubContracts.DataContracts.CE;
 using Microsoft.ServiceFabric.Data;
@@ -13,7 +11,6 @@ using OMS.Common.Cloud.ReliableCollectionHelpers;
 using OMS.Common.WcfClient.CE;
 using OMS.Common.WcfClient.OMS.HistoryDBManager;
 using OMS.Common.WcfClient.OMS.ModelAccess;
-using OMS.Common.WcfClient.OMS.ModelProvider;
 using OMS.OutageLifecycleImplementation.Helpers;
 using System;
 using System.Collections.Generic;
@@ -40,6 +37,8 @@ namespace OMS.OutageLifecycleImplementation.ContractProviders
 		#region Reliable Dictionaries
 		private bool isRecloserOutageMapInitialized;
         private bool isOutageTopologyModelInitialized;
+        private bool isOptimumIsolationPointsInitialized;
+        private bool isCommandedElementsInitialized;
         private bool isPotentialOutagesQueueInitialized;
 
         private bool ReliableDictionariesInitialized
@@ -47,7 +46,9 @@ namespace OMS.OutageLifecycleImplementation.ContractProviders
 			get
 			{
 				return isRecloserOutageMapInitialized &&
-                       isOutageTopologyModelInitialized && 
+                       isOutageTopologyModelInitialized &&
+                       isOptimumIsolationPointsInitialized &&
+                       isCommandedElementsInitialized &&
                        isPotentialOutagesQueueInitialized;
 			}
 		}
@@ -62,6 +63,19 @@ namespace OMS.OutageLifecycleImplementation.ContractProviders
         private ReliableDictionaryAccess<string, OutageTopologyModel> OutageTopologyModel
         {
             get { return outageTopologyModel; }
+        }
+
+        //TODO: for now value is allways 0
+        private ReliableDictionaryAccess<long, long> optimumIsolationPoints;
+        private ReliableDictionaryAccess<long, long> OptimumIsolationPoints
+        {
+            get { return optimumIsolationPoints; }
+        }
+
+        private ReliableDictionaryAccess<long, DiscreteCommandingType> commandedElements;
+        private ReliableDictionaryAccess<long, DiscreteCommandingType> CommandedElements
+        {
+            get { return commandedElements; }
         }
 
         private ReliableQueueAccess<PotentialOutageCommand> potentialOutagesQueue;
@@ -93,6 +107,22 @@ namespace OMS.OutageLifecycleImplementation.ContractProviders
                     string debugMessage = $"{baseLogString} OnStateManagerChangedHandler => '{ReliableDictionaryNames.OutageTopologyModel}' ReliableDictionaryAccess initialized.";
                     Logger.LogDebug(debugMessage);
                 }
+                else if (reliableStateName == ReliableDictionaryNames.OptimumIsolationPoints)
+                {
+                    this.optimumIsolationPoints = await ReliableDictionaryAccess<long, long>.Create(stateManager, ReliableDictionaryNames.OptimumIsolationPoints);
+                    this.isOptimumIsolationPointsInitialized = true;
+
+                    string debugMessage = $"{baseLogString} OnStateManagerChangedHandler => '{ReliableDictionaryNames.OptimumIsolationPoints}' ReliableDictionaryAccess initialized.";
+                    Logger.LogDebug(debugMessage);
+                }
+                else if (reliableStateName == ReliableDictionaryNames.CommandedElements)
+                {
+                    this.commandedElements = await ReliableDictionaryAccess<long, DiscreteCommandingType>.Create(stateManager, ReliableDictionaryNames.CommandedElements);
+                    this.isCommandedElementsInitialized = true;
+
+                    string debugMessage = $"{baseLogString} OnStateManagerChangedHandler => '{ReliableDictionaryNames.CommandedElements}' ReliableDictionaryAccess initialized.";
+                    Logger.LogDebug(debugMessage);
+                }
                 else if (reliableStateName == ReliableQueueNames.PotentialOutages)
                 {
                     this.potentialOutagesQueue = await ReliableQueueAccess<PotentialOutageCommand>.Create(stateManager, ReliableQueueNames.PotentialOutages);
@@ -122,6 +152,8 @@ namespace OMS.OutageLifecycleImplementation.ContractProviders
 			this.isRecloserOutageMapInitialized = false;
             this.isOutageTopologyModelInitialized = false;
             this.isPotentialOutagesQueueInitialized = false;
+            this.isCommandedElementsInitialized = false;
+            this.isOptimumIsolationPointsInitialized = false;
 
             this.stateManager = stateManager;
 			this.stateManager.StateManagerChanged += this.OnStateManagerChangedHandler;
@@ -188,9 +220,8 @@ namespace OMS.OutageLifecycleImplementation.ContractProviders
                 var affectedConsumersGids = GetAffectedConsumers(elementGid, topology, networkType);
 
                 var historyDBManagerClient = HistoryDBManagerClient.CreateClient();
-                var outageModelReadAccessClient = OutageModelReadAccessClient.CreateClient();
 
-                if (!(await CheckPreconditions(elementGid, commandOriginType, affectedConsumersGids, outageModelReadAccessClient, historyDBManagerClient)))
+                if (!(await CheckPreconditions(elementGid, commandOriginType, affectedConsumersGids, historyDBManagerClient)))
                 {
                     Logger.LogWarning($"{baseLogString} ReportPotentialOutage => Parameters do not satisfy required preconditions. ElementId: 0x{elementGid:X16}, CommandOriginType: {commandOriginType}");
                     return false;
@@ -345,7 +376,7 @@ namespace OMS.OutageLifecycleImplementation.ContractProviders
             }
         }
 
-        private async Task<bool> CheckPreconditions(long elementGid, CommandOriginType commandOriginType, List<long> affectedConsumersGids, IOutageModelReadAccessContract outageModelReadAccessClient, IHistoryDBManagerContract historyDBManagerClient)
+        private async Task<bool> CheckPreconditions(long elementGid, CommandOriginType commandOriginType, List<long> affectedConsumersGids, IHistoryDBManagerContract historyDBManagerClient)
         {
             if (this.ignorableCommandOriginTypes.Contains(commandOriginType))
             {
@@ -353,15 +384,15 @@ namespace OMS.OutageLifecycleImplementation.ContractProviders
                 return false;
             }
 
-            var commandedElements = await outageModelReadAccessClient.GetCommandedElements(); //TODO; naglasiti da li je samo ono sto je komandovano tokom IsolatingAlgorithma
-            var optimumIsolationPoints = await outageModelReadAccessClient.GetOptimumIsolatioPoints();
+            var enumerableCommandedElements = await CommandedElements.GetEnumerableDictionaryAsync(); //TODO; naglasiti da li je samo ono sto je komandovano tokom IsolatingAlgorithma
+            var enumerableOptimumIsolationPoints = await OptimumIsolationPoints.GetEnumerableDictionaryAsync();
 
-            if (commandedElements.ContainsKey(elementGid) || optimumIsolationPoints.ContainsKey(elementGid))
+            if (enumerableCommandedElements.ContainsKey(elementGid) || enumerableOptimumIsolationPoints.ContainsKey(elementGid))
             {
-                await historyDBManagerClient.OnSwitchOpened(elementGid, null);
-                await historyDBManagerClient.OnConsumerBlackedOut(affectedConsumersGids, null);
+                await historyDBManagerClient.OnSwitchOpened(elementGid, null); //TODO: zar se ovo ne resava na samom historiju?
+                await historyDBManagerClient.OnConsumerBlackedOut(affectedConsumersGids, null); //TODO: zar se ovo ne resava na samom historiju?
 
-                Logger.LogWarning($"{baseLogString} CheckPreconditions => ElementGid 0x{elementGid:X16} not found in commandedElements or optimumIsolationPoints.");
+                Logger.LogWarning($"{baseLogString} CheckPreconditions => ElementGid 0x{elementGid:X16} not found in commandedElements or optimumIsolationPoints."); //TODO: DA LI JE USLOV DOBRO POSTAVLJEN??
                 return false;
             }
 
