@@ -121,6 +121,20 @@ namespace CE.TopologyProviderImplementation
                                 Value = discreteMeasurement.GetCurrentValue()
                             });
                         }
+                        else
+                        {
+                            Logger.LogDebug($"{baseLogString} ConvertTopologyToUIModel => Calling GetDiscreteMeasurement method from measurement provider client for measurement GID {measurementGid:X16}.");
+                            var measurementProviderClient = MeasurementProviderClient.CreateClient();
+                            DiscreteMeasurement discreteMeasurement = await measurementProviderClient.GetDiscreteMeasurement(measurementGid);
+                            Logger.LogDebug($"{baseLogString} ConvertTopologyToUIModel => GetDiscreteMeasurement method from measurement provider client has been called successfully.");
+
+                            measurements.Add(new UIMeasurement()
+                            {
+                                Gid = discreteMeasurement.Id,
+                                Type = discreteMeasurement.GetMeasurementType(),
+                                Value = discreteMeasurement.GetCurrentValue()
+                            });
+                        }
                     }
 
 
