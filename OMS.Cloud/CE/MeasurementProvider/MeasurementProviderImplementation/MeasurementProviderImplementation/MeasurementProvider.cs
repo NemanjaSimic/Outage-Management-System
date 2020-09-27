@@ -902,11 +902,15 @@ namespace CE.MeasurementProviderImplementation
 
 			var modelProviderClient = CeModelProviderClient.CreateClient();
 
+			//TODO: see this
+			//if (measurementToElementMap.TryGetValue(measurementGid, out long recloserGid)
+			//	&& await modelProviderClient.IsRecloser(recloserGid)
+			//	&& (commandOrigin == CommandOriginType.USER_COMMAND
+			//		|| commandOrigin == CommandOriginType.ISOLATING_ALGORITHM_COMMAND 
+			//		|| commandOrigin == CommandOriginType.LOCATION_AND_ISOLATING_ALGORITHM_COMMAND))
 			if (measurementToElementMap.TryGetValue(measurementGid, out long recloserGid)
 				&& await modelProviderClient.IsRecloser(recloserGid)
-				&& (commandOrigin == CommandOriginType.USER_COMMAND
-					|| commandOrigin == CommandOriginType.ISOLATING_ALGORITHM_COMMAND 
-					|| commandOrigin == CommandOriginType.LOCATION_AND_ISOLATING_ALGORITHM_COMMAND))
+				&& commandOrigin == CommandOriginType.USER_COMMAND)
 			{
 				Logger.LogDebug($"{baseLogString} UpdateDiscreteMeasurement => Calling ResetRecloser on topology provider.");
 				var topologyProviderClient = TopologyProviderClient.CreateClient();
