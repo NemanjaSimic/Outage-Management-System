@@ -183,11 +183,11 @@ namespace OMS.OutageLifecycleImplementation.ContractProviders
             }
 
             var measurementMapClient = MeasurementMapClient.CreateClient();
-            //MODO: pokupiti if recloser podatak sa CE
-            bool isFirstBreakerRecloser = await lifecycleHelper.CheckIfBreakerIsRecloserAsync(defaultIsolationPoints[0]);
+            var ceModelProvider = CeModelProviderClient.CreateClient();
+            bool isFirstBreakerRecloser = await ceModelProvider.IsRecloser(defaultIsolationPoints[0]);
 
             #region HeadBreaker
-            long headBreakerGid = await lifecycleHelper.GetHeadBreakerAsync(defaultIsolationPoints, isFirstBreakerRecloser);
+            long headBreakerGid = await GetHeadBreakerAsync(defaultIsolationPoints, isFirstBreakerRecloser);
 
             if (headBreakerGid <= 0)
             {
@@ -213,7 +213,7 @@ namespace OMS.OutageLifecycleImplementation.ContractProviders
             #endregion HeadBreaker
 
             #region Recloser
-            long recloserGid = await lifecycleHelper.GetRecloserAsync(defaultIsolationPoints, isFirstBreakerRecloser);
+            long recloserGid = await GetRecloserAsync(defaultIsolationPoints, isFirstBreakerRecloser);
             long recloserMeasurementGid = -1;
 
             if (recloserGid > 0) //ne mora postojati recloser
@@ -256,6 +256,54 @@ namespace OMS.OutageLifecycleImplementation.ContractProviders
             };
 
             return new ConditionalValue<IsolationAlgorithm>(true, algorithm);
+        }
+
+        private async Task<long> GetHeadBreakerAsync(List<long> defaultIsolationPoints, bool isFirstBreakerRecloser)
+        {
+            long headBreaker = -1;
+            if (defaultIsolationPoints.Count == 2)
+            {
+                if (isFirstBreakerRecloser)
+                {
+                    headBreaker = defaultIsolationPoints[1];
+                }
+                else
+                {
+                    headBreaker = defaultIsolationPoints[0];
+                }
+            }
+            else
+            {
+                if (!isFirstBreakerRecloser)
+                {
+                    headBreaker = defaultIsolationPoints[0];
+                }
+                else
+                {
+                    Logger.LogWarning($"Invalid state: breaker with id 0x{defaultIsolationPoints[0]:X16} is the only default isolation element, but it is also a recloser.");
+                }
+            }
+
+            return headBreaker;
+        }
+
+        private async Task<long> GetRecloserAsync(List<long> defaultIsolationPoints, bool isFirstBreakerRecloser)
+        {
+            long recloser = -1;
+
+            if (defaultIsolationPoints.Count == 2)
+            {
+                if (isFirstBreakerRecloser)
+                {
+                    recloser = defaultIsolationPoints[0];
+                }
+                else
+                {
+                    recloser = defaultIsolationPoints[1];
+                }
+            }
+
+            return recloser;
         }
         #endregion Private Methods
     }

@@ -87,7 +87,14 @@ namespace WebAdapterService
         /// <param name="cancellationToken">Canceled when Service Fabric needs to shut down this service instance.</param>
         protected override async Task RunAsync(CancellationToken cancellationToken)
         {
-            //TEST Subscribe
+            while (!await SubscribeToTopics())
+            {
+                await Task.Delay(TimeSpan.FromMilliseconds(5_000), cancellationToken);
+            }
+        }
+
+        private async Task<bool> SubscribeToTopics()
+        {
             try
             {
                 var topics = new List<Topic>()
@@ -101,12 +108,18 @@ namespace WebAdapterService
 
                 var result = await registerSubscriberClient.SubscribeToTopics(topics, MicroserviceNames.WebAdapterService);
                 var subscriptions = await registerSubscriberClient.GetAllSubscribedTopics(MicroserviceNames.WebAdapterService);
+
+                Logger.LogDebug($"{baseLogString} SubscribeToTopics => subscribed to {subscriptions.Count} topics.");
+
+                return subscriptions.Count == topics.Count;
             }
             catch (Exception e)
             {
-                string errorMessage = $"{baseLogString} RynAsync => exception {e.Message}";
+                string errorMessage = $"{baseLogString} SubscribeToTopics => exception {e.Message}";
                 Logger.LogError(errorMessage, e);
                 ServiceEventSource.Current.ServiceMessage(this.Context, $"[WebAdapterService | Error] {errorMessage}");
+
+                return false;
             }
         }
     }

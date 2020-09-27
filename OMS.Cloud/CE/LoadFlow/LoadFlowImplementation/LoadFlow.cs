@@ -17,6 +17,8 @@ namespace CE.LoadFlowImplementation
 {
 	public class LoadFlow : ILoadFlowContract
     {
+        private const int recloserInterval = 20_000;
+
         #region Private fields
         private readonly string baseLogString;
 
@@ -80,6 +82,9 @@ namespace CE.LoadFlowImplementation
                     await SyncMachine(syncMachine, loadOfFeeders);
                 }
 
+                var commands = new Dictionary<long, float>();
+                var modbusData = new Dictionary<long, AnalogModbusData>();
+
                 foreach (var loadFeeder in loadOfFeeders)
                 {
                     if (feeders.TryGetValue(loadFeeder.Key, out ITopologyElement feeder))
@@ -96,22 +101,10 @@ namespace CE.LoadFlowImplementation
                         if (signalGid != 0)
                         {
                             Logger.LogDebug($"{baseLogString} UpdateLoadFlow => Calling SendAnalogCommand method from measurement provider. Measurement GID {signalGid:X16}, Value {loadFeeder.Value}.");
-                            var measurementProviderClient = MeasurementProviderClient.CreateClient();
-
-                            await measurementProviderClient.SendAnalogCommand(signalGid, loadFeeder.Value, CommandOriginType.CE_COMMAND);
-                            Logger.LogDebug($"{baseLogString} UpdateLoadFlow => SendAnalogCommand method from measurement provider successfully finished.");
+                            commands.Add(signalGid, loadFeeder.Value);
 
                             AlarmType alarmType = (loadFeeder.Value >= 36) ? AlarmType.HIGH_ALARM : AlarmType.NO_ALARM;
-
-                            Dictionary<long, AnalogModbusData> data = new Dictionary<long, AnalogModbusData>(1)
-                            {
-                                { signalGid, new AnalogModbusData(loadFeeder.Value, alarmType, signalGid, CommandOriginType.CE_COMMAND)}
-                            };
-
-                            Logger.LogDebug($"{baseLogString} UpdateLoadFlow => Calling update analog measurement method from measurement provider.");
-                            measurementProviderClient = MeasurementProviderClient.CreateClient();
-                            await measurementProviderClient.UpdateAnalogMeasurement(data);
-                            Logger.LogDebug($"{baseLogString} UpdateLoadFlow => Update analog measurement method from measurement provider successfully finished.");
+                            modbusData.Add(signalGid, new AnalogModbusData(loadFeeder.Value, alarmType, signalGid, CommandOriginType.CE_COMMAND));
                         }
                         else
                         {
@@ -119,6 +112,15 @@ namespace CE.LoadFlowImplementation
                         }
                     }
                 }
+
+                var measurementProviderClient = MeasurementProviderClient.CreateClient();
+
+                await measurementProviderClient.SendMultipleAnalogCommand(commands, CommandOriginType.CE_COMMAND);
+                Logger.LogDebug($"{baseLogString} UpdateLoadFlow => SendAnalogCommand method from measurement provider successfully finished.");
+
+                Logger.LogDebug($"{baseLogString} UpdateLoadFlow => Calling update analog measurement method from measurement provider.");
+                await measurementProviderClient.UpdateAnalogMeasurement(modbusData);
+                Logger.LogDebug($"{baseLogString} UpdateLoadFlow => Update analog measurement method from measurement provider successfully finished.");
             }
             catch (Exception e)
             {
@@ -209,7 +211,7 @@ namespace CE.LoadFlowImplementation
 
                         Logger.LogDebug($"{baseLogString} UpdateLoadFlow => Calling SendAnalogCommand method from measurement provider. Measurement GID {powerMeasurement.Id:X16}, Value {newSMPower}.");
                         var measurementProviderClient = MeasurementProviderClient.CreateClient();
-                        await measurementProviderClient.SendAnalogCommand(powerMeasurement.Id, newSMPower, CommandOriginType.CE_COMMAND);
+                        await measurementProviderClient.SendSingleAnalogCommand(powerMeasurement.Id, newSMPower, CommandOriginType.CE_COMMAND);
                         Logger.LogDebug($"{baseLogString} UpdateLoadFlow => SendAnalogCommand method called successfully.");
 
                         Dictionary<long, AnalogModbusData> data = new Dictionary<long, AnalogModbusData>(1)
@@ -491,7 +493,7 @@ namespace CE.LoadFlowImplementation
                     }
                     else if(!recloser.IsActive)
                     {
-                        Thread thread = new Thread(async () => await CommandToRecloser(measurementGid, 0, CommandOriginType.CE_COMMAND, recloser));
+                        Thread thread = new Thread(async () => await CommandToRecloser(measurementGid, (int)DiscreteCommandingType.CLOSE, CommandOriginType.CE_COMMAND, recloser));
                         thread.Start();
                     }
                 }
@@ -507,7 +509,7 @@ namespace CE.LoadFlowImplementation
                     }
                     else if(!recloser.IsActive)
                     {
-                        Thread thread = new Thread(async () => await CommandToRecloser(measurementGid, 0, CommandOriginType.CE_COMMAND, recloser));
+                        Thread thread = new Thread(async () => await CommandToRecloser(measurementGid, (int)DiscreteCommandingType.CLOSE, CommandOriginType.CE_COMMAND, recloser));
                         thread.Start();
                     }
                 }
@@ -515,7 +517,7 @@ namespace CE.LoadFlowImplementation
                 {
                     Logger.LogDebug($"{baseLogString} TurnOnAllMeasurement => Calling SendDiscreteCommand method from measurement provider. Measurement GID {measurementGid:X16}, Value 1.");
                     var measurementProviderClient = MeasurementProviderClient.CreateClient();
-                    await measurementProviderClient.SendDiscreteCommand(measurementGid, 1, CommandOriginType.CE_COMMAND);
+                    await measurementProviderClient.SendSingleDiscreteCommand(measurementGid, (int)DiscreteCommandingType.OPEN, CommandOriginType.CE_COMMAND);
                     Logger.LogDebug($"{baseLogString} TurnOnAllMeasurement => SendDiscreteCommand method from measurement provider successfully finished.");
                     recloser.IsActive = false;
                 }
@@ -628,18 +630,22 @@ namespace CE.LoadFlowImplementation
                 throw new Exception(message);
             }
 
-            Logger.LogDebug($"{baseLogString} CommandToRecloser => Enetring in sleep for 10 seconds.");
-            Thread.Sleep(10000);
-            Logger.LogDebug($"{baseLogString} CommandToRecloser => Waking up after 10 seconds.");
+            Logger.LogDebug($"{baseLogString} CommandToRecloser => Enetring in sleep for 20 seconds.");
+            await Task.Delay(recloserInterval);
+            Logger.LogDebug($"{baseLogString} CommandToRecloser => Waking up after 20 seconds.");
 
-            if (!((Recloser)recloser).IsReachedMaximumOfTries())
+            var topologyProviderClient = TopologyProviderClient.CreateClient();
+            int counter = await topologyProviderClient.GetRecloserCount(recloser.Id);
+
+            if (((Recloser)recloser).MaxNumberOfTries > counter)
             {
+                topologyProviderClient = TopologyProviderClient.CreateClient();
+                await topologyProviderClient.RecloserOpened(recloser.Id);
+
                 Logger.LogDebug($"{baseLogString} CommandToRecloser => Calling SendDiscreteCommand method from measurement provider. Measurement GID: {measurementGid:X16}, Value: {value}, OriginType {originType}.");
                 var measurementProviderClient = MeasurementProviderClient.CreateClient();
-                await measurementProviderClient.SendDiscreteCommand(measurementGid, value, originType);
+                await measurementProviderClient.SendSingleDiscreteCommand(measurementGid, value, originType);
                 Logger.LogDebug($"{baseLogString} CommandToRecloser => SendDiscreteCommand method has been successfully called.");
-                
-                ((Recloser)recloser).NumberOfTry++;
             }
         }
         #endregion
@@ -701,23 +707,24 @@ namespace CE.LoadFlowImplementation
 
             List<AnalogMeasurement> analogMeasurements = await GetMeasurements(measurements);
 
+            var commands = new Dictionary<long, float>();
+            var modbusData = new Dictionary<long, AnalogModbusData>();
+
             foreach (var meas in analogMeasurements)
             {
-                Logger.LogDebug($"{baseLogString} TurnOffAllMeasurement => Calling SendAnalogCommand method from measurement provider. Measurement GID {meas.Id:X16}.");
-                var measurementProviderClient = MeasurementProviderClient.CreateClient();
-                await measurementProviderClient.SendAnalogCommand(meas.Id, 0, CommandOriginType.CE_COMMAND);
-                Logger.LogDebug($"{baseLogString} TurnOffAllMeasurement => SendAnalogCommand method from measurement provider has been called successfully.");
-
-                Dictionary<long, AnalogModbusData> data = new Dictionary<long, AnalogModbusData>(1)
-                {
-                            { meas.Id, new AnalogModbusData(0, AlarmType.NO_ALARM, meas.Id, CommandOriginType.CE_COMMAND)}
-                };
-
-                Logger.LogDebug($"{baseLogString} TurnOffAllMeasurement => Calling UpdateAnalogMeasurement method from measurement provider.");
-                measurementProviderClient = MeasurementProviderClient.CreateClient();
-                await measurementProviderClient.UpdateAnalogMeasurement(data);
-                Logger.LogDebug($"{baseLogString} TurnOffAllMeasurement => UpdateAnalogMeasurement method from measurement provider has been called successfully.");
+                Logger.LogDebug($"{baseLogString} TurnOffAllMeasurement => Adding Command method from measurement provider. Measurement GID {meas.Id:X16}.");
+                commands.Add(meas.Id, 0);
+                modbusData.Add(meas.Id, new AnalogModbusData(0, AlarmType.NO_ALARM, meas.Id, CommandOriginType.CE_COMMAND));
             }
+
+            var measurementProviderClient = MeasurementProviderClient.CreateClient();
+
+            await measurementProviderClient.SendMultipleAnalogCommand(commands, CommandOriginType.CE_COMMAND);
+            Logger.LogDebug($"{baseLogString} TurnOffAllMeasurement => SendAnalogCommand method from measurement provider has been called successfully.");
+
+            Logger.LogDebug($"{baseLogString} TurnOffAllMeasurement => Calling UpdateAnalogMeasurement method from measurement provider.");
+            await measurementProviderClient.UpdateAnalogMeasurement(modbusData);
+            Logger.LogDebug($"{baseLogString} TurnOffAllMeasurement => UpdateAnalogMeasurement method from measurement provider has been called successfully.");
         }
         private async Task TurnOnAllMeasurement(Dictionary<long, string> measurements)
         {
@@ -726,21 +733,21 @@ namespace CE.LoadFlowImplementation
 
             List<AnalogMeasurement> analogMeasurements = await GetMeasurements(measurements);
 
+            var commands = new Dictionary<long,float>();
+            var modbusData = new Dictionary<long, AnalogModbusData>();
+
             foreach (var meas in analogMeasurements)
             {
-                var measurementProviderClient = MeasurementProviderClient.CreateClient();
-                await measurementProviderClient.SendAnalogCommand(meas.Id, meas.NormalValue, CommandOriginType.CE_COMMAND);
-
-                Dictionary<long, AnalogModbusData> data = new Dictionary<long, AnalogModbusData>(1)
-                {
-                            { meas.Id, new AnalogModbusData(meas.NormalValue, AlarmType.NO_ALARM, meas.Id, CommandOriginType.CE_COMMAND)}
-                };
-
-                Logger.LogDebug($"{baseLogString} TurnOnAllMeasurement => Calling update analog measurement method from measurement provider.");
-                await measurementProviderClient.UpdateAnalogMeasurement(data);
-                Logger.LogDebug($"{baseLogString} TurnOnAllMeasurement => Update analog measurement method from measurement provider successfully finished.");
-
+                commands.Add(meas.Id, meas.NormalValue);
+                modbusData.Add(meas.Id, new AnalogModbusData(meas.NormalValue, AlarmType.NO_ALARM, meas.Id, CommandOriginType.CE_COMMAND));
             }
+
+            var measurementProviderClient = MeasurementProviderClient.CreateClient();
+            await measurementProviderClient.SendMultipleAnalogCommand(commands, CommandOriginType.CE_COMMAND);
+                
+            Logger.LogDebug($"{baseLogString} TurnOnAllMeasurement => Calling update analog measurement method from measurement provider.");
+            await measurementProviderClient.UpdateAnalogMeasurement(modbusData);
+            Logger.LogDebug($"{baseLogString} TurnOnAllMeasurement => Update analog measurement method from measurement provider successfully finished.");
         }
 
         public Task<bool> IsAlive()

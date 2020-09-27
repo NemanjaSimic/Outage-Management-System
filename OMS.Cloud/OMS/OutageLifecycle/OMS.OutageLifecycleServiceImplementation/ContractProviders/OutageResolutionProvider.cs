@@ -8,7 +8,6 @@ using OMS.Common.Cloud;
 using OMS.Common.Cloud.Logger;
 using OMS.Common.Cloud.ReliableCollectionHelpers;
 using OMS.Common.WcfClient.OMS.ModelAccess;
-using OMS.Common.WcfClient.OMS.ModelProvider;
 using OMS.OutageLifecycleImplementation.Helpers;
 using System;
 using System.Collections.Generic;
@@ -161,12 +160,13 @@ namespace OMS.OutageLifecycleImplementation.ContractProviders
                     {
                         string errorMessage = $"{baseLogString} ValidateResolveConditions => element with gid 0x{isolationPoint.EquipmentId:X16} not found in current {ReliableDictionaryNames.OutageTopologyModel}";
                         Logger.LogError(errorMessage);
-                        throw new Exception(errorMessage);
-                        //MODO: soft handle
-                        //resolveCondition = false;
-                        //break;
+                        resolveCondition = false;
+                        break;
                     }
 
+                    //NoReclosing == True (nije recloser) && element.IsActive == false - nije recloser i kroz njega ne ide struja => nevalidno
+                    //NoReclosing == False (jeste recloser) && element.IsActive == true - jeste recloser i ide struja => nevalidno
+                    //uglavnom, uslov je dobar, ali neintuitivan
                     if (element.NoReclosing != element.IsActive)
                     {
                         resolveCondition = false;

@@ -1,14 +1,11 @@
 ﻿using Common.CE;
 using Common.CeContracts;
-using Common.CeContracts.ModelProvider;
-using Common.CeContracts.TopologyProvider;
 using Microsoft.ServiceFabric.Data;
 using Microsoft.ServiceFabric.Data.Notifications;
 using OMS.Common.Cloud;
 using OMS.Common.Cloud.Logger;
 using OMS.Common.Cloud.ReliableCollectionHelpers;
 using OMS.Common.PubSubContracts.DataContracts.SCADA;
-using OMS.Common.ScadaContracts.Commanding;
 using OMS.Common.WcfClient.CE;
 using OMS.Common.WcfClient.OMS.HistoryDBManager;
 using OMS.Common.WcfClient.OMS.OutageLifecycle;
@@ -19,7 +16,7 @@ using System.Threading.Tasks;
 
 namespace CE.MeasurementProviderImplementation
 {
-	public class MeasurementProvider : IMeasurementProviderContract
+    public class MeasurementProvider : IMeasurementProviderContract
 	{
 		#region Fields
 		private readonly HashSet<CommandOriginType> ignorableOriginTypes;
@@ -235,7 +232,7 @@ namespace CE.MeasurementProviderImplementation
 
 					await UpdateAnalogMeasurement(gid, (float)measurementData.Value, measurementData.CommandOrigin, measurementData.Alarm);
 				}
-				//DiscreteMeasurementDelegate?.Invoke(); //MODO: bilo je zakomentarisano?
+				//DiscreteMeasurementDelegate?.Invoke(); //MODO: vec bilo je zakomentarisano, da li je potrebno...?
 			}
 			catch (Exception e)
 			{
@@ -584,40 +581,44 @@ namespace CE.MeasurementProviderImplementation
 		#endregion
 
 		#region Commanding
-		public async Task SendAnalogCommand(long measurementGid, float commandingValue, CommandOriginType commandOrigin)
+		public async Task<bool> SendSingleAnalogCommand(long measurementGid, float commandingValue, CommandOriginType commandOrigin)
 		{
-			string verboseMessage = $"{baseLogString} entering SendAnalogCommand method. Measurement GID {measurementGid:X16}; Commanding value {commandingValue}; Command Origin {commandOrigin}";
+			string verboseMessage = $"{baseLogString} entering SendSingleAnalogCommand method. Measurement GID {measurementGid:X16}; Commanding value {commandingValue}; Command Origin {commandOrigin}";
 			Logger.LogVerbose(verboseMessage);
 
 			try
 			{
-				Logger.LogDebug($"{baseLogString} SendAnalogCommand => Calling Send single analog command from scada commanding client.");
+				Logger.LogDebug($"{baseLogString} SendSingleAnalogCommand => Calling Send single analog command from scada commanding client.");
 				var scadaCommandingClient = ScadaCommandingClient.CreateClient();
-				await scadaCommandingClient.SendSingleAnalogCommand(measurementGid, commandingValue, commandOrigin);
-				Logger.LogDebug($"{baseLogString} SendAnalogCommand => Send single analog command from scada commanding client successfully called.");
+				var success = await scadaCommandingClient.SendSingleAnalogCommand(measurementGid, commandingValue, commandOrigin);
+				Logger.LogDebug($"{baseLogString} SendSingleAnalogCommand => Send single analog command from scada commanding client called.");
+
+				return success;
 			}
 			catch (Exception e)
 			{
-				string message = $"{baseLogString} SendAnalogCommand => Failed. Exception message: {e.Message}.";
+				string message = $"{baseLogString} SendSingleAnalogCommand => Failed. Exception message: {e.Message}.";
 				Logger.LogError(message, e);
+				return false;
 			}
 		}
 
-		public async Task SendDiscreteCommand(long measurementGid, int value, CommandOriginType commandOrigin)
+		public async Task<bool> SendSingleDiscreteCommand(long measurementGid, int value, CommandOriginType commandOrigin)
 		{
-			string verboseMessage = $"{baseLogString} entering SendDiscreteCommand method. Measurement GID {measurementGid:X16}; Commanding value {value}; Command Origin {commandOrigin}";
+			string verboseMessage = $"{baseLogString} entering SendSingleDiscreteCommand method. Measurement GID {measurementGid:X16}; Commanding value {value}; Command Origin {commandOrigin}";
 			Logger.LogVerbose(verboseMessage);
 
 			try
 			{
+				bool success;
 				DiscreteMeasurement measurement = await GetDiscreteMeasurement(measurementGid);
 
 				if (measurement != null && !(measurement is ArtificalDiscreteMeasurement))
 				{
-					Logger.LogDebug($"{baseLogString} SendDiscreteCommand => Calling Send single discrete command from scada commanding client.");
+					Logger.LogDebug($"{baseLogString} SendSingleDiscreteCommand => Calling Send single discrete command from scada commanding client.");
 					var scadaCommandingClient = ScadaCommandingClient.CreateClient();
-					await scadaCommandingClient.SendSingleDiscreteCommand(measurementGid, (ushort)value, commandOrigin);
-					Logger.LogDebug($"{baseLogString} SendDiscreteCommand => Send single discrete command from scada commanding client successfully called.");
+					success = await scadaCommandingClient.SendSingleDiscreteCommand(measurementGid, (ushort)value, commandOrigin);
+					Logger.LogDebug($"{baseLogString} SendSingleDiscreteCommand => Send single discrete command from scada commanding client called.");
 				}
 				else
 				{
@@ -625,13 +626,99 @@ namespace CE.MeasurementProviderImplementation
 					{
 						{ measurementGid, new DiscreteModbusData((ushort)value, AlarmType.NO_ALARM, measurementGid, commandOrigin) }
 					};
+
 					await UpdateDiscreteMeasurement(data);
+					success = true;
 				}
+
+				return success;
 			}
 			catch (Exception e)
 			{
-				string message = $"{baseLogString} SendDiscreteCommand => Failed. Exception message: {e.Message}.";
+				string message = $"{baseLogString} SendSingleDiscreteCommand => Failed. Exception message: {e.Message}.";
 				Logger.LogError(message, e);
+				return false;
+			}
+		}
+
+		public async Task<bool> SendMultipleAnalogCommand(Dictionary<long, float> commands, CommandOriginType commandOrigin)
+		{
+			string verboseMessage = $"{baseLogString} entering SendMultipleAnalogCommand method. Commands count: {commands.Count}, Command Origin: {commandOrigin}";
+			Logger.LogVerbose(verboseMessage);
+
+			try
+			{
+				if(commands.Count == 0)
+				{
+					Logger.LogDebug($"{baseLogString} SendMultipleAnalogCommand => No commands to send.");
+					return true;
+				}
+				
+				Logger.LogDebug($"{baseLogString} SendMultipleAnalogCommand => Calling Send Multiple analog command from scada commanding client.");
+				var scadaCommandingClient = ScadaCommandingClient.CreateClient();
+				var success = await scadaCommandingClient.SendMultipleAnalogCommand(commands, commandOrigin);
+				Logger.LogDebug($"{baseLogString} SendMultipleAnalogCommand => Send Multiple analog command from scada commanding client called.");
+				return success;
+			}
+			catch (Exception e)
+			{
+				string message = $"{baseLogString} SendMultipleAnalogCommand => Failed. Exception message: {e.Message}.";
+				Logger.LogError(message, e);
+				return false;
+			}
+		}
+
+		public async Task<bool> SendMultipleDiscreteCommand(Dictionary<long, int> commands, CommandOriginType commandOrigin)
+		{
+			string verboseMessage = $"{baseLogString} entering SendMultipleDiscreteCommand method. Commands count: {commands.Count}, Command Origin: {commandOrigin}";
+			Logger.LogVerbose(verboseMessage);
+
+			try
+			{
+				if (commands.Count == 0)
+				{
+					Logger.LogDebug($"{baseLogString} SendMultipleDiscreteCommand => No commands to send.");
+					return true;
+				}
+
+				var nonArtificalCommands = new Dictionary<long, ushort>();
+				var artificalCommands = new Dictionary<long, DiscreteModbusData>();
+
+				foreach (var measurementGid in commands.Keys)
+                {
+					ushort value = (ushort)commands[measurementGid];
+					DiscreteMeasurement measurement = await GetDiscreteMeasurement(measurementGid);
+
+					if(measurement == null)
+                    {
+						Logger.LogError($"{baseLogString} SendMultipleDiscreteCommand => Measurement for measurementGid: 0x{measurementGid:X16} is null");
+						return false;
+					}
+
+					if (measurement is ArtificalDiscreteMeasurement)
+					{
+						artificalCommands.Add(measurementGid, new DiscreteModbusData(value, AlarmType.NO_ALARM, measurementGid, commandOrigin));
+					}
+					else
+					{
+						nonArtificalCommands.Add(measurementGid, value);
+					}
+				}
+
+				Logger.LogDebug($"{baseLogString} SendMultipleDiscreteCommand => Calling Send multiple discrete command from scada commanding client.");
+				var scadaCommandingClient = ScadaCommandingClient.CreateClient();
+				var success = await scadaCommandingClient.SendMultipleDiscreteCommand(nonArtificalCommands, commandOrigin);
+				Logger.LogDebug($"{baseLogString} SendMultipleDiscreteCommand => Send multiple discrete command from scada commanding client called.");
+
+				await UpdateDiscreteMeasurement(artificalCommands);
+
+				return success;
+			}
+			catch (Exception e)
+			{
+				string message = $"{baseLogString} SendMultipleDiscreteCommand => Failed. Exception message: {e.Message}.";
+				Logger.LogError(message, e);
+				return false;
 			}
 		}
 		#endregion Commanding
@@ -791,11 +878,11 @@ namespace CE.MeasurementProviderImplementation
 					if (!await ceModelProviderClient.IsRecloser(measurement.ElementId))
 					{
 						var potentialOutageReportingClient = PotentialOutageReportingClient.CreateClient();
-						await potentialOutageReportingClient.ReportPotentialOutage(measurement.ElementId, commandOrigin);
+						await potentialOutageReportingClient.EnqueuePotentialOutageCommand(measurement.ElementId, commandOrigin, NetworkType.SCADA_NETWORK); //TODO: proveriti da li ce ovde uvek biti skada deo mreze....
 					}
 					else
 					{
-						Logger.LogDebug($"{baseLogString} UpdateDiscreteMeasurement => Element with gid 0x{measurement.ElementId:X16} is a Recloser. ReportPotentialOutage call is not required.");
+						Logger.LogDebug($"{baseLogString} UpdateDiscreteMeasurement => Element with gid 0x{measurement.ElementId:X16} is a Recloser. EnqueuePotentialOutageCommand call is not required.");
 					}
 				}
 				else
@@ -815,10 +902,15 @@ namespace CE.MeasurementProviderImplementation
 
 			var modelProviderClient = CeModelProviderClient.CreateClient();
 
+			//TODO: see this
+			//if (measurementToElementMap.TryGetValue(measurementGid, out long recloserGid)
+			//	&& await modelProviderClient.IsRecloser(recloserGid)
+			//	&& (commandOrigin == CommandOriginType.USER_COMMAND
+			//		|| commandOrigin == CommandOriginType.ISOLATING_ALGORITHM_COMMAND 
+			//		|| commandOrigin == CommandOriginType.LOCATION_AND_ISOLATING_ALGORITHM_COMMAND))
 			if (measurementToElementMap.TryGetValue(measurementGid, out long recloserGid)
 				&& await modelProviderClient.IsRecloser(recloserGid)
-				&& commandOrigin != CommandOriginType.CE_COMMAND
-				&& commandOrigin != CommandOriginType.OUTAGE_SIMULATOR)
+				&& commandOrigin == CommandOriginType.USER_COMMAND)
 			{
 				Logger.LogDebug($"{baseLogString} UpdateDiscreteMeasurement => Calling ResetRecloser on topology provider.");
 				var topologyProviderClient = TopologyProviderClient.CreateClient();
@@ -985,7 +1077,7 @@ namespace CE.MeasurementProviderImplementation
 
 			return measurementsToElement.Value;
 		}
-		#endregion CacheGetter
-		#endregion Private Methods
-	}
+        #endregion CacheGetter
+        #endregion Private Methods
+    }
 }

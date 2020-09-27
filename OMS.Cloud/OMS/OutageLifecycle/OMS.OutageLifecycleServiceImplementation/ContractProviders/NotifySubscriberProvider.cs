@@ -1,14 +1,20 @@
-﻿using Common.OMS;
+﻿using Common.CeContracts;
+using Common.OMS;
 using Common.PubSubContracts.DataContracts.CE;
 using Microsoft.ServiceFabric.Data;
 using Microsoft.ServiceFabric.Data.Notifications;
+using OMS.Common.Cloud;
 using OMS.Common.Cloud.Logger;
 using OMS.Common.Cloud.Names;
 using OMS.Common.Cloud.ReliableCollectionHelpers;
 using OMS.Common.PubSubContracts;
 using OMS.Common.PubSubContracts.DataContracts.SCADA;
 using OMS.Common.PubSubContracts.Interfaces;
+using OMS.Common.WcfClient.CE;
+using OMS.Common.WcfClient.OMS.OutageLifecycle;
 using System;
+using System.Collections.Generic;
+using System.Linq;
 using System.Threading.Tasks;
 
 namespace OMS.OutageLifecycleImplementation.ContractProviders
@@ -29,13 +35,17 @@ namespace OMS.OutageLifecycleImplementation.ContractProviders
 		#region Reliable Dictionaries
 		private bool isMonitoredHeadBreakerMeasurementsInitialized;
 		private bool isOutageTopologyModelInitialized;
+		private bool isCommandedElementsInitialized;
+		private bool isPotentialOutagesQueueInitialized;
 
 		private bool ReliableDictionariesInitialized
 		{
 			get
 			{
 				return isMonitoredHeadBreakerMeasurementsInitialized &&
-					   isOutageTopologyModelInitialized;
+					   isOutageTopologyModelInitialized &&
+					   isCommandedElementsInitialized &&
+					   isPotentialOutagesQueueInitialized;
 			}
 		}
 
@@ -49,6 +59,18 @@ namespace OMS.OutageLifecycleImplementation.ContractProviders
 		private ReliableDictionaryAccess<string, OutageTopologyModel> OutageTopologyModel
 		{
 			get { return outageTopologyModel; }
+		}
+
+		private ReliableDictionaryAccess<long, CommandedElement> commandedElements;
+		private ReliableDictionaryAccess<long, CommandedElement> CommandedElements
+		{
+			get { return commandedElements; }
+		}
+
+		private ReliableQueueAccess<PotentialOutageCommand> potentialOutagesQueue;
+		private ReliableQueueAccess<PotentialOutageCommand> PotentialOutagesQueue
+		{
+			get { return potentialOutagesQueue; }
 		}
 
 		private async void OnStateManagerChangedHandler(object sender, NotifyStateManagerChangedEventArgs e)
@@ -74,6 +96,22 @@ namespace OMS.OutageLifecycleImplementation.ContractProviders
 					string debugMessage = $"{baseLogString} OnStateManagerChangedHandler => '{ReliableDictionaryNames.OutageTopologyModel}' ReliableDictionaryAccess initialized.";
 					Logger.LogDebug(debugMessage);
 				}
+				else if (reliableStateName == ReliableDictionaryNames.CommandedElements)
+				{
+					this.commandedElements = await ReliableDictionaryAccess<long, CommandedElement>.Create(stateManager, ReliableDictionaryNames.CommandedElements);
+					this.isCommandedElementsInitialized = true;
+
+					string debugMessage = $"{baseLogString} OnStateManagerChangedHandler => '{ReliableDictionaryNames.CommandedElements}' ReliableDictionaryAccess initialized.";
+					Logger.LogDebug(debugMessage);
+				}
+				else if (reliableStateName == ReliableQueueNames.PotentialOutages)
+				{
+					this.potentialOutagesQueue = await ReliableQueueAccess<PotentialOutageCommand>.Create(stateManager, ReliableQueueNames.PotentialOutages);
+					this.isPotentialOutagesQueueInitialized = true;
+
+					string debugMessage = $"{baseLogString} OnStateManagerChangedHandler => '{ReliableQueueNames.PotentialOutages}' ReliableDictionaryAccess initialized.";
+					Logger.LogDebug(debugMessage);
+				}
 			}
 		}
         #endregion Reliable Dictionaries
@@ -84,6 +122,8 @@ namespace OMS.OutageLifecycleImplementation.ContractProviders
 
 			this.isMonitoredHeadBreakerMeasurementsInitialized = false;
 			this.isOutageTopologyModelInitialized = false;
+			this.isCommandedElementsInitialized = false;
+			this.isPotentialOutagesQueueInitialized = false;
 
 			this.stateManager = stateManager;
 			this.stateManager.StateManagerChanged += this.OnStateManagerChangedHandler;
@@ -111,8 +151,8 @@ namespace OMS.OutageLifecycleImplementation.ContractProviders
 					Logger.LogDebug($"{baseLogString} MultipleDiscreteValueSCADAMessage received.");
 					var discreteData = multipleDiscreteValueSCADAMessage.Data;
 
-					var enumerableHeadBreakerMeasurements = await MonitoredHeadBreakerMeasurements.GetEnumerableDictionaryAsync();
-
+                    #region HeadBreakers
+                    var enumerableHeadBreakerMeasurements = await MonitoredHeadBreakerMeasurements.GetEnumerableDictionaryAsync();
 					foreach (var headMeasurementGid in enumerableHeadBreakerMeasurements.Keys)
 					{
 						if (!discreteData.ContainsKey(headMeasurementGid))
@@ -122,13 +162,62 @@ namespace OMS.OutageLifecycleImplementation.ContractProviders
 
 						await MonitoredHeadBreakerMeasurements.SetAsync(headMeasurementGid, discreteData[headMeasurementGid]);
 					}
+					#endregion HeadBreakers
+
+					#region CommandedElements
+					var measurementProviderClient = MeasurementProviderClient.CreateClient();
+					var enumerableCommandedElements = await CommandedElements.GetEnumerableDictionaryAsync();
+					foreach(var commandedElementGid in enumerableCommandedElements.Keys)
+                    {
+						var measurementGid = (await measurementProviderClient.GetMeasurementsOfElement(commandedElementGid)).FirstOrDefault();
+						var measurement = await measurementProviderClient.GetDiscreteMeasurement(measurementGid);
+
+						if(measurement is ArtificalDiscreteMeasurement)
+                        {
+							await CommandedElements.TryRemoveAsync(commandedElementGid);
+							Logger.LogInformation($"{baseLogString} Notify => Command on element 0x{commandedElementGid:X16} executed (ArtificalDiscreteMeasurement). New value: {measurement.CurrentOpen}");
+							continue;
+						}
+
+						if(!discreteData.ContainsKey(measurementGid))
+                        {
+							continue;
+						}
+
+						if(discreteData[measurementGid].Value == (ushort)enumerableCommandedElements[commandedElementGid].CommandingType)
+                        {
+							if((await CommandedElements.TryRemoveAsync(commandedElementGid)).HasValue)
+                            {
+								Logger.LogInformation($"{baseLogString} Notify => Command on element 0x{commandedElementGid:X16} executed. New value: {discreteData[measurementGid].Value}");
+                            }
+                        }
+                    }
+					#endregion CommandedElements
 				}
 				else if(message is OMSModelMessage omsModelMessage)
                 {
 					Logger.LogDebug($"{baseLogString} OMSModelMessage received. Count {omsModelMessage.OutageTopologyModel.OutageTopology.Count}");
+					
 					OutageTopologyModel topology = omsModelMessage.OutageTopologyModel;
 					await OutageTopologyModel.SetAsync(ReliableDictionaryNames.OutageTopologyModel, topology);
-				}
+
+					var reportingOutageClient = PotentialOutageReportingClient.CreateClient();
+
+					while(true)
+                    {
+						var result = await PotentialOutagesQueue.TryDequeueAsync();
+
+						if(!result.HasValue)
+                        {
+							break;
+                        }
+
+						var command = result.Value;
+
+						await reportingOutageClient.ReportPotentialOutage(command.ElementGid, command.CommandOriginType, command.NetworkType);
+						Logger.LogInformation($"{baseLogString} PotentianOutageCommand executed. ElementGid: 0x{command.ElementGid:X16}, OriginType: {command.CommandOriginType}");
+					}
+                }
 				else
                 {
 					Logger.LogWarning($"{baseLogString} Notify => unexpected type of message: {message.GetType()}");

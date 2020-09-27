@@ -14,7 +14,7 @@ namespace Common.OmsContracts.ModelAccess
 	public interface IConsumerAccessContract : IService, IHealthChecker
 	{
 		[OperationContract]
-		Task<IEnumerable<Consumer>> GetAllConsumers();
+		Task<List<Consumer>> GetAllConsumers();
 
 		[OperationContract]
 		Task<Consumer> GetConsumer(long gid);
@@ -30,15 +30,5 @@ namespace Common.OmsContracts.ModelAccess
 
 		[OperationContract]
 		Task RemoveAllConsumers();
-
-        //[OperationContract]
-        //Task<IEnumerable<Consumer>> FindConsumer(ConsumerExpression expression);
     }
-
- //   [DataContract]
- //   public class ConsumerExpression
-	//{
- //       [DataMember]
- //       public Expression<Func<Consumer, bool>> Predicate { get; set; }
- //   }
 }

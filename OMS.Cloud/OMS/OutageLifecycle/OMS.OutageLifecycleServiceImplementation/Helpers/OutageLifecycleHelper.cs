@@ -10,7 +10,6 @@ using OMS.Common.NmsContracts.GDA;
 using OMS.Common.WcfClient.CE;
 using OMS.Common.WcfClient.NMS;
 using OMS.Common.WcfClient.OMS.ModelAccess;
-using OMS.Common.WcfClient.OMS.ModelProvider;
 using OMS.Common.WcfClient.PubSub;
 using System;
 using System.Collections.Generic;
@@ -36,93 +35,6 @@ namespace OMS.OutageLifecycleImplementation.Helpers
 
             this.modelResourcesDesc = modelResourcesDesc;
         }
-
-        #region Consumer Helpers
-        public List<long> GetAffectedConsumers(long potentialOutageGid, OutageTopologyModel topology)
-        {
-            List<long> affectedConsumers = new List<long>();
-            Stack<long> nodesToBeVisited = new Stack<long>();
-            HashSet<long> visited = new HashSet<long>();
-            long startingSwitch = potentialOutageGid;
-
-            if (topology.OutageTopology.TryGetValue(potentialOutageGid, out OutageTopologyElement firstElement)
-                && topology.OutageTopology.TryGetValue(firstElement.FirstEnd, out OutageTopologyElement currentElementAbove))
-            {
-                while (!currentElementAbove.DmsType.Equals("ENERGYSOURCE"))
-                {
-                    if (currentElementAbove.IsOpen)
-                    {
-                        startingSwitch = currentElementAbove.Id;
-                        break;
-                    }
-
-                    if (!topology.OutageTopology.TryGetValue(currentElementAbove.FirstEnd, out currentElementAbove))
-                    {
-                        break;
-                    }
-                }
-            }
-
-            nodesToBeVisited.Push(startingSwitch);
-
-            while (nodesToBeVisited.Count > 0)
-            {
-                long currentNode = nodesToBeVisited.Pop();
-
-                if (!visited.Contains(currentNode))
-                {
-                    visited.Add(currentNode);
-
-                    if (topology.OutageTopology.TryGetValue(currentNode, out OutageTopologyElement topologyElement))
-                    {
-                        if (topologyElement.DmsType == "ENERGYCONSUMER" && !topologyElement.IsActive)
-                        {
-                            affectedConsumers.Add(currentNode);
-                        }
-                        else if (topologyElement.DmsType == "ENERGYCONSUMER" && !topologyElement.IsRemote)
-                        {
-                            affectedConsumers.Add(currentNode);
-
-                        }
-
-                        foreach (long adjNode in topologyElement.SecondEnd)
-                        {
-                            nodesToBeVisited.Push(adjNode);
-                        }
-                    }
-                    else
-                    {
-                        //TOOD
-                        string message = $"GID: 0x{currentNode:X16} not found in topologyModel.OutageTopology dictionary....";
-                        Logger.LogError(message);
-                        Console.WriteLine(message);
-                    }
-                }
-            }
-
-            return affectedConsumers;
-        }
-        
-        public List<Consumer> GetAffectedConsumersFromDatabase(List<long> affectedConsumersIds)
-        {
-            var consumerAccessClient = ConsumerAccessClient.CreateClient();
-            List<Consumer> affectedConsumers = new List<Consumer>();
-
-            foreach (long affectedConsumerId in affectedConsumersIds)
-            {
-                Consumer affectedConsumer = consumerAccessClient.GetConsumer(affectedConsumerId).Result;
-
-                if (affectedConsumer == null)
-                {
-                    break;
-                }
-
-                affectedConsumers.Add(affectedConsumer);
-            }
-
-            return affectedConsumers;
-        }
-        #endregion Consumer Helpers
 
         #region Breaker Helpers
         public long GetNextBreaker(long breakerId, OutageTopologyModel topology)
@@ -159,128 +71,6 @@ namespace OMS.OutageLifecycleImplementation.Helpers
 
             return nextBreakerId;
         }
-
-        public long GetRecloserForHeadBreaker(long headBreakerId, OutageTopologyModel topology)
-        {
-            long recolserId = -1;
-
-            if (!topology.OutageTopology.ContainsKey(headBreakerId))
-            {
-                string message = $"Head switch with gid: {headBreakerId} is not in a topology model.";
-                Logger.LogError(message);
-                throw new Exception(message);
-            }
-            long currentBreakerId = headBreakerId;
-            while (currentBreakerId != 0)
-            {
-                //currentBreakerId = TopologyModel.OutageTopology[currentBreakerId].SecondEnd.Where(element => modelResourcesDesc.GetModelCodeFromId(element) == ModelCode.BREAKER).FirstOrDefault();
-                currentBreakerId = GetNextBreaker(currentBreakerId, topology);
-                if (currentBreakerId == 0)
-                {
-                    continue;
-                }
-
-                if (!topology.OutageTopology.ContainsKey(currentBreakerId))
-                {
-                    string message = $"Switch with gid: 0X{currentBreakerId:X16} is not in a topology model.";
-                    Logger.LogError(message);
-                    throw new Exception(message);
-                }
-
-                if (!topology.OutageTopology[currentBreakerId].NoReclosing)
-                {
-                    recolserId = currentBreakerId;
-                    break;
-                }
-            }
-
-            return recolserId;
-        }
-
-        public async Task<bool> CheckIfBreakerIsRecloserAsync(long elementId)
-        {
-            bool isRecloser = false;
-
-            try
-            {
-                var networkModelGdaClient = NetworkModelGdaClient.CreateClient();
-                ResourceDescription resourceDescription = await networkModelGdaClient.GetValues(elementId, new List<ModelCode>() { ModelCode.BREAKER_NORECLOSING });
-                Property property = resourceDescription.GetProperty(ModelCode.BREAKER_NORECLOSING);
-
-                if (property != null)
-                {
-                    isRecloser = !property.AsBool();
-                }
-                else
-                {
-                    throw new Exception($"Element with id 0x{elementId:X16} is not a breaker.");
-                }
-
-            }
-            catch (Exception e)
-            {
-                Logger.LogError($"{baseLogString} CheckIfBreakerIsRecloserAsync => Exception: {e.Message}");
-                throw e;
-            }
-
-            return isRecloser;
-        }
-
-        public async Task<long> GetHeadBreakerAsync(List<long> defaultIsolationPoints, bool isFirstBreakerRecloser)
-        {
-            long headBreaker = -1;
-            if (defaultIsolationPoints.Count == 2)
-            {
-                if (isFirstBreakerRecloser)
-                {
-                    headBreaker = defaultIsolationPoints[1];
-                }
-                else
-                {
-                    headBreaker = defaultIsolationPoints[0];
-                }
-
-                var outageModelUpdateAccessClient = OutageModelUpdateAccessClient.CreateClient();
-                await outageModelUpdateAccessClient.UpdateCommandedElements(headBreaker, ModelUpdateOperationType.INSERT);
-            }
-            else
-            {
-                if (!isFirstBreakerRecloser)
-                {
-                    headBreaker = defaultIsolationPoints[0];
-                    var outageModelUpdateAccessClient = OutageModelUpdateAccessClient.CreateClient();
-                    await outageModelUpdateAccessClient.UpdateCommandedElements(headBreaker, ModelUpdateOperationType.INSERT);
-                }
-                else
-                {
-                    Logger.LogWarning($"Invalid state: breaker with id 0x{defaultIsolationPoints[0]:X16} is the only default isolation element, but it is also a recloser.");
-                }
-            }
-
-            return headBreaker;
-        }
-
-        public async Task<long> GetRecloserAsync(List<long> defaultIsolationPoints, bool isFirstBreakerRecloser)
-        {
-            long recloser = -1;
-
-            if (defaultIsolationPoints.Count == 2)
-            {
-                if (isFirstBreakerRecloser)
-                {
-                    recloser = defaultIsolationPoints[0];
-                }
-                else
-                {
-                    recloser = defaultIsolationPoints[1];
-                }
-
-                var outageModelUpdateAccessClient = OutageModelUpdateAccessClient.CreateClient();
-                await outageModelUpdateAccessClient.UpdateCommandedElements(recloser, ModelUpdateOperationType.INSERT);
-            }
-
-            return recloser;
-        }
         #endregion Breaker Helpers
 
         #region Equipment Helpers
@@ -304,7 +94,21 @@ namespace OMS.OutageLifecycleImplementation.Helpers
                 }
             }
 
-            equipmentList.AddRange(await CreateEquipmentEntitiesFromNmsDataAsync(equipmentIdsNotFoundInDb));
+            if (equipmentIdsNotFoundInDb.Count > 0)
+			{
+                List<Equipment> createdEquipments = await CreateEquipmentEntitiesFromNmsDataAsync(equipmentIdsNotFoundInDb);
+
+                var equipmentAccess = EquipmentAccessClient.CreateClient();
+
+                List<Task> addingEquipmentTasks = new List<Task>();
+                foreach (var createdEquipment in createdEquipments)
+                {
+                    addingEquipmentTasks.Add(Task.Run(() => equipmentAccess.AddEquipment(createdEquipment)));
+                }
+
+                Task.WaitAll(addingEquipmentTasks.ToArray());
+                equipmentList.AddRange(createdEquipments);
+            }
 
             return equipmentList;
         }
@@ -349,47 +153,89 @@ namespace OMS.OutageLifecycleImplementation.Helpers
         #endregion Equipment Helpers
 
         #region Commanding Helpers
-        public async Task SendScadaCommandAsync(long breakerGid, DiscreteCommandingType discreteCommandingType)
+        public async Task<bool> SendSingleScadaCommandAsync(long breakerGid, DiscreteCommandingType discreteCommandingType, Dictionary<long, CommandedElement> commandedElements, CommandOriginType commandOriginType)
+        {
+            if (commandedElements.ContainsKey(breakerGid) && commandedElements[breakerGid].CommandingType == discreteCommandingType)
+            {
+                Logger.LogDebug($"{baseLogString} SendSingleScadaCommandAsync => Trying to send duplicate command. Aborting call.");
+                return false;
+            }
+
+            var measurementMapClient = MeasurementMapClient.CreateClient();
+            List<long> measurementGids = await measurementMapClient.GetMeasurementsOfElement(breakerGid);
+
+            if (measurementGids.Count == 0)
+            {
+                Logger.LogWarning($"{baseLogString} SendSingleScadaCommandAsync => Element with gid: 0x{breakerGid:X16} has no measurements.");
+                return false;
+            }
+
+            var measurementGid = measurementGids.FirstOrDefault();
+            if (measurementGid == 0)
+            {
+                Logger.LogWarning($"{baseLogString} SendSingleScadaCommandAsync => Measurement gid is 0.");
+                return false;
+            }
+
+            var switchStatusCommandingClient = SwitchStatusCommandingClient.CreateClient();
+
+            bool sendCommandSuccess = false;
+
+            if(discreteCommandingType == DiscreteCommandingType.OPEN)
+            {
+                sendCommandSuccess = await switchStatusCommandingClient.SendOpenCommand(measurementGid);
+            }
+            else if(discreteCommandingType == DiscreteCommandingType.CLOSE)
+            {
+                sendCommandSuccess = await switchStatusCommandingClient.SendCloseCommand(measurementGid);
+            }
+
+            return sendCommandSuccess;
+        }
+
+        public async Task<bool> SendMultipleScadaCommandAsync(Dictionary<long, DiscreteCommandingType> elementGidCommandMap, Dictionary<long, CommandedElement> commandedElements, CommandOriginType commandOriginType)
         {
             var measurementMapClient = MeasurementMapClient.CreateClient();
-            List<long> measurements = await measurementMapClient.GetMeasurementsOfElement(breakerGid);
+            var elementToMeasurementMap = await measurementMapClient.GetElementToMeasurementMap();
 
-            if (measurements.Count == 0)
+            var commands = new Dictionary<long, int>();
+
+            foreach (var elementGid in elementGidCommandMap.Keys)
             {
-                Logger.LogWarning($"{baseLogString} SendSCADACommand => Element with gid: 0x{breakerGid:X16} has no measurements.");
-                return;
+                var discreteCommandingType = elementGidCommandMap[elementGid];
+
+                int reTryCount = 30;
+                while (commandedElements.ContainsKey(elementGid) && commandedElements[elementGid].CommandingType == discreteCommandingType)
+                {
+                    Logger.LogDebug($"{baseLogString} SendMultipleScadaCommandAsync => Trying to send duplicate command. Entering delay for 1000 ms and retrying the call.");
+
+                    await Task.Delay(1000);
+
+                    if(--reTryCount <= 0)
+                    {
+                        Logger.LogError($"{baseLogString} SendMultipleScadaCommandAsync => Trying to send duplicate command. ReTryCount reached 60 calls.");
+                        return false;
+                    }
+                }
+
+                if(!elementToMeasurementMap.TryGetValue(elementGid, out List<long> measurementGids) || measurementGids.Count == 0)
+                {
+                    Logger.LogWarning($"{baseLogString} SendMultipleScadaCommandAsync => Element with gid: 0x{elementGid:X16} has no measurements.");
+                    return false;
+                }
+
+                var measurementGid = measurementGids.FirstOrDefault();
+                if (measurementGid == 0)
+                {
+                    Logger.LogWarning($"{baseLogString} SendMultipleScadaCommandAsync => Measurement gid is 0.");
+                    return false;
+                }
+
+                commands.Add(measurementGid, (int)elementGidCommandMap[elementGid]);
             }
 
-            var measurement = measurements.FirstOrDefault();
-
-            if (measurement == 0)
-            {
-                Logger.LogWarning($"{baseLogString} SendSCADACommand => Measurement gid is 0.");
-                return;
-            }
-
-            var outageModelReadAccessClient = OutageModelReadAccessClient.CreateClient();
-            var commandedElements = await outageModelReadAccessClient.GetCommandedElements();
-
-            if (discreteCommandingType == DiscreteCommandingType.OPEN && !commandedElements.ContainsKey(breakerGid))
-            {
-                var outageModelUpdateAccessClient = OutageModelUpdateAccessClient.CreateClient();
-                await outageModelUpdateAccessClient.UpdateCommandedElements(breakerGid, ModelUpdateOperationType.INSERT);
-            }
-
-            //todo: SendOpenCommand da vraca bool pa onda provera
-            var switchStatusCommandingClient = SwitchStatusCommandingClient.CreateClient();
-            await switchStatusCommandingClient.SendOpenCommand(measurement);
-
-            //todo: u vezi gornjeg todo
-            //if(fail)
-            //{
-            //    if (discreteCommandingType == DiscreteCommandingType.OPEN && commandedElements.ContainsKey(currentBreakerId))
-            //    {
-            //        var outageModelUpdateAccessClient = OutageModelUpdateAccessClient.CreateClient();
-            //        await outageModelUpdateAccessClient.UpdateCommandedElements(currentBreakerId, ModelUpdateOperationType.DELETE);
-            //    }
-            //}
+            var measurementProviderClient = MeasurementProviderClient.CreateClient();
+            return await measurementProviderClient.SendMultipleDiscreteCommand(commands, commandOriginType);
         }
         #endregion Commanding Helpers
 

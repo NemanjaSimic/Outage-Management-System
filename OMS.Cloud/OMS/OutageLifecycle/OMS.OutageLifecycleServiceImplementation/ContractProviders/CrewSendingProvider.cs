@@ -8,7 +8,6 @@ using OMS.Common.Cloud;
 using OMS.Common.Cloud.Logger;
 using OMS.Common.Cloud.ReliableCollectionHelpers;
 using OMS.Common.WcfClient.OMS.ModelAccess;
-using OMS.Common.WcfClient.OMS.ModelProvider;
 using OMS.Common.WcfClient.OMS.OutageSimulator;
 using OMS.OutageLifecycleImplementation.Helpers;
 using System;
@@ -34,12 +33,14 @@ namespace OMS.OutageLifecycleImplementation.ContractProviders
 
         #region Reliable Dictionaries
         private bool isOutageTopologyModelInitialized;
+        private bool isCommandedElementsInitialized;
 
         private bool ReliableDictionariesInitialized
         {
             get
             {
-                return isOutageTopologyModelInitialized;
+                return isOutageTopologyModelInitialized &&
+                       isCommandedElementsInitialized;
             }
         }
 
@@ -47,6 +48,12 @@ namespace OMS.OutageLifecycleImplementation.ContractProviders
         private ReliableDictionaryAccess<string, OutageTopologyModel> OutageTopologyModel
         {
             get { return outageTopologyModel; }
+        }
+
+        private ReliableDictionaryAccess<long, CommandedElement> commandedElements;
+        private ReliableDictionaryAccess<long, CommandedElement> CommandedElements
+        {
+            get { return commandedElements; }
         }
 
         private async void OnStateManagerChangedHandler(object sender, NotifyStateManagerChangedEventArgs e)
@@ -64,6 +71,14 @@ namespace OMS.OutageLifecycleImplementation.ContractProviders
                     string debugMessage = $"{baseLogString} OnStateManagerChangedHandler => '{ReliableDictionaryNames.OutageTopologyModel}' ReliableDictionaryAccess initialized.";
                     Logger.LogDebug(debugMessage);
                 }
+                else if (reliableStateName == ReliableDictionaryNames.CommandedElements)
+                {
+                    this.commandedElements = await ReliableDictionaryAccess<long, CommandedElement>.Create(stateManager, ReliableDictionaryNames.CommandedElements);
+                    this.isCommandedElementsInitialized = true;
+
+                    string debugMessage = $"{baseLogString} OnStateManagerChangedHandler => '{ReliableDictionaryNames.CommandedElements}' ReliableDictionaryAccess initialized.";
+                    Logger.LogDebug(debugMessage);
+                }
             }
         }
         #endregion Reliable Dictionaries
@@ -76,6 +91,7 @@ namespace OMS.OutageLifecycleImplementation.ContractProviders
             this.outageMessageMapper = new OutageMessageMapper();
 
             this.isOutageTopologyModelInitialized = false;
+            this.isCommandedElementsInitialized = false;
 
             this.stateManager = stateManager;
             this.stateManager.StateManagerChanged += this.OnStateManagerChangedHandler;
@@ -150,7 +166,7 @@ namespace OMS.OutageLifecycleImplementation.ContractProviders
 
                 var outageEntity = result.Value;
 
-                //TODO: WHY???
+                //TODO: videti performanse, pa da li treba da cekamo uopste xD
                 //await Task.Delay(10000);
 
                 var outageSimulatorClient = OutageSimulatorClient.CreateClient();
@@ -199,7 +215,7 @@ namespace OMS.OutageLifecycleImplementation.ContractProviders
             long upBreaker;
             long outageElementGid = -1;
 
-            //MODO: tu je vec bio ovaj delay... zasto?
+            //Todo: pratiti performanse pa videti da li nam je potrebno usporenje
             //await Task.Delay(5000);
 
             var outageSimulatorClient = OutageSimulatorClient.CreateClient();
@@ -273,7 +289,7 @@ namespace OMS.OutageLifecycleImplementation.ContractProviders
 
             if (!topology.OutageTopology.ContainsKey(nextBreaker))
             {
-                string message = $"Breaker (next breaker) with id: 0x{nextBreaker:X16} is not in topology";
+                string message = $"{baseLogString} StartLocationAndIsolationAlgorithm => Breaker (next breaker) with id: 0x{nextBreaker:X16} is not in topology";
                 Logger.LogError(message);
                 throw new Exception(message);
             }
@@ -282,7 +298,7 @@ namespace OMS.OutageLifecycleImplementation.ContractProviders
 
             if (!topology.OutageTopology[upBreaker].SecondEnd.Contains(outageElement))
             {
-                string message = $"Outage element with gid: 0x{outageElement:X16} is not on a second end of current breaker id";
+                string message = $"{baseLogString} StartLocationAndIsolationAlgorithm => Outage element with gid: 0x{outageElement:X16} is not on a second end of current breaker id";
                 Logger.LogError(message);
                 throw new Exception(message);
             }
@@ -292,10 +308,15 @@ namespace OMS.OutageLifecycleImplementation.ContractProviders
             outageEntity.OutageState = OutageState.ISOLATED;
 
             await outageModelAccessClient.UpdateOutage(outageEntity);
-            await lifecycleHelper.SendScadaCommandAsync(upBreaker, DiscreteCommandingType.OPEN);
-            await lifecycleHelper.SendScadaCommandAsync(nextBreaker, DiscreteCommandingType.OPEN);
 
-            return true;
+            var commands = new Dictionary<long, DiscreteCommandingType>
+            {
+                { upBreaker, DiscreteCommandingType.OPEN },
+                { nextBreaker, DiscreteCommandingType.OPEN },
+            };
+
+            var enumerableCommandedElements = await CommandedElements.GetEnumerableDictionaryAsync();
+            return await lifecycleHelper.SendMultipleScadaCommandAsync(commands, enumerableCommandedElements, CommandOriginType.LOCATION_AND_ISOLATING_ALGORITHM_COMMAND);
         }
         #endregion Private Methods
     }

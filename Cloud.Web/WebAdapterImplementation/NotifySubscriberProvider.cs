@@ -40,6 +40,7 @@ namespace WebAdapterImplementation
         {
             if (message is ActiveOutageMessage activeOutage)
             {
+                Logger.LogInformation($"{baseLogString} Notify => ActiveOutageMessageReceived. OutageId: 0x{activeOutage.OutageId:x16} ElementId: 0x{activeOutage.OutageElementGid}");
                 var outageDispatcher = new OutageHubDispatcher(_outageMapper);
                 outageDispatcher.Connect();
 

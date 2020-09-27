@@ -1,16 +1,15 @@
 ﻿using Common.OMS;
+using Common.PubSubContracts.DataContracts.CE;
 using Common.PubSubContracts.DataContracts.EMAIL;
 using Microsoft.ServiceFabric.Data;
 using Microsoft.ServiceFabric.Data.Notifications;
 using OMS.Common.Cloud;
 using OMS.Common.Cloud.Logger;
-using OMS.Common.Cloud.Names;
 using OMS.Common.Cloud.ReliableCollectionHelpers;
 using OMS.Common.NmsContracts;
 using OMS.Common.PubSubContracts;
 using OMS.Common.PubSubContracts.Interfaces;
-using OMS.Common.WcfClient.OMS;
-using OMS.Common.WcfClient.OMS.ModelProvider;
+using OMS.Common.WcfClient.CE;
 using System;
 using System.Configuration;
 using System.Linq;
@@ -135,33 +134,36 @@ namespace OMS.CallTrackingImplementation
                 }
 
                 Logger.LogInformation($"Received call from Energy Consumer with GID: 0x{emailMessage.Gid:X16}.");
-                var outageModelReadAccessClient = OutageModelReadAccessClient.CreateClient();
 
                 if (!modelResourcesDesc.GetModelCodeFromId(emailMessage.Gid).Equals(ModelCode.ENERGYCONSUMER))
                 {
-                    Logger.LogWarning("Received GID is not id of energy consumer.");
+                    Logger.LogWarning($"Received GID 0x{emailMessage.Gid:X16} is not id of energy consumer.");
+                    return;
                 }
-                else if (await outageModelReadAccessClient.GetElementById(emailMessage.Gid) == null/*!outageModel.TopologyModel.OutageTopology.ContainsKey(emailMessage.Gid) && outageModel.TopologyModel.FirstNode != emailMessage.Gid*/)
+
+                var topologyProviderClient = TopologyProviderClient.CreateClient();
+                var topology = await topologyProviderClient.GetOMSModel();
+                
+                if (!topology.GetElementByGid(emailMessage.Gid, out OutageTopologyElement elment))
                 {
-                    Logger.LogWarning("Received GID is not part of topology");
+                    Logger.LogWarning($"Received GID 0x{emailMessage.Gid:X16} is not part of topology.");
+                    return;
                 }
-                else
+
+                if (!timer.Enabled)
                 {
-                    if (!timer.Enabled)
-                    {
-                        timer.Start();
-                    }
+                    timer.Start();
+                }
 
-                    await Calls.SetAsync(emailMessage.Gid, emailMessage.Gid);
-                    Logger.LogInformation($"Current number of calls is: {await Calls.GetCountAsync()}.");
+                await Calls.SetAsync(emailMessage.Gid, emailMessage.Gid);
+                Logger.LogInformation($"Current number of calls is: {await Calls.GetCountAsync()}.");
 
-                    if (await Calls.GetCountAsync() >= expectedCalls)
-                    {
-                        await trackingAlgorithm.Start((await Calls.GetDataCopyAsync()).Keys.ToList());
+                if (await Calls.GetCountAsync() >= expectedCalls)
+                {
+                    await trackingAlgorithm.Start((await Calls.GetDataCopyAsync()).Keys.ToList());
 
-                        await Calls.ClearAsync();
-                        timer.Stop();
-                    }
+                    await Calls.ClearAsync();
+                    timer.Stop();
                 }
             }
         }

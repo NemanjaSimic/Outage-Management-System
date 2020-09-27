@@ -14,7 +14,7 @@ namespace Common.OmsContracts.ModelAccess
 	public interface IEquipmentAccessContract : IService, IHealthChecker
 	{
 		[OperationContract]
-		Task<IEnumerable<Equipment>> GetAllEquipments();
+		Task<List<Equipment>> GetAllEquipments();
 
 		[OperationContract]
 		Task<Equipment> GetEquipment(long gid);
@@ -30,16 +30,5 @@ namespace Common.OmsContracts.ModelAccess
 
 		[OperationContract]
 		Task RemoveAllEquipments();
-
-        //[OperationContract]
-        //Task<IEnumerable<Equipment>> FindEquipment(EquipmentExpression expression);
     }
-
-    
- //   [DataContract]
- //   public class EquipmentExpression
-	//{
- //       [DataMember]
- //       public Expression<Func<Equipment, bool>> Predicate { get; set; }
- //   }
 }

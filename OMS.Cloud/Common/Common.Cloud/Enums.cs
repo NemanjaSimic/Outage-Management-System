@@ -125,6 +125,9 @@ namespace OMS.Common.Cloud
         ISOLATING_ALGORITHM_COMMAND,
 
         [EnumMember]
+        LOCATION_AND_ISOLATING_ALGORITHM_COMMAND,
+
+        [EnumMember]
         CE_COMMAND,
 
         [EnumMember]
@@ -158,6 +161,15 @@ namespace OMS.Common.Cloud
 
         [EnumMember]
         REMOVED = 5
+    }
+
+    [DataContract]
+    public enum NetworkType : short
+    {
+        [EnumMember]
+        SCADA_NETWORK = 1,
+        [EnumMember]
+        NON_SCADA_NETWORK = 2,
     }
 
     [DataContract]

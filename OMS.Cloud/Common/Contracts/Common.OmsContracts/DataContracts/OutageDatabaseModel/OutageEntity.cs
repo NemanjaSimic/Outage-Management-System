@@ -7,9 +7,9 @@ using System.Runtime.Serialization;
 
 namespace Common.OmsContracts.DataContracts.OutageDatabaseModel
 {
-    //dodato radi testa 16/8/2020
-    //[DataContract(IsReference = true)]
-    [DataContract]
+	//dodato radi testa 16/8/2020
+	[DataContract(IsReference = true)]
+    //[DataContract]
     public class OutageEntity
     {
         [Key]

@@ -9,7 +9,6 @@ using OMS.Common.WcfClient.SCADA;
 using OMS.Common.Cloud.Logger;
 using OMS.Common.Cloud;
 using OMS.Common.Cloud.Exceptions.SCADA;
-using System.ServiceModel;
 using OMS.Common.ScadaContracts.FunctionExecutior;
 using OMS.Common.ScadaContracts.ModelProvider;
 
@@ -39,7 +38,7 @@ namespace SCADA.CommandingImplementation
         }
 
         #region IScadaCommandingContract
-        public async Task SendSingleAnalogCommand(long gid, float commandingValue, CommandOriginType commandOriginType)
+        public async Task<bool> SendSingleAnalogCommand(long gid, float commandingValue, CommandOriginType commandOriginType)
         {
             string verboseMessage = $"{baseLogString} SendSingleAnalogCommand method called. gid: {gid:X16}, commandingValue: {commandingValue}, commandOriginType: {commandOriginType}";
             Logger.LogVerbose(verboseMessage);
@@ -51,14 +50,16 @@ namespace SCADA.CommandingImplementation
             {
                 string message = $"{baseLogString} SendSingleAnalogCommand => SendSingleAnalogCommand => SCADA model is null.";
                 Logger.LogError(message);
-                throw new InternalSCADAServiceException(message);
+                //throw new InternalSCADAServiceException(message);
+                return false;
             }
 
             if (!gidToPointItemMap.ContainsKey(gid))
             {
                 string message = $"{baseLogString} SendSingleAnalogCommand => Entity with gid: 0x{gid:X16} does not exist in current SCADA model.";
                 Logger.LogError(message);
-                throw new ArgumentException(message);
+                //throw new ArgumentException(message);
+                return false;
             }
 
             IScadaModelPointItem pointItem = gidToPointItemMap[gid];
@@ -67,7 +68,8 @@ namespace SCADA.CommandingImplementation
             {
                 string message = $"{baseLogString} SendSingleAnalogCommand => Either RegistarType of entity with gid: 0x{gid:X16} is not ANALOG_OUTPUT or entity does not implement IAnalogPointItem interface.";
                 Logger.LogError(message);
-                throw new ArgumentException(message);
+                //throw new ArgumentException(message);
+                return false;
             }
 
             try
@@ -89,22 +91,25 @@ namespace SCADA.CommandingImplementation
 
                 debugMessage = $"{baseLogString} SendSingleAnalogCommand => SendSingleCommand() executed SUCCESSFULLY";
                 Logger.LogDebug(debugMessage);
+
+                return true;
             }
             catch (Exception e)
             {
                 string message = $"{baseLogString} SendSingleAnalogCommand => Exception in SendAnalogCommand() method.";
                 Logger.LogError(message, e);
-                throw new InternalSCADAServiceException(message, e);
+                //throw new InternalSCADAServiceException(message, e);
+                return false;
             }
         }
 
-        public async Task SendMultipleAnalogCommand(Dictionary<long, float> commandingValues, CommandOriginType commandOriginType)
+        public async Task<bool> SendMultipleAnalogCommand(Dictionary<long, float> commandingValues, CommandOriginType commandOriginType)
         {
             if(commandingValues.Count == 0)
             {
                 string warnMessage = $"{baseLogString} SendMultipleAnalogCommand => commandingValues is empty and thus aborting the call.";
                 Logger.LogWarning(warnMessage);
-                return;
+                return false;
             }
 
             ushort startAddress = 1; //EasyModbus spec
@@ -116,7 +121,8 @@ namespace SCADA.CommandingImplementation
             {
                 string message = $"{baseLogString} SendMultipleAnalogCommand => SCADA model is null.";
                 Logger.LogError(message);
-                throw new InternalSCADAServiceException(message);
+                //throw new InternalSCADAServiceException(message);
+                return false;
             }
 
             int analogOutputCount = addressToGidMap[(short)PointType.ANALOG_OUTPUT].Count;
@@ -132,20 +138,23 @@ namespace SCADA.CommandingImplementation
                 {
                     string message = $"{baseLogString} SendMultipleAnalogCommand => Entity with gid: 0x{gid:X16} does not exist in current SCADA model.";
                     Logger.LogError(message);
-                    throw new ArgumentException(message);
+                    //throw new ArgumentException(message);
+                    return false;
                 }
                 else if(!(gidToPointItemMap[gid] is IAnalogPointItem analogPointItem))
                 {
                     string message = $"{baseLogString} SendMultipleAnalogCommand => Entity with gid: 0x{gid:X16} does not implement IAnalogPointItem interface.";
                     Logger.LogError(message);
-                    throw new InternalSCADAServiceException(message);
+                    //throw new InternalSCADAServiceException(message);
+                    return false;
                 }
                 else
                 {
                     if (!analogPointItem.Initialized)
                     {
-                        string errorMessage = $"{baseLogString} SendSingleAnalogCommand => PointItem was initialized. Gid: 0x{analogPointItem.Gid:X16}, Addres: {analogPointItem.Address}, Name: {analogPointItem.Name}, RegisterType: {analogPointItem.RegisterType}, Initialized: {analogPointItem.Initialized}";
+                        string errorMessage = $"{baseLogString} SendSingleAnalogCommand => PointItem was NOT initialized. Gid: 0x{analogPointItem.Gid:X16}, Addres: {analogPointItem.Address}, Name: {analogPointItem.Name}, RegisterType: {analogPointItem.RegisterType}, Initialized: {analogPointItem.Initialized}";
                         Logger.LogError(errorMessage);
+                        return false;
                     }
 
                     int commandingValue;
@@ -167,7 +176,8 @@ namespace SCADA.CommandingImplementation
                     {
                         string errorMessage = $"{baseLogString} SendMultipleAnalogCommand => PointItem addresses of ANALOG entities are not successive. This can happen due to cim/xml being invalid.";
                         Logger.LogError(errorMessage);
-                        throw new Exception(errorMessage);
+                        //throw new Exception(errorMessage);
+                        return false;
                     }
                 }
             }
@@ -182,16 +192,19 @@ namespace SCADA.CommandingImplementation
 
                 debugMessage = $"{baseLogString} SendMultipleAnalogCommand => SendMultipleCommand() executed SUCCESSFULLY";
                 Logger.LogDebug(debugMessage);
+
+                return true;
             }
             catch (Exception e)
             {
                 string message = $"{baseLogString} SendMultipleAnalogCommand => Exception: {e.Message}.";
                 Logger.LogError(message, e);
-                throw new InternalSCADAServiceException(message, e);
+                //throw new InternalSCADAServiceException(message, e);
+                return false;
             }
         }
 
-        public async Task SendSingleDiscreteCommand(long gid, ushort commandingValue, CommandOriginType commandOriginType)
+        public async Task<bool> SendSingleDiscreteCommand(long gid, ushort commandingValue, CommandOriginType commandOriginType)
         {
             IScadaModelReadAccessContract scadaModelReadAccessClient = ScadaModelReadAccessClient.CreateClient();
             Dictionary<long, IScadaModelPointItem> gidToPointItemMap = await scadaModelReadAccessClient.GetGidToPointItemMap();
@@ -200,14 +213,16 @@ namespace SCADA.CommandingImplementation
             {
                 string message = $"{baseLogString} SendSingleDiscreteCommand => SCADA model is null.";
                 Logger.LogError(message);
-                throw new InternalSCADAServiceException(message);
+                //throw new InternalSCADAServiceException(message);
+                return false;
             }
 
             if (!gidToPointItemMap.ContainsKey(gid))
             {
                 string message = $"{baseLogString} SendSingleDiscreteCommand => Entity with gid: 0x{gid:X16} does not exist in current SCADA model.";
                 Logger.LogError(message);
-                throw new ArgumentException(message);
+                //throw new ArgumentException(message);
+                return false;
             }
 
             IScadaModelPointItem pointItem = gidToPointItemMap[gid];
@@ -216,7 +231,8 @@ namespace SCADA.CommandingImplementation
             {
                 string message = $"{baseLogString} SendSingleDiscreteCommand => RegistarType of entity with gid: 0x{gid:X16} is not DIGITAL_OUTPUT or entity does not implement IDiscretePointItem interface.";
                 Logger.LogError(message);
-                throw new ArgumentException(message);
+                //throw new ArgumentException(message);
+                return false;
             }
 
             try
@@ -229,22 +245,25 @@ namespace SCADA.CommandingImplementation
 
                 debugMessage = $"{baseLogString} SendSingleDiscreteCommand => SendSingleCommand() executed SUCCESSFULLY";
                 Logger.LogDebug(debugMessage);
+
+                return true;
             }
             catch (Exception e)
             {
                 string message = $"{baseLogString} SendSingleDiscreteCommand => Exception: {e.Message}.";
                 Logger.LogError(message, e);
-                throw new InternalSCADAServiceException(message, e);
+                //throw new InternalSCADAServiceException(message, e);
+                return false;
             }
         }
 
-        public async Task SendMultipleDiscreteCommand(Dictionary<long, ushort> commandingValues, CommandOriginType commandOriginType)
+        public async Task<bool> SendMultipleDiscreteCommand(Dictionary<long, ushort> commandingValues, CommandOriginType commandOriginType)
         {
             if (commandingValues.Count == 0)
             {
                 string warnMessage = $"{baseLogString} SendMultipleDiscreteCommand => commandingValues is empty and thus aborting the call.";
                 Logger.LogWarning(warnMessage);
-                return;
+                return false;
             }
 
             ushort startAddress = 1; //EasyModbus spec
@@ -256,7 +275,8 @@ namespace SCADA.CommandingImplementation
             {
                 string message = $"{baseLogString} SendMultipleDiscreteCommand => SCADA model is null.";
                 Logger.LogError(message);
-                throw new InternalSCADAServiceException(message);
+                //throw new InternalSCADAServiceException(message);
+                return false;
             }
 
             int digitalOutputCount = addressToGidMap[(short)PointType.DIGITAL_OUTPUT].Count;
@@ -270,13 +290,15 @@ namespace SCADA.CommandingImplementation
                 {
                     string message = $"{baseLogString} SendMultipleDiscreteCommand => Entity with gid: 0x{gid:X16} does not exist in current SCADA model.";
                     Logger.LogError(message);
-                    throw new ArgumentException(message);
+                    //throw new ArgumentException(message);
+                    return false;
                 }
                 else if (!(gidToPointItemMap[gid] is IDiscretePointItem discretePointItem))
                 {
                     string message = $"{baseLogString} SendMultipleDiscreteCommand => Entity with gid: 0x{gid:X16} does not implement IDiscretePointItem interface.";
                     Logger.LogError(message);
-                    throw new InternalSCADAServiceException(message);
+                    //throw new InternalSCADAServiceException(message);
+                    return false;
                 }
                 else
                 {
@@ -299,7 +321,8 @@ namespace SCADA.CommandingImplementation
                     {
                         string errorMessage = $"{baseLogString} SendMultipleDiscreteCommand => PointItem addresses of DISCRETE entities are not successive. This can happen due to cim/xml being invalid.";
                         Logger.LogError(errorMessage);
-                        throw new Exception(errorMessage);
+                        //throw new Exception(errorMessage);
+                        return false;
                     }
                 }
             }
@@ -314,12 +337,15 @@ namespace SCADA.CommandingImplementation
 
                 debugMessage = $"{baseLogString} SendMultipleDiscreteCommand => SendMultipleCommand() executed SUCCESSFULLY";
                 Logger.LogDebug(debugMessage);
+
+                return true;
             }
             catch (Exception e)
             {
                 string message = $"{baseLogString} SendMultipleDiscreteCommand => Exception: {e.Message}.";
                 Logger.LogError(message, e);
-                throw new InternalSCADAServiceException(message, e);
+                //throw new InternalSCADAServiceException(message, e);
+                return false;
             }
         }
         #endregion IScadaCommandingContract

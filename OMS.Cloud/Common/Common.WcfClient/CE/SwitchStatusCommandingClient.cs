@@ -30,12 +30,12 @@ namespace OMS.Common.WcfClient.CE
 			return factory.CreateClient<SwitchStatusCommandingClient, ISwitchStatusCommandingContract>(serviceUri, servicePartitionKey);
 		}
 
-		public Task SendCloseCommand(long gid)
+		public Task<bool> SendCloseCommand(long gid)
 		{
             return InvokeWithRetryAsync(client => client.Channel.SendCloseCommand(gid));
 		}
 
-		public Task SendOpenCommand(long gid)
+		public Task<bool> SendOpenCommand(long gid)
 		{
             return InvokeWithRetryAsync(client => client.Channel.SendOpenCommand(gid));
 		}

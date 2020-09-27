@@ -1,11 +1,7 @@
-﻿using Common.OmsContracts.ModelProvider;
-using Common.OmsContracts.OutageLifecycle;
-using Common.PubSubContracts.DataContracts.CE;
+﻿using Common.PubSubContracts.DataContracts.CE;
 using OMS.Common.Cloud;
 using OMS.Common.Cloud.Logger;
 using OMS.Common.WcfClient.CE;
-using OMS.Common.WcfClient.OMS;
-using OMS.Common.WcfClient.OMS.ModelProvider;
 using OMS.Common.WcfClient.OMS.OutageLifecycle;
 using System;
 using System.Collections.Generic;
@@ -39,8 +35,8 @@ namespace OMS.CallTrackingImplementation
 			Logger.LogDebug("Starting tracking algorithm.");
 
             //on every start tracking algorithm get up to date outage topology model
-            var outageModelReadAccessClient = OutageModelReadAccessClient.CreateClient();
-            outageTopologyModel = await outageModelReadAccessClient.GetTopologyModel();
+            var topologyProviderClient = TopologyProviderClient.CreateClient();
+            outageTopologyModel = await topologyProviderClient.GetOMSModel();
 
             this.potentialOutages = LocateSwitchesUsingCalls(calls);
             this.outages = new List<long>();
@@ -89,7 +85,8 @@ namespace OMS.CallTrackingImplementation
                 var ceModelProviderClient = CeModelProviderClient.CreateClient();
                 if (!await ceModelProviderClient.IsRecloser(potentialOutageElementGid))
                 {
-                    await reportOutageClient.ReportPotentialOutage(potentialOutageElementGid, CommandOriginType.NON_SCADA_OUTAGE);
+                    //TODO: razdvojiti metode scada, noScada
+                    await reportOutageClient.ReportPotentialOutage(potentialOutageElementGid, CommandOriginType.NON_SCADA_OUTAGE, NetworkType.NON_SCADA_NETWORK);
                 }
                 else
                 {

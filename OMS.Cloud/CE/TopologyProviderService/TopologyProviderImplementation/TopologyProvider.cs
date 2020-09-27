@@ -15,6 +15,7 @@ using OMS.Common.PubSubContracts;
 using OMS.Common.WcfClient.CE;
 using OMS.Common.WcfClient.PubSub;
 using System;
+using System.Collections.Concurrent;
 using System.Collections.Generic;
 using System.Linq;
 using System.Threading.Tasks;
@@ -26,6 +27,7 @@ namespace CE.TopologyProviderImplementation
         #region Fields
         private readonly string baseLogString;
         private readonly IReliableStateManager stateManager;
+        private ConcurrentDictionary<long, int> recloserCounters;
 
         private const long topologyID = 1;
         private const long transactionTopologyID = 2;
@@ -109,6 +111,8 @@ namespace CE.TopologyProviderImplementation
             this.isTopologyCacheInitialized = false;
             this.isTopologyCacheUIInitialized = false;
             this.isTopologyCacheOMSInitialized = false;
+
+            recloserCounters = new ConcurrentDictionary<long, int>();
 
             transactionFlag = TransactionFlag.NoTransaction;
 
@@ -269,27 +273,34 @@ namespace CE.TopologyProviderImplementation
 
             try
             {
-                var topology = await GetTopologyFromCache(TopologyType.NoSpecific);
 
-                if (topology.GetElementByGid(recloserGid, out ITopologyElement element))
-                {
-                    if (element is Recloser recloser)
-                    {
-                        recloser.NumberOfTry = 0;
-                    }
-                    else
-                    {
-                        string errorMessage = $"{baseLogString} ResetRecloser => Element with GID {recloserGid:X16} is not a recloser.";
-                        Logger.LogError(errorMessage);
-                        throw new Exception(errorMessage);
-                    }
-                }
-                else
-                {
-                    string errorMessage = $"{baseLogString} ResetRecloser => Element with GID {recloserGid:X16} does not exist in Topology.";
-                    Logger.LogError(errorMessage);
-                    throw new Exception(errorMessage);
-                }
+                recloserCounters[recloserGid] = 0;
+                                
+                //var topology = await GetTopologyFromCache(TopologyType.NoSpecific);
+
+                //if (topology.GetElementByGid(recloserGid, out ITopologyElement element))
+                //{
+                //    if (element is Recloser recloser)
+                //    {
+                //        var oldNumberOfTry = recloser.NumberOfTry;
+                //        recloser.NumberOfTry = 0;
+                //        await TopologyCache.SetAsync(topologyID, topology);
+
+                //        Logger.LogDebug($"{baseLogString} ResetRecloser => RecloserGid: 0x{recloser.Id:X16}, IsActive: {recloser.IsActive}, NumberOfTry[OLD]: {oldNumberOfTry}, NumberOfTry[NEW]:{recloser.NumberOfTry}");
+                //    }
+                //    else
+                //    {
+                //        string errorMessage = $"{baseLogString} ResetRecloser => Element with GID {recloserGid:X16} is not a recloser.";
+                //        Logger.LogError(errorMessage);
+                //        throw new Exception(errorMessage);
+                //    }
+                //}
+                //else
+                //{
+                //    string errorMessage = $"{baseLogString} ResetRecloser => Element with GID {recloserGid:X16} does not exist in Topology.";
+                //    Logger.LogError(errorMessage);
+                //    throw new Exception(errorMessage);
+                //}
 
             }
             catch (Exception e)
@@ -301,6 +312,71 @@ namespace CE.TopologyProviderImplementation
                 throw;
             }
 
+        }
+
+        public async Task<int> GetRecloserCount(long recloserGid)
+        {
+            if (recloserCounters.TryGetValue(recloserGid, out int count))
+            {
+                return count;
+            }
+            else
+            {
+                return 0;
+            }
+        }
+
+        public async Task RecloserOpened(long recloserGid)
+        {
+            string verboseMessage = $"{baseLogString} entering ResetRecloser method. Recloser GID {recloserGid:X16}.";
+            Logger.LogVerbose(verboseMessage);
+
+            try
+            {
+                if (recloserCounters.TryGetValue(recloserGid, out int count))
+                {
+                    recloserCounters[recloserGid] = count+1;
+                }
+                else
+                {
+                    recloserCounters.TryAdd(recloserGid, 1);
+                }
+
+                //var topology = await GetTopologyFromCache(TopologyType.NoSpecific);
+
+                //if (topology.GetElementByGid(recloserGid, out ITopologyElement element))
+                //{
+                //    if (element is Recloser recloser)
+                //    {
+                //        var oldNumberOfTry = recloser.NumberOfTry;
+                //        recloser.NumberOfTry++;
+                //        await TopologyCache.SetAsync(topologyID, topology);
+
+                //        Logger.LogDebug($"{baseLogString} RecloserOpened => RecloserGid: 0x{recloser.Id:X16}, IsActive: {recloser.IsActive}, NumberOfTry[OLD]: {oldNumberOfTry}, NumberOfTry[NEW]:{recloser.NumberOfTry}");
+                //    }
+                //    else
+                //    {
+                //        string errorMessage = $"{baseLogString} RecloserOpened => Element with GID {recloserGid:X16} is not a recloser.";
+                //        Logger.LogError(errorMessage);
+                //        throw new Exception(errorMessage);
+                //    }
+                //}
+                //else
+                //{
+                //    string errorMessage = $"{baseLogString} RecloserOpened => Element with GID {recloserGid:X16} does not exist in Topology.";
+                //    Logger.LogError(errorMessage);
+                //    throw new Exception(errorMessage);
+                //}
+
+            }
+            catch (Exception e)
+            {
+                string errorMessage = $"{baseLogString} RecloserOpened =>" +
+                    $"{Environment.NewLine} Exception message: {e.Message} " +
+                    $"{Environment.NewLine} Stack Trace: {e.StackTrace}";
+                Logger.LogError(errorMessage);
+                throw;
+            }
         }
 
         #region Distributed Transaction
