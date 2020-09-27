@@ -352,8 +352,8 @@ namespace CE.ModelProviderImplementation
 				{
 					if (element.Measurements.Count == 0)
 					{
-						await CreateNoScadaMeasurementAsync(element);
-						updatedElements.Add(element);
+						ITopologyElement updatedElement = await CreateNoScadaMeasurementAsync(element);
+						updatedElements.Add(updatedElement);
 					}
 				}
 
@@ -362,6 +362,7 @@ namespace CE.ModelProviderImplementation
 					await TopologyElements.SetAsync(updatedEl.Id, updatedEl);
 				}
 
+				enumerableTopologyElements = await TopologyElements.GetEnumerableDictionaryAsync();
 				modelDelta.TopologyElements = enumerableTopologyElements;
 				modelDelta.ElementConnections = await ElementConnections.GetEnumerableDictionaryAsync();
 

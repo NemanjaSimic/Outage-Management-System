@@ -547,7 +547,10 @@ namespace CE.ModelProviderImplementation
 
             foreach (var item in dict)
             {
-                retVal.Add(item.Key, item.Value as TopologyElement);
+                if (!retVal.ContainsKey(item.Key))
+                {
+                    retVal.Add(item.Key, item.Value as TopologyElement);
+                }
             }
 
             return retVal;

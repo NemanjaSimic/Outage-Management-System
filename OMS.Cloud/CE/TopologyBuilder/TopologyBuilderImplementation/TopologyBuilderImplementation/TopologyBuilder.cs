@@ -47,7 +47,10 @@ namespace CE.TopologyBuilderImplementation
 
             foreach (var item in dict)
             {
-                retVal.Add(item.Key, item.Value as ITopologyElement);
+                if (!retVal.ContainsKey(item.Key))
+                {
+                    retVal.Add(item.Key, item.Value as ITopologyElement);
+                }
             }
 
             return retVal;
