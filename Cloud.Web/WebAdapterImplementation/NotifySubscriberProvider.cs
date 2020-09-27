@@ -1,4 +1,5 @@
 ﻿using Common.PubSubContracts.DataContracts.CE;
+using Common.PubSubContracts.DataContracts.EMAIL;
 using Common.PubSubContracts.DataContracts.OMS;
 using Common.Web.Mappers;
 using Common.Web.Models.ViewModels;
@@ -104,6 +105,21 @@ namespace WebAdapterImplementation
                     Logger.LogError(errorMessage, e);
                 }
             }
+            else if (message is EmailToOutageMessage emailToOutageMessage)
+			{
+                var outageEmailDispatcher = new OutageEmailHubDispatcher();
+                outageEmailDispatcher.Connect();
+
+                try
+				{
+                    await outageEmailDispatcher.NotifyGraphOutageCall(emailToOutageMessage.Gid);
+				}
+                catch (Exception e)
+				{
+                    string errorMessage = $"{baseLogString} Notify => exception {e.Message}";
+                    Logger.LogError(errorMessage, e);
+                }
+			}
         }
 
         public Task<string> GetSubscriberName()

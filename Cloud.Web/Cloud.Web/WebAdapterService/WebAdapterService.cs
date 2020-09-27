@@ -104,6 +104,7 @@ namespace WebAdapterService
                     Topic.ACTIVE_OUTAGE,
                     Topic.ARCHIVED_OUTAGE,
                     Topic.TOPOLOGY,
+                    Topic.OUTAGE_EMAIL,
                 };
 
                 var result = await registerSubscriberClient.SubscribeToTopics(topics, MicroserviceNames.WebAdapterService);

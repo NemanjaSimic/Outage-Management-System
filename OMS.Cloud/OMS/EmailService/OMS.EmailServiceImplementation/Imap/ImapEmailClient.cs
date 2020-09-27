@@ -26,14 +26,14 @@ namespace OMS.EmailImplementation.Imap
 		protected readonly IImapEmailMapper mapper;
 		protected readonly IEmailParser parser;
 		protected readonly IPublisherContract publisher;
-		protected readonly IDispatcher dispatcher;
+		//protected readonly IDispatcher dispatcher;
 
 		protected readonly string address;
 		protected readonly string password;
 		protected readonly string server;
 		protected readonly int port;
 
-		public ImapEmailClient(IImapEmailMapper mapper, IEmailParser parser, IPublisherContract publisher, IDispatcher dispatcher)
+		public ImapEmailClient(IImapEmailMapper mapper, IEmailParser parser, IPublisherContract publisher)
 		{
 			address = ConfigurationManager.AppSettings["emailAddress"];
 			password = ConfigurationManager.AppSettings["emailPassword"];
@@ -43,7 +43,7 @@ namespace OMS.EmailImplementation.Imap
 			this.mapper = mapper;
 			this.parser = parser;
 			this.publisher = publisher;
-			this.dispatcher = dispatcher;
+			//this.dispatcher = dispatcher;
 
 			client = new ImapClient(server, port, true);
 		}
@@ -81,10 +81,10 @@ namespace OMS.EmailImplementation.Imap
 
 				OutageTracingModel tracingModel = parser.Parse(outageMessage);
 
-				if (tracingModel.IsValidReport)
-				{
-					dispatcher.Dispatch(tracingModel.Gid);
-				}
+				//if (tracingModel.IsValidReport)
+				//{
+				//	dispatcher.Dispatch(tracingModel.Gid);
+				//}
 
 				try
 				{

@@ -39,6 +39,7 @@
     <ProjectReference Include="..\CE\TopologyProviderService\CE.TopologyProviderService.csproj" />
     <ProjectReference Include="..\NMS\NMS.GdaService\NMS.GdaService.csproj" />
     <ProjectReference Include="..\OMS\CallTracking\OMS.CallTrackingService\OMS.CallTrackingService.csproj" />
+    <ProjectReference Include="..\OMS\EmailService\OMS.EmailService\OMS.EmailService.csproj" />
     <ProjectReference Include="..\OMS\HistoryDBManager\OMS.HistoryDBManagerService\OMS.HistoryDBManagerService.csproj" />
     <ProjectReference Include="..\OMS\OutageLifecycle\OMS.OutageLifecycleService\OMS.OutageLifecycleService.csproj" />
     <ProjectReference Include="..\OMS\OutageSimulator\OMS.OutageSimulatorService\OMS.OutageSimulatorService.csproj" />

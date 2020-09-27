@@ -14,9 +14,8 @@ namespace OMS.EmailImplementation.Imap
         public ImapIdleEmailClient(
              IImapEmailMapper mapper,
              IEmailParser parser,
-             IPublisherContract publisher,
-             IDispatcher dispatcher)
-             : base(mapper, parser, publisher, dispatcher)
+             IPublisherContract publisher)
+             : base(mapper, parser, publisher)
         { }
 
         public bool StartIdling()
@@ -53,10 +52,10 @@ namespace OMS.EmailImplementation.Imap
 
                 OutageTracingModel tracingModel = parser.Parse(outageMessage);
 
-                if (tracingModel.IsValidReport)
-                {
-                    dispatcher.Dispatch(tracingModel.Gid);
-                }
+                //if (tracingModel.IsValidReport)
+                //{
+                //    dispatcher.Dispatch(tracingModel.Gid);
+                //}
 
                 try
                 {
