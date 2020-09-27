@@ -264,11 +264,6 @@ namespace OMS.OutageLifecycleImplementation.Algorithm
 
                 return new ConditionalValue<long>(true, algorithm.HeadBreakerGid);
             }
-            else if(headMeasurementData.Value != (ushort)DiscreteCommandingType.OPEN)
-            {
-                Logger.LogError($"{algorithmBaseLogString} StartIndividualAlgorithmCycle => headMeasurementData.Value is {headMeasurementData.Value} and cannot be casted to {typeof(DiscreteCommandingType)}.");
-                return new ConditionalValue<long>(false, algorithm.HeadBreakerGid);
-            }
             else if(headMeasurementData.Value == (ushort)DiscreteCommandingType.OPEN)
             {
                 //skipping untill all commands were successfully executed
@@ -278,6 +273,11 @@ namespace OMS.OutageLifecycleImplementation.Algorithm
                     Logger.LogInformation($"{algorithmBaseLogString} StartIndividualAlgorithmCycle => Skipping the cycle and waiting for {commandsCount} commands to be executed. HEAD is OPENED. AlgorithCycleCounter remains set on {algorithm.CycleCounter}.");
                     return new ConditionalValue<long>(true, algorithm.HeadBreakerGid);
                 }
+            }
+            else
+            {
+                Logger.LogError($"{algorithmBaseLogString} StartIndividualAlgorithmCycle => headMeasurementData.Value is {headMeasurementData.Value} and cannot be casted to {typeof(DiscreteCommandingType)}.");
+                return new ConditionalValue<long>(false, algorithm.HeadBreakerGid);
             }
             #endregion
 
@@ -349,7 +349,19 @@ namespace OMS.OutageLifecycleImplementation.Algorithm
                 return false;
             }
 
-            commands.Keys.ToList().ForEach(commandedElementGid => algorithm.ElementsCommandedInCurrentCycle.Add(commandedElementGid));
+            commands.Keys.ToList().ForEach(async commandedElementGid =>
+            {
+                var commandedElement = new CommandedElement()
+                {
+                    ElementGid = commandedElementGid,
+                    CorrespondingHeadElementGid = algorithm.HeadBreakerGid,
+                    CommandingType = commands[commandedElementGid],
+                };
+                await CommandedElements.SetAsync(commandedElementGid, commandedElement);
+
+                algorithm.ElementsCommandedInCurrentCycle.Add(commandedElementGid);
+            });
+
             await StartedIsolationAlgorithms.SetAsync(algorithm.HeadBreakerGid, algorithm);
             return true;
         }
