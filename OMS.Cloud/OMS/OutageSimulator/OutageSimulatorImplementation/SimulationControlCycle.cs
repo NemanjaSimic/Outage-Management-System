@@ -165,11 +165,13 @@ namespace OMS.OutageSimulatorImplementation
                         continue;
                     }
 
+                    var defaultIsolationPoint = enumerableMonitoredPoints[defaultPointMeasurementGid].DiscreteModbusData;
                     ushort optimumIsolationPointValue = enumerableMonitoredPoints[optimumPointMeasurementGid].DiscreteModbusData.Value;
 
-                    if (optimumIsolationPointValue == (ushort)DiscreteCommandingType.CLOSE)
+                    if (optimumIsolationPointValue == (ushort)DiscreteCommandingType.CLOSE && defaultIsolationPoint.Value == (ushort)DiscreteCommandingType.CLOSE)
                     {
-                        defaultIsolationPointsToBeOpened.Add(defaultPointMeasurementGid, enumerableMonitoredPoints[defaultPointMeasurementGid].DiscreteModbusData);
+                        defaultIsolationPointsToBeOpened.Add(defaultPointMeasurementGid, defaultIsolationPoint);
+                        Logger.LogInformation($"{baseLogString} Start => preparing command to OPEN 0x{defaultPointElementGid:X16} because element 0x{optimumPointElementGid:X16} is CLOSED.");
                     }
                 }
             }
@@ -189,7 +191,7 @@ namespace OMS.OutageSimulatorImplementation
 
                 var value = (ushort)DiscreteCommandingType.OPEN;
 
-                if (isolationPoints[measurementGid].Value != (ushort)DiscreteCommandingType.OPEN && await GetCommandedValuesCondition(measurementGid, value))
+                if (isolationPoints[measurementGid].Value == (ushort)DiscreteCommandingType.CLOSE && await GetCommandedValuesCondition(measurementGid, value))
                 {
                     await scadaCommandingClient.SendSingleDiscreteCommand(measurementGid,
                                                                           value,

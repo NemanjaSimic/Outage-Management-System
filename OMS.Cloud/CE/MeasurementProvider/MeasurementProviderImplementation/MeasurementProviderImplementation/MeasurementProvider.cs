@@ -648,11 +648,16 @@ namespace CE.MeasurementProviderImplementation
 
 			try
 			{
+				if(commands.Count == 0)
+				{
+					Logger.LogDebug($"{baseLogString} SendMultipleAnalogCommand => No commands to send.");
+					return true;
+				}
+				
 				Logger.LogDebug($"{baseLogString} SendMultipleAnalogCommand => Calling Send Multiple analog command from scada commanding client.");
 				var scadaCommandingClient = ScadaCommandingClient.CreateClient();
 				var success = await scadaCommandingClient.SendMultipleAnalogCommand(commands, commandOrigin);
 				Logger.LogDebug($"{baseLogString} SendMultipleAnalogCommand => Send Multiple analog command from scada commanding client called.");
-
 				return success;
 			}
 			catch (Exception e)
@@ -670,7 +675,14 @@ namespace CE.MeasurementProviderImplementation
 
 			try
 			{
+				if (commands.Count == 0)
+				{
+					Logger.LogDebug($"{baseLogString} SendMultipleDiscreteCommand => No commands to send.");
+					return true;
+				}
+
 				var nonArtificalCommands = new Dictionary<long, ushort>();
+				var artificalCommands = new Dictionary<long, DiscreteModbusData>();
 
 				foreach (var measurementGid in commands.Keys)
                 {
@@ -685,12 +697,7 @@ namespace CE.MeasurementProviderImplementation
 
 					if (measurement is ArtificalDiscreteMeasurement)
 					{
-						Dictionary<long, DiscreteModbusData> data = new Dictionary<long, DiscreteModbusData>(1)
-						{
-							{ measurementGid, new DiscreteModbusData(value, AlarmType.NO_ALARM, measurementGid, commandOrigin) }
-						};
-
-						await UpdateDiscreteMeasurement(data);
+						artificalCommands.Add(measurementGid, new DiscreteModbusData(value, AlarmType.NO_ALARM, measurementGid, commandOrigin));
 					}
 					else
 					{
@@ -702,6 +709,8 @@ namespace CE.MeasurementProviderImplementation
 				var scadaCommandingClient = ScadaCommandingClient.CreateClient();
 				var success = await scadaCommandingClient.SendMultipleDiscreteCommand(nonArtificalCommands, commandOrigin);
 				Logger.LogDebug($"{baseLogString} SendMultipleDiscreteCommand => Send multiple discrete command from scada commanding client called.");
+
+				await UpdateDiscreteMeasurement(artificalCommands);
 
 				return success;
 			}
@@ -895,7 +904,9 @@ namespace CE.MeasurementProviderImplementation
 
 			if (measurementToElementMap.TryGetValue(measurementGid, out long recloserGid)
 				&& await modelProviderClient.IsRecloser(recloserGid)
-				&& commandOrigin == CommandOriginType.USER_COMMAND)
+				&& (commandOrigin == CommandOriginType.USER_COMMAND
+					|| commandOrigin == CommandOriginType.ISOLATING_ALGORITHM_COMMAND 
+					|| commandOrigin == CommandOriginType.LOCATION_AND_ISOLATING_ALGORITHM_COMMAND))
 			{
 				Logger.LogDebug($"{baseLogString} UpdateDiscreteMeasurement => Calling ResetRecloser on topology provider.");
 				var topologyProviderClient = TopologyProviderClient.CreateClient();

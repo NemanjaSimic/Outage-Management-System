@@ -204,7 +204,7 @@ namespace OMS.OutageLifecycleImplementation.Helpers
             {
                 var discreteCommandingType = elementGidCommandMap[elementGid];
 
-                int reTryCount = 60;
+                int reTryCount = 30;
                 while (commandedElements.ContainsKey(elementGid) && commandedElements[elementGid].CommandingType == discreteCommandingType)
                 {
                     Logger.LogDebug($"{baseLogString} SendMultipleScadaCommandAsync => Trying to send duplicate command. Entering delay for 1000 ms and retrying the call.");

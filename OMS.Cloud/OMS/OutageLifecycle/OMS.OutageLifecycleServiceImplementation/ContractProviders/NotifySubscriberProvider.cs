@@ -175,6 +175,7 @@ namespace OMS.OutageLifecycleImplementation.ContractProviders
 						if(measurement is ArtificalDiscreteMeasurement)
                         {
 							await CommandedElements.TryRemoveAsync(commandedElementGid);
+							Logger.LogInformation($"{baseLogString} Notify => Command on element 0x{commandedElementGid:X16} executed (ArtificalDiscreteMeasurement). New value: {measurement.CurrentOpen}");
 							continue;
 						}
 
@@ -185,7 +186,10 @@ namespace OMS.OutageLifecycleImplementation.ContractProviders
 
 						if(discreteData[measurementGid].Value == (ushort)enumerableCommandedElements[commandedElementGid].CommandingType)
                         {
-							await CommandedElements.TryRemoveAsync(commandedElementGid);
+							if((await CommandedElements.TryRemoveAsync(commandedElementGid)).HasValue)
+                            {
+								Logger.LogInformation($"{baseLogString} Notify => Command on element 0x{commandedElementGid:X16} executed. New value: {discreteData[measurementGid].Value}");
+                            }
                         }
                     }
 					#endregion CommandedElements

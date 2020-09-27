@@ -29,7 +29,7 @@ namespace OMS.OutageSimulatorService
     /// </summary>
     internal sealed class OutageSimulatorService : StatefulService
     {
-        private const int commandedValueIntervalUpperLimit = 30_000;
+        private const int commandedValueIntervalUpperLimit = 20_000;
 
         private readonly string baseLogString;
 
@@ -154,7 +154,7 @@ namespace OMS.OutageSimulatorService
                     ServiceEventSource.Current.ServiceMessage(this.Context, $"[OMS.OutageSimulatorService | Error] {errorMessage}");
                 }
 
-                await Task.Delay(TimeSpan.FromMilliseconds(2000), cancellationToken);
+                await Task.Delay(TimeSpan.FromMilliseconds(2_000), cancellationToken);
             }
         }
 

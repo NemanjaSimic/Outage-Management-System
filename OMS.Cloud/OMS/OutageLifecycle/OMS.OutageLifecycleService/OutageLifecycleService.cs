@@ -41,7 +41,7 @@ namespace OMS.OutageLifecycleService
 		private readonly INotifySubscriberContract notifySubscriberProvider;
 
         private const int isolationAlgorithmCycleInterval = 15_000;
-        private const int isolationAlgorithmUpperLimit = 60_000;
+        private const int isolationAlgorithmUpperLimit = 30_000;
         private readonly IsolationAlgorithmCycle isolationAlgorithmCycle;
 
         private ICloudLogger logger;

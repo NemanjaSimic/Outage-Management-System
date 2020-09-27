@@ -465,14 +465,14 @@ namespace SCADA.FunctionExecutorImplementation
                     commandOrigin = commandValuesCache[gid].CommandOrigin;
                     await modelUpdateAccessClient.RemoveCommandDescription(gid);
                     Logger.LogDebug($"{baseLogString} ExecuteDiscreteReadCommand => Command origin of command address: {pointItem.Address} is set to {commandOrigin}.");
+                
+                    //LOGIC
+                    DiscreteModbusData digitalData = new DiscreteModbusData(value, pointItem.Alarm, gid, commandOrigin);
+                    this.discreteMeasurementCache.Add(gid, digitalData);
+
+                    verboseMessage = $"{baseLogString} ExecuteDiscreteReadCommand => DiscreteModbusData added to measurementCache. MeasurementGid: {digitalData.MeasurementGid:X16}, Value: {digitalData.Value}, Alarm: {digitalData.Alarm}, CommandOrigin: {digitalData.CommandOrigin} .";
+                    Logger.LogVerbose(verboseMessage);
                 }
-
-                //LOGIC
-                DiscreteModbusData digitalData = new DiscreteModbusData(value, pointItem.Alarm, gid, commandOrigin);
-                this.discreteMeasurementCache.Add(gid, digitalData);
-
-                verboseMessage = $"{baseLogString} ExecuteDiscreteReadCommand => DiscreteModbusData added to measurementCache. MeasurementGid: {digitalData.MeasurementGid:X16}, Value: {digitalData.Value}, Alarm: {digitalData.Alarm}, CommandOrigin: {digitalData.CommandOrigin} .";
-                Logger.LogVerbose(verboseMessage);
             }
 
             //LOGIC
@@ -581,14 +581,14 @@ namespace SCADA.FunctionExecutorImplementation
                     await modelUpdateAccessClient.RemoveCommandDescription(gid);
 
                     Logger.LogDebug($"{baseLogString} ExecuteAnalogReadCommand => Command origin of command address: {pointItem.Address} is set to {commandOrigin}.");
+                
+                    //LOGIC
+                    AnalogModbusData analogData = new AnalogModbusData(pointItem.CurrentEguValue, pointItem.Alarm, gid, commandOrigin);
+                    this.analogMeasurementCache.Add(gid, analogData);
+
+                    verboseMessage = $"{baseLogString} ExecuteAnalogReadCommand => AnalogModbusData added to measurementCache. MeasurementGid: {analogData.MeasurementGid:X16}, Value: {analogData.Value}, Alarm: {analogData.Alarm}, CommandOrigin: {analogData.CommandOrigin} .";
+                    Logger.LogVerbose(verboseMessage);
                 }
-
-                //LOGIC
-                AnalogModbusData analogData = new AnalogModbusData(pointItem.CurrentEguValue, pointItem.Alarm, gid, commandOrigin);
-                this.analogMeasurementCache.Add(gid, analogData);
-
-                verboseMessage = $"{baseLogString} ExecuteAnalogReadCommand => AnalogModbusData added to measurementCache. MeasurementGid: {analogData.MeasurementGid:X16}, Value: {analogData.Value}, Alarm: {analogData.Alarm}, CommandOrigin: {analogData.CommandOrigin} .";
-                Logger.LogVerbose(verboseMessage);
             }
 
             //LOGIC
