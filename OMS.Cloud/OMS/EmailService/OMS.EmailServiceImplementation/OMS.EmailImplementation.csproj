@@ -125,7 +125,6 @@
     <Compile Include="Imap\ImapEmailClient.cs" />
     <Compile Include="Imap\ImapEmailMapper.cs" />
     <Compile Include="Imap\ImapIdleClient.cs" />
-    <Compile Include="Interfaces\IDispatcher.cs" />
     <Compile Include="Interfaces\IEmailClient.cs" />
     <Compile Include="Interfaces\IEmailParser.cs" />
     <Compile Include="Interfaces\IIdleEmailClient.cs" />

@@ -6,17 +6,30 @@ using OMS.Common.Cloud;
 using OMS.Common.PubSubContracts;
 using System;
 using OMS.Common.Cloud.Names;
+using OMS.Common.Cloud.Logger;
 
 namespace OMS.EmailImplementation.Imap
 {
     public class ImapIdleEmailClient : ImapEmailClient, IIdleEmailClient
     {
+        private readonly string baseLogString;
+
+        private ICloudLogger logger;
+        private ICloudLogger Logger
+        {
+            get { return logger ?? (logger = CloudLoggerFactory.GetLogger()); }
+        }
+
         public ImapIdleEmailClient(
              IImapEmailMapper mapper,
              IEmailParser parser,
              IPublisherContract publisher)
              : base(mapper, parser, publisher)
-        { }
+        {
+            this.baseLogString = $"{this.GetType()} [{this.GetHashCode()}] =>{Environment.NewLine}";
+            string verboseMessage = $"{baseLogString} entering Ctor.";
+            Logger.LogVerbose(verboseMessage);
+        }
 
         public bool StartIdling()
         {
@@ -44,30 +57,25 @@ namespace OMS.EmailImplementation.Imap
 
         private void OnMessageArrived(object sender, IdleEventArgs args)
         {
-            foreach (var message in args.Messages)
+            try
             {
-                message.Seen = true;
-                OutageMailMessage outageMessage = mapper.MapMail(message);
-                Console.WriteLine(outageMessage);
-
-                OutageTracingModel tracingModel = parser.Parse(outageMessage);
-
-                //if (tracingModel.IsValidReport)
-                //{
-                //    dispatcher.Dispatch(tracingModel.Gid);
-                //}
-
-                try
+                foreach (var message in args.Messages)
                 {
+                    message.Seen = true;
+                    OutageMailMessage outageMessage = mapper.MapMail(message);
+                    Logger.LogInformation($"{baseLogString} OnMessageArrived => Message: {outageMessage}");
+
+                    OutageTracingModel tracingModel = parser.Parse(outageMessage);
+
                     publisher.Publish(new OutageEmailPublication(Topic.OUTAGE_EMAIL, new EmailToOutageMessage(tracingModel.Gid)), MicroserviceNames.OmsEmailService).Wait();
                 }
-                catch (Exception e)
-                {
-                    Console.WriteLine($"[ImapIdleEmailClient::OnMessageArrived] Sending to PubSub Engine failed. Exception message: {e.Message}");
-                }
+                
+                ReregisterIdleHandler();
             }
-
-            ReregisterIdleHandler();
+            catch (Exception e)
+            {
+                Logger.LogError($"{baseLogString} OnMessageArrived => Exception: {e.Message}", e);
+            }
         }
     }
 }
