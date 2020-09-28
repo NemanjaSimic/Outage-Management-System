@@ -420,9 +420,12 @@ namespace OMS.OutageLifecycleImplementation.Algorithm
                 return false;
             }
 
+            var affectedConsumersGids = lifecycleHelper.GetAffectedConsumers(outageToIsolate.OutageId, topology, NetworkType.SCADA_NETWORK);
+
             outageToIsolate.IsolatedTime = DateTime.UtcNow;
             outageToIsolate.OutageElementGid = outageElementGid;
             outageToIsolate.OutageState = OutageState.ISOLATED;
+            outageToIsolate.AffectedConsumers = await lifecycleHelper.GetAffectedConsumersFromDatabase(affectedConsumersGids);
 
             var outageModelAccessClient = OutageModelAccessClient.CreateClient();
             await outageModelAccessClient.UpdateOutage(outageToIsolate);

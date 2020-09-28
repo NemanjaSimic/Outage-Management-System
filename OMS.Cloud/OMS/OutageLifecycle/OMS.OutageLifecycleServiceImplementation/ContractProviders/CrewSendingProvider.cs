@@ -166,8 +166,9 @@ namespace OMS.OutageLifecycleImplementation.ContractProviders
 
                 var outageEntity = result.Value;
 
-                //TODO: videti performanse, pa da li treba da cekamo uopste xD
-                //await Task.Delay(10000);
+                Logger.LogInformation($"{baseLogString} SendRepairCrew => Entering 10 sec delay.");
+                await Task.Delay(10_000);
+                Logger.LogInformation($"{baseLogString} SendRepairCrew => 10 sec delay ended.");
 
                 var outageSimulatorClient = OutageSimulatorClient.CreateClient();
 
@@ -215,8 +216,9 @@ namespace OMS.OutageLifecycleImplementation.ContractProviders
             long upBreaker;
             long outageElementGid = -1;
 
-            //Todo: pratiti performanse pa videti da li nam je potrebno usporenje
-            //await Task.Delay(5000);
+            Logger.LogInformation($"{baseLogString} StartLocationAndIsolationAlgorithm => Entering 10 sec delay.");
+            await Task.Delay(10_000);
+            Logger.LogInformation($"{baseLogString} StartLocationAndIsolationAlgorithm => 10 sec delay ended.");
 
             var outageSimulatorClient = OutageSimulatorClient.CreateClient();
             var outageModelAccessClient = OutageModelAccessClient.CreateClient();
