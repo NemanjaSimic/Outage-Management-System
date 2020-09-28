@@ -244,18 +244,19 @@ namespace OMS.OutageLifecycleImplementation.ContractProviders
                     {
                         outageElementGid = potentialOutageElementGid;
                         outageEntity.OutageElementGid = outageElementGid;
+                        //outageEntity.AffectedConsumers = await lifecycleHelper.GetAffectedConsumersFromDatabase(lifecycleHelper.GetAffectedConsumers(outageElementGid, topology, NetworkType.NON_SCADA_NETWORK));
                     }
-                    else
-                    {
-                        //KAKO SE ULAZI U OVAJ ELSE? => u else se ulazi tako sto se ide kroz for i prvi element se oznaci kao outage element, zatim se pronaje jos neki... znaci ovo je nacin da se kreira drugi, treci outage, na racvanju ispod elementa, po for-u....
-                        var entity = new OutageEntity()
-                        {
-                            OutageElementGid = potentialOutageElementGid,
-                            ReportTime = DateTime.UtcNow
-                        };
+                    //else
+                    //{
+                    //    //KAKO SE ULAZI U OVAJ ELSE? => u else se ulazi tako sto se ide kroz for i prvi element se oznaci kao outage element, zatim se pronaje jos neki... znaci ovo je nacin da se kreira drugi, treci outage, na racvanju ispod elementa, po for-u....
+                    //    var entity = new OutageEntity()
+                    //    {
+                    //        OutageElementGid = potentialOutageElementGid,
+                    //        ReportTime = DateTime.UtcNow
+                    //    };
 
-                        await outageModelAccessClient.AddOutage(entity);
-                    }
+                    //    await outageModelAccessClient.AddOutage(entity);
+                    //}
                 }
             }
 
