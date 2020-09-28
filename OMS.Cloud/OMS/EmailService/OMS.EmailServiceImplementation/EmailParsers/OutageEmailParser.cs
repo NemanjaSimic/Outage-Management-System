@@ -13,6 +13,7 @@ namespace OMS.EmailImplementation.EmailParsers
         {
             get { return logger ?? (logger = CloudLoggerFactory.GetLogger()); }
         }
+
         public OutageTracingModel Parse(OutageMailMessage message)
         {
             string searchQuery = "gid";
@@ -42,7 +43,7 @@ namespace OMS.EmailImplementation.EmailParsers
             }
             catch (Exception e)
             {
-                Logger.LogError($"Exception on parsing outage email, invalid model will be build. Message: {e.Message}");
+                Logger.LogError($"Exception on parsing outage email, invalid model will be build. Message: {e.Message}", e);
                 return BuildInvalidModel();
             }
 
