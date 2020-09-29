@@ -25,13 +25,5 @@ namespace OMS.OutageLifecycleImplementation.Algorithm
 
         [DataMember]
         public int CycleCounter { get; set; }
-
-        [DataMember]
-        public HashSet<long> ElementsCommandedInCurrentCycle { get; set; }
-
-        public IsolationAlgorithm()
-        {
-            ElementsCommandedInCurrentCycle = new HashSet<long>();
-        }
     }
 }
