@@ -42,6 +42,7 @@ namespace OMS.OutageLifecycleImplementation.ContractProviders
         private bool isOptimumIsolationPointsInitialized;
         private bool isCommandedElementsInitialized;
         private bool isPotentialOutagesQueueInitialized;
+        private bool isElementsToBeIgnoredInReportPotentialOutageInitialized;
 
         private bool ReliableDictionariesInitialized
 		{
@@ -52,7 +53,8 @@ namespace OMS.OutageLifecycleImplementation.ContractProviders
                        isOutageTopologyModelInitialized &&
                        isOptimumIsolationPointsInitialized &&
                        isCommandedElementsInitialized &&
-                       isPotentialOutagesQueueInitialized;
+                       isPotentialOutagesQueueInitialized &&
+                       isElementsToBeIgnoredInReportPotentialOutageInitialized;
 			}
 		}
 
@@ -88,6 +90,12 @@ namespace OMS.OutageLifecycleImplementation.ContractProviders
         private ReliableDictionaryAccess<long, CommandedElement> CommandedElements
         {
             get { return commandedElements; }
+        }
+
+        private ReliableDictionaryAccess<long, DateTime> elementsToBeIgnoredInReportPotentialOutage;
+        private ReliableDictionaryAccess<long, DateTime> ElementsToBeIgnoredInReportPotentialOutage
+        {
+            get { return elementsToBeIgnoredInReportPotentialOutage; }
         }
 
         private ReliableQueueAccess<PotentialOutageCommand> potentialOutagesQueue;
@@ -143,6 +151,14 @@ namespace OMS.OutageLifecycleImplementation.ContractProviders
                     string debugMessage = $"{baseLogString} OnStateManagerChangedHandler => '{ReliableDictionaryNames.CommandedElements}' ReliableDictionaryAccess initialized.";
                     Logger.LogDebug(debugMessage);
                 }
+                else if (reliableStateName == ReliableDictionaryNames.ElementsToBeIgnoredInReportPotentialOutage)
+                {
+                    this.elementsToBeIgnoredInReportPotentialOutage = await ReliableDictionaryAccess<long, DateTime>.Create(stateManager, ReliableDictionaryNames.ElementsToBeIgnoredInReportPotentialOutage);
+                    this.isElementsToBeIgnoredInReportPotentialOutageInitialized = true;
+
+                    string debugMessage = $"{baseLogString} OnStateManagerChangedHandler => '{ReliableDictionaryNames.ElementsToBeIgnoredInReportPotentialOutage}' ReliableDictionaryAccess initialized.";
+                    Logger.LogDebug(debugMessage);
+                }
                 else if (reliableStateName == ReliableQueueNames.PotentialOutages)
                 {
                     this.potentialOutagesQueue = await ReliableQueueAccess<PotentialOutageCommand>.Create(stateManager, ReliableQueueNames.PotentialOutages);
@@ -175,6 +191,7 @@ namespace OMS.OutageLifecycleImplementation.ContractProviders
             this.isPotentialOutagesQueueInitialized = false;
             this.isCommandedElementsInitialized = false;
             this.isOptimumIsolationPointsInitialized = false;
+            this.isElementsToBeIgnoredInReportPotentialOutageInitialized = false;
 
             this.stateManager = stateManager;
 			this.stateManager.StateManagerChanged += this.OnStateManagerChangedHandler;
@@ -312,12 +329,21 @@ namespace OMS.OutageLifecycleImplementation.ContractProviders
                 return false;
             }
 
-            var enumerableStartedAlgorithms = await StartedIsolationAlgorithms.GetEnumerableDictionaryAsync();
-            var enumerableOptimumIsolationPoints = await OptimumIsolationPoints.GetEnumerableDictionaryAsync();
-
-            if (enumerableStartedAlgorithms.Values.Any(algorithm => algorithm.ElementsCommandedInCurrentCycle.Contains(elementGid)) || enumerableOptimumIsolationPoints.ContainsKey(elementGid))
+            if(await ElementsToBeIgnoredInReportPotentialOutage.ContainsKeyAsync(elementGid))
             {
-                Logger.LogWarning($"{baseLogString} CheckPreconditions => ElementGid 0x{elementGid:X16} found in elements commanded in current isolating algorithm cycle or in optimumIsolationPoints.");
+                Logger.LogWarning($"{baseLogString} CheckPreconditions => ElementGid 0x{elementGid:X16} found in '{ReliableDictionaryNames.ElementsToBeIgnoredInReportPotentialOutage}'.");
+
+                if((await ElementsToBeIgnoredInReportPotentialOutage.TryRemoveAsync(elementGid)).HasValue)
+                {
+                    Logger.LogDebug($"{baseLogString} CheckPreconditions => ElementGid 0x{elementGid:X16} removed form '{ReliableDictionaryNames.ElementsToBeIgnoredInReportPotentialOutage}'");
+                }
+
+                return false;
+            }
+
+            if (await OptimumIsolationPoints.ContainsKeyAsync(elementGid))
+            {
+                Logger.LogWarning($"{baseLogString} CheckPreconditions => ElementGid 0x{elementGid:X16} found in '{ReliableDictionaryNames.OptimumIsolationPoints}'.");
                 return false;
             }
 

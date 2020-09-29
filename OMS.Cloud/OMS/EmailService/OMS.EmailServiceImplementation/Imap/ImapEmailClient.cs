@@ -15,6 +15,8 @@ namespace OMS.EmailImplementation.Imap
 {
     public class ImapEmailClient : IEmailClient
 	{
+		private readonly string baseLogString;
+
 		private ICloudLogger logger;
 		private ICloudLogger Logger
 		{
@@ -26,7 +28,6 @@ namespace OMS.EmailImplementation.Imap
 		protected readonly IImapEmailMapper mapper;
 		protected readonly IEmailParser parser;
 		protected readonly IPublisherContract publisher;
-		//protected readonly IDispatcher dispatcher;
 
 		protected readonly string address;
 		protected readonly string password;
@@ -35,6 +36,10 @@ namespace OMS.EmailImplementation.Imap
 
 		public ImapEmailClient(IImapEmailMapper mapper, IEmailParser parser, IPublisherContract publisher)
 		{
+			this.baseLogString = $"{this.GetType()} [{this.GetHashCode()}] =>{Environment.NewLine}";
+			string verboseMessage = $"{baseLogString} entering Ctor.";
+			Logger.LogVerbose(verboseMessage);
+
 			address = ConfigurationManager.AppSettings["emailAddress"];
 			password = ConfigurationManager.AppSettings["emailPassword"];
 			server = ConfigurationManager.AppSettings["emailServer"];
@@ -43,58 +48,59 @@ namespace OMS.EmailImplementation.Imap
 			this.mapper = mapper;
 			this.parser = parser;
 			this.publisher = publisher;
-			//this.dispatcher = dispatcher;
 
 			client = new ImapClient(server, port, true);
 		}
 
 		public bool Connect()
 		{
-			if (client.Connect())
+			if (!client.Connect())
 			{
-				if (client.Login(address, password))
-				{
-					return true;
-				}
+				return false;
 			}
 
-			return false;
+			if (!client.Login(address, password))
+			{
+				return false;
+			}
+
+			return true;
 		}
 
 		public IEnumerable<OutageMailMessage> GetUnreadMessages()
 		{
-			if (!client.IsConnected)
-			{
-				throw new NullReferenceException("ImapClient is a null value (not connected).");
-			}
+			var outageMailMessages = new List<OutageMailMessage>();
 
-			Message[] messages = client.Folders["INBOX"].Search("UNSEEN", MessageFetchMode.Full);
-
-			List<OutageMailMessage> outageMailMessages = new List<OutageMailMessage>();
-
-			foreach (Message message in messages)
-			{
-				OutageMailMessage outageMessage = mapper.MapMail(message);
-
-				outageMailMessages.Add(outageMessage);
-				message.Seen = true;
-
-				OutageTracingModel tracingModel = parser.Parse(outageMessage);
-
-				//if (tracingModel.IsValidReport)
-				//{
-				//	dispatcher.Dispatch(tracingModel.Gid);
-				//}
-
-				try
+			try
+            {
+				if (!client.IsConnected)
 				{
+					if(!client.Connect())
+                    {
+						Logger.LogError($"{baseLogString} GetUnreadMessages => client could not connect to the email server.");
+						return outageMailMessages;
+					}
+				}
+
+				Message[] messages = client.Folders["INBOX"].Search("UNSEEN", MessageFetchMode.Full);
+
+				foreach (Message message in messages)
+				{
+					OutageMailMessage outageMessage = mapper.MapMail(message);
+
+					outageMailMessages.Add(outageMessage);
+					message.Seen = true;
+
+					OutageTracingModel tracingModel = parser.Parse(outageMessage);
+
 					publisher.Publish(new OutageEmailPublication(Topic.OUTAGE_EMAIL, new EmailToOutageMessage(tracingModel.Gid)), MicroserviceNames.OmsEmailService).Wait();
- 				}
-				catch (Exception)
-				{
-					Logger.LogError("[ImapEmailClient::GetUnreadMessages] Sending to PubSub Engine failed.");
 				}
 			}
+            catch (Exception e)
+            {
+				Logger.LogError($"{baseLogString} GetUnreadMessages => Message: {e.Message}", e);
+			}
+			
 			return outageMailMessages;
 		}
 	}

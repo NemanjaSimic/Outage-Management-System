@@ -319,6 +319,29 @@ namespace OMS.OutageLifecycleService
                 {
                     using (ITransaction tx = this.StateManager.CreateTransaction())
                     {
+                        /// <summary>
+                        /// KEY - element gid of optimum isolation point
+                        /// VALUE - element gid of head switch (to identify the corresponding algorithm)
+                        /// </summary>
+                        var result = await StateManager.TryGetAsync<IReliableDictionary<long, DateTime>>(ReliableDictionaryNames.ElementsToBeIgnoredInReportPotentialOutage);
+                        if(result.HasValue)
+                        {
+                            var gidToPointItemMap = result.Value;
+                            await gidToPointItemMap.ClearAsync();
+                            await tx.CommitAsync();
+                        }
+                        else
+                        {
+                            await StateManager.GetOrAddAsync<IReliableDictionary<long, DateTime>>(tx, ReliableDictionaryNames.ElementsToBeIgnoredInReportPotentialOutage);
+                            await tx.CommitAsync();
+                        }
+                    }
+                }),
+
+                Task.Run(async() =>
+                {
+                    using (ITransaction tx = this.StateManager.CreateTransaction())
+                    {
                         var result = await StateManager.TryGetAsync<IReliableConcurrentQueue<PotentialOutageCommand>>(ReliableQueueNames.PotentialOutages);
                         if(result.HasValue)
                         {

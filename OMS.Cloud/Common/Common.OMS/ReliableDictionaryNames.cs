@@ -16,10 +16,10 @@
         public const string OptimumIsolationPoints = "OptimumIsolatioPoints";
 
         //OMS.OutageLifecycleService
-        //public const string OutageTopologyModel = "OutageTopologyModel";
         public const string StartedIsolationAlgorithms = "StartedIsolationAlgorithms";
         public const string MonitoredHeadBreakerMeasurements = "MonitoredHeadBreakerMeasurements";
         public const string RecloserOutageMap = "RecloserOutageMap";
+        public const string ElementsToBeIgnoredInReportPotentialOutage = "ElementsToBeIgnoredInReportPotentialOutage";
 
         //OMS.OutageSimulatorService
         public const string SimulatedOutages = "SimulatedOutages";
