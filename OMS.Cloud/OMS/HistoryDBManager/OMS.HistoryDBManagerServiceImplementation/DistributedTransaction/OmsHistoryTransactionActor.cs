@@ -116,8 +116,8 @@ namespace OMS.HistoryDBManagerImplementation.DistributedTransaction
 
                 this.unitOfWork.OutageRepository.RemoveAll();
                 this.unitOfWork.EquipmentRepository.RemoveAll();
-                this.unitOfWork.EquipmentHistoricalRepository.RemoveAll();
-                this.unitOfWork.ConsumerHistoricalRepository.RemoveAll();
+                //this.unitOfWork.EquipmentHistoricalRepository.RemoveAll();
+                //this.unitOfWork.ConsumerHistoricalRepository.RemoveAll();
 
                 foreach (Consumer consumer in consumerDbEntities)
                 {
