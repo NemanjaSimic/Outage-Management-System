@@ -182,6 +182,7 @@ namespace OMS.OutageLifecycleImplementation.ContractProviders
             {
                 CommandOriginType.USER_COMMAND,
                 CommandOriginType.ISOLATING_ALGORITHM_COMMAND,
+                CommandOriginType.LOCATION_AND_ISOLATING_ALGORITHM_COMMAND,
                 CommandOriginType.UNKNOWN_ORIGIN,
             };
 
@@ -200,7 +201,7 @@ namespace OMS.OutageLifecycleImplementation.ContractProviders
         #region IPotentialOutageReportingContract
         public async Task<bool> EnqueuePotentialOutageCommand(long elementGid, CommandOriginType commandOriginType, NetworkType networkType)
         {
-            Logger.LogDebug($"{baseLogString} EnqueuePotentialOutageCommand method started.");
+            Logger.LogDebug($"{baseLogString} EnqueuePotentialOutageCommand method started. Element gid: {elementGid}, command origin type: {commandOriginType}, network type {networkType}");
 
             while (!ReliableDictionariesInitialized)
             {

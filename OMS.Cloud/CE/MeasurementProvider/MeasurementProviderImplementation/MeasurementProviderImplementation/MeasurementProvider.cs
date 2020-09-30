@@ -266,7 +266,7 @@ namespace CE.MeasurementProviderImplementation
 
 				Logger.LogDebug($"{baseLogString} UpdateDiscreteMeasurement => Invoking Discrete Measurement Delegate in topology provider service.");
 				var topologyProviderClient = TopologyProviderClient.CreateClient();
-				topologyProviderClient.DiscreteMeasurementDelegate();
+				await topologyProviderClient.DiscreteMeasurementDelegate();
 			}
 			catch (Exception e)
 			{
@@ -707,7 +707,11 @@ namespace CE.MeasurementProviderImplementation
 
 				Logger.LogDebug($"{baseLogString} SendMultipleDiscreteCommand => Calling Send multiple discrete command from scada commanding client.");
 				var scadaCommandingClient = ScadaCommandingClient.CreateClient();
-				var success = await scadaCommandingClient.SendMultipleDiscreteCommand(nonArtificalCommands, commandOrigin);
+				var success = true;
+				if (nonArtificalCommands.Count > 0)
+				{
+					success = await scadaCommandingClient.SendMultipleDiscreteCommand(nonArtificalCommands, commandOrigin);
+				}
 				Logger.LogDebug($"{baseLogString} SendMultipleDiscreteCommand => Send multiple discrete command from scada commanding client called.");
 
 				await UpdateDiscreteMeasurement(artificalCommands);
