@@ -216,11 +216,20 @@ namespace CE.TopologyProviderImplementation
             }
             else if(roots.Count > 1)
             {
-                string message = $"{baseLogString} CreateTopology => GetEnergySources returned more then one energy sources. First will be considered.";
+                string message = $"{baseLogString} CreateTopology => GetEnergySources returned more then one energy sources. Will try to find source with GID != 0.";
                 Logger.LogWarning(message);
             }
 
-            long energySourceGid = roots.First();
+            long energySourceGid = 0;
+
+            foreach (var source in roots)
+            {
+                if (source != 0)
+                {
+                    energySourceGid = source;
+                    break;
+                }
+            }
 
             Logger.LogDebug($"{baseLogString} CreateTopology => Calling CreateGraphTopology method from topology builder client. Energy source with GID {energySourceGid:X16.}");
             var topologyBuilderClient = TopologyBuilderClient.CreateClient();

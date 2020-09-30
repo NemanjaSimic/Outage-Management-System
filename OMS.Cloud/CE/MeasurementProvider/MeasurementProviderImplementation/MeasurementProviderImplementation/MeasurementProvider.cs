@@ -900,8 +900,8 @@ namespace CE.MeasurementProviderImplementation
 				}
 				else
 				{
-					var historyDBManagerClient = HistoryDBManagerClient.CreateClient();
-					await historyDBManagerClient.OnSwitchClosed(measurement.ElementId);
+					//var historyDBManagerClient = HistoryDBManagerClient.CreateClient();
+					//await historyDBManagerClient.OnSwitchClosed(measurement.ElementId);
 				}
 			}
 			else

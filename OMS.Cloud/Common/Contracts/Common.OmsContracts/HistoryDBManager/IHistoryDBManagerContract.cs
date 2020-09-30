@@ -14,11 +14,17 @@ namespace Common.OmsContracts.HistoryDBManager
     {
         [OperationContract]
         Task OnSwitchClosed(long elementGid);
-        [OperationContract]
-        Task OnConsumerBlackedOut(List<long> consumers, long? outageId);
+        //[OperationContract]
+        //Task OnConsumerBlackedOut(List<long> consumers, long? outageId);
         [OperationContract]
         Task OnSwitchOpened(long elementGid, long? outageId);
         [OperationContract]
         Task OnConsumersEnergized(HashSet<long> consumers);
+        [OperationContract]
+        Task OnConsumerBlackedOut(long consumer, long? outageId);
+        [OperationContract]
+        Task UpdateClosedSwitch(long elementGid, long outageId);
+        [OperationContract]
+        Task UpdateConsumer(long consumer, long outageId);
     }
 }

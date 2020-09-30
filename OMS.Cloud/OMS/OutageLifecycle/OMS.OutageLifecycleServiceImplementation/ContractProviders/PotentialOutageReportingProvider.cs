@@ -293,8 +293,8 @@ namespace OMS.OutageLifecycleImplementation.ContractProviders
                 var createdOutage = result.Value;
                 Logger.LogInformation($"{baseLogString} ReportPotentialOutage => Outage on element with gid: 0x{createdOutage.OutageElementGid:x16} is successfully stored in database.");
 
-                await historyDBManagerClient.OnSwitchOpened(elementGid, createdOutage.OutageId);
-                await historyDBManagerClient.OnConsumerBlackedOut(affectedConsumersGids, createdOutage.OutageId);
+                //await historyDBManagerClient.OnSwitchOpened(elementGid, createdOutage.OutageId);
+                //await historyDBManagerClient.OnConsumerBlackedOut(affectedConsumersGids, createdOutage.OutageId);
 
                 return await lifecycleHelper.PublishOutageAsync(Topic.ACTIVE_OUTAGE, outageMessageMapper.MapOutageEntity(createdOutage));
             }
@@ -323,16 +323,16 @@ namespace OMS.OutageLifecycleImplementation.ContractProviders
             {
                 foreach (var pair in outageAffectedPair)
                 {
-                    await historyDBManagerClient.OnConsumerBlackedOut(pair.Value, pair.Key);
-                    await historyDBManagerClient.OnSwitchOpened(elementGid, pair.Key);
+                    //await historyDBManagerClient.OnConsumerBlackedOut(pair.Value, pair.Key);
+                    //await historyDBManagerClient.OnSwitchOpened(elementGid, pair.Key);
                     isSwitchInvoked = true;
                 }
             }
 
-            if (!isSwitchInvoked)
-            {
-                await historyDBManagerClient.OnSwitchOpened(elementGid, null);
-            }
+            //if (!isSwitchInvoked)
+            //{
+            //    await historyDBManagerClient.OnSwitchOpened(elementGid, null);
+            //}
         }
 
         private async Task<bool> CheckPreconditions(long elementGid, CommandOriginType commandOriginType, List<long> affectedConsumersGids, IHistoryDBManagerContract historyDBManagerClient)
