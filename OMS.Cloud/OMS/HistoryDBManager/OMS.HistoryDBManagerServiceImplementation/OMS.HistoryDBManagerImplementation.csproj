@@ -47,6 +47,7 @@
     <Compile Include="DistributedTransaction\OmsHistoryNotifyNetworkModelUpdate.cs" />
     <Compile Include="DistributedTransaction\OmsHistoryTransactionActor.cs" />
     <Compile Include="HistoryDBManager.cs" />
+    <Compile Include="HistorySubscriber.cs" />
     <Compile Include="ModelAccess\ConsumerAccess.cs" />
     <Compile Include="ModelAccess\EquipmentAccess.cs" />
     <Compile Include="ModelAccess\OutageModelAccess.cs" />
@@ -94,6 +95,10 @@
     <ProjectReference Include="..\..\..\Common\Contracts\Common.OmsContracts\Common.OmsContracts.csproj">
       <Project>{7032AEF1-E55A-4D5C-90FF-E0B8B4C98BE0}</Project>
       <Name>Common.OmsContracts</Name>
+    </ProjectReference>
+    <ProjectReference Include="..\..\..\Common\Contracts\Common.PubSubContracts\Common.PubSubContracts.csproj">
+      <Project>{AA75150D-EE56-49C0-9431-751F83CCC0CD}</Project>
+      <Name>Common.PubSubContracts</Name>
     </ProjectReference>
     <ProjectReference Include="..\..\..\Common\Contracts\Common.TmsContracts\Common.TmsContracts.csproj">
       <Project>{A07D94C2-40EF-48DB-B828-7E53E7F5A372}</Project>

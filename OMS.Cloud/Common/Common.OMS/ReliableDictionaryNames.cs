@@ -9,6 +9,7 @@
         public const string OpenedSwitches = "OpenedSwitches";
         public const string UnenergizedConsumers = "UnenergizedConsumers";
         public const string HistoryModelChanges = "HistoryModelChanges";
+        public const string ActiveOutages = "ActiveOutages";
 
         //OMS.ModelProviderService
         public const string OutageTopologyModel = "OutageTopologyModel";

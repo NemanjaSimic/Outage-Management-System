@@ -19,7 +19,7 @@ namespace WebAPI.Controllers
         }
 
         [HttpGet]
-        public async Task<IActionResult> Get([System.Web.Http.FromUri] ReportOptions options)
+        public async Task<IActionResult> Get([FromQuery] ReportOptions options)
         {
             var report = await _mediator.Send<ReportViewModel>(new GenerateReportCommand(options));
             return Ok(report);

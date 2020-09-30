@@ -179,7 +179,10 @@ namespace OMS.Common.Cloud
         INSERT = 1,
 
         [EnumMember]
-        DELETE = 2
+        DELETE = 2,
+
+        [EnumMember]
+        UPDATE = 3
     }
 
     [DataContract]
