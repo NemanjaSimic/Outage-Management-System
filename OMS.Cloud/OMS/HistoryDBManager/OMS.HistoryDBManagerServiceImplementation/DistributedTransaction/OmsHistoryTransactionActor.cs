@@ -114,10 +114,15 @@ namespace OMS.HistoryDBManagerImplementation.DistributedTransaction
                 var resourceDescriptions = await GetExtentValues(ModelCode.ENERGYCONSUMER, modelResourcesDesc.GetAllPropertyIds(ModelCode.ENERGYCONSUMER));
                 var modelChangesEnumerable = await HistoryModelChanges.GetEnumerableDictionaryAsync();
 
-                this.unitOfWork.OutageRepository.RemoveAll();
-                this.unitOfWork.EquipmentRepository.RemoveAll();
-                this.unitOfWork.EquipmentHistoricalRepository.RemoveAll();
-                this.unitOfWork.ConsumerHistoricalRepository.RemoveAll();
+
+                List<OutageEntity> activeOutages = this.unitOfWork.OutageRepository.GetAllActive().ToList();
+               				
+                this.unitOfWork.OutageRepository.RemoveRange(activeOutages);
+				
+                //this.unitOfWork.OutageRepository.RemoveAll();
+                //this.unitOfWork.EquipmentRepository.RemoveAll();
+                //this.unitOfWork.EquipmentHistoricalRepository.RemoveAll();
+                //this.unitOfWork.ConsumerHistoricalRepository.RemoveAll();
 
                 foreach (Consumer consumer in consumerDbEntities)
                 {
