@@ -6,6 +6,7 @@ using OMS.Common.TmsContracts;
 using OMS.Common.WcfClient.TMS;
 using System;
 using System.Collections.Generic;
+using System.Fabric;
 using System.Text;
 using System.Threading.Tasks;
 
@@ -16,7 +17,7 @@ namespace TMS.TransactionManagerImplementation.ContractProviders
         private readonly string baseLogString;
         private readonly IReliableStateManager stateManager;
 
-        #region Private Properties
+        #region Reliable Dictionaries
         private bool isActiveTransactionsInitialized;
         private bool isTransactionEnlistmentLedgerInitialized;
 
@@ -56,23 +57,20 @@ namespace TMS.TransactionManagerImplementation.ContractProviders
         {
             get { return transactionEnlistmentLedger; }
         }
-        #endregion Private Properties
 
-        public TransactionCoordinatorProvider(IReliableStateManager stateManager)
+        private async void OnStateManagerChangedHandler(object sender, NotifyStateManagerChangedEventArgs eventArgs)
         {
-            this.baseLogString = $"{this.GetType()} [{this.GetHashCode()}] =>{Environment.NewLine}";
-
-            this.isActiveTransactionsInitialized = false;
-            this.isTransactionEnlistmentLedgerInitialized = false;
-
-            this.stateManager = stateManager;
-            stateManager.StateManagerChanged += this.OnStateManagerChangedHandler;
+            try
+            {
+                await InitializeReliableCollections(eventArgs);
+            }
+            catch (FabricNotPrimaryException)
+            {
+                Logger.LogDebug($"{baseLogString} OnStateManagerChangedHandler => NotPrimaryException. To be ignored.");
+            }
         }
-        public Task<bool> IsAlive()
-        {
-            return Task.Run(() => { return true; });
-        }
-        private async void OnStateManagerChangedHandler(object sender, NotifyStateManagerChangedEventArgs e)
+
+        private async Task InitializeReliableCollections(NotifyStateManagerChangedEventArgs e)
         {
             if (e.Action == NotifyStateManagerChangedAction.Add)
             {
@@ -96,6 +94,18 @@ namespace TMS.TransactionManagerImplementation.ContractProviders
                     Logger.LogDebug(debugMessage);
                 }
             }
+        }
+        #endregion Reliable Dictionaries
+
+        public TransactionCoordinatorProvider(IReliableStateManager stateManager)
+        {
+            this.baseLogString = $"{this.GetType()} [{this.GetHashCode()}] =>{Environment.NewLine}";
+
+            this.isActiveTransactionsInitialized = false;
+            this.isTransactionEnlistmentLedgerInitialized = false;
+
+            this.stateManager = stateManager;
+            stateManager.StateManagerChanged += this.OnStateManagerChangedHandler;
         }
 
         #region ITransactionCoordinatorContract
@@ -196,6 +206,11 @@ namespace TMS.TransactionManagerImplementation.ContractProviders
             }
             
             return result;
+        }
+
+        public Task<bool> IsAlive()
+        {
+            return Task.Run(() => { return true; });
         }
         #endregion ITransactionCoordinatorContract
 

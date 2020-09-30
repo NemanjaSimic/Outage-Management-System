@@ -10,6 +10,7 @@ using OMS.Common.TmsContracts;
 using OMS.Common.WcfClient.CE;
 using System;
 using System.Collections.Generic;
+using System.Fabric;
 using System.Threading.Tasks;
 
 namespace CE.ModelProviderImplementation
@@ -56,7 +57,19 @@ namespace CE.ModelProviderImplementation
         private ReliableDictionaryAccess<short, HashSet<long>> recloserCache;
         private ReliableDictionaryAccess<short, HashSet<long>> RecloserCache { get => recloserCache; }
 
-        private async void OnStateManagerChangedHandler(object sender, NotifyStateManagerChangedEventArgs e)
+        private async void OnStateManagerChangedHandler(object sender, NotifyStateManagerChangedEventArgs eventArgs)
+        {
+            try
+            {
+                await InitializeReliableCollections(eventArgs);
+            }
+            catch (FabricNotPrimaryException)
+            {
+                Logger.LogDebug($"{baseLogString} OnStateManagerChangedHandler => NotPrimaryException. To be ignored.");
+            }
+        }
+
+        private async Task InitializeReliableCollections(NotifyStateManagerChangedEventArgs e)
         {
             if (e.Action == NotifyStateManagerChangedAction.Add)
             {
@@ -95,11 +108,6 @@ namespace CE.ModelProviderImplementation
                     string debugMessage = $"{baseLogString} OnStateManagerChangedHandler => '{ReliableDictionaryNames.RecloserCache}' ReliableDictionaryAccess initialized.";
                     Logger.LogDebug(debugMessage);
                 }
-
-                //if (AreReliableDictionariesInitialized)
-                //{
-                //    await ImportDataInCache();
-                //}
             }
         }
         #endregion Reliable Dictionaries

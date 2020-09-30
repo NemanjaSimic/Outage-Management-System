@@ -9,6 +9,7 @@ using OMS.Common.TmsContracts.Notifications;
 using OMS.Common.WcfClient.TMS;
 using System;
 using System.Collections.Generic;
+using System.Fabric;
 using System.Threading.Tasks;
 
 namespace SCADA.ModelProviderImplementation.DistributedTransaction
@@ -33,7 +34,19 @@ namespace SCADA.ModelProviderImplementation.DistributedTransaction
 
         private ReliableDictionaryAccess<byte, List<long>> ModelChanges { get; set; }
 
-        private async void OnStateManagerChangedHandler(object sender, NotifyStateManagerChangedEventArgs e)
+        private async void OnStateManagerChangedHandler(object sender, NotifyStateManagerChangedEventArgs eventArgs)
+        {
+            try
+            {
+                await InitializeReliableCollections(eventArgs);
+            }
+            catch (FabricNotPrimaryException)
+            {
+                Logger.LogDebug($"{baseLogString} OnStateManagerChangedHandler => NotPrimaryException. To be ignored.");
+            }
+        }
+
+        private async Task InitializeReliableCollections(NotifyStateManagerChangedEventArgs e)
         {
             if (e.Action == NotifyStateManagerChangedAction.Add)
             {

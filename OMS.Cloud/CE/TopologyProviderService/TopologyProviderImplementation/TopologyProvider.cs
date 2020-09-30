@@ -17,6 +17,7 @@ using OMS.Common.WcfClient.PubSub;
 using System;
 using System.Collections.Concurrent;
 using System.Collections.Generic;
+using System.Fabric;
 using System.Linq;
 using System.Threading.Tasks;
 
@@ -64,7 +65,19 @@ namespace CE.TopologyProviderImplementation
         private ReliableDictionaryAccess<long, OutageTopologyModel> topologyCacheOMS;
         public ReliableDictionaryAccess<long, OutageTopologyModel> TopologyCacheOMS { get => topologyCacheOMS; }
 
-        private async void OnStateManagerChangedHandler(object sender, NotifyStateManagerChangedEventArgs e)
+        private async void OnStateManagerChangedHandler(object sender, NotifyStateManagerChangedEventArgs eventArgs)
+        {
+            try
+            {
+                await InitializeReliableCollections(eventArgs);
+            }
+            catch (FabricNotPrimaryException)
+            {
+                Logger.LogDebug($"{baseLogString} OnStateManagerChangedHandler => NotPrimaryException. To be ignored.");
+            }
+        }
+
+        private async Task InitializeReliableCollections(NotifyStateManagerChangedEventArgs e)
         {
             if (e.Action == NotifyStateManagerChangedAction.Add)
             {
@@ -105,12 +118,12 @@ namespace CE.TopologyProviderImplementation
             string verboseMessage = $"{baseLogString} entering Ctor.";
             Logger.LogVerbose(verboseMessage);
 
-            this.stateManager = stateManager;
-            stateManager.StateManagerChanged += this.OnStateManagerChangedHandler;
-
             this.isTopologyCacheInitialized = false;
             this.isTopologyCacheUIInitialized = false;
             this.isTopologyCacheOMSInitialized = false;
+
+            this.stateManager = stateManager;
+            stateManager.StateManagerChanged += this.OnStateManagerChangedHandler;
 
             recloserCounters = new ConcurrentDictionary<long, int>();
 

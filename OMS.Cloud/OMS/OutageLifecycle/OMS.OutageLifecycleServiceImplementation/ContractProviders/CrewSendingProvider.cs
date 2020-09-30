@@ -12,6 +12,7 @@ using OMS.Common.WcfClient.OMS.OutageSimulator;
 using OMS.OutageLifecycleImplementation.Helpers;
 using System;
 using System.Collections.Generic;
+using System.Fabric;
 using System.Linq;
 using System.Threading.Tasks;
 
@@ -63,7 +64,19 @@ namespace OMS.OutageLifecycleImplementation.ContractProviders
             get { return elementsToBeIgnoredInReportPotentialOutage; }
         }
 
-        private async void OnStateManagerChangedHandler(object sender, NotifyStateManagerChangedEventArgs e)
+        private async void OnStateManagerChangedHandler(object sender, NotifyStateManagerChangedEventArgs eventArgs)
+        {
+            try
+            {
+                await InitializeReliableCollections(eventArgs);
+            }
+            catch (FabricNotPrimaryException)
+            {
+                Logger.LogDebug($"{baseLogString} OnStateManagerChangedHandler => NotPrimaryException. To be ignored.");
+            }
+        }
+
+        private async Task InitializeReliableCollections(NotifyStateManagerChangedEventArgs e)
         {
             if (e.Action == NotifyStateManagerChangedAction.Add)
             {

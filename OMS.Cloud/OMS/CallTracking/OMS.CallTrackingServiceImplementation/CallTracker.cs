@@ -12,6 +12,7 @@ using OMS.Common.PubSubContracts.Interfaces;
 using OMS.Common.WcfClient.CE;
 using System;
 using System.Configuration;
+using System.Fabric;
 using System.Linq;
 using System.Threading.Tasks;
 using System.Timers;
@@ -20,6 +21,7 @@ namespace OMS.CallTrackingImplementation
 {
     public class CallTracker : INotifySubscriberContract
     {
+        private readonly string baseLogString;
         private readonly IReliableStateManager stateManager;
         private readonly ModelResourcesDesc modelResourcesDesc;
         private readonly TrackingAlgorithm trackingAlgorithm;
@@ -56,7 +58,19 @@ namespace OMS.CallTrackingImplementation
             get {   return calls;   }
         }
 
-        private async void OnStateManagerChangedHandler(object sender, NotifyStateManagerChangedEventArgs e)
+        private async void OnStateManagerChangedHandler(object sender, NotifyStateManagerChangedEventArgs eventArgs)
+        {
+            try
+            {
+                await InitializeReliableCollections(eventArgs);
+            }
+            catch (FabricNotPrimaryException)
+            {
+                Logger.LogDebug($"{baseLogString} OnStateManagerChangedHandler => NotPrimaryException. To be ignored.");
+            }
+        }
+
+        private async Task InitializeReliableCollections(NotifyStateManagerChangedEventArgs e)
         {
             if (e.Action == NotifyStateManagerChangedAction.Add)
             {
@@ -74,6 +88,10 @@ namespace OMS.CallTrackingImplementation
 
         public CallTracker(IReliableStateManager stateManager, string subscriberName)
         {
+            this.baseLogString = $"{this.GetType()} [{this.GetHashCode()}] =>{Environment.NewLine}";
+            string verboseMessage = $"{baseLogString} entering Ctor.";
+            Logger.LogVerbose(verboseMessage);
+
             this.stateManager = stateManager;
             this.stateManager.StateManagerChanged += OnStateManagerChangedHandler;
             this.subscriberName = subscriberName;

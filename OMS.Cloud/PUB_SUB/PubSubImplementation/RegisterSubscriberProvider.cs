@@ -7,6 +7,7 @@ using OMS.Common.PubSub;
 using OMS.Common.PubSubContracts;
 using System;
 using System.Collections.Generic;
+using System.Fabric;
 using System.Threading.Tasks;
 
 namespace PubSubImplementation
@@ -41,7 +42,19 @@ namespace PubSubImplementation
             get { return registeredSubscribersCache; }
         }
 
-        private async void OnStateManagerChangedHandler(object sender, NotifyStateManagerChangedEventArgs e)
+        private async void OnStateManagerChangedHandler(object sender, NotifyStateManagerChangedEventArgs eventArgs)
+        {
+            try
+            {
+                await InitializeReliableCollections(eventArgs);
+            }
+            catch (FabricNotPrimaryException)
+            {
+                Logger.LogDebug($"{baseLogString} OnStateManagerChangedHandler => NotPrimaryException. To be ignored.");
+            }
+        }
+
+        private async Task InitializeReliableCollections(NotifyStateManagerChangedEventArgs e)
         {
             if (e.Action == NotifyStateManagerChangedAction.Add)
             {
