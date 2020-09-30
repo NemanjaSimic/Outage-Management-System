@@ -29,7 +29,7 @@ namespace OMS.OutageSimulatorService
     /// </summary>
     internal sealed class OutageSimulatorService : StatefulService
     {
-        private const int commandedValueIntervalUpperLimit = 20_000;
+        private const int commandedValueIntervalUpperLimit = 60_000;
 
         private readonly string baseLogString;
 

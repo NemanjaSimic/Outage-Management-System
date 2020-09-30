@@ -12,7 +12,9 @@ using OMS.Common.WcfClient.OMS.OutageLifecycle;
 using OMS.Common.WcfClient.SCADA;
 using System;
 using System.Collections.Generic;
+using System.Fabric;
 using System.Threading.Tasks;
+using NetworkType = OMS.Common.Cloud.NetworkType;
 
 namespace CE.MeasurementProviderImplementation
 {
@@ -62,11 +64,23 @@ namespace CE.MeasurementProviderImplementation
 		private ReliableDictionaryAccess<short, Dictionary<long, long>> measurementToElementMapCache;
 		private ReliableDictionaryAccess<short, Dictionary<long, long>> MeasurementToElementMapCache { get => measurementToElementMapCache; }
 
-		private async void OnStateManagerChangedHandler(object sender, NotifyStateManagerChangedEventArgs e)
+		private async void OnStateManagerChangedHandler(object sender, NotifyStateManagerChangedEventArgs eventArgs)
 		{
-			if (e.Action == NotifyStateManagerChangedAction.Add)
+            try
+            {
+				await InitializeReliableCollections(eventArgs);
+			}
+            catch (FabricNotPrimaryException)
+            {
+				Logger.LogDebug($"{baseLogString} OnStateManagerChangedHandler => NotPrimaryException. To be ignored.");
+            }
+		}
+
+		private async Task InitializeReliableCollections(NotifyStateManagerChangedEventArgs eventArgs)
+        {
+			if (eventArgs.Action == NotifyStateManagerChangedAction.Add)
 			{
-				var operation = e as NotifyStateManagerSingleEntityChangedEventArgs;
+				var operation = eventArgs as NotifyStateManagerSingleEntityChangedEventArgs;
 				string reliableStateName = operation.ReliableState.Name.AbsolutePath;
 
 				if (reliableStateName == ReliableDictionaryNames.AnalogMeasurementsCache)
@@ -102,7 +116,6 @@ namespace CE.MeasurementProviderImplementation
 					string debugMessage = $"{baseLogString} OnStateManagerChangedHandler => '{ReliableDictionaryNames.MeasurementsToElementMapCache}' ReliableDictionaryAccess initialized.";
 					Logger.LogDebug(debugMessage);
 				}
-
 			}
 		}
 		#endregion ReliableDictionaries
@@ -429,7 +442,7 @@ namespace CE.MeasurementProviderImplementation
 			if (measurementId == 0 || elementId == 0)
 			{
 				//string message = $"Measurement with GID {measurementId:X16} already exists in measurement-element mapping.";
-				Logger.LogWarning($"{baseLogString} AddMeasurementElementPair => Error. mesurementID : {measurementId} | elementID : {elementId}");
+				Logger.LogWarning($"{baseLogString} AddMeasurementElementPair => mesurementID : {measurementId} | elementID : {elementId}");
 			}
 
 			try

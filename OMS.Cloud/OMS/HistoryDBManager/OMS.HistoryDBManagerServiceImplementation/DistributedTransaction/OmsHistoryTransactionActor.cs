@@ -13,6 +13,7 @@ using OMS.Common.WcfClient.NMS;
 using OutageDatabase.Repository;
 using System;
 using System.Collections.Generic;
+using System.Fabric;
 using System.Linq;
 using System.Text;
 using System.Threading.Tasks;
@@ -51,7 +52,19 @@ namespace OMS.HistoryDBManagerImplementation.DistributedTransaction
         private ReliableDictionaryAccess<long, long> UnenergizedConsumers { get; set; }
         private ReliableDictionaryAccess<byte, List<long>> HistoryModelChanges { get; set; }
 
-        private async void OnStateManagerChangedHandler(object sender, NotifyStateManagerChangedEventArgs e)
+        private async void OnStateManagerChangedHandler(object sender, NotifyStateManagerChangedEventArgs eventArgs)
+        {
+            try
+            {
+                await InitializeReliableCollections(eventArgs);
+            }
+            catch (FabricNotPrimaryException)
+            {
+                Logger.LogDebug($"{baseLogString} OnStateManagerChangedHandler => NotPrimaryException. To be ignored.");
+            }
+        }
+
+        private async Task InitializeReliableCollections(NotifyStateManagerChangedEventArgs e)
         {
             if (e.Action == NotifyStateManagerChangedAction.Add)
             {

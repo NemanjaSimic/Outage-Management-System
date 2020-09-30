@@ -15,8 +15,10 @@ using OMS.OutageLifecycleImplementation.Algorithm;
 using OMS.OutageLifecycleImplementation.Helpers;
 using System;
 using System.Collections.Generic;
+using System.Fabric;
 using System.Linq;
 using System.Threading.Tasks;
+using NetworkType = OMS.Common.Cloud.NetworkType;
 
 namespace OMS.OutageLifecycleImplementation.ContractProviders
 {
@@ -104,13 +106,25 @@ namespace OMS.OutageLifecycleImplementation.ContractProviders
             get { return potentialOutagesQueue; }
         }
 
-        private async void OnStateManagerChangedHandler(object sender, NotifyStateManagerChangedEventArgs e)
-		{
-			if (e.Action == NotifyStateManagerChangedAction.Add)
-			{
-				var operation = e as NotifyStateManagerSingleEntityChangedEventArgs;
-				string reliableStateName = operation.ReliableState.Name.AbsolutePath;
-                
+        private async void OnStateManagerChangedHandler(object sender, NotifyStateManagerChangedEventArgs eventArgs)
+        {
+            try
+            {
+                await InitializeReliableCollections(eventArgs);
+            }
+            catch (FabricNotPrimaryException)
+            {
+                Logger.LogDebug($"{baseLogString} OnStateManagerChangedHandler => NotPrimaryException. To be ignored.");
+            }
+        }
+
+        private async Task InitializeReliableCollections(NotifyStateManagerChangedEventArgs e)
+        {
+            if (e.Action == NotifyStateManagerChangedAction.Add)
+            {
+                var operation = e as NotifyStateManagerSingleEntityChangedEventArgs;
+                string reliableStateName = operation.ReliableState.Name.AbsolutePath;
+
                 if (reliableStateName == ReliableDictionaryNames.StartedIsolationAlgorithms)
                 {
                     this.startedIsolationAlgorithms = await ReliableDictionaryAccess<long, IsolationAlgorithm>.Create(stateManager, ReliableDictionaryNames.StartedIsolationAlgorithms);
@@ -168,7 +182,7 @@ namespace OMS.OutageLifecycleImplementation.ContractProviders
                     Logger.LogDebug(debugMessage);
                 }
             }
-		}
+        }
 		#endregion Reliable Dictionaries
 
 		public PotentialOutageReportingProvider(IReliableStateManager stateManager, OutageLifecycleHelper outageLifecycleHelper)

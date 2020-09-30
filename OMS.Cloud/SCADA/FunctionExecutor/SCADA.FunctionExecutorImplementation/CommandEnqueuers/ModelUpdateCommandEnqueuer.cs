@@ -7,6 +7,7 @@ using OMS.Common.ScadaContracts.DataContracts.ModbusFunctions;
 using OMS.Common.ScadaContracts.FunctionExecutior;
 using System;
 using System.Collections.Generic;
+using System.Fabric;
 using System.Threading.Tasks;
 
 namespace SCADA.FunctionExecutorImplementation.CommandEnqueuers
@@ -57,7 +58,19 @@ namespace SCADA.FunctionExecutorImplementation.CommandEnqueuers
             get { return modelUpdateCommandQueue; }
         }
 
-        private async void OnStateManagerChangedHandler(object sender, NotifyStateManagerChangedEventArgs e)
+        private async void OnStateManagerChangedHandler(object sender, NotifyStateManagerChangedEventArgs eventArgs)
+        {
+            try
+            {
+                await InitializeReliableCollections(eventArgs);
+            }
+            catch (FabricNotPrimaryException)
+            {
+                Logger.LogDebug($"{baseLogString} OnStateManagerChangedHandler => NotPrimaryException. To be ignored.");
+            }
+        }
+
+        private async Task InitializeReliableCollections(NotifyStateManagerChangedEventArgs e)
         {
             if (e.Action == NotifyStateManagerChangedAction.Add)
             {
@@ -72,7 +85,7 @@ namespace SCADA.FunctionExecutorImplementation.CommandEnqueuers
                     string debugMessage = $"{baseLogString} OnStateManagerChangedHandler => '{ReliableQueueNames.ReadCommandQueue}' ReliableQueueAccess initialized.";
                     Logger.LogDebug(debugMessage);
                 }
-                else if(reliableStateName == ReliableQueueNames.WriteCommandQueue)
+                else if (reliableStateName == ReliableQueueNames.WriteCommandQueue)
                 {
                     this.writeCommandQueue = await ReliableQueueAccess<ModbusFunction>.Create(stateManager, ReliableQueueNames.WriteCommandQueue);
                     this.isWriteCommandQueueInitialized = true;

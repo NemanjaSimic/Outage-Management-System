@@ -17,6 +17,7 @@ using SCADA.ModelProviderImplementation.Data;
 using SCADA.ModelProviderImplementation.Helpers;
 using System;
 using System.Collections.Generic;
+using System.Fabric;
 using System.Text;
 using System.Threading.Tasks;
 
@@ -74,7 +75,20 @@ namespace SCADA.ModelProviderImplementation.DistributedTransaction
         {
             return Task.Run(() => { return true; });
         }
-        private async void OnStateManagerChangedHandler(object sender, NotifyStateManagerChangedEventArgs e)
+
+        private async void OnStateManagerChangedHandler(object sender, NotifyStateManagerChangedEventArgs eventArgs)
+        {
+            try
+            {
+                await InitializeReliableCollections(eventArgs);
+            }
+            catch (FabricNotPrimaryException)
+            {
+                Logger.LogDebug($"{baseLogString} OnStateManagerChangedHandler => NotPrimaryException. To be ignored.");
+            }
+        }
+
+        private async Task InitializeReliableCollections(NotifyStateManagerChangedEventArgs e)
         {
             if (e.Action == NotifyStateManagerChangedAction.Add)
             {
@@ -89,7 +103,7 @@ namespace SCADA.ModelProviderImplementation.DistributedTransaction
                     string debugMessage = $"{baseLogString} OnStateManagerChangedHandler => '{ReliableDictionaryNames.GidToPointItemMap}' ReliableDictionaryAccess initialized.";
                     Logger.LogDebug(debugMessage);
                 }
-                else if(reliableStateName == ReliableDictionaryNames.IncomingGidToPointItemMap)
+                else if (reliableStateName == ReliableDictionaryNames.IncomingGidToPointItemMap)
                 {
                     IncomingGidToPointItemMap = await ReliableDictionaryAccess<long, IScadaModelPointItem>.Create(stateManager, ReliableDictionaryNames.IncomingGidToPointItemMap);
                     this.isIncomingGidToPointItemMapInitialized = true;
