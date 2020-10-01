@@ -3,12 +3,10 @@ using System.Collections.Generic;
 using System.Fabric;
 using System.Threading;
 using System.Threading.Tasks;
-using Common.CeContracts.TopologyProvider;
 using Common.OMS;
 using Common.OmsContracts.HistoryDBManager;
 using Common.OmsContracts.ModelAccess;
 using Common.OmsContracts.Report;
-using Common.PubSubContracts.DataContracts.CE;
 using Common.PubSubContracts.DataContracts.OMS;
 using Microsoft.ServiceFabric.Data;
 using Microsoft.ServiceFabric.Data.Collections;
@@ -22,7 +20,6 @@ using OMS.Common.Cloud.Names;
 using OMS.Common.PubSubContracts;
 using OMS.Common.TmsContracts;
 using OMS.Common.TmsContracts.Notifications;
-using OMS.Common.WcfClient.CE;
 using OMS.Common.WcfClient.PubSub;
 using OMS.HistoryDBManagerImplementation;
 using OMS.HistoryDBManagerImplementation.DistributedTransaction;
@@ -56,6 +53,8 @@ namespace OMS.HistoryDBManagerService
         public HistoryDBManagerService(StatefulServiceContext context)
             : base(context)
         {
+            this.logger = CloudLoggerFactory.GetLogger(ServiceEventSource.Current, context);
+
             this.baseLogString = $"{this.GetType()} [{this.GetHashCode()}] =>{Environment.NewLine}";
             Logger.LogDebug($"{baseLogString} Ctor => Logger initialized");
 
@@ -73,13 +72,11 @@ namespace OMS.HistoryDBManagerService
 
                 string infoMessage = $"{baseLogString} Ctor => Contract providers initialized.";
                 Logger.LogInformation(infoMessage);
-                ServiceEventSource.Current.ServiceMessage(this.Context, $"[HistoryDBManagerService | Information] {infoMessage}");
             }
             catch (Exception e)
             {
                 string errorMessage = $"{baseLogString} Ctor => Exception caught: {e.Message}.";
                 Logger.LogError(errorMessage, e);
-                ServiceEventSource.Current.ServiceMessage(this.Context, $"[HistoryDBManagerService | Error] {errorMessage}");
             }
         }
 
@@ -166,7 +163,6 @@ namespace OMS.HistoryDBManagerService
                 InitializeReliableCollections();
                 string debugMessage = $"{baseLogString} RunAsync => ReliableDictionaries initialized.";
                 Logger.LogDebug(debugMessage);
-                ServiceEventSource.Current.ServiceMessage(this.Context, $"[HistoryDBManagerService | Information] {debugMessage}");
 
                 var registerSubscriberClient = RegisterSubscriberClient.CreateClient();
                 await registerSubscriberClient.SubscribeToTopic(Topic.ACTIVE_OUTAGE, MicroserviceNames.OmsHistoryDBManagerService);

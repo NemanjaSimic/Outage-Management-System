@@ -6,11 +6,12 @@ using System.Linq;
 using System.Text;
 using System.Threading.Tasks;
 using Microsoft.ServiceFabric.Services.Runtime;
+using OMS.Common.Cloud.Logger;
 
 namespace WebAPI
 {
     [EventSource(Name = "MyCompany-Cloud.Web-WebAPI")]
-    internal sealed class ServiceEventSource : EventSource
+    internal sealed class ServiceEventSource : EventSource, IServiceEventTracing
     {
         public static readonly ServiceEventSource Current = new ServiceEventSource();
 
@@ -23,6 +24,11 @@ namespace WebAPI
 
         // Instance constructor is private to enforce singleton semantics
         private ServiceEventSource() : base() { }
+
+        public void UniversalServiceMessage(ServiceContext serviceContext, string message)
+        {
+            ServiceMessage(serviceContext, message);
+        }
 
         #region Keywords
         // Event keywords can be used to categorize events. 

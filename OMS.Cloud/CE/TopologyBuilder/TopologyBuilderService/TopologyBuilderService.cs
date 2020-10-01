@@ -31,6 +31,8 @@ namespace CE.TopologyBuilderService
 		public TopologyBuilderService(StatelessServiceContext context)
 			: base(context)
 		{
+			this.logger = CloudLoggerFactory.GetLogger(ServiceEventSource.Current, context);
+
 			this.baseLogString = $"{this.GetType()} [{this.GetHashCode()}] =>{Environment.NewLine}";
 			Logger.LogDebug($"{baseLogString} Ctor => Logger initialized");
 
@@ -40,13 +42,11 @@ namespace CE.TopologyBuilderService
 
 				string infoMessage = $"{baseLogString} Ctor => Contract providers initialized.";
 				Logger.LogInformation(infoMessage);
-				ServiceEventSource.Current.ServiceMessage(this.Context, $"[TopologyBuilderService | Information] {infoMessage}");
 			}
 			catch (Exception e)
 			{
 				string errorMessage = $"{baseLogString} Ctor => exception {e.Message}";
 				Logger.LogError(errorMessage, e);
-				ServiceEventSource.Current.ServiceMessage(this.Context, $"[TopologyBuilderService | Error] {errorMessage}");
 			}
 		}
 

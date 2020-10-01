@@ -35,6 +35,8 @@ namespace TMS.TransactionManagerService
         public TransactionManagerService(StatefulServiceContext context)
             : base(context)
         {
+            this.logger = CloudLoggerFactory.GetLogger(ServiceEventSource.Current, context);
+
             this.baseLogString = $"{this.GetType()} [{this.GetHashCode()}] =>{Environment.NewLine}";
             Logger.LogDebug($"{baseLogString} Ctor => Logger initialized");
 
@@ -46,13 +48,11 @@ namespace TMS.TransactionManagerService
 
                 string infoMessage = $"{baseLogString} Ctor => Contract providers initialized.";
                 Logger.LogInformation(infoMessage);
-                ServiceEventSource.Current.ServiceMessage(this.Context, $"[TransactionManagerService | Information] {infoMessage}");
             }
             catch (Exception e)
             {
                 string errorMessage = $"{baseLogString} Ctor => Exception caught: {e.Message}.";
                 Logger.LogError(errorMessage, e);
-                ServiceEventSource.Current.ServiceMessage(this.Context, $"[TransactionManagerService | Error] {errorMessage}");
             }
         }
 
@@ -102,13 +102,11 @@ namespace TMS.TransactionManagerService
                 InitializeReliableCollections();
                 string debugMessage = $"{baseLogString} RunAsync => ReliableDictionaries initialized.";
                 Logger.LogDebug(debugMessage);
-                ServiceEventSource.Current.ServiceMessage(this.Context, $"[TransactionManagerService | Information] {debugMessage}");
             }
             catch (Exception e)
             {
                 string errorMessage = $"{baseLogString} RunAsync => Exception caught: {e.Message}.";
                 Logger.LogInformation(errorMessage, e);
-                ServiceEventSource.Current.ServiceMessage(this.Context, $"[TransactionManagerService | Error] {errorMessage}");
             }
         }
 

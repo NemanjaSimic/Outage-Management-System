@@ -1,16 +1,13 @@
 ﻿using System;
-using System.Collections.Generic;
 using System.Diagnostics.Tracing;
 using System.Fabric;
-using System.Linq;
-using System.Text;
 using System.Threading.Tasks;
-using Microsoft.ServiceFabric.Services.Runtime;
+using OMS.Common.Cloud.Logger;
 
 namespace TMS.TransactionManagerService
 {
     [EventSource(Name = "MyCompany-OMS.Cloud-TMS.TransactionManagerService")]
-    internal sealed class ServiceEventSource : EventSource
+    internal sealed class ServiceEventSource : EventSource, IServiceEventTracing
     {
         public static readonly ServiceEventSource Current = new ServiceEventSource();
 
@@ -34,6 +31,11 @@ namespace TMS.TransactionManagerService
             public const EventKeywords ServiceInitialization = (EventKeywords)0x2L;
         }
         #endregion
+
+        public void UniversalServiceMessage(ServiceContext serviceContext, string message)
+        {
+            ServiceMessage((StatefulServiceContext)serviceContext, message);
+        }
 
         #region Events
         // Define an instance method for each event you want to record and apply an [Event] attribute to it.

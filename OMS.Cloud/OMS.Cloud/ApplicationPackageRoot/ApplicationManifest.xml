@@ -1,8 +1,8 @@
 ﻿<?xml version="1.0" encoding="utf-8"?>
 <ApplicationManifest xmlns:xsd="http://www.w3.org/2001/XMLSchema" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" ApplicationTypeName="OMS.CloudType" ApplicationTypeVersion="1.0.0" xmlns="http://schemas.microsoft.com/2011/01/fabric">
   <Parameters>
-    <!--<Parameter Name="OMS.EmailService_InstanceCount" DefaultValue="-1" />-->
     <!-- OMS -->
+    <!--<Parameter Name="OMS.EmailService_InstanceCount" DefaultValue="-1" />-->
     <Parameter Name="OMS.OutageLifecycleService_MinReplicaSetSize" DefaultValue="3" />
     <Parameter Name="OMS.OutageLifecycleService_PartitionCount" DefaultValue="1" />
     <Parameter Name="OMS.OutageLifecycleService_TargetReplicaSetSize" DefaultValue="3" />

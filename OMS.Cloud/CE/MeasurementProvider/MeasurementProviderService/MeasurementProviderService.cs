@@ -42,6 +42,8 @@ namespace CE.MeasurementProviderService
 		public MeasurementProviderService(StatefulServiceContext context)
 			: base(context)
 		{
+			this.logger = CloudLoggerFactory.GetLogger(ServiceEventSource.Current, context);
+
 			this.baseLogString = $"{this.GetType()} [{this.GetHashCode()}] =>{Environment.NewLine}";
 			Logger.LogDebug($"{baseLogString} Ctor => Logger initialized");
 
@@ -54,13 +56,11 @@ namespace CE.MeasurementProviderService
 
 				string infoMessage = $"{baseLogString} Ctor => Contract providers initialized.";
 				Logger.LogInformation(infoMessage);
-				ServiceEventSource.Current.ServiceMessage(this.Context, $"[MeasurementProviderService | Information] {infoMessage}");
 			}
 			catch (Exception e)
 			{
 				string errorMessage = $"{baseLogString} Ctor => Exception caught: {e.Message}.";
 				Logger.LogError(errorMessage, e);
-				ServiceEventSource.Current.ServiceMessage(this.Context, $"[MeasurementProviderService | Error] {errorMessage}");
 			}
 		}
 
@@ -122,7 +122,6 @@ namespace CE.MeasurementProviderService
 				InitializeReliableCollections();
 				string debugMessage = $"{baseLogString} RunAsync => ReliableDictionaries initialized.";
 				Logger.LogDebug(debugMessage);
-				ServiceEventSource.Current.ServiceMessage(this.Context, $"[MeasurementProviderService | Information] {debugMessage}");
 
 				this.registerSubscriberClient = RegisterSubscriberClient.CreateClient();
 				await this.registerSubscriberClient.SubscribeToTopic(Topic.MEASUREMENT, MicroserviceNames.CeMeasurementProviderService);
@@ -132,7 +131,6 @@ namespace CE.MeasurementProviderService
 			{
 				string errorMessage = $"{baseLogString} RunAsync => Exception caught: {e.Message}.";
 				Logger.LogInformation(errorMessage, e);
-				ServiceEventSource.Current.ServiceMessage(this.Context, $"[MeasurementProviderService | Error] {errorMessage}");
 			}
 		}
 

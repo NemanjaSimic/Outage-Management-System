@@ -36,6 +36,8 @@ namespace PubSubService
         public PubSubService(StatefulServiceContext context)
             : base(context)
         {
+            this.logger = CloudLoggerFactory.GetLogger(ServiceEventSource.Current, context);
+
             this.baseLogString = $"{this.GetType()} [{this.GetHashCode()}] =>{Environment.NewLine}";
             Logger.LogDebug($"{baseLogString} Ctor => Logger initialized");
 
@@ -46,13 +48,11 @@ namespace PubSubService
 
                 string infoMessage = $"{baseLogString} Ctor => Contract providers initialized.";
                 Logger.LogInformation(infoMessage);
-                ServiceEventSource.Current.ServiceMessage(this.Context, $"[PubSubService | Information] {infoMessage}");
             }
             catch (Exception e)
             {
                 string errMessage = $"{baseLogString} Ctor => Exception caught: {e.Message}.";
                 Logger.LogError(errMessage, e);
-                ServiceEventSource.Current.ServiceMessage(this.Context, $"[PubSubService | Error] {errMessage}");
             }
         }
 
@@ -103,13 +103,11 @@ namespace PubSubService
 
                 string debugMessage = $"{baseLogString} RunAsync => ReliableDictionaries initialized.";
                 Logger.LogDebug(debugMessage);
-                ServiceEventSource.Current.ServiceMessage(this.Context, $"[PubSubService | Debug] {debugMessage}");
             }
             catch (Exception e)
             {
                 string errMessage = $"{baseLogString} RunAsync => Exception caught: {e.Message}.";
                 Logger.LogError(errMessage, e);
-                ServiceEventSource.Current.ServiceMessage(this.Context, $"[PubSubService | Error] {errMessage}");
             }
         }
 

@@ -1,4 +1,5 @@
-﻿using System;
+﻿using OMS.Common.Cloud.Logger;
+using System;
 using System.Diagnostics.Tracing;
 using System.Fabric;
 using System.Threading.Tasks;
@@ -6,7 +7,7 @@ using System.Threading.Tasks;
 namespace SCADA.FunctionExecutorService
 {
     [EventSource(Name = "MyCompany-OMS.Cloud-SCADA.FunctionExecutorService")]
-    internal sealed class ServiceEventSource : EventSource
+    internal sealed class ServiceEventSource : EventSource, IServiceEventTracing
     {
         public static readonly ServiceEventSource Current = new ServiceEventSource();
 
@@ -19,6 +20,11 @@ namespace SCADA.FunctionExecutorService
 
         // Instance constructor is private to enforce singleton semantics
         private ServiceEventSource() : base() { }
+
+        public void UniversalServiceMessage(ServiceContext serviceContext, string message)
+        {
+            ServiceMessage((StatefulServiceContext)serviceContext, message);
+        }
 
         #region Keywords
         // Event keywords can be used to categorize events. 

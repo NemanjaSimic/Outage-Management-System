@@ -29,6 +29,8 @@ namespace CE.LoadFlowService
 		public LoadFlowService(StatelessServiceContext context)
 			: base(context)
 		{
+			this.logger = CloudLoggerFactory.GetLogger(ServiceEventSource.Current, context);
+
 			this.baseLogString = $"{this.GetType()} [{this.GetHashCode()}] =>{Environment.NewLine}";
 			Logger.LogDebug($"{baseLogString} Ctor => Logger initialized");
 
@@ -38,13 +40,11 @@ namespace CE.LoadFlowService
 
 				string infoMessage = $"{baseLogString} Ctor => Contract providers initialized.";
 				Logger.LogInformation(infoMessage);
-				ServiceEventSource.Current.ServiceMessage(this.Context, $"[LoadFlowService | Information] {infoMessage}");
 			}
 			catch (Exception e)
 			{
 				string errorMessage = $"{baseLogString} Ctor => exception {e.Message}";
 				Logger.LogError(errorMessage, e);
-				ServiceEventSource.Current.ServiceMessage(this.Context, $"[LoadFlowService | Error] {errorMessage}");
 			}
 		}
 

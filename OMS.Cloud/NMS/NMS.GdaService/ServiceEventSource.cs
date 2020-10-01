@@ -6,11 +6,12 @@ using System.Linq;
 using System.Text;
 using System.Threading.Tasks;
 using Microsoft.ServiceFabric.Services.Runtime;
+using OMS.Common.Cloud.Logger;
 
 namespace NMS.GdaService
 {
     [EventSource(Name = "MyCompany-OMS.Cloud-NMS.GdaService")]
-    internal sealed class ServiceEventSource : EventSource
+    internal sealed class ServiceEventSource : EventSource, IServiceEventTracing
     {
         public static readonly ServiceEventSource Current = new ServiceEventSource();
 
@@ -23,6 +24,11 @@ namespace NMS.GdaService
 
         // Instance constructor is private to enforce singleton semantics
         private ServiceEventSource() : base() { }
+
+        public void UniversalServiceMessage(ServiceContext serviceContext, string message)
+        {
+            ServiceMessage((StatelessServiceContext)serviceContext, message);
+        }
 
         #region Keywords
         // Event keywords can be used to categorize events. 

@@ -1,16 +1,13 @@
 ﻿using System;
-using System.Collections.Generic;
 using System.Diagnostics.Tracing;
 using System.Fabric;
-using System.Linq;
-using System.Text;
 using System.Threading.Tasks;
-using Microsoft.ServiceFabric.Services.Runtime;
+using OMS.Common.Cloud.Logger;
 
 namespace OMS.CallTrackingService
 {
-	[EventSource(Name = "MyCompany-OMS.Cloud-OMS.CallTrackingService")]
-	internal sealed class ServiceEventSource : EventSource
+    [EventSource(Name = "MyCompany-OMS.Cloud-OMS.CallTrackingService")]
+	internal sealed class ServiceEventSource : EventSource, IServiceEventTracing
 	{
 		public static readonly ServiceEventSource Current = new ServiceEventSource();
 
@@ -23,6 +20,11 @@ namespace OMS.CallTrackingService
 
 		// Instance constructor is private to enforce singleton semantics
 		private ServiceEventSource() : base() { }
+
+		public void UniversalServiceMessage(ServiceContext serviceContext, string message)
+		{
+			ServiceMessage((StatefulServiceContext)serviceContext, message);
+		}
 
 		#region Keywords
 		// Event keywords can be used to categorize events. 

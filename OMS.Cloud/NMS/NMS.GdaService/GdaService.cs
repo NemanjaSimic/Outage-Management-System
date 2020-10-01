@@ -38,6 +38,8 @@ namespace NMS.GdaService
         public GdaService(StatelessServiceContext context)
             : base(context)
         {
+            this.logger = CloudLoggerFactory.GetLogger(ServiceEventSource.Current, context);
+
             this.baseLogString = $"{this.GetType()} [{this.GetHashCode()}] =>{Environment.NewLine}";
             Logger.LogDebug($"{baseLogString} Ctor => Logger initialized");
 
@@ -48,14 +50,12 @@ namespace NMS.GdaService
                 
                 string debugMessage = $"{baseLogString} Ctor => Configuration initialized.";
                 Logger.LogDebug(debugMessage);
-                ServiceEventSource.Current.ServiceMessage(this.Context, $"[GdaService | Debug] {debugMessage}");
 
                 //LOGIC
                 this.networkModel = new NetworkModel();
 
                 string infoMessage = $"{baseLogString} Ctor => NetworkModel created.";
                 Logger.LogInformation(infoMessage);
-                ServiceEventSource.Current.ServiceMessage(this.Context, $"[GdaService | Information] {infoMessage}");
 
                 //LOGIC
                 this.genericDataAccess = new GenericDataAccess(networkModel);
@@ -63,13 +63,11 @@ namespace NMS.GdaService
 
                 infoMessage = $"{baseLogString} Ctor => Contract providers initialized.";
                 Logger.LogInformation(infoMessage);
-                ServiceEventSource.Current.ServiceMessage(this.Context, $"[GdaService | Information] {infoMessage}");
             }
             catch (Exception e)
             {
                 string errMessage = $"{baseLogString} Ctor => Exception caught: {e.Message}.";
                 Logger.LogError(errMessage, e);
-                ServiceEventSource.Current.ServiceMessage(this.Context, $"[GdaService | Error] {errMessage}");
             }
         }
 
@@ -113,13 +111,11 @@ namespace NMS.GdaService
 
                 string infoMessage = $"{baseLogString} RunAsync => NetworkModel initialized.";
                 Logger.LogInformation(infoMessage);
-                ServiceEventSource.Current.ServiceMessage(this.Context, $"[GdaService | Information] {infoMessage}");
             }
             catch (Exception e)
             {
                 string errMessage = $"{baseLogString} RunAsync => Exception caught: {e.Message}.";
                 Logger.LogError(errMessage, e);
-                ServiceEventSource.Current.ServiceMessage(this.Context, $"[GdaService | Error] {errMessage}");
             }
         }
     }

@@ -29,6 +29,8 @@ namespace SCADA.CommandingService
         public CommandingService(StatelessServiceContext context)
             : base(context)
         {
+            this.logger = CloudLoggerFactory.GetLogger(ServiceEventSource.Current, context);
+
             this.baseLogString = $"{this.GetType()} [{this.GetHashCode()}] =>{Environment.NewLine}";
             Logger.LogDebug($"{baseLogString} Ctor => Logger initialized");
 
@@ -36,7 +38,6 @@ namespace SCADA.CommandingService
 
             string infoMessage = $"{baseLogString} Ctor => Contract providers initialized.";
             Logger.LogInformation(infoMessage);
-            ServiceEventSource.Current.ServiceMessage(this.Context, $"[CommandingService | Information] {infoMessage}");
         }
 
         /// <summary>
