@@ -18,6 +18,7 @@ using SCADA.ModelProviderImplementation.Helpers;
 using System;
 using System.Collections.Generic;
 using System.Fabric;
+using System.Runtime.InteropServices;
 using System.Text;
 using System.Threading.Tasks;
 
@@ -71,10 +72,7 @@ namespace SCADA.ModelProviderImplementation.DistributedTransaction
         private ReliableDictionaryAccess<byte, List<long>> ModelChanges { get; set; }
         private ReliableDictionaryAccess<long, CommandDescription> CommandDescriptionCache { get; set; }
         private ReliableDictionaryAccess<long, ModbusData> MeasurementsCache { get; set; }
-        public Task<bool> IsAlive()
-        {
-            return Task.Run(() => { return true; });
-        }
+        
 
         private async void OnStateManagerChangedHandler(object sender, NotifyStateManagerChangedEventArgs eventArgs)
         {
@@ -89,6 +87,10 @@ namespace SCADA.ModelProviderImplementation.DistributedTransaction
             catch (FabricObjectClosedException)
             {
                 Logger.LogDebug($"{baseLogString} OnStateManagerChangedHandler => FabricObjectClosedException. To be ignored.");
+            }
+            catch (COMException)
+            {
+                Logger.LogDebug($"{baseLogString} OnStateManagerChangedHandler => {typeof(COMException)}. To be ignored.");
             }
         }
 
@@ -305,6 +307,11 @@ namespace SCADA.ModelProviderImplementation.DistributedTransaction
                 string errorMessage = $"{baseLogString} Rollback => Exception: {e.Message}";
                 Logger.LogError(errorMessage, e);
             }
+        }
+
+        public Task<bool> IsAlive()
+        {
+            return Task.Run(() => { return true; });
         }
         #endregion ITransactionActorContract
 

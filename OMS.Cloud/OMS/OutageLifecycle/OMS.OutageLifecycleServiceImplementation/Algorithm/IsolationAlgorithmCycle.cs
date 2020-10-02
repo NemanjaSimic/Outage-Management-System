@@ -13,6 +13,7 @@ using System;
 using System.Collections.Generic;
 using System.Fabric;
 using System.Linq;
+using System.Runtime.InteropServices;
 using System.Threading.Tasks;
 
 namespace OMS.OutageLifecycleImplementation.Algorithm
@@ -105,6 +106,10 @@ namespace OMS.OutageLifecycleImplementation.Algorithm
             catch (FabricObjectClosedException)
             {
                 Logger.LogDebug($"{baseLogString} OnStateManagerChangedHandler => FabricObjectClosedException. To be ignored.");
+            }
+            catch (COMException)
+            {
+                Logger.LogDebug($"{baseLogString} OnStateManagerChangedHandler => {typeof(COMException)}. To be ignored.");
             }
         }
 

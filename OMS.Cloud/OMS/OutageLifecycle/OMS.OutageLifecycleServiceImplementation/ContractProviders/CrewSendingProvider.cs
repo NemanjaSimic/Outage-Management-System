@@ -14,6 +14,7 @@ using System;
 using System.Collections.Generic;
 using System.Fabric;
 using System.Linq;
+using System.Runtime.InteropServices;
 using System.Threading.Tasks;
 
 namespace OMS.OutageLifecycleImplementation.ContractProviders
@@ -78,6 +79,10 @@ namespace OMS.OutageLifecycleImplementation.ContractProviders
             {
                 Logger.LogDebug($"{baseLogString} OnStateManagerChangedHandler => FabricObjectClosedException. To be ignored.");
             }
+            catch (COMException)
+            {
+                Logger.LogDebug($"{baseLogString} OnStateManagerChangedHandler => {typeof(COMException)}. To be ignored.");
+            }
         }
 
         private async Task InitializeReliableCollections(NotifyStateManagerChangedEventArgs e)
@@ -89,7 +94,7 @@ namespace OMS.OutageLifecycleImplementation.ContractProviders
 
                 if (reliableStateName == ReliableDictionaryNames.OutageTopologyModel)
                 {
-                    this.outageTopologyModel = await ReliableDictionaryAccess<string, OutageTopologyModel>.Create(stateManager, ReliableDictionaryNames.OutageTopologyModel);
+                    //this.outageTopologyModel = await ReliableDictionaryAccess<string, OutageTopologyModel>.Create(stateManager, ReliableDictionaryNames.OutageTopologyModel);
                     this.isOutageTopologyModelInitialized = true;
 
                     string debugMessage = $"{baseLogString} OnStateManagerChangedHandler => '{ReliableDictionaryNames.OutageTopologyModel}' ReliableDictionaryAccess initialized.";
@@ -97,7 +102,7 @@ namespace OMS.OutageLifecycleImplementation.ContractProviders
                 }
                 else if (reliableStateName == ReliableDictionaryNames.CommandedElements)
                 {
-                    this.commandedElements = await ReliableDictionaryAccess<long, CommandedElement>.Create(stateManager, ReliableDictionaryNames.CommandedElements);
+                    //this.commandedElements = await ReliableDictionaryAccess<long, CommandedElement>.Create(stateManager, ReliableDictionaryNames.CommandedElements);
                     this.isCommandedElementsInitialized = true;
 
                     string debugMessage = $"{baseLogString} OnStateManagerChangedHandler => '{ReliableDictionaryNames.CommandedElements}' ReliableDictionaryAccess initialized.";
@@ -105,7 +110,7 @@ namespace OMS.OutageLifecycleImplementation.ContractProviders
                 }
                 else if (reliableStateName == ReliableDictionaryNames.ElementsToBeIgnoredInReportPotentialOutage)
                 {
-                    this.elementsToBeIgnoredInReportPotentialOutage = await ReliableDictionaryAccess<long, DateTime>.Create(stateManager, ReliableDictionaryNames.ElementsToBeIgnoredInReportPotentialOutage);
+                    //this.elementsToBeIgnoredInReportPotentialOutage = await ReliableDictionaryAccess<long, DateTime>.Create(stateManager, ReliableDictionaryNames.ElementsToBeIgnoredInReportPotentialOutage);
                     this.isElementsToBeIgnoredInReportPotentialOutageInitialized = true;
 
                     string debugMessage = $"{baseLogString} OnStateManagerChangedHandler => '{ReliableDictionaryNames.ElementsToBeIgnoredInReportPotentialOutage}' ReliableDictionaryAccess initialized.";

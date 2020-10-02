@@ -12,6 +12,7 @@ using OMS.Common.ScadaContracts.ModelProvider;
 using System;
 using System.Collections.Generic;
 using System.Fabric;
+using System.Runtime.InteropServices;
 using System.Threading.Tasks;
 
 namespace SCADA.ModelProviderImplementation.ContractProviders
@@ -68,11 +69,15 @@ namespace SCADA.ModelProviderImplementation.ContractProviders
             }
             catch (FabricNotPrimaryException)
             {
-                Logger.LogDebug($"{baseLogString} OnStateManagerChangedHandler => NotPrimaryException. To be ignored.");
+                Logger.LogDebug($"{baseLogString} OnStateManagerChangedHandler => {typeof(FabricNotPrimaryException)}. To be ignored.");
             }
             catch (FabricObjectClosedException)
             {
-                Logger.LogDebug($"{baseLogString} OnStateManagerChangedHandler => FabricObjectClosedException. To be ignored.");
+                Logger.LogDebug($"{baseLogString} OnStateManagerChangedHandler => {typeof(FabricObjectClosedException)}. To be ignored.");
+            }
+            catch(COMException)
+            {
+                Logger.LogDebug($"{baseLogString} OnStateManagerChangedHandler => {typeof(COMException)}. To be ignored.");
             }
         }
 

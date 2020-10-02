@@ -14,6 +14,7 @@ using System;
 using System.Configuration;
 using System.Fabric;
 using System.Linq;
+using System.Runtime.InteropServices;
 using System.Threading.Tasks;
 using System.Timers;
 
@@ -71,6 +72,10 @@ namespace OMS.CallTrackingImplementation
             catch (FabricObjectClosedException)
             {
                 Logger.LogDebug($"{baseLogString} OnStateManagerChangedHandler => FabricObjectClosedException. To be ignored.");
+            }
+            catch (COMException)
+            {
+                Logger.LogDebug($"{baseLogString} OnStateManagerChangedHandler => {typeof(COMException)}. To be ignored.");
             }
         }
 

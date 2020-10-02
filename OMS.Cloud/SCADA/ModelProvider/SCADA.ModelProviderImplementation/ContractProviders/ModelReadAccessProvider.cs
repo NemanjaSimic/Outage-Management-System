@@ -10,6 +10,7 @@ using SCADA.ModelProviderImplementation.Helpers;
 using System;
 using System.Collections.Generic;
 using System.Fabric;
+using System.Runtime.InteropServices;
 using System.Text;
 using System.Threading.Tasks;
 
@@ -29,11 +30,12 @@ namespace SCADA.ModelProviderImplementation.ContractProviders
         private bool ReliableDictionariesInitialized
         {
             get 
-            { 
-                return isGidToPointItemMapInitialized && 
-                       isAddressToGidMapInitialized && 
-                       isCommandDescriptionCacheInitialized && 
-                       isInfoCacheInitialized;
+            {
+                return true;
+                //return isGidToPointItemMapInitialized && 
+                //       isAddressToGidMapInitialized && 
+                //       isCommandDescriptionCacheInitialized && 
+                //       isInfoCacheInitialized;
             }
         }
 
@@ -80,6 +82,10 @@ namespace SCADA.ModelProviderImplementation.ContractProviders
             catch (FabricObjectClosedException)
             {
                 Logger.LogDebug($"{baseLogString} OnStateManagerChangedHandler => FabricObjectClosedException. To be ignored.");
+            }
+            catch (COMException)
+            {
+                Logger.LogDebug($"{baseLogString} OnStateManagerChangedHandler => {typeof(COMException)}. To be ignored.");
             }
         }
 
@@ -136,7 +142,7 @@ namespace SCADA.ModelProviderImplementation.ContractProviders
             this.isInfoCacheInitialized = false;
             
             this.stateManager = stateManager;
-            this.stateManager.StateManagerChanged += this.OnStateManagerChangedHandler;
+            //this.stateManager.StateManagerChanged += this.OnStateManagerChangedHandler;
         }
 
         #region IScadaModelReadAccessContract

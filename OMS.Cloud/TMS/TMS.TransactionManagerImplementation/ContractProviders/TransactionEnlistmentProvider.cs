@@ -7,6 +7,7 @@ using OMS.Common.TmsContracts;
 using System;
 using System.Collections.Generic;
 using System.Fabric;
+using System.Runtime.InteropServices;
 using System.Threading.Tasks;
 
 namespace TMS.TransactionManagerImplementation.ContractProviders
@@ -70,6 +71,10 @@ namespace TMS.TransactionManagerImplementation.ContractProviders
             catch (FabricObjectClosedException)
             {
                 Logger.LogDebug($"{baseLogString} OnStateManagerChangedHandler => FabricObjectClosedException. To be ignored.");
+            }
+            catch (COMException)
+            {
+                Logger.LogDebug($"{baseLogString} OnStateManagerChangedHandler => {typeof(COMException)}. To be ignored.");
             }
         }
 

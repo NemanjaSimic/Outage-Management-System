@@ -109,16 +109,19 @@ namespace OMS.Common.Cloud.ReliableCollectionHelpers
                     reliableDictioanryName = this.reliableDictionaryName;
                 }
 
-                var result = await reliableStateManagerHelper.TryGetAsync<IReliableDictionary<TKey, TValue>>(this.stateManager, reliableDictioanryName);
+                using (ITransaction tx = stateManager.CreateTransaction())
+                {
+                    var result = await reliableStateManagerHelper.GetOrAddAsync<IReliableDictionary<TKey, TValue>>(this.stateManager, tx, reliableDictioanryName);
 
-                if (result.HasValue)
-                {
-                    return result.Value;
-                }
-                else
-                {
-                    string message = $"ReliableCollection Key: {reliableDictioanryName}, Type: {typeof(IReliableDictionary<TKey, TValue>)} was not initialized.";
-                    throw new Exception(message);
+                    if (result != null)
+                    {
+                        return result;
+                    }
+                    else
+                    {
+                        string message = $"ReliableCollection Key: {reliableDictioanryName}, Type: {typeof(IReliableDictionary<TKey, TValue>)} was not initialized.";
+                        throw new Exception(message);
+                    }
                 }
             }
             catch (Exception e)

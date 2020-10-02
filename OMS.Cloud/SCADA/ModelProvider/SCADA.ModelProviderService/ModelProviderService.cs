@@ -253,18 +253,8 @@ namespace SCADA.ModelProviderService
                 {
                     using (ITransaction tx = this.StateManager.CreateTransaction())
                     {
-                        var result = await StateManager.TryGetAsync<IReliableDictionary<long, ModbusData>>(ReliableDictionaryNames.MeasurementsCache);
-                        if(result.HasValue)
-                        {
-                            var measurementsCache = result.Value;
-                            await measurementsCache.ClearAsync();
-                            await tx.CommitAsync();
-                        }
-                        else
-                        {
-                            await StateManager.GetOrAddAsync<IReliableDictionary<long, ModbusData>>(tx, ReliableDictionaryNames.MeasurementsCache);
-                            await tx.CommitAsync();
-                        }
+                        await StateManager.GetOrAddAsync<IReliableDictionary<long, ModbusData>>(tx, ReliableDictionaryNames.MeasurementsCache);
+                        await tx.CommitAsync();
                     }
                 }),
 

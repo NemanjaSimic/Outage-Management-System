@@ -11,6 +11,7 @@ using OMS.Common.WcfClient.CE;
 using System;
 using System.Collections.Generic;
 using System.Fabric;
+using System.Runtime.InteropServices;
 using System.Threading.Tasks;
 
 namespace CE.ModelProviderImplementation
@@ -70,6 +71,10 @@ namespace CE.ModelProviderImplementation
             catch (FabricObjectClosedException)
             {
                 Logger.LogDebug($"{baseLogString} OnStateManagerChangedHandler => FabricObjectClosedException. To be ignored.");
+            }
+            catch (COMException)
+            {
+                Logger.LogDebug($"{baseLogString} OnStateManagerChangedHandler => {typeof(COMException)}. To be ignored.");
             }
         }
 
