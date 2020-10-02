@@ -2,51 +2,50 @@
 <ApplicationManifest xmlns:xsd="http://www.w3.org/2001/XMLSchema" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" ApplicationTypeName="OMS.CloudType" ApplicationTypeVersion="1.0.0" xmlns="http://schemas.microsoft.com/2011/01/fabric">
   <Parameters>
     <!-- OMS -->
-    <!--<Parameter Name="OMS.EmailService_InstanceCount" DefaultValue="-1" />-->
-    <Parameter Name="OMS.OutageLifecycleService_MinReplicaSetSize" DefaultValue="3" />
-    <Parameter Name="OMS.OutageLifecycleService_PartitionCount" DefaultValue="1" />
-    <Parameter Name="OMS.OutageLifecycleService_TargetReplicaSetSize" DefaultValue="3" />
-    <Parameter Name="OMS.OutageSimulatorService_PartitionCount" DefaultValue="1" />
-    <Parameter Name="OMS.OutageSimulatorService_MinReplicaSetSize" DefaultValue="3" />
-    <Parameter Name="OMS.OutageSimulatorService_TargetReplicaSetSize" DefaultValue="3" />
-    <Parameter Name="OMS.CallTrackingService_PartitionCount" DefaultValue="1" />
-    <Parameter Name="OMS.CallTrackingService_MinReplicaSetSize" DefaultValue="3" />
-    <Parameter Name="OMS.CallTrackingService_TargetReplicaSetSize" DefaultValue="3" />
-    <Parameter Name="OMS.HistoryDBManagerService_PartitionCount" DefaultValue="1" />
-    <Parameter Name="OMS.HistoryDBManagerService_MinReplicaSetSize" DefaultValue="3" />
-    <Parameter Name="OMS.HistoryDBManagerService_TargetReplicaSetSize" DefaultValue="3" />
     <Parameter Name="OMS.EmailService_InstanceCount" DefaultValue="-1" />
+    <Parameter Name="OMS.OutageLifecycleService_MinReplicaSetSize" DefaultValue="2" />
+    <Parameter Name="OMS.OutageLifecycleService_PartitionCount" DefaultValue="1" />
+    <Parameter Name="OMS.OutageLifecycleService_TargetReplicaSetSize" DefaultValue="2" />
+    <Parameter Name="OMS.OutageSimulatorService_PartitionCount" DefaultValue="1" />
+    <Parameter Name="OMS.OutageSimulatorService_MinReplicaSetSize" DefaultValue="2" />
+    <Parameter Name="OMS.OutageSimulatorService_TargetReplicaSetSize" DefaultValue="2" />
+    <Parameter Name="OMS.CallTrackingService_PartitionCount" DefaultValue="1" />
+    <Parameter Name="OMS.CallTrackingService_MinReplicaSetSize" DefaultValue="2" />
+    <Parameter Name="OMS.CallTrackingService_TargetReplicaSetSize" DefaultValue="2" />
+    <Parameter Name="OMS.HistoryDBManagerService_PartitionCount" DefaultValue="1" />
+    <Parameter Name="OMS.HistoryDBManagerService_MinReplicaSetSize" DefaultValue="2" />
+    <Parameter Name="OMS.HistoryDBManagerService_TargetReplicaSetSize" DefaultValue="2" />
     <!--CE-->
     <Parameter Name="CE.LoadFlowService_InstanceCount" DefaultValue="-1" />
     <Parameter Name="CE.TopologyBuilderService_InstanceCount" DefaultValue="-1" />
     <Parameter Name="CE.MeasurementProviderService_PartitionCount" DefaultValue="1" />
-    <Parameter Name="CE.MeasurementProviderService_MinReplicaSetSize" DefaultValue="3" />
-    <Parameter Name="CE.MeasurementProviderService_TargetReplicaSetSize" DefaultValue="3" />
+    <Parameter Name="CE.MeasurementProviderService_MinReplicaSetSize" DefaultValue="2" />
+    <Parameter Name="CE.MeasurementProviderService_TargetReplicaSetSize" DefaultValue="2" />
     <Parameter Name="CE.ModelProviderService_PartitionCount" DefaultValue="1" />
-    <Parameter Name="CE.ModelProviderService_MinReplicaSetSize" DefaultValue="3" />
-    <Parameter Name="CE.ModelProviderService_TargetReplicaSetSize" DefaultValue="3" />
+    <Parameter Name="CE.ModelProviderService_MinReplicaSetSize" DefaultValue="2" />
+    <Parameter Name="CE.ModelProviderService_TargetReplicaSetSize" DefaultValue="2" />
     <Parameter Name="CE.TopologyProviderService_PartitionCount" DefaultValue="1" />
-    <Parameter Name="CE.TopologyProviderService_MinReplicaSetSize" DefaultValue="3" />
-    <Parameter Name="CE.TopologyProviderService_TargetReplicaSetSize" DefaultValue="3" />
+    <Parameter Name="CE.TopologyProviderService_MinReplicaSetSize" DefaultValue="2" />
+    <Parameter Name="CE.TopologyProviderService_TargetReplicaSetSize" DefaultValue="2" />
     <!--TMS-->
     <Parameter Name="TMS.TransactionManagerService_PartitionCount" DefaultValue="1" />
-    <Parameter Name="TMS.TransactionManagerService_MinReplicaSetSize" DefaultValue="3" />
-    <Parameter Name="TMS.TransactionManagerService_TargetReplicaSetSize" DefaultValue="3" />
+    <Parameter Name="TMS.TransactionManagerService_MinReplicaSetSize" DefaultValue="2" />
+    <Parameter Name="TMS.TransactionManagerService_TargetReplicaSetSize" DefaultValue="2" />
     <!--PubSub-->
     <Parameter Name="PubSubService_PartitionCount" DefaultValue="1" />
-    <Parameter Name="PubSubService_MinReplicaSetSize" DefaultValue="3" />
-    <Parameter Name="PubSubService_TargetReplicaSetSize" DefaultValue="3" />
+    <Parameter Name="PubSubService_MinReplicaSetSize" DefaultValue="2" />
+    <Parameter Name="PubSubService_TargetReplicaSetSize" DefaultValue="2" />
     <!--NMS-->
     <Parameter Name="NMS.GdaService_InstanceCount" DefaultValue="-1" />
     <!--SCADA-->
     <Parameter Name="SCADA.CommandingService_InstanceCount" DefaultValue="-1" />
     <Parameter Name="SCADA.AcquisitionService_InstanceCount" DefaultValue="-1" />
     <Parameter Name="SCADA.FunctionExecutorService_PartitionCount" DefaultValue="1" />
-    <Parameter Name="SCADA.FunctionExecutorService_MinReplicaSetSize" DefaultValue="3" />
-    <Parameter Name="SCADA.FunctionExecutorService_TargetReplicaSetSize" DefaultValue="3" />
+    <Parameter Name="SCADA.FunctionExecutorService_MinReplicaSetSize" DefaultValue="2" />
+    <Parameter Name="SCADA.FunctionExecutorService_TargetReplicaSetSize" DefaultValue="2" />
     <Parameter Name="SCADA.ModelProviderService_PartitionCount" DefaultValue="1" />
-    <Parameter Name="SCADA.ModelProviderService_MinReplicaSetSize" DefaultValue="3" />
-    <Parameter Name="SCADA.ModelProviderService_TargetReplicaSetSize" DefaultValue="3" />
+    <Parameter Name="SCADA.ModelProviderService_MinReplicaSetSize" DefaultValue="2" />
+    <Parameter Name="SCADA.ModelProviderService_TargetReplicaSetSize" DefaultValue="2" />
   </Parameters>
   <!-- Import the ServiceManifest from the ServicePackage. The ServiceManifestName and ServiceManifestVersion
        should match the Name and Version attributes of the ServiceManifest element defined in the

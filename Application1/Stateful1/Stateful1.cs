@@ -18,7 +18,13 @@ namespace Stateful1
         public Stateful1(StatefulServiceContext context)
             : base(context)
         {
-            this.implementation = new Implementation(StateManager);
+            try
+            {
+                this.implementation = new Implementation(StateManager);
+            }
+            catch (Exception)
+            {
+            }
         }
 
         protected override IEnumerable<ServiceReplicaListener> CreateServiceReplicaListeners()

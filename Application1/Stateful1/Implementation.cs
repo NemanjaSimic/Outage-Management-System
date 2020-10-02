@@ -84,6 +84,15 @@ namespace Stateful1
 
             this.stateManager = stateManager;
             this.stateManager.StateManagerChanged += this.OnStateManagerChangedHandler;
+            this.stateManager.TransactionChanged += StateManager_TransactionChanged;
+        }
+
+        private void StateManager_TransactionChanged(object sender, NotifyTransactionChangedEventArgs e)
+        {
+            //if(e.Action == NotifyTransactionChangedAction.Commit)
+            //{
+
+            //}
         }
 
         public async Task Start()
@@ -93,7 +102,7 @@ namespace Stateful1
                 await Task.Delay(1000);
             }
 
-            var enumerableInfoCache = InfoCache.GetEnumerableDictionaryAsync();
+            var enumerableInfoCache = await InfoCache.GetEnumerableDictionaryAsync();
             await InfoCache.SetAsync(0, "Hello World!");
         }
     }

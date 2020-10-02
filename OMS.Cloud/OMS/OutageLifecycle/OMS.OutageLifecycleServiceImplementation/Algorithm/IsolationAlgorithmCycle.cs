@@ -102,6 +102,10 @@ namespace OMS.OutageLifecycleImplementation.Algorithm
             {
                 Logger.LogDebug($"{baseLogString} OnStateManagerChangedHandler => NotPrimaryException. To be ignored.");
             }
+            catch (FabricObjectClosedException)
+            {
+                Logger.LogDebug($"{baseLogString} OnStateManagerChangedHandler => FabricObjectClosedException. To be ignored.");
+            }
         }
 
         private async Task InitializeReliableCollections(NotifyStateManagerChangedEventArgs e)

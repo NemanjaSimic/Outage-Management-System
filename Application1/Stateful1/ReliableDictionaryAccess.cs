@@ -118,6 +118,7 @@ namespace Stateful1
                 if (result.HasValue)
                 {
                     this.reliableDictionary = result.Value;
+                    this.reliableDictionary.DictionaryChanged += ReliableDictionary_DictionaryChanged;
                     await tx.CommitAsync();
                 }
                 else
@@ -125,6 +126,30 @@ namespace Stateful1
                     string message = $"ReliableCollection Key: {reliableDictioanryName}, Type: {typeof(IReliableDictionary<TKey, TValue>)} was not initialized.";
                     throw new Exception(message);
                 }
+            }
+        }
+
+        private void ReliableDictionary_DictionaryChanged(object sender, NotifyDictionaryChangedEventArgs<TKey, TValue> e)
+        {
+            if (e.Action == NotifyDictionaryChangedAction.Add)
+            {
+
+            }
+            else if (e.Action == NotifyDictionaryChangedAction.Clear)
+            {
+
+            }
+            else if (e.Action == NotifyDictionaryChangedAction.Rebuild)
+            {
+
+            }
+            else if (e.Action == NotifyDictionaryChangedAction.Remove)
+            {
+
+            }
+            else if (e.Action == NotifyDictionaryChangedAction.Update)
+            {
+
             }
         }
 

@@ -10,15 +10,11 @@ using System.Threading.Tasks;
 
 namespace OMS.Common.Cloud.ReliableCollectionHelpers
 {
-    public sealed class ReliableDictionaryAccess<TKey, TValue> : IReliableDictionary<TKey, TValue>,
-                                                                 IDisposable
-                                                                 where TKey : IComparable<TKey>, IEquatable<TKey>
+    public sealed class ReliableDictionaryAccess<TKey, TValue> where TKey : IComparable<TKey>, IEquatable<TKey>
     {
         private readonly string reliableDictionaryName;
         private readonly IReliableStateManager stateManager;
         private readonly ReliableStateManagerHelper reliableStateManagerHelper;
-        
-        private IReliableDictionary<TKey, TValue> reliableDictionary;
 
         #region Static Members
         private static ICloudLogger logger;
@@ -35,8 +31,8 @@ namespace OMS.Common.Cloud.ReliableCollectionHelpers
             {
                 try
                 {
-                    ReliableDictionaryAccess<TKey, TValue> reliableDictionaryAccess = new ReliableDictionaryAccess<TKey, TValue>(stateManager, reliableDictioanryName);
-                    await reliableDictionaryAccess.InitializeReliableDictionary(reliableDictioanryName);
+                    var reliableDictionaryAccess = new ReliableDictionaryAccess<TKey, TValue>(stateManager, reliableDictioanryName);
+                    _ = await reliableDictionaryAccess.GetReliableDictionary(reliableDictioanryName);
                     return reliableDictionaryAccess;
                 }
                 catch (Exception e)
@@ -65,8 +61,8 @@ namespace OMS.Common.Cloud.ReliableCollectionHelpers
             {
                 try
                 {
-                    ReliableDictionaryAccess<TKey, TValue> reliableDictionaryAccess = new ReliableDictionaryAccess<TKey, TValue>(stateManager, reliableDictionary);
-                    await reliableDictionaryAccess.InitializeReliableDictionary();
+                    var reliableDictionaryAccess = new ReliableDictionaryAccess<TKey, TValue>(stateManager, reliableDictionary);
+                    _ = await reliableDictionaryAccess.GetReliableDictionary();
                     return reliableDictionaryAccess;
                 }
                 catch (Exception e)
@@ -99,27 +95,25 @@ namespace OMS.Common.Cloud.ReliableCollectionHelpers
         internal ReliableDictionaryAccess(IReliableStateManager stateManager, IReliableDictionary<TKey, TValue> reliableDictionary)
         {
             this.stateManager = stateManager;
-            this.reliableDictionary = reliableDictionary;
             this.reliableDictionaryName = reliableDictionary.Name.OriginalString;
             this.reliableStateManagerHelper = new ReliableStateManagerHelper();
         }
         #endregion Constructors
 
-        public async Task InitializeReliableDictionary(string reliableDictioanryName = "")
+        public async Task<IReliableDictionary<TKey, TValue>> GetReliableDictionary(string reliableDictioanryName = "")
         {
-            if (string.IsNullOrEmpty(reliableDictioanryName))
+            try
             {
-                reliableDictioanryName = this.reliableDictionaryName;
-            }
+                if (string.IsNullOrEmpty(reliableDictioanryName))
+                {
+                    reliableDictioanryName = this.reliableDictionaryName;
+                }
 
-            using (ITransaction tx = this.stateManager.CreateTransaction())
-            {
                 var result = await reliableStateManagerHelper.TryGetAsync<IReliableDictionary<TKey, TValue>>(this.stateManager, reliableDictioanryName);
 
                 if (result.HasValue)
                 {
-                    this.reliableDictionary = result.Value;
-                    await tx.CommitAsync();
+                    return result.Value;
                 }
                 else
                 {
@@ -127,9 +121,12 @@ namespace OMS.Common.Cloud.ReliableCollectionHelpers
                     throw new Exception(message);
                 }
             }
+            catch (Exception e)
+            { 
+                throw e;
+            }
+            
         }
-
-        public event EventHandler<NotifyDictionaryChangedEventArgs<TKey, TValue>> DictionaryChanged;
         
         public async Task<Dictionary<TKey, TValue>> GetDataCopyAsync()
         {
@@ -138,7 +135,7 @@ namespace OMS.Common.Cloud.ReliableCollectionHelpers
 
             using (ITransaction tx = stateManager.CreateTransaction())
             {
-                asyncEnumerable = await reliableDictionary.CreateEnumerableAsync(tx);
+                asyncEnumerable = await (await GetReliableDictionary()).CreateEnumerableAsync(tx);
             }
 
             var asyncEnumerator = asyncEnumerable.GetAsyncEnumerator();
@@ -153,361 +150,10 @@ namespace OMS.Common.Cloud.ReliableCollectionHelpers
             return copy;
         }
 
-        #region IReliableDictionary
-        public Func<IReliableDictionary<TKey, TValue>, NotifyDictionaryRebuildEventArgs<TKey, TValue>, Task> RebuildNotificationAsyncCallback 
-        { 
-            set
-            {
-                if (reliableDictionary == null)
-                {
-                    InitializeReliableDictionary().Wait();
-                }
-
-                reliableDictionary.RebuildNotificationAsyncCallback = value;
-            }
-        }
-
-        public Uri Name
-        {
-            get
-            {
-                if(reliableDictionary == null)
-                {
-                    InitializeReliableDictionary().Wait();
-                }
-
-                return reliableDictionary.Name;
-            }
-        }
-
-        public async Task AddAsync(ITransaction tx, TKey key, TValue value)
-        {
-            if (reliableDictionary == null)
-            {
-                await InitializeReliableDictionary();
-            }
-
-            await reliableDictionary.AddAsync(tx, key, value);
-        }
-
-        public async Task AddAsync(ITransaction tx, TKey key, TValue value, TimeSpan timeout, CancellationToken cancellationToken)
-        {
-            if (reliableDictionary == null)
-            {
-                await InitializeReliableDictionary();
-            }
-
-            await reliableDictionary.AddAsync(tx, key, value, timeout, cancellationToken);
-        }
-
-        public async Task<TValue> AddOrUpdateAsync(ITransaction tx, TKey key, Func<TKey, TValue> addValueFactory, Func<TKey, TValue, TValue> updateValueFactory)
-        {
-            if (reliableDictionary == null)
-            {
-                await InitializeReliableDictionary();
-            }
-
-            return await reliableDictionary.AddOrUpdateAsync(tx, key, addValueFactory, updateValueFactory);
-        }
-
-        public async Task<TValue> AddOrUpdateAsync(ITransaction tx, TKey key, TValue addValue, Func<TKey, TValue, TValue> updateValueFactory)
-        {
-            if (reliableDictionary == null)
-            {
-                await InitializeReliableDictionary();
-            }
-
-            return await reliableDictionary.AddOrUpdateAsync(tx, key, addValue, updateValueFactory);
-        }
-
-        public async Task<TValue> AddOrUpdateAsync(ITransaction tx, TKey key, Func<TKey, TValue> addValueFactory, Func<TKey, TValue, TValue> updateValueFactory, TimeSpan timeout, CancellationToken cancellationToken)
-        {
-            if (reliableDictionary == null)
-            {
-                await InitializeReliableDictionary();
-            }
-
-            return await reliableDictionary.AddOrUpdateAsync(tx, key, addValueFactory, updateValueFactory, timeout, cancellationToken);
-        }
-
-        public async Task<TValue> AddOrUpdateAsync(ITransaction tx, TKey key, TValue addValue, Func<TKey, TValue, TValue> updateValueFactory, TimeSpan timeout, CancellationToken cancellationToken)
-        {
-            if (reliableDictionary == null)
-            {
-                await InitializeReliableDictionary();
-            }
-
-            return await reliableDictionary.AddOrUpdateAsync(tx, key, addValue, updateValueFactory, timeout, cancellationToken);
-        }
-
-        public async Task ClearAsync(TimeSpan timeout, CancellationToken cancellationToken)
-        {
-            if (reliableDictionary == null)
-            {
-                await InitializeReliableDictionary();
-            }
-
-            await reliableDictionary.ClearAsync(timeout, cancellationToken);
-        }
-
-        public async Task ClearAsync()
-        {
-            if (reliableDictionary == null)
-            {
-                await InitializeReliableDictionary();
-            }
-
-            await reliableDictionary.ClearAsync();
-        }
-
-        public async Task<bool> ContainsKeyAsync(ITransaction tx, TKey key)
-        {
-            if (reliableDictionary == null)
-            {
-                await InitializeReliableDictionary();
-            }
-
-            return await reliableDictionary.ContainsKeyAsync(tx, key);
-        }
-
-        public async Task<bool> ContainsKeyAsync(ITransaction tx, TKey key, LockMode lockMode)
-        {
-            if (reliableDictionary == null)
-            {
-                await InitializeReliableDictionary();
-            }
-
-            return await reliableDictionary.ContainsKeyAsync(tx, key, lockMode);
-        }
-
-        public async Task<bool> ContainsKeyAsync(ITransaction tx, TKey key, TimeSpan timeout, CancellationToken cancellationToken)
-        {
-            if (reliableDictionary == null)
-            {
-                await InitializeReliableDictionary();
-            }
-
-            return await reliableDictionary.ContainsKeyAsync(tx, key, timeout, cancellationToken);
-        }
-
-        public async Task<bool> ContainsKeyAsync(ITransaction tx, TKey key, LockMode lockMode, TimeSpan timeout, CancellationToken cancellationToken)
-        {
-            if (reliableDictionary == null)
-            {
-                await InitializeReliableDictionary();
-            }
-
-            return await reliableDictionary.ContainsKeyAsync(tx, key, lockMode, timeout, cancellationToken);
-        }
-
-        public async Task<Microsoft.ServiceFabric.Data.IAsyncEnumerable<KeyValuePair<TKey, TValue>>> CreateEnumerableAsync(ITransaction txn)
-        {
-            if (reliableDictionary == null)
-            {
-                await InitializeReliableDictionary();
-            }
-
-            return await reliableDictionary.CreateEnumerableAsync(txn);
-        }
-
-        public async Task<Microsoft.ServiceFabric.Data.IAsyncEnumerable<KeyValuePair<TKey, TValue>>> CreateEnumerableAsync(ITransaction txn, EnumerationMode enumerationMode)
-        {
-            if (reliableDictionary == null)
-            {
-                await InitializeReliableDictionary();
-            }
-
-            return await reliableDictionary.CreateEnumerableAsync(txn, enumerationMode);
-        }
-
-        public async Task<Microsoft.ServiceFabric.Data.IAsyncEnumerable<KeyValuePair<TKey, TValue>>> CreateEnumerableAsync(ITransaction txn, Func<TKey, bool> filter, EnumerationMode enumerationMode)
-        {
-            if (reliableDictionary == null)
-            {
-                await InitializeReliableDictionary();
-            }
-
-            return await reliableDictionary.CreateEnumerableAsync(txn, filter, enumerationMode);
-        }
-
-        public async Task<long> GetCountAsync(ITransaction tx)
-        {
-            if (reliableDictionary == null)
-            {
-                await InitializeReliableDictionary();
-            }
-
-            return await reliableDictionary.GetCountAsync(tx);
-        }
-
-        public async Task<TValue> GetOrAddAsync(ITransaction tx, TKey key, Func<TKey, TValue> valueFactory)
-        {
-            if (reliableDictionary == null)
-            {
-                await InitializeReliableDictionary();
-            }
-
-            return await reliableDictionary.GetOrAddAsync(tx, key, valueFactory);
-        }
-
-        public async Task<TValue> GetOrAddAsync(ITransaction tx, TKey key, TValue value)
-        {
-            if (reliableDictionary == null)
-            {
-                await InitializeReliableDictionary();
-            }
-
-            return await reliableDictionary.GetOrAddAsync(tx, key, value);
-        }
-
-        public async Task<TValue> GetOrAddAsync(ITransaction tx, TKey key, Func<TKey, TValue> valueFactory, TimeSpan timeout, CancellationToken cancellationToken)
-        {
-            if (reliableDictionary == null)
-            {
-                await InitializeReliableDictionary();
-            }
-
-            return await reliableDictionary.GetOrAddAsync(tx, key, valueFactory, timeout, cancellationToken);
-        }
-
-        public async Task<TValue> GetOrAddAsync(ITransaction tx, TKey key, TValue value, TimeSpan timeout, CancellationToken cancellationToken)
-        {
-            if (reliableDictionary == null)
-            {
-                await InitializeReliableDictionary();
-            }
-
-            return await reliableDictionary.GetOrAddAsync(tx, key, value, timeout, cancellationToken);
-        }
-
-        public async Task SetAsync(ITransaction tx, TKey key, TValue value)
-        {
-            if (reliableDictionary == null)
-            {
-                await InitializeReliableDictionary();
-            }
-
-            await reliableDictionary.SetAsync(tx, key, value);
-        }
-
-        public async Task SetAsync(ITransaction tx, TKey key, TValue value, TimeSpan timeout, CancellationToken cancellationToken)
-        {
-            if (reliableDictionary == null)
-            {
-                await InitializeReliableDictionary();
-            }
-
-            await reliableDictionary.SetAsync(tx, key, value, timeout, cancellationToken);
-        }
-
-        public async Task<bool> TryAddAsync(ITransaction tx, TKey key, TValue value)
-        {
-            if (reliableDictionary == null)
-            {
-                await InitializeReliableDictionary();
-            }
-
-            return await reliableDictionary.TryAddAsync(tx, key, value);
-        }
-
-        public async Task<bool> TryAddAsync(ITransaction tx, TKey key, TValue value, TimeSpan timeout, CancellationToken cancellationToken)
-        {
-            if (reliableDictionary == null)
-            {
-                await InitializeReliableDictionary();
-            }
-
-            return await reliableDictionary.TryAddAsync(tx, key, value, timeout, cancellationToken);
-        }
-
-        public async Task<ConditionalValue<TValue>> TryGetValueAsync(ITransaction tx, TKey key)
-        {
-            if (reliableDictionary == null)
-            {
-                await InitializeReliableDictionary();
-            }
-
-            return await reliableDictionary.TryGetValueAsync(tx, key);
-        }
-
-        public async Task<ConditionalValue<TValue>> TryGetValueAsync(ITransaction tx, TKey key, LockMode lockMode)
-        {
-            if (reliableDictionary == null)
-            {
-                await InitializeReliableDictionary();
-            }
-
-            return await reliableDictionary.TryGetValueAsync(tx, key, lockMode);
-        }
-
-        public async Task<ConditionalValue<TValue>> TryGetValueAsync(ITransaction tx, TKey key, TimeSpan timeout, CancellationToken cancellationToken)
-        {
-            if (reliableDictionary == null)
-            {
-                await InitializeReliableDictionary();
-            }
-
-            return await reliableDictionary.TryGetValueAsync(tx, key, timeout, cancellationToken);
-        }
-
-        public async Task<ConditionalValue<TValue>> TryGetValueAsync(ITransaction tx, TKey key, LockMode lockMode, TimeSpan timeout, CancellationToken cancellationToken)
-        {
-            if (reliableDictionary == null)
-            {
-                await InitializeReliableDictionary();
-            }
-
-            return await reliableDictionary.TryGetValueAsync(tx, key, lockMode, timeout, cancellationToken);
-        }
-
-        public async Task<ConditionalValue<TValue>> TryRemoveAsync(ITransaction tx, TKey key)
-        {
-            if (reliableDictionary == null)
-            {
-                await InitializeReliableDictionary();
-            }
-
-            return await reliableDictionary.TryRemoveAsync(tx, key);
-        }
-
-        public async Task<ConditionalValue<TValue>> TryRemoveAsync(ITransaction tx, TKey key, TimeSpan timeout, CancellationToken cancellationToken)
-        {
-            if (reliableDictionary == null)
-            {
-                await InitializeReliableDictionary();
-            }
-
-            return await reliableDictionary.TryRemoveAsync(tx, key, timeout, cancellationToken);
-        }
-
-        public async Task<bool> TryUpdateAsync(ITransaction tx, TKey key, TValue newValue, TValue comparisonValue)
-        {
-            if (reliableDictionary == null)
-            {
-                await InitializeReliableDictionary();
-            }
-
-            return await reliableDictionary.TryUpdateAsync(tx, key, newValue, comparisonValue);
-        }
-
-        public async Task<bool> TryUpdateAsync(ITransaction tx, TKey key, TValue newValue, TValue comparisonValue, TimeSpan timeout, CancellationToken cancellationToken)
-        {
-            if (reliableDictionary == null)
-            {
-                await InitializeReliableDictionary();
-            }
-
-            return await reliableDictionary.TryUpdateAsync(tx, key, newValue, comparisonValue, timeout, cancellationToken);
-        }
-        #endregion IReliableDictionary
-
         #region Async Wrapper
         public async Task<bool> ContainsKeyAsync(TKey key)
         {
-            if (reliableDictionary == null)
-            {
-                await InitializeReliableDictionary();
-            }
+            var reliableDictionary = await GetReliableDictionary();
 
             using (ITransaction tx = stateManager.CreateTransaction())
             {
@@ -517,10 +163,7 @@ namespace OMS.Common.Cloud.ReliableCollectionHelpers
 
         public async Task<long> GetCountAsync()
         {
-            if (reliableDictionary == null)
-            {
-                await InitializeReliableDictionary();
-            }
+            var reliableDictionary = await GetReliableDictionary();
 
             using (ITransaction tx = stateManager.CreateTransaction())
             {
@@ -530,10 +173,7 @@ namespace OMS.Common.Cloud.ReliableCollectionHelpers
 
         public async Task<ConditionalValue<TValue>> TryGetValueAsync(TKey key)
         {
-            if (reliableDictionary == null)
-            {
-                await InitializeReliableDictionary();
-            }
+            var reliableDictionary = await GetReliableDictionary();
 
             using (ITransaction tx = stateManager.CreateTransaction())
             {
@@ -550,10 +190,7 @@ namespace OMS.Common.Cloud.ReliableCollectionHelpers
 
         public async Task<TValue> GetOrAddAsync(TKey key, TValue value)
         {
-            if (reliableDictionary == null)
-            {
-                await InitializeReliableDictionary();
-            }
+            var reliableDictionary = await GetReliableDictionary();
 
             using (ITransaction tx = stateManager.CreateTransaction())
             {
@@ -566,10 +203,7 @@ namespace OMS.Common.Cloud.ReliableCollectionHelpers
 
         public async Task SetAsync(TKey key, TValue value)
         {
-            if (reliableDictionary == null)
-            {
-                await InitializeReliableDictionary();
-            }
+            var reliableDictionary = await GetReliableDictionary();
 
             using (ITransaction tx = stateManager.CreateTransaction())
             {
@@ -580,10 +214,7 @@ namespace OMS.Common.Cloud.ReliableCollectionHelpers
 
         public async Task<bool> TryUpdateAsync(TKey key, TValue newValue, TValue comparisonValue)
         {
-            if (reliableDictionary == null)
-            {
-                await InitializeReliableDictionary();
-            }
+            var reliableDictionary = await GetReliableDictionary();
 
             using (ITransaction tx = stateManager.CreateTransaction())
             {
@@ -600,10 +231,7 @@ namespace OMS.Common.Cloud.ReliableCollectionHelpers
 
         public async Task<ConditionalValue<TValue>> TryRemoveAsync(TKey key)
         {
-            if (reliableDictionary == null)
-            {
-                await InitializeReliableDictionary();
-            }
+            var reliableDictionary = await GetReliableDictionary();
 
             using (ITransaction tx = stateManager.CreateTransaction())
             {
@@ -618,27 +246,17 @@ namespace OMS.Common.Cloud.ReliableCollectionHelpers
             }
         }
 
+        public async Task ClearAsync()
+        {
+            var reliableDictionary = await GetReliableDictionary();
+            await reliableDictionary.ClearAsync();
+        }
+
         public async Task<Dictionary<TKey, TValue>> GetEnumerableDictionaryAsync()
         {
             var enumerableDictionary = await GetDataCopyAsync();
             return enumerableDictionary;
         }
         #endregion Async Wrapper
-
-        #region IEnumerable
-        public async Task<IEnumerator> GetEnumerator()
-        {
-            var enumerableDictionary = await GetDataCopyAsync();
-            return enumerableDictionary.GetEnumerator();
-        }
-        #endregion IEnumerable
-
-        #region IDisposable
-        public void Dispose()
-
-        {
-            throw new NotImplementedException("ReliableDictionaryAccess.Dispose()");
-        }
-        #endregion IDisposable
     }
 }
