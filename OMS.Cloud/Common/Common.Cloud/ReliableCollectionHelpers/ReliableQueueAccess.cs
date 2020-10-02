@@ -2,21 +2,15 @@
 using Microsoft.ServiceFabric.Data.Collections;
 using OMS.Common.Cloud.Logger;
 using System;
-using System.Collections.Generic;
-using System.Linq;
-using System.Text;
-using System.Threading;
 using System.Threading.Tasks;
 
 namespace OMS.Common.Cloud.ReliableCollectionHelpers
 {
-    public sealed class ReliableQueueAccess<TValue> : IReliableConcurrentQueue<TValue>
+    public sealed class ReliableQueueAccess<TValue>
     {
         private readonly string reliableQueueName;
         private readonly IReliableStateManager stateManager;
         private readonly ReliableStateManagerHelper reliableStateManagerHelper;
-
-        private IReliableConcurrentQueue<TValue> reliableConcurrentQueue;
 
         #region Static Members
         private static ICloudLogger logger;
@@ -24,10 +18,6 @@ namespace OMS.Common.Cloud.ReliableCollectionHelpers
         {
             get { return logger ?? (logger = CloudLoggerFactory.GetLogger()); }
         }
-
-		public long Count => throw new NotImplementedException();
-
-		public Uri Name => throw new NotImplementedException();
 
 		public static async Task<ReliableQueueAccess<TValue>> Create(IReliableStateManager stateManager, string reliableQueueName)
         {
@@ -38,7 +28,7 @@ namespace OMS.Common.Cloud.ReliableCollectionHelpers
                 try
                 {
                     var reliableQueueAccess = new ReliableQueueAccess<TValue>(stateManager, reliableQueueName);
-                    await reliableQueueAccess.InitializeReliableQueue(reliableQueueName);
+                    _ = await reliableQueueAccess.GetReliableQueue(reliableQueueName);
                     return reliableQueueAccess;
                 }
                 catch (Exception e)
@@ -69,21 +59,20 @@ namespace OMS.Common.Cloud.ReliableCollectionHelpers
         }
         #endregion Constructors
 
-        public async Task InitializeReliableQueue(string reliableQueueName = "")
+        public async Task<IReliableConcurrentQueue<TValue>> GetReliableQueue(string reliableQueueName = "")
         {
             if (string.IsNullOrEmpty(reliableQueueName))
             {
                 reliableQueueName = this.reliableQueueName;
             }
 
-            using (ITransaction tx = this.stateManager.CreateTransaction())
+            try
             {
                 var result = await reliableStateManagerHelper.TryGetAsync<IReliableConcurrentQueue<TValue>>(this.stateManager, reliableQueueName);
 
                 if (result.HasValue)
                 {
-                    this.reliableConcurrentQueue = result.Value;
-                    await tx.CommitAsync();
+                    return result.Value;
                 }
                 else
                 {
@@ -91,47 +80,22 @@ namespace OMS.Common.Cloud.ReliableCollectionHelpers
                     throw new Exception(message);
                 }
             }
-        }
-
-        #region IReliableConcurentQueue
-        public async Task EnqueueAsync(ITransaction tx, TValue value, CancellationToken cancellationToken = default, TimeSpan? timeout = null)
-        {
-            if (reliableConcurrentQueue == null)
+            catch (Exception e)
             {
-                await InitializeReliableQueue();
+
+                throw e;
             }
-
-            await reliableConcurrentQueue.EnqueueAsync(tx, value, cancellationToken, timeout);
         }
-
-        public async Task<ConditionalValue<TValue>> TryDequeueAsync(ITransaction tx, CancellationToken cancellationToken = default, TimeSpan? timeout = null)
-        {
-            if (reliableConcurrentQueue == null)
-            {
-                await InitializeReliableQueue();
-            }
-
-            return await reliableConcurrentQueue.TryDequeueAsync(tx, cancellationToken, timeout);
-        }
-        #endregion IReliableConcurentQueue
 
         #region Async Wrapper
         public async Task ClearAsync()
 		{
-            if (reliableConcurrentQueue == null)
-            {
-                await InitializeReliableQueue();
-            }
-
-            while ((await TryDequeueAsync()).HasValue) ;
+            while ((await TryDequeueAsync()).HasValue);
         }
 
         public async Task EnqueueAsync(TValue item)
         {
-            if (reliableConcurrentQueue == null)
-            {
-                await InitializeReliableQueue();
-            }
+            var reliableConcurrentQueue = await GetReliableQueue();
 
             using (ITransaction tx = stateManager.CreateTransaction())
             {
@@ -142,19 +106,13 @@ namespace OMS.Common.Cloud.ReliableCollectionHelpers
 
         public async Task<long> GetCountAsync()
         {
-            if (reliableConcurrentQueue == null)
-            {
-                await InitializeReliableQueue();
-            }
+            var reliableConcurrentQueue = await GetReliableQueue();
             return reliableConcurrentQueue.Count;   
         }
 
         public async Task<ConditionalValue<TValue>> TryDequeueAsync()
         {
-            if (reliableConcurrentQueue == null)
-            {
-                await InitializeReliableQueue();
-            }
+            var reliableConcurrentQueue = await GetReliableQueue();
 
             using (ITransaction tx = stateManager.CreateTransaction())
             {
