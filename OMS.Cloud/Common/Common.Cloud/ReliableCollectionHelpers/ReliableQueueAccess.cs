@@ -51,7 +51,7 @@ namespace OMS.Common.Cloud.ReliableCollectionHelpers
         #endregion Static Members
 
         #region Constructors
-        internal ReliableQueueAccess(IReliableStateManager stateManager, string reliableDictioanryName)
+        public ReliableQueueAccess(IReliableStateManager stateManager, string reliableDictioanryName)
         {
             this.stateManager = stateManager;
             this.reliableQueueName = reliableDictioanryName;

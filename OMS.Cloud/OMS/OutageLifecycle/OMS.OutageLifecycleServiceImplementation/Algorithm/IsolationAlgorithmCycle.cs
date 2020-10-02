@@ -44,12 +44,13 @@ namespace OMS.OutageLifecycleImplementation.Algorithm
         {
             get
             {
-                return isStartedIsolationAlgorithmsInitialized &&
-                       isMonitoredHeadBreakerMeasurementsInitialized &&
-                       isOutageTopologyModelInitialized &&
-                       isOptimumIsolationPointsInitialized &&
-                       isCommandedElementsInitialized &&
-                       isElementsToBeIgnoredInReportPotentialOutageInitialized;
+                return true;
+                //return isStartedIsolationAlgorithmsInitialized &&
+                //       isMonitoredHeadBreakerMeasurementsInitialized &&
+                //       isOutageTopologyModelInitialized &&
+                //       isOptimumIsolationPointsInitialized &&
+                //       isCommandedElementsInitialized &&
+                //       isElementsToBeIgnoredInReportPotentialOutageInitialized;
             }
         }
 
@@ -201,7 +202,13 @@ namespace OMS.OutageLifecycleImplementation.Algorithm
             this.isElementsToBeIgnoredInReportPotentialOutageInitialized = false;
 
             this.stateManager = stateManager;
-            this.stateManager.StateManagerChanged += this.OnStateManagerChangedHandler;
+            //this.stateManager.StateManagerChanged += this.OnStateManagerChangedHandler;
+            startedIsolationAlgorithms = new ReliableDictionaryAccess<long, IsolationAlgorithm>(stateManager, ReliableDictionaryNames.StartedIsolationAlgorithms);
+            monitoredHeadBreakerMeasurements = new ReliableDictionaryAccess<long, DiscreteModbusData>(stateManager, ReliableDictionaryNames.MonitoredHeadBreakerMeasurements);
+            outageTopologyModel = new ReliableDictionaryAccess<string, OutageTopologyModel>(stateManager, ReliableDictionaryNames.OutageTopologyModel);
+            optimumIsolationPoints = new ReliableDictionaryAccess<long, long>(stateManager, ReliableDictionaryNames.OptimumIsolationPoints);
+            commandedElements = new ReliableDictionaryAccess<long, CommandedElement>(stateManager, ReliableDictionaryNames.CommandedElements);
+            elementsToBeIgnoredInReportPotentialOutage = new ReliableDictionaryAccess<long, DateTime>(stateManager, ReliableDictionaryNames.ElementsToBeIgnoredInReportPotentialOutage);
         }
 
         public async Task Start()

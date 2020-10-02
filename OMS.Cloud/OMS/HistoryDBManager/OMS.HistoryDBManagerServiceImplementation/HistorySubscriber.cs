@@ -33,7 +33,7 @@ namespace OMS.HistoryDBManagerImplementation
 
 		private IHistoryDBManagerContract historyDBManager;
 
-		private bool isActiveOutagesInitialized = false;
+		private bool isActiveOutagesInitialized = true;
 
 		private ReliableDictionaryAccess<long, ActiveOutageMessage> activeOutages;
 		private ReliableDictionaryAccess<long, ActiveOutageMessage> ActiveOutages
@@ -63,7 +63,8 @@ namespace OMS.HistoryDBManagerImplementation
 
 			this.historyDBManager = historyDBManager;
 			this.stateManager = stateManager;
-			this.stateManager.StateManagerChanged += OnStateManagerChangedHandler;
+			//this.stateManager.StateManagerChanged += OnStateManagerChangedHandler
+			activeOutages = new ReliableDictionaryAccess<long, ActiveOutageMessage>(stateManager, ReliableDictionaryNames.ActiveOutages);
 
 			string debugMessage = $"{baseLogString} Ctor => Clients initialized.";
 			Logger.LogDebug(debugMessage);

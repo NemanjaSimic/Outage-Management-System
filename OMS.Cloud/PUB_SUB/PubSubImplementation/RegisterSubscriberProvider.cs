@@ -30,7 +30,7 @@ namespace PubSubImplementation
         private bool isSubscriberCacheInitialized;
         private bool ReliableDictionariesInitialized
         {
-            get { return isSubscriberCacheInitialized; }
+            get { return true; }
         }
 
         private ReliableDictionaryAccess<short, HashSet<string>> registeredSubscribersCache;
@@ -87,7 +87,8 @@ namespace PubSubImplementation
             this.isSubscriberCacheInitialized = false;
 
             this.stateManager = stateManager;
-            this.stateManager.StateManagerChanged += this.OnStateManagerChangedHandler;
+            //this.stateManager.StateManagerChanged += this.OnStateManagerChangedHandler;
+            registeredSubscribersCache = new ReliableDictionaryAccess<short, HashSet<string>>(stateManager, ReliableDictionaryNames.RegisteredSubscribersCache);
         }
 
         #region IRegisterSubscriberContract

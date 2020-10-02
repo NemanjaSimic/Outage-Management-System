@@ -201,18 +201,8 @@ namespace OMS.OutageLifecycleService
                 {
                     using (ITransaction tx = this.StateManager.CreateTransaction())
                     {
-                        var result = await StateManager.TryGetAsync<IReliableDictionary<long, IsolationAlgorithm>>(ReliableDictionaryNames.StartedIsolationAlgorithms);
-                        if(result.HasValue)
-                        {
-                            var gidToPointItemMap = result.Value;
-                            await gidToPointItemMap.ClearAsync();
-                            await tx.CommitAsync();
-                        }
-                        else
-                        {
-                            await StateManager.GetOrAddAsync<IReliableDictionary<long, IsolationAlgorithm>>(tx, ReliableDictionaryNames.StartedIsolationAlgorithms);
-                            await tx.CommitAsync();
-                        }
+                        await StateManager.GetOrAddAsync<IReliableDictionary<long, IsolationAlgorithm>>(tx, ReliableDictionaryNames.StartedIsolationAlgorithms);
+                        await tx.CommitAsync();
                     }
                 }),
 
@@ -220,18 +210,8 @@ namespace OMS.OutageLifecycleService
                 {
                     using (ITransaction tx = this.StateManager.CreateTransaction())
                     {
-                        var result = await StateManager.TryGetAsync<IReliableDictionary<long, DiscreteModbusData>>(ReliableDictionaryNames.MonitoredHeadBreakerMeasurements);
-                        if(result.HasValue)
-                        {
-                            var gidToPointItemMap = result.Value;
-                            await gidToPointItemMap.ClearAsync();
-                            await tx.CommitAsync();
-                        }
-                        else
-                        {
-                            await StateManager.GetOrAddAsync<IReliableDictionary<long, DiscreteModbusData>>(tx, ReliableDictionaryNames.MonitoredHeadBreakerMeasurements);
-                            await tx.CommitAsync();
-                        }
+                        await StateManager.GetOrAddAsync<IReliableDictionary<long, DiscreteModbusData>>(tx, ReliableDictionaryNames.MonitoredHeadBreakerMeasurements);
+                        await tx.CommitAsync();
                     }
                 }),
 
@@ -239,18 +219,8 @@ namespace OMS.OutageLifecycleService
                 {
                     using (ITransaction tx = this.StateManager.CreateTransaction())
                     {
-                        var result = await StateManager.TryGetAsync<IReliableDictionary<long, Dictionary<long, List<long>>>>(ReliableDictionaryNames.RecloserOutageMap);
-                        if(result.HasValue)
-                        {
-                            var gidToPointItemMap = result.Value;
-                            await gidToPointItemMap.ClearAsync();
-                            await tx.CommitAsync();
-                        }
-                        else
-                        {
-                            await StateManager.GetOrAddAsync<IReliableDictionary<long, Dictionary<long, List<long>>>>(tx, ReliableDictionaryNames.RecloserOutageMap);
-                            await tx.CommitAsync();
-                        }
+                        await StateManager.GetOrAddAsync<IReliableDictionary<long, Dictionary<long, List<long>>>>(tx, ReliableDictionaryNames.RecloserOutageMap);
+                        await tx.CommitAsync();
                     }
                 }),
 
@@ -258,18 +228,8 @@ namespace OMS.OutageLifecycleService
                 {
                     using (ITransaction tx = this.StateManager.CreateTransaction())
                     {
-                        var result = await StateManager.TryGetAsync<IReliableDictionary<string, OutageTopologyModel>>(ReliableDictionaryNames.OutageTopologyModel);
-                        if(result.HasValue)
-                        {
-                            var gidToPointItemMap = result.Value;
-                            await gidToPointItemMap.ClearAsync();
-                            await tx.CommitAsync();
-                        }
-                        else
-                        {
-                            await StateManager.GetOrAddAsync<IReliableDictionary<string, OutageTopologyModel>>(tx, ReliableDictionaryNames.OutageTopologyModel);
-                            await tx.CommitAsync();
-                        }
+                        await StateManager.GetOrAddAsync<IReliableDictionary<string, OutageTopologyModel>>(tx, ReliableDictionaryNames.OutageTopologyModel);
+                        await tx.CommitAsync();
                     }
                 }),
 
@@ -277,18 +237,8 @@ namespace OMS.OutageLifecycleService
                 {
                     using (ITransaction tx = this.StateManager.CreateTransaction())
                     {
-                        var result = await StateManager.TryGetAsync<IReliableDictionary<long, CommandedElement>>(ReliableDictionaryNames.CommandedElements);
-                        if(result.HasValue)
-                        {
-                            var gidToPointItemMap = result.Value;
-                            await gidToPointItemMap.ClearAsync();
-                            await tx.CommitAsync();
-                        }
-                        else
-                        {
-                            await StateManager.GetOrAddAsync<IReliableDictionary<long, CommandedElement>>(tx, ReliableDictionaryNames.CommandedElements);
-                            await tx.CommitAsync();
-                        }
+                        await StateManager.GetOrAddAsync<IReliableDictionary<long, CommandedElement>>(tx, ReliableDictionaryNames.CommandedElements);
+                        await tx.CommitAsync();
                     }
                 }),
 
@@ -300,18 +250,8 @@ namespace OMS.OutageLifecycleService
                         /// KEY - element gid of optimum isolation point
                         /// VALUE - element gid of head switch (to identify the corresponding algorithm)
                         /// </summary>
-                        var result = await StateManager.TryGetAsync<IReliableDictionary<long, long>>(ReliableDictionaryNames.OptimumIsolationPoints);
-                        if(result.HasValue)
-                        {
-                            var gidToPointItemMap = result.Value;
-                            await gidToPointItemMap.ClearAsync();
-                            await tx.CommitAsync();
-                        }
-                        else
-                        {
-                            await StateManager.GetOrAddAsync<IReliableDictionary<long, long>>(tx, ReliableDictionaryNames.OptimumIsolationPoints);
-                            await tx.CommitAsync();
-                        }
+                        await StateManager.GetOrAddAsync<IReliableDictionary<long, long>>(tx, ReliableDictionaryNames.OptimumIsolationPoints);
+                        await tx.CommitAsync();
                     }
                 }),
 
@@ -323,18 +263,8 @@ namespace OMS.OutageLifecycleService
                         /// KEY - element gid of optimum isolation point
                         /// VALUE - element gid of head switch (to identify the corresponding algorithm)
                         /// </summary>
-                        var result = await StateManager.TryGetAsync<IReliableDictionary<long, DateTime>>(ReliableDictionaryNames.ElementsToBeIgnoredInReportPotentialOutage);
-                        if(result.HasValue)
-                        {
-                            var gidToPointItemMap = result.Value;
-                            await gidToPointItemMap.ClearAsync();
-                            await tx.CommitAsync();
-                        }
-                        else
-                        {
-                            await StateManager.GetOrAddAsync<IReliableDictionary<long, DateTime>>(tx, ReliableDictionaryNames.ElementsToBeIgnoredInReportPotentialOutage);
-                            await tx.CommitAsync();
-                        }
+                        await StateManager.GetOrAddAsync<IReliableDictionary<long, DateTime>>(tx, ReliableDictionaryNames.ElementsToBeIgnoredInReportPotentialOutage);
+                        await tx.CommitAsync();
                     }
                 }),
 
@@ -342,18 +272,8 @@ namespace OMS.OutageLifecycleService
                 {
                     using (ITransaction tx = this.StateManager.CreateTransaction())
                     {
-                        var result = await StateManager.TryGetAsync<IReliableConcurrentQueue<PotentialOutageCommand>>(ReliableQueueNames.PotentialOutages);
-                        if(result.HasValue)
-                        {
-                            var gidToPointItemMap = result.Value;
-                            while ((await result.Value.TryDequeueAsync(tx)).HasValue);
-                            await tx.CommitAsync();
-                        }
-                        else
-                        {
-                            await StateManager.GetOrAddAsync<IReliableConcurrentQueue<PotentialOutageCommand>>(tx, ReliableQueueNames.PotentialOutages);
-                            await tx.CommitAsync();
-                        }
+                        await StateManager.GetOrAddAsync<IReliableConcurrentQueue<PotentialOutageCommand>>(tx, ReliableQueueNames.PotentialOutages);
+                        await tx.CommitAsync();
                     }
                 }),
             };

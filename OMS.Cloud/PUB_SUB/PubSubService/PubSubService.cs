@@ -119,18 +119,8 @@ namespace PubSubService
                 {
                     using (ITransaction tx = this.StateManager.CreateTransaction())
                     {
-                        var result = await StateManager.TryGetAsync<IReliableDictionary<short, HashSet<string>>>(ReliableDictionaryNames.RegisteredSubscribersCache);
-                        if(result.HasValue)
-                        {
-                            var subscribers = result.Value;
-                            await subscribers.ClearAsync();
-                            await tx.CommitAsync();
-                        }
-                        else
-                        {
-                            await StateManager.GetOrAddAsync<IReliableDictionary<short, HashSet<string>>>(tx, ReliableDictionaryNames.RegisteredSubscribersCache);
-                            await tx.CommitAsync();
-                        }
+                        await StateManager.GetOrAddAsync<IReliableDictionary<short, HashSet<string>>>(tx, ReliableDictionaryNames.RegisteredSubscribersCache);
+                        await tx.CommitAsync();
                     }
                 }),
             };

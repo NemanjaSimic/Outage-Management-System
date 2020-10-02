@@ -182,18 +182,8 @@ namespace OMS.HistoryDBManagerService
                 {
                     using (ITransaction tx = this.StateManager.CreateTransaction())
                     {
-                        var result = await StateManager.TryGetAsync<IReliableDictionary<long, long>>(ReliableDictionaryNames.OpenedSwitches);
-                        if(result.HasValue)
-                        {
-                            var gidToPointItemMap = result.Value;
-                            await gidToPointItemMap.ClearAsync();
-                            await tx.CommitAsync();
-                        }
-                        else
-                        {
-                            await StateManager.GetOrAddAsync<IReliableDictionary<long, long>>(tx, ReliableDictionaryNames.OpenedSwitches);
-                            await tx.CommitAsync();
-                        }
+                        await StateManager.GetOrAddAsync<IReliableDictionary<long, long>>(tx, ReliableDictionaryNames.OpenedSwitches);
+                        await tx.CommitAsync();
                     }
                 }),
 
@@ -201,18 +191,8 @@ namespace OMS.HistoryDBManagerService
                 {
                     using (ITransaction tx = this.StateManager.CreateTransaction())
                     {
-                        var result = await StateManager.TryGetAsync<IReliableDictionary<long, long>>(ReliableDictionaryNames.UnenergizedConsumers);
-                        if(result.HasValue)
-                        {
-                            var gidToPointItemMap = result.Value;
-                            await gidToPointItemMap.ClearAsync();
-                            await tx.CommitAsync();
-                        }
-                        else
-                        {
-                            await StateManager.GetOrAddAsync<IReliableDictionary<long, long>>(tx, ReliableDictionaryNames.UnenergizedConsumers);
-                            await tx.CommitAsync();
-                        }
+                        await StateManager.GetOrAddAsync<IReliableDictionary<long, long>>(tx, ReliableDictionaryNames.UnenergizedConsumers);
+                        await tx.CommitAsync();
                     }
                 }),
 
@@ -221,18 +201,8 @@ namespace OMS.HistoryDBManagerService
                 {
                     using (ITransaction tx = this.StateManager.CreateTransaction())
                     {
-                        var result = await StateManager.TryGetAsync<IReliableDictionary<byte, List<long>>>(ReliableDictionaryNames.HistoryModelChanges);
-                        if(result.HasValue)
-                        {
-                            var modelChanges = result.Value;
-                            await modelChanges.ClearAsync();
-                            await tx.CommitAsync();
-                        }
-                        else
-                        {
-                            await StateManager.GetOrAddAsync<IReliableDictionary<byte, List<long>>>(tx, ReliableDictionaryNames.HistoryModelChanges);
-                            await tx.CommitAsync();
-                        }
+                        await StateManager.GetOrAddAsync<IReliableDictionary<byte, List<long>>>(tx, ReliableDictionaryNames.HistoryModelChanges);
+                        await tx.CommitAsync();
                     }
                 }),
 
@@ -240,18 +210,8 @@ namespace OMS.HistoryDBManagerService
                 {
                     using (ITransaction tx = this.StateManager.CreateTransaction())
                     {
-                        var result = await StateManager.TryGetAsync<IReliableDictionary<long, ActiveOutageMessage>>(ReliableDictionaryNames.ActiveOutages);
-                        if(result.HasValue)
-                        {
-                            var modelChanges = result.Value;
-                            await modelChanges.ClearAsync();
-                            await tx.CommitAsync();
-                        }
-                        else
-                        {
-                            await StateManager.GetOrAddAsync<IReliableDictionary<long, ActiveOutageMessage>>(tx, ReliableDictionaryNames.ActiveOutages);
-                            await tx.CommitAsync();
-                        }
+                        await StateManager.GetOrAddAsync<IReliableDictionary<long, ActiveOutageMessage>>(tx, ReliableDictionaryNames.ActiveOutages);
+                        await tx.CommitAsync();
                     }
                 }),
 

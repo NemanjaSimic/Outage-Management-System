@@ -106,18 +106,8 @@ namespace OMS.CallTrackingService
 				{
 					using (ITransaction tx = this.StateManager.CreateTransaction())
 					{
-						var result = await StateManager.TryGetAsync<IReliableDictionary<long, long>>(ReliableDictionaryNames.CallsDictionary);
-						if(result.HasValue)
-						{
-							var gidToPointItemMap = result.Value;
-							await gidToPointItemMap.ClearAsync();
-							await tx.CommitAsync();
-						}
-						else
-						{
-							await StateManager.GetOrAddAsync<IReliableDictionary<long, long>>(tx, ReliableDictionaryNames.CallsDictionary);
-							await tx.CommitAsync();
-						}
+						await StateManager.GetOrAddAsync<IReliableDictionary<long, long>>(tx, ReliableDictionaryNames.CallsDictionary);
+						await tx.CommitAsync();
 					}
 				}),
 			};

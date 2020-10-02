@@ -51,13 +51,14 @@ namespace OMS.OutageLifecycleImplementation.ContractProviders
 		{
 			get
 			{
-				return isStartedIsolationAlgorithmsInitialized &&
-                       isRecloserOutageMapInitialized &&
-                       isOutageTopologyModelInitialized &&
-                       isOptimumIsolationPointsInitialized &&
-                       isCommandedElementsInitialized &&
-                       isPotentialOutagesQueueInitialized &&
-                       isElementsToBeIgnoredInReportPotentialOutageInitialized;
+                return true;
+				//return isStartedIsolationAlgorithmsInitialized &&
+    //                   isRecloserOutageMapInitialized &&
+    //                   isOutageTopologyModelInitialized &&
+    //                   isOptimumIsolationPointsInitialized &&
+    //                   isCommandedElementsInitialized &&
+    //                   isPotentialOutagesQueueInitialized &&
+    //                   isElementsToBeIgnoredInReportPotentialOutageInitialized;
 			}
 		}
 
@@ -218,8 +219,16 @@ namespace OMS.OutageLifecycleImplementation.ContractProviders
             this.isElementsToBeIgnoredInReportPotentialOutageInitialized = false;
 
             this.stateManager = stateManager;
-			this.stateManager.StateManagerChanged += this.OnStateManagerChangedHandler;
-		}
+            //this.stateManager.StateManagerChanged += this.OnStateManagerChangedHandler;
+            startedIsolationAlgorithms = new ReliableDictionaryAccess<long, IsolationAlgorithm>(stateManager, ReliableDictionaryNames.StartedIsolationAlgorithms);
+            recloserOutageMap = new ReliableDictionaryAccess<long, Dictionary<long, List<long>>>(stateManager, ReliableDictionaryNames.RecloserOutageMap);
+            outageTopologyModel = new ReliableDictionaryAccess<string, OutageTopologyModel>(stateManager, ReliableDictionaryNames.OutageTopologyModel);
+            optimumIsolationPoints = new ReliableDictionaryAccess<long, long>(stateManager, ReliableDictionaryNames.OptimumIsolationPoints);
+            commandedElements = new ReliableDictionaryAccess<long, CommandedElement>(stateManager, ReliableDictionaryNames.CommandedElements);
+            elementsToBeIgnoredInReportPotentialOutage = new ReliableDictionaryAccess<long, DateTime>(stateManager, ReliableDictionaryNames.ElementsToBeIgnoredInReportPotentialOutage);
+            potentialOutagesQueue = new ReliableQueueAccess<PotentialOutageCommand>(stateManager, ReliableQueueNames.PotentialOutages);
+
+        }
 
         #region IPotentialOutageReportingContract
         public async Task<bool> EnqueuePotentialOutageCommand(long elementGid, CommandOriginType commandOriginType, NetworkType networkType)

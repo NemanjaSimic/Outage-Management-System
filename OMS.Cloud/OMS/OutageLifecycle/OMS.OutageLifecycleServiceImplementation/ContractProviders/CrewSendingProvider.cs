@@ -12,6 +12,7 @@ using OMS.Common.WcfClient.OMS.OutageSimulator;
 using OMS.OutageLifecycleImplementation.Helpers;
 using System;
 using System.Collections.Generic;
+using System.Diagnostics.Eventing.Reader;
 using System.Fabric;
 using System.Linq;
 using System.Runtime.InteropServices;
@@ -41,9 +42,10 @@ namespace OMS.OutageLifecycleImplementation.ContractProviders
         {
             get
             {
-                return isOutageTopologyModelInitialized &&
-                       isCommandedElementsInitialized &&
-                       isElementsToBeIgnoredInReportPotentialOutageInitialized;
+                return true;
+                //return isOutageTopologyModelInitialized &&
+                //       isCommandedElementsInitialized &&
+                //       isElementsToBeIgnoredInReportPotentialOutageInitialized;
             }
         }
 
@@ -132,7 +134,10 @@ namespace OMS.OutageLifecycleImplementation.ContractProviders
             this.isElementsToBeIgnoredInReportPotentialOutageInitialized = false;
 
             this.stateManager = stateManager;
-            this.stateManager.StateManagerChanged += this.OnStateManagerChangedHandler;
+            //this.stateManager.StateManagerChanged += this.OnStateManagerChangedHandler;
+            outageTopologyModel = new ReliableDictionaryAccess<string, OutageTopologyModel>(stateManager, ReliableDictionaryNames.OutageTopologyModel);
+            commandedElements = new ReliableDictionaryAccess<long, CommandedElement>(stateManager, ReliableDictionaryNames.CommandedElements);
+            elementsToBeIgnoredInReportPotentialOutage = new ReliableDictionaryAccess<long, DateTime>(stateManager, ReliableDictionaryNames.ElementsToBeIgnoredInReportPotentialOutage);
         }
 
         #region ICrewSendingContract

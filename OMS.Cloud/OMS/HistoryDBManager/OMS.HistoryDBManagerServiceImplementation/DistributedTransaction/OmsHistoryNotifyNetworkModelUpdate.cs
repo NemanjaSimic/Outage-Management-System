@@ -32,7 +32,7 @@ namespace OMS.HistoryDBManagerImplementation.DistributedTransaction
         {
             get 
             { 
-                return isHistoryModelChangesInitialized; 
+                return true; 
             }
         }
 
@@ -84,7 +84,8 @@ namespace OMS.HistoryDBManagerImplementation.DistributedTransaction
             this.isHistoryModelChangesInitialized = false;
 
             this.stateManager = stateManager;
-            this.stateManager.StateManagerChanged += this.OnStateManagerChangedHandler;
+            //this.stateManager.StateManagerChanged += this.OnStateManagerChangedHandler;
+            HistoryModelChanges = new ReliableDictionaryAccess<byte, List<long>>(stateManager, ReliableDictionaryNames.HistoryModelChanges);
         }
 
         #region INotifyNetworkModelUpdateContract

@@ -36,8 +36,9 @@ namespace OMS.OutageSimulatorImplementation.ContractProviders
         {
             get
             {
-                return isSimulatedOutagesInitialized &&
-                       isMonitoredIsolationPointsInitialized;
+                return true;
+                //return isSimulatedOutagesInitialized &&
+                //       isMonitoredIsolationPointsInitialized;
             }
         }
 
@@ -108,7 +109,9 @@ namespace OMS.OutageSimulatorImplementation.ContractProviders
             this.isMonitoredIsolationPointsInitialized = false;
 
             this.stateManager = stateManager;
-            this.stateManager.StateManagerChanged += this.OnStateManagerChangedHandler;
+            //this.stateManager.StateManagerChanged += this.OnStateManagerChangedHandler;
+            simulatedOutages = new ReliableDictionaryAccess<long, SimulatedOutage>(stateManager, ReliableDictionaryNames.SimulatedOutages);
+            monitoredIsolationPoints = new ReliableDictionaryAccess<long, MonitoredIsolationPoint>(stateManager, ReliableDictionaryNames.MonitoredIsolationPoints);
         }
 
         #region IOutageSimulatorUIContract
