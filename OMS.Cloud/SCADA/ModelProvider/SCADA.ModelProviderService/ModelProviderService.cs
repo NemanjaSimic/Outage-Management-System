@@ -158,18 +158,8 @@ namespace SCADA.ModelProviderService
                 {
                     using (ITransaction tx = this.StateManager.CreateTransaction())
                     {
-                        var result = await StateManager.TryGetAsync<IReliableDictionary<long, IScadaModelPointItem>>(ReliableDictionaryNames.GidToPointItemMap);
-                        if(result.HasValue)
-                        {
-                            var gidToPointItemMap = result.Value;
-                            await gidToPointItemMap.ClearAsync();
-                            await tx.CommitAsync();
-                        }
-                        else
-                        {
-                            await StateManager.GetOrAddAsync<IReliableDictionary<long, IScadaModelPointItem>>(tx, ReliableDictionaryNames.GidToPointItemMap);
-                            await tx.CommitAsync();
-                        }
+                        await StateManager.GetOrAddAsync<IReliableDictionary<long, IScadaModelPointItem>>(tx, ReliableDictionaryNames.GidToPointItemMap);
+                        await tx.CommitAsync();
                     }
                 }),
 
@@ -177,18 +167,8 @@ namespace SCADA.ModelProviderService
                 {
                     using (ITransaction tx = this.StateManager.CreateTransaction())
                     {
-                        var result = await StateManager.TryGetAsync<IReliableDictionary<long, IScadaModelPointItem>>(ReliableDictionaryNames.IncomingGidToPointItemMap);
-                        if(result.HasValue)
-                        {
-                            var gidToPointItemMap = result.Value;
-                            await gidToPointItemMap.ClearAsync();
-                            await tx.CommitAsync();
-                        }
-                        else
-                        {
-                            await StateManager.GetOrAddAsync<IReliableDictionary<long, IScadaModelPointItem>>(tx, ReliableDictionaryNames.IncomingGidToPointItemMap);
-                            await tx.CommitAsync();
-                        }
+                        await StateManager.GetOrAddAsync<IReliableDictionary<long, IScadaModelPointItem>>(tx, ReliableDictionaryNames.IncomingGidToPointItemMap);
+                        await tx.CommitAsync();
                     }
                 }),
 
@@ -196,18 +176,8 @@ namespace SCADA.ModelProviderService
                 {
                     using (ITransaction tx = this.StateManager.CreateTransaction())
                     {
-                        var result = await StateManager.TryGetAsync<IReliableDictionary<short, Dictionary<ushort, long>>>(ReliableDictionaryNames.AddressToGidMap);
-                        if(result.HasValue)
-                        {
-                            var addressToGidMap = result.Value;
-                            await addressToGidMap.ClearAsync();
-                            await tx.CommitAsync();
-                        }
-                        else
-                        {
-                            await StateManager.GetOrAddAsync<IReliableDictionary<short, Dictionary<ushort, long>>>(tx, ReliableDictionaryNames.AddressToGidMap);
-                            await tx.CommitAsync();
-                        }
+                        await StateManager.GetOrAddAsync<IReliableDictionary<short, Dictionary<ushort, long>>>(tx, ReliableDictionaryNames.AddressToGidMap);
+                        await tx.CommitAsync();
                     }
                 }),
 
@@ -215,18 +185,8 @@ namespace SCADA.ModelProviderService
                 {
                     using (ITransaction tx = this.StateManager.CreateTransaction())
                     {
-                        var result = await StateManager.TryGetAsync<IReliableDictionary<short, Dictionary<ushort, long>>>(ReliableDictionaryNames.IncomingAddressToGidMap);
-                        if(result.HasValue)
-                        {
-                            var addressToGidMap = result.Value;
-                            await addressToGidMap.ClearAsync();
-                            await tx.CommitAsync();
-                        }
-                        else
-                        {
-                            await StateManager.GetOrAddAsync<IReliableDictionary<short, Dictionary<ushort, long>>>(tx, ReliableDictionaryNames.IncomingAddressToGidMap);
-                            await tx.CommitAsync();
-                        }
+                        await StateManager.GetOrAddAsync<IReliableDictionary<short, Dictionary<ushort, long>>>(tx, ReliableDictionaryNames.IncomingAddressToGidMap);
+                        await tx.CommitAsync();
                     }
                 }),
 
@@ -234,18 +194,8 @@ namespace SCADA.ModelProviderService
                 {
                     using (ITransaction tx = this.StateManager.CreateTransaction())
                     {
-                        var result = await StateManager.TryGetAsync<IReliableDictionary<long, CommandDescription>>(ReliableDictionaryNames.CommandDescriptionCache);
-                        if(result.HasValue)
-                        {
-                            var commandDescriptionCache = result.Value;
-                            await commandDescriptionCache.ClearAsync();
-                            await tx.CommitAsync();
-                        }
-                        else
-                        {
-                            await StateManager.GetOrAddAsync<IReliableDictionary<long, CommandDescription>>(tx, ReliableDictionaryNames.CommandDescriptionCache);
-                            await tx.CommitAsync();
-                        }
+                        await StateManager.GetOrAddAsync<IReliableDictionary<long, CommandDescription>>(tx, ReliableDictionaryNames.CommandDescriptionCache);
+                        await tx.CommitAsync();
                     }
                 }),
 
@@ -262,18 +212,8 @@ namespace SCADA.ModelProviderService
                 {
                     using (ITransaction tx = this.StateManager.CreateTransaction())
                     {
-                        var result = await StateManager.TryGetAsync<IReliableDictionary<string, bool>>(ReliableDictionaryNames.InfoCache);
-                        if(result.HasValue)
-                        {
-                            var measurementsCache = result.Value;
-                            await measurementsCache.ClearAsync();
-                            await tx.CommitAsync();
-                        }
-                        else
-                        {
-                            await StateManager.GetOrAddAsync<IReliableDictionary<string, bool>>(tx, ReliableDictionaryNames.InfoCache);
-                            await tx.CommitAsync();
-                        }
+                        await StateManager.GetOrAddAsync<IReliableDictionary<string, bool>>(tx, ReliableDictionaryNames.InfoCache);
+                        await tx.CommitAsync();
                     }
                 }),
 
@@ -281,18 +221,8 @@ namespace SCADA.ModelProviderService
                 {
                     using (ITransaction tx = this.StateManager.CreateTransaction())
                     {
-                        var result = await StateManager.TryGetAsync<IReliableDictionary<byte, List<long>>>(ReliableDictionaryNames.ModelChanges);
-                        if(result.HasValue)
-                        {
-                            var modelChanges = result.Value;
-                            await modelChanges.ClearAsync();
-                            await tx.CommitAsync();
-                        }
-                        else
-                        {
-                            await StateManager.GetOrAddAsync<IReliableDictionary<byte, List<long>>>(tx, ReliableDictionaryNames.ModelChanges);
-                            await tx.CommitAsync();
-                        }
+                        await StateManager.GetOrAddAsync<IReliableDictionary<byte, List<long>>>(tx, ReliableDictionaryNames.ModelChanges);
+                        await tx.CommitAsync();
                     }
                 }),
             };

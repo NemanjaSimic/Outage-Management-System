@@ -140,8 +140,13 @@ namespace SCADA.ModelProviderImplementation.ContractProviders
             this.isAddressToGidMapInitialized = false;
             this.isCommandDescriptionCacheInitialized = false;
             this.isInfoCacheInitialized = false;
-            
+
             this.stateManager = stateManager;
+            gidToPointItemMap = new ReliableDictionaryAccess<long, IScadaModelPointItem>(stateManager, ReliableDictionaryNames.GidToPointItemMap);
+            addressToGidMap = new ReliableDictionaryAccess<short, Dictionary<ushort, long>>(stateManager, ReliableDictionaryNames.AddressToGidMap);
+            commandDescriptionCache = new ReliableDictionaryAccess<long, CommandDescription>(stateManager, ReliableDictionaryNames.CommandDescriptionCache);
+            infoCache = new ReliableDictionaryAccess<string, bool>(stateManager, ReliableDictionaryNames.InfoCache);
+
             //this.stateManager.StateManagerChanged += this.OnStateManagerChangedHandler;
         }
 
