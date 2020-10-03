@@ -120,7 +120,7 @@ namespace OMS.OutageSimulatorService
 
             try
             {
-                InitializeReliableCollections();
+                //InitializeReliableCollections();
                 string debugMessage = $"{baseLogString} RunAsync => ReliableDictionaries initialized.";
                 Logger.LogDebug(debugMessage);
                 

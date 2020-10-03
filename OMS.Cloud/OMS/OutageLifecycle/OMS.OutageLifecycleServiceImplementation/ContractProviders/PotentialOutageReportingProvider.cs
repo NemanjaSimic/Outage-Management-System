@@ -52,14 +52,7 @@ namespace OMS.OutageLifecycleImplementation.ContractProviders
 			get
 			{
                 return true;
-				//return isStartedIsolationAlgorithmsInitialized &&
-    //                   isRecloserOutageMapInitialized &&
-    //                   isOutageTopologyModelInitialized &&
-    //                   isOptimumIsolationPointsInitialized &&
-    //                   isCommandedElementsInitialized &&
-    //                   isPotentialOutagesQueueInitialized &&
-    //                   isElementsToBeIgnoredInReportPotentialOutageInitialized;
-			}
+            }
 		}
 
         private ReliableDictionaryAccess<long, IsolationAlgorithm> startedIsolationAlgorithms;
@@ -219,15 +212,13 @@ namespace OMS.OutageLifecycleImplementation.ContractProviders
             this.isElementsToBeIgnoredInReportPotentialOutageInitialized = false;
 
             this.stateManager = stateManager;
-            //this.stateManager.StateManagerChanged += this.OnStateManagerChangedHandler;
-            startedIsolationAlgorithms = new ReliableDictionaryAccess<long, IsolationAlgorithm>(stateManager, ReliableDictionaryNames.StartedIsolationAlgorithms);
-            recloserOutageMap = new ReliableDictionaryAccess<long, Dictionary<long, List<long>>>(stateManager, ReliableDictionaryNames.RecloserOutageMap);
-            outageTopologyModel = new ReliableDictionaryAccess<string, OutageTopologyModel>(stateManager, ReliableDictionaryNames.OutageTopologyModel);
-            optimumIsolationPoints = new ReliableDictionaryAccess<long, long>(stateManager, ReliableDictionaryNames.OptimumIsolationPoints);
-            commandedElements = new ReliableDictionaryAccess<long, CommandedElement>(stateManager, ReliableDictionaryNames.CommandedElements);
-            elementsToBeIgnoredInReportPotentialOutage = new ReliableDictionaryAccess<long, DateTime>(stateManager, ReliableDictionaryNames.ElementsToBeIgnoredInReportPotentialOutage);
-            potentialOutagesQueue = new ReliableQueueAccess<PotentialOutageCommand>(stateManager, ReliableQueueNames.PotentialOutages);
-
+            this.startedIsolationAlgorithms = new ReliableDictionaryAccess<long, IsolationAlgorithm>(stateManager, ReliableDictionaryNames.StartedIsolationAlgorithms);
+            this.recloserOutageMap = new ReliableDictionaryAccess<long, Dictionary<long, List<long>>>(stateManager, ReliableDictionaryNames.RecloserOutageMap);
+            this.outageTopologyModel = new ReliableDictionaryAccess<string, OutageTopologyModel>(stateManager, ReliableDictionaryNames.OutageTopologyModel);
+            this.optimumIsolationPoints = new ReliableDictionaryAccess<long, long>(stateManager, ReliableDictionaryNames.OptimumIsolationPoints);
+            this.commandedElements = new ReliableDictionaryAccess<long, CommandedElement>(stateManager, ReliableDictionaryNames.CommandedElements);
+            this.elementsToBeIgnoredInReportPotentialOutage = new ReliableDictionaryAccess<long, DateTime>(stateManager, ReliableDictionaryNames.ElementsToBeIgnoredInReportPotentialOutage);
+            this.potentialOutagesQueue = new ReliableQueueAccess<PotentialOutageCommand>(stateManager, ReliableQueueNames.PotentialOutages);
         }
 
         #region IPotentialOutageReportingContract

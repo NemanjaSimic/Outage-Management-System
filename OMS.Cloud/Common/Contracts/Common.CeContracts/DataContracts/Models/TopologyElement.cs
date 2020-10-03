@@ -10,7 +10,7 @@ namespace Common.CeContracts
 	[KnownType(typeof(Recloser))]
 	[KnownType(typeof(SynchronousMachine))]
 	[KnownType(typeof(TopologyElement))]
-	public class TopologyElement : ITopologyElement
+	public class TopologyElement// : ITopologyElement
 	{
 		#region Properties
 		[DataMember]
@@ -24,9 +24,9 @@ namespace Common.CeContracts
 		[DataMember]
 		public float NominalVoltage { get; set; }
 		[DataMember]
-		public ITopologyElement FirstEnd { get; set; }
+		public TopologyElement FirstEnd { get; set; }
 		[DataMember]
-		public List<ITopologyElement> SecondEnd { get; set; }
+		public List<TopologyElement> SecondEnd { get; set; }
 		[DataMember]
 		public string DmsType { get; set; }
 		[DataMember]
@@ -38,13 +38,13 @@ namespace Common.CeContracts
 		[DataMember]
 		public bool NoReclosing { get; set; }
 		[DataMember]
-		public ITopologyElement Feeder { get; set; }
+		public TopologyElement Feeder { get; set; }
 		#endregion
 
 		public TopologyElement(long gid)
 		{
 			Id = gid;
-			SecondEnd = new List<ITopologyElement>();
+			SecondEnd = new List<TopologyElement>();
 			Measurements = new Dictionary<long, string>();
 		}
 	}

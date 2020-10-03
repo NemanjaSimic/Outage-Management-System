@@ -8,7 +8,7 @@ namespace Common.CeContracts
     {
         [DataMember]
         public int MaxNumberOfTries { get; set; }
-        public Recloser(ITopologyElement element) : base(element.Id)
+        public Recloser(TopologyElement element) : base(element.Id)
         {
             Id = element.Id;
             Description = element.Description;

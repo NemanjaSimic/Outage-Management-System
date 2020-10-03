@@ -112,16 +112,8 @@ namespace OMS.Common.Cloud.ReliableCollectionHelpers
                 using (ITransaction tx = stateManager.CreateTransaction())
                 {
                     var result = await reliableStateManagerHelper.GetOrAddAsync<IReliableDictionary<TKey, TValue>>(this.stateManager, tx, reliableDictioanryName);
-
-                    if (result != null)
-                    {
-                        return result;
-                    }
-                    else
-                    {
-                        string message = $"ReliableCollection Key: {reliableDictioanryName}, Type: {typeof(IReliableDictionary<TKey, TValue>)} was not initialized.";
-                        throw new Exception(message);
-                    }
+                    await tx.CommitAsync();
+                    return result;
                 }
             }
             catch (Exception e)

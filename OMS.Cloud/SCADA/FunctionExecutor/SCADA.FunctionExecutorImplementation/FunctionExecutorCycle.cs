@@ -51,9 +51,7 @@ namespace SCADA.FunctionExecutorImplementation
         {
             get
             {
-                return isReadCommandQueueInitialized &&
-                       isWriteCommandQueueInitialized &&
-                       isModelUpdateCommandQueueInitialized;
+                return true;
             }
         }
 
@@ -146,7 +144,9 @@ namespace SCADA.FunctionExecutorImplementation
             this.isModelUpdateCommandQueueInitialized = false;
 
             this.stateManager = stateManager;
-            this.stateManager.StateManagerChanged += this.OnStateManagerChangedHandler;
+            this.readCommandQueue = new ReliableQueueAccess<ModbusFunction>(stateManager, ReliableQueueNames.ReadCommandQueue);
+            this.writeCommandQueue = new ReliableQueueAccess<ModbusFunction>(stateManager, ReliableQueueNames.WriteCommandQueue);
+            this.modelUpdateCommandQueue = new ReliableQueueAccess<ModbusFunction>(stateManager, ReliableQueueNames.ModelUpdateCommandQueue);
         }
 
         public async Task Start(bool isRetry = false)
@@ -465,9 +465,9 @@ namespace SCADA.FunctionExecutorImplementation
                     continue;
                 }
 
-                if (!(currentSCADAModel[gid] is IDiscretePointItem pointItem))
+                if (!(currentSCADAModel[gid] is DiscretePointItem pointItem))
                 {
-                    string message = $"{baseLogString} ExecuteDiscreteReadCommand => PointItem [Gid: 0x{gid:X16}] does not implement {typeof(IDiscretePointItem)}.";
+                    string message = $"{baseLogString} ExecuteDiscreteReadCommand => PointItem [Gid: 0x{gid:X16}] does not implement {typeof(DiscretePointItem)}.";
                     Logger.LogError(message);
                     throw new InternalSCADAServiceException(message);
                 }
@@ -475,7 +475,7 @@ namespace SCADA.FunctionExecutorImplementation
                 //KEY LOGIC
                 if (pointItem.CurrentValue != value)
                 {
-                    pointItem = (IDiscretePointItem)(await modelUpdateAccessClient.UpdatePointItemRawValue(pointItem.Gid, value));
+                    pointItem = (DiscretePointItem)(await modelUpdateAccessClient.UpdatePointItemRawValue(pointItem.Gid, value));
                     Logger.LogInformation($"{baseLogString} ExecuteDiscreteReadCommand => Alarm for Point [Gid: 0x{pointItem.Gid:X16}, Address: {pointItem.Address}] set to {pointItem.Alarm}.");
                 }
 
@@ -580,9 +580,9 @@ namespace SCADA.FunctionExecutorImplementation
                     continue;
                 }
 
-                if (!(gidToPointItemMap[gid] is IAnalogPointItem pointItem))
+                if (!(gidToPointItemMap[gid] is AnalogPointItem pointItem))
                 {
-                    string message = $"{baseLogString} ExecuteAnalogReadCommand => PointItem [Gid: 0x{gid:X16}] does not implement {typeof(IAnalogPointItem)}.";
+                    string message = $"{baseLogString} ExecuteAnalogReadCommand => PointItem [Gid: 0x{gid:X16}] does not implement {typeof(AnalogPointItem)}.";
                     Logger.LogError(message);
                     throw new Exception(message);
                 }
@@ -590,7 +590,7 @@ namespace SCADA.FunctionExecutorImplementation
                 //KEY LOGIC
                 if (pointItem.CurrentRawValue != rawValue)
                 {
-                    pointItem = (IAnalogPointItem)(await modelUpdateAccessClient.UpdatePointItemRawValue(pointItem.Gid, rawValue));
+                    pointItem = (AnalogPointItem)(await modelUpdateAccessClient.UpdatePointItemRawValue(pointItem.Gid, rawValue));
                     Logger.LogInformation($"{baseLogString} ExecuteAnalogReadCommand => Alarm for Point [Gid: 0x{pointItem.Gid:X16}, Address: {pointItem.Address}] set to {pointItem.Alarm}.");
                 }
 

@@ -60,7 +60,7 @@ namespace CE.TopologyProviderImplementation
             while (stack.Count > 0)
             {
                 nextElementGid = stack.Pop();
-                if (topology.GetElementByGid(nextElementGid, out ITopologyElement element))
+                if (topology.GetElementByGid(nextElementGid, out TopologyElement element))
                 {
                     if (!reclosers.Contains(nextElementGid))
                     {
@@ -192,7 +192,7 @@ namespace CE.TopologyProviderImplementation
             long nextElement = 0;
             long nextElementGid = 0;
 
-            ITopologyElement element;
+            TopologyElement element;
             bool isOpen;
 
             while (stack.Count > 0)

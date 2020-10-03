@@ -84,7 +84,6 @@ namespace OMS.HistoryDBManagerImplementation.DistributedTransaction
             this.isHistoryModelChangesInitialized = false;
 
             this.stateManager = stateManager;
-            //this.stateManager.StateManagerChanged += this.OnStateManagerChangedHandler;
             HistoryModelChanges = new ReliableDictionaryAccess<byte, List<long>>(stateManager, ReliableDictionaryNames.HistoryModelChanges);
         }
 

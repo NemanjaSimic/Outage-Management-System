@@ -41,16 +41,13 @@ namespace SCADA.ModelProviderImplementation.ContractProviders
         private bool ReliableDictionariesInitialized
         {
             get 
-            { 
-                return isGidToPointItemMapInitialized && 
-                       isMeasurementsCacheInitialized && 
-                       isCommandDescriptionCacheInitialized && 
-                       isInfoCacheInitialized; 
+            {
+                return true;
             }
         }
 
-        private ReliableDictionaryAccess<long, IScadaModelPointItem> gidToPointItemMap;
-        private ReliableDictionaryAccess<long, IScadaModelPointItem> GidToPointItemMap
+        private ReliableDictionaryAccess<long, ScadaModelPointItem> gidToPointItemMap;
+        private ReliableDictionaryAccess<long, ScadaModelPointItem> GidToPointItemMap
         {
             get { return gidToPointItemMap; }
         }
@@ -102,7 +99,7 @@ namespace SCADA.ModelProviderImplementation.ContractProviders
 
                 if (reliableStateName == ReliableDictionaryNames.GidToPointItemMap)
                 {
-                    gidToPointItemMap = await ReliableDictionaryAccess<long, IScadaModelPointItem>.Create(stateManager, ReliableDictionaryNames.GidToPointItemMap);
+                    gidToPointItemMap = await ReliableDictionaryAccess<long, ScadaModelPointItem>.Create(stateManager, ReliableDictionaryNames.GidToPointItemMap);
                     this.isGidToPointItemMapInitialized = true;
 
                     string debugMessage = $"{baseLogString} OnStateManagerChangedHandler => '{ReliableDictionaryNames.GidToPointItemMap}' ReliableDictionaryAccess initialized.";
@@ -146,7 +143,10 @@ namespace SCADA.ModelProviderImplementation.ContractProviders
             this.isInfoCacheInitialized = false;
 
             this.stateManager = stateManager;
-            this.stateManager.StateManagerChanged += this.OnStateManagerChangedHandler;
+            this.gidToPointItemMap = new ReliableDictionaryAccess<long, ScadaModelPointItem>(stateManager, ReliableDictionaryNames.GidToPointItemMap);
+            this.measurementsCache = new ReliableDictionaryAccess<long, ModbusData>(stateManager, ReliableDictionaryNames.MeasurementsCache);
+            this.commandDescriptionCache = new ReliableDictionaryAccess<long, CommandDescription>(stateManager, ReliableDictionaryNames.CommandDescriptionCache);
+            this.infoCache = new ReliableDictionaryAccess<string, bool>(stateManager, ReliableDictionaryNames.InfoCache);
         }
 
         private async Task<bool> GetIsScadaModelImportedIndicator()
@@ -313,7 +313,7 @@ namespace SCADA.ModelProviderImplementation.ContractProviders
             }
         }
 
-        public async Task<IScadaModelPointItem> UpdatePointItemRawValue(long gid, int rawValue)
+        public async Task<ScadaModelPointItem> UpdatePointItemRawValue(long gid, int rawValue)
         {
             string verboseMessage = $"{baseLogString} entering UpdatePointItemRawValue method.";
             Logger.LogVerbose(verboseMessage);
@@ -330,7 +330,7 @@ namespace SCADA.ModelProviderImplementation.ContractProviders
                 throw new ArgumentException(message);
             }
 
-            if ((await GidToPointItemMap.TryGetValueAsync(gid)).Value is IAnalogPointItem analogPoint)
+            if ((await GidToPointItemMap.TryGetValueAsync(gid)).Value is AnalogPointItem analogPoint)
             {
                 if (!analogPoint.Initialized)
                 {
@@ -345,7 +345,7 @@ namespace SCADA.ModelProviderImplementation.ContractProviders
 
                 if (result.HasValue)
                 {
-                    return result.Value as IAnalogPointItem;
+                    return result.Value as AnalogPointItem;
                 }
                 else
                 {
@@ -354,7 +354,7 @@ namespace SCADA.ModelProviderImplementation.ContractProviders
                     throw new Exception(errorMessage);
                 }
             }
-            else if ((await GidToPointItemMap.TryGetValueAsync(gid)).Value is IDiscretePointItem discretePoint)
+            else if ((await GidToPointItemMap.TryGetValueAsync(gid)).Value is DiscretePointItem discretePoint)
             {
                 discretePoint.CurrentValue = (ushort)rawValue;
                 await GidToPointItemMap.SetAsync(discretePoint.Gid, discretePoint);
@@ -363,7 +363,7 @@ namespace SCADA.ModelProviderImplementation.ContractProviders
 
                 if (result.HasValue)
                 {
-                    return result.Value as IDiscretePointItem;
+                    return result.Value as DiscretePointItem;
                 }
                 else
                 {

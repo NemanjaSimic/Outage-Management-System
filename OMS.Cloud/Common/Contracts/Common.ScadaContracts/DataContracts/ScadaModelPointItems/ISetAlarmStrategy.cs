@@ -2,6 +2,6 @@
 {
     public interface ISetAlarmStrategy
     {
-        bool SetAlarm(IScadaModelPointItem pointItem);
+        bool SetAlarm(ScadaModelPointItem pointItem);
     }
 }

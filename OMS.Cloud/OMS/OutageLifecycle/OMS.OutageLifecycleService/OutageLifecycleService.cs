@@ -15,6 +15,7 @@ using Microsoft.ServiceFabric.Services.Runtime;
 using OMS.Common.Cloud;
 using OMS.Common.Cloud.Logger;
 using OMS.Common.Cloud.Names;
+using OMS.Common.Cloud.ReliableCollectionHelpers;
 using OMS.Common.NmsContracts;
 using OMS.Common.PubSubContracts;
 using OMS.Common.PubSubContracts.DataContracts.SCADA;
@@ -165,22 +166,13 @@ namespace OMS.OutageLifecycleService
         {
             try
             {
-                InitializeReliableCollections();
+                //InitializeReliableCollections();
                 Logger.LogDebug($"{baseLogString} Initialize => ReliableDictionaries initialized.");
                 var topologyProviderClient = TopologyProviderClient.CreateClient();
-                using (ITransaction tx = this.StateManager.CreateTransaction())
-				{
-                    var result = await StateManager.TryGetAsync<IReliableDictionary<string, OutageTopologyModel>>(ReliableDictionaryNames.OutageTopologyModel);
-                    if (result.HasValue)
-					{
-                        await result.Value.SetAsync(tx, ReliableDictionaryNames.OutageTopologyModel, await topologyProviderClient.GetOMSModel());
-                        await tx.CommitAsync();
-					}
-                    else
-					{
-                        Logger.LogError($"{baseLogString} Initialize => Reliable dictionary {ReliableDictionaryNames.OutageTopologyModel} was not found.");
-					}
-                }
+
+                var topology = await topologyProviderClient.GetOMSModel();
+                var outageTopologyModel = new ReliableDictionaryAccess<string, OutageTopologyModel>(StateManager, ReliableDictionaryNames.OutageTopologyModel);
+                await outageTopologyModel.SetAsync(ReliableDictionaryNames.OutageTopologyModel, topology);
 
                 var registerSubscriberClient = RegisterSubscriberClient.CreateClient();
                 await registerSubscriberClient.SubscribeToTopic(Topic.SWITCH_STATUS, MicroserviceNames.OmsOutageLifecycleService);

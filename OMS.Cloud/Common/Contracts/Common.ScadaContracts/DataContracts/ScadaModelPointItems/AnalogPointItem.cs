@@ -6,7 +6,7 @@ using System.Runtime.Serialization;
 namespace OMS.Common.ScadaContracts.DataContracts.ScadaModelPointItems
 {
     [DataContract]
-    public class AnalogPointItem : ScadaModelPointItem, IAnalogPointItem
+    public class AnalogPointItem : ScadaModelPointItem//, IAnalogPointItem
     { 
         public AnalogPointItem(IAlarmConfigData alarmConfigData)
             : base(alarmConfigData)
@@ -191,9 +191,9 @@ namespace OMS.Common.ScadaContracts.DataContracts.ScadaModelPointItems
 
         #region IClonable
 
-        public override IScadaModelPointItem Clone()
+        public override ScadaModelPointItem Clone()
         {
-            return this.MemberwiseClone() as IScadaModelPointItem;
+            return this.MemberwiseClone() as ScadaModelPointItem;
         }
 
         #endregion IClonable

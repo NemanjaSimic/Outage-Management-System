@@ -102,8 +102,8 @@ namespace OMS.CallTrackingImplementation
             Logger.LogVerbose(verboseMessage);
 
             this.stateManager = stateManager;
-            //this.stateManager.StateManagerChanged += OnStateManagerChangedHandler;
-            calls = new ReliableDictionaryAccess<long, long>(stateManager, ReliableDictionaryNames.CallsDictionary);
+            this.calls = new ReliableDictionaryAccess<long, long>(stateManager, ReliableDictionaryNames.CallsDictionary);
+
             this.subscriberName = subscriberName;
 
             modelResourcesDesc = new ModelResourcesDesc();

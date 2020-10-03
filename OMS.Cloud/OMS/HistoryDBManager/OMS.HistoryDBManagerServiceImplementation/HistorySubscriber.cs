@@ -62,9 +62,9 @@ namespace OMS.HistoryDBManagerImplementation
 			Logger.LogVerbose(verboseMessage);
 
 			this.historyDBManager = historyDBManager;
+
 			this.stateManager = stateManager;
-			//this.stateManager.StateManagerChanged += OnStateManagerChangedHandler
-			activeOutages = new ReliableDictionaryAccess<long, ActiveOutageMessage>(stateManager, ReliableDictionaryNames.ActiveOutages);
+			this.activeOutages = new ReliableDictionaryAccess<long, ActiveOutageMessage>(stateManager, ReliableDictionaryNames.ActiveOutages);
 
 			string debugMessage = $"{baseLogString} Ctor => Clients initialized.";
 			Logger.LogDebug(debugMessage);

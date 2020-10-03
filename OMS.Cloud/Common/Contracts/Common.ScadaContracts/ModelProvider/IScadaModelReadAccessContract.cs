@@ -23,7 +23,7 @@ namespace OMS.Common.ScadaContracts.ModelProvider
         [ServiceKnownType(typeof(AnalogPointItem))]
         [ServiceKnownType(typeof(DiscretePointItem))]
         [ServiceKnownType(typeof(AlarmConfigData))]
-        Task<Dictionary<long, IScadaModelPointItem>> GetGidToPointItemMap();
+        Task<Dictionary<long, ScadaModelPointItem>> GetGidToPointItemMap();
 
         [OperationContract]
         Task<Dictionary<short, Dictionary<ushort, long>>> GetAddressToGidMap();
@@ -32,7 +32,7 @@ namespace OMS.Common.ScadaContracts.ModelProvider
         [ServiceKnownType(typeof(AnalogPointItem))]
         [ServiceKnownType(typeof(DiscretePointItem))]
         [ServiceKnownType(typeof(AlarmConfigData))]
-        Task<Dictionary<short, Dictionary<ushort, IScadaModelPointItem>>> GetAddressToPointItemMap();
+        Task<Dictionary<short, Dictionary<ushort, ScadaModelPointItem>>> GetAddressToPointItemMap();
 
         [OperationContract]
         Task<Dictionary<long, CommandDescription>> GetCommandDescriptionCache();

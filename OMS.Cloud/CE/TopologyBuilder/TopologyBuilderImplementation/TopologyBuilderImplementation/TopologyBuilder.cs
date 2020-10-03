@@ -21,7 +21,7 @@ namespace CE.TopologyBuilderImplementation
         private HashSet<long> visited;
         private HashSet<long> reclosers;
         private Stack<long> stack;
-        private Dictionary<long, ITopologyElement> elements;
+        private Dictionary<long, TopologyElement> elements;
         private Dictionary<long, List<long>> connections;
         #endregion
 
@@ -41,15 +41,15 @@ namespace CE.TopologyBuilderImplementation
             Logger.LogDebug(debugMessage);
         }
 
-        private Dictionary<long, ITopologyElement> TransformDictionary(Dictionary<long, TopologyElement> dict)
+        private Dictionary<long, TopologyElement> TransformDictionary(Dictionary<long, TopologyElement> dict)
         {
-            Dictionary<long, ITopologyElement> retVal = new Dictionary<long, ITopologyElement>();
+            Dictionary<long, TopologyElement> retVal = new Dictionary<long, TopologyElement>();
 
             foreach (var item in dict)
             {
                 if (!retVal.ContainsKey(item.Key))
                 {
-                    retVal.Add(item.Key, item.Value as ITopologyElement);
+                    retVal.Add(item.Key, item.Value as TopologyElement);
                 }
             }
 
@@ -60,7 +60,7 @@ namespace CE.TopologyBuilderImplementation
         {
             Logger.LogVerbose($"{baseLogString} CreateGraphTopology method called, by {whoIsCalling}.");
 
-            ITopologyElement currentFider = null;
+            TopologyElement currentFider = null;
 
             Logger.LogDebug($"{baseLogString} CreateGraphTopology => Calling GetElementModels method from model provider.");
             var modelProviderClient = CeModelProviderClient.CreateClient();
@@ -91,7 +91,7 @@ namespace CE.TopologyBuilderImplementation
             try
             {
                 stack.Push(firstElementGid);
-                ITopologyElement currentElement;
+                TopologyElement currentElement;
                 long currentElementId = 0;
 
                 while (stack.Count > 0)
@@ -114,7 +114,7 @@ namespace CE.TopologyBuilderImplementation
 
                     foreach (var element in referencedElements)
                     {
-                        if (elements.TryGetValue(element, out ITopologyElement newNode))
+                        if (elements.TryGetValue(element, out TopologyElement newNode))
                         {
                             if (!reclosers.Contains(element))
                             {
@@ -224,7 +224,7 @@ namespace CE.TopologyBuilderImplementation
 
             return refElements;
         }
-        private void ConnectTwoNodes(ITopologyElement newNode, ITopologyElement parent)
+        private void ConnectTwoNodes(TopologyElement newNode, TopologyElement parent)
         {
             string verboseMessage = $"{baseLogString} ConnectTwoNodes method called. New node GID {newNode?.Id:X16}, Parent node GID {parent?.Id:X16}.";
             Logger.LogVerbose(verboseMessage);

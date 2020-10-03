@@ -112,7 +112,7 @@ namespace SCADA.FunctionExecutorService
 
             try
             {
-                InitializeReliableCollections();
+                //InitializeReliableCollections();
                 string debugMessage = $"{baseLogString} RunAsync => ReliableDictionaries initialized.";
                 Logger.LogDebug(debugMessage);
 
@@ -174,19 +174,8 @@ namespace SCADA.FunctionExecutorService
                 {
                     using (ITransaction tx = this.StateManager.CreateTransaction())
                     {
-                        var result = await StateManager.TryGetAsync<IReliableConcurrentQueue<ModbusFunction>>(ReliableQueueNames.ReadCommandQueue);
-                        if(result.HasValue)
-                        {
-                            var gidToPointItemMap = result.Value;
-                            while ((await result.Value.TryDequeueAsync(tx)).HasValue) ;
-                            //await gidToPointItemMap.ClearAsync();
-                            await tx.CommitAsync();
-                        }
-                        else
-                        {
-                            await StateManager.GetOrAddAsync<IReliableConcurrentQueue<ModbusFunction>>(tx, ReliableQueueNames.ReadCommandQueue);
-                            await tx.CommitAsync();
-                        }
+                        await StateManager.GetOrAddAsync<IReliableConcurrentQueue<ModbusFunction>>(tx, ReliableQueueNames.ReadCommandQueue);
+                        await tx.CommitAsync();
                     }
                 }),
 
@@ -194,19 +183,8 @@ namespace SCADA.FunctionExecutorService
                 {
                     using (ITransaction tx = this.StateManager.CreateTransaction())
                     {
-                        var result = await StateManager.TryGetAsync<IReliableConcurrentQueue<ModbusFunction>>(ReliableQueueNames.WriteCommandQueue);
-                        if(result.HasValue)
-                        {
-                            var gidToPointItemMap = result.Value;
-                            while ((await result.Value.TryDequeueAsync(tx)).HasValue) ;
-                            //await gidToPointItemMap.ClearAsync();
-                            await tx.CommitAsync();
-                        }
-                        else
-                        {
-                            await StateManager.GetOrAddAsync<IReliableConcurrentQueue<ModbusFunction>>(tx, ReliableQueueNames.WriteCommandQueue);
-                            await tx.CommitAsync();
-                        }
+                        await StateManager.GetOrAddAsync<IReliableConcurrentQueue<ModbusFunction>>(tx, ReliableQueueNames.WriteCommandQueue);
+                        await tx.CommitAsync();
                     }
                 }),
 
@@ -214,19 +192,8 @@ namespace SCADA.FunctionExecutorService
                 {
                     using (ITransaction tx = this.StateManager.CreateTransaction())
                     {
-                        var result = await StateManager.TryGetAsync<IReliableConcurrentQueue<ModbusFunction>>(ReliableQueueNames.ModelUpdateCommandQueue);
-                        if(result.HasValue)
-                        {
-                            var addressToGidMap = result.Value;
-                            while ((await result.Value.TryDequeueAsync(tx)).HasValue) ;
-                            //await addressToGidMap.ClearAsync();
-                            await tx.CommitAsync();
-                        }
-                        else
-                        {
-                            await StateManager.GetOrAddAsync<IReliableConcurrentQueue<ModbusFunction>>(tx, ReliableQueueNames.ModelUpdateCommandQueue);
-                            await tx.CommitAsync();
-                        }
+                        await StateManager.GetOrAddAsync<IReliableConcurrentQueue<ModbusFunction>>(tx, ReliableQueueNames.ModelUpdateCommandQueue);
+                        await tx.CommitAsync();
                     }
                 }),
             };

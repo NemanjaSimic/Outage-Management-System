@@ -45,7 +45,7 @@ namespace SCADA.CommandingImplementation
             Logger.LogVerbose(verboseMessage);
 
             IScadaModelReadAccessContract scadaModelReadAccessClient = ScadaModelReadAccessClient.CreateClient();
-            Dictionary<long, IScadaModelPointItem> gidToPointItemMap = await scadaModelReadAccessClient.GetGidToPointItemMap();
+            Dictionary<long, ScadaModelPointItem> gidToPointItemMap = await scadaModelReadAccessClient.GetGidToPointItemMap();
 
             if (gidToPointItemMap == null)
             {
@@ -61,9 +61,9 @@ namespace SCADA.CommandingImplementation
                 return false;
             }
 
-            IScadaModelPointItem pointItem = gidToPointItemMap[gid];
+            ScadaModelPointItem pointItem = gidToPointItemMap[gid];
 
-            if (!(pointItem is IAnalogPointItem analogPointItem && pointItem.RegisterType == PointType.ANALOG_OUTPUT))
+            if (!(pointItem is AnalogPointItem analogPointItem && pointItem.RegisterType == PointType.ANALOG_OUTPUT))
             {
                 string message = $"{baseLogString} SendSingleAnalogCommand => Either RegistarType of entity with gid: 0x{gid:X16} is not ANALOG_OUTPUT or entity does not implement IAnalogPointItem interface.";
                 Logger.LogError(message);
@@ -122,7 +122,7 @@ namespace SCADA.CommandingImplementation
 
             ushort startAddress = 1; //EasyModbus spec
             IScadaModelReadAccessContract scadaModelReadAccessClient = ScadaModelReadAccessClient.CreateClient();
-            Dictionary<long, IScadaModelPointItem> gidToPointItemMap = await scadaModelReadAccessClient.GetGidToPointItemMap();
+            Dictionary<long, ScadaModelPointItem> gidToPointItemMap = await scadaModelReadAccessClient.GetGidToPointItemMap();
             Dictionary<short, Dictionary<ushort, long>> addressToGidMap = await scadaModelReadAccessClient.GetAddressToGidMap();
 
             if (gidToPointItemMap == null)
@@ -145,7 +145,7 @@ namespace SCADA.CommandingImplementation
                     Logger.LogError(message);
                     return false;
                 }
-                else if (!(gidToPointItemMap[gid] is IAnalogPointItem analogPointItem))
+                else if (!(gidToPointItemMap[gid] is AnalogPointItem analogPointItem))
                 {
                     string message = $"{baseLogString} SendMultipleAnalogCommand => Entity with gid: 0x{gid:X16} does not implement IAnalogPointItem interface.";
                     Logger.LogError(message);
@@ -208,7 +208,7 @@ namespace SCADA.CommandingImplementation
         public async Task<bool> SendSingleDiscreteCommand(long gid, ushort commandingValue, CommandOriginType commandOriginType)
         {
             IScadaModelReadAccessContract scadaModelReadAccessClient = ScadaModelReadAccessClient.CreateClient();
-            Dictionary<long, IScadaModelPointItem> gidToPointItemMap = await scadaModelReadAccessClient.GetGidToPointItemMap();
+            Dictionary<long, ScadaModelPointItem> gidToPointItemMap = await scadaModelReadAccessClient.GetGidToPointItemMap();
 
             if (gidToPointItemMap == null)
             {
@@ -224,9 +224,9 @@ namespace SCADA.CommandingImplementation
                 return false;
             }
 
-            IScadaModelPointItem pointItem = gidToPointItemMap[gid];
+            ScadaModelPointItem pointItem = gidToPointItemMap[gid];
 
-            if (!(pointItem is IDiscretePointItem && pointItem.RegisterType == PointType.DIGITAL_OUTPUT))
+            if (!(pointItem is DiscretePointItem && pointItem.RegisterType == PointType.DIGITAL_OUTPUT))
             {
                 string message = $"{baseLogString} SendSingleDiscreteCommand => RegistarType of entity with gid: 0x{gid:X16} is not DIGITAL_OUTPUT or entity does not implement IDiscretePointItem interface.";
                 Logger.LogError(message);
@@ -276,7 +276,7 @@ namespace SCADA.CommandingImplementation
 
             ushort startAddress = 1; //EasyModbus spec
             IScadaModelReadAccessContract scadaModelReadAccessClient = ScadaModelReadAccessClient.CreateClient();
-            Dictionary<long, IScadaModelPointItem> gidToPointItemMap = await scadaModelReadAccessClient.GetGidToPointItemMap();
+            Dictionary<long, ScadaModelPointItem> gidToPointItemMap = await scadaModelReadAccessClient.GetGidToPointItemMap();
             Dictionary<short, Dictionary<ushort, long>> addressToGidMap = await scadaModelReadAccessClient.GetAddressToGidMap();
 
             if (gidToPointItemMap == null)
@@ -299,7 +299,7 @@ namespace SCADA.CommandingImplementation
                     Logger.LogError(message);
                     return false;
                 }
-                else if (!(gidToPointItemMap[gid] is IDiscretePointItem discretePointItem))
+                else if (!(gidToPointItemMap[gid] is DiscretePointItem discretePointItem))
                 {
                     string message = $"{baseLogString} SendMultipleDiscreteCommand => Entity with gid: 0x{gid:X16} does not implement IDiscretePointItem interface.";
                     Logger.LogError(message);
@@ -359,7 +359,7 @@ namespace SCADA.CommandingImplementation
         #endregion IScadaCommandingContract
 
         #region Private Methods
-        private async Task SendSingleCommand(IScadaModelPointItem pointItem, int commandingValue, CommandOriginType commandOriginType, bool isRetry = false)
+        private async Task SendSingleCommand(ScadaModelPointItem pointItem, int commandingValue, CommandOriginType commandOriginType, bool isRetry = false)
         {
             try
             {

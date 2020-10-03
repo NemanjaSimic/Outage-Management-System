@@ -38,12 +38,12 @@ namespace CE.ModelProviderImplementation
         private bool isEnergySourceCacheInitialized = false;
         private bool isRecloserCacheInitialized = false;
 
-        private bool AreReliableDictionariesInitialized
+        private bool ReliableDictionariesInitialized
         {
-            get => isElementCacheInitialized
-                && isElementConnectionCacheInitialized
-                && isRecloserCacheInitialized
-                && isEnergySourceCacheInitialized;
+            get
+            {
+                return true;
+            }
         }
 
         private ReliableDictionaryAccess<short, List<long>> energySourceCache;
@@ -127,9 +127,6 @@ namespace CE.ModelProviderImplementation
             string verboseMessage = $"{baseLogString} entering Ctor.";
             Logger.LogVerbose(verboseMessage);
 
-            this.stateManager = stateManager;
-            stateManager.StateManagerChanged += this.OnStateManagerChangedHandler;
-
             transactionFlag = TransactionFlag.NoTransaction;
             this.modelManager = modelManager;
 
@@ -138,20 +135,26 @@ namespace CE.ModelProviderImplementation
             this.isEnergySourceCacheInitialized = false;
             this.isRecloserCacheInitialized = false;
 
+            this.stateManager = stateManager;
+            this.elementCache = new ReliableDictionaryAccess<short, Dictionary<long, TopologyElement>>(stateManager, ReliableDictionaryNames.ElementCache);
+            this.elementConnectionCache = new ReliableDictionaryAccess<short, Dictionary<long, List<long>>>(stateManager, ReliableDictionaryNames.ElementConnectionCache);
+            this.energySourceCache = new ReliableDictionaryAccess<short, List<long>>(stateManager, ReliableDictionaryNames.EnergySourceCache);
+            this.recloserCache = new ReliableDictionaryAccess<short, HashSet<long>>(stateManager, ReliableDictionaryNames.RecloserCache);
+
             string debugMessage = $"{baseLogString} Ctor => Clients initialized.";
             Logger.LogDebug(debugMessage);
         }
 
-        public async Task<IModelDelta> ImportDataInCache()
+        public async Task<ModelDelta> ImportDataInCache()
         {
-            while (!AreReliableDictionariesInitialized)
+            while (!ReliableDictionariesInitialized)
             {
                 await Task.Delay(1000);
             }
 
 			Logger.LogVerbose($"{baseLogString} enter in ImportDataInCache.");
 
-			IModelDelta modelDelta = await modelManager.TryGetAllModelEntitiesAsync();
+			ModelDelta modelDelta = await modelManager.TryGetAllModelEntitiesAsync();
 
             await ElementCache.SetAsync((short)TransactionFlag.NoTransaction, TransformDictionary(modelDelta.TopologyElements));
             await ElementConnectionCache.SetAsync((short)TransactionFlag.NoTransaction, modelDelta.ElementConnections);
@@ -296,7 +299,7 @@ namespace CE.ModelProviderImplementation
 
                 transactionFlag = TransactionFlag.InTransaction;
 
-                IModelDelta modelDelta = await modelManager.TryGetAllModelEntitiesAsync();
+                ModelDelta modelDelta = await modelManager.TryGetAllModelEntitiesAsync();
 
                 Logger.LogDebug($"{baseLogString} PrepareForTransaction => Writting new data in cache under InTransaction flag.");
                 await ElementCache.SetAsync((short)TransactionFlag.InTransaction, TransformDictionary(modelDelta.TopologyElements));
@@ -401,7 +404,7 @@ namespace CE.ModelProviderImplementation
             string verboseMessage = $"{baseLogString} entering GetElementsFromCache method.";
             Logger.LogVerbose(verboseMessage);
 
-            while (!AreReliableDictionariesInitialized)
+            while (!ReliableDictionariesInitialized)
             {
                 await Task.Delay(1000);
             }
@@ -441,7 +444,7 @@ namespace CE.ModelProviderImplementation
             string verboseMessage = $"{baseLogString} entering GetConnectionsFromCache method.";
             Logger.LogVerbose(verboseMessage);
 
-            while (!AreReliableDictionariesInitialized)
+            while (!ReliableDictionariesInitialized)
             {
                 await Task.Delay(1000);
             }
@@ -481,7 +484,7 @@ namespace CE.ModelProviderImplementation
             string verboseMessage = $"{baseLogString} entering GetReclosersFromCache method.";
             Logger.LogVerbose(verboseMessage);
 
-            while (!AreReliableDictionariesInitialized)
+            while (!ReliableDictionariesInitialized)
             {
                 await Task.Delay(1000);
             }
@@ -521,7 +524,7 @@ namespace CE.ModelProviderImplementation
             string verboseMessage = $"{baseLogString} entering GetEnergySourcesFromCache method.";
             Logger.LogVerbose(verboseMessage);
 
-            while (!AreReliableDictionariesInitialized)
+            while (!ReliableDictionariesInitialized)
             {
                 await Task.Delay(1000);
             }
@@ -558,7 +561,7 @@ namespace CE.ModelProviderImplementation
         }
         #endregion
 
-        private Dictionary<long, TopologyElement> TransformDictionary(Dictionary<long, ITopologyElement> dict)
+        private Dictionary<long, TopologyElement> TransformDictionary(Dictionary<long, TopologyElement> dict)
         {
             Dictionary<long, TopologyElement> retVal = new Dictionary<long, TopologyElement>();
 

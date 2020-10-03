@@ -38,8 +38,6 @@ namespace OMS.HistoryDBManagerImplementation
             get
             {
                 return true;
-                       //isUnenergizedConsumersInitialized &&
-                       //isOpenedSwitchesInitialized;
             }
         }
 
@@ -106,10 +104,8 @@ namespace OMS.HistoryDBManagerImplementation
             this.isUnenergizedConsumersInitialized = false;
 
             this.stateManager = stateManager;
-            //this.stateManager.StateManagerChanged += OnStateManagerChangedHandler;
-
-            openedSwitches = new ReliableDictionaryAccess<long, long>(stateManager, ReliableDictionaryNames.OpenedSwitches);
-            unenergizedConsumers = new ReliableDictionaryAccess<long, long>(stateManager, ReliableDictionaryNames.UnenergizedConsumers);
+            this.openedSwitches = new ReliableDictionaryAccess<long, long>(stateManager, ReliableDictionaryNames.OpenedSwitches);
+            this.unenergizedConsumers = new ReliableDictionaryAccess<long, long>(stateManager, ReliableDictionaryNames.UnenergizedConsumers);
         }
 
         #region IHistoryDBManagerContract

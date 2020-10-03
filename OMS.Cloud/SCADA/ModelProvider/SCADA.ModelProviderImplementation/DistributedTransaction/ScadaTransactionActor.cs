@@ -53,19 +53,12 @@ namespace SCADA.ModelProviderImplementation.DistributedTransaction
         {
             get 
             {
-                return isCurrentGidToPointItemMapInitialized &&
-                       isIncomingGidToPointItemMapInitialized &&
-                       isCurrentAddressToGidMapInitialized &&
-                       isIncomingAddressToGidMapInitialized &&
-                       isInfoCacheInitialized &&
-                       isModelChangesInitialized &&
-                       isCommandDescriptionCacheInitialized &&
-                       isMeasurementsCacheInitialized;
+                return true;
             }
         }
 
-        private ReliableDictionaryAccess<long, IScadaModelPointItem> CurrentGidToPointItemMap { get; set; }
-        private ReliableDictionaryAccess<long, IScadaModelPointItem> IncomingGidToPointItemMap { get; set; }
+        private ReliableDictionaryAccess<long, ScadaModelPointItem> CurrentGidToPointItemMap { get; set; }
+        private ReliableDictionaryAccess<long, ScadaModelPointItem> IncomingGidToPointItemMap { get; set; }
         private ReliableDictionaryAccess<short, Dictionary<ushort, long>> CurrentAddressToGidMap { get; set; }
         private ReliableDictionaryAccess<short, Dictionary<ushort, long>> IncomingAddressToGidMap { get; set; }
         private ReliableDictionaryAccess<string, bool> InfoCache { get; set; }
@@ -103,7 +96,7 @@ namespace SCADA.ModelProviderImplementation.DistributedTransaction
 
                 if (reliableStateName == ReliableDictionaryNames.GidToPointItemMap)
                 {
-                    CurrentGidToPointItemMap = await ReliableDictionaryAccess<long, IScadaModelPointItem>.Create(stateManager, ReliableDictionaryNames.GidToPointItemMap);
+                    CurrentGidToPointItemMap = await ReliableDictionaryAccess<long, ScadaModelPointItem>.Create(stateManager, ReliableDictionaryNames.GidToPointItemMap);
                     this.isCurrentGidToPointItemMapInitialized = true;
 
                     string debugMessage = $"{baseLogString} OnStateManagerChangedHandler => '{ReliableDictionaryNames.GidToPointItemMap}' ReliableDictionaryAccess initialized.";
@@ -111,7 +104,7 @@ namespace SCADA.ModelProviderImplementation.DistributedTransaction
                 }
                 else if (reliableStateName == ReliableDictionaryNames.IncomingGidToPointItemMap)
                 {
-                    IncomingGidToPointItemMap = await ReliableDictionaryAccess<long, IScadaModelPointItem>.Create(stateManager, ReliableDictionaryNames.IncomingGidToPointItemMap);
+                    IncomingGidToPointItemMap = await ReliableDictionaryAccess<long, ScadaModelPointItem>.Create(stateManager, ReliableDictionaryNames.IncomingGidToPointItemMap);
                     this.isIncomingGidToPointItemMapInitialized = true;
 
                     string debugMessage = $"{baseLogString} OnStateManagerChangedHandler => '{ReliableDictionaryNames.IncomingGidToPointItemMap}' ReliableDictionaryAccess initialized.";
@@ -181,13 +174,20 @@ namespace SCADA.ModelProviderImplementation.DistributedTransaction
             this.isModelChangesInitialized = false;
             this.isCommandDescriptionCacheInitialized = false;
 
-            this.stateManager = stateManager;
-            this.stateManager.StateManagerChanged += this.OnStateManagerChangedHandler;
-
             this.modelResourceDesc = modelResourceDesc;
             this.enumDescs = enumDescs;
             this.pointItemHelper = new ScadaModelPointItemHelper();
             this.reliableDictionaryHelper = new ReliableDictionaryHelper();
+
+            this.stateManager = stateManager;
+            CurrentGidToPointItemMap = new ReliableDictionaryAccess<long, ScadaModelPointItem>(stateManager, ReliableDictionaryNames.GidToPointItemMap);
+            IncomingGidToPointItemMap = new ReliableDictionaryAccess<long, ScadaModelPointItem>(stateManager, ReliableDictionaryNames.IncomingGidToPointItemMap);
+            CurrentAddressToGidMap = new ReliableDictionaryAccess<short, Dictionary<ushort, long>>(stateManager, ReliableDictionaryNames.AddressToGidMap);
+            IncomingAddressToGidMap = new ReliableDictionaryAccess<short, Dictionary<ushort, long>>(stateManager, ReliableDictionaryNames.IncomingAddressToGidMap);
+            InfoCache = new ReliableDictionaryAccess<string, bool>(stateManager, ReliableDictionaryNames.InfoCache);
+            ModelChanges = new ReliableDictionaryAccess<byte, List<long>>(stateManager, ReliableDictionaryNames.ModelChanges);
+            CommandDescriptionCache = new ReliableDictionaryAccess<long, CommandDescription>(stateManager, ReliableDictionaryNames.CommandDescriptionCache);
+            MeasurementsCache = new ReliableDictionaryAccess<long, ModbusData>(stateManager, ReliableDictionaryNames.MeasurementsCache);
         }
 
         #region ITransactionActorContract
@@ -207,7 +207,7 @@ namespace SCADA.ModelProviderImplementation.DistributedTransaction
 
                 //IMPORT ALL measurements from NMS and create PointItems for them
                 var enumerableModelChanges = await ModelChanges.GetEnumerableDictionaryAsync();
-                Dictionary<long, IScadaModelPointItem> incomingPointItems = await CreatePointItemsFromNetworkModelMeasurements(enumerableModelChanges);
+                Dictionary<long, ScadaModelPointItem> incomingPointItems = await CreatePointItemsFromNetworkModelMeasurements(enumerableModelChanges);
 
                 //ORDER IS IMPORTANT due to IncomingAddressToGidMap validity: DELETE => UPDATE => INSERT
                 var orderOfOperations = new List<DeltaOpType>() { DeltaOpType.Delete, DeltaOpType.Update, DeltaOpType.Insert };
@@ -228,12 +228,12 @@ namespace SCADA.ModelProviderImplementation.DistributedTransaction
                         }
                         else if (operation == DeltaOpType.Update)
                         {
-                            IScadaModelPointItem incomingPointItem = incomingPointItems[gid];
+                            ScadaModelPointItem incomingPointItem = incomingPointItems[gid];
                             await HandleUpdateOperation(incomingPointItem, gid);
                         }
                         else if (operation == DeltaOpType.Insert)
                         {
-                            IScadaModelPointItem incomingPointItem = incomingPointItems[gid];
+                            ScadaModelPointItem incomingPointItem = incomingPointItems[gid];
                             await HandleInsertOperation(incomingPointItem, gid);
                         }
                     }
@@ -261,7 +261,7 @@ namespace SCADA.ModelProviderImplementation.DistributedTransaction
 
             try
             {
-                await reliableDictionaryHelper.TryCopyToReliableDictionary<long, IScadaModelPointItem>(ReliableDictionaryNames.IncomingGidToPointItemMap, ReliableDictionaryNames.GidToPointItemMap, this.stateManager);
+                await reliableDictionaryHelper.TryCopyToReliableDictionary<long, ScadaModelPointItem>(ReliableDictionaryNames.IncomingGidToPointItemMap, ReliableDictionaryNames.GidToPointItemMap, this.stateManager);
                 await reliableDictionaryHelper.TryCopyToReliableDictionary<short, Dictionary<ushort, long>>(ReliableDictionaryNames.IncomingAddressToGidMap, ReliableDictionaryNames.AddressToGidMap, this.stateManager);
 
                 await IncomingGidToPointItemMap.ClearAsync();
@@ -324,7 +324,7 @@ namespace SCADA.ModelProviderImplementation.DistributedTransaction
             {
                 //NODO: to tasks, await all (performanse)
 
-                IScadaModelPointItem pointItem = enumerableCurrentGidToPointItemMap[gid].Clone();
+                ScadaModelPointItem pointItem = enumerableCurrentGidToPointItemMap[gid].Clone();
 
                 await IncomingGidToPointItemMap.SetAsync(gid, pointItem);
 
@@ -359,9 +359,9 @@ namespace SCADA.ModelProviderImplementation.DistributedTransaction
             }
         }
 
-        private async Task<Dictionary<long, IScadaModelPointItem>> CreatePointItemsFromNetworkModelMeasurements(Dictionary<byte, List<long>> modelChanges)
+        private async Task<Dictionary<long, ScadaModelPointItem>> CreatePointItemsFromNetworkModelMeasurements(Dictionary<byte, List<long>> modelChanges)
         {
-            Dictionary<long, IScadaModelPointItem> pointItems = new Dictionary<long, IScadaModelPointItem>();
+            Dictionary<long, ScadaModelPointItem> pointItems = new Dictionary<long, ScadaModelPointItem>();
 
             INetworkModelGDAContract nmsGdaClient = NetworkModelGdaClient.CreateClient();
 
@@ -410,7 +410,7 @@ namespace SCADA.ModelProviderImplementation.DistributedTransaction
                                 throw new ArgumentException(message);
                             }
 
-                            IScadaModelPointItem point;
+                            ScadaModelPointItem point;
 
                             //change service contract IModelUpdateNotificationContract => change List<long> to Hashset<long> 
                             if (modelChanges[(byte)DeltaOpType.Update].Contains(rd.Id) || modelChanges[(byte)DeltaOpType.Insert].Contains(rd.Id))
@@ -435,12 +435,12 @@ namespace SCADA.ModelProviderImplementation.DistributedTransaction
             return pointItems;
         }
 
-        private IScadaModelPointItem CreatePointItemFromResource(ResourceDescription resource)
+        private ScadaModelPointItem CreatePointItemFromResource(ResourceDescription resource)
         {
             long gid = resource.Id;
             ModelCode type = modelResourceDesc.GetModelCodeFromId(gid);
 
-            IScadaModelPointItem pointItem;
+            ScadaModelPointItem pointItem;
 
             if (type == ModelCode.ANALOG)
             {
@@ -472,7 +472,7 @@ namespace SCADA.ModelProviderImplementation.DistributedTransaction
                 throw new ArgumentException(errorMessage);
             }
 
-            IScadaModelPointItem oldPointItem = pointItemResult.Value;
+            ScadaModelPointItem oldPointItem = pointItemResult.Value;
 
             Dictionary<ushort, long> incomingAddressToGidMapDictionary;
             var type = (short)oldPointItem.RegisterType;
@@ -505,7 +505,7 @@ namespace SCADA.ModelProviderImplementation.DistributedTransaction
             Logger.LogDebug(debugMessage);
         }
 
-        private async Task HandleUpdateOperation(IScadaModelPointItem incomingPointItem, long gid)
+        private async Task HandleUpdateOperation(ScadaModelPointItem incomingPointItem, long gid)
         {
             var pointItemResult = await IncomingGidToPointItemMap.TryGetValueAsync(gid);
             if (!pointItemResult.HasValue)
@@ -515,7 +515,7 @@ namespace SCADA.ModelProviderImplementation.DistributedTransaction
                 throw new ArgumentException(errorMessage);
             }
 
-            IScadaModelPointItem oldPointItem = pointItemResult.Value;
+            ScadaModelPointItem oldPointItem = pointItemResult.Value;
 
             var addressToGidMapResult = await IncomingAddressToGidMap.TryGetValueAsync((short)oldPointItem.RegisterType);
             if (!addressToGidMapResult.HasValue)
@@ -559,7 +559,7 @@ namespace SCADA.ModelProviderImplementation.DistributedTransaction
             Logger.LogDebug(debugMessage);
         }
 
-        private async Task HandleInsertOperation(IScadaModelPointItem incomingPointItem, long gid)
+        private async Task HandleInsertOperation(ScadaModelPointItem incomingPointItem, long gid)
         {
             var pointItemResult = await IncomingGidToPointItemMap.TryGetValueAsync(gid);
             if (pointItemResult.HasValue)
@@ -651,7 +651,7 @@ namespace SCADA.ModelProviderImplementation.DistributedTransaction
                     foreach (long gid in analogItemsAddressToGidMap.Values)
                     {
                         var result = await CurrentGidToPointItemMap.TryGetValueAsync(gid);
-                        var analogPointItem = result.Value as IAnalogPointItem;
+                        var analogPointItem = result.Value as AnalogPointItem;
 
                         analogCommandingValues.Add(gid, analogPointItem.CurrentEguValue);
                     }
@@ -676,7 +676,7 @@ namespace SCADA.ModelProviderImplementation.DistributedTransaction
                     foreach (long gid in discreteItemsAddressToGidMap.Values)
                     {
                         var result = await CurrentGidToPointItemMap.TryGetValueAsync(gid);
-                        var discretePointItem = result.Value as IDiscretePointItem;
+                        var discretePointItem = result.Value as DiscretePointItem;
 
                         discreteCommandingValues.Add(gid, discretePointItem.CurrentValue);
                     }

@@ -99,7 +99,7 @@ namespace CE.TopologyProviderService
 
             try
             {
-                InitializeReliableCollections();
+                //InitializeReliableCollections();
                 string debugMessage = $"{baseLogString} RunAsync => ReliableDictionaries initialized.";
                 Logger.LogDebug(debugMessage);
             }
@@ -118,54 +118,26 @@ namespace CE.TopologyProviderService
                 {
                     using (ITransaction tx = this.StateManager.CreateTransaction())
                     {
-                        var result = await StateManager.TryGetAsync<IReliableDictionary<long, TopologyModel>>(ReliableDictionaryNames.TopologyCache);
-                        if(result.HasValue)
-                        {
-                            var topologyCache = result.Value;
-                            await topologyCache.ClearAsync();
-                            await tx.CommitAsync();
-                        }
-                        else
-                        {
-                            await StateManager.GetOrAddAsync<IReliableDictionary<long, TopologyModel>>(tx, ReliableDictionaryNames.TopologyCache);
-                            await tx.CommitAsync();
-                        }
-                    }
+						await StateManager.GetOrAddAsync<IReliableDictionary<long, TopologyModel>>(tx, ReliableDictionaryNames.TopologyCache);
+						await tx.CommitAsync();
+					}
                 }),
+
                 Task.Run(async() =>
                 {
                     using (ITransaction tx = this.StateManager.CreateTransaction())
                     {
-                        var result = await StateManager.TryGetAsync<IReliableDictionary<long, UIModel>>(ReliableDictionaryNames.TopologyCacheUI);
-                        if(result.HasValue)
-                        {
-                            var topologyCacheUI = result.Value;
-                            await topologyCacheUI.ClearAsync();
-                            await tx.CommitAsync();
-                        }
-                        else
-                        {
-                            await StateManager.GetOrAddAsync<IReliableDictionary<long, UIModel>>(tx, ReliableDictionaryNames.TopologyCacheUI);
-                            await tx.CommitAsync();
-                        }
+                        await StateManager.GetOrAddAsync<IReliableDictionary<long, UIModel>>(tx, ReliableDictionaryNames.TopologyCacheUI);
+                        await tx.CommitAsync();
                     }
                 }),
+
                 Task.Run(async() =>
                 {
                     using (ITransaction tx = this.StateManager.CreateTransaction())
                     {
-                        var result = await StateManager.TryGetAsync<IReliableDictionary<long, OutageTopologyModel>>(ReliableDictionaryNames.TopologyCacheOMS);
-                        if(result.HasValue)
-                        {
-                            var topologyCacheOMS = result.Value;
-                            await topologyCacheOMS.ClearAsync();
-                            await tx.CommitAsync();
-                        }
-                        else
-                        {
-                            await StateManager.GetOrAddAsync<IReliableDictionary<long, OutageTopologyModel>>(tx, ReliableDictionaryNames.TopologyCacheOMS);
-                            await tx.CommitAsync();
-                        }
+                        await StateManager.GetOrAddAsync<IReliableDictionary<long, OutageTopologyModel>>(tx, ReliableDictionaryNames.TopologyCacheOMS);
+                        await tx.CommitAsync();
                     }
                 }) 
             };

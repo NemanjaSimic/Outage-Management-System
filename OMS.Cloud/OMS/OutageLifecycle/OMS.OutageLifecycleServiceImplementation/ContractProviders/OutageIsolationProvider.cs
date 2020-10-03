@@ -45,8 +45,6 @@ namespace OMS.OutageLifecycleImplementation.ContractProviders
             get
             {
                 return true;
-                //return isMonitoredHeadBreakerMeasurementsInitialized &&
-                //       isStartedIsolationAlgorithmsInitialized;
             }
         }
 
@@ -121,9 +119,8 @@ namespace OMS.OutageLifecycleImplementation.ContractProviders
             this.isStartedIsolationAlgorithmsInitialized = false;
 
             this.stateManager = stateManager;
-            //this.stateManager.StateManagerChanged += this.OnStateManagerChangedHandler;
-            monitoredHeadBreakerMeasurements = new ReliableDictionaryAccess<long, DiscreteModbusData>(stateManager, ReliableDictionaryNames.MonitoredHeadBreakerMeasurements);
-            startedIsolationAlgorithms = new ReliableDictionaryAccess<long, IsolationAlgorithm>(stateManager, ReliableDictionaryNames.StartedIsolationAlgorithms);
+            this.monitoredHeadBreakerMeasurements = new ReliableDictionaryAccess<long, DiscreteModbusData>(stateManager, ReliableDictionaryNames.MonitoredHeadBreakerMeasurements);
+            this.startedIsolationAlgorithms = new ReliableDictionaryAccess<long, IsolationAlgorithm>(stateManager, ReliableDictionaryNames.StartedIsolationAlgorithms);
         }
 
         #region IOutageIsolationContract

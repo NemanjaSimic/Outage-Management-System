@@ -72,7 +72,6 @@ namespace PubSubImplementation
 
                 if (reliableStateName == ReliableDictionaryNames.RegisteredSubscribersCache)
                 {
-                    //_ = SubscriberCache;
                     registeredSubscribersCache = await ReliableDictionaryAccess<short, HashSet<string>>.Create(stateManager, ReliableDictionaryNames.RegisteredSubscribersCache);
                     isSubscriberCacheInitialized = true;
                 }
@@ -87,8 +86,7 @@ namespace PubSubImplementation
             this.isSubscriberCacheInitialized = false;
 
             this.stateManager = stateManager;
-            //this.stateManager.StateManagerChanged += this.OnStateManagerChangedHandler;
-            registeredSubscribersCache = new ReliableDictionaryAccess<short, HashSet<string>>(stateManager, ReliableDictionaryNames.RegisteredSubscribersCache);
+            this.registeredSubscribersCache = new ReliableDictionaryAccess<short, HashSet<string>>(stateManager, ReliableDictionaryNames.RegisteredSubscribersCache);
         }
 
         #region IRegisterSubscriberContract

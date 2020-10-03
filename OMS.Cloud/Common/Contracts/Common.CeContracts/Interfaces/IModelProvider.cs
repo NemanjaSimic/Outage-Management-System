@@ -7,7 +7,7 @@ namespace Common.CeContracts
     {
         List<long> GetEnergySources();
         Dictionary<long, List<long>> GetConnections();
-        Dictionary<long, ITopologyElement> GetElementModels();
+        Dictionary<long, TopologyElement> GetElementModels();
         void CommitTransaction();
         bool PrepareForTransaction();
         void RollbackTransaction();

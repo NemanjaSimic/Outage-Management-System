@@ -37,9 +37,7 @@ namespace SCADA.FunctionExecutorImplementation.CommandEnqueuers
         {
             get
             {
-                return isReadCommandQueueInitialized &&
-                       isWriteCommandQueueInitialized &&
-                       isModelUpdateCommandQueueInitialized;
+                return true;
             }
         }
 
@@ -129,7 +127,9 @@ namespace SCADA.FunctionExecutorImplementation.CommandEnqueuers
             this.isModelUpdateCommandQueueInitialized = false;
 
             this.stateManager = stateManager;
-            this.stateManager.StateManagerChanged += this.OnStateManagerChangedHandler;
+            this.readCommandQueue = new ReliableQueueAccess<ModbusFunction>(stateManager, ReliableQueueNames.ReadCommandQueue);
+            this.writeCommandQueue = new ReliableQueueAccess<ModbusFunction>(stateManager, ReliableQueueNames.WriteCommandQueue);
+            this.modelUpdateCommandQueue = new ReliableQueueAccess<ModbusFunction>(stateManager, ReliableQueueNames.ModelUpdateCommandQueue);
         }
 
         #region Command Enqueuers

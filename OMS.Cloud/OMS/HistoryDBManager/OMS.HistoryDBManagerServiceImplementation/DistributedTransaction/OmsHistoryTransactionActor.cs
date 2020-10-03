@@ -43,9 +43,7 @@ namespace OMS.HistoryDBManagerImplementation.DistributedTransaction
         {
             get
             {
-                return isOpenedSwitchesInitialized &&
-                       isUnenergizedConsumersInitialized &&
-                       isHistoryModelChangesInitialized;
+                return true;
             }
         }
 
@@ -117,8 +115,10 @@ namespace OMS.HistoryDBManagerImplementation.DistributedTransaction
             this.isHistoryModelChangesInitialized = false;
 
             this.stateManager = stateManager;
-            this.stateManager.StateManagerChanged += this.OnStateManagerChangedHandler;
-        
+            OpenedSwitches = new ReliableDictionaryAccess<long, long>(stateManager, ReliableDictionaryNames.OpenedSwitches);
+            UnenergizedConsumers = new ReliableDictionaryAccess<long, long>(stateManager, ReliableDictionaryNames.UnenergizedConsumers);
+            HistoryModelChanges = new ReliableDictionaryAccess<byte, List<long>>(stateManager, ReliableDictionaryNames.HistoryModelChanges);
+
             this.modelResourcesDesc = new ModelResourcesDesc();
         }
 

@@ -32,10 +32,6 @@ namespace SCADA.ModelProviderImplementation.ContractProviders
             get 
             {
                 return true;
-                //return isGidToPointItemMapInitialized && 
-                //       isAddressToGidMapInitialized && 
-                //       isCommandDescriptionCacheInitialized && 
-                //       isInfoCacheInitialized;
             }
         }
 
@@ -45,8 +41,8 @@ namespace SCADA.ModelProviderImplementation.ContractProviders
             get { return logger ?? (logger = CloudLoggerFactory.GetLogger()); }
         }
 
-        private ReliableDictionaryAccess<long, IScadaModelPointItem> gidToPointItemMap;
-        private ReliableDictionaryAccess<long, IScadaModelPointItem> GidToPointItemMap
+        private ReliableDictionaryAccess<long, ScadaModelPointItem> gidToPointItemMap;
+        private ReliableDictionaryAccess<long, ScadaModelPointItem> GidToPointItemMap
         {
             get { return gidToPointItemMap; }
         }
@@ -98,7 +94,7 @@ namespace SCADA.ModelProviderImplementation.ContractProviders
 
                 if (reliableStateName == ReliableDictionaryNames.GidToPointItemMap)
                 {
-                    gidToPointItemMap = await ReliableDictionaryAccess<long, IScadaModelPointItem>.Create(stateManager, ReliableDictionaryNames.GidToPointItemMap);
+                    gidToPointItemMap = await ReliableDictionaryAccess<long, ScadaModelPointItem>.Create(stateManager, ReliableDictionaryNames.GidToPointItemMap);
                     isGidToPointItemMapInitialized = true;
 
                     string debugMessage = $"{baseLogString} OnStateManagerChangedHandler => '{ReliableDictionaryNames.GidToPointItemMap}' ReliableDictionaryAccess initialized.";
@@ -142,12 +138,10 @@ namespace SCADA.ModelProviderImplementation.ContractProviders
             this.isInfoCacheInitialized = false;
 
             this.stateManager = stateManager;
-            gidToPointItemMap = new ReliableDictionaryAccess<long, IScadaModelPointItem>(stateManager, ReliableDictionaryNames.GidToPointItemMap);
-            addressToGidMap = new ReliableDictionaryAccess<short, Dictionary<ushort, long>>(stateManager, ReliableDictionaryNames.AddressToGidMap);
-            commandDescriptionCache = new ReliableDictionaryAccess<long, CommandDescription>(stateManager, ReliableDictionaryNames.CommandDescriptionCache);
-            infoCache = new ReliableDictionaryAccess<string, bool>(stateManager, ReliableDictionaryNames.InfoCache);
-
-            //this.stateManager.StateManagerChanged += this.OnStateManagerChangedHandler;
+            this.gidToPointItemMap = new ReliableDictionaryAccess<long, ScadaModelPointItem>(stateManager, ReliableDictionaryNames.GidToPointItemMap);
+            this.addressToGidMap = new ReliableDictionaryAccess<short, Dictionary<ushort, long>>(stateManager, ReliableDictionaryNames.AddressToGidMap);
+            this.commandDescriptionCache = new ReliableDictionaryAccess<long, CommandDescription>(stateManager, ReliableDictionaryNames.CommandDescriptionCache);
+            this.infoCache = new ReliableDictionaryAccess<string, bool>(stateManager, ReliableDictionaryNames.InfoCache);
         }
 
         #region IScadaModelReadAccessContract
@@ -195,7 +189,7 @@ namespace SCADA.ModelProviderImplementation.ContractProviders
             return config;
         }
 
-        public async Task<Dictionary<long, IScadaModelPointItem>> GetGidToPointItemMap()
+        public async Task<Dictionary<long, ScadaModelPointItem>> GetGidToPointItemMap()
         {
             string verboseMessage = $"{baseLogString} entering GetGidToPointItemMap method.";
             Logger.LogVerbose(verboseMessage);
@@ -216,7 +210,7 @@ namespace SCADA.ModelProviderImplementation.ContractProviders
             return copy;
         }
 
-        public async Task<Dictionary<short, Dictionary<ushort, IScadaModelPointItem>>> GetAddressToPointItemMap()
+        public async Task<Dictionary<short, Dictionary<ushort, ScadaModelPointItem>>> GetAddressToPointItemMap()
         {
             string verboseMessage = $"{baseLogString} entering GetAddressToPointItemMap method.";
             Logger.LogVerbose(verboseMessage);
@@ -226,9 +220,9 @@ namespace SCADA.ModelProviderImplementation.ContractProviders
                 await Task.Delay(1000);
             }
 
-            Dictionary<long, IScadaModelPointItem> gidToPointItemMap = await GetGidToPointItemMap();
+            Dictionary<long, ScadaModelPointItem> gidToPointItemMap = await GetGidToPointItemMap();
             Dictionary<short, Dictionary<ushort, long>> addressToGidMap = await GetAddressToGidMap();
-            Dictionary<short, Dictionary<ushort, IScadaModelPointItem>> addressToPointItemMap = new Dictionary<short, Dictionary<ushort, IScadaModelPointItem>>(addressToGidMap.Count);
+            Dictionary<short, Dictionary<ushort, ScadaModelPointItem>> addressToPointItemMap = new Dictionary<short, Dictionary<ushort, ScadaModelPointItem>>(addressToGidMap.Count);
 
             foreach (short key in addressToGidMap.Keys)
             {

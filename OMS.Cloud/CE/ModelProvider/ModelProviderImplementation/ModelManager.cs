@@ -94,14 +94,7 @@ namespace CE.ModelProviderImplementation
 		{
 			get
 			{
-				return	isEnergySourcesInitialized &&
-						isReclosersInitialized &&
-						isMeasurementsInitialized &&
-						isTopologyElementsInitialized &&
-						isBaseVoltagesInitialized &&
-						isElementConnectionsInitialized &&
-						isMeasurementToConnectedTerminalMapInitialized &&
-						isTerminalToConnectedElementsMapInitialized;
+				return true;
 			}
 		}
 
@@ -123,8 +116,8 @@ namespace CE.ModelProviderImplementation
 			get { return measurements; }
 		}
 
-		private ReliableDictionaryAccess<long, ITopologyElement> topologyElements;
-		private ReliableDictionaryAccess<long, ITopologyElement> TopologyElements
+		private ReliableDictionaryAccess<long, TopologyElement> topologyElements;
+		private ReliableDictionaryAccess<long, TopologyElement> TopologyElements
 		{
 			get { return topologyElements; }
 		}
@@ -206,7 +199,7 @@ namespace CE.ModelProviderImplementation
 				}
 				else if (reliableStateName == ReliableDictionaryNames.TopologyElements)
 				{
-					this.topologyElements = await ReliableDictionaryAccess<long, ITopologyElement>.Create(stateManager, ReliableDictionaryNames.TopologyElements);
+					this.topologyElements = await ReliableDictionaryAccess<long, TopologyElement>.Create(stateManager, ReliableDictionaryNames.TopologyElements);
 					this.isTopologyElementsInitialized = true;
 
 					string debugMessage = $"{baseLogString} OnStateManagerChangedHandler => '{ReliableDictionaryNames.TopologyElements}' ReliableDictionaryAccess initialized.";
@@ -267,11 +260,18 @@ namespace CE.ModelProviderImplementation
 			this.isTerminalToConnectedElementsMapInitialized = false;
 
 			this.stateManager = stateManager;
-			this.stateManager.StateManagerChanged += this.OnStateManagerChangedHandler;
+			this.energySources = new ReliableDictionaryAccess<string, List<long>>(stateManager, ReliableDictionaryNames.EnergySources);
+			this.reclosers = new ReliableDictionaryAccess<string, HashSet<long>>(stateManager, ReliableDictionaryNames.Reclosers);
+			this.measurements = new ReliableDictionaryAccess<long, IMeasurement>(stateManager, ReliableDictionaryNames.Measurements);
+			this.topologyElements = new ReliableDictionaryAccess<long, TopologyElement>(stateManager, ReliableDictionaryNames.TopologyElements);
+			this.baseVoltages = new ReliableDictionaryAccess<long, float>(stateManager, ReliableDictionaryNames.BaseVoltages);
+			this.elementConnections = new ReliableDictionaryAccess<long, List<long>>(stateManager, ReliableDictionaryNames.ElementConnections);
+			this.measurementToConnectedTerminalMap = new ReliableDictionaryAccess<long, long>(stateManager, ReliableDictionaryNames.MeasurementToConnectedTerminalMap);
+			this.terminalToConnectedElementsMap = new ReliableDictionaryAccess<long, List<long>>(stateManager, ReliableDictionaryNames.TerminalToConnectedElementsMap);
 		}
 
 		#region Functions
-		public async Task<IModelDelta> TryGetAllModelEntitiesAsync()
+		public async Task<ModelDelta> TryGetAllModelEntitiesAsync()
 		{
 			string verboseMessage = $"{baseLogString} entering TryGetAllModelEntities method.";
 			Logger.LogVerbose(verboseMessage);
@@ -369,12 +369,12 @@ namespace CE.ModelProviderImplementation
 				}
 
 				var enumerableTopologyElements = await TopologyElements.GetEnumerableDictionaryAsync();
-				List<ITopologyElement> updatedElements = new List<ITopologyElement>(enumerableTopologyElements.Count);
+				List<TopologyElement> updatedElements = new List<TopologyElement>(enumerableTopologyElements.Count);
 				foreach (var element in enumerableTopologyElements.Values)
 				{
 					if (element.Measurements.Count == 0)
 					{
-						ITopologyElement updatedElement = await CreateNoScadaMeasurementAsync(element);
+						TopologyElement updatedElement = await CreateNoScadaMeasurementAsync(element);
 						updatedElements.Add(updatedElement);
 					}
 				}
@@ -458,7 +458,7 @@ namespace CE.ModelProviderImplementation
 							&& GetDMSTypeOfTopologyElement(e) != DMSType.ANALOG);
 
 						var enumerableTopologyElements = await TopologyElements.GetEnumerableDictionaryAsync();
-						if (enumerableTopologyElements.TryGetValue(elementId, out ITopologyElement element))
+						if (enumerableTopologyElements.TryGetValue(elementId, out TopologyElement element))
 						{
 							if(!element.Measurements.ContainsKey(measurement.Id))
                             {
@@ -538,7 +538,7 @@ namespace CE.ModelProviderImplementation
 			}
 			else if (dmsType != DMSType.MASK_TYPE && dmsType != DMSType.BASEVOLTAGE)
 			{
-				ITopologyElement newElement = await GetPopulatedElement(modelEntity);
+				TopologyElement newElement = await GetPopulatedElement(modelEntity);
 
 				//lock (syncObj)
 				//{
@@ -631,12 +631,12 @@ namespace CE.ModelProviderImplementation
 
 			return properties;
 		}
-		private async Task<ITopologyElement> GetPopulatedElement(ResourceDescription rs)
+		private async Task<TopologyElement> GetPopulatedElement(ResourceDescription rs)
 		{
 			string verboseMessage = $"{baseLogString} entering GetPopulatedElement method.";
 			Logger.LogVerbose(verboseMessage);
 
-			ITopologyElement topologyElement = new TopologyElement(rs.Id);
+			TopologyElement topologyElement = new TopologyElement(rs.Id);
 			try
 			{
 				DMSType type = GetDMSTypeOfTopologyElement(rs.Id);
@@ -858,7 +858,7 @@ namespace CE.ModelProviderImplementation
 			};
 			return discreteMeasurement;
 		}
-		private async Task<ITopologyElement> CreateNoScadaMeasurementAsync(ITopologyElement element)
+		private async Task<TopologyElement> CreateNoScadaMeasurementAsync(TopologyElement element)
 		{
 			string verboseMessage = $"{baseLogString} entering CreateNoScadaMeasurement method.";
 			Logger.LogVerbose(verboseMessage);

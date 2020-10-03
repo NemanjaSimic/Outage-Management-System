@@ -36,15 +36,13 @@ namespace SCADA.ModelProviderImplementation.ContractProviders
         private bool ReliableDictionariesInitialized
         {
             get 
-            { 
-                return isGidToPointItemMapInitialized && 
-                       isCommandDescriptionCacheInitialized && 
-                       isInfoCacheInitialized;
+            {
+                return true;
             }
         }
 
-        private ReliableDictionaryAccess<long, IScadaModelPointItem> gidToPointItemMap;
-        private ReliableDictionaryAccess<long, IScadaModelPointItem> GidToPointItemMap
+        private ReliableDictionaryAccess<long, ScadaModelPointItem> gidToPointItemMap;
+        private ReliableDictionaryAccess<long, ScadaModelPointItem> GidToPointItemMap
         {
             get { return gidToPointItemMap; }
         }
@@ -90,7 +88,7 @@ namespace SCADA.ModelProviderImplementation.ContractProviders
 
                 if (reliableStateName == ReliableDictionaryNames.GidToPointItemMap)
                 {
-                    gidToPointItemMap = await ReliableDictionaryAccess<long, IScadaModelPointItem>.Create(stateManager, ReliableDictionaryNames.GidToPointItemMap);
+                    gidToPointItemMap = await ReliableDictionaryAccess<long, ScadaModelPointItem>.Create(stateManager, ReliableDictionaryNames.GidToPointItemMap);
                     this.isGidToPointItemMapInitialized = true;
 
                     string debugMessage = $"{baseLogString} OnStateManagerChangedHandler => '{ReliableDictionaryNames.GidToPointItemMap}' ReliableDictionaryAccess initialized.";
@@ -125,7 +123,9 @@ namespace SCADA.ModelProviderImplementation.ContractProviders
             this.isInfoCacheInitialized = false;
 
             this.stateManager = stateManager;
-            this.stateManager.StateManagerChanged += this.OnStateManagerChangedHandler;
+            this.gidToPointItemMap = new ReliableDictionaryAccess<long, ScadaModelPointItem>(stateManager, ReliableDictionaryNames.GidToPointItemMap);
+            this.commandDescriptionCache = new ReliableDictionaryAccess<long, CommandDescription>(stateManager, ReliableDictionaryNames.CommandDescriptionCache);
+            this.infoCache = new ReliableDictionaryAccess<string, bool>(stateManager, ReliableDictionaryNames.InfoCache);
         }
         
         
@@ -182,7 +182,7 @@ namespace SCADA.ModelProviderImplementation.ContractProviders
             {
                 CommandOriginType commandOrigin = CommandOriginType.UNKNOWN_ORIGIN;
 
-                if (enumerableGidToPointItemMap[gid] is IAnalogPointItem analogPointItem)
+                if (enumerableGidToPointItemMap[gid] is AnalogPointItem analogPointItem)
                 {
                     var result = await CommandDescriptionCache.TryGetValueAsync(gid);
 
@@ -194,7 +194,7 @@ namespace SCADA.ModelProviderImplementation.ContractProviders
                     AnalogModbusData analogValue = new AnalogModbusData(analogPointItem.CurrentEguValue, analogPointItem.Alarm, gid, commandOrigin);
                     analogModbusData.Add(gid, analogValue);
                 }
-                else if (enumerableGidToPointItemMap[gid] is IDiscretePointItem discretePointItem)
+                else if (enumerableGidToPointItemMap[gid] is DiscretePointItem discretePointItem)
                 {
                     var result = await CommandDescriptionCache.TryGetValueAsync(gid);
 
@@ -252,7 +252,7 @@ namespace SCADA.ModelProviderImplementation.ContractProviders
             {
                 CommandOriginType commandOrigin = CommandOriginType.UNKNOWN_ORIGIN;
 
-                if (topic == Topic.MEASUREMENT && enumerableGidToPointItemMap[gid] is IAnalogPointItem analogPointItem)
+                if (topic == Topic.MEASUREMENT && enumerableGidToPointItemMap[gid] is AnalogPointItem analogPointItem)
                 {
                     var result = await CommandDescriptionCache.TryGetValueAsync(gid);
 
@@ -264,7 +264,7 @@ namespace SCADA.ModelProviderImplementation.ContractProviders
                     AnalogModbusData analogValue = new AnalogModbusData(analogPointItem.CurrentEguValue, analogPointItem.Alarm, gid, commandOrigin);
                     analogModbusData.Add(gid, analogValue);
                 }
-                else if (topic == Topic.SWITCH_STATUS && enumerableGidToPointItemMap[gid] is IDiscretePointItem discretePointItem)
+                else if (topic == Topic.SWITCH_STATUS && enumerableGidToPointItemMap[gid] is DiscretePointItem discretePointItem)
                 {
                     var result = await CommandDescriptionCache.TryGetValueAsync(gid);
 

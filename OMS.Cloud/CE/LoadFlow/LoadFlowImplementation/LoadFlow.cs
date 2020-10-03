@@ -23,8 +23,8 @@ namespace CE.LoadFlowImplementation
         private readonly string baseLogString;
 
         private HashSet<long> reclosers;
-        private Dictionary<long, ITopologyElement> feeders;
-        private Dictionary<long, ITopologyElement> syncMachines;
+        private Dictionary<long, TopologyElement> feeders;
+        private Dictionary<long, TopologyElement> syncMachines;
         private Dictionary<DailyCurveType, DailyCurve> dailyCurves;
         #endregion
 
@@ -55,8 +55,8 @@ namespace CE.LoadFlowImplementation
             try
             {
                 Dictionary<long, float> loadOfFeeders = new Dictionary<long, float>();
-                feeders = new Dictionary<long, ITopologyElement>();
-                syncMachines = new Dictionary<long, ITopologyElement>();
+                feeders = new Dictionary<long, TopologyElement>();
+                syncMachines = new Dictionary<long, TopologyElement>();
                 dailyCurves = DailyCurveReader.ReadDailyCurves();
 
                 Logger.LogDebug($"{baseLogString} UpdateLoadFlow => Getting reclosers from model provider.");
@@ -87,7 +87,7 @@ namespace CE.LoadFlowImplementation
 
                 foreach (var loadFeeder in loadOfFeeders)
                 {
-                    if (feeders.TryGetValue(loadFeeder.Key, out ITopologyElement feeder))
+                    if (feeders.TryGetValue(loadFeeder.Key, out TopologyElement feeder))
                     {
                         long signalGid = 0;
                         foreach (var measurement in feeder.Measurements)
@@ -133,7 +133,7 @@ namespace CE.LoadFlowImplementation
 		#endregion
 
 		#region Private Methods
-		private async Task SyncMachine(ITopologyElement element, Dictionary<long, float> loadOfFeeders)
+		private async Task SyncMachine(TopologyElement element, Dictionary<long, float> loadOfFeeders)
         {
             string verboseMessage = $"{baseLogString} SyncMachine method called. Element with GID {element?.Id:X16}";
             Logger.LogVerbose(verboseMessage);
@@ -249,11 +249,11 @@ namespace CE.LoadFlowImplementation
                 throw new Exception(message);
             }
 
-            if (topology.GetElementByGid(topology.FirstNode, out ITopologyElement firsElement))
+            if (topology.GetElementByGid(topology.FirstNode, out TopologyElement firsElement))
             {
-                Stack<ITopologyElement> stack = new Stack<ITopologyElement>();
+                Stack<TopologyElement> stack = new Stack<TopologyElement>();
                 stack.Push(firsElement);
-                ITopologyElement nextElement;
+                TopologyElement nextElement;
                 long currentFider = 0;
 
                 while (stack.Count > 0)
@@ -314,7 +314,7 @@ namespace CE.LoadFlowImplementation
 
             Logger.LogVerbose($"{baseLogString} CalculateLoadFlowFirst => Calulate load flow finished.");
         }
-        private async Task<Tuple<bool, float>> IsElementEnergized(ITopologyElement element)
+        private async Task<Tuple<bool, float>> IsElementEnergized(TopologyElement element)
         {
             string verboseMessage = $"{baseLogString} IsElementEnergized method called => Element: {element?.Id:X16}.";
             Logger.LogVerbose(verboseMessage);
@@ -392,14 +392,14 @@ namespace CE.LoadFlowImplementation
 
             return new Tuple<bool, float>(element.IsActive, load);
         }
-        private async Task DeEnergizeElementsUnder(ITopologyElement element)
+        private async Task DeEnergizeElementsUnder(TopologyElement element)
         {
             string verboseMessage = $"{baseLogString} DeEnergizeElementsUnder method called => Element: {element?.Id:X16}.";
             Logger.LogVerbose(verboseMessage);
 
-            Stack<ITopologyElement> stack = new Stack<ITopologyElement>();
+            Stack<TopologyElement> stack = new Stack<TopologyElement>();
             stack.Push(element);
-            ITopologyElement nextElement;
+            TopologyElement nextElement;
 
             while (stack.Count > 0)
             {
@@ -441,13 +441,13 @@ namespace CE.LoadFlowImplementation
 
             foreach (var recloserGid in reclosers)
             {
-                if (topology.GetElementByGid(recloserGid, out ITopologyElement recloser))
+                if (topology.GetElementByGid(recloserGid, out TopologyElement recloser))
                 {
                     await CalculateLoadFlowFromRecloser(recloser, topology, loadOfFeeders);
                 }
             }
         }
-        private async Task<TopologyModel> CalculateLoadFlowFromRecloser(ITopologyElement recloser, TopologyModel topology, Dictionary<long, float> loadOfFeeders)
+        private async Task<TopologyModel> CalculateLoadFlowFromRecloser(TopologyElement recloser, TopologyModel topology, Dictionary<long, float> loadOfFeeders)
         {
             string verboseMessage = $"{baseLogString} CalculateLoadFlowFromRecloser method called. Element with GID {recloser?.Id:X16}.";
             Logger.LogVerbose(verboseMessage);
@@ -528,7 +528,7 @@ namespace CE.LoadFlowImplementation
             }
             return topology;
         }
-        private async Task CalculateLoadFlowUpsideDown(ITopologyElement element, long sourceElementGid, ITopologyElement feeder, Dictionary<long, float> loadOfFeeders)
+        private async Task CalculateLoadFlowUpsideDown(TopologyElement element, long sourceElementGid, TopologyElement feeder, Dictionary<long, float> loadOfFeeders)
         {
             string verboseMessage = $"{baseLogString} CalculateLoadFlowUpsideDown method called. Element with GID {element?.Id:X16}, Source GID {sourceElementGid}.";
             Logger.LogVerbose(verboseMessage);
@@ -547,11 +547,11 @@ namespace CE.LoadFlowImplementation
                 throw new Exception(message);
             }
 
-            Stack<Tuple<ITopologyElement, long>> stack = new Stack<Tuple<ITopologyElement, long>>();
-            stack.Push(new Tuple<ITopologyElement, long>(element, sourceElementGid));
+            Stack<Tuple<TopologyElement, long>> stack = new Stack<Tuple<TopologyElement, long>>();
+            stack.Push(new Tuple<TopologyElement, long>(element, sourceElementGid));
             
-            Tuple<ITopologyElement, long> tuple;
-            ITopologyElement nextElement;
+            Tuple<TopologyElement, long> tuple;
+            TopologyElement nextElement;
             long sourceGid;
 
             while (stack.Count > 0)
@@ -569,14 +569,14 @@ namespace CE.LoadFlowImplementation
                     if (!nextElement.DmsType.Equals(DMSType.ENERGYCONSUMER.ToString())
                     && nextElement.FirstEnd.Id != sourceGid)
                     {
-                        stack.Push(new Tuple<ITopologyElement, long>(nextElement.FirstEnd, nextElement.Id));
+                        stack.Push(new Tuple<TopologyElement, long>(nextElement.FirstEnd, nextElement.Id));
                     }
 
                     foreach (var child in nextElement.SecondEnd)
                     {
                         if (child.Id != sourceGid)
                         {
-                            stack.Push(new Tuple<ITopologyElement, long>(child, nextElement.Id));
+                            stack.Push(new Tuple<TopologyElement, long>(child, nextElement.Id));
                         }
                     }
 
@@ -604,14 +604,14 @@ namespace CE.LoadFlowImplementation
                         {
                             if (child.Id != sourceGid)
                             {
-                                stack.Push(new Tuple<ITopologyElement, long>(child, nextElement.Id));
+                                stack.Push(new Tuple<TopologyElement, long>(child, nextElement.Id));
                             }
                         }
                     }
                 }
             }
         }
-        private async Task CommandToRecloser(long measurementGid, int value, CommandOriginType originType, ITopologyElement recloser)
+        private async Task CommandToRecloser(long measurementGid, int value, CommandOriginType originType, TopologyElement recloser)
         {
             string verboseMessage = $"{baseLogString} CommandToRecloser method called.";
             Logger.LogVerbose(verboseMessage);

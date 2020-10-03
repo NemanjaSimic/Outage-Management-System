@@ -9,10 +9,10 @@ namespace Common.CeContracts
 	{
 		private static long fieldNumber = 5000;
 		[DataMember]
-		public List<ITopologyElement> Members { get; set; }
-		public Field(ITopologyElement firstElement) : base(++fieldNumber)
+		public List<TopologyElement> Members { get; set; }
+		public Field(TopologyElement firstElement) : base(++fieldNumber)
 		{
-			Members = new List<ITopologyElement>() { firstElement};
+			Members = new List<TopologyElement>() { firstElement};
 			Mrid = $"F_{fieldNumber}";
 			Name = $"F_{fieldNumber}";
 		}

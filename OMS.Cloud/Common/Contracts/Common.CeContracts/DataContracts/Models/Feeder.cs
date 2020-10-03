@@ -6,7 +6,7 @@ namespace Common.CeContracts
     [DataContract]
     public class Feeder : TopologyElement
 	{
-		public Feeder(ITopologyElement element) : base(element.Id)
+		public Feeder(TopologyElement element) : base(element.Id)
 		{
             Id = element.Id;
             Description = element.Description;

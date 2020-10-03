@@ -30,7 +30,10 @@ namespace SCADA.ModelProviderImplementation.DistributedTransaction
         private bool isModelChangesInitialized;
         private bool ReliableDictionariesInitialized
         {
-            get { return isModelChangesInitialized; }
+            get 
+            {
+                return true;
+            }
         }
 
         private ReliableDictionaryAccess<byte, List<long>> ModelChanges { get; set; }
@@ -81,7 +84,7 @@ namespace SCADA.ModelProviderImplementation.DistributedTransaction
             this.isModelChangesInitialized = false;
 
             this.stateManager = stateManager;
-            this.stateManager.StateManagerChanged += this.OnStateManagerChangedHandler;
+            ModelChanges = new ReliableDictionaryAccess<byte, List<long>>(stateManager, ReliableDictionaryNames.ModelChanges);
         }
 
         #region IModelUpdateNotificationContract

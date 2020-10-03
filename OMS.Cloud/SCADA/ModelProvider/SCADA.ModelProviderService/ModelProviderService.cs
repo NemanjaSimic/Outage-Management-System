@@ -139,7 +139,7 @@ namespace SCADA.ModelProviderService
 
             try
             {
-                InitializeReliableCollections();
+                //InitializeReliableCollections();
                 string debugMessage = $"{baseLogString} RunAsync => ReliableDictionaries initialized.";
                 Logger.LogDebug(debugMessage);
             }
@@ -158,7 +158,7 @@ namespace SCADA.ModelProviderService
                 {
                     using (ITransaction tx = this.StateManager.CreateTransaction())
                     {
-                        await StateManager.GetOrAddAsync<IReliableDictionary<long, IScadaModelPointItem>>(tx, ReliableDictionaryNames.GidToPointItemMap);
+                        await StateManager.GetOrAddAsync<IReliableDictionary<long, ScadaModelPointItem>>(tx, ReliableDictionaryNames.GidToPointItemMap);
                         await tx.CommitAsync();
                     }
                 }),
@@ -167,7 +167,7 @@ namespace SCADA.ModelProviderService
                 {
                     using (ITransaction tx = this.StateManager.CreateTransaction())
                     {
-                        await StateManager.GetOrAddAsync<IReliableDictionary<long, IScadaModelPointItem>>(tx, ReliableDictionaryNames.IncomingGidToPointItemMap);
+                        await StateManager.GetOrAddAsync<IReliableDictionary<long, ScadaModelPointItem>>(tx, ReliableDictionaryNames.IncomingGidToPointItemMap);
                         await tx.CommitAsync();
                     }
                 }),

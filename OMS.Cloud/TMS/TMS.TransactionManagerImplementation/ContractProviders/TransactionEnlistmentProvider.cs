@@ -24,9 +24,8 @@ namespace TMS.TransactionManagerImplementation.ContractProviders
         private bool ReliableDictionariesInitialized
         {
             get 
-            { 
-                return isActiveTransactionsInitialized &&
-                       isTransactionEnlistmentLedgerInitialized;
+            {
+                return true;
             }
         }
 
@@ -113,7 +112,8 @@ namespace TMS.TransactionManagerImplementation.ContractProviders
             this.isTransactionEnlistmentLedgerInitialized = false;
 
             this.stateManager = stateManager;
-            stateManager.StateManagerChanged += this.OnStateManagerChangedHandler;
+            this.activeTransactions = new ReliableDictionaryAccess<string, HashSet<string>>(stateManager, ReliableDictionaryNames.ActiveTransactions);
+            this.transactionEnlistmentLedger = new ReliableDictionaryAccess<string, HashSet<string>>(stateManager, ReliableDictionaryNames.TransactionEnlistmentLedger);
         }
 
         #region ITransactionEnlistmentContract

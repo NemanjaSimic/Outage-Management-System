@@ -97,8 +97,7 @@ namespace OMS.OutageLifecycleImplementation.ContractProviders
             this.isOutageTopologyModelInitialized = false;
 
             this.stateManager = stateManager;
-            //this.stateManager.StateManagerChanged += this.OnStateManagerChangedHandler;
-            outageTopologyModel = new ReliableDictionaryAccess<string, OutageTopologyModel>(stateManager, ReliableDictionaryNames.OutageTopologyModel);
+            this.outageTopologyModel = new ReliableDictionaryAccess<string, OutageTopologyModel>(stateManager, ReliableDictionaryNames.OutageTopologyModel);
         }
 
         #region IOutageResolutionContract

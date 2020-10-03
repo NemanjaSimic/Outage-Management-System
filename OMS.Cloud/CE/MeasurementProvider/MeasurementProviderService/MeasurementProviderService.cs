@@ -119,7 +119,7 @@ namespace CE.MeasurementProviderService
 
 			try
 			{
-				InitializeReliableCollections();
+				//InitializeReliableCollections();
 				string debugMessage = $"{baseLogString} RunAsync => ReliableDictionaries initialized.";
 				Logger.LogDebug(debugMessage);
 
@@ -142,72 +142,32 @@ namespace CE.MeasurementProviderService
 				{
 					using (ITransaction tx = this.StateManager.CreateTransaction())
 					{
-						var result = await StateManager.TryGetAsync<IReliableDictionary<short, Dictionary<long, AnalogMeasurement>>>(ReliableDictionaryNames.AnalogMeasurementsCache);
-						if(result.HasValue)
-						{
-							var topologyCache = result.Value;
-							await topologyCache.ClearAsync();
-							await tx.CommitAsync();
-						}
-						else
-						{
-							await StateManager.GetOrAddAsync<IReliableDictionary<short, Dictionary<long, AnalogMeasurement>>>(tx, ReliableDictionaryNames.AnalogMeasurementsCache);
-							await tx.CommitAsync();
-						}
+						await StateManager.GetOrAddAsync<IReliableDictionary<short, Dictionary<long, AnalogMeasurement>>>(tx, ReliableDictionaryNames.AnalogMeasurementsCache);
+						await tx.CommitAsync();
 					}
 				}),
 				Task.Run(async() =>
 				{
 					using (ITransaction tx = this.StateManager.CreateTransaction())
 					{
-						var result = await StateManager.TryGetAsync<IReliableDictionary<short, Dictionary<long, DiscreteMeasurement>>>(ReliableDictionaryNames.DiscreteMeasurementsCache);
-						if(result.HasValue)
-						{
-							var topologyCacheUI = result.Value;
-							await topologyCacheUI.ClearAsync();
-							await tx.CommitAsync();
-						}
-						else
-						{
-							await StateManager.GetOrAddAsync<IReliableDictionary<short, Dictionary<long, DiscreteMeasurement>>>(tx, ReliableDictionaryNames.DiscreteMeasurementsCache);
-							await tx.CommitAsync();
-						}
+						await StateManager.GetOrAddAsync<IReliableDictionary<short, Dictionary<long, DiscreteMeasurement>>>(tx, ReliableDictionaryNames.DiscreteMeasurementsCache);
+						await tx.CommitAsync();
 					}
 				}),
 				Task.Run(async() =>
 				{
 					using (ITransaction tx = this.StateManager.CreateTransaction())
 					{
-						var result = await StateManager.TryGetAsync<IReliableDictionary<short, Dictionary<long, List<long>>>>(ReliableDictionaryNames.ElementsToMeasurementMapCache);
-						if(result.HasValue)
-						{
-							var topologyCacheOMS = result.Value;
-							await topologyCacheOMS.ClearAsync();
-							await tx.CommitAsync();
-						}
-						else
-						{
-							await StateManager.GetOrAddAsync<IReliableDictionary<short, Dictionary<long, List<long>>>>(tx, ReliableDictionaryNames.ElementsToMeasurementMapCache);
-							await tx.CommitAsync();
-						}
+						await StateManager.GetOrAddAsync<IReliableDictionary<short, Dictionary<long, List<long>>>>(tx, ReliableDictionaryNames.ElementsToMeasurementMapCache);
+						await tx.CommitAsync();
 					}
 				}),
 				Task.Run(async() =>
 				{
 					using (ITransaction tx = this.StateManager.CreateTransaction())
 					{
-						var result = await StateManager.TryGetAsync<IReliableDictionary<short, Dictionary<long, long>>>(ReliableDictionaryNames.MeasurementsToElementMapCache);
-						if(result.HasValue)
-						{
-							var topologyCacheOMS = result.Value;
-							await topologyCacheOMS.ClearAsync();
-							await tx.CommitAsync();
-						}
-						else
-						{
-							await StateManager.GetOrAddAsync<IReliableDictionary<short, Dictionary<long, long>>>(tx, ReliableDictionaryNames.MeasurementsToElementMapCache);
-							await tx.CommitAsync();
-						}
+						await StateManager.GetOrAddAsync<IReliableDictionary<short, Dictionary<long, long>>>(tx, ReliableDictionaryNames.MeasurementsToElementMapCache);
+						await tx.CommitAsync();
 					}
 				})
 			};

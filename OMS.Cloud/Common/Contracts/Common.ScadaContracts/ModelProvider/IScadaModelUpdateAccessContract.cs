@@ -22,7 +22,7 @@ namespace OMS.Common.ScadaContracts.ModelProvider
         [ServiceKnownType(typeof(AnalogPointItem))]
         [ServiceKnownType(typeof(DiscretePointItem))]
         [ServiceKnownType(typeof(AlarmConfigData))]
-        Task<IScadaModelPointItem> UpdatePointItemRawValue(long gid, int rawValue);
+        Task<ScadaModelPointItem> UpdatePointItemRawValue(long gid, int rawValue);
 
         [OperationContract]
         Task AddOrUpdateCommandDescription(long gid, CommandDescription commandDescription);

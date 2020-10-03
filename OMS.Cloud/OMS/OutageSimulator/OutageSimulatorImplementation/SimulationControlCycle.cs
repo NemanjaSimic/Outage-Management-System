@@ -40,9 +40,6 @@ namespace OMS.OutageSimulatorImplementation
             get
             {
                 return true;
-                //return isSimulatedOutagesInitialized &&
-                //       isMonitoredIsolationPointsInitialized &&
-                //       isCommandedValuesInitialized;
             }
         }
 
@@ -133,12 +130,12 @@ namespace OMS.OutageSimulatorImplementation
 
             this.isSimulatedOutagesInitialized = false;
             this.isMonitoredIsolationPointsInitialized = false;
+            this.isCommandedValuesInitialized = false;
 
             this.stateManager = stateManager;
-            //this.stateManager.StateManagerChanged += this.OnStateManagerChangedHandler;
-            simulatedOutages = new ReliableDictionaryAccess<long, SimulatedOutage>(stateManager, ReliableDictionaryNames.SimulatedOutages);
-            monitoredIsolationPoints = new ReliableDictionaryAccess<long, MonitoredIsolationPoint>(stateManager, ReliableDictionaryNames.MonitoredIsolationPoints);
-            commandedValues = new ReliableDictionaryAccess<long, CommandedValue>(stateManager, ReliableDictionaryNames.CommandedValues);
+            this.simulatedOutages = new ReliableDictionaryAccess<long, SimulatedOutage>(stateManager, ReliableDictionaryNames.SimulatedOutages);
+            this.monitoredIsolationPoints = new ReliableDictionaryAccess<long, MonitoredIsolationPoint>(stateManager, ReliableDictionaryNames.MonitoredIsolationPoints);
+            this.commandedValues = new ReliableDictionaryAccess<long, CommandedValue>(stateManager, ReliableDictionaryNames.CommandedValues);
         }
 
         public async Task Start()

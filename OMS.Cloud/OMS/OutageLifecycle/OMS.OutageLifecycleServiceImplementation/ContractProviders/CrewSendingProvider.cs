@@ -43,9 +43,6 @@ namespace OMS.OutageLifecycleImplementation.ContractProviders
             get
             {
                 return true;
-                //return isOutageTopologyModelInitialized &&
-                //       isCommandedElementsInitialized &&
-                //       isElementsToBeIgnoredInReportPotentialOutageInitialized;
             }
         }
 
@@ -96,7 +93,7 @@ namespace OMS.OutageLifecycleImplementation.ContractProviders
 
                 if (reliableStateName == ReliableDictionaryNames.OutageTopologyModel)
                 {
-                    //this.outageTopologyModel = await ReliableDictionaryAccess<string, OutageTopologyModel>.Create(stateManager, ReliableDictionaryNames.OutageTopologyModel);
+                    this.outageTopologyModel = await ReliableDictionaryAccess<string, OutageTopologyModel>.Create(stateManager, ReliableDictionaryNames.OutageTopologyModel);
                     this.isOutageTopologyModelInitialized = true;
 
                     string debugMessage = $"{baseLogString} OnStateManagerChangedHandler => '{ReliableDictionaryNames.OutageTopologyModel}' ReliableDictionaryAccess initialized.";
@@ -104,7 +101,7 @@ namespace OMS.OutageLifecycleImplementation.ContractProviders
                 }
                 else if (reliableStateName == ReliableDictionaryNames.CommandedElements)
                 {
-                    //this.commandedElements = await ReliableDictionaryAccess<long, CommandedElement>.Create(stateManager, ReliableDictionaryNames.CommandedElements);
+                    this.commandedElements = await ReliableDictionaryAccess<long, CommandedElement>.Create(stateManager, ReliableDictionaryNames.CommandedElements);
                     this.isCommandedElementsInitialized = true;
 
                     string debugMessage = $"{baseLogString} OnStateManagerChangedHandler => '{ReliableDictionaryNames.CommandedElements}' ReliableDictionaryAccess initialized.";
@@ -112,7 +109,7 @@ namespace OMS.OutageLifecycleImplementation.ContractProviders
                 }
                 else if (reliableStateName == ReliableDictionaryNames.ElementsToBeIgnoredInReportPotentialOutage)
                 {
-                    //this.elementsToBeIgnoredInReportPotentialOutage = await ReliableDictionaryAccess<long, DateTime>.Create(stateManager, ReliableDictionaryNames.ElementsToBeIgnoredInReportPotentialOutage);
+                    this.elementsToBeIgnoredInReportPotentialOutage = await ReliableDictionaryAccess<long, DateTime>.Create(stateManager, ReliableDictionaryNames.ElementsToBeIgnoredInReportPotentialOutage);
                     this.isElementsToBeIgnoredInReportPotentialOutageInitialized = true;
 
                     string debugMessage = $"{baseLogString} OnStateManagerChangedHandler => '{ReliableDictionaryNames.ElementsToBeIgnoredInReportPotentialOutage}' ReliableDictionaryAccess initialized.";
@@ -134,10 +131,9 @@ namespace OMS.OutageLifecycleImplementation.ContractProviders
             this.isElementsToBeIgnoredInReportPotentialOutageInitialized = false;
 
             this.stateManager = stateManager;
-            //this.stateManager.StateManagerChanged += this.OnStateManagerChangedHandler;
-            outageTopologyModel = new ReliableDictionaryAccess<string, OutageTopologyModel>(stateManager, ReliableDictionaryNames.OutageTopologyModel);
-            commandedElements = new ReliableDictionaryAccess<long, CommandedElement>(stateManager, ReliableDictionaryNames.CommandedElements);
-            elementsToBeIgnoredInReportPotentialOutage = new ReliableDictionaryAccess<long, DateTime>(stateManager, ReliableDictionaryNames.ElementsToBeIgnoredInReportPotentialOutage);
+            this.outageTopologyModel = new ReliableDictionaryAccess<string, OutageTopologyModel>(stateManager, ReliableDictionaryNames.OutageTopologyModel);
+            this.commandedElements = new ReliableDictionaryAccess<long, CommandedElement>(stateManager, ReliableDictionaryNames.CommandedElements);
+            this.elementsToBeIgnoredInReportPotentialOutage = new ReliableDictionaryAccess<long, DateTime>(stateManager, ReliableDictionaryNames.ElementsToBeIgnoredInReportPotentialOutage);
         }
 
         #region ICrewSendingContract

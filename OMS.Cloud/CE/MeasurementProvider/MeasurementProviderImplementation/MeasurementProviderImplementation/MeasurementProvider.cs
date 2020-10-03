@@ -42,14 +42,11 @@ namespace CE.MeasurementProviderImplementation
 		private bool isElementToMeasurementInitialized = false;
 		private bool isMeasurementToElementInitialized = false;
 
-		private bool AreDictionariesInitialized
+		private bool ReliableDictionariesInitialized
 		{
 			get
 			{
-				return isAnalogMeasurementInitialized
-				&& isDiscreteMeasurementInitialized
-				&& isElementToMeasurementInitialized
-				&& isMeasurementToElementInitialized;
+				return true;
 			}
 		}
 
@@ -136,7 +133,11 @@ namespace CE.MeasurementProviderImplementation
 			Logger.LogVerbose(verboseMessage);
 
 			this.stateManager = stateManager;
-			stateManager.StateManagerChanged += this.OnStateManagerChangedHandler;
+			this.analogMeasurementsCache = new ReliableDictionaryAccess<short, Dictionary<long, AnalogMeasurement>>(stateManager, ReliableDictionaryNames.AnalogMeasurementsCache);
+			this.discreteMeasurementsCache = new ReliableDictionaryAccess<short, Dictionary<long, DiscreteMeasurement>>(stateManager, ReliableDictionaryNames.DiscreteMeasurementsCache);
+			this.elementToMeasurementMapCache = new ReliableDictionaryAccess<short, Dictionary<long, List<long>>>(stateManager, ReliableDictionaryNames.ElementsToMeasurementMapCache);
+			this.measurementToElementMapCache = new ReliableDictionaryAccess<short, Dictionary<long, long>>(stateManager, ReliableDictionaryNames.MeasurementsToElementMapCache);
+
 			syncObj = new object();
 			transactionMode = TransactionMode.NoTransaction;
 
@@ -156,7 +157,7 @@ namespace CE.MeasurementProviderImplementation
 			string verboseMessage = $"{baseLogString} entering AddAnalogMeasurement method.";
 			Logger.LogVerbose(verboseMessage);
 
-			while (!AreDictionariesInitialized)
+			while (!ReliableDictionariesInitialized)
 			{
 				await Task.Delay(1000);
 			}
@@ -192,7 +193,7 @@ namespace CE.MeasurementProviderImplementation
 			string verboseMessage = $"{baseLogString} entering AddDiscreteMeasurement method.";
 			Logger.LogVerbose(verboseMessage);
 
-			while (!AreDictionariesInitialized)
+			while (!ReliableDictionariesInitialized)
 			{
 				await Task.Delay(1000);
 			}
@@ -241,7 +242,7 @@ namespace CE.MeasurementProviderImplementation
 			string verboseMessage = $"{baseLogString} entering UpdateAnalogMeasurement method with dictionary parameter.";
 			Logger.LogVerbose(verboseMessage);
 
-			while (!AreDictionariesInitialized)
+			while (!ReliableDictionariesInitialized)
 			{
 				await Task.Delay(1000);
 			}
@@ -268,7 +269,7 @@ namespace CE.MeasurementProviderImplementation
 			string verboseMessage = $"{baseLogString} entering UpdateDiscreteMeasurement method with dictionary parameter.";
 			Logger.LogVerbose(verboseMessage);
 
-			while (!AreDictionariesInitialized)
+			while (!ReliableDictionariesInitialized)
 			{
 				await Task.Delay(1000);
 			}
@@ -302,7 +303,7 @@ namespace CE.MeasurementProviderImplementation
 			string verboseMessage = $"{baseLogString} entering GetAnalogMeasurement method for measurement GID {measurementGid:X16}.";
 			Logger.LogVerbose(verboseMessage);
 
-			while (!AreDictionariesInitialized)
+			while (!ReliableDictionariesInitialized)
 			{
 				await Task.Delay(1000);
 			}
@@ -340,7 +341,7 @@ namespace CE.MeasurementProviderImplementation
 			string verboseMessage = $"{baseLogString} entering GetDiscreteMeasurement method for measurement GID {measurementGid:X16}.";
 			Logger.LogVerbose(verboseMessage);
 
-			while (!AreDictionariesInitialized)
+			while (!ReliableDictionariesInitialized)
 			{
 				await Task.Delay(1000);
 			}
@@ -378,7 +379,7 @@ namespace CE.MeasurementProviderImplementation
 			string verboseMessage = $"{baseLogString} entering GetAnalogValue method for measurement GID {measurementGid:X16}.";
 			Logger.LogVerbose(verboseMessage);
 
-			while (!AreDictionariesInitialized)
+			while (!ReliableDictionariesInitialized)
 			{
 				await Task.Delay(1000);
 			}
@@ -412,7 +413,7 @@ namespace CE.MeasurementProviderImplementation
 			string verboseMessage = $"{baseLogString} entering GetDiscreteValue method for measurement GID {measurementGid:X16}.";
 			Logger.LogVerbose(verboseMessage);
 
-			while (!AreDictionariesInitialized)
+			while (!ReliableDictionariesInitialized)
 			{
 				await Task.Delay(1000);
 			}
@@ -443,7 +444,7 @@ namespace CE.MeasurementProviderImplementation
 			string verboseMessage = $"{baseLogString} entering AddMeasurementElementPair method for measurement GID {measurementId:X16}.";
 			Logger.LogVerbose(verboseMessage);
 
-			while (!AreDictionariesInitialized)
+			while (!ReliableDictionariesInitialized)
 			{
 				await Task.Delay(1000);
 			}
@@ -456,8 +457,14 @@ namespace CE.MeasurementProviderImplementation
 
 			try
             {
-				var measurementToElementMapChe = await MeasurementToElementMapCache.GetEnumerableDictionaryAsync();
-				var measurementToElementMap = measurementToElementMapChe[(short)MeasurementPorviderCacheType.Origin];
+				var measurementToElementMapCache = await MeasurementToElementMapCache.GetEnumerableDictionaryAsync();
+				if (!measurementToElementMapCache.ContainsKey((short)MeasurementPorviderCacheType.Origin))
+				{
+					await MeasurementToElementMapCache.SetAsync((short)MeasurementPorviderCacheType.Origin, new Dictionary<long, long>());
+					measurementToElementMapCache.Add((short)MeasurementPorviderCacheType.Origin, new Dictionary<long, long>());
+				}
+
+				var measurementToElementMap = measurementToElementMapCache[(short)MeasurementPorviderCacheType.Origin];
 				//var measurementToElementMap = await GetMeasurementToElementMapFromCache();
 
 				if (measurementToElementMap.ContainsKey(measurementId))
@@ -520,7 +527,7 @@ namespace CE.MeasurementProviderImplementation
 			string verboseMessage = $"{baseLogString} entering GetElementGidForMeasurement method for measurement GID {measurementGid:X16}.";
 			Logger.LogVerbose(verboseMessage);
 
-			while (!AreDictionariesInitialized)
+			while (!ReliableDictionariesInitialized)
 			{
 				await Task.Delay(1000);
 			}
@@ -554,9 +561,14 @@ namespace CE.MeasurementProviderImplementation
 
 			try
 			{
-				var measurementToElementMapChe = await MeasurementToElementMapCache.GetEnumerableDictionaryAsync();
-				result = measurementToElementMapChe[(short)MeasurementPorviderCacheType.Origin];
-				//result = await GetMeasurementToElementMapFromCache();
+				var measurementToElementMapCache = await MeasurementToElementMapCache.GetEnumerableDictionaryAsync();
+				if(!measurementToElementMapCache.ContainsKey((short)MeasurementPorviderCacheType.Origin))
+                {
+					await MeasurementToElementMapCache.SetAsync((short)MeasurementPorviderCacheType.Origin, new Dictionary<long, long>());
+					measurementToElementMapCache.Add((short)MeasurementPorviderCacheType.Origin, new Dictionary<long, long>());
+				}
+
+				result = measurementToElementMapCache[(short)MeasurementPorviderCacheType.Origin];
 			}
 			catch (Exception e)
 			{
@@ -854,7 +866,7 @@ namespace CE.MeasurementProviderImplementation
 			string verboseMessage = $"{baseLogString} entering UpdateAnalogMeasurement method for measurement GID {measurementGid:X16}.";
 			Logger.LogVerbose(verboseMessage);
 
-			while (!AreDictionariesInitialized)
+			while (!ReliableDictionariesInitialized)
 			{
 				await Task.Delay(1000);
 			}
@@ -879,7 +891,7 @@ namespace CE.MeasurementProviderImplementation
 			string verboseMessage = $"{baseLogString} entering UpdateDiscreteMeasurement method for measurement GID {measurementGid:X16}.";
 			Logger.LogVerbose(verboseMessage);
 
-			while (!AreDictionariesInitialized)
+			while (!ReliableDictionariesInitialized)
 			{
 				await Task.Delay(1000);
 			}
@@ -923,8 +935,14 @@ namespace CE.MeasurementProviderImplementation
 				success = false;
 			}
 
-			var measurementToElementMapChe = await MeasurementToElementMapCache.GetEnumerableDictionaryAsync();
-			var measurementToElementMap = measurementToElementMapChe[(short)MeasurementPorviderCacheType.Origin];
+			var measurementToElementMapCache = await MeasurementToElementMapCache.GetEnumerableDictionaryAsync();
+			if (!measurementToElementMapCache.ContainsKey((short)MeasurementPorviderCacheType.Origin))
+			{
+				await MeasurementToElementMapCache.SetAsync((short)MeasurementPorviderCacheType.Origin, new Dictionary<long, long>());
+				measurementToElementMapCache.Add((short)MeasurementPorviderCacheType.Origin, new Dictionary<long, long>());
+			}
+
+			var measurementToElementMap = measurementToElementMapCache[(short)MeasurementPorviderCacheType.Origin];
 
 			var modelProviderClient = CeModelProviderClient.CreateClient();
 
@@ -953,7 +971,7 @@ namespace CE.MeasurementProviderImplementation
 			string verboseMessage = $"{baseLogString} entering GetAnalogMeasurementsFromCache method.";
 			Logger.LogVerbose(verboseMessage);
 
-			while (!AreDictionariesInitialized)
+			while (!ReliableDictionariesInitialized)
 			{
 				await Task.Delay(1000);
 			}
@@ -992,7 +1010,7 @@ namespace CE.MeasurementProviderImplementation
 			string verboseMessage = $"{baseLogString} entering GetDicreteMeasurementsFromCache method.";
 			Logger.LogVerbose(verboseMessage);
 
-			while (!AreDictionariesInitialized)
+			while (!ReliableDictionariesInitialized)
 			{
 				await Task.Delay(1000);
 			}
@@ -1031,7 +1049,7 @@ namespace CE.MeasurementProviderImplementation
 			string verboseMessage = $"{baseLogString} entering GetElementToMeasurementMapFromCache method.";
 			Logger.LogVerbose(verboseMessage);
 
-			while (!AreDictionariesInitialized)
+			while (!ReliableDictionariesInitialized)
 			{
 				await Task.Delay(1000);
 			}
@@ -1070,7 +1088,7 @@ namespace CE.MeasurementProviderImplementation
 			string verboseMessage = $"{baseLogString} entering GetMeasurementToElementMapFromCache method.";
 			Logger.LogVerbose(verboseMessage);
 
-			while (!AreDictionariesInitialized)
+			while (!ReliableDictionariesInitialized)
 			{
 				await Task.Delay(1000);
 			}

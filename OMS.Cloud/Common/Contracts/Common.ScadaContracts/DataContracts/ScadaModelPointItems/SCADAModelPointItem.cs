@@ -9,7 +9,7 @@ namespace OMS.Common.ScadaContracts.DataContracts.ScadaModelPointItems
     [KnownType(typeof(AnalogPointItem))]
     [KnownType(typeof(DiscretePointItem))]
     [KnownType(typeof(AlarmConfigData))]
-    public abstract class ScadaModelPointItem : IScadaModelPointItem //, ICloneable
+    public abstract class ScadaModelPointItem// : IScadaModelPointItem //, ICloneable
     {
         [DataMember]
         protected readonly IAlarmConfigData alarmConfigData;
@@ -56,7 +56,7 @@ namespace OMS.Common.ScadaContracts.DataContracts.ScadaModelPointItems
 
         #region IClonable
 
-        public abstract IScadaModelPointItem Clone();
+        public abstract ScadaModelPointItem Clone();
 
 
         #endregion IClonable

@@ -61,23 +61,18 @@ namespace OMS.Common.Cloud.ReliableCollectionHelpers
 
         public async Task<IReliableConcurrentQueue<TValue>> GetReliableQueue(string reliableQueueName = "")
         {
-            if (string.IsNullOrEmpty(reliableQueueName))
-            {
-                reliableQueueName = this.reliableQueueName;
-            }
-
             try
             {
-                var result = await reliableStateManagerHelper.TryGetAsync<IReliableConcurrentQueue<TValue>>(this.stateManager, reliableQueueName);
-
-                if (result.HasValue)
+                if (string.IsNullOrEmpty(reliableQueueName))
                 {
-                    return result.Value;
+                    reliableQueueName = this.reliableQueueName;
                 }
-                else
+
+                using (ITransaction tx = stateManager.CreateTransaction())
                 {
-                    string message = $"ReliableCollection Key: {reliableQueueName}, Type: {typeof(IReliableConcurrentQueue<TValue>)} was not initialized.";
-                    throw new Exception(message);
+                    var result = await reliableStateManagerHelper.GetOrAddAsync<IReliableConcurrentQueue<TValue>>(this.stateManager, tx, reliableQueueName);
+                    await tx.CommitAsync();
+                    return result;
                 }
             }
             catch (Exception e)

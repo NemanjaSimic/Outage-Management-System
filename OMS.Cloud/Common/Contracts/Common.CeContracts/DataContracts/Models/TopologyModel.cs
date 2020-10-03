@@ -15,14 +15,14 @@ namespace Common.CeContracts
 		[DataMember]
 		public long FirstNode { get; set; }
 		[DataMember]
-		public Dictionary<long, ITopologyElement> TopologyElements { get; set; }
+		public Dictionary<long, TopologyElement> TopologyElements { get; set; }
 		
 		public TopologyModel()
 		{
-			TopologyElements = new Dictionary<long, ITopologyElement>();
+			TopologyElements = new Dictionary<long, TopologyElement>();
 		}
 
-		public void AddElement(ITopologyElement newElement)
+		public void AddElement(TopologyElement newElement)
 		{
 			if (!TopologyElements.ContainsKey(newElement.Id))
 			{
@@ -33,7 +33,7 @@ namespace Common.CeContracts
 				//Logger.Instance.LogWarn($"Topology element with GID 0x{newElement.Id.ToString("X16")} is already added.");
 			}
 		}
-		public bool GetElementByGid(long gid, out ITopologyElement topologyElement)
+		public bool GetElementByGid(long gid, out TopologyElement topologyElement)
 		{
 			bool success = false;
 			if (TopologyElements.ContainsKey(gid))

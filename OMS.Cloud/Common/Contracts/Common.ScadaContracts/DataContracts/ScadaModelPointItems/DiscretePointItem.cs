@@ -6,7 +6,7 @@ using OMS.Common.Cloud;
 namespace OMS.Common.ScadaContracts.DataContracts.ScadaModelPointItems
 {
     [DataContract]
-    public class DiscretePointItem : ScadaModelPointItem, IDiscretePointItem
+    public class DiscretePointItem : ScadaModelPointItem//, IDiscretePointItem
     {
         public DiscretePointItem(IAlarmConfigData alarmConfigData)
             : base(alarmConfigData)
@@ -65,9 +65,9 @@ namespace OMS.Common.ScadaContracts.DataContracts.ScadaModelPointItems
 
         #region IClonable
 
-        public override IScadaModelPointItem Clone()
+        public override ScadaModelPointItem Clone()
         {
-            return this.MemberwiseClone() as IScadaModelPointItem;
+            return this.MemberwiseClone() as ScadaModelPointItem;
         }
 
         #endregion IClonable

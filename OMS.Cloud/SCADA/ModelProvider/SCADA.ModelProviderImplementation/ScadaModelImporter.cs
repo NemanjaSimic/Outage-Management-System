@@ -45,13 +45,11 @@ namespace SCADA.ModelProviderImplementation
         {
             get
             {
-                return isGidToPointItemMapInitialized &&
-                       isAddressToGidMapInitialized &&
-                       isInfoCacheInitialized;
+                return true;
             }
         }
 
-        private ReliableDictionaryAccess<long, IScadaModelPointItem> GidToPointItemMap { get; set; }
+        private ReliableDictionaryAccess<long, ScadaModelPointItem> GidToPointItemMap { get; set; }
         private ReliableDictionaryAccess<short, Dictionary<ushort, long>> AddressToGidMap { get; set; }
         private ReliableDictionaryAccess<string, bool> InfoCache { get; set; }
 
@@ -84,7 +82,7 @@ namespace SCADA.ModelProviderImplementation
 
                 if (reliableStateName == ReliableDictionaryNames.GidToPointItemMap)
                 {
-                    GidToPointItemMap = await ReliableDictionaryAccess<long, IScadaModelPointItem>.Create(stateManager, ReliableDictionaryNames.GidToPointItemMap);
+                    GidToPointItemMap = await ReliableDictionaryAccess<long, ScadaModelPointItem>.Create(stateManager, ReliableDictionaryNames.GidToPointItemMap);
                     this.isGidToPointItemMapInitialized = true;
 
                     string debugMessage = $"{baseLogString} OnStateManagerChangedHandler => '{ReliableDictionaryNames.GidToPointItemMap}' ReliableDictionaryAccess initialized.";
@@ -119,7 +117,9 @@ namespace SCADA.ModelProviderImplementation
             this.isInfoCacheInitialized = false;
 
             this.stateManager = stateManager;
-            this.stateManager.StateManagerChanged += this.OnStateManagerChangedHandler;
+            GidToPointItemMap = new ReliableDictionaryAccess<long, ScadaModelPointItem>(stateManager, ReliableDictionaryNames.GidToPointItemMap);
+            AddressToGidMap = new ReliableDictionaryAccess<short, Dictionary<ushort, long>>(stateManager, ReliableDictionaryNames.AddressToGidMap);
+            InfoCache = new ReliableDictionaryAccess<string, bool>(stateManager, ReliableDictionaryNames.InfoCache);
 
             this.modelResourceDesc = modelResourceDesc;
             this.enumDescs = enumDescs;
@@ -451,7 +451,7 @@ namespace SCADA.ModelProviderImplementation
                     foreach (long gid in analogItemsAddressToGidMap.Values)
                     {
                         var result = await GidToPointItemMap.TryGetValueAsync(gid);
-                        var analogPointItem = result.Value as IAnalogPointItem;
+                        var analogPointItem = result.Value as AnalogPointItem;
 
                         analogCommandingValues.Add(gid, analogPointItem.CurrentEguValue);
                     }
@@ -476,7 +476,7 @@ namespace SCADA.ModelProviderImplementation
                     foreach (long gid in discreteItemsAddressToGidMap.Values)
                     {
                         var result = await GidToPointItemMap.TryGetValueAsync(gid);
-                        var discretePointItem = result.Value as IDiscretePointItem;
+                        var discretePointItem = result.Value as DiscretePointItem;
 
                         discreteCommandingValues.Add(gid, discretePointItem.CurrentValue);
                     }

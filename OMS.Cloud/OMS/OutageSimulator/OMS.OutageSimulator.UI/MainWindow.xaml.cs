@@ -1,4 +1,5 @@
-﻿using OMS.Common.WcfClient.OMS;
+﻿using OMS.Common.Cloud.Logger;
+using OMS.Common.WcfClient.OMS;
 using OMS.Common.WcfClient.OMS.OutageSimulator;
 using OMS.OutageSimulator.UI.UserControls;
 using System;
@@ -22,6 +23,13 @@ namespace OMS.OutageSimulator.UI
     {
         private readonly Overview overview;
         private readonly GenerateOutage generateOutage;
+
+        private ICloudLogger logger;
+
+        private ICloudLogger Logger
+        {
+            get { return logger ?? (logger = CloudLoggerFactory.GetLogger()); }
+        }
 
         public MainWindow()
         {
@@ -82,32 +90,32 @@ namespace OMS.OutageSimulator.UI
 
         private async void TabControl_SelectionChanged(object sender, SelectionChangedEventArgs e)
         {
-            int tabItem = ((sender as TabControl)).SelectedIndex;
-            
-            if (e.Source is TabControl)
+            try
             {
-                switch (tabItem)
+                int tabItem = ((sender as TabControl)).SelectedIndex;
+            
+                if (e.Source is TabControl)
                 {
-                    case (int)TabType.OVERVIEW:
-                        await OverviewSelection();
+                    switch (tabItem)
+                    {
+                        case (int)TabType.OVERVIEW:
+                            await OverviewSelection();
 
-                        //Dispatcher.Invoke(new Action(async () => 
-                        //{
-                        //    await OverviewSelection();
-                        //}));
-                        //Dispatcher.BeginInvoke((Action)(async () =>
-                        //{
-                        //    await OverviewSelection();
-                        //}));
-                        break;
+                            break;
 
-                    case (int)TabType.GENERATE_OUTAGE:
-                        break;
+                        case (int)TabType.GENERATE_OUTAGE:
+                            break;
 
-                    default:
-                        break;
+                        default:
+                            break;
+                    }
                 }
             }
+            catch (Exception ex)
+            {
+                Logger.LogError($"SimulatorUI.TabControl_SelectionChanged => Exception: {ex.Message}", ex);
+            }
+
         }
     }
 }

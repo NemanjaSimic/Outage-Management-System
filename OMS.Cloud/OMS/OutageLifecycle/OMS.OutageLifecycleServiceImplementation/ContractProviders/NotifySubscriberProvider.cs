@@ -45,10 +45,6 @@ namespace OMS.OutageLifecycleImplementation.ContractProviders
 			get
 			{
 				return true;
-				//return isMonitoredHeadBreakerMeasurementsInitialized &&
-				//	   isOutageTopologyModelInitialized &&
-				//	   isCommandedElementsInitialized &&
-				//	   isPotentialOutagesQueueInitialized;
 			}
 		}
 
@@ -149,11 +145,10 @@ namespace OMS.OutageLifecycleImplementation.ContractProviders
 			this.isPotentialOutagesQueueInitialized = false;
 
 			this.stateManager = stateManager;
-			//this.stateManager.StateManagerChanged += this.OnStateManagerChangedHandler;
-			monitoredHeadBreakerMeasurements = new ReliableDictionaryAccess<long, DiscreteModbusData>(stateManager, ReliableDictionaryNames.MonitoredIsolationPoints);
-			outageTopologyModel = new ReliableDictionaryAccess<string, OutageTopologyModel>(stateManager, ReliableDictionaryNames.OutageTopologyModel);
-			commandedElements = new ReliableDictionaryAccess<long, CommandedElement>(stateManager, ReliableDictionaryNames.CommandedElements);
-			potentialOutagesQueue = new ReliableQueueAccess<PotentialOutageCommand>(stateManager, ReliableQueueNames.PotentialOutages);
+			this.monitoredHeadBreakerMeasurements = new ReliableDictionaryAccess<long, DiscreteModbusData>(stateManager, ReliableDictionaryNames.MonitoredIsolationPoints);
+			this.outageTopologyModel = new ReliableDictionaryAccess<string, OutageTopologyModel>(stateManager, ReliableDictionaryNames.OutageTopologyModel);
+			this.commandedElements = new ReliableDictionaryAccess<long, CommandedElement>(stateManager, ReliableDictionaryNames.CommandedElements);
+			this.potentialOutagesQueue = new ReliableQueueAccess<PotentialOutageCommand>(stateManager, ReliableQueueNames.PotentialOutages);
 		}
 
 		#region INotifySubscriberContract

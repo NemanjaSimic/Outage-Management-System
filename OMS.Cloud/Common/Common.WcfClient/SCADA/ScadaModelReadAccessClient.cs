@@ -40,7 +40,7 @@ namespace OMS.Common.WcfClient.SCADA
             return InvokeWithRetryAsync(client => client.Channel.GetAddressToGidMap());
         }
 
-        public Task<Dictionary<short, Dictionary<ushort, IScadaModelPointItem>>> GetAddressToPointItemMap()
+        public Task<Dictionary<short, Dictionary<ushort, ScadaModelPointItem>>> GetAddressToPointItemMap()
         {
             //return MethodWrapperAsync<Dictionary<short, Dictionary<ushort, IScadaModelPointItem>>>("GetAddressToPointItemMap", new object[0]);
             return InvokeWithRetryAsync(client => client.Channel.GetAddressToPointItemMap());
@@ -52,7 +52,7 @@ namespace OMS.Common.WcfClient.SCADA
             return InvokeWithRetryAsync(client => client.Channel.GetCommandDescriptionCache());
         }
 
-        public Task<Dictionary<long, IScadaModelPointItem>> GetGidToPointItemMap()
+        public Task<Dictionary<long, ScadaModelPointItem>> GetGidToPointItemMap()
         {
             //return MethodWrapperAsync<Dictionary<long, IScadaModelPointItem>>("GetGidToPointItemMap", new object[0]);
             return InvokeWithRetryAsync(client => client.Channel.GetGidToPointItemMap());

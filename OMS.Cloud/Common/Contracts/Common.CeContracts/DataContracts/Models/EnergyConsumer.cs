@@ -7,7 +7,7 @@ namespace Common.CeContracts
     [DataContract]
     public class EnergyConsumer : TopologyElement
 	{
-		public EnergyConsumer(ITopologyElement element) : base (element.Id)
+		public EnergyConsumer(TopologyElement element) : base (element.Id)
 		{
             Id = element.Id;
             Description = element.Description;

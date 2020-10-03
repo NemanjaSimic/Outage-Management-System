@@ -99,7 +99,7 @@ namespace TMS.TransactionManagerService
 
             try
             {
-                InitializeReliableCollections();
+                //InitializeReliableCollections();
                 string debugMessage = $"{baseLogString} RunAsync => ReliableDictionaries initialized.";
                 Logger.LogDebug(debugMessage);
             }
@@ -118,36 +118,17 @@ namespace TMS.TransactionManagerService
                 {
                     using (ITransaction tx = this.StateManager.CreateTransaction())
                     {
-                        var result = await StateManager.TryGetAsync<IReliableDictionary<string, HashSet<string>>>(ReliableDictionaryNames.TransactionEnlistmentLedger);
-                        if(result.HasValue)
-                        {
-                            var gidToPointItemMap = result.Value;
-                            await gidToPointItemMap.ClearAsync();
-                            await tx.CommitAsync();
-                        }
-                        else
-                        {
-                            await StateManager.GetOrAddAsync<IReliableDictionary<string, HashSet<string>>>(tx, ReliableDictionaryNames.TransactionEnlistmentLedger);
-                            await tx.CommitAsync();
-                        }
+                        await StateManager.GetOrAddAsync<IReliableDictionary<string, HashSet<string>>>(tx, ReliableDictionaryNames.TransactionEnlistmentLedger);
+                        await tx.CommitAsync();
                     }
                 }),
+
                 Task.Run(async() =>
                 {
                     using (ITransaction tx = this.StateManager.CreateTransaction())
                     {
-                        var result = await StateManager.TryGetAsync<IReliableDictionary<string, HashSet<string>>>(ReliableDictionaryNames.ActiveTransactions);
-                        if(result.HasValue)
-                        {
-                            var gidToPointItemMap = result.Value;
-                            await gidToPointItemMap.ClearAsync();
-                            await tx.CommitAsync();
-                        }
-                        else
-                        {
-                            await StateManager.GetOrAddAsync<IReliableDictionary<string, HashSet<string>>>(tx, ReliableDictionaryNames.ActiveTransactions);
-                            await tx.CommitAsync();
-                        }
+                        await StateManager.GetOrAddAsync<IReliableDictionary<string, HashSet<string>>>(tx, ReliableDictionaryNames.ActiveTransactions);
+                        await tx.CommitAsync();
                     }
                 }),
             };

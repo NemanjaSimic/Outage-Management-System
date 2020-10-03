@@ -49,11 +49,11 @@ namespace CE.TopologyProviderImplementation
         private bool isTopologyCacheUIInitialized;
         private bool isTopologyCacheOMSInitialized;
 
-        public bool AreDictionariesInitialized
+        private bool ReliableDictionariesInitialized
         {
             get
             {
-                return isTopologyCacheInitialized && isTopologyCacheOMSInitialized && isTopologyCacheUIInitialized;
+                return true;
             }
         }
 
@@ -131,12 +131,13 @@ namespace CE.TopologyProviderImplementation
             this.isTopologyCacheUIInitialized = false;
             this.isTopologyCacheOMSInitialized = false;
 
-            this.stateManager = stateManager;
-            stateManager.StateManagerChanged += this.OnStateManagerChangedHandler;
-
             recloserCounters = new ConcurrentDictionary<long, int>();
-
             transactionFlag = TransactionFlag.NoTransaction;
+
+            this.stateManager = stateManager;
+            this.topologyCache = new ReliableDictionaryAccess<long, TopologyModel>(stateManager, ReliableDictionaryNames.TopologyCache);
+            this.topologyCacheUI = new ReliableDictionaryAccess<long, UIModel>(stateManager, ReliableDictionaryNames.TopologyCacheUI);
+            this.topologyCacheOMS = new ReliableDictionaryAccess<long, OutageTopologyModel>(stateManager, ReliableDictionaryNames.TopologyCacheOMS);
 
             string debugMessage = $"{baseLogString} Ctor => Clients initialized.";
             Logger.LogDebug(debugMessage);
@@ -144,7 +145,7 @@ namespace CE.TopologyProviderImplementation
 
         private async Task<TopologyModel> GetTopologyFromCache(TopologyType type)
         {
-            while (!AreDictionariesInitialized)
+            while (!ReliableDictionariesInitialized)
             {
                 await Task.Delay(1000);
             }
@@ -284,7 +285,7 @@ namespace CE.TopologyProviderImplementation
             bool isRemote;
             var topology = await GetTopologyFromCache(TopologyType.NoSpecific);
 
-            if (topology.GetElementByGid(elementGid, out ITopologyElement element))
+            if (topology.GetElementByGid(elementGid, out TopologyElement element))
             {
                 isRemote = element.IsRemote;
             }
@@ -499,7 +500,7 @@ namespace CE.TopologyProviderImplementation
 
         public async Task<OutageTopologyModel> GetOMSModel()
         {
-            while (!AreDictionariesInitialized)
+            while (!ReliableDictionariesInitialized)
             {
                 await Task.Delay(1000);
             }
@@ -526,7 +527,7 @@ namespace CE.TopologyProviderImplementation
         }
         public async Task<UIModel> GetUIModel()
         {
-            while (!AreDictionariesInitialized)
+            while (!ReliableDictionariesInitialized)
             {
                 await Task.Delay(1000);
             }

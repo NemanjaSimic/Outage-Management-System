@@ -6,7 +6,7 @@ namespace Common.CeContracts
     [DataContract]
     public class SynchronousMachine : TopologyElement
     {
-		public SynchronousMachine(ITopologyElement element) : base (element.Id)
+		public SynchronousMachine(TopologyElement element) : base (element.Id)
 		{
             Id = element.Id;
             Description = element.Description;

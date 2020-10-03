@@ -5,6 +5,6 @@ namespace Common.CeContracts
 
     public interface IModelManager
     {
-        Task<IModelDelta> TryGetAllModelEntitiesAsync();
+        Task<ModelDelta> TryGetAllModelEntitiesAsync();
     }
 }
