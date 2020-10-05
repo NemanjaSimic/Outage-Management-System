@@ -43,7 +43,7 @@ export class ReportFormComponent implements OnInit {
   public filteredScopes: Observable<any[]>;
   public selectedScopeControl = new FormControl();
   public startDate = new FormControl();
-  public endDate = new FormControl({disabled: true});
+  public endDate = new FormControl();
   public datePickerDisabled;
   
   private defaultDateType = DateType.Daily;
