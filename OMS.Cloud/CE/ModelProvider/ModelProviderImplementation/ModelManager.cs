@@ -110,8 +110,8 @@ namespace CE.ModelProviderImplementation
 			get { return reclosers; }
 		}
 
-		private ReliableDictionaryAccess<long, IMeasurement> measurements;
-		private ReliableDictionaryAccess<long, IMeasurement> Measurements
+		private ReliableDictionaryAccess<long, Measurement> measurements;
+		private ReliableDictionaryAccess<long, Measurement> Measurements
 		{
 			get { return measurements; }
 		}
@@ -191,7 +191,7 @@ namespace CE.ModelProviderImplementation
 				}
 				else if (reliableStateName == ReliableDictionaryNames.Measurements)
 				{
-					this.measurements = await ReliableDictionaryAccess<long, IMeasurement>.Create(stateManager, ReliableDictionaryNames.Measurements);
+					this.measurements = await ReliableDictionaryAccess<long, Measurement>.Create(stateManager, ReliableDictionaryNames.Measurements);
 					this.isMeasurementsInitialized = true;
 
 					string debugMessage = $"{baseLogString} OnStateManagerChangedHandler => '{ReliableDictionaryNames.Measurements}' ReliableDictionaryAccess initialized.";
@@ -262,7 +262,7 @@ namespace CE.ModelProviderImplementation
 			this.stateManager = stateManager;
 			this.energySources = new ReliableDictionaryAccess<string, List<long>>(stateManager, ReliableDictionaryNames.EnergySources);
 			this.reclosers = new ReliableDictionaryAccess<string, HashSet<long>>(stateManager, ReliableDictionaryNames.Reclosers);
-			this.measurements = new ReliableDictionaryAccess<long, IMeasurement>(stateManager, ReliableDictionaryNames.Measurements);
+			this.measurements = new ReliableDictionaryAccess<long, Measurement>(stateManager, ReliableDictionaryNames.Measurements);
 			this.topologyElements = new ReliableDictionaryAccess<long, TopologyElement>(stateManager, ReliableDictionaryNames.TopologyElements);
 			this.baseVoltages = new ReliableDictionaryAccess<long, float>(stateManager, ReliableDictionaryNames.BaseVoltages);
 			this.elementConnections = new ReliableDictionaryAccess<long, List<long>>(stateManager, ReliableDictionaryNames.ElementConnections);
@@ -354,7 +354,7 @@ namespace CE.ModelProviderImplementation
 				//});
 
 				var enumerableMeasurements = await Measurements.GetEnumerableDictionaryAsync();
-				List<IMeasurement> updatedMeasurements = new List<IMeasurement>(enumerableMeasurements.Count);
+				List<Measurement> updatedMeasurements = new List<Measurement>(enumerableMeasurements.Count);
 				foreach (var measurement in enumerableMeasurements.Values)
 				{
 					var elementId = await PutMeasurementsInElements(measurement);
@@ -440,7 +440,7 @@ namespace CE.ModelProviderImplementation
 				await TransformToTopologyElementAsync(element);
 			}
 		}
-		private async Task<long> PutMeasurementsInElements(IMeasurement measurement)
+		private async Task<long> PutMeasurementsInElements(Measurement measurement)
 		{
 			string verboseMessage = $"{baseLogString} entering PutMeasurementsInElements method. Measurement GID {measurement?.Id:X16}.";
 			Logger.LogVerbose(verboseMessage);
