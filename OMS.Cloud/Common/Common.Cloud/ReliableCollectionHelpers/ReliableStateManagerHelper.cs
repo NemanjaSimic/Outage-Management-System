@@ -7,7 +7,7 @@ namespace OMS.Common.Cloud.ReliableCollectionHelpers
 {
     public class ReliableStateManagerHelper
     {
-        private readonly int maxTryCount = 30;
+        private readonly int maxTryCount = 60;
 
         public async Task<T> GetOrAddAsync<T>(IReliableStateManager stateManager, ITransaction tx, string name) where T : IReliableState 
         {
