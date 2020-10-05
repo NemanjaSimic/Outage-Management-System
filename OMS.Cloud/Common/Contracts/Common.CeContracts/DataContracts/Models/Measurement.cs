@@ -8,7 +8,7 @@ namespace Common.CeContracts
     [KnownType(typeof(DiscreteMeasurement))]
     [KnownType(typeof(AnalogMeasurement))]
 
-    public abstract class Measurement : IMeasurement
+    public abstract class Measurement //: IMeasurement
     {
 		[DataMember]
         public long Id { get; set; }
@@ -26,7 +26,7 @@ namespace Common.CeContracts
 
 	[DataContract]
     [KnownType(typeof(ArtificalDiscreteMeasurement))]
-	public class DiscreteMeasurement : Measurement, IDiscreteMeasurement
+	public class DiscreteMeasurement : Measurement//, IDiscreteMeasurement
 	{
 		[DataMember]
 		public bool CurrentOpen { get; set; }
@@ -48,7 +48,7 @@ namespace Common.CeContracts
 	}
 
 	[DataContract]
-    public class AnalogMeasurement : Measurement, IAnalogMeasurement
+    public class AnalogMeasurement : Measurement//, IAnalogMeasurement
     {
 		[DataMember]
         public float CurrentValue { get; set; }

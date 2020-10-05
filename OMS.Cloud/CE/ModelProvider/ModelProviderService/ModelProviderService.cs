@@ -183,7 +183,7 @@ namespace CE.ModelProviderService
 				{
 					using (ITransaction tx = this.StateManager.CreateTransaction())
 					{
-						await StateManager.GetOrAddAsync<IReliableDictionary<long, IMeasurement>>(tx, ReliableDictionaryNames.Measurements);
+						await StateManager.GetOrAddAsync<IReliableDictionary<long, Measurement>>(tx, ReliableDictionaryNames.Measurements);
 						await tx.CommitAsync();
 					}
 				}),
