@@ -62,10 +62,8 @@ namespace OMS.Common.Cloud.Logger
             //TOOD: testirati sa solutionom prekopiranim u neki drugi direktorijum
             string logFilePath = $@"..\..\..\..\..\..\LogFiles\SharedLogFile.txt";
 
-            if (ConfigurationManager.AppSettings[logFilePathSettingKey] is string)
+            if (ConfigurationManager.AppSettings[logFilePathSettingKey] is string baseDirectory)
             {
-                string baseDirectory = ConfigurationManager.AppSettings[logFilePathSettingKey];
-
                 if (Directory.Exists(baseDirectory))
                 {
                     return $@"{baseDirectory}\LogFiles\SharedLogFile.txt";

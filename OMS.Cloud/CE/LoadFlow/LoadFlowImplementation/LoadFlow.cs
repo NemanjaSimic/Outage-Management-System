@@ -21,6 +21,7 @@ namespace CE.LoadFlowImplementation
 
         #region Private fields
         private readonly string baseLogString;
+        private readonly DailyCurveReader dailyCurveReader;
 
         private HashSet<long> reclosers;
         private Dictionary<long, TopologyElement> feeders;
@@ -40,8 +41,7 @@ namespace CE.LoadFlowImplementation
             string verboseMessage = $"{baseLogString} entering Ctor.";
             Logger.LogVerbose(verboseMessage);
 
-            string debugMessage = $"{baseLogString} Ctor => Clients initialized.";
-            Logger.LogDebug(debugMessage);
+            this.dailyCurveReader = new DailyCurveReader();
         }
 
 		#region ILoadFlowService
@@ -57,7 +57,7 @@ namespace CE.LoadFlowImplementation
                 Dictionary<long, float> loadOfFeeders = new Dictionary<long, float>();
                 feeders = new Dictionary<long, TopologyElement>();
                 syncMachines = new Dictionary<long, TopologyElement>();
-                dailyCurves = DailyCurveReader.ReadDailyCurves();
+                dailyCurves = dailyCurveReader.ReadDailyCurves();
 
                 Logger.LogDebug($"{baseLogString} UpdateLoadFlow => Getting reclosers from model provider.");
                 var modelProviderClient = CeModelProviderClient.CreateClient();
