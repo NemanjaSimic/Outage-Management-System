@@ -7,7 +7,7 @@ interface StartDateFormatMap {
 
 const startDateFormatMap: StartDateFormatMap = {
   [DateType.Yearly]: (date: moment.Moment) => `01/01/${date.format('YYYY')}`,
-  [DateType.Monthly]: (date: moment.Moment) => `01/${date.format('MM')}/${date.format('YYYY')}`,
+  [DateType.Monthly]: (date: moment.Moment) => `${date.format('MM')}/01/${date.format('YYYY')}`,
   [DateType.Daily]: (date: moment.Moment) => `${date.format('MM')}/${date.format('DD')}/${date.format('YYYY')}`,
 }
 

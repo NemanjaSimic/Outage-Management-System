@@ -57,7 +57,7 @@ export class ReportFormComponent implements OnInit {
     this.dateFormatService.setFormat(this.defaultDateType);
 
     this.graphService.getTopology().subscribe((graph) => {
-      graph.Nodes.forEach(node => this.scopes.push({
+      graph.Nodes.filter(node => node.DMSType == "ENERGYCONSUMER").forEach(node => this.scopes.push({
         value: node.Mrid,
         name: node.Name,
         gid: node.Id

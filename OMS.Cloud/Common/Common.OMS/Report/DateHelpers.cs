@@ -10,6 +10,7 @@ namespace Common.OMS.Report
     {
         public static string MONTHLY_TYPE = "Monthly";
         public static string YEARLY_TYPE = "Yearly";
+        public static string DAILY_TYPE = "Daily";
 
         public static Dictionary<int, string> Months = new Dictionary<int, string>
         {
@@ -27,14 +28,29 @@ namespace Common.OMS.Report
             { 12, "December" }
         };
 
-        public static string GetType(DateTime? startDate, DateTime? endDate) =>
-             startDate.HasValue ? endDate.HasValue ?
-                        endDate.Value.Subtract(startDate.Value).Days / (365.2425 / 12) < 12
-                            ? MONTHLY_TYPE
-                            : YEARLY_TYPE
-                    : DateTime.Now.Subtract(startDate.Value).Days / (365.2425 / 12) < 12
-                        ? MONTHLY_TYPE
-                        : YEARLY_TYPE
-                    : YEARLY_TYPE;
+        public static string GetType(DateTime? startDate, DateTime? endDate)
+        {
+            if (startDate.HasValue && endDate.HasValue)
+            {
+                int dayDiffernce = endDate.Value.Subtract(startDate.Value).Days;
+
+                if (dayDiffernce > 364)
+                {
+                    return YEARLY_TYPE;
+                }
+                else if (dayDiffernce > 1)
+                {
+                    return MONTHLY_TYPE;
+                }
+                else
+                {
+                    return DAILY_TYPE;
+                }
+            }
+            else
+            {
+                return YEARLY_TYPE;
+            }
+        }
     }
 }

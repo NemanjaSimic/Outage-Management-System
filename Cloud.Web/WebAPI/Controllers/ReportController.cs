@@ -21,6 +21,9 @@ namespace WebAPI.Controllers
         [HttpGet]
         public async Task<IActionResult> Get([FromQuery] ReportOptions options)
         {
+            options.StartDate = options.StartDate.Value.Date;
+            options.EndDate = options.EndDate.Value.Date.AddDays(1).AddTicks(-1);
+
             var report = await _mediator.Send<ReportViewModel>(new GenerateReportCommand(options));
             return Ok(report);
         }

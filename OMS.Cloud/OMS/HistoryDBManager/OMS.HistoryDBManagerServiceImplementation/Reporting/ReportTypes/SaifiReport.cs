@@ -26,7 +26,6 @@ namespace OMS.HistoryDBManagerImplementation.Reporting.ReportTypes
 
         public OutageReport Generate(ReportOptions options)
         {
-            bool isScope = false;
             List<Specification<ConsumerHistorical>> specs = new List<Specification<ConsumerHistorical>>();
 
             if (options.StartDate.HasValue)
@@ -38,42 +37,49 @@ namespace OMS.HistoryDBManagerImplementation.Reporting.ReportTypes
             if (options.ElementId != null)
             {
                 specs.Add(new HistoricalConsumerElementIdQuery((long)options.ElementId));
-                isScope = true;
             }
 
             specs.Add(new HistoricalConsumerOperationQuery(DatabaseOperation.DELETE));
 
-            IEnumerable<ConsumerHistorical> outages;
+            IEnumerable<ConsumerHistorical> consumers;
 
             if (specs.Count > 1)
             {
                 AndSpecification<ConsumerHistorical> andQuery = new AndSpecification<ConsumerHistorical>(specs);
-                outages = _outageRepository.Find(andQuery.IsSatisfiedBy).ToList();
+                consumers = _outageRepository.Find(andQuery.IsSatisfiedBy).ToList();
             }
             else if (specs.Count == 1)
             {
-                outages = _outageRepository.Find(specs[0].IsSatisfiedBy).ToList();
+                consumers = _outageRepository.Find(specs[0].IsSatisfiedBy).ToList();
             }
             else
             {
-                outages = _outageRepository.GetAll().ToList();
+                consumers = _outageRepository.GetAll().ToList();
             }
 
             var type = DateHelpers.GetType(options.StartDate, options.EndDate);
-            var outageReportGrouping = outages.GroupBy(o => type == "Monthly" ? o.OperationTime.Month : o.OperationTime.Year).Select(o => o).ToList();
+            List<IGrouping<int, ConsumerHistorical>> outageReportGrouping = null;
 
-            var numOfConsumers = 1;
-
-            if (!isScope)
+            if (type == "Yearly")
             {
-                numOfConsumers = _consumerRepository.GetAll().Count();
+                outageReportGrouping = consumers.GroupBy(o => o.OperationTime.Month).Select(o => o).ToList();
             }
+            else if (type == "Monthly")
+            {
+                outageReportGrouping = consumers.GroupBy(o => o.OperationTime.Day).Select(o => o).ToList();
+            }
+            else
+            {
+                outageReportGrouping = consumers.GroupBy(o => o.OperationTime.Hour).Select(o => o).ToList();
+            }
+
+            var numOfConsumers = _consumerRepository.GetAll().Count();
 
             var reportData = new Dictionary<string, float>();
             foreach (var outage in outageReportGrouping)
             {
                 var outageCount = outage.Count();
-                reportData.Add(type == "Monthly" ? DateHelpers.Months[outage.Key] : outage.Key.ToString(), (float)outageCount / (float)numOfConsumers); ;
+                reportData.Add(type == "Yearly" ? DateHelpers.Months[outage.Key] : outage.Key.ToString(), (float)outageCount / (float)numOfConsumers); ;
             }
 
             return new OutageReport

@@ -152,13 +152,12 @@ namespace OMS.HistoryDBManagerImplementation
 					{
 						if (IsOpened(element))
 						{
-							await this.historyDBManager.OnSwitchClosed(element.Id);
+							var outageId = await CheckSwitch(element.Id);
+							await this.historyDBManager.OnSwitchOpened(element.Id, outageId);
 						}
 						else
 						{
-							var outageId = await CheckSwitch(element.Id);
-							await this.historyDBManager.OnSwitchOpened(element.Id, outageId);
-
+							await this.historyDBManager.OnSwitchClosed(element.Id);
 						}
 					}
 
