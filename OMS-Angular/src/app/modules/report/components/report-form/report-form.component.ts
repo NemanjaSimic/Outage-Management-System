@@ -45,6 +45,7 @@ export class ReportFormComponent implements OnInit {
   public startDate = new FormControl();
   public endDate = new FormControl();
   public datePickerDisabled;
+  public scopeDisabled = false;
   
   private defaultDateType = DateType.Daily;
 
@@ -70,6 +71,16 @@ export class ReportFormComponent implements OnInit {
           map(name => name ? this.filterScopes(name) : this.scopes.slice())
         );
     });
+  }
+
+  onReportTypeChange(event): void {
+    console.log(event.value);
+    if(event.value !== "0") {
+      this.selectedScopeControl.disable();
+    } else {
+      this.selectedScopeControl.enable();
+
+    }
   }
 
   filterScopes(name): any[] {
@@ -121,7 +132,7 @@ export class ReportFormComponent implements OnInit {
   onSubmitHandler(): void {
     const options: ReportOptions = {
       Type: this.selectedReportType,
-      ElementId: +this.selectedScopeControl.value,
+      ElementId: this.selectedReportType !== "0" ? +this.selectedScopeControl.value: 0,
       StartDate: formatStartDate(this.startDate.value, this.selectedDateType),
       EndDate: formatEndDate(this.endDate.value, this.selectedDateType)
     }

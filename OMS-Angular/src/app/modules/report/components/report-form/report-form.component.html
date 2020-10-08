@@ -1,14 +1,14 @@
 <div class="report-form">
   <mat-form-field class="form-field white-label">
     <mat-label class="white-label"> Report Type </mat-label>
-    <mat-select [(value)]="selectedReportType">
+    <mat-select (selectionChange)="onReportTypeChange($event)" [(value)]="selectedReportType">
       <mat-option *ngFor="let reportType of reportTypes" [value]="reportType.value">
         {{ reportType.name }}
       </mat-option>
     </mat-select>
   </mat-form-field>
 
-  <mat-form-field class="form-field custom-width">
+  <mat-form-field class="form-field custom-width" >
     <mat-label class="white-label">Scope</mat-label>
     <input type="text" class="white-label" matInput [formControl]="selectedScopeControl" [matAutocomplete]="auto">
     <mat-autocomplete #auto="matAutocomplete">
