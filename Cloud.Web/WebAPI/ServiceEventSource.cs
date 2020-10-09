@@ -25,10 +25,23 @@ namespace WebAPI
         // Instance constructor is private to enforce singleton semantics
         private ServiceEventSource() : base() { }
 
+        [NonEvent]
         public void UniversalServiceMessage(ServiceContext serviceContext, string message)
         {
-            ServiceMessage(serviceContext, message);
+            if (this.IsEnabled())
+            {
+                ServiceMessage(
+                    serviceContext.ServiceName.ToString(),
+                    serviceContext.ServiceTypeName,
+                    GetReplicaOrInstanceId(serviceContext),
+                    serviceContext.PartitionId,
+                    serviceContext.CodePackageActivationContext.ApplicationName,
+                    serviceContext.CodePackageActivationContext.ApplicationTypeName,
+                    serviceContext.NodeContext.NodeName,
+                    message);
+            }
         }
+
 
         #region Keywords
         // Event keywords can be used to categorize events. 

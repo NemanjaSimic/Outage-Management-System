@@ -63,7 +63,7 @@ namespace WebAdapterImplementation.HubDispatchers
                 var jsonOutput = JsonConvert.SerializeObject(omsGraphData);
                 await this.connection.InvokeAsync("NotifyGraphUpdate", jsonOutput);
 
-                Logger.LogDebug($"{baseLogString} NotifyGraphUpdate => json output sent to graph hub: {jsonOutput}");
+                Logger.LogDebug($"{baseLogString} NotifyGraphUpdate => json output sent to graph hub: " + jsonOutput);
             }
             catch (Exception e)
             {

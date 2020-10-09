@@ -32,7 +32,7 @@ namespace WebAPI.Hubs
 
                 await Clients.All.SendAsync("updateGraph", omsGraphJsonData);
 
-                Logger.LogDebug($"{baseLogString} NotifyGraphUpdate => scada data in json format sent to front-end: {omsGraphJsonData}");
+                Logger.LogDebug($"{baseLogString} NotifyGraphUpdate => scada data in json format sent to front-end: " + omsGraphJsonData);
             }
             catch (Exception e)
             {

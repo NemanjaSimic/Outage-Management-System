@@ -25,9 +25,23 @@ namespace WebAdapterService
         // Instance constructor is private to enforce singleton semantics
         private ServiceEventSource() : base() { }
 
+        [NonEvent]
         public void UniversalServiceMessage(ServiceContext serviceContext, string message)
         {
-            ServiceMessage((StatelessServiceContext)serviceContext, message);
+            var statelessServiceContext = (StatelessServiceContext)serviceContext;
+
+            if (this.IsEnabled())
+            {
+                ServiceMessage(
+                    statelessServiceContext.ServiceName.ToString(),
+                    statelessServiceContext.ServiceTypeName,
+                    statelessServiceContext.InstanceId,
+                    statelessServiceContext.PartitionId,
+                    statelessServiceContext.CodePackageActivationContext.ApplicationName,
+                    statelessServiceContext.CodePackageActivationContext.ApplicationTypeName,
+                    statelessServiceContext.NodeContext.NodeName,
+                    message);
+            }
         }
 
         #region Keywords
