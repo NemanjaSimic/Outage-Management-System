@@ -103,7 +103,8 @@ namespace CE.TopologyProviderImplementation
                             {
                                 Gid = analogMeasurement.Id,
                                 Type = analogMeasurement.GetMeasurementType(),
-                                Value = analogMeasurement.GetCurrentValue()
+                                Value = analogMeasurement.GetCurrentValue(),
+                                AlarmType = analogMeasurement.GetAlarmType()
                             });
 
                         }
@@ -118,7 +119,8 @@ namespace CE.TopologyProviderImplementation
                             {
                                 Gid = discreteMeasurement.Id,
                                 Type = discreteMeasurement.GetMeasurementType(),
-                                Value = discreteMeasurement.GetCurrentValue()
+                                Value = discreteMeasurement.GetCurrentValue(),
+                                AlarmType = AlarmType.NO_ALARM
                             });
                         }
                         else
@@ -132,7 +134,8 @@ namespace CE.TopologyProviderImplementation
                             {
                                 Gid = discreteMeasurement.Id,
                                 Type = discreteMeasurement.GetMeasurementType(),
-                                Value = discreteMeasurement.GetCurrentValue()
+                                Value = discreteMeasurement.GetCurrentValue(),
+                                AlarmType = AlarmType.NO_ALARM
                             });
                         }
                     }

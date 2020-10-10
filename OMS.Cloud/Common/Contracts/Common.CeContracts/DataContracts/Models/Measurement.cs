@@ -40,7 +40,6 @@ namespace Common.CeContracts
 		public int NormalValue { get; set; }
 		public override string GetMeasurementType() => MeasurementType.ToString();
 		public override float GetCurrentValue() => (CurrentOpen) ? 1 : 0;
-
         public DiscreteMeasurement()
         {
             Alarm = AlarmType.NO_ALARM;
@@ -66,6 +65,10 @@ namespace Common.CeContracts
         public AnalogMeasurementType SignalType { get; set; }
         public override string GetMeasurementType() => SignalType.ToString();
         public override float GetCurrentValue() => CurrentValue;
+        public  AlarmType GetAlarmType()
+        {
+            return CurrentValue > MaxValue ? AlarmType.HIGH_ALARM : AlarmType.NO_ALARM;
+        }
 
         public AnalogMeasurement()
         {

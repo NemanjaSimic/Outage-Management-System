@@ -29,8 +29,8 @@
   </mat-form-field>
 
   <mat-form-field class="form-field">
-    <mat-label class="white-label">Choose a start date</mat-label>
-    <input matInput [matDatepicker]="datePicker" [formControl]="startDate" >
+    <mat-label class="white-label">Choose a  date</mat-label>
+    <input matInput [matDatepicker]="datePicker" [formControl]="selectedDate" >
     <mat-datepicker-toggle matSuffix [for]="datePicker"></mat-datepicker-toggle>
     <mat-datepicker 
       #datePicker 
@@ -40,7 +40,7 @@
     </mat-datepicker>
   </mat-form-field>
 
-  <mat-form-field class="form-field">
+  <!-- <mat-form-field class="form-field">
     <mat-label class="white-label">Choose a end date</mat-label>
     <input matInput [matDatepicker]="endDatePicker" [formControl]="endDate" >
     <mat-datepicker-toggle matSuffix [for]="endDatePicker"></mat-datepicker-toggle>
@@ -50,7 +50,7 @@
       (yearSelected)="chosenEndYearHandler($event, endDatePicker)"
       (monthSelected)="chosenEndMonthHandler($event, endDatePicker)">
     </mat-datepicker>
-  </mat-form-field>
+  </mat-form-field> -->
 
   <button class="generate-button" mat-flat-button (click)="onSubmitHandler()">Generate report</button>
 </div>
