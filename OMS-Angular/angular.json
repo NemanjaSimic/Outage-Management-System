@@ -131,5 +131,8 @@
       }
     }
   },
-  "defaultProject": "OMS-Angular"
+  "defaultProject": "OMS-Angular",
+  "cli": {
+    "analytics": false
+  }
 }
