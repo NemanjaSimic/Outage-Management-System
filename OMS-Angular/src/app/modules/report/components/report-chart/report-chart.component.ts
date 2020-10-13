@@ -19,6 +19,9 @@ export class ReportChartComponent implements OnInit {
   showXAxisLabel = true;
   showYAxisLabel = true;
   yAxisLabel = '# of outages per consumer';
+  colorScheme = {
+    domain: ['#FFFB33']
+  };
 
   constructor() {}
 
