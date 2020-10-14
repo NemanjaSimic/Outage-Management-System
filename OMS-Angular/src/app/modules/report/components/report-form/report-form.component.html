@@ -8,7 +8,7 @@
     </mat-select>
   </mat-form-field>
 
-  <mat-form-field class="form-field custom-width" >
+  <mat-form-field class="form-field custom-width" *ngIf="selectedScopeControl.disabled !== true">
     <mat-label class="white-label">Scope</mat-label>
     <input type="text" class="white-label" matInput [formControl]="selectedScopeControl" [matAutocomplete]="auto">
     <mat-autocomplete #auto="matAutocomplete">
