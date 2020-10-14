@@ -2,6 +2,7 @@ import { Component, OnInit } from '@angular/core';
 import { ReportService } from '@services/report/report.service';
 import { Report } from '@shared/models/report.model';
 import { ChartData } from '@shared/models/chart-data.model';
+import { ReportType } from '@shared/models/report-options.model';
 
 @Component({
   selector: 'app-report',
@@ -12,6 +13,7 @@ export class ReportComponent implements OnInit {
   public hasChartData: Boolean = false;
   public chartData;
   public chartType;
+  public reportType;
 
   constructor(private reportService: ReportService) { }
 
@@ -21,6 +23,13 @@ export class ReportComponent implements OnInit {
   onGenerateHandler(options): void {
     this.hasChartData = true;
     console.log(options);
+
+    //mock
+   /*  const chartData: ChartData[] = [];
+    chartData.push({name:'2', value: 2});
+    this.chartData = chartData;
+    this.chartType = 'Monthly';
+    this.reportType = options.Type; */
 
     this.reportService.generateReport(options).subscribe(
       (report: Report)  => {
@@ -32,6 +41,7 @@ export class ReportComponent implements OnInit {
         console.log(chartData);
         this.chartData = chartData;
         this.chartType = report.Type;
+        this.reportType = options.Type;
       },
       err => console.error(err)
     );
