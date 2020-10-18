@@ -103,7 +103,8 @@ namespace CE.TopologyProviderImplementation
                             {
                                 Gid = analogMeasurement.Id,
                                 Type = analogMeasurement.GetMeasurementType(),
-                                Value = analogMeasurement.GetCurrentValue()
+                                Value = analogMeasurement.GetCurrentValue(),
+                                AlarmType = analogMeasurement.GetAlarmType()
                             });
 
                         }
@@ -118,7 +119,23 @@ namespace CE.TopologyProviderImplementation
                             {
                                 Gid = discreteMeasurement.Id,
                                 Type = discreteMeasurement.GetMeasurementType(),
-                                Value = discreteMeasurement.GetCurrentValue()
+                                Value = discreteMeasurement.GetCurrentValue(),
+                                AlarmType = AlarmType.NO_ALARM
+                            });
+                        }
+                        else
+                        {
+                            Logger.LogDebug($"{baseLogString} ConvertTopologyToUIModel => Calling GetDiscreteMeasurement method from measurement provider client for measurement GID {measurementGid:X16}.");
+                            var measurementProviderClient = MeasurementProviderClient.CreateClient();
+                            DiscreteMeasurement discreteMeasurement = await measurementProviderClient.GetDiscreteMeasurement(measurementGid);
+                            Logger.LogDebug($"{baseLogString} ConvertTopologyToUIModel => GetDiscreteMeasurement method from measurement provider client has been called successfully.");
+
+                            measurements.Add(new UIMeasurement()
+                            {
+                                Gid = discreteMeasurement.Id,
+                                Type = discreteMeasurement.GetMeasurementType(),
+                                Value = discreteMeasurement.GetCurrentValue(),
+                                AlarmType = AlarmType.NO_ALARM
                             });
                         }
                     }

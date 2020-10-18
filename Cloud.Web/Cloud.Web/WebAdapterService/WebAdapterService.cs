@@ -29,7 +29,7 @@ namespace WebAdapterService
         private readonly IRegisterSubscriberContract registerSubscriberClient;
 
         private ICloudLogger logger;
-        protected ICloudLogger Logger
+        private ICloudLogger Logger
         {
             get { return logger ?? (logger = CloudLoggerFactory.GetLogger()); }
         }
@@ -37,6 +37,8 @@ namespace WebAdapterService
         public WebAdapterService(StatelessServiceContext context)
             : base(context)
         {
+            this.logger = CloudLoggerFactory.GetLogger(ServiceEventSource.Current, context);
+
             this.baseLogString = $"{this.GetType()} [{this.GetHashCode()}] =>{Environment.NewLine}";
             Logger.LogDebug($"{baseLogString} Ctor => Logger initialized");
 
@@ -104,6 +106,7 @@ namespace WebAdapterService
                     Topic.ACTIVE_OUTAGE,
                     Topic.ARCHIVED_OUTAGE,
                     Topic.TOPOLOGY,
+                    Topic.OUTAGE_EMAIL,
                 };
 
                 var result = await registerSubscriberClient.SubscribeToTopics(topics, MicroserviceNames.WebAdapterService);

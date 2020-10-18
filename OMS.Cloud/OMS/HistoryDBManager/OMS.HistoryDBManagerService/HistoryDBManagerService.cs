@@ -3,23 +3,24 @@ using System.Collections.Generic;
 using System.Fabric;
 using System.Threading;
 using System.Threading.Tasks;
-using Common.CeContracts.TopologyProvider;
 using Common.OMS;
 using Common.OmsContracts.HistoryDBManager;
 using Common.OmsContracts.ModelAccess;
 using Common.OmsContracts.Report;
-using Common.PubSubContracts.DataContracts.CE;
+using Common.PubSubContracts.DataContracts.OMS;
 using Microsoft.ServiceFabric.Data;
 using Microsoft.ServiceFabric.Data.Collections;
 using Microsoft.ServiceFabric.Services.Communication.Runtime;
 using Microsoft.ServiceFabric.Services.Communication.Wcf;
 using Microsoft.ServiceFabric.Services.Communication.Wcf.Runtime;
 using Microsoft.ServiceFabric.Services.Runtime;
+using OMS.Common.Cloud;
 using OMS.Common.Cloud.Logger;
 using OMS.Common.Cloud.Names;
+using OMS.Common.PubSubContracts;
 using OMS.Common.TmsContracts;
 using OMS.Common.TmsContracts.Notifications;
-using OMS.Common.WcfClient.CE;
+using OMS.Common.WcfClient.PubSub;
 using OMS.HistoryDBManagerImplementation;
 using OMS.HistoryDBManagerImplementation.DistributedTransaction;
 using OMS.HistoryDBManagerImplementation.ModelAccess;
@@ -41,6 +42,7 @@ namespace OMS.HistoryDBManagerService
         private readonly IEquipmentAccessContract equipmentAccessProvider;
         private readonly INotifyNetworkModelUpdateContract notifyNetworkModelUpdateProvider;
         private readonly ITransactionActorContract transactionActorProvider;
+        private readonly HistorySubscriber historySubscriber;
 
         private ICloudLogger logger;
         private ICloudLogger Logger
@@ -51,6 +53,8 @@ namespace OMS.HistoryDBManagerService
         public HistoryDBManagerService(StatefulServiceContext context)
             : base(context)
         {
+            this.logger = CloudLoggerFactory.GetLogger(ServiceEventSource.Current, context);
+
             this.baseLogString = $"{this.GetType()} [{this.GetHashCode()}] =>{Environment.NewLine}";
             Logger.LogDebug($"{baseLogString} Ctor => Logger initialized");
 
@@ -63,16 +67,16 @@ namespace OMS.HistoryDBManagerService
                 this.equipmentAccessProvider = new EquipmentAccess();
                 this.notifyNetworkModelUpdateProvider = new OmsHistoryNotifyNetworkModelUpdate(this.StateManager);
                 this.transactionActorProvider = new OmsHistoryTransactionActor(this.StateManager);
+                this.historySubscriber = new HistorySubscriber(this.StateManager, this.historyDBManagerProvider);
+
 
                 string infoMessage = $"{baseLogString} Ctor => Contract providers initialized.";
                 Logger.LogInformation(infoMessage);
-                ServiceEventSource.Current.ServiceMessage(this.Context, $"[HistoryDBManagerService | Information] {infoMessage}");
             }
             catch (Exception e)
             {
                 string errorMessage = $"{baseLogString} Ctor => Exception caught: {e.Message}.";
                 Logger.LogError(errorMessage, e);
-                ServiceEventSource.Current.ServiceMessage(this.Context, $"[HistoryDBManagerService | Error] {errorMessage}");
             }
         }
 
@@ -142,6 +146,13 @@ namespace OMS.HistoryDBManagerService
                                                                                        WcfUtility.CreateTcpClientBinding(),
                                                                                        EndpointNames.TmsTransactionActorEndpoint);
                 }, EndpointNames.TmsTransactionActorEndpoint),
+                new ServiceReplicaListener(context =>
+                {
+                    return new WcfCommunicationListener<INotifySubscriberContract>(context,
+                                                                             this.historySubscriber,
+                                                                             WcfUtility.CreateTcpListenerBinding(),
+                                                                             EndpointNames.PubSubNotifySubscriberEndpoint);
+                }, EndpointNames.PubSubNotifySubscriberEndpoint)
             };
         }
 
@@ -152,7 +163,10 @@ namespace OMS.HistoryDBManagerService
                 InitializeReliableCollections();
                 string debugMessage = $"{baseLogString} RunAsync => ReliableDictionaries initialized.";
                 Logger.LogDebug(debugMessage);
-                ServiceEventSource.Current.ServiceMessage(this.Context, $"[HistoryDBManagerService | Information] {debugMessage}");
+
+                var registerSubscriberClient = RegisterSubscriberClient.CreateClient();
+                await registerSubscriberClient.SubscribeToTopic(Topic.ACTIVE_OUTAGE, MicroserviceNames.OmsHistoryDBManagerService);
+                await registerSubscriberClient.SubscribeToTopic(Topic.TOPOLOGY, MicroserviceNames.OmsHistoryDBManagerService);
             }
             catch (Exception e)
             {
@@ -217,6 +231,25 @@ namespace OMS.HistoryDBManagerService
                         else
                         {
                             await StateManager.GetOrAddAsync<IReliableDictionary<byte, List<long>>>(tx, ReliableDictionaryNames.HistoryModelChanges);
+                            await tx.CommitAsync();
+                        }
+                    }
+                }),
+
+                Task.Run(async() =>
+                {
+                    using (ITransaction tx = this.StateManager.CreateTransaction())
+                    {
+                        var result = await StateManager.TryGetAsync<IReliableDictionary<long, ActiveOutageMessage>>(ReliableDictionaryNames.ActiveOutages);
+                        if(result.HasValue)
+                        {
+                            var modelChanges = result.Value;
+                            await modelChanges.ClearAsync();
+                            await tx.CommitAsync();
+                        }
+                        else
+                        {
+                            await StateManager.GetOrAddAsync<IReliableDictionary<long, ActiveOutageMessage>>(tx, ReliableDictionaryNames.ActiveOutages);
                             await tx.CommitAsync();
                         }
                     }

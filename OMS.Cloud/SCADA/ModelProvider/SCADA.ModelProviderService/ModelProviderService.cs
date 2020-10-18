@@ -31,7 +31,6 @@ namespace SCADA.ModelProviderService
     internal sealed class ModelProviderService : StatefulService
     {
         private readonly string baseLogString;
-        //private readonly ScadaModelImporter scadaModelImporter;
 
         private readonly IScadaModelReadAccessContract modelReadAccessProvider;
         private readonly IScadaModelUpdateAccessContract modelUpdateAccessProvider;
@@ -48,6 +47,8 @@ namespace SCADA.ModelProviderService
         public ModelProviderService(StatefulServiceContext context)
             : base(context)
         {
+            this.logger = CloudLoggerFactory.GetLogger(ServiceEventSource.Current, context);
+
             this.baseLogString = $"{this.GetType()} [{this.GetHashCode()}] =>{Environment.NewLine}";
             Logger.LogDebug($"{baseLogString} Ctor => Logger initialized");
 
@@ -57,8 +58,6 @@ namespace SCADA.ModelProviderService
                 var modelResourceDesc = new ModelResourcesDesc();
                 var enumDescs = new EnumDescs();
 
-                //this.scadaModelImporter = new ScadaModelImporter(this.StateManager, modelResourceDesc, enumDescs);
-
                 this.modelReadAccessProvider = new ModelReadAccessProvider(this.StateManager);
                 this.modelUpdateAccessProvider = new ModelUpdateAccessProvider(this.StateManager);
                 this.integrityUpdateProvider = new IntegrityUpdateProvider(this.StateManager);
@@ -67,13 +66,11 @@ namespace SCADA.ModelProviderService
 
                 string infoMessage = $"{baseLogString} Ctor => Contract providers initialized.";
                 Logger.LogInformation(infoMessage);
-                ServiceEventSource.Current.ServiceMessage(this.Context, $"[SCADA.ModelProviderService | Information] {infoMessage}");
             }
             catch (Exception e)
             {
                 string errorMessage = $"{baseLogString} Ctor => Exception caught: {e.Message}.";
                 Logger.LogError(errorMessage, e);
-                ServiceEventSource.Current.ServiceMessage(this.Context, $"[SCADA.ModelProviderService | Error] {errorMessage}");
             }
         }
 
@@ -145,35 +142,11 @@ namespace SCADA.ModelProviderService
                 InitializeReliableCollections();
                 string debugMessage = $"{baseLogString} RunAsync => ReliableDictionaries initialized.";
                 Logger.LogDebug(debugMessage);
-                ServiceEventSource.Current.ServiceMessage(this.Context, $"[SCADA.ModelProviderService | Information] {debugMessage}");
-
-
-                //while (true)
-                //{
-                //    //var success = await scadaModelImporter.InitializeScadaModel();
-                    
-                //    if(success)
-                //    {
-                //        string infoMessage = $"{baseLogString} RunAsync => ScadaModel initialized.";
-                //        Logger.LogInformation(infoMessage);
-                //        ServiceEventSource.Current.ServiceMessage(this.Context, $"[SCADA.ModelProviderService | Information] {infoMessage}");
-
-                //        break;
-                //    }
-                //    else
-                //    {
-                //        string warnMessage = $"{baseLogString} RunAsync => ScadaModel failed to initialized. Entering 1000 ms sleep before retry";
-                //        Logger.LogWarning(warnMessage);
-
-                //        await Task.Delay(1000);
-                //    }
-                //}
             }
             catch (Exception e)
             {
                 string errorMessage = $"{baseLogString} RunAsync => Exception caught: {e.Message}.";
                 Logger.LogInformation(errorMessage, e);
-                ServiceEventSource.Current.ServiceMessage(this.Context, $"[SCADA.ModelProviderService | Error] {errorMessage}");
             }
         }
 

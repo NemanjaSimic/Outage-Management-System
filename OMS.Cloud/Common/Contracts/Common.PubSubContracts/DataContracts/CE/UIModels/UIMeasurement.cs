@@ -1,4 +1,5 @@
-﻿using System.Runtime.Serialization;
+﻿using OMS.Common.Cloud;
+using System.Runtime.Serialization;
 
 namespace Common.PubSubContracts.DataContracts.CE.UIModels
 {
@@ -11,5 +12,7 @@ namespace Common.PubSubContracts.DataContracts.CE.UIModels
 		public float Value { get; set; }
 		[DataMember]
 		public string Type { get; set; }
+		[DataMember]
+		public AlarmType AlarmType { get; set; }
 	}
 }

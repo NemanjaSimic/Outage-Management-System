@@ -42,6 +42,8 @@ namespace SCADA.FunctionExecutorService
         public FunctionExecutorService(StatefulServiceContext context)
             : base(context)
         {
+            this.logger = CloudLoggerFactory.GetLogger(ServiceEventSource.Current, context);
+
             this.baseLogString = $"{this.GetType()} [{this.GetHashCode()}] =>{Environment.NewLine}";
             Logger.LogDebug($"{baseLogString} Ctor => Logger initialized");
 
@@ -54,13 +56,11 @@ namespace SCADA.FunctionExecutorService
 
                 string infoMessage = $"{baseLogString} Ctor => Contract providers initialized.";
                 Logger.LogInformation(infoMessage);
-                ServiceEventSource.Current.ServiceMessage(this.Context, $"[FunctionExecutorService | Information] {infoMessage}");
             }
             catch (Exception e)
             {
                 string errorMessage = $"{baseLogString} Ctor => exception {e.Message}";
                 Logger.LogError(errorMessage, e);
-                ServiceEventSource.Current.ServiceMessage(this.Context, $"[FunctionExecutorService | Error] {errorMessage}");
             }
         }
 
@@ -115,20 +115,17 @@ namespace SCADA.FunctionExecutorService
                 InitializeReliableCollections();
                 string debugMessage = $"{baseLogString} RunAsync => ReliableDictionaries initialized.";
                 Logger.LogDebug(debugMessage);
-                ServiceEventSource.Current.ServiceMessage(this.Context, $"[SCADA.FunctionExecutorService | Information] {debugMessage}");
 
                 IScadaModelReadAccessContract readAccessClient = ScadaModelReadAccessClient.CreateClient();
                 configData = await readAccessClient.GetScadaConfigData();
 
                 string infoMessage = $"{baseLogString} RunAsync => FunctionExecutorCycle initialized.";
                 Logger.LogInformation(infoMessage);
-                ServiceEventSource.Current.ServiceMessage(this.Context, $"[SCADA.FunctionExecutorService | Information] {infoMessage}");
             }
             catch (Exception e)
             {
                 string errorMessage = $"{baseLogString} RunAsync => exception {e.Message}";
                 Logger.LogError(errorMessage, e);
-                ServiceEventSource.Current.ServiceMessage(this.Context, $"[SCADA.FunctionExecutorService | Error] {errorMessage}");
                 throw e;
             }
 
@@ -162,7 +159,6 @@ namespace SCADA.FunctionExecutorService
                 {
                     string errorMessage = $"{baseLogString} RunAsync => exception {e.Message}";
                     Logger.LogError(errorMessage, e);
-                    ServiceEventSource.Current.ServiceMessage(this.Context, $"[SCADA.FunctionExecutorService | Error] {errorMessage}");
                 }
 
                 await Task.Delay(TimeSpan.FromMilliseconds(configData.FunctionExecutionInterval), cancellationToken);

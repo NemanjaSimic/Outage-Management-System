@@ -28,6 +28,8 @@ namespace SCADA.AcquisitionService
         public AcquisitionService(StatelessServiceContext context)
             : base(context)
         {
+            this.logger = CloudLoggerFactory.GetLogger(ServiceEventSource.Current, context);
+
             this.baseLogString = $"{this.GetType()} [{this.GetHashCode()}] =>{Environment.NewLine}";
             Logger.LogDebug($"{baseLogString} Ctor => Logger initialized");
         }
@@ -59,14 +61,12 @@ namespace SCADA.AcquisitionService
                 configData = await readAccessClient.GetScadaConfigData();
 
                 string message = $"{baseLogString} RunAsync => AcquisitionCycle initialized.";
-                ServiceEventSource.Current.ServiceMessage(this.Context, $"[AcquisitionService | Information] {message}");
                 Logger.LogInformation(message);
             }
             catch (Exception e)
             {
                 string errMessage = $"{baseLogString} RunAsync => Exception caught: {e.Message}.";
                 Logger.LogError(errMessage, e);
-                ServiceEventSource.Current.ServiceMessage(this.Context, $"[AcquisitionService | Error] {errMessage}");
                 throw e;
             }
 
@@ -100,7 +100,6 @@ namespace SCADA.AcquisitionService
                 {
                     string errMessage = $"{baseLogString} RunAsync => Exception caught: {e.Message}";
                     Logger.LogError(errMessage, e);
-                    ServiceEventSource.Current.ServiceMessage(this.Context, $"[AcquisitionService | Error] {errMessage}");
                 }
 
                 await Task.Delay(TimeSpan.FromMilliseconds(configData.AcquisitionInterval), cancellationToken);

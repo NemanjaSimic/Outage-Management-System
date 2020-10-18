@@ -43,7 +43,10 @@ export class ReportFormComponent implements OnInit {
   public filteredScopes: Observable<any[]>;
   public selectedScopeControl = new FormControl();
   public selectedDate = new FormControl();
-  public endDate = new FormControl(moment());
+  public endDate = new FormControl({disabled: true});
+
+  public scopeDisabled = false;
+  
   private defaultDateType = DateType.Daily;
 
   @Output() generate = new EventEmitter<ReportOptions>();
@@ -51,8 +54,11 @@ export class ReportFormComponent implements OnInit {
   constructor(private graphService: GraphService, private dateFormatService: DateFormatService ) { }
 
   ngOnInit() {
+    
+    //this.dateFormatService.setFormat(this.defaultDateType);
+
     this.graphService.getTopology().subscribe((graph) => {
-      graph.Nodes.forEach(node => this.scopes.push({
+      graph.Nodes.filter(node => node.DMSType == "ENERGYCONSUMER").forEach(node => this.scopes.push({
         value: node.Mrid,
         name: node.Name,
         gid: node.Id
@@ -65,6 +71,16 @@ export class ReportFormComponent implements OnInit {
           map(name => name ? this.filterScopes(name) : this.scopes.slice())
         );
     });
+  }
+
+  onReportTypeChange(event): void {
+    console.log(event.value);
+    if(event.value !== "0") {
+      this.selectedScopeControl.disable();
+    } else {
+      this.selectedScopeControl.enable();
+
+    }
   }
 
   filterScopes(name): any[] {
@@ -93,15 +109,37 @@ export class ReportFormComponent implements OnInit {
     if(this.selectedDateType === DateType.Monthly) datePicker.close();
   }
 
+  // chosenEndYearHandler(event: moment.Moment, datePicker: MatDatepicker<moment.Moment>): void {
+  //   this.endDate = new FormControl(moment());
+  //   const ctrlValue = this.endDate.value;
+  //   ctrlValue.year(event.year());
+    
+  //   // @TODO: Da li potrebno dodati zastitu od datuma preko sadasnjeg ? 
+  //   this.endDate.setValue(ctrlValue);
+
+
+  //   if(this.selectedDateType === DateType.Yearly) datePicker.close();
+  // }
+
+  // chosenEndMonthHandler(event: moment.Moment, datePicker: MatDatepicker<string>): void {
+  //   const ctrlValue = this.endDate.value;
+  //   ctrlValue.month(event.month());
+  //   this.endDate.setValue(ctrlValue);
+
+  //   if(this.selectedDateType === DateType.Monthly) datePicker.close();
+  // }
+
   onSubmitHandler(): void {
     const options: ReportOptions = {
       Type: this.selectedReportType,
-      ElementId: +this.selectedScopeControl.value,
+      ElementId: this.selectedReportType !== "0" ? +this.selectedScopeControl.value: 0,
       StartDate: formatStartDate(this.selectedDate.value, this.selectedDateType),
       EndDate: formatEndDate(this.selectedDate.value, this.selectedDateType)
     }
 
     this.generate.emit(options);
+
+    console.log(options);
   }
 
 

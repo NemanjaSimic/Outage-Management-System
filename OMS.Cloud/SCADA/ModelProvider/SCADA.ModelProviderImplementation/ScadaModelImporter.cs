@@ -16,6 +16,7 @@ using SCADA.ModelProviderImplementation.Helpers;
 using System;
 using System.Collections.Generic;
 using System.Diagnostics;
+using System.Fabric;
 using System.Threading.Tasks;
 
 namespace SCADA.ModelProviderImplementation
@@ -27,9 +28,6 @@ namespace SCADA.ModelProviderImplementation
         private readonly ModelResourcesDesc modelResourceDesc;
         private readonly ScadaModelPointItemHelper pointItemHelper;
         private readonly IReliableStateManager stateManager;
-
-        //private INetworkModelGDAContract nmsGdaClient;
-        //private IScadaCommandingContract scadaCommandingClient;
 
         private ICloudLogger logger;
         private ICloudLogger Logger
@@ -56,7 +54,19 @@ namespace SCADA.ModelProviderImplementation
         private ReliableDictionaryAccess<short, Dictionary<ushort, long>> AddressToGidMap { get; set; }
         private ReliableDictionaryAccess<string, bool> InfoCache { get; set; }
 
-        private async void OnStateManagerChangedHandler(object sender, NotifyStateManagerChangedEventArgs e)
+        private async void OnStateManagerChangedHandler(object sender, NotifyStateManagerChangedEventArgs eventArgs)
+        {
+            try
+            {
+                await InitializeReliableCollections(eventArgs);
+            }
+            catch (FabricNotPrimaryException)
+            {
+                Logger.LogDebug($"{baseLogString} OnStateManagerChangedHandler => NotPrimaryException. To be ignored.");
+            }
+        }
+
+        private async Task InitializeReliableCollections(NotifyStateManagerChangedEventArgs e)
         {
             if (e.Action == NotifyStateManagerChangedAction.Add)
             {

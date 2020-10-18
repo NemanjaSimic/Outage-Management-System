@@ -17,34 +17,6 @@ namespace CE.ModelProviderImplementation
         private ICloudLogger logger;
         private ICloudLogger Logger => logger ?? (logger = CloudLoggerFactory.GetLogger());
 
-        //#region Reliable Dictionaries
-        //private bool isModelChangesInitialized;
-        //private bool ReliableDictionariesInitialized
-        //{
-        //    get { return isModelChangesInitialized; }
-        //}
-
-        //private ReliableDictionaryAccess<byte, List<long>> ModelChanges { get; set; }
-
-        //private async void OnStateManagerChangedHandler(object sender, NotifyStateManagerChangedEventArgs e)
-        //{
-        //    if (e.Action == NotifyStateManagerChangedAction.Add)
-        //    {
-        //        var operation = e as NotifyStateManagerSingleEntityChangedEventArgs;
-        //        string reliableStateName = operation.ReliableState.Name.AbsolutePath;
-
-        //        if (reliableStateName == ReliableDictionaryNames.ModelChanges)
-        //        {
-        //            ModelChanges = await ReliableDictionaryAccess<byte, List<long>>.Create(stateManager, ReliableDictionaryNames.ModelChanges);
-        //            this.isModelChangesInitialized = true;
-
-        //            string debugMessage = $"{baseLogString} OnStateManagerChangedHandler => '{ReliableDictionaryNames.ModelChanges}' ReliableDictionaryAccess initialized.";
-        //            Logger.LogDebug(debugMessage);
-        //        }
-        //    }
-        //}
-        //#endregion Reliable Dictionaries
-
         public CeNetworkNotifyModelUpdate()
         {
             this.baseLogString = $"{this.GetType()} [{this.GetHashCode()}] =>{Environment.NewLine}";
@@ -54,21 +26,6 @@ namespace CE.ModelProviderImplementation
         public async Task<bool> Notify(Dictionary<DeltaOpType, List<long>> modelChanges)
         {
             logger.LogDebug($"{baseLogString } Notify method.");
-
-            //while (!ReliableDictionariesInitialized)
-            //{
-            //    await Task.Delay(1000);
-            //}
-
-            //var tasks = new List<Task>();
-
-            //foreach (var element in modelChanges)
-            //{
-            //    tasks.Add(ModelChanges.SetAsync((byte)element.Key, element.Value));
-            //}
-
-            //Task.WaitAll(tasks.ToArray());
-
 
             ITransactionEnlistmentContract transactionEnlistmentClient = TransactionEnlistmentClient.CreateClient();
             logger.LogDebug($"{baseLogString } Notify calling enlist.");

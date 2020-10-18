@@ -11,6 +11,7 @@ using OMS.Common.WcfClient.OMS.ModelAccess;
 using OMS.OutageLifecycleImplementation.Helpers;
 using System;
 using System.Collections.Generic;
+using System.Fabric;
 using System.Linq;
 using System.Threading.Tasks;
 
@@ -36,6 +37,7 @@ namespace OMS.OutageLifecycleImplementation.Algorithm
         private bool isOutageTopologyModelInitialized;
         private bool isOptimumIsolationPointsInitialized;
         private bool isCommandedElementsInitialized;
+        private bool isElementsToBeIgnoredInReportPotentialOutageInitialized;
 
         private bool ReliableDictionariesInitialized
         {
@@ -45,7 +47,8 @@ namespace OMS.OutageLifecycleImplementation.Algorithm
                        isMonitoredHeadBreakerMeasurementsInitialized &&
                        isOutageTopologyModelInitialized &&
                        isOptimumIsolationPointsInitialized &&
-                       isCommandedElementsInitialized;
+                       isCommandedElementsInitialized &&
+                       isElementsToBeIgnoredInReportPotentialOutageInitialized;
             }
         }
 
@@ -83,7 +86,25 @@ namespace OMS.OutageLifecycleImplementation.Algorithm
             get { return commandedElements; }
         }
 
-        private async void OnStateManagerChangedHandler(object sender, NotifyStateManagerChangedEventArgs e)
+        private ReliableDictionaryAccess<long, DateTime> elementsToBeIgnoredInReportPotentialOutage;
+        private ReliableDictionaryAccess<long, DateTime> ElementsToBeIgnoredInReportPotentialOutage
+        {
+            get { return elementsToBeIgnoredInReportPotentialOutage; }
+        }
+
+        private async void OnStateManagerChangedHandler(object sender, NotifyStateManagerChangedEventArgs eventArgs)
+        {
+            try
+            {
+                await InitializeReliableCollections(eventArgs);
+            }
+            catch (FabricNotPrimaryException)
+            {
+                Logger.LogDebug($"{baseLogString} OnStateManagerChangedHandler => NotPrimaryException. To be ignored.");
+            }
+        }
+
+        private async Task InitializeReliableCollections(NotifyStateManagerChangedEventArgs e)
         {
             if (e.Action == NotifyStateManagerChangedAction.Add)
             {
@@ -98,7 +119,7 @@ namespace OMS.OutageLifecycleImplementation.Algorithm
                     string debugMessage = $"{baseLogString} OnStateManagerChangedHandler => '{ReliableDictionaryNames.StartedIsolationAlgorithms}' ReliableDictionaryAccess initialized.";
                     Logger.LogDebug(debugMessage);
                 }
-                else if(reliableStateName == ReliableDictionaryNames.MonitoredHeadBreakerMeasurements)
+                else if (reliableStateName == ReliableDictionaryNames.MonitoredHeadBreakerMeasurements)
                 {
                     this.monitoredHeadBreakerMeasurements = await ReliableDictionaryAccess<long, DiscreteModbusData>.Create(stateManager, ReliableDictionaryNames.MonitoredHeadBreakerMeasurements);
                     this.isMonitoredHeadBreakerMeasurementsInitialized = true;
@@ -128,6 +149,14 @@ namespace OMS.OutageLifecycleImplementation.Algorithm
                     this.isCommandedElementsInitialized = true;
 
                     string debugMessage = $"{baseLogString} OnStateManagerChangedHandler => '{ReliableDictionaryNames.CommandedElements}' ReliableDictionaryAccess initialized.";
+                    Logger.LogDebug(debugMessage);
+                }
+                else if (reliableStateName == ReliableDictionaryNames.ElementsToBeIgnoredInReportPotentialOutage)
+                {
+                    this.elementsToBeIgnoredInReportPotentialOutage = await ReliableDictionaryAccess<long, DateTime>.Create(stateManager, ReliableDictionaryNames.ElementsToBeIgnoredInReportPotentialOutage);
+                    this.isElementsToBeIgnoredInReportPotentialOutageInitialized = true;
+
+                    string debugMessage = $"{baseLogString} OnStateManagerChangedHandler => '{ReliableDictionaryNames.ElementsToBeIgnoredInReportPotentialOutage}' ReliableDictionaryAccess initialized.";
                     Logger.LogDebug(debugMessage);
                 }
             }
@@ -160,6 +189,7 @@ namespace OMS.OutageLifecycleImplementation.Algorithm
             this.isOutageTopologyModelInitialized = false;
             this.isOptimumIsolationPointsInitialized = false;
             this.isCommandedElementsInitialized = false;
+            this.isElementsToBeIgnoredInReportPotentialOutageInitialized = false;
 
             this.stateManager = stateManager;
             this.stateManager.StateManagerChanged += this.OnStateManagerChangedHandler;
@@ -292,7 +322,6 @@ namespace OMS.OutageLifecycleImplementation.Algorithm
             }
 
             algorithm.CycleCounter = 0;
-            algorithm.ElementsCommandedInCurrentCycle.Clear();
 
             //moving to the next breaker
             algorithm.CurrentBreakerGid = lifecycleHelper.GetNextBreaker(algorithm.CurrentBreakerGid, topology);
@@ -357,9 +386,10 @@ namespace OMS.OutageLifecycleImplementation.Algorithm
                     CorrespondingHeadElementGid = algorithm.HeadBreakerGid,
                     CommandingType = commands[commandedElementGid],
                 };
-                await CommandedElements.SetAsync(commandedElementGid, commandedElement);
 
-                algorithm.ElementsCommandedInCurrentCycle.Add(commandedElementGid);
+                await CommandedElements.SetAsync(commandedElementGid, commandedElement);
+                await ElementsToBeIgnoredInReportPotentialOutage.SetAsync(commandedElementGid, DateTime.UtcNow);
+                Logger.LogDebug($"{algorithmBaseLogString} SendCommands => Element 0x{commandedElementGid:X16} set to collection '{ReliableDictionaryNames.ElementsToBeIgnoredInReportPotentialOutage}' at {DateTime.UtcNow}.");
             });
 
             await StartedIsolationAlgorithms.SetAsync(algorithm.HeadBreakerGid, algorithm);

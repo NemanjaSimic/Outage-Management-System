@@ -30,10 +30,10 @@ namespace OMS.Common.WcfClient.OMS.HistoryDBManager
         }
 
         #region IHistoryDBManagerContract
-        public Task OnConsumerBlackedOut(List<long> consumers, long? outageId)
-        {
-            return InvokeWithRetryAsync(client => client.Channel.OnConsumerBlackedOut(consumers, outageId));
-        }
+        //public Task OnConsumerBlackedOut(List<long> consumers, long? outageId)
+        //{
+        //    return InvokeWithRetryAsync(client => client.Channel.OnConsumerBlackedOut(consumers, outageId));
+        //}
 
         public Task OnConsumersEnergized(HashSet<long> consumers)
         {
@@ -53,6 +53,24 @@ namespace OMS.Common.WcfClient.OMS.HistoryDBManager
         public Task<bool> IsAlive()
         {
             return InvokeWithRetryAsync(client => client.Channel.IsAlive());
+        }
+
+        public Task OnConsumerBlackedOut(long consumer, long? outageId)
+        {
+            return InvokeWithRetryAsync(client => client.Channel.OnConsumerBlackedOut(consumer, outageId));
+
+        }
+
+        public Task UpdateClosedSwitch(long elementGid, long outageId)
+        {
+            return InvokeWithRetryAsync(client => client.Channel.UpdateClosedSwitch(elementGid, outageId));
+
+        }
+
+        public Task UpdateConsumer(long consumer, long outageId)
+        {
+            return InvokeWithRetryAsync(client => client.Channel.UpdateConsumer(consumer, outageId));
+
         }
         #endregion IHistoryDBManagerContract
     }

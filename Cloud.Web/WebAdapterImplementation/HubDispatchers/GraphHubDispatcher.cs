@@ -5,17 +5,11 @@ using OMS.Common.Cloud.Logger;
 using System;
 using System.Collections.Generic;
 using Microsoft.Extensions.DependencyInjection;
-using Newtonsoft.Json;
-using Newtonsoft.Json.Serialization;
-using OMS.Common.Cloud.Logger;
-using System;
-using System.Collections.Generic;
-using System.Fabric.Query;
 using System.Threading.Tasks;
 
 namespace WebAdapterImplementation.HubDispatchers
 {
-    class GraphHubDispatcher
+	class GraphHubDispatcher
     {
         private const string graphHubUrl = "http://localhost:44351/graphhub";
 

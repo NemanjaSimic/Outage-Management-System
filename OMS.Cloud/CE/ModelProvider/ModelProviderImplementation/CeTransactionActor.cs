@@ -12,7 +12,6 @@ namespace CE.ModelProviderImplementation
     public class CeTransactionActor : ITransactionActorContract
     {
         private readonly string baseLogString;
-        //private readonly IReliableStateManager stateManager;
 
         #region Private Properties
         private ICloudLogger logger;
@@ -34,23 +33,6 @@ namespace CE.ModelProviderImplementation
             Logger.LogDebug($"{baseLogString} ctor initialized.");
         }
 
-        //private async void OnStateManagerChangedHandler(object sender, NotifyStateManagerChangedEventArgs e)
-        //{
-        //    if (e.Action == NotifyStateManagerChangedAction.Add)
-        //    {
-        //        var operation = e as NotifyStateManagerSingleEntityChangedEventArgs;
-        //        string reliableStateName = operation.ReliableState.Name.AbsolutePath;
-
-        //        if (reliableStateName == ReliableDictionaryNames.ModelChanges)
-        //        {
-        //            ModelChanges = await ReliableDictionaryAccess<byte, List<long>>.Create(stateManager, ReliableDictionaryNames.ModelChanges);
-        //            this.isModelChangesInitialized = true;
-
-        //            string debugMessage = $"{baseLogString} OnStateManagerChangedHandler => '{ReliableDictionaryNames.ModelChanges}' ReliableDictionaryAccess initialized.";
-        //            Logger.LogDebug(debugMessage);
-        //        }
-        //    }
-        //}
         public Task<bool> IsAlive()
         {
             return Task.Run(() => { return true; });
@@ -61,11 +43,6 @@ namespace CE.ModelProviderImplementation
         {
             logger.LogDebug($"{baseLogString} Prepare entered.");
             bool success;
-
-            //while (!isModelChangesInitialized)
-            //{
-            //    await Task.Delay(1000);
-            //}
 
             try
             {
@@ -94,11 +71,6 @@ namespace CE.ModelProviderImplementation
         {
             logger.LogDebug($"{baseLogString} Commit entered.");
 
-            //while (!isModelChangesInitialized)
-            //{
-            //    await Task.Delay(1000);
-            //}
-
             try
             {
                 var modelProviderClient = CeModelProviderClient.CreateClient();
@@ -117,11 +89,6 @@ namespace CE.ModelProviderImplementation
         public async Task Rollback()
         {
             logger.LogDebug($"{baseLogString} Rollback entered.");
-
-            //while (!isModelChangesInitialized)
-            //{
-            //    await Task.Delay(1000);
-            //}
 
             try
             {

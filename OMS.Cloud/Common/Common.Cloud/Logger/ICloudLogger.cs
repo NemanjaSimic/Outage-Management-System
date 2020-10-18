@@ -1,4 +1,5 @@
 ﻿using System;
+using System.Fabric;
 
 namespace OMS.Common.Cloud.Logger
 {
@@ -10,5 +11,8 @@ namespace OMS.Common.Cloud.Logger
         void LogWarning(string message, Exception e = null);
         void LogError(string message, Exception e = null);
         void LogFatal(string message, Exception e = null);
+
+        void SetServiceEventTracing(IServiceEventTracing serviceEventTracing);
+        void SetServiceContext(ServiceContext serviceContext);
     }
 }

@@ -9,6 +9,7 @@ using OMS.Common.Cloud.ReliableCollectionHelpers;
 using OutageDatabase.Repository;
 using System;
 using System.Collections.Generic;
+using System.Fabric;
 using System.Linq;
 using System.Threading.Tasks;
 
@@ -54,7 +55,19 @@ namespace OMS.HistoryDBManagerImplementation
             get { return openedSwitches; }
         }
 
-        private async void OnStateManagerChangedHandler(object sender, NotifyStateManagerChangedEventArgs e)
+        private async void OnStateManagerChangedHandler(object sender, NotifyStateManagerChangedEventArgs eventArgs)
+        {
+            try
+            {
+                await InitializeReliableCollections(eventArgs);
+            }
+            catch (FabricNotPrimaryException)
+            {
+                Logger.LogDebug($"{baseLogString} OnStateManagerChangedHandler => NotPrimaryException. To be ignored.");
+            }
+        }
+
+        private async Task InitializeReliableCollections(NotifyStateManagerChangedEventArgs e)
         {
             if (e.Action == NotifyStateManagerChangedAction.Add)
             {
@@ -120,7 +133,7 @@ namespace OMS.HistoryDBManagerImplementation
             }
         }
 
-        public async Task OnConsumerBlackedOut(List<long> consumers, long? outageId)
+        public async Task UpdateClosedSwitch(long elementGid, long outageId)
         {
             while (!ReliableDictionariesInitialized)
             {
@@ -131,15 +144,79 @@ namespace OMS.HistoryDBManagerImplementation
             {
                 try
                 {
-                    var consumerHistoricals = new List<ConsumerHistorical>();
-                    
-                    foreach (var consumer in consumers)
+                    if (!(await OpenedSwitches.ContainsKeyAsync(elementGid)))
                     {
-                        if (!await UnenergizedConsumers.ContainsKeyAsync(consumer))
+                        var equipment = new EquipmentHistorical()
                         {
-                            consumerHistoricals.Add(new ConsumerHistorical() { OutageId = outageId, ConsumerId = consumer, OperationTime = DateTime.Now, DatabaseOperation = DatabaseOperation.INSERT });
-                            await UnenergizedConsumers.SetAsync(consumer, 0);
-                        }
+                            EquipmentId = elementGid,
+                            OperationTime = DateTime.Now,
+                            DatabaseOperation = DatabaseOperation.UPDATE,
+                            OutageId = outageId
+                        };
+
+                        unitOfWork.EquipmentHistoricalRepository.Add(equipment);
+                        //await OpenedSwitches.TryRemoveAsync(elementGid);
+                        unitOfWork.Complete();
+                    }
+                }
+                catch (Exception e)
+                {
+                    string message = $"{baseLogString} UpdateClosedSwitch => Exception: {e.Message}";
+                    Logger.LogError(message, e);
+                }
+            }
+        }
+
+        //public async Task OnConsumerBlackedOut(List<long> consumers, long? outageId)
+        //{
+        //    while (!ReliableDictionariesInitialized)
+        //    {
+        //        await Task.Delay(1000);
+        //    }
+
+        //    using (var unitOfWork = new UnitOfWork())
+        //    {
+        //        try
+        //        {
+        //            var consumerHistoricals = new List<ConsumerHistorical>();
+
+        //            foreach (var consumer in consumers)
+        //            {
+        //                if (!await UnenergizedConsumers.ContainsKeyAsync(consumer))
+        //                {
+        //                    consumerHistoricals.Add(new ConsumerHistorical() { OutageId = outageId, ConsumerId = consumer, OperationTime = DateTime.Now, DatabaseOperation = DatabaseOperation.INSERT });
+        //                    await UnenergizedConsumers.SetAsync(consumer, 0);
+        //                }
+        //            }
+
+        //            unitOfWork.ConsumerHistoricalRepository.AddRange(consumerHistoricals);
+        //            unitOfWork.Complete();
+        //        }
+        //        catch (Exception e)
+        //        {
+        //            string message = $"{baseLogString} OnConsumersBlackedOut => Exception: {e.Message}";
+        //            Logger.LogError(message, e);
+        //        }
+        //    }
+        //}
+
+        public async Task OnConsumerBlackedOut(long consumer, long? outageId)
+        {
+            while (!ReliableDictionariesInitialized)
+            {
+                await Task.Delay(1000);
+            }
+
+            using (var unitOfWork = new UnitOfWork())
+            {
+                try
+                {
+                    var consumerHistoricals = new List<ConsumerHistorical>(1);
+
+                    if (!await UnenergizedConsumers.ContainsKeyAsync(consumer))
+                    {
+                        consumerHistoricals.Add(new ConsumerHistorical() { OutageId = outageId, ConsumerId = consumer, OperationTime = DateTime.Now, DatabaseOperation = DatabaseOperation.INSERT });
+                        await UnenergizedConsumers.SetAsync(consumer, 0);
                     }
 
                     unitOfWork.ConsumerHistoricalRepository.AddRange(consumerHistoricals);
@@ -148,6 +225,36 @@ namespace OMS.HistoryDBManagerImplementation
                 catch (Exception e)
                 {
                     string message = $"{baseLogString} OnConsumersBlackedOut => Exception: {e.Message}";
+                    Logger.LogError(message, e);
+                }
+            }
+        }
+
+        public async Task UpdateConsumer(long consumer, long outageId)
+        {
+            while (!ReliableDictionariesInitialized)
+            {
+                await Task.Delay(1000);
+            }
+
+            using (var unitOfWork = new UnitOfWork())
+            {
+                try
+                {
+                    var consumerHistoricals = new List<ConsumerHistorical>(1);
+
+                    if (await UnenergizedConsumers.ContainsKeyAsync(consumer))
+                    {
+                        consumerHistoricals.Add(new ConsumerHistorical() { OutageId = outageId, ConsumerId = consumer, OperationTime = DateTime.Now, DatabaseOperation = DatabaseOperation.UPDATE });
+                        //await UnenergizedConsumers.SetAsync(consumer, 0);
+                    }
+
+                    unitOfWork.ConsumerHistoricalRepository.AddRange(consumerHistoricals);
+                    unitOfWork.Complete();
+                }
+                catch (Exception e)
+                {
+                    string message = $"{baseLogString} UpdateConsumer => Exception: {e.Message}";
                     Logger.LogError(message, e);
                 }
             }

@@ -99,7 +99,7 @@ export class GraphComponent implements OnInit, OnDestroy {
     // web api
     this.getTopology();
     this.startConnection();
-    this.startScadaConnection();
+   // this.startScadaConnection();
     this.startOutageConnection();
 
     this.cy = cytoscape({});

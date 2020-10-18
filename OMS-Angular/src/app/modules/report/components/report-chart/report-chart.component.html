@@ -1,3 +1,4 @@
+<p>Total consumers: {{ numOfConsumers }}</p>
 <ngx-charts-bar-vertical
   [view]="view"
   [results]="data"
@@ -6,5 +7,6 @@
   [showXAxisLabel]="showXAxisLabel"
   [showYAxisLabel]="showYAxisLabel"
   [xAxisLabel]="type"
-  [yAxisLabel]="yAxisLabel">
+  [yAxisLabel]="yAxisLabel"
+  [scheme]="colorScheme">
 </ngx-charts-bar-vertical>

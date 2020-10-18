@@ -7221,7 +7221,7 @@
 		<cim:Analog.scalingFactor>1</cim:Analog.scalingFactor>
 		<cim:Analog.deviation>0</cim:Analog.deviation>
 		<cim:Analog.currentValue>0</cim:Analog.currentValue>
-		<cim:Analog.maxValue>30</cim:Analog.maxValue>
+		<cim:Analog.maxValue>143</cim:Analog.maxValue>
 		<cim:Analog.measurementType>FeederCurrent</cim:Analog.measurementType>
 		<cim:Analog.minValue>0</cim:Analog.minValue>
 		<cim:Analog.normalValue>20</cim:Analog.normalValue>
@@ -7236,7 +7236,7 @@
 		<cim:Analog.scalingFactor>1</cim:Analog.scalingFactor>
 		<cim:Analog.deviation>0</cim:Analog.deviation>
 		<cim:Analog.currentValue>0</cim:Analog.currentValue>
-		<cim:Analog.maxValue>30</cim:Analog.maxValue>
+		<cim:Analog.maxValue>68</cim:Analog.maxValue>
 		<cim:Analog.measurementType>FeederCurrent</cim:Analog.measurementType>
 		<cim:Analog.minValue>0</cim:Analog.minValue>
 		<cim:Analog.normalValue>20</cim:Analog.normalValue>
@@ -7311,7 +7311,7 @@
 		<cim:Analog.scalingFactor>1</cim:Analog.scalingFactor>
 		<cim:Analog.deviation>0</cim:Analog.deviation>
 		<cim:Analog.currentValue>0</cim:Analog.currentValue>
-		<cim:Analog.maxValue>30</cim:Analog.maxValue>
+		<cim:Analog.maxValue>130</cim:Analog.maxValue>
 		<cim:Analog.measurementType>FeederCurrent</cim:Analog.measurementType>
 		<cim:Analog.minValue>0</cim:Analog.minValue>
 		<cim:Analog.normalValue>20</cim:Analog.normalValue>
@@ -7326,7 +7326,7 @@
 		<cim:Analog.scalingFactor>1</cim:Analog.scalingFactor>
 		<cim:Analog.deviation>0</cim:Analog.deviation>
 		<cim:Analog.currentValue>0</cim:Analog.currentValue>
-		<cim:Analog.maxValue>30</cim:Analog.maxValue>
+		<cim:Analog.maxValue>290</cim:Analog.maxValue>
 		<cim:Analog.measurementType>FeederCurrent</cim:Analog.measurementType>
 		<cim:Analog.minValue>0</cim:Analog.minValue>
 		<cim:Analog.normalValue>20</cim:Analog.normalValue>

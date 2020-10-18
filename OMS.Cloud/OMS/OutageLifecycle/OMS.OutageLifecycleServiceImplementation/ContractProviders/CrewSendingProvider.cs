@@ -12,6 +12,7 @@ using OMS.Common.WcfClient.OMS.OutageSimulator;
 using OMS.OutageLifecycleImplementation.Helpers;
 using System;
 using System.Collections.Generic;
+using System.Fabric;
 using System.Linq;
 using System.Threading.Tasks;
 
@@ -34,13 +35,14 @@ namespace OMS.OutageLifecycleImplementation.ContractProviders
         #region Reliable Dictionaries
         private bool isOutageTopologyModelInitialized;
         private bool isCommandedElementsInitialized;
-
+        private bool isElementsToBeIgnoredInReportPotentialOutageInitialized;
         private bool ReliableDictionariesInitialized
         {
             get
             {
                 return isOutageTopologyModelInitialized &&
-                       isCommandedElementsInitialized;
+                       isCommandedElementsInitialized &&
+                       isElementsToBeIgnoredInReportPotentialOutageInitialized;
             }
         }
 
@@ -56,7 +58,25 @@ namespace OMS.OutageLifecycleImplementation.ContractProviders
             get { return commandedElements; }
         }
 
-        private async void OnStateManagerChangedHandler(object sender, NotifyStateManagerChangedEventArgs e)
+        private ReliableDictionaryAccess<long, DateTime> elementsToBeIgnoredInReportPotentialOutage;
+        private ReliableDictionaryAccess<long, DateTime> ElementsToBeIgnoredInReportPotentialOutage
+        {
+            get { return elementsToBeIgnoredInReportPotentialOutage; }
+        }
+
+        private async void OnStateManagerChangedHandler(object sender, NotifyStateManagerChangedEventArgs eventArgs)
+        {
+            try
+            {
+                await InitializeReliableCollections(eventArgs);
+            }
+            catch (FabricNotPrimaryException)
+            {
+                Logger.LogDebug($"{baseLogString} OnStateManagerChangedHandler => NotPrimaryException. To be ignored.");
+            }
+        }
+
+        private async Task InitializeReliableCollections(NotifyStateManagerChangedEventArgs e)
         {
             if (e.Action == NotifyStateManagerChangedAction.Add)
             {
@@ -79,6 +99,14 @@ namespace OMS.OutageLifecycleImplementation.ContractProviders
                     string debugMessage = $"{baseLogString} OnStateManagerChangedHandler => '{ReliableDictionaryNames.CommandedElements}' ReliableDictionaryAccess initialized.";
                     Logger.LogDebug(debugMessage);
                 }
+                else if (reliableStateName == ReliableDictionaryNames.ElementsToBeIgnoredInReportPotentialOutage)
+                {
+                    this.elementsToBeIgnoredInReportPotentialOutage = await ReliableDictionaryAccess<long, DateTime>.Create(stateManager, ReliableDictionaryNames.ElementsToBeIgnoredInReportPotentialOutage);
+                    this.isElementsToBeIgnoredInReportPotentialOutageInitialized = true;
+
+                    string debugMessage = $"{baseLogString} OnStateManagerChangedHandler => '{ReliableDictionaryNames.ElementsToBeIgnoredInReportPotentialOutage}' ReliableDictionaryAccess initialized.";
+                    Logger.LogDebug(debugMessage);
+                }
             }
         }
         #endregion Reliable Dictionaries
@@ -92,6 +120,7 @@ namespace OMS.OutageLifecycleImplementation.ContractProviders
 
             this.isOutageTopologyModelInitialized = false;
             this.isCommandedElementsInitialized = false;
+            this.isElementsToBeIgnoredInReportPotentialOutageInitialized = false;
 
             this.stateManager = stateManager;
             this.stateManager.StateManagerChanged += this.OnStateManagerChangedHandler;
@@ -166,8 +195,9 @@ namespace OMS.OutageLifecycleImplementation.ContractProviders
 
                 var outageEntity = result.Value;
 
-                //TODO: videti performanse, pa da li treba da cekamo uopste xD
-                //await Task.Delay(10000);
+                Logger.LogInformation($"{baseLogString} SendRepairCrew => Entering 10 sec delay.");
+                await Task.Delay(10_000);
+                Logger.LogInformation($"{baseLogString} SendRepairCrew => 10 sec delay ended.");
 
                 var outageSimulatorClient = OutageSimulatorClient.CreateClient();
 
@@ -215,8 +245,9 @@ namespace OMS.OutageLifecycleImplementation.ContractProviders
             long upBreaker;
             long outageElementGid = -1;
 
-            //Todo: pratiti performanse pa videti da li nam je potrebno usporenje
-            //await Task.Delay(5000);
+            Logger.LogInformation($"{baseLogString} StartLocationAndIsolationAlgorithm => Entering 10 sec delay.");
+            await Task.Delay(10_000);
+            Logger.LogInformation($"{baseLogString} StartLocationAndIsolationAlgorithm => 10 sec delay ended.");
 
             var outageSimulatorClient = OutageSimulatorClient.CreateClient();
             var outageModelAccessClient = OutageModelAccessClient.CreateClient();
@@ -242,6 +273,7 @@ namespace OMS.OutageLifecycleImplementation.ContractProviders
                     {
                         outageElementGid = potentialOutageElementGid;
                         outageEntity.OutageElementGid = outageElementGid;
+                        //outageEntity.AffectedConsumers = await lifecycleHelper.GetAffectedConsumersFromDatabase(lifecycleHelper.GetAffectedConsumers(outageElementGid, topology, NetworkType.NON_SCADA_NETWORK));
                     }
                     else
                     {
@@ -316,7 +348,21 @@ namespace OMS.OutageLifecycleImplementation.ContractProviders
             };
 
             var enumerableCommandedElements = await CommandedElements.GetEnumerableDictionaryAsync();
-            return await lifecycleHelper.SendMultipleScadaCommandAsync(commands, enumerableCommandedElements, CommandOriginType.LOCATION_AND_ISOLATING_ALGORITHM_COMMAND);
+            
+            if (!await lifecycleHelper.SendMultipleScadaCommandAsync(commands, enumerableCommandedElements, CommandOriginType.LOCATION_AND_ISOLATING_ALGORITHM_COMMAND))
+            {
+                string message = $"{baseLogString} StartLocationAndIsolationAlgorithm => Sending multiple command failed.";
+                Logger.LogError(message);
+                return false;
+            }
+
+            commands.Keys.ToList().ForEach(async commandedElementGid =>
+            {
+                await ElementsToBeIgnoredInReportPotentialOutage.SetAsync(commandedElementGid, DateTime.UtcNow);
+                Logger.LogDebug($"{baseLogString} SendCommands => Element 0x{commandedElementGid:X16} set to collection '{ReliableDictionaryNames.ElementsToBeIgnoredInReportPotentialOutage}' at {DateTime.UtcNow}.");
+            });
+
+            return true;
         }
         #endregion Private Methods
     }

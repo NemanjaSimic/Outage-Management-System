@@ -38,7 +38,7 @@ namespace Common.Web.Mappers
                         Id = measurement.Gid.ToString(),
                         Type = measurement.Type,
                         Value = measurement.Value,
-                        AlarmType = AlarmType.NO_ALARM
+                        AlarmType = measurement.AlarmType
                     });
                 }
 

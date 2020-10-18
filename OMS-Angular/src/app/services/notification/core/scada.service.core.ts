@@ -20,6 +20,11 @@ export class ScadaCoreService {
         this.hubConnection = new signalR.HubConnectionBuilder()
         .withUrl(`${environment.serverUrl}/${this.hubName}`)
         .build();
+
+        this.hubConnection.onclose((err) => { 
+            console.log('Disconnected from scada: ' + err)
+            this.startConnection();
+          })    
         
         this.hubConnection
         .start()

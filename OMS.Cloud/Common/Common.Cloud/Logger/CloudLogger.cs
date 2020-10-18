@@ -3,14 +3,14 @@ using Serilog.Events;
 using System;
 using System.Collections.Generic;
 using System.Configuration;
+using System.Fabric;
 using System.IO;
-using System.Runtime.CompilerServices;
 
 namespace OMS.Common.Cloud.Logger
 {
     internal class CloudLogger : ICloudLogger
     {
-        private const LogEventLevel sharedLogLevel = LogEventLevel.Debug;
+        private readonly LogEventLevel sharedLogLevel = LogEventLevel.Information;
 
         private readonly string sourceName;
         private readonly IEnumerable<ILogger> serilogLoggers;
@@ -18,8 +18,13 @@ namespace OMS.Common.Cloud.Logger
         private const string logLevelSettingKey = "logLevelSettingKey";
         private const string logFilePathSettingKey = "logFilePathSettingKey";
 
-        internal CloudLogger(string sourceName)
+        private IServiceEventTracing serviceEventTracing;
+        private ServiceContext serviceContext; 
+
+        internal CloudLogger(IServiceEventTracing serviceEventTracing, ServiceContext serviceContext, string sourceName)
         {
+            this.serviceEventTracing = serviceEventTracing;
+            this.serviceContext = serviceContext;
             this.sourceName = sourceName;
 
             var logOutputTemplate = "{NewLine}{NewLine}{NewLine}{Timestamp:yyyy-MM-dd HH:mm:ss.fff} [{Level}]{NewLine}{Message}{NewLine}{Exception}";
@@ -124,6 +129,16 @@ namespace OMS.Common.Cloud.Logger
         }
 
         #region ICloudLogger
+        public void SetServiceEventTracing(IServiceEventTracing serviceEventTracing)
+        {
+            this.serviceEventTracing = serviceEventTracing;
+        }
+
+        public void SetServiceContext(ServiceContext serviceContext)
+        {
+            this.serviceContext = serviceContext;
+        }
+
         public void LogVerbose(string message, Exception e = null)
         {
             if (e == null)
@@ -140,6 +155,11 @@ namespace OMS.Common.Cloud.Logger
                     logger.Verbose(e, MessageFormat(message));
                 }
             }
+
+            if(sharedLogLevel <= LogEventLevel.Verbose)
+            {
+                LogServiceEvent(message, e);
+            }
         }
 
         public void LogDebug(string message, Exception e = null)
@@ -150,6 +170,8 @@ namespace OMS.Common.Cloud.Logger
                 {
                     logger.Debug(MessageFormat(message));
                 }
+
+                LogServiceEvent(message, e);
             }
             else
             {
@@ -157,6 +179,13 @@ namespace OMS.Common.Cloud.Logger
                 {
                     logger.Debug(e, MessageFormat(message));
                 }
+
+                LogServiceEvent(message);
+            }
+
+            if (sharedLogLevel <= LogEventLevel.Debug)
+            {
+                LogServiceEvent(message, e);
             }
         }
 
@@ -176,6 +205,11 @@ namespace OMS.Common.Cloud.Logger
                     logger.Information(e, MessageFormat(message));
                 }
             }
+
+            if (sharedLogLevel <= LogEventLevel.Information)
+            {
+                LogServiceEvent(message, e);
+            }
         }
 
         public void LogWarning(string message, Exception e = null)
@@ -193,6 +227,11 @@ namespace OMS.Common.Cloud.Logger
                 {
                     logger.Warning(e, MessageFormat(message));
                 }
+            }
+
+            if (sharedLogLevel <= LogEventLevel.Warning)
+            {
+                LogServiceEvent(message, e);
             }
         }
 
@@ -212,6 +251,11 @@ namespace OMS.Common.Cloud.Logger
                     logger.Error(e, MessageFormat(message));
                 }
             }
+
+            if (sharedLogLevel <= LogEventLevel.Error)
+            {
+                LogServiceEvent(message, e);
+            }
         }
 
         public void LogFatal(string message, Exception e = null)
@@ -230,7 +274,29 @@ namespace OMS.Common.Cloud.Logger
                     logger.Fatal(e, MessageFormat(message));
                 }
             }
+
+            if (sharedLogLevel <= LogEventLevel.Fatal)
+            {
+                LogServiceEvent(message, e);
+            }
         }
         #endregion ICloudLogger
+
+        private void LogServiceEvent(string message, Exception e = null)
+        {
+            if(this.serviceEventTracing == null || this.serviceContext == null)
+            {
+                return;
+            }
+
+            if(e == null)
+            {
+                this.serviceEventTracing.UniversalServiceMessage(this.serviceContext, message);
+            }
+            else
+            {
+                this.serviceEventTracing.UniversalServiceMessage(this.serviceContext, $"{message}{Environment.NewLine}Exception Message: {e.Message}");
+            }
+        }
     }
 }

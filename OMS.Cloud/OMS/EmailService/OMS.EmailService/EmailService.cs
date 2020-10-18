@@ -25,43 +25,45 @@ namespace OMS.EmailService
 		public EmailService(StatelessServiceContext context)
 			: base(context)
 		{
-			this.baseLogString = $"{this.GetType()} [{this.GetHashCode()}] =>{Environment.NewLine}";
+            this.logger = CloudLoggerFactory.GetLogger(ServiceEventSource.Current, context);
+
+            this.baseLogString = $"{this.GetType()} [{this.GetHashCode()}] =>{Environment.NewLine}";
 			string verboseMessage = $"{baseLogString} entering Ctor.";
 			Logger.LogVerbose(verboseMessage);
 		}
 
-		
 
-		/// <summary>
-		/// This is the main entry point for your service instance.
-		/// </summary>
-		/// <param name="cancellationToken">Canceled when Service Fabric needs to shut down this service instance.</param>
-		protected override async Task RunAsync(CancellationToken cancellationToken)
-		{
-			//modo: neki while dok se ne konektuje
+
+        /// <summary>
+        /// This is the main entry point for your service instance.
+        /// </summary>
+        /// <param name="cancellationToken">Canceled when Service Fabric needs to shut down this service instance.</param>
+        protected override async Task RunAsync(CancellationToken cancellationToken)
+        {
+            //modo: neki while dok se ne konektuje
 
             try
             {
-				IIdleEmailClient idleEmailclient = new ImapIdleClientFactory().CreateClient();
+                IIdleEmailClient idleEmailclient = new ImapIdleClientFactory().CreateClient();
 
-				if (!idleEmailclient.Connect())
-				{
-					Logger.LogError($"{baseLogString} RunAsync => idleEmailclient.Connect() returned false.");
-					return;
-				}
+                if (!idleEmailclient.Connect())
+                {
+                    Logger.LogError($"{baseLogString} RunAsync => idleEmailclient.Connect() returned false.");
+                    return;
+                }
 
-				idleEmailclient.RegisterIdleHandler();
+                idleEmailclient.RegisterIdleHandler();
 
-				if (!idleEmailclient.StartIdling())
-				{
-					Logger.LogError($"{baseLogString} RunAsync => idleEmailclient.StartIdling() returned false.");
-					return;
-				}
-			}
+                if (!idleEmailclient.StartIdling())
+                {
+                    Logger.LogError($"{baseLogString} RunAsync => idleEmailclient.StartIdling() returned false.");
+                    return;
+                }
+            }
             catch (Exception e)
             {
-				Logger.LogError($"{baseLogString} RunAsync => Exception: {e.Message}");
-			}
-		}
-	}
+                Logger.LogError($"{baseLogString} RunAsync => Exception: {e.Message}");
+            }
+        }
+    }
 }

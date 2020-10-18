@@ -54,6 +54,7 @@
     <Compile Include="Logger\CloudLogger.cs" />
     <Compile Include="Logger\CloudLoggerFactory.cs" />
     <Compile Include="Logger\ICloudLogger.cs" />
+    <Compile Include="Logger\IServiceEventTracing.cs" />
     <Compile Include="ModelDefines.cs" />
     <Compile Include="Names\DistributedTransactionNames.cs" />
     <Compile Include="Names\LoggerSourceNames.cs" />

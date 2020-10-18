@@ -73,13 +73,16 @@ namespace CE.LoadFlowImplementation
                     return topology;
                 }
 
-                await CalculateLoadFlow(topology, loadOfFeeders);
+                var tuple = await CalculateLoadFlow(topology, loadOfFeeders);
+
+                loadOfFeeders = tuple.Item1;
+                feeders = tuple.Item2;
 
                 await UpdateLoadFlowFromRecloser(topology, loadOfFeeders);
 
                 foreach (var syncMachine in syncMachines.Values)
                 {
-                    await SyncMachine(syncMachine, loadOfFeeders);
+                    loadOfFeeders = await SyncMachine(syncMachine, loadOfFeeders);
                 }
 
                 var commands = new Dictionary<long, float>();
@@ -133,7 +136,7 @@ namespace CE.LoadFlowImplementation
 		#endregion
 
 		#region Private Methods
-		private async Task SyncMachine(ITopologyElement element, Dictionary<long, float> loadOfFeeders)
+		private async Task<Dictionary<long, float>> SyncMachine(ITopologyElement element, Dictionary<long, float> loadOfFeeders)
         {
             string verboseMessage = $"{baseLogString} SyncMachine method called. Element with GID {element?.Id:X16}";
             Logger.LogVerbose(verboseMessage);
@@ -157,12 +160,23 @@ namespace CE.LoadFlowImplementation
 
             if (element.Feeder != null)
             {
-                if(loadOfFeeders.TryGetValue(element.Feeder.Id, out float feederLoad))
+                List<AnalogMeasurement> analogMeasurements = await GetMeasurements(element.Feeder.Measurements);
+                AnalogMeasurement feederCurrent = null;
+
+                foreach (var measurement in analogMeasurements)
+                {
+                    if (measurement.GetMeasurementType().Equals("FEEDER_CURRENT"))
+                    {
+                        feederCurrent = measurement;
+                    }
+                }
+
+                if(loadOfFeeders.TryGetValue(element.Feeder.Id, out float feederLoad) && feederCurrent != null)
                 {
                     float machineCurrentChange;
-                    if (feederLoad > 36)
+                    if (feederLoad > feederCurrent.MaxValue)
                     {
-                        float improvementFactor = feederLoad - 36;
+                        float improvementFactor = feederLoad - feederCurrent.MaxValue;
 
                         machineCurrentChange = (((SynchronousMachine)element).Capacity >= improvementFactor)
                                                     ? improvementFactor
@@ -236,8 +250,10 @@ namespace CE.LoadFlowImplementation
             {
                 Logger.LogError($"{baseLogString} UpdateLoadFlow => Synchronous machine with GID {element.Id:X16} does not belond to any feeder.");
             }
+
+            return loadOfFeeders;
         }
-        private async Task CalculateLoadFlow(TopologyModel topology, Dictionary<long, float> loadOfFeeders)
+        private async Task<Tuple<Dictionary<long, float>, Dictionary<long, ITopologyElement>>> CalculateLoadFlow(TopologyModel topology, Dictionary<long, float> loadOfFeeders)
         {
             string verboseMessage = $"{baseLogString} CalculateLoadFlow method called.";
             Logger.LogVerbose(verboseMessage);
@@ -313,6 +329,7 @@ namespace CE.LoadFlowImplementation
             }
 
             Logger.LogVerbose($"{baseLogString} CalculateLoadFlowFirst => Calulate load flow finished.");
+            return new Tuple<Dictionary<long, float>, Dictionary<long, ITopologyElement>>(loadOfFeeders, feeders);
         }
         private async Task<Tuple<bool, float>> IsElementEnergized(ITopologyElement element)
         {

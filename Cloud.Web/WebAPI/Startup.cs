@@ -60,6 +60,9 @@ namespace WebAPI
             services.AddSignalR(o =>
             {
                 o.EnableDetailedErrors = true;
+                o.ClientTimeoutInterval = TimeSpan.FromMinutes(30);
+                o.HandshakeTimeout = TimeSpan.FromMinutes(30);
+                o.KeepAliveInterval = TimeSpan.FromMinutes(30);
             })
             .AddJsonProtocol(options =>
             {
@@ -84,16 +87,16 @@ namespace WebAPI
                     options.TransportMaxBufferSize = 9223372036854775800;
                     options.ApplicationMaxBufferSize = 9223372036854775800;
                     //options.Transports = TransportType.All;
-                    options.WebSockets.CloseTimeout = TimeSpan.FromSeconds(10);
-                    options.LongPolling.PollTimeout = TimeSpan.FromSeconds(10);
+                    options.WebSockets.CloseTimeout = TimeSpan.FromMinutes(10);
+                    options.LongPolling.PollTimeout = TimeSpan.FromMinutes(10);
                 });
 
                 routes.MapHub<OutageHub>("/outagehub", options => {
                     options.TransportMaxBufferSize = 9223372036854775800;
                     options.ApplicationMaxBufferSize = 9223372036854775800;
                     //options.Transports = TransportType.All;
-                    options.WebSockets.CloseTimeout = TimeSpan.FromSeconds(10);
-                    options.LongPolling.PollTimeout = TimeSpan.FromSeconds(10);
+                    options.WebSockets.CloseTimeout = TimeSpan.FromMinutes(10);
+                    options.LongPolling.PollTimeout = TimeSpan.FromMinutes(10);
                 });
 
                 routes.MapHub<ScadaHub>("/scadahub", options => {

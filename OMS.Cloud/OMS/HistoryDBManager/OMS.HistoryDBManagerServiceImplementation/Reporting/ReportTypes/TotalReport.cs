@@ -52,11 +52,25 @@ namespace OMS.HistoryDBManagerImplementation.Reporting.ReportTypes
 
             var type = DateHelpers.GetType(options.StartDate, options.EndDate);
 
-            var outageReportGrouping = outages.GroupBy(o => type == "Monthly" ? o.ReportTime.Month : o.ReportTime.Year).Select(o => o).ToList();
+            List<IGrouping<int, OutageEntity>> outageReportGrouping = null;
+
+            if (type == "Yearly")
+            {
+                outageReportGrouping = outages.GroupBy(o => o.ReportTime.Month).Select(o => o).ToList();
+            }
+            else if (type == "Monthly")
+            {
+                outageReportGrouping = outages.GroupBy(o => o.ReportTime.Day).Select(o => o).ToList();
+            }
+            else
+            {
+                outageReportGrouping = outages.GroupBy(o => o.ReportTime.Hour).Select(o => o).ToList();
+            }
+
 
             var reportData = new Dictionary<string, float>();
             foreach (var outage in outageReportGrouping)
-                reportData.Add(type == "Monthly" ? DateHelpers.Months[outage.Key] : outage.Key.ToString(), outage.Count());
+                reportData.Add(type == "Yearly" ? DateHelpers.Months[outage.Key] : outage.Key.ToString(), outage.Count());
 
             return new OutageReport
             {

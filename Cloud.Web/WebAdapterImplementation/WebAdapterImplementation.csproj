@@ -190,6 +190,7 @@
   </ItemGroup>
   <ItemGroup>
     <Compile Include="HubDispatchers\GraphHubDispatcher.cs" />
+    <Compile Include="HubDispatchers\OutageEmailHubDispatcher.cs" />
     <Compile Include="HubDispatchers\OutageHubDispatcher.cs" />
     <Compile Include="HubDispatchers\ScadaHubDispatcher.cs" />
     <Compile Include="NotifySubscriberProvider.cs" />

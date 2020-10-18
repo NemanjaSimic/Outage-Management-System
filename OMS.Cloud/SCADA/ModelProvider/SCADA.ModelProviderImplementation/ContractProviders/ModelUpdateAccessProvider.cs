@@ -13,6 +13,7 @@ using OMS.Common.ScadaContracts.ModelProvider;
 using OMS.Common.WcfClient.PubSub;
 using System;
 using System.Collections.Generic;
+using System.Fabric;
 using System.Text;
 using System.Threading.Tasks;
 using ReliableDictionaryNames = OMS.Common.SCADA.ReliableDictionaryNames;
@@ -71,7 +72,19 @@ namespace SCADA.ModelProviderImplementation.ContractProviders
             get { return infoCache; }
         }
 
-        private async void OnStateManagerChangedHandler(object sender, NotifyStateManagerChangedEventArgs e)
+        private async void OnStateManagerChangedHandler(object sender, NotifyStateManagerChangedEventArgs eventArgs)
+        {
+            try
+            {
+                await InitializeReliableCollections(eventArgs);
+            }
+            catch (FabricNotPrimaryException)
+            {
+                Logger.LogDebug($"{baseLogString} OnStateManagerChangedHandler => NotPrimaryException. To be ignored.");
+            }
+        }
+
+        private async Task InitializeReliableCollections(NotifyStateManagerChangedEventArgs e)
         {
             if (e.Action == NotifyStateManagerChangedAction.Add)
             {
@@ -80,7 +93,6 @@ namespace SCADA.ModelProviderImplementation.ContractProviders
 
                 if (reliableStateName == ReliableDictionaryNames.GidToPointItemMap)
                 {
-                    //_ = GidToPointItemMap;
                     gidToPointItemMap = await ReliableDictionaryAccess<long, IScadaModelPointItem>.Create(stateManager, ReliableDictionaryNames.GidToPointItemMap);
                     this.isGidToPointItemMapInitialized = true;
 
@@ -89,7 +101,6 @@ namespace SCADA.ModelProviderImplementation.ContractProviders
                 }
                 else if (reliableStateName == ReliableDictionaryNames.MeasurementsCache)
                 {
-                    //_ = MeasurementsCache;
                     measurementsCache = await ReliableDictionaryAccess<long, ModbusData>.Create(stateManager, ReliableDictionaryNames.MeasurementsCache);
                     this.isMeasurementsCacheInitialized = true;
 
@@ -98,7 +109,6 @@ namespace SCADA.ModelProviderImplementation.ContractProviders
                 }
                 else if (reliableStateName == ReliableDictionaryNames.CommandDescriptionCache)
                 {
-                    //_ = CommandDescriptionCache;
                     commandDescriptionCache = await ReliableDictionaryAccess<long, CommandDescription>.Create(stateManager, ReliableDictionaryNames.CommandDescriptionCache);
                     this.isCommandDescriptionCacheInitialized = true;
 
@@ -107,7 +117,6 @@ namespace SCADA.ModelProviderImplementation.ContractProviders
                 }
                 else if (reliableStateName == ReliableDictionaryNames.InfoCache)
                 {
-                    //_ = InfoCache;
                     infoCache = await ReliableDictionaryAccess<string, bool>.Create(stateManager, ReliableDictionaryNames.InfoCache);
                     isInfoCacheInitialized = true;
 
@@ -116,7 +125,7 @@ namespace SCADA.ModelProviderImplementation.ContractProviders
                 }
             }
         }
-        #endregion Private Propetires
+        #endregion Reliable Dictionaries
 
         public ModelUpdateAccessProvider(IReliableStateManager stateManager)
         {

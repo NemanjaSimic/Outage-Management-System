@@ -15,8 +15,10 @@ using OMS.OutageLifecycleImplementation.Algorithm;
 using OMS.OutageLifecycleImplementation.Helpers;
 using System;
 using System.Collections.Generic;
+using System.Fabric;
 using System.Linq;
 using System.Threading.Tasks;
+using NetworkType = OMS.Common.Cloud.NetworkType;
 
 namespace OMS.OutageLifecycleImplementation.ContractProviders
 {
@@ -42,6 +44,7 @@ namespace OMS.OutageLifecycleImplementation.ContractProviders
         private bool isOptimumIsolationPointsInitialized;
         private bool isCommandedElementsInitialized;
         private bool isPotentialOutagesQueueInitialized;
+        private bool isElementsToBeIgnoredInReportPotentialOutageInitialized;
 
         private bool ReliableDictionariesInitialized
 		{
@@ -52,7 +55,8 @@ namespace OMS.OutageLifecycleImplementation.ContractProviders
                        isOutageTopologyModelInitialized &&
                        isOptimumIsolationPointsInitialized &&
                        isCommandedElementsInitialized &&
-                       isPotentialOutagesQueueInitialized;
+                       isPotentialOutagesQueueInitialized &&
+                       isElementsToBeIgnoredInReportPotentialOutageInitialized;
 			}
 		}
 
@@ -90,19 +94,37 @@ namespace OMS.OutageLifecycleImplementation.ContractProviders
             get { return commandedElements; }
         }
 
+        private ReliableDictionaryAccess<long, DateTime> elementsToBeIgnoredInReportPotentialOutage;
+        private ReliableDictionaryAccess<long, DateTime> ElementsToBeIgnoredInReportPotentialOutage
+        {
+            get { return elementsToBeIgnoredInReportPotentialOutage; }
+        }
+
         private ReliableQueueAccess<PotentialOutageCommand> potentialOutagesQueue;
         private ReliableQueueAccess<PotentialOutageCommand> PotentialOutagesQueue
         {
             get { return potentialOutagesQueue; }
         }
 
-        private async void OnStateManagerChangedHandler(object sender, NotifyStateManagerChangedEventArgs e)
-		{
-			if (e.Action == NotifyStateManagerChangedAction.Add)
-			{
-				var operation = e as NotifyStateManagerSingleEntityChangedEventArgs;
-				string reliableStateName = operation.ReliableState.Name.AbsolutePath;
-                
+        private async void OnStateManagerChangedHandler(object sender, NotifyStateManagerChangedEventArgs eventArgs)
+        {
+            try
+            {
+                await InitializeReliableCollections(eventArgs);
+            }
+            catch (FabricNotPrimaryException)
+            {
+                Logger.LogDebug($"{baseLogString} OnStateManagerChangedHandler => NotPrimaryException. To be ignored.");
+            }
+        }
+
+        private async Task InitializeReliableCollections(NotifyStateManagerChangedEventArgs e)
+        {
+            if (e.Action == NotifyStateManagerChangedAction.Add)
+            {
+                var operation = e as NotifyStateManagerSingleEntityChangedEventArgs;
+                string reliableStateName = operation.ReliableState.Name.AbsolutePath;
+
                 if (reliableStateName == ReliableDictionaryNames.StartedIsolationAlgorithms)
                 {
                     this.startedIsolationAlgorithms = await ReliableDictionaryAccess<long, IsolationAlgorithm>.Create(stateManager, ReliableDictionaryNames.StartedIsolationAlgorithms);
@@ -143,6 +165,14 @@ namespace OMS.OutageLifecycleImplementation.ContractProviders
                     string debugMessage = $"{baseLogString} OnStateManagerChangedHandler => '{ReliableDictionaryNames.CommandedElements}' ReliableDictionaryAccess initialized.";
                     Logger.LogDebug(debugMessage);
                 }
+                else if (reliableStateName == ReliableDictionaryNames.ElementsToBeIgnoredInReportPotentialOutage)
+                {
+                    this.elementsToBeIgnoredInReportPotentialOutage = await ReliableDictionaryAccess<long, DateTime>.Create(stateManager, ReliableDictionaryNames.ElementsToBeIgnoredInReportPotentialOutage);
+                    this.isElementsToBeIgnoredInReportPotentialOutageInitialized = true;
+
+                    string debugMessage = $"{baseLogString} OnStateManagerChangedHandler => '{ReliableDictionaryNames.ElementsToBeIgnoredInReportPotentialOutage}' ReliableDictionaryAccess initialized.";
+                    Logger.LogDebug(debugMessage);
+                }
                 else if (reliableStateName == ReliableQueueNames.PotentialOutages)
                 {
                     this.potentialOutagesQueue = await ReliableQueueAccess<PotentialOutageCommand>.Create(stateManager, ReliableQueueNames.PotentialOutages);
@@ -152,7 +182,7 @@ namespace OMS.OutageLifecycleImplementation.ContractProviders
                     Logger.LogDebug(debugMessage);
                 }
             }
-		}
+        }
 		#endregion Reliable Dictionaries
 
 		public PotentialOutageReportingProvider(IReliableStateManager stateManager, OutageLifecycleHelper outageLifecycleHelper)
@@ -166,6 +196,7 @@ namespace OMS.OutageLifecycleImplementation.ContractProviders
             {
                 CommandOriginType.USER_COMMAND,
                 CommandOriginType.ISOLATING_ALGORITHM_COMMAND,
+                CommandOriginType.LOCATION_AND_ISOLATING_ALGORITHM_COMMAND,
                 CommandOriginType.UNKNOWN_ORIGIN,
             };
 
@@ -175,6 +206,7 @@ namespace OMS.OutageLifecycleImplementation.ContractProviders
             this.isPotentialOutagesQueueInitialized = false;
             this.isCommandedElementsInitialized = false;
             this.isOptimumIsolationPointsInitialized = false;
+            this.isElementsToBeIgnoredInReportPotentialOutageInitialized = false;
 
             this.stateManager = stateManager;
 			this.stateManager.StateManagerChanged += this.OnStateManagerChangedHandler;
@@ -183,7 +215,7 @@ namespace OMS.OutageLifecycleImplementation.ContractProviders
         #region IPotentialOutageReportingContract
         public async Task<bool> EnqueuePotentialOutageCommand(long elementGid, CommandOriginType commandOriginType, NetworkType networkType)
         {
-            Logger.LogDebug($"{baseLogString} EnqueuePotentialOutageCommand method started.");
+            Logger.LogDebug($"{baseLogString} EnqueuePotentialOutageCommand method started. Element gid: {elementGid}, command origin type: {commandOriginType}, network type {networkType}");
 
             while (!ReliableDictionariesInitialized)
             {
@@ -238,7 +270,7 @@ namespace OMS.OutageLifecycleImplementation.ContractProviders
                 }
 
                 var topology = enumerableTopology[ReliableDictionaryNames.OutageTopologyModel];
-                var affectedConsumersGids = GetAffectedConsumers(elementGid, topology, networkType);
+                var affectedConsumersGids = lifecycleHelper.GetAffectedConsumers(elementGid, topology, networkType);
 
                 var historyDBManagerClient = HistoryDBManagerClient.CreateClient();
 
@@ -262,8 +294,8 @@ namespace OMS.OutageLifecycleImplementation.ContractProviders
                 var createdOutage = result.Value;
                 Logger.LogInformation($"{baseLogString} ReportPotentialOutage => Outage on element with gid: 0x{createdOutage.OutageElementGid:x16} is successfully stored in database.");
 
-                await historyDBManagerClient.OnSwitchOpened(elementGid, createdOutage.OutageId);
-                await historyDBManagerClient.OnConsumerBlackedOut(affectedConsumersGids, createdOutage.OutageId);
+                //await historyDBManagerClient.OnSwitchOpened(elementGid, createdOutage.OutageId);
+                //await historyDBManagerClient.OnConsumerBlackedOut(affectedConsumersGids, createdOutage.OutageId);
 
                 return await lifecycleHelper.PublishOutageAsync(Topic.ACTIVE_OUTAGE, outageMessageMapper.MapOutageEntity(createdOutage));
             }
@@ -282,100 +314,6 @@ namespace OMS.OutageLifecycleImplementation.ContractProviders
         #endregion IPotentialOutageReportingContract
 
         #region Private Methods
-        private List<long> GetAffectedConsumers(long potentialOutageGid, OutageTopologyModel topology, NetworkType networkType)
-        {
-            List<long> affectedConsumers = new List<long>();
-            Stack<long> nodesToBeVisited = new Stack<long>();
-            HashSet<long> visited = new HashSet<long>();
-            long startingSwitch = potentialOutageGid;
-
-            //TODO: pogledati kad se bude testirala NoScada
-            //if(networkType == NetworkType.NON_SCADA_NETWORK)
-            //{
-                //TODO: cemu sluzi ova logika? -deluje da podize starter ka gore.... a cemu to sluzi boga pitaj, eventualno za neSkada deo, bolje razdvojiti metode...
-                if (topology.OutageTopology.TryGetValue(potentialOutageGid, out OutageTopologyElement firstElement)
-                    && topology.OutageTopology.TryGetValue(firstElement.FirstEnd, out OutageTopologyElement currentElementAbove))
-                {
-                    while (!currentElementAbove.DmsType.Equals("ENERGYSOURCE"))
-                    {
-                        if (currentElementAbove.IsOpen)
-                        {
-                            startingSwitch = currentElementAbove.Id;
-                            break;
-                        }
-
-                        if (!topology.OutageTopology.TryGetValue(currentElementAbove.FirstEnd, out currentElementAbove))
-                        {
-                            break;
-                        }
-                    }
-                }
-            //}
-
-
-            nodesToBeVisited.Push(startingSwitch);
-
-            while (nodesToBeVisited.Count > 0)
-            {
-                long currentNode = nodesToBeVisited.Pop();
-
-                if (!visited.Contains(currentNode))
-                {
-                    visited.Add(currentNode);
-
-                    if (!topology.OutageTopology.TryGetValue(currentNode, out OutageTopologyElement topologyElement))
-                    {
-                        //TOOD
-                        string message = $"GID: 0x{currentNode:X16} not found in topologyModel.OutageTopology dictionary....";
-                        Logger.LogError(message);
-
-                        continue; //or throw? //break
-                    }
-
-                    foreach (long adjNode in topologyElement.SecondEnd)
-                    {
-                        nodesToBeVisited.Push(adjNode);
-                    }
-
-                    if (topologyElement.DmsType != "ENERGYCONSUMER")
-                    {
-                        continue;
-                    }
-
-                    if(networkType == NetworkType.SCADA_NETWORK && !topologyElement.IsActive)
-                    {
-                        affectedConsumers.Add(currentNode);
-                    }
-                    else if (networkType == NetworkType.SCADA_NETWORK && !topologyElement.IsRemote)
-                    {
-                        affectedConsumers.Add(currentNode);
-                    }
-                }
-            }
-
-            return affectedConsumers;
-        }
-
-        private List<Consumer> GetAffectedConsumersFromDatabase(List<long> affectedConsumersIds)
-        {
-            var consumerAccessClient = ConsumerAccessClient.CreateClient();
-            List<Consumer> affectedConsumers = new List<Consumer>();
-
-            foreach (long affectedConsumerId in affectedConsumersIds)
-            {
-                Consumer affectedConsumer = consumerAccessClient.GetConsumer(affectedConsumerId).Result;
-
-                if (affectedConsumer == null)
-                {
-                    break;
-                }
-
-                affectedConsumers.Add(affectedConsumer);
-            }
-
-            return affectedConsumers;
-        }
-
         private async Task OnZeroAffectedConsumersCase(long elementGid, IHistoryDBManagerContract historyDBManagerClient)
         {
             bool isSwitchInvoked = false;
@@ -386,16 +324,16 @@ namespace OMS.OutageLifecycleImplementation.ContractProviders
             {
                 foreach (var pair in outageAffectedPair)
                 {
-                    await historyDBManagerClient.OnConsumerBlackedOut(pair.Value, pair.Key);
-                    await historyDBManagerClient.OnSwitchOpened(elementGid, pair.Key);
+                    //await historyDBManagerClient.OnConsumerBlackedOut(pair.Value, pair.Key);
+                    //await historyDBManagerClient.OnSwitchOpened(elementGid, pair.Key);
                     isSwitchInvoked = true;
                 }
             }
 
-            if (!isSwitchInvoked)
-            {
-                await historyDBManagerClient.OnSwitchOpened(elementGid, null);
-            }
+            //if (!isSwitchInvoked)
+            //{
+            //    await historyDBManagerClient.OnSwitchOpened(elementGid, null);
+            //}
         }
 
         private async Task<bool> CheckPreconditions(long elementGid, CommandOriginType commandOriginType, List<long> affectedConsumersGids, IHistoryDBManagerContract historyDBManagerClient)
@@ -406,12 +344,21 @@ namespace OMS.OutageLifecycleImplementation.ContractProviders
                 return false;
             }
 
-            var enumerableStartedAlgorithms = await StartedIsolationAlgorithms.GetEnumerableDictionaryAsync();
-            var enumerableOptimumIsolationPoints = await OptimumIsolationPoints.GetEnumerableDictionaryAsync();
-
-            if (enumerableStartedAlgorithms.Values.Any(algorithm => algorithm.ElementsCommandedInCurrentCycle.Contains(elementGid)) || enumerableOptimumIsolationPoints.ContainsKey(elementGid))
+            if(await ElementsToBeIgnoredInReportPotentialOutage.ContainsKeyAsync(elementGid))
             {
-                Logger.LogWarning($"{baseLogString} CheckPreconditions => ElementGid 0x{elementGid:X16} found in elements commanded in current isolating algorithm cycle or in optimumIsolationPoints.");
+                Logger.LogWarning($"{baseLogString} CheckPreconditions => ElementGid 0x{elementGid:X16} found in '{ReliableDictionaryNames.ElementsToBeIgnoredInReportPotentialOutage}'.");
+
+                if((await ElementsToBeIgnoredInReportPotentialOutage.TryRemoveAsync(elementGid)).HasValue)
+                {
+                    Logger.LogDebug($"{baseLogString} CheckPreconditions => ElementGid 0x{elementGid:X16} removed form '{ReliableDictionaryNames.ElementsToBeIgnoredInReportPotentialOutage}'");
+                }
+
+                return false;
+            }
+
+            if (await OptimumIsolationPoints.ContainsKeyAsync(elementGid))
+            {
+                Logger.LogWarning($"{baseLogString} CheckPreconditions => ElementGid 0x{elementGid:X16} found in '{ReliableDictionaryNames.OptimumIsolationPoints}'.");
                 return false;
             }
 
@@ -448,7 +395,7 @@ namespace OMS.OutageLifecycleImplementation.ContractProviders
                 return new ConditionalValue<OutageEntity>(false, null);
             }
 
-            List<Consumer> consumerDbEntities = GetAffectedConsumersFromDatabase(affectedConsumersGids);
+            List<Consumer> consumerDbEntities = await lifecycleHelper.GetAffectedConsumersFromDatabase(affectedConsumersGids);
 
             if (consumerDbEntities.Count != affectedConsumersGids.Count)
             {

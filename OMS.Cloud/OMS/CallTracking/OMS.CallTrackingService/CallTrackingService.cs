@@ -36,6 +36,8 @@ namespace OMS.CallTrackingService
 		public CallTrackingService(StatefulServiceContext context)
 			: base(context)
 		{
+			this.logger = CloudLoggerFactory.GetLogger(ServiceEventSource.Current, context);
+
 			this.baseLogString = $"{this.GetType()} [{this.GetHashCode()}] =>{Environment.NewLine}";
 			Logger.LogDebug($"{baseLogString} Ctor => Logger initialized");
 
@@ -45,13 +47,11 @@ namespace OMS.CallTrackingService
 
 				string infoMessage = $"{baseLogString} Ctor => Contract providers initialized.";
 				Logger.LogInformation(infoMessage);
-				ServiceEventSource.Current.ServiceMessage(this.Context, $"[CallTrackingService | Information] {infoMessage}");
 			}
 			catch (Exception e)
 			{
 				string errorMessage = $"{baseLogString} Ctor => Exception caught: {e.Message}.";
 				Logger.LogError(errorMessage, e);
-				ServiceEventSource.Current.ServiceMessage(this.Context, $"[CallTrackingService | Error] {errorMessage}");
 			}
 		}
 
@@ -88,7 +88,6 @@ namespace OMS.CallTrackingService
 				InitializeReliableCollections();
 				string debugMessage = $"{baseLogString} RunAsync => ReliableDictionaries initialized.";
 				Logger.LogDebug(debugMessage);
-				ServiceEventSource.Current.ServiceMessage(this.Context, $"[CallTrackingService | Information] {debugMessage}");
 
 				var registerSubscriberClient = RegisterSubscriberClient.CreateClient();
 				await registerSubscriberClient.SubscribeToTopic(Topic.OUTAGE_EMAIL, MicroserviceNames.OmsCallTrackingService);

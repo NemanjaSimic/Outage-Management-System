@@ -53,6 +53,8 @@ namespace OMS.OutageLifecycleService
 		public OutageLifecycleService(StatefulServiceContext context)
             : base(context)
         {
+            this.logger = CloudLoggerFactory.GetLogger(ServiceEventSource.Current, context);
+
             this.baseLogString = $"{this.GetType()} [{this.GetHashCode()}] =>{Environment.NewLine}";
             Logger.LogDebug($"{baseLogString} Ctor => Logger initialized");
 
@@ -71,13 +73,11 @@ namespace OMS.OutageLifecycleService
 
                 string infoMessage = $"{baseLogString} Ctor => Contract providers initialized.";
                 Logger.LogInformation(infoMessage);
-                ServiceEventSource.Current.ServiceMessage(this.Context, $"[OMS.OutageLifecycleService | Information] {infoMessage}");
             }
             catch (Exception e)
             {
                 string errorMessage = $"{baseLogString} Ctor => Exception caught: {e.Message}.";
                 Logger.LogError(errorMessage, e);
-                ServiceEventSource.Current.ServiceMessage(this.Context, $"[OMS.OutageLifecycleService | Error] {errorMessage}");
             }
         }
 
@@ -310,6 +310,29 @@ namespace OMS.OutageLifecycleService
                         else
                         {
                             await StateManager.GetOrAddAsync<IReliableDictionary<long, long>>(tx, ReliableDictionaryNames.OptimumIsolationPoints);
+                            await tx.CommitAsync();
+                        }
+                    }
+                }),
+
+                Task.Run(async() =>
+                {
+                    using (ITransaction tx = this.StateManager.CreateTransaction())
+                    {
+                        /// <summary>
+                        /// KEY - element gid of optimum isolation point
+                        /// VALUE - element gid of head switch (to identify the corresponding algorithm)
+                        /// </summary>
+                        var result = await StateManager.TryGetAsync<IReliableDictionary<long, DateTime>>(ReliableDictionaryNames.ElementsToBeIgnoredInReportPotentialOutage);
+                        if(result.HasValue)
+                        {
+                            var gidToPointItemMap = result.Value;
+                            await gidToPointItemMap.ClearAsync();
+                            await tx.CommitAsync();
+                        }
+                        else
+                        {
+                            await StateManager.GetOrAddAsync<IReliableDictionary<long, DateTime>>(tx, ReliableDictionaryNames.ElementsToBeIgnoredInReportPotentialOutage);
                             await tx.CommitAsync();
                         }
                     }

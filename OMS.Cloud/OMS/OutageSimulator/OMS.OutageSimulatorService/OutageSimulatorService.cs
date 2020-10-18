@@ -29,7 +29,7 @@ namespace OMS.OutageSimulatorService
     /// </summary>
     internal sealed class OutageSimulatorService : StatefulService
     {
-        private const int commandedValueIntervalUpperLimit = 20_000;
+        private const int commandedValueIntervalUpperLimit = 60_000;
 
         private readonly string baseLogString;
 
@@ -48,6 +48,8 @@ namespace OMS.OutageSimulatorService
         public OutageSimulatorService(StatefulServiceContext context)
             : base(context)
         {
+            this.logger = CloudLoggerFactory.GetLogger(ServiceEventSource.Current, context);
+
             this.baseLogString = $"{this.GetType()} [{this.GetHashCode()}] =>{Environment.NewLine}";
             Logger.LogDebug($"{baseLogString} Ctor => Logger initialized");
 
@@ -63,7 +65,6 @@ namespace OMS.OutageSimulatorService
             {
                 string errorMessage = $"{baseLogString} Ctor => Exception caught: {e.Message}.";
                 Logger.LogError(errorMessage, e);
-                ServiceEventSource.Current.ServiceMessage(this.Context, $"[OMS.OutageSimulatorService | Error] {errorMessage}");
             }
         }
 
@@ -122,20 +123,17 @@ namespace OMS.OutageSimulatorService
                 InitializeReliableCollections();
                 string debugMessage = $"{baseLogString} RunAsync => ReliableDictionaries initialized.";
                 Logger.LogDebug(debugMessage);
-                ServiceEventSource.Current.ServiceMessage(this.Context, $"[OMS.OutageSimulatorService | Information] {debugMessage}");
-
+                
                 var registerSubscriber = RegisterSubscriberClient.CreateClient();
                 await registerSubscriber.SubscribeToTopic(Topic.SWITCH_STATUS, MicroserviceNames.OmsOutageSimulatorService);
 
                 debugMessage = $"{baseLogString} RunAsync => Subscribed to {Topic.SWITCH_STATUS} topic.";
                 Logger.LogDebug(debugMessage);
-                ServiceEventSource.Current.ServiceMessage(this.Context, $"[OMS.OutageSimulatorService | Information] {debugMessage}");
             }
             catch (Exception e)
             {
                 string errorMessage = $"{baseLogString} RunAsync => Exception caught: {e.Message}.";
                 Logger.LogInformation(errorMessage, e);
-                ServiceEventSource.Current.ServiceMessage(this.Context, $"[OMS.OutageSimulatorService | Error] {errorMessage}");
             }
             
             while (true)
@@ -151,7 +149,6 @@ namespace OMS.OutageSimulatorService
                 {
                     string errorMessage = $"{baseLogString} RunAsync (while) => Exception caught: {e.Message}.";
                     Logger.LogInformation(errorMessage, e);
-                    ServiceEventSource.Current.ServiceMessage(this.Context, $"[OMS.OutageSimulatorService | Error] {errorMessage}");
                 }
 
                 await Task.Delay(TimeSpan.FromMilliseconds(2_000), cancellationToken);

@@ -11,7 +11,6 @@ using System.Threading.Tasks;
 namespace OMS.Common.Cloud.ReliableCollectionHelpers
 {
     public sealed class ReliableDictionaryAccess<TKey, TValue> : IReliableDictionary<TKey, TValue>,
-                                                                 //IEnumerable,
                                                                  IDisposable
                                                                  where TKey : IComparable<TKey>, IEquatable<TKey>
     {

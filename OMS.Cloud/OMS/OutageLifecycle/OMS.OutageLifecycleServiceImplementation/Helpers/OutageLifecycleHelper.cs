@@ -72,6 +72,117 @@ namespace OMS.OutageLifecycleImplementation.Helpers
             return nextBreakerId;
         }
         #endregion Breaker Helpers
+        
+        #region Consumer Helpers
+        public List<long> GetAffectedConsumers(long outageGid, OutageTopologyModel topology, NetworkType networkType)
+        {
+            List<long> affectedConsumers = new List<long>();
+            Stack<long> nodesToBeVisited = new Stack<long>();
+            HashSet<long> visited = new HashSet<long>();
+            long startingSwitch = outageGid;
+
+            //TODO: da li nam je ovo potrebno
+            //startingSwitch = CorrectTheStartingSwitch(outageGid, topology, startingSwitch);
+            
+            nodesToBeVisited.Push(startingSwitch);
+
+            while (nodesToBeVisited.Count > 0)
+            {
+                long currentNode = nodesToBeVisited.Pop();
+
+                if (visited.Contains(currentNode))
+                {
+                    continue;
+                }
+
+                visited.Add(currentNode);
+
+                if (!topology.OutageTopology.TryGetValue(currentNode, out OutageTopologyElement topologyElement))
+                {
+                    string message = $"{baseLogString} GetAffectedConsumers => GID: 0x{currentNode:X16} not found in topologyModel.OutageTopology dictionary.";
+                    Logger.LogError(message);
+                    throw new Exception(message);
+                }
+
+                foreach (long adjNode in topologyElement.SecondEnd)
+                {
+                    nodesToBeVisited.Push(adjNode);
+                }
+
+                if (topologyElement.DmsType != "ENERGYCONSUMER")
+                {
+                    continue;
+                }
+
+                if (networkType == NetworkType.SCADA_NETWORK && !topologyElement.IsActive)
+                {
+                    affectedConsumers.Add(currentNode);
+                }
+                else if (networkType == NetworkType.NON_SCADA_NETWORK && !topologyElement.IsRemote)
+                {
+                    affectedConsumers.Add(currentNode);
+                }
+            }
+
+            return affectedConsumers;
+        }
+
+        private long CorrectTheStartingSwitch(long outageGid, OutageTopologyModel topology, long startingSwitch)
+        {
+            if (!topology.OutageTopology.TryGetValue(outageGid, out OutageTopologyElement firstElement))
+            {
+                string message = $"{baseLogString} GetAffectedConsumers => GID: 0x{outageGid:X16} not found in topologyModel.OutageTopology dictionary.";
+                Logger.LogError(message);
+                throw new Exception(message);
+            }
+
+            if (!topology.OutageTopology.TryGetValue(firstElement.FirstEnd, out OutageTopologyElement currentElementAbove))
+            {
+                string message = $"{baseLogString} GetAffectedConsumers => GID: 0x{firstElement.FirstEnd:X16} not found in topologyModel.OutageTopology dictionary.";
+                Logger.LogError(message);
+                throw new Exception(message);
+            }
+
+            //MOVING UP to the top opened switch
+            while (!currentElementAbove.DmsType.Equals("ENERGYSOURCE"))
+            {
+                if (currentElementAbove.IsOpen)
+                {
+                    startingSwitch = currentElementAbove.Id;
+                    break;
+                }
+
+                if (!topology.OutageTopology.TryGetValue(currentElementAbove.FirstEnd, out currentElementAbove))
+                {
+                    string message = $"{baseLogString} GetAffectedConsumers => GID: 0x{currentElementAbove.FirstEnd:X16} not found in topologyModel.OutageTopology dictionary.";
+                    Logger.LogError(message);
+                    throw new Exception(message);
+                }
+            }
+
+            return startingSwitch;
+        }
+
+        public async Task<List<Consumer>> GetAffectedConsumersFromDatabase(List<long> affectedConsumersIds)
+        {
+            var consumerAccessClient = ConsumerAccessClient.CreateClient();
+            var affectedConsumers = new List<Consumer>();
+
+            foreach (long affectedConsumerId in affectedConsumersIds)
+            {
+                var affectedConsumer = await consumerAccessClient.GetConsumer(affectedConsumerId);
+
+                if (affectedConsumer == null)
+                {
+                    break;
+                }
+
+                affectedConsumers.Add(affectedConsumer);
+            }
+
+            return affectedConsumers;
+        }
+        #endregion Consumer Helpers
 
         #region Equipment Helpers
         public async Task<List<Equipment>> GetEquipmentEntityAsync(List<long> equipmentIds)

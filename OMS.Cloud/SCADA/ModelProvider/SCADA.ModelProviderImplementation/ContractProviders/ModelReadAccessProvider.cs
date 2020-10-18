@@ -9,6 +9,7 @@ using OMS.Common.ScadaContracts.ModelProvider;
 using SCADA.ModelProviderImplementation.Helpers;
 using System;
 using System.Collections.Generic;
+using System.Fabric;
 using System.Text;
 using System.Threading.Tasks;
 
@@ -18,8 +19,8 @@ namespace SCADA.ModelProviderImplementation.ContractProviders
     {
         private readonly string baseLogString;
         private readonly IReliableStateManager stateManager;
-        
-        #region Private Properties
+
+        #region Reliable Dictionaries
         private bool isGidToPointItemMapInitialized;
         private bool isAddressToGidMapInitialized;
         private bool isCommandDescriptionCacheInitialized;
@@ -65,7 +66,61 @@ namespace SCADA.ModelProviderImplementation.ContractProviders
         {
             get { return infoCache; }
         }
-        #endregion Properties
+
+        private async void OnStateManagerChangedHandler(object sender, NotifyStateManagerChangedEventArgs eventArgs)
+        {
+            try
+            {
+                await InitializeReliableCollections(eventArgs);
+            }
+            catch (FabricNotPrimaryException)
+            {
+                Logger.LogDebug($"{baseLogString} OnStateManagerChangedHandler => NotPrimaryException. To be ignored.");
+            }
+        }
+
+        private async Task InitializeReliableCollections(NotifyStateManagerChangedEventArgs e)
+        {
+            if (e.Action == NotifyStateManagerChangedAction.Add)
+            {
+                var operation = e as NotifyStateManagerSingleEntityChangedEventArgs;
+                string reliableStateName = operation.ReliableState.Name.AbsolutePath;
+
+                if (reliableStateName == ReliableDictionaryNames.GidToPointItemMap)
+                {
+                    gidToPointItemMap = await ReliableDictionaryAccess<long, IScadaModelPointItem>.Create(stateManager, ReliableDictionaryNames.GidToPointItemMap);
+                    isGidToPointItemMapInitialized = true;
+
+                    string debugMessage = $"{baseLogString} OnStateManagerChangedHandler => '{ReliableDictionaryNames.GidToPointItemMap}' ReliableDictionaryAccess initialized.";
+                    Logger.LogDebug(debugMessage);
+                }
+                else if (reliableStateName == ReliableDictionaryNames.AddressToGidMap)
+                {
+                    addressToGidMap = await ReliableDictionaryAccess<short, Dictionary<ushort, long>>.Create(stateManager, ReliableDictionaryNames.AddressToGidMap);
+                    isAddressToGidMapInitialized = true;
+
+                    string debugMessage = $"{baseLogString} OnStateManagerChangedHandler => '{ReliableDictionaryNames.AddressToGidMap}' ReliableDictionaryAccess initialized.";
+                    Logger.LogDebug(debugMessage);
+                }
+                else if (reliableStateName == ReliableDictionaryNames.CommandDescriptionCache)
+                {
+                    commandDescriptionCache = await ReliableDictionaryAccess<long, CommandDescription>.Create(stateManager, ReliableDictionaryNames.CommandDescriptionCache);
+                    isCommandDescriptionCacheInitialized = true;
+
+                    string debugMessage = $"{baseLogString} OnStateManagerChangedHandler => '{ReliableDictionaryNames.CommandDescriptionCache}' ReliableDictionaryAccess initialized.";
+                    Logger.LogDebug(debugMessage);
+                }
+                else if (reliableStateName == ReliableDictionaryNames.InfoCache)
+                {
+                    infoCache = await ReliableDictionaryAccess<string, bool>.Create(stateManager, ReliableDictionaryNames.InfoCache);
+                    isInfoCacheInitialized = true;
+
+                    string debugMessage = $"{baseLogString} OnStateManagerChangedHandler => '{ReliableDictionaryNames.InfoCache}' ReliableDictionaryAccess initialized.";
+                    Logger.LogDebug(debugMessage);
+                }
+            }
+        }
+        #endregion Reliable Dictionaries
 
         public ModelReadAccessProvider(IReliableStateManager stateManager)
         {
@@ -78,52 +133,6 @@ namespace SCADA.ModelProviderImplementation.ContractProviders
             
             this.stateManager = stateManager;
             this.stateManager.StateManagerChanged += this.OnStateManagerChangedHandler;
-        }
-
-        private async void OnStateManagerChangedHandler(object sender, NotifyStateManagerChangedEventArgs e)
-        {
-            if (e.Action == NotifyStateManagerChangedAction.Add)
-            {
-                var operation = e as NotifyStateManagerSingleEntityChangedEventArgs;
-                string reliableStateName = operation.ReliableState.Name.AbsolutePath;
-
-                if (reliableStateName == ReliableDictionaryNames.GidToPointItemMap)
-                {
-                    //_ = GidToPointItemMap;
-                    gidToPointItemMap = await ReliableDictionaryAccess<long, IScadaModelPointItem>.Create(stateManager, ReliableDictionaryNames.GidToPointItemMap);
-                    isGidToPointItemMapInitialized = true;
-
-                    string debugMessage = $"{baseLogString} OnStateManagerChangedHandler => '{ReliableDictionaryNames.GidToPointItemMap}' ReliableDictionaryAccess initialized.";
-                    Logger.LogDebug(debugMessage);
-                }
-                else if (reliableStateName == ReliableDictionaryNames.AddressToGidMap)
-                {
-                    //_ = AddressToGidMap;
-                    addressToGidMap = await ReliableDictionaryAccess<short, Dictionary<ushort, long>>.Create(stateManager, ReliableDictionaryNames.AddressToGidMap);
-                    isAddressToGidMapInitialized = true;
-
-                    string debugMessage = $"{baseLogString} OnStateManagerChangedHandler => '{ReliableDictionaryNames.AddressToGidMap}' ReliableDictionaryAccess initialized.";
-                    Logger.LogDebug(debugMessage);
-                }
-                else if (reliableStateName == ReliableDictionaryNames.CommandDescriptionCache)
-                {
-                    //_ = CommandDescriptionCache;
-                    commandDescriptionCache = await ReliableDictionaryAccess<long, CommandDescription>.Create(stateManager, ReliableDictionaryNames.CommandDescriptionCache);
-                    isCommandDescriptionCacheInitialized = true;
-
-                    string debugMessage = $"{baseLogString} OnStateManagerChangedHandler => '{ReliableDictionaryNames.CommandDescriptionCache}' ReliableDictionaryAccess initialized.";
-                    Logger.LogDebug(debugMessage);
-                }
-                else if (reliableStateName == ReliableDictionaryNames.InfoCache)
-                {
-                    //_ = InfoCache;
-                    infoCache = await ReliableDictionaryAccess<string, bool>.Create(stateManager, ReliableDictionaryNames.InfoCache);
-                    isInfoCacheInitialized = true;
-
-                    string debugMessage = $"{baseLogString} OnStateManagerChangedHandler => '{ReliableDictionaryNames.InfoCache}' ReliableDictionaryAccess initialized.";
-                    Logger.LogDebug(debugMessage);
-                }
-            }
         }
 
         #region IScadaModelReadAccessContract

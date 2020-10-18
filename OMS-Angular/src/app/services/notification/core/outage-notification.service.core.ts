@@ -22,6 +22,13 @@ export class OutageNotificationCoreService {
       this.hubConnection = new signalR.HubConnectionBuilder()
                               .withUrl(`${environment.serverUrl}/${this.hubName}`)
                               .build();
+                              
+     this.hubConnection.serverTimeoutInMilliseconds = 1000 * 1800;
+      
+      this.hubConnection.onclose((err) => { 
+        console.log('Disconnected from outage: ' + err)
+        this.startConnection();
+      })    
    
       this.hubConnection
         .start()

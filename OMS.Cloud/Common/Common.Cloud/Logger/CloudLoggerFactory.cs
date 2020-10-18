@@ -1,6 +1,7 @@
 ﻿using OMS.Common.Cloud.Names;
 using System.Collections.Generic;
 using System.Configuration;
+using System.Fabric;
 using System.Linq;
 using System.Reflection;
 
@@ -20,7 +21,7 @@ namespace OMS.Common.Cloud.Logger
             }
         }
 
-        public static ICloudLogger GetLogger(string sourceName = null)
+        public static ICloudLogger GetLogger(IServiceEventTracing serviceEventTracing = null, ServiceContext context = null, string sourceName = null)
         {
             sourceName = ResolveSourceName(sourceName);
 
@@ -30,8 +31,19 @@ namespace OMS.Common.Cloud.Logger
                 {
                     if (!Loggers.ContainsKey(sourceName))
                     {
-                        var logger = new CloudLogger(sourceName);
+                        var logger = new CloudLogger(serviceEventTracing, context, sourceName);
                         Loggers.Add(sourceName, logger);
+                    }
+                }
+            }
+            else if(serviceEventTracing != null && context != null)
+            {
+                lock(lockSync)
+                {
+                    if(Loggers.ContainsKey(sourceName))
+                    {
+                        Loggers[sourceName].SetServiceEventTracing(serviceEventTracing);
+                        Loggers[sourceName].SetServiceContext(context);
                     }
                 }
             }

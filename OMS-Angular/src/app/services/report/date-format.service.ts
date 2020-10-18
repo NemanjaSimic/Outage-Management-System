@@ -12,7 +12,7 @@ export class DateFormatService {
   private dateFormatMap: DateFormatMap = {
     [DateType.Yearly]: "YYYY",
     [DateType.Monthly]: "MM/YYYY",
-    [DateType.Daily]: "DD/MM/YYYY",
+    [DateType.Daily]: "MM/DD/YYYY",
   }
 
   private format;
