@@ -33,7 +33,7 @@
 		<cim:IdentifiedObject.description>SynchronousMachine1</cim:IdentifiedObject.description>
 		<cim:IdentifiedObject.mRID>SM_1</cim:IdentifiedObject.mRID>
 		<ftn:IdentifiedObject.name>SM_1</ftn:IdentifiedObject.name>
-		<cim:SynchronousMachine.capacity>1100</cim:SynchronousMachine.capacity>
+		<cim:SynchronousMachine.capacity>33000</cim:SynchronousMachine.capacity>
 		<cim:SynchronousMachine.currentRegime>0</cim:SynchronousMachine.currentRegime>
 	</cim:SynchronousMachine>
 	<cim:SynchronousMachine rdf:ID="SM_2">
@@ -42,7 +42,7 @@
 		<cim:IdentifiedObject.description>SynchronousMachine2</cim:IdentifiedObject.description>
 		<cim:IdentifiedObject.mRID>SM_2</cim:IdentifiedObject.mRID>
 		<ftn:IdentifiedObject.name>SM_2</ftn:IdentifiedObject.name>
-		<cim:SynchronousMachine.capacity>1100</cim:SynchronousMachine.capacity>
+		<cim:SynchronousMachine.capacity>33000</cim:SynchronousMachine.capacity>
 		<cim:SynchronousMachine.currentRegime>0</cim:SynchronousMachine.currentRegime>
 	</cim:SynchronousMachine>
 	
